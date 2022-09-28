@@ -203,7 +203,6 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         POSEntrySaleLine: Record "NPR POS Entry Sales Line";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
-        exit; //TODO: [Test result: FAIL] Fixing in progress
         //TODO: At the moment, item posting is never compressed. This appears to be a design choice.
 
         // [Given] Completed but unposted sales with one of the sales invalid for posting.
@@ -240,7 +239,6 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         POSEntrySaleLine: Record "NPR POS Entry Sales Line";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
-        exit; //TODO: [Test result: FAIL] Fixing in progress
         // [Given] Completed POS sales where one of them cannot post for whatever reason.
         InitializeData(POSPostingProfile."Posting Compression"::"Per POS Period");
         CreateSales(3);
@@ -274,7 +272,6 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         POSEntrySaleLine: Record "NPR POS Entry Sales Line";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
-        exit; //TODO: [Test result: FAIL] Fixing in progress
         //TODO: The behaviour this test shows is that: The other entries in the same period register are left unposted when there is an error in one of them, EVEN when compression is set to POS Entry level. This might be a bug but a low impact one.
 
         // [Given] Completed POS sales where one of them cannot post for whatever reason.
@@ -358,9 +355,9 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, POSPostingProfile.Code);
         NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
         NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod, _POSPaymentMethod."Processing Type"::CASH, '', false);
-        
+
         DeletePostedEntries();
-        
+
         _Initialized := true;
 
         Commit();
@@ -383,5 +380,5 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         VATEntry.DeleteAll();
         GLEntry.DeleteAll();
         GLVATEntryLink.DeleteAll();
-    end;    
+    end;
 }

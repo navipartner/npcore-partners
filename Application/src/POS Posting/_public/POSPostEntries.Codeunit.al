@@ -41,12 +41,6 @@
 
     local procedure "Code"(var POSEntry: Record "NPR POS Entry")
     var
-        TempPOSPostingBuffer: Record "NPR POS Posting Buffer" temporary;
-        TempPOSSalesLineToPost: Record "NPR POS Entry Sales Line" temporary;
-        TempPOSPaymentLinetoPost: Record "NPR POS Entry Payment Line" temporary;
-        TempGenJournalLine: Record "Gen. Journal Line" temporary;
-        TempPOSEntry: Record "NPR POS Entry" temporary;
-        POSSalesTax: codeunit "NPR POS Sales Tax";
     begin
 
         if ((not PostItemEntriesVar) and (not PostPOSEntriesVar)) or POSEntry.IsEmpty then
@@ -71,53 +65,14 @@
         end;
 
         if PostPOSEntriesVar then begin
-            //POS Entries must belong to the same POS Legder Register Entry
+            //POS Entries must belong to the same POS Ledger Register Entry
             POSPostingLogEntryNo := CreatePOSPostingLogEntry(POSEntry, 0);
-
             Commit();
-
             Clear(_GLPostingErrorEntries);
-
-            CreateTempRecordsToPost(POSEntry, TempPOSSalesLineToPost, TempPOSPaymentLinetoPost);
-            IsSalesTaxEnabled := POSSalesTax.NALocalizationEnabled() or POSSalesTax.SalesTaxEnabled(POSEntry."Entry No.");
-            if not IsSalesTaxEnabled then
-                CreatePostingBufferLinesFromPOSSalesLines(TempPOSSalesLineToPost, TempPOSPostingBuffer)
-            else
-                POSSalesTax.CreatePostingBufferLinesFromPOSSalesLines(TempPOSSalesLineToPost, TempPOSPostingBuffer, POSEntry);
-
-            CreatePostingBufferLinesFromPOSSPaymentLines(TempPOSPaymentLinetoPost, TempPOSPostingBuffer);
-
-            if ((not TempPOSPaymentLinetoPost.IsEmpty) or (not TempPOSSalesLineToPost.IsEmpty)) and (TempPOSPostingBuffer.IsEmpty) then
-                Error(TextErrorBufferLinesnotmade, TempPOSPostingBuffer.TableCaption);
-
-            CreateGenJnlLinesFromPOSPostingBuffer(TempPOSPostingBuffer, TempGenJournalLine);
-
-            if IsSalesTaxEnabled then
-                POSSalesTax.CreateGenJournalLinesFromSalesTax(TempPOSPostingBuffer, TempGenJournalLine, POSEntry, LineNumber);
-
-            if (not TempPOSPostingBuffer.IsEmpty) and (TempGenJournalLine.IsEmpty) then
-                Error(TextErrorGJLinesnotmade, TempGenJournalLine.TableCaption);
-
-            CreateGenJnlLinesFromPOSBalancingLines(POSEntry, TempGenJournalLine);
-
-            if StopOnErrorVar then begin
-                CheckandPostGenJournal(TempGenJournalLine, POSEntry, TempPOSEntry);
-                UpdatePOSPostingLogEntry(POSPostingLogEntryNo, false);
-                MarkPOSEntries(0, POSPostingLogEntryNo, POSEntry, TempPOSEntry);
-            end else begin
-                Commit();
-                if not CheckandPostGenJournal(TempGenJournalLine, POSEntry, TempPOSEntry) then begin
-                    UpdatePOSPostingLogEntry(POSPostingLogEntryNo, true);
-                    MarkPOSEntries(1, POSPostingLogEntryNo, POSEntry, TempPOSEntry);
-                end else begin
-                    UpdatePOSPostingLogEntry(POSPostingLogEntryNo, false);
-                    MarkPOSEntries(0, POSPostingLogEntryNo, POSEntry, TempPOSEntry);
-                end;
-
-            end;
+            PostPOSEntries(POSEntry);
         end;
 
-        if POSEntry.FindSet() then
+        if POSEntry.FindSet(true, true) then
             repeat
                 OnAfterPostPOSEntry(POSEntry, false);
             until POSEntry.Next() = 0;
@@ -126,6 +81,47 @@
 
         if ShowProgressDialog then
             ProgressWindow.Close();
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    local procedure PostPOSEntries(var POSEntry: Record "NPR POS Entry")
+    var
+        TempPOSPostingBuffer: Record "NPR POS Posting Buffer" temporary;
+        TempPOSSalesLineToPost: Record "NPR POS Entry Sales Line" temporary;
+        TempPOSPaymentLinetoPost: Record "NPR POS Entry Payment Line" temporary;
+        TempGenJournalLine: Record "Gen. Journal Line" temporary;
+        TempPOSEntry: Record "NPR POS Entry" temporary;
+        POSSalesTax: codeunit "NPR POS Sales Tax";
+    begin
+        CreateTempRecordsToPost(POSEntry, TempPOSSalesLineToPost, TempPOSPaymentLinetoPost);
+        IsSalesTaxEnabled := POSSalesTax.NALocalizationEnabled() or POSSalesTax.SalesTaxEnabled(POSEntry."Entry No.");
+        if not IsSalesTaxEnabled then
+            CreatePostingBufferLinesFromPOSSalesLines(TempPOSSalesLineToPost, TempPOSPostingBuffer)
+        else
+            POSSalesTax.CreatePostingBufferLinesFromPOSSalesLines(TempPOSSalesLineToPost, TempPOSPostingBuffer, POSEntry);
+
+        CreatePostingBufferLinesFromPOSSPaymentLines(TempPOSPaymentLinetoPost, TempPOSPostingBuffer);
+
+        if ((not TempPOSPaymentLinetoPost.IsEmpty) or (not TempPOSSalesLineToPost.IsEmpty)) and (TempPOSPostingBuffer.IsEmpty) then
+            Error(TextErrorBufferLinesnotmade, TempPOSPostingBuffer.TableCaption);
+
+        CreateGenJnlLinesFromPOSPostingBuffer(TempPOSPostingBuffer, TempGenJournalLine);
+
+        if IsSalesTaxEnabled then
+            POSSalesTax.CreateGenJournalLinesFromSalesTax(TempPOSPostingBuffer, TempGenJournalLine, POSEntry, LineNumber);
+
+        if (not TempPOSPostingBuffer.IsEmpty) and (TempGenJournalLine.IsEmpty) then
+            Error(TextErrorGJLinesnotmade, TempGenJournalLine.TableCaption);
+
+        CreateGenJnlLinesFromPOSBalancingLines(POSEntry, TempGenJournalLine);
+
+        if (not CheckAndPostGenJournal(TempGenJournalLine, POSEntry, TempPOSEntry)) then begin
+            UpdatePOSPostingLogEntry(POSPostingLogEntryNo, false);
+            MarkPOSEntries(1, POSPostingLogEntryNo, POSEntry, TempPOSEntry);
+        end else begin
+            UpdatePOSPostingLogEntry(POSPostingLogEntryNo, false);
+            MarkPOSEntries(0, POSPostingLogEntryNo, POSEntry, TempPOSEntry);
+        end;
     end;
 
     internal procedure PostRangePerPOSEntry(var POSEntry: Record "NPR POS Entry")
@@ -191,7 +187,7 @@
             ProgressWindow.Update(2, NoOfRecords);
         end;
 
-        if POSEntry.FindSet() then
+        if POSEntry.FindSet(true, true) then
             repeat
                 if ShowProgressDialog then begin
                     LineCount := LineCount + 1;
@@ -300,16 +296,16 @@
                                                     end;
                                                 end;
                                             else begin
-                                                    MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
-                                                       POSPostingBuffer.Amount,
-                                                       POSPostingBuffer."Amount (LCY)",
-                                                       GenJournalLine."Gen. Posting Type"::Sale,
-                                                       GenJournalLine."Account Type"::"G/L Account",
-                                                       GeneralPostingSetup."Sales Account",
-                                                       POSPostingBuffer."VAT Amount",
-                                                       POSPostingBuffer."VAT Amount (LCY)",
-                                                       GenJournalLine);
-                                                end;
+                                                MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
+                                                   POSPostingBuffer.Amount,
+                                                   POSPostingBuffer."Amount (LCY)",
+                                                   GenJournalLine."Gen. Posting Type"::Sale,
+                                                   GenJournalLine."Account Type"::"G/L Account",
+                                                   GeneralPostingSetup."Sales Account",
+                                                   POSPostingBuffer."VAT Amount",
+                                                   POSPostingBuffer."VAT Amount (LCY)",
+                                                   GenJournalLine);
+                                            end;
                                         end;
                                     end;
                                 POSPostingBuffer.Type::"G/L Account":
@@ -381,16 +377,16 @@
                                                         end;
                                                     end;
                                                 else begin
-                                                        MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
-                                                            POSPostingBuffer.Amount,
-                                                            POSPostingBuffer."Amount (LCY)",
-                                                            GenJournalLine."Gen. Posting Type"::Sale,
-                                                            GenJournalLine."Account Type"::"G/L Account",
-                                                            POSPostingBuffer."No.",
-                                                            POSPostingBuffer."VAT Amount",
-                                                            POSPostingBuffer."VAT Amount (LCY)",
-                                                            GenJournalLine);
-                                                    end;
+                                                    MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
+                                                        POSPostingBuffer.Amount,
+                                                        POSPostingBuffer."Amount (LCY)",
+                                                        GenJournalLine."Gen. Posting Type"::Sale,
+                                                        GenJournalLine."Account Type"::"G/L Account",
+                                                        POSPostingBuffer."No.",
+                                                        POSPostingBuffer."VAT Amount",
+                                                        POSPostingBuffer."VAT Amount (LCY)",
+                                                        GenJournalLine);
+                                                end;
                                             end
                                         end;
                                     end;
@@ -502,7 +498,7 @@
                             TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                     POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No.",
                                     POSBalancingLine."Balanced Diff. Amount", POSBalancingLine.Description, GenJournalLine);
-                            
+
                             OnAfterMakeGenJournalForBalancedDifference(POSBalancingLine, GenJournalLine);
                         end;
                         if POSBalancingLine."Balanced Diff. Amount" < 0 then begin
@@ -556,7 +552,7 @@
                             TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                         POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetup), POSPostingSetup."Account No.",
                                         POSBalancingLine."New Float Amount", StrSubstNo(TextClosingEntryFloat, POSEntry."Entry No."), GenJournalLine);
-                        
+
                             OnAfterMakeGenJournalForNewFloatAmount(POSBalancingLine, GenJournalLine);
                         end;
                         AmountToPostToAccount := AmountToPostToAccount - POSBalancingLine."New Float Amount";
@@ -646,27 +642,34 @@
         ErrorText := '';
     end;
 
-    local procedure CheckandPostGenJournal(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry"): Boolean
-    var
-        GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
+    local procedure CheckAndPostGenJournal(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry"): Boolean
     begin
         GenJournalLine.Reset();
         GenJournalLine.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
-        if not StopOnErrorVar then begin
-            if GenJournalLine.FindSet() then begin
-                repeat
-                    if not GenJnlCheckLine.Run(GenJournalLine) then begin
-                        ErrorText := GetLastErrorText;
-                        exit(false);
-                    end;
-                until GenJournalLine.Next() = 0;
+        if (not GenJournalLine.FindSet()) then
+            exit(false);
+
+        repeat
+            if (not TryCheckJournalLine(GenJournalLine)) then begin
+                if (StopOnErrorVar) then
+                    Error(GetLastErrorText());
+                exit(false);
             end;
-        end;
+        until GenJournalLine.Next() = 0;
+
         if not CheckOrPostGenJnlPerDocument(GenJournalLine, POSEntry, POSEntryWithError, 0) then
             exit(false);
         if not CheckOrPostGenJnlPerDocument(GenJournalLine, POSEntry, POSEntryWithError, 1) then
             exit(false);
         exit(true);
+    end;
+
+    [TryFunction]
+    local procedure TryCheckJournalLine(var GenJournalLine: Record "Gen. Journal Line")
+    var
+        GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
+    begin
+        GenJnlCheckLine.RunCheck(GenJournalLine);
     end;
 
     local procedure CheckOrPostGenJnlPerDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry"; Action: Option Check,Post) Success: Boolean
@@ -710,21 +713,21 @@
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         DifferenceAmount := CalculateDifferenceAmount(GenJournalLine);
-        if ABS(DifferenceAmount) > 0 then begin
+        if Abs(DifferenceAmount) > 0 then begin
             GetPOSPostingProfile(POSEntry, POSPostingProfile);
-            if ABS(DifferenceAmount) > POSPostingProfile."Max. POS Posting Diff. (LCY)" then begin
+            if Abs(DifferenceAmount) > POSPostingProfile."Max. POS Posting Diff. (LCY)" then begin
                 POSPostingProfile.TestField("POS Posting Diff. Account");
                 ErrorText := StrSubstNo(TextImbalance, GenJournalLine.FieldCaption("Document No."), GenJournalLine."Document No.", GenJournalLine.FieldCaption("Posting Date"), GenJournalLine."Posting Date", DifferenceAmount);
-                if StopOnErrorVar then
-                    Error(ErrorText)
-                else
-                    exit(FALSE);
+                if (StopOnErrorVar) then
+                    Error(ErrorText);
+                exit(false);
             end;
         end;
         exit(true);
     end;
 
     local procedure PostGenJournalDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"): Boolean
+
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         TempPOSPostingProfile: Record "NPR POS Posting Profile" temporary;
@@ -1279,7 +1282,7 @@
         ProceedWithUpdate: Boolean;
         POSPeriodRegister: Record "NPR POS Period Register";
     begin
-        if POSEntry.FindSet() then
+        if POSEntry.FindSet(true) then
             repeat
                 if (POSEntry."Post Entry Status" in [POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting"]) then begin
                     case OptStatus of
@@ -1612,6 +1615,7 @@
     begin
     end;
 
+    [CommitBehavior(CommitBehavior::Error)]
     [IntegrationEvent(false, false)]
     local procedure OnAfterPostPOSEntry(var POSEntry: Record "NPR POS Entry"; PreviewMode: Boolean)
     begin
@@ -1627,6 +1631,7 @@
     begin
     end;
 
+    [CommitBehavior(CommitBehavior::Error)]
     [IntegrationEvent(false, false)]
     local procedure OnAfterPostPOSEntryBatch(var POSEntry: Record "NPR POS Entry"; PreviewMode: Boolean)
     begin
