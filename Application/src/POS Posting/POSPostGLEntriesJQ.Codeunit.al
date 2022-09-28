@@ -10,8 +10,11 @@ codeunit 6014699 "NPR POS Post GL Entries JQ"
         Hashset: Codeunit "NPR HashSet of [Integer]";
         ErrorCount: Integer;
         ErrMessage: Label '%1 POS entries failed to post.';
+        DetailedMessage: TextBuilder;
         ErrorEntries: List of [Integer];
         SkipPeriodRegisterGroup: Boolean;
+        ErrorTextDictionary: Dictionary of [Integer, Text];
+        Period: Integer;
     begin
         POSPostEntries.SetPostCompressed(true);
         POSPostEntries.SetStopOnError(false);
@@ -31,8 +34,10 @@ codeunit 6014699 "NPR POS Post GL Entries JQ"
                     Clear(POSEntry2);
                     POSEntry2.SetCurrentKey("POS Period Register No.");
                     POSEntry2.SetFilter("POS Period Register No.", '=%1', POSEntry."POS Period Register No.");
-                    POSPostEntries.Run(POSEntry2);
+                    if (not POSPostEntries.Run(POSEntry2)) then
+                        ErrorTextDictionary.Add(POSEntry."POS Period Register No.", GetLastErrorText());
                     Commit();
+
                     POSPostEntries.GetGLPostingErrorEntries(ErrorEntries);
                     ErrorCount += ErrorEntries.Count();
                 end;
@@ -42,5 +47,14 @@ codeunit 6014699 "NPR POS Post GL Entries JQ"
 
         if ErrorCount > 0 then
             Message(ErrMessage, ErrorCount);
+
+        if (ErrorTextDictionary.Count() > 0) then begin
+            Commit();
+            foreach Period in ErrorTextDictionary.Keys() do begin
+                DetailedMessage.AppendLine(StrSubstNo('Period %1 - %2', Period, ErrorTextDictionary.Get(Period)));
+            end;
+            Error(DetailedMessage.ToText());
+        end;
+
     end;
 }
