@@ -47,6 +47,12 @@
             Editable = false;
             FieldClass = FlowField;
         }
+
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -55,6 +61,9 @@
         {
         }
         key(Key2; "Category Id")
+        {
+        }
+        key(Key3; "Replication Counter")
         {
         }
     }

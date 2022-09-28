@@ -70,6 +70,7 @@
                 InStr: InStream;
             begin
                 TempBlob.CreateOutStream(OutStr);
+                Rec.CalcFields("Long Value");
                 Rec."Long Value".CreateInStream(InStr);
                 CopyStream(OutStr, InStr);
                 if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
@@ -98,11 +99,19 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
         key(Key1; "Attribute ID", "Item No.", "Variant Code", "Attribute Label Line No.")
+        {
+        }
+        key(key2; "Replication Counter")
         {
         }
     }

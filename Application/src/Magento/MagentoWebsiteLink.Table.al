@@ -32,11 +32,19 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
         key(Key1; "Website Code", "Item No.", "Variant Code")
+        {
+        }
+        key(Key2; "Replication Counter")
         {
         }
     }

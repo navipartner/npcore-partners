@@ -750,6 +750,680 @@
         end;
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Website", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoWebsite(var Rec: Record "NPR Magento Website"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Website", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoWebsite(var Rec: Record "NPR Magento Website"; var xRec: Record "NPR Magento Website"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Website", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoWebsite(var Rec: Record "NPR Magento Website"; var xRec: Record "NPR Magento Website"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Website Link", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoWebsiteLink(var Rec: Record "NPR Magento Website Link"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Website Link", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoWebsiteLink(var Rec: Record "NPR Magento Website Link"; var xRec: Record "NPR Magento Website Link"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Website Link", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoWebsiteLink(var Rec: Record "NPR Magento Website Link"; var xRec: Record "NPR Magento Website Link"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Store", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoStore(var Rec: Record "NPR Magento Store"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Store", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoStore(var Rec: Record "NPR Magento Store"; var xRec: Record "NPR Magento Store"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Store", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoStore(var Rec: Record "NPR Magento Store"; var xRec: Record "NPR Magento Store"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Picture", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoPicture(var Rec: Record "NPR Magento Picture"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Picture", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoPicture(var Rec: Record "NPR Magento Picture"; var xRec: Record "NPR Magento Picture"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Picture", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoPicture(var Rec: Record "NPR Magento Picture"; var xRec: Record "NPR Magento Picture"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Picture Link", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoPictureLink(var Rec: Record "NPR Magento Picture Link"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Picture Link", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoPictureLink(var Rec: Record "NPR Magento Picture Link"; var xRec: Record "NPR Magento Picture Link"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Picture Link", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoPictureLink(var Rec: Record "NPR Magento Picture Link"; var xRec: Record "NPR Magento Picture Link"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Category", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoCategory(var Rec: Record "NPR Magento Category"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Category", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoCategory(var Rec: Record "NPR Magento Category"; var xRec: Record "NPR Magento Category"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Category", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoCategory(var Rec: Record "NPR Magento Category"; var xRec: Record "NPR Magento Category"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Category Link", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoCategoryLink(var Rec: Record "NPR Magento Category Link"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Category Link", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoCategoryLink(var Rec: Record "NPR Magento Category Link"; var xRec: Record "NPR Magento Category Link"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Category Link", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoCategoryLink(var Rec: Record "NPR Magento Category Link"; var xRec: Record "NPR Magento Category Link"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Brand", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoBrand(var Rec: Record "NPR Magento Brand"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Brand", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoBrand(var Rec: Record "NPR Magento Brand"; var xRec: Record "NPR Magento Brand"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Brand", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoBrand(var Rec: Record "NPR Magento Brand"; var xRec: Record "NPR Magento Brand"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Attribute", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoAttribute(var Rec: Record "NPR Magento Attribute"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Attribute", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoAttribute(var Rec: Record "NPR Magento Attribute"; var xRec: Record "NPR Magento Attribute"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Attribute", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoAttribute(var Rec: Record "NPR Magento Attribute"; var xRec: Record "NPR Magento Attribute"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Attr. Label", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoAttributeLabel(var Rec: Record "NPR Magento Attr. Label"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Attr. Label", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoAttributeLabel(var Rec: Record "NPR Magento Attr. Label"; var xRec: Record "NPR Magento Attr. Label"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Attr. Label", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoAttributeLabel(var Rec: Record "NPR Magento Attr. Label"; var xRec: Record "NPR Magento Attr. Label"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Attribute Set", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoAttributeSet(var Rec: Record "NPR Magento Attribute Set"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Attribute Set", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoAttributeSet(var Rec: Record "NPR Magento Attribute Set"; var xRec: Record "NPR Magento Attribute Set"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Attribute Set", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoAttributeSet(var Rec: Record "NPR Magento Attribute Set"; var xRec: Record "NPR Magento Attribute Set"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Attr. Set Value", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoAttributeSetVal(var Rec: Record "NPR Magento Attr. Set Value"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Attr. Set Value", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoAttributeSetVal(var Rec: Record "NPR Magento Attr. Set Value"; var xRec: Record "NPR Magento Attr. Set Value"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Attr. Set Value", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoAttributeSetVal(var Rec: Record "NPR Magento Attr. Set Value"; var xRec: Record "NPR Magento Attr. Set Value"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Item Attr.", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoItemAttribute(var Rec: Record "NPR Magento Item Attr."; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Item Attr.", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoItemAttribute(var Rec: Record "NPR Magento Item Attr."; var xRec: Record "NPR Magento Item Attr."; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Item Attr.", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoItemAttribute(var Rec: Record "NPR Magento Item Attr."; var xRec: Record "NPR Magento Item Attr."; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Item Attr. Value", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoItemAttributeVal(var Rec: Record "NPR Magento Item Attr. Value"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Item Attr. Value", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoItemAttributeVal(var Rec: Record "NPR Magento Item Attr. Value"; var xRec: Record "NPR Magento Item Attr. Value"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Item Attr. Value", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoItemAttributeVal(var Rec: Record "NPR Magento Item Attr. Value"; var xRec: Record "NPR Magento Item Attr. Value"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Display Group", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoDisplayGroup(var Rec: Record "NPR Magento Display Group"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Display Group", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoDisplayGroup(var Rec: Record "NPR Magento Display Group"; var xRec: Record "NPR Magento Display Group"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Display Group", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoDisplayGroup(var Rec: Record "NPR Magento Display Group"; var xRec: Record "NPR Magento Display Group"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
     #endregion
 
     #region TableExtensions
@@ -1965,6 +2639,141 @@
             AuxGLAcc."No." := xRec."No.";
             AuxGLAcc.Insert();
         end; // modify/rename not needed because it is handled in codeuninit 6014460 "NPR Aux. Tables Event Subs." function --> GLAccountOnAfterRename 
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Translation", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertItemTranslation(var Rec: Record "Item Translation"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Translation", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyItemTranslation(var Rec: Record "Item Translation"; var xRec: Record "Item Translation"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Translation", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameItemTranslation(var Rec: Record "Item Translation"; var xRec: Record "Item Translation"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Substitution", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertItemSubstitution(var Rec: Record "Item Substitution"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Substitution", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyItemSubstitution(var Rec: Record "Item Substitution"; var xRec: Record "Item Substitution"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Substitution", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameItemSubstitution(var Rec: Record "Item Substitution"; var xRec: Record "Item Substitution"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Manufacturer", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertManufacturer(var Rec: Record "Manufacturer"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Manufacturer", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyManufacturer(var Rec: Record "Manufacturer"; var xRec: Record "Manufacturer"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Manufacturer", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameManufacturer(var Rec: Record "Manufacturer"; var xRec: Record "Manufacturer"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
     end;
     #endregion
 
