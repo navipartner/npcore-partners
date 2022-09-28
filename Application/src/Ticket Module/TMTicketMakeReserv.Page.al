@@ -133,12 +133,14 @@
 
                         if (Rec.Quantity < 1) then
                             Error(QTY_MUST_BE_GT_ZERO);
-                        if CustomisableTicket() then
+
+                        if CustomizableTicket() then
                             Error(OptionalErr);
 
-                        if (xRec.Quantity <> Rec.Quantity) then
+                        if (xRec.Quantity <> Rec.Quantity) then begin
                             ChangeQuantity(Rec.Quantity);
-                        //CurrPage.Update(false);
+                        end;
+
                     end;
                 }
                 field("Admission Inclusion"; Rec."Admission Inclusion")
@@ -815,6 +817,9 @@
             TicketRequestManager.ConfirmChangeRequest(Rec."Session Token ID");
         end;
 
+        if (gAllowQuantityChange and gQuantityChanged) then
+            ChangeTourTicketQuantity(Rec);
+
         exit(0);
     end;
 
@@ -986,12 +991,45 @@
         exit(StrSubstNo(DateTimeLbl, Today(), Time()));
     end;
 
-    local procedure CustomisableTicket(): Boolean
+    local procedure CustomizableTicket(): Boolean
     var
         TMTicketReservationReq: Record "NPR TM Ticket Reservation Req.";
     begin
         TMTicketReservationReq.SetRange("Session Token ID", Rec."Session Token ID");
         TMTicketReservationReq.SetFilter("Admission Inclusion", '%1|%2', TMTicketReservationReq."Admission Inclusion"::NOT_SELECTED, TMTicketReservationReq."Admission Inclusion"::SELECTED);
         exit(not TMTicketReservationReq.IsEmpty());
+    end;
+
+    local procedure ChangeTourTicketQuantity(Request: Record "NPR TM Ticket Reservation Req.")
+    var
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        Ticket: Record "NPR TM Ticket";
+    begin
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', Request."Entry No.");
+        Ticket.FindFirst();
+
+        if (not IsUnpaidTourTicket(Ticket)) then
+            exit;
+
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindSet();
+        repeat
+            TicketManagement.ChangeConfirmedTicketQuantity(Ticket."No.", TicketAccessEntry."Admission Code", Request.Quantity);
+        until (TicketAccessEntry.Next() = 0);
+    end;
+
+    local procedure IsUnpaidTourTicket(Ticket: Record "NPR TM Ticket"): Boolean
+    var
+        TicketType: Record "NPR TM Ticket Type";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        TicketType.Get(Ticket."Ticket Type Code");
+        if (TicketType."Admission Registration" <> TicketType."Admission Registration"::GROUP) then
+            exit(false);
+
+        DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        DetTicketAccessEntry.SetFilter(Type, '=%1|=%2|=%3', DetTicketAccessEntry.Type::PAYMENT, DetTicketAccessEntry.Type::POSTPAID, DetTicketAccessEntry.Type::PREPAID);
+        exit(DetTicketAccessEntry.IsEmpty());
     end;
 }

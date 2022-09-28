@@ -260,7 +260,7 @@
                     scope = Repeater;
                     trigger OnAction()
                     begin
-                        ChangeTicketReservation();
+                        ChangeTicketReservation(Rec);
                     end;
                 }
 
@@ -553,9 +553,8 @@
         Message(ETICKET_SENT);
     end;
 
-    local procedure ChangeTicketReservation();
+    local procedure ChangeTicketReservation(Ticket: Record "NPR TM Ticket");
     var
-        Ticket: Record "NPR TM Ticket";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketMakeReservationPage: Page "NPR TM Ticket Make Reserv.";
@@ -564,18 +563,15 @@
         PageAction: Action;
     begin
 
-        CurrPage.SETSELECTIONFILTER(Ticket);
-        Ticket.FindFirst();
-
-        TicketReservationRequest.Get(Rec."Ticket Reservation Entry No.");
+        TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
         if (not TicketRequestManager.CreateChangeRequest(Ticket."External Ticket No.",
                   TicketReservationRequest."Authorization Code", RequestToken, ResponseMessage)) then
             Error(ResponseMessage);
 
         Commit();
 
-        Rec.Reset();
         TicketMakeReservationPage.SetTicketItem(Ticket."Item No.", Ticket."Variant Code");
+        TicketMakeReservationPage.AllowQuantityChange(IsUnpaidTourTicket(Ticket));
         TicketMakeReservationPage.LoadTicketRequest(RequestToken);
         TicketMakeReservationPage.LookupMode(true);
         PageAction := TicketMakeReservationPage.RunModal();
@@ -583,6 +579,20 @@
             TicketMakeReservationPage.FinalizeChangeRequest(true, ResponseMessage);
         end;
 
+    end;
+
+    local procedure IsUnpaidTourTicket(Ticket: Record "NPR TM Ticket"): Boolean
+    var
+        TicketType: Record "NPR TM Ticket Type";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        TicketType.Get(Ticket."Ticket Type Code");
+        if (TicketType."Admission Registration" <> TicketType."Admission Registration"::GROUP) then
+            exit(false);
+
+        DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        DetTicketAccessEntry.SetFilter(Type, '=%1|=%2|=%3', DetTicketAccessEntry.Type::PAYMENT, DetTicketAccessEntry.Type::POSTPAID, DetTicketAccessEntry.Type::PREPAID);
+        exit(DetTicketAccessEntry.IsEmpty());
     end;
 
     local procedure DisplayTicketRequest(RequestEntryNo: Integer);
