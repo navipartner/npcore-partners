@@ -35,11 +35,19 @@
             NotBlank = true;
             TableRelation = Language;
         }
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
         key(Key1; "Code")
+        {
+        }
+        key(Key2; "Replication Counter")
         {
         }
     }

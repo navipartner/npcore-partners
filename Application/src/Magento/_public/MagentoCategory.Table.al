@@ -203,6 +203,11 @@
             Caption = 'Meta Description';
             DataClassification = CustomerContent;
         }
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -211,6 +216,9 @@
         {
         }
         key(Key2; Path)
+        {
+        }
+        key(Key3; "Replication Counter")
         {
         }
     }

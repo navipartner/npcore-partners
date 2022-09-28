@@ -1,0 +1,75 @@
+page 6060016 "NPR APIV1 - MagentoCatLink"
+{
+    APIGroup = 'magento';
+    APIPublisher = 'navipartner';
+    APIVersion = 'v1.0';
+    DelayedInsert = true;
+    EntityName = 'magentoCategoryLink';
+    EntitySetName = 'magentoCategoryLinks';
+    EntityCaption = 'Magento Category Link';
+    EntitySetCaption = 'Magento Category Links';
+    Extensible = false;
+    ODataKeyFields = SystemId;
+    PageType = API;
+    SourceTable = "NPR Magento Category Link";
+
+    layout
+    {
+        area(content)
+        {
+            repeater(Group)
+            {
+                field(id; Rec.SystemId)
+                {
+                    Caption = 'Id', Locked = true;
+                    Editable = false;
+                }
+
+                field(itemNo; Rec."Item No.")
+                {
+                    Caption = 'Item No.', Locked = true;
+                }
+
+                field(categoryId; Rec."Category Id")
+                {
+                    Caption = 'Category Id', Locked = true;
+                }
+
+                field(categoryName; Rec."Category Name")
+                {
+                    Caption = 'Category Name', Locked = true;
+                }
+
+                field(position; Rec.Position)
+                {
+                    Caption = 'Position', Locked = true;
+                }
+
+                field(rootNo; Rec."Root No.")
+                {
+                    Caption = 'Root No.', Locked = true;
+                }
+
+                field(disabled; Rec.disabled)
+                {
+                    Caption = 'disabled', Locked = true;
+                }
+
+                field(replicationCounter; Rec."Replication Counter")
+                {
+                    Caption = 'replicationCounter', Locked = true;
+                }
+            }
+        }
+    }
+
+    actions
+    {
+    }
+
+    trigger OnInit()
+    begin
+        CurrentTransactionType := TransactionType::Update;
+    end;
+
+}

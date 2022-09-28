@@ -22,6 +22,8 @@ codeunit 6014608 "NPR Replication Register"
         DimensionsServiceNameLbl: Label 'Dimension - NP Replication API V1.0';
         MiscServiceCodeLbl: Label 'Misc_NPAPI V1', Locked = true;
         MiscServiceNameLbl: Label 'Miscellaneous - NP Replication API V1.0';
+        MagentoServiceCodeLbl: Label 'Magento_NPAPI V1', Locked = true;
+        MagentoServiceNameLbl: Label 'Magento - NP Replication API V1.0';
 
         #region Item related endpoints data
         ItemsEndPointIDLbl: Label 'GetItems', Locked = true;
@@ -55,6 +57,18 @@ codeunit 6014608 "NPR Replication Register"
         ItemReferencesEndPointIDLbl: Label 'GetItemReferences', Locked = true;
         ItemReferencesEndPointDescriptionLbl: Label 'Gets Item References from related company. ', Locked = true;
         ItemReferencesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemReferences/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        ItemTranslationsEndPointIDLbl: Label 'GetItemTranslations', Locked = true;
+        ItemTranslationsEndPointDescriptionLbl: Label 'Gets Item Translations from related company. ', Locked = true;
+        ItemTranslationsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemTranslations/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        ItemSubstitutionsEndPointIDLbl: Label 'GetItemSubstitutions', Locked = true;
+        ItemSubstitutionsEndPointDescriptionLbl: Label 'Gets Item Substitutions from related company. ', Locked = true;
+        ItemSubstitutionsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemSubstitutions/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        ManufacturersEndPointIDLbl: Label 'GetManufacturers', Locked = true;
+        ManufacturersEndPointDescriptionLbl: Label 'Gets Manufacturers from related company. ', Locked = true;
+        ManufacturersPathLbl: Label '/navipartner/core/v1.0/companies(%1)/manufacturers/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
         UOMEndPointIDLbl: Label 'GetUnitsOfMeasure', Locked = true;
         UOMEndPointDescriptionLbl: Label 'Gets Units Of Measure from related company. ', Locked = true;
@@ -155,7 +169,6 @@ codeunit 6014608 "NPR Replication Register"
         DefaultDimensionsEndPointIDLbl: Label 'GetDefaultDimensions', Locked = true;
         DefaultDimensionsEndPointDescriptionLbl: Label 'Gets Default Dimensions from related company.', Locked = true;
         DefaultDimensionsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/defaultDimensions/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
         #endregion
 
         #region MISC endpoints data
@@ -186,6 +199,68 @@ codeunit 6014608 "NPR Replication Register"
         AuxGLAccountsEndPointIDLbl: Label 'GetAuxGLAccounts', Locked = true;
         AuxGLAccountsEndPointDescriptionLbl: Label 'Gets Aux. G/L Accounts from related company.', Locked = true;
         AuxGLAccountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/glAccountsRead/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+        #endregion
+
+        #region MAGENTO endpoints data
+        MagentoWebSitesEndPointIDLbl: Label 'GetMagentoWebSites', Locked = true;
+        MagentoWebSitesEndPointDescriptionLbl: Label 'Gets Magento Web Sites from related company. ', Locked = true;
+        MagentoWebSitesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoWebsites/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoWebSiteLinksEndPointIDLbl: Label 'GetMagentoWebSiteLinks', Locked = true;
+        MagentoWebSiteLinksEndPointDescriptionLbl: Label 'Gets Magento Web Site Links from related company. ', Locked = true;
+        MagentoWebSiteLinksPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoWebsiteLinks/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoStoresEndPointIDLbl: Label 'GetMagentoStores', Locked = true;
+        MagentoStoresEndPointDescriptionLbl: Label 'Gets Magento Stores from related company. ', Locked = true;
+        MagentoStoresPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoStores/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoPicturesEndPointIDLbl: Label 'GetMagentoPictures', Locked = true;
+        MagentoPicturesEndPointDescriptionLbl: Label 'Gets Magento Pictures from related company. ', Locked = true;
+        MagentoPicturesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoPictures/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoPictureLinksEndPointIDLbl: Label 'GetMagentoPictureLinks', Locked = true;
+        MagentoPictureLinksEndPointDescriptionLbl: Label 'Gets Magento Picture Links from related company. ', Locked = true;
+        MagentoPictureLinksPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoPictureLinks/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoCategoriesEndPointIDLbl: Label 'GetMagentoCategories', Locked = true;
+        MagentoCategoriesEndPointDescriptionLbl: Label 'Gets Magento Categories from related company. ', Locked = true;
+        MagentoCategoriesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoCategories/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoCategoryLinksEndPointIDLbl: Label 'GetMagentoCategoryLinks', Locked = true;
+        MagentoCategoryLinksEndPointDescriptionLbl: Label 'Gets Magento Category Links from related company. ', Locked = true;
+        MagentoCategoryLinksPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoCategoryLinks/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoBrandsEndPointIDLbl: Label 'GetMagentoBrands', Locked = true;
+        MagentoBrandsEndPointDescriptionLbl: Label 'Gets Magento Brands from related company. ', Locked = true;
+        MagentoBrandsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoBrands/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoAttributesEndPointIDLbl: Label 'GetMagentoAttributes', Locked = true;
+        MagentoAttributesEndPointDescriptionLbl: Label 'Gets Magento Attributes from related company. ', Locked = true;
+        MagentoAttributesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoAttributes/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoAttributeLabelsEndPointIDLbl: Label 'GetMagentoAttribLabels', Locked = true;
+        MagentoAttributeLabelsEndPointDescriptionLbl: Label 'Gets Magento Attribute Labels from related company. ', Locked = true;
+        MagentoAttributeLabelsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoAttributeLabels/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoAttributeSetsEndPointIDLbl: Label 'GetMagentoAttribSets', Locked = true;
+        MagentoAttributeSetsEndPointDescriptionLbl: Label 'Gets Magento Attribute Sets from related company. ', Locked = true;
+        MagentoAttributeSetsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoAttributeSets/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoAttributeSetValuesEndPointIDLbl: Label 'GetMagentoAttrSetValues', Locked = true;
+        MagentoAttributeSetValuesEndPointDescriptionLbl: Label 'Gets Magento Attribute Set Values from related company. ', Locked = true;
+        MagentoAttributeSetValuesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoAttributeSetValues/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoItemAttributesEndPointIDLbl: Label 'GetMagentoItemAttributes', Locked = true;
+        MagentoItemAttributesEndPointDescriptionLbl: Label 'Gets Magento Item Attributes from related company. ', Locked = true;
+        MagentoItemAttributesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoItemAttributes/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoItemAttributeValuesEndPointIDLbl: Label 'GetMagentoItemAttrVal', Locked = true;
+        MagentoItemAttributeValuesEndPointDescriptionLbl: Label 'Gets Magento Item Attribute Values from related company. ', Locked = true;
+        MagentoItemAttributeValuesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoItemAttributeValues/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+
+        MagentoDisplayGroupsEndPointIDLbl: Label 'GetMagentoDisplayGrp', Locked = true;
+        MagentoDisplayGroupsEndPointDescriptionLbl: Label 'Gets Magento Display Groups from related company. ', Locked = true;
+        MagentoDisplayGroupsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoDisplayGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
     #endregion
 
     #region Register Service with EndPoints
@@ -258,6 +333,15 @@ codeunit 6014608 "NPR Replication Register"
             ReplicationAPI.ScheduleJobQueueEntry(sender);
         end;
 
+        // MAGENTO
+        sender.RegisterService(MagentoServiceCodeLbl,
+            BaseURLAPI, MagentoServiceNameLbl, false, "NPR API Auth. Type"::Basic, Tenant);
+        RegisterMagentoServiceEndPoints();
+        if sender.Enabled then begin
+            ReplicationAPI.RegisterNcImportType(sender."API Version");
+            ReplicationAPI.ScheduleJobQueueEntry(sender);
+        end;
+
         OnAfterRegisterServices(sender);
     end;
 
@@ -316,6 +400,18 @@ codeunit 6014608 "NPR Replication Register"
         ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, ItemReferencesEndPointIDLbl, ItemReferencesPathLbl,
                     ItemReferencesEndPointDescriptionLbl, true, 600, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
                     10000, Database::"Item Reference", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, ItemTranslationsEndPointIDLbl, ItemTranslationsPathLbl,
+                    ItemTranslationsEndPointDescriptionLbl, true, 700, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                    10000, Database::"Item Translation", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, ItemSubstitutionsEndPointIDLbl, ItemSubstitutionsPathLbl,
+                    ItemSubstitutionsEndPointDescriptionLbl, true, 800, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                    10000, Database::"Item Substitution", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, ManufacturersEndPointIDLbl, ManufacturersPathLbl,
+                    ManufacturersEndPointDescriptionLbl, true, 900, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                    10000, Database::Manufacturer, false, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
@@ -575,6 +671,48 @@ codeunit 6014608 "NPR Replication Register"
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
            Rec.FieldNo("Unit of Measure"), 'unitofMeasure', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterItemTranslationSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "Item Translation";
+    begin
+        if sender."Table ID" <> Database::"Item Translation" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterItemSubstitutionSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "Item Substitution";
+    begin
+        if sender."Table ID" <> Database::"Item Substitution" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo(SystemId), 'id', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo("Quantity Avail. on Shpt. Date"), 'quantityAvailableOnShipmentDate', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterManufacturerSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "Manufacturer";
+    begin
+        if sender."Table ID" <> Database::Manufacturer then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo(SystemId), 'id', 0, false, false);
     end;
 
     local procedure RegisterCustServiceEndPoints()
@@ -1339,6 +1477,296 @@ codeunit 6014608 "NPR Replication Register"
         Rec: Record "NPR Aux. G/L Account";
     begin
         if sender."Table ID" <> Database::"NPR Aux. G/L Account" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    local procedure RegisterMagentoServiceEndPoints()
+    var
+        ServiceSetup: Record "NPR Replication Service Setup";
+        ServiceEndPoint: Record "NPR Replication Endpoint";
+    begin
+        ServiceSetup.SetRange("API Version", DimensionsServiceCodeLbl);
+        if ServiceSetup.IsEmpty() then
+            exit;
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoWebsitesEndPointIDLbl, MagentoWebsitesPathLbl,
+                            MagentoWebsitesEndPointDescriptionLbl, true, 100, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                            1000, Database::"NPR Magento Website", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoWebsiteLinksEndPointIDLbl, MagentoWebsiteLinksPathLbl,
+                            MagentoWebsiteLinksEndPointDescriptionLbl, true, 200, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                            1000, Database::"NPR Magento Website Link", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoStoresEndPointIDLbl, MagentoStoresPathLbl,
+                            MagentoStoresEndPointDescriptionLbl, true, 300, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                            1000, Database::"NPR Magento Store", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoPicturesEndPointIDLbl, MagentoPicturesPathLbl,
+                           MagentoPicturesEndPointDescriptionLbl, true, 400, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                           1000, Database::"NPR Magento Picture", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoPictureLinksEndPointIDLbl, MagentoPictureLinksPathLbl,
+                           MagentoPictureLinksEndPointDescriptionLbl, true, 500, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                           1000, Database::"NPR Magento Picture Link", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoCategoriesEndPointIDLbl, MagentoCategoriesPathLbl,
+                          MagentoCategoriesEndPointDescriptionLbl, true, 600, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                          1000, Database::"NPR Magento Category", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoCategoryLinksEndPointIDLbl, MagentoCategoryLinksPathLbl,
+                          MagentoCategoryLinksEndPointDescriptionLbl, true, 700, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                          1000, Database::"NPR Magento Category Link", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoBrandsEndPointIDLbl, MagentoBrandsPathLbl,
+                          MagentoBrandsEndPointDescriptionLbl, true, 800, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                          1000, Database::"NPR Magento Brand", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoAttributesEndPointIDLbl, MagentoAttributesPathLbl,
+                          MagentoAttributesEndPointDescriptionLbl, true, 900, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                          1000, Database::"NPR Magento Attribute", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoAttributeLabelsEndPointIDLbl, MagentoAttributeLabelsPathLbl,
+                          MagentoAttributeLabelsEndPointDescriptionLbl, true, 1000, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                          1000, Database::"NPR Magento Attr. Label", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoAttributeSetsEndPointIDLbl, MagentoAttributeSetsPathLbl,
+                         MagentoAttributeSetsEndPointDescriptionLbl, true, 1100, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                         1000, Database::"NPR Magento Attribute Set", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoAttributeSetValuesEndPointIDLbl, MagentoAttributeSetValuesPathLbl,
+                         MagentoAttributeSetValuesEndPointDescriptionLbl, true, 1200, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                         1000, Database::"NPR Magento Attr. Set Value", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoItemAttributesEndPointIDLbl, MagentoItemAttributesPathLbl,
+                         MagentoItemAttributesEndPointDescriptionLbl, true, 1300, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                         1000, Database::"NPR Magento Item Attr.", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoItemAttributeValuesEndPointIDLbl, MagentoItemAttributeValuesPathLbl,
+                         MagentoItemAttributeValuesEndPointDescriptionLbl, true, 1400, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                         1000, Database::"NPR Magento Item Attr. Value", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoDisplayGroupsEndPointIDLbl, MagentoDisplayGroupsPathLbl,
+                        MagentoDisplayGroupsEndPointDescriptionLbl, true, 1500, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                        1000, Database::"NPR Magento Display Group", false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoWebsiteSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Website";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Website" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoWebsiteLinkSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Website Link";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Website Link" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoStoreSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Store";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Store" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoPictureSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Picture";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Picture" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo("Size (kb)"), 'sizeKb', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+          Rec.FieldNo(Image), 'image@odata.mediaReadLink', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoPictureLinkSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Picture Link";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Picture Link" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoCategorySpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Category";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Category" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id1', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(Description), 'description@odata.mediaReadLink', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo("Short Description"), 'shortDescription@odata.mediaReadLink', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoCategoryLinkSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Category Link";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Category Link" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoBrandSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Brand";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Brand" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id1', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(Description), 'description@odata.mediaReadLink', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo("Short Description"), 'shortDescription@odata.mediaReadLink', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoAttributeSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Attribute";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Attribute" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoAttributeLabelSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Attr. Label";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Attr. Label" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo("Text Field"), 'textField@odata.mediaReadLink', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoAttributeSetSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Attribute Set";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Attribute Set" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoAttributeSetValSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Attr. Set Value";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Attr. Set Value" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoItemAttributeSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Item Attr.";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Item Attr." then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoItemAttributeValSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Item Attr. Value";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Item Attr. Value" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo("Long Value"), 'longValue@odata.mediaReadLink', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoDisplayGroupSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Display Group";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Display Group" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",

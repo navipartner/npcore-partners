@@ -1,0 +1,68 @@
+page 6060019 "NPR APIV1 - MagentoAttribLabel"
+{
+    APIGroup = 'magento';
+    APIPublisher = 'navipartner';
+    APIVersion = 'v1.0';
+    DelayedInsert = true;
+    EntityName = 'magentoAttributeLabel';
+    EntitySetName = 'magentoAttributeLabels';
+    EntityCaption = 'Magento Attribute Label';
+    EntitySetCaption = 'Magento Attribute Labels';
+    Extensible = false;
+    ODataKeyFields = SystemId;
+    PageType = API;
+    SourceTable = "NPR Magento Attr. Label";
+
+    layout
+    {
+        area(content)
+        {
+            repeater(Group)
+            {
+                field(id; Rec.SystemId)
+                {
+                    Caption = 'Id', Locked = true;
+                    Editable = false;
+                }
+                field(attributeId; Rec."Attribute ID")
+                {
+                    Caption = 'Attribute ID', Locked = true;
+                }
+                field(lineNo; Rec."Line No.")
+                {
+                    Caption = 'Line No.', Locked = true;
+                }
+                field(value; Rec.Value)
+                {
+                    Caption = 'Value', Locked = true;
+                }
+                field(image; Rec.Image)
+                {
+                    Caption = 'Image', Locked = true;
+                }
+                field("sorting"; Rec.Sorting)
+                {
+                    Caption = 'Sorting', Locked = true;
+                }
+                field(textField; Rec."Text Field")
+                {
+                    Caption = 'Text Field', Locked = true;
+                }
+                field(replicationCounter; Rec."Replication Counter")
+                {
+                    Caption = 'replicationCounter', Locked = true;
+                }
+            }
+        }
+    }
+
+    actions
+    {
+    }
+
+    trigger OnInit()
+    begin
+        CurrentTransactionType := TransactionType::Update;
+    end;
+
+}

@@ -59,11 +59,19 @@
                 end;
             end;
         }
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
         key(Key1; "Attribute ID", "Line No.")
+        {
+        }
+        key(Key2; "Replication Counter")
         {
         }
     }
