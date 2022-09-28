@@ -14,13 +14,11 @@
                 ShowCaption = false;
                 field(Id; Rec.Id)
                 {
-
                     ToolTip = 'Specifies the value of the Id field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-
                     ToolTip = 'Specifies the value of the Name field';
                     ApplicationArea = NPRRetail;
 
@@ -35,7 +33,6 @@
                 }
                 field("Description"; Format(Rec.Description.HasValue))
                 {
-
                     Caption = 'Description';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
@@ -48,6 +45,7 @@
                         InStr: InStream;
                     begin
                         TempBlob.CreateOutStream(OutStr);
+                        Rec.CalcFields(Description);
                         Rec."Description".CreateInStream(InStr);
                         CopyStream(OutStr, InStr);
                         if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
@@ -63,7 +61,6 @@
                 }
                 field("Short Description"; Format(Rec."Short Description".HasValue))
                 {
-
                     Caption = 'Short Description';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Short Description field';
@@ -76,6 +73,7 @@
                         InStr: InStream;
                     begin
                         TempBlob.CreateOutStream(OutStr);
+                        Rec.CalcFields("Short Description");
                         Rec."Short Description".CreateInStream(InStr);
                         CopyStream(OutStr, InStr);
                         if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
@@ -91,19 +89,16 @@
                 }
                 field("Seo Link"; Rec."Seo Link")
                 {
-
                     ToolTip = 'Specifies the value of the Seo Link field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Meta Title"; Rec."Meta Title")
                 {
-
                     ToolTip = 'Specifies the value of the Meta Title field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Meta Description"; Rec."Meta Description")
                 {
-
                     ToolTip = 'Specifies the value of the Meta Description field';
                     ApplicationArea = NPRRetail;
                 }
@@ -115,13 +110,11 @@
                 }
                 field("Logo Picture"; Rec."Logo Picture")
                 {
-
                     ToolTip = 'Specifies the value of the Logo field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sorting"; Rec.Sorting)
                 {
-
                     ToolTip = 'Specifies the value of the Sorting field';
                     ApplicationArea = NPRRetail;
                 }
@@ -137,7 +130,6 @@
                 SubPageLink = Type = CONST(Brand),
                               Name = FIELD(Picture);
                 ApplicationArea = NPRRetail;
-
             }
             part(LogoPictureDragDropAddin; "NPR Magento DragDropPic. Addin")
             {
@@ -147,7 +139,6 @@
                 SubPageLink = Type = CONST(Brand),
                               Name = FIELD("Logo Picture");
                 ApplicationArea = NPRRetail;
-
             }
         }
     }

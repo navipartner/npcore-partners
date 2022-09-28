@@ -1,0 +1,103 @@
+page 6060013 "NPR APIV1 - Magento Picture"
+{
+    APIGroup = 'magento';
+    APIPublisher = 'navipartner';
+    APIVersion = 'v1.0';
+    DelayedInsert = true;
+    EntityName = 'magentoPicture';
+    EntitySetName = 'magentoPictures';
+    EntityCaption = 'Magento Picture';
+    EntitySetCaption = 'Magento Picture';
+    Extensible = false;
+    ODataKeyFields = SystemId;
+    PageType = API;
+    SourceTable = "NPR Magento Picture";
+
+    layout
+    {
+        area(content)
+        {
+            repeater(Group)
+            {
+                field(id; Rec.SystemId)
+                {
+                    Caption = 'Id', Locked = true;
+                    Editable = false;
+                }
+                field(type; Rec.Type)
+                {
+                    Caption = 'Type', Locked = true;
+                }
+                field(name; Rec.Name)
+                {
+                    Caption = 'Name', Locked = true;
+                }
+                field(sizeKb; Rec."Size (kb)")
+                {
+                    Caption = 'Size (kb)', Locked = true;
+                }
+                field(mimeType; Rec."Mime Type")
+                {
+                    Caption = 'Mime Type', Locked = true;
+                }
+                field(entryNo; Rec."Entry No.")
+                {
+                    Caption = 'Entry No.', Locked = true;
+                }
+                field(lastDateModified; Rec."Last Date Modified")
+                {
+                    Caption = 'Last Date Modified', Locked = true;
+                }
+                field(lastTimeModified; Rec."Last Time Modified")
+                {
+                    Caption = 'Last Time Modified', Locked = true;
+                }
+                field(image; TempNPRBlob."Buffer 1")
+                {
+                    Caption = 'Image', Locked = true;
+                }
+                field(replicationCounter; Rec."Replication Counter")
+                {
+                    Caption = 'replicationCounter', Locked = true;
+                }
+            }
+        }
+    }
+
+    actions
+    {
+    }
+
+    var
+        TempNPRBlob: Record "NPR BLOB buffer" temporary;
+
+    trigger OnInit()
+    begin
+        CurrentTransactionType := TransactionType::Update;
+    end;
+
+    trigger OnAfterGetRecord()
+    var
+        OStr: OutStream;
+    begin
+
+        // get Media fields
+        TempNPRBlob.Init();
+        if Rec.Image.HasValue() then begin
+            TempNPRBlob."Buffer 1".CreateOutStream(OStr);
+            GetTenantMedia(Rec.Image.MediaId, OStr);
+        end;
+    end;
+
+    local procedure GetTenantMedia(MediaId: Guid; var OStr: OutStream)
+    var
+        TenantMedia: Record "Tenant Media";
+        IStr: InStream;
+    begin
+        TenantMedia.Get(MediaId);
+        TenantMedia.CalcFields(Content);
+        TenantMedia.Content.CreateInStream(IStr);
+        CopyStream(OStr, IStr);
+    end;
+
+}

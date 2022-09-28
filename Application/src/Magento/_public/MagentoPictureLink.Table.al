@@ -136,6 +136,11 @@
                 end;
             end;
         }
+        field(6151479; "Replication Counter"; BigInteger)
+        {
+            Caption = 'Replication Counter';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -144,6 +149,9 @@
         {
         }
         key(Key2; "Variant Value Code")
+        {
+        }
+        key(Key3; "Replication Counter")
         {
         }
     }

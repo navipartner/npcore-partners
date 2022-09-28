@@ -1,0 +1,64 @@
+page 6060028 "NPR APIV1 - Item Translations"
+{
+    APIGroup = 'core';
+    APIPublisher = 'navipartner';
+    APIVersion = 'v1.0';
+    DelayedInsert = true;
+    EntityName = 'itemTranslation';
+    EntitySetName = 'itemTranslations';
+    EntityCaption = 'Item Translation';
+    EntitySetCaption = 'Item Translations';
+    Extensible = false;
+    ODataKeyFields = SystemId;
+    PageType = API;
+    SourceTable = "Item Translation";
+
+    layout
+    {
+        area(content)
+        {
+            repeater(Group)
+            {
+                field(id; Rec.SystemId)
+                {
+                    Caption = 'Id', Locked = true;
+                    Editable = false;
+                }
+                field(itemNo; Rec."Item No.")
+                {
+                    Caption = 'Item No', Locked = true;
+                }
+                field(variantCode; Rec."Variant Code")
+                {
+                    Caption = 'Variant Code', Locked = true;
+                }
+                field(languageCode; Rec."Language Code")
+                {
+                    Caption = 'Language Code', Locked = true;
+                }
+                field(description; Rec.Description)
+                {
+                    Caption = 'Description', Locked = true;
+                }
+                field(description2; Rec."Description 2")
+                {
+                    Caption = 'Description 2', Locked = true;
+                }
+                field(replicationCounter; Rec."NPR Replication Counter")
+                {
+                    Caption = 'replicationCounter', Locked = true;
+                }
+            }
+        }
+    }
+
+    actions
+    {
+    }
+
+    trigger OnInit()
+    begin
+        CurrentTransactionType := TransactionType::Update;
+    end;
+
+}
