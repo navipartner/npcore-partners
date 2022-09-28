@@ -31,7 +31,6 @@
         TICKET_NOT_VALID_YET: Label 'Ticket %1 is not valid until %2.';
         TICKET_EXPIRED: Label 'Ticket %1 expired on %2.';
         SHOULD_NOT_BE_ZERO: Label 'Should not be zero.';
-        QTY_CHANGE_NOT_ALLOWED: Label 'Ticket %1 has been used and quantity cannot be changed. %2 %3.';
         SCHEDULE_ENTRY_EXPIRED: Label 'The schedule entry %1 specifies a time in the past (%2) and cant be used for ticket reservation at this time (%3).';
         TICKET_CALENDAR: Label 'Ticket calendar defined for %1 %2 %3 states that ticket is not valid for %4.';
         RESERVATION_NOT_FOR_NOW: Label 'The ticket reservation for %4 allows admission from %1 until %2 on %3.\\Current time is: %5';
@@ -62,6 +61,7 @@
         RESCHEDULE_NOT_ALLOWED_NO: Label '-1031';
         INVALID_ADMISSION_CODE_NO: Label '-1032';
         HAS_PAYMENT_NO: Label '-1033';
+        ENTRY_NOT_FOUND_NO: Label '-1034';
         POSTPAID_RESULT: Label 'Number of postpaid tickets: %1\\Number of invoices: %2\\Invoices created: %3';
         gAccessEntryPaymentType: Option PAYMENT,PREPAID,POSTPAID;
         HANDLE_POSTPAID: Label 'Do you want to generate invoices for postpaid ticket?';
@@ -937,6 +937,8 @@
         AllowAdmissionOverAllocation: Enum "NPR TM Ternary";
         OriginalQty: Integer;
         ExtAdmSchEntryNo: Integer;
+        QTY_CHANGE_NOT_ALLOWED: Label 'Ticket %1 has been used and quantity cannot be changed. %2 %3.';
+        ENTRY_NOT_FOUND: Label 'Ticket %1 has been paid and quantity cannot be changed. %2 %3.';
     begin
 
         ValidateTicketReference(0, TicketNo, AdmissionCode, TicketAccessEntryNo, true);
@@ -958,10 +960,10 @@
             DetTicketAccessEntry.Reset();
             DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
             DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
-            DetTicketAccessEntry.SetFilter(Open, '=%1', true);
             DetTicketAccessEntry.SetFilter(Quantity, '>0');
             DetTicketAccessEntry.SetFilter("Closed By Entry No.", '=%1', 0);
-            DetTicketAccessEntry.FindFirst();
+            if (not DetTicketAccessEntry.FindFirst()) then
+                RaiseError(StrSubstNo(ENTRY_NOT_FOUND, TicketNo, DetTicketAccessEntry.TableCaption(), DetTicketAccessEntry."Entry No."), ENTRY_NOT_FOUND_NO);
 
             OriginalQty := DetTicketAccessEntry.Quantity;
             ExtAdmSchEntryNo := DetTicketAccessEntry."External Adm. Sch. Entry No.";
@@ -998,10 +1000,17 @@
         until (TicketAccessEntry.Next() = 0);
 
         TicketRequest.Get(Ticket."Ticket Reservation Entry No.");
+
         TicketRequest.SetCurrentKey("Session Token ID");
         TicketRequest.SetFilter("Session Token ID", '=%1', TicketRequest."Session Token ID");
         TicketRequest.SetFilter("Ext. Line Reference No.", '=%1', TicketRequest."Ext. Line Reference No.");
-        TicketRequest.ModifyAll(Quantity, NewTicketQuantity);
+        TicketRequest.FindSet();
+        repeat
+            if (TicketRequest."Admission Inclusion" <> TicketRequest."Admission Inclusion"::NOT_SELECTED) then begin
+                TicketRequest.Quantity := NewTicketQuantity;
+                TicketRequest.Modify();
+            end;
+        until (TicketRequest.Next() = 0);
 
     end;
 
