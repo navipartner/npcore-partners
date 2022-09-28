@@ -1,7 +1,5 @@
 ﻿page 6060130 "NPR MM Member Card List"
 {
-    Extensible = False;
-
     Caption = 'Member Cards';
     AdditionalSearchTerms = ' Member Card List';
     DeleteAllowed = false;
