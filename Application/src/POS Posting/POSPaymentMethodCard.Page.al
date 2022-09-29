@@ -87,15 +87,19 @@
                 }                
                 field("Post Condensed"; Rec."Post Condensed")
                 {
-
-                    ToolTip = 'Specifies if POS Payment line will be posted uncompressed, per POS Entry or per POS Period Register';
+                    ToolTip = 'Enable "Post Condensed" to be able to set placeholders in "Condensed Posting Description".';
                     ApplicationArea = NPRRetail;
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update();
+                    end;
                 }
                 field("Condensed Posting Description"; Rec."Condensed Posting Description")
                 {
-
-                    ToolTip = 'Specifies Posting Description for condensed POS Payment lines %1 = POS Unit Code, %2 = POS Store Code, %3 = Posting Date, %4 = POS Period Register No, %5 = POS Payment Date';
+                    ToolTip = 'Default placeholders, when "Post Condensed" is enabled, for uncompressed entries are %6 - %3, for compression per POS entry %6 - %3, for compression per POS Period %2/%1/%6 - %4/%3. When POS payment is posted, placeholders (values %1, %2 ... %6) will be replaced with real values where %1 will be replaced with actual value of "POS Unit No.", %2 with "POS Store Code", %3 with "Posting Date", %4 with "POS Period Register No.", %5 with "POS Payment Bin Code", %6 with "POS Payment Method Code". You can choose any order of placeholders from %1 to %6 (e.g. %4_%1%2).';
                     ApplicationArea = NPRRetail;
+                    Editable = IsPostCondensed;
                 }
                 field("Zero as Default on Popup"; Rec."Zero as Default on Popup")
                 {
@@ -281,5 +285,13 @@
             }
         }
     }
+
+    var
+        IsPostCondensed: Boolean;
+    
+    trigger OnAfterGetCurrRecord()
+    begin
+        IsPostCondensed := Rec."Post Condensed";
+    end;
 }
 
