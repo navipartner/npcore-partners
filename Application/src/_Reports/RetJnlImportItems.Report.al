@@ -60,13 +60,11 @@
                             RetailJournalLine.Validate("Variant Code", ItemVariants.Code);
                             RetailJournalLine.Insert();
                             Item.SetFilter("Variant Filter", '=%1', ItemVariants.Code);
-                            CalcFields(Item.Inventory);
                             RetailJournalLine.Validate("Quantity to Print", 1);
                             RetailJournalLine.Validate(Description, Item.Description);
                             RetailJournalLine.Validate("Vendor No.", Item."Vendor No.");
                             RetailJournalLine.Validate("Vend Item No.", Item."Vendor Item No.");
                             RetailJournalLine.Validate("Unit Price", Item."Unit Price");
-                            RetailJournalLine.Validate(RetailJournalLine.Inventory, Item.Inventory);
 
                             case ImportUnitCost of
                                 ImportUnitCost::"Standard Cost":
