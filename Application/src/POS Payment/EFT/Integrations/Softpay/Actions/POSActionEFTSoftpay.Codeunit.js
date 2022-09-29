@@ -5,6 +5,11 @@ let main = async (obj) => {
         await popup.error("You can only use Softpay on Android devices.", "Device error");
         return {"success": false};
     }
+    if (window.parent.jsBridge.SoftpayProtocol == null || window.parent.jsBridge.SoftpayProtocol === undefined)
+    {
+        await popup.error("Softpay integration not found. Either you are using an outdated version of the Mobile App or the device is not supported.", "Device error");
+        return {"success": false};
+    }
     let request = 
     {
         SoftpayAction: context.request.SoftpayAction,
@@ -43,7 +48,8 @@ let main = async (obj) => {
             default:
                 bc = await workflow.respond('Failed', {
                     ErrorMessage: "Command: " + request.SoftpayAction + " Is not supported", 
-                    SoftpayRequest: request
+                    SoftpayRequest: request,
+                    SoftpayResponse: null
                 });
         }
         
@@ -51,7 +57,8 @@ let main = async (obj) => {
     {
         bc = await workflow.respond('Failed', {
             ErrorMessage: e.message, 
-            SoftpayRequest: request
+            SoftpayRequest: request,
+            SoftpayResponse: null
         });
     }
     if (!bc.success)
