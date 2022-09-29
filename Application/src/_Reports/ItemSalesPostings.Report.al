@@ -1,7 +1,7 @@
 ﻿report 6014439 "NPR Item Sales Postings"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Sales Postings.rdlc';
@@ -13,118 +13,132 @@
 
     dataset
     {
-        dataitem(AuxItemLedgerEntry; "NPR Aux. Item Ledger Entry")
+        dataitem(CompanyInformation; "Company Information")
         {
-            DataItemTableView = SORTING("Item No.", "Entry Type", "Posting Date") ORDER(Ascending) WHERE("Entry Type" = FILTER(Sale));
-            RequestFilterFields = "Item No.", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code", "Salespers./Purch. Code", "Item Category Code", Quantity;
-            column(ItemFilters; StrSubstNo(Pct1Lbl, TableCaption, ItemFilter))
-            {
-            }
-            column(DimFilters; GetFilter("Global Dimension 1 Code"))
-            {
-            }
             column(COMPANYNAME; CompanyName)
             {
             }
-            column(ItemNo_ItemLedgerEntry; AuxItemLedgerEntry."Item No.")
+            column(ItemFilters; (Pct1Lbl + ' ' + ItemFilter))
             {
             }
-            column(EntryNo_ItemLedgerEntry; AuxItemLedgerEntry."Entry No.")
+            column(DimFilters; Item.GetFilter("Global Dimension 1 Code"))
             {
             }
+            column(PrintAlsoWithoutSale; PrintAlsoWithoutSale)
+            {
+            }
+
+        }
+        dataitem(Item; Item)
+        {
+            CalcFields = "Sales (Qty.)", "Sales (LCY)", "COGS (LCY)", "Assembly BOM", Inventory;
+            DataItemTableView = SORTING("No.") ORDER(Ascending);
+            RequestFilterFields = "No.", "Date Filter", "Item Category Code", "Vendor No.";
             column(No_Item; Item."No.")
             {
+                IncludeCaption = true;
             }
             column(Description_Item; Item.Description)
+            {
+                IncludeCaption = true;
+            }
+            column(VendorNo_; Item."Vendor No.")
+            {
+                IncludeCaption = true;
+            }
+            column(VendorItemNo_Item; Item."Vendor Item No.")
             {
             }
             column(UnitCost_Item; Item."Unit Cost")
             {
+                IncludeCaption = true;
             }
-            column(UnitPrice_Item; Item."Unit Price")
+            column(UnitPrice_Item; Item.CalcUnitPriceExclVAT())
             {
             }
             column(SalesQty_Item; ItemSalesQty)
             {
             }
-            column(SalesLCY_Item; ItemSalesAmount)
+            column(Sales_Unit_Price; Item.CalcUnitPriceExclVAT() * ItemSalesQty)
             {
             }
-            column(Profit; Profit)
+            column(SalesAmount_Item; ItemSalesAmount)
             {
             }
-            column(ItemProfitPct; ItemProfitPct)
+            column(DiscountAmount; DiscountAmount)
+            {
+            }
+            column(Profit_Item; Profit)
+            {
+            }
+            column(ProfitPct_Item; ItemProfitPct)
             {
             }
             column(Inventory_Item; Item.Inventory)
             {
+                IncludeCaption = true;
             }
-            column(Quantity_ItemLedgerEntry; AuxItemLedgerEntry.Quantity)
+            column(ShowVendorNo_; ShowVendorNo)
             {
             }
             column(ShowVendorItemNo; ShowVendorItemNo)
             {
             }
-            column(VendorItemNo; VendorItemNo)
-            {
-            }
-            column(Sales_Unit_Price; Item."Unit Price" * ItemSalesQty)
-            {
-            }
-            column(Report_Filters; AuxItemLedgerEntry.GetFilters)
-            {
-            }
-            column(ShowVendorNo_; ShowVendorNo)
-            {
-            }
-            column(VendorNo_; Item."Vendor No.")
-            {
-            }
 
             trigger OnAfterGetRecord()
+            var
+                ValueEntry: Record "Value Entry";
+                ItemLedgerEntry: Record "Item Ledger Entry";
             begin
-                Item.Get("Item No.");
-                Item.SetFilter("Global Dimension 1 Filter", GetFilter("Global Dimension 1 Code"));
-                Item.SetFilter("Global Dimension 2 Filter", GetFilter("Global Dimension 2 Code"));
-                Item.SetFilter("Location Filter", GetFilter("Location Code"));
-                Item.SetFilter("Variant Filter", GetFilter("Variant Code"));
-                Item.SetFilter("Serial No. Filter", GetFilter("Serial No."));
-                Item.SetFilter("Date Filter", GetFilter("Posting Date"));
-                Item.CalcFields(Inventory);
-                Item.CalcFields("Sales (Qty.)", "Sales (LCY)", "COGS (LCY)", "Assembly BOM");
 
-                ItemSalesQty := 0;
-                ItemSalesAmount := 0;
-                ItemCOG := 0;
-                Profit := 0;
+                Clear(ItemSalesQty);
+                Clear(ItemSalesAmount);
+                Clear(CostAmountActual);
+                Clear(CostAmountNonInvtbl);
+                Clear(DiscountAmount);
+                ItemLedgerEntry.Reset();
+                ItemLedgerEntry.SetRange("Item No.", Item."No.");
+                ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
+                ItemLedgerEntry.SetFilter("Global Dimension 1 Code", Item.GetFilter("Global Dimension 1 Code"));
+                ItemLedgerEntry.SetFilter("Global Dimension 2 Code", Item.GetFilter("Global Dimension 2 Code"));
+                ItemLedgerEntry.SetFilter("Location Code", Item.GetFilter("Location Filter"));
+                ItemLedgerEntry.SetFilter("Posting Date", Item.GetFilter("Date Filter"));
+                ItemLedgerEntry.CalcSums("Invoiced Quantity");
+                IF ItemLedgerEntry.FindSet() THEN
+                    repeat
+                        ItemLedgerEntry.CalcFields("Sales Amount (Actual)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)");
+                        ItemSalesQty += -ItemLedgerEntry."Invoiced Quantity";
+                        ItemSalesAmount += ItemLedgerEntry."Sales Amount (Actual)";
+                        CostAmountActual += ItemLedgerEntry."Cost Amount (Actual)";
+                        CostAmountNonInvtbl += ItemLedgerEntry."Cost Amount (Non-Invtbl.)";
+                    until ItemLedgerEntry.Next() = 0;
+
                 ValueEntry.Reset();
+                ValueEntry.SetRange("Item No.", Item."No.");
                 ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                ValueEntry.SetFilter("Global Dimension 1 Code", GetFilter("Global Dimension 1 Code"));
-                ValueEntry.SetFilter("Global Dimension 2 Code", GetFilter("Global Dimension 2 Code"));
-                ValueEntry.SetFilter("Location Code", GetFilter("Location Code"));
-                ValueEntry.SetFilter("Posting Date", GetFilter("Posting Date"));
-                ValueEntry.SetFilter("Salespers./Purch. Code", GetFilter("Salespers./Purch. Code"));
-                ValueEntry.SetRange("Item No.", AuxItemLedgerEntry."Item No.");
-                ValueEntry.CalcSums("Invoiced Quantity", "Sales Amount (Actual)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)");
-                ItemSalesQty := -ValueEntry."Invoiced Quantity";
-                ItemSalesAmount := ValueEntry."Sales Amount (Actual)";
-                if Item.Type <> Item.Type::Inventory then
-                    ItemCOG := -ValueEntry."Cost Amount (Non-Invtbl.)"
+                ValueEntry.SetFilter("Global Dimension 1 Code", Item.GetFilter("Global Dimension 1 Code"));
+                ValueEntry.SetFilter("Global Dimension 2 Code", Item.GetFilter("Global Dimension 2 Code"));
+                ValueEntry.SetFilter("Location Code", Item.GetFilter("Location Filter"));
+                ValueEntry.SetFilter("Posting Date", Item.GetFilter("Date Filter"));
+                ValueEntry.CalcSums("Discount Amount");
+                DiscountAmount := Abs(ValueEntry."Discount Amount");
+
+                if Item.Type = Item.Type::Service then
+                    ItemCOG := CostAmountNonInvtbl
                 else
-                    ItemCOG := -ValueEntry."Cost Amount (Actual)";
-                Profit := ItemSalesAmount - ItemCOG;
+                    ItemCOG := CostAmountActual;
+                Profit := ItemSalesAmount - Abs(ItemCOG);
+
                 if ItemSalesAmount <> 0 then
                     ItemProfitPct := Round(Profit / ItemSalesAmount * 100, 0.1)
                 else
                     ItemProfitPct := 0;
-                SetRange("Item No.", "Item No.");
-                FindLast();
-                SetFilter("Item No.", Reportfilter);
-                VendorItemNo := '';
-                if ShowVendorItemNo then
-                    if Item1.Get(AuxItemLedgerEntry."Item No.") then
-                        VendorItemNo := Item1."Vendor Item No.";
+
+                if not PrintAlsoWithoutSale then
+                    if (ItemSalesQty = 0) and (ItemSalesAmount = 0) then
+                        CurrReport.Skip();
             end;
+
         }
     }
 
@@ -139,22 +153,19 @@
                 field("Print Also Without Sale"; PrintAlsoWithoutSale)
                 {
                     Caption = 'Include Items That Has Not Been Sold';
-
-                    ToolTip = 'Specifies the value of the Include Items That Has Not Been Sold field';
+                    ToolTip = 'Specifies if items without sale should be listed.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Show Vendor Item No"; ShowVendorItemNo)
                 {
                     Caption = 'Show Vendor Item No.';
-
-                    ToolTip = 'Specifies the value of the Show Vendor Item No. field';
+                    ToolTip = 'Displays Vendor Item No. on the report.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Show Vendor No"; ShowVendorNo)
                 {
                     Caption = 'Show Vendor No';
-
-                    ToolTip = 'Specifies the value of the Show Vendor No field';
+                    ToolTip = 'Displays Vendor No. on the report.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -165,24 +176,20 @@
     {
         Report_Caption = 'Item Sales Postings';
         Page_Caption = 'Page';
-        No_Caption = 'No.';
-        Description_Caption = 'Description';
-        CostAmount_Caption = 'Cost amount';
-        SalesAmount_Caption = 'Sales amount';
+        UnitPrice_Caption = 'Unit price';
         SalesQty_Caption = 'Sales (Qty.)';
-        SalesRCY_Caption = 'Sales(RCY)';
+        SalesAmtActual_Caption = 'Sales amount (Actual)';
         Profit_Caption = 'Profit (LCY)';
         ProfitPct_Caption = 'Profit %';
-        Inventory_Caption = 'Inventory';
         Total_Caption = 'Total';
         VendorItemNo_Caption = 'Vendor Item No.';
         SalesUnitPrice_Caption = 'Sales (Unit Price)';
-        VendorNo_Caption = 'Vendor No.';
+        DiscountAmount_Caption = 'Discount Amount';
     }
 
     trigger OnPreReport()
     begin
-        Reportfilter := AuxItemLedgerEntry.GetFilter("Item No.");
+        ItemFilter := Item.GetFilters;
     end;
 
     var
@@ -190,16 +197,13 @@
         ItemFilter: Text[250];
         Profit: Decimal;
         ItemProfitPct: Decimal;
-        Item: Record Item;
-        Reportfilter: Text;
         ShowVendorItemNo: Boolean;
-        Item1: Record Item;
-        VendorItemNo: Text;
         ItemSalesQty: Decimal;
         ItemSalesAmount: Decimal;
-        ValueEntry: Record "Value Entry";
+        DiscountAmount: Decimal;
+        CostAmountActual: Decimal;
+        CostAmountNonInvtbl: Decimal;
         ItemCOG: Decimal;
         ShowVendorNo: Boolean;
-        Pct1Lbl: Label '%1: %2', locked = true;
+        Pct1Lbl: Label 'Item Filter:', locked = true;
 }
-
