@@ -383,6 +383,80 @@
             OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", DEFAULT_TIME);
         end;
     end;
+
+    internal procedure ImportOfflineValidationFile(ImportId: Integer)
+    var
+        TicketOfflineValidation: Record "NPR TM Offline Ticket Valid.";
+        TempBlob: Codeunit "Temp Blob";
+        FileMgt: Codeunit "File Management";
+        FileName: Text;
+        IMPORT_FILE: Label 'Import File';
+        FILE_FILTER: Label 'Offline Ticket Validation Files (*.json)|*.json';
+        JStream: InStream;
+        JRootObject: JsonObject;
+    begin
+
+        /***
+        Expected file format is:
+        {
+            "Admit":[{"ExternalTicketNumber":"","AdmissionCode":"","EventDate":"","EventTime":""}],
+            "Depart":[{"ExternalTicketNumber":"","AdmissionCode":"","EventDate":"","EventTime":""}]
+        }
+        ***/
+        FileName := FileMgt.BLOBImportWithFilter(TempBlob, IMPORT_FILE, '', FILE_FILTER, 'json');
+        if (FileName = '') then
+            exit;
+
+        TempBlob.CreateInStream(JStream);
+        JRootObject.ReadFrom(JStream);
+        CreateEvents(FileName, JRootObject, TicketOfflineValidation."Event Type"::ADMIT, 'Admit', ImportId);
+        CreateEvents(FileName, JRootObject, TicketOfflineValidation."Event Type"::DEPART, 'Depart', ImportId);
+
+    end;
+
+    local procedure CreateEvents(FileName: Text; JRootObject: JsonObject; EventType: Option; KeyName: Text; ImportId: Integer)
+    var
+        JObject: JsonObject;
+        JArray: JsonArray;
+        JToken: JsonToken;
+    begin
+        if (JRootObject.Get(KeyName, JToken)) then begin
+            JArray := JToken.AsArray();
+            foreach JToken in JArray do begin
+                JObject := JToken.AsObject();
+                CreateEventLine(FileName, JObject, EventType, ImportId);
+            end;
+        end;
+    end;
+
+    local procedure CreateEventLine(FileName: Text; var JObject: JsonObject; EventType: Option; ImportId: Integer)
+    var
+        TicketOfflineValidation: Record "NPR TM Offline Ticket Valid.";
+    begin
+        TicketOfflineValidation.Init();
+        TicketOfflineValidation."Entry No." := 0;
+
+        TicketOfflineValidation."Ticket Reference Type" := TicketOfflineValidation."Ticket Reference Type"::EXTERNALTICKETNO;
+        TicketOfflineValidation."Ticket Reference No." := CopyStr(GetValue(JObject, 'ExternalTicketNumber').AsCode(), 1, MaxStrLen(TicketOfflineValidation."Ticket Reference No."));
+        TicketOfflineValidation."Admission Code" := CopyStr(GetValue(JObject, 'AdmissionCode').AsCode(), 1, MaxStrLen(TicketOfflineValidation."Admission Code"));
+        TicketOfflineValidation."Event Type" := EventType;
+        TicketOfflineValidation."Event Date" := GetValue(JObject, 'EventDate').AsDate();
+        TicketOfflineValidation."Event Time" := GetValue(JObject, 'EventTime').AsTime();
+        TicketOfflineValidation."Imported At" := CurrentDateTime;
+        TicketOfflineValidation."Import Reference Name" := CopyStr(FileName, 1, MaxStrLen(TicketOfflineValidation."Import Reference Name"));
+        TicketOfflineValidation."Import Reference No." := ImportId;
+
+        TicketOfflineValidation.Insert();
+    end;
+
+    local procedure GetValue(Json: JsonObject; TokenName: Text): JsonValue
+    var
+        Token: JsonToken;
+    begin
+        Json.Get(TokenName, Token);
+        exit(Token.AsValue());
+    end;
+
 }
 
 
