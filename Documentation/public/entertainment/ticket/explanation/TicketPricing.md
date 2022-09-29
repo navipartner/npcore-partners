@@ -88,20 +88,20 @@ The second part of the rule is the price calculation. The original amount calcul
 When the booking date is in May 2022, the rule 20 will be selected. There are no rules selected when the booking date comes before 2022-04-01 or after 2022-06-30.
 
 **Line No.**|**Booking Date From**|**Booking Date Until**|**Relative Booking Date Formula**|**Event Date From**|**Event Date Until**|**Relative Event Date Formula**|**Relative Until Date Formula**
-:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:
-10|2022-04-01|2022-04-30| | | | | 
-20|2022-05-01|2022-05-31| | | | | 
-30|2022-06-01|2022-06-30| | | | | 
+|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+|10|2022-04-01|2022-04-30| | | | | 
+|20|2022-05-01|2022-05-31| | | | | 
+|30|2022-06-01|2022-06-30| | | | | 
 
 #### Example 2
 
 In order for any of the rules to be true, **booking date** must be during May or June and the selected **event date** in July. 
 
 **Line No.**|**Booking Date From**|**Booking Date Until**|**Relative Booking Date Formula**|**Event Date From**|**Event Date Until**|**Relative Event Date Formula**|**Relative Until Date Formula**
-:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:
-10|2022-04-01|2022-04-30| |2022-07-01|2022-07-31| | 
-20|2022-05-01|2022-05-31| |2022-07-01|2022-07-31| | 
-30|2022-06-01|2022-06-30| |2022-07-01|2022-07-31| | 
+|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+|10|2022-04-01|2022-04-30| |2022-07-01|2022-07-31| | 
+|20|2022-05-01|2022-05-31| |2022-07-01|2022-07-31| | 
+|30|2022-06-01|2022-06-30| |2022-07-01|2022-07-31| | 
 
 
 #### Example 3
@@ -114,8 +114,8 @@ This rule is true when all of the following statements are true.
 - the event date falls on Saturday (WeekDay 6).
 
 **Line No.**|**Booking Date From**|**Booking Date Until**|**Relative Booking Date Formula**|**Event Date From**|**Event Date Until**|**Relative Event Date Formula**|**Relative Until Date Formula**
-:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:
-40|2022-05-01|2022-05-31|WD5|2022-07-01|2022-07-31|WD6| 
+|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+|40|2022-05-01|2022-05-31|WD5|2022-07-01|2022-07-31|WD6| 
 
 
 #### Example 4
@@ -123,12 +123,12 @@ This rule is true when all of the following statements are true.
 This set of rules could be used to increase the price in steps as you are getting closer to the event date. When the event date is more than 28 days away, no rule applies. When the event date is between 22 and 28 days away, rule 50 applies, and so on. When the booking date is the same as the event date (rule 90), the price could be reduced in order to encourage the sellout.
 
 **Line No.**|**Booking Date From**|**Booking Date Until**|**Relative Booking Date Formula**|**Event Date From**|**Event Date Until**|**Relative Event Date Formula**|**Relative Until Date Formula**
-:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:
-50| | | | | | |+28D
-60| | | | | | |+21D
-70| | | | | | |+14D
-80| | | | | | |+7D
-90| | | | | | |+0D
+|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+|50| | | | | | |+28D|
+|60| | | | | | |+21D|
+|70| | | | | | |+14D|
+|80| | | | | | |+7D|
+|90| | | | | | |+0D|
 
 
 ### Related links
