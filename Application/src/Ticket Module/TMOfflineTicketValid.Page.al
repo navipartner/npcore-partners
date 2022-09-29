@@ -180,6 +180,25 @@
                 end;
             }
 
+            action(ImportFile)
+            {
+                ToolTip = 'Import a file containing ticket data.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Import File';
+                Image = ImportExcel;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                begin
+                    Randomize();
+                    OfflineTicketValidation.ImportOfflineValidationFile(Random(Power(2, 31) - 1));
+                    CurrPage.Update(false);
+                end;
+            }
+
         }
         area(navigation)
         {
