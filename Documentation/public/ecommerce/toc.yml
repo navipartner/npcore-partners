@@ -1,5 +1,9 @@
 - name: Getting started
   href: intro.md
+- name: Explanation
+  items: 
+  - name: Ticket Type
+    href: explanation/ticket_type.md
 - name: How-To  
   items:
   - name: Create a brand
