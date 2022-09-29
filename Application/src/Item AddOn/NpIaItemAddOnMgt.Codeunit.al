@@ -580,8 +580,10 @@
                 begin
                     ItemAddOnLine.Quantity := 0;
                     if SelectedAddOnLine.IsObject then begin
+#pragma warning disable AA0139
                         ItemNo := GetJCode(SelectedAddOnLine, 'item', MaxStrLen(ItemNo), false);
                         VariantCode := GetJCode(SelectedAddOnLine, 'variant', MaxStrLen(VariantCode), false);
+#pragma warning restore
                         if ItemNo <> '' then begin
                             ItemAddOnLineOption.SetRange("AddOn No.", ItemAddOnLine."AddOn No.");
                             ItemAddOnLineOption.SetRange("AddOn Line No.", ItemAddOnLine."Line No.");
