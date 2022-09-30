@@ -726,14 +726,13 @@
         LabelLibrary.RunPrintPage(RecRef);
     end;
 
-    internal procedure PrintLabel(VarRec: Variant; ReportType: Option)
+    procedure PrintLabel(VarRec: Variant; ReportType: Option)
     var
-        LabelLibrary: Codeunit "NPR Label Library";
         RecRef: RecordRef;
     begin
         ApplyFilter(VarRec, RecRef);
-        LabelLibrary.InvertAllLines(RecRef);
-        LabelLibrary.PrintSelection(ReportType);
+        InvertAllLines(RecRef);
+        PrintSelection(ReportType);
     end;
 
     local procedure ApplyFilter(VarRec: Variant; var FilteredLineRecRef: RecordRef)
@@ -753,6 +752,7 @@
         PurchInvLine: Record "Purch. Inv. Line";
         WarehouseActivityHeader: Record "Warehouse Activity Header";
         WarehouseActivityLine: Record "Warehouse Activity Line";
+        IsHandled: Boolean;
     begin
         RecRef2.GetTable(VarRec);
         case RecRef2.Number of
@@ -804,10 +804,18 @@
                     FilteredLineRecRef.GetTable(WarehouseActivityLine);
                 end;
             else begin
-                FilteredLineRecRef := RecRef2;
-                FilteredLineRecRef.SetRecFilter();
+                OnApplyFilter(FilteredLineRecRef, VarRec, IsHandled);
+                if not IsHandled then begin
+                    FilteredLineRecRef := RecRef2;
+                    FilteredLineRecRef.SetRecFilter();
+                end;
             end;
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnApplyFilter(var FilteredLineRecRef: RecordRef; Rec: Variant; var IsHandled: Boolean)
+    begin
     end;
 
     [IntegrationEvent(false, false)]
