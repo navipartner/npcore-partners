@@ -591,7 +591,7 @@
         TaxFreeExecute.OnRunHandledGetSet(Handled, true);
         TaxFreeExecute.OnRunSilentSet(Silent);
 
-        OnRunFunction := OnRunFunction::UnitAutoConfigure;
+        TaxFreeExecute.OnRunFunctionSet(OnRunFunction::UnitAutoConfigure);
 
         Constructor(TaxFreeRequest."Handler ID Enum");
         TaxFreeExecute.TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterface);
