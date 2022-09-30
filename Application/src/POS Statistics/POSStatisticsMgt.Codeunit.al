@@ -38,12 +38,12 @@ codeunit 6059818 "NPR POS Statistics Mgt."
             else
                 POSCurrentStatsBuffer."Return Sales Quantity" -= POSSaleLine.Quantity;
 
+            POSCurrentStatsBuffer."Cost Amount" += GetCostAmount(POSSaleLine) * POSSaleLine.Quantity;
+            POSCurrentStatsBuffer."Profit Amount" += POSSaleLine.Amount - (GetCostAmount(POSSaleLine) * POSSaleLine.Quantity);
             POSCurrentStatsBuffer."Sales Amount" += POSSaleLine.Amount;
-            POSCurrentStatsBuffer."Cost Amount" += GetCostAmount(POSSaleLine) * POSCurrentStatsBuffer."Sales Quantity";
             POSCurrentStatsBuffer."Discount Amount" += POSSaleLine."Discount Amount";
             POSCurrentStatsBuffer."Tax Amount" += POSSaleLine."Amount Including VAT" - POSSaleLine.Amount;
             POSCurrentStatsBuffer."Amount Incl. Tax" += POSSaleLine."Amount Including VAT";
-            POSCurrentStatsBuffer."Profit Amount" += POSSaleLine.Amount - (GetCostAmount(POSSaleLine) * POSCurrentStatsBuffer."Sales Quantity");
         until POSSaleLine.Next() = 0;
 
         POSCurrentStatsBuffer."Profit %" := CalculatePercentAmount(POSCurrentStatsBuffer."Sales Amount" - POSCurrentStatsBuffer."Cost Amount", POSCurrentStatsBuffer."Sales Amount");
@@ -397,7 +397,7 @@ codeunit 6059818 "NPR POS Statistics Mgt."
 
         if POSSaleLine.Type <> POSSaleLine.Type::Item then
             exit;
-        
+
         Item.SetLoadFields("Last Direct Cost", "Unit Cost");
         if not Item.Get(POSSaleLine."No.") then
             exit;
