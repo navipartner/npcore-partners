@@ -47,12 +47,24 @@
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnBeforeMemberInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var ShowStandardUserInterface: Boolean)
+    internal procedure OnBeforeMembInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var ShowStandardUserInterface: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnAfterMemberInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; StandardUserInterface: Boolean; var LookupOK: Boolean);
+    [Obsolete('Replaced by OnBeforeMembInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var ShowStandardUserInterface: Boolean)')]
+    internal procedure OnBeforeMemberInfoCaptureDialog(MemberInfoCaptureFilter: Text; var ShowStandardUserInterface: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterMembInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; StandardUserInterface: Boolean; var LookupOK: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by OnAfterMembInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; StandardUserInterface: Boolean; var LookupOK: Boolean)')]
+    internal procedure OnAfterMemberInfoCaptureDialog(MemberInfoCaptureFilter: Text; StandardUserInterface: Boolean; var LookupOK: Boolean)
     begin
     end;
 
