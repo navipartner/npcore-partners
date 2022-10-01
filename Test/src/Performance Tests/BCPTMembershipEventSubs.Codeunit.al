@@ -3,8 +3,8 @@ codeunit 85075 "NPR BCPT Membership Event Subs"
 {
     EventSubscriberInstance = Manual;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Membership Events", 'OnBeforeMemberInfoCaptureDialog', '', false, false)]
-    local procedure HandleOnBeforeMemberInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var ShowStandardUserInterface: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Membership Events", 'OnBeforeMembInfoCaptureDialog', '', false, false)]
+    local procedure HandleOnBeforeMembInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var ShowStandardUserInterface: Boolean)
     begin
         repeat
             if MemberInfoCapture."E-Mail Address" = '' then begin

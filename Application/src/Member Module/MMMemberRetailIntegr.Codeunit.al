@@ -663,7 +663,7 @@
 
         ShowStandardUserInterface := true;
         LookupOK := true;
-        MembershipEvents.OnBeforeMemberInfoCaptureDialog(MemberInfoCapture, ShowStandardUserInterface);
+        MembershipEvents.OnBeforeMembInfoCaptureDialog(MemberInfoCapture, ShowStandardUserInterface);
 
         if (ShowStandardUserInterface) then begin
             if (GuiAllowed()) then begin
@@ -684,7 +684,7 @@
             end;
         end;
 
-        MembershipEvents.OnAfterMemberInfoCaptureDialog(MemberInfoCapture, ShowStandardUserInterface, LookupOK);
+        MembershipEvents.OnAfterMembInfoCaptureDialog(MemberInfoCapture, ShowStandardUserInterface, LookupOK);
         exit(LookupOK);
     end;
 
