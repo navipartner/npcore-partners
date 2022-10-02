@@ -15,7 +15,7 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.5');
+        exit('1.6');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -28,9 +28,9 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
           ActionVersion())
         then begin
             Sender.RegisterWorkflow20(
-              'let test = await workflow.respond("StartTrx");' +
+              'await workflow.respond("StartTrx");' +
 
-              'let dialog = popup.open({' +
+              'let _dialog = await popup.open({' +
                   'title: "Payment",' +
                   'ui: [' +
                       '{' +
@@ -42,17 +42,25 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
                   'buttons: []' +
               '});' +
 
-              'async function checkResponse() {' +
-                'let trxDone = await workflow.respond("CheckResponse");' +
-                'if (trxDone) {' +
-                  'dialog.close(true);' +
-                  'workflow.complete()' +
-                '} else {' +
-                  'setTimeout(async () => { await checkResponse(); }, 1000);' +
-                '}' +
-              '};' +
+              'let trxPromise = new Promise((resolve, reject) => {' +
+                'let checkResponse = async () => {' +
+                    'try {' +
+                        'let trxDone = await workflow.respond("CheckResponse");' +
+                        'if (trxDone) {' +
+                            '_dialog.close();' +
+                            'resolve();' +
+                            'return;' +
+                        '};' +
+                        'setTimeout(checkResponse, 1000);' +
+                    '}' +
+                    'catch (e) {' +
+                        'reject(e);' +
+                    '}' +
+                '};' +
+                'setTimeout(checkResponse, 1000);' +
+              '});' +
 
-              'await checkResponse();'
+              'await trxPromise;'
             );
         end;
     end;
