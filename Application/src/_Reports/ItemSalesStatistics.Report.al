@@ -1,8 +1,8 @@
 ﻿report 6014414 "NPR Item Sales Statistics"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Sales Statistics NPR.rdlc';
     Caption = 'Item Sales Statistics';
@@ -13,63 +13,27 @@
 
     dataset
     {
-        dataitem(RunOnce; "Integer")
+        dataitem("Company Information"; "Company Information")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
-            MaxIteration = 1;
-
-            trigger OnAfterGetRecord()
-            var
-                Item: Record Item;
-            begin
-                if NoDefaultFilters then
-                    CurrReport.Skip();
-
-                if InventoryPostingGroupFilter <> '' then begin
-                    Item.SetFilter("Inventory Posting Group", InventoryPostingGroupFilter);
-                    InventoryPostingGroupFilterTxt := StrSubstNo(InventoryPostingGroupFilterCaption, InventoryPostingGroupFilter);
-                end;
-
-                if VendorItemNoFilter <> '' then begin
-                    Item.SetFilter("Vendor Item No.", VendorItemNoFilter);
-                    VendorItemNoFilterTxt := StrSubstNo(VendorItemNoFilterCaption, VendorItemNoFilter);
-                end;
-
-                if Item.FindSet() then
-                    repeat
-                        TempItem.Init();
-                        TempItem."No." := Item."No.";
-                        TempItem.Insert();
-                    until Item.Next() = 0;
-            end;
-
-            trigger OnPreDataItem()
-            begin
-                Clear(NoDefaultFilters);
-                Clear(VendorItemNoFilterTxt);
-                Clear(InventoryPostingGroupFilterTxt);
-                Clear(FiltersTxt);
-
-                if (InventoryPostingGroupFilter = '') and (VendorItemNoFilter = '') then
-                    NoDefaultFilters := true;
-
-                if ItemLedgerEntry.GetFilters <> '' then
-                    FiltersTxt := StrSubstNo(ItemLedgEntryFilterCaption, ItemLedgerEntry.GetFilters);
-            end;
-        }
-        dataitem(ItemLedgerEntry; "Item Ledger Entry")
-        {
-            DataItemTableView = SORTING("Source Type", "Source No.", "Item No.", "Variant Code", "Posting Date");
-            RequestFilterFields = "Document Type", "Posting Date", Quantity;
-            column(GetFilters; FiltersTxt)
+            DataItemTableView = sorting("Primary Key");
+            column(Name; Name)
             {
+                IncludeCaption = true;
             }
-            column(InventoryPostingGroupFilter; InventoryPostingGroupFilterTxt)
+            column("GetFilters"; FiltersTxt)
             {
             }
             column(VendorItemNoFilter; VendorItemNoFilterTxt)
             {
             }
+            column(InventoryPostingGroupFilter; InventoryPostingGroupFilterTxt)
+            {
+            }
+        }
+        dataitem(ItemLedgerEntry; "Item Ledger Entry")
+        {
+            DataItemTableView = SORTING("Source Type", "Source No.", "Item No.", "Variant Code", "Posting Date");
+            RequestFilterFields = "Document Type", "Posting Date", Quantity;
 
             trigger OnAfterGetRecord()
             begin
@@ -109,6 +73,7 @@
                 if not Item2.Get(Template) then
                     Clear(Item2);
             end;
+
         }
     }
 
@@ -166,6 +131,39 @@
         ItemNoLabel = 'Item No.';
         QuantityLabel = 'Quantity';
     }
+    trigger OnPreReport()
+    var
+        Item: Record Item;
+    begin
+        if NoDefaultFilters then
+            Clear(NoDefaultFilters);
+        Clear(VendorItemNoFilterTxt);
+        Clear(InventoryPostingGroupFilterTxt);
+        Clear(FiltersTxt);
+
+        if InventoryPostingGroupFilter <> '' then begin
+            Item.SetFilter("Inventory Posting Group", InventoryPostingGroupFilter);
+            InventoryPostingGroupFilterTxt := StrSubstNo(InventoryPostingGroupFilterCaption, InventoryPostingGroupFilter);
+        end;
+
+        if VendorItemNoFilter <> '' then begin
+            Item.SetFilter("Vendor Item No.", VendorItemNoFilter);
+            VendorItemNoFilterTxt := StrSubstNo(VendorItemNoFilterCaption, VendorItemNoFilter);
+        end;
+
+        if (InventoryPostingGroupFilter = '') and (VendorItemNoFilter = '') then
+            NoDefaultFilters := true;
+
+        if ItemLedgerEntry.GetFilters <> '' then
+            FiltersTxt := StrSubstNo(ItemLedgEntryFilterCaption, ItemLedgerEntry.GetFilters);
+
+        if Item.FindSet() then
+            repeat
+                TempItem.Init();
+                TempItem."No." := Item."No.";
+                TempItem.Insert();
+            until Item.Next() = 0;
+    end;
 
     var
         Item2: Record Item;

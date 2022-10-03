@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>2db4b053-d79c-440f-8bdb-d759c7fc8983</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -200,7 +201,7 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox35</rd:DefaultName>
-                  <Top>0.03526cm</Top>
+                  <Top>0.00351cm</Top>
                   <Height>0.82021cm</Height>
                   <Width>3.57715cm</Width>
                   <Style>
@@ -208,6 +209,11 @@
                       <Color>#7292cc</Color>
                       <Style>None</Style>
                     </Border>
+                    <TopBorder>
+                      <Color>Black</Color>
+                      <Style>Solid</Style>
+                      <Width>1pt</Width>
+                    </TopBorder>
                     <PaddingLeft>2pt</PaddingLeft>
                     <PaddingRight>2pt</PaddingRight>
                     <PaddingTop>2pt</PaddingTop>
@@ -244,6 +250,11 @@
                       <Color>#7292cc</Color>
                       <Style>None</Style>
                     </Border>
+                    <TopBorder>
+                      <Color>Black</Color>
+                      <Style>Solid</Style>
+                      <Width>1pt</Width>
+                    </TopBorder>
                     <PaddingLeft>2pt</PaddingLeft>
                     <PaddingRight>2pt</PaddingRight>
                     <PaddingTop>2pt</PaddingTop>
@@ -271,16 +282,21 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox35</rd:DefaultName>
-                  <Top>0.03526cm</Top>
-                  <Left>16.83632cm</Left>
-                  <Height>0.78495cm</Height>
-                  <Width>2.24543cm</Width>
+                  <Top>0.00351cm</Top>
+                  <Left>16.74442cm</Left>
+                  <Height>0.8167cm</Height>
+                  <Width>2.33733cm</Width>
                   <ZIndex>2</ZIndex>
                   <Style>
                     <Border>
                       <Color>#7292cc</Color>
                       <Style>None</Style>
                     </Border>
+                    <TopBorder>
+                      <Color>Black</Color>
+                      <Style>Solid</Style>
+                      <Width>1pt</Width>
+                    </TopBorder>
                     <PaddingLeft>2pt</PaddingLeft>
                     <PaddingRight>2pt</PaddingRight>
                     <PaddingTop>2pt</PaddingTop>
@@ -321,6 +337,7 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox15</rd:DefaultName>
+              <Top>0.53975cm</Top>
               <Left>14.478cm</Left>
               <Height>0.508cm</Height>
               <Width>4.572cm</Width>
@@ -356,7 +373,7 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox15</rd:DefaultName>
-              <Top>0.47625cm</Top>
+              <Top>1.016cm</Top>
               <Left>14.478cm</Left>
               <Height>0.508cm</Height>
               <Width>4.572cm</Width>
@@ -392,7 +409,7 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox15</rd:DefaultName>
-              <Top>0.95603cm</Top>
+              <Top>1.49578cm</Top>
               <Left>14.478cm</Left>
               <Height>0.508cm</Height>
               <Width>4.572cm</Width>
@@ -516,6 +533,42 @@
                 <PaddingBottom>2pt</PaddingBottom>
               </Style>
             </Textbox>
+            <Textbox Name="Textbox21">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=First(Fields!Name.Value, "DataSet_Result")</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox15</rd:DefaultName>
+              <Top>0.03175cm</Top>
+              <Left>14.478cm</Left>
+              <Height>0.508cm</Height>
+              <Width>4.572cm</Width>
+              <ZIndex>6</ZIndex>
+              <Style>
+                <Border>
+                  <Color>#e5e5e5</Color>
+                  <Style>None</Style>
+                </Border>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+                <PaddingTop>2pt</PaddingTop>
+                <PaddingBottom>2pt</PaddingBottom>
+              </Style>
+            </Textbox>
           </ReportItems>
           <Style>
             <Border>
@@ -606,11 +659,20 @@
       </DefaultValue>
       <Prompt>QuantityLabel</Prompt>
     </ReportParameter>
+    <ReportParameter Name="NameCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>NameCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>NameCaption</Prompt>
+    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>7</NumberOfRows>
+      <NumberOfRows>8</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -646,6 +708,11 @@
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>6</RowIndex>
           <ParameterName>QuantityLabel</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>7</RowIndex>
+          <ParameterName>NameCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -742,17 +809,21 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>78af2e94-cf8b-4872-8438-7d4deb35273b</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
+        <Field Name="Name">
+          <DataField>Name</DataField>
+        </Field>
         <Field Name="GetFilters">
           <DataField>GetFilters</DataField>
         </Field>
-        <Field Name="InventoryPostingGroupFilter">
-          <DataField>InventoryPostingGroupFilter</DataField>
-        </Field>
         <Field Name="VendorItemNoFilter">
           <DataField>VendorItemNoFilter</DataField>
+        </Field>
+        <Field Name="InventoryPostingGroupFilter">
+          <DataField>InventoryPostingGroupFilter</DataField>
         </Field>
         <Field Name="ItemNo">
           <DataField>ItemNo</DataField>
