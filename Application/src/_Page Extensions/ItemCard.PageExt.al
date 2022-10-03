@@ -729,14 +729,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 #endif
         addafter("Va&riants")
         {
-            action("NPR NPR_VarietyMatrix")
-            {
-                Caption = 'Variety Matrix';
-                Image = ItemAvailability;
-                ShortCutKey = 'Ctrl+Alt+v';
-                ToolTip = 'Executes the display Variety Matrix action. View or edit varieties for the item/';
-                ApplicationArea = NPRRetail;
-            }
             action("NPR AttributeValues")
             {
                 Caption = 'All Attributes Values';
@@ -780,8 +772,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page 6014402;
-                                ToolTip = 'Open a list of retail journals where you can the physical of retail items on inventory.';
-                                ApplicationArea = NPRRetail;
+                ToolTip = 'Open a list of retail journals where you can the physical of retail items on inventory.';
+                ApplicationArea = NPRRetail;
             }
 
             action("NPR RetailItemReclassJnl")
@@ -792,8 +784,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page 6014403;
-                                ToolTip = 'Change information on item ledger entries, such as dimensions, location codes, bin codes, and serial or lot number.';
-                                ApplicationArea = NPRRetail;
+                ToolTip = 'Change information on item ledger entries, such as dimensions, location codes, bin codes, and serial or lot number.';
+                ApplicationArea = NPRRetail;
             }
         }
 
@@ -816,9 +808,9 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         RetailJournalHeader: Record "NPR Retail Journal Header";
                         RetailJournalLine: Record "NPR Retail Journal Line";
                         InputDialog: Page "NPR Input Dialog";
-                                         TempInt: Integer;
-                                         TempQty: Integer;
-                                         t001: Label 'Quantity to be transfered to UPDATED?';
+                        TempInt: Integer;
+                        TempQty: Integer;
+                        t001: Label 'Quantity to be transfered to UPDATED?';
                     begin
                         IF PAGE.RUNMODAL(PAGE::"NPR Retail Journal List", RetailJournalHeader) <> ACTION::LookupOK THEN
                             EXIT;
@@ -885,7 +877,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     PromotedIsBig = true;
                     PromotedCategory = Category5;
                     Image = ItemVariant;
-                    ShortCutKey = 'Ctrl+Alt+I';
+                    ShortCutKey = 'Ctrl+Alt+V';
                     ToolTip = 'Executes the display Variety Matrix action.';
                     ApplicationArea = NPRRetail;
 
@@ -977,7 +969,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Caption = 'POS Info';
                     Image = Info;
                     RunObject = Page 6150643;
-                                    RunPageLink = "Table ID" = const(27), "Primary Key" = field("No.");
+                    RunPageLink = "Table ID" = const(27), "Primary Key" = field("No.");
                     ToolTip = 'Executes the POS Info action. Allows you to link a POS info code with the item.';
                     ApplicationArea = NPRRetail;
                 }
@@ -995,7 +987,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Promoted = true;
                     PromotedCategory = Category6;
                     RunObject = Page 6014466;
-                                    RunPageLink = "Item No." = field("No.");
+                    RunPageLink = "Item No." = field("No.");
                     RunPageMode = Edit;
                     ToolTip = 'Setup different unit prices for the item. An item price is automatically granted on the invoice line when the specified criteria are such as quantity are met.';
                     ApplicationArea = NPRRetail;
@@ -1084,7 +1076,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Image = Camera;
                     Visible = MagentoEnabled;
                     RunObject = page 6151455;
-                                    RunPageLink = "Item No." = field("No.");
+                    RunPageLink = "Item No." = field("No.");
                     ToolTip = 'Executes the Videos action';
                     ApplicationArea = NPRRetail;
                 }
