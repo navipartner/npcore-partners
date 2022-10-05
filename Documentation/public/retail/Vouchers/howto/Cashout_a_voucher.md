@@ -29,13 +29,11 @@ The POS payment line for the voucher cash-out will also be created.
 
 <br/><img src="../images/PaymentLineVoucher.png" width="600"/>
 
-4. Navigate to the payment and end the sale. 
+4. Navigate to the payment and end the sale.      
+   The suggested amount will be the difference between the value of the Voucher and the commission.
 
-<br/>The suggested amount will be the difference between the value of the Voucher and the commission.
+<img width="25%" src="../images/Cashout.png"> 
 
-<p align="center" width="100%">
-    <img width="33%" src="../images/Cashout.png"> 
-</p>
    After the sale is finalized, the voucher will be archived.
 
 ## Related links:
