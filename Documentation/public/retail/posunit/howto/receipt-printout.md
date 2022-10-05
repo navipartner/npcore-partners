@@ -4,7 +4,7 @@ You can customize the sales report content that is printed out, depending on the
 
 ## Prerequisite
 
- - Select which report you wish to edit the receipt printout for by searching Report Selection in global search and selecting the area/scenario you wish to edit the receipt for. / category
+ - Select which report you wish to edit the receipt printout for by searching Report Selection in global search and selecting the area/scenario you wish to edit the receipt for the category
 
 ## Procedure
 
