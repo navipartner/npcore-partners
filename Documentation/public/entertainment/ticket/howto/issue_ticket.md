@@ -25,3 +25,4 @@ The created tickets are displayed in the **Ticket List** page.
 
 - [Set up DIY printed tickets](SetUpDIYPrintedTicket.md)
 - [Refunding tickets](RefundingTickets.md)
+- [Issue tickets from the POS](issue_ticket_from_pos.md)
