@@ -13,3 +13,11 @@ The general flow is as follows:
 3. Manually check and adjust the imported data.
 4. Validate the data in the worksheet.
 5. Implement the modifications or create new items/variants by registering the worksheet.
+
+### Related links
+
+- [Adding variety values to the worksheet](explanation/adding_variety_values.md)
+- [Item worksheet line creation](explanation/creating_item_worksheet_lines.md)
+- [Worksheet line registration](explanation/worksheet_line_registration.md)
+- [Item Worksheet (reference guide)](reference/item_worksheets.md)
+- [Item Worksheet Template (reference guide)](reference/item_worksheet_template.md)
