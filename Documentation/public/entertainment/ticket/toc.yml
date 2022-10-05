@@ -46,3 +46,5 @@
   items:
   - name: Ticket types (reference guide)
     href: reference/ticket_types.md
+  - name: Ticket booking proces - API
+    href: files/aquire_ticket_workflow.pdf
