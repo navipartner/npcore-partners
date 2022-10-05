@@ -1,4 +1,4 @@
-# Item Worksheet
+# Item Worksheet (reference guide)
 
 An item worksheet template can have one or more item worksheet records. The item worksheet specifies more options on the import and processing of item worksheet lines. From **Item Worksheet Template** it is possible to navigate to **Item Worksheets** using that template:
 

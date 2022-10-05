@@ -10,5 +10,5 @@
     href: howto/create_a_new_voucher.md  
   - name: Create a new voucher on a sales order
     href: howto/create_a_voucher_on_a_sales_order.md
-  - name: Cashout a voucher
+  - name: Cash out a voucher
     href: howto/cashout_a_voucher.md

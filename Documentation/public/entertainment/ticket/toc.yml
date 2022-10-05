@@ -41,3 +41,8 @@
     href: explanation/AuthorizationCode.md
   - name: Ticket statistics and forecast
     href: explanation/TicketStatandForecast.md
+  
+- name: Reference
+  items:
+  - name: Ticket types (reference guide)
+    href: reference/ticket_types.md
