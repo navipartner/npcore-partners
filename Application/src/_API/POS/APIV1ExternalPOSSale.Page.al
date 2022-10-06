@@ -119,6 +119,8 @@ page 6059775 "NPR APIV1 - External POS Sale"
 
         IF Rec."Sales Ticket No." = '' then
             Rec."Sales Ticket No." := POSSaleCU.GetNextReceiptNo(Rec."Register No.");
+
+        CurrPage.externalPosSaleLines.Page.SetExternalPOSSale(Rec);
     end;
 
     local procedure GetUserSetup()
