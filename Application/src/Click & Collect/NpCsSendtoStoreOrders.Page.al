@@ -1,20 +1,20 @@
 ﻿page 6151204 "NPR NpCs Send to Store Orders"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Send to Store Orders';
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR NpCs Document";
-    SourceTableView = SORTING("Entry No.")
-                      WHERE(Type = CONST("Send to Store"),
-                            "Document Type" = CONST(Order));
+    SourceTableView = sorting("Entry No.")
+                      where(Type = const("Send to Store"),
+                            "Document Type" = const(Order));
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
 
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -102,7 +102,7 @@
 
                     Caption = 'Last Log Error Message';
                     Style = Attention;
-                    StyleExpr = TRUE;
+                    StyleExpr = true;
                     ToolTip = 'Specifies the value of the Last Log Error Message field';
                     ApplicationArea = NPRRetail;
                 }
@@ -196,7 +196,7 @@
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             action(New)
             {
@@ -206,7 +206,7 @@
                 PromotedOnly = true;
                 PromotedCategory = New;
                 PromotedIsBig = true;
-                ShortCutKey = 'Ctrl+Insert';
+                ShortcutKey = 'Ctrl+Insert';
                 ToolTip = 'Create new Collect in Store Order';
                 ApplicationArea = NPRRetail;
 
@@ -223,15 +223,19 @@
                 Caption = 'Run Next Workflow Step';
                 Image = Start;
 
-                ToolTip = 'Executes the Run Next Workflow Step action';
+                ToolTip = 'Executes the Run Next Workflow Step action for selected orders';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
+                    NpCsDocument: Record "NPR NpCs Document";
                     NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
                 begin
-                    NpCsWorkflowMgt.ScheduleRunWorkflow(Rec);
-                    //NpCsCollectMgt.RunLog(Rec, true);
+                    CurrPage.SetSelectionFilter(NpCsDocument);
+                    if NpCsDocument.FindSet() then
+                        repeat
+                            NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
+                        until NpCsDocument.Next() = 0;
                 end;
             }
             group("Send Order")
@@ -242,14 +246,19 @@
                     Caption = 'Send Order to Store';
                     Image = Approve;
 
-                    ToolTip = 'Executes the Send Order to Store action';
+                    ToolTip = 'Executes the Send Order to Store action for selected orders';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
+                        NpCsDocument: Record "NPR NpCs Document";
                         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
                     begin
-                        NpCsWorkflowMgt.RunWorkflowSendOrder(Rec);
+                        CurrPage.SetSelectionFilter(NpCsDocument);
+                        if NpCsDocument.FindSet() then
+                            repeat
+                                NpCsWorkflowMgt.RunWorkflowSendOrder(NpCsDocument);
+                            until NpCsDocument.Next() = 0;
                     end;
                 }
                 action("Send Notification to Store")
@@ -257,14 +266,19 @@
                     Caption = 'Send Notification to Store';
                     Image = SendTo;
 
-                    ToolTip = 'Executes the Send Notification to Store action';
+                    ToolTip = 'Executes the Send Notification to Store action for selected orders';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
+                        NpCsDocument: Record "NPR NpCs Document";
                         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
                     begin
-                        NpCsWorkflowMgt.SendNotificationToStore(Rec);
+                        CurrPage.SetSelectionFilter(NpCsDocument);
+                        if NpCsDocument.FindSet() then
+                            repeat
+                                NpCsWorkflowMgt.SendNotificationToStore(NpCsDocument);
+                            until NpCsDocument.Next() = 0;
                     end;
                 }
             }
@@ -276,30 +290,41 @@
                     Caption = 'Update Order Status';
                     Image = ChangeStatus;
 
-                    ToolTip = 'Executes the Update Order Status action';
+                    ToolTip = 'Executes the Update Order Status action for selected orders';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
+                        NpCsDocument: Record "NPR NpCs Document";
                         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
                     begin
-                        NpCsWorkflowMgt.RunWorkflowOrderStatus(Rec);
+                        CurrPage.SetSelectionFilter(NpCsDocument);
+                        if NpCsDocument.FindSet() then
+                            repeat
+                                NpCsWorkflowMgt.RunWorkflowOrderStatus(NpCsDocument);
+                            until NpCsDocument.Next() = 0;
                     end;
                 }
                 action("Send Notification to Customer")
                 {
                     Caption = 'Send Notification to Customer';
                     Image = SendTo;
-                    Visible = NOT Rec."Send Notification from Store";
+                    Visible = not Rec."Send Notification from Store";
 
-                    ToolTip = 'Executes the Send Notification to Customer action';
+                    ToolTip = 'Executes the Send Notification to Customer action for selected orders';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
+                        NpCsDocument: Record "NPR NpCs Document";
                         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
                     begin
-                        NpCsWorkflowMgt.SendNotificationToCustomer(Rec);
+                        CurrPage.SetSelectionFilter(NpCsDocument);
+                        if NpCsDocument.FindSet() then
+                            repeat
+                                if NpCsDocument."Send Notification from Store" then
+                                    NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
+                            until NpCsDocument.Next() = 0;
                     end;
                 }
             }
@@ -311,14 +336,19 @@
                     Caption = 'Perform Post Processing';
                     Image = Intercompany;
 
-                    ToolTip = 'Executes the Perform Post Processing action';
+                    ToolTip = 'Executes the Perform Post Processing action for selected orders';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
+                        NpCsDocument: Record "NPR NpCs Document";
                         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
                     begin
-                        NpCsWorkflowMgt.RunWorkflowPostProcessing(Rec);
+                        CurrPage.SetSelectionFilter(NpCsDocument);
+                        if NpCsDocument.FindSet() then
+                            repeat
+                                NpCsWorkflowMgt.RunWorkflowPostProcessing(NpCsDocument);
+                            until NpCsDocument.Next() = 0;
                     end;
                 }
                 action(Archive)
@@ -332,30 +362,33 @@
                     trigger OnAction()
                     var
                         NpCsArchCollectMgt: Codeunit "NPR NpCs Arch. Collect Mgt.";
+                        ConfirmQst: Label 'Collect %1 %2 has not been delivered.\\Archive anyway?';
+                        SuccessMsg: Label 'Collect %1 %2 has been archived.';
+                        FailedMsg: Label 'Collect %1 %2 could not be archived:\\%3';
                     begin
                         if (Rec."Processing Status" in [Rec."Processing Status"::" ", Rec."Processing Status"::Pending, Rec."Processing Status"::Confirmed]) and
                           (Rec."Delivery Status" in [Rec."Delivery Status"::" ", Rec."Delivery Status"::Ready])
                         then begin
-                            if not Confirm(Text002, false, Rec."Document Type", Rec."Document No.") then
+                            if not Confirm(ConfirmQst, false, Rec."Document Type", Rec."Document No.") then
                                 exit;
                         end;
-                        if NpCsArchCollectMgt.ArchiveCollectDocument(Rec,true) then
-                            Message(Text003, Rec."Document Type", Rec."Reference No.")
+                        if NpCsArchCollectMgt.ArchiveCollectDocument(Rec, true) then
+                            Message(SuccessMsg, Rec."Document Type", Rec."Reference No.")
                         else
-                            Message(Text004, Rec."Document Type", Rec."Reference No.", GetLastErrorText);
+                            Message(FailedMsg, Rec."Document Type", Rec."Reference No.", GetLastErrorText);
 
                         CurrPage.Update(false);
                     end;
                 }
             }
         }
-        area(navigation)
+        area(Navigation)
         {
             action(Document)
             {
                 Caption = 'Document';
                 Image = Document;
-                ShortCutKey = 'Shift+F7';
+                ShortcutKey = 'Shift+F7';
 
                 ToolTip = 'Executes the Document action';
                 ApplicationArea = NPRRetail;
@@ -371,7 +404,7 @@
             {
                 Caption = 'Log Entries';
                 Image = Log;
-                ShortCutKey = 'Ctrl+F7';
+                ShortcutKey = 'Ctrl+F7';
 
                 ToolTip = 'Executes the Log Entries action';
                 ApplicationArea = NPRRetail;
@@ -387,8 +420,5 @@
     }
 
     var
-        Text002: Label 'Collect %1 %2 has not been delivered.\\Archive anyway?';
-        Text003: Label 'Collect %1 %2 has been archived.';
-        Text004: Label 'Collect %1 %2 could not be archived:\\%3';
 }
 
