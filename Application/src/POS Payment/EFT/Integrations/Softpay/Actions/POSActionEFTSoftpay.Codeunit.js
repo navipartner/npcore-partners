@@ -63,7 +63,7 @@ let main = async (obj) => {
     }
     if (!bc.success)
         await popup.error(bc.errorcaption, bc.errortitle);
-    return {"success": bc.succes, "endSale": bc.endSale};
+    return {"success": bc.succes, "tryEndSale": bc.endSale};
 }
 let step = 1;
 /**
