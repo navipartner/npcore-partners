@@ -4,3 +4,4 @@ Global Blue is a company which provides tax-free shopping services. Its IC2 solu
 
 ## Related links
 - [Set up Global Blue tax free](../postaxfree/howto/globalblue.md)
+- [Tax-free troubleshooting](../../troubleshooting/tax_free_troubleshooting.md)
