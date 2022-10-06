@@ -218,6 +218,15 @@ page 6059788 "NPR APIV1 - Ext. POS Sale Line"
         }
     }
 
+    var
+        ExternalPOSSale: Record "NPR External POS Sale";
+
+    procedure SetExternalPOSSale(pExternalPOSSale: Record "NPR External POS Sale")
+    var
+    begin
+        ExternalPOSSale := pExternalPOSSale;
+    end;
+
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     var
         LineNoInt: Integer;
@@ -242,5 +251,8 @@ page 6059788 "NPR APIV1 - Ext. POS Sale Line"
             Rec.GetCurrency(Currency);
             Rec."Discount %" := Round(Rec."Discount Amount" / (Rec.Quantity * Rec."Unit Price") * 100, Currency."Amount Rounding Precision");
         end;
+
+        If Rec."Sale Type" = Rec."Sale Type"::Sale then
+            Rec."Price Includes VAT" := ExternalPOSSale."Prices Including VAT";
     end;
 }
