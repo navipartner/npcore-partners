@@ -480,21 +480,19 @@
 
     trigger OnInit()
     begin
+        TicketAccessStatisticsMgr.BuildCompressedStatistics(Today);
         LineFactOption := 0;
         ColumnFactOption := 1;
         PeriodType := PeriodType::Day;
         SetAutoFilterOnBlockedFacts();
-        CalcVerticalTotal();
     end;
 
     trigger OnOpenPage()
     begin
-
-        TicketAccessStatisticsMgr.BuildCompressedStatistics(Today);
-
         FindPeriod('');
         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
         UpdateMatrixSubForm();
+        CalcVerticalTotal();
     end;
 
     var
