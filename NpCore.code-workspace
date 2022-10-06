@@ -104,7 +104,8 @@
 				"label": "Compile with analyzers",
 				"detail": "Compile with all analyzers enabled and ContinueBuildOnError for pipeline equivalent full & slow compilation.",
 				"type": "shell",
-				"command": "${workspaceFolder}/.scripts/compile_with_analyzers -workspaceFolder ${workspaceFolder}",
+				"command": "${workspaceFolder}/.scripts/compile_with_analyzers.ps1",
+				"args": ["${workspaceFolder}"],
 				"presentation": {
 					"echo": true,
 					"reveal": "always",
