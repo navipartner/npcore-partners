@@ -1020,7 +1020,7 @@
         TicketStatistics."Admission Code" := AsCode20(TicketStatisticsJson, 'AdmissionCode');
         TicketStatistics."Admission Date" := AsDate(TicketStatisticsJson, 'AccessDate');
         TicketStatistics."Admission Hour" := AsInteger(TicketStatisticsJson, 'AdmissionHour');
-        TicketStatistics."Variant Code" := AsCode10(TicketStatisticsJson, 'ItemCode');
+        TicketStatistics."Variant Code" := AsCode10(TicketStatisticsJson, 'VariantCode');
 
         TicketStatistics."Highest Access Entry No." := AsInteger(TicketStatisticsJson, 'MaxAdmissionEntryNo');
 
