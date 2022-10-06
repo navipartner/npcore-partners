@@ -1,6 +1,7 @@
 ﻿codeunit 6014437 "NPR Phone Lookup"
 {
     Access = Internal;
+
     var
         IComm: Record "NPR I-Comm";
         Initialized: Boolean;
@@ -20,7 +21,7 @@
         Clear(TempPhoneLookupBuffer);
         TempPhoneLookupBuffer."Phone No." := PhoneNo;
 
-        CODEUNIT.Run(IComm."Number Info Codeunit ID", TempPhoneLookupBuffer);
+        Codeunit.Run(IComm."Number Info Codeunit ID", TempPhoneLookupBuffer);
 
         case TempPhoneLookupBuffer.Count() of
             0:
@@ -32,7 +33,7 @@
                 end;
         end;
 
-        exit(PAGE.RunModal(PAGE::"NPR Phone Number Lookup", TempPhoneLookupBuffer) = ACTION::LookupOK);
+        exit(Page.RunModal(Page::"NPR Phone Number Lookup", TempPhoneLookupBuffer) = Action::LookupOK);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Contact, 'OnAfterValidateEvent', 'No.', true, true)]
@@ -73,17 +74,6 @@
             UpdateCust(Rec, TempPhoneLookupBuffer);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterModifyEvent', '', true, true)]
-    local procedure CustomerOnAfterModify(var Rec: Record Customer; RunTrigger: Boolean)
-    begin
-        if not RunTrigger then
-            exit;
-
-        Rec."Last Date Modified" := Today();
-        Rec.Modify(false);
-    end;
-
-
     [EventSubscriber(ObjectType::Table, Database::Vendor, 'OnAfterValidateEvent', 'No.', true, true)]
     local procedure VendorOnValidateNo(var Rec: Record Vendor; var xRec: Record Vendor; CurrFieldNo: Integer)
     var
@@ -101,16 +91,6 @@
 
         if RunPhoneLookup(Rec."No.", TempPhoneLookupBuffer) then
             UpdateVend(Rec, TempPhoneLookupBuffer);
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::Vendor, 'OnAfterModifyEvent', '', true, true)]
-    local procedure VendorOnAfterModify(var Rec: Record Vendor; RunTrigger: Boolean)
-    begin
-        if not RunTrigger then
-            exit;
-
-        Rec."Last Date Modified" := Today();
-        Rec.Modify(false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR MM Member Info Capture", 'OnAfterValidateEvent', 'Phone No.', true, true)]
@@ -236,7 +216,7 @@
         Commit();
 
         Customer.SetRecFilter();
-        if PAGE.RunModal(PAGE::"Customer Card", Customer) = ACTION::LookupOK then;
+        if Page.RunModal(Page::"Customer Card", Customer) = Action::LookupOK then;
     end;
 
     local procedure CreateContact(TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary)
@@ -263,7 +243,7 @@
 
         if (TempTDCNamesNumbersBuffer."Create Contact") and (not TempTDCNamesNumbersBuffer."Create Customer") then begin
             Contact.SetRecFilter();
-            if (PAGE.RunModal(PAGE::"Contact Card", Contact) = ACTION::OK) then;
+            if (Page.RunModal(Page::"Contact Card", Contact) = Action::OK) then;
         end;
     end;
 
@@ -275,7 +255,7 @@
             exit;
 
         ContactBusinessRelation.Init();
-        ContactBusinessRelation."Contact No." := Copystr(TempTDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(ContactBusinessRelation."Contact No."));
+        ContactBusinessRelation."Contact No." := CopyStr(TempTDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(ContactBusinessRelation."Contact No."));
         ContactBusinessRelation."Business Relation Code" := '';
         ContactBusinessRelation."Link to Table" := LinkToTable;
         ContactBusinessRelation.Insert();
@@ -305,7 +285,7 @@
 
 
         Vendor.SetRecFilter();
-        if (PAGE.RunModal(PAGE::"Vendor Card", Vendor) = ACTION::OK) then;
+        if (Page.RunModal(Page::"Vendor Card", Vendor) = Action::OK) then;
     end;
 
     local procedure InitIComm(): Boolean
