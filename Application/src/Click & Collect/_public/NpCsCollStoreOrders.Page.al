@@ -1,21 +1,21 @@
 ﻿page 6151205 "NPR NpCs Coll. Store Orders"
 {
     Caption = 'Collect in Store Orders';
-    CardPageID = "NPR NpCs Coll. StoreOrder Card";
+    CardPageId = "NPR NpCs Coll. StoreOrder Card";
     Editable = false;
     InsertAllowed = false;
     PageType = List;
     RefreshOnActivate = true;
     SourceTable = "NPR NpCs Document";
-    SourceTableView = WHERE(Type = CONST("Collect in Store"),
-                            "Document Type" = FILTER(Order | "Posted Invoice"));
+    SourceTableView = where(Type = const("Collect in Store"),
+                            "Document Type" = filter(Order | "Posted Invoice"));
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
 
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -228,7 +228,7 @@
 
                     Caption = 'Last Log Error Message';
                     Style = Attention;
-                    StyleExpr = TRUE;
+                    StyleExpr = true;
                     ToolTip = 'Specifies the value of the Last Log Error Message field';
                     ApplicationArea = NPRRetail;
                 }
@@ -238,7 +238,7 @@
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             group("&Print")
             {
@@ -254,14 +254,20 @@
                     PromotedIsBig = true;
                     Visible = Rec."Processing Print Template" <> '';
 
-                    ToolTip = 'Executes the Print Order action';
+                    ToolTip = 'Print the selected Orders';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
+                        NpCsDocument: Record "NPR NpCs Document";
                         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
                     begin
-                        NpCsCollectMgt.PrintOrder(Rec);
+                        CurrPage.SetSelectionFilter(NpCsDocument);
+                        if NpCsDocument.FindSet() then
+                            repeat
+                                if NpCsDocument."Processing Print Template" <> '' then
+                                    NpCsCollectMgt.PrintOrder(NpCsDocument);
+                            until NpCsDocument.Next() = 0;
                     end;
                 }
                 action("Print Confirmation")
@@ -296,7 +302,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = (Rec."Delivery Status" = Rec."Delivery Status"::Delivered) AND (((Rec."Bill via" = Rec."Bill via"::POS) AND (Rec."Delivery Print Template (POS)" <> '')) OR ((Rec."Bill via" = Rec."Bill via"::"Sales Document") AND (Rec."Delivery Print Template (S.)" <> '')));
+                    Visible = (Rec."Delivery Status" = Rec."Delivery Status"::Delivered) and (((Rec."Bill via" = Rec."Bill via"::POS) and (Rec."Delivery Print Template (POS)" <> '')) or ((Rec."Bill via" = Rec."Bill via"::"Sales Document") and (Rec."Delivery Print Template (S.)" <> '')));
 
                     ToolTip = 'Executes the Print Delivery action';
                     ApplicationArea = NPRRetail;
@@ -320,19 +326,31 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = ((Rec."Processing Status" = 0) OR (Rec."Processing Status" = 1)) AND (Rec."Delivery Status" = 0);
+                    Visible = ((Rec."Processing Status" = 0) or (Rec."Processing Status" = 1)) and (Rec."Delivery Status" = 0);
 
-                    ToolTip = 'Executes the Confirm Order action';
+                    ToolTip = 'Confirms the selected  Orders';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     var
+                        NpCsDocument: Record "NPR NpCs Document";
                         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
-                    begin
-                        if not Confirm(Text000, true, Rec."Document No.") then
-                            exit;
+                        ConfirmSingleQst: Label 'Confirm Order %1?';
+                        ConfirmMultipleQst: Label 'Confirm selected Orders?';
 
-                        NpCsCollectMgt.ConfirmProcessing(Rec);
+                    begin
+                        CurrPage.SetSelectionFilter(NpCsDocument);
+                        if NpCsDocument.Count = 1 then begin
+                            if not Confirm(ConfirmSingleQst, true, NpCsDocument."Document No.") then
+                                exit;
+                        end else
+                            if not Confirm(ConfirmMultipleQst, true) then
+                                exit;
+                        if NpCsDocument.FindSet() then
+                            repeat
+                                if ((NpCsDocument."Processing Status" = 0) or (NpCsDocument."Processing Status" = 1)) and (NpCsDocument."Delivery Status" = 0) then
+                                    NpCsCollectMgt.ConfirmProcessing(NpCsDocument);
+                            until NpCsDocument.Next() = 0;
                     end;
                 }
                 action("Reject Order")
@@ -343,7 +361,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = ((Rec."Processing Status" = 0) OR (Rec."Processing Status" = 1)) AND (Rec."Delivery Status" = 0) AND (Rec."Store Stock");
+                    Visible = ((Rec."Processing Status" = 0) or (Rec."Processing Status" = 1)) and (Rec."Delivery Status" = 0) and (Rec."Store Stock");
 
                     ToolTip = 'Executes the Reject Order action';
                     ApplicationArea = NPRRetail;
@@ -351,8 +369,9 @@
                     trigger OnAction()
                     var
                         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
+                        ConfirmQst: Label 'Reject Order %1?';
                     begin
-                        if not Confirm(Text001, true, Rec."Document No.") then
+                        if not Confirm(ConfirmQst, true, Rec."Document No.") then
                             exit;
 
                         NpCsCollectMgt.RejectProcessing(Rec);
@@ -379,8 +398,10 @@
                         CurrPage.SetSelectionFilter(NpCsDocument);
                         if NpCsDocument.FindSet(true) then
                             repeat
-                                NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
-                                Commit();
+                                if NpCsDocument."Send Notification from Store" then begin
+                                    NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
+                                    Commit();
+                                end;
                             until NpCsDocument.Next() = 0;
                     end;
                 }
@@ -395,17 +416,20 @@
                     trigger OnAction()
                     var
                         NpCsArchCollectMgt: Codeunit "NPR NpCs Arch. Collect Mgt.";
+                        SuccessMsg: Label 'Collect %1 %2 has been archived.';
+                        FailedMsg: Label 'Collect %1 %2 could not be archived:\\%3';
+                        ConfirmQst: Label 'Collect %1 %2 has not been delivered.\\Archive anyway?';
                     begin
                         if (Rec."Processing Status" in [Rec."Processing Status"::" ", Rec."Processing Status"::Pending, Rec."Processing Status"::Confirmed]) and
                           (Rec."Delivery Status" in [Rec."Delivery Status"::" ", Rec."Delivery Status"::Ready])
                         then begin
-                            if not Confirm(Text002, false, Rec."Document Type", Rec."Document No.") then
+                            if not Confirm(ConfirmQst, false, Rec."Document Type", Rec."Document No.") then
                                 exit;
                         end;
                         if NpCsArchCollectMgt.ArchiveCollectDocument(Rec, true) then
-                            Message(Text003, Rec."Document Type", Rec."Reference No.")
+                            Message(SuccessMsg, Rec."Document Type", Rec."Reference No.")
                         else
-                            Message(Text004, Rec."Document Type", Rec."Reference No.", GetLastErrorText);
+                            Message(FailedMsg, Rec."Document Type", Rec."Reference No.", GetLastErrorText);
 
                         CurrPage.Update(false);
                     end;
@@ -425,20 +449,25 @@
 
                     trigger OnAction()
                     var
+                        NpCsDocument: Record "NPR NpCs Document";
                         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
                     begin
-                        NpCsWorkflowMgt.RunCallback(Rec);
+                        CurrPage.SetSelectionFilter(NpCsDocument);
+                        if NpCsDocument.FindSet() then
+                            repeat
+                                NpCsWorkflowMgt.RunCallback(NpCsDocument);
+                            until NpCsDocument.Next() = 0;
                     end;
                 }
             }
         }
-        area(navigation)
+        area(Navigation)
         {
             action(Document)
             {
                 Caption = 'Document';
                 Image = Document;
-                ShortCutKey = 'Shift+F7';
+                ShortcutKey = 'Shift+F7';
 
                 ToolTip = 'Executes the Document action';
                 ApplicationArea = NPRRetail;
@@ -454,7 +483,7 @@
             {
                 Caption = 'Log Entries';
                 Image = Log;
-                ShortCutKey = 'Ctrl+F7';
+                ShortcutKey = 'Ctrl+F7';
 
                 ToolTip = 'Executes the Log Entries action';
                 ApplicationArea = NPRRetail;
@@ -475,16 +504,11 @@
     end;
 
     var
-        Text000: Label 'Confirm Order %1?';
-        Text001: Label 'Reject Order %1?';
         HasCallback: Boolean;
-        Text002: Label 'Collect %1 %2 has not been delivered.\\Archive anyway?';
-        Text003: Label 'Collect %1 %2 has been archived.';
-        Text004: Label 'Collect %1 %2 could not be archived:\\%3';
 
     local procedure RunCard()
     begin
-        PAGE.Run(PAGE::"NPR NpCs Coll. StoreOrder Card", Rec);
+        Page.Run(Page::"NPR NpCs Coll. StoreOrder Card", Rec);
     end;
 }
 
