@@ -2,8 +2,8 @@
 {
     Extensible = False;
     Caption = 'Ticket Access Statistics';
-    Editable = false;
     PageType = List;
+    InsertAllowed = false;
     SourceTable = "NPR TM Ticket Access Stats";
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -14,6 +14,7 @@
         {
             repeater(Group)
             {
+                Editable = false;
                 field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -80,6 +81,12 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sum Admission Count field';
                 }
+                field("Highest Access Entry No."; Rec."Highest Access Entry No.")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Highest Access Entry No. field.';
+                }
+
             }
         }
     }
