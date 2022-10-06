@@ -237,7 +237,7 @@
         exit(true);
     end;
 
-    internal procedure CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader: Record "NPR E-mail Template Header"; var RecRef: RecordRef; ReportID: Integer) ErrorMessage: Text[1024]
+    procedure CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader: Record "NPR E-mail Template Header"; var RecRef: RecordRef; ReportID: Integer) ErrorMessage: Text[1024]
     var
         EmailTemplateLine: Record "NPR E-mail Templ. Line";
         EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
@@ -311,7 +311,7 @@
         exit('');
     end;
 
-    internal procedure SendSmtpMessage(var RecRef: RecordRef; Silent: Boolean) ErrorMessage: Text[1024]
+    procedure SendSmtpMessage(var RecRef: RecordRef; Silent: Boolean) ErrorMessage: Text[1024]
     var
         TransactionalEmail: Record "NPR Smart Email";
         EmailLog: Record "NPR E-mail Log";
