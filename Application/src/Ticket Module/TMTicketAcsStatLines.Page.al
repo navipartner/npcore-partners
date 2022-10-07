@@ -22,7 +22,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("LINE_Total"; LINE_Total)
+                field(LINE_Total; LINE_Total)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Admissions';
@@ -191,6 +191,9 @@
     var
         Found: Boolean;
     begin
+        if HideLinesWithZeroAdmitted and not Rec.Visible then
+            SetItemWithAdmissionCount(Rec);
+
         Found := TicketAdmissionStatisticsMgr.FindRec(LineFactOption, Rec, Which, TicketFactLineFilter, PeriodType, PeriodFilter, PeriodInitialized, InternalDateFilter);
         if (Found) then
             MATRIX_OnAfterGetRecord(MATRIX_MaxNoOfMatrixColumn);
@@ -386,6 +389,16 @@
         CellValue := TicketAdmissionStatisticsMgr.FormatCellValue(LineFactOption, Rec.Code,
                             ColumnFactOption, MATRIX_ColumnTempRec.Code, IncludeColumns,
                             TicketStatisticsFilter, MatrixPeriod, DisplayOption, PeriodType, TrendPeriodType, AdmissionDefinition);
+    end;
+
+    local procedure SetItemWithAdmissionCount(var DimensionCodeBuffer: Record "Dimension Code Buffer")
+    var
+        TicketStatistics: Record "NPR TM Ticket Access Stats";
+    begin
+        TicketStatistics.CopyFilters(TicketDrillDownFilter);
+        TicketStatistics.SetFilter("Admission Count", '<>0');
+        if TicketStatistics.FindFirst() then
+            DimensionCodeBuffer.Code := TicketStatistics."Item No.";
     end;
 }
 
