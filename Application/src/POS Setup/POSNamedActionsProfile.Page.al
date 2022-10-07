@@ -15,13 +15,11 @@
             {
                 field("Primary Key"; Rec."Primary Key")
                 {
-
                     ToolTip = 'Specifies the value of the Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
@@ -30,7 +28,6 @@
             {
                 field("Login Action Code"; Rec."Login Action Code")
                 {
-
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = LoginActionRefreshNeeded;
@@ -44,7 +41,6 @@
                 }
                 field("Text Enter Action Code"; Rec."Text Enter Action Code")
                 {
-
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = TextEnterActionRefreshNeeded;
@@ -58,7 +54,6 @@
                 }
                 field("Item Insert Action Code"; Rec."Item Insert Action Code")
                 {
-
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = ItemInsertActionRefreshNeeded;
@@ -72,7 +67,6 @@
                 }
                 field("Payment Action Code"; Rec."Payment Action Code")
                 {
-
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = PaymentActionRefreshNeeded;
@@ -86,7 +80,6 @@
                 }
                 field("Customer Action Code"; Rec."Customer Action Code")
                 {
-
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = CustomerActionRefreshNeeded;
@@ -100,7 +93,6 @@
                 }
                 field("Lock POS Action Code"; Rec."Lock POS Action Code")
                 {
-
                     Style = Unfavorable;
                     StyleExpr = LockActionRefreshNeeded;
                     ToolTip = 'Specifies the value of the Lock POS Action Code field';
@@ -113,7 +105,6 @@
                 }
                 field("Unlock POS Action Code"; Rec."Unlock POS Action Code")
                 {
-
                     Style = Unfavorable;
                     StyleExpr = UnlockActionRefreshNeeded;
                     ToolTip = 'Specifies the value of the Unlock POS Action Code field';
@@ -126,7 +117,6 @@
                 }
                 field("OnBeforePaymentView Action"; Rec."OnBeforePaymentView Action")
                 {
-
                     Style = Unfavorable;
                     StyleExpr = OnBeforePaymentViewActionRefreshNeeded;
                     ToolTip = 'Specifies the value of the On Before Payment View Action Code field';
@@ -139,7 +129,8 @@
                 }
                 field("Idle Timeout Action Code"; Rec."Idle Timeout Action Code")
                 {
-
+                    Style = Unfavorable;
+                    StyleExpr = IdleTimeoutActionRefreshNeeded;
                     ToolTip = 'Specifies the value of the Idle Timeout Action Code field';
                     ApplicationArea = NPRRetail;
 
@@ -150,13 +141,26 @@
                 }
                 field("Admin Menu Action Code"; Rec."Admin Menu Action Code")
                 {
-
+                    Style = Unfavorable;
+                    StyleExpr = AdminMenuActionRefreshNeeded;
                     ToolTip = 'Specifies the value of the Admin Menu Action Code field';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     begin
                         Rec.AssistEdit(Rec."Admin Menu Action Code", Rec.FieldNo("Admin Menu Action Code"));
+                    end;
+                }
+                field("End of Day Action Code"; Rec."End of Day Action Code")
+                {
+                    Style = Unfavorable;
+                    StyleExpr = EndOfDayActionRefreshNeeded;
+                    ToolTip = 'Specifies a POS action designed to perform end of day balancing of POS units. By default system uses ''BALANCE_V3'', if no value is specified in this field.', Comment = 'BALANCE_V3 is a POS action name. Do not translate it.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAssistEdit()
+                    begin
+                        Rec.AssistEdit(Rec."End of Day Action Code", Rec.FieldNo("End of Day Action Code"));
                     end;
                 }
             }
@@ -214,6 +218,9 @@
         LockActionRefreshNeeded: Boolean;
         UnlockActionRefreshNeeded: Boolean;
         OnBeforePaymentViewActionRefreshNeeded: Boolean;
+        IdleTimeoutActionRefreshNeeded: Boolean;
+        AdminMenuActionRefreshNeeded: Boolean;
+        EndOfDayActionRefreshNeeded: Boolean;
         RefreshEnabled: Boolean;
 
     local procedure UpdateActionsStyles()
@@ -228,10 +235,14 @@
         LockActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("Lock POS Action Code"), Rec."Lock POS Action Code");
         UnlockActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("Unlock POS Action Code"), Rec."Unlock POS Action Code");
         OnBeforePaymentViewActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("OnBeforePaymentView Action"), Rec."OnBeforePaymentView Action");
+        IdleTimeoutActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("Idle Timeout Action Code"), Rec."Idle Timeout Action Code");
+        AdminMenuActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("Admin Menu Action Code"), Rec."Admin Menu Action Code");
+        EndOfDayActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId, '', Rec.FieldNo("End of Day Action Code"), Rec."End of Day Action Code");
 
         RefreshEnabled :=
           LoginActionRefreshNeeded or TextEnterActionRefreshNeeded or ItemInsertActionRefreshNeeded or PaymentActionRefreshNeeded or CustomerActionRefreshNeeded or
-          LockActionRefreshNeeded or UnlockActionRefreshNeeded or OnBeforePaymentViewActionRefreshNeeded;
+          LockActionRefreshNeeded or UnlockActionRefreshNeeded or OnBeforePaymentViewActionRefreshNeeded or IdleTimeoutActionRefreshNeeded or AdminMenuActionRefreshNeeded or
+          EndOfDayActionRefreshNeeded;
     end;
 
     local procedure RefreshInvalidActions()
@@ -261,6 +272,14 @@
 
         if OnBeforePaymentViewActionRefreshNeeded then
             ParamMgt.RefreshParameters(Rec.RecordId, '', Rec.FieldNo("OnBeforePaymentView Action"), Rec."OnBeforePaymentView Action");
+
+        if IdleTimeoutActionRefreshNeeded then
+            ParamMgt.RefreshParameters(Rec.RecordId, '', Rec.FieldNo("Idle Timeout Action Code"), Rec."Idle Timeout Action Code");
+
+        if AdminMenuActionRefreshNeeded then
+            ParamMgt.RefreshParameters(Rec.RecordId, '', Rec.FieldNo("Admin Menu Action Code"), Rec."Admin Menu Action Code");
+
+        if EndOfDayActionRefreshNeeded then
+            ParamMgt.RefreshParameters(Rec.RecordId, '', Rec.FieldNo("End of Day Action Code"), Rec."End of Day Action Code");
     end;
 }
-

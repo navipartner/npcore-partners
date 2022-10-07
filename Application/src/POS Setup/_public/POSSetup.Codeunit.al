@@ -375,6 +375,13 @@
         IsConfigured := POSSession.RetrieveSessionAction(ActionCode_AdminMenu(), ActionOut);
     end;
 
+    internal procedure Action_EndOfDay(var ActionOut: Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session") IsConfigured: Boolean
+    begin
+        Clear(ActionOut);
+        InitializeSetup();
+        IsConfigured := POSSession.RetrieveSessionAction(ActionCode_EndOfDay(), ActionOut);
+    end;
+
     internal procedure ActionCode_Login(): Code[20]
     begin
         InitializeSetup();
@@ -432,6 +439,14 @@
     begin
         InitializeSetup();
         exit(Setup."Admin Menu Action Code");
+    end;
+
+    internal procedure ActionCode_EndOfDay(): Code[20]
+    begin
+        InitializeSetup();
+        if Setup."End of Day Action Code" = '' then
+            Setup."End of Day Action Code" := 'BALANCE_V3';
+        exit(Setup."End of Day Action Code");
     end;
 
     #endregion "Action Settings"

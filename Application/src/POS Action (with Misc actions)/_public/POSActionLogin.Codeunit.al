@@ -115,7 +115,7 @@
                     // This state might happen first time when attaching a POS as a slave with status open when master is state close.
                     if ((IsManagedPOS) and (ManagedByPOSUnit.Status <> ManagedByPOSUnit.Status::OPEN)) then begin
                         Message(ManagedPos, ManagedByPOSUnit."No.", ManagedByPOSUnit.Name);
-                        StartEODWorkflow(FrontEnd, POSSession, 'BALANCE_V3', IsManagedPOS); // will fix status on the managed POS
+                        StartEODWorkflow(FrontEnd, POSSession, Setup.ActionCode_EndOfDay(), IsManagedPOS); // will fix status on the managed POS
                         exit;
                     end;
 
@@ -129,7 +129,7 @@
                             Error(InvalidStatus);
 
                         // Force a Z-Report or Close WorkShift
-                        StartEODWorkflow(FrontEnd, POSSession, 'BALANCE_V3', IsManagedPOS);
+                        StartEODWorkflow(FrontEnd, POSSession, Setup.ActionCode_EndOfDay(), IsManagedPOS);
                         exit;
                     end;
 
@@ -153,7 +153,7 @@
                         if (not Confirm(BalancingRequired, true, Format(Today - BalanceAge))) then
                             Error(InvalidStatus);
 
-                        StartEODWorkflow(FrontEnd, POSSession, 'BALANCE_V3', IsManagedPOS);
+                        StartEODWorkflow(FrontEnd, POSSession, Setup.ActionCode_EndOfDay(), IsManagedPOS);
                         exit;
                     end;
 
@@ -166,7 +166,7 @@
                     if (not Confirm(ContinueEoD, true, POSUnit.TableCaption(), POSUnit."No.")) then
                         Error(IsEoD, POSUnit.TableCaption(), POSUnit.FieldCaption(Status));
 
-                    StartEODWorkflow(FrontEnd, POSSession, 'BALANCE_V3', IsManagedPOS);
+                    StartEODWorkflow(FrontEnd, POSSession, Setup.ActionCode_EndOfDay(), IsManagedPOS);
                 end;
         end;
     end;
@@ -230,7 +230,7 @@
         POSSession.StartTransaction();
 
         case ActionName of
-            'BALANCE_V3':
+            'BALANCE_V3', 'BALANCE_V4':
                 begin
                     if (not ManagedEOD) then POSAction.SetWorkflowInvocationParameter('Type', 1, FrontEnd);  // Z-Report, final count
                     if (ManagedEOD) then POSAction.SetWorkflowInvocationParameter('Type', 2, FrontEnd);  // Close WorkShift - for managed POS

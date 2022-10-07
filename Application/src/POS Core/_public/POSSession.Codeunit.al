@@ -480,6 +480,8 @@
         POSAction: Record "NPR POS Action";
     begin
         Clear(ActionOut);
+        if ActionCode = '' then
+            exit(false);
         if not TempSessionActions.Get(ActionCode) then begin
             if (not POSAction.Get(ActionCode)) then
                 exit(false);

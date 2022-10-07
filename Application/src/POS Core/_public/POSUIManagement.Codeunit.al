@@ -696,6 +696,9 @@
         Setup.Action_AdminMenu(TempAction, POSSession);
         ConfigureReusableWorkflow(TempAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("Admin Menu Action Code")), POSSetup.FieldNo("Admin Menu Action Code"));
 
+        Setup.Action_EndOfDay(TempAction, POSSession);
+        ConfigureReusableWorkflow(TempAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, POSSetup.TableCaption(), POSSetup.FieldCaption("End of Day Action Code")), POSSetup.FieldNo("End of Day Action Code"));
+
         OnConfigureReusableWorkflows(POSSession, Setup);
     end;
 
@@ -738,6 +741,7 @@
         Options.Add('kioskUnlockEnabled', Setup.GetKioskUnlockEnabled());
         Options.Add('idleTimeoutWorkflow', Setup.ActionCode_IdleTimeout());
         Options.Add('posUnitType', Format(GetPOSUnitType(Setup), 0, 9));
+        Options.Add('endOfDayWorkflow', Setup.ActionCode_EndOfDay());
         Options.Add('adminMenuWorkflow', Setup.ActionCode_AdminMenu());
         Setup.GetNamedActionSetup(POSSetup);
         Options.Add('adminMenuWorkflow_parameters', POSActionParameterMgt.GetParametersAsJson(POSSetup.RecordId, POSSetup.FieldNo("Admin Menu Action Code")));

@@ -196,6 +196,24 @@
                 ParamMgt.CopyFromActionToField("Admin Menu Action Code", RecordId, FieldNo("Admin Menu Action Code"));
             end;
         }
+        field(160; "End of Day Action Code"; Code[20])
+        {
+            Caption = 'End of Day Action Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Action";
+
+            trigger OnLookup()
+            begin
+                if ActionMgt.LookupAction("End of Day Action Code") then
+                    Validate("End of Day Action Code");
+            end;
+
+            trigger OnValidate()
+            begin
+                ParamMgt.ClearParametersForRecord(RecordId, FieldNo("End of Day Action Code"));
+                ParamMgt.CopyFromActionToField("End of Day Action Code", RecordId, FieldNo("End of Day Action Code"));
+            end;
+        }
     }
 
     keys
