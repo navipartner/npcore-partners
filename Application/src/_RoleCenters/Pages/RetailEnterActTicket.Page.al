@@ -46,6 +46,17 @@
                         Page.Run(Page::"NPR TM Ticket Type");
                     end;
                 }
+                field(TicketItems; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(TicketItems))))
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the list of ticket items.';
+                    Caption = 'Ticket Items';
+
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR TM Ticket Item List");
+                    end;
+                }
                 field("Ticket Admission BOM"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Ticket Admission BOM"))))
                 {
                     ApplicationArea = NPRRetail;

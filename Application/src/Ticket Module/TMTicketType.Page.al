@@ -166,6 +166,37 @@
                 PromotedCategory = Category4;
                 RunObject = Page "NPR TM Ticket Admissions";
             }
+
+            action(TicketItemsFiltered)
+            {
+                ToolTip = 'Navigate to Ticket Items List, showing Tickets Items configured with the selected Ticket Type';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Ticket Items (Filtered)';
+                Image = ItemTracing;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category4;
+                trigger OnAction()
+                var
+                    TicketItemsListPage: Page "NPR TM Ticket Item List";
+                begin
+                    TicketItemsListPage.SetTicketTypeFilter(Rec.Code);
+                    TicketItemsListPage.Run();
+                end;
+            }
+
+            action(TicketItemsAll)
+            {
+                ToolTip = 'Navigate to Ticket Items List, showing Tickets Items configured with the selected Ticket Type';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Ticket Items (All)';
+                Image = ItemTracing;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category4;
+                RunObject = Page "NPR TM Ticket Item List";
+            }
+
             action("Ticket BOM")
             {
                 ToolTip = 'Navigate to Ticket BOM, showing Tickets configured with the selected Ticket Type';

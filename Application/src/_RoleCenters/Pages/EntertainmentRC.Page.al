@@ -218,6 +218,16 @@
 
                     ApplicationArea = NPRRetail;
                 }
+                action(TicketItems)
+                {
+
+                    Caption = 'Ticket Items';
+                    RunObject = Page "NPR TM Ticket Item List";
+                    ToolTip = 'View or edit detailed information about the ticket Items, such as the ticket item configuration and constraints, etc.';
+
+                    ApplicationArea = NPRRetail;
+                }
+
                 action("Ticket BOM")
                 {
 
@@ -232,7 +242,7 @@
 
                     Caption = 'Ticket Schedules';
                     RunObject = Page "NPR TM Ticket Schedules";
-                    ToolTip = 'View or edit detailed information about the sicket schedules such as schedule code and type, start from, recurrence pattern etc.';
+                    ToolTip = 'View or edit detailed information about the ticket schedules such as schedule code and type, start from, recurrence pattern etc.';
 
                     ApplicationArea = NPRRetail;
                 }
