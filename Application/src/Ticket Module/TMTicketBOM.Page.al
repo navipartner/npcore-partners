@@ -7,7 +7,7 @@
     UsageCategory = Administration;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     ContextSensitiveHelpPage = 'product/ticket/intro.html';
-    PromotedActionCategories = 'New,Process,Report,Create Tickets,Navigate';
+    PromotedActionCategories = 'New,Process,Report,Create Tickets,Navigate,History';
     CardPageId = "NPR TM Ticket BOM Card";
     Editable = true;
 
@@ -20,27 +20,27 @@
                 field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the identification number of an item created in the ERP system that is used in the POS for selling a specific ticket. ';
+                    ToolTip = 'Specifies the item No. used to create this specific ticket configuration. The same Item No. can be added multiple times with different Ticket Admissions or if variants are applied.';
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the code that is added to the value in the Item No. column to determine the ticket type (e.g., tickets for children/adults/seniors). Microsoft only supports one dimension of variants.';
+                    ToolTip = 'Specifies the variant code that can be added to the Item No. This is optional, and only used if the Item is configured with variants';
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the type of admission that the ticket can be used for. Tickets offer different levels of clearance, and they may allow access to multiple sites (e.g., dungeon and treasury tours in a castle).';
+                    ToolTip = 'Specifies the specific Ticket admission that the ticket can be used for. Multiple Ticket admissions can be applied to the same Ticket Item configuration.';
                 }
                 field(Default; Rec.Default)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the default admission when multiple admissions are created for the ticket.';
+                    ToolTip = 'Specifies the default admission when multiple admissions are created for the ticket. This is relevant if POS is configured to admit Default Admission upon sale.';
                 }
                 field("Ticket Schedule Selection"; Rec."Ticket Schedule Selection")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the default POS schedule selection behavior, intended to provide a smart assist for the walk-up ticket sales process.';
+                    ToolTip = 'Specifies the default POS schedule selection behavior. It is possible to select something different than was previously specified in Admission Setup. This option is useful if different behavior is requested on the POS sale, as opposed to Web sales.';
                 }
                 field("Sales From Date"; Rec."Sales From Date")
                 {
@@ -60,18 +60,18 @@
                 field("Admission Entry Validation"; Rec."Admission Entry Validation")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Determines how many times the ticket can be validated when admitting entry.';
+                    ToolTip = 'Determines how the ticket can be validated: Single - allows for a single admission of the ticket.; Same Day - the ticket can be validated throughout the same day as the first admission; Multiple -the ticket can be validated a number of times as stated in Max No. Of Entries. Using this can allow the ticket to be validated over the course of several days.';
                 }
                 field("Activation Method"; Rec."Activation Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Determines when the ticket is recorded as admitted. The activation can, for example, occur automatically after sales.';
+                    ToolTip = 'Determines how the ticket should be admitted: On Scan - the ticket will be admitted upon scanning; On Sale - the ticket will be admitted during its sale, often in the context of the POS sale; Always - similar to On-Sale, except it allows for the ticket to be re-admitted later; Per Unit - reacts based on the setup in Default admission per a POS Unit.';
                     Caption = 'Admission Method';
                 }
                 field("Percentage of Adm. Capacity"; Rec."Percentage of Adm. Capacity")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Determines a percentage of maximum admission capacity for the provided Item No.. This is a useful option when there are several types of tickets sold for the same admission.';
+                    ToolTip = 'Determines a percentage of the maximum admission capacity for the provided Item No. This is a useful option when several types of tickets are sold for the same admission. One ticket needs to be at 100% in order to be able to sell full capacity.';
                 }
                 field("POS Sale May Exceed Capacity"; Rec."POS Sale May Exceed Capacity")
                 {
@@ -82,7 +82,7 @@
                 field("Max No. Of Entries"; Rec."Max No. Of Entries")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Determines the maximum number of entries to an admission that can be made before the ticket becomes invalid.';
+                    ToolTip = 'Determines the maximum number of entries for an admission that can be made before the ticket becomes invalid. This requires the Admission Entry Validation to be set to Multiple.';
                 }
                 field("Admission Dependency Code"; Rec."Admission Dependency Code")
                 {
@@ -91,60 +91,60 @@
                 }
                 field("Revisit Condition (Statistics)"; Rec."Revisit Condition (Statistics)")
                 {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies how to define a unique visitor when a ticket is used more than once.';
+                    ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies how to define a unique visitor when a ticket is used more than once: Never - every ticket scan is considered unique; Non-initial - only the first scan is considered unique; Daily Non-Initial - only the first daily scan is considered unique, and if no setup is applied, it will act as Non-Initial.';
                 }
                 field("Duration Formula"; Rec."Duration Formula")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Determines the period during which the ticket is valid.';
+                    ToolTip = 'Determines the period during which the ticket is valid. This occurs if the setting on Ticket Type is set to Ticket BOM.';
                 }
                 field("Allow Rescan Within (Sec.)"; Rec."Allow Rescan Within (Sec.)")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the number of seconds after scan during which the ticket can be rescanned even though ticket only allows a single admission. If no value is stated, the ticket can’t be rescanned (assuming single entry is allowed). This option is useful for speed gates, in case a person fails to enter and immediately retries entry.';
+                    ToolTip = 'Specifies the number of seconds after the scan during which the ticket can be rescanned, even though it only permits a single admission. If no value is stated, the ticket cannot be rescanned (assuming single entry is allowed). This option is useful for speed gates, if a person fails to enter, and immediately retries the entry.';
                 }
                 field("Prefered Sales Display Method"; Rec."Prefered Sales Display Method")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Prefered Sales Display Method field';
+                    ToolTip = 'Specifies the preferred sales display method. This setting is only relevant in a Magento web shop.';
                 }
                 field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Quantity field';
+                    ToolTip = 'Specifies the quantity of admissions related to this ticket. If set to 5, selling 1 ticket item, will result in 5 admissions.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies useful information about the ticket, that can be included on the printed ticket.';
+                    ToolTip = 'Specifies useful information about the ticket, that can be included on the printed ticket. This can be different from the Item Description.';
                 }
                 field("Admission Description"; Rec."Admission Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies useful information about the admission that can be included on a printed ticket.';
+                    ToolTip = 'Specifies useful information about the admission that can be included on a printed ticket. This can be different from the Admission Description.';
                 }
                 field("Reschedule Policy"; Rec."Reschedule Policy")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies whether it’s possible to change the ticket reservation time.';
+                    ToolTip = 'Specifies whether it''s possible to change the ticket reservation time: Not Allowed - it''s not possible to change the reservation; Always (Until Used) - it''s possible to change the reservation up until the ticket admittance; Cut-Off (Hours) - it''s possible to change the reservation up until the time stated in Reschedule Cut-Off. A reservation can only be changed within the boundaries of the ticket valid from, and valid to dates.';
                 }
                 field("Reschedule Cut-Off (Hours)"; Rec."Reschedule Cut-Off (Hours)")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies after how many hours it’s possible to reschedule if Cut-Off (Hours) is selected in the Reschedule Policy column.';
+                    ToolTip = 'Specifies after how many hours it is possible to reschedule if Cut-Off (Hours) is selected in the Reschedule Policy column. The value 24 allows rescheduling up until 24 hours remain before the event ends.';
                 }
                 field("Revoke Policy"; Rec."Revoke Policy")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies whether it’s possible to receive a refund for a ticket (e.g., if it’s unused).';
+                    ToolTip = 'Specifies whether it is possible to receive a refund for a ticket: Unused Admission - the refund is allowed if there have been no admissions; Never Allow - refund ticket is never allowed; Always Allow - always allows the ticket refund, even if an admission has been registered.';
                 }
                 field("Notification Profile Code"; Rec."Notification Profile Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies which events will trigger notifications to be sent to the ticket holder. This option is useful for CRM purposes.';
+                    ToolTip = 'Specifies the Notification profile associated with this ticket. Events trigger notifications to be sent to the ticketholder based on the specific Notification Profile configuration. This option is useful for CRM purposes.';
                 }
                 field("Refund Price %"; Rec."Refund Price %")
                 {
@@ -173,24 +173,23 @@
                 field("Publish As eTicket"; Rec."Publish As eTicket")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                    ToolTip = 'Specifies that this ticket should be published using the Apple Wallet technology.';
+                    ToolTip = 'Specifies that this ticket should be published to the pass server. This is required for the ticket to be used on Apple Wallet, or Google Passes.';
                 }
                 field("eTicket Type Code"; Rec."eTicket Type Code")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the ticket design options used for displaying the ticket in the Wallet.';
+                    ToolTip = 'Specifies the ticket design options used for displaying the ticket in Apple Wallet, or Google Passes.';
                 }
                 field("Publish Ticket URL"; Rec."Publish Ticket URL")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the URL to the server on which you can share the ticket with customers.';
+                    ToolTip = 'Specifies if the URL to the digital tickets from the Ticket server should be published on the Ticket. This is required if a Notification is to be sent to the customer, containing a link to the online Ticket.';
                 }
                 field("Admission Inclusion"; Rec."Admission Inclusion")
                 {
                     ToolTip = 'Specifies the value of the Admission Inclusion field.';
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
-
             }
         }
     }
@@ -216,6 +215,9 @@
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Issued Tickets';
                 Image = Navigate;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category6;
                 RunObject = Page "NPR TM Ticket List";
                 RunPageLink = "Item No." = field("Item No.");
             }
@@ -273,6 +275,9 @@
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket Types';
                 Image = Category;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category5;
                 RunObject = Page "NPR TM Ticket Type";
             }
             Action(NavigateItems)
@@ -281,6 +286,9 @@
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Item';
                 Image = ItemLines;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category5;
                 RunObject = Page "Item Card";
                 RunPageLink = "No." = field("Item No.");
             }
@@ -330,6 +338,27 @@
                 trigger OnAction()
                 begin
                     MakeTourTicket(Rec."Item No.", Rec."Variant Code");
+                end;
+            }
+        }
+        area(Processing)
+        {
+            Action("Handle Postpaid Tickets")
+            {
+                ToolTip = 'Create invoices for tickets with post-payment as payment method.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Handle Postpaid Tickets';
+                Image = Invoice;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                var
+                    TicketManagement: Codeunit "NPR TM Ticket Management";
+                begin
+
+                    TicketManagement.HandlePostpaidTickets(false);
                 end;
             }
         }
