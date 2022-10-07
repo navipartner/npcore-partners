@@ -82,6 +82,12 @@
             FieldClass = FlowField;
             Caption = 'Ticket BOM';
         }
+        field(14; TicketItems; integer)
+        {
+            Caption = 'Ticket Items';
+            FieldClass = FlowField;
+            CalcFormula = count("Item" where("NPR Ticket Type" = filter(<> '')));
+        }
     }
 
     keys
