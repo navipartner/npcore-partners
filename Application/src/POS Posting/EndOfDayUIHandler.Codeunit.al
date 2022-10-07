@@ -28,7 +28,6 @@
     local procedure GetSectionBalancing() Balancing: JsonObject
     begin
         Balancing.Add('createdAt', Format(_POSWorkShiftCheckpoint."Created At"));
-        Balancing.Add('directSalesCount', _POSWorkShiftCheckpoint."Direct Sales Count");
         Balancing.Add('directItemSalesCount', _POSWorkShiftCheckpoint."Direct Item Sales Line Count");
         Balancing.Add('directItemReturnCount', _POSWorkShiftCheckpoint."Direct Item Returns Line Count");
     end;
@@ -43,6 +42,7 @@
         OverviewCreditSales: JsonObject;
         OverviewDetails: JsonObject;
     begin
+        OverviewSales.Add('directSalesCount', _POSWorkShiftCheckpoint."Direct Sales Count");
         OverviewSales.Add('directItemSalesLcy', _POSWorkShiftCheckpoint."Direct Item Sales (LCY)");
         OverviewSales.Add('directItemReturnsLcy', _POSWorkShiftCheckpoint."Direct Item Returns (LCY)");
         Overview.Add('sales', OverviewSales);

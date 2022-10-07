@@ -138,7 +138,7 @@
         Setup: Codeunit "NPR POS Setup";
         POSOpenPOSUnit: Codeunit "NPR POS Manage POS Unit";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
-        EoDActionName: Text;
+        EoDActionCode: Code[20];
         OpeningEntryNo: Integer;
         BinContentsConfirmed: Boolean;
     begin
@@ -174,10 +174,10 @@
                         // (Note: PAGE.RunModal() will also work)
                         // *****
                         if (Confirm(BalanceNow, true)) then begin
-                            EoDActionName := 'BALANCE_V3';
+                            EoDActionCode := Setup.ActionCode_EndOfDay();
 
-                            if (not POSSession.RetrieveSessionAction(CopyStr(EoDActionName, 1, 20), POSAction)) then
-                                POSAction.Get(EoDActionName);
+                            if (not POSSession.RetrieveSessionAction(EoDActionCode, POSAction)) then
+                                POSAction.Get(EoDActionCode);
 
                             POSAction.SetWorkflowInvocationParameter('Type', 1, FrontEnd);
                             FrontEnd.InvokeWorkflow(POSAction);
