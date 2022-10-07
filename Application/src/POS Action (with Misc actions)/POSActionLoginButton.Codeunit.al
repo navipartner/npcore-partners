@@ -1,6 +1,7 @@
 ﻿codeunit 6150860 "NPR POS Action: LoginButton"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This is a built-in action for completing the login request passed on from the front end.';
         Text001: Label 'Unknown login type requested by JavaScript: %1.';
@@ -114,7 +115,7 @@
         POSUnit.Get(POSUnit."No.");
 
         Setup.GetSalespersonRecord(SalespersonPurchaser);
-        POSActionLogin.CheckPosUnitGroup(SalespersonPurchaser, POSUnit."No.");        
+        POSActionLogin.CheckPosUnitGroup(SalespersonPurchaser, POSUnit."No.");
 
         BalanceAge := DaysSinceLastBalance(POSUnit."No.");
 
@@ -123,7 +124,7 @@
             POSUnit.Status::OPEN:
                 begin
                     if (BalanceAge = -1) then begin // Has never been balanced
-                        StartWorkflow(FrontEnd, POSSession, 'START_POS');
+                        StartWorkflow(FrontEnd, POSSession, Setup, 'START_POS');
                         exit;
                     end;
 
@@ -131,7 +132,7 @@
                         if (not Confirm(t004, true, (Today - BalanceAge))) then
                             Error(InvalidStatus);
 
-                        StartWorkflow(FrontEnd, POSSession, 'BALANCE_V3');
+                        StartWorkflow(FrontEnd, POSSession, Setup, Setup.ActionCode_EndOfDay());
                         exit;
                     end;
 
@@ -144,11 +145,11 @@
                         if (not Confirm(t004, true, Format(Today - BalanceAge))) then
                             Error(InvalidStatus);
 
-                        StartWorkflow(FrontEnd, POSSession, 'BALANCE_V3');
+                        StartWorkflow(FrontEnd, POSSession, Setup, Setup.ActionCode_EndOfDay());
                         exit;
                     end;
 
-                    StartWorkflow(FrontEnd, POSSession, 'START_POS');
+                    StartWorkflow(FrontEnd, POSSession, Setup, 'START_POS');
                 end;
 
             POSUnit.Status::EOD:
@@ -156,7 +157,7 @@
                     if (not Confirm(ContinueEoD, true, POSUnit.TableCaption(), POSUnit."No.")) then
                         Error(IsEoD, POSUnit.TableCaption(), POSUnit.FieldCaption(Status));
 
-                    StartWorkflow(FrontEnd, POSSession, 'BALANCE_V3');
+                    StartWorkflow(FrontEnd, POSSession, Setup, Setup.ActionCode_EndOfDay());
                 end;
         end;
 
@@ -174,16 +175,15 @@
         POSSession.ChangeViewSale();
     end;
 
-    local procedure StartWorkflow(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; ActionName: Code[20])
+    local procedure StartWorkflow(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; Setup: Codeunit "NPR POS Setup"; ActionName: Code[20])
     var
         POSAction: Record "NPR POS Action";
     begin
-
         if (not POSSession.RetrieveSessionAction(ActionName, POSAction)) then
             POSAction.Get(ActionName);
 
         case ActionName of
-            'BALANCE_V3':
+            Setup.ActionCode_EndOfDay():
                 POSAction.SetWorkflowInvocationParameter('Type', 1, FrontEnd);  // Z-Report, final count
         end;
 
