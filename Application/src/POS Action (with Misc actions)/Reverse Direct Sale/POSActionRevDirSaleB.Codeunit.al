@@ -211,8 +211,10 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         AdjustedQty: Decimal;
         QtyIsAdjusted: Boolean;
     begin
-        SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', CurrentSalePOS."Sales Ticket No.");
-        if (SaleLinePOS.FindSet()) then begin
+        SaleLinePOS.SetRange("Register No.", CurrentSalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", CurrentSalePOS."Sales Ticket No.");
+        SaleLinePOS.SetLoadFields(Type, "Orig.POS Entry S.Line SystemId", Quantity);
+        if SaleLinePOS.FindSet(true) then begin
             repeat
                 if ((SaleLinePOS.Quantity < 0) and (SaleLinePOS.Type = SaleLinePOS.Type::Item) and (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale)) then begin
                     AdjustedQty := GetRemainingQtyToReturn(OriginalSalesTicketNo, Abs(SaleLinePOS.Quantity), SaleLinePOS."Line No.", SaleLinePOS."Orig.POS Entry S.Line SystemId") * -1;
