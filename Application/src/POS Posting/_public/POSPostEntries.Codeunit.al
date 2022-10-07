@@ -249,6 +249,7 @@
             NoOfRecords := POSPostingBuffer.Count();
             ProgressWindow.Update(4, NoOfRecords);
         end;
+        GenJournalLine.SetSuppressCommit(true);
 
         if POSPostingBuffer.FindSet() then
             repeat
