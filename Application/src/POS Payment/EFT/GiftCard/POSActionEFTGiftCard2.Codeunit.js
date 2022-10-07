@@ -16,9 +16,9 @@ let main = async ({ workflow, context, captions, parameters }) => {
 
     context.discountPct = 0;
     if (parameters.PromptDiscountPct) {
-        context.discountPct = await popup.numpad(captions.VoucherDiscount);        
+        context.discountPct = await popup.numpad(captions.VoucherDiscount);
     }
-    if (!context.discountPct || context.discountPct <= 0 || context.discountPct > 100) {
+    if (context.discountPct < 0 || context.discountPct > 100) {
         await popup.error(captions.InvalidDiscount);
         return;
     }
@@ -26,9 +26,9 @@ let main = async ({ workflow, context, captions, parameters }) => {
     for (i = 1; i < context.quantity + 1; i++) {
         debugger;
         context.voucherNumber = i;
-        let { workflowName, integrationRequest } = await workflow.respond("PrepareGiftCardLoad");
+        let { workflowName, integrationRequest, synchronousRequest } = await workflow.respond("PrepareGiftCardLoad");
 
-        if (!integrationRequest.synchronousRequest) {
+        if (!synchronousRequest) {
             let { success } = await workflow.run(workflowName, { context: { request: integrationRequest, amount: context.amount } });
             if (!success) {
                 return;

@@ -82,6 +82,12 @@
     begin
     end;
 
+    /// <summary>
+    /// This event can be used to either queue an integration specific workflow along with parameters in the dictionary OR
+    /// to execute a synchronous reconciliation directly in AL code, depending on what each integration needs.
+    /// </summary>
+    /// <param name="EndOfDayType"></param>
+    /// <param name="EftWorkflows"></param>
     [IntegrationEvent(false, false)]
     internal procedure OnEndOfDayCloseEft(EndOfDayType: Option "X-Report","Z-Report",CloseWorkShift; var EftWorkflows: Dictionary of [Text, JsonObject])
     begin
@@ -103,13 +109,19 @@
     begin
     end;
 
+    /// <summary>
+    /// This method should be called from an EFT integration implementing this interface to return control back to the EFT module when a transaction is done. 
+    /// It will process the resulting EFT data on the record and create associated records such as POS payments and (!) commit everything. 
+    /// Meaning, when a specific integration reaches a success/failure/error state for any EFT transaction they should modify their data onto the record, but not commit manually, 
+    /// and then call this method.    
+    /// </summary>
+    /// <param name="EftTransactionRequest"></param>
     procedure EftIntegrationResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTFramework: Codeunit "NPR EFT Framework Mgt.";
     begin
         EFTFramework.EftIntegrationResponseReceived(EftTransactionRequest);
     end;
-
 
     #region Obsolete
     [Obsolete('Move to workflow v3 and subscribe to OnPrepareRequestSend and, if synchronous instead of via workflow, OnSendRequestSynchronously instead of this')]

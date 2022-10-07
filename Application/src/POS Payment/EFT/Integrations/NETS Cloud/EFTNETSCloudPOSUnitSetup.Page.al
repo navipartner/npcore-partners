@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-page 6184515 "NPR EFT NETSCloud POSUnitSetup"
+﻿page 6184515 "NPR EFT NETSCloud POSUnitSetup"
 {
     Extensible = False;
     Caption = 'EFT NETS Cloud POS Unit Setup';
@@ -62,4 +61,3 @@ page 6184515 "NPR EFT NETSCloud POSUnitSetup"
         GlobalEFTSetup := EFTSetup;
     end;
 }
-#endif

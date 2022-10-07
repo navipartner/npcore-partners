@@ -60,6 +60,11 @@ codeunit 6184474 "NPR POS Action: EFT Trx" implements "NPR POS IPaymentWFHandler
         WorkflowRequest.Add('workflowName', Workflow);
         WorkflowRequest.Add('legacy', false);
         WorkflowRequest.Add('integrationRequest', IntegrationRequest);
+        if Mechanism = Mechanism::Synchronous then begin
+            WorkflowRequest.Add('synchronousRequest', true);
+            EFTTransactionRequest.Get(EntryNo);
+            WorkflowRequest.Add('synchronousSuccess', EFTTransactionRequest.Successful);
+        end;
         exit(WorkflowRequest);
     end;
 
@@ -67,7 +72,7 @@ codeunit 6184474 "NPR POS Action: EFT Trx" implements "NPR POS IPaymentWFHandler
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionEFTTrx.js###
-'let main=async({workflow:t,runtime:n,context:u})=>{const e=await t.respond("PrepareEftRequest",{context:{suggestedAmount:u.suggestedAmount}}),{workflowName:r,integrationRequest:s,legacy:c}=e;debugger;if(c)return{success:!0,legacy:!0};if(s.synchronousRequest)return{success:s.synchronousSuccess,tryEndSale:e.tryEndSale};n.suspendTimeout();debugger;const{success:a,tryEndSale:o}=await t.run(r,{context:{request:s}});return{success:a,tryEndSale:e.tryEndSale&&o}};'
+'let main=async({workflow:s,runtime:t,context:n})=>{const e=await s.respond("PrepareEftRequest",{context:{suggestedAmount:n.suggestedAmount}}),{workflowName:u,integrationRequest:r,legacy:c,synchronousRequest:a,synchronousSuccess:o}=e;debugger;if(c)return{success:!0,legacy:!0};if(a)return{success:o,tryEndSale:e.tryEndSale};t.suspendTimeout();debugger;const{success:d,tryEndSale:g}=await s.run(u,{context:{request:r}});return{success:d,tryEndSale:e.tryEndSale&&g}};'
         );
     end;
 

@@ -1,8 +1,8 @@
 ﻿table 6184506 "NPR EFT Trx Async Resp."
 {
     Access = Internal;
-    // NPR5.48/MMV /20190124 CASE 341237 Created object
-    // NPR5.54/MMV /20200218 CASE 387990 Added "Transaction Started" bool to track how critical error is.
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Background sessions are too limited in BC Cloud so we are shifting to page background tasks for EFT requests';
 
     Caption = 'EFT Transaction Async Response';
     DataClassification = CustomerContent;

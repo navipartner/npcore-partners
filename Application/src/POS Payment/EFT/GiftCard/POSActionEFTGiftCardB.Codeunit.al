@@ -29,6 +29,11 @@ codeunit 6059883 "NPR POS Action: EFTGiftCard B."
 
         WorkflowRequest.Add('workflowName', Workflow);
         WorkflowRequest.Add('integrationRequest', IntegrationRequest);
+        if Mechanism = Mechanism::Synchronous then begin
+            WorkflowRequest.Add('synchronousRequest', true);
+            EFTTransactionRequest.Get(EntryNo);
+            WorkflowRequest.Add('synchronousSuccess', EFTTransactionRequest.Successful);
+        end;
         exit(WorkflowRequest);
     end;
 

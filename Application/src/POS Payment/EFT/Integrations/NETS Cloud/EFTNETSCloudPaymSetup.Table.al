@@ -1,7 +1,6 @@
 ﻿table 6184517 "NPR EFT NETS Cloud Paym. Setup"
 {
     Access = Internal;
-    // NPR5.54/MMV /20200129 CASE 364340 Created object
 
     Caption = 'EFT NETS Cloud Payment Setup';
     DataClassification = CustomerContent;

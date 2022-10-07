@@ -1,13 +1,9 @@
 ﻿codeunit 6184506 "NPR EFT Trx Bgd. Session Mgt"
 {
     Access = Internal;
-    // NPR5.53/MMV /20191120 CASE 377533 Created object
-    // NPR5.54/MMV /20200226 CASE 364340 Added method IsRequestOutdated & ResponseExists()
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Background sessions are too limited in BC Cloud so we are shifting to page background tasks for EFT requests';
 
-
-    trigger OnRun()
-    begin
-    end;
 
     procedure CreateRequestRecord(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var EFTTransactionAsyncRequest: Record "NPR EFT Trx Async Req.")
     begin
