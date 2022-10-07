@@ -230,7 +230,7 @@
         }
         field(120; "Notification Profile Code"; Code[10])
         {
-            Caption = 'Notification Profile Code';
+            Caption = 'Ticket Notification Profile Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR TM Notification Profile";
         }
