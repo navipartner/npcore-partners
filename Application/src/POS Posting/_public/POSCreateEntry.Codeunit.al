@@ -558,6 +558,7 @@
     local procedure InsertBinTransfer(CheckpointEntry: Record "NPR POS Bin Entry"; TargetBinNo: Code[10]; TransactionAmount: Decimal; Reference: Text[50])
     var
         POSBinEntry: Record "NPR POS Bin Entry";
+        POSPaymentBin: Record "NPR POS Payment Bin";
     begin
 
         // Withdrawl from source bin
@@ -577,7 +578,9 @@
         POSBinEntry."Entry No." := 0;
         POSBinEntry."Payment Bin No." := TargetBinNo;
         POSBinEntry.Type := POSBinEntry.Type::BIN_TRANSFER_IN;
-
+        POSPaymentBin.Get(POSBinEntry."Payment Bin No.");
+        POSBinEntry."POS Unit No." := POSPaymentBin."Attached to POS Unit No.";
+        POSBinEntry."Register No." := POSPaymentBin."Attached to POS Unit No.";
         POSBinEntry."Transaction Amount" *= -1;
         POSBinEntry."Transaction Amount (LCY)" *= -1;
 
@@ -882,7 +885,7 @@
             POSBinEntry."Transaction Amount (LCY)" := CurrExchRate.ExchangeAmtFCYToLCY(POSBinEntry."Transaction Date", POSBinEntry."Transaction Currency Code", POSBinEntry."Transaction Amount",
                                                        1 / CurrExchRate.ExchangeRate(POSBinEntry."Transaction Date", POSBinEntry."Transaction Currency Code"));
             if Currency."Amount Rounding Precision" <> 0 then
-                POSBinEntry."Transaction Amount (LCY)" := Round(POSBinEntry."Transaction Amount (LCY)", Currency."Amount Rounding Precision", Currency.InvoiceRoundingDirection());    
+                POSBinEntry."Transaction Amount (LCY)" := Round(POSBinEntry."Transaction Amount (LCY)", Currency."Amount Rounding Precision", Currency.InvoiceRoundingDirection());
         end else begin
             if POSPaymentMethod."Fixed Rate" <> 0 then
                 POSBinEntry."Transaction Amount (LCY)" := POSBinEntry."Transaction Amount" * POSPaymentMethod."Fixed Rate" / 100;
@@ -990,7 +993,6 @@
         LineNo := 10000;
         repeat
             InsertPOSBalancingLine(PaymentBinCheckpoint, POSEntry, LineNo, (POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::TRANSFER));
-
             LineNo += 10000;
             PaymentBinCheckpointUpdate.Get(PaymentBinCheckpoint."Entry No.");
             PaymentBinCheckpointUpdate.Status := PaymentBinCheckpointUpdate.Status::TRANSFERED;

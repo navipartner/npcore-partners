@@ -519,16 +519,13 @@
                                     StrSubstNo(PostingSetupNotFoundLbl, POSBalancingLine.FieldCaption("POS Store Code"), POSBalancingLine.FieldCaption("POS Payment Method Code"), POSBalancingLine.FieldCaption("Move-To Bin Code"),
                                     POSBalancingLine."POS Store Code", POSBalancingLine."POS Payment Method Code", POSBalancingLine."Move-To Bin Code"));
 
-                            if (POSPostingSetup."Account Type" <> POSPostingSetupNewBin."Account Type") or (POSPostingSetup."Account No." <> POSPostingSetupNewBin."Account No.") then begin
-                                //Make posting only if the account is different for the new Bin
-                                AmountToPostToAccount := AmountToPostToAccount - POSBalancingLine."Move-To Bin Amount";
-                                POSPostingSetupNewBin.TestField("Account No.");
-                                TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
-                                    POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.",
-                                    POSBalancingLine."Move-To Bin Amount", POSBalancingLine."Move-To Reference", GenJournalLine);
+                            AmountToPostToAccount := AmountToPostToAccount - POSBalancingLine."Move-To Bin Amount";
+                            POSPostingSetupNewBin.TestField("Account No.");
+                            TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
+                                POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.",
+                                POSBalancingLine."Move-To Bin Amount", POSBalancingLine."Move-To Reference", GenJournalLine);
 
-                                OnAfterMakeGenJournalForMoveToBin(POSBalancingLine, GenJournalLine);
-                            end;
+                            OnAfterMakeGenJournalForMoveToBin(POSBalancingLine, GenJournalLine);
                         end;
 
                         if (POSBalancingLine."Deposit-To Bin Amount" <> 0) then begin

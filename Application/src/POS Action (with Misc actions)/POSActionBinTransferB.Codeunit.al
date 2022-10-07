@@ -85,27 +85,33 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
 
     procedure UserSelectBin(POSSession: Codeunit "NPR POS Session"): Code[10]
     var
+        POSUnittoBinRelation: Record "NPR POS Unit to Bin Relation";
+        POSPaymentBin: Record "NPR POS Payment Bin";
         POSSetup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
-        POSUnittoBinRelation: Record "NPR POS Unit to Bin Relation";
-        POSUnittoBinRelationPage: Page "NPR POS Unit to Bin Relation";
+        POSPaymentBinsPage: Page "NPR POS Payment Bins";
         PageAction: Action;
     begin
-
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
 
         POSUnittoBinRelation.SetRange("POS Unit No.", POSUnit."No.");
-        POSUnittoBinRelation.FilterGroup(2);
-        POSUnittoBinRelationPage.SetTableView(POSUnittoBinRelation);
-        POSUnittoBinRelation.FilterGroup(0);
-        POSUnittoBinRelationPage.LookupMode(true);
-        PageAction := POSUnittoBinRelationPage.RunModal();
+        if POSUnittoBinRelation.FindSet() then
+                repeat
+                    IF POSPaymentBin.GET(POSUnittoBinRelation."POS Payment Bin No.") then
+                        POSPaymentBin.Mark(true);
+                until POSUnittoBinRelation.Next() = 0;
+
+        POSPaymentBin.MarkedOnly(true);
+        POSPaymentBinsPage.Editable(false);
+        POSPaymentBinsPage.LookupMode(true);
+        POSPaymentBinsPage.SetTableView(POSPaymentBin);
+        PageAction := POSPaymentBinsPage.RunModal();
         if (PageAction <> ACTION::LookupOK) then
             Error('Bin selection aborted.');
 
-        POSUnittoBinRelationPage.GetRecord(POSUnittoBinRelation);
-        exit(POSUnittoBinRelation."POS Payment Bin No.");
+        POSPaymentBinsPage.GetRecord(POSPaymentBin);
+        exit(POSPaymentBin."No.");
     end;
 
     local procedure GetUnitNo(POSSession: Codeunit "NPR POS Session"): Code[10]

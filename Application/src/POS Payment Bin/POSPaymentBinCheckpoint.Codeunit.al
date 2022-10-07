@@ -33,7 +33,6 @@
         PaymentBinCheckpointDescriptionLbl: Label '[%1] %2', Locked = true;
         POSBinEntryCalc: Query "NPR POS Bin Entry Calc.";
     begin
-
         POSUnit.Get(UnitNo);
         POSBinMovement := false;
 
@@ -124,7 +123,7 @@
             end;
 
             // Aggregate the transfers from between this checkpoint and previous
-            if ((not POSBinMovement) and (LastCheckpointEntryNo >= 0)) then begin
+            if (LastCheckpointEntryNo >= 0) then begin
                 Clear(POSBinEntryCalc);
                 POSBinEntryCalc.SetFilter(PBE_EntryNo_Filter, '>%1', LastCheckpointEntryNo);
                 POSBinEntryCalc.SetRange(PBE_PaymentBinNo_Filter, PaymentBinCheckpoint."Payment Bin No.");
