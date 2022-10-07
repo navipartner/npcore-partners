@@ -165,15 +165,11 @@
         if Mechanism <> Mechanism::Synchronous then
             exit;
 
-        Request.Add('synchronousRequest', true);
         EFTTransactionRequest.Get(EntryNo);
 
         EFTInterface.OnSendRequestSynchronously(EFTTransactionRequest, Handled);
         if not Handled then
             Error('EFT Integration %1 is not subscribing to OnSendRequestSynchronously correctly.', EFTTransactionRequest."Integration Type");
-
-        EFTTransactionRequest.Get(EntryNo);
-        Request.Add('synchronousSuccess', EFTTransactionRequest.Successful);
     end;
 
     #region Response Handlers

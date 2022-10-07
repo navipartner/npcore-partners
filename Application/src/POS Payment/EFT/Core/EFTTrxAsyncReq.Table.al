@@ -1,8 +1,8 @@
 ﻿table 6184516 "NPR EFT Trx Async Req."
 {
     Access = Internal;
-    // NPR5.53/MMV /20191120 CASE 377533 Created object
-    // NPR5.54/MMV /20200219 CASE 364340 Added fields 40, 50
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Background sessions are too limited in BC Cloud so we are shifting to page background tasks for EFT requests';
 
     Caption = 'EFT Transaction Async Request';
     DataClassification = CustomerContent;
