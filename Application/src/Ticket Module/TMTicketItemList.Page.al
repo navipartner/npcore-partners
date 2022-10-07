@@ -143,13 +143,37 @@ page 6059888 "NPR TM Ticket Item List"
     var
         _Item: Record Item;
         _TicketPaymentType: Option DIRECT,PREPAID,POSTPAID;
+        _TicketTypeCodeFilter: Text;
 
-    trigger OnInit()
+    trigger OnOpenPage()
+    begin
+        if (Rec.IsTemporary()) then
+            Rec.DeleteAll();
+
+        LoadRecords();
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        Clear(_Item);
+        if _Item.Get(Rec."Item No.") then;
+    end;
+
+    procedure SetTicketTypeFilter(TicketTypeCodeFilter: text)
+    begin
+        _TicketTypeCodeFilter := TicketTypeCodeFilter
+    end;
+
+    local procedure LoadRecords()
     var
         Item: Record "Item";
         ItemVariant: Record "Item Variant";
     begin
-        Item.SetFilter("NPR Ticket Type", '<>%1', '');
+        if (_TicketTypeCodeFilter = '') then
+            Item.SetFilter("NPR Ticket Type", '<>%1', '')
+        else
+            Item.SetFilter("NPR Ticket Type", '%1', _TicketTypeCodeFilter);
+
         if (not Item.FindSet()) then
             exit;
 
@@ -169,10 +193,5 @@ page 6059888 "NPR TM Ticket Item List"
         until (Item.Next() = 0);
 
         if (not Rec.FindFirst()) then;
-    end;
-
-    trigger OnAfterGetRecord()
-    begin
-        if _Item.Get(Rec."Item No.") then;
     end;
 }
