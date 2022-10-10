@@ -58,7 +58,7 @@
     begin
 
         HeadlineManagement.GetUserGreetingText(GreetingText);
-        NPRVersion := StrSubstNo(NPRVersionTxt, LicenseInformation.GetRetailVersion());
+        NPRVersion := CopyStr(StrSubstNo(NPRVersionTxt, LicenseInformation.GetRetailVersion()), 1, MaxStrLen(NPRVersion));
     end;
 
     var
