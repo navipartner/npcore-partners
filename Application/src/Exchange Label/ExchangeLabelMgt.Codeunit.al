@@ -435,7 +435,7 @@
             exit;
 
         LineRef.SetTable(SaleLinePOS);
-        ReferenceNo := NpGpPOSSalesInitMgt.InitReferenceNoSaleLinePOS(SaleLinePOS);
+        ReferenceNo := CopyStr(NpGpPOSSalesInitMgt.InitReferenceNoSaleLinePOS(SaleLinePOS), 1, MaxStrLen(ReferenceNo));
         //+NPR5.51
     end;
 
@@ -485,9 +485,9 @@
                         EAN := Format(Prefix) + PadStr('', 10 - StrLen(Format(Unique)), '0') + Format(Unique);
                     end;
                 else begin
-                        EAN := Format(Prefix) + Format(POSUnit."POS Store Code") +
-                               PadStr('', 12 - StrLen(Prefix) - (StrLen(POSUnit."POS Store Code") + StrLen(Format(Unique))), '0') + Format(Unique);
-                    end;
+                    EAN := Format(Prefix) + Format(POSUnit."POS Store Code") +
+                           PadStr('', 12 - StrLen(Prefix) - (StrLen(POSUnit."POS Store Code") + StrLen(Format(Unique))), '0') + Format(Unique);
+                end;
             end;
             EAN := EAN + Format(StrCheckSum(EAN, '131313131313'));
 
