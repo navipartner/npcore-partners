@@ -118,7 +118,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
             TempPKField.Init();
             TempPKField.TableNo := RecRef.Number;
             TempPKField."No." := FRef.Number;
-            TempPKField.FieldName := FRef.Name;
+            TempPKField.FieldName := CopyStr(FRef.Name, 1, MaxStrLen(TempPKField.FieldName));
             Evaluate(TempPKField.Type, Format(FRef.Type));
             TempPKField.Len := FRef.Length;
             TempPKField.Insert();
@@ -216,7 +216,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         // try find by Field Name in camelcase
         APIPageFieldName := TextFunctions.Camelize(FieldRec.FieldName);
         if ReplicationAPI.SelectJsonToken(JToken.AsObject(), '$.' + APIPageFieldName, SourceText) then begin
-            TempFoundAPIField."API Field Name" := APIPageFieldName;
+            TempFoundAPIField."API Field Name" := CopyStr(APIPageFieldName, 1, MaxStrLen(TempFoundAPIField."API Field Name"));
             exit(true);
         end;
 

@@ -188,10 +188,10 @@ report 6014415 "NPR Rep. Check Missing Fields"
     begin
         TempMetadata.Init();
         TempMetadata."Entry No." := LastMetadataEntryNo + 1;
-        TempMetadata.Name := EntitySet; // this should be used in the API request url
-        TempMetadata.Value := FieldName;
-        TempMetadata.Path := EntityType;
-        TempMetadata.Namespace := MetadataURI;
+        TempMetadata.Name := CopyStr(EntitySet, 1, MaxStrLen(TempMetadata.Name)); // this should be used in the API request url
+        TempMetadata.Value := CopyStr(FieldName, 1, MaxStrLen(TempMetadata.Value));
+        TempMetadata.Path := CopyStr(EntityType, 1, MaxStrLen(TempMetadata.Path));
+        TempMetadata.Namespace := CopyStr(MetadataURI, 1, MaxStrLen(TempMetadata.Namespace));
         TempMetadata.Insert();
 
         LastMetadataEntryNo := TempMetadata."Entry No.";
@@ -208,7 +208,8 @@ report 6014415 "NPR Rep. Check Missing Fields"
                 if TempSpecialFieldMapping.Skip then
                     exit(true);
                 if FieldRec.Type in [FieldRec.Type::BLOB, FieldRec.Type::Media, FieldRec.Type::MediaSet] then
-                    TempSpecialFieldMapping."API Field Name" := TempSpecialFieldMapping."API Field Name".Replace('@odata.mediaReadLink', '');
+                    TempSpecialFieldMapping."API Field Name" := CopyStr(TempSpecialFieldMapping."API Field Name".Replace('@odata.mediaReadLink', ''),
+                     1, MaxStrLen(TempSpecialFieldMapping."API Field Name"));
                 if FindFieldInMetadata(MetadataURI, EntitySet, TempSpecialFieldMapping."API Field Name") then
                     exit(true);
             until TempSpecialFieldMapping.Next() = 0;
