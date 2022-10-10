@@ -82,7 +82,7 @@
         if not MPOSQRCode.Find() then
             MPOSQRCode.Insert(true);
         if MPOSQRCode.Url = '' then
-            MPOSQRCode.Url := StringReplace(GetUrl(CLIENTTYPE::Windows));
+            MPOSQRCode.Url := CopyStr(StringReplace(GetUrl(CLIENTTYPE::Windows)), 1, MaxStrLen(MPOSQRCode.Url));
         if MPOSQRCode.Tenant = '' then
             MPOSQRCode.Tenant := TenantId();
         if MPOSQRCode.Company = '' then begin
@@ -91,7 +91,7 @@
             MPOSQRCode.Rename(MPOSQRCode."User ID", CompanyName);
         end;
         if MPOSQRCode."Webservice Url" = '' then
-            MPOSQRCode."Webservice Url" := GetUrl(CLIENTTYPE::SOAP);
+            MPOSQRCode."Webservice Url" := CopyStr(GetUrl(CLIENTTYPE::SOAP), 1, MaxStrLen(MPOSQRCode."Webservice Url"));
         MPOSQRCode.Modify(true);
     end;
 
