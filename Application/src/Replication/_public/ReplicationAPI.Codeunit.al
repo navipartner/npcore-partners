@@ -154,7 +154,7 @@
         if Response.HasValue() then begin
             EndPoint := ServiceEndPoint."Endpoint Method";
 
-            ImportEntry."Document Name" := EndPoint.GetDefaultFileName(ServiceEndPoint) + '.' + 'json';
+            ImportEntry."Document Name" := CopyStr(EndPoint.GetDefaultFileName(ServiceEndPoint) + '.' + 'json', 1, MaxStrLen(ImportEntry."Document Name"));
             ImportEntry."Document ID" := Format(ServiceEndPoint.RecordId());
             DataTypeManagement.GetRecordRef(ImportEntry, RecRef);
             Response.ToRecordRef(RecRef, ImportEntry.FieldNo("Document Source"));

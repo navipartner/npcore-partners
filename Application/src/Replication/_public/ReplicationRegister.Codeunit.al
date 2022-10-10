@@ -1779,9 +1779,9 @@ codeunit 6014608 "NPR Replication Register"
     var
         EmailTemplate: Record "NPR E-mail Template Header";
         EmailTemplateLine: Record "NPR E-mail Templ. Line";
-        Lines: List of [Text];
+        Lines: List of [Text[250]];
         i: Integer;
-        ErrorLogUrlTxt: Text;
+        ErrorLogUrlTxt: Text[250];
     begin
         EmailTemplate.SetRange("Table No.", Database::"NPR Replication Error Log");
         if not EmailTemplate.IsEmpty() then
@@ -1802,9 +1802,10 @@ codeunit 6014608 "NPR Replication Register"
         Lines.Add('Error Log Entry No.: $(1$)');
         Lines.Add('API Version: $(10$)');
         Lines.Add('Endpoint Id: $(15$)');
-        ErrorLogUrlTxt := 'Error Log URL: ' + System.GetUrl(ClientType::Web, CompanyName(), ObjectType::Page, Page::"NPR Replication Error Log");
-        if StrLen(ErrorLogUrlTxt) <= MaxStrLen(EmailTemplateLine."Mail Body Line") then
-            Lines.Add(ErrorLogUrlTxt);
+        ErrorLogUrlTxt := 'Error Log URL: ';
+        ErrorLogUrlTxt += CopyStr(System.GetUrl(ClientType::Web, CompanyName(), ObjectType::Page, Page::"NPR Replication Error Log"),
+         1, MaxStrLen(ErrorLogUrlTxt) - StrLen(ErrorLogUrlTxt));
+        Lines.Add(ErrorLogUrlTxt);
         Lines.Add('');
         Lines.Add('Error Message:');
         Lines.Add('$(31$)');
@@ -1836,22 +1837,24 @@ codeunit 6014608 "NPR Replication Register"
             until ReplicationSetup.Next() = 0;
     end;
 
-    local procedure GetAPIServiceURL() BaseURL: Text
+    local procedure GetAPIServiceURL() BaseURL: Text[250]
     begin
-        BaseURL := GetUrl(ClientType::Api).TrimEnd('/');
+        BaseURL := Copystr(GetUrl(ClientType::Api).TrimEnd('/'), 1, MaxStrLen(BaseURL));
         IF BaseURL.ToLower().Contains('?tenant=') then
-            BaseUrl := BaseURL.Remove(BaseURL.ToLower().IndexOf('?tenant='), StrLen(BaseURL) - BaseURL.ToLower().IndexOf('?tenant=') + 1).TrimEnd('/'); // remove tenant
+            BaseUrl := CopyStr(BaseURL.Remove(BaseURL.ToLower().IndexOf('?tenant='), StrLen(BaseURL) - BaseURL.ToLower().IndexOf('?tenant=') + 1).TrimEnd('/'),
+             1, MaxStrLen(BaseURL)); // remove tenant
     end;
 
-    local procedure GetTenant() Tenant: Text
+    local procedure GetTenant() Tenant: Text[50]
     var
         BaseURL: Text;
     begin
         BaseURL := GetUrl(ClientType::Api);
         IF BaseURL.ToLower().Contains('?tenant=') then
-            Tenant := BaseURL.Substring(BaseURL.ToLower().IndexOf('?tenant='), StrLen(BaseURL) - BaseURL.ToLower().IndexOf('?tenant=') + 1).Replace('?tenant=', '')
+            Tenant := CopyStr(BaseURL.Substring(BaseURL.ToLower().IndexOf('?tenant='), StrLen(BaseURL) - BaseURL.ToLower().IndexOf('?tenant=') + 1).Replace('?tenant=', ''),
+             1, MaxStrLen(Tenant))
         Else
-            tenant := 'DEFAULT'
+            tenant := 'DEFAULT';
     end;
 
     [BusinessEvent(false)]
