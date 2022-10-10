@@ -871,7 +871,7 @@
         DisplayContentLines: Record "NPR Display Content Lines";
         ImageCounter: Integer;
         CurrBase64: Text;
-        CurrExtension: Text[10];
+        CurrExtension: Text;
     begin
         if DisplaySetup."Image Rotation Interval" = 0 then
             DisplaySetup."Image Rotation Interval" := 3000;
@@ -967,7 +967,7 @@
         exit(ContentHtml);
     end;
 
-    local procedure GetImageContentAndExtension(DisplayContentLines: Record "NPR Display Content Lines"; var Base64: Text; var Extension: Text[10])
+    local procedure GetImageContentAndExtension(DisplayContentLines: Record "NPR Display Content Lines"; var Base64: Text; var Extension: Text)
     var
         InS: InStream;
         OutS: OutStream;
