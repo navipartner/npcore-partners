@@ -1163,12 +1163,12 @@ then
     begin
         EnumIndex := PurchDocType.Ordinals().IndexOf(PurchDocType.AsInteger());
         PurchDocType.Names().Get(EnumIndex, EnumValueName);
-        exit(UpperCase(EnumValueName));
+        exit(CopyStr(UpperCase(EnumValueName), 1, 250));
     end;
 
     procedure GetDocumentTypeOptionCaption(PurchDocType: Enum "Purchase Document Type"): Text[250]
     begin
-        exit(UpperCase(Format(PurchDocType)));
+        exit(CopyStr(UpperCase(Format(PurchDocType)), 1, 250));
     end;
 
     procedure ConstructDocumenttypeUnknownErr(): Text
