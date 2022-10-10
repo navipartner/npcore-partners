@@ -36,7 +36,7 @@ stages:
         # - name: Insider_CLOUD
         #   compareAppWithSpecificCompareAppVersion: true
                
-    analyzers: 'AppSourceCop,UICop,CodeCop'
+    analyzers: ('AppSourceCop','UICop','CodeCop')
     keyVaultCert:
       certPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
       certPassword: 498eH$??nhxUSSFS
