@@ -31,7 +31,7 @@ You can choose the admission code for the ticket you wish to see admission data 
 > [!NOTE]
 > All ticket schedules connected to the **Admission Code** show up in the list.
 
-In **Display Options** you can choose between:
+In **Display Options** you can configure the following:
 
 | Field Name      | Description |
 | ----------- | ----------- |
@@ -50,6 +50,7 @@ In **Period type**, you can choose between the following options:
 | **Month** | Specifies all tickets cumulated by month. |
 | **Quarter** | Specifies all tickets cumulated by quarter. |
 | **Year** | Specifies all tickets cumulated by year.
+
 ### Related links
 
 - [Ticket admission](./admission.md)

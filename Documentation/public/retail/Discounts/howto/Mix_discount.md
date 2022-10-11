@@ -1,10 +1,10 @@
 # Set up mix discounts
 
-The mix discount is a type of discounts in which customers need to buy several different items if they wish to get discount. The discount is triggered when a certain combination of items is selected in a POS transaction. 
+The mix discount type implies that customers need to buy several different items if they wish to be eligible for a discount. The discount is triggered when a certain combination of items is selected in a POS transaction. 
 
 To set up mix discounts, follow the provided steps:
 
-1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Mix discount** and choose the related link.           
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Mix discount**, and choose the related link.           
    Mix discount list will be opened.
 2. To create a new mix discount, click **New** from the ribbon.       
     The **Mix Discount** card is displayed.
@@ -27,7 +27,7 @@ To set up mix discounts, follow the provided steps:
 | **Block Custom Discount** | If enabled, the custom discounts will be blocked for items from the **Mix Discount Lines**. |
 | **Total Amount Excl. VAT** | If not enabled, the amount from mix discounts is taken without VAT. | 
 
-1. Insert the necessary information in the **Conditions** tab:
+4. Insert the necessary information in the **Conditions** tab:
 
 | Field Name      | Description |
 | ----------- | ----------- |

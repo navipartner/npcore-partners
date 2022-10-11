@@ -1,8 +1,8 @@
 # Welcome to the NP E-commerce product documentation
 
-E-commerce refers to a business model that allows companies to buy and sell goods and services online. 
+E-commerce refers to a business model that allows companies to buy and sell goods and services online. The NP E-commerce solution helps our customers build a foundation for a successful omnichannel online business.
 
-The NP E-commerce solution helps our customers build a foundation for a successful omnichannel online business.
+Customers can also activate loyalty programs which give them rights for accumulating points both online, and in stores. 
 
 ### Highlighted articles
 

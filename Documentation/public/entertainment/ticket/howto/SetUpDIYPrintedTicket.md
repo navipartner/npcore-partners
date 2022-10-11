@@ -16,8 +16,8 @@ To set up a DIY printed ticket, follow the provided steps:
 
 This concludes the DIY printed ticket setup, however, if you wish for tickets created in the back office (e.g. prepaid tickets) to have a separate design from the other ticket design, follow the provided steps:
 
-1. Create a new ticket design in the Ticket Designer, and provide it with a new name separate from the existing **Ticket Type**.
-2. Add the new ticket design name to the **Ticket Layout Code**.        
+4. Create a new ticket design in the Ticket Designer, and provide it with a new name separate from the existing **Ticket Type**.
+5. Add the new ticket design name to the **Ticket Layout Code**.        
    When you create new tickets in the back office, they will be provided with the design defined in the **Ticket Layout Code**, instead of the **Ticket Type** design. 
 
 ### Related links

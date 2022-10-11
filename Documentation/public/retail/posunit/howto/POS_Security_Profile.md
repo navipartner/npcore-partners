@@ -1,16 +1,16 @@
 # Set up the POS Security Profile
 
-In **POS security profile** it is possible to set up administrator password and the password for unlocking a POS unit after the unit has been locked due to non-activity.
+In **POS security profile** it is possible to set up the administrator password, and the password for unlocking a POS unit after the unit has been locked due to non-activity.
 
 ![security_profile](../images/Security_profile.PNG)
 
 To set up the security profile, follow the provided steps:
 
-1. In the **General** insert **Code** and **Description**.      
+1. In **General** insert **Code** and **Description**.      
    The **Code** has to be unique for for each profile, while the **Description** field should contain a short description of the profile.
 
 2. Provide the **Administrator Password**.       
-   It can be assigned to different buttons in the POS menu, so if someone presses the button the administrator password should be provided in the pop up window. 
+   It can be assigned to different buttons in the POS menu, so if someone presses a button, the administrator password should be provided in the pop up window. 
 
 3. Set the **Lock Timeout**, i.e. the time of non-activity after which the POS unit will be locked.
 

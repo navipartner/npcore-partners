@@ -34,22 +34,22 @@ To create new POS store follow the provided steps:
 
 5. Fill all necessary fields in **Profiles** tab.
 
-- **POS Restaurant Profile** - The profile defined for restaurants. Defines restaurant and seats for restaurant.
+- **POS Restaurant Profile** - The profile defined for restaurants and restaurant seats.
 - **POS Posting Profile** - The profile defined for postings. In this profile you can define which business groups store will be used for postings (VAT business and General business posting group), source code; whether the entries will be compressed after posting or not, and which accounts will be used for rounding and differences.
 
-6. Fill all necessary fields in the **Reporting** section.
+1. Fill all necessary fields in the **Reporting** section.
 
 | Field Name      | Description |
 | ----------- | ----------- |
 | **Department Code**   | Specifies the global dimension which will be assigned to all entries from this store.     |
 | **Project Code**   | Specifies the global dimension which will be assigned to all entries from this store.      |
 | **Store Group Code**  | The code of the group that this store belongs to. It is used for reports. |
-|  **Store Category Code** | Specifies the category that this store belongs to. It is used for reports. |
+| **Store Category Code** | Specifies the category that this store belongs to. It is used for reports. |
 | **Store Locality Code** | Specifies the store locality used for reports. |
 | **Store Size** | Specifies the size of the store |
 | **Opening Date** | Specifies the date on which the store is opened. |
-| **Geolocation Latitude** | Specifies the latitude of the store. |
-| **Geolocation Longitude** | Specifies the longitude of the store |
+| **Geolocation Latitude** | Specifies the latitude of the store's location. |
+| **Geolocation Longitude** | Specifies the longitude of the store's location |
 
 ### Related links
 

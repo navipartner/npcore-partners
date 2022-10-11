@@ -1,6 +1,6 @@
 # POS Audit Profile (reference guide)
 
-The POS Audit Profile is used so different number series and different rules for printing can be assigned to different POS units.
+The POS audit profile is used so different number series and different rules for printing can be assigned to different POS units.
 
 ![POSAuditProfile](../images/POS%20audit%20profile.PNG)
 

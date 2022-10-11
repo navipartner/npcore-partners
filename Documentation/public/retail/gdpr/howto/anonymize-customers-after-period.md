@@ -11,6 +11,7 @@ You can anonymize multiple customers simultaneously after a certain period. To d
    - **CHECK_PERIOD = No** - this task anonymizes customers with **To Anonymize On** field having a value irrespective of the GDPR period setup and the customer doesn't have any documents open. 
    - **CHECK_PERIOD = Yes and No_of_Customers** - this task anonymizes all customers which don't have transactions after the period X after the GDPR setup, and who don't have any transactions open, irrespectively of whether the **To Anonymize On** field has a value under the **Customer Card**
 
-   ### Related links
-   - [General Data Protection Regulation](../intro.md)
-   - [Anonymize customer data](/public/retail/gdpr/howto/anonymize-customer-data.md)
+### Related links
+
+- [General Data Protection Regulation](../intro.md)
+- [Anonymize customer data](/public/retail/gdpr/howto/anonymize-customer-data.md)

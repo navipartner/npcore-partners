@@ -26,6 +26,11 @@
     href: howto/SetUpRefundPolicy.md
   - name: Refunding tickets
     href: howto/RefundingTickets.md
+  - name: Create prepaid tickets
+    href: howto/create_prepaid_ticket.md
+  - name: Create postpaid tickets
+    href: howto/create_postpaid_ticket.md
+
 
 - name: Explanation
   items:
@@ -52,4 +57,6 @@
     href: reference/ticket_schedules.md
   - name: Ticket BOM (reference guide)
     href: reference/ticket_bom.md
+  - name: Ticket booking proces - API
+    href: files/aquire_ticket_workflow.pdf
 

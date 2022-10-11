@@ -61,8 +61,7 @@ Variety lines can't be inserted manually, but they can be modified. The unit pri
 
 Header lines are inserted automatically with a **Header Text** summarizing the actions underneath. They will not result in an update of the variant or master data. However, they can be used to quickly modify the fields in the rows below. For example, setting an action or a sales price on a heading text will copy this action or the sales price to all rows below. 
 
-All lines inserted manually into the **Item Worksheet** are by default set to be skipped. The lines created via the **Suggest Item Worksheet Item Lines** action can be set to 
-a default value (skip, create new, update only, update, and create variants). The **Item Worksheet** lines created via the Excel import are automatically set to **Update and Create Variants** if they can be matched to the existing items, or to **Create New** if they can't be matched. 
+All lines inserted manually into the **Item Worksheet** are by default set to be skipped. The lines created via the **Suggest Item Worksheet Item Lines** action can be set to a default value (skip, create new, update only, update, and create variants). The **Item Worksheet** lines created via the Excel import are automatically set to **Update and Create Variants** if they can be matched to the existing items, or to **Create New** if they can't be matched. 
 
 The provided table describes the system behavior in different scenarios of the existing data in Business Central, and the method of input. 
 

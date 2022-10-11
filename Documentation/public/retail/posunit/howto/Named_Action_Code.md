@@ -24,9 +24,6 @@ First, you need to create and set the **POS Named Action Profile**.
 | **Idle Timeout Action Code** | Add the action *SS_IDLE_TIMEOUT*. |
 | **Admin Menu Action Code** | Add the action *SS_ADMIN_MENU*. |
 
-> [!Note]
-> All fields that are not marked as **(required)** are optional.
-
 ![POS_NAMED](../images/POS_Ac_Set.png)
 
 ## Next steps

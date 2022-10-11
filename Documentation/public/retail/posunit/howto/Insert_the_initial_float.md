@@ -31,3 +31,7 @@ If a mistake is made, when the salesperson opens the POS unit for the first time
 If the floats don't match, the salesperson can perform a count, and balance the POS unit before they begin working on it. The salesperson needs to click **No** in the **Confirm Bin Contents** window, and they will be prompted to confirm whether the bin should be balanced. 
 
 When the salesperson clicks **Yes**, the window for balancing will be displayed, and the salesperson will be able to correct the initial float.
+
+### Related links
+
+- [Create a POS payment bin](create_pos_payment_bin.md)

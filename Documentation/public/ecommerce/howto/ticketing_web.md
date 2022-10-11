@@ -75,3 +75,8 @@ You can apply different combinations of options in the **Ticket Package App Setu
 - The **Qty (Q1)** can be used to indicate the quantity that will be added once the addon is selected. 
 - **Qty Increment Factor** is the number of tickets selected that will consequently increase the defined number of addons. 
 - **Min and Max Specified** defines the range that you can select for how many addons you wish to add. 
+
+### Related links
+
+- [Entertainment settings (reference guide)](../reference/entertainment_settings.md)
+- [Ticket delivery (reference guide)](../reference/ticket_delivery.md)

@@ -10,12 +10,12 @@ Different types of event codes are:
 
 | Field Name      | Description |
 | ----------- | ----------- |
-| **CUSTOMERN**       | The customers will be searched by their customer numbers.     |
-| **CUSTOMERSEARCH**   | The customers will be searched by their names.        |
-| **ITEMNO**  | The items will be searched by their item numbers. |
-| **ITEMSEARCH** | The items will be searched by their names. |
-| **ITEMCROSSREFERENCENO** | The items will be searched by their cross reference numbers. |
-| **DISCOUNT_COUPON** | The coupons will be searched (scanned) by coupon reference numbers. |
+| **CUSTOMERN**       | The customers will be looked up by their customer numbers.     |
+| **CUSTOMERSEARCH**   | The customers will be looked up by their names.        |
+| **ITEMNO**  | The items will be looked up by their item numbers. |
+| **ITEMSEARCH** | The items will be looked up by their names. |
+| **ITEMCROSSREFERENCENO** | The items will be looked up by their cross reference numbers. |
+| **DISCOUNT_COUPON** | The coupons will be looked up (scanned) by coupon reference numbers. |
 | **QTYSTAR** | Allows changing the quantity in the active sales line by entering *3 (a new quantity) in the input box. When you press **Enter**, the quantity in active sale line will change from the old quantity to "3" (a new quantity). |
 
 ### Related links

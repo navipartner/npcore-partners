@@ -6,11 +6,11 @@ Tickets can be priced either via the ERP pricing model, or via time-based pricin
 
 The ERP price model is based on item, date, quantity, and customers. It is capable of:
 
-- Quantity and date based price ladders
-- Quantity and date based discount ladders
-- Item discount groups
-- Customer discount groups
-- Campaigns
+- Quantity and date based price ladders;
+- Quantity and date based discount ladders;
+- Item discount groups;
+- Customer discount groups;
+- Campaigns.
 
  The learn more about the ERP price model, see the following article on [managing sales prices in Dynamics 365 Business Central](https://docs.microsoft.com/en-us/learn/modules/manage-sales-prices-dynamics-365-business-central/).
 
@@ -29,8 +29,8 @@ A rule consists of two sections. The first section describes when the rule is ap
 
 To define when a rule is valid, there are 4-date and 3-date formula fields to identify the **booking date** and the **event date**. These fields can be used in any combination to construct the selection part of the rule.
 
->[!Note]
->Rules can overlap, and if that happens the most precise rule wins. If multiple rules are found to be equally precise, the rule with the highest line number is persists. 
+> [!Note]
+> Rules can overlap, and if that happens the most precise rule wins. If multiple rules are found to be equally precise, the rule with the highest line number is persists. 
 
 ### Booking Date
 
