@@ -70,14 +70,13 @@
     var
         EmailTemplateHeader: Record "NPR E-mail Template Header";
     begin
-        exit(SendEmailTemplate(RecRef, EmailTemplateHeader, RecipientEmail, Silent));
+        if (StrLen(RecipientEmail) > 250) then
+            Error(EmailTemplateErr);
+        exit(SendEmailTemplate(RecRef, EmailTemplateHeader, CopyStr(RecipientEmail, 1, 250), Silent));
     end;
 
     internal procedure SendEmailTemplate(var RecRef: RecordRef; var EmailTemplateHeader: Record "NPR E-mail Template Header"; RecipientEmail: Text[250]; Silent: Boolean) ErrorMessage: Text
     begin
-        if (StrLen(RecipientEmail) > 250) then
-            Error(EmailTemplateErr);
-
         ErrorMessage := SetupEmailTemplate(RecRef, CopyStr(RecipientEmail, 1, 250), Silent, EmailTemplateHeader);
         if EmailTemplateHeader."Default Recipient Address" = '' then
             exit;
@@ -388,7 +387,7 @@
             end;
         end else begin
             if Silent then
-                exit(TempErrorMessage.ToString())
+                exit(CopyStr(TempErrorMessage.ToString(), 1, MaxStrLen(ErrorMessage)))
             else
                 TempErrorMessage.ShowErrors();
         end;
@@ -433,7 +432,7 @@
         TempEmailAttachment.Description := CopyStr(Filename, 1, MaxStrLen(TempEmailAttachment.Description));
         TempEmailAttachment."Attached File".CreateOutStream(OStream);
         Parameters := GetReqParametersFromStore(ReportID);
-        Result := REPORT.SaveAs(ReportID, Parameters, REPORTFORMAT::Pdf, OStream, RecVariant);
+        Result := Report.SaveAs(ReportID, Parameters, ReportFormat::Pdf, OStream, RecVariant);
         ClearRequestParameters(ReportID);
         if not TempEmailAttachment."Attached File".HasValue() then begin
             Result := false;
@@ -553,22 +552,22 @@
 
         if ReportID > 0 then begin
             case RecRef.Number() of
-                DATABASE::"Sales Cr.Memo Header":
-                    GetCustomEmailForReportID(DATABASE::Customer, Format(RecRef.Field(4).Value), ReportSelections.Usage::"S.Cr.Memo", EmailTemplateHeader."Report ID");
-                DATABASE::"Sales Header":
+                Database::"Sales Cr.Memo Header":
+                    GetCustomEmailForReportID(Database::Customer, Format(RecRef.Field(4).Value), ReportSelections.Usage::"S.Cr.Memo", EmailTemplateHeader."Report ID");
+                Database::"Sales Header":
                     begin
                         RecRef.SetTable(SalesHeader);
                         case SalesHeader."Document Type" of
                             SalesHeader."Document Type"::Quote:
-                                GetCustomEmailForReportID(DATABASE::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Quote", EmailTemplateHeader."Report ID");
+                                GetCustomEmailForReportID(Database::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Quote", EmailTemplateHeader."Report ID");
                             SalesHeader."Document Type"::Order:
-                                GetCustomEmailForReportID(DATABASE::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Order", EmailTemplateHeader."Report ID");
+                                GetCustomEmailForReportID(Database::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Order", EmailTemplateHeader."Report ID");
                             SalesHeader."Document Type"::"Return Order":
-                                GetCustomEmailForReportID(DATABASE::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Return", EmailTemplateHeader."Report ID");
+                                GetCustomEmailForReportID(Database::Customer, SalesHeader."Bill-to Customer No.", ReportSelections.Usage::"S.Return", EmailTemplateHeader."Report ID");
                         end;
                     end;
-                DATABASE::"Sales Invoice Header":
-                    GetCustomEmailForReportID(DATABASE::Customer, Format(RecRef.Field(4).Value), ReportSelections.Usage::"S.Invoice", EmailTemplateHeader."Report ID");
+                Database::"Sales Invoice Header":
+                    GetCustomEmailForReportID(Database::Customer, Format(RecRef.Field(4).Value), ReportSelections.Usage::"S.Invoice", EmailTemplateHeader."Report ID");
             end;
         end;
         OnAfterGetReportIDEvent(RecRef, ReportID);
@@ -594,17 +593,17 @@
             exit(EmailAddress);
 
         case RecRef.Number of
-            DATABASE::Customer:
+            Database::Customer:
                 exit(RecRef.Field(102).Value);
-            DATABASE::"Sales Header":
+            Database::"Sales Header":
                 exit(RecRef.Field(6014414).Value);
-            DATABASE::"Service Header":
+            Database::"Service Header":
                 exit(RecRef.Field(5916).Value);
-            DATABASE::"Service Invoice Header":
+            Database::"Service Invoice Header":
                 exit(RecRef.Field(5916).Value);
-            DATABASE::"Service Shipment Header":
+            Database::"Service Shipment Header":
                 exit(RecRef.Field(5916).Value);
-            DATABASE::"Issued Fin. Charge Memo Header":
+            Database::"Issued Fin. Charge Memo Header":
                 begin
                     CustomerNo := RecRef.Field(2).Value;
                     if Customer.Get(CustomerNo) then
@@ -612,7 +611,7 @@
                     else
                         exit('');
                 end;
-            DATABASE::"Issued Reminder Header":
+            Database::"Issued Reminder Header":
                 begin
                     CustomerNo := RecRef.Field(2).Value;
                     if Customer.Get(CustomerNo) then
@@ -799,7 +798,7 @@
         Clear(EmailLog);
         EmailLog.SetRange("Table No.", RecRef.Number);
         EmailLog.SetRange("Primary Key", RecRef.GetPosition(false));
-        PAGE.Run(PAGE::"NPR E-mail Log", EmailLog);
+        Page.Run(Page::"NPR E-mail Log", EmailLog);
     end;
 
     local procedure VerifyEmailAddress(RecipientEmail: Text) NewRecipientEmail: Text
@@ -809,7 +808,7 @@
         Clear(InputDialog);
         InputDialog.SetInput(1, RecipientEmail, Text001);
         InputDialog.LookupMode(true);
-        if InputDialog.RunModal() <> ACTION::LookupOK then
+        if InputDialog.RunModal() <> Action::LookupOK then
             exit('');
 
         InputDialog.InputText(1, NewRecipientEmail);

@@ -38,7 +38,7 @@
         {
             Caption = 'Field No.';
             DataClassification = CustomerContent;
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Merge Table ID"));
+            TableRelation = Field."No." where(TableNo = field("Merge Table ID"));
 
             trigger OnValidate()
             begin
@@ -48,8 +48,8 @@
         }
         field(62; "Field Name"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Merge Table ID"),
-                                                              "No." = FIELD("Field No.")));
+            CalcFormula = lookup(Field."Field Caption" where(TableNo = field("Merge Table ID"),
+                                                              "No." = field("Field No.")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;

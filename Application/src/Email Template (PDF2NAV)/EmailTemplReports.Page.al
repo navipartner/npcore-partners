@@ -1,6 +1,6 @@
 ﻿page 6059798 "NPR E-mail Templ. Reports"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Additional E-mail Template Reports';
     DelayedInsert = true;
     PageType = List;
@@ -11,7 +11,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {

@@ -1,6 +1,7 @@
 ﻿codeunit 6059941 "NPR NaviDocs Handl. Prof. Tmpl"
 {
     Access = Internal;
+
     var
         NaviDocsHandlingProfileTxt: Label 'Add Description here';
         DataTypeManagement: Codeunit "Data Type Management";
@@ -13,7 +14,7 @@
         exit(Handled);
     end;
 
-    procedure AddToNaviDocs(RecordVariant: Variant; Recepient: Text; ReportID: Integer; DelayUntil: DateTime)
+    procedure AddToNaviDocs(RecordVariant: Variant; Recepient: Text[80]; ReportID: Integer; DelayUntil: DateTime)
     var
         NaviDocsManagement: Codeunit "NPR NaviDocs Management";
         RecRef: RecordRef;
@@ -56,7 +57,7 @@
         WithSuccess := ErrorMessage = '';
     end;
 
-    local procedure NaviDocsHandlingProfileCode(): Text
+    local procedure NaviDocsHandlingProfileCode(): Code[20]
     begin
         //Let function return the HandlingProfileCode
         exit('');

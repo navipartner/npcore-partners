@@ -1,6 +1,7 @@
 ﻿codeunit 6059821 "NPR CampaignMonitor Mgt."
 {
     Access = Internal;
+
     var
         ConnectionSuccessMsg: Label 'The connection test was successful. The settings are valid.';
 
@@ -47,10 +48,10 @@
                 TransactionalJSONResult.Init();
                 TransactionalJSONResult.Provider := TransactionalJSONResult.Provider::"Campaign Monitor";
                 TransactionalJSONResult."Entry No" := I;
-                TransactionalJSONResult.ID := GetString(JObject, 'ID');
+                TransactionalJSONResult.ID := CopyStr(GetString(JObject, 'ID'), 1, MaxStrLen(TransactionalJSONResult.ID));
                 TransactionalJSONResult.Name := CopyStr(GetString(JObject, 'Name'), 1, MaxStrLen(TransactionalJSONResult.Name));
                 TransactionalJSONResult.Created := GetDate(JObject, 'CreatedAt');
-                TransactionalJSONResult.Status := GetString(JObject, 'Status');
+                TransactionalJSONResult.Status := CopyStr(GetString(JObject, 'Status'), 1, MaxStrLen(TransactionalJSONResult.Status));
                 TransactionalJSONResult.Insert();
             end;
         end;
@@ -78,7 +79,7 @@
             Error(Response);
         JObject.ReadFrom(Response);
 
-        SmartEmail.Status := GetString(JObject, 'Status');
+        SmartEmail.Status := CopyStr(GetString(JObject, 'Status'), 1, MaxStrLen(SmartEmail.Status));
         SmartEmail."Smart Email Name" := CopyStr(GetString(JObject, 'Name'), 1, MaxStrLen(SmartEmail."Smart Email Name"));
         if GetJToken(JObject, 'Properties', JToken) then
             if JToken.IsObject then begin
@@ -146,14 +147,14 @@
             Error(Response);
 
         if JObject.ReadFrom(Response) then begin
-            EmailLog.Status := GetString(JObject, 'Status');
+            EmailLog.Status := CopyStr(GetString(JObject, 'Status'), 1, MaxStrLen(EmailLog.Status));
             EmailLog.Recipient := CopyStr(GetString(JObject, 'Recipient'), 1, MaxStrLen(EmailLog.Recipient));
             if Evaluate(EmailLog."Smart Email ID", GetString(JObject, 'SmartEmailID')) then;
             EmailLog."Sent At" := GetDateTime(JObject, 'SentAt');
             EmailLog."Total Opens" := GetInt(JObject, 'TotalOpens');
             EmailLog."Total Clicks" := GetInt(JObject, 'TotalClicks');
             if GetJToken(JObject, 'Message', JToken) then
-                EmailLog.Subject := GetString(JToken.AsObject(), 'Subject');
+                EmailLog.Subject := CopyStr(GetString(JToken.AsObject(), 'Subject'), 1, MaxStrLen(EmailLog.Subject));
             EmailLog.Modify();
         end;
     end;
@@ -242,7 +243,7 @@
                     EmailLog."Entry No." := 0;
                     EmailLog.Provider := EmailLog.Provider::"Campaign Monitor";
                     EmailLog."Message ID" := GetString(JToken.AsObject(), 'MessageID');
-                    EmailLog.Status := GetString(JToken.AsObject(), 'Status');
+                    EmailLog.Status := CopyStr(GetString(JToken.AsObject(), 'Status'), 1, MaxStrLen(EmailLog.Status));
                     EmailLog.Recipient := CopyStr(GetString(JToken.AsObject(), 'Recipient'), 1, MaxStrLen(EmailLog.Recipient));
                     EmailLog.Insert(true);
                 end;
@@ -257,7 +258,7 @@
 
     begin
         InitMailAdrSeparators(Separators);
-        exit(SendClasicMail(Recipient.Split(Separators), cc.Split(Separators), Bcc.Split(Separators), Subject, BodyHtml, BodyText, From, ReplyTo, TrackOpen, TrackClick, Group, AddRecipientsToListID, Attachment, Silent));
+        exit(SendClasicMail(Recipient.Split(Separators), Cc.Split(Separators), Bcc.Split(Separators), Subject, BodyHtml, BodyText, From, ReplyTo, TrackOpen, TrackClick, Group, AddRecipientsToListID, Attachment, Silent));
     end;
 
     procedure SendClasicMail(Recipient: List of [Text]; Cc: List of [Text]; Bcc: List of [Text]; Subject: Text; BodyHtml: Text; BodyText: Text; From: Text; ReplyTo: Text; TrackOpen: Boolean; TrackClick: Boolean; Group: Text; AddRecipientsToListID: Text; var Attachment: Record "NPR E-mail Attachment"; Silent: Boolean): Text
@@ -326,7 +327,7 @@
                     EmailLog."Entry No." := 0;
                     EmailLog.Provider := EmailLog.Provider::"Campaign Monitor";
                     EmailLog."Message ID" := GetString(JToken.AsObject(), 'MessageID');
-                    EmailLog.Status := GetString(JToken.AsObject(), 'Status');
+                    EmailLog.Status := CopyStr(GetString(JToken.AsObject(), 'Status'), 1, MaxStrLen(EmailLog.Status));
                     EmailLog.Recipient := CopyStr(GetString(JToken.AsObject(), 'Recipient'), 1, MaxStrLen(EmailLog.Recipient));
                     EmailLog.Insert(true);
                 end;
@@ -338,7 +339,7 @@
     procedure PreviewSmartEmail(SmartEmail: Record "NPR Smart Email")
     begin
         if SmartEmail."Preview Url" <> '' then
-            HyperLink(SmartEmail."Preview Url");
+            Hyperlink(SmartEmail."Preview Url");
     end;
 
     local procedure InitializeClient(Client: HttpClient)
@@ -442,7 +443,7 @@
         exit(String);
     end;
 
-    local procedure DefaultAPIURL(): Text
+    local procedure DefaultAPIURL(): Text[250]
     begin
         exit('https://api.createsend.com/api/v3.1');
     end;

@@ -1,6 +1,6 @@
 ﻿page 6059792 "NPR E-mail Field List"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'E-mail Field List';
     DeleteAllowed = false;
     Editable = false;
@@ -11,11 +11,11 @@
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "Field";
-    SourceTableView = SORTING(TableNo, "No.");
+    SourceTableView = sorting(TableNo, "No.");
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {

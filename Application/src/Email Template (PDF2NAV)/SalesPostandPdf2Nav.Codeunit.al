@@ -64,7 +64,7 @@
         if SalesSetup."Post & Print with Job Queue" and not SendReportAsEmail then
             SalesPostViaJobQueue.EnqueueSalesDoc(SalesHeader)
         else begin
-            CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
+            Codeunit.Run(Codeunit::"Sales-Post", SalesHeader);
             Mode := Mode::Standard;
             GetReport(SalesHeader);
         end;
@@ -160,7 +160,7 @@
 
     local procedure IsPrintingBothDocumentsForNonWindowsClient(PrintBothDocuments: Boolean): Boolean
     begin
-        exit(PrintBothDocuments and (CurrentClientType <> CLIENTTYPE::Windows));
+        exit(PrintBothDocuments and (CurrentClientType <> ClientType::Windows));
     end;
 
     local procedure HandleReport(ReportUsage: Enum "Report Selection Usage") Printed: Boolean
@@ -205,17 +205,17 @@
             ReportSelection.TestField("Report ID");
             case ReportUsage of
                 ReportSelection.Usage::"SM.Invoice":
-                    REPORT.Run(ReportSelection."Report ID", false, false, SalesInvHeader);
+                    Report.Run(ReportSelection."Report ID", false, false, SalesInvHeader);
                 ReportSelection.Usage::"SM.Credit Memo":
-                    REPORT.Run(ReportSelection."Report ID", false, false, SalesCrMemoHeader);
+                    Report.Run(ReportSelection."Report ID", false, false, SalesCrMemoHeader);
                 ReportSelection.Usage::"S.Invoice":
-                    REPORT.Run(ReportSelection."Report ID", false, false, SalesInvHeader);
+                    Report.Run(ReportSelection."Report ID", false, false, SalesInvHeader);
                 ReportSelection.Usage::"S.Cr.Memo":
-                    REPORT.Run(ReportSelection."Report ID", false, false, SalesCrMemoHeader);
+                    Report.Run(ReportSelection."Report ID", false, false, SalesCrMemoHeader);
                 ReportSelection.Usage::"S.Shipment":
-                    REPORT.Run(ReportSelection."Report ID", false, false, SalesShptHeader);
+                    Report.Run(ReportSelection."Report ID", false, false, SalesShptHeader);
                 ReportSelection.Usage::"S.Ret.Rcpt.":
-                    REPORT.Run(ReportSelection."Report ID", false, false, ReturnRcptHeader);
+                    Report.Run(ReportSelection."Report ID", false, false, ReturnRcptHeader);
             end;
             Printed := true;
         until ReportSelection.Next() = 0;

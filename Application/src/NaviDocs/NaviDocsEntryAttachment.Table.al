@@ -16,7 +16,7 @@
             Caption = 'Line No.';
             DataClassification = CustomerContent;
         }
-        field(10; Data; BLOB)
+        field(10; Data; Blob)
         {
             Caption = 'Data';
             DataClassification = CustomerContent;

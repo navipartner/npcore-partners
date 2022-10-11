@@ -1,8 +1,8 @@
 ﻿enum 6014463 "NPR ND Entry Type (Rec.)"
 {
-    #IF NOT BC17  
-    Access = Internal;       
-    #ENDIF
+#IF NOT BC17
+    Access = Internal;
+#ENDIF
     Extensible = true;
 
     value(0; " ")

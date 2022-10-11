@@ -1,13 +1,13 @@
 ﻿page 6059823 "NPR Smart Email Variables"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Smart Email Variables';
     PageType = ListPart;
     SourceTable = "NPR Smart Email Variable";
     UsageCategory = None;
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -39,7 +39,7 @@
                         FieldsLookup.SetTableView(Field);
                         FieldsLookup.LookupMode(true);
 
-                        if FieldsLookup.RunModal() = ACTION::LookupOK then begin
+                        if FieldsLookup.RunModal() = Action::LookupOK then begin
                             FieldsLookup.GetRecord(Field);
                             Rec.Validate("Field No.", Field."No.");
                         end;

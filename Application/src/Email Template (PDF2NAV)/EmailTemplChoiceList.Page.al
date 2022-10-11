@@ -1,6 +1,6 @@
 ﻿page 6059799 "NPR E-mail Templ. Choice List"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Choose E-mail Templates';
     PageType = List;
     UsageCategory = None;
@@ -9,7 +9,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
