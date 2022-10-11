@@ -110,7 +110,7 @@
                     (SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::Sale, SaleLinePOS."Sale Type"::Deposit]):
                         SaleAmount += SaleLinePOS."Amount Including VAT";
                     (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment") and (SaleLinePOS."Discount Type" <> SaleLinePOS."Discount Type"::Rounding):
-                        SaleAmount -= SaleLinePOS."Amount Including VAT";
+                        SaleAmount += SaleLinePOS."Amount Including VAT";
                     (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment") and (SaleLinePOS."Discount Type" = SaleLinePOS."Discount Type"::Rounding):
                         RoundingAmount += SaleLinePOS."Amount Including VAT";
                     (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Payment):
