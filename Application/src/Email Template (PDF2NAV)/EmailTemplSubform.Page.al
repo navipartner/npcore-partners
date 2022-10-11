@@ -1,6 +1,6 @@
 ﻿page 6059793 "NPR E-mail Templ. Subform"
 {
-    Extensible = False;
+    Extensible = false;
     AutoSplitKey = true;
     Caption = 'E-mail Template Subform';
     PageType = ListPart;
@@ -9,7 +9,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {

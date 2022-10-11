@@ -25,7 +25,7 @@
         field(8; "Field No."; Integer)
         {
             Caption = 'Field No.';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
+            TableRelation = Field."No." where(TableNo = field("Table No."));
             DataClassification = CustomerContent;
 
             trigger OnLookup()
@@ -35,7 +35,7 @@
                 Field.FilterGroup(2);
                 Field.SetRange(TableNo, "Table No.");
                 Field.FilterGroup(0);
-                if PAGE.RunModal(PAGE::"NPR Field Lookup", Field) = ACTION::LookupOK then
+                if Page.RunModal(Page::"NPR Field Lookup", Field) = Action::LookupOK then
                     "Field No." := Field."No.";
             end;
         }
@@ -46,8 +46,8 @@
         }
         field(10; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table No."),
-                                                        "No." = FIELD("Field No.")));
+            CalcFormula = lookup(Field.FieldName where(TableNo = field("Table No."),
+                                                        "No." = field("Field No.")));
             Caption = 'Field Name';
             Description = 'PN1.07,PN1.08';
             Editable = false;

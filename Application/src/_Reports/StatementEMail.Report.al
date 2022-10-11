@@ -335,6 +335,8 @@
         TempNaviDocsEntryAttachment: Record "NPR NaviDocs Entry Attachment" temporary;
         NaviDocsManagement: Codeunit "NPR NaviDocs Management";
         RecRefBlob: RecordRef;
+        SendToList: List of [Text[80]];
+        SendToMailAdr: Text[80];
     begin
         TempNaviDocsEntryAttachment."Data Type" := 'Report PARAM';
 
@@ -346,7 +348,9 @@
         TempNaviDocsEntryAttachment."File Extension" := 'xml';
         TempNaviDocsEntryAttachment."Internal Type" := TempNaviDocsEntryAttachment."Internal Type"::"Report Parameters";
         TempNaviDocsEntryAttachment.Insert();
-        NaviDocsManagement.AddDocumentEntryWithAttachments(RecRef, NaviDocsManagement.HandlingTypeMailCode(), ReportId, SendToEmail, '', DelayUntil, TempNaviDocsEntryAttachment);
+        NaviDocsManagement.ConvertSendToEmail(SendToEmail, SendToList);
+        foreach SendToMailAdr in SendToList do
+            NaviDocsManagement.AddDocumentEntryWithAttachments(RecRef, NaviDocsManagement.HandlingTypeMailCode(), ReportId, SendToMailAdr, '', DelayUntil, TempNaviDocsEntryAttachment);
     end;
 
     local procedure GetCustomReportSelectionEmail(CustomerNo: Code[20]; ReportID: Integer): Text[250]

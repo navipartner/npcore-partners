@@ -1,6 +1,6 @@
 ﻿page 6059767 "NPR NaviDocs Setup"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'NaviDocs Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -11,7 +11,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(General)
             {

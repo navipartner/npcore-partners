@@ -1,6 +1,6 @@
 ﻿page 6059797 "NPR E-mail Attachments"
 {
-    Extensible = False;
+    Extensible = false;
     AutoSplitKey = true;
     Caption = 'E-mail Attachments';
     PageType = List;
@@ -9,12 +9,12 @@
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "NPR E-mail Attachment";
-    SourceTableView = SORTING("Table No.", "Primary Key", "Line No.");
+    SourceTableView = sorting("Table No.", "Primary Key", "Line No.");
     ApplicationArea = NPRRetail;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {

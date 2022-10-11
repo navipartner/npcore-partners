@@ -1,6 +1,6 @@
 ﻿page 6059769 "NPR NaviDocs Document List"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'NaviDocs Document List';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -14,7 +14,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -139,8 +139,8 @@
             part(NaviDocsAttachments; "NPR NaviDocs Entry Attachments")
             {
                 ShowFilter = false;
-                SubPageLink = "NaviDocs Entry No." = FIELD("Entry No.");
-                SubPageView = SORTING("NaviDocs Entry No.", "Line No.");
+                SubPageLink = "NaviDocs Entry No." = field("Entry No.");
+                SubPageView = sorting("NaviDocs Entry No.", "Line No.");
                 Visible = ShowAttachmentSubpage;
                 ApplicationArea = NPRRetail;
 
@@ -150,7 +150,7 @@
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             group("<Action6150636>")
             {
@@ -164,7 +164,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ShortCutKey = 'F9';
+                    ShortcutKey = 'F9';
 
                     ToolTip = 'Executes the Handle action';
                     ApplicationArea = NPRRetail;
@@ -183,7 +183,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ShortCutKey = 'Shift+F9';
+                    ShortcutKey = 'Shift+F9';
 
                     ToolTip = 'Executes the Handle marked action';
                     ApplicationArea = NPRRetail;
@@ -206,7 +206,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ShortCutKey = 'Ctrl+U';
+                    ShortcutKey = 'Ctrl+U';
 
                     ToolTip = 'Executes the Show unhandled action';
                     ApplicationArea = NPRRetail;
@@ -316,7 +316,7 @@
                 }
             }
         }
-        area(navigation)
+        area(Navigation)
         {
             action(DocumentCard)
             {
@@ -325,7 +325,7 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Category4;
-                ShortCutKey = 'Shift+F5';
+                ShortcutKey = 'Shift+F5';
 
                 ToolTip = 'Executes the Document Card action';
                 ApplicationArea = NPRRetail;
@@ -342,7 +342,7 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Category4;
-                ShortCutKey = 'Ctrl+F5';
+                ShortcutKey = 'Ctrl+F5';
 
                 ToolTip = 'Executes the Master Card action';
                 ApplicationArea = NPRRetail;
@@ -359,7 +359,7 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Category4;
-                ShortCutKey = 'Ctrl+M';
+                ShortcutKey = 'Ctrl+M';
 
                 ToolTip = 'Executes the Template action';
                 ApplicationArea = NPRRetail;
@@ -374,7 +374,7 @@
 
     trigger OnAfterGetCurrRecord()
     begin
-        CurrPage.NaviDocsCommentSubpage.PAGE.SetData(Rec, NaviDocsSetup."Log to Activity Log");
+        CurrPage.NaviDocsCommentSubpage.Page.SetData(Rec, NaviDocsSetup."Log to Activity Log");
     end;
 
     trigger OnAfterGetRecord()
@@ -447,7 +447,7 @@
         CurrPage.Update(false);
     end;
 
-    local procedure ChangeStatus(UpdateStatus: Integer)
+    local procedure ChangeStatus(NewStatus: Integer)
     var
         NaviDocsEntry3: Record "NPR NaviDocs Entry";
     begin
@@ -457,7 +457,7 @@
         if NaviDocsEntry2.FindSet() then
             repeat
                 NaviDocsEntry3.Copy(NaviDocsEntry2);
-                NaviDocsManagement.UpdateStatus(NaviDocsEntry3, UpdateStatus);
+                NaviDocsManagement.UpdateStatus(NaviDocsEntry3, NewStatus);
                 Commit();
             until NaviDocsEntry2.Next() = 0;
 
@@ -471,7 +471,7 @@
     begin
         NaviDocsEntry2.SetCurrentKey("Entry No.");
 
-        if PAGE.RunModal(0, NewHandlingProfile) <> ACTION::LookupOK then
+        if Page.RunModal(0, NewHandlingProfile) <> Action::LookupOK then
             exit;
         if NaviDocsEntry2.FindSet() then
             repeat

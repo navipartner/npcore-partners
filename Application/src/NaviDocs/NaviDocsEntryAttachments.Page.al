@@ -1,6 +1,6 @@
 ﻿page 6059949 "NPR NaviDocs Entry Attachments"
 {
-    Extensible = False;
+    Extensible = false;
 
     Caption = 'Attachments';
     Editable = false;
@@ -10,7 +10,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -45,7 +45,7 @@
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             action(ShowOutput)
             {

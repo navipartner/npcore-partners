@@ -1,6 +1,6 @@
 ﻿page 6059829 "NPR Trx JSON Result"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Transactional JSON Result';
     DeleteAllowed = false;
     Editable = false;
@@ -14,7 +14,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {

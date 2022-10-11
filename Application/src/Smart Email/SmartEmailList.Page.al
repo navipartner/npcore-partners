@@ -1,8 +1,8 @@
 ﻿page 6059821 "NPR Smart Email List"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Smart Email List';
-    CardPageID = "NPR Smart Email Card";
+    CardPageId = "NPR Smart Email Card";
     Editable = false;
     PageType = List;
     SourceTable = "NPR Smart Email";
@@ -11,7 +11,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {

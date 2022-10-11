@@ -1,8 +1,8 @@
 ﻿table 6014462 "NPR E-mail Template Header"
 {
     Caption = 'E-mail Template Header';
-    DrillDownPageID = "NPR E-mail Templates";
-    LookupPageID = "NPR E-mail Templates";
+    DrillDownPageId = "NPR E-mail Templates";
+    LookupPageId = "NPR E-mail Templates";
     DataClassification = CustomerContent;
 
     fields
@@ -24,7 +24,7 @@
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
             DataClassification = CustomerContent;
         }
-        field(20; "HTML Template"; BLOB)
+        field(20; "HTML Template"; Blob)
         {
             Caption = 'HTML Template';
             Description = 'Using external HTML Editor from Web - Retail Setup (Magento integration)';
@@ -73,8 +73,8 @@
         }
         field(65; "Report Name"; Text[249])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Report ID")));
+            CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Report ID")));
             Caption = 'Report Name';
             Editable = false;
             FieldClass = FlowField;
@@ -100,7 +100,7 @@
         field(82; "Transactional E-mail Code"; Code[20])
         {
             Caption = 'Transactional E-mail Code';
-            TableRelation = IF ("Transactional E-mail" = CONST("Smart Email")) "NPR Smart Email" WHERE("Merge Table ID" = FIELD("Table No."));
+            TableRelation = if ("Transactional E-mail" = const("Smart Email")) "NPR Smart Email" where("Merge Table ID" = field("Table No."));
             DataClassification = CustomerContent;
         }
         field(90; "Fieldnumber Start Tag"; Text[10])

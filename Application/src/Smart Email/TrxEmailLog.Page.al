@@ -1,6 +1,6 @@
 ﻿page 6059825 "NPR Trx Email Log"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Transactional Email Log';
     DeleteAllowed = false;
     Editable = false;
@@ -14,7 +14,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -90,7 +90,7 @@
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             action("Update Details")
             {

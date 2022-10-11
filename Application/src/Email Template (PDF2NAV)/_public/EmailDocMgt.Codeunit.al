@@ -34,33 +34,33 @@
 
         RecRef.GetTable(RecVariant);
         case RecRef.Number of
-            DATABASE::Customer:
+            Database::Customer:
                 SendReportCustomerStatement(RecVariant);
-            DATABASE::"Issued Fin. Charge Memo Header":
+            Database::"Issued Fin. Charge Memo Header":
                 SendReportIssuedFinChrgMemoHdr(RecVariant, Silent);
-            DATABASE::"Issued Reminder Header":
+            Database::"Issued Reminder Header":
                 SendReportIssuedReminderHdr(RecVariant, Silent);
-            DATABASE::"Purch. Cr. Memo Hdr.":
+            Database::"Purch. Cr. Memo Hdr.":
                 SendReportPurchCrMemoHdr(RecVariant, Silent);
-            DATABASE::"Purchase Header":
+            Database::"Purchase Header":
                 SendReportPurchHdr(RecVariant, Silent);
-            DATABASE::"Purch. Inv. Header":
+            Database::"Purch. Inv. Header":
                 SendReportPurchInvHdr(RecVariant, Silent);
-            DATABASE::"Purch. Rcpt. Header":
+            Database::"Purch. Rcpt. Header":
                 SendReportPurchRcptHdr(RecVariant, Silent);
-            DATABASE::"Sales Cr.Memo Header":
+            Database::"Sales Cr.Memo Header":
                 SendReportSalesCrMemoHdr(RecVariant, Silent);
-            DATABASE::"Sales Header":
+            Database::"Sales Header":
                 SendReportSalesHdr(RecVariant, Silent);
-            DATABASE::"Sales Invoice Header":
+            Database::"Sales Invoice Header":
                 SendReportSalesInvHdr(RecVariant, Silent);
-            DATABASE::"Sales Shipment Header":
+            Database::"Sales Shipment Header":
                 SendReportSalesShptHdr(RecVariant, Silent);
-            DATABASE::"Service Invoice Header":
+            Database::"Service Invoice Header":
                 SendReportServHdr(RecVariant, Silent);
-            DATABASE::"Service Header":
+            Database::"Service Header":
                 SendReportServInvHdr(RecVariant, Silent);
-            DATABASE::"Service Shipment Header":
+            Database::"Service Shipment Header":
                 SendReportServShptHdr(RecVariant, Silent);
         end;
     end;
@@ -289,7 +289,7 @@
     begin
         Customer2.Copy(Customer);
         Customer2.SetRecFilter();
-        REPORT.RunModal(REPORT::"NPR Statement E-Mail", false, false, Customer2);
+        Report.RunModal(Report::"NPR Statement E-Mail", false, false, Customer2);
     end;
 
     internal procedure "TemplateType.SalesQuote"(): Integer
@@ -417,7 +417,7 @@
 
     local procedure CurrCodeunitId(): Integer
     begin
-        exit(CODEUNIT::"NPR E-mail Doc. Mgt.");
+        exit(Codeunit::"NPR E-mail Doc. Mgt.");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]

@@ -1,6 +1,6 @@
 page 6059860 "NPR Email Send Message"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Send E-mail';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -101,7 +101,7 @@ page 6059860 "NPR Email Send Message"
             RecVariant := RecRef;
             if RecRef.IsEmpty then
                 Message(Text001, RecRef.Caption);
-            if Page.RunModal(PageID, RecVariant) = ACTION::LookupOK then begin
+            if Page.RunModal(PageID, RecVariant) = Action::LookupOK then begin
                 DataTypeManagement.GetRecordRef(RecVariant, RecRef);
                 exit(true);
             end;
@@ -127,7 +127,7 @@ page 6059860 "NPR Email Send Message"
     end;
 
     var
-        RecipientEmail: Text;
+        RecipientEmail: Text[250];
         RecordInfo: Text;
         EmailText: Text;
         SenderEmailTemplate: Text;

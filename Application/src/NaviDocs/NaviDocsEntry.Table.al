@@ -29,7 +29,7 @@
             NotBlank = true;
             DataClassification = CustomerContent;
         }
-        field(20; "Record ID"; RecordID)
+        field(20; "Record ID"; RecordId)
         {
             Caption = 'Record ID';
             DataClassification = CustomerContent;
@@ -72,7 +72,7 @@
         field(45; "Report No."; Integer)
         {
             Caption = 'Report No.';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
             DataClassification = CustomerContent;
         }
         field(50; "Posting Date"; Date)
@@ -111,9 +111,9 @@
         {
             Caption = 'No. (Recipient)';
             NotBlank = true;
-            TableRelation = IF ("Type (Recipient)" = CONST(Customer)) Customer
-            ELSE
-            IF ("Type (Recipient)" = CONST(Vendor)) Vendor;
+            TableRelation = if ("Type (Recipient)" = const(Customer)) Customer
+            else
+            if ("Type (Recipient)" = const(Vendor)) Vendor;
             DataClassification = CustomerContent;
         }
         field(210; "E-mail (Recipient)"; Text[80])
@@ -176,9 +176,9 @@
         }
         field(1040; "Error Qty."; Integer)
         {
-            CalcFormula = Count("NPR NaviDocs Entry Comment" WHERE("Table No." = FIELD("Table No."),
-                                                                "Document No." = FIELD("No."),
-                                                                Warning = CONST(true)));
+            CalcFormula = count("NPR NaviDocs Entry Comment" where("Table No." = field("Table No."),
+                                                                "Document No." = field("No."),
+                                                                Warning = const(true)));
             Caption = 'Errors Qty.';
             Editable = false;
             FieldClass = FlowField;

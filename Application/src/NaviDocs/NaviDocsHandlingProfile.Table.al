@@ -2,8 +2,8 @@
 {
     Access = Internal;
     Caption = 'NaviDocs Entry Report Filters';
-    DrillDownPageID = "NPR NaviDocs Handling Profiles";
-    LookupPageID = "NPR NaviDocs Handling Profiles";
+    DrillDownPageId = "NPR NaviDocs Handling Profiles";
+    LookupPageId = "NPR NaviDocs Handling Profiles";
     DataClassification = CustomerContent;
 
     fields

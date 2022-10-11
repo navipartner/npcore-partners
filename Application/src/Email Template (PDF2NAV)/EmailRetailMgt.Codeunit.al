@@ -60,7 +60,7 @@
     begin
         Clear(RetailReportSelection);
         case RecRef.Number of
-            DATABASE::"NPR POS Entry":
+            Database::"NPR POS Entry":
                 RetailReportSelection.SetRange("Report Type", RetailReportSelection."Report Type"::"Large Sales Receipt (POS Entry)");
             else
                 exit(0);
@@ -79,7 +79,7 @@
     begin
         RecRef.GetTable(RecVariant);
         case RecRef.Number of
-            DATABASE::"NPR POS Entry":
+            Database::"NPR POS Entry":
                 SendReportPOSEntry(RecVariant, Silent);
         end;
     end;

@@ -22,7 +22,7 @@
             Caption = 'Line No.';
             DataClassification = CustomerContent;
         }
-        field(30; "Attached File"; BLOB)
+        field(30; "Attached File"; Blob)
         {
             Caption = 'Attached data';
             DataClassification = CustomerContent;

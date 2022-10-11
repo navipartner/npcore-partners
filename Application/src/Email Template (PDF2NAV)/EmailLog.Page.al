@@ -1,6 +1,6 @@
 ﻿page 6059796 "NPR E-mail Log"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Mail And Document Log List';
     Editable = false;
     PageType = List;
@@ -11,7 +11,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {

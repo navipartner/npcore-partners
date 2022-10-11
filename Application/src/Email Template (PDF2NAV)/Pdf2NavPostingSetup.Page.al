@@ -1,6 +1,6 @@
 ﻿page 6059790 "NPR Pdf2Nav Posting Setup"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Pdf2Nav Posting Setup';
     PageType = Card;
     SourceTable = "NPR SalesPost Pdf2Nav Setup";
@@ -8,7 +8,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(General)
             {

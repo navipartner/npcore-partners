@@ -79,12 +79,12 @@
             until TempHandlingProfile.Next() = 0;
     end;
 
-    procedure AddDocumentEntryWithHandlingProfile(RecRef: RecordRef; HandlingProfile: Code[20]; ReportNo: Integer; Recipient: Text; DelayUntil: DateTime)
+    procedure AddDocumentEntryWithHandlingProfile(RecRef: RecordRef; HandlingProfile: Code[20]; ReportNo: Integer; Recipient: Text[80]; DelayUntil: DateTime)
     begin
         AddDocumentEntryWithHandlingProfileExt(RecRef, HandlingProfile, ReportNo, Recipient, '', DelayUntil);
     end;
 
-    procedure AddDocumentEntryWithHandlingProfileExt(RecRef: RecordRef; HandlingProfile: Code[20]; ReportNo: Integer; Recipient: Text; TemplateCode: Code[20]; DelayUntil: DateTime): BigInteger
+    procedure AddDocumentEntryWithHandlingProfileExt(RecRef: RecordRef; HandlingProfile: Code[20]; ReportNo: Integer; Recipient: Text[80]; TemplateCode: Code[20]; DelayUntil: DateTime): BigInteger
     var
         NaviDocsEntry: Record "NPR NaviDocs Entry";
         TableMetadata: Record "Table Metadata";
@@ -106,6 +106,9 @@
         if InsertedEntryNo <> 0 then
             exit(InsertedEntryNo);
 
+        if AddPOSEntryDocumentEntry(RecRef, HandlingProfile, ReportNo, Recipient, TemplateCode, DelayUntil, InsertedEntryNo) then
+            exit(InsertedEntryNo);
+
         if RecRef.Get(RecRef.RecordId) then begin
             NaviDocsEntry.Init();
             NaviDocsEntry."Entry No." := 0;
@@ -125,7 +128,6 @@
             NaviDocsEntry.Validate("Document Handling Profile", HandlingProfile);
             if Recipient <> '' then
                 NaviDocsEntry."E-mail (Recipient)" := Recipient;
-
             NaviDocsEntry."Report No." := ReportNo;
             NaviDocsEntry."Delay sending until" := DelayUntil;
             NaviDocsEntry."Template Code" := TemplateCode;
@@ -135,7 +137,7 @@
         exit(InsertedEntryNo);
     end;
 
-    procedure AddDocumentEntryWithAttachments(RecRef: RecordRef; HandlingProfile: Code[20]; ReportNo: Integer; Recipient: Text; TemplateCode: Code[20]; DelayUntil: DateTime; var Attachments: Record "NPR NaviDocs Entry Attachment"): Boolean
+    procedure AddDocumentEntryWithAttachments(RecRef: RecordRef; HandlingProfile: Code[20]; ReportNo: Integer; Recipient: Text[80]; TemplateCode: Code[20]; DelayUntil: DateTime; var Attachments: Record "NPR NaviDocs Entry Attachment"): Boolean
     var
         NaviDocsEntryAttachment: Record "NPR NaviDocs Entry Attachment";
         NewEntryNo: BigInteger;
@@ -175,7 +177,7 @@
         ReturnShipmentHeader: Record "Return Shipment Header";
     begin
         case RecRef.Number of
-            DATABASE::Customer:
+            Database::Customer:
                 begin
                     RecRef.SetTable(Customer);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
@@ -183,7 +185,7 @@
                     NaviDocsEntry."Name (Recipient)" := Customer.Name;
                     NaviDocsEntry."Name 2 (Recipient)" := Customer."Name 2";
                 end;
-            DATABASE::Vendor:
+            Database::Vendor:
                 begin
                     RecRef.SetTable(Vendor);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Vendor;
@@ -191,7 +193,7 @@
                     NaviDocsEntry."Name (Recipient)" := Vendor.Name;
                     NaviDocsEntry."Name 2 (Recipient)" := Vendor."Name 2";
                 end;
-            DATABASE::"Sales Header":
+            Database::"Sales Header":
                 begin
                     RecRef.SetTable(SalesHeader);
                     NaviDocsEntry."Document Type" := SalesHeader."Document Type".AsInteger();
@@ -202,7 +204,7 @@
                     NaviDocsEntry."Posting Date" := SalesHeader."Posting Date";
                     NaviDocsEntry."External Document No." := SalesHeader."External Document No.";
                 end;
-            DATABASE::"Purchase Header":
+            Database::"Purchase Header":
                 begin
                     RecRef.SetTable(PurchHeader);
                     NaviDocsEntry."Document Type" := PurchHeader."Document Type".AsInteger();
@@ -212,7 +214,7 @@
                     NaviDocsEntry."Name (Recipient)" := PurchHeader."Buy-from Vendor Name";
                     NaviDocsEntry."Name 2 (Recipient)" := PurchHeader."Buy-from Vendor Name 2";
                 end;
-            DATABASE::"Sales Shipment Header":
+            Database::"Sales Shipment Header":
                 begin
                     RecRef.SetTable(SalesShipmentHeader);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
@@ -222,7 +224,7 @@
                     NaviDocsEntry."Name 2 (Recipient)" := SalesShipmentHeader."Sell-to Customer Name 2";
                     NaviDocsEntry."External Document No." := SalesShipmentHeader."External Document No.";
                 end;
-            DATABASE::"Sales Invoice Header":
+            Database::"Sales Invoice Header":
                 begin
                     RecRef.SetTable(SalesInvoiceHeader);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
@@ -233,7 +235,7 @@
                     NaviDocsEntry."Order No." := SalesInvoiceHeader."Order No.";
                     NaviDocsEntry."External Document No." := SalesInvoiceHeader."External Document No.";
                 end;
-            DATABASE::"Sales Cr.Memo Header":
+            Database::"Sales Cr.Memo Header":
                 begin
                     RecRef.SetTable(SalesCrMemoHeader);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
@@ -243,7 +245,7 @@
                     NaviDocsEntry."Name 2 (Recipient)" := SalesCrMemoHeader."Bill-to Name 2";
                     NaviDocsEntry."External Document No." := SalesCrMemoHeader."External Document No.";
                 end;
-            DATABASE::"Issued Reminder Header":
+            Database::"Issued Reminder Header":
                 begin
                     RecRef.SetTable(IssuedReminderHeader);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
@@ -252,7 +254,7 @@
                     NaviDocsEntry."Name 2 (Recipient)" := IssuedReminderHeader."Name 2";
                     NaviDocsEntry."Posting Date" := IssuedReminderHeader."Posting Date";
                 end;
-            DATABASE::"Issued Fin. Charge Memo Header":
+            Database::"Issued Fin. Charge Memo Header":
                 begin
                     RecRef.SetTable(IssuedFinChargeMemoHeader);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
@@ -261,7 +263,7 @@
                     NaviDocsEntry."Name 2 (Recipient)" := IssuedFinChargeMemoHeader."Name 2";
                     NaviDocsEntry."Posting Date" := IssuedFinChargeMemoHeader."Posting Date";
                 end;
-            DATABASE::"Return Receipt Header":
+            Database::"Return Receipt Header":
                 begin
                     RecRef.SetTable(ReturnReceiptHeader);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
@@ -270,7 +272,7 @@
                     NaviDocsEntry."Name 2 (Recipient)" := ReturnReceiptHeader."Sell-to Customer Name 2";
                     NaviDocsEntry."Posting Date" := ReturnReceiptHeader."Posting Date";
                 end;
-            DATABASE::"Service Header":
+            Database::"Service Header":
                 begin
                     RecRef.SetTable(ServiceHeader);
                     NaviDocsEntry."Document Type" := ServiceHeader."Document Type".AsInteger();
@@ -280,7 +282,7 @@
                     NaviDocsEntry."Name 2 (Recipient)" := ServiceHeader."Name 2";
                     NaviDocsEntry."Posting Date" := ServiceHeader."Posting Date";
                 end;
-            DATABASE::"Service Shipment Header":
+            Database::"Service Shipment Header":
                 begin
                     RecRef.SetTable(ServiceShipmentHeader);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
@@ -289,7 +291,7 @@
                     NaviDocsEntry."Name 2 (Recipient)" := ServiceShipmentHeader."Name 2";
                     NaviDocsEntry."Posting Date" := ServiceShipmentHeader."Posting Date";
                 end;
-            DATABASE::"Service Invoice Header":
+            Database::"Service Invoice Header":
                 begin
                     RecRef.SetTable(ServiceInvoiceHeader);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
@@ -298,7 +300,7 @@
                     NaviDocsEntry."Name 2 (Recipient)" := ServiceInvoiceHeader."Bill-to Name 2";
                     NaviDocsEntry."Posting Date" := ServiceInvoiceHeader."Posting Date";
                 end;
-            DATABASE::"Service Cr.Memo Header":
+            Database::"Service Cr.Memo Header":
                 begin
                     RecRef.SetTable(ServiceCrMemoHeader);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
@@ -307,7 +309,7 @@
                     NaviDocsEntry."Name 2 (Recipient)" := ServiceCrMemoHeader."Bill-to Name 2";
                     NaviDocsEntry."Posting Date" := ServiceCrMemoHeader."Posting Date";
                 end;
-            DATABASE::"Service Contract Header":
+            Database::"Service Contract Header":
                 begin
                     RecRef.SetTable(ServiceContractHeader);
 #if BC17 or BC18
@@ -321,7 +323,7 @@
                     NaviDocsEntry."Name (Recipient)" := ServiceContractHeader."Bill-to Name";
                     NaviDocsEntry."Name 2 (Recipient)" := ServiceContractHeader."Bill-to Name 2";
                 end;
-            DATABASE::"Purch. Rcpt. Header":
+            Database::"Purch. Rcpt. Header":
                 begin
                     RecRef.SetTable(PurchRcptHeader);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Vendor;
@@ -330,7 +332,7 @@
                     NaviDocsEntry."Name 2 (Recipient)" := PurchRcptHeader."Buy-from Vendor Name 2";
                     NaviDocsEntry."Posting Date" := PurchRcptHeader."Posting Date";
                 end;
-            DATABASE::"Purch. Inv. Header":
+            Database::"Purch. Inv. Header":
                 begin
                     RecRef.SetTable(PurchInvHeader);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Vendor;
@@ -339,7 +341,7 @@
                     NaviDocsEntry."Name 2 (Recipient)" := PurchInvHeader."Pay-to Name 2";
                     NaviDocsEntry."Posting Date" := PurchInvHeader."Posting Date";
                 end;
-            DATABASE::"Purch. Cr. Memo Hdr.":
+            Database::"Purch. Cr. Memo Hdr.":
                 begin
                     RecRef.SetTable(PurchCrMemoHdr);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Vendor;
@@ -348,7 +350,7 @@
                     NaviDocsEntry."Name 2 (Recipient)" := PurchCrMemoHdr."Pay-to Name 2";
                     NaviDocsEntry."Posting Date" := PurchCrMemoHdr."Posting Date";
                 end;
-            DATABASE::"Return Shipment Header":
+            Database::"Return Shipment Header":
                 begin
                     RecRef.SetTable(ReturnShipmentHeader);
                     NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Vendor;
@@ -430,7 +432,7 @@
 
     local procedure DocManagePrint(NaviDocsEntry: Record "NPR NaviDocs Entry"; RecRef: RecordRef; ReportID: Integer): Boolean
     var
-        ErrorMessage: Text[1024];
+        ErrorMessage: Text;
     begin
         RecRef.SetRecFilter();
         SetCustomReportLayout(RecRef, ReportID);
@@ -578,31 +580,31 @@
         CustomerNo := '';
 
         case RecRef.Number of
-            DATABASE::Customer:
+            Database::Customer:
                 CustomerNo := RecRef.Field(1).Value;  //No.
-            DATABASE::"Sales Header":
+            Database::"Sales Header":
                 CustomerNo := RecRef.Field(2).Value;  //Sell-to Customer No.
-            DATABASE::"Sales Shipment Header":
+            Database::"Sales Shipment Header":
                 CustomerNo := RecRef.Field(2).Value;  //Sell-to Customer No.
-            DATABASE::"Sales Invoice Header":
+            Database::"Sales Invoice Header":
                 CustomerNo := RecRef.Field(4).Value;  //Bill-to Customer No.
-            DATABASE::"Sales Cr.Memo Header":
+            Database::"Sales Cr.Memo Header":
                 CustomerNo := RecRef.Field(4).Value;  //Bill-to Customer No.
-            DATABASE::"Return Receipt Header":
+            Database::"Return Receipt Header":
                 CustomerNo := RecRef.Field(2).Value;  //Sell-to Customer No.
-            DATABASE::"Issued Reminder Header":
+            Database::"Issued Reminder Header":
                 CustomerNo := RecRef.Field(2).Value;  //Customer No.
-            DATABASE::"Issued Fin. Charge Memo Header":
+            Database::"Issued Fin. Charge Memo Header":
                 CustomerNo := RecRef.Field(2).Value;  //Customer No.
-            DATABASE::"Service Header":
+            Database::"Service Header":
                 CustomerNo := RecRef.Field(2).Value;  //Customer No.
-            DATABASE::"Service Shipment Header":
+            Database::"Service Shipment Header":
                 CustomerNo := RecRef.Field(2).Value;  //Customer No.
-            DATABASE::"Service Invoice Header":
+            Database::"Service Invoice Header":
                 CustomerNo := RecRef.Field(4).Value;  //Bill-to Customer No.
-            DATABASE::"Service Cr.Memo Header":
+            Database::"Service Cr.Memo Header":
                 CustomerNo := RecRef.Field(4).Value;  //Bill-to Customer No.
-            DATABASE::"Service Contract Header":
+            Database::"Service Contract Header":
                 CustomerNo := RecRef.Field(16).Value;  //Bill-to Customer No.
             else
                 exit(false);  // table is not listed as related to a Customer
@@ -655,17 +657,17 @@
         TempHandlingProfiles.DeleteAll();
         VendorNo := '';
         case RecRef.Number of
-            DATABASE::Vendor:
+            Database::Vendor:
                 VendorNo := RecRef.Field(1).Value;
-            DATABASE::"Purchase Header":
+            Database::"Purchase Header":
                 VendorNo := RecRef.Field(2).Value; //Buy-from Vendor No.
-            DATABASE::"Purch. Rcpt. Header":
+            Database::"Purch. Rcpt. Header":
                 VendorNo := RecRef.Field(2).Value; //Buy-from Vendor No.
-            DATABASE::"Purch. Inv. Header":
+            Database::"Purch. Inv. Header":
                 VendorNo := RecRef.Field(4).Value; //Pay-to Vendor No.
-            DATABASE::"Purch. Cr. Memo Hdr.":
+            Database::"Purch. Cr. Memo Hdr.":
                 VendorNo := RecRef.Field(4).Value; //Pay-to Vendor No.
-            DATABASE::"Return Shipment Header":
+            Database::"Return Shipment Header":
                 VendorNo := RecRef.Field(2).Value; //Buy-from Vendor No.
             else
                 exit(false);  // table is not listed as related to a Vendor
@@ -814,27 +816,27 @@
         RecRef: RecordRef;
     begin
         case NaviDocsEntry."Table No." of
-            DATABASE::"Sales Header":
+            Database::"Sales Header":
                 if SalesHeader.Get(NaviDocsEntry."Document Type", NaviDocsEntry."No.") then begin
                     RecRef.GetTable(SalesHeader);
                     NaviDocsEntry."Printed Qty." := SalesHeader."No. Printed";
                 end;
-            DATABASE::"Sales Invoice Header":
+            Database::"Sales Invoice Header":
                 if SalesInvoiceHeader.Get(NaviDocsEntry."No.") then begin
                     RecRef.GetTable(SalesInvoiceHeader);
                     NaviDocsEntry."Printed Qty." := SalesInvoiceHeader."No. Printed";
                 end;
-            DATABASE::"Sales Cr.Memo Header":
+            Database::"Sales Cr.Memo Header":
                 if SalesCrMemoHeader.Get(NaviDocsEntry."No.") then begin
                     RecRef.GetTable(SalesCrMemoHeader);
                     NaviDocsEntry."Printed Qty." := SalesCrMemoHeader."No. Printed";
                 end;
-            DATABASE::"Issued Reminder Header":
+            Database::"Issued Reminder Header":
                 if IssuedReminderHeader.Get(NaviDocsEntry."No.") then begin
                     RecRef.GetTable(IssuedReminderHeader);
                     NaviDocsEntry."Printed Qty." := IssuedReminderHeader."No. Printed";
                 end;
-            DATABASE::"Issued Fin. Charge Memo Header":
+            Database::"Issued Fin. Charge Memo Header":
                 if IssuedFinChargeMemoHeader.Get(NaviDocsEntry."No.") then begin
                     RecRef.GetTable(IssuedFinChargeMemoHeader);
                     NaviDocsEntry."Printed Qty." := IssuedFinChargeMemoHeader."No. Printed";
@@ -889,7 +891,7 @@
         CustomReportLayoutVariant: Code[20];
     begin
         if RecRef.Number in [18, 36, 112, 114] then begin
-            CustomReportSelection.SetRange("Source Type", DATABASE::Customer);
+            CustomReportSelection.SetRange("Source Type", Database::Customer);
             if RecRef.Number = 18 then
                 CustomReportSelection.SetRange("Source No.", Format(RecRef.Field(1).Value))
             else
@@ -946,17 +948,17 @@
             NaviDocsEntry."Type (Recipient)"::Customer:
                 begin
                     Customer.Get(NaviDocsEntry."No. (Recipient)");
-                    PAGE.RunModal(PAGE::"Customer Card", Customer);
+                    Page.RunModal(Page::"Customer Card", Customer);
                 end;
             NaviDocsEntry."Type (Recipient)"::Vendor:
                 begin
                     Vendor.Get(NaviDocsEntry."No. (Recipient)");
-                    PAGE.RunModal(PAGE::"Vendor Card", Vendor);
+                    Page.RunModal(Page::"Vendor Card", Vendor);
                 end;
             NaviDocsEntry."Type (Recipient)"::Contact:
                 begin
                     Contact.Get(NaviDocsEntry."No. (Recipient)");
-                    PAGE.RunModal(PAGE::"Contact Card", Contact);
+                    Page.RunModal(Page::"Contact Card", Contact);
                 end;
         end;
     end;
@@ -991,16 +993,16 @@
             if not MailAndDocumentHeader.FindFirst() then
                 MailAndDocumentHeader.SetRange("Report ID");
         end;
-        PAGE.RunModal(PAGE::"NPR E-mail Template", MailAndDocumentHeader);
+        Page.RunModal(Page::"NPR E-mail Template", MailAndDocumentHeader);
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeAddDocumentEntry(var IsInsertHandled: Boolean; var RecRef: RecordRef; var HandlingProfile: Code[20]; var ReportNo: Integer; var Recipient: Text)
+    local procedure OnBeforeAddDocumentEntry(var IsInsertHandled: Boolean; var RecRef: RecordRef; var HandlingProfile: Code[20]; var ReportNo: Integer; var Recipient: Text[80])
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeAddDocumentEntryExt(var InsertedEntryNo: BigInteger; var RecRef: RecordRef; var HandlingProfile: Code[20]; var ReportNo: Integer; var Recipient: Text; var TemplateCode: Code[20]; var DelayUntil: DateTime)
+    local procedure OnBeforeAddDocumentEntryExt(var InsertedEntryNo: BigInteger; var RecRef: RecordRef; var HandlingProfile: Code[20]; var ReportNo: Integer; var Recipient: Text[80]; var TemplateCode: Code[20]; var DelayUntil: DateTime)
     begin
     end;
 
@@ -1030,6 +1032,8 @@
         EMailMgt: Codeunit "NPR E-mail Management";
         ReportID: Integer;
         Recipient: Text;
+        SendToList: List of [Text[80]];
+        SendToMailAdr: Text[80];
     begin
         if not NaviDocsSetup.Get() then
             exit;
@@ -1051,13 +1055,56 @@
         Recipient := EMailMgt.GetCustomReportEmailAddress();
         if Recipient = '' then
             Recipient := EmailDocumentManagement.GetMailReceipients(RecRef, ReportID);
-        AddDocumentEntryWithHandlingProfile(RecRef, HandlingTypeMailCode(), ReportID, Recipient, 0DT);
+        ConvertSendToEmail(Recipient, SendToList);
+        foreach SendToMailAdr in SendToList do
+            AddDocumentEntryWithHandlingProfile(RecRef, HandlingTypeMailCode(), ReportID, SendToMailAdr, 0DT);
 
         OverruleMail := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NaviDocs Management", 'OnBeforeAddDocumentEntryExt', '', true, true)]
-    local procedure OnBeforeAddPOSEntryDocumentEntry(var InsertedEntryNo: BigInteger; var RecRef: RecordRef; var HandlingProfile: Code[20]; var ReportNo: Integer; var Recipient: Text; var TemplateCode: Code[20]; var DelayUntil: DateTime)
+    internal procedure ConvertSendToEmail(SendToEmail: Text; EmailList: List of [Text[80]])
+    var
+        MailList: List of [Text];
+        Separators: List of [Text];
+    begin
+        Separators.Add(';');
+        Separators.Add(',');
+        MailList := SendToEmail.Split(Separators);
+        repeat
+            EmailList.Add(GetMailPart(MailList));
+        until MailList.Count = 0;
+    end;
+
+    local procedure GetMailPart(MailList: List of [Text]): Text[80]
+    var
+        MailElement: Text;
+        MailAddress: Text[80];
+        ElementNo: Integer;
+        MailAddressErr: Label 'NaviDocs doesn''t support email addresses longer than %1 characters. Value "%2" is too long', Comment = '%1 max length, %2 = Value with error';
+    begin
+        if MailList.Count = 0 then
+            exit('');
+        MailElement := MailList.Get(1).Trim();
+        if StrLen(MailElement) > MaxStrLen(MailAddress) then
+            Error(MailAddressErr, MaxStrLen(MailAddress), MailElement);
+        MailAddress := CopyStr(MailElement, 1, MaxStrLen(MailAddress));
+        MailList.RemoveAt(1);
+        ElementNo := 1;
+        if MailList.Count > 0 then
+            repeat
+                MailElement := MailList.Get(ElementNo).Trim();
+                if StrLen(MailElement) > MaxStrLen(MailAddress) then
+                    Error(MailAddressErr, MaxStrLen(MailAddress), MailElement);
+                if StrLen(StrSubstNo('%1;%2', MailAddress, MailElement)) <= MaxStrLen(MailAddress) then begin
+                    MailAddress := CopyStr(StrSubstNo('%1;%2', MailAddress, MailElement), 1, MaxStrLen(MailAddress));
+                    MailList.RemoveAt(ElementNo);
+                end else
+                    ElementNo += 1;
+            until ElementNo > MailList.Count;
+        exit(MailAddress);
+    end;
+
+    local procedure AddPOSEntryDocumentEntry(var RecRef: RecordRef; HandlingProfile: Code[20]; ReportNo: Integer; Recipient: Text[80]; TemplateCode: Code[20]; DelayUntil: DateTime; var InsertedEntryNo: BigInteger): Boolean
     var
         POSEntry: Record "NPR POS Entry";
         NaviDocsEntry: Record "NPR NaviDocs Entry";
@@ -1065,15 +1112,16 @@
         Contact: Record Contact;
         EmailMgt: Codeunit "NPR E-mail Management";
         RecipientRecRef: RecordRef;
+        RecipientFromRecRef: Text;
     begin
         if InsertedEntryNo <> 0 then
-            exit;
+            exit(false);
 
-        if RecRef.Number <> DATABASE::"NPR POS Entry" then
-            exit;
+        if RecRef.Number <> Database::"NPR POS Entry" then
+            exit(false);
 
         if not POSEntry.Get(RecRef.RecordId) then
-            exit;
+            exit(false);
 
         NaviDocsEntry.Init();
         NaviDocsEntry."Entry No." := 0;
@@ -1091,7 +1139,7 @@
                     if (Recipient = '') and (HandlingProfile = HandlingTypeMailCode()) then
                         if Customer.Get(NaviDocsEntry."No. (Recipient)") then begin
                             RecipientRecRef.GetTable(Customer);
-                            Recipient := EmailMgt.GetEmailAddressFromRecRef(RecipientRecRef);
+                            RecipientFromRecRef := EmailMgt.GetEmailAddressFromRecRef(RecipientRecRef);
                         end;
                 end;
             POSEntry."Contact No." <> '':
@@ -1101,18 +1149,20 @@
                     if (Recipient = '') and (HandlingProfile = HandlingTypeMailCode()) then
                         if Contact.Get(NaviDocsEntry."No. (Recipient)") then begin
                             RecipientRecRef.GetTable(Contact);
-                            Recipient := EmailMgt.GetEmailAddressFromRecRef(RecipientRecRef);
+                            RecipientFromRecRef := EmailMgt.GetEmailAddressFromRecRef(RecipientRecRef);
                         end;
                 end;
         end;
-
+        if RecipientFromRecRef <> '' then
+            Recipient := CopyStr(RecipientFromRecRef, 1, MaxStrLen(Recipient));
         NaviDocsEntry.Validate("Document Handling Profile", HandlingProfile);
-        NaviDocsEntry."E-mail (Recipient)" := CopyStr(Recipient, 1, MaxStrLen(NaviDocsEntry."E-mail (Recipient)"));
+        NaviDocsEntry."E-mail (Recipient)" := Recipient;
         NaviDocsEntry."Report No." := ReportNo;
         NaviDocsEntry."Delay sending until" := DelayUntil;
         NaviDocsEntry."Template Code" := TemplateCode;
         NaviDocsEntry.Insert(true);
         InsertedEntryNo := NaviDocsEntry."Entry No.";
+        exit(true);
     end;
 
     procedure SendWarningMail(NaviDocsEntry: Record "NPR NaviDocs Entry"; var ErrorMessage: Record "Error Message"; var EmailItem: Record "Email Item")
