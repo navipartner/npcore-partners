@@ -31,12 +31,10 @@ stages:
         - name: BC1905
 
         - name: vLatest_CLOUD
-          compareAppWithSpecificCompareAppVersion: true
 
         - name: Insider_CLOUD
-          compareAppWithSpecificCompareAppVersion: true
         
-      analyzers: ('AppSourceCop','UICop','CodeCop')
+      analyzers: ('UICop','CodeCop')
       keyVaultCert:
         certPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
         certPassword: 498eH$??nhxUSSFS
