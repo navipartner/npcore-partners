@@ -1,6 +1,6 @@
 ﻿page 6059770 "NPR NaviDocs Comment Subpage"
 {
-    Extensible = False;
+    Extensible = false;
 
     Caption = 'Comments';
     DeleteAllowed = false;
@@ -11,11 +11,11 @@
     RefreshOnActivate = true;
     SourceTable = "Activity Log";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Activity Date");
+    SourceTableView = sorting("Activity Date");
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {

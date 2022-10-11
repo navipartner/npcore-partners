@@ -52,6 +52,7 @@
         RecRefDialog: RecordRef;
         MessageDialog: Text;
         ReceiverDialog: Text;
+        RecipientEmail: Text[250];
         EmailManagement: Codeunit "NPR E-mail Management";
     begin
         EmailSendMessage.SetRecord(Template);
@@ -68,11 +69,11 @@
 
 
         EmailSendMessage.GetData(SenderEmailDialog, RecRefDialog, ReceiverDialog, MessageDialog);
-
+        RecipientEmail := CopyStr(ReceiverDialog, 1, MaxStrLen(RecipientEmail));
         if Template."Report ID" > 0 then
-            EmailManagement.SendReportTemplate(Template."Report ID", RecRefDialog, Template, ReceiverDialog, false)
+            EmailManagement.SendReportTemplate(Template."Report ID", RecRefDialog, Template, RecipientEmail, false)
         else
-            EmailManagement.SendEmailTemplate(RecRefDialog, Template, ReceiverDialog, false);
+            EmailManagement.SendEmailTemplate(RecRefDialog, Template, RecipientEmail, false);
 
     end;
 
@@ -112,7 +113,7 @@
         EmailTemplateFilterFrom: Record "NPR E-mail Template Filter";
         EmailTemplateFilterTo: Record "NPR E-mail Template Filter";
     begin
-        if ACTION::LookupOK <> PAGE.RunModal(0, EmailTemplateHeaderFrom) then
+        if Action::LookupOK <> Page.RunModal(0, EmailTemplateHeaderFrom) then
             exit;
 
         if not Confirm(Text001, true, EmailTemplateHeaderTo.Code, EmailTemplateHeaderFrom.Code) then
@@ -194,7 +195,7 @@
             FileManagement.BLOBImport(TempBlob, Path);
 
         TempBlob.CreateInStream(InStr);
-        EmailTemplateHeader."HTML Template".CreateOutStream(OutStr, TEXTENCODING::UTF8);
+        EmailTemplateHeader."HTML Template".CreateOutStream(OutStr, TextEncoding::UTF8);
         CopyStream(OutStr, InStr);
         EmailTemplateHeader.Modify(true);
     end;
@@ -204,7 +205,7 @@
         Path: Text;
     begin
         Path := ExportHtmlTemplate(EmailTemplateHeader, false);
-        HyperLink(Path);
+        Hyperlink(Path);
     end;
     #endregion
 }

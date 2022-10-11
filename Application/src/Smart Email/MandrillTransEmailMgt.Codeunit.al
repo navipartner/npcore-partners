@@ -1,6 +1,7 @@
 ﻿codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
 {
     Access = Internal;
+
     var
         ConnectionSuccessMsg: Label 'The connection test was successful. The settings are valid.';
         GeneratePreviewTxt: Label 'Generate Preview';
@@ -28,8 +29,8 @@
                 TransactionalJSONResult.Init();
                 TransactionalJSONResult.Provider := TransactionalJSONResult.Provider::Mailchimp;
                 TransactionalJSONResult."Entry No" := i;
-                TransactionalJSONResult.ID := GetString(JObject, 'slug');
-                TransactionalJSONResult.Name := GetString(JObject, 'name');
+                TransactionalJSONResult.ID := CopyStr(GetString(JObject, 'slug'), 1, MaxStrLen(TransactionalJSONResult.ID));
+                TransactionalJSONResult.Name := CopyStr(GetString(JObject, 'name'), 1, MaxStrLen(TransactionalJSONResult.Name));
                 TransactionalJSONResult.Created := GetDate(JObject, 'created_at');
                 TransactionalJSONResult.Insert();
                 i += 1;
@@ -111,12 +112,12 @@
     begin
         if JObject.Keys.Count() = 0 then
             exit;
-        EmailLog.Status := GetString(JObject, 'state');
+        EmailLog.Status := CopyStr(GetString(JObject, 'state'), 1, MaxStrLen(EmailLog.Status));
         EmailLog.Recipient := CopyStr(GetString(JObject, 'email'), 1, MaxStrLen(EmailLog.Recipient));
         if Evaluate(EmailLog."Smart Email ID", GetString(JObject, 'template')) then;
         EmailLog."Total Opens" := GetInt(JObject, 'opens');
         EmailLog."Total Clicks" := GetInt(JObject, 'clicks');
-        EmailLog.Subject := GetString(JObject, 'subject');
+        EmailLog.Subject := CopyStr(GetString(JObject, 'subject'), 1, MaxStrLen(EmailLog.Subject));
         EmailLog.Modify();
     end;
 
@@ -166,7 +167,7 @@
                 EmailLog."Entry No." := 0;
                 EmailLog.Provider := EmailLog.Provider::Mailchimp;
                 EmailLog."Message ID" := GetString(JObject, '_id');
-                EmailLog.Status := GetString(JObject, 'status');
+                EmailLog.Status := CopyStr(GetString(JObject, 'status'), 1, MaxStrLen(EmailLog.Status));
                 EmailLog."Status Message" := CopyStr(GetString(JObject, 'reject_reason'), 1, MaxStrLen(EmailLog."Status Message"));
                 EmailLog.Recipient := CopyStr(GetString(JObject, 'email'), 1, MaxStrLen(EmailLog.Recipient));
                 EmailLog.Insert(true);
@@ -221,7 +222,7 @@
                 EmailLog."Entry No." := 0;
                 EmailLog.Provider := EmailLog.Provider::Mailchimp;
                 EmailLog."Message ID" := GetString(JObject, '_id');
-                EmailLog.Status := GetString(JObject, 'status');
+                EmailLog.Status := CopyStr(GetString(JObject, 'status'), 1, MaxStrLen(EmailLog.Status));
                 EmailLog."Status Message" := CopyStr(GetString(JObject, 'reject_reason'), 1, MaxStrLen(EmailLog."Status Message"));
                 EmailLog.Recipient := CopyStr(GetString(JObject, 'email'), 1, MaxStrLen(EmailLog.Recipient));
                 EmailLog.Insert(true);
@@ -379,7 +380,7 @@
                 end else begin
                     JObject.Add('name', SmartEmailVariable."Variable Name");
                     if (RecRef.Number <> 0) and (SmartEmailVariable."Field No." <> 0) then begin
-                        FldRef := RecRef.field(SmartEmailVariable."Field No.");
+                        FldRef := RecRef.Field(SmartEmailVariable."Field No.");
                         if Format(FldRef.Class) = 'FlowField' then
                             FldRef.CalcField();
                         JObject.Add('content', Format(FldRef.Value));

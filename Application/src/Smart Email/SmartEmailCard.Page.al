@@ -1,13 +1,13 @@
 ﻿page 6059822 "NPR Smart Email Card"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Smart Email Card';
     PageType = Card;
     SourceTable = "NPR Smart Email";
     UsageCategory = None;
     layout
     {
-        area(content)
+        area(Content)
         {
             group(General)
             {
@@ -116,7 +116,7 @@
             part(Control6014403; "NPR Smart Email Variables")
             {
 
-                SubPageLink = "Transactional Email Code" = FIELD(Code);
+                SubPageLink = "Transactional Email Code" = field(Code);
                 Visible = ShowVariablesSubPage;
                 ApplicationArea = NPRRetail;
             }

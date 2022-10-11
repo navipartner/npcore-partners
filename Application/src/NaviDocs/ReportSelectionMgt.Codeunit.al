@@ -38,8 +38,8 @@ codeunit 6059867 "NPR ReportSelectionMgt"
     begin
         if not Rec.IsTemporary() then
             exit;
-        if Strlen(Rec.Sequence) < 3 then
-            Rec.Sequence := Format(Rec.Sequence).PadLeft(3, '0');
+        if StrLen(Rec.Sequence) < 3 then
+            Rec.Sequence := CopyStr(Format(Rec.Sequence).PadLeft(3, '0'), 1, MaxStrLen(Rec.Sequence));
     end;
 
     local procedure FilterReportSelectionsRespCenter(ResponsibilityCenter: Code[20]; var ReportSelections: Record "Report Selections")
@@ -60,11 +60,11 @@ codeunit 6059867 "NPR ReportSelectionMgt"
         FieldRec: Record Field;
         FieldReference: FieldRef;
     begin
-        FieldRec.setrange(TableNo, RecordReference.Number);
+        FieldRec.SetRange(TableNo, RecordReference.Number);
         FieldRec.SetRange(FieldName, 'Responsibility Center');
         if (FieldRec.FindFirst()) then begin
             FieldReference := RecordReference.Field(FieldRec."No.");
-            Exit(Format(FieldReference.Value));
+            exit(Format(FieldReference.Value));
         end;
     end;
 

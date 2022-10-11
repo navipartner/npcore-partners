@@ -1,6 +1,6 @@
 ﻿page 6059826 "NPR Trx Email Setup Card"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Transaction Email Setup Card';
     PageType = Card;
     SourceTable = "NPR Trx Email Setup";
@@ -8,7 +8,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(General)
             {
@@ -48,7 +48,7 @@
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             action(CheckConnection)
             {

@@ -2,8 +2,8 @@
 {
     Access = Internal;
     Caption = 'Transactional JSON Result';
-    DrillDownPageID = "NPR Trx JSON Result";
-    LookupPageID = "NPR Trx JSON Result";
+    DrillDownPageId = "NPR Trx JSON Result";
+    LookupPageId = "NPR Trx JSON Result";
     DataClassification = CustomerContent;
 
     fields

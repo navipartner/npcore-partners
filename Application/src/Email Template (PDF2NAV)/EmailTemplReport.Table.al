@@ -15,7 +15,7 @@
         field(2; "Report ID"; Integer)
         {
             Caption = 'Report ID';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -30,8 +30,8 @@
         }
         field(100; "Report Name"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Report ID")));
+            CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Report ID")));
             Caption = 'Report Name';
             Editable = false;
             FieldClass = FlowField;

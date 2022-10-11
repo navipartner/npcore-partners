@@ -2,8 +2,8 @@
 {
     Access = Internal;
     Caption = 'Smart Email';
-    DrillDownPageID = "NPR Smart Email List";
-    LookupPageID = "NPR Smart Email List";
+    DrillDownPageId = "NPR Smart Email List";
+    LookupPageId = "NPR Smart Email List";
     DataClassification = CustomerContent;
 
     fields
@@ -55,7 +55,7 @@
         }
         field(60; "Table Caption"; Text[80])
         {
-            CalcFormula = Lookup("Table Metadata".Caption WHERE(ID = FIELD("Merge Table ID")));
+            CalcFormula = lookup("Table Metadata".Caption where(ID = field("Merge Table ID")));
             Caption = 'Table Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -63,7 +63,7 @@
         field(100; "Smart Email ID"; Text[50])
         {
             Caption = 'Smart Email ID';
-            TableRelation = "NPR Trx JSON Result".ID WHERE(Provider = FIELD(Provider));
+            TableRelation = "NPR Trx JSON Result".ID where(Provider = field(Provider));
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
 
