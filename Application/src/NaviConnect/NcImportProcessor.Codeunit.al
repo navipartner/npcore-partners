@@ -120,11 +120,13 @@
         NcImportEntry."Session Id" := 0;
         NcImportEntry.Imported := Success;
         NcImportEntry."Runtime Error" := not Success;
-        LastErrorText := GetLastErrorText;
-        if LastErrorText <> '' then begin
-            NcImportEntry."Error Message" := CopyStr(LastErrorText, 1, MaxStrLen(NcImportEntry."Error Message"));
-            NcImportEntry."Last Error Message".CreateOutStream(OutStr, TEXTENCODING::UTF8);
-            OutStr.WriteText(LastErrorText);
+        if not Success then begin
+            LastErrorText := GetLastErrorText();
+            if LastErrorText <> '' then begin
+                NcImportEntry."Error Message" := CopyStr(LastErrorText, 1, MaxStrLen(NcImportEntry."Error Message"));
+                NcImportEntry."Last Error Message".CreateOutStream(OutStr, TEXTENCODING::UTF8);
+                OutStr.WriteText(LastErrorText);
+            end;
         end;
         NcImportEntry.Modify(true);
         MarkUnimportedEntriesWithSameBatchIdAsError(NcImportEntry);

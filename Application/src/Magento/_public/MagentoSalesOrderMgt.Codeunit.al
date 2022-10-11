@@ -1027,12 +1027,13 @@
             SalesCommentLine."Line No." := LineNo;
             SalesCommentLine.Date := Today();
             SalesCommentLine.Comment := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'description', MaxStrLen(SalesLine.Description), true), 1, MaxStrLen(SalesCommentLine.Comment));
-            if not SalesCommentLine.Insert(true) then begin
-                if SalesCommentLineNoWasUsed(SalesHeader, LineNo) then
-                    SalesCommentLine."Line No." := LineNo;
 
-                SalesCommentLine.Insert(true);
+            if SalesCommentLineExists(SalesHeader, LineNo) then begin
+                LineNo := GetNextSalesCommentLineLineNo(SalesHeader);
+                SalesCommentLine."Line No." := LineNo;
             end;
+            SalesCommentLine.Insert(true);
+
         end else begin
             UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement, 'unit_price_incl_vat', true);
             VatPct := NpXmlDomMgt.GetElementDec(XmlElement, 'vat_percent', true);
@@ -1083,20 +1084,24 @@
         end;
     end;
 
-    local procedure SalesCommentLineNoWasUsed(SalesHeader: Record "Sales Header"; var LineNo: Integer): Boolean
+    local procedure SalesCommentLineExists(SalesHeader: Record "Sales Header"; LineNo: Integer): Boolean
     var
         SalesCommentLine: Record "Sales Comment Line";
-        LastUsedLineNo: Integer;
+    begin
+        SalesCommentLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesCommentLine.SetRange("No.", SalesHeader."No.");
+        SalesCommentLine.SetRange("Line No.", LineNo);
+        Exit(not SalesCommentLine.IsEmpty());
+    end;
+
+    local procedure GetNextSalesCommentLineLineNo(SalesHeader: Record "Sales Header"): Integer
+    var
+        SalesCommentLine: Record "Sales Comment Line";
     begin
         SalesCommentLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesCommentLine.SetRange("No.", SalesHeader."No.");
         if SalesCommentLine.FindLast() then
-            LastUsedLineNo := SalesCommentLine."Line No.";
-
-        if LastUsedLineNo = LineNo then begin
-            LineNo := LastUsedLineNo + 10000;
-            exit(true);
-        end
+            Exit(SalesCommentLine."Line No." + 10000);
     end;
 
     local procedure InsertSalesLineRetailVoucher(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
@@ -1308,10 +1313,10 @@
                     SalesNo := MagentoCustomOptionValue."Sales No.";
                 end;
             else begin
-                    MagentoCustomOption.TestField("Sales No.");
-                    SalesType := MagentoCustomOption."Sales Type";
-                    SalesNo := MagentoCustomOption."Sales No.";
-                end;
+                MagentoCustomOption.TestField("Sales No.");
+                SalesType := MagentoCustomOption."Sales Type";
+                SalesNo := MagentoCustomOption."Sales No.";
+            end;
         end;
 
         UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement, 'unit_price_incl_vat', true);
@@ -1354,57 +1359,64 @@
 
     local procedure InsertPaymentLine(var PaymentLine: Record "NPR Magento Payment Line"; SalesHeader: Record "Sales Header"; var LineNo: Integer)
     begin
-        if PaymentLine.Insert(true) then
-            exit;
-
-        if PaymentLineNoWasUsed(SalesHeader, LineNo) then
+        if PaymentLineExists(SalesHeader, LineNo) then begin
+            LineNo := GetNextPaymentLineLineNo(SalesHeader);
             PaymentLine."Line No." := LineNo;
+        end;
 
         PaymentLine.Insert(true);
     end;
 
-    local procedure PaymentLineNoWasUsed(SalesHeader: Record "Sales Header"; var LineNo: Integer): Boolean
+    local procedure PaymentLineExists(SalesHeader: Record "Sales Header"; LineNo: Integer): Boolean
     var
         PaymentLine: Record "NPR Magento Payment Line";
-        LastUsedLineNo: Integer;
+    begin
+        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
+        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.SetRange("Line No.", LineNo);
+        Exit(not PaymentLine.IsEmpty());
+    end;
+
+    local procedure GetNextPaymentLineLineNo(SalesHeader: Record "Sales Header"): Integer
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
     begin
         PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
         PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
         PaymentLine.SetRange("Document No.", SalesHeader."No.");
         if PaymentLine.FindLast() then
-            LastUsedLineNo := PaymentLine."Line No.";
-
-        if LastUsedLineNo = LineNo then begin
-            LineNo := LastUsedLineNo + 10000;
-            exit(true);
-        end
+            Exit(PaymentLine."Line No." + 10000);
     end;
 
     local procedure InsertSalesLine(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; var LineNo: Integer)
     begin
-        if SalesLine.Insert(true) then
-            exit;
-
-        if SalesLineNoWasUsed(SalesHeader, LineNo) then
+        if SalesLineExists(SalesHeader, LineNo) then begin
+            LineNo := GetNextSalesLineLineNo(SalesHeader);
             SalesLine."Line No." := LineNo;
+        end;
 
         SalesLine.Insert(true);
     end;
 
-    local procedure SalesLineNoWasUsed(SalesHeader: Record "Sales Header"; var LineNo: Integer): Boolean
+    local procedure SalesLineExists(SalesHeader: Record "Sales Header"; LineNo: Integer): Boolean
     var
         SalesLine: Record "Sales Line";
-        LastUsedLineNo: Integer;
+    begin
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange("Line No.", LineNo);
+        Exit(not SalesLine.IsEmpty());
+    end;
+
+    local procedure GetNextSalesLineLineNo(SalesHeader: Record "Sales Header"): Integer
+    var
+        SalesLine: Record "Sales Line";
     begin
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         if SalesLine.FindLast() then
-            LastUsedLineNo := SalesLine."Line No.";
-
-        if LastUsedLineNo = LineNo then begin
-            LineNo := LastUsedLineNo + 10000;
-            exit(true);
-        end
+            Exit(SalesLine."Line No." + 10000);
     end;
 
     local procedure UpdateExtCouponReservations(SalesHeader: Record "Sales Header")
@@ -1784,9 +1796,9 @@
                     Cust."No." := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'phone', MaxStrLen(Cust."No."), false), 1, MaxStrLen(Cust."No."));
                 end;
             else begin
-                    if MagentoWebsite."Customer No. Series" <> '' then
-                        NoSeriesMgt.InitSeries(MagentoWebsite."Customer No. Series", Cust."No. Series", Today(), Cust."No.", Cust."No. Series");
-                end;
+                if MagentoWebsite."Customer No. Series" <> '' then
+                    NoSeriesMgt.InitSeries(MagentoWebsite."Customer No. Series", Cust."No. Series", Today(), Cust."No.", Cust."No. Series");
+            end;
         end;
     end;
 
