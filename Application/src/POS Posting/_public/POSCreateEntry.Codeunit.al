@@ -77,7 +77,7 @@
                         end;
                     POSSaleLine."Sale Type"::"Out payment":
                         if POSSaleLine.Type = POSSaleLine.Type::"G/L Entry" then begin
-                            InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, true, POSEntrySalesLine);
+                            InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine);
                             InsertPOSTaxAmountReverseSign(POSSaleLine.SystemId, POSEntry);
                         end else
                             InsertPOSPaymentLine(POSSale, POSSaleLine, POSEntry, POSEntryPaymentLine);
@@ -311,10 +311,6 @@
         POSEntrySalesLine."Amount Incl. VAT" := POSSaleLine."Amount Including VAT";
         POSEntrySalesLine."VAT Base Amount" := POSSaleLine."VAT Base Amount";
         POSEntrySalesLine."Line Amount" := POSSaleLine."Line Amount";
-
-        if ((POSSaleLine."Sale Type" = POSSaleLine."Sale Type"::"Out payment")
-          and (POSSaleLine."Discount Type" <> POSSaleLine."Discount Type"::Rounding)) then
-            POSEntrySalesLine."Line Amount" *= -1;
 
         POSEntrySalesLine."Amount Excl. VAT (LCY)" := POSSaleLine.Amount * POSEntry."Currency Factor";
         POSEntrySalesLine."Amount Incl. VAT (LCY)" := POSSaleLine."Amount Including VAT" * POSEntry."Currency Factor";

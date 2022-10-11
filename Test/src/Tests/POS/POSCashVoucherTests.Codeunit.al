@@ -98,7 +98,7 @@ codeunit 85076 "NPR POS Cash Voucher Tests"
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
         Assert.IsTrue(SaleLinePOS."No." = AccountNo, 'GL account is inserted');
         Assert.IsTrue(SaleLinePOS.Description = ('Commision ' + Format(CommisionPercentage) + '%'), 'Commision Description relatable');
-        Assert.IsTrue(SaleLinePOS."Amount Including VAT" = -CommisionAmount, 'Commision Amount is correct');
+        Assert.IsTrue(SaleLinePOS."Amount Including VAT" = CommisionAmount, 'Commision Amount is correct');
         //[Then] 
         TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethodCash.Code, VoucherAmount - CommisionAmount, '');
         Assert.AreEqual(true, TransactionEnded, 'Transaction is ended');

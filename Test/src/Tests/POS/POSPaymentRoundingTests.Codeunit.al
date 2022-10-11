@@ -529,7 +529,7 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
             POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
             POSSalesLine.SetRange(Type, POSSalesLine.Type::Rounding);
             Assert.IsTrue(POSSalesLine.FindFirst(), 'Rounding line exists');
-            Assert.AreEqual(RoundingAmount, POSSalesLine."Amount Incl. VAT (LCY)", 'Rounding amount not according to test scenario.');
+            Assert.AreEqual(-RoundingAmount, POSSalesLine."Amount Incl. VAT (LCY)", 'Rounding amount not according to test scenario.');
         end;
 
         if ReturnAmount <> 0 then begin
@@ -627,7 +627,7 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
             POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
             POSSalesLine.SetRange(Type, POSSalesLine.Type::Rounding);
             Assert.IsTrue(POSSalesLine.FindFirst(), 'Rounding line exists');
-            Assert.AreEqual(RoundingAmount, POSSalesLine."Amount Incl. VAT (LCY)", 'Rounding amount not according to test scenario.');
+            Assert.AreEqual(-RoundingAmount, POSSalesLine."Amount Incl. VAT (LCY)", 'Rounding amount not according to test scenario.');
         end;
 
         if ReturnAmount <> 0 then begin

@@ -9,7 +9,7 @@ codeunit 6059790 "NPR Pay-in Payout Mgr"
         Amount := Abs(Amount);
         Quantity := 1;
 
-        if (PaymentType = 1) then // Pay-In 
+        if (PaymentType = 0) then // Pay-Out 
             Quantity := -1;
 
         SaleLine.InitPayoutPayInLine(Line);
