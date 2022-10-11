@@ -41,8 +41,10 @@ This tutorial will teach you how to create the setup for a fully functional tick
 
 ## Next Steps
 
-- [Issue tickets from Business Central](../howto/issue_ticket.md)
+- [Create prepaid tickets](../howto/create_prepaid_ticket.md)
+- [Create postpaid tickets](../howto/create_postpaid_ticket.md)
 - [Issue tickets from POS](../../../../public/404.md)
+- [Create dynamic tickets](../howto/CreateDynamicTicket.md)
 
 ### Related links
 

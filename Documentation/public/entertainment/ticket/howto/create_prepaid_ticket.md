@@ -28,5 +28,4 @@ Individual tickets or the entire batch of tickets can be validated for admission
 ### Related links
 
 - [Create postpaid tickets](create_postpaid_ticket.md)
-- [Issue tickets from Business Central](issue_ticket.md)
 - [Issue tickets from the POS](issue_ticket_from_pos.md)

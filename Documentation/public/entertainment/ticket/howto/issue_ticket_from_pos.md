@@ -12,4 +12,5 @@ The process of issuing a ticket from the POS follows the same flow as when stand
 
 ### Related links
 
-- [Issue tickets from Business Central](../howto/issue_ticket.md)
+- [Create prepaid tickets](create_prepaid_ticket.md)
+- [Create postpaid tickets](create_postpaid_ticket.md)
