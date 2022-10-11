@@ -1,6 +1,6 @@
 # Coupon types (Reference guide)
 
-The **Coupon Type Card** gives you the option to create a setup for coupons. It has four sections: **General**, **Issue coupon**, **Validate coupon** and **Apply discount**.
+The **Coupon Type Card** gives you the option to create a setup for coupons. It has four sections: **General**, **Issue Coupon**, **Validate Coupon** and **Apply Discount**.
 
 In the **General** section the following fields can be defined:         
 
@@ -11,8 +11,8 @@ In the **General** section the following fields can be defined:
 | **Discount Type**  | You can choose between two methods of conveying discounts - **Discount amount** or **Discount %**. |
 | **Discount Amount** | The amount that will be on the coupon. |
 | **Discount %** | The discount percentage that the customer gets with the coupon. |
-| **Max. discount Amount** | The maximum amount on which the discount will be calculated. |
-| **POS store Group** | The group of stores in which the coupon can be used. If this field is left blank, it will be possible to use the coupon in all stores. |
+| **Max. Discount Amount** | The maximum amount on which the discount will be calculated. |
+| **POS Store Group** | The group of stores in which the coupon can be used. If this field is left blank, it will be possible to use the coupon in all stores. |
 | **Coupon Qty. (Open)** | The number of open coupons. |
 | **Arch. Coupon Qty.** | The number of archived coupons. |
 | **Enabled** | If the coupon type is in use, this field should be checked. | 
@@ -21,16 +21,16 @@ In the **General** section the following fields can be defined:
 
 For example, the coupon from the screenshot above will give a discount amount of 65 to the customer and it is possible to apply it in all stores.
 
-In the **Issue coupon** section you can define how the coupon will be issued:
+In the **Issue Coupon** section you can define how the coupon will be issued:
 
 | Field Name      | Description |
 | ----------- | ----------- |
 | **Issue Coupon Module**       | You can choose between three options:  **DEFAULT** - the coupon is issued manually from Business Central or from the POS (after the button is created); **ON-SALE** - the coupon is created during a sale in the POS; **MEMBER-LOYALTY** - the coupon is created when a member has enough points for it.     |
-| **Match POS Store Group**   | If a coupon created ON-SALE in one store can be used just in that store, you need to assign the **POS Store Group** in the **General** section, and to check this field. In this way, the coupons ON-SALE will be issued only in stores from the POS Store Group assigned.        |
+| **Match POS Store Group**   | If a coupon created ON-SALE in one store can be used just in that store, you need to assign the **POS Store Group** in the **General** section, and to check this field. In this way, the coupons ON-SALE will be issued only in stores from the POS store group assigned.        |
 | **Reference No. Pattern**  |  The pattern used to create the coupon external number, which will later be scanned. |
-|  **Customer No.** | The number used for making the coupon tracking easier for a customer. |
-| **Print template code** | Template which will be printed for the coupon. |
-| **Print on issue** | If this field is checked, the coupon will be printed. |
+| **Customer No.** | The number used for making the coupon tracking easier for a customer. |
+| **Print Template Code** | Template which will be printed for the coupon. |
+| **Print on Issue** | If this field is checked, the coupon will be printed. |
 
 ![issue](../images/Issue%20coupon.png)
 
@@ -46,7 +46,7 @@ In the section **Validate Coupon** you can define which parameters need to be va
 
 ![validate](../images/Validate%20coupon.png)
 
-In the section **Apply discount** you can define how the discount will be applied.
+In the section **Apply Discount** you can define how the discount will be applied.
 
 | Field Name      | Description |
 | ----------- | ----------- |

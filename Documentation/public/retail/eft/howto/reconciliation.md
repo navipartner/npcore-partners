@@ -21,8 +21,8 @@ To import a new reconciliation file:
 
 ## Next steps
 
-- After the import, entries can be matched with the entries in **EFT Transactions Requests**.
-- Matching can be performed automatically, by clicking **Match Automatically**, or manually, by clicking **Match Manually**.
+- After the import, the entries can be matched with the entries in **EFT Transactions Requests**.
+- Matching can be performed automatically, by clicking **Match Automatically** or manually, by clicking **Match Manually**.
 - Once the entries are matched, reconciliation can be posted with the **Post** action.
 
 ### Related links

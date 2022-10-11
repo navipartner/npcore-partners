@@ -2,7 +2,7 @@
 
 To configure relations between POS units for balancing it is necessary to set up master POS unit and assign it to all slave POS units.
 
-To set up this relation follow the provided steps:
+To set up this connection, follow the provided steps:
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Units** and open the related link.
    
@@ -15,3 +15,7 @@ To set up this relation follow the provided steps:
 4. Insert the same **POS End of Day Profile** in all POS units which will be slave units of the master unit assigned in the profile you created.
 
 5. Insert the same **POS End of Day Profile** in the POS unit which you assigned as master.
+
+### Related links
+
+- [Balance the POS (Z-report)](balance_the_pos.md)

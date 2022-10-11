@@ -1,7 +1,9 @@
 # Set up Bambora payment integration
+
 To set up the Bambora payment integration in NP Retail, make sure the prerequisites are met, and follow the provided steps:
 
 ### Prerequisites
+
 1. Get a Bambora merchant.
 
     Before you can get the required information to integrate Business Central and Bambora,
@@ -18,17 +20,18 @@ To set up the Bambora payment integration in NP Retail, make sure the prerequisi
     > [!Note]
     > NaviPartner advises that you give the key an appropriate name, for example "Business Central". This will help you differentiate the keys afterwards.
 
-3. Set up Payment Method Mapping.
+3. Set up payment method mapping.
 
     For the payment gateway to be used it will have to be assigned to specific payment method mappings. These should be created beforehand.
 
 ### Procedure
+
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Payment Gateways**, and select the related link.      
  
 2. Create a new entry for the Bambora integration. The following fields are required and must contain the appropriate values:
     - **Code**
-    - **Api Username** - This field needs to contain the **Access token**.
-    - **Api Password** - This field needs to contain the **Secret token**.
+    - **API Username** - This field needs to contain the **Access token**.
+    - **API Password** - This field needs to contain the **Secret token**.
     - **Merchant ID** - This field needs to contain the **Merchant ID**.
 
     Depending on your desired setup, fill out the following three fields:
@@ -43,4 +46,7 @@ To set up the Bambora payment integration in NP Retail, make sure the prerequisi
 3. Click the ![Lightbulb that opens the Tell Me feature](../../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Payment Method Mapping**, and select the related link.      
 
 4. Add the **Code** of the entry you create in step 2 to the **Payment Gateway Code** field of the appropriate mapping lines.
- 
+
+### Related links
+
+- [Payment Gateways](../paymentgateway.md)

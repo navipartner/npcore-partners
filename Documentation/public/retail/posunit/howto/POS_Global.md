@@ -31,7 +31,7 @@ If there are multiple companies, and each one has POS units, there is a way to c
 There's a way to track all POS transactions from other companies in the master company. 
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Global Sales Entries** and choose the related link.
-2. On this page you can see in which POS Store, POS unit, and on which date the sales were completed in the POS. You can also view which items were sold in each transaction.
+2. On this page you can see in which POS store, POS unit, and on which date the sales were completed in the POS. You can also see which items were sold in each transaction.
 
 ### Related links
 

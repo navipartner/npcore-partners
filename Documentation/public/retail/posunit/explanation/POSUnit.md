@@ -4,11 +4,12 @@ Each business has multiple operation categories, regardless of its size (payment
 
 POS units are also capable of tracking the real-time status of the shop's inventory and recording transactions on paper or spreadsheets, helping strategize marketing efforts and boost sales.
 
-In brief, the POS units help streamline retail operations by automating the transaction process and tracking important sales data. 
+In brief, POS units help streamline retail operations by automating the transaction process and tracking important sales data. 
 
 As POS units in the NP Retail solution are highly customizable, it's possible to configure each of their many aspects. To find out more, refer to one of the following links.
 
 ### Related links
+
 - [Create a new POS (using an old one as a reference)](../howto/createnew.md)
 - [POS self-service actions](../explanation/POS_Self_Service_Actions.md)
 - [Balancing the POS](../howto/balance_the_pos.md)

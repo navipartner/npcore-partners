@@ -4,10 +4,10 @@ Period discounts can be used when there are periods of time during which some it
 
 To set up period discounts, follow the provided steps:
 
-1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Period discount** and choose the related link.             
-   Period discount list will be opened. 
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Period discount**, and choose the related link.             
+   The **Period Discount List** is opened as a result. 
 
-2. To create a new period discount, chose **New** from Action ribon and Period discount card will open.
+2. To create a new period discount, chose **New** from the ribbon, and the **Period Discount** card will be opened.
 
 ![period_discount](../images/Period%20discount%20card.PNG)
 
@@ -32,3 +32,8 @@ To set up period discounts, follow the provided steps:
 | **Customer Disc. Group Filter** | If the period discount is active only for certain customers, you should select their customer discount group in this field. |
 
 5. Insert the **Item No.** and **Period Price** in the **Period Discount Lines**.
+
+### Related links
+
+- [Mix discount types](../explanation/discount_types.md)
+- [Set up mix discounts](Mix_discount.md)

@@ -42,7 +42,7 @@ A **Loyalty Code** is a type of loyalty program which has its own setups. Loyalt
 
 3. If there is need to set up a loyalty program with points that have a defined expiration period, tick the **Expire Uncollected Points** checkbox and specify the period after which points are going to expire in the **Expire Uncollected After** field.
 
-4. Select conditions for accumulation of points in the **Point Base** field. You can choose between the following options: **Amount**, **Item Point Setup** or **Amount and Item Point Setup**. 
+4. Select conditions for accumulating points in the **Point Base** field. You can choose between the following options:
 
 - **Amount** - if selected, the ratio between the amount spent and points awarded will be taken from the **Loyalty Setup** page and the **Amount Factor** field. This setup will be used for all items the member has purchased. 
 
@@ -54,7 +54,7 @@ A **Loyalty Code** is a type of loyalty program which has its own setups. Loyalt
 
 - **Amount and Item Points Setup** - if selected, for items setup in the **Item Points Setup** page, the setup from that page will be used, and for the rest the setup from **Loyalty Setup** page will be used.
 
-5. Provide the **Amount Factor**, which determines how many pointes will be awarded per 1EUR spent.
+5. Provide the **Amount Factor**, which determines how many pointes will be awarded per 1 EUR spent.
 
 6. Define whether the points will be calculated on the amount with or without VAT in the **Amount Base** field.
 
@@ -75,7 +75,7 @@ All benefits which member gets being loyal to the company are summed up in coupo
 > [!Note]
 > Instead of money, customers can get a discount % when they accumulate enough points.
 
-1. In the **Value Assignment** field you need to set **Coupon Setup**, so that after the customer accumulates the necessary points (points set up in the **Points Threshold** field) they will receive benefits associated with the coupon assigned.       
+3. In the **Value Assignment** field you need to set **Coupon Setup**, so that after the customer accumulates the necessary points (points set up in the **Points Threshold** field) they will receive benefits associated with the coupon assigned.       
    In the example illustrated by the screenshot below, after the customer gets 500 points, they will be able to use the coupon with the “20%OFF” name, and enjoy the benefits that this coupon offers. 
 
 ![Loyalty_points_setup_example](../images/Loyalty%20points%20setup%20example.png)

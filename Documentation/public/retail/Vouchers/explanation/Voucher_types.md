@@ -29,7 +29,7 @@ In the **Setup Voucher** section you can define voucher amount  (if amount is en
 
 - **Apply Payment**
 
-  Rules for redeeming vouchers are created in the section **Apply Payment**. In this section there are two modules for validating vouchers. 
+  Rules for redeeming vouchers are created in the **Apply Payment** section. In this section there are two modules for validating vouchers. 
 
   - **Default** - It implies that the voucher will be redeemed in total. If the sales amount is lower than the voucher amount, you can define that a credit voucher will be created as a refund in **Setup** > **Setup Apply Payment**.
   - **Partial** - It implies that the voucher amount will be used partially, and that the leftover amount can be used another time.
