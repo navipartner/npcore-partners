@@ -8,8 +8,6 @@
     href: tutorial/TicketDesigner.md  
 - name: How-To
   items:
-  - name: Issue tickets from Business Central
-    href: howto/issue_ticket.md
   - name: Issue tickets from the POS
     href: howto/issue_ticket_from_pos.md
   - name: Set up DIY printed ticket

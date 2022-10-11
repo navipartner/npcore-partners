@@ -20,7 +20,9 @@ To assign the notification profile to one or more lines in **Ticket BOM**:
 3. Find the **Notification Profile Code** field.
 4. Click the field and select the appropriate **Notification Profile Code** from the list.
 
-After completing this procedure, you can [issue tickets from Business Central](./issue_ticket.md)
+### Issue tickets from Business Central
+
+After completing these procedures, you can create [prepaid](create_prepaid_ticket.md) and [postpaid](create_postpaid_ticket.md) tickets in Business Central.
 
 ### Related links
 

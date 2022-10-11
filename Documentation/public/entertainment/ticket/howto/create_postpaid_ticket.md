@@ -32,5 +32,4 @@ Postpaid tickets are invoiced to the distributor after the ticket has been redee
 
 ### Related links
 
-- [Issue tickets from Business Central](issue_ticket.md)
 - [Issue tickets from the POS](issue_ticket_from_pos.md)

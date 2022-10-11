@@ -54,4 +54,5 @@ In **Period type**, you can choose between the following options:
 ### Related links
 
 - [Ticket admission](./admission.md)
-- [Issue tickets from Business Central](../howto/issue_ticket.md)
+- [Create prepaid tickets](../howto/create_prepaid_ticket.md)
+- [Create postpaid tickets](../howto/create_postpaid_ticket.md)

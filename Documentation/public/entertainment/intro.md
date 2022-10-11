@@ -16,4 +16,3 @@ All data from the ticket sales, stores, and cafés is collected and managed in B
 - [Ticket module](../entertainment/ticket/intro.md)
 - [Ticket Designer](../entertainment/ticket/tutorial/TicketDesigner.md)
 - [Set up tickets using the Ticket Setup Wizard](../entertainment/ticket/tutorial/ticket_tutorial.md)
-- [Issuing tickets from Business Central](../entertainment/ticket/howto/issue_ticket.md)
