@@ -1,17 +1,14 @@
 report 6014448 "NPR Item Cat. Inv. Value"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Category Inventory Value.rdlc';
     Caption = 'Item Category Inventory Value';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
-
-
-
     dataset
     {
         dataitem("Item Category"; "Item Category")
@@ -24,26 +21,20 @@ report 6014448 "NPR Item Cat. Inv. Value"
             column(CompanyInfoPicture; CompanyInfo.Picture)
             {
             }
-            column(DateFilter; GetFilter("NPR Date Filter"))
+            column(AppliedFilters; AppliedFilters)
             {
             }
-            column(Primo; StrSubstNo(StartOf, Format(GetRangeMin("NPR Date Filter"))))
+            column(PeriodDateFilter; PeriodDateFilter)
             {
             }
-            column(Ultimo; StrSubstNo(EndOf, Format(GetRangeMax("NPR Date Filter"))))
+            column("Code"; "Code")
             {
             }
-            column(No; "Code")
+            column(Parent_Category; "Parent Category")
             {
                 AutoFormatType = 1;
             }
             column(Description; Description)
-            {
-            }
-            column(ItemCategoryMovementAtStartOf; ItemCategoryMovementAtStartOf)
-            {
-            }
-            column(ItemCategoryInventoryAtStartOf; ItemCategoryInventoryAtStartOf)
             {
             }
             column(PurchaseQuantity; "NPR Purchases (Qty.)")
@@ -56,6 +47,12 @@ report 6014448 "NPR Item Cat. Inv. Value"
             {
             }
             column(SaleLCY; "NPR Sales (LCY)")
+            {
+            }
+            column(ItemCategoryMovementAtStartOf; ItemCategoryMovementAtStartOf)
+            {
+            }
+            column(ItemCategoryInventoryAtStartOf; ItemCategoryInventoryAtStartOf)
             {
             }
             column(Profit; Profit)
@@ -76,9 +73,9 @@ report 6014448 "NPR Item Cat. Inv. Value"
             column(PurchaseLbl; StrSubstNo(PurchaseLbl, GeneralLedgerSetup."LCY Code"))
             {
             }
-
             trigger OnAfterGetRecord()
             begin
+
                 ItemCategoryLast.Get("Code");
                 ItemCategoryLast.SetFilter("NPR Date Filter", '..%1', GetRangeMax("NPR Date Filter"));
                 ItemCategoryLast.SetFilter("NPR Global Dimension 1 Filter", GetFilter("NPR Global Dimension 1 Filter"));
@@ -97,12 +94,10 @@ report 6014448 "NPR Item Cat. Inv. Value"
                 ItemCategoryFirst.SETFILTER("NPR Location Filter", GETFILTER("NPR Location Filter"));
 
                 ItemCategoryFirst.CalcFields("NPR Movement", "NPR Inventory Value");
-
                 ItemCategoryMovementAtStartOf := ItemCategoryFirst."NPR Movement";
                 ItemCategoryInventoryAtStartOf := ItemCategoryFirst."NPR Inventory Value";
 
                 Profit := "NPR Sales (LCY)" - "NPR Consumption (Amount)";
-
                 if "NPR Sales (LCY)" <> 0 then
                     Dg := Profit / "NPR Sales (LCY)" * 100
                 else
@@ -120,13 +115,17 @@ report 6014448 "NPR Item Cat. Inv. Value"
         ReportCap = 'Item Category Inventory Value';
         ItemCategoryCap = 'Item Category';
         NameCap = 'Name';
-        QtyCap = 'Qty';
+        StartQtyCap = 'Start Qty';
+        EndQtyCap = 'End Qty';
         AmountCap = 'Amount';
         PurchaseAtyCap = 'Purchase (Qty)';
         SalesQtyCap = 'Sales (Qty)';
         DBCap = 'Margin';
         DGCap = 'Margin %';
         PeriodCap = 'Period ';
+        Total = 'Total ';
+        Off = 'of';
+        AppliedFiltersCaption = 'Applied Filters:';
     }
 
     trigger OnInitReport()
@@ -134,6 +133,28 @@ report 6014448 "NPR Item Cat. Inv. Value"
         CompanyInfo.Get();
         CompanyInfo.CalcFields(Picture);
         GeneralLedgerSetup.Get();
+        CompanyInfo.Get();
+
+    end;
+
+    trigger OnPreReport()
+    var
+        "Date": Record "Date";
+    begin
+
+        CompanyInfo.CalcFields(Picture);
+
+        if PeriodDateFilter <> '' then begin
+            "Date".SetRange("Period Type", "Date"."Period Type"::"Date");
+            "Date".SetFilter("Date"."Period Start", PeriodDateFilter);
+            "Item Category".SetFilter("NPR Date Filter", '<=%1', "Date".GetRangeMax("Date"."Period Start"));
+            "Item Category".SetFilter("NPR Date Filter", '>=%1', "Date".GetRangeMin("Date"."Period Start"));
+        end;
+
+        if "Item Category".GetFilters <> '' then
+            AppliedFilters := StrSubstNo('%1', "Item Category".GetFilters)
+        else
+            AppliedFilters := "Item Category".GetFilters;
     end;
 
     var
@@ -146,10 +167,10 @@ report 6014448 "NPR Item Cat. Inv. Value"
         ItemCategoryInventoryAtStartOf: Decimal;
         ItemCategoryMovementAtEndOf: Decimal;
         ItemCategoryMovementAtStartOf: Decimal;
+        AppliedFilters: Text[200];
+        PeriodDateFilter: Text;
         Profit: Decimal;
-        EndOf: Label '------- End of %1 -------';
         PurchaseLbl: Label 'Purchases (%1)';
         SaleLbl: Label 'Sales (%1)';
-        StartOf: Label '------- Start of %1 -------';
 }
 
