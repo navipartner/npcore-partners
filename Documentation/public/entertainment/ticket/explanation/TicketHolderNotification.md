@@ -21,3 +21,4 @@ It is also possible to state a detention time for each notification rule that ca
 
 - [Create a ticket notification profile](../howto/CreateNotificationProfile.md)
 - [Set up tickets using the Ticket Setup Wizard](../tutorial/ticket_tutorial.md)
+- [Ticket BOM (reference guide)](../reference/ticket_bom.md)

@@ -13,4 +13,5 @@ NP Retail comes with a module to handle the payments done on web orders. The out
 - [QuickPay](https://quickpay.net)
 
 ## How-to guides on setup
-- [Bambora](./howto/bambora.md)
+
+- [Set up Bambora payment integration](./howto/bambora.md)

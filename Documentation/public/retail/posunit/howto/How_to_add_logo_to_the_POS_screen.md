@@ -11,14 +11,14 @@ To add a logo to the POS login screen, follow the provided steps:
 4. Open the [view profile](../reference/POS_view_profile.md) which you want to edit. 
    
 > [!Note]
-> All POS units that have the **POS view profile** you are editing will have the logo you are inserting.
+> All POS units that have the **POS view profile** you are editing will have the logo you have inserted.
 
-5. Click **POS view picture** and chose **Import**.
+1. Click **POS view picture** and chose **Import**.
 
 ![pos_view_picture](../images/POS%20view%20picture.png)
 
 6. Click **Choose** in the window that pops up, so you can select the picture from your files for import.           
-   After you select picture, the picture will be added to the **POS Unit** page, and you will see it on POS units in the login screen.
+   After you select a picture, the picture will be added to the **POS Unit** page, and you will see it on POS units in the login screen.
 
 ### Related links
 

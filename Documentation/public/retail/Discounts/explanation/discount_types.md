@@ -2,7 +2,7 @@
 
 There are five discount types that can be chosen on the **Mixed Discount** card.
 
-### Total amount per Min. Qty.
+## Total amount per Min. Qty.
   
 This mix discount type is used for defining the total amount that will be paid for the minimum quantity.
 
@@ -10,7 +10,7 @@ This mix discount type is used for defining the total amount that will be paid f
 
 In the example provided above, if a customer buys 5 items, the total amount that they will pay is 1.500. If a customer buys 6 items, they will pay (1500/5)*6=1800. The difference between the unit price and the total amount will be applied as a discount to the items.
 
-### Total Discount %      
+## Total Discount %      
   
 This mix discount type is used to define discount percentage that will be used to calculate the discount if a customer buys the minimum quantity. When this type is selected, the **Total discount %** field is displayed. 
 
@@ -18,7 +18,7 @@ This mix discount type is used to define discount percentage that will be used t
 
 In the example provided above, if a customer buys 5 items, they get the 10% discount on all items which are in the **Mix Discount Lines**. This discount applies to the unlimited quantity of an item. The difference between the unit price and the total amount will be applied as a discount to the items.
 
-### Total Discount Amt. per Min Qty.
+## Total Discount Amt. per Min Qty.
 
 This mix discount type is used to define the total discount amount that will be assigned to the sale if a customer purchases the minimum quantity.
 
@@ -26,7 +26,7 @@ This mix discount type is used to define the total discount amount that will be 
 
 In the example above, if a customer buys 5 items, the total discount amount will be 100. If a customer buys 6 items, they will get the discount of (100/5)*6=120. The discount percentage will be automatically calculated.
 
-### Priority Discount per Min. Qty.
+## Priority Discount per Min. Qty.
 
 When this discount type is selected, the **Item Discount Quantity** field is displayed.
 
@@ -34,7 +34,7 @@ When this discount type is selected, the **Item Discount Quantity** field is dis
 
 In the example above, if a customer buys 5 items, they will get 10% discount on two items. This discount will be applied to every set of 5 items until the maximum quantity is reached.
 
-### Multiple discount Levels
+## Multiple discount Levels
 
 This discount type is used if you need to set up different discount percentages for different quantities.
 
@@ -46,7 +46,7 @@ When this type of discount is selected, a new tab **Mix discount levels** is dis
 
 In the example above, if a customer buys 5 items, they will get 5% discount on items from the **Mix Discount Lines**, but if they buy 15 items, they will get the 10% discount.
 
-### Combination Mix Type
+## Combination Mix Type
 
 If you select **Combination** in the **Mix type** field in the **General** tab, in **Mix Discount Lines** there will be **New part** and **Part card** actions.
 
