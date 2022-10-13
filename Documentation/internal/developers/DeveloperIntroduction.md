@@ -83,6 +83,9 @@ Every object must be prefixed with “NPR”. Every page-/tableextension field, 
 For IDs in NpCore we do not maintain module specific areas. Microsoft long term plans are to remove IDs and grouping based on ID is no longer required when using vscode to organize files.
 It is recommended to make heavy use of intellisense (ctrl+space when Id in a snippet is selected) to pull next available ID for new object. If someone else used the same ID as you and his pull request is merged before yours, you will get an error that you can quickly fix locally by swapping IDs. Remember that AL code maintain references via name instead of IDs so you can quickly swap IDs without losing test data in your container.
 
+For making sure we don't have conflicts when multiple developers are creating new objects in the same project we are using 
+[AL Object ID Ninja](ALObjectIDNinja.md)
+
 # Project Structure
 
 Modules are split into separate folders as much as possible. There are no hard rules about the organization inside of these as the details are module specific.
