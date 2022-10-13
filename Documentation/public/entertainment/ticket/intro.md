@@ -1,11 +1,11 @@
 # Ticket module
 
-The ticket module in NPRetail is used for managing tickets. A Ticket is an entity that links all properties and characteristics of a specific issued ticket. From a user's perspective, this represents the physical ticket that the user has acquired.
+The ticket module in NPRetail offers an omnichannel solution for customers in the entertainment industry. A Ticket is an entity that links all properties and characteristics of a physically issued ticket with the Business Central database.
 
-The ticket information structure is complex and consists of several entities which can present its capabilities and capture all events when a ticket is used.
+The ticket information structure is complex and consists of several entities which can present its capabilities and capture all events when a ticket is used. For that reason, setting up tickets for new customers requires them to know exactly what kind of setup they want to implement.
 
 
-### Related links
+### Highlighted articles
 
 - [Ticket designer](./tutorial/TicketDesigner.md)
 - [Ticket admission](./explanation/admission.md)
