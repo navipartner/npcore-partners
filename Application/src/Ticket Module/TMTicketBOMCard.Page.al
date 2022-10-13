@@ -222,6 +222,20 @@ page 6059886 "NPR TM Ticket BOM Card"
                     ToolTip = 'Specifies the code of a base calendar. The calendar defines exceptions to the general schedules and has the possibility to prevent sales for specific dates or holidays.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
+                field("Ticket Customized Calendar"; _CalendarManager.CustomizedChangesExist(Rec))
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                    Caption = 'Customized Calendar';
+                    Editable = false;
+                    ToolTip = 'If a base calendar is added, you can select calendar variations in this column that applies to this ticket specifically.';
+
+                    trigger OnDrillDown()
+                    begin
+                        CurrPage.SaveRecord();
+                        Rec.TestField("Ticket Base Calendar Code");
+                        _CalendarManager.ShowCustomizedCalendar(Rec);
+                    end;
+                }
 
                 field(SystemCreatedAt; Rec.SystemCreatedAt)
                 {
@@ -288,5 +302,8 @@ page 6059886 "NPR TM Ticket BOM Card"
         }
 
     }
+
+    var
+        _CalendarManager: Codeunit "Calendar Management";
 
 }
