@@ -57,6 +57,16 @@ table 6014696 "NPR Tenant Diagnostic"
             Caption = 'POS Units Last Sent';
             DataClassification = CustomerContent;
         }
+        field(50; "Last Tenant ID Sent to CS"; Text[50])
+        {
+            Caption = 'Last Tenant ID Sent to Case System';
+            DataClassification = CustomerContent;
+        }
+        field(55; "Last DT Tenant ID Sent to CS"; DateTime)
+        {
+            Caption = 'Last DateTime Tenant ID Sent to Case System';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
