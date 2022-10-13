@@ -73,6 +73,11 @@ table 6014693 "NPR Client Diagnostic"
             Caption = 'Locked Message Last Checked';
             DataClassification = CustomerContent;
         }
+        field(60; "Client Diagnostic Last Sent"; DateTime)
+        {
+            Caption = 'Client Diagnostic Last Sent';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
