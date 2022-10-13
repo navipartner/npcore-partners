@@ -1141,6 +1141,76 @@ codeunit 85013 "NPR TM API SmokeTest"
 
     end;
 
+
+    [Test]
+    procedure AdmissionBaseCalendar()
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
+        Schedule: Record "NPR TM Admis. Schedule";
+        AdmissionSchedule: Record "NPR TM Admis. Schedule Lines";
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        CustomizedCalendar: Record "Customized Calendar Change";
+        ScheduleManager: Codeunit "NPR TM Admission Sch. Mgt.";
+        CalendarManager: Codeunit "NPR TMBaseCalendarManager";
+
+        Assert: Codeunit "Assert";
+        ItemNo: Code[20];
+        CountedEntries: Integer;
+    begin
+        ItemNo := SelectBaseCalendarTestScenario();
+
+        TicketBom.SetFilter("Item No.", '=%1', ItemNo);
+        TicketBom.FindFirst();
+
+        Admission.Get(TicketBom."Admission Code");
+        AdmissionSchedule.SetFilter("Admission Code", '=%1', Admission."Admission Code");
+        AdmissionSchedule.FindFirst();
+        Schedule.Get(AdmissionSchedule."Schedule Code");
+
+        ScheduleManager.CreateAdmissionSchedule(Admission."Admission Code", true, Today);
+        AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', Admission."Admission Code");
+        AdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', Schedule."Schedule Code");
+        AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+
+        if (AdmissionScheduleEntry.Count() < 10) then
+            Error('Less than 10 entries was created but scenaio expects 1 month of entries (>=28).');
+
+        AdmissionScheduleEntry.SetFilter("Admission Is", '=%1', AdmissionScheduleEntry."Admission Is"::CLOSED);
+        CountedEntries := AdmissionScheduleEntry.Count();
+        Assert.AreEqual(0, CountedEntries, 'Expected closed entries must be zero at this point.');
+
+        CalendarManager.SetAdmissionCalendar(Admission, CustomizedCalendar);
+        CreateNonWorkingEntry(CustomizedCalendar, CalcDate('+3D'));
+
+        ScheduleManager.CreateAdmissionSchedule(Admission."Admission Code", true, Today);
+        CountedEntries := AdmissionScheduleEntry.Count();
+        Assert.AreEqual(1, CountedEntries, 'Customized Calendar for Admision did not impact closed state on timeslot.');
+
+        CalendarManager.SetScheduleCalendar(Schedule, CustomizedCalendar);
+        CreateNonWorkingEntry(CustomizedCalendar, CalcDate('+5D'));
+
+        ScheduleManager.CreateAdmissionSchedule(Admission."Admission Code", true, Today);
+        CountedEntries := AdmissionScheduleEntry.Count();
+        Assert.AreEqual(2, CountedEntries, 'Customized Calendar for Schedule did not impact closed state on timeslot.');
+
+        CalendarManager.SetAdmissionScheduleCalendar(AdmissionSchedule, CustomizedCalendar);
+        CreateNonWorkingEntry(CustomizedCalendar, CalcDate('+7D'));
+
+        ScheduleManager.CreateAdmissionSchedule(Admission."Admission Code", true, Today);
+        CountedEntries := AdmissionScheduleEntry.Count();
+        Assert.AreEqual(3, CountedEntries, 'Customized Calendar for Admision Schedule did not impact closed state on timeslot.');
+
+    end;
+
+    [Normal]
+    local procedure CreateNonWorkingEntry(var CustomizedCalendar: Record "Customized Calendar Change"; Date: Date)
+    begin
+        CustomizedCalendar.Date := Date;
+        CustomizedCalendar.Nonworking := true;
+        CustomizedCalendar.Insert();
+    end;
+
     [Normal]
     local procedure SelectSmokeTestScenario() ItemNo: Code[20]
     var
@@ -1149,6 +1219,7 @@ codeunit 85013 "NPR TM API SmokeTest"
         ItemNo := TicketLibrary.CreateScenario_SmokeTest();
     end;
 
+    [Normal]
     local procedure SelectSimpleReservationTestScenario(NumberOfTimeslots: Integer) ItemNo: Code[20]
     var
         TicketLibrary: Codeunit "NPR Library - Ticket Module";
@@ -1156,11 +1227,19 @@ codeunit 85013 "NPR TM API SmokeTest"
         ItemNo := TicketLibrary.CreateScenario_ReservationRequired(NumberOfTimeslots)
     end;
 
-
+    [Normal]
     local procedure GenerateCode20(): Code[20]
     var
         TicketLibrary: Codeunit "NPR Library - Ticket Module";
     begin
         exit(TicketLibrary.GenerateCode20());
+    end;
+
+    [Normal]
+    local procedure SelectBaseCalendarTestScenario() ItemNo: Code[20]
+    var
+        TicketLibrary: Codeunit "NPR Library - Ticket Module";
+    begin
+        ItemNo := TicketLibrary.CreateScenario_BaseCalendar();
     end;
 }

@@ -76,6 +76,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG MPOS QR Code"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG DE Audit Setup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG PaymentV2"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR TM Calendar Upgrade"));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -268,6 +269,8 @@
                 Exit('NPRFRAuditSetup2UPG-2022-08-03');
             Codeunit::"NPR UPG NpXml Template":
                 Exit('NPRUPGNpXmlTemplateFtpFieldsToNcEndpoint');
+            Codeunit::"NPR TM Calendar Upgrade":
+                Exit('NPR_TMCalendarUpgrade_20221011');
         end;
     end;
 }

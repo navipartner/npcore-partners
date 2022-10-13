@@ -104,7 +104,7 @@
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'The calendar defines exceptions to the general schedules and has the possibility to prevent sales for specific dates or holidays.';
                 }
-                field("AdmissionCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(TempCustomizedCalendarChangeAdmission))
+                field("AdmissionCustomized Calendar"; _CalendarManager.CustomizedChangesExist(Rec))
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Admission Customized Calendar';
@@ -115,7 +115,7 @@
                     begin
                         CurrPage.SaveRecord();
                         Rec.TestField("Admission Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(TempCustomizedCalendarChangeAdmission);
+                        _CalendarManager.ShowCustomizedCalendar(Rec);
                     end;
                 }
                 field("Ticket Base Calendar Code"; Rec."Ticket Base Calendar Code")
@@ -123,7 +123,7 @@
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'The calendar defines exceptions to the general schedules and has the possibility to prevent sales for specific dates or holidays.';
                 }
-                field("TicketCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(TempCustomizedCalendarChangeTicket))
+                field("TicketCustomized Calendar"; _TmCalendarManager.TicketBomAdmissionChangesExist(Rec))
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Ticket Customized Calendar';
@@ -134,7 +134,7 @@
                     begin
                         CurrPage.SaveRecord();
                         Rec.TestField("Admission Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(TempCustomizedCalendarChangeTicket);
+                        _TMCalendarManager.ShowTicketBomAdmissionCalendar(Rec);
                     end;
                 }
                 field("eTicket Type Code"; Rec."eTicket Type Code")
@@ -275,24 +275,8 @@
         }
     }
 
-    trigger OnAfterGetCurrRecord()
-    begin
-        Clear(TempCustomizedCalendarChangeAdmission);
-        TempCustomizedCalendarChangeAdmission."Source Type" := TempCustomizedCalendarChangeAdmission."Source Type"::Location;
-        TempCustomizedCalendarChangeAdmission."Source Code" := Rec."Admission Code";
-        TempCustomizedCalendarChangeAdmission."Base Calendar Code" := Rec."Admission Base Calendar Code";
-        if (not TempCustomizedCalendarChangeAdmission.Insert()) then;
-
-        Clear(TempCustomizedCalendarChangeTicket);
-        TempCustomizedCalendarChangeTicket."Source Type" := TempCustomizedCalendarChangeTicket."Source Type"::Service;
-        TempCustomizedCalendarChangeTicket."Source Code" := Rec."Admission Code";
-        TempCustomizedCalendarChangeTicket."Base Calendar Code" := Rec."Ticket Base Calendar Code";
-        if (not TempCustomizedCalendarChangeTicket.Insert()) then;
-    end;
-
     var
-        TempCustomizedCalendarChangeAdmission: Record "Customized Calendar Change" temporary;
-        TempCustomizedCalendarChangeTicket: Record "Customized Calendar Change" temporary;
-        CalendarMgmt: Codeunit "Calendar Management";
+        _CalendarManager: Codeunit "Calendar Management";
+        _TMCalendarManager: Codeunit "NPR TMBaseCalendarManager";
 }
 

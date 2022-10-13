@@ -207,7 +207,7 @@
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Base Calendar Code field';
                 }
-                field("Customized Calendar"; CalendarMgmt.CustomizedChangesExist(TempCustomizedCalendarChange))
+                field("Customized Calendar"; _CalendarManager.CustomizedChangesExist(Rec))
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Customized Calendar';
@@ -218,7 +218,7 @@
                     begin
                         CurrPage.SaveRecord();
                         Rec.TestField("Admission Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(TempCustomizedCalendarChange);
+                        _CalendarManager.ShowCustomizedCalendar(Rec);
                     end;
                 }
             }
@@ -258,17 +258,7 @@
         }
     }
 
-    trigger OnAfterGetCurrRecord()
-    begin
-        Clear(TempCustomizedCalendarChange);
-        TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Location;
-        TempCustomizedCalendarChange."Additional Source Code" := Rec."Schedule Code";
-        TempCustomizedCalendarChange."Base Calendar Code" := Rec."Admission Base Calendar Code";
-        if (not TempCustomizedCalendarChange.Insert()) then;
-    end;
-
     var
-        TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
-        CalendarMgmt: Codeunit "Calendar Management";
+        _CalendarManager: Codeunit "Calendar Management";
 }
 

@@ -156,7 +156,7 @@
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the code of a base calendar. The calendar defines exceptions to the general schedules and has the possibility to prevent sales for specific dates or holidays.';
                 }
-                field("Ticket Customized Calendar"; CalendarMgmt.CustomizedChangesExist(TempCustomizedCalendarChange))
+                field("Ticket Customized Calendar"; _CalendarManager.CustomizedChangesExist(Rec))
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Customized Calendar';
@@ -167,7 +167,7 @@
                     begin
                         CurrPage.SaveRecord();
                         Rec.TestField("Ticket Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(TempCustomizedCalendarChange);
+                        _CalendarManager.ShowCustomizedCalendar(Rec);
                     end;
                 }
                 field("Publish As eTicket"; Rec."Publish As eTicket")
@@ -364,22 +364,12 @@
         }
     }
 
-    trigger OnAfterGetCurrRecord()
-    begin
-        Clear(TempCustomizedCalendarChange);
-        TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Service;
-        TempCustomizedCalendarChange."Source Code" := Rec."Admission Code";
-        TempCustomizedCalendarChange."Base Calendar Code" := Rec."Ticket Base Calendar Code";
-        if (not TempCustomizedCalendarChange.Insert()) then;
-    end;
-
     var
         TicketPaymentType: Option DIRECT,PREPAID,POSTPAID;
         SCHEDULE_ERROR: Label 'There was an error changing the reservation \\%1\\Do you want to try again?';
         EXPORT_TO_EXCEL: Label 'Do you want to export generated tickets to excel?';
         OFFLINE_VALIDATION: Label 'Do you want to create offline ticket validation entries to be able to create admissions.';
-        TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
-        CalendarMgmt: Codeunit "Calendar Management";
+        _CalendarManager: Codeunit "Calendar Management";
 
     procedure MakeTourTicket(ItemNo: Code[20]; VariantCode: Code[10])
     var

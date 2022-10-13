@@ -267,11 +267,9 @@
     local procedure AddTimeEntry(StartFromDate: Date; Admission: Record "NPR TM Admission"; Schedule: Record "NPR TM Admis. Schedule"; var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary)
     var
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
-        CalendarManagement: Codeunit "Calendar Management";
-        TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
+        TicketCalendarManagement: Codeunit "NPR TMBaseCalendarManager";
         EndDateTime: DateTime;
         EntryNo: Integer;
-        CalendarDesc: Text;
     begin
 
         // we are not creating historical entries
@@ -337,50 +335,17 @@
         TmpAdmissionScheduleEntry."Visibility On Web" := AdmissionScheduleLines."Visibility On Web";
         TmpAdmissionScheduleEntry."Dynamic Price Profile Code" := AdmissionScheduleLines."Dynamic Price Profile Code";
 
-        if ((Admission."Admission Base Calendar Code" <> '') and (TmpAdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is"::OPEN)) then begin
-            TempCustomizedCalendarChange.Init();
-            TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Location;
-            TempCustomizedCalendarChange."Base Calendar Code" := Admission."Admission Base Calendar Code";
-            TempCustomizedCalendarChange."Date" := StartFromDate;
-            TempCustomizedCalendarChange.Description := CopyStr(CalendarDesc, 1, MaxStrLen(TempCustomizedCalendarChange.Description));
-            TempCustomizedCalendarChange."Source Code" := TmpAdmissionScheduleEntry."Admission Code";
-            TempCustomizedCalendarChange.Insert();
-
-            CalendarManagement.CheckDateStatus(TempCustomizedCalendarChange);
-            if (TempCustomizedCalendarChange.Nonworking) then
+        if ((Admission."Admission Base Calendar Code" <> '') and (TmpAdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is"::OPEN)) then
+            if (TicketCalendarManagement.CheckAdmissionIsNonWorking(Admission, StartFromDate)) then
                 TmpAdmissionScheduleEntry."Admission Is" := Schedule."Admission Is"::CLOSED;
-        end;
 
-        if ((Schedule."Admission Base Calendar Code" <> '') and (TmpAdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is"::OPEN)) then begin
-            TempCustomizedCalendarChange.DeleteAll();
-            TempCustomizedCalendarChange.Init();
-            TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Location;
-            TempCustomizedCalendarChange."Base Calendar Code" := Admission."Admission Base Calendar Code";
-            TempCustomizedCalendarChange."Date" := StartFromDate;
-            TempCustomizedCalendarChange.Description := CopyStr(CalendarDesc, 1, MaxStrLen(TempCustomizedCalendarChange.Description));
-            TempCustomizedCalendarChange."Additional Source Code" := TmpAdmissionScheduleEntry."Schedule Code";
-            TempCustomizedCalendarChange.Insert();
-
-            CalendarManagement.CheckDateStatus(TempCustomizedCalendarChange);
-            if (TempCustomizedCalendarChange.Nonworking) then
+        if ((Schedule."Admission Base Calendar Code" <> '') and (TmpAdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is"::OPEN)) then
+            if (TicketCalendarManagement.CheckScheduleIsNonWorking(Schedule, StartFromDate)) then
                 TmpAdmissionScheduleEntry."Admission Is" := Schedule."Admission Is"::CLOSED;
-        end;
 
-        if ((AdmissionScheduleLines."Admission Base Calendar Code" <> '') and (TmpAdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is"::OPEN)) then begin
-            TempCustomizedCalendarChange.DeleteAll();
-            TempCustomizedCalendarChange.Init();
-            TempCustomizedCalendarChange."Source Type" := TempCustomizedCalendarChange."Source Type"::Location;
-            TempCustomizedCalendarChange."Base Calendar Code" := Admission."Admission Base Calendar Code";
-            TempCustomizedCalendarChange."Date" := StartFromDate;
-            TempCustomizedCalendarChange.Description := CopyStr(CalendarDesc, 1, MaxStrLen(TempCustomizedCalendarChange.Description));
-            TempCustomizedCalendarChange."Source Code" := TmpAdmissionScheduleEntry."Admission Code";
-            TempCustomizedCalendarChange."Additional Source Code" := TmpAdmissionScheduleEntry."Schedule Code";
-            TempCustomizedCalendarChange.Insert();
-
-            CalendarManagement.CheckDateStatus(TempCustomizedCalendarChange);
-            if (TempCustomizedCalendarChange.Nonworking) then
+        if ((AdmissionScheduleLines."Admission Base Calendar Code" <> '') and (TmpAdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is"::OPEN)) then
+            if (TicketCalendarManagement.CheckAdmissionScheduleIsNonWorking(AdmissionScheduleLines, StartFromDate)) then
                 TmpAdmissionScheduleEntry."Admission Is" := Schedule."Admission Is"::CLOSED;
-        end;
 
         TmpAdmissionScheduleEntry.Cancelled := false;
         TmpAdmissionScheduleEntry."Reason Code" := 'NTE'; // New Time Entry
