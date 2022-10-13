@@ -1129,5 +1129,52 @@
         POSStoreGroupLine.Insert();
     end;
 
+    [Test]
 
+    [HandlerFunctions('OpenVoucherCardHandler')]
+    procedure CheckExistingVoucher()
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        POSActionCheckVoucherB: codeunit "NPR POS Action:Check Voucher B";
+        Assert: Codeunit "Assert";
+        VoucherAmount: Decimal;
+    begin
+        // [SCENARIO] Scanned Reference No. open Voucher Card Page
+        // [GIVEN] Voucher created in POS Transaction
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+        // [WHEN]
+        POSActionCheckVoucherB.CheckVoucher(_VoucherTypeDefault.Code, NpRvVoucher."Reference No.");
+        // [THEN] Voucher Card opens. Caught by OpenVoucherCardHandler 
+    end;
+
+    [ModalPageHandler]
+    procedure OpenVoucherCardHandler(var VoucherCard: Page "NPR NpRv Voucher Card"; var ActionResponse: Action)
+    begin
+        ActionResponse := Action::Cancel;
+    end;
+
+    [Test]
+    procedure CheckMissingVoucher()
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        Assert: Codeunit "Assert";
+        POSActionCheckVoucherB: codeunit "NPR POS Action:Check Voucher B";
+        VoucherAmount: Decimal;
+        ReferenceNo: Text[50];
+        NotFoundErr: Label 'Reference No. %1 and Voucher Type %2 not found', Comment = '%1=Voucher Reference No;%2=Voucher Type Code';
+    begin
+        // [SCENARIO] Scanned Reference No. caused error
+        // [GIVEN] Voucher created in POS Transaction
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+        //[WHEN]
+        ReferenceNo := NpRvVoucher."Reference No.";
+        NpRvVoucher.Delete(); //Voucher doesn't exist anymore
+        // [THEN] 
+        asserterror POSActionCheckVoucherB.CheckVoucher(_VoucherTypeDefault.Code, ReferenceNo);
+        Assert.ExpectedError(StrSubstNo(NotFoundErr, ReferenceNo, _VoucherTypeDefault.Code));
+    end;
 }

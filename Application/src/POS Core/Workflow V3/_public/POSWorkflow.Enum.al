@@ -316,6 +316,12 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'EFT_NETS_CLOUD_TRX', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: NetsCloud Trx";
     }
+    value(60; CHECK_VOUCHER)
+    {
+        Caption = 'CHECK_VOUCHER', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NpRvCheckVoucher";
+    }
+
     value(6014600; BALANCE_V4)
     {
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;
