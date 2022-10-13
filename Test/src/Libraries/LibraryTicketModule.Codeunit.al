@@ -37,8 +37,8 @@ codeunit 85011 "NPR Library - Ticket Module"
         CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
-        AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
-        ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY, '', ''));
+        ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, '');
         CreateScheduleLinePriceProfile(AdmissionCode, ScheduleCode, 1, true, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+7D>', 0, 0);
 
 
@@ -79,9 +79,9 @@ codeunit 85011 "NPR Library - Ticket Module"
         CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
-        AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
-        ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-        CreateScheduleLine(AdmissionCode, ScheduleCode, 1, false, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
+        AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY, '', ''));
+        ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, '');
+        CreateScheduleLine(AdmissionCode, ScheduleCode, 1, false, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0, '');
 
         ItemNo := CreateItem('', TicketTypeCode, Random(200) + 100);
         CreateTicketBOM(ItemNo, '', AdmissionCode, '', 1, true, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
@@ -122,10 +122,10 @@ codeunit 85011 "NPR Library - Ticket Module"
         CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
-        AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY));
+        AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY, '', ''));
         for i := 1 to NumberOfTimeSlots do begin
-            ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, (000001T + SlotSize * (i - 1) * 1000), (000001T + SlotSize * i * 1000), true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-            CreateScheduleLine(AdmissionCode, ScheduleCode, 1, true, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
+            ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, (000001T + SlotSize * (i - 1) * 1000), (000001T + SlotSize * i * 1000), true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, '');
+            CreateScheduleLine(AdmissionCode, ScheduleCode, 1, true, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0, '');
         end;
 
         ItemNo := CreateItem('', TicketTypeCode, Random(200) + 100);
@@ -166,9 +166,9 @@ codeunit 85011 "NPR Library - Ticket Module"
         CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::MULTIPLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
-        AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
-        ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, true, true, true, true, true, true);
-        CreateScheduleLine(AdmissionCode, ScheduleCode, 1, false, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+10D>', 0, 0);
+        AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY, '', ''));
+        ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, true, true, true, true, true, true, '');
+        CreateScheduleLine(AdmissionCode, ScheduleCode, 1, false, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+10D>', 0, 0, '');
 
         ItemNo := CreateItem('', TicketTypeCode, Random(200) + 100);
         CreateTicketBOM(ItemNo, '', AdmissionCode, '', 1, true, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::MULTIPLE);
@@ -184,6 +184,66 @@ codeunit 85011 "NPR Library - Ticket Module"
         exit(ItemNo)
     end;
 
+    procedure CreateScenario_BaseCalendar() SalesItemNo: Code[20]
+    var
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
+        AdmissionSchedule: Record "NPR TM Admis. Schedule";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
+        TicketSetup: Record "NPR TM Ticket Setup";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        NprMasterData: Codeunit "NPR Library - POS Master Data";
+        ScheduleManager: Codeunit "NPR TM Admission Sch. Mgt.";
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+        AdmissionBaseCalendarCode, TicketBaseCalendarCode : Code[10];
+    begin
+
+        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
+        WorkDate(Today());
+
+        // Used for smoke testing
+        // This scenario creates a ticket which is always available today.
+
+        CreateNoSerie('ATF-TM-ATF001', 'QWETMATF9000001');
+        CreateNoSerie('ATF-TM-TICKET', 'QWE9000001');
+        CreateNoSerie('ATF-TM-PK10', 'QWEPK10000');         // Code 10 number series
+        CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
+
+        AdmissionBaseCalendarCode := CreateBaseCalendar(GenerateCode10());
+        TicketBaseCalendarCode := CreateBaseCalendar(GenerateCode10());
+
+        TicketTypeCode := CreateTicketType(GenerateCode10(), '<+1M>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::MULTIPLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
+        AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY, AdmissionBaseCalendarCode, TicketBaseCalendarCode));
+        ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, true, true, true, true, true, true, AdmissionBaseCalendarCode);
+        CreateScheduleLine(AdmissionCode, ScheduleCode, 1, false, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+1M>', 0, 0, AdmissionBaseCalendarCode);
+
+        ItemNo := CreateItem('', TicketTypeCode, Random(200) + 100);
+        CreateTicketBOM(ItemNo, '', AdmissionCode, TicketBaseCalendarCode, 1, true, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::MULTIPLE);
+
+        ScheduleManager.CreateAdmissionSchedule(AdmissionCode, true, Today);
+
+        exit(ItemNo)
+    end;
+
+    local procedure CreateBaseCalendar(CalendarCode: Code[10]): Code[10]
+    var
+        BaseCalendar: Record "Base Calendar";
+    begin
+        if (CalendarCode = '') then
+            CalendarCode := GenerateCode10();
+
+        if (not BaseCalendar.Get(CalendarCode)) then begin
+            BaseCalendar.Init();
+            BaseCalendar.Code := CalendarCode;
+            BaseCalendar.Insert();
+        end;
+
+        exit(BaseCalendar.Code);
+    end;
 
     procedure CreateItem(VariantCode: Code[10]; TicketTypeCode: Code[10]; UnitPrice: Decimal) ItemNo: Code[20]
     var
@@ -232,7 +292,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         exit(TicketItem."No.");
     end;
 
-    procedure CreateAdmissionCode(AdmissionCode: Code[20]; AdmissionType: Option; CapacityLimit: Option; DefaultSchedule: Option): code[20]
+    procedure CreateAdmissionCode(AdmissionCode: Code[20]; AdmissionType: Option; CapacityLimit: Option; DefaultSchedule: Option; AdmissionBaseCalendarCode: Code[10]; TicketBaseCalendarCode: Code[10]): code[20]
     var
         Admission: Record "NPR TM Admission";
     begin
@@ -246,6 +306,9 @@ codeunit 85011 "NPR Library - Ticket Module"
         Admission.Description := AdmissionCode;
         Admission."Capacity Limits By" := CapacityLimit;
         Admission."Default Schedule" := DefaultSchedule;
+
+        Admission."Admission Base Calendar Code" := AdmissionBaseCalendarCode;
+        Admission."Ticket Base Calendar Code" := TicketBaseCalendarCode;
 
         Admission.Modify();
 
@@ -304,7 +367,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         end;
     end;
 
-    procedure CreateSchedule(ScehduleCode: Code[20]; ScheduleType: Option; AdmissionIs: Option; StartFrom: Date; RecurrencePattern: Option; StartTime: Time; EndTime: Time; Monday: Boolean; Tuesday: Boolean; Wednesday: Boolean; Thursday: Boolean; Friday: Boolean; Saturday: Boolean; Sunday: Boolean): Code[20]
+    procedure CreateSchedule(ScehduleCode: Code[20]; ScheduleType: Option; AdmissionIs: Option; StartFrom: Date; RecurrencePattern: Option; StartTime: Time; EndTime: Time; Monday: Boolean; Tuesday: Boolean; Wednesday: Boolean; Thursday: Boolean; Friday: Boolean; Saturday: Boolean; Sunday: Boolean; AdmissionBaseCalendarCode: Code[10]): Code[20]
     var
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
     begin
@@ -328,7 +391,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         AdmissionSchedule.Friday := Friday;
         AdmissionSchedule.Saturday := Saturday;
         AdmissionSchedule.Sunday := Sunday;
-
+        AdmissionSchedule."Admission Base Calendar Code" := AdmissionBaseCalendarCode;
         AdmissionSchedule.Modify();
 
         exit(ScehduleCode);
@@ -338,13 +401,13 @@ codeunit 85011 "NPR Library - Ticket Module"
     var
         ScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
-        CreateScheduleLine(AdmissionCode, ScheduleCode, ProcessOrder, PreBookRequired, MaxCapacity, CapacityControl, PrebookFromFormula, AllowAdmissionBeforeStart_Minutes, AllowAdmissionPassedStart_Minutes);
+        CreateScheduleLine(AdmissionCode, ScheduleCode, ProcessOrder, PreBookRequired, MaxCapacity, CapacityControl, PrebookFromFormula, AllowAdmissionBeforeStart_Minutes, AllowAdmissionPassedStart_Minutes, '');
         ScheduleLines.Get(AdmissionCode, ScheduleCode);
         ScheduleLines."Dynamic Price Profile Code" := CreatePriceProfile(GenerateCode10());
         ScheduleLines.Modify();
     end;
 
-    procedure CreateScheduleLine(AdmissionCode: Code[20]; ScheduleCode: Code[20]; ProcessOrder: Integer; PreBookRequired: Boolean; MaxCapacity: Integer; CapacityControl: Option; PrebookFromFormula: Text[30]; AllowAdmissionBeforeStart_Minutes: Integer; AllowAdmissionPassedStart_Minutes: Integer)
+    procedure CreateScheduleLine(AdmissionCode: Code[20]; ScheduleCode: Code[20]; ProcessOrder: Integer; PreBookRequired: Boolean; MaxCapacity: Integer; CapacityControl: Option; PrebookFromFormula: Text[30]; AllowAdmissionBeforeStart_Minutes: Integer; AllowAdmissionPassedStart_Minutes: Integer; AdmissionBaseCalendar: Code[10])
     var
         ScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
@@ -374,6 +437,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         end;
         ScheduleLines."Max Capacity Per Sch. Entry" := MaxCapacity;
         ScheduleLines."Capacity Control" := CapacityControl;
+        ScheduleLines."Admission Base Calendar Code" := AdmissionBaseCalendar;
         ScheduleLines.Modify();
     end;
 
@@ -544,9 +608,9 @@ codeunit 85011 "NPR Library - Ticket Module"
 
         for i := 1 to TicketBOMElements do begin
             Setup(i, Default, AdmissionInclusion, RequiredBOMElements);
-            AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
-            ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-            CreateScheduleLine(AdmissionCode, ScheduleCode, 1, false, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
+            AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY, '', ''));
+            ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, '');
+            CreateScheduleLine(AdmissionCode, ScheduleCode, 1, false, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0, '');
 
             CreateTicketBOMDynamic(ItemNo, '', AdmissionCode, '', 1, Default, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, AdmissionInclusion);
         end;
