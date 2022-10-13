@@ -126,14 +126,22 @@
 
     local procedure ValidateBCOnlineTenant()
     var
+        TenantDiagnostic: Record "NPR Tenant Diagnostic";
         EnvironmentInformation: Codeunit "Environment Information";
         ResponseMessage: Text;
     begin
         if not EnvironmentInformation.IsSaaS() then
             exit;
 
-        if not TryInitAndSendRequest('ValidateBCOnlineTenant', '', '', TenantId(), ResponseMessage) then
+        InitTenantDiagnostic(TenantDiagnostic);
+        if TenantDiagnostic."Last Tenant ID Sent to CS" = TenantId() then
             exit;
+
+        if TryInitAndSendRequest('ValidateBCOnlineTenant', '', '', TenantId(), ResponseMessage) then begin
+            TenantDiagnostic."Last Tenant ID Sent to CS" := TenantId();
+            TenantDiagnostic."Last DT Tenant ID Sent to CS" := CurrentDateTime;
+            TenantDiagnostic.Modify();
+        end;
     end;
 
     local procedure TestUserOnLogin()
@@ -151,13 +159,12 @@
                 exit;
         end;
 
-        TestUserExpired();
+        TestUserExpired(false);
         TestUserLocked(false);
     end;
 
     local procedure TestUserOnPOSSessionInitialize()
     var
-        POSSession: Codeunit "NPR POS Session";
         CheckIsUsingRegularInvoicing, UsingRegularInvoicing, WebServiceCallSucceeded, Handled : Boolean;
     begin
         OnShouldCheckIsUsingRegularInvoicing(CheckIsUsingRegularInvoicing);
@@ -171,9 +178,8 @@
                 exit;
         end;
 
-        TestUserExpired();
-        if not TryTestUserLocked() then
-            POSSession.SetErrorOnInitialize(true);
+        TestUserExpired(true);
+        TestUserLocked(true);
     end;
 
     local procedure IsUsingRegularInvoicing(var UsingRegularInvoicing: Boolean; var WebServiceCallSucceeded: Boolean)
@@ -190,7 +196,7 @@
                 WebServiceCallSucceeded := false;
     end;
 
-    local procedure TestUserExpired()
+    local procedure TestUserExpired(PreventLogin: Boolean)
     var
         ExpirationMessage: Text;
     begin
@@ -199,7 +205,8 @@
             Message(ExpirationMessage);
 
         UpdateExpirationDate();
-        PreventLoginIfUserIsExpired();
+        if PreventLogin then
+            PreventLoginIfUserIsExpired();
     end;
 
     local procedure UpdateExpirationMessage(var ExpirationMessage: Text)
@@ -234,7 +241,8 @@
             ClientDiagnostic."Expirat. Message Last Updated" := CurrentDateTime();
         end;
         ClientDiagnostic."Expirat. Message Last Checked" := CurrentDateTime();
-        ClientDiagnostic.Modify();
+        if not ClientDiagnostic.Modify() then
+            exit;
     end;
 
     local procedure UpdateExpirationDate()
@@ -265,8 +273,8 @@
             ClientDiagnostic."Expiry Date Last Updated" := CurrentDateTime();
         end;
         ClientDiagnostic."Expiry Date Last Checked" := CurrentDateTime();
-        ClientDiagnostic.Modify();
-        Commit();
+        if ClientDiagnostic.Modify() then
+            Commit();
     end;
 
     local procedure GetExpirationDateTime(): DateTime
@@ -309,8 +317,8 @@
 
         ClientDiagnostic.Init();
         ClientDiagnostic."User Security ID" := UserSecurityId();
-        ClientDiagnostic.Insert();
-        Initialized := true;
+        if ClientDiagnostic.Insert() then
+            Initialized := true;
     end;
 
     local procedure PreventLoginIfUserIsExpired()
@@ -333,7 +341,7 @@
             exit;
 
         if ThrowAnError then
-            Error(LockedMessage)
+            TryThrowAnError(LockedMessage)
         else
             Message(LockedMessage);
     end;
@@ -370,14 +378,17 @@
             ClientDiagnostic."Locked Message Last Updated" := CurrentDateTime();
         end;
         ClientDiagnostic."Locked Message Last Checked" := CurrentDateTime();
-        ClientDiagnostic.Modify();
-        Commit();
+        if ClientDiagnostic.Modify() then
+            Commit();
     end;
 
     [TryFunction]
-    local procedure TryTestUserLocked()
+    local procedure TryThrowAnError(LockedMessage: Text)
+    var
+        POSSession: Codeunit "NPR POS Session";
     begin
-        TestUserLocked(true);
+        POSSession.SetErrorOnInitialize(true);
+        Error(LockedMessage);
     end;
 
     local procedure SendPosUnitQty()
