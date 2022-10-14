@@ -1296,7 +1296,7 @@
         Position2 := StrPos(CustomOptionTxt, '_');
 
         if Position2 <> 0 then begin
-            CustomOptionNo := CopyStr(CustomOptionTxt, 1, Position2 - 1);
+            CustomOptionNo := CopyStr(CopyStr(CustomOptionTxt, 1, Position2 - 1), 1, MaxStrLen(CustomOptionNo));
             Evaluate(CustomOptionLineNo, CopyStr(CustomOptionTxt, Position2 + 1), 9);
         end else
             CustomOptionNo := CopyStr(CustomOptionTxt, 1, MaxStrLen(MagentoCustomOption."No."));
