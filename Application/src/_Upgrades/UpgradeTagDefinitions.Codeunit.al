@@ -180,6 +180,8 @@
                         exit('AutoRescheduleRetenPolicy-20220627');
                     'TMRetentionJQCategory':
                         exit('TMRetentionJQCategory-20220707');
+                    'AutoScheduleMembershipStatistics':
+                        exit('AutoScheduleMembershipStatistics-20221011');
                 end;
             Codeunit::"NPR New Prices Install":
                 exit('NPRNewPriceTableInstall-20210920');

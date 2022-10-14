@@ -25,11 +25,13 @@
                 ApplicationArea = NPRRetail;
 
             }
+            part(MembershipStats; "NPR RC Membership Statistics")
+            {
+                ApplicationArea = NPRRetail;
+            }
             part(RCMembershipBurndownChart; "NPR RC Members. Burndown Chart")
             {
                 ApplicationArea = NPRRetail;
-
-
             }
             part(RetailActivities; "NPR Retail Activities")
             {
