@@ -37,11 +37,9 @@ report 6014436 "NPR Update Retention Policy"
 
     trigger OnPreReport()
     var
-        UpgradeTag: Codeunit "Upgrade Tag";
         RtnPeriodEnum: Enum "Retention Period Enum";
         ConfirmUpdateLbl: Label 'System will update Retention Policy with NPCore defined tables. Continue?';
         SuccessfullyProcessedLbl: Label 'Successfully processed %1 tables', Comment = '%1-table count';
-        SuccessfullyProcessedWithProblemLbl: Label 'Successfully processed %1 tables.\\There was a problem with some tables:\%2', Comment = '%1-table count, %2-table name list';
     begin
         if not Confirm(ConfirmUpdateLbl, false) then
             exit;
@@ -90,9 +88,7 @@ report 6014436 "NPR Update Retention Policy"
     begin
         RecRef.Open(TableId);
 
-        if not RetenPolAllowedTables.AddAllowedTable(TableId, RecRef.SystemCreatedAtNo()) then
-            TablesWithProblem += '\' + RecRef.Name;
-
+        RetenPolAllowedTables.AddAllowedTable(TableId, RecRef.SystemCreatedAtNo());
         CreateRetentionPolicySetup(TableId, GetRetentionPeriodCode(RtnPeriodEnum));
         SuccessfullyProcessedCount += 1;
     end;
@@ -136,11 +132,9 @@ report 6014436 "NPR Update Retention Policy"
         RetentionPeriod.SetRange("Retention Period", RtnPeriodEnum);
         if RetentionPeriod.FindFirst() then
             exit(true);
-
         exit(false);
     end;
 
     var
         SuccessfullyProcessedCount: Integer;
-        TablesWithProblem: Text;
 }
