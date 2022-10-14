@@ -167,5 +167,7 @@ report 6014440 "NPR POS Entry Sales & Payments"
             end;
         end;
     end;
+#else
+    UsageCategory = None;
 #endif
 }
