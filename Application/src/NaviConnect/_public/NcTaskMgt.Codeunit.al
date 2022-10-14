@@ -293,7 +293,7 @@
                             TempTask."Table No." := TempDataLogRecord."Table ID";
                             RecordID := TempDataLogRecord."Record ID";
                             RecRef := RecordID.GetRecord();
-                            TempTask."Record Position" := RecRef.GetPosition(false);
+                            TempTask."Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(TempTask."Record Position"));
                             TempTask."Record ID" := RecordID;
                             TempTask."Log Date" := TempDataLogRecord."Log Date";
                             TempTask."Record Value" := CopyStr(DelStr(Format(RecRef.RecordId), 1, StrLen(RecRef.Name) + 2), 1, MaxStrLen(TempTask."Record Value"));
