@@ -7,7 +7,6 @@
     var
         ClientDiagnostic: Record "NPR Client Diagnostic";
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
-        EnvHandler: Codeunit "NPR Environment Handler";
     begin
 #if BC17 or BC18 or BC19
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Client Diagn. NpCase Mgt.', 'OnBeforeLogInStart');

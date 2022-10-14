@@ -69,6 +69,11 @@
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'TMRetentionJQCategory'));
         end;
 
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AutoScheduleMembershipStatistics')) then begin
+            AutoScheduleMembershipStatistics();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AutoScheduleMembershipStatistics'));
+        end;
+
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", 'NPRUpgradePriceLogTaskQue')) then begin
             UpgradePriceLogTaskQue();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", 'NPRUpgradePriceLogTaskQue'));
@@ -336,5 +341,12 @@
         PriceLogSetup."Job Queue Activated" := true;
         PriceLogSetup.Modify();
         RetailPriceLogMgt.CreatePriceLogJobQueue('');
+    end;
+
+    local procedure AutoScheduleMembershipStatistics()
+    var
+        MembershipStatMgmt: Codeunit "NPR MM Membership Stat. Mgmt.";
+    begin
+        MembershipStatMgmt.CreateJobQueueEntry();
     end;
 }
