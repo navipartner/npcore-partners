@@ -25,10 +25,17 @@ codeunit 6184496 "NPR Pepper Library HWC"
         if (_PepperSetupInitialized) then
             exit;
 
-        _PepperSetupInitialized := FindTerminalSetupFromRegister(RegisterNo, _PepperTerminal, _PepperInstance, _PepperConfiguration, _PepperVersion);
+        _PepperSetupInitialized := DoInitializePepperSetup(RegisterNo);
 
         if (not _PepperSetupInitialized) then
             Error(PepperSetupNotFound, RegisterNo);
+    end;
+
+    local procedure DoInitializePepperSetup(RegisterNo: Code[10]): Boolean
+    var
+        PepperSetupInitialized: Boolean;
+    begin
+        exit(FindTerminalSetupFromRegister(RegisterNo, _PepperTerminal, _PepperInstance, _PepperConfiguration, _PepperVersion));
     end;
 
     procedure MakeHwcDeviceRequest(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var HwcRequest: JsonObject): Boolean
@@ -1475,12 +1482,19 @@ codeunit 6184496 "NPR Pepper Library HWC"
     local procedure AttemptOpenAndRetry(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     var
         EFTResultCode: Record "NPR Pepper EFT Result Code";
+        PepperTerminal: Record "NPR Pepper Terminal";
     begin
 
         if (EFTTransactionRequest.Successful) then
             exit(false);
 
         if (EFTTransactionRequest."Offline mode") then
+            exit(false);
+
+        if (not PepperTerminal.Get(EFTTransactionRequest."Pepper Terminal Code")) then
+            exit(false);
+
+        if (not PepperTerminal."Open Automatically") then
             exit(false);
 
         if (not EFTResultCode.Get(EFTTransactionRequest."Integration Type", EFTTransactionRequest."Pepper Transaction Type Code", EFTTransactionRequest."Pepper Trans. Subtype Code", EFTTransactionRequest."Result Code")) then
@@ -1845,6 +1859,7 @@ codeunit 6184496 "NPR Pepper Library HWC"
         Sale: codeunit "NPR POS Sale";
         PosSale: Record "NPR POS Sale";
         EFTSetup: Record "NPR EFT Setup";
+        PepperTerminal: Record "NPR Pepper Terminal";
         EftWorkflow, Request : JsonObject;
         EftTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
         Mechanism: Enum "NPR EFT Request Mechanism";
@@ -1865,8 +1880,13 @@ codeunit 6184496 "NPR Pepper Library HWC"
                 exit;
         end;
 
+        if (not DoInitializePepperSetup(POSSetup.GetPOSUnitNo())) then
+            exit;
+
+        if (not _PepperTerminal."Close Automatically") then
+            exit;
+
         EftTransactionMgt.PrepareEndWorkshift(EFTSetup, PosSale, Request, Mechanism, Workflow);
-        EftWorkflow.Add('WorkflowName', Format(Enum::"NPR POS Workflow"::EFT_PEPPER_CLOSE));
         EftWorkflow.Add('showSuccessMessage', false);
         EftWorkflow.Add('hideFailureMessage', true);
         EftWorkflow.Add('request', Request);
