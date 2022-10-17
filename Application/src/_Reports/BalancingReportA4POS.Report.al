@@ -727,6 +727,7 @@
                     column(Quantity; BinDenomination.Quantity)
                     {
                     }
+                    column(AttachedToID; BinDenomination."Attached-to ID".AsInteger()) { }
                     column(VarDenomination_; VarDenomination)
                     {
                     }
