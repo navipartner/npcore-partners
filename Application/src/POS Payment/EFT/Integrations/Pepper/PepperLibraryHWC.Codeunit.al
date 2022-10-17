@@ -32,8 +32,6 @@ codeunit 6184496 "NPR Pepper Library HWC"
     end;
 
     local procedure DoInitializePepperSetup(RegisterNo: Code[10]): Boolean
-    var
-        PepperSetupInitialized: Boolean;
     begin
         exit(FindTerminalSetupFromRegister(RegisterNo, _PepperTerminal, _PepperInstance, _PepperConfiguration, _PepperVersion));
     end;
@@ -1859,7 +1857,6 @@ codeunit 6184496 "NPR Pepper Library HWC"
         Sale: codeunit "NPR POS Sale";
         PosSale: Record "NPR POS Sale";
         EFTSetup: Record "NPR EFT Setup";
-        PepperTerminal: Record "NPR Pepper Terminal";
         EftWorkflow, Request : JsonObject;
         EftTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
         Mechanism: Enum "NPR EFT Request Mechanism";
