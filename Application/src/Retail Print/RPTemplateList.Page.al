@@ -19,14 +19,12 @@
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of the print template';
                     ApplicationArea = NPRRetail;
                 }
                 field("Printer Type"; Rec."Printer Type")
                 {
-
-                    ToolTip = 'Specifies the value of the Printer Type field';
+                    ToolTip = 'Specifies the printer type of the print template';
                     ApplicationArea = NPRRetail;
                 }
                 field(DeviceType; DeviceType)
@@ -37,20 +35,17 @@
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Comments field';
+                    ToolTip = 'Specifies the comments of the print template';
                     ApplicationArea = NPRRetail;
                 }
                 field(Version; Rec.Version)
                 {
-
-                    ToolTip = 'Specifies the value of the Version field';
+                    ToolTip = 'Specifies the version of the print template';
                     ApplicationArea = NPRRetail;
                 }
                 field("Last Modified At"; Rec."Last Modified At")
                 {
-
-                    ToolTip = 'Specifies the value of the Last Modified At field';
+                    ToolTip = 'Specifies when this print template was last modified';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -75,7 +70,7 @@
                 Caption = 'Create Copy';
                 Image = Copy;
 
-                ToolTip = 'Executes the Create Copy action';
+                ToolTip = 'Creates a copy of the selected print template';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -92,7 +87,7 @@
                 Caption = 'Export Package (Selected)';
                 Image = Export;
 
-                ToolTip = 'Executes the Export Package (Selected) action';
+                ToolTip = 'Exports a package of the selected record';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -109,7 +104,7 @@
                 Caption = 'Export Package (All)';
                 Image = Export;
 
-                ToolTip = 'Executes the Export Package (All) action';
+                ToolTip = 'Exports a package of all records';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -126,7 +121,7 @@
                 Caption = 'Import Package File';
                 Image = Import;
 
-                ToolTip = 'Executes the Import Package File action';
+                ToolTip = 'Imports a package, a json file';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -141,7 +136,7 @@
                 Caption = 'Download Template data';
                 Image = ImportDatabase;
 
-                ToolTip = 'Downloads Template data.';
+                ToolTip = 'Downloads different print templates for different devices and versions';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

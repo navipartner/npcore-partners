@@ -22,7 +22,7 @@
             {
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a Code to identify the POS Menu';
                     ApplicationArea = NPRRetail;
                 }
                 field(Caption; Rec.Caption)

@@ -17,38 +17,33 @@ page 6014580 "NPR Object Output Selection"
                 ShowCaption = false;
                 field("User ID"; Rec."User ID")
                 {
-
-                    ToolTip = 'Specifies the value of the User ID field';
+                    ToolTip = 'Specifies the user';
                     ApplicationArea = NPRRetail;
                 }
                 field("Object ID"; Rec."Object ID")
                 {
-
-                    ToolTip = 'Specifies the value of the Object ID field';
+                    ToolTip = 'Specifies the codeunit id';
                     ApplicationArea = NPRRetail;
                 }
                 field("Object Name"; Rec."Codeunit Name")
                 {
-
-                    ToolTip = 'Specifies the value of the Object Name field';
+                    ToolTip = 'Specifies the codeunit name based on the selection on Codeunit ID field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print Template"; Rec."Print Template")
                 {
-
-                    ToolTip = 'Specifies the value of the Print Template field';
+                    ToolTip = 'Specifies the print template';
                     ApplicationArea = NPRRetail;
                 }
                 field("Output Type"; Rec."Output Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Output Type field';
+                    ToolTip = 'Specifies the output type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Output Path"; Rec."Output Path")
                 {
-
-                    ToolTip = 'Specifies the value of the Output Path field';
+                    ToolTip = 'Specifies the output path';
                     ApplicationArea = NPRRetail;
                 }
             }

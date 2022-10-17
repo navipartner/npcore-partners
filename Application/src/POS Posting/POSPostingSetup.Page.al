@@ -18,55 +18,49 @@
                 field("POS Store Code"; Rec."POS Store Code")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Store Code field';
+                    ToolTip = 'Specifies a code to identify the POS Store';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Payment Method Code"; Rec."POS Payment Method Code")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Payment Method Code field';
+                    ToolTip = 'Specifies a code to identify the POS Payment Method';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Payment Bin Code"; Rec."POS Payment Bin Code")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Payment Bin Code field';
+                    ToolTip = 'Specifies a code to identify the POS Payment Bin';
                     ApplicationArea = NPRRetail;
                 }
                 field("Account Type"; Rec."Account Type")
                 {
-
-                    ToolTip = 'Specifies the value of the Account Type field';
+                    ToolTip = 'Specifies the type of account that a balancing entry is posted to, such as BANK for a cash account.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Account No."; Rec."Account No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Account No. field';
+                    ToolTip = 'Specifies the number of the general ledger, customer, vendor, or bank account that the balancing entry is posted to, such as a cash account for cash purchases.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Difference Account Type"; Rec."Difference Account Type")
                 {
-
-                    ToolTip = 'Specifies the value of the Difference Account Type field';
+                    ToolTip = 'Specifies the account type used to track differences';
                     ApplicationArea = NPRRetail;
                 }
                 field("Close to POS Bin No."; Rec."Close to POS Bin No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Close to POS Bin No. field';
+                    ToolTip = 'Specifies the bin number used to close the POS';
                     ApplicationArea = NPRRetail;
                 }
                 field("Difference Acc. No."; Rec."Difference Acc. No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Difference Acc. No. field';
+                    ToolTip = 'Specifies the account to track positive differences based on the Difference Account Type selection';
                     ApplicationArea = NPRRetail;
                 }
                 field("Difference Acc. No. (Neg)"; Rec."Difference Acc. No. (Neg)")
                 {
-
-                    ToolTip = 'Specifies the value of the Difference Acc. No. (Neg) field';
+                    ToolTip = 'Specifies the account to track negative differences based on the Difference Account Type selection';
                     ApplicationArea = NPRRetail;
                 }
             }

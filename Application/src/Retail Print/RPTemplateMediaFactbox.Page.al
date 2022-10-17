@@ -16,13 +16,12 @@
             {
 
                 ExtendedDatatype = URL;
-                ToolTip = 'Specifies the value of the URL field';
+                ToolTip = 'Specifies the url of the Template Media Factbox';
                 ApplicationArea = NPRRetail;
             }
             field(Description; Rec.Description)
             {
-
-                ToolTip = 'Specifies the value of the Description field';
+                ToolTip = 'Specifies the description of the Template Media Factbox';
                 ApplicationArea = NPRRetail;
             }
             field(Picture; Rec.Image)
