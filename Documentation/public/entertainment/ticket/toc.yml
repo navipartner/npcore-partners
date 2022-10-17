@@ -32,6 +32,8 @@
     href: howto/admit_issued_ticket.md
   - name: Generate a ticketholder notification
     href: howto/ticketholder_notification.md
+  - name: Create and customize Base Calendar for Admission
+    href: howto/CreateCustomizedCalendar.md
 
 
 - name: Explanation
@@ -52,6 +54,8 @@
     href: explanation/TicketStatandForecast.md
   - name: Admission schedule lines
     href: explanation/admission_schedule_lines.md
+  - name: Ticketing Base Calendar
+    href: explanation/BaseCalendar.md
   
 - name: Reference
   items:
