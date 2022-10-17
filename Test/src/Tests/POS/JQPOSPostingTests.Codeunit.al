@@ -5,6 +5,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     Subtype = Test;
     Permissions = tabledata "VAT Entry" = rd,
                     tabledata "G/L Entry" = rd,
+                    tabledata "Item Ledger Entry" = rd,
                     tabledata "G/L Entry - VAT Entry Link" = rd;
 
     var
@@ -372,6 +373,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         GLEntry: Record "G/L Entry";
         VATEntry: Record "VAT Entry";
         GLVATEntryLink: Record "G/L Entry - VAT Entry Link";
+        ItemLedgerEntry: Record "Item Ledger Entry";
     begin
         POSEntry.DeleteAll();
         POSEntrySalesLine.DeleteAll();
@@ -380,5 +382,6 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         VATEntry.DeleteAll();
         GLEntry.DeleteAll();
         GLVATEntryLink.DeleteAll();
+        ItemLedgerEntry.DeleteAll();
     end;
 }
