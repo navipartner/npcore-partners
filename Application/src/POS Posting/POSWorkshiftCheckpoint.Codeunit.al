@@ -453,6 +453,7 @@
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSEntryToPost: Record "NPR POS Entry";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
+        DenominationMgt: Codeunit "NPR Denomination Mgt.";
         DimMgt: Codeunit DimensionManagement;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         NoSeriesManagement: Codeunit NoSeriesManagement;
@@ -491,12 +492,12 @@
             if (EntryNo = 0) then
                 exit(0);
 
-            StoreCountedDenominations(UnitNo, CheckPointEntryNo);
+            POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
+            DenominationMgt.StoreCountedDenominations(POSWorkshiftCheckpoint);
 
             if (Mode = EodWorkshiftMode::ZREPORT) then begin
 
                 // Create running total statistics
-                POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
                 POSWorkshiftCheckpoint.SetCurrentKey("POS Unit No.", Open, "Type");
                 POSWorkshiftCheckpoint.SetFilter("POS Unit No. Filter", '=%1', POSWorkshiftCheckpoint."POS Unit No.");
                 POSWorkshiftCheckpoint.SetFilter("Type Filter", '=%1', POSWorkshiftCheckpoint.Type);
@@ -700,56 +701,6 @@
                 POSWorkshiftTaxCheckpoint.Modify();
 
             until (POSWorkshiftTaxCheckpoint.Next() = 0);
-        end;
-
-    end;
-
-    local procedure StoreCountedDenominations(UnitNo: Code[10]; WorkshiftEntryNo: Integer)
-    var
-        EODDenomination: Record "NPR EOD Denomination";
-        EODDenomination2: Record "NPR EOD Denomination";
-        POSPaymentBinDenomination: Record "NPR POS Paym. Bin Denomin.";
-        POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-    begin
-        EODDenomination.SetCurrentKey("POS Unit No.");
-        EODDenomination.SetFilter("POS Unit No.", '=%1', UnitNo);
-        if (EODDenomination.IsEmpty()) then
-            exit;
-
-        POSPaymentBinCheckpoint.Reset();
-        POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
-        POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftEntryNo);
-        POSPaymentBinCheckpoint.SetFilter(Status, '=%1', POSPaymentBinCheckpoint.Status::TRANSFERED);
-        if (POSPaymentBinCheckpoint.FindSet()) then begin
-            repeat
-                EODDenomination.SetFilter("POS Payment Method Code", '=%1', POSPaymentBinCheckpoint."Payment Type No.");
-                EODDenomination.SetFilter(Quantity, '<>0');
-                if (EODDenomination.FindSet()) then begin
-                    repeat
-                        POSPaymentBinDenomination."Entry No." := 0;
-                        POSPaymentBinDenomination."Payment Method No." := POSPaymentBinCheckpoint."Payment Method No.";
-                        POSPaymentBinDenomination."Payment Type No." := POSPaymentBinCheckpoint."Payment Type No.";
-                        POSPaymentBinDenomination."POS Unit No." := UnitNo;
-                        POSPaymentBinDenomination."Workshift Checkpoint Entry No." := WorkshiftEntryNo;
-                        POSPaymentBinDenomination."Bin Checkpoint Entry No." := POSPaymentBinCheckpoint."Entry No.";
-                        POSPaymentBinDenomination."Denomination Type" := EODDenomination."Denomination Type";
-                        POSPaymentBinDenomination.Denomination := EODDenomination.Denomination;
-                        POSPaymentBinDenomination.Quantity := EODDenomination.Quantity;
-                        POSPaymentBinDenomination.Amount := EODDenomination.Amount;
-                        POSPaymentBinDenomination.Insert();
-
-                    until (EODDenomination.Next() = 0);
-                end;
-            until (POSPaymentBinCheckpoint.Next() = 0);
-        end;
-        EODDenomination.Reset();
-        EODDenomination.SetCurrentKey("POS Unit No.");
-        EODDenomination.SetFilter("POS Unit No.", '=%1', UnitNo);
-        if (EODDenomination.FindSet()) then begin
-            repeat
-                if (EODDenomination2.Get(EODDenomination."POS Payment Method Code", EODDenomination."POS Unit No.", EODDenomination."Denomination Type", EODDenomination.Denomination)) then
-                    EODDenomination2.Delete();
-            until (EODDenomination.Next() = 0)
         end;
 
     end;

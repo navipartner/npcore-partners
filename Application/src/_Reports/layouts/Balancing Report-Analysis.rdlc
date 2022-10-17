@@ -5144,6 +5144,13 @@
                                     <FilterValue DataType="Integer">1</FilterValue>
                                   </FilterValues>
                                 </Filter>
+                                <Filter>
+                                  <FilterExpression>=Fields!AttachedToID.Value</FilterExpression>
+                                  <Operator>Equal</Operator>
+                                  <FilterValues>
+                                    <FilterValue DataType="Integer">0</FilterValue>
+                                  </FilterValues>
+                                </Filter>
                               </Filters>
                               <Top>22.81659cm</Top>
                               <Left>0cm</Left>
@@ -8294,6 +8301,9 @@ End Function
         </Field>
         <Field Name="Quantity">
           <DataField>Quantity</DataField>
+        </Field>
+        <Field Name="AttachedToID">
+          <DataField>AttachedToID</DataField>
         </Field>
         <Field Name="VarDenomination_">
           <DataField>VarDenomination_</DataField>

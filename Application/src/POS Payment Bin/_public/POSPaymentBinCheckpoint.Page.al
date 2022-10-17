@@ -5,7 +5,6 @@
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
-
     SourceTable = "NPR POS Payment Bin Checkp.";
     ApplicationArea = NPRRetail;
 
@@ -22,21 +21,18 @@
                     Visible = ShowCountingSection;
                     field(PaymentTypeNo; Rec."Payment Type No.")
                     {
-
                         Editable = false;
                         ToolTip = 'Specifies the value of the Payment Type No. field';
                         ApplicationArea = NPRRetail;
                     }
                     field(Description; Rec.Description)
                     {
-
                         Editable = false;
                         ToolTip = 'Specifies the value of the Description field';
                         ApplicationArea = NPRRetail;
                     }
                     field(PaymentBinNo; Rec."Payment Bin No.")
                     {
-
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Payment Bin No. field';
@@ -44,7 +40,6 @@
                     }
                     field(PaymentMethodNo; Rec."Payment Method No.")
                     {
-
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Payment Method No. field';
@@ -52,10 +47,10 @@
                     }
                     field(CountedAmountInclFloat; Rec."Counted Amount Incl. Float")
                     {
-
                         MinValue = 0;
                         ToolTip = 'Specifies the value of the Counted Amount Incl. Float field';
                         ApplicationArea = NPRRetail;
+                        AssistEdit = true;
 
                         trigger OnAssistEdit()
                         begin
@@ -64,14 +59,11 @@
 
                         trigger OnValidate()
                         begin
-                            CountingDifference := CalculatedDifference();
-                            CalculateNewFloatAmount();
-                            CurrPage.Update(true);
+                            OnValidateCounting();
                         end;
                     }
                     field(CalculatedAmountInclFloat; Rec."Calculated Amount Incl. Float")
                     {
-
                         Editable = false;
                         Visible = not IsBlindCount;
                         ToolTip = 'Specifies the value of the Calculated Amount Incl. Float field';
@@ -79,7 +71,6 @@
                     }
                     field(CountingDifference; CountingDifference)
                     {
-
                         Caption = 'Difference';
                         Style = Unfavorable;
                         StyleExpr = CountingDifference <> 0;
@@ -97,7 +88,6 @@
                     }
                     field(Comment1; Rec.Comment)
                     {
-
                         Visible = not IsBlindCount;
                         ToolTip = 'Specifies the value of the Comment field';
                         ApplicationArea = NPRRetail;
@@ -113,14 +103,12 @@
                     Visible = ShowClosingSection;
                     field("Payment Type No."; Rec."Payment Type No.")
                     {
-
                         Editable = false;
                         ToolTip = 'Specifies the value of the Payment Type No. field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Payment Method No."; Rec."Payment Method No.")
                     {
-
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Payment Method No. field';
@@ -128,7 +116,6 @@
                     }
                     field("Payment Bin No."; Rec."Payment Bin No.")
                     {
-
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Payment Bin No. field';
@@ -136,18 +123,17 @@
                     }
                     field("Float Amount"; Rec."Float Amount")
                     {
-
                         Editable = false;
                         ToolTip = 'Specifies the opening count of this POS period.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Counted Amount Incl. Float"; Rec."Counted Amount Incl. Float")
                     {
-
                         MinValue = 0;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Counted Amount Incl. Float field';
                         ApplicationArea = NPRRetail;
+                        AssistEdit = true;
 
                         trigger OnAssistEdit()
                         begin
@@ -156,13 +142,11 @@
 
                         trigger OnValidate()
                         begin
-                            CalculateNewFloatAmount();
-                            CurrPage.Update(true);
+                            OnValidateCounting();
                         end;
                     }
                     field("Transfer In Amount"; Rec."Transfer In Amount")
                     {
-
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Transfer In Amount field';
@@ -170,7 +154,6 @@
                     }
                     field("Transfer Out Amount"; Rec."Transfer Out Amount")
                     {
-
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Transfer Out Amount field';
@@ -185,7 +168,6 @@
                     }
                     field("Calculated Amount Incl. Float"; Rec."Calculated Amount Incl. Float")
                     {
-
                         Editable = false;
                         Visible = not IsBlindCount;
                         ToolTip = 'Specifies the value of the Calculated Amount Incl. Float. It contains the same information as in the Counting tab.';
@@ -193,7 +175,6 @@
                     }
                     field("New Float Amount"; Rec."New Float Amount")
                     {
-
                         Editable = PageMode = PageMode::FINAL_COUNT;
                         MinValue = 0;
                         Style = Strong;
@@ -215,76 +196,79 @@
                     }
                     field("Bank Deposit Amount"; Rec."Bank Deposit Amount")
                     {
-
                         Style = Unfavorable;
                         StyleExpr = InvalidDistribution;
                         ToolTip = 'Specifies the amount that should be transferred to the bank.';
                         ApplicationArea = NPRRetail;
+                        AssistEdit = true;
+
+                        trigger OnAssistEdit()
+                        var
+                            DenominationMgt: Codeunit "NPR Denomination Mgt.";
+                        begin
+                            if not DenominationMgt.AssistEditPOSPaymentBinCheckpointDenominations(Rec, "NPR Denomination Target"::BankDeposit, ViewMode, Rec."Bank Deposit Amount") then
+                                exit;
+                            OnValidateBankDepositAmount();
+                        end;
 
                         trigger OnValidate()
                         begin
-                            CalculateNewFloatAmount();
-                            SelectBankBin();
-                            CurrPage.Update(true);
+                            OnValidateBankDepositAmount();
                         end;
                     }
                     field("Bank Deposit Bin Code"; Rec."Bank Deposit Bin Code")
                     {
-
                         ShowMandatory = Rec."Bank Deposit Amount" <> 0;
                         ToolTip = 'This field is automatically populated according to the value provided in the Bank Deposit Amount field.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Bank Deposit Reference"; Rec."Bank Deposit Reference")
                     {
-
                         ShowMandatory = Rec."Bank Deposit Amount" <> 0;
                         ToolTip = 'This field is automatically populated according to the value provided in the Bank Deposit Amount field, but it can be changed later.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Move to Bin Amount"; Rec."Move to Bin Amount")
                     {
-
                         Style = Unfavorable;
                         StyleExpr = InvalidDistribution;
                         ToolTip = 'Specifies the value of the Move to Bin Amount field';
                         ApplicationArea = NPRRetail;
+                        AssistEdit = true;
+
+                        trigger OnAssistEdit()
+                        var
+                            DenominationMgt: Codeunit "NPR Denomination Mgt.";
+                        begin
+                            if not DenominationMgt.AssistEditPOSPaymentBinCheckpointDenominations(Rec, "NPR Denomination Target"::MoveToBin, ViewMode, Rec."Move to Bin Amount") then
+                                exit;
+                            OnValidateMoveToBinAmount();
+                        end;
 
                         trigger OnValidate()
                         begin
-                            CalculateNewFloatAmount();
-                            SelectSafeBin();
-
-                            if (PageMode = PageMode::TRANSFER) then
-                                if ((Rec."Move to Bin Amount" <> 0) and (Rec."Include In Counting" = Rec."Include In Counting"::NO)) then
-                                    Rec."Include In Counting" := Rec."Include In Counting"::YES;
-
-                            CurrPage.Update(true);
+                            OnValidateMoveToBinAmount();
                         end;
                     }
                     field("Move to Bin Code"; Rec."Move to Bin Code")
                     {
-
                         ShowMandatory = Rec."Move to bin amount" <> 0;
                         ToolTip = 'Specifies the value of the Move to Bin No. field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Move to Bin Reference"; Rec."Move to Bin Reference")
                     {
-
                         ShowMandatory = Rec."Move to bin amount" <> 0;
                         ToolTip = 'Specifies the value of the Move to Bin Trans. ID field';
                         ApplicationArea = NPRRetail;
                     }
                     field(Status; Rec.Status)
                     {
-
                         ToolTip = 'Specifies the value of the Status field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Checkpoint Bin Entry No."; Rec."Checkpoint Bin Entry No.")
                     {
-
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Checkpoint Bin Entry No. field';
@@ -292,7 +276,6 @@
                     }
                     field("Payment Bin Entry Amount"; Rec."Payment Bin Entry Amount")
                     {
-
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Payment Bin Entry Amount field';
@@ -300,7 +283,6 @@
                     }
                     field("Payment Bin Entry Amount (LCY)"; Rec."Payment Bin Entry Amount (LCY)")
                     {
-
                         Editable = false;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Payment Bin Entry Amount (LCY) field';
@@ -323,7 +305,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Count action';
                 ApplicationArea = NPRRetail;
             }
@@ -362,7 +343,6 @@
         COMMENT_DIFFERENCE: Label 'Difference counted vs calculated.';
         TextFinishCountingandPost: Label 'Do you want to finish counting and post results?';
         TextFinishTransfer: Label 'Do you want to finish transfer and post results?';
-        TextSetupPaymentTypeMissing: Label 'No counting details have been setup for %1, enter counted amount/quantity as is.';
         PageMode: Option PRELIMINARY_COUNT,FINAL_COUNT,TRANSFER,VIEW;
         NetTransfer: Decimal;
         AutoCountCompleted: Boolean;
@@ -373,33 +353,39 @@
 
     local procedure OnAssistEditCounting()
     var
-        EODDenomination: Record "NPR EOD Denomination";
+        DenominationMgt: Codeunit "NPR Denomination Mgt.";
     begin
-        FillDenominationBuffer(EODDenomination);
-
-        if (EODDenomination.IsEmpty()) then
-            Error(TextSetupPaymentTypeMissing, Rec."Payment Type No.");
-
-        CountDenominations(EODDenomination);
-
+        if not DenominationMgt.AssistEditPOSPaymentBinCheckpointDenominations(Rec, "NPR Denomination Target"::Counted, ViewMode, Rec."Counted Amount Incl. Float") then
+            exit;
         CountingDifference := CalculatedDifference();
         CalculateNewFloatAmount();
         CurrPage.Update(true);
     end;
 
-    local procedure GetRegisterNo(): Code[10]
-    var
-        POSFrontEndManagement: Codeunit "NPR POS Front End Management";
-        POSSession: Codeunit "NPR POS Session";
-        POSSetup: Codeunit "NPR POS Setup";
+    local procedure OnValidateCounting()
     begin
-        if (POSSession.IsActiveSession(POSFrontEndManagement)) then begin
-            POSFrontEndManagement.GetSession(POSSession);
-            POSSession.GetSetup(POSSetup);
-            exit(POSSetup.GetPOSUnitNo());
-        end;
+        CountingDifference := CalculatedDifference();
+        CalculateNewFloatAmount();
+        CurrPage.Update(true);
+    end;
 
-        exit('NOREGISTER');
+    local procedure OnValidateBankDepositAmount()
+    begin
+        CalculateNewFloatAmount();
+        SelectBankBin();
+        CurrPage.Update(true);
+    end;
+
+    local procedure OnValidateMoveToBinAmount()
+    begin
+        CalculateNewFloatAmount();
+        SelectSafeBin();
+
+        if (PageMode = PageMode::TRANSFER) then
+            if ((Rec."Move to Bin Amount" <> 0) and (Rec."Include In Counting" = Rec."Include In Counting"::NO)) then
+                Rec."Include In Counting" := Rec."Include In Counting"::YES;
+
+        CurrPage.Update(true);
     end;
 
     local procedure GetPosUnitNo(): Code[10]
@@ -438,7 +424,6 @@
 
     local procedure CalculatedDifference() Difference: Decimal
     begin
-
         Difference := Rec."Calculated Amount Incl. Float" - Rec."Counted Amount Incl. Float";
         Rec.Comment := COMMENT_DIFFERENCE;
         if (Difference = 0) then
@@ -481,11 +466,11 @@
                 end;
 
             else begin
-                    ShowCountingSection := true;
-                    ShowClosingSection := true;
-                    ViewMode := true;
-                    PageMode := PageMode::VIEW;
-                end;
+                ShowCountingSection := true;
+                ShowClosingSection := true;
+                ViewMode := true;
+                PageMode := PageMode::VIEW;
+            end;
         end;
     end;
 
@@ -571,46 +556,6 @@
             POSPaymentBin.FindFirst();
             Rec.Validate("Move to Bin Code", POSPaymentBin."No.");
             exit;
-        end;
-    end;
-
-    local procedure FillDenominationBuffer(var EODDenomination: Record "NPR EOD Denomination")
-    var
-        PaymentMethodDenom: Record "NPR Payment Method Denom";
-    begin
-        EODDenomination.SetFilter("POS Payment Method Code", '=%1', Rec."Payment Type No.");
-        EODDenomination.SetFilter("POS Unit No.", '=%1', GetRegisterNo());
-        if (EODDenomination.IsEmpty()) then begin
-            PaymentMethodDenom.SetFilter("POS Payment Method Code", '=%1', Rec."Payment Type No.");
-            if PaymentMethodDenom.FindSet() then begin
-                repeat
-                    EODDenomination.Init();
-                    EODDenomination."POS Payment Method Code" := Rec."Payment Type No.";
-                    EODDenomination."POS Unit No." := GetRegisterNo();
-                    EODDenomination."Denomination Type" := PaymentMethodDenom."Denomination Type";
-                    EODDenomination.Denomination := PaymentMethodDenom.Denomination;
-                    EODDenomination.Insert();
-
-                until (PaymentMethodDenom.Next() = 0);
-                Commit();
-            end;
-        end;
-    end;
-
-    local procedure CountDenominations(var EODDenomination: Record "NPR EOD Denomination")
-    var
-        EODDenominationCount: Page "NPR EOD Denomination Count";
-    begin
-        EODDenominationCount.SetTableView(EODDenomination);
-        EODDenominationCount.LookupMode(true);
-        EODDenominationCount.Editable(true);
-
-        if (EODDenominationCount.RunModal() = Action::LookupOK) then begin
-            Rec."Counted Amount Incl. Float" := 0;
-            if (EODDenomination.FindSet()) then
-                repeat
-                    Rec."Counted Amount Incl. Float" += EODDenomination.Amount;
-                until (EODDenomination.Next() = 0);
         end;
     end;
 

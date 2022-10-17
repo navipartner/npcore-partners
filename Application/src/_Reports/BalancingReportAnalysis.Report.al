@@ -404,6 +404,7 @@
                     column(Quantity; BinDenomination.Quantity)
                     {
                     }
+                    column(AttachedToID; BinDenomination."Attached-to ID".AsInteger()) { }
                     column(VarDenomination_; VarDenomination)
                     {
                     }
@@ -507,13 +508,13 @@
                         ToolTip = 'Specifies the value of the Print TurnOver field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("CompareDay_"; CompareDay)
+                    field(CompareDay_; CompareDay)
                     {
                         Caption = 'Compare To Day';
                         ToolTip = 'Specifies the value of the Compare To Day field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("compareNearestDate_"; CompareNearestDate)
+                    field(compareNearestDate_; CompareNearestDate)
                     {
                         Caption = 'Compare Nearest Date';
                         ToolTip = 'Specifies the value of the Compare Nearest Date field';

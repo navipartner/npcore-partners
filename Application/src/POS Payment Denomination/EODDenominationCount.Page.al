@@ -1,4 +1,4 @@
-﻿page 6014443 "NPR EOD Denomination Count"
+page 6014443 "NPR EOD Denomination Count"
 {
     Extensible = False;
 
@@ -6,6 +6,8 @@
     PageType = Worksheet;
     SourceTable = "NPR EOD Denomination";
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Replaced by table "NPR POS Pmt. Bin Checkp. Denom"';
 
     layout
     {

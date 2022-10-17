@@ -193,7 +193,6 @@
             TableRelation = "NPR POS Workshift Checkpoint";
         }
     }
-
     keys
     {
         key(Key1; "Entry No.")
@@ -204,8 +203,14 @@
         }
     }
 
-    fieldgroups
-    {
-    }
+    trigger OnDelete()
+    var
+        POSPmtBinCheckpDenom: Record "NPR POS Pmt. Bin Checkp. Denom";
+    begin
+        if IsTemporary() then
+            exit;
+        POSPmtBinCheckpDenom.SetRange("POS Pmt. Bin Checkp. Entry No.", "Entry No.");
+        if not POSPmtBinCheckpDenom.IsEmpty() then
+            POSPmtBinCheckpDenom.DeleteAll();
+    end;
 }
-

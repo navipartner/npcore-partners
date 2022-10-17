@@ -203,12 +203,14 @@
                     CountingType.Add('disableDifferenceField', EndOfDayProfile.DisableDifferenceField);
 
                     PaymentMethodDenom.SetFilter("POS Payment Method Code", '=%1', POSPaymentBinCheckPoint."Payment Method No.");
+                    PaymentMethodDenom.SetRange(Blocked, false);
                     if (PaymentMethodDenom.FindSet()) then begin
                         repeat
                             CoinType.ReadFrom('{}');
                             CoinType.Add('id', POSPaymentBinCheckPoint."Entry No.");
-                            CoinType.Add('type', PaymentMethodDenom."Denomination Type");
+                            CoinType.Add('type', PaymentMethodDenom."Denomination Type".AsInteger());
                             CoinType.Add('description', StrSubstNo(CoinTypeDescLbl, PaymentMethodDenom.Denomination, PaymentMethodDenom."Denomination Type"));
+                            CoinType.Add('variation', PaymentMethodDenom."Denomination Variant ID");
                             CoinType.Add('value', PaymentMethodDenom.Denomination);
                             CoinTypes.Add(CoinType);
                         until (PaymentMethodDenom.Next() = 0);
@@ -377,13 +379,14 @@
         end;
     end;
 
-    local procedure TransferCountingToBinCheckpointRec(Counting: JsonArray; var TempBinCheckpoint: Record "NPR POS Payment Bin Checkp." temporary; POSUnitNo: Code[10])
+    local procedure TransferCountingToBinCheckpointRec(Counting: JsonArray; var TempBinCheckpoint: Record "NPR POS Payment Bin Checkp." temporary)
     var
+        POSPmtBinCheckpDenom: Record "NPR POS Pmt. Bin Checkp. Denom";
         CountedPayment: JsonToken;
         ManualCountComment: Label 'Counted by %1', MaxLength = 25;
         Denominations: JsonArray;
         CoinTypesToken, Denomination : JsonToken;
-        EODDenomination: Record "NPR EOD Denomination";
+        Qty: Decimal;
     begin
         foreach CountedPayment in Counting do begin
             TempBinCheckpoint.Get(GetValueAsInteger(CountedPayment.AsObject(), 'id'));
@@ -396,15 +399,19 @@
                 if (CoinTypesToken.IsArray) then begin
                     Denominations := CoinTypesToken.AsArray();
                     foreach Denomination in Denominations do begin
-                        EODDenomination."POS Payment Method Code" := TempBinCheckpoint."Payment Method No.";
-                        EODDenomination."POS Unit No." := POSUnitNo;
-                        EODDenomination."Denomination Type" := GetValueAsInteger(Denomination.AsObject(), 'type');
-                        EODDenomination.Denomination := GetValueAsDecimal(Denomination.AsObject(), 'value');
-                        EODDenomination.Quantity := GetValueAsInteger(Denomination.AsObject(), 'quantity');
-                        EODDenomination.Amount := EODDenomination.Denomination * EODDenomination.Quantity;
-                        if (EODDenomination.Quantity <> 0) then
-                            if (not EODDenomination.Insert()) then
-                                ;
+                        Qty := GetValueAsInteger(Denomination.AsObject(), 'quantity');
+                        if Qty <> 0 then begin
+                            POSPmtBinCheckpDenom."POS Pmt. Bin Checkp. Entry No." := TempBinCheckpoint."Entry No.";
+                            POSPmtBinCheckpDenom."Attached-to ID" := Enum::"NPR Denomination Target"::Counted;
+                            POSPmtBinCheckpDenom."Denomination Type" := Enum::"NPR Denomination Type".FromInteger(GetValueAsInteger(Denomination.AsObject(), 'type'));
+                            POSPmtBinCheckpDenom.Denomination := GetValueAsDecimal(Denomination.AsObject(), 'value');
+                            POSPmtBinCheckpDenom."Denomination Variant ID" := GetValueAsText(Denomination.AsObject(), 'variantId');
+                            if not POSPmtBinCheckpDenom.Find() then
+                                POSPmtBinCheckpDenom.Insert();
+                            POSPmtBinCheckpDenom."Currency Code" := TempBinCheckpoint."Currency Code";
+                            POSPmtBinCheckpDenom.Quantity := Qty;
+                            POSPmtBinCheckpDenom.Modify();
+                        end;
                     end;
                 end;
         end;
@@ -521,7 +528,7 @@
         if (not Context.SelectToken(JPath, JToken)) then
             Error(UnexpectedJsonError, JPath);
         CountingArray := JToken.AsArray();
-        TransferCountingToBinCheckpointRec(CountingArray, TempBinCheckpoint, _POSWorkShiftCheckpoint."POS Unit No.");
+        TransferCountingToBinCheckpointRec(CountingArray, TempBinCheckpoint);
         HandleVirtualCounting(TempBinCheckpoint);
 
         TempBinCheckpoint.Reset();
