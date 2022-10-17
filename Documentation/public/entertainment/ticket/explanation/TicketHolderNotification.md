@@ -1,6 +1,6 @@
-# Ticket-holder notification
+# Ticketholder notification
 
-Notifications can be sent to the ticket-holder prior to the visit and for follow-up purposes, for example, after the visit or if the ticket is revoked. 
+Notifications can be [sent](../howto/ticketholder_notification.md) to the ticket-holder prior to the visit and for follow-up purposes, for example, after the visit or if the ticket is revoked. Notifications are generated from the admission schedule entries that have reservations.
 
 Each line in the **Ticket BOM** table can share a common notification profile, or have individual notification profiles for different admissions or ticket items. It is only when the **Ticket BOM** line has a **Notification Profile Code** assigned, that notifications will be considered for that ticket.
 
@@ -10,7 +10,7 @@ There are different types of reminders to target the three use-cases:
 
 - **Reservation Reminder** is a reminder for an upcoming event. It requires a ticket reservation. The date and time calculations are based on the admission start and the notification is scheduled to be sent before the _admission start_;
 - **First Admission** is meant to send a notification including a follow-up evaluation of the visit experience. Date and time calculations are based on _admission end_ and the notification is scheduled to be sent after the admission ends;
-- **Revoke** – is meant to send a follow-up evaluation of the ticket-holder's reason for revoking the ticket. The date and time values are based on when the revocation occurred (now) and notification is scheduled to be sent with some delay after that;
+- **Revoke** – is meant to send a follow-up evaluation of the ticket-holder's reason for revoking the ticket. The date and time values are based on when the revocation occurred (now) and notification is scheduled to be sent with some delay after that.
 
 > [!Note]
 > The actual send time of the notification can be offset by a duration expressed in hours or days.

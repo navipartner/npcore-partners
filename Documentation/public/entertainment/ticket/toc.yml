@@ -28,6 +28,10 @@
     href: howto/create_prepaid_ticket.md
   - name: Create postpaid tickets
     href: howto/create_postpaid_ticket.md
+  - name: Admit an issued ticket
+    href: howto/admit_issued_ticket.md
+  - name: Generate a ticketholder notification
+    href: howto/ticketholder_notification.md
 
 
 - name: Explanation
@@ -46,15 +50,17 @@
     href: explanation/AuthorizationCode.md
   - name: Ticket statistics and forecast
     href: explanation/TicketStatandForecast.md
+  - name: Admission schedule lines
+    href: explanation/admission_schedule_lines.md
   
 - name: Reference
   items:
   - name: Ticket types (reference guide)
     href: reference/ticket_types.md
-  - name: Ticket Schedules
-    href: reference/ticket_schedules.md
   - name: Ticket BOM (reference guide)
     href: reference/ticket_bom.md
   - name: Ticket booking proces - API
     href: files/aquire_ticket_workflow.pdf
+  - name: Admission schedule
+    href: reference/admission_schedule.md
 
