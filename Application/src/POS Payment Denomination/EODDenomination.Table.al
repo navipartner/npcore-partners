@@ -3,6 +3,8 @@
     Access = Internal;
     Caption = 'NPR EOD Denomination';
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Replaced by table "NPR POS Pmt. Bin Checkp. Denom"';
 
     fields
     {
@@ -25,7 +27,6 @@
             OptionMembers = COIN,BILL;
             OptionCaption = 'Coin,Bill';
             InitValue = COIN;
-
         }
         field(10; Denomination; Decimal)
         {
@@ -61,10 +62,4 @@
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-
-

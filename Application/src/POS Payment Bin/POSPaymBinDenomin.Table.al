@@ -18,17 +18,19 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Unit";
         }
-        field(5; "Denomination Type"; Option)
+        field(5; "Denomination Type"; Enum "NPR Denomination Type")
         {
             Caption = 'Denomination Type';
             DataClassification = CustomerContent;
-            OptionMembers = COIN,BILL;
-            OptionCaption = 'Coin,Bill';
-            InitValue = COIN;
         }
         field(10; Denomination; Decimal)
         {
             Caption = 'Denomination';
+            DataClassification = CustomerContent;
+        }
+        field(15; "Denomination Variant ID"; Code[20])
+        {
+            Caption = 'Denomination Variant ID';
             DataClassification = CustomerContent;
         }
         field(20; Amount; Decimal)
@@ -64,6 +66,11 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Workshift Checkpoint";
         }
+        field(260; "Attached-to ID"; Enum "NPR Denomination Target")
+        {
+            Caption = 'Attached-to ID';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -78,9 +85,4 @@
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-
