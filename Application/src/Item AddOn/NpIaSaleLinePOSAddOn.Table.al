@@ -85,5 +85,8 @@
         key(Key1; "Register No.", "Sales Ticket No.", "Sale Type", "Sale Date", "Sale Line No.", "Line No.")
         {
         }
+        key(Key2; "Applies-to Line No.")
+        {
+        }
     }
 }

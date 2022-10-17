@@ -56,7 +56,8 @@
 
         SaleLinePOSAddOn.SetRange("Sale Line No.");
         SaleLinePOSAddOn.SetRange("Applies-to Line No.", Rec."Line No.");
-        if SaleLinePOSAddOn.FindSet() then
+        SaleLinePOSAddon.SetLoadFields("Register No.", "Sales Ticket No.", "Sale Date", "Sale Type", "Sale Line No.");
+        if SaleLinePOSAddOn.FindSet() then begin
             repeat
                 if SaleLinePOS.Get(
                     SaleLinePOSAddOn."Register No.",
@@ -68,7 +69,9 @@
                     SaleLinePOS.Delete(true);
             until SaleLinePOSAddOn.Next() = 0;
 
-        SaleLinePOSAddOn.DeleteAll();
+            SaleLinePOSAddOn.DeleteAll();
+        end;
+
         if Rec.Find() then;
     end;
 
