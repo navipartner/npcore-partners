@@ -14,7 +14,7 @@ query 6014415 "NPR POS Salesperson Stats"
             {
             }
 
-            dataitem(NPR_Aux__Value_Entry; "NPR Aux. Value Entry")
+            dataitem(NPR_Aux__Value_Entry; "Value Entry")
             {
                 DataItemLink = "Salespers./Purch. Code" = Salesperson_Purchaser.Code;
                 SqlJoinType = InnerJoin;

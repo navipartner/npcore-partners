@@ -110,18 +110,19 @@ report 6014449 "NPR Vendor Trn. by Item Cat."
                     if "NPR Sales (LCY)" <> 0 then
                         dg := (("NPR Sales (LCY)" - "NPR COGS (LCY)") / "NPR Sales (LCY)") * 100;
 
-                    AuxItemLedgerEntry.SetRange("Vendor No.", "No.");
-                    AuxItemLedgerEntry.CalcSums(Quantity);
+                    ItemLedgerEntry.SetRange("Source Type", ItemLedgerEntry."Source Type"::Vendor);
+                    ItemLedgerEntry.SetRange("Source No.", "No.");
+                    ItemLedgerEntry.CalcSums(Quantity);
                     vgvendor.SetFilter("NPR Vendor Filter", "No.");
                     vgvendor.CalcFields("NPR Purchases (LCY)", "NPR Purchases (Qty.)", "NPR Sales (LCY)", "NPR Sales (Qty.)");
                 end;
 
                 trigger OnPreDataItem()
                 begin
-                    AuxItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Item Category Code", "Vendor No.");
-                    AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
-                    AuxItemLedgerEntry.SetRange("Item Category Code", ItemCategory."Code");
-                    ItemCategory.CopyFilter("NPR Date Filter", AuxItemLedgerEntry."Posting Date");
+                    ItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Item Category Code", "Source No.");
+                    ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
+                    ItemLedgerEntry.SetRange("Item Category Code", ItemCategory."Code");
+                    ItemCategory.CopyFilter("NPR Date Filter", ItemLedgerEntry."Posting Date");
 
                     vgvendor.CopyFilters(ItemCategory);
                     vgvendor.SetRange("Code", ItemCategory."Code");
@@ -171,14 +172,15 @@ report 6014449 "NPR Vendor Trn. by Item Cat."
             trigger OnPreDataItem()
             begin
                 //Totalsalg
-                CopyFilter("NPR Date Filter", AuxValueEntry."Posting Date");
+                CopyFilter("NPR Date Filter", ValueEntry."Posting Date");
 
-                CopyFilter("NPR Vendor Filter", AuxValueEntry."Vendor No.");
-                AuxValueEntry.SetCurrentKey("Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code");
-                CopyFilter("NPR Date Filter", AuxValueEntry."Posting Date");
-                AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
-                AuxValueEntry.CalcSums("Sales Amount (Actual)");
-                totalsalg := AuxValueEntry."Sales Amount (Actual)";
+                //TODO:Temporary Aux Value Entry Reimplementation
+                // CopyFilter("NPR Vendor Filter", ValueEntry."NPR Vendor No.");
+                ValueEntry.SetCurrentKey("Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code");
+                CopyFilter("NPR Date Filter", ValueEntry."Posting Date");
+                ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+                ValueEntry.CalcSums("Sales Amount (Actual)");
+                totalsalg := ValueEntry."Sales Amount (Actual)";
 
                 //Salg sidste år - filtre
                 if ItemCategory.GetFilter("NPR Date Filter") <> '' then begin
@@ -271,10 +273,10 @@ report 6014449 "NPR Vendor Trn. by Item Cat."
 
     var
         firmaoplysninger: Record "Company Information";
-        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
+        ItemLedgerEntry: Record "Item Ledger Entry";
         varegruppefjor: Record "Item Category";
         vgvendor: Record "Item Category";
-        AuxValueEntry: Record "NPR Aux. Value Entry";
+        ValueEntry: Record "Value Entry";
         visudensalg: Boolean;
         slutdato: Date;
         startdato: Date;

@@ -292,11 +292,11 @@
         Customer: Record Customer;
         DateRecord: Record Date;
         Item: Record Item;
-        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         TempBuffer: Record "NPR Advanced Sales Statistics" temporary;
         ItemCategory: Record "Item Category";
         "Salesperson/Purchaser": Record "Salesperson/Purchaser";
-        AuxValueEntry: Record "NPR Aux. Value Entry";
+        ValueEntry: Record "Value Entry";
         Vendor: Record Vendor;
         "Record": RecordRef;
         Caption: FieldRef;
@@ -417,8 +417,8 @@
                     Title := TitleVendor;
                 end;
             else begin
-                    Error(NoTypeErr);
-                end;
+                Error(NoTypeErr);
+            end;
         end;
 
         d.Open(DialogText);
@@ -443,11 +443,11 @@
                 end;
 
                 // F¢rst beregner vi dette år
-                SetValueEntryFilter(AuxValueEntry, false, Format(Field.Value));
-                AuxValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
+                SetValueEntryFilter(ValueEntry, false, Format(Field.Value));
+                ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
 
-                SetItemLedgerEntryFilter(AuxItemLedgerEntry, false, Format(Field.Value));
-                AuxItemLedgerEntry.CalcSums(Quantity);
+                SetItemLedgerEntryFilter(POSEntrySalesLine, false, Format(Field.Value));
+                POSEntrySalesLine.CalcSums(Quantity);
 
                 TempBuffer.Init();
                 if Type = Type::Period then begin
@@ -459,24 +459,24 @@
                     TempBuffer.Description := Format(Caption.Value)
                 else
                     TempBuffer.Description := StrSubstNo(Pct2Lbl, ProjektKodeStart, ProjektKodeSlut);
-                TempBuffer."Sales qty." := AuxItemLedgerEntry.Quantity;
-                TempBuffer."Sales LCY" := AuxValueEntry."Sales Amount (Actual)";
-                TempBuffer."Profit LCY" := AuxValueEntry."Sales Amount (Actual)" + AuxValueEntry."Cost Amount (Actual)";
+                TempBuffer."Sales qty." := POSEntrySalesLine.Quantity;
+                TempBuffer."Sales LCY" := ValueEntry."Sales Amount (Actual)";
+                TempBuffer."Profit LCY" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
                 if TempBuffer."Sales LCY" <> 0 then
                     TempBuffer."Profit %" := TempBuffer."Profit LCY" / TempBuffer."Sales LCY" * 100
                 else
                     TempBuffer."Profit %" := 0;
 
                 // Dernæst sidste år
-                SetValueEntryFilter(AuxValueEntry, true, Format(Field.Value));
-                AuxValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
+                SetValueEntryFilter(ValueEntry, true, Format(Field.Value));
+                ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
 
-                SetItemLedgerEntryFilter(AuxItemLedgerEntry, true, Format(Field.Value));
-                AuxItemLedgerEntry.CalcSums(Quantity);
+                SetItemLedgerEntryFilter(POSEntrySalesLine, true, Format(Field.Value));
+                POSEntrySalesLine.CalcSums(Quantity);
 
-                TempBuffer."Sales qty. last year" := AuxItemLedgerEntry.Quantity;
-                TempBuffer."Sales LCY last year" := AuxValueEntry."Sales Amount (Actual)";
-                TempBuffer."Profit LCY last year" := AuxValueEntry."Sales Amount (Actual)" + AuxValueEntry."Cost Amount (Actual)";
+                TempBuffer."Sales qty. last year" := POSEntrySalesLine.Quantity;
+                TempBuffer."Sales LCY last year" := ValueEntry."Sales Amount (Actual)";
+                TempBuffer."Profit LCY last year" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
                 if TempBuffer."Sales LCY last year" <> 0 then
                     TempBuffer."Profit % last year" := TempBuffer."Profit LCY last year" / TempBuffer."Sales LCY last year" * 100
                 else
@@ -489,98 +489,102 @@
 
     end;
 
-    internal procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry"; LastYear: Boolean; "Code": Code[20])
+    internal procedure SetItemLedgerEntryFilter(var POSEntrySalesLine: Record "NPR POS Entry Sales Line"; LastYear: Boolean; "Code": Code[20])
     begin
-        AuxItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
-        AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
 
         case Type of
             Type::Item:
-                AuxItemLedgerEntry.SetRange("Item No.", Code);
+                begin
+                    POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+                    POSEntrySalesLine.SetRange("No.", Code);
+                end;
             Type::ItemCategory:
-                AuxItemLedgerEntry.SetRange("Item Category Code", Code);
+                POSEntrySalesLine.SetRange("Item Category Code", Code);
             Type::Salesperson:
-                AuxItemLedgerEntry.SetRange("Salespers./Purch. Code", Code);
+                POSEntrySalesLine.SetRange("Salesperson Code", Code);
             Type::Customer:
-                AuxItemLedgerEntry.SetRange("Source No.", Code);
+                POSEntrySalesLine.SetRange("Document No.", Code);
             Type::Vendor:
-                AuxItemLedgerEntry.SetRange("Vendor No.", Code);
+                POSEntrySalesLine.SetRange("Vendor No.", Code);
             Type::Projectcode:
                 begin
                     if (ProjektKodeStart <> '') and (ProjektKodeStart <> '') then
-                        AuxItemLedgerEntry.SetFilter("Global Dimension 2 Code", '%1..%2', ProjektKodeStart, ProjektKodeSlut);
+                        POSEntrySalesLine.SetFilter("Shortcut Dimension 2 Code", '%1..%2', ProjektKodeStart, ProjektKodeSlut);
                 end;
         end;
 
         if not LastYear then
-            AuxItemLedgerEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
+            POSEntrySalesLine.SetFilter("Entry Date", '%1..%2', Periodestart, Periodeslut)
         else
-            AuxItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate('<- 1Y>', Periodestart), CalcDate('<- 1Y>', Periodeslut));
+            POSEntrySalesLine.SetFilter("Entry Date", '%1..%2', CalcDate('<- 1Y>', Periodestart), CalcDate('<- 1Y>', Periodeslut));
 
         if Type <> Type::ItemCategory then begin
             if ItemCategoryFilter <> '' then
-                AuxItemLedgerEntry.SetRange("Item Category Code", ItemCategoryFilter)
+                POSEntrySalesLine.SetRange("Item Category Code", ItemCategoryFilter)
             else
-                AuxItemLedgerEntry.SetRange("Item Category Code");
+                POSEntrySalesLine.SetRange("Item Category Code");
         end;
 
         if Dim1Filter <> '' then
-            AuxItemLedgerEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
+            POSEntrySalesLine.SetRange("Shortcut Dimension 1 Code", Dim1Filter)
         else
-            AuxItemLedgerEntry.SetRange("Global Dimension 1 Code");
+            POSEntrySalesLine.SetRange("Shortcut Dimension 1 Code");
 
         if not (Type = Type::Projectcode) then begin
             if Dim2Filter <> '' then
-                AuxItemLedgerEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
+                POSEntrySalesLine.SetRange("Shortcut Dimension 2 Code", Dim2Filter)
             else
-                AuxItemLedgerEntry.SetRange("Global Dimension 2 Code");
+                POSEntrySalesLine.SetRange("Shortcut Dimension 2 Code");
         end;
     end;
 
-    internal procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry"; LastYear: Boolean; "Code": Code[20])
+    internal procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry"; LastYear: Boolean; "Code": Code[20])
     begin
-        AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
+        ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
 
         case Type of
             Type::Item:
-                AuxValueEntry.SetRange("Item No.", Code);
-            Type::ItemCategory:
-                AuxValueEntry.SetRange("Item Category Code", Code);
+                ValueEntry.SetRange("Item No.", Code);
+            //TODO:Temporary Aux Value Entry Reimplementation
+            // Type::ItemCategory:
+            //     ValueEntry.SetRange("NPR Item Category Code", Code);
             Type::Salesperson:
-                AuxValueEntry.SetRange("Salespers./Purch. Code", Code);
+                ValueEntry.SetRange("Salespers./Purch. Code", Code);
             Type::Customer:
-                AuxValueEntry.SetRange("Source No.", Code);
-            Type::Vendor:
-                AuxValueEntry.SetRange("Vendor No.", Code);
+                ValueEntry.SetRange("Source No.", Code);
+            //TODO:Temporary Aux Value Entry Reimplementation
+            // Type::Vendor:
+            //     ValueEntry.SetRange("NPR Vendor No.", Code);
             Type::Projectcode:
                 begin
                     if (ProjektKodeStart <> '') and (ProjektKodeStart <> '') then
-                        AuxValueEntry.SetFilter("Global Dimension 2 Code", '%1..%2', ProjektKodeStart, ProjektKodeSlut);
+                        ValueEntry.SetFilter("Global Dimension 2 Code", '%1..%2', ProjektKodeStart, ProjektKodeSlut);
                 end;
         end;
 
         if not LastYear then
-            AuxValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
+            ValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
-            AuxValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate('<- 1Y>', Periodestart), CalcDate('<- 1Y>', Periodeslut));
+            ValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate('<- 1Y>', Periodestart), CalcDate('<- 1Y>', Periodeslut));
 
-        if Type <> Type::ItemCategory then begin
-            if ItemCategoryFilter <> '' then
-                AuxValueEntry.SetRange("Item Category Code", ItemCategoryFilter)
-            else
-                AuxValueEntry.SetRange("Item Category Code");
-        end;
+        //TODO:Temporary Aux Value Entry Reimplementation
+        // if Type <> Type::ItemCategory then begin
+        //     if ItemCategoryFilter <> '' then
+        //         ValueEntry.SetRange("NPR Item Category Code", ItemCategoryFilter)
+        //     else
+        //         ValueEntry.SetRange("NPR Item Category Code");
+        // end;
 
         if Dim1Filter <> '' then
-            AuxValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
+            ValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
         else
-            AuxValueEntry.SetRange("Global Dimension 1 Code");
+            ValueEntry.SetRange("Global Dimension 1 Code");
 
         if not (Type = Type::Projectcode) then begin
             if Dim2Filter <> '' then
-                AuxValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
+                ValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
             else
-                AuxValueEntry.SetRange("Global Dimension 2 Code");
+                ValueEntry.SetRange("Global Dimension 2 Code");
         end;
     end;
 
@@ -609,11 +613,11 @@
             SortBy::"Profit % last year":
                 TempBuffer.SetCurrentKey("Profit % last year");
             else begin
-                    if Type = Type::Period then
-                        TempBuffer.SetCurrentKey("Date 1")
-                    else
-                        TempBuffer.SetCurrentKey("No.");
-                end;
+                if Type = Type::Period then
+                    TempBuffer.SetCurrentKey("Date 1")
+                else
+                    TempBuffer.SetCurrentKey("No.");
+            end;
         end;
     end;
 }

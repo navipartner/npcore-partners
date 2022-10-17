@@ -17,9 +17,11 @@
                 filter(Line_No; "Line No.")
                 {
                 }
-                dataitem(Value_Entry; "NPR Aux. Value Entry")
+                dataitem(Value_Entry; "Value Entry")
                 {
-                    DataItemLink = "Discount Type" = Retail_Campaign_Line.Type, "Discount Code" = Retail_Campaign_Line.Code;
+                    //TODO:Temporary Aux Value Entry Reimplementation
+                    DataItemLink = "Item No." = Retail_Campaign_Line.Code;
+                    // DataItemLink = "NPR Discount Type" = Retail_Campaign_Line.Type, "NPR Discount Code" = Retail_Campaign_Line.Code;
                     SqlJoinType = InnerJoin;
                     column(Sum_Sales_Amount_Actual; "Sales Amount (Actual)")
                     {

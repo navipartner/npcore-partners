@@ -151,7 +151,7 @@ pageextension 6014446 "NPR Item Categories" extends "Item Categories"
                 {
                     Caption = '&Item Ledger Entries';
                     Image = Form;
-                    RunObject = Page "NPR Aux. Item Ledger Entries";
+                    RunObject = Page "Item Ledger Entries";
                     RunPageLink = "Item Category Code" = FIELD(Code);
                     ShortCutKey = 'Shift+Ctrl+N';
 

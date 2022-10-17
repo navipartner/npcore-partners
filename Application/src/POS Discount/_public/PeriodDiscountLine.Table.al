@@ -268,15 +268,15 @@
         }
         field(200; "Quantity Sold"; Decimal)
         {
-            CalcFormula = - Sum("NPR Aux. Item Ledger Entry".Quantity
+            CalcFormula = - Sum("NPR POS Entry Sales Line".Quantity
                                 WHERE(
-                                    "Item No." = FIELD("Item No."),
-                                    "Discount Type" = CONST(Period),
+                                    Type = Const(Item),
+                                    "No." = FIELD("Item No."),
+                                    "Discount Type" = CONST(Campaign),
                                     "Discount Code" = FIELD(Code),
-                                    "Entry Type" = CONST(Sale),
-                                    "Posting Date" = FIELD("Date Filter"),
-                                    "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                    "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                    "Entry Date" = FIELD("Date Filter"),
+                                    "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
+                                    "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
                                     "Location Code" = FIELD("Location Filter")));
             Caption = 'Sold Quantity';
             Editable = false;

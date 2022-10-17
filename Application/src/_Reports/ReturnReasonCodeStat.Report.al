@@ -63,11 +63,11 @@
             column(ExistItemLedgEntry; ExistItemLedgEntry)
             {
             }
-            dataitem(AuxItemLedgerEntry; "NPR Aux. Item Ledger Entry")
+            dataitem(ItemLedgerEntry; "Item Ledger Entry")
             {
                 DataItemLink = "Return Reason Code" = FIELD(Code);
                 DataItemTableView = SORTING("Entry No.");
-                RequestFilterFields = "Posting Date", "POS Unit No.";
+                RequestFilterFields = "Posting Date";
 
                 column(EntryNo_ItemLedgerEntry; "Entry No.")
                 {
@@ -98,13 +98,6 @@
                 column(DocumentNo_ItemLedgerEntry; GlobItemLedgerentry."Document No.")
                 {
                 }
-                column(RegisterNumber_ItemLedgerEntry; "POS Unit No.")
-                {
-                    IncludeCaption = true;
-                }
-                column(SalespersonCode_ItemLedgerEntry; "Salespers./Purch. Code")
-                {
-                }
                 column(UnitofMeasureCode_ItemLedgerEntry; GlobItemLedgerentry."Unit of Measure Code")
                 {
                 }
@@ -117,6 +110,18 @@
                 }
                 column(SalesAmountActual_ItemLedgerEntry; GlobItemLedgerentry."Sales Amount (Actual)")
                 {
+                }
+                dataitem(POSEntrySalesLine; "NPR POS Entry Sales Line")
+                {
+                    DataItemLink = "Item Entry No." = field("Entry No.");
+                    RequestFilterFields = "POS Unit No.";
+                    column(RegisterNumber_ItemLedgerEntry; "POS Unit No.")
+                    {
+                        IncludeCaption = true;
+                    }
+                    column(SalespersonCode_ItemLedgerEntry; "Salesperson Code")
+                    {
+                    }
                 }
 
                 trigger OnAfterGetRecord()
@@ -171,8 +176,8 @@
         if "Return Reason".GetFilters <> '' then
             ReturnReasonFilters := "Return Reason".TableCaption + ' ' + "Return Reason".GetFilters;
 
-        if AuxItemLedgerEntry.GetFilters <> '' then
-            ItemLedgerEntryFilters := AuxItemLedgerEntry.TableCaption + ' ' + AuxItemLedgerEntry.GetFilters;
+        if ItemLedgerEntry.GetFilters <> '' then
+            ItemLedgerEntryFilters := ItemLedgerEntry.TableCaption + ' ' + ItemLedgerEntry.GetFilters;
     end;
 
     var

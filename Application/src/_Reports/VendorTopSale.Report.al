@@ -1,8 +1,8 @@
 ﻿report 6014426 "NPR Vendor Top/Sale"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Vendor TopSale.rdlc';
     Caption = 'Vendor Top/Sale';
@@ -303,28 +303,29 @@
                 IndexDb[1] := "Pct."(Vendor."NPR Sales (LCY)" - Vendor."NPR COGS (LCY)", Vendor2."NPR Sales (LCY)" - Vendor2."NPR COGS (LCY)");
                 IndexDb[2] := "Pct."(VendorProfit, DbLastYear);
                 Clear(StockQty);
-                AuxValueEntry2.SetFilter("Posting Date", '..%1', Vendor.GetRangeMax("Date Filter"));
-                Vendor.CopyFilter("Global Dimension 1 Filter", AuxValueEntry2."Global Dimension 1 Code");
-                Vendor.CopyFilter("NPR Item Category Filter", AuxValueEntry2."Item Category Code");
-                Vendor.CopyFilter("NPR Salesperson Filter", AuxValueEntry2."Salespers./Purch. Code");
-                AuxValueEntry2.SetFilter("Vendor No.", Vendor."No.");
+                ValueEntry2.SetFilter("Posting Date", '..%1', Vendor.GetRangeMax("Date Filter"));
+                Vendor.CopyFilter("Global Dimension 1 Filter", ValueEntry2."Global Dimension 1 Code");
+                //TODO:Temporary Aux Value Entry Reimplementation
+                // Vendor.CopyFilter("NPR Item Category Filter", ValueEntry2."NPR Item Category Code");
+                // ValueEntry2.SetFilter("NPR Vendor No.", Vendor."No.");
+                Vendor.CopyFilter("NPR Salesperson Filter", ValueEntry2."Salespers./Purch. Code");
 
-                AuxValueEntry2.CalcSums("Cost per Unit");
-                if AuxValueEntry2."Cost per Unit" <> 0 then
-                    StockQty := AuxValueEntry2."Cost Amount (Actual)" / AuxValueEntry2."Cost per Unit";
+                ValueEntry2.CalcSums("Cost per Unit");
+                if ValueEntry2."Cost per Unit" <> 0 then
+                    StockQty := ValueEntry2."Cost Amount (Actual)" / ValueEntry2."Cost per Unit";
             end;
 
             trigger OnPreDataItem()
             begin
                 // Calculates sales and consumption in total
-                AuxValueEntry.SetCurrentKey("Item Ledger Entry Type", "Posting Date");
-                AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
-                Vendor.CopyFilter("Date Filter", AuxValueEntry."Posting Date");
-                AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
-                VendorSales := AuxValueEntry."Sales Amount (Actual)";
-                CostAmtFooter := AuxValueEntry."Cost Amount (Actual)";
+                ValueEntry.SetCurrentKey("Item Ledger Entry Type", "Posting Date");
+                ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+                Vendor.CopyFilter("Date Filter", ValueEntry."Posting Date");
+                ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
+                VendorSales := ValueEntry."Sales Amount (Actual)";
+                CostAmtFooter := ValueEntry."Cost Amount (Actual)";
 
-                VendorProfit := VendorSales - Abs(AuxValueEntry."Cost Amount (Actual)");
+                VendorProfit := VendorSales - Abs(ValueEntry."Cost Amount (Actual)");
 
                 // Calculates the inventory total for the period '..GETRANGEMAX'
                 Vendor3.SetFilter("Global Dimension 1 Filter", Vendor."Global Dimension 1 Filter");
@@ -442,8 +443,8 @@
 
     var
         CompanyInfo: Record "Company Information";
-        AuxValueEntry: Record "NPR Aux. Value Entry";
-        AuxValueEntry2: Record "NPR Aux. Value Entry";
+        ValueEntry: Record "Value Entry";
+        ValueEntry2: Record "Value Entry";
         Vendor2: Record Vendor;
         Vendor3: Record Vendor;
         TempVendorAmount: Record "Vendor Amount" temporary;

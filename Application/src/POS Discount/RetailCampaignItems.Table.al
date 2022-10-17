@@ -585,25 +585,26 @@
 
     local procedure GetQuantitySold() QuantitySold: Decimal
     var
-        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
     begin
-        AuxItemLedgerEntry.SetRange("Item No.", "Item No.");
-        AuxItemLedgerEntry.SetFilter("Document Date", '%1..%2', "Starting Date", "Ending Date");
-        AuxItemLedgerEntry.SetFilter(Quantity, '<0');
+        POSEntrySalesLine.SetRange("Type", POSEntrySalesLine.Type::Item);
+        POSEntrySalesLine.SetRange("No.", "Item No.");
+        POSEntrySalesLine.SetFilter("Entry Date", '%1..%2', "Starting Date", "Ending Date");
+        POSEntrySalesLine.SetFilter(Quantity, '<0');
         case "Disc. Type" of
             "Disc. Type"::Periodic:
-                AuxItemLedgerEntry.SetRange("Discount Type", AuxItemLedgerEntry."Discount Type"::Period);
+                POSEntrySalesLine.SetRange("Discount Type", POSEntrySalesLine."Discount Type"::Campaign);
             "Disc. Type"::Mix:
-                AuxItemLedgerEntry.SetRange("Discount Type", AuxItemLedgerEntry."Discount Type"::Mixed);
+                POSEntrySalesLine.SetRange("Discount Type", POSEntrySalesLine."Discount Type"::Mix);
             else
                 exit;
         end;
-        AuxItemLedgerEntry.SetRange("Discount Code", "Disc. Code");
-        AuxItemLedgerEntry.SetRange("Variant Code", "Variant Code");
+        POSEntrySalesLine.SetRange("Discount Code", "Disc. Code");
+        POSEntrySalesLine.SetRange("Variant Code", "Variant Code");
 
-        AuxItemLedgerEntry.CalcSums(Quantity);
+        POSEntrySalesLine.CalcSums(Quantity);
 
-        QuantitySold := -AuxItemLedgerEntry.Quantity;
+        QuantitySold := -POSEntrySalesLine.Quantity;
     end;
 
     local procedure FindRequsitionLinePrice(var RequisitionLine: Record "Requisition Line")
