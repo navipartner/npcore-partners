@@ -568,14 +568,23 @@
     var
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
     begin
-        case PageMode of
-            PageMode::TRANSFER:
-                Rec.ModifyAll(Type, POSPaymentBinCheckpoint.Type::TRANSFER);
-            PageMode::FINAL_COUNT:
-                if not AutoCountCompleted then
-                    Rec.ModifyAll(Type, POSPaymentBinCheckpoint.Type::ZREPORT);
-            PageMode::PRELIMINARY_COUNT:
-                Rec.ModifyAll(Type, POSPaymentBinCheckpoint.Type::XREPORT);
+        if (PageMode in [PageMode::PRELIMINARY_COUNT, PageMode::TRANSFER]) or
+           ((PageMode = PageMode::FINAL_COUNT) and not AutoCountCompleted)
+        then begin
+            POSPaymentBinCheckpoint.CopyFilters(Rec);
+            POSPaymentBinCheckpoint.SetLoadFields(Type);
+            if POSPaymentBinCheckpoint.FindSet(true) then
+                repeat
+                    case PageMode of
+                        PageMode::TRANSFER:
+                            POSPaymentBinCheckpoint.Type := POSPaymentBinCheckpoint.Type::TRANSFER;
+                        PageMode::FINAL_COUNT:
+                            POSPaymentBinCheckpoint.Type := POSPaymentBinCheckpoint.Type::ZREPORT;
+                        PageMode::PRELIMINARY_COUNT:
+                            POSPaymentBinCheckpoint.Type := POSPaymentBinCheckpoint.Type::XREPORT;
+                    end;
+                    POSPaymentBinCheckpoint.Modify();
+                until POSPaymentBinCheckpoint.Next() = 0;
         end;
 
         if (PageMode = PageMode::FINAL_COUNT) and not AutoCountCompleted then
@@ -585,7 +594,8 @@
             POSPaymentBinCheckpoint.Reset();
             POSPaymentBinCheckpoint.CopyFilters(Rec);
             POSPaymentBinCheckpoint.SetFilter("Include In Counting", '=%1', POSPaymentBinCheckpoint."Include In Counting"::YES);
-            if (POSPaymentBinCheckpoint.FindSet()) then
+            POSPaymentBinCheckpoint.SetLoadFields("New Float Amount");
+            if (POSPaymentBinCheckpoint.FindSet(true)) then
                 repeat
                     POSPaymentBinCheckpoint."New Float Amount" := 0;
                     POSPaymentBinCheckpoint.Modify();
@@ -605,13 +615,12 @@
 
         if (PageMode = PageMode::TRANSFER) then begin
             POSPaymentBinCheckpoint.CopyFilters(Rec);
-            if (POSPaymentBinCheckpoint.FindSet()) then begin
+            POSPaymentBinCheckpoint.SetLoadFields("Counted Amount Incl. Float", "Calculated Amount Incl. Float");
+            if (POSPaymentBinCheckpoint.FindSet(true)) then
                 repeat
                     POSPaymentBinCheckpoint.Validate("Counted Amount Incl. Float", POSPaymentBinCheckpoint."Calculated Amount Incl. Float");
                     POSPaymentBinCheckpoint.Modify();
-
                 until (POSPaymentBinCheckpoint.Next() = 0);
-            end;
         end;
     end;
 
