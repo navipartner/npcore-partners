@@ -13,6 +13,8 @@ page 6060006 "NPR APIV1 PBIValueEntryAux"
     SourceTable = "NPR Aux. Value Entry";
     Extensible = false;
     Editable = false;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Aux. Value Entry table has been removed.';
     layout
     {
         area(content)

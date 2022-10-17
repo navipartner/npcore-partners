@@ -9,6 +9,8 @@
     InsertAllowed = false;
     ModifyAllowed = false;
     DeleteAllowed = false;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Aux. Value Entry table has been removed.';
 
     layout
     {

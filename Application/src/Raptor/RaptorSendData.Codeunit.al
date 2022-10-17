@@ -69,7 +69,7 @@
 
     local procedure ItemLedgerIsEligibleForSending(ItemLedger: Record "Item Ledger Entry"): Boolean
     var
-        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         Eligible: Boolean;
         Handled: Boolean;
     begin
@@ -91,8 +91,9 @@
             if TempSalesperson.IsEmpty then
                 CreateTmpSalespersonList(TempSalesperson);
             TempSalesperson.SetFilter(Code, RaptorSetup."Webshop Salesperson Filter");
-            AuxItemLedgerEntry.Get(ItemLedger."Entry No.");
-            TempSalesperson.Code := AuxItemLedgerEntry."Salespers./Purch. Code";
+            POSEntrySalesLine.SetRange("Item Entry No.", ItemLedger."Entry No.");
+            POSEntrySalesLine.FindFirst();
+            TempSalesperson.Code := POSEntrySalesLine."Salesperson Code";
             Eligible := not TempSalesperson.Find();
         end;
 
@@ -124,7 +125,7 @@
     local procedure GenerateParameters(var Parameters: Record "Name/Value Buffer"; ItemLedger: Record "Item Ledger Entry"; SessionGUID: Guid)
     var
         POSUnit: Record "NPR POS Unit";
-        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         Item: Record Item;
     begin
         /*
@@ -151,8 +152,9 @@
         Use parameters with names starting with low line (underscore) character "_" to pass data between NAV modules/subscribers. Those are not sent to Raptor.
         */
 
-        AuxItemLedgerEntry.Get(ItemLedger."Entry No.");
-        if not POSUnit.Get(AuxItemLedgerEntry."POS Unit No.") then
+        POSEntrySalesLine.SetRange("Item Entry No.", ItemLedger."Entry No.");
+        POSEntrySalesLine.FindFirst();
+        if not POSUnit.Get(POSEntrySalesLine."POS Unit No.") then
             POSUnit.Init();
 
         if not Item.Get(ItemLedger."Item No.") then

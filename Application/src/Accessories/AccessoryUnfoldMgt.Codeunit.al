@@ -227,11 +227,14 @@
 
     local procedure Worksheet2ItemJnlLine(var AccessoryUnfoldWorksheet: Record "NPR Accessory Unfold Worksheet"; var LineNo: Integer; var TempItemJnlLine: Record "Item Journal Line" temporary)
     var
-        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        ItemLedgerEntry: Record "Item Ledger Entry";
         ValueEntry: Record "Value Entry";
     begin
-        AuxItemLedgerEntry.Get(AccessoryUnfoldWorksheet."Item Ledger Entry No.");
-        ValueEntry.SetRange("Item Ledger Entry No.", AuxItemLedgerEntry."Entry No.");
+        ItemLedgerEntry.Get(AccessoryUnfoldWorksheet."Item Ledger Entry No.");
+        POSEntrySalesLine.SetRange("Item Entry No.", AccessoryUnfoldWorksheet."Item Ledger Entry No.");
+        POSEntrySalesLine.FindFirst();
+        ValueEntry.SetRange("Item Ledger Entry No.", POSEntrySalesLine."Item Entry No.");
         ValueEntry.FindFirst();
 
         LineNo += 10000;
@@ -242,21 +245,21 @@
             TempItemJnlLine.Validate("Item No.", AccessoryUnfoldWorksheet."Item No.")
         else
             TempItemJnlLine.Validate("Item No.", AccessoryUnfoldWorksheet."Accessory Item No.");
-        TempItemJnlLine.Validate("Posting Date", AuxItemLedgerEntry."Posting Date");
-        TempItemJnlLine."Document No." := AuxItemLedgerEntry."Document No.";
-        TempItemJnlLine."NPR Register Number" := AuxItemLedgerEntry."POS Unit No.";
-        TempItemJnlLine."NPR Document Time" := AuxItemLedgerEntry."Document Time";
-        TempItemJnlLine.Validate("Entry Type", AuxItemLedgerEntry."Entry Type");
-        TempItemJnlLine.Validate("Source Type", AuxItemLedgerEntry."Source Type");
-        TempItemJnlLine.Validate("Source No.", AuxItemLedgerEntry."Source No.");
+        TempItemJnlLine.Validate("Posting Date", POSEntrySalesLine."Entry Date");
+        TempItemJnlLine."Document No." := POSEntrySalesLine."Document No.";
+        TempItemJnlLine."NPR Register Number" := POSEntrySalesLine."POS Unit No.";
+        TempItemJnlLine."NPR Document Time" := POSEntrySalesLine."Ending Time";
+        TempItemJnlLine.Validate("Entry Type", ItemLedgerEntry."Entry Type");
+        TempItemJnlLine.Validate("Source Type", ItemLedgerEntry."Source Type");
+        TempItemJnlLine.Validate("Source No.", ItemLedgerEntry."Source No.");
         TempItemJnlLine.Validate("Source Code", ValueEntry."Source Code");
         TempItemJnlLine.Validate("Gen. Bus. Posting Group", ValueEntry."Gen. Bus. Posting Group");
         TempItemJnlLine.Validate("Gen. Prod. Posting Group", ValueEntry."Gen. Prod. Posting Group");
         TempItemJnlLine.Validate(Quantity, AccessoryUnfoldWorksheet.Quantity);
-        TempItemJnlLine.Validate("Location Code", AuxItemLedgerEntry."Location Code");
-        TempItemJnlLine.Validate("Shortcut Dimension 1 Code", AuxItemLedgerEntry."Global Dimension 1 Code");
-        TempItemJnlLine.Validate("Shortcut Dimension 2 Code", AuxItemLedgerEntry."Global Dimension 2 Code");
-        TempItemJnlLine.Validate("Salespers./Purch. Code", AuxItemLedgerEntry."Salespers./Purch. Code");
+        TempItemJnlLine.Validate("Location Code", POSEntrySalesLine."Location Code");
+        TempItemJnlLine.Validate("Shortcut Dimension 1 Code", POSEntrySalesLine."Shortcut Dimension 1 Code");
+        TempItemJnlLine.Validate("Shortcut Dimension 2 Code", POSEntrySalesLine."Shortcut Dimension 2 Code");
+        TempItemJnlLine.Validate("Salespers./Purch. Code", POSEntrySalesLine."Salesperson Code");
         TempItemJnlLine.Validate("Unit Amount", AccessoryUnfoldWorksheet."Unit Price");
         TempItemJnlLine.Insert();
     end;

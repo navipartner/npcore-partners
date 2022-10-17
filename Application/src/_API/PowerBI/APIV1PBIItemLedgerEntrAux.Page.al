@@ -13,6 +13,8 @@ page 6059931 "NPR APIV1 PBIItemLedgerEntrAux"
     SourceTable = "NPR Aux. Item Ledger Entry";
     Extensible = false;
     Editable = false;
+    ObsoleteReason = 'Aux Item Ledger Entry has been removed.';
+    ObsoleteState = Pending;
 
     layout
     {

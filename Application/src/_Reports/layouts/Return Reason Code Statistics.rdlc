@@ -3108,15 +3108,6 @@
       </DefaultValue>
       <Prompt>LocationCode_ItemLedgerEntryCaption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="RegisterNumber_ItemLedgerEntryCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>RegisterNumber_ItemLedgerEntryCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>RegisterNumber_ItemLedgerEntryCaption</Prompt>
-    </ReportParameter>
     <ReportParameter Name="Quantity_ItemLedgerEntryCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -3125,6 +3116,15 @@
         </Values>
       </DefaultValue>
       <Prompt>Quantity_ItemLedgerEntryCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="RegisterNumber_ItemLedgerEntryCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>RegisterNumber_ItemLedgerEntryCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>RegisterNumber_ItemLedgerEntryCaption</Prompt>
     </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
@@ -3165,12 +3165,12 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>6</RowIndex>
-          <ParameterName>RegisterNumber_ItemLedgerEntryCaption</ParameterName>
+          <ParameterName>Quantity_ItemLedgerEntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>7</RowIndex>
-          <ParameterName>Quantity_ItemLedgerEntryCaption</ParameterName>
+          <ParameterName>RegisterNumber_ItemLedgerEntryCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -3289,12 +3289,6 @@ End Function
         <Field Name="DocumentNo_ItemLedgerEntry">
           <DataField>DocumentNo_ItemLedgerEntry</DataField>
         </Field>
-        <Field Name="RegisterNumber_ItemLedgerEntry">
-          <DataField>RegisterNumber_ItemLedgerEntry</DataField>
-        </Field>
-        <Field Name="SalespersonCode_ItemLedgerEntry">
-          <DataField>SalespersonCode_ItemLedgerEntry</DataField>
-        </Field>
         <Field Name="UnitofMeasureCode_ItemLedgerEntry">
           <DataField>UnitofMeasureCode_ItemLedgerEntry</DataField>
         </Field>
@@ -3315,6 +3309,12 @@ End Function
         </Field>
         <Field Name="SalesAmountActual_ItemLedgerEntryFormat">
           <DataField>SalesAmountActual_ItemLedgerEntryFormat</DataField>
+        </Field>
+        <Field Name="RegisterNumber_ItemLedgerEntry">
+          <DataField>RegisterNumber_ItemLedgerEntry</DataField>
+        </Field>
+        <Field Name="SalespersonCode_ItemLedgerEntry">
+          <DataField>SalespersonCode_ItemLedgerEntry</DataField>
         </Field>
       </Fields>
       <Query>

@@ -206,12 +206,13 @@ report 6014431 "NPR S.Person Trn by Item Cat."
 
             trigger OnPreDataItem()
             begin
-                CopyFilter("NPR Date Filter", AuxValueEntry."Posting Date");
-                AuxValueEntry.SetCurrentKey("Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code");
-                AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
-                AuxValueEntry.SetFilter(AuxValueEntry."Item Category Code", '<>%1', '');
-                AuxValueEntry.CalcSums("Sales Amount (Actual)");
-                TotalSale := AuxValueEntry."Sales Amount (Actual)";
+                CopyFilter("NPR Date Filter", ValueEntry."Posting Date");
+                ValueEntry.SetCurrentKey("Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code");
+                ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+                //TODO:Temporary Aux Value Entry Reimplementation
+                // ValueEntry.SetFilter(ValueEntry."NPR Item Category Code", '<>%1', '');
+                ValueEntry.CalcSums("Sales Amount (Actual)");
+                TotalSale := ValueEntry."Sales Amount (Actual)";
             end;
         }
     }
@@ -290,7 +291,7 @@ report 6014431 "NPR S.Person Trn by Item Cat."
 
     var
         CompanyInformation: Record "Company Information";
-        AuxValueEntry: Record "NPR Aux. Value Entry";
+        ValueEntry: Record "Value Entry";
         TempVendorAmount: Record "Vendor Amount" temporary;
         ShowItemsCatWithoutSale: Boolean;
         [InDataSet]
