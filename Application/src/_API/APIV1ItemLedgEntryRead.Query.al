@@ -6,9 +6,10 @@
     APIVersion = 'v1.0';
     EntityName = 'itemLedgerEntry';
     EntitySetName = 'itemLedgerEntries';
-    OrderBy = ascending(replicationCounter);
     QueryType = API;
     ReadState = ReadShared;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Item Ledger Entry is not needed to be replicated';
 
     elements
     {
@@ -128,41 +129,6 @@
             {
                 Caption = 'globalDimension2Code', Locked = true;
             }
-            dataitem(auxItemLedgerEntry; "NPR Aux. Item Ledger Entry")
-            {
-                DataItemLink = "Entry No." = itemLedgerEntry."Entry No.";
-                SqlJoinType = InnerJoin;
-
-                column(posUnitNo; "POS Unit No.")
-                {
-                    Caption = 'POS Unit No.', Locked = true;
-                }
-                column(salesPersonCode; "Salespers./Purch. Code")
-                {
-                    Caption = 'Salesperson Code', Locked = true;
-                }
-
-                column(auxLastModifiedDateTime; SystemModifiedAt)
-                {
-                    Caption = 'lastModifiedDateTime', Locked = true;
-                }
-
-                column(auxSystemId; SystemId)
-                {
-                    Caption = 'auxiliaryEntrySystemId', Locked = true;
-                }
-
-                column(replicationCounter; "Replication Counter")
-                {
-                    Caption = 'replicationCounter', Locked = true;
-                }
-
-            }
         }
     }
-
-    trigger OnBeforeOpen()
-    begin
-
-    end;
 }

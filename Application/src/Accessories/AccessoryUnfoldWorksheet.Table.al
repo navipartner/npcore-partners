@@ -135,21 +135,21 @@
         }
         field(65; "Cash Register No."; Code[20])
         {
-            CalcFormula = Lookup("NPR Aux. Item Ledger Entry"."POS Unit No." WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry Sales Line"."POS Unit No." WHERE("Item Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'POS Unit No.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(70; "Salesperson Code"; Code[20])
         {
-            CalcFormula = Lookup("NPR Aux. Item Ledger Entry"."Salespers./Purch. Code" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry Sales Line"."Salesperson Code" WHERE("Item Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Salesperson Code';
             Editable = false;
             FieldClass = FlowField;
         }
         field(75; "Document Time"; Time)
         {
-            CalcFormula = Lookup("NPR Aux. Item Ledger Entry"."Document Time" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry Sales Line"."Ending Time" WHERE("Item Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Document Time';
             Editable = false;
             FieldClass = FlowField;

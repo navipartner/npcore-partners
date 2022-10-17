@@ -1,8 +1,8 @@
 report 6014420 "NPR Item Category Top"
 {
-    #IF NOT BC17
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     RDLCLayout = './src/_Reports/layouts/Item Category Top.rdlc';
     Caption = 'Item Category Top';
     UsageCategory = ReportsAndAnalysis;
@@ -27,31 +27,31 @@ report 6014420 "NPR Item Category Top"
                     IleSalesLCY := 0;
                     IleCostAmtActual := 0;
 
-                    AuxItemLedgerEntry.Reset();
-                    AuxItemLedgerEntry.SetRange("Item Category Code", "Code");
-                    AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
-                    AuxItemLedgerEntry.SetFilter("Vendor No.", "Item Category".GetFilter("NPR Vendor Filter"));
-                    AuxItemLedgerEntry.SetFilter("Posting Date", "Item Category".GetFilter("NPR Date Filter"));
-                    AuxItemLedgerEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
-                    AuxItemLedgerEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
+                    POSEntrySalesLine.Reset();
+                    POSEntrySalesLine.SetRange("Item Category Code", "Code");
+                    POSEntrySalesLine.SetFilter("Vendor No.", "Item Category".GetFilter("NPR Vendor Filter"));
+                    POSEntrySalesLine.SetFilter("Entry Date", "Item Category".GetFilter("NPR Date Filter"));
+                    POSEntrySalesLine.SetFilter("Shortcut Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
+                    POSEntrySalesLine.SetFilter("Shortcut Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
 
-                    AuxItemLedgerEntry.CalcSums(Quantity);
+                    POSEntrySalesLine.CalcSums(Quantity);
 
-                    IleSalesQty := -AuxItemLedgerEntry.Quantity;
+                    IleSalesQty := -POSEntrySalesLine.Quantity;
 
-                    AuxValueEntry.Reset();
-                    AuxValueEntry.SetRange("Item Category Code", "Code");
-                    AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
-                    AuxValueEntry.SetFilter("Vendor No.", "Item Category".GetFilter("NPR Vendor Filter"));
-                    AuxValueEntry.SetFilter("Posting Date", "Item Category".GetFilter("NPR Date Filter"));
-                    AuxValueEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
-                    AuxValueEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
-                    AuxValueEntry.SetFilter("Salespers./Purch. Code", "Item Category".GetFilter("NPR Salesperson/Purch. Filter"));
+                    ValueEntry.Reset();
+                    //TODO:Temporary Aux Value Entry Reimplementation
+                    // ValueEntry.SetRange("NPR Item Category Code", "Code");
+                    // ValueEntry.SetFilter("NPR Vendor No.", "Item Category".GetFilter("NPR Vendor Filter"));
+                    ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+                    ValueEntry.SetFilter("Posting Date", "Item Category".GetFilter("NPR Date Filter"));
+                    ValueEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
+                    ValueEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
+                    ValueEntry.SetFilter("Salespers./Purch. Code", "Item Category".GetFilter("NPR Salesperson/Purch. Filter"));
 
-                    AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
+                    ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
 
-                    IleSalesLCY := AuxValueEntry."Sales Amount (Actual)";
-                    IleCostAmtActual := -AuxValueEntry."Cost Amount (Actual)";
+                    IleSalesLCY := ValueEntry."Sales Amount (Actual)";
+                    IleCostAmtActual := -ValueEntry."Cost Amount (Actual)";
 
                     db := IleSalesLCY - IleCostAmtActual;
 
@@ -142,7 +142,7 @@ report 6014420 "NPR Item Category Top"
                 column(COMPANYNAME; CompanyName)
                 {
                 }
-                column(Sorting; SortOrder)
+                column("Sorting"; SortOrder)
                 {
                 }
                 column(SortType; SortType)
@@ -173,31 +173,31 @@ report 6014420 "NPR Item Category Top"
                         IleSalesLCY := 0;
                         IleCostAmtActual := 0;
 
-                        AuxItemLedgerEntry.Reset();
-                        AuxItemLedgerEntry.SetRange("Item Category Code", "Item Category"."Code");
-                        AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
-                        AuxItemLedgerEntry.SetFilter("Vendor No.", "Item Category".GetFilter("NPR Vendor Filter"));
-                        AuxItemLedgerEntry.SetFilter("Posting Date", "Item Category".GetFilter("NPR Date Filter"));
-                        AuxItemLedgerEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
-                        AuxItemLedgerEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
+                        POSEntrySalesLine.Reset();
+                        POSEntrySalesLine.SetRange("Item Category Code", "Item Category"."Code");
+                        POSEntrySalesLine.SetFilter("Vendor No.", "Item Category".GetFilter("NPR Vendor Filter"));
+                        POSEntrySalesLine.SetFilter("Entry Date", "Item Category".GetFilter("NPR Date Filter"));
+                        POSEntrySalesLine.SetFilter("Shortcut Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
+                        POSEntrySalesLine.SetFilter("Shortcut Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
 
-                        AuxItemLedgerEntry.CalcSums(Quantity);
+                        POSEntrySalesLine.CalcSums(Quantity);
 
-                        IleSalesQty += -AuxItemLedgerEntry.Quantity;
+                        IleSalesQty += -POSEntrySalesLine.Quantity;
 
-                        AuxValueEntry.Reset();
-                        AuxValueEntry.SetRange("Item Category Code", "Item Category"."Code");
-                        AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
-                        AuxValueEntry.SetFilter("Vendor No.", "Item Category".GetFilter("NPR Vendor Filter"));
-                        AuxValueEntry.SetFilter("Posting Date", "Item Category".GetFilter("NPR Date Filter"));
-                        AuxValueEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
-                        AuxValueEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
-                        AuxValueEntry.SetFilter("Salespers./Purch. Code", "Item Category".GetFilter("NPR Salesperson/Purch. Filter"));
+                        ValueEntry.Reset();
+                        //TODO:Temporary Aux Value Entry Reimplementation
+                        // ValueEntry.SetRange("NPR Item Category Code", "Item Category"."Code");
+                        // ValueEntry.SetFilter("NPR Vendor No.", "Item Category".GetFilter("NPR Vendor Filter"));
+                        ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+                        ValueEntry.SetFilter("Posting Date", "Item Category".GetFilter("NPR Date Filter"));
+                        ValueEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
+                        ValueEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
+                        ValueEntry.SetFilter("Salespers./Purch. Code", "Item Category".GetFilter("NPR Salesperson/Purch. Filter"));
 
-                        AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
+                        ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
 
-                        IleSalesLCY := AuxValueEntry."Sales Amount (Actual)";
-                        IleCostAmtActual := -AuxValueEntry."Cost Amount (Actual)";
+                        IleSalesLCY := ValueEntry."Sales Amount (Actual)";
+                        IleCostAmtActual := -ValueEntry."Cost Amount (Actual)";
                     end;
 
                     db := IleSalesLCY - IleCostAmtActual;
@@ -310,9 +310,9 @@ report 6014420 "NPR Item Category Top"
     var
         CompanyInformation: Record "Company Information";
         Item: Record Item;
-        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         TempNPRBufferSort: Record "NPR TEMP Buffer" temporary;
-        AuxValueEntry: Record "NPR Aux. Value Entry";
+        ValueEntry: Record "Value Entry";
         PreviousDimValueCode: Code[20];
         db: Decimal;
         dg: Decimal;

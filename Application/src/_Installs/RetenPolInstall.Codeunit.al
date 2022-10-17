@@ -27,8 +27,8 @@
         tabledata "NPR POS Entry Tax Line" = rd,
         tabledata "NPR POS Posting Log" = rd,
         tabledata "NPR EFT Transaction Request" = rd,
-        tabledata "NPR Aux. Value Entry" = rd,
-        tabledata "NPR Aux. Item Ledger Entry" = rd,
+        tabledata "Value Entry" = rd,
+        tabledata "Item Ledger Entry" = rd,
         tabledata "NPR Replication Error Log" = rd,
         tabledata "NPR BTF EndPoint Error Log" = rd,
         tabledata "NPR MM Admis. Service Entry" = rd;
@@ -195,8 +195,6 @@
             Database::"NPR POS Entry Tax Line",
             Database::"NPR POS Posting Log",
             Database::"NPR EFT Transaction Request",
-            Database::"NPR Aux. Value Entry",
-            Database::"NPR Aux. Item Ledger Entry",
             Database::"NPR Replication Error Log",
             Database::"NPR BTF EndPoint Error Log",
             Database::"NPR MM Admis. Service Entry"])

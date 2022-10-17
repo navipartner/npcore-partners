@@ -1,8 +1,8 @@
 ﻿report 6014419 "NPR Vendor Sales Stat"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Vendor Sales Stat.rdlc';
     Caption = 'Vendor Sales Statistics';
@@ -105,10 +105,10 @@
             column(DateFilter; StrSubstNo(Text002, StartDate, EndDate))
             {
             }
-            dataitem(AuxItemLedgerEntryPurchase; "NPR Aux. Item Ledger Entry")
+            dataitem(AuxItemLedgerEntryPurchase; "Item Ledger Entry")
             {
                 CalcFields = "Cost Amount (Actual)";
-                DataItemLink = "Vendor No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code"), "Posting Date" = FIELD("Date Filter");
+                DataItemLink = "Source No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code"), "Posting Date" = FIELD("Date Filter");
                 DataItemTableView = SORTING("Entry No.") WHERE("Entry Type" = CONST(Purchase));
 
                 trigger OnAfterGetRecord()
@@ -123,10 +123,10 @@
                     PurchaseLCY := 0;
                 end;
             }
-            dataitem(AuxItemLedgerEntrySale; "NPR Aux. Item Ledger Entry")
+            dataitem(AuxItemLedgerEntrySale; "Item Ledger Entry")
             {
                 CalcFields = "Sales Amount (Actual)";
-                DataItemLink = "Vendor No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code"), "Posting Date" = FIELD("Date Filter");
+                DataItemLink = "Source No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code"), "Posting Date" = FIELD("Date Filter");
                 DataItemTableView = SORTING("Entry No.") WHERE("Entry Type" = CONST(Sale));
 
                 trigger OnAfterGetRecord()

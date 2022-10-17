@@ -137,7 +137,7 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                 {
                     Caption = '&Item Ledger Entries';
                     Image = Form;
-                    RunObject = Page "NPR Aux. Item Ledger Entries";
+                    RunObject = Page "Item Ledger Entries";
                     RunPageLink = "Item Category Code" = FIELD(Code);
                     ShortCutKey = 'Shift+Ctrl+N';
 

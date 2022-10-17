@@ -41,17 +41,17 @@
             column(ProfitPct_Item; ProfitPct)
             {
             }
-            dataitem(AuxItemLedgerEntry; "NPR Aux. Item Ledger Entry")
+            dataitem(AuxItemLedgerEntry; "NPR POS Entry Sales Line")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Posting Date" = FIELD("Date Filter"), "Location Code" = FIELD("Location Filter");
-                DataItemTableView = SORTING("Item No.", "Entry Type") WHERE("Invoiced Quantity" = FILTER(<> 0), "Entry Type" = CONST(Sale), "Salespers./Purch. Code" = FILTER(<> ''));
-                column(ItemNo_ItemLedgerEntry; "Item No.")
+                DataItemLink = "No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Entry Date" = FIELD("Date Filter"), "Location Code" = FIELD("Location Filter");
+                DataItemTableView = SORTING("No.") WHERE("Quantity" = FILTER(<> 0), "Salesperson Code" = FILTER(<> ''));
+                column(ItemNo_ItemLedgerEntry; "No.")
                 {
                 }
-                column(SalespersonCode_ItemLedgerEntry; "Salespers./Purch. Code")
+                column(SalespersonCode_ItemLedgerEntry; "Salesperson Code")
                 {
                 }
-                column(InvoicedQuantity_ItemLedgerEntry; "Invoiced Quantity")
+                column(InvoicedQuantity_ItemLedgerEntry; "Quantity")
                 {
                 }
                 column(SalespersonName_ItemLedgerEntry; SalespersonName)
@@ -61,7 +61,7 @@
                 trigger OnAfterGetRecord()
                 begin
                     SalespersonName := '';
-                    if SalespersonPurchaser.Get("Salespers./Purch. Code") then
+                    if SalespersonPurchaser.Get("Salesperson Code") then
                         SalespersonName := SalespersonPurchaser.Name;
                 end;
             }

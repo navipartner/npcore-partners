@@ -191,9 +191,9 @@
         }
         field(200; "Quantity sold"; Decimal)
         {
-            CalcFormula = - Sum("NPR Aux. Item Ledger Entry".Quantity
+            CalcFormula = - Sum("NPR POS Entry Sales Line".Quantity
                                 WHERE(
-                                    "Discount Type" = CONST(Mixed),
+                                    "Discount Type" = CONST(Mix),
                                     "Discount Code" = FIELD(Code)));
             Caption = 'Sold Qty';
             DecimalPlaces = 0 : 5;
@@ -203,10 +203,11 @@
         }
         field(201; Turnover; Decimal)
         {
-            CalcFormula = Sum("NPR Aux. Value Entry"."Sales Amount (Actual)"
-                            WHERE(
-                                "Discount Type" = CONST(Mixed),
-                                "Discount Code" = FIELD(Code)));
+            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)");
+            //TODO:Temporary Aux Value Entry Reimplementation
+            // WHERE(
+            //     "NPR Discount Type" = CONST(Mixed),
+            //     "NPR Discount Code" = FIELD(Code)));
             Caption = 'Turnover';
             Editable = false;
             FieldClass = FlowField;

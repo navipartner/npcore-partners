@@ -172,21 +172,21 @@
 
     internal procedure CalculateYear(DateFilter: Code[50]; DepartmentFilter: Code[50])
     var
-        AuxValueEntry: Record "NPR Aux. Value Entry";
+        ValueEntry: Record "Value Entry";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SalesAmountActual: Decimal;
     begin
-        AuxValueEntry.SetCurrentKey("Salespers./Purch. Code", "Item Category Code", "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code");
+        ValueEntry.SetCurrentKey("Salespers./Purch. Code", "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code");
 
         SalesAmountActual := 0;
         if SalespersonPurchaser.Find('-') then
             repeat
-                AuxValueEntry.SetRange("Salespers./Purch. Code", SalespersonPurchaser.Code);
-                AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
-                AuxValueEntry.SetFilter("Posting Date", DateFilter);
-                AuxValueEntry.SetFilter("Global Dimension 1 Code", DepartmentFilter);
-                AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
-                SalesAmountActual += AuxValueEntry."Sales Amount (Actual)";
+                ValueEntry.SetRange("Salespers./Purch. Code", SalespersonPurchaser.Code);
+                ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+                ValueEntry.SetFilter("Posting Date", DateFilter);
+                ValueEntry.SetFilter("Global Dimension 1 Code", DepartmentFilter);
+                ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
+                SalesAmountActual += ValueEntry."Sales Amount (Actual)";
             until SalespersonPurchaser.Next() = 0;
         Netto := SalesAmountActual;
 
@@ -194,20 +194,20 @@
 
     internal procedure CalculateLastYear(DateFilter: Code[50]; DepartmentFilter: Code[50])
     var
-        AuxValueEntry: Record "NPR Aux. Value Entry";
+        ValueEntry: Record "Value Entry";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SalesAmountActual: Decimal;
     begin
-        AuxValueEntry.SetCurrentKey("Salespers./Purch. Code", "Item Category Code", "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code");
+        ValueEntry.SetCurrentKey("Salespers./Purch. Code", "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code");
         SalesAmountActual := 0;
         if SalespersonPurchaser.Find('-') then
             repeat
-                AuxValueEntry.SetRange("Salespers./Purch. Code", SalespersonPurchaser.Code);
-                AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
-                AuxValueEntry.SetFilter("Posting Date", DateFilter);
-                AuxValueEntry.SetFilter("Global Dimension 1 Code", DepartmentFilter);
-                AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
-                SalesAmountActual += AuxValueEntry."Sales Amount (Actual)";
+                ValueEntry.SetRange("Salespers./Purch. Code", SalespersonPurchaser.Code);
+                ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+                ValueEntry.SetFilter("Posting Date", DateFilter);
+                ValueEntry.SetFilter("Global Dimension 1 Code", DepartmentFilter);
+                ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
+                SalesAmountActual += ValueEntry."Sales Amount (Actual)";
             until SalespersonPurchaser.Next() = 0;
         NettoLast := SalesAmountActual;
 

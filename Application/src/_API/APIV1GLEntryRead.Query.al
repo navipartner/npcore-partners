@@ -6,7 +6,6 @@
     APIVersion = 'v1.0';
     EntityName = 'glEntry';
     EntitySetName = 'glEntries';
-    OrderBy = ascending(replicationCounter);
     QueryType = API;
     ReadState = ReadShared;
 
@@ -225,20 +224,6 @@
             column(systemModifiedAt; SystemModifiedAt)
             {
                 Caption = 'SystemModifiedAt', Locked = true;
-            }
-
-            dataitem(auxGLEntry; "NPR Aux. G/L Entry")
-            {
-                DataItemLink = "Entry No." = gLEntry."Entry No.";
-                SqlJoinType = InnerJoin;
-                column(auxSystemId; SystemId)
-                {
-                    Caption = 'auxiliaryEntrySystemId', Locked = true;
-                }
-                column(replicationCounter; "Replication Counter")
-                {
-                    Caption = 'replicationCounter', Locked = true;
-                }
             }
         }
     }

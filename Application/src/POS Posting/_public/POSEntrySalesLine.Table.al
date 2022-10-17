@@ -570,6 +570,12 @@
             Caption = 'POS Sale Line Created At';
             DataClassification = CustomerContent;
         }
+        field(7000; "Vendor No."; Code[20])
+        {
+            Caption = 'Vendor No.';
+            DataClassification = CustomerContent;
+            TableRelation = Vendor;
+        }
         field(10014; "Orig.POS Entry S.Line SystemId"; Guid)
         {
             Caption = 'Original POS Entry Sale Line SystemId';
@@ -583,6 +589,9 @@
         {
         }
         key(Key2; "Document No.", "Line No.")
+        {
+        }
+        key(Key3; Type, "No.", "Document No.")
         {
         }
     }

@@ -17,11 +17,11 @@
                 filter(Line_No; "Line No.")
                 {
                 }
-                dataitem(Item_Ledger_Entry; "NPR Aux. Item Ledger Entry")
+                dataitem(Item_Ledger_Entry; "NPR POS Entry Sales Line")
                 {
                     DataItemLink = "Discount Type" = Retail_Campaign_Line.Type, "Discount Code" = Retail_Campaign_Line.Code;
                     SqlJoinType = InnerJoin;
-                    column(Entry_No; "Entry No.")
+                    column(Entry_No; "Item Entry No.")
                     {
                     }
                 }

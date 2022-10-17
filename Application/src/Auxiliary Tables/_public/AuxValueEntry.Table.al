@@ -6,6 +6,8 @@
     DataClassification = CustomerContent;
     DrillDownPageId = "NPR Aux. Value Entries";
     LookupPageId = "NPR Aux. Value Entries";
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Aux Item Ledger Entry is removed due performance downsides.';
 
     fields
     {

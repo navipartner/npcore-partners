@@ -9,6 +9,8 @@
     InsertAllowed = false;
     ModifyAllowed = false;
     DeleteAllowed = false;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Aux. Item Ledger Entry has been removed.';
 
     layout
     {

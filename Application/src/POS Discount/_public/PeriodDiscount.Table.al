@@ -234,22 +234,23 @@
         }
         field(200; "Quantity Sold"; Decimal)
         {
-            CalcFormula = - Sum("NPR Aux. Item Ledger Entry".Quantity
+            CalcFormula = - Sum("NPR POS Entry Sales Line".Quantity
                                 WHERE(
-                                    "Discount Type" = CONST(Period),
+                                    "Discount Type" = CONST(Campaign),
                                     "Discount Code" = FIELD(Code),
-                                    "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"),
-                                    "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code")));
+                                    "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Code"),
+                                    "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Code")));
             Caption = 'Sold Qty';
             Editable = false;
             FieldClass = FlowField;
         }
         field(201; Turnover; Decimal)
         {
-            CalcFormula = Sum("NPR Aux. Value Entry"."Sales Amount (Actual)"
+            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)"
                             WHERE(
-                                "Discount Type" = CONST(Period),
-                                "Discount Code" = FIELD(Code),
+                                //TODO:Temporary Aux Value Entry Reimplementation
+                                // "NPR Discount Type" = CONST(Period),
+                                // "NPR Discount Code" = FIELD(Code),
                                 "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"),
                                 "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code")));
             Caption = 'Sold Amount';

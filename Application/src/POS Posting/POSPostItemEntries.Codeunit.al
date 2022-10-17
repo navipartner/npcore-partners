@@ -7,6 +7,7 @@
     var
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
+        ItemJournalLine: Record "Item Journal Line";
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
         OnBeforePostPOSEntry(Rec);
@@ -37,7 +38,9 @@
         POSSalesLine.SetRange("Exclude from Posting", false);
         if POSSalesLine.FindSet() then
             repeat
-                POSSalesLine."Item Entry No." := PostItemJnlLine(POSEntry, POSSalesLine);
+                PostItemJnlLine(POSEntry, POSSalesLine, ItemJournalLine);
+                POSSalesLine."Item Entry No." := ItemJournalLine."Item Shpt. Entry No.";
+                POSSalesLine."Vendor No." := ItemJournalLine."NPR Vendor No.";
                 POSSalesLine.Modify();
 
                 CheckAndCreateServiceItemPos(POSEntry, POSSalesLine);
@@ -75,17 +78,17 @@
         end;
     end;
 
-    local procedure PostItemJnlLine(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line"): Integer
+    local procedure PostItemJnlLine(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line"; var ItemJnlLine: Record "Item Journal Line")
     var
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
-        ItemJnlLine: Record "Item Journal Line";
         MoveToLocation: Record Location;
         Item: Record Item;
         POSPeriodRegister: Record "NPR POS Period Register";
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
         WMSManagement: Codeunit "WMS Management";
     begin
+        Clear(ItemJnlLine);
         OnBeforePostPOSSalesLineItemJnl(POSSalesLine);
 
         if POSSalesLine."Withhold Item" and (POSSalesLine."Move to Location" = '') then
@@ -181,7 +184,6 @@
 
         if (ItemJnlLine."Journal Template Name" = '') and (ItemJnlLine."Journal Batch Name" = '') then
             ItemJnlPostLine.RunWithCheck(ItemJnlLine);
-        exit(ItemJnlLine."Item Shpt. Entry No.");
     end;
 
     local procedure InsertTrackingLine(var ItemJournalLine: Record "Item Journal Line")

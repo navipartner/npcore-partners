@@ -25,12 +25,13 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         }
         field(6014403; "NPR Sales (LCY)"; Decimal)
         {
-            CalcFormula = Sum("NPR Aux. Value Entry"."Sales Amount (Actual)"
+            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)"
                             WHERE(
                                 "Item Ledger Entry Type" = CONST(Sale),
                                 "Salespers./Purch. Code" = FIELD(Code),
                                 "Posting Date" = FIELD("Date Filter"),
-                                "Item Category Code" = FIELD("NPR Item Category Filter"),
+                                //TODO:Temporary Aux Value Entry Reimplementation
+                                // "NPR Item Category Code" = FIELD("NPR Item Category Filter"),
                                 "Global Dimension 1 Code" = FIELD("NPR Global Dimension 1 Filter"),
                                 "Item No." = FIELD("NPR Item Filter")));
             Caption = 'Sales (LCY)';
@@ -39,12 +40,13 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         }
         field(6014404; "NPR Discount Amount"; Decimal)
         {
-            CalcFormula = - Sum("NPR Aux. Value Entry"."Discount Amount"
+            CalcFormula = - Sum("Value Entry"."Discount Amount"
                                 WHERE(
                                     "Item Ledger Entry Type" = CONST(Sale),
                                     "Salespers./Purch. Code" = FIELD(Code),
                                     "Posting Date" = FIELD("Date Filter"),
-                                    "Item Category Code" = FIELD("NPR Item Category Filter"),
+                                    //TODO:Temporary Aux Value Entry Reimplementation
+                                    // "NPR Item Category Code" = FIELD("NPR Item Category Filter"),
                                     "Global Dimension 1 Code" = FIELD("NPR Global Dimension 1 Filter")));
             Caption = 'Discount Amount';
             Description = 'NPR7.100.000';
@@ -52,12 +54,13 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         }
         field(6014405; "NPR COGS (LCY)"; Decimal)
         {
-            CalcFormula = - Sum("NPR Aux. Value Entry"."Cost Amount (Actual)"
+            CalcFormula = - Sum("Value Entry"."Cost Amount (Actual)"
                                 WHERE(
                                     "Item Ledger Entry Type" = CONST(Sale),
                                     "Salespers./Purch. Code" = FIELD(Code),
                                     "Posting Date" = FIELD("Date Filter"),
-                                    "Item Category Code" = FIELD("NPR Item Category Filter"),
+                                    //TODO:Temporary Aux Value Entry Reimplementation
+                                    // "NPR Item Category Code" = FIELD("NPR Item Category Filter"),
                                     "Global Dimension 1 Code" = FIELD("NPR Global Dimension 1 Filter")));
             Caption = 'COGS (LCY)';
             Description = 'NPR7.100.000';
@@ -71,12 +74,13 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         }
         field(6014407; "NPR Sales (Qty.)"; Decimal)
         {
-            CalcFormula = - Sum("NPR Aux. Value Entry"."Valued Quantity"
+            CalcFormula = - Sum("Value Entry"."Valued Quantity"
                                 WHERE(
                                     "Item Ledger Entry Type" = CONST(Sale),
                                     "Salespers./Purch. Code" = FIELD(Code),
                                     "Posting Date" = FIELD("Date Filter"),
-                                    "Item Category Code" = FIELD("NPR Item Category Filter"),
+                                    //TODO:Temporary Aux Value Entry Reimplementation
+                                    // "NPR Item Category Code" = FIELD("NPR Item Category Filter"),
                                     "Global Dimension 1 Code" = FIELD("NPR Global Dimension 1 Filter"),
                                     "Item No." = FIELD("NPR Item Filter")));
             Caption = 'Sales (Qty.)';
@@ -111,13 +115,14 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         }
         field(6014412; "NPR Item Group Sales (LCY)"; Decimal)
         {
-            CalcFormula = Sum("NPR Aux. Value Entry"."Sales Amount (Actual)"
+            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)"
                             WHERE("Item Ledger Entry Type" = CONST(Sale),
                                 "Salespers./Purch. Code" = FIELD(Code),
                                 "Posting Date" = FIELD("Date Filter"),
-                                "Item Category Code" = FIELD("NPR Item Category Filter"),
-                                "Global Dimension 1 Code" = FIELD("NPR Global Dimension 1 Filter"),
-                                "Group Sale" = CONST(true)));
+                                "Global Dimension 1 Code" = FIELD("NPR Global Dimension 1 Filter")));
+            //TODO:Temporary Aux Value Entry Reimplementation
+            // "NPR Item Category Code" = FIELD("NPR Item Category Filter"),
+            // "NPR Group Sale" = CONST(true)));
             Caption = 'Item Group Sales (LCY)';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;

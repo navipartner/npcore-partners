@@ -104,34 +104,35 @@
                 column(Name_Salesperson_Purchaser; "Salesperson/Purchaser".Name)
                 {
                 }
-                dataitem(AuxValueEntry; "NPR Aux. Value Entry")
+                dataitem(ValueEntry; "Value Entry")
                 {
                     DataItemLink = "Item No." = FIELD("No.");
                     DataItemLinkReference = Item;
                     DataItemTableView = SORTING("Item No.", "Posting Date", "Item Ledger Entry Type") WHERE("Item Ledger Entry Type" = CONST(Sale));
-                    RequestFilterFields = "Discount Type", "POS Unit No.";
+                    //TODO:Temporary Aux Value Entry Reimplementation
+                    // RequestFilterFields = "NPR Discount Type";
                     column(Entry_No_Caption; Entry_No_Caption_Lbl)
                     {
                     }
-                    column(Entry_No_Value_Entry; AuxValueEntry."Entry No.")
+                    column(Entry_No_Value_Entry; ValueEntry."Entry No.")
                     {
                     }
-                    column(Invoiced_Quantity_Value_Entry; -(AuxValueEntry."Invoiced Quantity"))
+                    column(Invoiced_Quantity_Value_Entry; -(ValueEntry."Invoiced Quantity"))
                     {
                     }
-                    column(Sales_Amount_Actual_Value_Entry; AuxValueEntry."Sales Amount (Actual)")
+                    column(Sales_Amount_Actual_Value_Entry; ValueEntry."Sales Amount (Actual)")
                     {
                     }
-                    column(Discount_Amount_Value_Entry; AuxValueEntry."Discount Amount")
+                    column(Discount_Amount_Value_Entry; ValueEntry."Discount Amount")
                     {
                     }
-                    column(Posting_Date_Value_Entry; AuxValueEntry."Posting Date")
+                    column(Posting_Date_Value_Entry; ValueEntry."Posting Date")
                     {
                     }
-                    column(Document_Type_Value_Entry; AuxValueEntry."Document Type")
+                    column(Document_Type_Value_Entry; ValueEntry."Document Type")
                     {
                     }
-                    column(Saleperson_Code_Value_Entry; AuxValueEntry."Salespers./Purch. Code")
+                    column(Saleperson_Code_Value_Entry; ValueEntry."Salespers./Purch. Code")
                     {
                     }
                     column(Total_VE_Qty; Total_VE_Qty)
@@ -143,29 +144,32 @@
                     column(Total_VE_Discount_Amt; Total_VE_Discount_Amt)
                     {
                     }
-                    column(GroupSale; "Group Sale")
+                    //TODO:Temporary Aux Value Entry Reimplementation
+                    // column(GroupSale; "NPR Group Sale")
+                    column(GroupSale; TempAuxValueEntry)
                     {
                     }
                     dataitem("Value Entry"; "Value Entry")
                     {
                         DataItemLink = "Entry No." = FIELD("Entry No.");
-                        DataItemLinkReference = AuxValueEntry;
+                        DataItemLinkReference = ValueEntry;
                         column(Document_No_; "Document No.")
                         {
                         }
                     }
                     trigger OnAfterGetRecord()
                     begin
-                        Total_VE_Qty += -(AuxValueEntry."Invoiced Quantity");
-                        Total_VE_Sales_Amt += AuxValueEntry."Sales Amount (Actual)";
-                        Total_VE_Discount_Amt += AuxValueEntry."Discount Amount";
+                        Total_VE_Qty += -(ValueEntry."Invoiced Quantity");
+                        Total_VE_Sales_Amt += ValueEntry."Sales Amount (Actual)";
+                        Total_VE_Discount_Amt += ValueEntry."Discount Amount";
                     end;
 
                     trigger OnPreDataItem()
                     begin
                         SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
-                        Item.CopyFilter("Date Filter", AuxValueEntry."Posting Date");
-                        Item.CopyFilter("Vendor No.", AuxValueEntry."Vendor No.");
+                        Item.CopyFilter("Date Filter", ValueEntry."Posting Date");
+                        //TODO:Temporary Aux Value Entry Reimplementation
+                        // Item.CopyFilter("Vendor No.", ValueEntry."NPR Vendor No.");
                     end;
                 }
 
@@ -222,11 +226,11 @@
         CompanyInformation.CalcFields(Picture);
 
         SalesPersonFilter := "Salesperson/Purchaser".GetFilter(Code);
-        POSUnitFilter := AuxValueEntry.GetFilter("POS Unit No.");
         DateFilter := Item.GetFilter("Date Filter");
         SupplierFilter := Item.GetFilter("Vendor No.");
         ItemNoFilter := Item.GetFilter("No.");
-        DiscountFilter := AuxValueEntry.GetFilter("Discount Type");
+        //TODO:Temporary Aux Value Entry Reimplementation
+        // DiscountFilter := ValueEntry.GetFilter("NPR Discount Type");
     end;
 
     var
@@ -256,5 +260,7 @@
         Salesperson_Filter_Caption_Lbl: Label 'Salesperson/purchaser';
         Total_Caption_Lbl: Label 'Total';
         Vendor_Filter_Caption_Lbl: Label 'Vendor filter';
+        //TODO:Temporary Aux Value Entry Reimplementation
+        TempAuxValueEntry:Integer;
 }
 
