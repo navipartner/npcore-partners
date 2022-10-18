@@ -1,8 +1,5 @@
 ﻿enum 6014408 "NPR BTF Service Method"
 {
-#IF NOT BC17
-    Access = Internal;       
-#ENDIF
     Extensible = true;
 
     value(0; "GET")
