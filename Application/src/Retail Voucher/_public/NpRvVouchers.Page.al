@@ -1,6 +1,5 @@
 ﻿page 6151015 "NPR NpRv Vouchers"
 {
-    Extensible = False;
     Caption = 'Retail Vouchers';
     ContextSensitiveHelpPage = 'retail/Vouchers/intro.html';
     CardPageID = "NPR NpRv Voucher Card";
