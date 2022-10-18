@@ -229,7 +229,6 @@
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef2: RecordRef;
         FRef: FieldRef;
-        FRef2: FieldRef;
         ItemNo: Code[20];
         ItemVariantCode: Code[10];
         ItemNoField: Integer;
@@ -255,7 +254,7 @@
             repeat
                 ItemNo := RecRef2.Field(ItemNoField).Value;
                 ItemVariantCode := RecRef2.Field(ItemVariantField).Value;
-                if (Format(FRef2.Value) <> '') then begin
+                if (ItemVariantCode <> '') then begin
                     ItemVariant.Get(ItemVariantCode, ItemNo);
                     TempVRTBuffer.Get(ItemVariant."NPR Variety 1 Value", ItemVariant."NPR Variety 2 Value",
                                      ItemVariant."NPR Variety 3 Value", ItemVariant."NPR Variety 4 Value");
