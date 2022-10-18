@@ -586,7 +586,7 @@
         end;
         SetInformationContext(AlterationOption, MemberInfoCapture);
 
-        MemberInfoCapture."External Membership No." := FldExternalNumber;
+        MemberInfoCapture."External Membership No." := CopyStr(FldExternalNumber, 1, MaxStrLen(MemberInfoCapture."External Membership No."));
         if (not SelectMembershipUsingMemberCard(CopyStr(FldExternalNumber, 1, 100), MemberInfoCapture)) then
             SetExternalMembershipNo(CopyStr(FldExternalNumber, 1, 20), MemberInfoCapture);
 

@@ -145,7 +145,7 @@
 
         if ReferenceNo = '' then
             if VoucherListEnabled then
-                ReferenceNo := SetReferenceNo(VoucherType)
+                ReferenceNo := SetReferenceNo(VoucherTypeCode)
             else
                 Error(BlankReferenceNoErr);
 
@@ -206,14 +206,14 @@
         exit('1.1');
     end;
 
-    local procedure SetReferenceNo(VoucherType: Text): text[50]
+    local procedure SetReferenceNo(VoucherTypeCode: Code[20]): Text[50]
     var
         Voucher: Record "NPR NpRv Voucher";
         NpRvVouchers: Page "NPR NpRv Vouchers";
-        ReferenceNo: Text;
+        ReferenceNo: Text[50];
     begin
         Voucher.SetCurrentKey("Voucher Type");
-        Voucher.SetRange("Voucher Type", VoucherType);
+        Voucher.SetRange("Voucher Type", VoucherTypeCode);
 
         Clear(NpRvVouchers);
         NpRvVouchers.LookupMode := true;
@@ -225,6 +225,5 @@
         if ReferenceNo = '' then
             Error(BlankReferenceNoErr);
         exit(ReferenceNo);
-
     end;
 }

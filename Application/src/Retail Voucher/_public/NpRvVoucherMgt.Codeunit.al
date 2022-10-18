@@ -389,7 +389,7 @@
         VoucherEntry."External Document No." := NpRvSalesLine."Sales Ticket No.";
 
         VoucherEntry."Partner Code" := VoucherType."Partner Code";
-        VoucherEntry."User ID" := UserId;
+        VoucherEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(VoucherEntry."User ID"));
         VoucherEntry."Closed by Entry No." := 0;
         OnBeforeInsertIssuedVoucherEntry(VoucherEntry, Voucher, NpRvSalesLine);
         VoucherEntry.Insert();
@@ -854,7 +854,7 @@
         ArchVoucherSendingLog.DeleteAll();
     end;
 
-    internal procedure FindVoucher(VoucherTypeCode: Text; ReferenceNo: Text; var Voucher: Record "NPR NpRv Voucher"): Boolean
+    internal procedure FindVoucher(VoucherTypeCode: Code[20]; ReferenceNo: Text[50]; var Voucher: Record "NPR NpRv Voucher"): Boolean
     begin
         if VoucherTypeCode <> '' then
             Voucher.SetFilter("Voucher Type", VoucherTypeCode);
@@ -870,7 +870,7 @@
         exit(ArchVoucher.FindFirst());
     end;
 
-    internal procedure FindPartnerVoucher(VoucherTypeCode: Text; ReferenceNo: Text; var Voucher: Record "NPR NpRv Voucher") Handled: Boolean
+    internal procedure FindPartnerVoucher(VoucherTypeCode: Code[20]; ReferenceNo: Text[50]; var Voucher: Record "NPR NpRv Voucher") Handled: Boolean
     var
         NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
     begin
@@ -1243,13 +1243,16 @@
     local procedure InsertForeignVoucher(var Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; VoucherNumber: Text)
     var
         NoSeriesMgt: Codeunit NoSeriesManagement;
+        TooLongErr: Label 'Voucher %1 is too long. Max length is %2';
     begin
         Voucher.Init();
         Voucher."No." := '';
         Voucher.Validate("Voucher Type", VoucherType.Code);
         if VoucherType."No. Series" <> '' then
             NoSeriesMgt.InitSeries(Voucher."No. Series", '', 0D, Voucher."No.", Voucher."No. Series");
-        Voucher."Reference No." := VoucherNumber;
+        if StrLen(VoucherNumber) > MaxStrLen(Voucher."Reference No.") then
+            Error(TooLongErr, VoucherNumber, MaxStrLen(Voucher."Reference No."));
+        Voucher."Reference No." := CopyStr(VoucherNumber, 1, MaxStrLen(Voucher."Reference No."));
         Voucher.Description := CopyStr(Voucher."Reference No." + ' ' + VoucherType.Description, 1, MaxStrLen(Voucher.Description));
 
         Voucher.Insert();
@@ -1505,6 +1508,19 @@
         end;
 
         InsertNpRvSalesLine(TempNpRvVoucherBuffer, SalePOS, NpRvSalesLine, VoucherType, POSLine);
+    end;
+
+
+    procedure TrimTypeAndReference(VoucherType: Text; var VoucherTypeCode: Code[20]; ReferenceNo: Text; var VoucherReferenceNumber: Text[50])
+    var
+        TooLongErr: Label '%1 cannot have more than %2 characters.';
+    begin
+        if StrLen(ReferenceNo) > MaxStrLen(VoucherReferenceNumber) then
+            Error(TooLongErr, 'ReferenceNo', MaxStrLen(VoucherReferenceNumber));
+        VoucherReferenceNumber := CopyStr(ReferenceNo, 1, MaxStrLen(VoucherReferenceNumber));
+        if StrLen(VoucherType) > MaxStrLen(VoucherTypeCode) then
+            Error(TooLongErr, 'VoucherTypeCode', VoucherTypeCode);
+        VoucherTypeCode := CopyStr(VoucherType, 1, MaxStrLen(VoucherTypeCode));
     end;
 
     [IntegrationEvent(false, false)]
