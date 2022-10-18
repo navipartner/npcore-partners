@@ -24,9 +24,15 @@
 
                         Caption = 'Product Videos';
                         Image = TileVideo;
-                        RunObject = Page "Product Videos";
                         ToolTip = 'Open a list of videos that showcase some of the product capabilities.';
                         ApplicationArea = NPRRetail;
+
+                        trigger OnAction()
+                        var
+                            Video: Codeunit Video;
+                        begin
+                            Video.Show("Video Category"::NPR);
+                        end;
                     }
                 }
             }
