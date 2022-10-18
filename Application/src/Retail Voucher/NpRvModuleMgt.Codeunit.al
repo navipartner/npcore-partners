@@ -38,7 +38,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnRunFindVoucher(VoucherTypeCode: Text; ReferenceNo: Text; var Voucher: Record "NPR NpRv Voucher"; var Handled: Boolean)
+    internal procedure OnRunFindVoucher(VoucherTypeCode: Code[20]; ReferenceNo: Text[50]; var Voucher: Record "NPR NpRv Voucher"; var Handled: Boolean)
     begin
     end;
 

@@ -1,6 +1,7 @@
 ﻿codeunit 6151023 "NPR NpRv POS Action Top-up"
 {
     Access = Internal;
+
     var
         Text000: Label 'Apply Top-up (refill) on existing Retail Voucher.';
         Text001: Label 'Top-up Retail Voucher';
@@ -136,6 +137,8 @@
         NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
         VoucherTypeFilter: Text;
         ReferenceNo: Text;
+        VoucherTypeCode: Code[20];
+        VoucherReferenceNumber: Text[50];
         NotFoundErr: Label 'Reference No. %1 and Voucher Type %2 not found';
     begin
         VoucherTypeFilter := JSON.GetStringParameter('VoucherTypeFilter');
@@ -143,14 +146,15 @@
         JSON.SetScopeRoot();
         JSON.SetScope('$voucher_input', StrSubstNo(SettingScopeErr, ActionCode()));
         ReferenceNo := UpperCase(JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode())));
+        NpRvVoucherMgt.TrimTypeAndReference(VoucherTypeFilter, VoucherTypeCode, ReferenceNo, VoucherReferenceNumber);
 
-        NpRvVoucher.SetFilter("Voucher Type", VoucherTypeFilter);
-        NpRvVoucher.SetFilter("Reference No.", '=%1', ReferenceNo);
+        NpRvVoucher.SetFilter("Voucher Type", VoucherTypeCode);
+        NpRvVoucher.SetFilter("Reference No.", '=%1', VoucherReferenceNumber);
         if NpRvVoucher.FindFirst() then
             NpRvModuleValidGlobal.UpdateVoucherAmount(NpRvVoucher)
         else
-            if not NpRvVoucherMgt.FindPartnerVoucher(VoucherTypeFilter, ReferenceNo, NpRvVoucher) then
-                Error(NotFoundErr, ReferenceNo, VoucherTypeFilter);
+            if not NpRvVoucherMgt.FindPartnerVoucher(VoucherTypeCode, VoucherReferenceNumber, NpRvVoucher) then
+                Error(NotFoundErr, VoucherReferenceNumber, VoucherTypeCode);
 
         if not NpRvVoucher."Allow Top-up" then
             Error(Text006, NpRvVoucher."Reference No.");

@@ -37,13 +37,17 @@
     local procedure ProcessVoucher(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
     var
         VoucherTypeCode: Code[20];
-        ReferenceNo: Text;
+        ReferenceNo, VoucherType : Text;
+        VoucherReferenceNumber: Text[50];
         POSActionCheckVoucherB: Codeunit "NPR POS Action:Check Voucher B";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
         ReferenceNo := Context.GetString('ReferenceNo');
-        VoucherTypeCode := Context.GetStringParameter('VoucherTypeCode');
+        VoucherType := Context.GetStringParameter('VoucherTypeCode');
 
-        POSActionCheckVoucherB.CheckVoucher(VoucherTypeCode, ReferenceNo);
+        NpRvVoucherMgt.TrimTypeAndReference(VoucherType, VoucherTypeCode, ReferenceNo, VoucherReferenceNumber);
+
+        POSActionCheckVoucherB.CheckVoucher(VoucherTypeCode, VoucherReferenceNumber);
         exit(Response);
 
     end;

@@ -215,12 +215,12 @@
         NpDcSaleLinePOSNewCoupon.DeleteAll();
     end;
 
-    local procedure IssueCouponActionCode(): Text
+    local procedure IssueCouponActionCode(): Code[20]
     begin
         exit('ISSUE_COUPON');
     end;
 
-    local procedure IssueCouponActionVersion(): Text
+    local procedure IssueCouponActionVersion(): Text[30]
     begin
         exit('1.1');
     end;
