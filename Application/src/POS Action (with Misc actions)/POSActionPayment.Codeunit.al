@@ -437,12 +437,17 @@
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         VoucherTypeCode: Code[20];
+        Voucher: Record "NPR NpRv Voucher";
+        TooLongErr: Label '%1 is too long. Max %2 characters allowed.';
     begin
         if AmountToCaptureLCY = 0 then
             exit(true);
 
         if not ValidateExternalVoucher(VoucherNumber) then
             Error(VoucherNotValid, VoucherNumber);
+
+        if StrLen(VoucherNumber) > MaxStrLen(Voucher."Reference No.") then
+            Error(TooLongErr, VoucherNumber, MaxStrLen(Voucher."Reference No."));
 
         NpRvVoucherType.SetRange("Payment Type", POSPaymentMethod.Code);
         if NpRvVoucherType.FindFirst() then

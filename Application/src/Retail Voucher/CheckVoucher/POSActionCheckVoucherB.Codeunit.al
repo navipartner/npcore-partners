@@ -1,7 +1,7 @@
 codeunit 6059908 "NPR POS Action:Check Voucher B"
 {
     Access = Internal;
-    internal procedure CheckVoucher(VoucherTypeCode: Text; ReferenceNo: Text): Boolean
+    internal procedure CheckVoucher(VoucherTypeCode: Code[20]; ReferenceNo: Text[50]): Boolean
     var
         Voucher: Record "NPR NpRv Voucher";
         NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";

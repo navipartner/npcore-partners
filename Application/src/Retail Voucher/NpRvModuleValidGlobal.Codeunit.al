@@ -162,7 +162,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunFindVoucher', '', true, true)]
-    local procedure OnRunFindVoucher(VoucherTypeCode: Text; ReferenceNo: Text; var Voucher: Record "NPR NpRv Voucher"; var Handled: Boolean)
+    local procedure OnRunFindVoucher(VoucherTypeCode: Code[20]; ReferenceNo: Text[50]; var Voucher: Record "NPR NpRv Voucher"; var Handled: Boolean)
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
     begin
@@ -367,7 +367,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         end;
     end;
 
-    procedure FindVoucher(ReferenceNo: Text; NpRvVoucherType: Record "NPR NpRv Voucher Type"; var Voucher: Record "NPR NpRv Voucher") Found: Boolean
+    procedure FindVoucher(ReferenceNo: Text[50]; NpRvVoucherType: Record "NPR NpRv Voucher Type"; var Voucher: Record "NPR NpRv Voucher") Found: Boolean
     var
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
@@ -880,11 +880,13 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvVoucherEntry.Positive := NpRvVoucherEntry.Amount > 0;
         NpRvVoucherEntry."Posting Date" := WorkDate();
         NpRvVoucherEntry.Open := NpRvVoucherEntry.Amount <> 0;
+#pragma warning disable AA0139
         NpRvVoucherEntry."Register No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_register_no', MaxStrLen(NpRvVoucherEntry."Register No."), false);
         NpRvVoucherEntry."Document No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_sales_ticket_no', MaxStrLen(NpRvVoucherEntry."Document No."), false);
         NpRvVoucherEntry."User ID" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_user_id', MaxStrLen(NpRvVoucherEntry."User ID"), false);
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry."Partner Code" := UpperCase(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_partner_code', MaxStrLen(NpRvVoucherEntry."Partner Code"), false));
+#pragma warning restore
         NpRvVoucherEntry.Insert();
         Commit();
     end;
