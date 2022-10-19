@@ -109,6 +109,8 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         ParamSetNegDocumentType_DescLbl: Label 'Sales Document to create on negative sales balance';
         ParamSetNegDocumentTypeOptions_Lbl: Label 'ReturnOrder,CreditMemo,Restrict';
         ParamSetNegDocumentTypeOptions_CptLbl: Label 'Return Order,Credit Memo,Restrict';
+        ParamProformaInv_CptLbl: Label 'Set Print Proforma Invoice';
+        ParamProformaInv_DescLbl: Label 'Set Print Proforma Invoice for export document';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -181,6 +183,7 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('SendICOrderConfirmation', false, ParamSendICOrderConfirmation_CptLbl, ParamSendICOrderConfirmation_DescLbl);
         WorkflowConfig.AddTextParameter('PaymentMethodCode', '', ParamPaymentMethodCode_CptLbl, ParamPaymentMethodCode_DescLbl);
         WorkflowConfig.AddBooleanParameter('EnforceCustomerFilter', false, ParamEnforceCustomerFilter_CptLbl, ParamEnforceCustomerFilter_DescLbl);
+        WorkflowConfig.AddBooleanParameter('SetPrintProformaInvoice', false, ParamProformaInv_CptLbl, ParamProformaInv_DescLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -293,6 +296,7 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         DocumentTypePositive: Option "Order",Invoice,Quote,Restrict;
         LocationSource: Option Undefined,"POS Store","POS Sale",SpecificLocation;
         FixedPrepaymentValue: Decimal;
+        PrintProforma: Boolean;
     begin
         If not POSAction.Get('SALES_DOC_EXP') then
             exit;
@@ -340,6 +344,7 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         if LocationSource = LocationSource::Undefined then
             LocationSource := LocationSource::"POS Store";
         FixedPrepaymentValue := Context.GetDecimalParameter('FixedPrepaymentValue');
+        PrintProforma := Context.GetBooleanParameter('SetPrintProformaInvoice');
 
         POSAction.SetWorkflowInvocationParameterUnsafe('SelectCustomer', false);
         POSAction.SetWorkflowInvocationParameterUnsafe('SetNegBalDocumentType', NegBalDocType);
@@ -388,6 +393,7 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         POSAction.SetWorkflowInvocationParameterUnsafe('CustomerLookupPage', 0);
         POSAction.SetWorkflowInvocationParameterUnsafe('EnforceCustomerFilter', EnforceCustomerFilter);
         POSAction.SetWorkflowInvocationParameterUnsafe('SetDocumentType', DocumentTypePositive);
+        POSAction.SetWorkflowInvocationParameterUnsafe('SetPrintProformaInvoice', PrintProforma);
 
         FrontEnd.InvokeWorkflow(POSAction);
     end;
