@@ -17,11 +17,12 @@
         }
         field(300; "Task Queue Enabled"; Boolean)
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Task Que module to be removed from NP Retail. We are now using Job Que instead.';
+            ObsoleteTag = '20.0';
             Caption = 'Task Queue Enabled';
             DataClassification = CustomerContent;
             Description = 'NC1.11,NC1.12,NC1.16,NC1.17';
-            TableRelation = "NPR Task Worker Group";
-            ValidateTableRelation = false;
         }
         field(305; "Task Worker Group"; Code[10])
         {

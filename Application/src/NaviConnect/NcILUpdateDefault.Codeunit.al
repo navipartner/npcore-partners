@@ -1,6 +1,8 @@
 ﻿codeunit 6151506 "NPR Nc IL Update Default" implements "NPR Nc Import List IUpdate"
 {
     Access = Internal;
+
+    [Obsolete('Task Que module to be removed from NP Retail. We are now using Job Que instead.', '20.0')]
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
     var
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";

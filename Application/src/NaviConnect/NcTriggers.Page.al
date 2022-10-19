@@ -78,19 +78,6 @@
     {
         area(navigation)
         {
-            action("Task Queue Entry")
-            {
-                Caption = 'Task Queue Entry';
-                Image = JobTimeSheet;
-
-                ToolTip = 'Executes the Task Queue Entry action';
-                ApplicationArea = NPRNaviConnect;
-
-                trigger OnAction()
-                begin
-                    RunTaskQueuePage();
-                end;
-            }
             action("Endpoint Links")
             {
                 Caption = 'Endpoint Links';
@@ -130,18 +117,5 @@
     var
         NcTriggerTaskMgt: Codeunit "NPR Nc Trigger Task Mgt.";
 
-    local procedure RunTaskQueuePage()
-    var
-        TaskLine: Record "NPR Task Line";
-        TaskLineParameters: Record "NPR Task Line Parameters";
-        TaskCard: Page "NPR TQ Task Card";
-        NcTriggerScheduler: Codeunit "NPR Nc Trigger Scheduler";
-    begin
-        if NcTriggerScheduler.FindTaskLine(Rec, TaskLine, TaskLineParameters) then begin
-            TaskCard.SetRecord(TaskLine);
-            TaskCard.RunModal();
-            Clear(TaskCard);
-        end;
-    end;
 }
 
