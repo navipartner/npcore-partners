@@ -1,8 +1,9 @@
 ﻿codeunit 6014648 "NPR Get External POS Sale" implements "NPR Nc Import List IUpdate"
 {
     Access = Internal;
-    procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
 
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
     begin
         GetNewEntries(ImportType);
     end;

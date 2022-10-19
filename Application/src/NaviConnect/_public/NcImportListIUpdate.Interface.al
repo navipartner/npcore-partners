@@ -1,7 +1,7 @@
 ﻿interface "NPR Nc Import List IUpdate"
 {
 #IF NOT BC17
-    [Obsolete('Task Que module to be removed from NP Retail. We are now using Job Que instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
 #ENDIF
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type");
 
