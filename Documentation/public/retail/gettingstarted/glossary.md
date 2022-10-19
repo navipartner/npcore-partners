@@ -6,6 +6,7 @@ This topic contains the list of Business Central and NPRetail specific terms tha
 - **Role Explorer** - opened from the **Role Center** by clicking the burger icon (three vertical lines in the top-right corner). Each element on the role explorer is an action that opens a page. Accordingly, you can also use the role explorer as a means to navigate in Business Central.
 - **Tell Me** - the popup window that displays when you click the **Search** button.
 - **Major Tom** - Windows desktop POS software developed by NaviPartner. It is written in C# and it embeds the web client, prevents accidental interaction with the browser, and serves as a middleware between the web browser and the local hardware.
+- **Minor Tom** - an abbreviated version of Major Tom, which offers the essential POS features.
 - **EFT (Electronic Funds Transfer)** - Credit card terminals, MobilePay, AliPay etc.
 - **Tax Free** - A POS service where tourists taking home certain purchased goods, can get a VAT refund when leaving the country.
 - **Hardware Connector** - Local desktop service developed by NaviPartner. Allows hardware access from the browser.
