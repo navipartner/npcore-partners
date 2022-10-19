@@ -2,7 +2,7 @@
 {
     Access = Internal;
 
-    [Obsolete('Task Que module to be removed from NP Retail. We are now using Job Que instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
     var
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";

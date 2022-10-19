@@ -30,13 +30,13 @@
             group("Task Queue")
             {
                 ObsoleteState = Pending;
-                ObsoleteReason = 'Task Que module to be removed from NP Retail. We are now using Job Que instead.';
+                ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead.';
                 ObsoleteTag = '20.0';
                 Caption = 'Task Queue';
                 field("Task Queue Enabled"; Rec."Task Queue Enabled")
                 {
                     ObsoleteState = Pending;
-                    ObsoleteReason = 'Task Que module to be removed from NP Retail. We are now using Job Que instead.';
+                    ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead.';
                     ObsoleteTag = '20.0';
                     ToolTip = 'Specifies the value of the Task Queue Enabled field';
                     ApplicationArea = NPRNaviConnect;
@@ -58,7 +58,7 @@
             action("Setup Task Queue")
             {
                 ObsoleteState = Pending;
-                ObsoleteReason = 'Task Que module to be removed from NP Retail. We are now using Job Que instead.';
+                ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead.';
                 ObsoleteTag = '20.0';
                 Caption = 'Setup Task Queue';
                 Image = Setup;
