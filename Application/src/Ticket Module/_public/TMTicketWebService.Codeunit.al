@@ -163,7 +163,6 @@
             Confirmation.SetReservationResult(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        Confirmation.SetReservationResult(ImportEntry."Document ID");
         Confirmation.SetDestination(OutStr);
         Confirmation.Export();
         ImportEntry.Modify(true);

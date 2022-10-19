@@ -221,6 +221,7 @@
 
     local procedure ImportTicketConfirmation(Document: XmlDocument)
     var
+        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Reservation: XmlElement;
         ReservationNodeList: XmlNodeList;
@@ -228,6 +229,7 @@
         NReservation: Integer;
         Token: Text[100];
         ResponseMessage: Text;
+        ALREADY_CONFIRMED: Label 'Token %1 has already been confirmed.';
     begin
 
         if (not Document.GetRoot(Reservation)) then
@@ -241,13 +243,18 @@
             Reservation := Node.AsXmlElement();
 
             Token := GetXmlText100(Reservation, 'ticket_token', MaxStrLen(Token), true);
+
+            TicketReservationResponse.SetFilter("Session Token ID", '=%1', Token);
+            if (TicketReservationResponse.FindFirst()) then
+                if (TicketReservationResponse.Confirmed) then
+                    Error(ALREADY_CONFIRMED, Token);
+
             TicketRequestManager.SetReservationRequestExtraInfo(Token,
-              GetXmlText80(Reservation, 'send_notification_to', 80, false),
-              GetXmlText20(Reservation, 'external_order_no', 20, false));
+                GetXmlText80(Reservation, 'send_notification_to', 80, false),
+                GetXmlText20(Reservation, 'external_order_no', 20, false));
 
             // Response is updated with a soft fail message if confirm fails.
             TicketRequestManager.ConfirmReservationRequest(Token, ResponseMessage);
-
         end;
     end;
 
