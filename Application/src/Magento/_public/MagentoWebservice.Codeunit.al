@@ -368,8 +368,6 @@
 
         MagentoSetupMgt.SetupImportTypes();
         Commit();
-        NaviConnectSetupMgt.SetupTaskQueue();
-        Commit();
 
         MagentoSetupMgt.TriggerSetupNpXmlTemplates();
         Commit();
