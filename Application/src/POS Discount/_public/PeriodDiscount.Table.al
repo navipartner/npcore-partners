@@ -10,7 +10,6 @@
         {
             Caption = 'Code';
             DataClassification = CustomerContent;
-            NotBlank = true;
 
             trigger OnValidate()
             begin
@@ -18,6 +17,8 @@
                     NoSeriesMgt.TestManual("No. Series");
                     "No. Series" := '';
                 end;
+
+                Rec.TestField(Code);
             end;
         }
         field(2; Description; Text[50])
