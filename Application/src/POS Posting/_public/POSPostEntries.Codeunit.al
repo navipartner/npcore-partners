@@ -950,6 +950,8 @@
                         POSPostingBuffer."Rounding Amount (LCY)" -= POSSalesLineToBeCompressed."Amount Incl. VAT (LCY)";
                     end;
 
+                    OnBeforeModifySalesPOSPostingBufferCreatedFromPOSSalesLines(POSSalesLineToBeCompressed, POSPostingBuffer);
+
                     POSPostingBuffer.Modify();
                 end;
             until POSSalesLineToBeCompressed.Next() = 0;
@@ -1067,6 +1069,9 @@
                     POSPostingBuffer."VAT Amount" += POSPaymentLineToBeCompressed."VAT Amount (LCY)"; // VAT reversal in foreign currency not supported.
                     POSPostingBuffer."VAT Amount (LCY)" += POSPaymentLineToBeCompressed."VAT Amount (LCY)";
                     POSPostingBuffer."VAT Base Amount" += POSPaymentLineToBeCompressed."VAT Base Amount (LCY)";
+
+                    OnBeforeModifySalesPOSPostingBufferCreatedFromPOSPaymentLines(POSPaymentLineToBeCompressed, POSPostingBuffer);
+
                     POSPostingBuffer.Modify();
                 end;
             until POSPaymentLineToBeCompressed.Next() = 0;
@@ -1657,6 +1662,16 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterMakeGenJournalForTotalAmount(POSBalancingLine: Record "NPR POS Balancing Line"; var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeModifySalesPOSPostingBufferCreatedFromPOSSalesLines(var POSSalesLineToBeCompressed: Record "NPR POS Entry Sales Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeModifySalesPOSPostingBufferCreatedFromPOSPaymentLines(var POSPaymentLineToBeCompressed: Record "NPR POS Entry Payment Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer")
     begin
     end;
 
