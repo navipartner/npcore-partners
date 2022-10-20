@@ -1,5 +1,9 @@
 - name: Introduction
   href: intro.md
+- name: How-To
+  items:
+  - name: Set up auto-renewal process
+    href: howto/auto_renewal.md
 - name: Reference
   items:
   - name: Member community (reference guide)
