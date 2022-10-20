@@ -16,6 +16,9 @@
     // TQ1.34/JDH /20181011 CASE 326930 Locking of Task Queue
 
     TableNo = "NPR Task Queue";
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module is about to be removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteTag = '20';
 
     trigger OnRun()
     var

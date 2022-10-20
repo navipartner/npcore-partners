@@ -3,6 +3,9 @@
     Access = Internal;
     Permissions = TableData "Job Journal Template" = imd,
                   TableData "Job Journal Batch" = imd;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module is about to be removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteTag = '20';
 
     trigger OnRun()
     begin
@@ -309,11 +312,11 @@
                     1:
                         NASGroup2.FindFirst();
                     else begin
-                            if not NASGroup2.Get(TaskBatch."Task Worker Group") then begin
-                                NASGroup2.SetRange(Default, true);
-                                NASGroup2.FindFirst();
-                            end;
+                        if not NASGroup2.Get(TaskBatch."Task Worker Group") then begin
+                            NASGroup2.SetRange(Default, true);
+                            NASGroup2.FindFirst();
                         end;
+                    end;
                 end;
 
                 if not TaskTemplate2.Get(TaskBatch."Journal Template Name") then begin

@@ -11,6 +11,9 @@
     Caption = 'Task Template';
     LookupPageID = "NPR Task Template";
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module is about to be removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteTag = '20';
 
     fields
     {

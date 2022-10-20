@@ -7,6 +7,9 @@
     Caption = 'Task Batch';
     PageType = List;
     UsageCategory = Administration;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Task Queue module is about to be removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteTag = '20';
 
     SourceTable = "NPR Task Batch";
     ApplicationArea = NPRRetail;
