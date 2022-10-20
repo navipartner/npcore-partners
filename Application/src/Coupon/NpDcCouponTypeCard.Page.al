@@ -137,9 +137,25 @@
                         ToolTip = 'Specifies the value of the Customer No. field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("Print Object Type"; Rec."Print Object Type")
+                    {
+                        ToolTip = 'Specifies the print object type for the voucher type';
+                        ApplicationArea = NPRRetail;
+
+                        trigger OnValidate()
+                        begin
+                            UpdateControls();
+                        end;
+                    }
+                    field("Print Object ID"; Rec."Print Object ID")
+                    {
+                        Enabled = not PrintUsingTemplate;
+                        ToolTip = 'Specifies the print object Id for the voucher type';
+                        ApplicationArea = NPRRetail;
+                    }
                     field("Print Template Code"; Rec."Print Template Code")
                     {
-
+                        Enabled = PrintUsingTemplate;
                         ToolTip = 'Specifies the value of the Print Template Code field';
                         ApplicationArea = NPRRetail;
                     }
@@ -386,6 +402,7 @@
         HasApplyDiscountSetup: Boolean;
         HasIssueCouponSetup: Boolean;
         HasValidateCouponSetup: Boolean;
+        PrintUsingTemplate: Boolean;
 
     local procedure SetHasSetup()
     var
@@ -401,6 +418,11 @@
         NpDcCouponModuleMgt.OnHasApplyDiscountSetup(Rec, HasApplyDiscountSetup);
 
         CurrPage.Update(false);
+    end;
+
+    local procedure UpdateControls()
+    begin
+        PrintUsingTemplate := Rec."Print Object Type" = Rec."Print Object Type"::Template;
     end;
 }
 
