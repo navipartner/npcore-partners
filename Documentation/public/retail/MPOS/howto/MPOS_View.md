@@ -27,3 +27,4 @@ To define a new mobile view:
 - [Set up POS Posting Profile](../../posunit/howto/POS_Pos_Prof.md)
 - [Set up POS Pricing Profile](../../posunit/howto/POS_Pricing_profile.md)
 - [Balance the POS (Z-report)](../../posunit/howto/balance_the_pos.md)
+- [Establish connection between receipt printer and iPad/iPhone](mpos_bluetooth_guide.md)
