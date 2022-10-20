@@ -1075,9 +1075,20 @@
     var
         RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
-        Coupon.TestField("Print Template Code");
-        Coupon.SetRecFilter();
-        RPTemplateMgt.PrintTemplate(Coupon."Print Template Code", Coupon, 0);
+        case Coupon."Print Object Type" of
+            Coupon."Print Object Type"::Template:
+                begin
+                    Coupon.TestField("Print Template Code");
+                    Coupon.SetRecFilter();
+                    RPTemplateMgt.PrintTemplate(Coupon."Print Template Code", Coupon, 0);
+                end;
+            Coupon."Print Object Type"::Report:
+                begin
+                    Coupon.TestField("Print Object ID", Report::"NPR NpDc Coupon");
+                    Coupon.SetRecFilter();
+                    Report.Run(Report::"NPR NpDc Coupon", true, false, Coupon);
+                end;
+        end;
     end;
 
     #endregion Print

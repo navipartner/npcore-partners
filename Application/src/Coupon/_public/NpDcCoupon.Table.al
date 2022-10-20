@@ -34,6 +34,8 @@
                 "Discount Amount" := CouponType."Discount Amount";
                 "Max Use per Sale" := CouponType."Max Use per Sale";
                 "Print Template Code" := CouponType."Print Template Code";
+                "Print Object ID" := CouponType."Print Object ID";
+                "Print Object Type" := CouponType."Print Object Type";
                 "POS Store Group" := CouponType."POS Store Group";
 
                 if ((Rec."Starting Date" = CreateDateTime(0D, 0T)) and (Format(CouponType."Starting Date DateFormula") <> '')) then
@@ -185,6 +187,28 @@
             Caption = 'Coupon Issued';
             Editable = false;
             FieldClass = FlowField;
+        }
+        field(161; "Issue Date"; Date)
+        {
+            CalcFormula = min("NPR NpDc Coupon Entry"."Posting Date" where("Coupon No." = field("No."),
+                                                              "Entry Type" = const("Issue Coupon")));
+            Caption = 'Issue Date';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(162; "Print Object Type"; Enum "NPR Print Object Type")
+        {
+            Caption = 'Print Object Type';
+            DataClassification = CustomerContent;
+            InitValue = Template;
+        }
+        field(163; "Print Object ID"; Integer)
+        {
+            Caption = 'Print Object ID';
+            DataClassification = CustomerContent;
+            TableRelation = IF ("Print Object Type" = CONST(Codeunit)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit)) ELSE
+            IF ("Print Object Type" = CONST(Report)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            BlankZero = true;
         }
     }
 
