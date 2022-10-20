@@ -18,3 +18,4 @@ To create a new button for an item in MPOS follow the provided steps:
 ### Related links
 
 - [MPOS menu](../explanation/MPOS_Menu.md)
+- [Establish connection between receipt printer and iPad/iPhone](mpos_bluetooth_guide.md)
