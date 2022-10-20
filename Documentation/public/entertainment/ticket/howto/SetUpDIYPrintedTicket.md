@@ -2,7 +2,7 @@
 
 To set up a DIY printed ticket, follow the provided steps:
 
-1. In Business Central, search for **Items**, and open the **Item Card** of the item you wish to edit.
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Items**, and choose the related link. Then open the **Item Card** of the item you wish to edit.
 2. Navigate to the **NPR Properties** section, and select the **Ticket Type**.      
    Each ticket type corresponds to the value found in the **Code** column in the **Ticket Type** administrative section, and it links Business Central with the [Ticket Designer](../tutorial/TicketDesigner.md).
 

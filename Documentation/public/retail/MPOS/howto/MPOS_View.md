@@ -11,7 +11,7 @@ To define a new mobile view:
 ![MPOS VIEW](../images/MPOS%20View%202022-09-20.png) 
 
 
-> [Note]  
+> [!Note]  
 > MPOS uses the same configuration defined in [POS Unit.](../../posunit/reference/POS_view_profile.md)
 
 
