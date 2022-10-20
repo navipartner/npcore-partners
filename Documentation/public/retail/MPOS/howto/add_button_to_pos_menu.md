@@ -32,3 +32,4 @@ All data is automatically saved.
 
 - [MPOS menu](../explanation/MPOS_Menu.md)
 - [Create a new item button in the POS](Create_a_new_item_button_in_the_POS.md)
+- [Establish connection between receipt printer and iPad/iPhone](mpos_bluetooth_guide.md)
