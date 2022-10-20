@@ -179,6 +179,20 @@
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
         }
+        field(6151480; "Print Object Type"; Enum "NPR Print Object Type")
+        {
+            Caption = 'Print Object Type';
+            DataClassification = CustomerContent;
+            InitValue = Template;
+        }
+        field(6151481; "Print Object ID"; Integer)
+        {
+            Caption = 'Print Object ID';
+            DataClassification = CustomerContent;
+            TableRelation = IF ("Print Object Type" = CONST(Codeunit)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit)) ELSE
+            IF ("Print Object Type" = CONST(Report)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            BlankZero = true;
+        }
     }
 
     keys
