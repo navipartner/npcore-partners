@@ -1,8 +1,8 @@
 ﻿report 6060043 "NPR Export Excel Item Worksh."
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     Caption = 'Export Excel Item Worksheet';
     ProcessingOnly = true;
     UsageCategory = None;
@@ -25,7 +25,7 @@
                     Window.Update(1, Round(RecNo / TotalRecNo * 10000, 1));
                 end;
 
-                ItemWshtImpExpMgt.RaiseOnBeforeExportWorksheetLine("Item Worksheet Line");
+                ItemWorksheetCU.OnBeforeExportWorksheetLine("Item Worksheet Line");
 
                 ItemWorksheetVariantLine.Reset();
                 ItemWorksheetVariantLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
@@ -35,7 +35,7 @@
                 if ItemWorksheetVariantLine.FindSet() then begin
                     repeat
                         //Add row based on Worksheet Variant Line
-                        ItemWshtImpExpMgt.RaiseOnBeforeExportWorksheetVariantLine(ItemWorksheetVariantLine);
+                        ItemWorksheetCU.OnBeforeExportWorksheetVariantLine(ItemWorksheetVariantLine);
                         RowNo := RowNo + 1;
                         if MappingFound then begin
                             if ItemWorksheetVariantLine."Existing Item No." <> '' then
@@ -314,7 +314,7 @@
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemWorksheet: Record "NPR Item Worksheet";
         NPRAttrManagement: Codeunit "NPR Attribute Management";
-        ItemWshtImpExpMgt: Codeunit "NPR Item Wsht. Imp. Exp.";
+        ItemWorksheetCU: Codeunit "NPR Item Worksheet";
         MappingFound: Boolean;
         NPRAttrVisibleArray: array[40] of Boolean;
         Window: Dialog;
