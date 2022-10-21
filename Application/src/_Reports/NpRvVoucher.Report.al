@@ -127,9 +127,15 @@ report 6151013 "NPR NpRv Voucher"
             column(VoucherMessage_NpRvVoucher; "NpRv Voucher"."Voucher Message")
             {
             }
+#if BC17
             column(Barcode_NpRvVoucher; TempBlobBuffer."Buffer 1")
             {
             }
+#else
+            column(Barcode_NpRvVoucher; BarCodeEncodedText)
+            {
+            }
+#endif
             column(IssueDate_NpRvVoucher; "NpRv Voucher"."Issue Date")
             {
             }
@@ -168,8 +174,18 @@ report 6151013 "NPR NpRv Voucher"
             var
                 Language: Codeunit Language;
             begin
+#if BC17
                 BarcodeLib.GenerateBarcode("NpRv Voucher"."Reference No.", TempBlobCol1);
                 TempBlobBuffer.GetFromTempBlob(TempBlobCol1, 1);
+#else
+               BarCodeText := "NpRv Voucher"."Reference No.";
+               BarcodeSimbiology := BarcodeFontProviderMgt.SetBarcodeSimbiology(BarCodeText);
+
+               if BarcodeSimbiology = BarcodeSimbiology::Code39 then
+                   BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, BarcodeSimbiology, BarcodeFontProviderMgt.SetBarcodeSettings(0, true, true, false))
+               else
+                   BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, BarcodeSimbiology);      
+#endif
 
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
                 Evaluate(StartingDate, Format(DT2Date("NpRv Voucher"."Starting Date"), 4));
@@ -198,7 +214,17 @@ report 6151013 "NPR NpRv Voucher"
         IssuedDate: Text;
         StartingDate: Text;
         TempBlobBuffer: Record "NPR BLOB buffer" temporary;
+#if BC17
         BarcodeLib: Codeunit "NPR Barcode Image Library";
+#else
+        BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
+        BarcodeSimbiology: Enum "Barcode Symbology";
+
+        BarCodeText: Code[250];
+        BarCodeEncodedText: Text;
+#endif
         TempBlobCol1: Codeunit "Temp Blob";
+
+
 }
 #endif
