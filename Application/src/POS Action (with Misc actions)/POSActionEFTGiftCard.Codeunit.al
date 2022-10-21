@@ -220,14 +220,11 @@
 
         LineAmount := Round((Amount / 100) * (DiscountPercent), Currency."Amount Rounding Precision") * -1;
 
-        SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Deposit);
-        SaleLinePOS.Validate(Type, SaleLinePOS.Type::"G/L Entry");
+        SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"Issue Voucher");
         SaleLinePOS.Validate("No.", EFTTransactionMgt.GetPOSPostingSetupAccountNo(POSSession, EFTTransactionRequest."Original POS Payment Type Code"));
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS.Description := CopyStr(SaleLinePOS.Description + ' - ' + DISCOUNT, 1, MaxStrLen(SaleLinePOS.Description));
         SaleLinePOS.Validate("Unit Price", LineAmount);
-        SaleLinePOS.Validate("Amount Including VAT", LineAmount);
-        SaleLinePOS.UpdateAmounts(SaleLinePOS);
         POSSaleLine.InsertLineRaw(SaleLinePOS, true);
 
         POSSession.RequestRefreshData();

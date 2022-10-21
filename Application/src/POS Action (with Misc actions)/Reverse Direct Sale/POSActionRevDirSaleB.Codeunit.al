@@ -92,8 +92,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
                 SaleLinePOS."Register No." := SalePOS."Register No.";
                 SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
                 SaleLinePOS.Date := SalePOS.Date;
-                SaleLinePOS.Type := SaleLinePOS.Type::Item;
-                SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
+                SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
                 SaleLinePOS."Line No." := SaleLinePOSLineNo;
                 SaleLinePOS.Insert(true);
                 SaleLinePOSLineNo := SaleLinePOSLineNo + 10000;
@@ -213,10 +212,10 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
     begin
         SaleLinePOS.SetRange("Register No.", CurrentSalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", CurrentSalePOS."Sales Ticket No.");
-        SaleLinePOS.SetLoadFields(Type, "Orig.POS Entry S.Line SystemId", Quantity);
+        SaleLinePOS.SetLoadFields("Line Type", "Orig.POS Entry S.Line SystemId", Quantity);
         if SaleLinePOS.FindSet(true) then begin
             repeat
-                if ((SaleLinePOS.Quantity < 0) and (SaleLinePOS.Type = SaleLinePOS.Type::Item) and (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale)) then begin
+                if ((SaleLinePOS.Quantity < 0) and (SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Item)) then begin
                     AdjustedQty := GetRemainingQtyToReturn(OriginalSalesTicketNo, Abs(SaleLinePOS.Quantity), SaleLinePOS."Line No.", SaleLinePOS."Orig.POS Entry S.Line SystemId") * -1;
                     if (AdjustedQty <> SaleLinePOS.Quantity) then begin
                         SaleLinePOS.Validate(Quantity, AdjustedQty);
@@ -295,11 +294,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         if (NewQuantity >= 0) then
             exit;
 
-        if (SaleLinePOS."Sale Type" <> SaleLinePOS."Sale Type"::Sale)
-          then
-            exit;
-
-        if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) then
+        if (SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item) then
             exit;
 
         // if this line is missing the sales ticket reference, all the other lines must also not have a reference
@@ -307,7 +302,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
             SaleLinePOSCopy.SetRange("Register No.", SaleLinePOS."Register No.");
             SaleLinePOSCopy.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
             SaleLinePOSCopy.SetRange("Sale Type", SaleLinePOSCopy."Sale Type"::Sale);
-            SaleLinePOSCopy.SetRange(Type, SaleLinePOSCopy.Type::Item);
+            SaleLinePOSCopy.SetRange("Line Type", SaleLinePOSCopy."Line Type"::Item);
             SaleLinePOSCopy.SetFilter(Quantity, '<%1', 0);
             SaleLinePOSCopy.SetFilter("Return Sale Sales Ticket No.", '<>%1', '');
             if (not SaleLinePOSCopy.IsEmpty()) then

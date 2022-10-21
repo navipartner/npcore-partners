@@ -83,7 +83,7 @@
         if (CurrentView.Type() = CurrentView.Type() ::Sale) then begin
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetCurrentSaleLine(LinePOS);
-            if LinePOS.Type = LinePOS.Type::Item then begin
+            if LinePOS."Line Type" = LinePOS."Line Type"::Item then begin
                 POSInventoryOverview.SetParameters(LinePOS."No.", LinePOS."Variant Code", LinePOS."Location Code", OnlyCurrrentLocation);
             end;
         end;

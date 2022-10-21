@@ -584,8 +584,7 @@
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         case MultiLineDiscTarget of
             MultiLineDiscTarget::" ":
                 Error(UnexpectedFilterType);
@@ -746,10 +745,8 @@
     var
         PrevRec: Text;
     begin
-        if not (SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::Sale, SaleLinePOS."Sale Type"::"Debit Sale", SaleLinePOS."Sale Type"::Deposit]) then
-            Error(Text005, SaleLinePOS."Sale Type");
-        if SaleLinePOS.Type = SaleLinePOS.Type::Comment then
-            Error(Text005, SaleLinePOS.Type);
+        if SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::"POS Payment", SaleLinePOS."Line Type"::"GL Payment", SaleLinePOS."Line Type"::Comment] then
+            Error(Text005, SaleLinePOS."Line Type");
         PrevRec := Format(SaleLinePOS);
 
         SaleLinePOS."Unit Price" := UnitPrice;

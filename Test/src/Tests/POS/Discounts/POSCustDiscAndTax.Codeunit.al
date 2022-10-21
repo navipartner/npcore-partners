@@ -7015,11 +7015,10 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
     begin
         POSSaleLine."Register No." := POSSale."Register No.";
         POSSaleLine."Sales Ticket No." := POSSale."Sales Ticket No.";
-        POSSaleLine."Sale Type" := POSSaleLine."Sale Type"::Sale;
         POSSaleLine."Line No." := 10000;
         POSSaleLine.Date := Today();
         POSSaleLine.Init();
-        POSSaleLine.Type := POSSaleLine.Type::Item;
+        POSSaleLine."Line Type" := POSSaleLine."Line Type"::Item;
         POSSaleLine."No." := Item."No.";
         POSSaleLine.Quantity := 1;
         POSSaleLine."Unit Price" := Item."Unit Price";

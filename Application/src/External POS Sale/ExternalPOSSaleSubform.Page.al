@@ -13,13 +13,7 @@
         {
             repeater(General)
             {
-                field(saleType; Rec."Sale Type")
-                {
-                    Caption = 'Sale Type';
-                    ToolTip = 'Specifies the value of the Sale Type field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(type; Rec."Type")
+                field(type; Rec."Line Type")
                 {
                     Caption = 'Type';
                     ToolTip = 'Specifies the value of the Type field';

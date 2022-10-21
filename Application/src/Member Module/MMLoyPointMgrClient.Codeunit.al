@@ -216,8 +216,7 @@
 
         // Sales items are points rewarding
         SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', EFTTransactionRequest."Sales Ticket No.");
-        SaleLinePOS.SetFilter("Sale Type", '=%1', SaleLinePOS."Sale Type"::Sale);
-        SaleLinePOS.SetFilter(Type, '=%1', SaleLinePOS.Type::Item);
+        SaleLinePOS.SetFilter("Line Type", '=%1', SaleLinePOS."Line Type"::Item);
         if (SaleLinePOS.FindSet()) then
             repeat
                 TempRegisterSalesLines."Entry No." := TempRegisterSalesLines.Count() + 1;

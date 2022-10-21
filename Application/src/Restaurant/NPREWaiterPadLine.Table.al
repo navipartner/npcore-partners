@@ -86,6 +86,11 @@
             Caption = 'Line Status Description';
             FieldClass = FlowField;
         }
+        field(47; "Line Type"; enum "NPR POS Sale Line Type")
+        {
+            Caption = 'Type';
+            DataClassification = CustomerContent;
+        }
         field(50; Type; Option)
         {
             Caption = 'Type';
@@ -93,20 +98,22 @@
             InitValue = Item;
             OptionCaption = 'G/L,Item,Item Group,Repair,,Payment,Open/Close,Inventory,Customer,Comment';
             OptionMembers = "G/L Entry",Item,"Item Group",Repair,,Payment,"Open/Close","BOM List",Customer,Comment;
-        }
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Line Type';
+        }        
         field(51; "No."; Code[20])
         {
             Caption = 'No.';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST("G/L Entry")) "G/L Account"."No."
+            TableRelation = IF ("Line Type" = filter("GL Payment" | "Issue Voucher")) "G/L Account"."No."
             ELSE
-            IF (Type = CONST("Item Group")) "Item Category".Code
+            IF ("Line Type" = CONST("Item Category")) "Item Category".Code
             ELSE
-            IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
+            IF ("Line Type" = CONST("POS Payment")) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
             ELSE
-            IF (Type = CONST(Customer)) Customer."No."
+            IF ("Line Type" = CONST("Customer Deposit")) Customer."No."
             ELSE
-            IF (Type = CONST(Item)) Item."No.";
+            IF ("Line Type" = CONST(Item)) Item."No.";
             ValidateTableRelation = false;
         }
         field(52; Description; Text[100])
@@ -150,7 +157,7 @@
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = IF ("Line Type" = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
         }
         field(58; "Order No. from Web"; Code[20])
         {
@@ -239,8 +246,8 @@
             var
                 UOMMgt: Codeunit "Unit of Measure Management";
             begin
-                case Type of
-                    Type::Item:
+                case "Line Type" of
+                    "Line Type"::Item:
                         begin
                             GetItem();
                             "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
@@ -549,7 +556,7 @@
 
     local procedure GetItem()
     begin
-        TestField(Type, Type::Item);
+        TestField("Line Type", "Line Type"::Item);
         TestField("No.");
         if "No." <> Item."No." then
             Item.Get("No.");

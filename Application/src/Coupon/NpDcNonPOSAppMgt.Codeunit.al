@@ -143,9 +143,8 @@
         SaleLinePOS."Register No." := SalePOS."Register No.";
         SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
         SaleLinePOS.Date := Today();
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
         SaleLinePOS."Line No." := TempSaleLinePOS."Line No.";
-        SaleLinePOS.Type := SaleLinePOS.Type::Item;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
         SaleLinePOS."No." := TempSaleLinePOS."No.";
         SaleLinePOS."Variant Code" := TempSaleLinePOS."Variant Code";
         SaleLinePOS."VAT %" := TempSaleLinePOS."VAT %";
@@ -266,7 +265,7 @@
         TempSaleLinePOS.DeleteAll();
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         if SaleLinePOS.FindSet() then
             repeat
                 TempSaleLinePOS.Init();

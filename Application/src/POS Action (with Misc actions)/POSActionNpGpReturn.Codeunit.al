@@ -364,11 +364,10 @@
             SaleLinePOS.Validate("Sales Ticket No.", SalePOS."Sales Ticket No.");
 
             SaleLinePOS."Line No." := TempNpGpPOSSalesLine."Line No.";
-            SaleLinePOS.Validate("Sale Type", SalePOS."Sale type");
             SaleLinePOS.Date := SalePOS.Date;
             SaleLinePOS.Insert(true);
 
-            SaleLinePOS.Type := SaleLinePOS.Type::Item;
+            SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
             SaleLinePOS."VAT Bus. Posting Group" := SalePOS."VAT Bus. Posting Group";
             SaleLinePOS."Gen. Bus. Posting Group" := NpGpCrossCompanySetup."Gen. Bus. Posting Group";
 
@@ -445,7 +444,6 @@
         if TempNpGpPOSSalesLine.Quantity > 0 then begin
             SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
             SaleLinePOS.SetFilter(Quantity, '<0');
 
             POSCrossReference.SetRange("Reference No.", TempNpGpPOSSalesLine."Global Reference");

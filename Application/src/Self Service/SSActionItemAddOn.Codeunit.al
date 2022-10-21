@@ -74,7 +74,7 @@
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         if (not ItemAddOn.Get(Context.GetStringParameter('ItemAddOnNo'))) then begin
-            if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) then
+            if (SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item) then
                 exit;
             if (not Item.Get(SaleLinePOS."No.")) then
                 exit;
@@ -235,7 +235,7 @@
         MasterLineNumber := 0;
         if (not ItemAddOn.Get(Context.GetStringParameter('ItemAddOnNo'))) then begin
             POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-            if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) then
+            if (SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item) then
                 exit;
             if (not Item.Get(SaleLinePOS."No.")) then
                 exit;
@@ -302,7 +302,7 @@
             POSSaleLine.GetNewSaleLine(SaleLinePOS);
 
             // Should be refactored and use ITEM WF2.0 with sequences
-            SaleLinePOS.Type := SaleLinePOS.Type::Item;
+            SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
             SaleLinePOS."Variant Code" := ItemAddOnLine."Variant Code";
             SaleLinePOS.Validate("No.", ItemAddOnLine."Item No.");
             SaleLinePOS.Description := ItemAddOnLine.Description;
@@ -351,7 +351,7 @@
             POSSaleLine.GetNewSaleLine(SaleLinePOS);
 
             // Should be refactored and use ITEM WF2.0 with sequences
-            SaleLinePOS.Type := SaleLinePOS.Type::Item;
+            SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
             SaleLinePOS."Variant Code" := VariantCode;
             SaleLinePOS.Validate("No.", ItemNo);
             SaleLinePOS.Description := ItemAddOnLineOption.Description;
@@ -369,7 +369,7 @@
             InsertAddOn(SaleLinePOS, NpIaItemAddOnLine, MasterLineNumber);
         end;
 
-        SaleLinePOS.Type := SaleLinePOS.Type::Item;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
         SaleLinePOS."Variant Code" := ItemAddOnLineOption."Variant Code";
         SaleLinePOS.Validate("No.", ItemAddOnLineOption."Item No.");
         SaleLinePOS.Description := ItemAddOnLineOption.Description;
@@ -413,7 +413,7 @@
             POSInfoTransaction."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
             POSInfoTransaction."Sales Line No." := SaleLinePOS."Line No.";
             POSInfoTransaction."Sale Date" := SaleLinePOS.Date;
-            POSInfoTransaction."Receipt Type" := SaleLinePOS.Type;
+            POSInfoTransaction."Line Type" := SaleLinePOS."Line Type";
             POSInfoTransaction."Entry No." := 0;
             POSInfoTransaction."POS Info Code" := POSInfo.Code;
             POSInfoTransaction."POS Info" := CopyStr(Comment, 1, MaxStrLen(POSInfoTransaction."POS Info"));
@@ -470,7 +470,6 @@
         // Register No., Sales Ticket No., Sale Type, Sale Date, Sale Line No., Line No.
         SaleLinePOSAddOn.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOSAddOn.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        SaleLinePOSAddOn.SetRange("Sale Type", SaleLinePOS."Sale Type");
         SaleLinePOSAddOn.SetRange("Sale Date", SaleLinePOS.Date);
         SaleLinePOSAddOn.SetRange("Sale Line No.", SaleLinePOS."Line No.");
         SaleLinePOSAddOn."Line No." := 0;
@@ -480,7 +479,6 @@
 
         SaleLinePOSAddOn."Register No." := SaleLinePOS."Register No.";
         SaleLinePOSAddOn."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        SaleLinePOSAddOn."Sale Type" := SaleLinePOS."Sale Type";
         SaleLinePOSAddOn."Sale Date" := SaleLinePOS.Date;
         SaleLinePOSAddOn."Sale Line No." := SaleLinePOS."Line No.";
 

@@ -95,7 +95,6 @@ codeunit 85007 "NPR POS Saved Sale Tests"
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
         SaleLinePOS.FindFirst();
         SaleLinePOS.TestField("No.", Item."No.");
         SaleLinePOS.TestField("Unit Price", 10);

@@ -20,7 +20,7 @@ codeunit 6059871 "NPR POS Action: Item Lookup B"
         Item.SetRange(Blocked, false);
 
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        if SaleLinePOS.Type = SaleLinePOS.Type::Item then
+        if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Item then
             if Item.Get(SaleLinePOS."No.") then;
 
         if Page.RunModal(Page::"Item List", Item) = Action::LookupOK then

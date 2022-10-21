@@ -156,7 +156,7 @@
                     if not SaleLinePOS.GetBySystemId(NpRvSalesLine."Retail ID") then
                         exit;
 
-                    if SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Payment then begin
+                    if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"POS Payment" then begin
                         SaleLinePOS."Unit Price" := Abs(SaleLinePOS."Amount Including VAT");
                         SaleLinePOS.Quantity := 1;
                     end;
@@ -1133,7 +1133,6 @@
         NpRvSalesLine."Retail ID" := POSLine.SystemID;
         NpRvSalesLine."Register No." := SalePOS."Register No.";
         NpRvSalesLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
-        NpRvSalesLine."Sale Type" := POSLine."Sale Type";
         NpRvSalesLine."Sale Date" := POSLine.Date;
         NpRvSalesLine."Sale Line No." := POSLine."Line No.";
 
@@ -1342,8 +1341,7 @@
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Payment);
-        SaleLinePOS.Validate(Type, SaleLinePOS.Type::Payment);
+        SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"POS Payment");
         SaleLinePOS.Validate("No.", VoucherType."Payment Type");
         SaleLinePOS.Description := VoucherType.Description;
         SaleLinePOS.Quantity := 0;
@@ -1372,7 +1370,6 @@
         NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
         NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
         NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
         NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
         NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
         NpRvSalesLine.Type := NpRvSalesLine.Type::"New Voucher";
@@ -1423,8 +1420,7 @@
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Deposit);
-        SaleLinePOS.Validate(Type, SaleLinePOS.Type::"G/L Entry");
+        SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"Issue Voucher");
         SaleLinePOS.Validate("No.", NpRvVoucher."Account No.");
         SaleLinePOS.Description := NpRvVoucher.Description;
         SaleLinePOS.Quantity := 1;
@@ -1450,7 +1446,6 @@
         NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
         NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
         NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
         NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
         NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
         NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";

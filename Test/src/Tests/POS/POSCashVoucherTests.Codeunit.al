@@ -53,7 +53,7 @@ codeunit 85076 "NPR POS Cash Voucher Tests"
         Assert.IsTrue(PaymentLinePOS."Amount Including VAT" = VoucherAmount, 'Voucher full application');
 
         //[Then]
-        Assert.IsTrue(SaleLinePOS.Type = SaleLinePOS.Type::Comment, 'Comment is inserted');
+        Assert.IsTrue(SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Comment, 'Comment is inserted');
         Assert.IsTrue(SaleLinePOS.Description = ('Cashout ' + NpRvVoucher.Description), 'Comment Description relatable');
 
         //[Then]

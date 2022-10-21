@@ -97,8 +97,7 @@
         field(1000; Amount; Decimal)
         {
             CalcFormula = Sum("NPR POS Saved Sale Line".Amount WHERE("Quote Entry No." = FIELD("Entry No."),
-                                                             "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
-                                                             Type = FILTER(<> Comment & <> "Open/Close")));
+                                                                    "Line Type" = filter(Item | "Item Category" | "BOM List" | "Issue Voucher" | "Customer Deposit")));
             Caption = 'Amount';
             DecimalPlaces = 2 : 2;
             Editable = false;
@@ -107,8 +106,7 @@
         field(1005; "Amount Including VAT"; Decimal)
         {
             CalcFormula = Sum("NPR POS Saved Sale Line"."Amount Including VAT" WHERE("Quote Entry No." = FIELD("Entry No."),
-                                                                             "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
-                                                                             Type = FILTER(<> Comment & <> "Open/Close")));
+                                                                                        "Line Type" = filter(Item | "Item Category" | "BOM List" | "Issue Voucher" | "Customer Deposit")));
             Caption = 'Amount Including VAT';
             Editable = false;
             FieldClass = FlowField;

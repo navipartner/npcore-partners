@@ -125,7 +125,7 @@
         else
             if MatrixIsActivated then begin
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
-                if SaleLinePOS.Type = SaleLinePOS.Type::Payment then
+                if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"POS Payment" then
                     UpdateDisplayFromSalePOS(Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
                 else
                     UpdateDisplayFromSalePOS(Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
@@ -208,7 +208,7 @@
         else
             if MatrixIsActivated then begin
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
-                if SaleLinePOS.Type = SaleLinePOS.Type::Payment then
+                if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"POS Payment" then
                     UpdateDisplayFromSalePOS(Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
                 else
                     UpdateDisplayFromSalePOS(Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
@@ -323,13 +323,13 @@
         Line1: Text;
         Line2: Text;
     begin
-        if not (Rec.Type in [Rec.Type::"G/L Entry", Rec.Type::Item, Rec.Type::Customer, Rec.Type::"BOM List"]) then
+        if not (Rec."Line Type" in [Rec."Line Type"::"Issue Voucher", Rec."Line Type"::Item, Rec."Line Type"::"Customer Deposit", Rec."Line Type"::"BOM List"]) then
             exit;
 
         if Rec."No." = '' then
             exit;
 
-        if (Rec.Type = Rec.Type::Item) and (Rec."Discount Type" = Rec."Discount Type"::"BOM List") then
+        if (Rec."Line Type" = Rec."Line Type"::Item) and (Rec."Discount Type" = Rec."Discount Type"::"BOM List") then
             exit;
 
         Line1 := PadStr(Rec.Description, 20);
@@ -522,7 +522,7 @@
                     repeat
                         ShowLine := true;
 
-                        if not (SaleLinePOS.Type in [SaleLinePOS.Type::"G/L Entry", SaleLinePOS.Type::Item, SaleLinePOS.Type::Customer, SaleLinePOS.Type::"BOM List", SaleLinePOS.Type::Payment]) then
+                        if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::"Issue Voucher", SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type"::"Customer Deposit", SaleLinePOS."Line Type"::"BOM List", SaleLinePOS."Line Type"::"POS Payment"]) then
                             ShowLine := false;
 
                         if SaleLinePOS."No." = '' then
@@ -533,7 +533,7 @@
 
                         if ShowLine then begin
                             LineCounter += 1;
-                            if SaleLinePOS.Type = SaleLinePOS.Type::Payment then begin
+                            if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"POS Payment" then begin
                                 if SaleLinePOS."Amount Including VAT" <> SaleLinePOS."Currency Amount" then
                                     PaymentAmountTxt := ' ' + SaleLinePOS."No." + ' ' + Format(SaleLinePOS."Currency Amount", 0, '<Precision,2:2><Standard Format,0>')
                                 else
@@ -677,7 +677,7 @@
         SaleLinePOS.SetRange(Date, Rec.Date);
         if SaleLinePOS.FindSet() then begin
             repeat
-                if SaleLinePOS.Type = SaleLinePOS.Type::Payment then begin
+                if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"POS Payment" then begin
                     Payment := Payment + SaleLinePOS."Amount Including VAT"
                 end else begin
                     GrandTotal := GrandTotal + SaleLinePOS."Amount Including VAT";

@@ -20,7 +20,7 @@ codeunit 6184634 "NPR Cashout Voucher B"
     var
         POSSaleLine: Record "NPR POS Sale Line";
     begin
-        POSSaleLine.Type := POSSaleLine.Type::Comment;
+        POSSaleLine."Line Type" := POSSaleLine."Line Type"::Comment;
         POSSaleLine.Description := CopyStr('Cashout ' + Line.Description, 1, MaxStrLen(POSSaleLine.Description));
         SaleLine.InsertLine(POSSaleLine);
     end;

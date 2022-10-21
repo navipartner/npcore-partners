@@ -32,12 +32,19 @@
             DataClassification = CustomerContent;
             OptionCaption = 'G/L,Item,Payment,Open/Close,Customer,Debit Sale,Cancelled,Comment';
             OptionMembers = "G/L",Item,Payment,"Open/Close",Customer,"Debit Sale",Cancelled,Comment;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Line Type';
         }
         field(6; "Entry No."; Integer)
         {
             Caption = 'Entry No.';
             DataClassification = CustomerContent;
         }
+        field(7; "Line Type"; enum "NPR POS Sale Line Type")
+        {
+            Caption = 'Receipt Type';
+            DataClassification = CustomerContent;
+        }        
         field(10; "POS Info Code"; Code[20])
         {
             Caption = 'POS Info Code';

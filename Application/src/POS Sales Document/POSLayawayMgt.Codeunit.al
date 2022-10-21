@@ -194,8 +194,7 @@
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
-        SaleLinePOS.Type := SaleLinePOS.Type::Customer;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"Customer Deposit";;
         SaleLinePOS.Validate("No.", CreditMemoCustLedgerEntry."Customer No.");
         SaleLinePOS.Validate("Unit Price", CreditMemoCustLedgerEntry."Remaining Amt. (LCY)");
         SaleLinePOS.Validate(Quantity, 1);

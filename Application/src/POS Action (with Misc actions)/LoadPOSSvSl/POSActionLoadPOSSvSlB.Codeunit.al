@@ -64,7 +64,7 @@ codeunit 6059852 "NPR POS Action: LoadPOSSvSl B"
         POSSession.GetSaleLine(POSSaleLine);
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.Type::Payment);
+        SaleLinePOS.SetFilter("Line Type", '<>%1', SaleLinePOS."Line Type"::"POS Payment");
         if not SaleLinePOS.IsEmpty then
             POSSaleLine.SetLast();
 

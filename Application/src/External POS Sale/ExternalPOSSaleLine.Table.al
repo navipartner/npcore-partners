@@ -29,6 +29,7 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Deposit,Out payment,Comment,Cancelled,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,Cancelled,"Open/Close";
+            Description = 'This field has been "obsoleted" by removing all reference to it in Np Retail app';
         }
         field(40; "Line No."; Integer)
         {
@@ -43,20 +44,27 @@
             InitValue = Item;
             OptionCaption = 'G/L,Item,Item Group,Repair,,Payment,Open/Close,Inventory,Customer,Comment';
             OptionMembers = "G/L Entry",Item,"Item Group",Repair,,Payment,"Open/Close","BOM List",Customer,Comment;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Line Type';
+        }        
+        field(51; "Line Type"; Enum "NPR POS Sale Line Type")
+        {
+            Caption = 'Type';
+            DataClassification = CustomerContent;
         }
         field(60; "No."; Code[20])
         {
             Caption = 'No.';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST("G/L Entry")) "G/L Account"."No."
+            TableRelation = IF ("Line Type" = filter("GL Payment" | "Issue Voucher")) "G/L Account"."No."
             ELSE
-            IF (Type = CONST("Item Group")) "Item Category".Code
+            IF ("Line Type" = CONST("Item Category")) "Item Category".Code
             ELSE
-            IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
+            IF ("Line Type" = CONST("POS Payment")) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
             ELSE
-            IF (Type = CONST(Customer)) Customer."No."
+            IF ("Line Type" = CONST("Customer Deposit")) Customer."No."
             ELSE
-            IF (Type = CONST(Item)) Item."No.";
+            IF ("Line Type" = CONST(Item)) Item."No.";
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -65,34 +73,33 @@
 
                 POSUnitGlobal.Get(Rec."Register No.");
 
-                if (Type = Type::Item) and ("No." = '*') then begin
-                    Type := Type::Comment;
-                    "Sale Type" := "Sale Type"::Comment;
+                if ("Line Type" = "Line Type"::Item) and ("No." = '*') then begin
+                    "Line Type" := "Line Type"::Comment;
                 end;
 
-                case Type of
-                    Type::"G/L Entry":
+                case "Line Type" of
+                    "Line Type"::"GL Payment":
                         begin
                             InitFromGLAccount();
                             UpdateVATSetup();
                         end;
-                    Type::Item, Type::"BOM List":
+                    "Line Type"::Item, "Line Type"::"BOM List":
                         begin
                             InitFromItem();
                             UpdateVATSetup();
                             CalculateCostPrice();
                             Validate(Quantity);
                         end;
-                    Type::"Item Group":
+                    "Line Type"::"Item Category":
                         begin
                             InitFromItemCategory();
                             UpdateVATSetup();
                         end;
-                    Type::Payment:
+                    "Line Type"::"POS Payment":
                         begin
                             InitFromPaymentTypePOS();
                         end;
-                    Type::Customer:
+                    "Line Type"::"Customer Deposit":
                         begin
                             InitFromCustomer();
                         end;
@@ -101,7 +108,7 @@
                 end;
 
                 CreateDim(
-                  NPRDimMgt.TypeToTableNPR(Type), "No.",
+                  NPRDimMgt.TypeToTableNPR("Line Type"), "No.",
                    0, '',
                    0, '',
                    0, '');
@@ -135,7 +142,7 @@
             Caption = 'Posting Group';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = IF (Type = CONST(Item)) "Inventory Posting Group";
+            TableRelation = IF ("Line Type" = CONST(Item)) "Inventory Posting Group";
         }
 
         field(100; Description; Text[100])
@@ -148,7 +155,6 @@
         {
             Caption = 'Description 2';
             DataClassification = CustomerContent;
-            Description = 'NPR5.23';
         }
 
         field(102; "Custom Descr"; Boolean)
@@ -161,7 +167,7 @@
         {
             Caption = 'Unit of Measure Code';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST(Item),
+            TableRelation = IF ("Line Type" = CONST(Item),
                                 "No." = FILTER(<> '')) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
             ELSE
             "Unit of Measure";
@@ -170,8 +176,8 @@
             var
                 UOMMgt: Codeunit "Unit of Measure Management";
             begin
-                case Type of
-                    Type::"G/L Entry":
+                case true of
+                    "Line Type" <> "Line Type"::Item:
                         begin
                             "Qty. per Unit of Measure" := 1;
                         end;
@@ -197,7 +203,6 @@
                 Err003: Label 'A quantity must be specified on the line';
             begin
                 if ("Serial No." <> '') and
-                  ("Sale Type" = "Sale Type"::Sale) and
                     (Abs(Quantity) <> 1) then
                     Error(Err001,
                       "Serial No.", FieldName("Serial No."));
@@ -205,13 +210,13 @@
                 if ("Serial No." <> '') then
                     Validate("Serial No.", "Serial No.");
 
-                case Type of
-                    Type::"G/L Entry":
+                case "Line Type" of
+                    "Line Type"::"GL Payment":
                         begin
                             if Quantity = 0 then
                                 Error(Err003);
                         end;
-                    Type::Item:
+                    "Line Type"::Item:
                         begin
                             GetItem();
                             "Quantity (Base)" := CalcBaseQty(Quantity);
@@ -312,7 +317,7 @@
 
             trigger OnValidate()
             begin
-                IF Type IN [Type::Item, Type::"Item Group", Type::"G/L Entry"] then
+                IF "Line Type" IN ["Line Type"::Item, "Line Type"::"Item Category", "Line Type"::"GL Payment"] then
                     Rec."VAT Base Amount" := Rec.Amount;
 
                 Rec."Line Amount" := Rec.Amount;
@@ -347,7 +352,7 @@
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = IF ("Line Type" = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
         }
 
         field(350; "Gen. Bus. Posting Group"; Code[20])
@@ -374,7 +379,7 @@
                 if "Gen. Posting Type" = "Gen. Posting Type"::Settlement then
                     FieldError("Gen. Posting Type");
                 if "Gen. Posting Type" <> "Gen. Posting Type"::" " then
-                    TestField(Type, Type::"G/L Entry");
+                    TestField("Line Type", "Line Type"::"GL Payment");
             end;
         }
 
@@ -523,7 +528,7 @@
             trigger OnValidate()
             begin
                 CreateDim(
-                   NPRDimMgt.TypeToTableNPR(Type), "No.",
+                   NPRDimMgt.TypeToTableNPR("Line Type"), "No.",
                    0, '',
                    0, '',
                    0, '');
@@ -739,23 +744,16 @@
     var
         VATPostingSetup: Record "VAT Posting Setup";
     begin
-        if (Type = Type::"G/L Entry") then begin
-            case "Gen. Posting Type" of
-                "Gen. Posting Type"::" ":
-                    begin
-                        "VAT Calculation Type" := "VAT Calculation Type"::"Normal VAT";
-                        "VAT %" := 0;
-                        "Gen. Bus. Posting Group" := '';
-                        "Gen. Prod. Posting Group" := '';
-                        "VAT Bus. Posting Group" := '';
-                        "VAT Prod. Posting Group" := '';
-                    end;
-                else begin
-                    VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
-                    "VAT Identifier" := VATPostingSetup."VAT Identifier";
-                    "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
-                end;
-            end;
+        if ("Line Type" = "Line Type"::"GL Payment") then
+            TestField("Gen. Posting Type");
+
+        if "Gen. Posting Type" = "Gen. Posting Type"::" " then begin
+            "VAT Calculation Type" := "VAT Calculation Type"::"Normal VAT";
+            "VAT %" := 0;
+            "Gen. Bus. Posting Group" := '';
+            "Gen. Prod. Posting Group" := '';
+            "VAT Bus. Posting Group" := '';
+            "VAT Prod. Posting Group" := '';
         end else begin
             VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
             "VAT Identifier" := VATPostingSetup."VAT Identifier";
@@ -835,8 +833,7 @@
         TempItemLedgerEntry: Record "Item Ledger Entry" temporary;
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        TestField("Sale Type", "Sale Type"::Sale);
-        TestField(Type, Type::Item);
+        TestField("Line Type", "Line Type"::Item);
 
         GetItem();
         Item.TestField("Costing Method", Item."Costing Method"::Specific);
@@ -962,7 +959,6 @@
 
         TotalAuditRollQuantity := 0;
         TotalItemLedgerEntryQuantity := 0;
-        TestField("Sale Type", "Sale Type"::Sale);
         TestField(Quantity);
 
         GetItem();

@@ -31,14 +31,13 @@ codeunit 6059875 "NPR POS Action: Imp. PstdInv B"
             case SalesInvLine.Type of
                 SalesInvLine.Type::Item:
                     begin
-                        SaleLinePOS.Type := SaleLinePOS.Type::Item;
-                        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
+                        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
                         SaleLinePOS.Validate("No.", SalesInvLine."No.");
                         SaleLinePOS.Validate("Unit of Measure Code", SalesInvLine."Unit of Measure Code");
                     end;
                 SalesInvLine.Type::" ":
                     begin
-                        SaleLinePOS.Type := SaleLinePOS.Type::Comment;
+                        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
                         SaleLinePOS.Description := SalesInvLine.Description;
                     end;
             end;

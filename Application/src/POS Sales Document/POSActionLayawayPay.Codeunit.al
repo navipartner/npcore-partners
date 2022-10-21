@@ -263,8 +263,7 @@
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
-        SaleLinePOS.Type := SaleLinePOS.Type::Comment;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
         SaleLinePOS.Description := CopyStr(Description, 1, MaxStrLen(SaleLinePOS.Description));
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
     end;

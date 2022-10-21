@@ -40,7 +40,7 @@ codeunit 6150795 "NPR POS Action - Insert Comm." implements "NPR IPOS Workflow"
     begin
         NewDesc := CopyStr(Context.GetString('NewDescription'), 1, MaxStrLen(Line.Description));
 
-        Line.Type := Line.Type::Comment;
+        Line."Line Type" := Line."Line Type"::Comment;
         Line.Description := NewDesc;
 
         SaleLine.InsertLine(Line);
