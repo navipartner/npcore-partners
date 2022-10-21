@@ -8,4 +8,11 @@ codeunit 6059844 "NPR Retail Print"
     begin
         exit(BarcodeLookupMgt.GetItemVariantBarcode(Barcode, ItemNo, VariantCode, ResolvingTable, AllowDiscontinued));
     end;
+
+    procedure EnterTransferItemCrossRef(var TransferLine: Record "Transfer Line")
+    var
+        BarcodeLookupMgt: Codeunit "NPR Barcode Lookup Mgt.";
+    begin
+        BarcodeLookupMgt.EnterTransferItemCrossRef(TransferLine);
+    end;
 }

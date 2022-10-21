@@ -1,6 +1,7 @@
 ﻿codeunit 6060047 "NPR Item Wsht. Imp. Exp."
 {
     Access = Internal;
+
     var
         ItemWorksheet: Record "NPR Item Worksheet";
         IsExported: Boolean;
@@ -12,7 +13,7 @@
         FromFile: Text;
         ToFile: Text;
 
-    procedure Export(ItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure Export(ItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
         TempBlob: Codeunit "Temp Blob";
     begin
@@ -32,7 +33,7 @@
         end;
     end;
 
-    procedure Import()
+    internal procedure Import()
     var
         FileMgt: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";
@@ -43,7 +44,7 @@
         XMLPORT.Import(XMLPORT::"NPR Item Worksh. Import/Export", XmlINStream);
     end;
 
-    procedure ExportToExcel(ParItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure ExportToExcel(ParItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
         ExportExcelItemWorksheet: Report "NPR Export Excel Item Worksh.";
@@ -56,7 +57,7 @@
         ExportExcelItemWorksheet.Run();
     end;
 
-    procedure ImportFromExcel(ItemWorksheet: Record "NPR Item Worksheet")
+    internal procedure ImportFromExcel(ItemWorksheet: Record "NPR Item Worksheet")
     var
         ImportExcelItemWorksheet: Report "NPR Import Excel Item Worksh.";
     begin
@@ -66,7 +67,7 @@
         ImportExcelItemWorksheet.Run();
     end;
 
-    procedure SelectExcelToMap(ItemWorksheet: Record "NPR Item Worksheet")
+    internal procedure SelectExcelToMap(ItemWorksheet: Record "NPR Item Worksheet")
     var
         MapExcelItemWorksheet: Report "NPR Map Excel Item Worksh.";
     begin
@@ -76,7 +77,7 @@
         MapExcelItemWorksheet.Run();
     end;
 
-    procedure SetImportActionWorksheetLine(var ItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure SetImportActionWorksheetLine(var ItemWorksheetLine: Record "NPR Item Worksheet Line")
     begin
         if ItemWorksheetLine."Existing Item No." <> '' then
             ItemWorksheetLine.Action := ItemWorksheetLine.Action::UpdateAndCreateVariants
@@ -84,7 +85,7 @@
             ItemWorksheetLine.Validate(Action, ItemWorksheetLine.Action::CreateNew);
     end;
 
-    procedure SetImportActionWorksheetVariantLine(ItemWorksheetLine: Record "NPR Item Worksheet Line"; ActionIfVariantUnknown: Option Skip,Create; ActionIfVarietyUnknown: Option Skip,Create; var ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line")
+    internal procedure SetImportActionWorksheetVariantLine(ItemWorksheetLine: Record "NPR Item Worksheet Line"; ActionIfVariantUnknown: Option Skip,Create; ActionIfVarietyUnknown: Option Skip,Create; var ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line")
     var
         VarietyValue: Record "NPR Variety Value";
     begin
@@ -105,45 +106,4 @@
             ItemWorksheetVariantLine.Validate(Action);
         end;
     end;
-
-    procedure RaiseOnBeforeExportWorksheetLine(var ItemWorksheetLine: Record "NPR Item Worksheet Line")
-    begin
-        OnBeforeExportWorksheetLine(ItemWorksheetLine);
-    end;
-
-    procedure RaiseOnBeforeExportWorksheetVariantLine(var ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line")
-    begin
-        OnBeforeExportWorksheetVariantLine(ItemWorksheetVariantLine);
-    end;
-
-    procedure RaiseOnAfterImportWorksheetLine(var ItemWorksheetLine: Record "NPR Item Worksheet Line")
-    begin
-        OnAfterImportWorksheetLine(ItemWorksheetLine);
-    end;
-
-    procedure RaiseOnAfterImportWorksheetVariantLine(var ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line")
-    begin
-        OnAfterImportWorksheetVariantLine(ItemWorksheetVariantLine);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeExportWorksheetLine(var ItemWorksheetLine: Record "NPR Item Worksheet Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeExportWorksheetVariantLine(var ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterImportWorksheetLine(var ItemWorksheetLine: Record "NPR Item Worksheet Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterImportWorksheetVariantLine(var ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line")
-    begin
-    end;
 }
-
