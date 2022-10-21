@@ -1086,7 +1086,7 @@
         LastPOSEntry.FindLast();
         POSPostingLog.Init();
         POSPostingLog."Entry No." := 0;
-        POSPostingLog."User ID" := UserId;
+        POSPostingLog."User ID" := CopyStr(UserId(), 1, MaxStrLen(POSPostingLog."User ID"));
         POSPostingLog."Posting Timestamp" := CurrentDateTime;
         POSPostingLog."With Error" := true;
         POSPostingLog."Error Description" := TextUnknownError;
@@ -1130,7 +1130,7 @@
     begin
         POSPostingLog.Init();
         POSPostingLog."Entry No." := 0;
-        POSPostingLog."User ID" := UserId;
+        POSPostingLog."User ID" := CopyStr(UserId(), 1, MaxStrLen(POSPostingLog."User ID"));
         POSPostingLog."Posting Timestamp" := CurrentDateTime;
         POSPostingLog."With Error" := true;
         POSPostingLog."Error Description" := copystr(PostingErrorTxt, 1, MaxStrLen(POSPostingLog."Error Description"));
