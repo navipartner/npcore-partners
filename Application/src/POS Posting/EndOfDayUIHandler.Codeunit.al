@@ -405,7 +405,7 @@
                             POSPmtBinCheckpDenom."Attached-to ID" := Enum::"NPR Denomination Target"::Counted;
                             POSPmtBinCheckpDenom."Denomination Type" := Enum::"NPR Denomination Type".FromInteger(GetValueAsInteger(Denomination.AsObject(), 'type'));
                             POSPmtBinCheckpDenom.Denomination := GetValueAsDecimal(Denomination.AsObject(), 'value');
-                            POSPmtBinCheckpDenom."Denomination Variant ID" := GetValueAsText(Denomination.AsObject(), 'variantId');
+                            POSPmtBinCheckpDenom."Denomination Variant ID" := GetValueAsCode20(Denomination.AsObject(), 'variantId');
                             if not POSPmtBinCheckpDenom.Find() then
                                 POSPmtBinCheckpDenom.Insert();
                             POSPmtBinCheckpDenom."Currency Code" := TempBinCheckpoint."Currency Code";
@@ -456,6 +456,13 @@
         exit(JToken.AsValue().AsText());
     end;
 
+#pragma warning disable AA0139
+    local procedure GetValueAsCode20(JObject: JsonObject; KeyName: Text): Code[20]
+    begin
+        exit(UpperCase(CopyStr(GetValueAsText(JObject, KeyName), 1, 20)));
+    end;
+#pragma warning restore AA0139
+
     local procedure GetValueAsDecimal(JObject: JsonObject; KeyName: Text): Decimal
     var
         JToken: JsonToken;
@@ -503,7 +510,7 @@
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
         CheckPointMgr: codeunit "NPR POS Workshift Checkpoint";
         EndOfDayWorker: Codeunit "NPR End Of Day Worker";
-        SalesPersonCode: Code[10];
+        SalesPersonCode: Code[20];
         BalanceEntryToPrint: Integer;
         DimId: Integer;
         ClosingEntryNo: Integer;
@@ -545,7 +552,7 @@
         // Warning when not all checkpoints have status READY? 
 
         DimId := GetValueAsInteger(Context, 'state.backendContext.dimensionId');
-        SalesPersonCode := GetValueAsText(Context, 'state.backendContext.salesPersonCode');
+        SalesPersonCode := GetValueAsCode20(Context, 'state.backendContext.salesPersonCode');
         BalanceEntryToPrint := CheckPointMgr.CreateBalancingEntry(_EodWorkShiftMode::ZREPORT, _POSWorkShiftCheckpoint."POS Unit No.", _POSWorkShiftCheckpoint."Entry No.", DimId);
         ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(_POSWorkShiftCheckpoint."POS Unit No.", SalesPersonCode);
         POSManagePOSUnit.ClosePOSUnitNo(_POSWorkShiftCheckpoint."POS Unit No.", ClosingEntryNo);

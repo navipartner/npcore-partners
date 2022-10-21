@@ -1,6 +1,7 @@
 ﻿codeunit 6150637 "NPR POS Posting Control"
 {
     Access = Internal;
+
     var
         DimConsistencyErr: Label 'There was an attempt to post a transaction with inconsistent dimensions. The following values were used:\%1=%2, %3=%4, %5=%6.\RecordID: %7.\This indicates a programming bug, no a user error. Please contact system vendor.\\Error call stack:\%8\Ref. case ID 375258';
         GLSetup: Record "General Ledger Setup";
@@ -35,7 +36,7 @@
                     DimSetEntry.FieldCaption("Dimension Set ID"), DimSetID,
                     RecID,
                     LastErrorStack),
-                    UserId, '');
+                    CopyStr(UserId(), 1, 50), '');
         end;
     end;
 
@@ -106,8 +107,10 @@
         RecordLink."Link ID" := 0;
         RecordLink."Record ID" := RecID;
         RecordLink.Type := RecordLink.Type::Note;
-        RecordLink.Company := CompanyName;
-        RecordLink.Created := CurrentDateTime;
+#pragma warning disable AA0139
+        RecordLink.Company := CompanyName();
+#pragma warning restore AA0139
+        RecordLink.Created := CurrentDateTime();
         RecordLink.Description := CopyStr(HeaderTxt, 1, MaxStrLen(RecordLink.Description));
         RecordLink."User ID" := FromUserID;
         RecordLink."To User ID" := SentToUserID;
