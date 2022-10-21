@@ -2,7 +2,7 @@
 report 6151013 "NPR NpRv Voucher"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     RDLCLayout = './src/_Reports/layouts/NpRv Voucher.rdlc';
     WordLayout = './src/_Reports/layouts/NpRv Voucher.docx';
@@ -13,7 +13,7 @@ report 6151013 "NPR NpRv Voucher"
     DefaultLayout = Word;
     ObsoleteState = Pending;
     ObsoleteReason = 'Will be removed in the next version.';
-    
+
     dataset
     {
         dataitem("NpRv Voucher"; "NPR NpRv Voucher")
@@ -159,6 +159,13 @@ report 6151013 "NPR NpRv Voucher"
             column(IssuedDate_DateFormat; IssuedDate)
             {
             }
+            dataitem("Voucher Type"; "NPR NpRv Voucher Type")
+            {
+                DataItemLink = code = field("Voucher Type");
+                column(VoucherTypeDescription; Description)
+                {
+                }
+            }
 
             trigger OnAfterGetRecord()
             var
@@ -178,7 +185,7 @@ report 6151013 "NPR NpRv Voucher"
             end;
         }
     }
-     requestpage
+    requestpage
     {
         SaveValues = true;
     }
