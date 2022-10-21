@@ -41,7 +41,7 @@
             POSSession.GetSetup(POSSetup);
             POSEntryOutputLog."Salesperson Code" := POSSetup.Salesperson();
         end;
-        POSEntryOutputLog."User ID" := UserId;
+        POSEntryOutputLog."User ID" := CopyStr(UserId, 1, MaxStrLen(POSEntryOutputLog."User ID"));
         POSEntryOutputLog."Output Method" := POSEntryOutputLog."Output Method"::Print;
         POSEntryOutputLog.Insert();
 

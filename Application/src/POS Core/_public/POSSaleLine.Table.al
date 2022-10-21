@@ -1089,7 +1089,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.40';
         }
-        field(405; "Discount Authorised by"; Code[20])
+        field(405; "Discount Authorised by"; Code[50])
         {
             Caption = 'Discount Authorised by';
             DataClassification = CustomerContent;
@@ -1140,7 +1140,7 @@
         {
             Caption = 'Derived from Line';
             DataClassification = SystemMetadata;
-        }        
+        }
         field(495; "Created At"; DateTime)
         {
             Caption = 'Created At';

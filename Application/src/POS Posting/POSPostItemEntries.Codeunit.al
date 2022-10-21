@@ -175,7 +175,9 @@
         ItemJnlLine."Serial No." := '';
         ItemJnlLine."Lot No." := '';
         ItemJnlLine."NPR Discount Type" := POSSalesLine."Discount Type";
+#pragma warning disable AA0139 
         ItemJnlLine."NPR Discount Code" := POSSalesLine."Discount Code";
+#pragma warning restore AA0139
         ItemJnlLine."NPR Register Number" := POSEntry."POS Unit No.";
         if Item.Get(POSSalesLine."No.") then
             ItemJnlLine."NPR Vendor No." := Item."Vendor No.";
@@ -235,7 +237,7 @@
         ReservationEntry."Expected Receipt Date" := Today();
         ReservationEntry."Serial No." := ItemJournalLine."Serial No.";
         ReservationEntry."Lot No." := ItemJournalLine."Lot No.";
-        ReservationEntry."Created By" := UserId;
+        ReservationEntry."Created By" := CopyStr(UserId, 1, MaxStrLen(ReservationEntry."Created By"));
         ReservationEntry."Qty. per Unit of Measure" := ItemJournalLine."Qty. per Unit of Measure";
         ReservationEntry.Quantity := -ItemJournalLine.Quantity;
         ReservationEntry."Qty. to Handle (Base)" := -ItemJournalLine.Quantity;

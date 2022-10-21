@@ -265,7 +265,7 @@
         Evaluate(TempPOSSalesLine."Reason Code", NpXmlDomMgt.GetXmlText(Element, 'reasoncode', 0, false), 9);
         Evaluate(TempPOSSalesLine."Discount Type", NpXmlDomMgt.GetXmlText(Element, 'discounttype', 0, false), 9);
         Evaluate(TempPOSSalesLine."Discount Code", NpXmlDomMgt.GetXmlText(Element, 'discountcode', 0, false), 9);
-        TempPOSSalesLine."Discount Authorised by" := CopyStr(NpXmlDomMgt.GetXmlText(Element, 'discountauthorisedby', MaxStrLen(TempPOSSalesLine."Discount Authorised by"), false), 1, 20);
+        Evaluate(TempPOSSalesLine."Discount Authorised by", NpXmlDomMgt.GetXmlText(Element, 'discountauthorisedby', MaxStrLen(TempPOSSalesLine."Discount Authorised by"), false), 9);
         if NpXmlDomMgt.GetXmlText(Element, 'dimensionsetid', 0, false) <> '' then
             Evaluate(TempPOSSalesLine."Dimension Set ID", NpXmlDomMgt.GetXmlText(Element, 'dimensionsetid', 0, false), 9);
         Evaluate(TempPOSSalesLine."Variant Code", NpXmlDomMgt.GetXmlText(Element, 'variantcode', 0, false), 9);

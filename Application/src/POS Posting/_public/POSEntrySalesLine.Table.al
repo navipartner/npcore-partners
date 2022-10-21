@@ -446,7 +446,7 @@
             Caption = 'Discount Code';
             DataClassification = CustomerContent;
         }
-        field(405; "Discount Authorised by"; Code[20])
+        field(405; "Discount Authorised by"; Code[50])
         {
             Caption = 'Discount Authorised by';
             DataClassification = CustomerContent;

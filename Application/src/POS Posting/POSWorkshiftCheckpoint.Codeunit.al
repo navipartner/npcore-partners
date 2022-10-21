@@ -474,7 +474,7 @@
             SalePOS."Register No." := POSUnit."No.";
             SalePOS."POS Store Code" := POSUnit."POS Store Code";
             SalePOS.Date := Today();
-            SalePOS."Sales Ticket No." := DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '01234567890'));
+            SalePOS."Sales Ticket No." := CopyStr(DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '01234567890')), 1, MaxStrLen(SalePOS."Sales Ticket No."));
 
             if (Mode = EodWorkshiftMode::ZREPORT) and (POSEndofDayProfile."Z-Report Number Series" <> '') then
                 SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo(POSEndofDayProfile."Z-Report Number Series", Today, true);

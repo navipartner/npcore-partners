@@ -488,7 +488,7 @@
         // Move to a different bin instruction ("The safe")
         if (PaymentBinCheckpoint."Move to Bin Amount" <> 0) then begin
             if (PaymentBinCheckpoint."Move to Bin Reference" = '') then begin
-                PaymentBinCheckpoint."Move to Bin Reference" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+                PaymentBinCheckpoint."Move to Bin Reference" := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, MaxStrLen(PaymentBinCheckpoint."Move to Bin Reference"));
                 PaymentBinCheckpoint.Modify();
             end;
             PaymentBinCheckpoint.TestField("Move to Bin Code");
@@ -504,7 +504,7 @@
         // Move to a different bin instruction (The "BANK")
         if (PaymentBinCheckpoint."Bank Deposit Amount" <> 0) then begin
             if (PaymentBinCheckpoint."Bank Deposit Reference" = '') then begin
-                PaymentBinCheckpoint."Bank Deposit Reference" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+                PaymentBinCheckpoint."Bank Deposit Reference" := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, MaxStrLen(PaymentBinCheckpoint."Bank Deposit Reference"));
                 PaymentBinCheckpoint.Modify();
             end;
             PaymentBinCheckpoint.TestField("Bank Deposit Bin Code");
@@ -772,7 +772,7 @@
 
     end;
 
-    local procedure CreatePOSSystemEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]; Description: Text[80]): Integer
+    local procedure CreatePOSSystemEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]; Description: Text[100]): Integer
     var
         POSEntry: Record "NPR POS Entry";
         POSPeriodRegister: Record "NPR POS Period Register";
@@ -1370,7 +1370,7 @@
         end;
     end;
 
-    local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text[1024]; DocNoOfRecords: Integer): Integer
+    local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text; DocNoOfRecords: Integer): Integer
     begin
         if (DocNoOfRecords = 0) then
             exit(DocNoOfRecords);

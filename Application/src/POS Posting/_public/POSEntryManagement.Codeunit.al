@@ -320,6 +320,7 @@
         OnAfterPrintEntry(POSEntry, IsReprint);
     end;
 
+#pragma warning disable AA0139
     procedure DeObfuscateTicketNo(ObfucationMethod: Option "None",MI; var SalesTicketNo: Code[20])
     var
         RPAuxMiscLibrary: Codeunit "NPR RP Aux - Misc. Library";
@@ -337,6 +338,7 @@
                 end;
         end;
     end;
+#pragma warning restore AA0139
 
     [IntegrationEvent(false, false)]
     internal procedure OnBeforePrintEntry(POSEntry: Record "NPR POS Entry"; IsReprint: Boolean)
