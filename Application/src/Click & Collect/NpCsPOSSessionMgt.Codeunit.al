@@ -42,12 +42,7 @@
         if not NpCsSaleLinePOSReference.Get(SaleLinePos."Register No.", SaleLinePos."Sales Ticket No.", SaleLinePos."Sale Type", SaleLinePos.Date, SaleLinePos."Line No.") then
             exit;
 
-        case NpCsSaleLinePOSReference."Sale Type" of
-            NpCsSaleLinePOSReference."Sale Type"::Sale:
-                begin
-                    UpdateCollectDocumentDelivery(NpCsSaleLinePOSReference);
-                end;
-        end;
+        UpdateCollectDocumentDelivery(NpCsSaleLinePOSReference);
     end;
 
     local procedure UpdateCollectDocumentDelivery(NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref.")

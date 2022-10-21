@@ -178,7 +178,6 @@
 
                 NpIaSaleLinePOSAddOn.SetRange("Register No.", SaleLinePOS."Register No.");
                 NpIaSaleLinePOSAddOn.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-                NpIaSaleLinePOSAddOn.SetRange("Sale Type", SaleLinePOS."Sale Type");
                 NpIaSaleLinePOSAddOn.SetRange("Sale Date", SaleLinePOS.Date);
                 NpIaSaleLinePOSAddOn.SetRange("Sale Line No.", SaleLinePOS."Line No.");
                 if NpIaSaleLinePOSAddOn.FindSet() then begin
@@ -218,7 +217,6 @@
 
                 NpDcSaleLinePOSCoupon.SetRange("Register No.", SaleLinePOS."Register No.");
                 NpDcSaleLinePOSCoupon.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-                NpDcSaleLinePOSCoupon.SetRange("Sale Type", SaleLinePOS."Sale Type");
                 NpDcSaleLinePOSCoupon.SetRange("Sale Date", SaleLinePOS.Date);
                 NpDcSaleLinePOSCoupon.SetRange("Sale Line No.", SaleLinePOS."Line No.");
                 if NpDcSaleLinePOSCoupon.FindSet() then begin
@@ -234,7 +232,6 @@
 
                 NpDcSaleLinePOSNewCoupon.SetRange("Register No.", SaleLinePOS."Register No.");
                 NpDcSaleLinePOSNewCoupon.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-                NpDcSaleLinePOSNewCoupon.SetRange("Sale Type", SaleLinePOS."Sale Type");
                 NpDcSaleLinePOSNewCoupon.SetRange("Sale Date", SaleLinePOS.Date);
                 NpDcSaleLinePOSNewCoupon.SetRange("Sale Line No.", SaleLinePOS."Line No.");
                 if NpDcSaleLinePOSNewCoupon.FindSet() then begin
@@ -260,7 +257,6 @@
 
                 NpCsSaleLinePOSRef.SetRange("Register No.", SaleLinePOS."Register No.");
                 NpCsSaleLinePOSRef.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-                NpCsSaleLinePOSRef.SetRange("Sale Type", SaleLinePOS."Sale Type");
                 NpCsSaleLinePOSRef.SetRange("Sale Date", SaleLinePOS.Date);
                 NpCsSaleLinePOSRef.SetRange("Sale Line No.", SaleLinePOS."Line No.");
                 if NpCsSaleLinePOSRef.FindSet() then begin

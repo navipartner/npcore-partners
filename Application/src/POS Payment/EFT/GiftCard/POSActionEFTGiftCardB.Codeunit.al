@@ -70,8 +70,7 @@ codeunit 6059883 "NPR POS Action: EFTGiftCard B."
 
         LineAmount := Round((Amount / 100) * (DiscountPercent), Currency."Amount Rounding Precision") * -1;
 
-        SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Deposit);
-        SaleLinePOS.Validate(Type, SaleLinePOS.Type::"G/L Entry");
+        SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"Customer Deposit");
         SaleLinePOS.Validate("No.", EFTTransactionMgt.GetPOSPostingSetupAccountNo(POSSession, EFTTransactionRequest."Original POS Payment Type Code"));
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS.Description := CopyStr(SaleLinePOS.Description + ' - ' + DiscountLbl, 1, MaxStrLen(SaleLinePOS.Description));

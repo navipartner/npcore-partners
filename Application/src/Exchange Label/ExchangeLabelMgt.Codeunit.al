@@ -113,8 +113,6 @@
                 begin
                     FieldRef := LineRef.Field(GetFieldNo(LineRef, 'Line No.'));
                     FieldRef.SetRange();
-                    FieldRef := LineRef.Field(GetFieldNo(LineRef, 'Sale Type'));
-                    FieldRef.SetRange();
                     if LineRef.FindSet() then
                         repeat
                             AssignIntegerFieldValue(LineCount, LineRef, 'Quantity');
@@ -233,8 +231,7 @@
                     SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
                     SaleLinePOS."Line No." := LineNo;
                     SaleLinePOS.Date := SalePOS.Date;
-                    SaleLinePOS.Type := SaleLinePOS.Type::Item;
-                    SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
+                    SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
                     SaleLinePOS."Eksp. Salgspris" := true;
                     SaleLinePOS."Custom Price" := true;
                     SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
@@ -369,8 +366,8 @@
                 end;
             DATABASE::"NPR POS Sale Line":
                 begin
-                    AssignIntegerFieldValue(Type, RecRef, 'Type');
-                    exit(Type = SaleLinePOS.Type::Item)
+                    AssignIntegerFieldValue(Type, RecRef, 'Line Type');
+                    exit(Type = SaleLinePOS."Line Type"::Item.AsInteger())
                 end;
         end;
     end;

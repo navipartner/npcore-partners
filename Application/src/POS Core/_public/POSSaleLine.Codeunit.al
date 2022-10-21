@@ -34,7 +34,7 @@
         Rec.FilterGroup(2);
         Rec.SetRange("Register No.", RegisterNo);
         Rec.SetRange("Sales Ticket No.", SalesTicketNo);
-        Rec.SetFilter(Type, '<>%1', Rec.Type::Payment);
+        Rec.SetFilter("Line Type", '<>%1', Rec."Line Type"::"POS Payment");
         Rec.FilterGroup(0);
 
         Sale.Get(RegisterNo, SalesTicketNo);
@@ -66,8 +66,7 @@
         Rec."Register No." := Sale."Register No.";
         Rec."Sales Ticket No." := Sale."Sales Ticket No.";
         Rec.Date := Sale.Date;
-        Rec."Sale Type" := Rec."Sale Type"::Sale;
-        Rec.Type := Rec.Type::Item;
+        Rec."Line Type" := Rec."Line Type"::Item;
 
         Setup.GetPOSStore(POSStore);
         Rec."Location Code" := POSStore."Location Code";
@@ -151,12 +150,11 @@
 
         InitLine();
 
-        Rec.Type := Line.Type;
-        Rec."Sale Type" := Line."Sale Type";
+        Rec."Line Type" := Line."Line Type";
 
         Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
 
-        if (Line.Type = Line.Type::Item) and (Line."Variant Code" = '') then begin
+        if (Line."Line Type" = Line."Line Type"::Item) and (Line."Variant Code" = '') then begin
             Line."Variant Code" := FillVariantThroughLookUp(Line."No.", Rec."Location Code");
             Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
         end;
@@ -178,7 +176,7 @@
 
         Rec.Validate("NPRE Seating Code", Line."NPRE Seating Code");
 
-        if (Rec."Sale Type" = Rec."Sale Type"::"Out payment") then begin
+        if Rec."Line Type" in [Rec."Line Type"::"GL Payment", Rec."Line Type"::Rounding] then begin
             Rec."Unit Price" := Line."Unit Price";
             Rec.Amount := Line.Amount;
             Rec."Amount Including VAT" := Line."Amount Including VAT";
@@ -207,7 +205,7 @@
         if (Line."Unit Price" <> 0) and UseLinePriceVATParams then
             ConvertPriceToVAT(Line."Price Includes VAT", Line."VAT Bus. Posting Group", Line."VAT Prod. Posting Group", Rec, Line."Unit Price")
         else
-            if (Rec.Type = Rec.Type::Item) and (Rec."No." <> '') and (Line."Unit Price" <> 0) then begin
+            if (Rec."Line Type" = Rec."Line Type"::Item) and (Rec."No." <> '') and (Line."Unit Price" <> 0) then begin
                 Item.Get(Rec."No.");
                 if Item."Price Includes VAT" then begin
                     Item.TestField("VAT Bus. Posting Gr. (Price)");
@@ -311,7 +309,7 @@
 
         Rec.Validate("Unit Price", UnitPriceLCY);
 
-        if (Rec.Type = Rec.Type::Item) then
+        if (Rec."Line Type" = Rec."Line Type"::Item) then
             Rec."Initial Group Sale Price" := UnitPriceLCY;
 
         Rec.Modify(true);
@@ -343,20 +341,20 @@
         if (Rec."Register No." <> '') and (Rec."Sales Ticket No." <> '') then begin
             SaleLine.SetRange("Register No.", Rec."Register No.");
             SaleLine.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
-            SaleLine.SetFilter(Type, '<>%1', Rec.Type::Comment);
+            SaleLine.SetFilter("Line Type", '<>%1', Rec."Line Type"::Comment);
             if SaleLine.FindSet() then begin
                 repeat
-                    if SaleLine.Type = SaleLine.Type::Item then
+                    if SaleLine."Line Type" = SaleLine."Line Type"::Item then
                         ItemCountWhenCalculatedBalance += SaleLine.Quantity;
-                    if SaleLine."Sale Type" in [SaleLine."Sale Type"::Sale, SaleLine."Sale Type"::Deposit] then begin
+                    if SaleLine."Line Type" in [SaleLine."Line Type"::"BOM List",SaleLine."Line Type"::"Customer Deposit",SaleLine."Line Type"::"Issue Voucher",SaleLine."Line Type"::"Item Category",SaleLine."Line Type"::"Issue Voucher",SaleLine."Line Type"::Item,SaleLine."Line Type"::Rounding] then begin
                         AmountExclVAT += SaleLine.Amount;
                         TotalAmount += SaleLine."Amount Including VAT";
                     end else
-                        if SaleLine."Sale Type" = SaleLine."Sale Type"::"Out payment" then
-                            if SaleLine."Discount Type" <> SaleLine."Discount Type"::Rounding then begin
-                                OutPaymentAmount += SaleLine."Amount Including VAT";
-                                AmountExclVAT += SaleLine.Amount;
-                            end;
+                        if SaleLine."Line Type" = SaleLine."Line Type"::"GL Payment" then begin
+                            OutPaymentAmount += SaleLine."Amount Including VAT";
+                            AmountExclVAT += SaleLine.Amount;
+                        end;
+                            
                 until SaleLine.Next() = 0;
                 TotalAmount += OutPaymentAmount;
                 VATAmount := TotalAmount - AmountExclVAT;
@@ -379,9 +377,10 @@
         CurrDataSet.Totals().Add('ItemCount', ItemCountWhenCalculatedBalance);
     end;
 
+    [Obsolete('Zero reference')]
     procedure GetDepositLine(var LinePOS: Record "NPR POS Sale Line")
     begin
-        SetDepositLineType(LinePOS);
+        
     end;
 
     procedure InitPayoutPayInLine(var LinePOS: Record "NPR POS Sale Line")
@@ -389,32 +388,22 @@
         SetPayoutPayInLineType(LinePOS);
     end;
 
-    local procedure SetDepositLineType(var LinePOS: Record "NPR POS Sale Line")
-    begin
-        LinePOS."Register No." := Sale."Register No.";
-        LinePOS."Sales Ticket No." := Sale."Sales Ticket No.";
-        LinePOS.Date := Sale.Date;
-        LinePOS."Sale Type" := LinePOS."Sale Type"::Deposit;
-        LinePOS.Quantity := 1;
-    end;
 
     local procedure SetPayoutPayInLineType(var LinePOS: Record "NPR POS Sale Line")
     begin
         LinePOS."Register No." := Sale."Register No.";
         LinePOS."Sales Ticket No." := Sale."Sales Ticket No.";
         LinePOS.Date := Sale.Date;
-        LinePOS.Type := LinePOS.Type::"G/L Entry";
-        LinePOS."Sale Type" := LinePOS."Sale Type"::"Out payment";
+        LinePOS."Line Type" := LinePOS."Line Type"::"GL Payment";
         LinePOS.Quantity := 1;
     end;
 
+    [Obsolete('Zero reference')]
     procedure InsertDepositLine(var Line: Record "NPR POS Sale Line"; ForeignCurrencyAmount: Decimal) Return: Boolean
     begin
         InitLine();
 
-        SetDepositLineType(Rec);
-
-        Rec.Type := Line.Type;
+        Rec."Line Type" := Line."Line Type";
         Rec."No." := Line."No.";
         Rec.Description := Line.Description;
         Rec.Quantity := Line.Quantity;

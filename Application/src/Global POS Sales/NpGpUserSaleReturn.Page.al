@@ -134,7 +134,6 @@
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
 
         POSCrossReference.SetRange("Reference No.", Rec."Global Reference");
         if POSCrossReference.FindSet() then

@@ -336,7 +336,7 @@
         if ItemQuantity = 0 then
             ItemQuantity := 1;
 
-        Line.Type := Line.Type::Item;
+        Line."Line Type" := Line."Line Type"::Item;
         Line.Quantity := ItemQuantity;
 
         case ItemIdentifierType of
@@ -357,7 +357,7 @@
             ItemIdentifierType::SerialNoItemCrossReference:
                 begin
                     SaleLinePOS.Reset();
-                    SaleLinePOS.SetFilter(Type, '=%1', SaleLinePOS.Type::Item);
+                    SaleLinePOS.SetFilter("Line Type", '=%1', SaleLinePOS."Line Type"::Item);
                     SaleLinePOS.SetFilter("Serial No. not Created", '=%1', ItemReference."Reference No.");
                     if not SaleLinePOS.IsEmpty then
                         exit;
@@ -381,7 +381,7 @@
         if SetUnitPrice then begin
             Line."Unit Price" := UnitPrice;
 
-            if (Line.Type = Line.Type::Item) then
+            if (Line."Line Type" = Line."Line Type"::Item) then
                 Line."Initial Group Sale Price" := UnitPrice;
         end;
 
@@ -493,7 +493,7 @@
             exit;
 
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        SaleLinePOS.Validate(Type, SaleLinePOS.Type::"BOM List");
+        SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"BOM List");
         SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::"BOM List";
         SaleLinePOS."Discount Code" := SaleLinePOS."No.";
         SaleLinePOS."Unit Price" := 0;
@@ -636,7 +636,7 @@
         if ItemTrackingCode."SN Specific Tracking" then begin
             SaleLinePOS.Reset();
             SaleLinePOS.SetCurrentKey("Serial No.");
-            SaleLinePOS.SetFilter(Type, '=%1', SaleLinePOS.Type::Item);
+            SaleLinePOS.SetFilter("Line Type", '=%1', SaleLinePOS."Line Type"::Item);
             SaleLinePOS.SetFilter("No.", '=%1', ItemNo);
             SaleLinePOS.SetFilter("Serial No.", '=%1', SerialNumber);
             if not SaleLinePOS.IsEmpty then begin

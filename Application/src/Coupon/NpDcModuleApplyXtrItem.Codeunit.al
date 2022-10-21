@@ -54,9 +54,8 @@
         SaleLinePOS."Register No." := SaleLinePOSCoupon."Register No.";
         SaleLinePOS."Sales Ticket No." := SaleLinePOSCoupon."Sales Ticket No.";
         SaleLinePOS.Date := SaleLinePOSCoupon."Sale Date";
-        SaleLinePOS."Sale Type" := SaleLinePOSCoupon."Sale Type";
         SaleLinePOS."Line No." := LineNo;
-        SaleLinePOS.Type := SaleLinePOS.Type::Item;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
         SaleLinePOS.Validate("No.", ExtraCouponItem."Item No.");
         SaleLinePOS.Validate(Quantity, 1);
 
@@ -72,7 +71,6 @@
         SaleLinePOSCouponApply.Init();
         SaleLinePOSCouponApply."Register No." := SaleLinePOS."Register No.";
         SaleLinePOSCouponApply."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        SaleLinePOSCouponApply."Sale Type" := SaleLinePOS."Sale Type";
         SaleLinePOSCouponApply."Sale Date" := SaleLinePOS.Date;
         SaleLinePOSCouponApply."Sale Line No." := SaleLinePOS."Line No.";
         SaleLinePOSCouponApply."Line No." := 10000;
@@ -213,7 +211,6 @@
         Clear(SaleLinePOSCouponApply);
         SaleLinePOSCouponApply.SetRange("Register No.", SaleLinePOSCoupon."Register No.");
         SaleLinePOSCouponApply.SetRange("Sales Ticket No.", SaleLinePOSCoupon."Sales Ticket No.");
-        SaleLinePOSCouponApply.SetRange("Sale Type", SaleLinePOSCoupon."Sale Type");
         SaleLinePOSCouponApply.SetRange("Sale Date", SaleLinePOSCoupon."Sale Date");
         SaleLinePOSCouponApply.SetRange(Type, SaleLinePOSCouponApply.Type::Discount);
         SaleLinePOSCouponApply.SetRange("Applies-to Sale Line No.", SaleLinePOSCoupon."Sale Line No.");
@@ -235,7 +232,6 @@
         SaleLinePOS.SetRange("Register No.", SaleLinePOSCoupon."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOSCoupon."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SaleLinePOSCoupon."Sale Date");
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOSCoupon."Sale Type");
         if SaleLinePOS.FindLast() then;
         exit(SaleLinePOS."Line No." + 10000);
     end;

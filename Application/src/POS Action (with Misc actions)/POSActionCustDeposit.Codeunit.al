@@ -173,8 +173,7 @@
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
-        SaleLinePOS.Type := SaleLinePOS.Type::Customer;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"Customer Deposit";
         SaleLinePOS.Validate("No.", SalePOS."Customer No.");
         SaleLinePOS.Quantity := 1;
         SaleLinePOS.Amount := Amount;

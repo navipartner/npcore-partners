@@ -86,7 +86,7 @@
         GUID := CreateGuid();
 
         SaleLinePOS2.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        SaleLinePOS2.SetRange(Type, SaleLinePOS2.Type::Item);
+        SaleLinePOS2.SetRange("Line Type", SaleLinePOS2."Line Type"::Item);
 
         if SaleLinePOS2.FindSet() then
             repeat

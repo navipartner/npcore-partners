@@ -61,7 +61,7 @@
             POSSession.GetSale(POSSale);  //Ensure the sale still exists (haven't been seized and finished/cancelled by another session)
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetCurrentSaleLine(LinePOS);
-            if LinePOS.Type = LinePOS.Type::Item then begin
+            if LinePOS."Line Type" = LinePOS."Line Type"::Item then begin
                 if Item.Get(LinePOS."No.") then begin
                     Item.SetRecFilter();
                     RetailItemCard.Editable(JSON.GetBooleanParameter('PageEditable'));

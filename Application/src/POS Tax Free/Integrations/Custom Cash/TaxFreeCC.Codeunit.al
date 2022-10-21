@@ -301,8 +301,7 @@
         TaxFreeCCParam: Record "NPR Tax Free CC Param.";
     begin
         SaleLinePOS.SetRange("Sales Ticket No.", SalesTicketNo);
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetFilter(Quantity, '>0');
         SaleLinePOS.SetFilter("VAT %", '>0');
 

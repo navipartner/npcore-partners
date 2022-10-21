@@ -286,7 +286,7 @@
     begin
         Init();
         "Request No." := 0;
-        Type := WaiterPadLine.Type;
+        Type := WaiterPadLine."Line Type";
         "No." := WaiterPadLine."No.";
         "Variant Code" := WaiterPadLine."Variant Code";
         Description := WaiterPadLine.Description;

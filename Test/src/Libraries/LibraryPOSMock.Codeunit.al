@@ -225,8 +225,7 @@ codeunit 85003 "NPR Library - POS Mock"
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Deposit);
-        SaleLinePOS.Validate(Type, SaleLinePOS.Type::"G/L Entry");
+        SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"Issue Voucher");
         SaleLinePOS.Validate("No.", VoucherType."Account No.");
         SaleLinePOS.Description := VoucherType.Description;
         SaleLinePOS.Quantity := Quantity;
@@ -256,7 +255,6 @@ codeunit 85003 "NPR Library - POS Mock"
         NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
         NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
         NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
         NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
         NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
         NpRvSalesLine."Voucher No." := TempVoucher."No.";

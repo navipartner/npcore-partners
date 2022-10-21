@@ -17,7 +17,6 @@
             TempSaleLinePOS.SetRange("Register No.", Rec."Register No.");
             TempSaleLinePOS.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
             TempSaleLinePOS.SetRange(Date, Rec.Date);
-            TempSaleLinePOS.SetRange("Sale Type", Rec."Sale Type");
             TempSaleLinePOS.SetFilter("Discount Type", '=%1|=%2', TempSaleLinePOS."Discount Type"::" ", TempSaleLinePOS."Discount Type"::Campaign);
             if TempSaleLinePOS.FindSet() then
                 repeat

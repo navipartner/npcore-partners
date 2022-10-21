@@ -41,11 +41,7 @@ page 6059788 "NPR APIV1 - Ext. POS Sale Line"
                 {
                     Caption = 'Line No.', Locked = true;
                 }
-                field(saleType; Rec."Sale Type")
-                {
-                    Caption = 'Sale Type', Locked = true;
-                }
-                field(type; Rec."Type")
+                field(type; Rec."Line Type")
                 {
                     Caption = 'Type', Locked = true;
                 }

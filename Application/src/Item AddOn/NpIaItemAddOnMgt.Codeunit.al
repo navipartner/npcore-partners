@@ -450,7 +450,7 @@
             POSSaleLine.GetNewSaleLine(SaleLinePOS);
 
             BeforeInsertPOSAddOnLine(SalePOS, AppliesToLineNo, ItemAddOnLine);
-            SaleLinePOS.Type := SaleLinePOS.Type::Item;
+            SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
             SaleLinePOS."Variant Code" := ItemAddOnLine."Variant Code";
             SaleLinePOS.Validate("No.", ItemAddOnLine."Item No.");
             SaleLinePOS.Description := ItemAddOnLine.Description;
@@ -476,7 +476,6 @@
             SaleLinePOSAddOn.Init();
             SaleLinePOSAddOn."Register No." := SaleLinePOS."Register No.";
             SaleLinePOSAddOn."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-            SaleLinePOSAddOn."Sale Type" := SaleLinePOS."Sale Type";
             SaleLinePOSAddOn."Sale Date" := SaleLinePOS.Date;
             SaleLinePOSAddOn."Sale Line No." := SaleLinePOS."Line No.";
             SaleLinePOSAddOn."Line No." := LineNo;
@@ -499,7 +498,7 @@
         PrevRec := Format(SaleLinePOS);
 
         BeforeInsertPOSAddOnLine(SalePOS, AppliesToLineNo, ItemAddOnLine);
-        SaleLinePOS.Type := SaleLinePOS.Type::Item;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
         SaleLinePOS."Variant Code" := ItemAddOnLine."Variant Code";
         SaleLinePOS.Validate("No.", ItemAddOnLine."Item No.");
         SaleLinePOS.Description := ItemAddOnLine.Description;
@@ -546,7 +545,7 @@
             POSInfoTransaction."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
             POSInfoTransaction."Sales Line No." := SaleLinePOS."Line No.";
             POSInfoTransaction."Sale Date" := SaleLinePOS.Date;
-            POSInfoTransaction."Receipt Type" := SaleLinePOS.Type;
+            POSInfoTransaction."Line Type" := SaleLinePOS."Line Type";
             POSInfoTransaction."Entry No." := 0;
             POSInfoTransaction."POS Info Code" := POSInfo.Code;
             POSInfoTransaction."POS Info" := CopyStr(Comment, 1, MaxStrLen(POSInfoTransaction."POS Info"));
@@ -672,7 +671,6 @@
         Clear(SaleLinePOSAddOn);
         SaleLinePOSAddOn.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOSAddOn.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        SaleLinePOSAddOn.SetRange("Sale Type", SaleLinePOS."Sale Type");
         SaleLinePOSAddOn.SetRange("Sale Date", SaleLinePOS.Date);
         SaleLinePOSAddOn.SetRange("Sale Line No.", SaleLinePOS."Line No.");
     end;
@@ -682,7 +680,6 @@
         Clear(SaleLinePOSAddOn);
         SaleLinePOSAddOn.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOSAddOn.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        SaleLinePOSAddOn.SetRange("Sale Type", SaleLinePOS."Sale Type");
         SaleLinePOSAddOn.SetRange("Sale Date", SaleLinePOS.Date);
         SaleLinePOSAddOn.SetRange("Applies-to Line No.", AppliesToLineNo);
     end;
@@ -703,7 +700,7 @@
     begin
         Clear(ItemAddOn);
 
-        if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
+        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item then
             exit(false);
 
         if SaleLinePOS."No." in ['', '*'] then

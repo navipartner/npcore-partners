@@ -693,6 +693,7 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
             NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(_Item, _POSUnit, _POSStore);
+            NPRLibraryPOSMasterData.DontPrintReceiptOnSaleEnd(_POSUnit);
             CreateDKKPaymentMethod();
             CreateCashPaymentMethod();
             CreateEURPaymentMethod();

@@ -13,7 +13,7 @@
         {
             repeater(Group)
             {
-                field(Type; Rec.Type)
+                field(Type; Rec."Line Type")
                 {
 
                     ToolTip = 'Specifies the value of the Type field';

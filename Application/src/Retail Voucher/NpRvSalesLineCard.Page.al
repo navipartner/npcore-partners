@@ -201,12 +201,6 @@
                         ToolTip = 'Specifies the value of the Sales Ticket No. field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("Sale Type"; Rec."Sale Type")
-                    {
-
-                        ToolTip = 'Specifies the value of the Sale Type field';
-                        ApplicationArea = NPRRetail;
-                    }
                     field("Sale Date"; Rec."Sale Date")
                     {
 

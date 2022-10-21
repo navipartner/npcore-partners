@@ -404,7 +404,7 @@
                     repeat
                         Clear(WaiterPadLineContent);
                         WaiterPadLineContent.Add('id', FORMAT(WaiterPadLine."Line No.", 0, 9));
-                        WaiterPadLineContent.Add('type', FORMAT(WaiterPadLine.Type));
+                        WaiterPadLineContent.Add('type', FORMAT(WaiterPadLine."Line Type"));
                         WaiterPadLineContent.Add('itemNo', WaiterPadLine."No.");
                         WaiterPadLineContent.Add('quantity', WaiterPadLine.Quantity);
                         WaiterPadLineContent.Add('unitPrice', FORMAT(WaiterPadLine."Unit Price"));

@@ -56,14 +56,13 @@
             case SalesLine.Type of
                 SalesLine.Type::Item:
                     begin
-                        SaleLinePOS.Type := SaleLinePOS.Type::Item;
-                        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
+                        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
                         SaleLinePOS.Validate("No.", SalesLine."No.");
                         SaleLinePOS.Validate("Unit of Measure Code", SalesLine."Unit of Measure Code");
                     end;
                 SalesLine.Type::" ":
                     begin
-                        SaleLinePOS.Type := SaleLinePOS.Type::Comment;
+                        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
                         SaleLinePOS.Description := SalesLine.Description;
                     end;
             end;
@@ -149,8 +148,7 @@
 
     procedure SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount: Decimal; var SaleLinePOS: Record "NPR POS Sale Line"; var SalesHeader: Record "Sales Header"; Pdf2Nav: Boolean; Send: Boolean; SyncPost: Boolean)
     begin
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
-        SaleLinePOS.Type := SaleLinePOS.Type::Customer;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"Customer Deposit";
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS.Validate("No.", SalesHeader."Bill-to Customer No.");
         SaleLinePOS."Sales Document Type" := SalesHeader."Document Type";
@@ -178,8 +176,7 @@
 
     procedure SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount: Decimal; var SaleLinePOS: Record "NPR POS Sale Line"; var SalesInvoiceHeader: Record "Sales Invoice Header"; Pdf2Nav: Boolean; Send: Boolean; SyncPost: Boolean)
     begin
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
-        SaleLinePOS.Type := SaleLinePOS.Type::Customer;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"Customer Deposit";
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS.Validate("No.", SalesInvoiceHeader."Bill-to Customer No.");
         SaleLinePOS.Validate("Unit Price", PaymentAmount);

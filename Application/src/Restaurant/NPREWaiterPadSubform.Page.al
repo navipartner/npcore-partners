@@ -65,7 +65,7 @@
                     ToolTip = 'Specifies the value of the Start Time field';
                     ApplicationArea = NPRRetail;
                 }
-                field(Type; Rec.Type)
+                field(Type; Rec."Line Type")
                 {
 
                     Editable = false;
@@ -99,14 +99,6 @@
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Billed Quantity field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Sale Type"; Rec."Sale Type")
-                {
-
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Sale Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")

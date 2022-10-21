@@ -2794,7 +2794,7 @@ codeunit 85004 "NPR EFT Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetRange(SystemId, LineSystemId);
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"POS Payment");
         if ShouldExist then begin
             SaleLinePOS.FindFirst();
             SaleLinePOS.TestField("Amount Including VAT", Amount);
@@ -2808,8 +2808,7 @@ codeunit 85004 "NPR EFT Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetRange(SystemId, LineSystemId);
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         if ShouldExist then begin
             SaleLinePOS.FindFirst();
             SaleLinePOS.TestField("Amount Including VAT", Amount);
@@ -2823,8 +2822,7 @@ codeunit 85004 "NPR EFT Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetRange(SystemId, LineSystemId);
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::"G/L Entry");
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Deposit);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"Issue Voucher");
         if ShouldExist then begin
             SaleLinePOS.FindFirst();
             SaleLinePOS.TestField("Amount Including VAT", Amount);

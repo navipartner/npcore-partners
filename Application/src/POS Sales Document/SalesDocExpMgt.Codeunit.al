@@ -408,10 +408,11 @@
                 SalesLine."Document Type" := SalesHeader."Document Type";
                 SalesLine."Document No." := SalesHeader."No.";
 
-                case SaleLinePOS.Type of
-                    SaleLinePOS.Type::"G/L Entry":
+                case SaleLinePOS."Line Type" of
+                    SaleLinePOS."Line Type"::"GL Payment",
+                    SaleLinePOS."Line Type"::"Issue Voucher":
                         SalesLine.Type := SalesLine.Type::"G/L Account";
-                    SaleLinePOS.Type::Comment:
+                    SaleLinePOS."Line Type"::Comment:
                         SalesLine.Type := SalesLine.Type::" ";
                     else
                         SalesLine.Type := SalesLine.Type::Item;
@@ -426,7 +427,7 @@
                         SalesLine.Validate(Quantity, -SaleLinePOS.Quantity)
                     else begin
                         SalesLine.Validate(Quantity, SaleLinePOS.Quantity);
-                        if SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment" then
+                        if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"GL Payment" then
                             SalesLine.Validate(Quantity, -SaleLinePOS.Quantity);
                     end;
 
@@ -502,20 +503,19 @@
 
     procedure TestSaleLinePOS(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
-        if SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Payment then
+        if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"POS Payment" then
             Error(CannotPostPaymentErr);
 
         if SaleLinePOS."Sales Document No." <> '' then
             Error(OneDocPerSalesTicketErr);
 
-        if (SaleLinePOS.Type = SaleLinePOS.Type::Customer) and
-           (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Deposit) then
+        if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"Customer Deposit" then
             Error(CannotPostPaymentSalesModuleErr);
 
         if SaleLinePOS."Buffer Document No." <> '' then
             Error(CannotPostPaymentSalesModuleErr);
 
-        if SaleLinePOS.Type = SaleLinePOS.Type::"Item Group" then
+        if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"Item Category" then
             Error(CannotDeleteItemGroupsErr);
     end;
 
@@ -969,8 +969,7 @@
         end;
 
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
-        SaleLinePOS.Type := SaleLinePOS.Type::Customer;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"Customer Deposit";
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS.Validate("No.", SalesHeader."Bill-to Customer No.");
         SaleLinePOS."Sales Document Type" := SalesHeader."Document Type";
@@ -1004,8 +1003,7 @@
         PrepaymentRefundAmount := POSPrepaymentMgt.GetPrepaymentAmountToDeductInclVAT(SalesHeader);
 
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
-        SaleLinePOS.Type := SaleLinePOS.Type::Customer;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"Customer Deposit";
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS.Validate("No.", SalesHeader."Bill-to Customer No.");
         SaleLinePOS."Sales Document Type" := SalesHeader."Document Type";

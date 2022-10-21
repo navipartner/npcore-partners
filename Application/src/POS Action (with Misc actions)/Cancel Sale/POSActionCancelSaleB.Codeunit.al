@@ -25,7 +25,7 @@ codeunit 6059872 "NPR POSAction: Cancel Sale B"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.DeleteAll();
 
-        Line.Type := Line.Type::Comment;
+        Line."Line Type" := Line."Line Type"::Comment;
         if AltSaleCancelDescription <> '' then begin
             Line.Description := CopyStr(AltSaleCancelDescription, 1, MaxStrLen(Line.Description));
             Line."Description 2" := CopyStr(AltSaleCancelDescription, MaxStrLen(Line.Description) + 1, MaxStrLen(Line."Description 2"));

@@ -38,7 +38,7 @@ codeunit 6059783 "NPR POS Item-Check Avail."
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.Copy(Scope);
-        SaleLinePOS.SetRange(Type, SaleLinePOS.type::Item);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetFilter("No.", '<>%1', '');
         SaleLinePOS.SetFilter("Quantity (Base)", '>%1', 0);
         if SaleLinePOS.IsEmpty() then
@@ -68,7 +68,7 @@ codeunit 6059783 "NPR POS Item-Check Avail."
         PosInventoryProfile: Record "NPR POS Inventory Profile";
         TempPosItemAvailability: Record "NPR POS Item Availability" temporary;
     begin
-        if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) or (SaleLinePOS."No." = '') or (SaleLinePOS."Quantity (Base)" <= 0) then
+        if (SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item) or (SaleLinePOS."No." = '') or (SaleLinePOS."Quantity (Base)" <= 0) then
             exit(true);
         SaleLinePOS.TestField("Register No.");
         GetPosInvtProfile(SaleLinePOS."Register No.", PosInventoryProfile);
@@ -143,7 +143,7 @@ codeunit 6059783 "NPR POS Item-Check Avail."
     begin
         SaleLinePOS.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetRange("No.", SaleLinePOS."No.");
         SaleLinePOS.SetRange("Variant Code", SaleLinePOS."Variant Code");
         SaleLinePOS.SetRange("Location Code", SaleLinePOS."Location Code");
@@ -285,7 +285,7 @@ codeunit 6059783 "NPR POS Item-Check Avail."
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SetxDataset(SaleLinePOS);
     end;
 
@@ -306,7 +306,7 @@ codeunit 6059783 "NPR POS Item-Check Avail."
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         if not (SaleLinePOS.IsEmpty() or TempxSaleLinePOS.IsEmpty()) then begin
             SaleLinePOS.FindSet();
             repeat

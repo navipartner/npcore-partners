@@ -46,8 +46,7 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
                         begin
 
                             TmpSaleLinePOSRequest."Sales Ticket No." := TicketNumber;
-                            TmpSaleLinePOSRequest.Type := TmpSaleLinePOSRequest.Type::Item;
-
+                            TmpSaleLinePOSRequest."Line Type" := TmpSaleLinePOSRequest."Line Type"::Item;
                             TmpSaleLinePOSRequest.Date := TmpSalePOSRequest.Date
                         end;
                     }

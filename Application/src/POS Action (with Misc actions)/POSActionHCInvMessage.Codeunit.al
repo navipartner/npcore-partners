@@ -67,7 +67,7 @@
         if JSON.GetBooleanParameter('ShowList') then
             ExtLocationFilter := 'LIST:' + ExtLocationFilter;
 
-        SaleLinePOS.TestField(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.TestField("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.TestField("No.");
 
         ParametersText[1] := SaleLinePOS."No.";

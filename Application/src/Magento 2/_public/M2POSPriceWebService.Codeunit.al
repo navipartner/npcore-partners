@@ -1,11 +1,5 @@
 ﻿codeunit 6151145 "NPR M2 POS Price WebService"
 {
-    trigger OnRun()
-    begin
-        // TEST_SOAP_PosPrice ();
-        // TEST_SOAP_ItemPrice ();
-    end;
-
     procedure POSQuote(var POSPriceRequest: XMLport "NPR M2 POS Sv. Sale Price Req.")
     var
         TempSalePOS: Record "NPR POS Sale" temporary;
@@ -63,8 +57,7 @@
 
                     VATPostingSetup.Get(VATBusPostingGroup, Item."VAT Prod. Posting Group");
 
-                    TmpSaleLinePOS."Sale Type" := TmpSaleLinePOS."Sale Type"::Sale;
-                    TmpSaleLinePOS.Type := TmpSaleLinePOS.Type::Item;
+                    TmpSaleLinePOS."Line Type" := TmpSaleLinePOS."Line Type"::Item;
                     TmpSaleLinePOS.Description := Item.Description;
 
                     TmpSaleLinePOS."Price Includes VAT" := TmpSalePOS."Prices Including VAT";
@@ -81,7 +74,7 @@
                     TmpSaleLinePOS.UpdateAmounts(TmpSaleLinePOS);
 
                 end else begin
-                    TmpSaleLinePOS.Type := TmpSaleLinePOS.Type::Comment;
+                    TmpSaleLinePOS."Line Type" := TmpSaleLinePOS."Line Type"::Comment;
 
                 end;
                 TmpSaleLinePOS.Modify();

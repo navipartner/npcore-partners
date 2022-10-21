@@ -89,7 +89,7 @@
 
     local procedure FindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
-        if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
+        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item then
             exit;
 
         SetCurrency(SaleLinePOS."Currency Code", GetCurrencyFactor(SaleLinePOS."Currency Code", SalePOS.Date), SalePOS.Date);
@@ -132,7 +132,7 @@
 
     procedure FindSalesLineLineDisc(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
-        if SaleLinePOS.Type <> SaleLinePOS.Type then
+        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type" then
             exit;
         SetCurrency('', 0, 0D);
         SetUoM(Abs(SaleLinePOS.Quantity), 1);
@@ -155,7 +155,7 @@
         LineWithPrice: Interface "Line With Price";
         PriceCalculation: Interface "Price Calculation";
     begin
-        if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) then
+        if (SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item) then
             exit;
         if not Item.Get(SaleLinePOS."No.") then
             exit;
@@ -204,7 +204,7 @@
         LineWithPrice: Interface "Line With Price";
         PriceCalculation: Interface "Price Calculation";
     begin
-        if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) then
+        if (SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item) then
             exit;
         if not Item.Get(SaleLinePOS."No.") then
             exit;

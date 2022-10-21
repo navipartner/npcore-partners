@@ -540,8 +540,7 @@ tableextension 6014427 "NPR Item" extends Item
         if not POSEntry.IsEmpty() then
             Error(POSEntryNotEmptyErr, Rec."No.");
 
-        SalesLinePOS.SetRange("Sale Type", SalesLinePOS."Sale Type"::Sale);
-        SalesLinePOS.SetRange(Type, SalesLinePOS.Type::Item);
+        SalesLinePOS.SetRange("Line Type", SalesLinePOS."Line Type"::Item);
         SalesLinePOS.SetRange("No.", Rec."No.");
         if not SalesLinePOS.IsEmpty() then
             Error(SalesLinePOSNotEmptyErr, Rec."No.");
