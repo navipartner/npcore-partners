@@ -57,7 +57,7 @@ page 6060000 "NPR APIV1 PBIWaiterPadLine"
                 {
                     Caption = 'Unit Price', Locked = true;
                 }
-                field(type; Rec.Type)
+                field(type; Rec."Line Type")
                 {
                     Caption = 'Type', Locked = true;
                 }

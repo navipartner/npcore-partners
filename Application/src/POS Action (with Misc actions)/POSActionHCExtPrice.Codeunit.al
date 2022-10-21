@@ -60,7 +60,7 @@
         EndpointSetup.FindFirst();
 
         SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetFilter(Type, '=%1', SaleLinePOS.Type::Item);
+        SaleLinePOS.SetFilter("Line Type", '=%1', SaleLinePOS."Line Type"::Item);
         if (not SaleLinePOS.FindSet()) then
             exit;
 

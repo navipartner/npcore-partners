@@ -131,7 +131,7 @@
             SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
             SaleLinePOS."Register No." := SalePOS."Register No.";
             SaleLinePOS.Date := SalePOS.Date;
-            SaleLinePOS.Type := SaleLinePOS.Type::Item;
+            SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
         end;
 
         POSInfoManagement.ProcessPOSInfoMenuFunction(

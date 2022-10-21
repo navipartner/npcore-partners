@@ -157,8 +157,7 @@
                     SaleLinePOS.Reset();
                     SaleLinePOS.SetRange("Register No.", "Register No.");
                     SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                    SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
-                    SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+                    SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
                     SaleLinePOS.SetRange(Date, Date);
                     if not SaleLinePOS.IsEmpty and ("Prices Including VAT" <> xRec."Prices Including VAT") then begin
                         SaleLinePOS.ModifyAll(Amount, 0);
@@ -398,6 +397,11 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Sale,Annullment';
             OptionMembers = Sale,Annullment;
+        }        
+        field(110; "Header Type"; Enum "NPR POS Sale Type")
+        {
+            Caption = 'Sale Type';
+            DataClassification = CustomerContent;
         }
         field(111; "Retursalg Bonnummer"; Code[20])
         {
@@ -472,7 +476,6 @@
 
                 SaleLinePOS.SetRange("Register No.", "Register No.");
                 SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
                 SaleLinePOS.SetRange(Date, Date);
                 if SaleLinePOS.FindSet(true, false) then begin
                     SaleLinePOS.ModifyAll(Amount, 0);
@@ -644,8 +647,7 @@
             AutoFormatType = 1;
             CalcFormula = Sum("NPR POS Sale Line".Amount WHERE("Register No." = FIELD("Register No."),
                                                             "Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                            "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
-                                                            Type = FILTER(<> Comment & <> "Open/Close")));
+                                                            "Line Type" = filter(Item | "Item Category" | "BOM List" | "Issue Voucher" | "Customer Deposit")));
             Caption = 'Amount';
             Description = 'NPR5.54';
             Editable = false;
@@ -660,8 +662,7 @@
             AutoFormatType = 1;
             CalcFormula = Sum("NPR POS Sale Line"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
                                                                             "Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                                            "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
-                                                                            Type = FILTER(<> Comment & <> "Open/Close")));
+                                                                            "Line Type" = filter(Item | "Item Category" | "BOM List" | "Issue Voucher" | "Customer Deposit")));
             Caption = 'Amount Including VAT';
             Description = 'NPR5.54';
             Editable = false;
@@ -672,8 +673,7 @@
             AutoFormatType = 1;
             CalcFormula = Sum("NPR POS Sale Line"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
                                                                             "Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                                            "Sale Type" = FILTER(Payment | "Out payment"),
-                                                                            Type = FILTER(<> Comment & <> "Open/Close")));
+                                                                            "Line Type" = filter("POS Payment" | Rounding | "GL Payment")));
             Caption = 'Payment Amount';
             Description = 'NPR5.54';
             Editable = false;
@@ -713,7 +713,6 @@
             begin
                 SaleLinePOS.SetRange("Register No.", "Register No.");
                 SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
                 if "NPRE Pre-Set Seating Code" <> '' then
                     SaleLinePOS.SetRange("NPRE Seating Code", xRec."NPRE Pre-Set Seating Code");
                 if SaleLinePOS.FindSet(true) then

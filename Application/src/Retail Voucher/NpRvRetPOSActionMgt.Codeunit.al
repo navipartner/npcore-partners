@@ -215,7 +215,6 @@
 
         NpRvSalesLine.SetRange("Register No.", SaleLinePOS."Register No.");
         NpRvSalesLine.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        NpRvSalesLine.SetRange("Sale Type", SaleLinePOS."Sale Type");
         NpRvSalesLine.SetRange("Sale Date", SaleLinePOS.Date);
         NpRvSalesLine.SetRange("Sale Line No.", SaleLinePOS."Line No.");
         if not NpRvSalesLine.FindSet() then

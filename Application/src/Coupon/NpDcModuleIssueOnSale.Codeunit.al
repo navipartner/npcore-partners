@@ -51,7 +51,7 @@
         SalePOS: Record "NPR POS Sale";
     begin
         if not TriggerOnSaleCoupon(SaleLinePOS, SalePOS) then begin
-            if SaleLinePOS.Type = SaleLinePOS.Type::Comment then
+            if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Comment then
                 RemoveNewCouponsSalesLinePOS(SaleLinePOS);
             exit;
         end;
@@ -150,14 +150,13 @@
             SaleLinePOS."Register No." := SalePOS."Register No.";
             SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
             SaleLinePOS."Line No." := LineNo;
-            SaleLinePOS.Type := SaleLinePOS.Type::Comment;
+            SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
             SaleLinePOS.Description := CopyStr(StrSubstNo(Text002, CouponType.Description), 1, MaxStrLen(SaleLinePOS.Description));
             SaleLinePOS.Insert(true);
 
             NpDcSaleLinePOSNewCoupon.Init();
             NpDcSaleLinePOSNewCoupon."Register No." := SaleLinePOS."Register No.";
             NpDcSaleLinePOSNewCoupon."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-            NpDcSaleLinePOSNewCoupon."Sale Type" := SaleLinePOS."Sale Type";
             NpDcSaleLinePOSNewCoupon."Sale Date" := SaleLinePOS.Date;
             NpDcSaleLinePOSNewCoupon."Sale Line No." := SaleLinePOS."Line No.";
             NpDcSaleLinePOSNewCoupon."Line No." := 10000;
@@ -443,7 +442,7 @@
         if not NpDcIssueOnSaleSetupLine.FindSet() then begin
             SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+            SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
             SaleLinePOS.SetFilter(Quantity, '>%1', 0);
             SaleLinePOS2DiscBuffer(SaleLinePOS, NpDcItemBuffer);
             exit;
@@ -453,7 +452,7 @@
             Clear(SaleLinePOS);
             SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+            SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
             SaleLinePOS.SetFilter("Variant Code", NpDcIssueOnSaleSetupLine."Variant Code");
             SaleLinePOS.SetFilter(Quantity, '>%1', 0);
             case NpDcIssueOnSaleSetupLine.Type of
@@ -553,7 +552,7 @@
     begin
         if SaleLinePOS.IsTemporary then
             exit(false);
-        if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
+        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item then
             exit(false);
 
         exit(SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No."));

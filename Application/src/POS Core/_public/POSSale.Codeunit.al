@@ -64,7 +64,6 @@
         Rec."Sales Ticket No." := GetNextReceiptNo(Rec."Register No.");
         Rec.Date := Today();
         Rec."Start Time" := Time;
-        Rec."Sale type" := Rec."Sale type"::Sale;
 
         if WorkDate() <> Today() then begin
             WorkDate := Today();
@@ -522,14 +521,14 @@
         POSStore.Get(Sale."POS Store Code");
 
         SaleLinePOS.Reset();
-        SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", Type);
+        SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
         SaleLinePOS.SetRange("Register No.", Sale."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
         if SaleLinePOS.FindSet() then
             repeat
                 SaleLinePOS.Validate("Shortcut Dimension 1 Code");
                 SaleLinePOS.Validate("Shortcut Dimension 2 Code");
-                if ((SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale) and (SaleLinePOS.Type = SaleLinePOS.Type::Item)) then begin
+                if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Item then begin
                     TotalItemAmountInclVat += SaleLinePOS."Amount Including VAT";
                 end
             until SaleLinePOS.Next() = 0;
@@ -539,11 +538,10 @@
             Clear(SaleLinePOS);
             if SalespersonPurchaser.Get(Sale."Salesperson Code") then
                 if SalespersonPurchaser."NPR Maximum Cash Returnsale" > 0 then begin
-                    SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", Type);
+                    SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
                     SaleLinePOS.SetRange("Register No.", Sale."Register No.");
                     SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
-                    SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);
-                    SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Payment);
+                    SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"POS Payment");
                     if SaleLinePOS.FindSet() then
                         repeat
                             if POSPaymentMethod.Get(SaleLinePOS."No.") then
@@ -561,7 +559,7 @@
         SaleLinePOS.SetRange("Register No.", Sale."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
         if SaleLinePOS.Find('+') then;
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::"BOM List");
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"BOM List");
         if SaleLinePOS.Find('-') then
             repeat
                 Item.Get(SaleLinePOS."No.");
@@ -583,9 +581,13 @@
             Error(ErrNoLines);
 
         repeat
-            if (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale) and (SaleLinePOS.Type = SaleLinePOS.Type::Item) then begin
+            if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Item then begin
                 Item.Get(SaleLinePOS."No.");
+                if Item."Costing Method" = Item."Costing Method"::Specific then
+                    SaleLinePOS.TestField("Serial No.");
+
                 CreateServiceItem.Create(SaleLinePOS, Sale, Item);
+                
                 if Item."Item Tracking Code" <> '' then begin
                     ItemTrackingCode.Get(Item."Item Tracking Code");
 #if BC17
@@ -604,19 +606,14 @@
                 end else begin
                     if SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.") then
                         SerialNoInfo.TestField(Blocked, false);
-                end;
+                end;                
             end;
 
-            if (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale)
-                and not (SaleLinePOS.Type = SaleLinePOS.Type::"BOM List")
-                and not (SaleLinePOS.Type = SaleLinePOS.Type::Comment) then begin
+            if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::"BOM List",SaleLinePOS."Line Type"::Comment,SaleLinePOS."Line Type"::"POS Payment",SaleLinePOS."Line Type"::Rounding]) then begin
                 SaleLinePOS.TestField("Gen. Bus. Posting Group");
                 SaleLinePOS.TestField("Gen. Prod. Posting Group");
                 SaleLinePOS.TestField("VAT Bus. Posting Group");
                 SaleLinePOS.TestField("VAT Prod. Posting Group");
-                Item.Get(SaleLinePOS."No.");
-                if Item."Costing Method" = Item."Costing Method"::Specific then
-                    SaleLinePOS.TestField("Serial No.");
             end;
 
             if (SaleLinePOS."Discount %" = 0) and
@@ -679,7 +676,7 @@
         SaleLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, FrontEnd);
         SaleLinePOS.SetRange("Register No.", Rec."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
-        SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.Type::Payment);
+        SaleLinePOS.SetFilter("Line Type", '<>%1', SaleLinePOS."Line Type"::"POS Payment");
         if not SaleLinePOS.IsEmpty then
             SaleLine.SetLast();
 
@@ -705,7 +702,7 @@
         if Ok then begin
             SaleLinePOS.SetRange("Register No.", Rec."Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
-            SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.Type::Payment);
+            SaleLinePOS.SetFilter("Line Type", '<>%1', SaleLinePOS."Line Type"::"POS Payment");
             if not SaleLinePOS.IsEmpty then
                 SaleLine.SetLast();
 

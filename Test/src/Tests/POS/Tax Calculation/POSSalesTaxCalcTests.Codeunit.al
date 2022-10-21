@@ -1466,7 +1466,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         //First Direct Sale
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
         SaleLinePOS.SetRange("No.", Item[1]."No.");
         SaleLinePOS.FindFirst();
         AmountToPay[1] := GetAmountToPay(SaleLinePOS);
@@ -1606,7 +1605,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         //First Debit Sale
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
         SaleLinePOS.SetRange("No.", Item[1]."No.");
         SaleLinePOS.FindFirst();
         AmountToPay[1] := GetAmountToPay(SaleLinePOS);
@@ -1729,7 +1727,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         //First Direct Sale
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
         SaleLinePOS.SetRange("No.", Item[1]."No.");
         SaleLinePOS.FindFirst();
         AmountToPay[1] := GetAmountToPay(SaleLinePOS);
@@ -1863,7 +1860,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         //First Debit Sale
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
         SaleLinePOS.SetRange("No.", Item[1]."No.");
         SaleLinePOS.FindFirst();
         AmountToPay[1] := GetAmountToPay(SaleLinePOS);
@@ -1985,7 +1981,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         //First Direct Sale
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
         SaleLinePOS.SetRange("No.", Item[1]."No.");
         SaleLinePOS.FindFirst();
         AmountToPay[1] := GetAmountToPay(SaleLinePOS);
@@ -2125,7 +2120,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         //First Debit Sale
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
         SaleLinePOS.SetRange("No.", Item[1]."No.");
         SaleLinePOS.FindFirst();
         AmountToPay[1] := GetAmountToPay(SaleLinePOS);

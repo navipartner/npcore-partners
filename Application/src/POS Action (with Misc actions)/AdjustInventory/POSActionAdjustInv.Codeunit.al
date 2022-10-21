@@ -92,7 +92,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv." implements "NPR IPOS Workflow"
     begin
 
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) or (SaleLinePOS."No." = '') then
+        if (SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item) or (SaleLinePOS."No." = '') then
             Error(SelectItemLbl);
 
         if SaleLinePOS."Variant Code" <> '' then

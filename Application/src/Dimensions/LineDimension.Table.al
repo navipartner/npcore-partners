@@ -31,7 +31,7 @@
             Caption = 'Sale Type';
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Payment1,Disbursement,Comment,Cancelled,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Payment1,Disbursement,Comment,Cancelled,"Open/Close";
-            DataClassification = CustomerContent;
+            DataClassification = CustomerContent;            
         }
         field(5; "Line No."; Integer)
         {
@@ -83,7 +83,12 @@
         }
         key(Key2; "Table ID", Date, "Sale Type", "Line No.", "Dimension Code", "Dimension Value Code")
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Sale Type field not used anymore';
         }
+        key(Key3; "Table ID", Date, "Line No.", "Dimension Code", "Dimension Value Code")
+        {
+        }        
     }
 
     trigger OnDelete()
@@ -233,7 +238,6 @@
             NewNPRLineDim.SetRange("Table ID", DATABASE::"NPR POS Sale Line");
             NewNPRLineDim.SetRange("Register No.", NPRLineDim."Register No.");
             NewNPRLineDim.SetRange("Sales Ticket No.", NPRLineDim."Sales Ticket No.");
-            NewNPRLineDim.SetRange("Sale Type", NPRLineDim."Sale Type");
             NewNPRLineDim.SetRange("Line No.", NPRLineDim."Line No.");
             NewNPRLineDim.SetRange(Date, NPRLineDim.Date);
             NewNPRLineDim.SetRange("Dimension Code", NPRLineDim."Dimension Code");
@@ -261,7 +265,6 @@
         NewNPRLineDim."Table ID" := TableNo;
         NewNPRLineDim."Register No." := "Ekspedition linie"."Register No.";
         NewNPRLineDim."Sales Ticket No." := "Ekspedition linie"."Sales Ticket No.";
-        NewNPRLineDim."Sale Type" := "Ekspedition linie"."Sale Type";
         NewNPRLineDim."Line No." := "Ekspedition linie"."Line No.";
         NewNPRLineDim.Date := "Ekspedition linie".Date;
         NewNPRLineDim."Dimension Code" := NPRLineDim."Dimension Code";
@@ -281,7 +284,6 @@
         NPRLineDim.SetRange("Table ID", TableNo);
         NPRLineDim.SetRange("Register No.", Kassenr);
         NPRLineDim.SetRange("Sales Ticket No.", Bonnr);
-        NPRLineDim.SetRange("Sale Type", EkspArt);
         NPRLineDim.SetRange("Line No.", LinjeNr);
         NPRLineDim.SetRange(Date, Dato2);
         NPRLineDim.SetRange("No.", Nr);
@@ -308,7 +310,6 @@
         NPRLineDimHeader.SetRange("Table ID", TableNo);
         NPRLineDimHeader.SetRange("Register No.", Kassenr);
         NPRLineDimHeader.SetRange("Sales Ticket No.", Bonnr);
-        NPRLineDimHeader.SetRange("Sale Type", 0);
         NPRLineDimHeader.SetRange(Date, 0D);
         NPRLineDimHeader.SetRange("Line No.", 0);
         NPRLineDimHeader.SetRange("No.", '');

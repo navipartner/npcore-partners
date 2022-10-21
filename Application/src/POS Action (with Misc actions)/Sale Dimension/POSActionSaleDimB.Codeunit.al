@@ -37,7 +37,6 @@ codeunit 6059841 "NPR POS Action: Sale Dim. B"
                 begin
                     SaleLinePOS.SetRange("Register No.", SaleLinePOS."Register No.");
                     SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-                    SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
                 end;
         end;
 

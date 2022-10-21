@@ -14,7 +14,7 @@
     begin
         if Rec.IsTemporary then
             exit;
-        if Rec.Type = Rec.Type::Item then begin
+        if Rec."Line Type" = Rec."Line Type"::Item then begin
             POSInfoLinkTable.Reset();
             POSInfoLinkTable.SetRange("Table ID", DATABASE::Item);
             POSInfoLinkTable.SetRange("Primary Key", Rec."No.");
@@ -56,7 +56,6 @@
         pSaleLinePos."Register No." := Rec."Register No.";
         pSaleLinePos."Sales Ticket No." := Rec."Sales Ticket No.";
         pSaleLinePos.Date := Rec.Date;
-        pSaleLinePos."Sale Type" := pSaleLinePos."Sale Type"::Sale;
         pSaleLinePos."Line No." := 0;
 
         FrontEndUpdateIsNeeded := ProcessPOSInfoLinkEntries(POSInfoLinkTable, pSaleLinePos, ApplicScope::"All Lines");
@@ -174,7 +173,6 @@
         SaleLinePos2.SetRange("Register No.", pSaleLinePos."Register No.");
         SaleLinePos2.SetRange("Sales Ticket No.", pSaleLinePos."Sales Ticket No.");
         SaleLinePos2.SetRange(Date, pSaleLinePos.Date);
-        SaleLinePos2.SetRange("Sale Type", pSaleLinePos."Sale Type");
         if SaleLinePos2.IsEmpty and (pApplicScope in [pApplicScope::" ", pApplicScope::Ask]) then
             pApplicScope := pApplicScope::"New Lines";
         if pApplicScope = pApplicScope::" " then
@@ -285,7 +283,6 @@
             SaleLinePos2.SetRange("Register No.", pSaleLinePos."Register No.");
             SaleLinePos2.SetRange("Sales Ticket No.", pSaleLinePos."Sales Ticket No.");
             SaleLinePos2.SetRange(Date, pSaleLinePos.Date);
-            SaleLinePos2.SetRange("Sale Type", pSaleLinePos."Sale Type");
             if pApplicScope = pApplicScope::"Current Line" then
                 SaleLinePos2.SetRange("Line No.", pSaleLinePos."Line No.");
             if SaleLinePos2.FindSet() then begin
@@ -320,7 +317,7 @@
                         POSInfoTransaction."Sales Ticket No." := TempSaleLinePos."Sales Ticket No.";
                         POSInfoTransaction."Sales Line No." := TempSaleLinePos."Line No.";
                         POSInfoTransaction."Sale Date" := TempSaleLinePos.Date;
-                        POSInfoTransaction."Receipt Type" := TempSaleLinePos.Type;
+                        POSInfoTransaction."Line Type" := TempSaleLinePos."Line Type";
                         POSInfoTransaction."Entry No." := 0;
                         POSInfoTransaction."POS Info Code" := POSInfoTransParam."POS Info Code";
                         POSInfoTransaction."POS Info" := POSInfoTransParam."POS Info";
@@ -341,8 +338,7 @@
         ToSaleLinePos."Register No." := pSaleLinePos."Register No.";
         ToSaleLinePos."Sales Ticket No." := pSaleLinePos."Sales Ticket No.";
         ToSaleLinePos.Date := pSaleLinePos.Date;
-        ToSaleLinePos."Sale Type" := pSaleLinePos."Sale Type";
-        ToSaleLinePos.Type := ToSaleLinePos.Type::Item;
+        ToSaleLinePos."Line Type" := ToSaleLinePos."Line Type"::Item;
         ToSaleLinePos."Line No." := LineNo;
         ToSaleLinePos.Insert();
     end;
@@ -386,7 +382,6 @@
     begin
         SaleLinePOS.Reset();
         SaleLinePOS.SetRange("Register No.", POSInfoTransaction."Register No.");
-        SaleLinePOS.SetFilter("Sale Type", '%1|%2', SaleLinePOS."Sale Type"::Sale, SaleLinePOS."Sale Type"::"Debit Sale");
         SaleLinePOS.SetRange("Sales Ticket No.", POSInfoTransaction."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, POSInfoTransaction."Sale Date");
         if POSInfoTransaction."Sales Line No." <> 0 then
@@ -445,10 +440,10 @@
                 POSInfoTransaction."Sales Line No." := pSaleLinePos."Line No.";
 
                 POSInfoTransaction."Sale Date" := pSaleLinePos.Date;
-                POSInfoTransaction."Receipt Type" := pSaleLinePos.Type;
+                POSInfoTransaction."Line Type" := pSaleLinePos."Line Type";
             end else begin
                 POSInfoTransaction."Sale Date" := pSalePos.Date;
-                POSInfoTransaction."Receipt Type" := pSaleLinePos.Type::Comment;
+                POSInfoTransaction."Line Type" := pSaleLinePos."Line Type"::Comment;
             end;
 
             POSInfoTransaction."Entry No." := 0;
@@ -464,9 +459,7 @@
         POSInfoTransaction_Hdr: Record "NPR POS Info Transaction";
         Updated: Boolean;
     begin
-        if not (SaleLinePos.Type in [SaleLinePos.Type::Item, SaleLinePos.Type::"Item Group", SaleLinePos.Type::"G/L Entry"]) or
-          (SaleLinePos."Sale Type" = SaleLinePos."Sale Type"::Comment)
-        then
+        if not (SaleLinePos."Line Type" in [SaleLinePos."Line Type"::Item, SaleLinePos."Line Type"::"Item Category", SaleLinePos."Line Type"::"Customer Deposit", SaleLinePOS."Line Type"::"Issue Voucher", SaleLinePos."Line Type"::Comment]) then
             exit(false);
 
         POSInfoTransaction_Hdr.SetCurrentKey("Register No.", "Sales Ticket No.", "Sales Line No.");
@@ -493,7 +486,7 @@
                     POSInfoTransaction."Sales Ticket No." := SaleLinePos."Sales Ticket No.";
                     POSInfoTransaction."Sales Line No." := SaleLinePos."Line No.";
                     POSInfoTransaction."Sale Date" := SaleLinePos.Date;
-                    POSInfoTransaction."Receipt Type" := SaleLinePos.Type;
+                    POSInfoTransaction."Line Type" := SaleLinePos."Line Type";
                     POSInfoTransaction."Entry No." := 0;
                     POSInfoTransaction."POS Info Code" := POSInfoTransaction_Hdr."POS Info Code";
                     POSInfoTransaction."POS Info" := POSInfoTransaction_Hdr."POS Info";
@@ -590,7 +583,7 @@
             POSInfoTransaction."Sales Ticket No." := SalePOSLine."Sales Ticket No.";
             POSInfoTransaction."Sales Line No." := SalePOSLine."Line No.";
             POSInfoTransaction."Sale Date" := SalePOSLine.Date;
-            POSInfoTransaction."Receipt Type" := POSInfoTransaction."Receipt Type"::Customer;
+            POSInfoTransaction."Line Type" := POSInfoTransaction."Line Type"::"Customer Deposit";
             POSInfoTransaction."POS Info" := CopyStr(POSInfoText, 1, MaxStrLen(POSInfoTransaction."POS Info"));
             POSInfoTransaction.Insert(true);
         end;
@@ -614,7 +607,7 @@
             POSInfoTransaction."Register No." := SalePOS."Register No.";
             POSInfoTransaction."Sales Ticket No." := SalePOS."Sales Ticket No.";
             POSInfoTransaction."Sale Date" := SalePOS.Date;
-            POSInfoTransaction."Receipt Type" := POSInfoTransaction."Receipt Type"::Customer;
+            POSInfoTransaction."Line Type" := POSInfoTransaction."Line Type"::"Customer Deposit";
             POSInfoTransaction."POS Info" := CopyStr(POSInfoText, 1, MaxStrLen(POSInfoTransaction."POS Info"));
             POSInfoTransaction.Insert(true);
         end;

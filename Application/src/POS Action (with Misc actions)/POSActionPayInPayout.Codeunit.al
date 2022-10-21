@@ -158,8 +158,7 @@
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(Line);
 
-        Line.Type := Line.Type::"G/L Entry";
-        Line."Sale Type" := Line."Sale Type"::"Out payment";
+        Line."Line Type" := Line."Line Type"::"GL Payment";
 
         Line.Validate("No.", AccountNo);
         Line."Custom Descr" := (Description <> '');

@@ -224,7 +224,7 @@
                         POSSaleTaxCalc.DeleteAllLines(POSSaleTax); 
                 
                 SaleLinePOS.CreateDim(
-                  NPRDimMgt.TypeToTableNPR(SaleLinePOS.Type), SaleLinePOS."No.",
+                  NPRDimMgt.TypeToTableNPR(SaleLinePOS."Line Type".AsInteger()), SaleLinePOS."No.",
                   NPRDimMgt.DiscountTypeToTableNPR(SaleLinePOS."Discount Type"), SaleLinePOS."Discount Code",
                   DATABASE::"NPR NPRE Seating", SaleLinePOS."NPRE Seating Code",
                   0, '');
@@ -241,9 +241,7 @@
             exit(false);
         if SaleLinePOS."Coupon Applied" then
             exit(true);
-        if SaleLinePOS."Sale Type" <> SaleLinePOS."Sale Type"::Sale then
-            exit(false);
-        if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
+        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item then
             exit(false);
         if SaleLinePOS.Quantity < 0 then
             exit;
@@ -309,13 +307,12 @@
         if not TempSaleLinePOS.IsTemporary then
             exit;
 
-        SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", Date, "Sale Type", Type, "Discount Type");
+        SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", Date, "Sale Type", "Line Type", "Discount Type");
         SaleLinePOS.SetFilter("Discount Type", '<>%1&<>%2&<>%3', SaleLinePOS."Discount Type"::Manual, SaleLinePOS."Discount Type"::Combination, SaleLinePOS."Discount Type"::"BOM List");
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
         if SaleLinePOS.FindSet() then
             repeat

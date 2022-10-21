@@ -150,7 +150,7 @@
             exit(false);
         SalePOSLine.SetRange("Register No.", SalePOS."Register No.");
         SalePOSLine.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SalePOSLine.SetRange(Type, SalePOSLine.Type::Item);
+        SalePOSLine.SetRange("Line Type", SalePOSLine."Line Type"::Item);
         if not SalePOSLine.FindSet() then
             exit(true);
         repeat

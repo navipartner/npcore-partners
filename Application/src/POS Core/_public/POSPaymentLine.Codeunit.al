@@ -21,7 +21,7 @@
     begin
         Clear(Rec);
         Rec.FilterGroup(2);
-        Rec.SetRange(Type, Rec.Type::Payment);
+        Rec.SetRange("Line Type", Rec."Line Type"::"POS Payment");
         Rec.SetRange("Register No.", RegisterNoIn);
         Rec.SetRange("Sales Ticket No.", SalesTicketNoIn);
         Rec.FilterGroup(0);
@@ -103,17 +103,17 @@
 
         SaleLinePOS.SetRange(SaleLinePOS."Register No.", RegisterNo);
         SaleLinePOS.SetRange(SaleLinePOS."Sales Ticket No.", SalesTicketNo);
-        SaleLinePOS.SetFilter(SaleLinePOS.Type, '<>%1', SaleLinePOS.Type::Comment);
+        SaleLinePOS.SetFilter(SaleLinePOS."Line Type", '<>%1', SaleLinePOS."Line Type"::Comment);
         if SaleLinePOS.FindSet() then
             repeat
                 case true of
-                    (SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::Sale, SaleLinePOS."Sale Type"::Deposit]):
+                    (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::"Customer Deposit", SaleLinePOS."Line Type"::"Issue Voucher",SaleLinePOS."Line Type"::Item,SaleLinePOS."Line Type"::"Item Category",SaleLinePOS."Line Type"::"BOM List"]):
                         SaleAmount += SaleLinePOS."Amount Including VAT";
-                    (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment") and (SaleLinePOS."Discount Type" <> SaleLinePOS."Discount Type"::Rounding):
+                    (SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"GL Payment"):
                         SaleAmount += SaleLinePOS."Amount Including VAT";
-                    (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment") and (SaleLinePOS."Discount Type" = SaleLinePOS."Discount Type"::Rounding):
+                    (SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Rounding):
                         RoundingAmount += SaleLinePOS."Amount Including VAT";
-                    (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Payment):
+                    (SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"POS Payment"):
                         PaidAmount += SaleLinePOS."Amount Including VAT";
                 end;
             until SaleLinePOS.Next() = 0;
@@ -157,8 +157,7 @@
         PaymentLinePOS."Register No." := Sale."Register No.";
         PaymentLinePOS."Sales Ticket No." := Sale."Sales Ticket No.";
         PaymentLinePOS.Date := Sale.Date;
-        PaymentLinePOS."Sale Type" := PaymentLinePOS."Sale Type"::Payment;
-        PaymentLinePOS.Type := PaymentLinePOS.Type::Payment;
+        PaymentLinePOS."Line Type" := PaymentLinePOS."Line Type"::"POS Payment";
     end;
 
     procedure InsertPaymentLine(Line: Record "NPR POS Sale Line"; ForeignCurrencyAmount: Decimal) Return: Boolean

@@ -67,7 +67,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         if ItemQuantity = 0 then
             ItemQuantity := 1;
 
-        Line.Type := Line.Type::Item;
+        Line."Line Type" := Line."Line Type"::Item;
         Line.Quantity := ItemQuantity;
 
         case ItemIdentifierType of
@@ -91,7 +91,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
                 begin
 
                     SaleLinePOS.Reset();
-                    SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+                    SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
                     SaleLinePOS.SetRange("Serial No. not Created", ItemReference."Reference No.");
                     if not SaleLinePOS.IsEmpty then
                         exit;
@@ -115,7 +115,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
 
         Line."Unit Price" := UnitPrice;
 
-        if (Line.Type = Line.Type::Item) then
+        if (Line."Line Type" = Line."Line Type"::Item) then
             Line."Initial Group Sale Price" := UnitPrice;
 
         POSSession.GetSaleLine(SaleLine);
@@ -142,7 +142,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             exit;
 
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        SaleLinePOS.Validate(Type, SaleLinePOS.Type::"BOM List");
+        SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"BOM List");
         SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::"BOM List";
         SaleLinePOS."Discount Code" := SaleLinePOS."No.";
         SaleLinePOS."Unit Price" := 0;
@@ -294,7 +294,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             if CanBeUsed then begin
                 SaleLinePOS.Reset();
                 SaleLinePOS.SetCurrentKey("Serial No.");
-                SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+                SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
                 SaleLinePOS.SetRange("No.", ItemRef."Item No.");
                 SaleLinePOS.SetRange("Serial No.", SerialNumber);
                 repeat
@@ -324,8 +324,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.Init();
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
-        SaleLinePOS.Type := SaleLinePOS.Type::Item;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
         SaleLinePOS."No." := ItemRef."Item No.";
         SaleLinePOS."Variant Code" := ItemRef."Variant Code";
         SaleLinePOS."Location Code" := LocationCode;

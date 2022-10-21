@@ -39,7 +39,6 @@
         NPRLineDimension.SetRange("Register No.", RegisterNo);
         NPRLineDimension.SetRange("Sales Ticket No.", SalesTicketNo);
         NPRLineDimension.SetRange(Date, Date2);
-        NPRLineDimension.SetRange("Sale Type", SaleType);
         NPRLineDimension.SetRange("Line No.", LineNo);
         NPRLineDimension.SetRange("No.", No);
         NPRLineDimension.DeleteAll();
@@ -52,7 +51,6 @@
                 NPRLineDimension.Validate("Register No.", RegisterNo);
                 NPRLineDimension.Validate("Sales Ticket No.", SalesTicketNo);
                 NPRLineDimension.Validate(Date, Date2);
-                NPRLineDimension.Validate("Sale Type", SaleType);
                 NPRLineDimension.Validate("Line No.", LineNo);
                 NPRLineDimension.Validate("No.", No);
                 NPRLineDimension."Dimension Code" := TempDimBuf2."Dimension Code";
@@ -218,7 +216,6 @@
         NPRLineDimension.SetRange("Register No.", RegisterNo);
         NPRLineDimension.SetRange("Sales Ticket No.", SalesTicketNo);
         NPRLineDimension.SetRange(Date, Date2);
-        NPRLineDimension.SetRange("Sale Type", SaleType);
         NPRLineDimension.SetRange("Line No.", LineNo);
         NPRLineDimension.SetRange("No.", No);
         NPRLineDimension.DeleteAll();
@@ -284,7 +281,6 @@
                 NPRLineDim.Validate("Register No.", RegisterNo);
                 NPRLineDim.Validate("Sales Ticket No.", SalesTicketNo);
                 NPRLineDim.Validate(Date, Date2);
-                NPRLineDim.Validate("Sale Type", SaleType);
                 NPRLineDim.Validate("Line No.", LineNo);
                 NPRLineDim.Validate("No.", No);
                 NPRLineDim.Validate("Dimension Code", GLSetupShortcutDimCode[FieldNumber]);

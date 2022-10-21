@@ -800,7 +800,7 @@
 
         TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
 
-        SaleLinePOS.Type := SaleLinePOS.Type::Item;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
         SaleLinePOS."No." := Ticket."Item No.";
         SaleLinePOS."Variant Code" := Ticket."Variant Code";
         SaleLinePOS.Quantity := -1;
@@ -1032,7 +1032,7 @@
             POSSaleLine.GetNewSaleLine(SaleLinePos);
             POSSaleLine.SetUsePresetLineNo(true);
 
-            SaleLinePos.Type := SaleLinePos.Type::Item;
+            SaleLinePos."Line Type" := SaleLinePos."Line Type"::Item;
             SaleLinePos."No." := TicketReservationRequest."Item No.";
             SaleLinePos."Variant Code" := TicketReservationRequest."Variant Code";
             SaleLinePos.Quantity := TicketReservationRequest.Quantity;
@@ -1363,7 +1363,7 @@
                 Admission.Get(TMTicketReservationReq."Admission Code");
                 if Admission."Additional Experience Item No." <> '' then begin
                     SaleLinePOS."Sales Ticket No." := SalesTicketNo;
-                    SaleLinePOS.Type := SaleLinePOS.Type::Item;
+                    SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
                     SaleLinePOS."No." := Admission."Additional Experience Item No.";
                     SaleLinePOS.Description := Admission.Description;
                     SaleLinePOS.Quantity := -1;

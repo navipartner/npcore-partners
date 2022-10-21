@@ -268,11 +268,11 @@
     begin
         WaiterPadLine.Reset();
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
-        WaiterPadLine.SetFilter(Type, '<>%1', WaiterPadLine.Type::Comment);
+        WaiterPadLine.SetFilter("Line Type", '<>%1', WaiterPadLine."Line Type"::Comment);
         if not WaiterPadLine.IsEmpty then
             exit;
 
-        WaiterPadLine.SetRange(Type, WaiterPadLine.Type::Comment);
+        WaiterPadLine.SetRange("Line Type", WaiterPadLine."Line Type"::Comment);
         if not WaiterPadLine.IsEmpty then
             WaiterPadLine.DeleteAll(true);
 
@@ -337,7 +337,7 @@
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
-        WaiterPadLine.SetFilter(Type, '<>%1', WaiterPadLine.Type::Comment);
+        WaiterPadLine.SetFilter("Line Type", '<>%1', WaiterPadLine."Line Type"::Comment);
         if WaiterPadLine.FindSet() then
             repeat
                 if not OnlyIfFullyPaid then begin
@@ -367,7 +367,7 @@
             exit(true);
 
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
-        WaiterPadLine.SetFilter(Type, '<>%1', WaiterPadLine.Type::Comment);
+        WaiterPadLine.SetFilter("Line Type", '<>%1', WaiterPadLine."Line Type"::Comment);
         if WaiterPadLine.IsEmpty then
             exit(true);
 
@@ -569,7 +569,7 @@
         if RemoveExisting then
             ClearAssignedPrintCategories(WaiterPadLine.RecordId);
 
-        if (WaiterPadLine.Type <> WaiterPadLine.Type::Item) or (WaiterPadLine."No." = '') then
+        if (WaiterPadLine."Line Type" <> WaiterPadLine."Line Type"::Item) or (WaiterPadLine."No." = '') then
             exit;
 
         case SetupProxy.ServingStepDiscoveryMethod() of
@@ -715,7 +715,7 @@
         if RemoveExisting then
             ClearAssignedFlowStatuses(WaiterPadLine.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow);
 
-        if (WaiterPadLine.Type <> WaiterPadLine.Type::Item) or (WaiterPadLine."No." = '') then
+        if (WaiterPadLine."Line Type" <> WaiterPadLine."Line Type"::Item) or (WaiterPadLine."No." = '') then
             exit;
 
         FlowStatus.SetRange("Status Object", FlowStatus."Status Object"::WaiterPadLineMealFlow);

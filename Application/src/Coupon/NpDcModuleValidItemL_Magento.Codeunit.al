@@ -144,8 +144,7 @@
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         case NpDcCouponListItem.Type of
             NpDcCouponListItem.Type::Item:
                 begin
@@ -179,8 +178,7 @@
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         case NpDcCouponListItem.Type of
             NpDcCouponListItem.Type::Item:
                 begin

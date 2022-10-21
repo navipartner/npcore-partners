@@ -129,24 +129,16 @@
     local procedure CalcVATFromSale(SalePOS: Record "NPR POS Sale"): Decimal
     var
         SaleLinePOS: Record "NPR POS Sale Line";
-        TotalVAT: Decimal;
     begin
         SaleLinePOS.Reset();
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
+        if SaleLinePOS.IsEmpty() then 
+            exit;
 
-        if SaleLinePOS.IsEmpty then exit;
-        SaleLinePOS.FindSet(false, false);
-        TotalVAT := 0;
-        repeat
-            TotalVAT := TotalVAT + (SaleLinePOS."Amount Including VAT" - SaleLinePOS."VAT Base Amount");
-
-
-        until (0 = SaleLinePOS.Next());
-
-        exit(TotalVAT);
+        SaleLinePOS.CalcSums("Amount Including VAT","VAT Base Amount");
+        exit(SaleLinePOS."Amount Including VAT" - SaleLinePOS."VAT Base Amount");
     end;
 
     local procedure ValidateMinMaxAmount(NPRPOSPaymentMethod: Record "NPR POS Payment Method"; AmountToCapture: Decimal)

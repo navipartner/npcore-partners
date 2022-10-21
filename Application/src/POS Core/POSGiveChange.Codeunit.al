@@ -50,12 +50,11 @@
         SaleLinePOS."Register No." := SalePOS."Register No.";
         SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
         SaleLinePOS.Date := SalePOS.Date;
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Payment;
         SaleLinePOS."Line No." := GetLastLineNo(SalePOS) + 10000;
         SaleLinePOS.Insert(true);
         SaleLinePOS."Location Code" := SalePOS."Location Code";
         SaleLinePOS.Reference := SalePOS.Reference;
-        SaleLinePOS.Type := SaleLinePOS.Type::Payment;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"POS Payment";
         SaleLinePOS."No." := NoIn;
         SaleLinePOS.Description := CopyStr(DescriptionIn, 1, MaxStrLen(SaleLinePOS.Description));
         SaleLinePOS."Amount Including VAT" := AmountIn;
@@ -106,19 +105,18 @@
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
         if SaleLinePOS.FindSet() then
             repeat
                 TotalAmount := TotalAmount + SaleLinePOS."Amount Including VAT";
             until SaleLinePOS.Next() = 0;
 
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Deposit);
+        SaleLinePOS.SetFilter("Line Type", '%1|%2', SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type"::"Item Category", SaleLinePOS."Line Type"::"BOM List", SaleLinePOS."Line Type"::"Customer Deposit",SaleLinePOS."Line Type"::"Issue Voucher");
         if SaleLinePOS.FindSet() then
             repeat
                 TotalAmount := TotalAmount + SaleLinePOS."Amount Including VAT";
             until SaleLinePOS.Next() = 0;
 
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::"Out payment");
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"GL Payment");
         if SaleLinePOS.FindSet() then
             repeat
                 TotalAmount := TotalAmount - SaleLinePOS."Amount Including VAT";
@@ -134,7 +132,7 @@
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"POS Payment");
         if SaleLinePOS.FindSet() then
             repeat
                 TotalAmount := TotalAmount + SaleLinePOS."Amount Including VAT";

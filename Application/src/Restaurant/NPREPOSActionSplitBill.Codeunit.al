@@ -273,7 +273,7 @@
     begin
         Clear(WPadLineCollection);
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPadCode);
-        WaiterPadLine.SetRange(Type, WaiterPadLine.Type::Item);
+        WaiterPadLine.SetRange("Line Type", WaiterPadLine."Line Type"::Item);
         if WaiterPadLine.FindSet() then
             repeat
                 if WaiterPadLine.Quantity - WaiterPadLine."Billed Quantity" > 0 then begin

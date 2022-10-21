@@ -120,6 +120,7 @@
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         Line: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
     begin
 
         POSSession.GetSale(POSSale);
@@ -128,10 +129,13 @@
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.DeleteAll();
 
-        Line.Type := Line.Type::Comment;
+        Line."Line Type" := Line."Line Type"::Comment;
         Line.Description := StrSubstNo(CANCEL_SALE, CurrentDateTime);
-        Line."Sale Type" := Line."Sale Type"::Cancelled;
         POSSaleLine.InsertLine(Line);
+
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS."Header Type" := SalePOS."Header Type"::Cancelled;
+        POSSale.Refresh(SalePOS);
 
         POSSession.GetSale(POSSale);
         exit(POSSale.TryEndSale(POSSession, false));

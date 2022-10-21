@@ -568,7 +568,7 @@
         POSUnit: Record "NPR POS Unit";
         POSPricingProfile: Record "NPR POS Pricing Profile";
     begin
-        TempSaleLinePOS.Type := TempSaleLinePOS.Type::Item;
+        TempSaleLinePOS."Line Type" := TempSaleLinePOS."Line Type"::Item;
         TempSaleLinePOS."No." := "Item No.";
         TempSaleLinePOS."Variant Code" := "Variant Code";
 

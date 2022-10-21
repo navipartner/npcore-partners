@@ -54,7 +54,7 @@
         if CommentTextPattern = '' then
             CommentTextPattern := BuzzerText;
 
-        Line.Type := Line.Type::Comment;
+        Line."Line Type" := Line."Line Type"::Comment;
         Line.Description := StrSubstNo(CommentTextPattern, JSON.GetStringOrFail('value', StrSubstNo(ReadingErr, ActionCode())));
 
         POSSession.GetSaleLine(SaleLine);

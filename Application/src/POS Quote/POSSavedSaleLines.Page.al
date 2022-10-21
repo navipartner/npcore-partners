@@ -139,9 +139,8 @@
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
                     ApplicationArea = NPRRetail;
                 }
-                field(Type; Rec.Type)
+                field(Type; Rec."Line Type")
                 {
-
                     ToolTip = 'Specifies the value of the Type field';
                     ApplicationArea = NPRRetail;
                 }

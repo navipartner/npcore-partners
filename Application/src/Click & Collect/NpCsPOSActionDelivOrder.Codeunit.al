@@ -307,7 +307,7 @@
         if DeliveryText = '' then
             DeliveryText := StrSubstNo(DeliveryLbl, NpCsDocument."Document Type", NpCsDocument."Reference No.");
         SaleLinePOS.Init();
-        SaleLinePOS.Type := SaleLinePOS.Type::Comment;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
         SaleLinePOS."No." := '*';
         SaleLinePOS.Description := CopyStr(DeliveryText, 1, MaxStrLen(SaleLinePOS.Description));
         POSSaleLine.InsertLine(SaleLinePOS);
@@ -318,7 +318,6 @@
         NpCsSaleLinePOSReference.Init();
         NpCsSaleLinePOSReference."Register No." := SaleLinePOS."Register No.";
         NpCsSaleLinePOSReference."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        NpCsSaleLinePOSReference."Sale Type" := SaleLinePOS."Sale Type";
         NpCsSaleLinePOSReference."Sale Date" := SaleLinePOS.Date;
         NpCsSaleLinePOSReference."Sale Line No." := SaleLinePOS."Line No.";
         NpCsSaleLinePOSReference."Collect Document Entry No." := NpCsDocument."Entry No.";

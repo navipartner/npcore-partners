@@ -395,7 +395,7 @@ codeunit 6059818 "NPR POS Statistics Mgt."
     begin
         Cost := POSSaleLine."Unit Cost (LCY)";
 
-        if POSSaleLine.Type <> POSSaleLine.Type::Item then
+        if POSSaleLine."Line Type" <> POSSaleLine."Line Type"::Item then
             exit;
 
         Item.SetLoadFields("Last Direct Cost", "Unit Cost");

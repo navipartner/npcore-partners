@@ -111,7 +111,7 @@
             POSSale.GetCurrentSale(SalePOS);
             SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.Type::Comment);
+            SaleLinePOS.SetFilter("Line Type", '<>%1', SaleLinePOS."Line Type"::Comment);
             if SaleLinePOS.IsEmpty() then
                 Error(NO_SALES_LINES);
         end;

@@ -139,7 +139,7 @@
 
         WaiterPadLine.Copy(WaiterPadLineIn);
         WaiterPadLine.FilterGroup(2);
-        WaiterPadLine.SetFilter(Type, '<>%1', WaiterPadLine.Type::Comment);
+        WaiterPadLine.SetFilter("Line Type", '<>%1', WaiterPadLine."Line Type"::Comment);
         WaiterPadLine.FilterGroup(0);
         if WaiterPadLine.IsEmpty then
             exit(false);
@@ -550,7 +550,7 @@
     begin
         WaiterPadLine2.SetRange("Waiter Pad No.", WaiterPadLine."Waiter Pad No.");
         WaiterPadLine2 := WaiterPadLine;
-        while (WaiterPadLine2.Next() <> 0) and (WaiterPadLine2.Type = WaiterPadLine2.Type::Comment) do begin
+        while (WaiterPadLine2.Next() <> 0) and (WaiterPadLine2."Line Type" = WaiterPadLine2."Line Type"::Comment) do begin
             WaiterPadLine := WaiterPadLine2;
             WaiterPadLine.Mark := true;
         end;

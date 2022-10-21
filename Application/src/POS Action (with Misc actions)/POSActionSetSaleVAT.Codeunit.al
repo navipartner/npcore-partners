@@ -108,7 +108,7 @@
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSDescLbl: Label '%1: %2', Locked = true;
     begin
-        SaleLinePOS.Type := SaleLinePOS.Type::Comment;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
 
         if VATAmountDifference = 0 then
             exit
@@ -141,7 +141,6 @@
         POSSale.GetCurrentSale(SalePOS);
 
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
         if SaleLinePOS.FindSet() then
             repeat
                 OldVATTotal += (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);

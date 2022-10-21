@@ -159,7 +159,7 @@
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS.Type := SaleLinePOS.Type::Item;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
         SaleLinePOS.Validate("No.", CreationFeeItemNo);
         SaleLinePOS.Validate(Quantity, 1);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);

@@ -246,8 +246,7 @@ tableextension 6014423 "NPR Customer" extends Customer
         if not SalesPOS.IsEmpty() then
             Error(DeleteCustActiveSalesDocErr, Rec."No.");
 
-        SalesLinePOS.SetRange("Sale Type", SalesLinePOS."Sale Type"::Deposit);
-        SalesLinePOS.SetRange(Type, SalesLinePOS.Type::Customer);
+        SalesLinePOS.SetRange("Line Type", SalesLinePOS."Line Type"::"Customer Deposit");
         SalesLinePOS.SetRange("No.", Rec."No.");
         if not SalesLinePOS.IsEmpty() then
             Error(DeleteCustActiveCashErr, Rec."No.");

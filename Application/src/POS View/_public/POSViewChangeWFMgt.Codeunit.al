@@ -207,7 +207,7 @@
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         if SaleLinePOS.IsEmpty then
             exit(false);
 
@@ -224,7 +224,7 @@
     var
         Item: Record Item;
     begin
-        if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
+        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item then
             exit;
         if not Item.Get(SaleLinePOS."No.") then
             exit;

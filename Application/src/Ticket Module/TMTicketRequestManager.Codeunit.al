@@ -2668,7 +2668,7 @@
         if Admission."Additional Experience Item No." = '' then
             exit;
 
-        SaleLinePOS.Type := SaleLinePOS.Type::Item;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
         SaleLinePOS."No." := Admission."Additional Experience Item No.";
         SaleLinePOS.Description := Admission.Description;
         SaleLinePOS.Quantity := ReservationRequest.Quantity;

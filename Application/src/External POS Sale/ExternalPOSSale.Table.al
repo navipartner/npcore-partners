@@ -126,8 +126,7 @@
                     SaleLinePOS.Reset();
                     SaleLinePOS.SetRange("Register No.", "Register No.");
                     SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                    SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
-                    SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+                    SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
                     SaleLinePOS.SetRange(Date, Date);
                     if SaleLinePOS.FindSet(true, false) then begin
                         repeat
@@ -205,7 +204,11 @@
                 ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
-
+        field(110; "Header Type"; Enum "NPR POS Sale Type")
+        {
+            Caption = 'Sale Type';
+            DataClassification = CustomerContent;
+        }
         field(128; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';

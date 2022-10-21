@@ -82,13 +82,13 @@ codeunit 85006 "NPR POS Payment Tests"
         Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.FindLast();
         SaleLineSystemId := SaleLinePOS.SystemId;
 
         // [When] Paying 2 LCY first and then 8 LCY
         SaleEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, 2, '');
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Payment);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"POS Payment");
         SaleLinePOS.FindLast();
         PaymentLineSystemId := SaleLinePOS.SystemId;
 

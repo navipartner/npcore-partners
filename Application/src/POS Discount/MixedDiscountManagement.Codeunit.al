@@ -747,7 +747,7 @@
             if CurrentQtyToApply > 0 then begin
                 TempPriorityBuffer.FindSet();
                 repeat
-                    SaleLinePOSApply.SetRange(Type, SaleLinePOSApply.Type::Item);
+                    SaleLinePOSApply.SetRange("Line Type", SaleLinePOSApply."Line Type"::Item);
                     SaleLinePOSApply.SetRange("No.", TempPriorityBuffer."Item No.");
                     SaleLinePOSApply.SetRange("Variant Code", TempPriorityBuffer."Variant Code");
                     SaleLinePOSApply.SetRange("Unit Price", TempPriorityBuffer."Unit Price");
@@ -838,7 +838,7 @@
             else
                 exit(false);
         end;
-        TempSaleLinePOS.SetRange(Type, TempSaleLinePOS.Type::Item);
+        TempSaleLinePOS.SetRange("Line Type", TempSaleLinePOS."Line Type"::Item);
         TempSaleLinePOS.SetRange("Discount Type", TempSaleLinePOS."Discount Type"::" ");
         TempSaleLinePOS.SetFilter("Discount Code", '=%1', '');
         TempSaleLinePOS.SetFilter(Quantity, '>%1', 0);
@@ -1149,7 +1149,7 @@
         MixedDiscountLine.FindSet();
         repeat
             TempSaleLinePOS2.Copy(TempSaleLinePOS, true);
-            TempSaleLinePOS2.SetRange(Type, TempSaleLinePOS2.Type::Item);
+            TempSaleLinePOS2.SetRange("Line Type", TempSaleLinePOS2."Line Type"::Item);
             case MixedDiscountLine."Disc. Grouping Type" of
                 MixedDiscountLine."Disc. Grouping Type"::Item:
                     begin

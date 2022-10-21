@@ -91,7 +91,7 @@
         POSSale.GetCurrentSale(SalePOS);
         SaleLinePOS.SetFilter("Register No.", '=%1', SalePOS."Register No.");
         SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.Type::Comment);
+        SaleLinePOS.SetFilter("Line Type", '<>%1', SaleLinePOS."Line Type"::Comment);
 
         if (SaleLinePOS.IsEmpty()) then begin
             if POSAuditProfile.Get(POSUnit."POS Audit Profile") then

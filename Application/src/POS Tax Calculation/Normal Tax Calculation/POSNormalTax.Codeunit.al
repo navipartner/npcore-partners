@@ -29,7 +29,7 @@
             Rec."VAT Calculation Type"::"Normal VAT":
                 Rec."VAT %" := VATPostingSetup."VAT %";
             Rec."VAT Calculation Type"::"Reverse Charge VAT":
-                if (Rec.Type = Rec.Type::"G/L Entry") and (Rec."Gen. Posting Type" = Rec."Gen. Posting Type"::Purchase) then
+                if (Rec."Line Type" = Rec."Line Type"::"GL Payment") and (Rec."Gen. Posting Type" = Rec."Gen. Posting Type"::Purchase) then
                     Rec."VAT %" := VATPostingSetup."VAT %"
                 else
                     Rec."VAT %" := 0;

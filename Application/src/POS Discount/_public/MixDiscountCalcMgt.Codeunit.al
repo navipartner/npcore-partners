@@ -46,7 +46,7 @@
         POSSaleLineTemp."Register No." := GetCalculationTempPosSalesLineId();
         POSSaleLineTemp."Sales Ticket No." := GetCalculationTempPosSalesLineId();
         POSSaleLineTemp."Line No." := LastLineNo + 1;
-        POSSaleLineTemp.Validate(Type, POSSaleLineTemp.Type::Item);
+        POSSaleLineTemp.Validate("Line Type", POSSaleLineTemp."Line Type"::Item);
         POSSaleLineTemp."No." := RetailJournalLine."Item No.";
         POSSaleLineTemp."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
         POSSaleLineTemp."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";

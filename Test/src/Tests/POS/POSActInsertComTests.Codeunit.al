@@ -31,7 +31,7 @@ codeunit 85071 "NPR POS Act. Insert Com. Tests"
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
 
-        Line.Type := Line.Type::Comment;
+        Line."Line Type" := Line."Line Type"::Comment;
         Line.Description := NewDesc;
 
         POSSaleLine.InsertLine(Line);
@@ -39,6 +39,6 @@ codeunit 85071 "NPR POS Act. Insert Com. Tests"
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         Assert.IsTrue(SaleLinePOS.Description = NewDesc, 'New Description is inserted.');
-        Assert.IsTrue(SaleLinePOS.Type = SaleLinePOS.Type::Comment, 'Comment inserted.');
+        Assert.IsTrue(SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Comment, 'Comment inserted.');
     end;
 }

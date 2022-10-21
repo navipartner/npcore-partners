@@ -231,7 +231,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         POSSaleUnit.GetCurrentSale(POSSale);
         POSSaleLine.SetRange("Register No.", POSSale."Register No.");
         POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
-        POSSaleLine.SetRange("Sale Type", POSSaleLine."Sale Type"::Sale);
         Assert.IsTrue(POSSaleLine.FindSet(), 'Active Sale Line not created');
         repeat
             Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
@@ -323,7 +322,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
 
         POSSaleLine.SetRange("Register No.", POSSale."Register No.");
         POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
-        POSSaleLine.SetRange("Sale Type", POSSaleLine."Sale Type"::Sale);
         Assert.IsTrue(POSSaleLine.FindFirst(), 'Active Sale Line not created');
 
         Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed to first active sale line');
@@ -4754,11 +4752,10 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
     begin
         POSSaleLine."Register No." := POSSale."Register No.";
         POSSaleLine."Sales Ticket No." := POSSale."Sales Ticket No.";
-        POSSaleLine."Sale Type" := POSSaleLine."Sale Type"::Sale;
         POSSaleLine."Line No." := 10000;
         POSSaleLine.Date := Today();
         POSSaleLine.Init();
-        POSSaleLine.Type := POSSaleLine.Type::Item;
+        POSSaleLine."Line Type" := POSSaleLine."Line Type"::Item;
         POSSaleLine."No." := Item."No.";
         POSSaleLine.Quantity := 1;
         POSSaleLine."Unit Price" := Item."Unit Price";

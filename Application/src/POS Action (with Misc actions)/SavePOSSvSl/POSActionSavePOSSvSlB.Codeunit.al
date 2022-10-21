@@ -81,8 +81,7 @@ codeunit 6059851 "NPR POS Action: SavePOSSvSl B"
         POSQuoteLine."Line No." := LineNo;
         POSQuoteLine."Sale Line No." := SaleLinePOS."Line No.";
         POSQuoteLine."Sale Date" := SaleLinePOS.Date;
-        POSQuoteLine."Sale Type" := SaleLinePOS."Sale Type";
-        POSQuoteLine.Type := SaleLinePOS.Type;
+        POSQuoteLine."Line Type" := SaleLinePOS."Line Type";
         POSQuoteLine."No." := SaleLinePOS."No.";
         POSQuoteLine."Variant Code" := SaleLinePOS."Variant Code";
         POSQuoteLine.Description := SaleLinePOS.Description;

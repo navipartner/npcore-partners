@@ -31,6 +31,7 @@
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Deposit,Out payment,Comment,Cancelled,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,Cancelled,"Open/Close";
             DataClassification = CustomerContent;
+            Description = 'This field has been "obsoleted" by removing all reference to it in Np Retail app';
         }
         field(4; "Line No."; Integer)
         {
@@ -44,21 +45,23 @@
             OptionCaption = 'G/L,Item,Item Group,Repair,,Payment,Open/Close,Inventory,Customer,Comment';
             OptionMembers = "G/L Entry",Item,"Item Group",Repair,,Payment,"Open/Close","BOM List",Customer,Comment;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Line Type field';           
         }
         field(6; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST("G/L Entry")) "G/L Account"."No."
-            ELSE
-            IF (Type = CONST("Item Group")) "Item Category".Code
-            ELSE
-            IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
-            ELSE
-            IF (Type = CONST(Customer)) Customer."No."
-            ELSE
-            IF (Type = CONST(Item)) Item."No.";
-            ValidateTableRelation = false;
             DataClassification = CustomerContent;
+            TableRelation = IF ("Line Type" = filter("GL Payment" | "Issue Voucher")) "G/L Account"."No."
+            ELSE
+            IF ("Line Type" = CONST("Item Category")) "Item Category".Code
+            ELSE
+            IF ("Line Type" = CONST("POS Payment")) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
+            ELSE
+            IF ("Line Type" = CONST("Customer Deposit")) Customer."No."
+            ELSE
+            IF ("Line Type" = CONST(Item)) Item."No.";
+            ValidateTableRelation = false;
         }
         field(7; "Location Code"; Code[10])
         {
@@ -70,7 +73,7 @@
         {
             Caption = 'Posting Group';
             Editable = false;
-            TableRelation = IF (Type = CONST(Item)) "Inventory Posting Group";
+            TableRelation = IF ("Line Type" = CONST(Item)) "Inventory Posting Group";
             DataClassification = CustomerContent;
         }
         field(9; "Qty. Discount Code"; Code[20])
@@ -86,7 +89,7 @@
         field(11; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item),
+            TableRelation = IF ("Line Type" = CONST(Item),
                                 "No." = FILTER(<> '')) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
             ELSE
             "Unit of Measure";
@@ -169,6 +172,11 @@
             Caption = 'Date';
             DataClassification = CustomerContent;
         }
+        field(26; "Line Type"; enum "NPR POS Sale Line Type")
+        {
+            Caption = 'Type';
+            DataClassification = CustomerContent;
+        }        
         field(30; Amount; Decimal)
         {
             AutoFormatExpression = "Currency Code";
@@ -410,7 +418,7 @@
         field(102; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = IF ("Line Type" = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
             DataClassification = CustomerContent;
         }
         field(103; "Line Amount"; Decimal)
@@ -631,7 +639,6 @@
         {
             CalcFormula = Count("NPR NpDc SaleLinePOS Coupon" WHERE("Register No." = FIELD("Register No."),
                                                                    "Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                                   "Sale Type" = FIELD("Sale Type"),
                                                                    "Sale Date" = FIELD(Date),
                                                                    "Sale Line No." = FIELD("Line No."),
                                                                    Type = CONST(Coupon)));
@@ -644,7 +651,6 @@
             AutoFormatType = 1;
             CalcFormula = Sum("NPR NpDc SaleLinePOS Coupon"."Discount Amount" WHERE("Register No." = FIELD("Register No."),
                                                                                    "Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                                                   "Sale Type" = FIELD("Sale Type"),
                                                                                    "Sale Date" = FIELD(Date),
                                                                                    "Sale Line No." = FIELD("Line No."),
                                                                                    Type = CONST(Discount)));
@@ -940,7 +946,7 @@
         field(7014; "Item Disc. Group"; Code[20])
         {
             Caption = 'Item Disc. Group';
-            TableRelation = IF (Type = CONST(Item),
+            TableRelation = IF ("Line Type" = CONST(Item),
                                 "No." = FILTER(<> '')) "Item Discount Group" WHERE(Code = FIELD("Item Disc. Group"));
 
             ValidateTableRelation = false;
@@ -1042,6 +1048,8 @@
         {
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Sale Type field not used anymore';
         }
         key(Key3; "Register No.", "Sales Ticket No.", "Sale Type", Type, "No.", "Item Group", Quantity)
         {
@@ -1066,6 +1074,8 @@
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Sale Type field not used anymore';            
         }
         key(Key7; "Serial No.")
         {
@@ -1083,17 +1093,35 @@
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Sale Type field not used anymore';            
         }
 
         key(Key10; "Register No.", "Sales Ticket No.", "Sale Type", Type, "No.", "Item Category Code", Quantity)
         {
             MaintainSIFTIndex = false;
             SumIndexFields = "Amount Including VAT", Amount, Quantity;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Sale Type field not used anymore';            
         }
-    }
+        key(Key11; "Register No.", "Sales Ticket No.", Date, "Line Type", "Discount Type", "Line No.")
+        {
+            MaintainSIFTIndex = false;
+            MaintainSQLIndex = false;
+            SumIndexFields = "Amount Including VAT";       
+        }
+        key(Key12; "Insurance Category", "Register No.", "Sales Ticket No.", Date, "Line Type")
+        {
+            MaintainSIFTIndex = false;
+            MaintainSQLIndex = false;
+            SumIndexFields = "Amount Including VAT";            
+        }
 
-    fieldgroups
-    {
+        key(Key13; "Register No.", "Sales Ticket No.", "Line Type", "No.", "Item Category Code", Quantity)
+        {
+            MaintainSIFTIndex = false;
+            SumIndexFields = "Amount Including VAT", Amount, Quantity;       
+        }                
     }
 }
 

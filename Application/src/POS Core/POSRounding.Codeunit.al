@@ -40,9 +40,8 @@
         SaleLinePOS."Register No." := SalePOS."Register No.";
         SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
         SaleLinePOS.Date := SalePOS.Date;
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Out payment";
         SaleLinePOS."Line No." := GetLastLineNo(SalePOS) + 10000;
-        SaleLinePOS.Type := SaleLinePOS.Type::"G/L Entry";
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Rounding;
         SaleLinePOS.Validate("No.", GLAccount."No.");
         SaleLinePOS."Location Code" := SalePOS."Location Code";
         SaleLinePOS.Reference := SalePOS.Reference;
@@ -52,7 +51,6 @@
         SaleLinePOS.Amount := Amount;
         SaleLinePOS."Amount Including VAT" := Amount;
         SaleLinePOS."VAT Base Amount" := Amount;
-        SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Rounding; // This is the only thing that differentiates a rounding line from a normal out payment line later on!
         SaleLinePOS.Insert(true);
     end;
 }

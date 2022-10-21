@@ -27,6 +27,7 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Deposit,Out payment,Comment,Cancelled,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,Cancelled,"Open/Close";
+            Description = 'This field has been "obsoleted" by removing all reference to it in Np Retail app';
         }
         field(4; "Line No."; Integer)
         {
@@ -41,21 +42,24 @@
             InitValue = Item;
             OptionCaption = 'G/L,Item,Item Group,Repair,,Payment,Open/Close,Inventory,Customer,Comment';
             OptionMembers = "G/L Entry",Item,"Item Group",Repair,,Payment,"Open/Close","BOM List",Customer,Comment;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Line Type';
         }
         field(6; "No."; Code[20])
         {
             Caption = 'No.';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST("G/L Entry")) "G/L Account"."No."
+            TableRelation = IF ("Line Type" = filter("GL Payment" | "Issue Voucher")) "G/L Account"."No."
             ELSE
-            IF (Type = CONST("Item Group")) "Item Category".Code
+            IF ("Line Type" = CONST("Item Category")) "Item Category".Code
             ELSE
-            IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
+            IF ("Line Type" = CONST("POS Payment")) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
             ELSE
-            IF (Type = CONST(Customer)) Customer."No."
+            IF ("Line Type" = CONST("Customer Deposit")) Customer."No."
             ELSE
-            IF (Type = CONST(Item)) Item."No.";
+            IF ("Line Type" = CONST(Item)) Item."No.";
             ValidateTableRelation = false;
+
 
             trigger OnValidate()
             begin
@@ -63,18 +67,19 @@
 
                 POSUnitGlobal.Get(Rec."Register No.");
 
-                if (Type = Type::Item) and ("No." = '*') then begin
-                    Type := Type::Comment;
-                    "Sale Type" := "Sale Type"::Comment;
+                if ("Line Type" = "Line Type"::Item) and ("No." = '*') then begin
+                    "Line Type" := "Line Type"::Comment;
                 end;
 
-                case Type of
-                    Type::"G/L Entry":
+                case "Line Type" of
+                    "Line Type"::"GL Payment",
+                    "Line Type"::Rounding,
+                    "Line Type"::"Issue Voucher":
                         begin
                             InitFromGLAccount();
                             UpdateVATSetup();
                         end;
-                    Type::Item, Type::"BOM List":
+                    "Line Type"::Item, "Line Type"::"BOM List":
                         begin
                             InitFromItem();
                             UpdateVATSetup();
@@ -82,16 +87,16 @@
                             "Unit Price" := FindItemSalesPrice();
                             Validate(Quantity);
                         end;
-                    Type::"Item Group":
+                    "Line Type"::"Item Category":
                         begin
                             InitFromItemCategory();
                             UpdateVATSetup();
                         end;
-                    Type::Payment:
+                    "Line Type"::"POS Payment":
                         begin
                             InitFromPaymentTypePOS();
                         end;
-                    Type::Customer:
+                    "Line Type"::"Customer Deposit":
                         begin
                             InitFromCustomer();
                         end;
@@ -100,7 +105,7 @@
                 end;
 
                 CreateDim(
-                  NPRDimMgt.TypeToTableNPR(Type), "No.",
+                  NPRDimMgt.TypeToTableNPR("Line Type"), "No.",
                   NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
                   DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
                   0, '');
@@ -117,7 +122,7 @@
             Caption = 'Posting Group';
             DataClassification = CustomerContent;
             Editable = false;
-            TableRelation = IF (Type = CONST(Item)) "Inventory Posting Group";
+            TableRelation = IF ("Line Type" = CONST(Item)) "Inventory Posting Group";
         }
         field(9; "Qty. Discount Code"; Code[20])
         {
@@ -135,7 +140,7 @@
         {
             Caption = 'Unit of Measure Code';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST(Item),
+            TableRelation = IF ("Line Type" = CONST(Item),
                                 "No." = FILTER(<> '')) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
             ELSE
             "Unit of Measure";
@@ -144,8 +149,8 @@
             var
                 UOMMgt: Codeunit "Unit of Measure Management";
             begin
-                case Type of
-                    Type::"G/L Entry":
+                case "Line Type" of
+                    "Line Type"::"GL Payment","Line Type"::"Issue VOucher","Line Type"::Rounding,"Line Type"::"Issue Voucher","Line Type"::"Customer Deposit":
                         begin
                             "Qty. per Unit of Measure" := 1;
                         end;
@@ -169,13 +174,11 @@
             trigger OnValidate()
             var
                 SaleLinePOS: Record "NPR POS Sale Line";
-                Txt001: Label 'Quantity can not be changes on a repair sale';
                 Err001: Label 'Quantity at %2 %1 can only be 1 or -1';
                 Err003: Label 'A quantity must be specified on the line';
                 OldUnitPrice: Decimal;
             begin
                 if ("Serial No." <> '') and
-                  ("Sale Type" = "Sale Type"::Sale) and
                     (Abs(Quantity) <> 1) then
                     Error(Err001,
                       "Serial No.", FieldName("Serial No."));
@@ -183,14 +186,14 @@
                 if ("Serial No." <> '') then
                     Validate("Serial No.", "Serial No.");
 
-                case Type of
-                    Type::"G/L Entry":
+                case "Line Type" of
+                    "Line Type"::"POS Payment","Line Type"::"GL Payment","Line Type"::Rounding,"Line Type"::"Issue Voucher","Line Type"::"Customer Deposit":
                         begin
                             if Quantity = 0 then
                                 Error(Err003);
                             UpdateAmounts(Rec);
                         end;
-                    Type::Item:
+                    "Line Type"::Item:
                         begin
                             GetItem();
                             "Quantity (Base)" := CalcBaseQty(Quantity);
@@ -210,7 +213,7 @@
                                     UpdateAmounts(Rec);
                             end;
                         end;
-                    Type::"Item Group":
+                    "Line Type"::"Item Category":
                         begin
                             if Quantity = 0 then
                                 Error(Err003);
@@ -219,15 +222,10 @@
                             else
                                 "Amount Including VAT" := Round("Unit Price" * Quantity * (1 + "VAT %" / 100), 0.01);
                         end;
-                    Type::Repair:
-                        begin
-                            Error(Txt001);
-                        end;
-                    Type::"BOM List":
+                    "Line Type"::"BOM List":
                         begin
                             SaleLinePOS.SetRange("Register No.", "Register No.");
                             SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                            SaleLinePOS.SetRange("Sale Type", "Sale Type");
                             SaleLinePOS.SetRange(Date, Date);
                             SaleLinePOS.SetRange("Discount Code", "Discount Code");
                             SaleLinePOS.SetFilter("No.", '<>%1', "No.");
@@ -270,15 +268,15 @@
                 Err003: Label 'The sales price cannot be changed for this item';
             begin
                 POSUnitGlobal.Get("Register No.");
-                case Type of
-                    Type::"G/L Entry":
+                case "Line Type" of
+                    "Line Type"::"POS Payment","Line Type"::"GL Payment","Line Type"::Rounding,"Line Type"::"Issue Voucher":
                         begin
                             if Quantity <> 0 then begin
                                 "Amount Including VAT" := "Unit Price" * Quantity;
                                 Amount := "Amount Including VAT";
                             end;
                         end;
-                    Type::Item:
+                    "Line Type"::Item:
                         begin
                             if "Unit Price" < 0 then
                                 Error(ErrItemBelow);
@@ -295,7 +293,7 @@
                             end;
                             "Custom Price" := true;
                         end;
-                    Type::"Item Group":
+                    "Line Type"::"Item Category":
                         begin
                             if Quantity = 0 then
                                 Error(Err001);
@@ -304,12 +302,12 @@
                             else
                                 "Amount Including VAT" := Round("Unit Price" * Quantity * (1 + "VAT %" / 100), 0.01);
                         end;
-                    Type::"BOM List":
+                    "Line Type"::"BOM List":
                         begin
                             "Unit Price" := xRec."Unit Price";
                             exit;
                         end;
-                    Type::Customer:
+                    "Line Type"::"Customer Deposit":
                         begin
                             if Quantity <> 0 then begin
                                 "Amount Including VAT" := "Unit Price" * Quantity;
@@ -376,17 +374,19 @@
                 POSUnit.Get("Register No.");
                 POSSetup.SetPOSUnit(POSUnit);
 
-                case Type of
-                    Type::"G/L Entry":
+                case "Line Type" of
+                    "Line Type"::"POS Payment","Line Type"::"GL Payment","Line Type"::Rounding:
                         begin
-                            if not ("Sale Type" = "Sale Type"::Deposit) then
-                                Error(Trans0003);
+                            Error(Trans0003);
+                        end;                
+                    "Line Type"::"Issue VOucher":
+                        begin
                             "Discount Type" := "Discount Type"::" ";
                             "Discount Code" := '';
                             "Discount Amount" := Round("Unit Price" * "Discount %" / 100, POSSetup.AmountRoundingPrecision());
                             "Amount Including VAT" := "Unit Price" - "Discount Amount";
                         end;
-                    Type::Item:
+                    "Line Type"::Item:
                         begin
                             RemoveBOMDiscount();
                             if "Discount %" > 0 then
@@ -398,14 +398,14 @@
                             GetItem();
                             GetAmount(Rec, Item, Rec."Unit Price");
                         end;
-                    Type::"Item Group":
+                    "Line Type"::"Item Category":
                         Error(Trans0002);
-                    Type::"BOM List":
+                    "Line Type"::"BOM List":
                         begin
                             "Discount %" := xRec."Discount %";
                             exit;
                         end;
-                    Type::Customer:
+                    "Line Type"::"Customer Deposit":
                         Error(Trans0001);
                 end;
             end;
@@ -442,6 +442,11 @@
             Caption = 'Date';
             DataClassification = CustomerContent;
         }
+        field(26; "Line Type"; Enum "NPR POS Sale Line Type")
+        {
+            Caption = 'Type';
+            DataClassification = CustomerContent;
+        }        
         field(30; Amount; Decimal)
         {
             AutoFormatExpression = "Currency Code";
@@ -456,8 +461,8 @@
                 Trans0001: Label 'The sign on quantity and amount must be the same';
             begin
                 if Amount <> xRec.Amount then begin
-                    case Type of
-                        Type::Item:
+                    case "Line Type" of
+                        "Line Type"::Item:
                             begin
                                 GetItem();
                                 if Amount * xRec.Amount <> Abs(Amount) * Abs(xRec.Amount) then
@@ -729,8 +734,6 @@
             begin
                 if "Gen. Posting Type" = "Gen. Posting Type"::Settlement then
                     FieldError("Gen. Posting Type");
-                if "Gen. Posting Type" <> "Gen. Posting Type"::" " then
-                    TestField(Type, Type::"G/L Entry");
             end;
         }
         field(85; "Tax Area Code"; Code[20])
@@ -821,7 +824,7 @@
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = IF ("Line Type" = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
 
             trigger OnValidate()
             begin
@@ -837,7 +840,7 @@
 
             trigger OnValidate()
             begin
-                TestField(Type);
+                TestField("Line Type");
                 TestField(Quantity);
                 TestField("Unit Price");
                 GetPOSHeader();
@@ -1074,7 +1077,7 @@
             trigger OnValidate()
             begin
                 CreateDim(
-                    NPRDimMgt.TypeToTableNPR(Type), "No.",
+                    NPRDimMgt.TypeToTableNPR("Line Type"), "No.",
                     NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
                     DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
                     0, '');
@@ -1097,7 +1100,6 @@
         {
             CalcFormula = Count("NPR NpDc SaleLinePOS Coupon" WHERE("Register No." = FIELD("Register No."),
                                                                    "Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                                   "Sale Type" = FIELD("Sale Type"),
                                                                    "Sale Date" = FIELD(Date),
                                                                    "Sale Line No." = FIELD("Line No."),
                                                                    Type = CONST(Coupon)));
@@ -1111,7 +1113,6 @@
             AutoFormatType = 1;
             CalcFormula = Sum("NPR NpDc SaleLinePOS Coupon"."Discount Amount" WHERE("Register No." = FIELD("Register No."),
                                                                                    "Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                                                   "Sale Type" = FIELD("Sale Type"),
                                                                                    "Sale Date" = FIELD(Date),
                                                                                    "Sale Line No." = FIELD("Line No."),
                                                                                    Type = CONST(Discount)));
@@ -1183,7 +1184,7 @@
             begin
                 CreateDim(
                   DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
-                  NPRDimMgt.TypeToTableNPR(Type), "No.",
+                  NPRDimMgt.TypeToTableNPR("Line Type"), "No.",
                   NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
                   0, '');
             end;
@@ -1456,7 +1457,7 @@
             trigger OnValidate()
             begin
                 CreateDim(
-                  NPRDimMgt.TypeToTableNPR(Type), "No.",
+                  NPRDimMgt.TypeToTableNPR("Line Type"), "No.",
                   NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
                   DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
                   0, '');
@@ -1492,7 +1493,7 @@
         {
             Caption = 'Item Disc. Group';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST(Item),
+            TableRelation = IF ("Line Type" = CONST(Item),
                                 "No." = FILTER(<> '')) "Item Discount Group" WHERE(Code = FIELD("Item Disc. Group"));
             ValidateTableRelation = false;
         }
@@ -1637,6 +1638,8 @@
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Sale Type field not used anymore. For usage of Sale Type refer to NPR POS Sale table';
         }
         key(Key7; "Serial No.")
         {
@@ -1653,13 +1656,34 @@
         {
             MaintainSIFTIndex = false;
             SumIndexFields = "Amount Including VAT", Amount, Quantity;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Sale Type field not used anymore. For usage of Sale Type refer to NPR POS Sale table';            
         }
         key(Key11; "Register No.", "Sales Ticket No.", Date, "Sale Type", Type)
         {
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Sale Type field not used anymore. For usage of Sale Type refer to NPR POS Sale table';            
         }
+        key(Key12; "Register No.", "Sales Ticket No.", Date, "Line Type", "Discount Type", "Line No.")
+        {
+            MaintainSIFTIndex = false;
+            MaintainSQLIndex = false;
+            SumIndexFields = "Amount Including VAT";
+        }
+        key(Key13; "Register No.", "Sales Ticket No.", "Line Type", "No.", "Item Category Code", Quantity)
+        {
+            MaintainSIFTIndex = false;
+            SumIndexFields = "Amount Including VAT", Amount, Quantity;      
+        }
+        key(Key14; "Register No.", "Sales Ticket No.", Date, "Line Type")
+        {
+            MaintainSIFTIndex = false;
+            MaintainSQLIndex = false;
+            SumIndexFields = "Amount Including VAT";
+        }        
     }
 
     fieldgroups
@@ -1680,22 +1704,21 @@
         if "EFT Approved" then
             Error(ERR_EFT_DELETE);
 
-        if ((Type = Type::Customer) and ("Sale Type" = "Sale Type"::Deposit) and ("From Selection")) then
+        if (("Line Type" = "Line Type"::"Customer Deposit") and ("From Selection")) then
             Error(ErrNoDeleteDep);
 
-        if (Type = Type::Item) or (Type = Type::"BOM List") then begin
+        if ("Line Type" = "Line Type"::Item) or ("Line Type" = "Line Type"::"BOM List") then begin
             case "Discount Type" of
                 "Discount Type"::"BOM List":
                     begin
                         SaleLinePOS.Reset();
                         SaleLinePOS.SetRange("Register No.", "Register No.");
                         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                        SaleLinePOS.SetRange("Sale Type", "Sale Type");
                         SaleLinePOS.SetRange(Date, Date);
                         SaleLinePOS.SetRange("Discount Code", "Discount Code");
                         if SaleLinePOS.FindSet() then
                             repeat
-                                if SaleLinePOS.Type = Type::"BOM List" then
+                                if SaleLinePOS."Line Type" = "Line Type"::"BOM List" then
                                     SaleLinePOS.Validate("No.");
                                 if "Line No." <> SaleLinePOS."Line No." then
                                     SaleLinePOS.Delete();
@@ -1770,13 +1793,12 @@
         if ("Discount Type" = "Discount Type"::"BOM List") then begin
             SaleLinePOS.SetRange("Register No.", "Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-            SaleLinePOS.SetRange("Sale Type", "Sale Type");
             SaleLinePOS.SetRange(Date, Date);
             SaleLinePOS.SetRange("Discount Code", "Discount Code");
             SaleLinePOS.SetFilter("No.", '<>%1', "No.");
             if SaleLinePOS.FindSet(true, false) then
                 repeat
-                    if SaleLinePOS.Type = Type::"BOM List" then
+                    if SaleLinePOS."Line Type" = "Line Type"::"BOM List" then
                         SaleLinePOS.Delete()
                     else begin
                         SaleLinePOS."Discount Type" := "Discount Type"::" ";
@@ -1820,14 +1842,14 @@
     var
         Txt001: Label 'Deposit';
     begin
-        if ("No." = '*') or (Type = Type::Comment) then begin
+        if ("No." = '*') or ("Line Type" = "Line Type"::Comment) then begin
             SalesLine."No." := '';
             SalesLine.Description := Description;
             SalesLine."Description 2" := "Description 2";
             exit;
         end;
 
-        if (Type = Type::Customer) and ("Sale Type" = "Sale Type"::Deposit) then begin
+        if ("Line Type" = "Line Type"::"Customer Deposit") then begin
             SalesLine."No." := '';
             SalesLine.Description := Txt001 + ' ' + Format(Abs("Amount Including VAT"));
             exit;
@@ -1935,7 +1957,6 @@
             SaleLinePOS.Reset();
             SaleLinePOS.SetRange("Register No.", "Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-            SaleLinePOS.SetFilter("Sale Type", '%1|%2|%3', "Sale Type"::Sale, "Sale Type"::Deposit, "Sale Type"::"Out payment");
             SaleLinePOS.SetRange(Date, Date);
             SaleLinePOS.SetRange("Line No.", StartLineNo + 1, StartLineNo + 10000);
             if SaleLinePOS.FindFirst() then
@@ -1958,7 +1979,6 @@
                     SaleLinePOS.Init();
                     SaleLinePOS."Register No." := "Register No.";
                     SaleLinePOS."Sales Ticket No." := "Sales Ticket No.";
-                    SaleLinePOS."Sale Type" := "Sale Type";
                     SaleLinePOS.Date := Rec.Date;
                     SaleLinePOS."Line No." := Round(EndLineNo - (EndLineNo - StartLineNo) / (2 * Level), 1);
                     if not SaleLinePOS.Insert(true) then
@@ -2091,18 +2111,27 @@
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Handled: Boolean;
     begin
-        if (Type = Type::"G/L Entry") then begin
-            case "Gen. Posting Type" of
-                "Gen. Posting Type"::" ":
-                    begin
+        case true of
+            "Line Type" in ["Line Type"::Rounding, "Line Type"::"GL Payment","Line Type"::"Issue Voucher"]:
+                begin
+                    if Rec."Gen. Posting Type" = Rec."Gen. Posting Type"::" " then begin
                         "VAT Calculation Type" := "VAT Calculation Type"::"Normal VAT";
                         "VAT %" := 0;
                         "Gen. Bus. Posting Group" := '';
                         "Gen. Prod. Posting Group" := '';
                         "VAT Bus. Posting Group" := '';
                         "VAT Prod. Posting Group" := '';
+                    end else begin
+                        VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
+                        POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                        "VAT Identifier" := VATPostingSetup."VAT Identifier";
+                        "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
+
+                        POSSaleTaxCalc.UpdateSourceTaxSetup(Rec, VATPostingSetup, SalePOS, 0);
                     end;
-                else begin
+                end;
+            "Line Type" in ["Line Type"::Item, "Line Type"::"Item Category", "Line Type"::"BOM List"]:
+                begin
                     VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
                     POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
                     "VAT Identifier" := VATPostingSetup."VAT Identifier";
@@ -2110,14 +2139,6 @@
 
                     POSSaleTaxCalc.UpdateSourceTaxSetup(Rec, VATPostingSetup, SalePOS, 0);
                 end;
-            end;
-        end else begin
-            VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
-            POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
-            "VAT Identifier" := VATPostingSetup."VAT Identifier";
-            "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
-
-            POSSaleTaxCalc.UpdateSourceTaxSetup(Rec, VATPostingSetup, SalePOS, 0);
         end;
     end;
 
@@ -2331,7 +2352,6 @@
         SaleLinePOS.LockTable(true);
         SaleLinePOS.SetFilter("Register No.", '=%1', "Register No.");
         SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', "Sales Ticket No.");
-        SaleLinePOS.SetFilter("Sale Type", '=%1', "Sale Type"::Sale);
         SaleLinePOS.SetFilter("Main Line No.", '=%1', "Line No.");
         SaleLinePOS.SetFilter(Accessory, '=%1', true); // not really required, would also be one solution for combination items below
         SaleLinePOS.SetFilter("Main Item No.", '=%1', "No."); // not really required, would also be one solution for combination items below
@@ -2349,7 +2369,6 @@
 
         SaleLinePOS.SetRange("Register No.", "Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-        SaleLinePOS.SetRange("Sale Type", "Sale Type"::Sale);
         SaleLinePOS.SetRange("Line No.", "Line No.", "Line No." + 9999);
         SaleLinePOS.SetRange(Accessory, true);
         SaleLinePOS.SetRange("Main Item No.", "No.");
@@ -2366,7 +2385,6 @@
         SaleLinePOS.SetRange("Register No.", "Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
         SaleLinePOS.SetRange(Date, Date);
-        SaleLinePOS.SetRange("Sale Type", "Sale Type"::Sale);
         SaleLinePOS.SetRange("Line No.", "Line No.", "Line No." + 9999);
         SaleLinePOS.SetRange("Combination Item", true);
         SaleLinePOS.SetRange("Main Item No.", "No.");
@@ -2423,8 +2441,7 @@
         TempItemLedgerEntry: Record "Item Ledger Entry" temporary;
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        TestField("Sale Type", "Sale Type"::Sale);
-        TestField(Type, Type::Item);
+        TestField("Line Type", "Line Type"::Item);
 
         GetItem();
         Item.TestField("Costing Method", Item."Costing Method"::Specific);
@@ -2483,7 +2500,6 @@
 
         TotalAuditRollQuantity := 0;
         TotalItemLedgerEntryQuantity := 0;
-        TestField("Sale Type", "Sale Type"::Sale);
         TestField(Quantity);
 
         GetItem();

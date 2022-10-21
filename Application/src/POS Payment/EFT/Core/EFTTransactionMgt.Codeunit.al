@@ -426,8 +426,7 @@
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS.Validate(Type, SaleLinePOS.Type::Item);
-        SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Sale);
+        SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.Validate("No.", ItemNo);
         SaleLinePOS.Validate(Quantity, Qty);
         SaleLinePOS.Validate("Unit Price", Amount);
@@ -471,8 +470,7 @@
 
         LineAmount := EFTTransactionRequest."Result Amount" * -1;
 
-        SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Deposit);
-        SaleLinePOS.Validate(Type, SaleLinePOS.Type::"G/L Entry");
+        SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"Issue Voucher");        
         SaleLinePOS.Validate("No.", GetPOSPostingSetupAccountNo(POSSession, EFTTransactionRequest."Original POS Payment Type Code"));
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS."EFT Approved" := EFTTransactionRequest.Successful;

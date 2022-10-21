@@ -207,6 +207,11 @@
             OptionMembers = Sale,Annullment;
             DataClassification = CustomerContent;
         }
+        field(110; "Header Type"; Enum "NPR POS Sale Type")
+        {
+            Caption = 'Sale type';
+            DataClassification = CustomerContent;
+        }        
         field(111; "Retursalg Bonnummer"; Code[20])
         {
             Caption = 'Reversesale Ticket No.';
@@ -358,8 +363,7 @@
             AutoFormatType = 1;
             CalcFormula = Sum("NPR Archive Sale Line POS".Amount WHERE("Register No." = FIELD("Register No."),
                                                                     "Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                                    "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
-                                                                    Type = FILTER(<> Comment & <> "Open/Close")));
+                                                                    "Line Type" = filter(Item | "Item Category" | "BOM List" | "Issue Voucher" | "Customer Deposit")));                                                                    
             Caption = 'Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -373,8 +377,7 @@
             AutoFormatType = 1;
             CalcFormula = Sum("NPR Archive Sale Line POS"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
                                                                                     "Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                                                    "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
-                                                                                    Type = FILTER(<> Comment & <> "Open/Close")));
+                                                                                    "Line Type" = filter(Item | "Item Category" | "BOM List" | "Issue Voucher" | "Customer Deposit")));                                                                                    
             Caption = 'Amount Including VAT';
             Editable = false;
             FieldClass = FlowField;
@@ -384,8 +387,7 @@
             AutoFormatType = 1;
             CalcFormula = Sum("NPR Archive Sale Line POS"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
                                                                                     "Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                                                    "Sale Type" = FILTER(Payment | "Out payment"),
-                                                                                    Type = FILTER(<> Comment & <> "Open/Close")));
+                                                                                    "Line Type" = filter("POS Payment" | Rounding | "GL Payment")));                                                                                    
             Caption = 'Payment Amount';
             Editable = false;
             FieldClass = FlowField;

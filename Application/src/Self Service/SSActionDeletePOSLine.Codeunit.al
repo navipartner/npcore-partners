@@ -63,14 +63,13 @@
         SaleLinePOS2: Record "NPR POS Sale Line";
     begin
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
+        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item then
             exit;
         if SaleLinePOS."No." in ['', '*'] then
             exit;
 
         SaleLinePOS2.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOS2.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        SaleLinePOS2.SetRange("Sale Type", SaleLinePOS."Sale Type");
         SaleLinePOS2.SetFilter("Line No.", '<>%1', SaleLinePOS."Line No.");
         SaleLinePOS2.SetRange("Main Line No.", SaleLinePOS."Line No.");
         SaleLinePOS2.SetRange(Accessory, true);

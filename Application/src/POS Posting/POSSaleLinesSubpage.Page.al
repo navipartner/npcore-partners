@@ -13,19 +13,13 @@
         {
             repeater(Group)
             {
-                field("Sale Type"; Rec."Sale Type")
-                {
-
-                    ToolTip = 'Specifies the value of the Sale Type field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Line No."; Rec."Line No.")
                 {
 
                     ToolTip = 'Specifies the value of the Line No. field';
                     ApplicationArea = NPRRetail;
                 }
-                field(Type; Rec.Type)
+                field(Type; Rec."Line Type")
                 {
 
                     ToolTip = 'Specifies the value of the Type field';

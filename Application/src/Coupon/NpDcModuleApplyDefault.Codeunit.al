@@ -65,7 +65,6 @@
         SaleLinePOSCouponApply.Init();
         SaleLinePOSCouponApply."Register No." := SaleLinePOS."Register No.";
         SaleLinePOSCouponApply."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        SaleLinePOSCouponApply."Sale Type" := SaleLinePOS."Sale Type";
         SaleLinePOSCouponApply."Sale Date" := SaleLinePOS.Date;
         SaleLinePOSCouponApply."Sale Line No." := SaleLinePOS."Line No.";
         SaleLinePOSCouponApply."Line No." := LineNo;
@@ -116,7 +115,6 @@
     begin
         SaleLinePOSCouponApply.SetRange("Register No.", SaleLinePOSCoupon."Register No.");
         SaleLinePOSCouponApply.SetRange("Sales Ticket No.", SaleLinePOSCoupon."Sales Ticket No.");
-        SaleLinePOSCouponApply.SetRange("Sale Type", SaleLinePOSCoupon."Sale Type");
         SaleLinePOSCouponApply.SetRange("Sale Date", SaleLinePOSCoupon."Sale Date");
         SaleLinePOSCouponApply.SetRange(Type, SaleLinePOSCouponApply.Type::Discount);
         if SaleLinePOSCouponApply.IsEmpty then
@@ -132,7 +130,6 @@
     begin
         SaleLinePOSCouponApply.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOSCouponApply.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        SaleLinePOSCouponApply.SetRange("Sale Type", SaleLinePOS."Sale Type");
         SaleLinePOSCouponApply.SetRange("Sale Date", SaleLinePOS.Date);
         SaleLinePOSCouponApply.SetRange("Sale Line No.", SaleLinePOS."Line No.");
         SaleLinePOSCouponApply.SetRange(Type, SaleLinePOSCouponApply.Type::Discount);
@@ -171,8 +168,7 @@
         SaleLinePOS.SetRange("Register No.", SaleLinePOSCoupon."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOSCoupon."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SaleLinePOSCoupon."Sale Date");
-        SaleLinePOS.SetFilter("Sale Type", '=%1|=%2', SaleLinePOS."Sale Type"::Deposit, SaleLinePOS."Sale Type"::Sale);
-        SaleLinePOS.SetFilter(Type, '=%1|=%2', SaleLinePOS.Type::Item, SaleLinePOS.Type::"G/L Entry");
+        SaleLinePOS.SetFilter("Line Type", '=%1|=%2', SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type"::"Issue Voucher");
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
         exit(SaleLinePOS.FindFirst());
     end;
@@ -182,7 +178,6 @@
         Clear(SaleLinePOSCouponApply);
         SaleLinePOSCouponApply.SetRange("Register No.", SaleLinePOSCoupon."Register No.");
         SaleLinePOSCouponApply.SetRange("Sales Ticket No.", SaleLinePOSCoupon."Sales Ticket No.");
-        SaleLinePOSCouponApply.SetRange("Sale Type", SaleLinePOSCoupon."Sale Type");
         SaleLinePOSCouponApply.SetRange("Sale Date", SaleLinePOSCoupon."Sale Date");
         SaleLinePOSCouponApply.SetRange(Type, SaleLinePOSCouponApply.Type::Discount);
         SaleLinePOSCouponApply.SetRange("Applies-to Sale Line No.", SaleLinePOSCoupon."Sale Line No.");
@@ -198,7 +193,6 @@
         Clear(SaleLinePOSCouponApply);
         SaleLinePOSCouponApply.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOSCouponApply.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        SaleLinePOSCouponApply.SetRange("Sale Type", SaleLinePOS."Sale Type");
         SaleLinePOSCouponApply.SetRange("Sale Date", SaleLinePOS.Date);
         SaleLinePOSCouponApply.SetRange("Line No.", SaleLinePOS."Line No.");
         SaleLinePOSCouponApply.SetRange(Type, SaleLinePOSCouponApply.Type::Discount);
@@ -216,7 +210,6 @@
     begin
         SaleLinePOSCoupon.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOSCoupon.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        SaleLinePOSCoupon.SetRange("Sale Type", SaleLinePOS."Sale Type");
         SaleLinePOSCoupon.SetRange("Sale Date", SaleLinePOS.Date);
         SaleLinePOSCoupon.SetRange("Sale Line No.", SaleLinePOS."Line No.");
         if SaleLinePOSCoupon.FindLast() then;

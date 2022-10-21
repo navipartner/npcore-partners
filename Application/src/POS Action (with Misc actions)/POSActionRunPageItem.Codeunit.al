@@ -30,7 +30,7 @@
             Sender.RegisterWorkflowStep('run_page_item', 'respond();');
             Sender.RegisterWorkflow(false);
             Sender.RegisterDataSourceBinding('BUILTIN_SALELINE');
-            Sender.RegisterCustomJavaScriptLogic('enable', 'return row.getField(' + Format(SaleLinePOS.FieldNo(Type)) + ').rawValue == 1;');
+            Sender.RegisterCustomJavaScriptLogic('enable', 'return row.getField(' + Format(SaleLinePOS.FieldNo("Line Type")) + ').rawValue == 1;');
 
             Sender.RegisterIntegerParameter('PageId', PAGE::"Item Availability by Location");
         end;
@@ -83,7 +83,7 @@
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        SaleLinePOS.TestField(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.TestField("Line Type", SaleLinePOS."Line Type"::Item);
         Item.Get(SaleLinePOS."No.");
         Item.SetFilter("Variant Filter", Item."Variant Filter");
 

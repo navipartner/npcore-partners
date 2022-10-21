@@ -499,6 +499,17 @@
         CreatePostingSetupForSaleItem(Item, POSUnit, POSStore);
     end;
 
+    procedure DontPrintReceiptOnSaleEnd(POSUnit: Record "NPR POS Unit")
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+    begin
+        if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
+            exit;
+        if POSAuditProfile."Do Not Print Receipt on Sale" then
+            exit;
+        POSAuditProfile."Do Not Print Receipt on Sale" := true;
+        POSAuditProfile.Modify();        
+    end;
     procedure CreateItemForPOSSaleUsage(var Item: Record Item; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store"; VATProductPostingGroup: Record "VAT Product Posting Group")
     var
         NPRLibraryInventory: Codeunit "NPR Library - Inventory";

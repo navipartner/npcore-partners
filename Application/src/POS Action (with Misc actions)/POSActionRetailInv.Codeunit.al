@@ -54,7 +54,7 @@
     begin
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        SaleLinePOS.TestField(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.TestField("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.TestField("No.");
 
         if not SelectRetailInventorySetCode(JSON, RetailInventorySet) then

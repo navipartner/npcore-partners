@@ -79,7 +79,7 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
 
                         trigger OnAfterInitRecord()
                         begin
-                            TempSaleLinePOSReq.Type := TempSaleLinePOSReq.Type::Item;
+                            TempSaleLinePOSReq."Line Type" := TempSaleLinePOSReq."Line Type"::Item;
                         end;
 
                         trigger OnBeforeInsertRecord()

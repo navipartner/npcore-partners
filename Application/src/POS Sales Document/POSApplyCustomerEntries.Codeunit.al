@@ -137,8 +137,7 @@
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
 
         GenJnlApply.CheckAgainstApplnCurrency(SaleLinePOS."Currency Code", CustLedgEntry."Currency Code", "Gen. Journal Account Type"::Customer, true);
-        if (SaleLinePOS.Type = SaleLinePOS.Type::Customer) and
-           (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Deposit) and
+        if (SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"Customer Deposit") and
            (CustLedgEntry."Document Type" = CustLedgEntry."Document Type"::Invoice) and
            (SaleLinePOS.Date <= CustLedgEntry."Pmt. Discount Date")
         then
@@ -155,8 +154,7 @@
         if (ApplnAmountToApply < LineAmount) and (ApplnAmountToApply <> 0) then
             LineAmount := ApplnAmountToApply;
 
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
-        SaleLinePOS.Type := SaleLinePOS.Type::Customer;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"Customer Deposit";
         SaleLinePOS.Validate("No.", CustLedgEntry."Customer No.");
         SaleLinePOS."Buffer Document Type" := CustLedgEntry."Document Type";
         SaleLinePOS."Buffer Document No." := CustLedgEntry."Document No.";

@@ -35,7 +35,7 @@
         TempWaiterPadLine.SetRange(Marked, true);
         TempWaiterPadLine.FilterGroup(-1);
         TempWaiterPadLine.SetFilter("Marked Qty", '<>%1', 0);
-        TempWaiterPadLine.SetRange(Type, TempWaiterPadLine.Type::Comment);
+        TempWaiterPadLine.SetRange("Line Type", TempWaiterPadLine."Line Type"::Comment);
         TempWaiterPadLine.FilterGroup(0);
         if TempWaiterPadLine.IsEmpty then
             exit;
@@ -131,7 +131,6 @@
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
         SaleLinesExist := SaleLinePOS.FindSet(CleanupSale);
         if SaleLinesExist then begin
             TempTouchedWaiterPadLine.DeleteAll();
@@ -151,7 +150,7 @@
                     TempTouchedWaiterPadLine := WaiterPadLine;
                     if not TempTouchedWaiterPadLine.Find() then begin
                         if (WaiterPadLine."Kitchen Order Sent" or WaiterPadLine."Serving Requested") and
-                           (WaiterPadLine.Type = WaiterPadLine.Type::Item)
+                           (WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Item)
                         then begin
                             if WaiterPadLine.Quantity <> 0 then begin
                                 WaiterPadLine.Validate(Quantity, 0);
@@ -199,8 +198,7 @@
         NewLine := not WaiterPadLine2.FindFirst() or IsNullGuid(SaleLinePOS.SystemID);
         if not NewLine then begin
             WaiterPadLine := WaiterPadLine2;
-            WaiterPadLine.TestField(WaiterPadLine.Type, SaleLinePOS.Type);
-            WaiterPadLine.TestField(WaiterPadLine."Sale Type", SaleLinePOS."Sale Type");
+            WaiterPadLine.TestField(WaiterPadLine."Line Type", SaleLinePOS."Line Type");
             WaiterPadLine.TestField(WaiterPadLine."No.", SaleLinePOS."No.");
             WaiterPadLine.TestField(WaiterPadLine."Variant Code", SaleLinePOS."Variant Code");
             WaiterPadLine.TestField(WaiterPadLine."Unit of Measure Code", SaleLinePOS."Unit of Measure Code");
@@ -214,8 +212,7 @@
             WaiterPadLine."Start Date" := Today();
             WaiterPadLine."Start Time" := Time;
 
-            WaiterPadLine."Sale Type" := SaleLinePOS."Sale Type";
-            WaiterPadLine.Type := SaleLinePOS.Type;
+            WaiterPadLine."Line Type" := SaleLinePOS."Line Type";
             WaiterPadLine."No." := SaleLinePOS."No.";
             WaiterPadLine."Variant Code" := SaleLinePOS."Variant Code";
             WaiterPadLine.Description := SaleLinePOS.Description;
@@ -296,9 +293,8 @@
     begin
         SaleLinePOS.SetSkipUpdateDependantQuantity(true);
 
-        SaleLinePOS.Type := WaiterPadLine.Type;
-        SaleLinePOS."Sale Type" := WaiterPadLine."Sale Type";
-        if SaleLinePOS.Type <> SaleLinePOS.Type::Comment then
+        SaleLinePOS."Line Type" := WaiterPadLine."Line Type";
+        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Comment then
             SaleLinePOS."No." := WaiterPadLine."No.";
         SaleLinePOS."Variant Code" := WaiterPadLine."Variant Code";
 
@@ -306,7 +302,7 @@
         SaleLinePOS."Description 2" := WaiterPadLine."Description 2";
         SaleLinePOS."Order No. from Web" := WaiterPadLine."Order No. from Web";
         SaleLinePOS."Order Line No. from Web" := WaiterPadLine."Order Line No. from Web";
-        if SaleLinePOS.Type = SaleLinePOS.Type::Item then
+        if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Item then
             SaleLinePOS.Validate("Unit of Measure Code");
 
         SaleLinePOS.SetSkipUpdateDependantQuantity(false);
@@ -324,7 +320,7 @@
 
         SaleLinePOS."Discount %" := WaiterPadLine."Discount %";
 
-        if SaleLinePOS.Type <> SaleLinePOS.Type::Comment then begin
+        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Comment then begin
             WaiterPad.CalcFields("Current Seating FF");
             SaleLinePOS."NPRE Seating Code" := WaiterPad."Current Seating FF";
         end;
@@ -656,7 +652,7 @@
                         POSInfoTransaction."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
                         POSInfoTransaction."Sales Line No." := SaleLinePOS."Line No.";
                         POSInfoTransaction."Sale Date" := SaleLinePOS.Date;
-                        POSInfoTransaction."Receipt Type" := SaleLinePOS.Type;
+                        POSInfoTransaction."Line Type" := SaleLinePOS."Line Type";
                         POSInfoTransaction."Entry No." := 0;
                         POSInfoTransaction."POS Info Code" := POSInfoWaiterPadLink."POS Info Code";
                         POSInfoTransaction."POS Info" := POSInfoWaiterPadLink."POS Info";

@@ -68,36 +68,30 @@
         POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
         if POSSaleLine.FindSet() then begin
             repeat
-                case POSSaleLine."Sale Type" of
-                    POSSaleLine."Sale Type"::Sale,
-                    POSSaleLine."Sale Type"::Deposit:
+                case POSSaleLine."Line Type" of
+                    POSSaleLine."Line Type"::Item,
+                    POSSaleLine."Line Type"::"Item Category",
+                    POSSaleLine."Line Type"::"BOM List",
+                    POSSaleLine."Line Type"::"Customer Deposit",
+                    POSSaleLine."Line Type"::"Issue Voucher":
                         begin
                             InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine);
                             InsertPOSTaxAmount(POSSaleLine.SystemId, POSEntry);
                         end;
-                    POSSaleLine."Sale Type"::"Out payment":
-                        if POSSaleLine.Type = POSSaleLine.Type::"G/L Entry" then begin
-                            InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine);
-                            InsertPOSTaxAmountReverseSign(POSSaleLine.SystemId, POSEntry);
-                        end else
-                            InsertPOSPaymentLine(POSSale, POSSaleLine, POSEntry, POSEntryPaymentLine);
-                    POSSaleLine."Sale Type"::Comment:
-                        ; //To-do Comments
-                    POSSaleLine."Sale Type"::"Debit Sale":
+                    POSSaleLine."Line Type"::Rounding,
+                    POSSaleLine."Line Type"::"GL Payment":
                         begin
                             InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine);
-                            InsertPOSTaxAmount(POSSaleLine.SystemId, POSEntry);
-                        end;
-                    POSSaleLine."Sale Type"::"Open/Close":
-                        ; //To do Open / Close
-                    POSSaleLine."Sale Type"::Payment:
+                            InsertPOSTaxAmountReverseSign(POSSaleLine.SystemId, POSEntry); 
+                        end;                           
+                    POSSaleLine."Line Type"::"POS Payment":
                         InsertPOSPaymentLine(POSSale, POSSaleLine, POSEntry, POSEntryPaymentLine);
                 end;
             until POSSaleLine.Next() = 0;
         end;
     end;
 
-    internal procedure CreatePOSEntryForCreatedSalesDocument(var POSSale: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header"; Posted: Boolean)
+    internal procedure CreatePOSEntryForCreatedSalesDocument(var POSSale: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header"; Posted: Boolean)    
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
@@ -234,33 +228,21 @@
         POSEntrySalesLine."Customer No." := POSSale."Customer No.";
         POSEntrySalesLine."Salesperson Code" := POSSale."Salesperson Code";
 
-        case POSSaleLine.Type of
-            POSSaleLine.Type::Item:
+        case POSSaleLine."Line Type" of
+            POSSaleLine."Line Type"::Item:
                 POSEntrySalesLine.Type := POSEntrySalesLine.Type::Item;
-            POSSaleLine.Type::"G/L Entry":
-                POSEntrySalesLine.Type := POSEntrySalesLine.Type::"G/L Account";
-            else
-                ;//Add silent error comment line
-        end;
-
-        case POSSaleLine."Sale Type" of
-            POSSaleLine."Sale Type"::Deposit:
-                if POSSaleLine.Type = POSSaleLine.Type::Customer then
-                    POSEntrySalesLine.Type := POSEntrySalesLine.Type::Customer
+            POSSaleLine."Line Type"::"Customer Deposit":
+                POSEntrySalesLine.Type := POSEntrySalesLine.Type::Customer;
+            POSSaleLine."Line Type"::"Issue Voucher":
+                POSEntrySalesLine.Type := POSEntrySalesLine.Type::Voucher;
+            POSSaleLine."Line Type"::Rounding:
+                POSEntrySalesLine.Type := POSEntrySalesLine.Type::Rounding;                    
+            POSSaleLine."Line Type"::"GL Payment":
+                if POSSaleLine."Gen. Posting Type" <> POSSaleLine."Gen. Posting Type"::Purchase then
+                    POSEntrySalesLine.Type := POSEntrySalesLine.Type::"G/L Account"
                 else
-                    POSEntrySalesLine.Type := POSEntrySalesLine.Type::Voucher;
-
-            POSSaleLine."Sale Type"::"Out payment":
-                //This is currently the only way to see the difference between a Rounding and a Payout line!
-                if POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Rounding then
-                    POSEntrySalesLine.Type := POSEntrySalesLine.Type::Rounding
-                else
-                    if POSSaleLine."Gen. Posting Type" <> POSSaleLine."Gen. Posting Type"::Purchase then
-                        POSEntrySalesLine.Type := POSEntrySalesLine.Type::"G/L Account"
-                    else
-                        POSEntrySalesLine.Type := POSEntrySalesLine.Type::Payout;
+                    POSEntrySalesLine.Type := POSEntrySalesLine.Type::Payout;
         end;
-
 
         POSEntrySalesLine."Exclude from Posting" := ExcludeFromPosting(POSSaleLine);
         POSEntrySalesLine."No." := POSSaleLine."No.";
@@ -1012,10 +994,7 @@
         if (SaleLinePOS.Quantity >= 0) then
             exit;
 
-        if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) then
-            exit;
-
-        if (SaleLinePOS."Sale Type" <> SaleLinePOS."Sale Type"::Sale) then
+        if (SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item) then
             exit;
 
         // Only referenced return sales
@@ -1063,14 +1042,13 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        if SalePOS."Sale type" = SalePOS."Sale type"::Annullment then
+        if SalePOS."Header Type" = SalePOS."Header Type"::Cancelled then
             exit(true);
 
         SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Comment);
-        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Cancelled);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Comment);
         exit(not SaleLinePOS.IsEmpty());
     end;
 
@@ -1207,10 +1185,7 @@
 
     internal procedure ExcludeFromPosting(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     begin
-        if SaleLinePOS.Type in [SaleLinePOS.Type::Comment] then
-            exit(true);
-
-        exit(SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::Comment, SaleLinePOS."Sale Type"::"Debit Sale", SaleLinePOS."Sale Type"::"Open/Close"]);
+        exit(SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::Comment]);
     end;
 
     [IntegrationEvent(false, false)]
@@ -1518,11 +1493,13 @@
     var
         ExtSaleLinePOS: Record "NPR External POS Sale Line";
     begin
+        if ExtSalePOS."Header Type" = ExtSalePOS."Header Type"::Cancelled then
+            exit(true);
+
         ExtSaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
         ExtSaleLinePOS.SetRange("Register No.", ExtSalePOS."Register No.");
         ExtSaleLinePOS.SetRange("Sales Ticket No.", ExtSalePOS."Sales Ticket No.");
-        ExtSaleLinePOS.SetRange(Type, ExtSaleLinePOS.Type::Comment);
-        ExtSaleLinePOS.SetRange("Sale Type", ExtSaleLinePOS."Sale Type"::Cancelled);
+        ExtSaleLinePOS.SetRange("Line Type", ExtSaleLinePOS."Line Type"::Comment);
         exit(not ExtSaleLinePOS.IsEmpty());
     end;
 
@@ -1628,28 +1605,25 @@
         ExtSaleLinePOS.SetRange("External POS Sale Entry No.", ExtSalePOS."Entry No.");
         if ExtSaleLinePOS.FindSet() then begin
             repeat
-                case ExtSaleLinePOS."Sale Type" of
-                    ExtSaleLinePOS."Sale Type"::Sale,
-                    ExtSaleLinePOS."Sale Type"::Deposit:
+                case ExtSaleLinePOS."Line Type" of
+                    ExtSaleLinePOS."Line Type"::Item,
+                    ExtSaleLinePOS."Line Type"::"Item Category",
+                    ExtSaleLinePOS."Line Type"::"BOM List",
+                    ExtSaleLinePOS."Line Type"::"Customer Deposit",
+                    ExtSaleLinePOS."Line Type"::"Issue Voucher":
                         begin
                             InsertPOSSaleLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, false, POSSalesLine);
                             InsertPOSTaxAmountExt(POSEntryTaxLine, ExtSaleLinePOS, POSEntry)
                         end;
-                    ExtSaleLinePOS."Sale Type"::"Out payment":
-                        if ExtSaleLinePOS.Type = ExtSaleLinePOS.Type::"G/L Entry" then begin
+                    ExtSaleLinePOS."Line Type"::Rounding:
+                        begin
+                            InsertPOSSaleLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, false, POSSalesLine);
+                        end;                        
+                    ExtSaleLinePOS."Line Type"::"GL Payment":
+                        begin
                             InsertPOSSaleLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, true, POSSalesLine);
-                        end else
-                            InsertPOSPaymentLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, POSPaymentLine);
-                    ExtSaleLinePOS."Sale Type"::Comment:
-                        ; //To-do Comments
-                    ExtSaleLinePOS."Sale Type"::"Debit Sale":
-                        begin
-                            InsertPOSSaleLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, false, POSSalesLine);
-                            InsertPOSTaxAmountExt(POSEntryTaxLine, ExtSaleLinePOS, POSEntry)
                         end;
-                    ExtSaleLinePOS."Sale Type"::"Open/Close":
-                        ; //To do Open / Close
-                    ExtSaleLinePOS."Sale Type"::Payment:
+                    ExtSaleLinePOS."Line Type"::"POS Payment":
                         InsertPOSPaymentLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, POSPaymentLine);
                 end;
             until ExtSaleLinePOS.Next() = 0;
@@ -1688,29 +1662,20 @@
         POSSalesLine."Customer No." := ExtSalePOS."Customer No.";
         POSSalesLine."Salesperson Code" := ExtSalePOS."Salesperson Code";
 
-        case ExtSaleLinePOS.Type of
-            ExtSaleLinePOS.Type::Item:
-                POSSalesLine.Type := POSSalesLine.Type::Item;
-            ExtSaleLinePOS.Type::"G/L Entry":
-                POSSalesLine.Type := POSSalesLine.Type::"G/L Account";
-            else
-                ;//Add silent error comment line
-        end;
-
-        case ExtSaleLinePOS."Sale Type" of
-            ExtSaleLinePOS."Sale Type"::Deposit:
-                if ExtSaleLinePOS.Type = ExtSaleLinePOS.Type::Customer then
-                    POSSalesLine.Type := POSSalesLine.Type::Customer;
-
-            ExtSaleLinePOS."Sale Type"::"Out payment":
-                //This is currently the only way to see the difference between a Rounding and a Payout line!
-                if ExtSaleLinePOS."Discount Type" = ExtSaleLinePOS."Discount Type"::Rounding then
-                    POSSalesLine.Type := POSSalesLine.Type::Rounding
-                else
+        case ExtSaleLinePOS."Line Type" of
+            ExtSaleLinePOS."Line Type"::Item:
+                POSSalesLine.Type := POSSalesLine.Type::Item;        
+            ExtSaleLinePOS."Line Type"::"Customer Deposit":
+                POSSalesLine.Type := POSSalesLine.Type::Customer;
+            ExtSaleLinePOS."Line Type"::Rounding:
+                    POSSalesLine.Type := POSSalesLine.Type::Rounding;
+            ExtSaleLinePOS."Line Type"::"GL Payment":
+                begin
                     if ExtSaleLinePOS."Gen. Posting Type" <> ExtSaleLinePOS."Gen. Posting Type"::Purchase then
                         POSSalesLine.Type := POSSalesLine.Type::"G/L Account"
                     else
                         POSSalesLine.Type := POSSalesLine.Type::Payout;
+                end;
         end;
 
 
@@ -1762,8 +1727,7 @@
         POSSalesLine."VAT Base Amount" := ExtSaleLinePOS."VAT Base Amount";
         POSSalesLine."Line Amount" := ExtSaleLinePOS."Line Amount";
 
-        if ((ExtSaleLinePOS."Sale Type" = ExtSaleLinePOS."Sale Type"::"Out payment")
-          and (ExtSaleLinePOS."Discount Type" <> ExtSaleLinePOS."Discount Type"::Rounding)) then
+        if ExtSaleLinePOS."Line Type" = ExtSaleLinePOS."Line Type"::"GL Payment" then
             POSSalesLine."Line Amount" *= -1;
 
         POSSalesLine."Amount Excl. VAT (LCY)" := ExtSaleLinePOS.Amount * POSEntry."Currency Factor";
@@ -1806,10 +1770,7 @@
 
     internal procedure ExcludeFromPostingExt(ExtSaleLinePOS: Record "NPR External POS Sale Line"): Boolean
     begin
-        if ExtSaleLinePOS.Type in [ExtSaleLinePOS.Type::Comment] then
-            exit(true);
-
-        exit(ExtSaleLinePOS."Sale Type" in [ExtSaleLinePOS."Sale Type"::Comment, ExtSaleLinePOS."Sale Type"::"Debit Sale", ExtSaleLinePOS."Sale Type"::"Open/Close"]);
+        exit(ExtSaleLinePOS."Line Type" in [ExtSaleLinePOS."Line Type"::Comment]);
     end;
 
     local procedure InsertPOSPaymentLineExt(ExtSalePOS: Record "NPR External POS Sale"; ExtSaleLinePOS: Record "NPR External POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSPaymentLine: Record "NPR POS Entry Payment Line")
@@ -1888,10 +1849,7 @@
         if (ExtSaleLinePOS.Quantity >= 0) then
             exit;
 
-        if (ExtSaleLinePOS.Type <> ExtSaleLinePOS.Type::Item) then
-            exit;
-
-        if (ExtSaleLinePOS."Sale Type" <> ExtSaleLinePOS."Sale Type"::Sale) then
+        if (ExtSaleLinePOS."Line Type" <> ExtSaleLinePOS."Line Type"::Item) then
             exit;
 
         // Only referenced return sales

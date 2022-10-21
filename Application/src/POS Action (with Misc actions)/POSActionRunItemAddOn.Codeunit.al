@@ -79,7 +79,7 @@
         end;
 
         SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
-        SaleLinePOS.TestField(Type, SaleLinePOS.Type::Item);
+        SaleLinePOS.TestField("Line Type", SaleLinePOS."Line Type"::Item);
 
         AddOnNo := CopyStr(Context.GetStringParameter('ItemAddOnNo'), 1, MaxStrLen(AddOnNo));
         if AddOnNo = '' then begin
@@ -125,7 +125,7 @@
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         UpdateActiveSaleLine := SaleLinePOS."Line No." <> AppliesToLineNo;
         SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
-        if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
+        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item then
             exit;
         IF UpdateActiveSaleLine THEN
             POSSaleLine.SetPosition(SaleLinePOS.GetPosition());

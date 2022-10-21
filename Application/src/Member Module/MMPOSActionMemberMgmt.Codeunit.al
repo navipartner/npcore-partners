@@ -758,7 +758,7 @@
         if (not MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, Resolver)) then
             Error(NotFoundErr, ExternalItemNo);
 
-        Line.Type := Line.Type::Item;
+        Line."Line Type" := Line."Line Type"::Item;
         Line."No." := ItemNo;
 
         Line."Variant Code" := VariantCode;

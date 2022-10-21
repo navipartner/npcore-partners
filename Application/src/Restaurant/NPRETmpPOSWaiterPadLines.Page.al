@@ -41,7 +41,7 @@
                     ToolTip = 'Specifies the value of the Line No. field';
                     ApplicationArea = NPRRetail;
                 }
-                field(Type; Rec.Type)
+                field(Type; Rec."Line Type")
                 {
 
                     Editable = false;

@@ -209,7 +209,6 @@
         if InUseQty > 0 then begin
             NpRvSalesLine.SetRange("Register No.", TempNpRvVoucherBuffer."Redeem Register No.");
             NpRvSalesLine.SetRange("Sales Ticket No.", TempNpRvVoucherBuffer."Redeem Sales Ticket No.");
-            NpRvSalesLine.SetRange("Sale Type", NpRvSalesLine."Sale Type"::Sale);
             NpRvSalesLine.SetRange("Sale Date", TempNpRvVoucherBuffer."Redeem Date");
             NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
             NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
@@ -231,7 +230,6 @@
         NpRvSalesLine.Id := CreateGuid();
         NpRvSalesLine."Register No." := TempNpRvVoucherBuffer."Redeem Register No.";
         NpRvSalesLine."Sales Ticket No." := TempNpRvVoucherBuffer."Redeem Sales Ticket No.";
-        NpRvSalesLine."Sale Type" := NpRvSalesLine."Sale Type"::Sale;
         NpRvSalesLine."Sale Date" := TempNpRvVoucherBuffer."Redeem Date";
         NpRvSalesLine."Sale Line No." := 10000;
         NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
@@ -277,7 +275,6 @@
 
         NpRvSalesLine.SetRange("Register No.", TempNpRvVoucherBuffer."Redeem Register No.");
         NpRvSalesLine.SetRange("Sales Ticket No.", TempNpRvVoucherBuffer."Redeem Sales Ticket No.");
-        NpRvSalesLine.SetRange("Sale Type", NpRvSalesLine."Sale Type"::Sale);
         NpRvSalesLine.SetRange("Sale Date", TempNpRvVoucherBuffer."Redeem Date");
         NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
         NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
@@ -361,7 +358,6 @@
         if InUseQty > 0 then begin
             NpRvSalesLine.SetRange("Register No.", NpRvVoucherBuffer."Redeem Register No.");
             NpRvSalesLine.SetRange("Sales Ticket No.", NpRvVoucherBuffer."Redeem Sales Ticket No.");
-            NpRvSalesLine.SetRange("Sale Type", NpRvSalesLine."Sale Type"::Sale);
             NpRvSalesLine.SetRange("Sale Date", NpRvVoucherBuffer."Redeem Date");
             NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
             NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
@@ -437,7 +433,6 @@
         if InUseQty > 0 then begin
             NpRvSalesLine.SetRange("Register No.", NpRvVoucherBuffer."Redeem Register No.");
             NpRvSalesLine.SetRange("Sales Ticket No.", NpRvVoucherBuffer."Redeem Sales Ticket No.");
-            NpRvSalesLine.SetRange("Sale Type", NpRvSalesLine."Sale Type"::Sale);
             NpRvSalesLine.SetRange("Sale Date", NpRvVoucherBuffer."Redeem Date");
             NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
             NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
@@ -570,7 +565,6 @@
         if InUseQty > 0 then begin
             NpRvSalesLine.SetRange("Register No.", TempNpRvVoucherBuffer."Redeem Register No.");
             NpRvSalesLine.SetRange("Sales Ticket No.", TempNpRvVoucherBuffer."Redeem Sales Ticket No.");
-            NpRvSalesLine.SetRange("Sale Type", NpRvSalesLine."Sale Type"::Sale);
             NpRvSalesLine.SetRange("Sale Date", TempNpRvVoucherBuffer."Redeem Date");
             NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
             NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");

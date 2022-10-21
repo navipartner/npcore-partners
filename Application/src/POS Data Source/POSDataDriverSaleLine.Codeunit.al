@@ -19,7 +19,7 @@
         ShowPricesIncludingVAT := POSUnit.ShowPricesIncludingVAT();
 
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("No."), false);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Type), false);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Line Type"), false);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Description), true);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Description 2"), false);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Variant Code"), false);
