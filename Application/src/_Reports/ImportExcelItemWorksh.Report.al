@@ -154,6 +154,7 @@
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         ItemWorksheetMgt: Codeunit "NPR Item Worksheet Mgt.";
         ItemWshtImpExpMgt: Codeunit "NPR Item Wsht. Imp. Exp.";
+        ItemWorksheetCU: Codeunit "NPR Item Worksheet";
         CombineVarieties: Boolean;
         SetItemsToSkip: Boolean;
         Window: Dialog;
@@ -349,7 +350,7 @@
                     if SetItemsToSkip then
                         ItemWorksheetLine.Validate(Action, ItemWorksheetLine.Action::Skip);
                     ItemWorksheetLine.Modify(true);
-                    ItemWshtImpExpMgt.RaiseOnAfterImportWorksheetLine(ItemWorksheetLine);
+                    ItemWorksheetCU.OnAfterImportWorksheetLine(ItemWorksheetLine);
 
                     ItemWorksheetVariantLine.Init();
                     ItemWorksheetVariantLine.Validate("Worksheet Template Name", ItemWorksheetLine."Worksheet Template Name");
@@ -415,7 +416,7 @@
                     if SetItemsToSkip then
                         ItemWorksheetVariantLine.Validate(Action, ItemWorksheetVariantLine.Action::Skip);
                     ItemWorksheetVariantLine.Modify(true);
-                    ItemWshtImpExpMgt.RaiseOnAfterImportWorksheetVariantLine(ItemWorksheetVariantLine);
+                    ItemWorksheetCU.OnAfterImportWorksheetVariantLine(ItemWorksheetVariantLine);
                 end;
                 LastRow := ExcelBuf."Row No.";
             until ExcelBuf.Next() = 0;

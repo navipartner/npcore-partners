@@ -759,7 +759,7 @@
         if TempText <> '' then
             ItemWorksheetLine.Validate("Purch. Unit of Measure", TempText);
         ItemWorksheetLine.Modify(true);
-        ItemWshtImpExpMgt.RaiseOnAfterImportWorksheetLine(ItemWorksheetLine);
+        ItemWorksheetCU.OnAfterImportWorksheetLine(ItemWorksheetLine);
         ItemWorksheetVariantLine.Init();
         ItemWorksheetVariantLine.Validate("Worksheet Template Name", ItemWorksheetLine."Worksheet Template Name");
         ItemWorksheetVariantLine.Validate("Worksheet Name", ItemWorksheetLine."Worksheet Name");
@@ -795,7 +795,7 @@
         end;
         ItemWshtImpExpMgt.SetImportActionWorksheetVariantLine(ItemWorksheetLine, ActionIfVariantUnknown, ActionIfVarietyUnknown, ItemWorksheetVariantLine);
         ItemWorksheetVariantLine.Modify(true);
-        ItemWshtImpExpMgt.RaiseOnAfterImportWorksheetVariantLine(ItemWorksheetVariantLine);
+        ItemWorksheetCU.OnAfterImportWorksheetVariantLine(ItemWorksheetVariantLine);
         ItemWorksheetLine.CleanupObsoleteLines();
         TempText := UpperCase(GetXmlText(Element, 'ValidateLine', MaxStrLen(TempText), false));
         if TempText in ['YES', '1', 'TRUE'] then
@@ -929,6 +929,7 @@
         LastItemWorksheetLine: Record "NPR Item Worksheet Line";
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         ItemWshtImpExpMgt: Codeunit "NPR Item Wsht. Imp. Exp.";
+        ItemWorksheetCU: Codeunit "NPR Item Worksheet";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         CombineVarieties: Boolean;
         Initialized: Boolean;
