@@ -2,7 +2,7 @@
 {
     AutoSplitKey = true;
     Caption = 'Magento Custom Option Subform';
-    PageType = CardPart;
+    PageType = ListPart;
     UsageCategory = None;
     SourceTable = "NPR Magento Custom Optn. Value";
 

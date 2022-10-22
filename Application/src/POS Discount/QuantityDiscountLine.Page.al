@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Multiple Unit Price';
-    PageType = CardPart;
+    PageType = ListPart;
     UsageCategory = None;
     SourceTable = "NPR Quantity Discount Line";
 
