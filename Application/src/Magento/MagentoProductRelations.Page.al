@@ -4,7 +4,7 @@
     Caption = 'Product Relations';
     DelayedInsert = true;
     LinksAllowed = false;
-    PageType = CardPart;
+    PageType = ListPart;
     UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR Magento Product Relation";

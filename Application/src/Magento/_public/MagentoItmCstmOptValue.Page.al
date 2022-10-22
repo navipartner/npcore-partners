@@ -3,7 +3,7 @@
     Caption = 'Magento Item Custom Option Value';
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = CardPart;
+    PageType = ListPart;
     UsageCategory = None;
     SourceTable = "NPR Magento Itm Cstm Opt.Value";
     SourceTableTemporary = true;
