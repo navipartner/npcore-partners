@@ -1,9 +1,9 @@
 report 6014444 "NPR NpDc Coupon"
 {
-#if BC17
 #if not BC17
-    Extensible = False; 
-#endif
+    Extensible = False;
+    UsageCategory = None;
+#else
     RDLCLayout = './src/_Reports/layouts/NpDc Coupon.rdlc';
     WordLayout = './src/_Reports/layouts/NpDc Coupon.docx';
     ApplicationArea = NPRRetail;
