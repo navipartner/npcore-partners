@@ -6,6 +6,8 @@
     href: howto/create_variety.md
   - name: Assign a variety to an item
     href: howto/assign_variety_to_item.md
+  - name: Block a variety on an item
+    href: howto/block_variety.md
 - name: Reference
   items:
   - name: Variety setup (reference guide)
