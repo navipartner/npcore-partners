@@ -9,6 +9,7 @@ codeunit 6059919 "NPR Videos"
     begin
         NavApp.GetCurrentModuleInfo(VarModuleInfo);
         POSUnitSetupGeneralSettings(sender, VarModuleInfo.Id);
+        POSUnitSetupAuditProfile(sender, VarModuleInfo.Id);
         POSUnitSetupViewProfile(sender, VarModuleInfo.Id);
         POSStoreSetup(sender, VarModuleInfo.Id);
     end;
@@ -17,6 +18,14 @@ codeunit 6059919 "NPR Videos"
     var
         VideoLbl: Label 'https://share.synthesia.io/embeds/videos/40f96b2f-14c7-4819-998b-33844664def0', locked = true;
         TitleLbl: Label 'POS Unit Setup 01 - General Settings';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure POSUnitSetupAuditProfile(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://share.synthesia.io/embeds/videos/e27ed957-4ed0-4ed9-a879-3a14edc2560c', locked = true;
+        TitleLbl: Label 'POS Unit Setup 02 - Audit Profile';
     begin
         Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
     end;
