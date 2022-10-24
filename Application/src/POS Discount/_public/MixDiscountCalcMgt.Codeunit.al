@@ -121,4 +121,11 @@
     begin
         Exit(CalculationTempPosSalesLineId);
     end;
+
+    procedure MixDiscountExistWithDateFilters(_Code: Code[20]; _Date: Date): Boolean
+    var
+        MixedDiscount: Record "NPR Mixed Discount";
+    begin
+        exit(MixedDiscount.Get(MixedDiscount.Code) and ((MixedDiscount."Starting date" <= _Date) and (MixedDiscount."Ending date" >= _Date)));
+    end;
 }

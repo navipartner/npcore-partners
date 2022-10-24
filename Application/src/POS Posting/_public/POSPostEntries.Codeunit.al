@@ -1227,7 +1227,7 @@
         exit(false);
     end;
 
-    internal procedure GetGLPostingErrorEntries(var ListOut: List of [Integer])
+    procedure GetGLPostingErrorEntries(var ListOut: List of [Integer])
     begin
         ListOut := _GLPostingErrorEntries;
     end;
