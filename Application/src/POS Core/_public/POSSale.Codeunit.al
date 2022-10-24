@@ -587,7 +587,6 @@
                     SaleLinePOS.TestField("Serial No.");
 
                 CreateServiceItem.Create(SaleLinePOS, Sale, Item);
-                
                 if Item."Item Tracking Code" <> '' then begin
                     ItemTrackingCode.Get(Item."Item Tracking Code");
 #if BC17
@@ -606,10 +605,10 @@
                 end else begin
                     if SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.") then
                         SerialNoInfo.TestField(Blocked, false);
-                end;                
+                end;
             end;
 
-            if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::"BOM List",SaleLinePOS."Line Type"::Comment,SaleLinePOS."Line Type"::"POS Payment",SaleLinePOS."Line Type"::Rounding]) then begin
+            if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::"BOM List", SaleLinePOS."Line Type"::Comment, SaleLinePOS."Line Type"::"POS Payment", SaleLinePOS."Line Type"::Rounding, SaleLinePOS."Line Type"::"Customer Deposit"]) then begin
                 SaleLinePOS.TestField("Gen. Bus. Posting Group");
                 SaleLinePOS.TestField("Gen. Prod. Posting Group");
                 SaleLinePOS.TestField("VAT Bus. Posting Group");
