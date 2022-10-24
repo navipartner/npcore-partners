@@ -12,6 +12,8 @@
   href: replication/toc.yml
 - name: Discounts
   href: Discounts/toc.yml
+- name: Events
+  href: Events/toc.yml
 - name: Coupons
   href: coupons/toc.yml
 - name: Vouchers
