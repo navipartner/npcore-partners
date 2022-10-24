@@ -1,0 +1,4 @@
+- name: How-To  
+  items:
+  - name: Set up event templates
+    href: howto/event_templates.md
