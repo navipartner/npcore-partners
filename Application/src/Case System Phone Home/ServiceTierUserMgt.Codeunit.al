@@ -19,7 +19,7 @@
         if NavApp.IsInstalling() then
             exit;
 
-        if not (CurrentClientType in [ClientType::Windows, ClientType::Web, ClientType::Tablet, ClientType::Phone, ClientType::Desktop]) then
+        if not GuiAllowed then //we only want to work on user sessions = GuiAllowed.
             exit;
 
         if EnvironmentInformation.IsSandbox() then
@@ -35,7 +35,7 @@
     var
         EnvironmentInformation: Codeunit "Environment Information";
     begin
-        if not (CurrentClientType in [ClientType::Windows, ClientType::Web, ClientType::Tablet, ClientType::Phone, ClientType::Desktop]) then
+        if not GuiAllowed then //we only want to work on user sessions = GuiAllowed.
             exit;
 
         if EnvironmentInformation.IsSandbox() then

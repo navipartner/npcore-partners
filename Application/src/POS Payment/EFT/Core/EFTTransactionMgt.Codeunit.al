@@ -360,6 +360,7 @@
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         OriginalProcessingType: Integer;
         POSPaymentMethod: Record "NPR POS Payment Method";
+        EFTSetup: Record "NPR EFT Setup";
     begin
         if not EFTTransactionRequest.Successful then
             exit;
@@ -372,16 +373,32 @@
             OriginalProcessingType := OriginalEFTTransactionRequest."Processing Type";
         end;
 
-        POSPaymentMethod.Get(EFTTransactionRequest."POS Payment Type Code");
-        POSPaymentMethod.TestField("EFT Surcharge Service Item No.");
 
-        case OriginalProcessingType of
-            EFTTransactionRequest."Processing Type"::PAYMENT:
-                EFTTransactionRequest."Fee Line ID" := InsertServiceItemLine(POSSession, POSPaymentMethod."EFT Surcharge Service Item No.", EFTTransactionRequest."Fee Amount", '', 1);
-            EFTTransactionRequest."Processing Type"::REFUND,
-          EFTTransactionRequest."Processing Type"::VOID:
-                EFTTransactionRequest."Fee Line ID" := InsertServiceItemLine(POSSession, POSPaymentMethod."EFT Surcharge Service Item No.", EFTTransactionRequest."Fee Amount", ' - ' + Format(EFTTransactionRequest."Processing Type"), -1);
+        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
+        if EFTSetup.UseAccountPostingForServices() then begin
+            POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code");
+            POSPaymentMethod.TestField("EFT Surcharge Account No.");
+
+            case OriginalProcessingType of
+                EFTTransactionRequest."Processing Type"::PAYMENT:
+                    EFTTransactionRequest."Fee Line ID" := InsertAccountLine(POSSession, POSPaymentMethod."EFT Surcharge Account No.", EFTTransactionRequest."Fee Amount", '');
+                EFTTransactionRequest."Processing Type"::REFUND,
+                EFTTransactionRequest."Processing Type"::VOID:
+                    EFTTransactionRequest."Fee Line ID" := InsertAccountLine(POSSession, POSPaymentMethod."EFT Surcharge Account No.", EFTTransactionRequest."Fee Amount" * -1, ' - ' + Format(EFTTransactionRequest."Processing Type"));
+            end;
+        end else begin
+            POSPaymentMethod.Get(EFTTransactionRequest."POS Payment Type Code");
+            POSPaymentMethod.TestField("EFT Surcharge Service Item No.");
+
+            case OriginalProcessingType of
+                EFTTransactionRequest."Processing Type"::PAYMENT:
+                    EFTTransactionRequest."Fee Line ID" := InsertServiceItemLine(POSSession, POSPaymentMethod."EFT Surcharge Service Item No.", EFTTransactionRequest."Fee Amount", '', 1);
+                EFTTransactionRequest."Processing Type"::REFUND,
+                EFTTransactionRequest."Processing Type"::VOID:
+                    EFTTransactionRequest."Fee Line ID" := InsertServiceItemLine(POSSession, POSPaymentMethod."EFT Surcharge Service Item No.", EFTTransactionRequest."Fee Amount", ' - ' + Format(EFTTransactionRequest."Processing Type"), -1);
+            end;
         end;
+
         EFTTransactionRequest.Modify();
     end;
 
@@ -390,6 +407,7 @@
         POSPaymentMethod: Record "NPR POS Payment Method";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         OriginalProcessingType: Integer;
+        EFTSetup: Record "NPR EFT Setup";
     begin
         if not EFTTransactionRequest.Successful then
             exit;
@@ -402,16 +420,32 @@
             OriginalProcessingType := OriginalEFTTransactionRequest."Processing Type";
         end;
 
-        POSPaymentMethod.Get(EFTTransactionRequest."POS Payment Type Code");
-        POSPaymentMethod.TestField("EFT Tip Service Item No.");
 
-        case OriginalProcessingType of
-            EFTTransactionRequest."Processing Type"::PAYMENT:
-                EFTTransactionRequest."Tip Line ID" := InsertServiceItemLine(POSSession, POSPaymentMethod."EFT Tip Service Item No.", EFTTransactionRequest."Tip Amount", '', 1);
-            EFTTransactionRequest."Processing Type"::REFUND,
-          EFTTransactionRequest."Processing Type"::VOID:
-                EFTTransactionRequest."Tip Line ID" := InsertServiceItemLine(POSSession, POSPaymentMethod."EFT Tip Service Item No.", EFTTransactionRequest."Tip Amount", ' - ' + Format(EFTTransactionRequest."Processing Type"), -1);
+        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
+        if EFTSetup.UseAccountPostingForServices() then begin
+            POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code");
+            POSPaymentMethod.TestField("EFT Tip Account No.");
+
+            case OriginalProcessingType of
+                EFTTransactionRequest."Processing Type"::PAYMENT:
+                    EFTTransactionRequest."Fee Line ID" := InsertAccountLine(POSSession, POSPaymentMethod."EFT Tip Account No.", EFTTransactionRequest."Fee Amount", '');
+                EFTTransactionRequest."Processing Type"::REFUND,
+                EFTTransactionRequest."Processing Type"::VOID:
+                    EFTTransactionRequest."Fee Line ID" := InsertAccountLine(POSSession, POSPaymentMethod."EFT Tip Account No.", EFTTransactionRequest."Fee Amount" * -1, ' - ' + Format(EFTTransactionRequest."Processing Type"));
+            end;
+        end else begin
+            POSPaymentMethod.Get(EFTTransactionRequest."POS Payment Type Code");
+            POSPaymentMethod.TestField("EFT Tip Service Item No.");
+
+            case OriginalProcessingType of
+                EFTTransactionRequest."Processing Type"::PAYMENT:
+                    EFTTransactionRequest."Tip Line ID" := InsertServiceItemLine(POSSession, POSPaymentMethod."EFT Tip Service Item No.", EFTTransactionRequest."Tip Amount", '', 1);
+                EFTTransactionRequest."Processing Type"::REFUND,
+                EFTTransactionRequest."Processing Type"::VOID:
+                    EFTTransactionRequest."Tip Line ID" := InsertServiceItemLine(POSSession, POSPaymentMethod."EFT Tip Service Item No.", EFTTransactionRequest."Tip Amount", ' - ' + Format(EFTTransactionRequest."Processing Type"), -1);
+            end;
         end;
+
         EFTTransactionRequest.Modify();
     end;
 
@@ -433,6 +467,35 @@
         if DescriptionPostFix <> '' then begin
             SaleLinePOS.Description := CopyStr(SaleLinePOS.Description + DescriptionPostFix, 1, MaxStrLen(SaleLinePOS.Description));
         end;
+        POSSaleLine.InsertLineRaw(SaleLinePOS, false);
+        exit(SaleLinePOS.SystemId);
+    end;
+
+    local procedure InsertAccountLine(POSSession: Codeunit "NPR POS Session"; AccountNo: Text; Amount: Decimal; DescriptionPostFix: Text): Guid
+    var
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        GLAccount: Record "G/L Account";
+    begin
+        if Amount = 0 then
+            exit;
+
+        GLAccount.Get(AccountNo);
+        GLAccount.TestField("Account Type", GLAccount."Account Type"::Posting);
+        GLAccount.TestField("Direct Posting", true);
+
+        POSSession.GetSaleLine(POSSaleLine);
+
+        POSSaleLine.GetNewSaleLine(SaleLinePOS);
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"GL Payment";
+        SaleLinePOS.Quantity := 1;
+        SaleLinePOS.Validate("No.", AccountNo);
+        SaleLinePOS."Amount Including VAT" := Amount;
+        SaleLinePOS."Unit Price" := Amount;
+        if DescriptionPostFix <> '' then begin
+            SaleLinePOS.Description := CopyStr(SaleLinePOS.Description + DescriptionPostFix, 1, MaxStrLen(SaleLinePOS.Description));
+        end;
+
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
         exit(SaleLinePOS.SystemId);
     end;

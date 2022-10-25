@@ -125,6 +125,9 @@
             OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
             if OriginalEftTransactionRequest.Recovered then
                 OriginalEftTransactionRequest.Get(OriginalEftTransactionRequest."Recovered by Entry No.");
+
+            EftTransactionRequest."Tip Amount" := OriginalEftTransactionRequest."Tip Amount"; //Void original
+            EftTransactionRequest."Fee Amount" := OriginalEftTransactionRequest."Fee Amount"; //Void original
         end;
 
         CreateGenericRequest(EftTransactionRequest);
@@ -137,12 +140,23 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateVoidRequest', '', false, false)]
     local procedure OnCreateVoidRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
+    var
+        OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
             exit;
         Handled := true;
 
         CreateGenericRequest(EftTransactionRequest);
+
+        if EftTransactionRequest."Processed Entry No." <> 0 then begin
+            OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
+            if OriginalEftTransactionRequest.Recovered then
+                OriginalEftTransactionRequest.Get(OriginalEftTransactionRequest."Recovered by Entry No.");
+
+            EftTransactionRequest."Tip Amount" := OriginalEftTransactionRequest."Tip Amount"; //Void original
+            EftTransactionRequest."Fee Amount" := OriginalEftTransactionRequest."Fee Amount"; //Void original
+        end;
 
         EftTransactionRequest.Recoverable := true;
         EftTransactionRequest.Insert(true);
@@ -431,6 +445,8 @@
     var
         EFTSetup: Record "NPR EFT Setup";
         EFTNETSCloudProtocol: Codeunit "NPR EFT NETSCloud Protocol";
+        EFTSetupVersion: Version;
+        POSPaymentMethod: Record "NPR POS Payment Method";
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
 
@@ -441,10 +457,16 @@
 
         EFTTransactionRequest.TestField("Hardware ID");
 
+        if EFTSetup.UseAccountPostingForServices() then begin
+            POSPaymentMethod.Get(EFTSetup."Payment Type POS");
+            POSPaymentMethod.TestField("EFT Surcharge Account No.");
+            POSPaymentMethod.TestField("EFT Tip Account No.");
+        end;
+
         EFTNETSCloudProtocol.GetToken(EFTSetup); // Trigger token refresh if missing
     end;
 
-    procedure VoidTransactionAfterSignatureDecline(EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    procedure SignaturePrompt(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTSetup: Record "NPR EFT Setup";
         VoidEFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -457,7 +479,39 @@
         Mechanism: Enum "NPR EFT Request Mechanism";
         Workflow: Text;
         EntryNo: Integer;
+        SIGNATURE_APPROVAL: Label 'Customer must sign the receipt. Please confirm that signature is valid';
+        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
+        EftTransactionRequest.Get(EftTransactionRequest."Entry No.");
+
+        if not EFTTransactionRequest.Successful then
+            exit;
+        if not (EftTransactionRequest."Signature Type" = EftTransactionRequest."Signature Type"::"On Receipt") then
+            exit;
+
+        case true of
+            EftTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND]:
+                ;
+            EftTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::LOOK_UP]:
+                begin
+                    OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
+                    if not (OriginalEFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND]) then
+                        exit;
+                end;
+            else
+                exit;
+        end;
+
+        if Confirm(SIGNATURE_APPROVAL) then
+            exit;
+
+
+        Sleep(5 * 1000);
+        //Gap in integration - we need to void if signature was declined, however we have no way of knowing if terminal is ready to accept a void request yet,
+        //because we are not receiving events from it. We have observed "terminal busy" errors for this scenario.
+        //Sleeping 5 seconds is a pragmatic workaround to reduce impact of this problem.
+        //A manual "void last" is the solution if this fails but it will confuse sales person.
+
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(POSSaleRecord);

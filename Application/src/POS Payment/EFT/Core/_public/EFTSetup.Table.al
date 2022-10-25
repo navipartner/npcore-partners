@@ -47,6 +47,12 @@
             ObsoleteState = Removed;
             ObsoleteReason = 'No longer needed';
         }
+
+        field(20; "Created on version"; Text[250])
+        {
+            Caption = 'Created on version';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -66,9 +72,14 @@
     end;
 
     trigger OnInsert()
+    var
+        CurrentModuleInfo: ModuleInfo;
     begin
         TestField("Payment Type POS");
         TestField("EFT Integration Type");
+
+        NavApp.GetCurrentModuleInfo(CurrentModuleInfo);
+        "Created on version" := Format(CurrentModuleInfo.AppVersion);
     end;
 
     trigger OnModify()
@@ -119,6 +130,16 @@
         EFTTypePOSUnitBLOBParam.SetRange("Integration Type", "EFT Integration Type");
         EFTTypePOSUnitBLOBParam.SetRange("POS Unit No.", "POS Unit No.");
         EFTTypePOSUnitBLOBParam.DeleteAll();
+    end;
+
+    internal procedure UseAccountPostingForServices(): Boolean
+    begin
+        //Start enforcing new surcharge & tip G/L fields on the integration payment method to avoid receiving unpostable money from external result.
+        //Only enforced starting with records created from version 13 and forward.
+
+        if Rec."Created on version" = '' then
+            exit(false);
+        exit(Version.Create(Rec."Created on version").Minor >= 13);
     end;
 }
 

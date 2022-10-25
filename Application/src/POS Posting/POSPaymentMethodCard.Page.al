@@ -188,15 +188,23 @@
                 }
                 field("EFT Surcharge Service Item No."; Rec."EFT Surcharge Service Item No.")
                 {
-
-                    ToolTip = 'Specifies which Service Item will be used for EFT Surcharge.';
+                    ToolTip = 'Field will be deprecated. Use Account No. setup instead';
                     ApplicationArea = NPRRetail;
                 }
                 field("EFT Tip Service Item No."; Rec."EFT Tip Service Item No.")
                 {
-
-                    ToolTip = 'Specifies which Service Item will be used for EFT Tip.';
+                    ToolTip = 'Field will be deprecated. Use Account No. setup instead';
                     ApplicationArea = NPRRetail;
+                }
+                field("EFT Surcharge Account No."; Rec."EFT Surcharge Account No.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'The account on which to post any surcharge amounts from transactions';
+                }
+                field("EFT Tip Account No."; Rec."EFT Tip Account No.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'The account on which to post any tip amounts from transactions';
                 }
             }
 

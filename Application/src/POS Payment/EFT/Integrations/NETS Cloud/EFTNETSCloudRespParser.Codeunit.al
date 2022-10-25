@@ -270,15 +270,17 @@
 
         if EFTTransactionRequest.Successful then begin
             if TrySelectValue(JObject, 'TipAmount', JValue, false) then begin
-                EFTTransactionRequest."Tip Amount" := JValue.AsDecimal() / 100;
+                if JValue.AsInteger() <> 0 then
+                    EFTTransactionRequest."Tip Amount" := JValue.AsInteger() / 100;
             end;
 
             if TrySelectValue(JObject, 'SurchargeAmount', JValue, false) then begin
-                EFTTransactionRequest."Fee Amount" := JValue.AsDecimal() / 100;
+                if JValue.AsInteger() <> 0 then
+                    EFTTransactionRequest."Fee Amount" := JValue.AsInteger() / 100;
             end;
 
             if TrySelectValue(JObject, 'TotalAmount', JValue, false) then begin
-                EFTTransactionRequest."Amount Output" := JValue.AsDecimal() / 100;
+                EFTTransactionRequest."Amount Output" := JValue.AsInteger() / 100;
             end;
         end;
 
