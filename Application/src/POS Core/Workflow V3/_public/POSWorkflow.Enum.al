@@ -58,7 +58,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(10; PAYMENT_CHECK)
     {
         Caption = 'PAYMENT_CHECK', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action Check Payment";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction PaymentWithCheck";
     }
     value(6184481; EFT_PEPPER_OPEN)
     {
@@ -315,12 +315,12 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     {
         Caption = 'EFT_NETS_CLOUD_TRX', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: NetsCloud Trx";
-    }    
+    }
     value(58; "SS-ITEM")
     {
         Caption = 'SS-ITEM', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR SS Action: Insert Item";
-    }   
+    }
     value(59; SALES_DOC_PAY_POST)
     {
         Caption = 'SALES_DOC_PAY_POST', Locked = true, MaxLength = 20;
@@ -337,4 +337,16 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: EndOfDay V4";
     }
+
+    value(6059935; VOUCHER_PAYMENT)
+    {
+        Caption = 'VOUCHER_PAYMENT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction VoucherPayment";
+    }
+    value(6059939; FOREIGN_VOUCHER_PMT)
+    {
+        Caption = 'FOREIGN_VOUCHER_PMT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction ForeignVoucher";
+    }
+
 }
