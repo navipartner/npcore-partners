@@ -207,13 +207,31 @@
         case TempMixedDiscount."Discount Type" of
             TempMixedDiscount."Discount Type"::"Total Amount per Min. Qty.":
                 begin
-                    TotalAmountAfterDisc := BatchQty * TempMixedDiscount."Total Amount";
-                    AvgDiscPct := 1 - (TotalAmountAfterDisc / TotalAmount);
-                    LineDiscAmount := TempSaleLinePOSApply."Unit Price" * TempSaleLinePOSApply."MR Anvendt antal" * AvgDiscPct;
-                    if AmountExclVat(TempMixedDiscount) then begin
-                        AvgDiscPct := 1 - (TotalAmountAfterDisc / (TotalAmount - TotalVATAmount));
-                        UnitPrice := TempSaleLinePOSApply."Unit Price" / (1 + TempSaleLinePOSApply."VAT %" / 100);
-                        LineDiscAmount := UnitPrice * TempSaleLinePOSApply."MR Anvendt antal" * AvgDiscPct;
+                    case true of
+                        PricesInclTax(TempSaleLinePOSApply):
+                            begin
+                                TotalAmountAfterDisc := BatchQty * TempMixedDiscount."Total Amount";
+                                AvgDiscPct := 1 - TotalAmountAfterDisc / TotalAmount;
+                                LineDiscAmount := TempSaleLinePOSApply."Unit Price" * TempSaleLinePOSApply."MR Anvendt antal" * AvgDiscPct;
+                                if AmountExclVat(TempMixedDiscount) then begin
+                                    AvgDiscPct := 1 - (TotalAmountAfterDisc / (TotalAmount - TotalVATAmount));
+                                    UnitPrice := TempSaleLinePOSApply."Unit Price" / (1 + TempSaleLinePOSApply."VAT %" / 100);
+                                    LineDiscAmount := UnitPrice * TempSaleLinePOSApply."MR Anvendt antal" * AvgDiscPct;
+                                    LineDiscAmount := LineDiscAmount * (1 + TotalVATAmount / (TotalAmount - TotalVATAmount));
+                                end;
+                            end;
+                        (not PricesInclTax(TempSaleLinePOSApply)) and (not AmountExclVat(TempMixedDiscount)):
+                            begin
+                                TotalAmountAfterDisc := BatchQty * TempMixedDiscount."Total Amount";
+                                AvgDiscPct := 1 - TotalAmountAfterDisc / (TotalAmount + TotalVATAmount);
+                                LineDiscAmount := TempSaleLinePOSApply."Unit Price" * TempSaleLinePOSApply."MR Anvendt antal" * AvgDiscPct;
+                            end;
+                        (not PricesInclTax(TempSaleLinePOSApply)) and AmountExclVat(TempMixedDiscount):
+                            begin                                
+                                TotalAmountAfterDisc := BatchQty * TempMixedDiscount."Total Amount";
+                                AvgDiscPct := 1 - (TotalAmountAfterDisc / TotalAmount);
+                                LineDiscAmount := TempSaleLinePOSApply."Unit Price" * TempSaleLinePOSApply."MR Anvendt antal" * AvgDiscPct;
+                            end;
                     end;
                 end;
             TempMixedDiscount."Discount Type"::"Total Discount %":
@@ -261,6 +279,51 @@
                     TotalDiscAmount := TotalAmount - TotalAmountAfterDisc;
                     if AmountExclVat(TempMixedDiscount) then
                         TotalDiscAmount -= TotalVATAmount;
+                end;
+            TempMixedDiscount."Discount Type"::"Total Discount %":
+                begin
+                    AvgDiscPct := TempMixedDiscount."Total Discount %" / 100;
+                    TotalDiscAmount := TotalAmount * AvgDiscPct;
+                end;
+            TempMixedDiscount."Discount Type"::"Total Discount Amt. per Min. Qty.":
+                begin
+                    TotalDiscAmount := BatchQty * TempMixedDiscount."Total Discount Amount";
+                end;
+            TempMixedDiscount."Discount Type"::"Priority Discount per Min. Qty":
+                begin
+                    if TempPriorityBuffer.IsEmpty then
+                        exit(0);
+
+                    ItemDiscQty := TempMixedDiscount."Item Discount Qty." * BatchQty;
+                    TempPriorityBuffer.FindSet();
+                    repeat
+                        DiscQty := TempPriorityBuffer.Quantity;
+                        if DiscQty > ItemDiscQty - TotalDiscQty then
+                            DiscQty := ItemDiscQty - TotalDiscQty;
+                        TotalDiscQty += DiscQty;
+                        TotalDiscAmount += DiscQty * TempPriorityBuffer."Unit Price" * (TempMixedDiscount."Item Discount %" / 100);
+                    until (TempPriorityBuffer.Next() = 0) or (TotalDiscQty >= ItemDiscQty);
+                end;
+        end;
+
+        TotalDiscAmount := Round(TotalDiscAmount, GLSetup."Amount Rounding Precision");
+        exit(TotalDiscAmount);
+    end;
+
+    procedure CalcTotalDiscAmount(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; BatchQty: Decimal; TotalVATAmount: Decimal; TotalAmount: Decimal; AppliedDiscAmount: Decimal; var TempPriorityBuffer: Record "NPR Mixed Disc. Prio. Buffer" temporary) TotalDiscAmount: Decimal
+    var
+        AvgDiscPct: Decimal;
+        ItemDiscQty: Decimal;
+        DiscQty: Decimal;
+        TotalDiscQty: Decimal;
+    begin
+        if TotalAmount <= 0 then
+            exit(0);
+
+        case TempMixedDiscount."Discount Type" of
+            TempMixedDiscount."Discount Type"::"Total Amount per Min. Qty.":
+                begin
+                    TotalDiscAmount := AppliedDiscAmount;
                 end;
             TempMixedDiscount."Discount Type"::"Total Discount %":
                 begin
@@ -683,10 +746,7 @@
             TempSaleLinePOSApply."Discount Code" := TempMixedDiscount.Code;
             TempSaleLinePOSApply."Custom Disc Blocked" := TempMixedDiscount."Block Custom Discount";
             LineDiscAmount := CalcLineDiscAmount(TempMixedDiscount, TempMixedDiscountLine, BatchQty, TotalQty, TotalVATAmount, TotalAmount, TempSaleLinePOSApply, InvQtyDict);
-            if AmountExclVat(TempMixedDiscount) then
-                TempSaleLinePOSApply."Discount Amount" := LineDiscAmount * (1 + TempSaleLinePOSApply."VAT %" / 100)
-            else
-                TempSaleLinePOSApply."Discount Amount" := LineDiscAmount;
+            TempSaleLinePOSApply."Discount Amount" := LineDiscAmount;
             if TempMixedDiscount."Discount Type" = TempMixedDiscount."Discount Type"::"Total Discount %" then
                 TempSaleLinePOSApply."Discount %" := TempMixedDiscount."Total Discount %";
             TempSaleLinePOSApply.Modify();
@@ -694,7 +754,7 @@
         until TempSaleLinePOSApply.Next() = 0;
 
         TransferSaleLinePOS2PriorityBuffer(TempSaleLinePOSApply, TempMixedDiscount, TempMixedDiscountLine, TempPriorityBuffer);
-        TotalDiscAmount := CalcTotalDiscAmount(TempMixedDiscount, BatchQty, TotalVATAmount, TotalAmount, TempPriorityBuffer);
+        TotalDiscAmount := CalcTotalDiscAmount(TempMixedDiscount, BatchQty, TotalVATAmount, TotalAmount, AppliedDiscAmount, TempPriorityBuffer);
         if AppliedDiscAmount <> TotalDiscAmount then begin
             if AmountExclVat(TempMixedDiscount) then
                 TempSaleLinePOSApply."Discount Amount" += (TotalDiscAmount - AppliedDiscAmount) * (1 + TempSaleLinePOSApply."VAT %" / 100)
@@ -1014,6 +1074,7 @@
                 TempSaleLinePOSApply."Amount Including VAT" := TempSaleLinePOSApply."MR Anvendt antal" * TempSaleLinePOSApply."Unit Price";
                 TempSaleLinePOSApply."VAT Base Amount" := TempSaleLinePOSApply."Amount Including VAT" - TempSaleLinePOSApply."Amount Including VAT" / (1 + TempSaleLinePOSApply."VAT %" / 100);
                 TempSaleLinePOSApply.Amount := TempSaleLinePOSApply."Amount Including VAT" - TempSaleLinePOSApply."VAT Base Amount";
+                RecalcZeroTaxBaseAmount(TempSaleLinePOSApply);
                 TempSaleLinePOSApply.Modify();
 
                 InvQtyDisc.Add(TempSaleLinePOSApply.SystemId, TempSaleLinePOSApply."MR Anvendt antal");
@@ -1024,6 +1085,28 @@
         exit(AppliedQty);
     end;
 
+    local procedure RecalcZeroTaxBaseAmount(var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary)
+    var
+        TempSaleLinePOSApply2: Record "NPR POS Sale Line" temporary;
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+    begin
+        if PricesInclTax(TempSaleLinePOSApply) then
+            exit;
+        if TempSaleLinePOSApply."VAT Base Amount" <> 0 then
+            exit;
+        Item.Get(TempSaleLinePOSApply."No.");
+        if not Item."Price Includes VAT" then
+            exit;
+        if not VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)",Item."VAT Prod. Posting Group") then
+            exit;
+
+        TempSaleLinePOSApply2."VAT %" := VATPostingSetup."VAT %";
+        TempSaleLinePOSApply2."Amount Including VAT" := TempSaleLinePOSApply."MR Anvendt antal" * TempSaleLinePOSApply."Unit Price" * (1 + TempSaleLinePOSApply2."VAT %" / 100);
+        TempSaleLinePOSApply2."VAT Base Amount" := TempSaleLinePOSApply2."Amount Including VAT" - TempSaleLinePOSApply2."Amount Including VAT" / (1 + TempSaleLinePOSApply2."VAT %" / 100);
+        TempSaleLinePOSApply."VAT Base Amount" := TempSaleLinePOSApply2."VAT Base Amount";
+        TempSaleLinePOSApply."VAT %" := TempSaleLinePOSApply2."VAT %";
+    end;
     local procedure TransferAppliedDiscountToSale(var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; LastLineNo: Integer; InvQtyDict: Dictionary of [Guid, Decimal])
     var
         RemainingQty: Decimal;
@@ -1099,6 +1182,11 @@
           TempMixedDiscount."Discount Type" in
             [TempMixedDiscount."Discount Type"::"Total Amount per Min. Qty.",
              TempMixedDiscount."Discount Type"::"Multiple Discount Levels"]);
+    end;
+
+    local procedure PricesInclTax(TempPOSSaleLine: Record "NPR POS Sale Line" temporary):Boolean
+    begin
+        exit(TempPOSSaleLine."Price Includes VAT");    
     end;
 
     procedure FindMatchingMixedDiscounts(SalePOS: Record "NPR POS Sale"; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
