@@ -24,4 +24,4 @@ To create a new event template, follow the provided steps:
 7. In the **Lines** section, you can set resources/items that are usually referenced alongside this template (e.g. room, tutor, brochures...). 
 
     > [!Important]
-    > Don't specify a date unless you're creating an event for a specific date. The same applies for any specific quantities - if you don't need 
+    > Don't specify a date unless you're creating an event for a specific date. The same applies for any specific quantities - if you're creating a template, it should have a broader use than an event, so adding specific data may get in the way of that. 

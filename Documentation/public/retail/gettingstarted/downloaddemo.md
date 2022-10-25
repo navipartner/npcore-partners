@@ -26,44 +26,11 @@ Once you've completed the initial setup, there some additional configurations th
 
 ### Install Major Tom
 
-Major Tom is Windows desktop POS software which embeds the web client and serves as a middleware between the web browser and the local hardware. Follow these steps to set up Major Tom:
-
-1. [Download](https://clickonce.dynamics-retail.com/clickonce/majortom/install.html), and install the user interface.     
-   You can choose between the 32-bit and the 64-bit version.   
-2. Configure the URL to where the database is.      
-   If this is a multi-tenant database environment, you need to configure the tenant as well.
-3. To define which company a user will have access to, open **User Personalization**.
-4. From **My settings** menu, navigate to the company list that the user has access to and select the company the user works in.        
-   This action also changes the default company attached to the user in the **User Personalization** menu.   
+Refer to the [how-to guide](install_major_tom.md) for installing our desktop POS software.
 
 ### Install Minor Tom
 
-Minor Tom is an abbreviated version of Major Tom, which offers only the essential POS features. Due to its limited functionality, it is faster and intended for wider usage. Follow these steps to set up Minor Tom:
-
-1. Download Minor Tom either from the NP Retail Role Center dashboard, or from the [direct link](https://npminortom.blob.core.windows.net/prod/Setup.exe), and install it.     
-   The desktop shortcut is automatically created as soon as installation is finished.
-2. Open Minor Tom.    
-   When you enter the app for the first time, you will be presented with the setup page. 
-3. Depending on which environment you're using, do one of the following:
-   
-   **On-Prem**
-   - Both **Username** and **Password** are optional, but you can provide them if you wish to enable the auto-login feature. 
-   - In the **BaseURL** field paste the URL of the Business Central instance in the following form: https://www.examplecustomer.dynamics-retail.net.
-   - Make sure that the **IsSSO** toggle switch is deactivated. 
-
-   **Cloud (SaaS)**
-   - Leave the **Username** and **Password** fields empty. 
-   - Paste the URL for the Business Central instance into the **BaseURL** field, while using the following form: https://businesscentral.dynamics/[TenantID]/[Environment]. The POS page will be automatically appended to the provided URL.
-   - Enable the **IsSSO** toggle switch.
-   
-   > [!Note]
-   > The customers' Azure tenant needs to be [configured](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-session-lifetime) prior to using the cloud version so that their session can be automatically extended on the following login.
-
-4. Once the installation is complete, you can click **New Sale** in the sidebar to start using the POS features.
-
-   > [!Note]
-   > Whenever a new Minor Tom version is available, it will be automatically detected and downloaded as soon as you launch the app.
-
+Refer to the [how-to guide](install_minor_tom.md) for installing the abbreviated version of our desktop POS software. 
 ### Install ClickOnce
 
 ClickOnce is a deployment technology that enables you to create self-updating Windows-based applications that can be installed and run with minimal user interaction. 
