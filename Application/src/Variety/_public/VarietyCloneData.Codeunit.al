@@ -559,8 +559,8 @@
 
     internal procedure CreateEAN13BarcodeNoSeries(IsInternal: Boolean)
     var
-        Prefix: Code[20];
-        CompNo: Code[20];
+        Prefix: Code[50];
+        CompNo: Code[50];
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
         LineNo: Integer;
@@ -603,12 +603,19 @@
         NoSeriesLine.Init();
         NoSeriesLine."Series Code" := NoSeries.Code;
         NoSeriesLine."Line No." := LineNo + 10000;
-        NoSeriesLine.Validate("Starting No.", Prefix + CompNo + PadStr('', 12 - StrLen(Prefix) - StrLen(CompNo), '0'));
-        NoSeriesLine.Validate("Ending No.", Prefix + CompNo + PadStr('', 12 - StrLen(Prefix) - StrLen(CompNo), '9'));
+        NoSeriesLine.Validate("Starting No.", GenerateNewNoSeriesLimitingNo(Prefix, CompNo, '0'));
+        NoSeriesLine.Validate("Ending No.", GenerateNewNoSeriesLimitingNo(Prefix, CompNo, '9'));
         NoSeriesLine.Open := true;
         NoSeriesLine.Insert();
 
         Message(Text004, NoSeries.TableCaption, NoSeries.Code);
+    end;
+
+    local procedure GenerateNewNoSeriesLimitingNo(Prefix: Code[50]; CompNo: Code[50]; FillerCharacter: Text[1]) Result: Code[20]
+    begin
+        Result := CopyStr(Prefix + CompNo, 1, MaxStrLen(Result));
+        if StrLen(Result) < 12 then
+            Result := PadStr(Result, 12, FillerCharacter);
     end;
 
     procedure CreateTableCopy(var Item: Record Item; VarietyNo: Option Ask,Variety1,Variety2,Variety3,Variety4; ExcludeLockedTables: Boolean)

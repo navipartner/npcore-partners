@@ -21,7 +21,7 @@
         if ItemVariant.Code <> '' then begin
             Item.Get(SalesLine."No.");
             SalesLine.Description := Item.Description;
-            SalesLine."Description 2" := ItemVariant.Description;
+            SalesLine."Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen(SalesLine."Description 2"));
         end;
     end;
 
@@ -44,7 +44,7 @@
         if ItemVariant.Code <> '' then begin
             Item.Get(PurchaseLine."No.");
             PurchaseLine.Description := Item.Description;
-            PurchaseLine."Description 2" := ItemVariant.Description;
+            PurchaseLine."Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen(PurchaseLine."Description 2"));
         end;
     end;
 }
