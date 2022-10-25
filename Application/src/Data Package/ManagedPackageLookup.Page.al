@@ -8,9 +8,8 @@
     Editable = false;
     InsertAllowed = false;
     ModifyAllowed = false;
-    PageType = StandardDialog;
     UsageCategory = Administration;
-
+    PageType = Worksheet;
     SourceTable = "NPR Managed Package Lookup";
     SourceTableTemporary = true;
     ApplicationArea = NPRRetail;
