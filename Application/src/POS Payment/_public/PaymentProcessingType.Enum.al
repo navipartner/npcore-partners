@@ -14,12 +14,12 @@ enum 6014487 "NPR Payment Processing Type" implements "NPR POS IPaymentWFHandler
     value(1; VOUCHER)
     {
         Caption = 'Voucher';
-        Implementation = "NPR POS IPaymentWFHandler" = "NPR Null PaymentHandler";
+        Implementation = "NPR POS IPaymentWFHandler" = "NPR POSAction VoucherPayment";
     }
     value(2; CHECK)
     {
         Caption = 'Check';
-        Implementation = "NPR POS IPaymentWFHandler" = "NPR Null PaymentHandler";
+        Implementation = "NPR POS IPaymentWFHandler" = "NPR POSAction PaymentWithCheck";
     }
     value(3; EFT)
     {
@@ -34,7 +34,7 @@ enum 6014487 "NPR Payment Processing Type" implements "NPR POS IPaymentWFHandler
     value(6; "FOREIGN VOUCHER")
     {
         Caption = 'Foreign Voucher';
-        Implementation = "NPR POS IPaymentWFHandler" = "NPR Null PaymentHandler";
+        Implementation = "NPR POS IPaymentWFHandler" = "NPR POSAction ForeignVoucher";
     }
 
 }
