@@ -1,6 +1,8 @@
 report 6014447 "NPR TM Admis. Forecast Matrix"
 {
-#if not (BC17 or BC18 or BC19)
+#if (BC17 or BC18 or BC19)
+    UsageCategory = None;
+#else
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     Caption = 'Admission Forecast Matrix Excel';
     UsageCategory = ReportsAndAnalysis;
