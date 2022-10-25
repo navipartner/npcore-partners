@@ -5,7 +5,7 @@
     DataCaptionExpression = GetDataCaptionExpr();
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = StandardDialog;
+    PageType = Worksheet;
     SourceTable = "NPR TM Ticket Reservation Req.";
     SourceTableView = sorting("Session Token ID", "Admission Inclusion");
     SourceTableTemporary = true;

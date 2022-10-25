@@ -7,7 +7,7 @@
     InsertAllowed = false;
     InstructionalText = 'Select time entry.';
     ModifyAllowed = false;
-    PageType = StandardDialog;
+    PageType = Worksheet;
     SourceTable = "NPR TM Admis. Schedule Entry";
     SourceTableTemporary = true;
     SourceTableView = SORTING("Admission Start Date", "Admission Start Time");

@@ -4,7 +4,7 @@
     Caption = 'Choose return quantities';
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = StandardDialog;
+    PageType = Worksheet;
     UsageCategory = Administration;
 
     SourceTable = "NPR NpGp POS Sales Line";

@@ -2,7 +2,7 @@ page 6059867 "NPR TM Price Profile Simulator"
 {
     Extensible = False;
     Caption = 'Dynamic Price Profile Analyzer';
-    PageType = StandardDialog;
+    PageType = Worksheet;
     UsageCategory = None;
     SourceTable = Date;
 
@@ -13,7 +13,7 @@ page 6059867 "NPR TM Price Profile Simulator"
 
             group(g1)
             {
-                field("_BookingDate"; _BookingDate)
+                field(BookingDate; _BookingDate)
                 {
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                     Caption = 'Booking Date';
@@ -28,7 +28,7 @@ page 6059867 "NPR TM Price Profile Simulator"
                         CurrPage.Update(false);
                     end;
                 }
-                field("_OriginalUnitPrice"; _OriginalUnitPrice)
+                field(OriginalUnitPrice; _OriginalUnitPrice)
                 {
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                     Caption = 'Unit Price';
@@ -38,7 +38,7 @@ page 6059867 "NPR TM Price Profile Simulator"
                         CurrPage.Update(false);
                     end;
                 }
-                field("_UnitPriceIncludesVAT"; _UnitPriceIncludesVAT)
+                field(UnitPriceIncludesVAT; _UnitPriceIncludesVAT)
                 {
                     Caption = 'Price Includes VAT';
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
@@ -48,7 +48,7 @@ page 6059867 "NPR TM Price Profile Simulator"
                         CurrPage.Update(false);
                     end;
                 }
-                field("_UnitPriceVatPercentage"; _UnitPriceVatPercentage)
+                field(UnitPriceVatPercentage; _UnitPriceVatPercentage)
                 {
                     Caption = 'VAT Percentage';
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
@@ -75,13 +75,13 @@ page 6059867 "NPR TM Price Profile Simulator"
                     ToolTip = 'Specifies the value of the Period No. field.';
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                 }
-                field("_RuleLineNo"; _RuleLineNo)
+                field(RuleLineNo; _RuleLineNo)
                 {
                     Caption = 'Rule Line No.';
                     ToolTip = 'Specifies the value of the Rule Line No. field.';
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                 }
-                field("_SuggestedAmount"; _SuggestedAmount)
+                field(SuggestedAmount; _SuggestedAmount)
                 {
                     Caption = 'Suggested Amount';
                     ToolTip = 'Specifies the value of the Suggested Amount field.';
