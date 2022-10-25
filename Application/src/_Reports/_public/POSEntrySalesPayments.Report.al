@@ -1,7 +1,7 @@
 report 6014440 "NPR POS Entry Sales & Payments"
 {
 #if not (BC17 or BC18 or BC19)
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'POS Entry Sales & Payments';
     DefaultRenderingLayout = ExcelLayout;
     Extensible = true;
