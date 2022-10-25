@@ -445,7 +445,6 @@
     var
         EFTSetup: Record "NPR EFT Setup";
         EFTNETSCloudProtocol: Codeunit "NPR EFT NETSCloud Protocol";
-        EFTSetupVersion: Version;
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
