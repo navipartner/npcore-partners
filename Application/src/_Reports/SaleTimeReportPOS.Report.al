@@ -594,7 +594,7 @@ report 6014418 "NPR Sale Time Report POS"
                 Noofdebtsales := PosEntry2.Count;
                 repeat
                     POSSalesline.Reset();
-                    POSSalesline.SetRange("POS Entry No.", PosEntry1."Entry No.");
+                    POSSalesline.SetRange("POS Entry No.", PosEntry2."Entry No.");
                     if POSSalesline.FindSet() then begin
                         repeat
                             DebitExcVat += POSSalesline."Amount Excl. VAT";
