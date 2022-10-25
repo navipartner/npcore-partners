@@ -140,7 +140,7 @@
         RequestMechanism := RequestMechanism::POSWorkflow;
         Workflow := Format(Enum::"NPR POS Workflow"::EFT_EXT_TERMNL);
 
-        EFTSetup.Get(EftTransactionRequest."POS Payment Type Code", EftTransactionRequest."Register No.");
+        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EftTransactionRequest."POS Payment Type Code");
 
         Request.Add('PaymentType', EftTransactionRequest."POS Payment Type Code");
         Request.add('PromptCardDigits', EFTExtTerminalInteg.GetCardDigitsParameter(EFTSetup));
