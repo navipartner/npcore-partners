@@ -18,6 +18,8 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the list of issued tickets.';
                     Caption = 'Issued Tickets';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -29,6 +31,8 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the list of ticket requests.';
                     Caption = 'Ticket Requests';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -40,6 +44,8 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the list of ticket types.';
                     Caption = 'Ticket Types';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -51,6 +57,8 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the list of ticket items.';
                     Caption = 'Ticket Items';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -62,6 +70,8 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Ticket BOM field.';
                     Caption = 'Ticket BOM';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -73,6 +83,8 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Ticket Schedules.';
                     Caption = 'Ticket Schedules';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -85,6 +97,8 @@
                     DrillDownPageID = "NPR TM Ticket Admissions";
                     ToolTip = 'Specifies the list of Ticket Admissions.';
                     Caption = 'Ticket Admissions';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -101,6 +115,8 @@
                     ShowCaption = false;
                     ToolTip = 'Specifies the list of Members associated with different Memberships.';
                     Caption = 'Members';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -112,6 +128,8 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the list of Memberships.';
                     Caption = 'Memberships';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -123,6 +141,8 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the list of Member Cards.';
                     Caption = 'Member Cards';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -139,6 +159,8 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the list of Items.';
                     Caption = 'Items';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -151,27 +173,27 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the list of Contacts.';
                     Caption = 'Contacts';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"Contact List");
                     end;
-
                 }
                 field(Customers; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Customers))))
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the list of Customers.';
                     Caption = 'Customers';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"Customer List");
                     end;
                 }
-
-
-
             }
         }
     }
@@ -209,7 +231,7 @@
             BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
     end;
 
-    local procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Integer
+    local procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Decimal
     begin
         if not BackgroundTaskResults.ContainsKey(FieldNo) then
             exit(0);
