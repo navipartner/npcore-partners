@@ -222,12 +222,30 @@
             Caption = 'Surcharge Service Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item WHERE(Type = CONST(Service));
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaced by G/L account setup field which is enforced when creating new EFT Setup records';
+        }
+        field(521; "EFT Surcharge Account No."; Code[20])
+        {
+            Caption = 'EFT Surcharge Account No.';
+            DataClassification = CustomerContent;
+            TableRelation = "G/L Account" WHERE("Account Type" = CONST(Posting),
+                                                 "Direct Posting" = CONST(true));
         }
         field(530; "EFT Tip Service Item No."; Code[20])
         {
             Caption = 'Tip Service Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item WHERE(Type = CONST(Service));
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaced by G/L account setup field which is enforced when creating new EFT Setup records';
+        }
+        field(531; "EFT Tip Account No."; Code[20])
+        {
+            Caption = 'EFT Tip Account No.';
+            DataClassification = CustomerContent;
+            TableRelation = "G/L Account" WHERE("Account Type" = CONST(Posting),
+                                                 "Direct Posting" = CONST(true));
         }
         field(540; "Block POS Payment"; Boolean)
         {

@@ -295,7 +295,7 @@
         ActiveSession: Record "Active Session";
         NewSessionId: Integer;
     begin
-        if CurrentClientType = ClientType::Background then
+        if not GuiAllowed then //we only want to work on user sessions = GuiAllowed.
             exit;
 
         FindMySession(ActiveSession);
