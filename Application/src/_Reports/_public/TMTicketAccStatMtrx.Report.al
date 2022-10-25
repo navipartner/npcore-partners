@@ -1,6 +1,8 @@
 report 6014451 "NPR TM Ticket Acc. Stat. Mtrx"
 {
-#if not (BC17 or BC18 or BC19)
+#if (BC17 or BC18 or BC19)
+    UsageCategory = None;
+#else
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     Caption = 'Ticket Access Statistics Matrix Excel';
     UsageCategory = ReportsAndAnalysis;
