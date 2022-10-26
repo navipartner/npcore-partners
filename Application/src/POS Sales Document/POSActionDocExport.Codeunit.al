@@ -1,16 +1,9 @@
-﻿codeunit 6150859 "NPR POS Action: Doc. Export"
+﻿codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'Export current sale to a standard NAV sales document';
-        ERRNOSALELINES: Label 'There are no sale lines to export';
-        ERR_PREPAY: Label 'Sale was exported correctly but prepayment in new sale failed: %1';
-        ERR_PAY: Label 'Sale was exported correctly but payment in new sale failed: %1';
-        ERR_CUSTOMER_NOT_IN_FILTER: Label 'The customer with Customer No. %1 is not within the filter defined in the POS Action parameters', Comment = '%1 = Customer No.';
-        PAYMENT_OPTION: Label 'No Payment,Prepayment Percent,Prepayment Amount,Pay & Post';
-        PAYMENT_OPTION_SPLIT: Label 'No Payment,Prepayment Percent,Prepayment Amount,Split Pay & Post,Full Pay & Post';
-        PAYMENT_OPTION_DESC: Label 'Select document payment';
         TextExtDocNoLabel: Label 'Enter External Document No.';
         TextAttentionLabel: Label 'Enter Attention';
         TextYourRefLabel: Label 'Enter a value for the field ''Your Reference''';
@@ -67,18 +60,12 @@
         DescOpenDoc: Label 'Open sales document page after export is done';
         DescCheckCustCredit: Label 'Check the customer credit before export is done, returns an error';
         DescWarningCheckCustCredit: Label 'Check the customer credit before export is done, returns a warning';
-        OptionDocTypePozitive: Label 'Order,Invoice,Quote,Restrict';
-        OptionDocTypeNegative: Label 'Return Order,Credit Memo,Restrict';
         CaptionPrintPrepaymentDoc: Label 'Print Prepayment Document';
         DescPrintPrepaymentDoc: Label 'Print standard prepayment document after posting.';
         CaptionPayAndPostNext: Label 'Pay&Post Immediately';
-        CaptionPrintPayAndPost: Label 'Pay&Post Print';
+        CaptionPrintPayAndPost: Label ' PrintPay&Post';
         DescPayAndPostNext: Label 'Insert a full payment line for the exported document in the next sale.';
         DescPrintPayAndPost: Label 'Print the document of the Pay&Post operation in next sale.';
-        DescSaveLinesOnPOSEntry: Label 'Save exported sale lines on POS Entry';
-        CaptionSaveLinesOnPOSEntry: Label 'Save POS Entry Lines';
-        WrongNegativeSignErr: Label 'Amount must be positive for: %1';
-        WrongPozitiveSignErr: Label 'Amount must be negative for: %1';
         CaptionForcePricesInclVAT: Label 'Force Prices Including VAT';
         DescForcePricesInclVAT: Label 'Force Prices Including VAT on exported document';
         CaptionPrepayIsAmount: Label 'Prepayment Amount Input';
@@ -101,14 +88,11 @@
         DescDocPaymentMenu: Label 'Prompt with different payment methods for handling in new sale, after export is done.';
         CaptionUseLocationFrom: Label 'Use Location From';
         DescUseLocationFrom: Label 'Select source to get location code from for sales document';
-        OptionUseLocationFrom: Label '<Undefined>,POS Store,POS Sale Header,Specific Location';
+        OptionUseLocationFrom: Label '<Undefined>,POS Store,POS Sale,Specific Location';
         CaptionUseSpecLocationCode: Label 'Use Specific Location Code';
         DescUseSpecLocationCode: Label 'Select location code to be used for sales document, if parameter ''%1'' is set to ''%2''', Comment = 'Select location code to be used for sales document, if parameter ''Use Location From'' is set to ''Specific Location''';
-        LocationSourceMustBeSpecified: Label 'POS Action''s parameter ''%1'' cannot be set to ''%2'' value', Comment = 'POS Action''s parameter ''Use Location From'' cannot be set to ''<Undefined>'' value';
-        SpecLocationCodeMustBeSpecified: Label 'POS Action''s parameter ''%1'' is set to ''%2''. You must specify location code to be used for sale document as a parameter of the POS action (the parameter name is ''%3'')', Comment = 'POS Action''s parameter ''Use Location From'' is set to ''Specific Location''. You must specify location code to be used for sale document as a parameter of the POS action (the parameter name is ''Use Specific Location Code'')';
         CaptionSendICOrderConfirmation: Label 'Send IC Order Cnfmn.';
         DescSendICOrderConfirmation: Label 'Send intercompany order confirmation immediately after sales document has been created. ';
-        ReadingErr: Label 'reading in %1 of %2';
         CaptionPaymentMethodCode: Label 'Payment Method Code';
         DescPaymentMethodCode: Label 'Select Payment Method Code to be used for sales document';
         CaptionCustomerTableView: Label 'Customer Table View';
@@ -117,167 +101,151 @@
         DescCustomerLookupPage: Label 'Custom customer lookup page';
         CaptionEnforceCustomerFilter: Label 'Enforce Customer Filter';
         DescEnforceCustomerFilter: Label 'Enforce that the selected customer is within the defined filter in "CustomerTableView"';
-        SpecPaymentMethodCodeMustBeSpecified: Label 'POS Action''s parameter ''%1'' is set to ''%2''. You must specify payment method code to be used for sale document as a parameter of the POS action (the parameter name is ''%3'')', Comment = 'POS Action''s parameter ''Use Location From'' is set to ''Specific Location''. You must specify location code to be used for sale document as a parameter of the POS action (the parameter name is ''Use Specific Location Code'')';
-        OptionPaymentMethodCodeFrom: Label 'Sales Header Default,Force Blank Code,Specific Payment Method Code';
         CaptionPaymentMethodCodeFrom: Label 'Use Payment Method Code From';
         DescPaymentMethodCodeFrom: Label 'Select source of payment method code for sales document';
         CaptionPrintProformaInvoice: Label 'Print Pro Forma Invoice';
-
-    local procedure ActionCode(): Code[20]
+        OptionNameSetDocumentType: Label 'Order,Invoice,Quote,Restrict', Locked = true;
+        OptionCptSetDocumentType: Label 'Order,Invoice,Quote,Restrict';
+        OptionNameSetNegBalDocumentType: Label 'ReturnOrder,CreditMemo,Restrict', Locked = true;
+        OptionCptSetNegBalDocumentType: Label 'Return Order,Credit Memo,Restrict';
+        OptionNameUseLocationFrom: Label '<Undefined>,POS Store,POS Sale,SpecificLocation', Locked = true;
+        OptionNamePaymentMethCodeFrom: Label 'Sales Header Default,Force Blank Code,Specific Payment Method Code', Locked = true;
+        OptionCptPaymentMethCodeFrom: Label 'Sales Header Default,Force Blank Code,Specific Payment Method Code';
     begin
-        exit('SALES_DOC_EXP');
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddBooleanParameter('SetAsk', false, CaptionAskOperation, DescAskOperation);
+        WorkflowConfig.AddBooleanParameter('SetPrint', false, CaptionPrint, DescPrint);
+        WorkflowConfig.AddBooleanParameter('SetInvoice', false, CaptionInvoice, DescInvoice);
+        WorkflowConfig.AddBooleanParameter('SetReceive', false, CaptionReceive, DescReceive);
+        WorkflowConfig.AddBooleanParameter('SetShip', false, CaptionShip, DescShip);
+        WorkflowConfig.AddOptionParameter('SetDocumentType',
+                                        OptionNameSetDocumentType,
+                                        SelectStr(1, OptionNameSetDocumentType),
+                                        CaptionDocType,
+                                        DescDocType,
+                                        OptionCptSetDocumentType);
+        WorkflowConfig.AddOptionParameter('SetNegBalDocumentType',
+                                        OptionNameSetNegBalDocumentType,
+                                        SelectStr(1, OptionNameSetNegBalDocumentType),
+                                        CaptionNegDocType,
+                                        DescNegDocType,
+                                        OptionCptSetNegBalDocumentType);
+        WorkflowConfig.AddBooleanParameter('SetShowCreationMessage', false, CaptionCreationMsg, DescCreationMsg);
+        WorkflowConfig.AddBooleanParameter('SetTransferPostingSetup', true, CaptionTransferPostingSetup, DescTransferPostingSetup);
+        WorkflowConfig.AddBooleanParameter('SetAutoReserveSalesLine', false, CaptionAutoResrvSalesLine, DescAutoResrvSalesLine);
+        WorkflowConfig.AddBooleanParameter('SetSendPdf2Nav', false, CaptionSendPdf2Nav, DescSendPdf2Nav);
+        WorkflowConfig.AddBooleanParameter('AskExtDocNo', false, CaptionAskExtDocNo, DescAskExtDocNo);
+        WorkflowConfig.AddBooleanParameter('AskAttention', false, CaptionAskAttention, DescAskAttention);
+        WorkflowConfig.AddBooleanParameter('AskYourRef', false, CaptionAskYourRef, DescAskYourRef);
+        WorkflowConfig.AddBooleanParameter('SetTransferSalesperson', true, CaptionTransferSalesperson, DescTransferSalesperson);
+        WorkflowConfig.AddBooleanParameter('SetTransferDimensions', true, CaptionTransferDim, DescTransferDim);
+        WorkflowConfig.AddBooleanParameter('SetTransferTaxSetup', true, CaptionTransferTaxSetup, DescTransferTaxSetup);
+        WorkflowConfig.AddBooleanParameter('ConfirmExport', true, CaptionConfirm, DescConfirm);
+        WorkflowConfig.AddBooleanParameter('PrepaymentDialog', false, CaptionPrepaymentDlg, DescPrepaymentDlg);
+        WorkflowConfig.AddDecimalParameter('FixedPrepaymentValue', 0, CaptionFixedPrepaymentValue, DescFixedPrepaymentPct);
+        WorkflowConfig.AddBooleanParameter('PrintPrepaymentDocument', false, CaptionPrintPrepaymentDoc, DescPrintPrepaymentDoc);
+        WorkflowConfig.AddBooleanParameter('PrintRetailConfirmation', true, CaptionRetailPrint, DescRetailPrint);
+        WorkflowConfig.AddBooleanParameter('CheckCustomerCredit', false, CaptionCheckCustCredit, DescCheckCustCredit);
+        WorkflowConfig.AddBooleanParameter('CheckCustomerCreditWarning', true, CaptionWarningCustCredit, DescWarningCheckCustCredit);
+        WorkflowConfig.AddBooleanParameter('OpenDocumentAfterExport', false, CaptionOpenDoc, DescOpenDoc);
+        WorkflowConfig.AddBooleanParameter('PayAndPostInNextSale', false, CaptionPayAndPostNext, DescPayAndPostNext);
+        WorkflowConfig.AddBooleanParameter('PrintPayAndPostDocument', false, CaptionPrintPayAndPost, DescPrintPayAndPost);
+        WorkflowConfig.AddBooleanParameter('ForcePricesInclVAT', false, CaptionForcePricesInclVAT, DescForcePricesInclVAT);
+        WorkflowConfig.AddBooleanParameter('PrepaymentInputIsAmount', false, CaptionPrepayIsAmount, DescPrepayIsAmount);
+        WorkflowConfig.AddBooleanParameter('SetSend', false, CaptionSetSend, DescSetSend);
+        WorkflowConfig.AddBooleanParameter('SendPrepaymentDocument', false, CaptionSendPrepayDoc, DescSendPrepayDoc);
+        WorkflowConfig.AddBooleanParameter('Pdf2NavPrepaymentDocument', false, CaptionPdf2NavPrepayDoc, DescPdf2NavPrepayDoc);
+        WorkflowConfig.AddBooleanParameter('SendPayAndPostDocument', false, CaptionSendPayAndPost, DescSendPayAndPost);
+        WorkflowConfig.AddBooleanParameter('Pdf2NavPayAndPostDocument', false, CaptionPdf2NavPayAndPost, DescPdf2NavPayAndPost);
+        WorkflowConfig.AddBooleanParameter('SelectCustomer', true, CaptionSelectCustomer, DescSelectCustomer);
+        WorkflowConfig.AddBooleanParameter('ShowDocumentPaymentMenu', false, CaptionDocPaymentMenu, DescDocPaymentMenu);
+        WorkflowConfig.AddBooleanParameter('BlockEmptySale', true, CaptionBlockEmptySale, DescBlockEmptySale);
+        WorkflowConfig.AddOptionParameter('UseLocationFrom',
+                        OptionNameUseLocationFrom,
+                        SelectStr(2, OptionNameUseLocationFrom),
+                        CaptionUseLocationFrom,
+                        DescUseLocationFrom,
+                        OptionUseLocationFrom);
+        WorkflowConfig.AddTextParameter('UseSpecLocationCode', '', CaptionUseSpecLocationCode, StrSubstNo(DescUseSpecLocationCode, CaptionUseLocationFrom, SelectStr(4, OptionUseLocationFrom)));
+        WorkflowConfig.AddBooleanParameter('SendICOrderConfirmation', false, CaptionSendICOrderConfirmation, DescSendICOrderConfirmation);
+        WorkflowConfig.AddOptionParameter('PaymentMethodCodeFrom',
+                        OptionNamePaymentMethCodeFrom,
+                        SelectStr(1, OptionNamePaymentMethCodeFrom),
+                        CaptionPaymentMethodCodeFrom,
+                        DescPaymentMethodCodeFrom,
+                        OptionCptPaymentMethCodeFrom);
+        WorkflowConfig.AddTextParameter('PaymentMethodCode', '', CaptionPaymentMethodCode, DescPaymentMethodCode);
+        WorkflowConfig.AddTextParameter('CustomerTableView', '', CaptionCustomerTableView, DescCustomerTableView);
+        WorkflowConfig.AddIntegerParameter('CustomerLookupPage', 0, CaptionCustomerLookupPage, DescCustomerLookupPage);
+        WorkflowConfig.AddBooleanParameter('EnforceCustomerFilter', false, CaptionEnforceCustomerFilter, DescEnforceCustomerFilter);
+        WorkflowConfig.AddBooleanParameter('SetPrintProformaInvoice', false, CaptionPrintProformaInvoice, CaptionPrintProformaInvoice);
+
+        //labels
+        WorkflowConfig.AddLabel('ExtDocNo', TextExtDocNoLabel);
+        WorkflowConfig.AddLabel('Attention', TextAttentionLabel);
+        WorkflowConfig.AddLabel('YourRef', TextYourRefLabel);
+        WorkflowConfig.AddLabel('confirmTitle', TextConfirmTitle);
+        WorkflowConfig.AddLabel('confirmLead', TextConfirmLead);
+        WorkflowConfig.AddLabel('prepaymentDialogTitle', TextPrepaymentTitle);
+        WorkflowConfig.AddLabel('prepaymentPctLead', TextPrepaymentPctLead);
+        WorkflowConfig.AddLabel('prepaymentAmountLead', TextPrepaymentAmountLead);
     end;
 
-    local procedure ActionVersion(): Text[30]
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     begin
-        exit('1.18');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('confirm', 'param.ConfirmExport && confirm(labels.confirmTitle, labels.confirmLead).no (abort);');
-            Sender.RegisterWorkflowStep('extdocno', 'param.AskExtDocNo && input (labels.ExtDocNo).cancel (abort);');
-            Sender.RegisterWorkflowStep('attention', 'param.AskAttention && input (labels.Attention).cancel (abort);');
-            Sender.RegisterWorkflowStep('yourref', 'param.AskYourRef && input (labels.YourRef).cancel (abort);');
-
-            Sender.RegisterWorkflowStep('exportDocument', 'respond();');
-
-            Sender.RegisterWorkflowStep('endSaleAndDocumentPayment',
-                'if (context.prompt_prepayment) {' +
-                    'context.prepayment_is_amount && numpad(labels.prepaymentDialogTitle, labels.prepaymentAmountLead, param.FixedPrepaymentValue);' +
-                    '!context.prepayment_is_amount && numpad(labels.prepaymentDialogTitle, labels.prepaymentPctLead, param.FixedPrepaymentValue);' +
-                '}' +
-                'respond();');
-            Sender.RegisterWorkflow(false);
-
-            Sender.RegisterBooleanParameter('SetAsk', false);
-            Sender.RegisterBooleanParameter('SetPrint', false);
-            Sender.RegisterBooleanParameter('SetInvoice', false);
-            Sender.RegisterBooleanParameter('SetReceive', false);
-            Sender.RegisterBooleanParameter('SetShip', false);
-            Sender.RegisterOptionParameter('SetDocumentType', 'Order,Invoice,Quote,Restrict', 'Order');
-            Sender.RegisterOptionParameter('SetNegBalDocumentType', 'ReturnOrder,CreditMemo,Restrict', 'ReturnOrder');
-            Sender.RegisterBooleanParameter('SetShowCreationMessage', false);
-            Sender.RegisterBooleanParameter('SetTransferPostingSetup', true);
-            Sender.RegisterBooleanParameter('SetAutoReserveSalesLine', false);
-            Sender.RegisterBooleanParameter('SetSendPdf2Nav', false);
-            Sender.RegisterBooleanParameter('AskExtDocNo', false);
-            Sender.RegisterBooleanParameter('AskAttention', false);
-            Sender.RegisterBooleanParameter('AskYourRef', false);
-            Sender.RegisterBooleanParameter('SetTransferSalesperson', true);
-            Sender.RegisterBooleanParameter('SetTransferDimensions', true);
-            Sender.RegisterBooleanParameter('SetTransferTaxSetup', true);
-            Sender.RegisterBooleanParameter('ConfirmExport', true);
-            Sender.RegisterBooleanParameter('PrepaymentDialog', false);
-            Sender.RegisterDecimalParameter('FixedPrepaymentValue', 0);
-            Sender.RegisterBooleanParameter('PrintPrepaymentDocument', false);
-            Sender.RegisterBooleanParameter('PrintRetailConfirmation', true);
-            Sender.RegisterBooleanParameter('CheckCustomerCredit', false);
-            Sender.RegisterBooleanParameter('CheckCustomerCreditWarning', true);
-            Sender.RegisterBooleanParameter('OpenDocumentAfterExport', false);
-            Sender.RegisterBooleanParameter('PayAndPostInNextSale', false);
-            Sender.RegisterBooleanParameter('PrintPayAndPostDocument', false);
-            Sender.RegisterBooleanParameter('ForcePricesInclVAT', false);
-            Sender.RegisterBooleanParameter('PrepaymentInputIsAmount', false);
-            Sender.RegisterBooleanParameter('SetSend', false);
-            Sender.RegisterBooleanParameter('SendPrepaymentDocument', false);
-            Sender.RegisterBooleanParameter('Pdf2NavPrepaymentDocument', false);
-            Sender.RegisterBooleanParameter('SendPayAndPostDocument', false);
-            Sender.RegisterBooleanParameter('Pdf2NavPayAndPostDocument', false);
-            Sender.RegisterBooleanParameter('SelectCustomer', true);
-            Sender.RegisterBooleanParameter('ShowDocumentPaymentMenu', false);
-            Sender.RegisterBooleanParameter('BlockEmptySale', true);
-            Sender.RegisterOptionParameter('UseLocationFrom', '<Undefined>,POS Store,POS Sale,SpecificLocation', 'POS Store');
-            Sender.RegisterTextParameter('UseSpecLocationCode', '');
-            Sender.RegisterBooleanParameter('SendICOrderConfirmation', false);
-            Sender.RegisterOptionParameter('PaymentMethodCodeFrom', 'Sales Header Default,Force Blank Code,Specific Payment Method Code', 'Sales Header Default');
-            Sender.RegisterTextParameter('PaymentMethodCode', '');
-            Sender.RegisterTextParameter('CustomerTableView', '');
-            Sender.RegisterIntegerParameter('CustomerLookupPage', 0);
-            Sender.RegisterBooleanParameter('EnforceCustomerFilter', false);
-            Sender.RegisterBooleanParameter('SetPrintProformaInvoice', false);
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-        Captions.AddActionCaption(ActionCode(), 'ExtDocNo', TextExtDocNoLabel);
-        Captions.AddActionCaption(ActionCode(), 'Attention', TextAttentionLabel);
-        Captions.AddActionCaption(ActionCode(), 'YourRef', TextYourRefLabel);
-        Captions.AddActionCaption(ActionCode(), 'confirmTitle', TextConfirmTitle);
-        Captions.AddActionCaption(ActionCode(), 'confirmLead', TextConfirmLead);
-        Captions.AddActionCaption(ActionCode(), 'prepaymentDialogTitle', TextPrepaymentTitle);
-        Captions.AddActionCaption(ActionCode(), 'prepaymentPctLead', TextPrepaymentPctLead);
-        Captions.AddActionCaption(ActionCode(), 'prepaymentAmountLead', TextPrepaymentAmountLead);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-        Handled := true;
-
-        case WorkflowStep of
+        case Step of
             'exportDocument':
-                ExportToDocument(Context, POSSession, FrontEnd);
+                FrontEnd.WorkflowResponse(ExportSalesDoc(Context, Sale, SaleLine));
             'endSaleAndDocumentPayment':
-                DocumentPayment(Context, POSSession, FrontEnd);
+                FrontEnd.WorkflowResponse(DocumentPayment(Context, Sale));
         end;
     end;
 
-    local procedure ExportToDocument(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionDocExport.js###
+'let main=async({workflow:p,parameters:t,captions:e})=>{debugger;let l,n,a,i;if(t.ConfirmExport&&!await popup.confirm(e.confirmLead,e.confirmTitle)||t.AskExtDocNo&&(a=await popup.input(e.ExtDocNo),a===""||a===null)||t.AskAttention&&(n=await popup.input(e.AskAttention),n===""||n===null)||t.AskYourRef&&(i=await popup.input(e.YourRef),i===""||i===null))return;const{createdSalesHeader:u,createdSalesHeaderDocumentType:m,additionalParameters:r}=await p.respond("exportDocument",{extDocNo:a,attention:n,yourref:i});let o;r.prompt_prepayment?r.prepayment_is_amount?o=await popup.numpad(e.prepaymentAmountLead,e.prepaymentDialogTitle):o=await popup.numpad(e.prepaymentPctLead,e.prepaymentDialogTitle):o=t.FixedPrepaymentValue,await p.respond("endSaleAndDocumentPayment",{additionalParameters:r,createdSalesHeader:u,createdSalesHeaderDocumentType:m,prepaymentAmt:o})};'
+        )
+    end;
+
+    local procedure ExportSalesDoc(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject;
     var
-        JSON: Codeunit "NPR POS JSON Management";
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         SalePOS: Record "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
+        POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
         SalesHeader: Record "Sales Header";
         CustomerTableView: Text;
         CustomerLookupPage: Integer;
     begin
-        POSSession.GetSale(POSSale);
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSession.ClearActionState();
-        POSSession.BeginAction(ActionCode());
-        POSSale.GetCurrentSale(SalePOS);
+        Sale.GetCurrentSale(SalePOS);
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        if (JSON.GetBooleanParameter('SelectCustomer')) then begin
-            CustomerTableView := JSON.GetStringParameterOrFail('CustomerTableView', ActionCode());
-            CustomerLookupPage := JSON.GetIntegerParameterOrFail('CustomerLookupPage', ActionCode());
-
-            if not SelectCustomer(SalePOS, POSSale, CustomerTableView, CustomerLookupPage) then
+        CustomerTableView := Context.GetStringParameter('CustomerTableView');
+        CustomerLookupPage := Context.GetIntegerParameter('CustomerLookupPage');
+        if Context.GetBooleanParameter('SelectCustomer') then
+            if not POSActionDocExportB.SelectCustomer(SalePOS, Sale, CustomerTableView, CustomerLookupPage) then
                 SalePOS.TestField("Customer No.");
-        end;
-        SetReference(SalePOS, JSON);
-        SetPricesInclVAT(SalePOS, JSON);
-        SetParameters(POSSaleLine, JSON, RetailSalesDocMgt);
-        ValidateSale(SalePOS, RetailSalesDocMgt, JSON);
 
-        POSSale.RefreshCurrent();
-        RetailSalesDocMgt.ProcessPOSSale(POSSale);
+        SetReference(SalePOS, Context);
+        SetPricesInclVAT(SalePOS, Context);
+        SetParameters(SaleLine, Context, RetailSalesDocMgt);
+        ValidateSale(SalePOS, RetailSalesDocMgt, Context, CustomerTableView);
+
+        Sale.RefreshCurrent();
+        RetailSalesDocMgt.ProcessPOSSale(Sale);
 
         Commit();
 
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeader);
-        POSSession.StoreActionState('CreatedSalesHeader', SalesHeader);
-        SetPaymentParameters(JSON, FrontEnd, SalesHeader);
+
+        Response.Add('createdSalesHeader', SalesHeader."No.");
+        Response.Add('createdSalesHeaderDocumentType', SalesHeader."Document Type".AsInteger());
+        SetPaymentParameters(Context, SalesHeader, Response);
     end;
 
-    local procedure DocumentPayment(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure DocumentPayment(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"): JsonObject;
     var
-        JSON: Codeunit "NPR POS JSON Management";
         PayAndPost: Boolean;
         PayAndPostPrint: Boolean;
         PrepaymentIsAmount: Boolean;
@@ -289,52 +257,52 @@
         PrintPrepayment: Boolean;
         FullPosting: Boolean;
         SalesHeader: Record "Sales Header";
-        POSSale: Codeunit "NPR POS Sale";
-        RecRef: RecordRef;
+        CreatedSalesHeader: Text[20];
+        POSSession: Codeunit "NPR POS Session";
+        POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
+        CreatedDocTypeIndex: Integer;
     begin
-        POSSession.GetSale(POSSale);
-        POSSession.RetrieveActionStateRecordRef('CreatedSalesHeader', RecRef);
-        RecRef.SetTable(SalesHeader);
+        CreatedSalesHeader := Context.GetString('createdSalesHeader');
+        CreatedDocTypeIndex := Context.GetInteger('createdSalesHeaderDocumentType');
+        if SalesHeader.Get(CreatedDocTypeIndex, CreatedSalesHeader) then;
+        PrepaymentValue := Context.GetDecimal('prepaymentAmt');
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
+        ReadAdditionalParameters(Context, PrepaymentIsAmount, PayAndPost, FullPosting);
 
-        PrepaymentValue := GetPrepaymentValue(JSON);
-        JSON.SetScopeRoot();
-
-        PrepaymentIsAmount := JSON.GetBooleanOrFail('prepayment_is_amount', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
-        PayAndPost := JSON.GetBooleanOrFail('pay_and_post', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
-        FullPosting := JSON.GetBooleanOrFail('full_posting', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
-
-        PrepaymentPdf2Nav := JSON.GetBooleanParameterOrFail('Pdf2NavPrepaymentDocument', ActionCode());
-        PrepaymentSend := JSON.GetBooleanParameterOrFail('SendPrepaymentDocument', ActionCode());
-        PayAndPostPdf2Nav := JSON.GetBooleanParameterOrFail('Pdf2NavPayAndPostDocument', ActionCode());
-        PayAndPostSend := JSON.GetBooleanParameterOrFail('SendPayAndPostDocument', ActionCode());
-        PrintPrepayment := JSON.GetBooleanParameterOrFail('PrintPrepaymentDocument', ActionCode());
-        PayAndPostPrint := JSON.GetBooleanParameterOrFail('PrintPayAndPostDocument', ActionCode());
+        PrepaymentPdf2Nav := Context.GetBooleanParameter('Pdf2NavPrepaymentDocument');
+        PrepaymentSend := Context.GetBooleanParameter('SendPrepaymentDocument');
+        PayAndPostPdf2Nav := Context.GetBooleanParameter('Pdf2NavPayAndPostDocument');
+        PayAndPostSend := Context.GetBooleanParameter('SendPayAndPostDocument');
+        PrintPrepayment := Context.GetBooleanParameter('PrintPrepaymentDocument');
+        PayAndPostPrint := Context.GetBooleanParameter('PrintPayAndPostDocument');
         if PrepaymentValue > 0 then begin
             //End sale, auto start new sale, and insert prepayment line.
             POSSession.StartTransaction();
             POSSession.ChangeViewSale();
-            HandlePrepayment(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, PrintPrepayment, PrepaymentSend, PrepaymentPdf2Nav);
+            POSActionDocExportB.HandlePrepayment(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, PrintPrepayment, PrepaymentSend, PrepaymentPdf2Nav);
         end else
             if PayAndPost then begin
                 //End sale, auto start new sale, and insert payment line.
                 POSSession.StartTransaction();
                 POSSession.ChangeViewSale();
-                HandlePayAndPost(POSSession, SalesHeader, PayAndPostPrint, PayAndPostPdf2Nav, PayAndPostSend, FullPosting);
+                POSActionDocExportB.HandlePayAndPost(POSSession, SalesHeader, PayAndPostPrint, PayAndPostPdf2Nav, PayAndPostSend, FullPosting);
             end else begin
                 //End sale
-                POSSale.SelectViewForEndOfSale(POSSession);
+                Sale.SelectViewForEndOfSale(POSSession);
             end;
     end;
 
-    local procedure SetPaymentParameters(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"; SalesHeader: Record "Sales Header")
+    local procedure SetPaymentParameters(Context: Codeunit "NPR POS JSON Helper"; SalesHeader: Record "Sales Header"; var Response: JsonObject)
     var
         Choice: Integer;
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
+        PAYMENT_OPTION: Label 'No Payment,Prepayment Percent,Prepayment Amount,Pay & Post';
+        PAYMENT_OPTION_SPLIT: Label 'No Payment,Prepayment Percent,Prepayment Amount,Split Pay & Post,Full Pay & Post';
+        PAYMENT_OPTION_DESC: Label 'Select document payment';
+        Parameters: JsonObject;
     begin
         if SalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.") then begin //If document has been posted/deleted, we cannot pay parts of it.
-            if JSON.GetBooleanParameterOrFail('ShowDocumentPaymentMenu', ActionCode()) then begin
+            if Context.GetBooleanParameter('ShowDocumentPaymentMenu') then begin
                 if RetailSalesDocImpMgt.DocumentIsSetToFullPosting(SalesHeader) then
                     Choice := StrMenu(PAYMENT_OPTION, 1, PAYMENT_OPTION_DESC)
                 else
@@ -344,105 +312,72 @@
                     0,  //Cancelled
                     1: //None
                         begin
-                            JSON.SetContext('prompt_prepayment', false);
-                            JSON.SetContext('prepayment_is_amount', false);
-                            JSON.SetContext('pay_and_post', false);
-                            JSON.SetContext('full_posting', false);
+                            Parameters.Add('prompt_prepayment', false);
+                            Parameters.Add('prepayment_is_amount', false);
+                            Parameters.Add('pay_and_post', false);
+                            Parameters.Add('full_posting', false);
                         end;
                     2: //Prepayment Percent
                         begin
-                            JSON.SetContext('prompt_prepayment', true);
-                            JSON.SetContext('prepayment_is_amount', false);
-                            JSON.SetContext('pay_and_post', false);
-                            JSON.SetContext('full_posting', false);
+                            Parameters.Add('prompt_prepayment', true);
+                            Parameters.Add('prepayment_is_amount', false);
+                            Parameters.Add('pay_and_post', false);
+                            Parameters.Add('full_posting', false);
                         end;
                     3: //Prepayment Amount
                         begin
-                            JSON.SetContext('prompt_prepayment', true);
-                            JSON.SetContext('prepayment_is_amount', true);
-                            JSON.SetContext('pay_and_post', false);
-                            JSON.SetContext('full_posting', false);
+                            Parameters.Add('prompt_prepayment', true);
+                            Parameters.Add('prepayment_is_amount', true);
+                            Parameters.Add('pay_and_post', false);
+                            Parameters.Add('full_posting', false);
                         end;
                     4: //Payment + post
                         begin
-                            JSON.SetContext('prompt_prepayment', false);
-                            JSON.SetContext('prepayment_is_amount', false);
-                            JSON.SetContext('pay_and_post', true);
-                            JSON.SetContext('full_posting', false);
+                            Parameters.Add('prompt_prepayment', false);
+                            Parameters.Add('prepayment_is_amount', false);
+                            Parameters.Add('pay_and_post', true);
+                            Parameters.Add('full_posting', false);
                         end;
                     5: //Full payment + post
                         begin
-                            JSON.SetContext('prompt_prepayment', false);
-                            JSON.SetContext('prepayment_is_amount', false);
-                            JSON.SetContext('pay_and_post', true);
-                            JSON.SetContext('full_posting', true);
+                            Parameters.Add('prompt_prepayment', false);
+                            Parameters.Add('prepayment_is_amount', false);
+                            Parameters.Add('pay_and_post', true);
+                            Parameters.Add('full_posting', true);
                         end;
                 end;
             end else begin
-                JSON.SetContext('pay_and_post', JSON.GetBooleanParameterOrFail('PayAndPostInNextSale', ActionCode()));
-                JSON.SetContext('prompt_prepayment', JSON.GetBooleanParameterOrFail('PrepaymentDialog', ActionCode()));
-                JSON.SetContext('prepayment_is_amount', JSON.GetBooleanParameterOrFail('PrepaymentInputIsAmount', ActionCode()));
-                JSON.SetContext('full_posting', false);
+                Parameters.Add('pay_and_post', Context.GetBooleanParameter('PayAndPostInNextSale'));
+                Parameters.Add('prompt_prepayment', Context.GetBooleanParameter('PrepaymentDialog'));
+                Parameters.Add('prepayment_is_amount', Context.GetBooleanParameter('PrepaymentInputIsAmount'));
+                Parameters.Add('full_posting', false);
             end;
         end else begin
-            JSON.SetContext('prompt_prepayment', false);
-            JSON.SetContext('prepayment_is_amount', false);
-            JSON.SetContext('pay_and_post', false);
-            JSON.SetContext('full_posting', false);
+            Parameters.Add('prompt_prepayment', false);
+            Parameters.Add('prepayment_is_amount', false);
+            Parameters.Add('pay_and_post', false);
+            Parameters.Add('full_posting', false);
         end;
-
-        FrontEnd.SetActionContext(ActionCode(), JSON);
+        Response.Add('additionalParameters', Parameters);
     end;
 
-    local procedure ValidateSale(var SalePOS: Record "NPR POS Sale"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; JSON: Codeunit "NPR POS JSON Management")
+    local procedure ValidateSale(var SalePOS: Record "NPR POS Sale"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; Context: Codeunit "NPR POS JSON Helper"; CustomerTableView: Text)
     var
-        CustomerTableView: Text;
-        Customer: Record Customer;
+        POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
     begin
-        if JSON.GetBooleanParameterOrFail('BlockEmptySale', ActionCode()) then begin
-            if not SaleLinesExists(SalePOS) then
-                Error(ERRNOSALELINES);
-        end;
+        if Context.GetBooleanParameter('BlockEmptySale') then
+            POSActionDocExportB.SaleLinesExists(SalePOS);
 
-        CustomerTableView := JSON.GetStringParameterOrFail('CustomerTableView', ActionCode());
-        if CustomerTableView <> '' then begin
-            if JSON.GetBooleanParameterOrFail('EnforceCustomerFilter', ActionCode()) then begin
-                Customer.SetView(CustomerTableView);
-                Customer.FilterGroup(40);
-                Customer.SetRange("No.", SalePOS."Customer No.");
-                if Customer.IsEmpty then
-                    Error(ERR_CUSTOMER_NOT_IN_FILTER, SalePOS."Customer No.");
-            end;
-        end;
+        if CustomerTableView <> '' then
+            if Context.GetBooleanParameter('EnforceCustomerFilter') then
+                POSActionDocExportB.CheckCustomer(SalePOS, CustomerTableView);
 
         RetailSalesDocMgt.TestSalePOS(SalePOS);
     end;
 
-    local procedure SelectCustomer(var SalePOS: Record "NPR POS Sale"; POSSale: Codeunit "NPR POS Sale"; CustomerTableView: Text; CustomerLookupPage: Integer): Boolean
+    local procedure SetParameters(var POSSaleLine: Codeunit "NPR POS Sale Line"; Context: Codeunit "NPR POS JSON Helper"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
     var
-        Customer: Record Customer;
-    begin
-        if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
-            exit(true);
-        end;
-
-        if CustomerTableView <> '' then
-            Customer.SetView(CustomerTableView);
-
-        if PAGE.RunModal(CustomerLookupPage, Customer) <> ACTION::LookupOK then
-            exit(false);
-
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
-        SalePOS.Validate("Customer No.", Customer."No.");
-        SalePOS.Modify(true);
-        Commit();
-        POSSale.RefreshCurrent();
-        exit(true);
-    end;
-
-    local procedure SetParameters(var POSSaleLine: Codeunit "NPR POS Sale Line"; var JSON: Codeunit "NPR POS JSON Management"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
-    var
+        POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
         AmountExclVAT: Decimal;
         VATAmount: Decimal;
         AmountInclVAT: Decimal;
@@ -453,406 +388,64 @@
         SpecificLocationCode: Code[10];
         PaymentMethodCode: Code[10];
     begin
-        RetailSalesDocMgt.SetAsk(JSON.GetBooleanParameterOrFail('SetAsk', ActionCode()));
-        RetailSalesDocMgt.SetPrint(JSON.GetBooleanParameterOrFail('SetPrint', ActionCode()));
-        RetailSalesDocMgt.SetInvoice(JSON.GetBooleanParameterOrFail('SetInvoice', ActionCode()));
-        RetailSalesDocMgt.SetReceive(JSON.GetBooleanParameterOrFail('SetReceive', ActionCode()));
-        RetailSalesDocMgt.SetShip(JSON.GetBooleanParameterOrFail('SetShip', ActionCode()));
-        RetailSalesDocMgt.SetSendPostedPdf2Nav(JSON.GetBooleanParameterOrFail('SetSendPdf2Nav', ActionCode()));
-        RetailSalesDocMgt.SetRetailPrint(JSON.GetBooleanParameterOrFail('PrintRetailConfirmation', ActionCode()));
-        RetailSalesDocMgt.SetAutoReserveSalesLine(JSON.GetBooleanParameterOrFail('SetAutoReserveSalesLine', ActionCode()));
-        RetailSalesDocMgt.SetTransferSalesPerson(JSON.GetBooleanParameterOrFail('SetTransferSalesperson', ActionCode()));
-        RetailSalesDocMgt.SetTransferPostingsetup(JSON.GetBooleanParameterOrFail('SetTransferPostingSetup', ActionCode()));
-        RetailSalesDocMgt.SetTransferDimensions(JSON.GetBooleanParameterOrFail('SetTransferDimensions', ActionCode()));
-        RetailSalesDocMgt.SetTransferTaxSetup(JSON.GetBooleanParameterOrFail('SetTransferTaxSetup', ActionCode()));
-        RetailSalesDocMgt.SetOpenSalesDocAfterExport(JSON.GetBooleanParameterOrFail('OpenDocumentAfterExport', ActionCode()));
-        RetailSalesDocMgt.SetSendDocument(JSON.GetBooleanParameterOrFail('SetSend', ActionCode()));
-        RetailSalesDocMgt.SetSendICOrderConf(JSON.GetBooleanParameter('SendICOrderConfirmation'));
-        RetailSalesDocMgt.SetCustomerCreditCheck(JSON.GetBooleanParameter('CheckCustomerCredit'));
-        RetailSalesDocMgt.SetWarningCustomerCreditCheck(JSON.GetBooleanParameter('CheckCustomerCreditWarning'));
-        RetailSalesDocMgt.SetPrintProformaInvoice(JSON.GetBooleanParameterOrFail('SetPrintProformaInvoice', ActionCode()));
+        RetailSalesDocMgt.SetAsk(Context.GetBooleanParameter('SetAsk'));
+        RetailSalesDocMgt.SetPrint(Context.GetBooleanParameter('SetPrint'));
+        RetailSalesDocMgt.SetInvoice(Context.GetBooleanParameter('SetInvoice'));
+        RetailSalesDocMgt.SetReceive(Context.GetBooleanParameter('SetReceive'));
+        RetailSalesDocMgt.SetShip(Context.GetBooleanParameter('SetShip'));
+        RetailSalesDocMgt.SetSendPostedPdf2Nav(Context.GetBooleanParameter('SetSendPdf2Nav'));
+        RetailSalesDocMgt.SetRetailPrint(Context.GetBooleanParameter('PrintRetailConfirmation'));
+        RetailSalesDocMgt.SetAutoReserveSalesLine(Context.GetBooleanParameter('SetAutoReserveSalesLine'));
+        RetailSalesDocMgt.SetTransferSalesPerson(Context.GetBooleanParameter('SetTransferSalesperson'));
+        RetailSalesDocMgt.SetTransferPostingsetup(Context.GetBooleanParameter('SetTransferPostingSetup'));
+        RetailSalesDocMgt.SetTransferDimensions(Context.GetBooleanParameter('SetTransferDimensions'));
+        RetailSalesDocMgt.SetTransferTaxSetup(Context.GetBooleanParameter('SetTransferTaxSetup'));
+        RetailSalesDocMgt.SetOpenSalesDocAfterExport(Context.GetBooleanParameter('OpenDocumentAfterExport'));
+        RetailSalesDocMgt.SetSendDocument(Context.GetBooleanParameter('SetSend'));
+        RetailSalesDocMgt.SetSendICOrderConf(Context.GetBooleanParameter('SendICOrderConfirmation'));
+        RetailSalesDocMgt.SetCustomerCreditCheck(Context.GetBooleanParameter('CheckCustomerCredit'));
+        RetailSalesDocMgt.SetWarningCustomerCreditCheck(Context.GetBooleanParameter('CheckCustomerCreditWarning'));
+        RetailSalesDocMgt.SetPrintProformaInvoice(Context.GetBooleanParameter('SetPrintProformaInvoice'));
 
-        if JSON.GetBooleanParameterOrFail('SetShowCreationMessage', ActionCode()) then
+        if Context.GetBooleanParameter('SetShowCreationMessage') then
             RetailSalesDocMgt.SetShowCreationMessage();
 
         POSSaleLine.CalculateBalance(AmountExclVAT, VATAmount, AmountInclVAT);
 
-        DocumentTypePozitive := JSON.GetIntegerParameterOrFail('SetDocumentType', ActionCode());
-        DocumentTypeNegative := JSON.GetIntegerParameterOrFail('SetNegBalDocumentType', ActionCode());
-        SetDocumentType(AmountInclVAT, RetailSalesDocMgt, DocumentTypePozitive, DocumentTypeNegative);
+        DocumentTypePozitive := Context.GetIntegerParameter('SetDocumentType');
+        DocumentTypeNegative := Context.GetIntegerParameter('SetNegBalDocumentType');
+        POSActionDocExportB.SetDocumentType(AmountInclVAT, RetailSalesDocMgt, DocumentTypePozitive, DocumentTypeNegative);
 
-        LocationSource := JSON.GetIntegerParameterOrFail('UseLocationFrom', ActionCode());
-        SpecificLocationCode := COPYSTR(JSON.GetStringParameter('UseSpecLocationCode'), 1, MaxStrLen(SpecificLocationCode));
-        SetLocationSource(RetailSalesDocMgt, LocationSource, SpecificLocationCode);
+        LocationSource := Context.GetIntegerParameter('UseLocationFrom');
+        SpecificLocationCode := CopyStr(Context.GetStringParameter('UseSpecLocationCode'), 1, MaxStrLen(SpecificLocationCode));
+        POSActionDocExportB.SetLocationSource(RetailSalesDocMgt, LocationSource, SpecificLocationCode);
 
-        PaymentMethodCodeSource := JSON.GetIntegerParameterOrFail('PaymentMethodCodeFrom', ActionCode());
-        PaymentMethodCode := COPYSTR(JSON.GetStringParameter('PaymentMethodCode'), 1, MaxStrLen(PaymentMethodCode));
-        SetPaymentMethodCode(RetailSalesDocMgt, PaymentMethodCodeSource, PaymentMethodCode);
+        PaymentMethodCodeSource := Context.GetIntegerParameter('PaymentMethodCodeFrom');
+        PaymentMethodCode := CopyStr(Context.GetStringParameter('PaymentMethodCode'), 1, MaxStrLen(PaymentMethodCode));
+        POSActionDocExportB.SetPaymentMethodCode(RetailSalesDocMgt, PaymentMethodCodeSource, PaymentMethodCode);
     end;
 
-    procedure SetDocumentType(AmountInclVAT: Decimal; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; DocumentTypePozitive: Option "Order",Invoice,Quote,Restrict; DocumentTypeNegative: Option ReturnOrder,CreditMemo,Restrict)
+    local procedure SetPricesInclVAT(var SalePOS: Record "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper")
     begin
-        if AmountInclVAT >= 0 then
-            case DocumentTypePozitive of
-                DocumentTypePozitive::Order:
-                    RetailSalesDocMgt.SetDocumentTypeOrder();
-                DocumentTypePozitive::Invoice:
-                    RetailSalesDocMgt.SetDocumentTypeInvoice();
-                DocumentTypePozitive::Quote:
-                    RetailSalesDocMgt.SetDocumentTypeQuote();
-                DocumentTypePozitive::Restrict:
-                    Error(WrongPozitiveSignErr, SelectStr(DocumentTypeNegative + 1, OptionDocTypeNegative));
-            end
-        else
-            case DocumentTypeNegative of
-                DocumentTypeNegative::CreditMemo:
-                    RetailSalesDocMgt.SetDocumentTypeCreditMemo();
-                DocumentTypeNegative::ReturnOrder:
-                    RetailSalesDocMgt.SetDocumentTypeReturnOrder();
-                DocumentTypeNegative::Restrict:
-                    Error(WrongNegativeSignErr, SelectStr(DocumentTypePozitive + 1, OptionDocTypePozitive));
-            end;
-    end;
-
-    procedure SetLocationSource(var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; LocationSource: Option Undefined,"POS Store","POS Sale",SpecificLocation; SpecificLocationCode: Code[10])
-    begin
-        if LocationSource = LocationSource::Undefined then
-            Error(LocationSourceMustBeSpecified, CaptionUseLocationFrom, SelectStr(LocationSource + 1, OptionUseLocationFrom));
-
-        if (LocationSource = LocationSource::SpecificLocation) and (SpecificLocationCode = '') then
-            Error(SpecLocationCodeMustBeSpecified, CaptionUseLocationFrom, SelectStr(LocationSource + 1, OptionUseLocationFrom), CaptionUseSpecLocationCode);
-
-        RetailSalesDocMgt.SetLocationSource(LocationSource, SpecificLocationCode);
-    end;
-
-    procedure SetPaymentMethodCode(var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; PaymentMethodCodeSource: Option "Sales Header Default","Force Blank Code","Specific Payment Method Code"; SpecificPaymentMethodCode: Code[10])
-    begin
-        if (PaymentMethodCodeSource = PaymentMethodCodeSource::"Specific Payment Method Code") and (SpecificPaymentMethodCode = '') then
-            Error(SpecPaymentMethodCodeMustBeSpecified, CaptionPaymentMethodCodeFrom, SelectStr(PaymentMethodCodeSource + 1, OptionPaymentMethodCodeFrom), CaptionPaymentMethodCode);
-
-        RetailSalesDocMgt.SetPaymentMethodCodeFrom(PaymentMethodCodeSource);
-        RetailSalesDocMgt.SetPaymentMethod(SpecificPaymentMethodCode);
-    end;
-
-    local procedure GetPrepaymentValue(var JSON: Codeunit "NPR POS JSON Management"): Decimal
-    begin
-        if JSON.GetBooleanOrFail('prompt_prepayment', StrSubstNo(ReadingErr, 'GetPrepaymentValue', ActionCode())) then begin
-            exit(GetNumpad(JSON, 'endSaleAndDocumentPayment'));
-        end else begin
-            exit(JSON.GetDecimalParameterOrFail('FixedPrepaymentValue', ActionCode()));
-        end;
-    end;
-
-    local procedure HandlePrepayment(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; PrepaymentValue: Decimal; PrepaymentIsAmount: Boolean; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean)
-    var
-        HandlePayment: Codeunit "NPR POS Doc. Export Try Pay";
-    begin
-        //An error after sale end, before front end sync, is not allowed so we catch all
-        Commit();
-        if not HandlePayment.HandlePrepaymentTransactional(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, Print, Send, Pdf2Nav, HandlePayment) then
-            Message(ERR_PREPAY, GetLastErrorText);
-        POSSession.RequestRefreshData();
-    end;
-
-    local procedure HandlePayAndPost(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; FullPosting: Boolean)
-    var
-        HandlePayment: Codeunit "NPR POS Doc. Export Try Pay";
-    begin
-        //An error after sale end, before front end sync, is not allowed so we catch all
-        Commit();
-        if not HandlePayment.HandlePayAndPostTransactional(POSSession, SalesHeader, Print, Pdf2Nav, Send, FullPosting, HandlePayment) then
-            Message(ERR_PAY, GetLastErrorText);
-        POSSession.RequestRefreshData();
-    end;
-
-    local procedure SaleLinesExists(SalePOS: Record "NPR POS Sale"): Boolean
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-    begin
-        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        exit(not SaleLinePOS.IsEmpty());
-    end;
-
-    local procedure SetPricesInclVAT(var SalePOS: Record "NPR POS Sale"; var JSON: Codeunit "NPR POS JSON Management")
-    begin
-        if JSON.GetBooleanParameterOrFail('ForcePricesInclVAT', ActionCode()) and (not SalePOS."Prices Including VAT") then begin
+        if Context.GetBooleanParameter('ForcePricesInclVAT') and (not SalePOS."Prices Including VAT") then begin
             SalePOS.Validate("Prices Including VAT", true);
             SalePOS.Modify(true);
         end;
     end;
 
-    local procedure SetReference(var SalePOS: Record "NPR POS Sale"; var JSON: Codeunit "NPR POS JSON Management")
+    local procedure SetReference(var SalePOS: Record "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper")
     var
+        POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
         ExtDocNo: Text;
         Attention: Text;
         YourRef: Text;
-        ModifyRec: Boolean;
     begin
-        ExtDocNo := GetInput(JSON, 'extdocno');
-        if (ExtDocNo <> '') then begin
-            SalePOS.Validate("External Document No.", CopyStr(ExtDocNo, 1, MaxStrLen(SalePOS."External Document No.")));
-            ModifyRec := true;
-        end;
+        if Context.GetString('extdocno', ExtDocNo) then;
+        if Context.GetString('attention', Attention) then;
+        if Context.GetString('yourref', YourRef) then;
 
-        Attention := GetInput(JSON, 'attention');
-        if (Attention <> '') then begin
-            SalePOS.Validate("Contact No.", CopyStr(Attention, 1, MaxStrLen(SalePOS."Contact No.")));
-            ModifyRec := true;
-        end;
-
-        YourRef := GetInput(JSON, 'yourref');
-        if (YourRef <> '') then begin
-            SalePOS.Validate(Reference, CopyStr(YourRef, 1, MaxStrLen(SalePOS.Reference)));
-            ModifyRec := true;
-        end;
-
-        if ModifyRec then
+        if POSActionDocExportB.SetInputs(ExtDocNo, Attention, YourRef, SalePOS) then
             SalePOS.Modify(true);
-    end;
-
-    local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
-    begin
-        JSON.SetScopeRoot();
-        if (not JSON.SetScope('$' + Path)) then
-            exit('');
-
-        exit(JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, 'GetInput', ActionCode())));
-    end;
-
-    local procedure GetNumpad(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Decimal
-    begin
-        JSON.SetScopeRoot();
-        if (not JSON.SetScope('$' + Path)) then
-            exit(0);
-
-        exit(JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'GetNumpad', ActionCode())));
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
-    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'AskExtDocNo':
-                Caption := CaptionAskExtDocNo;
-            'AskAttention':
-                Caption := CaptionAskAttention;
-            'AskYourRef':
-                Caption := CaptionAskYourRef;
-            'ConfirmExport':
-                Caption := CaptionConfirm;
-            'SetAsk':
-                Caption := CaptionAskOperation;
-            'SetPrint':
-                Caption := CaptionPrint;
-            'SetInvoice':
-                Caption := CaptionInvoice;
-            'SetReceive':
-                Caption := CaptionReceive;
-            'SetShip':
-                Caption := CaptionShip;
-            'SetDocumentType':
-                Caption := CaptionDocType;
-            'SetNegBalDocumentType':
-                Caption := CaptionNegDocType;
-            'SetShowCreationMessage':
-                Caption := CaptionCreationMsg;
-            'PrepaymentDialog':
-                Caption := CaptionPrepaymentDlg;
-            'FixedPrepaymentValue':
-                Caption := CaptionFixedPrepaymentValue;
-            'SetTransferSalesperson':
-                Caption := CaptionTransferSalesperson;
-            'SetTransferPostingSetup':
-                Caption := CaptionTransferPostingSetup;
-            'SetTransferDimensions':
-                Caption := CaptionTransferDim;
-            'SetTransferTaxSetup':
-                Caption := CaptionTransferTaxSetup;
-            'SetAutoReserveSalesLine':
-                Caption := CaptionAutoResrvSalesLine;
-            'SetSendPdf2Nav':
-                Caption := CaptionSendPdf2Nav;
-            'PrintRetailConfirmation':
-                Caption := CaptionRetailPrint;
-            'CheckCustomerCredit':
-                Caption := CaptionCheckCustCredit;
-            'CheckCustomerCreditWarning':
-                Caption := CaptionWarningCustCredit;
-            'PrintPrepaymentDocument':
-                Caption := CaptionPrintPrepaymentDoc;
-            'OpenDocumentAfterExport':
-                Caption := CaptionOpenDoc;
-            'PayAndPostInNextSale':
-                Caption := CaptionPayAndPostNext;
-            'PrintPayAndPostInvoice':
-                Caption := CaptionPrintPayAndPost;
-            'SaveLinesOnPOSEntry':
-                Caption := CaptionSaveLinesOnPOSEntry;
-            'ForcePricesInclVAT':
-                Caption := CaptionForcePricesInclVAT;
-            'PrepaymentInputIsAmount':
-                Caption := CaptionPrepayIsAmount;
-            'SetSend':
-                Caption := CaptionSetSend;
-            'SendPrepaymentDocument':
-                Caption := CaptionSendPrepayDoc;
-            'Pdf2NavPrepaymentDocument':
-                Caption := CaptionPdf2NavPrepayDoc;
-            'SendPayAndPostDocument':
-                Caption := CaptionSendPayAndPost;
-            'Pdf2NavPayAndPostDocument':
-                Caption := CaptionPdf2NavPayAndPost;
-            'SelectCustomer':
-                Caption := CaptionSelectCustomer;
-            'ShowDocumentPaymentMenu':
-                Caption := CaptionDocPaymentMenu;
-            'BlockEmptySale':
-                Caption := CaptionBlockEmptySale;
-            'UseLocationFrom':
-                Caption := CaptionUseLocationFrom;
-            'UseSpecLocationCode':
-                Caption := CaptionUseSpecLocationCode;
-            'SendICOrderConfirmation':
-                Caption := CaptionSendICOrderConfirmation;
-            'PaymentMethodCode':
-                Caption := CaptionPaymentMethodCode;
-            'PaymentMethodCodeFrom':
-                Caption := CaptionPaymentMethodCodeFrom;
-            'CustomerTableView':
-                Caption := CaptionCustomerTableView;
-            'CustomerLookupPage':
-                Caption := CaptionCustomerLookupPage;
-            'EnforceCustomerFilter':
-                Caption := CaptionEnforceCustomerFilter;
-            'SetPrintProformaInvoice':
-                Caption := CaptionPrintProformaInvoice;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
-    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'AskExtDocNo':
-                Caption := DescAskExtDocNo;
-            'AskAttention':
-                Caption := DescAskAttention;
-            'AskYourRef':
-                Caption := DescAskYourRef;
-            'ConfirmExport':
-                Caption := DescConfirm;
-            'SetAsk':
-                Caption := DescAskOperation;
-            'SetPrint':
-                Caption := DescPrint;
-            'SetInvoice':
-                Caption := DescInvoice;
-            'SetReceive':
-                Caption := DescReceive;
-            'SetShip':
-                Caption := DescShip;
-            'SetDocumentType':
-                Caption := DescDocType;
-            'SetNegBalDocumentType':
-                Caption := DescNegDocType;
-            'SetShowCreationMessage':
-                Caption := DescCreationMsg;
-            'PrepaymentDialog':
-                Caption := DescPrepaymentDlg;
-            'FixedPrepaymentValue':
-                Caption := DescFixedPrepaymentPct;
-            'SetTransferSalesperson':
-                Caption := DescTransferSalesperson;
-            'SetTransferPostingSetup':
-                Caption := DescTransferPostingSetup;
-            'SetTransferDimensions':
-                Caption := DescTransferDim;
-            'SetTransferTaxSetup':
-                Caption := DescTransferTaxSetup;
-            'SetAutoReserveSalesLine':
-                Caption := DescAutoResrvSalesLine;
-            'SetSendPdf2Nav':
-                Caption := DescSendPdf2Nav;
-            'PrintRetailConfirmation':
-                Caption := DescRetailPrint;
-            'CheckCustomerCredit':
-                Caption := DescCheckCustCredit;
-            'CheckCustomerCreditWarning':
-                Caption := DescWarningCheckCustCredit;
-            'PrintPrepaymentDocument':
-                Caption := DescPrintPrepaymentDoc;
-            'OpenDocumentAfterExport':
-                Caption := DescOpenDoc;
-            'PayAndPostInNextSale':
-                Caption := DescPayAndPostNext;
-            'PrintPayAndPostDocument':
-                Caption := DescPrintPayAndPost;
-            'SaveLinesOnPOSEntry':
-                Caption := DescSaveLinesOnPOSEntry;
-            'ForcePricesInclVAT':
-                Caption := DescForcePricesInclVAT;
-            'PrepaymentInputIsAmount':
-                Caption := DescPrepayIsAmount;
-            'SetSend':
-                Caption := DescSetSend;
-            'SendPrepaymentDocument':
-                Caption := DescSendPrepayDoc;
-            'Pdf2NavPrepaymentDocument':
-                Caption := DescPdf2NavPrepayDoc;
-            'SendPayAndPostDocument':
-                Caption := DescSendPayAndPost;
-            'Pdf2NavPayAndPostDocument':
-                Caption := DescPdf2NavPayAndPost;
-            'SelectCustomer':
-                Caption := DescSelectCustomer;
-            'ShowDocumentPaymentMenu':
-                Caption := DescDocPaymentMenu;
-            'BlockEmptySale':
-                Caption := DescBlockEmptySale;
-            'UseLocationFrom':
-                Caption := DescUseLocationFrom;
-            'UseSpecLocationCode':
-                Caption := StrSubstNo(DescUseSpecLocationCode, CaptionUseLocationFrom, SelectStr(4, OptionUseLocationFrom));
-            'SendICOrderConfirmation':
-                Caption := DescSendICOrderConfirmation;
-            'PaymentMethodCode':
-                Caption := DescPaymentMethodCode;
-            'PaymentMethodCodeFrom':
-                Caption := DescPaymentMethodCodeFrom;
-            'CustomerTableView':
-                Caption := DescCustomerTableView;
-            'CustomerLookupPage':
-                Caption := DescCustomerLookupPage;
-            'EnforceCustomerFilter':
-                Caption := DescEnforceCustomerFilter;
-            'SetPrintProformaInvoice':
-                Caption := CaptionPrintProformaInvoice;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', false, false)]
-    local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'SetDocumentType':
-                Caption := OptionDocTypePozitive;
-            'SetNegBalDocumentType':
-                Caption := OptionDocTypeNegative;
-            'UseLocationFrom':
-                Caption := OptionUseLocationFrom;
-            'PaymentMethodCodeFrom':
-                Caption := OptionPaymentMethodCodeFrom;
-        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
@@ -863,7 +456,7 @@
         FilterBuilder: FilterPageBuilder;
         Customer: Record Customer;
     begin
-        if POSParameterValue."Action Code" <> ActionCode() then
+        if POSParameterValue."Action Code" <> 'SALES_DOC_EXP' then
             exit;
 
         case POSParameterValue.Name of
@@ -872,12 +465,12 @@
                     Location.FilterGroup(2);
                     Location.SetRange("Use As In-Transit", false);
                     Location.FilterGroup(0);
-                    if PAGE.RunModal(0, Location) = ACTION::LookupOK then
+                    if Page.RunModal(0, Location) = Action::LookupOK then
                         POSParameterValue.Value := Location.Code;
                 end;
             'PaymentMethodCode':
                 begin
-                    if PAGE.RunModal(0, PaymentMethod) = ACTION::LookupOK then
+                    if Page.RunModal(0, PaymentMethod) = Action::LookupOK then
                         POSParameterValue.Value := PaymentMethod.Code;
                 end;
             'CustomerTableView':
@@ -902,7 +495,7 @@
         PageId: Integer;
         PageMetadata: Record "Page Metadata";
     begin
-        if POSParameterValue."Action Code" <> ActionCode() then
+        if POSParameterValue."Action Code" <> 'SALES_DOC_EXP' then
             exit;
 
         case POSParameterValue.Name of
@@ -911,8 +504,8 @@
                     if POSParameterValue.Value = '' then
                         exit;
                     Location.SetRange("Use As In-Transit", false);
-                    Location.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(Location.Code));
-                    Location.Find();
+                    Location.SetFilter(Code, CopyStr(POSParameterValue.Value, 1, MaxStrLen(Location.Code)));
+                    Location.FindFirst();
                 end;
             'PaymentMethodCode':
                 begin
@@ -933,6 +526,24 @@
                     PageMetadata.SetRange(SourceTable, Database::Customer);
                     PageMetadata.FindFirst();
                 end;
+        end;
+    end;
+
+    local procedure ReadAdditionalParameters(Context: Codeunit "NPR POS JSON Helper"; var PrepaymentIsAmount: Boolean; var PayAndPost: Boolean; var FullPosting: Boolean)
+    var
+        JSObj: JsonObject;
+        ContextObj: JsonObject;
+        JToken: JsonToken;
+    begin
+        Context.GetJObject(ContextObj);
+        if ContextObj.Get('additionalParameters', JToken) then begin
+            JSObj := JToken.AsObject();
+            if JSObj.Get('prepayment_is_amount', JToken) then
+                PrepaymentIsAmount := JToken.AsValue().AsBoolean();
+            if JSObj.Get('pay_and_post', JToken) then
+                PayAndPost := JToken.AsValue().AsBoolean();
+            if JSObj.Get('full_posting', JToken) then
+                FullPosting := JToken.AsValue().AsBoolean();
         end;
     end;
 }
