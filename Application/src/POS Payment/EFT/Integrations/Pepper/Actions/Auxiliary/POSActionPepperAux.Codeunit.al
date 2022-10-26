@@ -13,8 +13,8 @@ codeunit 6184484 "NPR POS Action Pepper Aux" implements "NPR IPOS Workflow"
         ConfirmAbort: Label 'Are you sure you want to abort this operation?';
         AuxCaption: Label 'EFT Auxiliary Operation';
         AuxDescription: Label 'Auxiliary operations manages certain settings on the terminal.';
-        AuxOptions: Label 'StrMenu,Abort,PAN Suppression ON,PAN Suppression OFF,Custom Menu,Ticket Reprint,Summary Report,Diagnostics,System Info,Display with Num Input,TINA Activation,TINA Query,Show Custom Menu,Activate Offline Mode,Deactivate Offline Mode', locked = true, MaxLength = 255;
-        AuxOptionCaptions: Label 'String Menu,Abort,PAN Suppression ON,PAN Suppression OFF,Custom Menu,Ticket Reprint,Summary Report,Diagnostics,System Info,Display with Num Input,TINA Activation,TINA Query,Show Custom Menu,Activate Offline Mode,Deactivate Offline Mode', locked = true, MaxLength = 255;
+        AuxOptions: Label 'StrMenu,Abort,PAN Suppression ON,PAN Suppression OFF,Custom Menu,Ticket Reprint,Summary Report,Diagnostics,System Info,Display with Num Input,TINA Activation,TINA Query,Show Custom Menu,Activate Offline Mode,Deactivate Offline Mode', locked = true, MaxLength = 250;
+        AuxOptionCaptions: Label 'String Menu,Abort,PAN Suppression ON,PAN Suppression OFF,Custom Menu,Ticket Reprint,Summary Report,Diagnostics,System Info,Display with Num Input,TINA Activation,TINA Query,Show Custom Menu,Activate Offline Mode,Deactivate Offline Mode', locked = true, MaxLength = 250;
 
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);

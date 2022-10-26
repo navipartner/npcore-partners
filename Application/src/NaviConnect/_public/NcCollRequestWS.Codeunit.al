@@ -1,4 +1,5 @@
-﻿codeunit 6151532 "NPR Nc Coll.  Request WS"
+﻿#pragma warning disable AA0139
+codeunit 6151532 "NPR Nc Coll.  Request WS"
 {
     ObsoleteState = Pending;
     ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';

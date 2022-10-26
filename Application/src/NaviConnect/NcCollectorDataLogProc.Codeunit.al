@@ -1,4 +1,5 @@
-﻿codeunit 6151527 "NPR Nc Collector DataLog Proc."
+﻿#pragma warning disable AA0139
+codeunit 6151527 "NPR Nc Collector DataLog Proc."
 {
     Access = Internal;
     TableNo = "NPR Data Log Record";
@@ -19,13 +20,13 @@
         NcCollector.SetRange("Table No.", Datalogrecord."Table ID");
         NcCollector.SetRange(Active, true);
         if NcCollector.FindSet() then
-                repeat
-                    if ((Datalogrecord."Type of Change" = Datalogrecord."Type of Change"::Insert) and NcCollector."Record Insert") or
-                       ((Datalogrecord."Type of Change" = Datalogrecord."Type of Change"::Delete) and NcCollector."Record Delete") or
-                       ((Datalogrecord."Type of Change" = Datalogrecord."Type of Change"::Rename) and NcCollector."Record Rename") or
-                       ((Datalogrecord."Type of Change" = Datalogrecord."Type of Change"::Modify) and NcCollector."Record Modify") then
-                        ProcessChange(Datalogrecord, NcCollector.Code);
-                until NcCollector.Next() = 0;
+            repeat
+                if ((Datalogrecord."Type of Change" = Datalogrecord."Type of Change"::Insert) and NcCollector."Record Insert") or
+                   ((Datalogrecord."Type of Change" = Datalogrecord."Type of Change"::Delete) and NcCollector."Record Delete") or
+                   ((Datalogrecord."Type of Change" = Datalogrecord."Type of Change"::Rename) and NcCollector."Record Rename") or
+                   ((Datalogrecord."Type of Change" = Datalogrecord."Type of Change"::Modify) and NcCollector."Record Modify") then
+                    ProcessChange(Datalogrecord, NcCollector.Code);
+            until NcCollector.Next() = 0;
     end;
 
     local procedure ProcessChange(DataLogRecord: Record "NPR Data Log Record"; NcCollectorCode: Code[20])
@@ -77,22 +78,22 @@
         NcCollectorFilter.SetRange("Collector Code", NcCollectorCode);
         NcCollectorFilter.SetRange("Table No.", DataLogRecord."Table ID");
         if NcCollectorFilter.FindSet() then
-                repeat
-                    FieldRefTemp := RecReftemp.Field(NcCollectorFilter."Field No.");
-                    FieldRefChange := RecRefchange.Field(NcCollectorFilter."Field No.");
-                    FieldRefTemp.Value := FieldRefChange.Value;
-                    DataLogField.SetRange("Table ID", DataLogRecord."Table ID");
-                    DataLogField.SetRange("Data Log Record Entry No.", DataLogRecord."Entry No.");
-                    DataLogField.SetRange("Field No.", NcCollectorFilter."Field No.");
-                    DataLogField.SetRange("Field Value Changed", true);
-                    if DataLogField.FindFirst() then
-                        AssignValue(FieldRefTemp, DataLogField."Field Value");
-                    RecReftemp.Insert();
-                    FieldRefTemp.SetFilter(NcCollectorFilter."Filter Text");
-                    if RecReftemp.IsEmpty() then
-                        exit(false);
-                    RecReftemp.Delete();
-                until NcCollectorFilter.Next() = 0;
+            repeat
+                FieldRefTemp := RecReftemp.Field(NcCollectorFilter."Field No.");
+                FieldRefChange := RecRefchange.Field(NcCollectorFilter."Field No.");
+                FieldRefTemp.Value := FieldRefChange.Value;
+                DataLogField.SetRange("Table ID", DataLogRecord."Table ID");
+                DataLogField.SetRange("Data Log Record Entry No.", DataLogRecord."Entry No.");
+                DataLogField.SetRange("Field No.", NcCollectorFilter."Field No.");
+                DataLogField.SetRange("Field Value Changed", true);
+                if DataLogField.FindFirst() then
+                    AssignValue(FieldRefTemp, DataLogField."Field Value");
+                RecReftemp.Insert();
+                FieldRefTemp.SetFilter(NcCollectorFilter."Filter Text");
+                if RecReftemp.IsEmpty() then
+                    exit(false);
+                RecReftemp.Delete();
+            until NcCollectorFilter.Next() = 0;
 
         exit(true);
     end;
@@ -113,14 +114,14 @@
         NcCollectorFilter.SetRange("Table No.", DataLogRecord."Table ID");
         NcCollectorFilter.SetRange("Collect When Modified", true);
         if NcCollectorFilter.FindSet() then begin
-                                                repeat
-                                                    DataLogField.SetRange("Table ID", DataLogRecord."Table ID");
-                                                    DataLogField.SetRange("Data Log Record Entry No.", DataLogRecord."Entry No.");
-                                                    DataLogField.SetRange("Field No.", NcCollectorFilter."Field No.");
-                                                    DataLogField.SetRange("Field Value Changed", true);
-                                                    if not DataLogField.IsEmpty() then
-                                                        exit(true);
-                                                until (NcCollectorFilter.Next() = 0);
+            repeat
+                DataLogField.SetRange("Table ID", DataLogRecord."Table ID");
+                DataLogField.SetRange("Data Log Record Entry No.", DataLogRecord."Entry No.");
+                DataLogField.SetRange("Field No.", NcCollectorFilter."Field No.");
+                DataLogField.SetRange("Field Value Changed", true);
+                if not DataLogField.IsEmpty() then
+                    exit(true);
+            until (NcCollectorFilter.Next() = 0);
             exit(false);
         end else
             exit(true);

@@ -1,4 +1,5 @@
-﻿table 6184483 "NPR EFT Type Pay. Gen. Param."
+﻿#pragma warning disable AA0139
+table 6184483 "NPR EFT Type Pay. Gen. Param."
 {
     Caption = 'EFT Type Payment Gen. Param.';
     DataClassification = CustomerContent;

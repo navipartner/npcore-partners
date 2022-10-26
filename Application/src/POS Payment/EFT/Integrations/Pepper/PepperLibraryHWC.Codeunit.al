@@ -390,6 +390,7 @@ codeunit 6184496 "NPR Pepper Library HWC"
         PepperTrxTransaction.SetTimeout(GetTimeout(_PepperConfiguration.Code, _PepperConfiguration."Transaction Type Payment Code"));
         ActivateOffline := (_PepperTerminal.Status = _PepperTerminal.Status::ActiveOffline);
 
+#pragma warning disable AA0139
         EFTTransactionRequest."Result Code" := PepperTrxTransaction.SetPaymentOfGoods(EFTTransactionRequest."Amount Input",
           CalcAmountInCents(EFTTransactionRequest."Amount Input", EFTTransactionRequest."Currency Code"),
           CalcAmountInCents(EFTTransactionRequest."Cashback Amount", EFTTransactionRequest."Currency Code"),
@@ -399,6 +400,7 @@ codeunit 6184496 "NPR Pepper Library HWC"
           EFTTransactionRequest."Reference Number Input",
           MbxPosReference,
           ActivateOffline);
+#pragma warning restore AA0139
         EFTTransactionRequest.Modify();
 
         if (CheckTestMode(_PepperConfiguration)) then begin
@@ -425,10 +427,12 @@ codeunit 6184496 "NPR Pepper Library HWC"
         PepperTrxTransaction.SetReceiptEncoding(GetPepperReceiptEncoding(_PepperTerminal));
         PepperTrxTransaction.SetTimeout(GetTimeout(_PepperConfiguration.Code, _PepperConfiguration."Transaction Type Refund Code"));
 
+#pragma warning disable AA0139
         EFTTransactionRequest."Result Code" := PepperTrxTransaction.SetVoidPaymentOfGoods(EFTTransactionRequest."Amount Input",
           CalcAmountInCents(EFTTransactionRequest."Amount Input", EFTTransactionRequest."Currency Code"),
           EFTTransactionRequest."Currency Code",
           EFTTransactionRequest."Reference Number Input");
+#pragma warning restore AA0139
 
         EFTTransactionRequest.Modify();
 
@@ -455,10 +459,12 @@ codeunit 6184496 "NPR Pepper Library HWC"
         PepperTrxTransaction.SetReceiptEncoding(GetPepperReceiptEncoding(_PepperTerminal));
         PepperTrxTransaction.SetTimeout(GetTimeout(_PepperConfiguration.Code, _PepperConfiguration."Transaction Type Refund Code"));
 
+#pragma warning disable AA0139
         EFTTransactionRequest."Result Code" := PepperTrxTransaction.SetRefund(EFTTransactionRequest."Amount Input",
           CalcAmountInCents(EFTTransactionRequest."Amount Input", EFTTransactionRequest."Currency Code"),
           EFTTransactionRequest."Currency Code",
           EFTTransactionRequest."Reference Number Input");
+#pragma warning restore AA0139
 
         EFTTransactionRequest.Modify();
 
@@ -532,6 +538,7 @@ codeunit 6184496 "NPR Pepper Library HWC"
             PepperTrxTransaction.GetTrx_CardInformation(EFTTransactionRequest."Card Type", EFTTransactionRequest."Card Name", EFTTransactionRequest."Card Number", EFTTransactionRequest."Card Expiry Date");
             CheckCardInformation(EFTTransactionRequest."Card Type", EFTTransactionRequest."Card Name", EFTTransactionRequest."Card Number", EFTTransactionRequest."Card Expiry Date");
 
+#pragma warning disable AA0139
             PepperTrxTransaction.GetTrx_AuthorizationInfo(EFTTransactionRequest."Reference Number Output",
               TransactionDateText,
               TransactionTimeText,
@@ -539,7 +546,7 @@ codeunit 6184496 "NPR Pepper Library HWC"
               EFTTransactionRequest."Hardware ID",
               EFTTransactionRequest."Authentication Method",
               EFTTransactionRequest."Bookkeeping Period");
-
+#pragma warning restore AA0139
             EFTTransactionRequest."Transaction Date" := GetTransactionDate(TransactionDateText);
             EFTTransactionRequest."Transaction Time" := GetTransactionTime(TransactionTimeText);
 
@@ -551,7 +558,7 @@ codeunit 6184496 "NPR Pepper Library HWC"
                 EFTTransactionRequest."POS Payment Type Code" := PaymentType;
 
             EFTTransactionRequest."Result Display Text" := CopyStr(PepperTrxTransaction.GetTrx_DisplayText(), 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
-            EFTTransactionRequest."POS Description" := GetPOSDescription(EFTTransactionRequest);
+            EFTTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EFTTransactionRequest), 1, MaxStrLen(EFTTransactionRequest."POS Description"));
         end;
 
         EFTTransactionRequest.Finished := CurrentDateTime;
@@ -604,7 +611,15 @@ codeunit 6184496 "NPR Pepper Library HWC"
             if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::PAYMENT) then
                 if (_PepperTerminal."Cancel at Wrong Signature") then begin
                     if (not Confirm(ConfirmSignature)) then begin
-                        CreateVoidPaymentOfGoodsRequest(EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", EftTransactionRequest."Currency Code", EftTransactionRequest."Amount Output", EftTransactionRequest."Reference Number Output", EftTransactionRequest."POS Payment Type Code", EftVoidTransactionRequest);
+#pragma warning disable AA0139
+                        CreateVoidPaymentOfGoodsRequest(EftTransactionRequest."Register No.",
+                            EftTransactionRequest."Sales Ticket No.",
+                            EftTransactionRequest."Currency Code",
+                            EftTransactionRequest."Amount Output",
+                            EftTransactionRequest."Reference Number Output",
+                            EftTransactionRequest."POS Payment Type Code",
+                            EftVoidTransactionRequest);
+#pragma warning restore AA0139
                         MakeHwcDeviceRequest(EftVoidTransactionRequest, Result);
                         Result.Add('Success', false);
                         Result.Add('Message', VoidTransaction);
@@ -1043,7 +1058,7 @@ codeunit 6184496 "NPR Pepper Library HWC"
         EFTTransactionRequest."Integration Version Code" := _PepperConfiguration.Version;
 
         EFTTransactionRequest.Started := CurrentDateTime;
-        EFTTransactionRequest."User ID" := UserId;
+        EFTTransactionRequest."User ID" := CopyStr(UserId, 1, MaxStrLen(EFTTransactionRequest."User ID"));
     end;
 
     procedure SetTrxProcessingType(TransactionSubtypeCode: Code[10]; RegisterNo: Code[10]; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -1762,9 +1777,14 @@ codeunit 6184496 "NPR Pepper Library HWC"
             exit;
 
         if (OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.")) then;
-
-        Handled := CreateRefundRequest(EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", EftTransactionRequest."Currency Code", EftTransactionRequest."Amount Input", OriginalTransactionRequest."Reference Number Output", EftTransactionRequest);
-
+#pragma warning disable AA0139
+        Handled := CreateRefundRequest(EftTransactionRequest."Register No.",
+            EftTransactionRequest."Sales Ticket No.",
+            EftTransactionRequest."Currency Code",
+            EftTransactionRequest."Amount Input",
+            OriginalTransactionRequest."Reference Number Output",
+            EftTransactionRequest);
+#pragma warning restore AA0139
         if (Handled) then begin
             if (OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.")) then begin
                 OriginalTransactionRequest.Reversed := true;
@@ -1786,9 +1806,15 @@ codeunit 6184496 "NPR Pepper Library HWC"
         OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
         if (OriginalTransactionRequest."Processing Type" <> OriginalTransactionRequest."Processing Type"::PAYMENT) then
             exit;
-
-        Handled := CreateVoidPaymentOfGoodsRequest(EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", OriginalTransactionRequest."Currency Code", OriginalTransactionRequest."Amount Output", OriginalTransactionRequest."Reference Number Output", OriginalTransactionRequest."POS Payment Type Code", EftTransactionRequest);
-
+#pragma warning disable AA0139
+        Handled := CreateVoidPaymentOfGoodsRequest(EftTransactionRequest."Register No.",
+            EftTransactionRequest."Sales Ticket No.",
+            OriginalTransactionRequest."Currency Code",
+            OriginalTransactionRequest."Amount Output",
+            OriginalTransactionRequest."Reference Number Output",
+            OriginalTransactionRequest."POS Payment Type Code",
+            EftTransactionRequest);
+#pragma warning restore AA0139
         if (Handled) then begin
             if (OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.")) then begin
                 OriginalTransactionRequest.Reversed := true;

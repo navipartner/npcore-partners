@@ -422,6 +422,7 @@
         InStr: InStream;
         Content: Text;
         BufferText: Text;
+        FileName: Text;
     begin
         Rec.CalcFields("Data Output");
         if not Rec."Data Output".HasValue() then begin
@@ -429,7 +430,8 @@
             if NcTaskOutput.FindLast() and NcTaskOutput.Data.HasValue() then begin
                 NcTaskOutput.CalcFields(Data);
                 NcTaskOutput.Data.CreateInStream(InStr, TEXTENCODING::UTF8);
-                DownloadFromStream(InStr, 'Export', FileMgt.Magicpath(), '.' + FileMgt.GetExtension(NcTaskOutput.Name), NcTaskOutput.Name);
+                FileName := NcTaskOutput.Name;
+                DownloadFromStream(InStr, 'Export', FileMgt.Magicpath(), '.' + FileMgt.GetExtension(NcTaskOutput.Name), FileName);
                 exit;
             end;
             Message(NoOutputMsg);

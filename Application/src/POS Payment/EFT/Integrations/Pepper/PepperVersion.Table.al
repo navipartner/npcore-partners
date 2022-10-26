@@ -179,7 +179,7 @@
     var
         FileManagement: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";
-        UploadResult: Text[250];
+        UploadResult: Text;
         TxtNotUploaded: Label 'File was not uploaded.';
         TxtSuccess: Label 'File %1 was uploaded.';
         TxtNotStored: Label 'File was not stored.';

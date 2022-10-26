@@ -1,4 +1,5 @@
-﻿table 6184482 "NPR EFTType POSUnit BLOBParam."
+﻿#pragma warning disable AA0139
+table 6184482 "NPR EFTType POSUnit BLOBParam."
 {
     Access = Internal;
     ObsoleteState = Pending;

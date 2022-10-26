@@ -13,8 +13,8 @@
         NaviConnectSetup."Task Worker Group" := NaviConnectDefaultTaskProcessorCode();
         NaviConnectSetup.Insert();
     end;
-
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+#pragma warning disable AA0139
+    [Obsolete('Task Que module to be removed from NP Retail. We are now using Job Que instead.', '20.0')]
     procedure SetupTaskQueue()
     var
         SyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -263,6 +263,7 @@
         if TaskLine.FindLast() then;
         LineNo := TaskLine."Line No." + 10000;
     end;
+#pragma warning restore AA0139
 
     internal procedure SetupTaskProcessingJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Autocreated: Boolean)
     var

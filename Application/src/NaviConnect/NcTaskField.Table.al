@@ -18,7 +18,7 @@
             DataClassification = CustomerContent;
             Description = 'NC1.07';
         }
-        field(3; "Field Name"; Text[50])
+        field(3; "Field Name"; Text[80])
         {
             Caption = 'Field Name';
             DataClassification = CustomerContent;

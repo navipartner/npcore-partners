@@ -119,11 +119,13 @@
             repeat
                 if UseDialog() then
                     Window.Update(7, TaskProcesLine.Value);
+#pragma warning disable AA0139
                 if DataLogSubScriberMgt.GetNewRecordsCompany(TaskProcessor.Code, TaskProcesLine.Value, true,
                                                       NaviConnectSetup."Max Task Count per Batch", TempDataLogRecord) then begin
                     if UseDialog() then
                         Window.Update(1, 10000);
                     InsertTempTasks(TaskProcessor, TaskProcesLine.Value, TempDataLogRecord, TempTask);
+#pragma warning restore AA0139
                     TempDataLogRecord.DeleteAll();
                     DeleteDuplicates(TaskProcessor, TempTask);
                     InsertTasks(TempTask);

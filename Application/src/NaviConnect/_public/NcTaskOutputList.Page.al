@@ -200,6 +200,7 @@
     var
         FileMgt: Codeunit "File Management";
         InStr: InStream;
+        FileName: Text;
     begin
         Rec.CalcFields(Data);
         if not Rec.Data.HasValue() then begin
@@ -208,7 +209,8 @@
         end;
 
         Rec.Data.CreateInStream(InStr, TEXTENCODING::UTF8);
-        DownloadFromStream(InStr, 'Export', FileMgt.Magicpath(), '.' + FileMgt.GetExtension(Rec.Name), Rec.Name);
+        FileName := Rec.Name;
+        DownloadFromStream(InStr, 'Export', FileMgt.Magicpath(), '.' + FileMgt.GetExtension(Rec.Name), FileName);
     end;
 
     local procedure UpdateResponseText()

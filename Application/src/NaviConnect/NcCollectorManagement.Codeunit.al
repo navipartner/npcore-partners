@@ -1,4 +1,5 @@
-﻿codeunit 6151528 "NPR Nc Collector Management"
+﻿#pragma warning disable AA0139
+codeunit 6151528 "NPR Nc Collector Management"
 {
     Access = Internal;
     ObsoleteState = Pending;
@@ -97,25 +98,25 @@
         RecRef.Open(NcCollector."Table No.");
         RecReftemp.Open(NcCollector."Table No.", true);
         if RecRef.FindFirst() then
-                repeat
-                    SkipRecord := false;
-                    NcCollectorFilter.Reset();
-                    NcCollectorFilter.SetRange("Collector Code", NcCollector.Code);
-                    NcCollectorFilter.SetRange("Table No.", NcCollector."Table No.");
-                    if NcCollectorFilter.FindSet() then
-                        repeat
-                                FieldRefTemp := RecReftemp.Field(NcCollectorFilter."Field No.");
-                            FieldRefChange := RecRef.Field(NcCollectorFilter."Field No.");
-                            FieldRefTemp.Value := FieldRefChange.Value;
-                            RecReftemp.Insert();
-                            FieldRefTemp.SetFilter(NcCollectorFilter."Filter Text");
-                            if RecReftemp.IsEmpty then
-                                SkipRecord := true;
-                            RecReftemp.Delete();
-                        until (NcCollectorFilter.Next() = 0) or SkipRecord;
-                    if not SkipRecord then
-                        InsertModifyCollectionLine(RecRef, NcCollector.Code);
-                until RecRef.Next() = 0;
+            repeat
+                SkipRecord := false;
+                NcCollectorFilter.Reset();
+                NcCollectorFilter.SetRange("Collector Code", NcCollector.Code);
+                NcCollectorFilter.SetRange("Table No.", NcCollector."Table No.");
+                if NcCollectorFilter.FindSet() then
+                    repeat
+                        FieldRefTemp := RecReftemp.Field(NcCollectorFilter."Field No.");
+                        FieldRefChange := RecRef.Field(NcCollectorFilter."Field No.");
+                        FieldRefTemp.Value := FieldRefChange.Value;
+                        RecReftemp.Insert();
+                        FieldRefTemp.SetFilter(NcCollectorFilter."Filter Text");
+                        if RecReftemp.IsEmpty then
+                            SkipRecord := true;
+                        RecReftemp.Delete();
+                    until (NcCollectorFilter.Next() = 0) or SkipRecord;
+                if not SkipRecord then
+                    InsertModifyCollectionLine(RecRef, NcCollector.Code);
+            until RecRef.Next() = 0;
     end;
 
     local procedure InsertModifyCollectionLine(RecRef: RecordRef; NcCollectorCode: Code[20])
@@ -161,7 +162,7 @@
         end else begin
             if OldNcCollectionLine.FindSet() then
                 repeat
-                        OldNcCollectionLine.Validate(Obsolete, true);
+                    OldNcCollectionLine.Validate(Obsolete, true);
                     OldNcCollectionLine.Modify(true);
                 until OldNcCollectionLine.Next() = 0;
         end;
@@ -276,7 +277,7 @@
             FieldRec.SetRange(Class, FieldRec.Class::Normal);
             if FieldRec.FindSet() then
                 repeat
-                        FldRef := RecRef.Field(FieldRec."No.");
+                    FldRef := RecRef.Field(FieldRec."No.");
                     FilterText := CopyStr(Format(FldRef.GetFilter, 0, 9), 1, MaxStrLen(NcCollectorRequestFilter."Filter Text"));
                     if FilterText <> '' then begin
                         NcCollectorRequestFilter.Init();

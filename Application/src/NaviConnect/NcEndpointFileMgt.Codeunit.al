@@ -75,8 +75,10 @@
         TempNcEndPointFile.Init();
         TempNcEndPointFile.Copy(NcEndpointFile);
         TempNcEndPointFile."Output Nc Task Entry No." := NcTask."Entry No.";
+#pragma warning disable AA0139
         if Filename <> '' then
             TempNcEndPointFile.Filename := Filename;
+#pragma warning restore AA0139
         NcTriggerSyncMgt.FillFields(NewTask, TempNcEndPointFile);
         NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextTaskInserted, NcEndpointFile.Code, NcEndpointFile.Description, NcEndpointFile.Filename, NcEndpointFile.Path, NewTask."Entry No."));
     end;
@@ -129,6 +131,7 @@
     local procedure FileProcessOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFile: Record "NPR Nc Endpoint File")
     var
         InStr: InStream;
+        Name: Text;
     begin
         NcEndpointFile.TestField(Path);
 
@@ -141,8 +144,9 @@
                 NcTaskOutput.Data.CreateInStream(InStr);
         end;
 
+        Name := NcTaskOutput.Name;
         if NcEndpointFile."Client Path" then
-            DownloadFromStream(InStr, 'Save file as...', NcEndpointFile.Path, 'All Files|*.*', NcTaskOutput.Name);
+            DownloadFromStream(InStr, 'Save file as...', NcEndpointFile.Path, 'All Files|*.*', Name);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Trigger Task Mgt.", 'OnAfterGetOutputTriggerTask', '', false, false)]

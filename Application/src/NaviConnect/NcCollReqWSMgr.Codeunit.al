@@ -1,4 +1,5 @@
-﻿codeunit 6151533 "NPR Nc Coll. Req. WS Mgr"
+﻿#pragma warning disable AA0139
+codeunit 6151533 "NPR Nc Coll. Req. WS Mgr"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";

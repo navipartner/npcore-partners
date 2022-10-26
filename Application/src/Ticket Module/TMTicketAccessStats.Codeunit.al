@@ -1047,6 +1047,7 @@
         exit(JToken.AsValue().AsDate());
     end;
 
+#pragma warning disable AA0139
     local procedure AsCode10(JObject: JsonObject; KeyName: Text): Code[10]
     var
         JToken: JsonToken;
@@ -1066,6 +1067,6 @@
         Result := JToken.AsValue().AsText();
         exit(Result);
     end;
-
+#pragma warning restore AA0139
 }
 
