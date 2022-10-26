@@ -295,13 +295,15 @@
                     TempBlob: Codeunit "Temp Blob";
                     TemplateInStream: InStream;
                     DownloadLbl: Label 'Download file';
+                    FileName: Text;
                 begin
                     Rec.CalcFields("Document Source");
                     TempBlob.FromRecord(Rec, Rec.FieldNo("Document Source"));
                     if not TempBlob.HasValue() then
                         exit;
                     TempBlob.CreateInStream(TemplateInStream);
-                    DownloadFromStream(TemplateInStream, DownloadLbl, '', '', Rec."Document Name");
+                    FileName := Rec."Document Name";
+                    DownloadFromStream(TemplateInStream, DownloadLbl, '', '', FileName);
                 end;
             }
             action("Import File")

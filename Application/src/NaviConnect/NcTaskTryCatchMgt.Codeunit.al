@@ -1,4 +1,5 @@
-﻿codeunit 6151534 "NPR Nc Task Try Catch Mgt."
+﻿#pragma warning disable AA0139
+codeunit 6151534 "NPR Nc Task Try Catch Mgt."
 {
     Access = Internal;
     TableNo = "NPR Nc Task Output";

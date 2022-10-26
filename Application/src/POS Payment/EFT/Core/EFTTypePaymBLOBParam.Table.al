@@ -1,4 +1,5 @@
-﻿table 6184481 "NPR EFTType Paym. BLOB Param."
+﻿#pragma warning disable AA0139
+table 6184481 "NPR EFTType Paym. BLOB Param."
 {
     Access = Internal;
     ObsoleteState = Pending;

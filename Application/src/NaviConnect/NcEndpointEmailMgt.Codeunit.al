@@ -55,6 +55,7 @@
         end;
     end;
 
+#pragma warning disable AA0139
     local procedure InsertEndpointTask(var NcEndpointEmail: Record "NPR Nc Endpoint E-mail"; var NcTask: Record "NPR Nc Task"; Filename: Text; Subject: Text; Body: Text)
     var
         NcTriggerSyncMgt: Codeunit "NPR Nc Trigger Sync. Mgt.";
@@ -76,9 +77,11 @@
             TempNcEndPointEmail."Subject Text" := Subject;
         if Body <> '' then
             TempNcEndPointEmail."Body Text" := Body;
+
         NcTriggerSyncMgt.FillFields(NewTask, TempNcEndPointEmail);
         NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextTaskInsertedLbl, NcEndpointEmail.Code, NcEndpointEmail.Description, NcEndpointEmail."Recipient E-Mail Address", NewTask."Entry No."));
     end;
+#pragma warning restore AA0139
 
     local procedure ProcessEndPointTask(var NcEndpointEmail: Record "NPR Nc Endpoint E-mail"; var NcTask: Record "NPR Nc Task"; Output: Text; Filename: Text; Subject: Text; Body: Text)
     var
@@ -125,8 +128,9 @@
         TempBlob.CreateOutStream(OStream, TEXTENCODING::UTF8);
         OStream.WriteText(OutputText);
         TempBlob.CreateInStream(IStream, TEXTENCODING::UTF8);
+#pragma warning disable AA0139
         EmailSendingHandler.AddAttachmentFromStream(TempEmailItem, IStream, Filename);
-
+#pragma warning restore AA0139
         if NcEndpointEmail."CC E-Mail Address" <> '' then begin
             CCRecipients := NcEndpointEmail."CC E-Mail Address".Split(Separators);
             EmailSendingHandler.AddRecipientCC(TempEmailItem, CCRecipients);

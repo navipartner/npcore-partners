@@ -332,7 +332,7 @@
         Message(TextWhole);
     end;
 
-    local procedure InitGenericRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; POSUnitNo: Text; SalesReceiptNo: Text)
+    local procedure InitGenericRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; POSUnitNo: Code[10]; SalesReceiptNo: Code[20])
     var
         SalePOS: Record "NPR POS Sale";
     begin
@@ -343,7 +343,7 @@
         EFTTransactionRequest."Original POS Payment Type Code" := EFTSetup."Payment Type POS"; //This one will keep pointing to EFTSetup value.
         EFTTransactionRequest."Register No." := POSUnitNo;
         EFTTransactionRequest."Sales Ticket No." := SalesReceiptNo;
-        EFTTransactionRequest."User ID" := UserId;
+        EFTTransactionRequest."User ID" := CopyStr(UserId, 1, MaxStrLen(EFTTransactionRequest."User ID"));
         EFTTransactionRequest.Started := CurrentDateTime;
         EFTTransactionRequest.Token := CreateGuid();
 

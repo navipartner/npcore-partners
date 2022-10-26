@@ -84,9 +84,9 @@
             '401':
                 Error(AuthorizationFailedErrorText);
             else begin
-                    FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue().AsText());
-                end;
+                FTPResponse.Get('Error', JToken);
+                Error(JToken.AsValue().AsText());
+            end;
         end;
 
         Clear(TempImportEntry);
@@ -152,9 +152,9 @@
             '401':
                 Error(AuthorizationFailedErrorText);
             else begin
-                    FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue().AsText());
-                end;
+                FTPResponse.Get('Error', JToken);
+                Error(JToken.AsValue().AsText());
+            end;
         end;
 
         Clear(TempImportEntry);
@@ -402,9 +402,9 @@
             '401':
                 Error(AuthorizationFailedErrorText);
             else begin
-                    FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue().AsText());
-                end;
+                FTPResponse.Get('Error', JToken);
+                Error(JToken.AsValue().AsText());
+            end;
         end;
     end;
 
@@ -456,12 +456,13 @@
             '401':
                 Error(AuthorizationFailedErrorText);
             else begin
-                    FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue().AsText());
-                end;
+                FTPResponse.Get('Error', JToken);
+                Error(JToken.AsValue().AsText());
+            end;
         end;
     end;
 
+#pragma warning disable AA0139
     local procedure ManageHostPrefix(Host: Text[250]) NewHost: Text[250]
     begin
         NewHost := Host;
@@ -472,6 +473,7 @@
         if StrPos(Host, 'ftp://') = 1 then
             NewHost := CopyStr(Host, 7);
     end;
+#pragma warning restore AA0139
 
     local procedure ManagePathSlashes(RemotePath: Text) FormattedPath: Text
     begin
@@ -559,9 +561,9 @@
             '401':
                 Error(AuthorizationFailedErrorText);
             else begin
-                    FTPResponse.Get('Error', JToken);
-                    Error(JToken.AsValue().AsText());
-                end;
+                FTPResponse.Get('Error', JToken);
+                Error(JToken.AsValue().AsText());
+            end;
         end;
 
         exit(FolderExist);
@@ -582,7 +584,8 @@
         exit(ResponseCodeText = '200');
     end;
 
-    local procedure GetDocName(Filename: Text; MaxLength: Integer) DocName: Text
+#pragma warning disable AA0139
+    local procedure GetDocName(Filename: Text; MaxLength: Integer) DocName: Text[100]
     var
         FileMgt: Codeunit "File Management";
         DocExt: Text;
@@ -601,6 +604,7 @@
 
         exit(DocName);
     end;
+#pragma warning restore AA0139
 
     [TryFunction]
     local procedure MakeFtpUrl(FtpUrl: Text)

@@ -95,7 +95,7 @@
         NcImportEntry."Import Duration" := 0;
         NcImportEntry."Import Completed at" := 0DT;
         NcImportEntry."Import Count" += 1;
-        NcImportEntry."Import Started by" := UserId;
+        NcImportEntry."Import Started by" := CopyStr(UserId, 1, MaxStrLen(NcImportEntry."Import Started by"));
         NcImportEntry."Server Instance Id" := ServiceInstanceId();
         NcImportEntry."Session Id" := SessionId();
         NcImportEntry.Modify(true);

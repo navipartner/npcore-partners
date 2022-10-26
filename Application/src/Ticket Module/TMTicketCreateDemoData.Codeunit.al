@@ -361,7 +361,7 @@
         exit(ProfileCode);
     end;
 
-    local procedure CreatePriceRule(var ProfileCode: Code[10]; Description: Text;
+    local procedure CreatePriceRule(var ProfileCode: Code[10]; Description: Text[100];
                                         BookingFrom: Date; BookingUntil: Date; RelativeBookingDateFormula: Text;
                                         EventFrom: Date; EventUntil: Date; RelativeEventDateFormula: Text;
                                         RelativeUntilDateFormula: Text;
