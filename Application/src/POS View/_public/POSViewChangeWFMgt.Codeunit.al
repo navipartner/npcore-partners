@@ -172,7 +172,7 @@
                 TempSaleLinePOS.Modify();
         until TempSaleLinePOS.Next() = 0;
 
-        exit(TempSaleLinePOS.FindFirst());
+        exit(not TempSaleLinePOS.IsEmpty());
     end;
 
     local procedure CalcInventory(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Decimal
@@ -228,9 +228,11 @@
             exit;
         if not Item.Get(SaleLinePOS."No.") then
             exit;
-        if Item.Type <> Item.Type::Inventory then
+        if Item.IsNonInventoriableType() then
             exit;
         if Item."NPR Group sale" then
+            exit;
+        if not Item.PreventNegativeInventory() then
             exit;
 
         TempSaleLinePOS.SetRange("No.", SaleLinePOS."No.");
