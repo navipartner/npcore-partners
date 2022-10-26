@@ -11,7 +11,7 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
         ParamSalesDocViewString_DescLbl: Label 'Pre-filtered Posted Sales Invoice View';
         ParamLocationFrom_CptLbl: Label 'Location From';
         ParamLocationFrom_DescLbl: Label 'Pre-filtered location option';
-        ParamLocationFrom_OptionsLbl: Label 'POS Store,Location Filter Parameter';
+        ParamLocationFrom_OptionsLbl: Label 'POS Store,Location Filter Parameter', Locked = true;
         ParamLocationFrom_OptionsCptLbl: Label 'POS Store, Location Filter Parameter';
         ParamLocation_CptLbl: Label 'Location Filter';
         ParamLocation_DescLbl: Label 'Pre-filtered location';
