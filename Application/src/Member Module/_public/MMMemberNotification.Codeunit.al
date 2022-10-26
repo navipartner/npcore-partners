@@ -455,14 +455,14 @@
     begin
 
         RecordRef.GetTable(MemberNotificationEntry);
-
         ResponseMessage := 'E-Mail address is missing.';
+
         if (MemberNotificationEntry."E-Mail Address" <> '') then begin
             case MemberNotificationEntry."Notification Engine" OF
                 MemberNotificationEntry."Notification Engine"::M2_EMAILER:
                     ResponseMessage := SendEmailUsingM2Engine(MemberNotificationEntry);
                 MemberNotificationEntry."Notification Engine"::NATIVE:
-                    ResponseMessage := EMailMgt.SendEmail(RecordRef, MemberNotificationEntry."E-Mail Address", true);
+                    EMailMgt.AttemptSendEmail(RecordRef, MemberNotificationEntry."E-Mail Address", ResponseMessage);
             end;
         end;
 
