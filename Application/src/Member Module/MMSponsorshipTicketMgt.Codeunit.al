@@ -257,6 +257,8 @@
                 if (SponsorshipTicketEntry."Notification Address" = '') then
                     SponsorshipTicketEntry."Notification Address" := TicketReservationRequest."Notification Address";
 
+                Commit();
+
                 case TicketReservationRequest."Notification Method" of
 
                     TicketReservationRequest."Notification Method"::EMAIL:
@@ -271,9 +273,9 @@
                                 SendStatus := SponsorshipTicketEntry."Notification Send Status"::DELIVERED;
                         end;
                     else begin
-                            SendStatus := SponsorshipTicketEntry."Notification Send Status"::NOT_DELIVERED;
-                            ResponseMessage := 'Unhandled notification method.';
-                        end;
+                        SendStatus := SponsorshipTicketEntry."Notification Send Status"::NOT_DELIVERED;
+                        ResponseMessage := 'Unhandled notification method.';
+                    end;
                 end;
             end;
         end else begin
@@ -331,7 +333,7 @@
 
         ResponseMessage := 'E-Mail address is missing.';
         if (SponsorshipTicketEntry."Notification Address" <> '') then
-            ResponseMessage := EMailMgt.SendEmail(RecordRef, SponsorshipTicketEntry."Notification Address", true);
+            EMailMgt.AttemptSendEmail(RecordRef, SponsorshipTicketEntry."Notification Address", ResponseMessage);
 
         exit(ResponseMessage = '');
     end;
