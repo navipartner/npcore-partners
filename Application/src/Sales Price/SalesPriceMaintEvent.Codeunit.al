@@ -196,6 +196,7 @@
                         end;
 
                         PriceListLine.Init();
+                        PriceListLine."Price List Code" := PriceListHeader.Code;
                         PriceListLine.CopyFrom(PriceListHeader);
                         PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
                         PriceListLine.Validate("Asset No.", Item."No.");
