@@ -192,13 +192,9 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
     begin
         case step of
             'import_sales_doc':
-                begin
-                    FrontEnd.WorkflowResponse(ImportSalesDoc(Context));
-                end;
+                FrontEnd.WorkflowResponse(ImportSalesDoc(Context));
             'export_SalesDoc':
-                begin
-                    ExportSalesDoc(Context, FrontEnd);
-                end;
+                FrontEnd.WorkflowResponse(ExportSalesDoc(Context));
         end;
     end;
 
@@ -206,7 +202,7 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionReverseSale.js###
-'let main=async({workflow:a})=>{const{parameters:e}=await a.respond("import_sales_doc");await a.run("IMPORT_POSTED_INV",{parameters:e}),await a.respond("export_SalesDoc")};'
+'let main=async({workflow:a})=>{const{parameters:e}=await a.respond("import_sales_doc");await a.run("IMPORT_POSTED_INV",{parameters:e});const{expParameters:t}=await a.respond("export_SalesDoc");await a.run("SALES_DOC_EXP",{parameters:t})};'
         )
     end;
 
@@ -253,13 +249,12 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         Response.Add('parameters', Parameters);
     end;
 
-    local procedure ExportSalesDoc(Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure ExportSalesDoc(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
     var
         POSAction: Record "NPR POS Action";
         Invoice: Boolean;
         ShowMsg: Boolean;
         NegBalDocType: Option ReturnOrder,CreditMemo,Restrict;
-        ForcePricesIncVAT: Boolean;
         Ask: Boolean;
         Print: Boolean;
         Receive: Boolean;
@@ -298,6 +293,7 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         DocumentTypePositive: Option "Order",Invoice,Quote,Restrict;
         LocationSource: Option Undefined,"POS Store","POS Sale",SpecificLocation;
         FixedPrepaymentValue: Decimal;
+        Parameters: JsonObject;
         PrintProforma: Boolean;
     begin
         If not POSAction.Get('SALES_DOC_EXP') then
@@ -306,7 +302,7 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         Invoice := Context.GetBooleanParameter('Post');
         ShowMsg := Context.GetBooleanParameter('ShowExportMessage');
         NegBalDocType := Context.GetIntegerParameter('SetNegBalDocumentType');
-        ForcePricesIncVAT := Context.GetBooleanParameter('ForcePricesInclVAT');
+        ForcePricesInclVAT := Context.GetBooleanParameter('ForcePricesInclVAT');
         Ask := Context.GetBooleanParameter('SetAsk');
         Print := Context.GetBooleanParameter('SetPrint');
         Receive := Context.GetBooleanParameter('SetReceive');
@@ -348,55 +344,53 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         FixedPrepaymentValue := Context.GetDecimalParameter('FixedPrepaymentValue');
         PrintProforma := Context.GetBooleanParameter('SetPrintProformaInvoice');
 
-        POSAction.SetWorkflowInvocationParameterUnsafe('SelectCustomer', false);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetNegBalDocumentType', NegBalDocType);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetShowCreationMessage', ShowMsg);
-        POSAction.SetWorkflowInvocationParameterUnsafe('ForcePricesInclVAT', ForcePricesIncVAT);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetAsk', Ask);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetPrint', Print);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetInvoice', Invoice);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetReceive', Receive);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetShip', Ship);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetTransferPostingSetup', TransferPostingSetup);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetAutoReserveSalesLine', false);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetSendPdf2Nav', SendPdf2Nav);
-        POSAction.SetWorkflowInvocationParameterUnsafe('AskExtDocNo', ExtDocNo);
-        POSAction.SetWorkflowInvocationParameterUnsafe('AskAttention', Attention);
-        POSAction.SetWorkflowInvocationParameterUnsafe('AskYourRef', YouRef);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetTransferSalesperson', TransferSalesperson);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetTransferDimensions', TransferDimensions);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetTransferTaxSetup', TransferTaxSetup);
-        POSAction.SetWorkflowInvocationParameterUnsafe('ConfirmExport', ConfirmExport);
-        POSAction.SetWorkflowInvocationParameterUnsafe('PrepaymentDialog', PrepaymentDialog);
-        POSAction.SetWorkflowInvocationParameterUnsafe('FixedPrepaymentValue', FixedPrepaymentValue);
-        POSAction.SetWorkflowInvocationParameterUnsafe('PrintPrepaymentDocument', PrintPrepaymentDocument);
-        POSAction.SetWorkflowInvocationParameterUnsafe('PrintRetailConfirmation', PrintRetailConfirmation);
-        POSAction.SetWorkflowInvocationParameterUnsafe('CheckCustomerCredit', CheckCustomerCredit);
-        POSAction.SetWorkflowInvocationParameterUnsafe('CheckCustomerCreditWarning', CheckCustomerCreditWarning);
-        POSAction.SetWorkflowInvocationParameterUnsafe('OpenDocumentAfterExport', OpenDocumentAfterExport);
-        POSAction.SetWorkflowInvocationParameterUnsafe('PayAndPostInNextSale', PayAndPostInNextSale);
-        POSAction.SetWorkflowInvocationParameterUnsafe('PrintPayAndPostDocument', PrintPayAndPostDocument);
-        POSAction.SetWorkflowInvocationParameterUnsafe('ForcePricesInclVAT', ForcePricesInclVAT);
-        POSAction.SetWorkflowInvocationParameterUnsafe('PrepaymentInputIsAmount', PrepaymentInputIsAmount);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetSend', SetSend);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SendPrepaymentDocument', SendPrepaymentDocument);
-        POSAction.SetWorkflowInvocationParameterUnsafe('Pdf2NavPrepaymentDocument', Pdf2NavPrepaymentDocument);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SendPayAndPostDocument', SendPayAndPostDocument);
-        POSAction.SetWorkflowInvocationParameterUnsafe('Pdf2NavPayAndPostDocument', Pdf2NavPayAndPostDocument);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SelectCustomer', false);
-        POSAction.SetWorkflowInvocationParameterUnsafe('ShowDocumentPaymentMenu', ShowDocumentPaymentMenu);
-        POSAction.SetWorkflowInvocationParameterUnsafe('BlockEmptySale', BlockEmptySale);
-        POSAction.SetWorkflowInvocationParameterUnsafe('UseLocationFrom', LocationSource);
-        POSAction.SetWorkflowInvocationParameterUnsafe('UseSpecLocationCode', UseSpecLocationCode);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SendICOrderConfirmation', SendICOrderConfirmation);
-        POSAction.SetWorkflowInvocationParameterUnsafe('PaymentMethodCodeFrom', PaymentMethodCodeSource);
-        POSAction.SetWorkflowInvocationParameterUnsafe('PaymentMethodCode', PaymentMethodCode);
-        POSAction.SetWorkflowInvocationParameterUnsafe('CustomerTableView', '');
-        POSAction.SetWorkflowInvocationParameterUnsafe('CustomerLookupPage', 0);
-        POSAction.SetWorkflowInvocationParameterUnsafe('EnforceCustomerFilter', EnforceCustomerFilter);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetDocumentType', DocumentTypePositive);
-        POSAction.SetWorkflowInvocationParameterUnsafe('SetPrintProformaInvoice', PrintProforma);
+        Parameters.Add('SelectCustomer', false);
+        Parameters.Add('SetNegBalDocumentType', NegBalDocType);
+        Parameters.Add('SetShowCreationMessage', ShowMsg);
+        Parameters.Add('SetAsk', Ask);
+        Parameters.Add('SetPrint', Print);
+        Parameters.Add('SetInvoice', Invoice);
+        Parameters.Add('SetReceive', Receive);
+        Parameters.Add('SetShip', Ship);
+        Parameters.Add('SetTransferPostingSetup', TransferPostingSetup);
+        Parameters.Add('SetAutoReserveSalesLine', false);
+        Parameters.Add('SetSendPdf2Nav', SendPdf2Nav);
+        Parameters.Add('AskExtDocNo', ExtDocNo);
+        Parameters.Add('AskAttention', Attention);
+        Parameters.Add('AskYourRef', YouRef);
+        Parameters.Add('SetTransferSalesperson', TransferSalesperson);
+        Parameters.Add('SetTransferDimensions', TransferDimensions);
+        Parameters.Add('SetTransferTaxSetup', TransferTaxSetup);
+        Parameters.Add('ConfirmExport', ConfirmExport);
+        Parameters.Add('PrepaymentDialog', PrepaymentDialog);
+        Parameters.Add('FixedPrepaymentValue', FixedPrepaymentValue);
+        Parameters.Add('PrintPrepaymentDocument', PrintPrepaymentDocument);
+        Parameters.Add('PrintRetailConfirmation', PrintRetailConfirmation);
+        Parameters.Add('CheckCustomerCredit', CheckCustomerCredit);
+        Parameters.Add('CheckCustomerCreditWarning', CheckCustomerCreditWarning);
+        Parameters.Add('OpenDocumentAfterExport', OpenDocumentAfterExport);
+        Parameters.Add('PayAndPostInNextSale', PayAndPostInNextSale);
+        Parameters.Add('PrintPayAndPostDocument', PrintPayAndPostDocument);
+        Parameters.Add('ForcePricesInclVAT', ForcePricesInclVAT);
+        Parameters.Add('PrepaymentInputIsAmount', PrepaymentInputIsAmount);
+        Parameters.Add('SetSend', SetSend);
+        Parameters.Add('SendPrepaymentDocument', SendPrepaymentDocument);
+        Parameters.Add('Pdf2NavPrepaymentDocument', Pdf2NavPrepaymentDocument);
+        Parameters.Add('SendPayAndPostDocument', SendPayAndPostDocument);
+        Parameters.Add('Pdf2NavPayAndPostDocument', Pdf2NavPayAndPostDocument);
+        Parameters.Add('ShowDocumentPaymentMenu', ShowDocumentPaymentMenu);
+        Parameters.Add('BlockEmptySale', BlockEmptySale);
+        Parameters.Add('UseLocationFrom', LocationSource);
+        Parameters.Add('UseSpecLocationCode', UseSpecLocationCode);
+        Parameters.Add('SendICOrderConfirmation', SendICOrderConfirmation);
+        Parameters.Add('PaymentMethodCodeFrom', PaymentMethodCodeSource);
+        Parameters.Add('PaymentMethodCode', PaymentMethodCode);
+        Parameters.Add('CustomerTableView', '');
+        Parameters.Add('CustomerLookupPage', 0);
+        Parameters.Add('EnforceCustomerFilter', EnforceCustomerFilter);
+        Parameters.Add('SetDocumentType', DocumentTypePositive);
+        Parameters.Add('SetPrintProformaInvoice', PrintProforma);
 
-        FrontEnd.InvokeWorkflow(POSAction);
+        Response.Add('expParameters', Parameters);
     end;
 }
