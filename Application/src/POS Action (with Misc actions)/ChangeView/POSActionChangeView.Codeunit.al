@@ -7,7 +7,7 @@ codeunit 6150724 "NPR POS Action - Change View" implements "NPR IPOS Workflow"
         ActionDescription: Label 'Changes the current view.';
         ParamViewCode_CptLbl: Label 'View Code';
         ParamViewCode_DescLbl: Label 'Specifies View Code';
-        ParamViewType_OptLbl: Label 'Login,Sale,Payment,Balance,Locked';
+        ParamViewType_OptLbl: Label 'Login,Sale,Payment,Balance,Locked', Locked = true;
         ParamViewType_CptLbl: Label 'View Type';
         ParamViewType_DescLbl: Label 'Specifies View Type';
     begin
@@ -46,7 +46,7 @@ codeunit 6150724 "NPR POS Action - Change View" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionChangeView.js###
-        'let main=async({})=>{await workflow.respond("ChangeView")};'
+'let main=async({})=>{await workflow.respond("ChangeView")};'
         )
     end;
 }

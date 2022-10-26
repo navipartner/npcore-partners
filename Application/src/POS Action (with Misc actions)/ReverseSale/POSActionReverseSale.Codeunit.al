@@ -11,7 +11,7 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         ParamSalesDocViewString_DescLbl: Label 'Pre-filtered Posted Sales Invoice View';
         ParamLocationFrom_CptLbl: Label 'Location From';
         ParamLocationFrom_DescLbl: Label 'Pre-filtered location option';
-        ParamLocationFrom_OptionsLbl: Label 'POS Store,Location Filter Parameter';
+        ParamLocationFrom_OptionsLbl: Label 'POS Store,Location Filter Parameter', Locked = true;
         ParamLocationFrom_OptionsCptLbl: Label 'POS Store, Location Filter Parameter';
         ParamLocation_CptLbl: Label 'Location Filter';
         ParamLocation_DescLbl: Label 'Pre-filtered location';
@@ -100,14 +100,16 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         ParamPaymentMethodCode_CptLbl: Label 'Payment Method Code';
         ParamPaymentMethodCode_DescLbl: Label 'Select Payment Method Code to be used for sales document';
         ParamPaymentMethodCodeFromOptins_CptLbl: Label 'Sales Header Default,Force Blank Code,Specific Payment Method Code';
+        ParamPaymentMethodCodeFrom_OptLbl: Label 'Sales Header Default,Force Blank Code,Specific Payment Method Code', Locked = true;
         ParamPaymentMethodCodeFrom_CptLbl: Label 'Use Payment Method Code From';
         ParamPaymentMethodCodeFrom_DescLbl: Label 'Select source of payment method code for sales document';
         ParamSetDocumentType_CptLbl: Label 'Document Type';
         ParamSetDocumentType_DescLbl: Label 'Sales Document to create on positive sales balance';
         ParamSetDocumentTypeOptions_CptLbl: Label 'Order,Invoice,Quote,Restrict';
+        ParamSetDocumentType_OptLbl: Label 'Order,Invoice,Quote,Restrict', Locked = true;
         ParamSetNegDocumentType_CptLbl: Label 'Negative Document Type';
         ParamSetNegDocumentType_DescLbl: Label 'Sales Document to create on negative sales balance';
-        ParamSetNegDocumentTypeOptions_Lbl: Label 'ReturnOrder,CreditMemo,Restrict';
+        ParamSetNegDocumentTypeOptions_Lbl: Label 'ReturnOrder,CreditMemo,Restrict', Locked = true;
         ParamSetNegDocumentTypeOptions_CptLbl: Label 'Return Order,Credit Memo,Restrict';
         ParamProformaInv_CptLbl: Label 'Set Print Proforma Invoice';
         ParamProformaInv_DescLbl: Label 'Set Print Proforma Invoice for export document';
@@ -123,8 +125,8 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
                                           ParamLocationFrom_DescLbl,
                                           ParamLocationFrom_OptionsCptLbl);
         WorkflowConfig.AddOptionParameter('PaymentMethodCodeFrom',
-                                           ParamPaymentMethodCodeFromOptins_CptLbl,
-                                           SelectStr(1, ParamPaymentMethodCodeFromOptins_CptLbl),
+                                           ParamPaymentMethodCodeFrom_OptLbl,
+                                           SelectStr(1, ParamPaymentMethodCodeFrom_OptLbl),
                                            ParamPaymentMethodCodeFrom_CptLbl,
                                            ParamPaymentMethodCodeFrom_DescLbl,
                                            ParamPaymentMethodCodeFromOptins_CptLbl);
@@ -141,8 +143,8 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('SetReceive', false, ParamReceive_CptLbl, ParamReceive_DescLbl);
         WorkflowConfig.AddBooleanParameter('SetShip', false, ParamShip_CptLbl, ParamShip_DescLbl);
         WorkflowConfig.AddOptionParameter('SetDocumentType',
-                                           ParamSetDocumentTypeOptions_CptLbl,
-                                           SelectStr(1, ParamSetDocumentTypeOptions_CptLbl),
+                                           ParamSetDocumentType_OptLbl,
+                                           SelectStr(1, ParamSetDocumentType_OptLbl),
                                            ParamSetDocumentType_CptLbl,
                                            ParamSetDocumentType_DescLbl,
                                            ParamSetDocumentTypeOptions_CptLbl);
