@@ -15,9 +15,9 @@
 
         ReplicationJobQueueCategoryCode: Label 'REP', locked = true;
 
-        ReplicationCounterEvaluateErr: Label 'Cannot evaluate Replication Counter value %1 into a BigInteger.';
+        ReplicationCounterEvaluateErr: Label 'Cannot evaluate %1 value %2 into a BigInteger.';
 
-        ReplicationCounterCannotBeEmptyErr: Label 'Replication Counter cannot be empty.';
+        ReplicationCounterCannotBeEmptyErr: Label '%1 cannot be empty.';
 
         MissingFieldInJsonErr: Label 'Field %1 is missing. Please contact support.';
 
@@ -317,15 +317,28 @@
         if not JTokenEntity.IsObject() then
             exit;
 
+#IF (BC17 or BC18 or BC19 or BC20)
         if SelectJsonToken(JTokenEntity.AsObject(), '$.replicationCounter') = '' then
-            Error(ReplicationCounterCannotBeEmptyErr);
+            Error(ReplicationCounterCannotBeEmptyErr,'Replication Counter');
+#ELSE
+        if SelectJsonToken(JTokenEntity.AsObject(), '$.systemRowVersion') = '' then
+            Error(ReplicationCounterCannotBeEmptyErr, 'System Row Version');
+#ENDIF
 
+#IF (BC17 or BC18 or BC19 or BC20)
         if Evaluate(RepCounter, SelectJsonToken(JTokenEntity.AsObject(), '$.replicationCounter')) then begin
+#ELSE
+        if Evaluate(RepCounter, SelectJsonToken(JTokenEntity.AsObject(), '$.systemRowVersion')) then begin
+#ENDIF
             if RepCounter > ReplicationEndPoint."Replication Counter" then
                 UpdateSQLTimestampEndpoint(ReplicationEndPoint, RepCounter);
             System.ClearLastError();
         end else
-            Error(ReplicationCounterEvaluateErr, SelectJsonToken(JTokenEntity.AsObject(), '$.replicationCounter'));
+#IF (BC17 or BC18 or BC19 or BC20)
+            Error(ReplicationCounterEvaluateErr, 'Replication Counter', SelectJsonToken(JTokenEntity.AsObject(), '$.replicationCounter'));
+#ELSE
+            Error(ReplicationCounterEvaluateErr, 'System Row Version', SelectJsonToken(JTokenEntity.AsObject(), '$.systemRowVersion'));
+#ENDIF
     end;
 
     procedure UpdateSQLTimestampEndpoint(var Endpoint: Record "NPR Replication Endpoint"; pRepCounter: BigInteger)
@@ -481,8 +494,13 @@
             RepCounter := ReplicationEndPoint."Replication Counter";
             //%1 = company ID, %2 = replication Counter
             URI := StrSubstNo(URI, ReplicationSetup.GetCompanyId(), Format(RepCounter));
+#IF (BC17 or BC18 or BC19 or BC20)
             if not URI.Contains('$orderby=replicationCounter') then
                 URI += '&$orderby=replicationCounter';
+#ELSE
+            if not URI.Contains('$orderby=systemRowVersion') then
+                URI += '&$orderby=systemRowVersion';
+#ENDIF
             AddFixedFilterToURI(URI, ReplicationEndPoint."Fixed Filter");
             ReplicationSetup.AddTenantToURL(URI);
         end else begin
@@ -712,7 +730,11 @@
     var
         ReplicationCounterOfEntity: BigInteger;
     begin
+#IF (BC17 or BC18 or BC19 or BC20)
         if Evaluate(ReplicationCounterOfEntity, SelectJsonToken(JToken.AsObject(), '$.replicationCounter')) then;
+#ELSE
+        if Evaluate(ReplicationCounterOfEntity, SelectJsonToken(JToken.AsObject(), '$.systemRowVersion')) then;
+#ENDIF
         Exit(NOT (ReplicationCounterOfEntity < ReplicationEndPoint."Replication Counter")); // means that we try to manually process an older version of the record which would overwrite latest changes.
     end;
 

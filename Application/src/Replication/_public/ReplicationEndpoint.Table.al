@@ -126,7 +126,11 @@
         field(20; "Replication Counter"; BigInteger)
         {
             DataClassification = CustomerContent;
+#IF (BC17 or BC18 or BC19 or BC20)
             Caption = 'Replication Counter';
+#ELSE
+            Caption = 'System Row Version';
+#ENDIF
         }
     }
     keys

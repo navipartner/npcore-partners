@@ -7,7 +7,6 @@ query 6014409 "NPR APIV1 - Aux Items Read"
     APIVersion = 'v1.0';
     EntityName = 'auxItemRead';
     EntitySetName = 'auxItemsRead';
-    OrderBy = ascending(replicationCounter);
     QueryType = API;
     ReadState = ReadShared;
     ObsoleteState = Pending;

@@ -8,10 +8,14 @@ codeunit 6059774 "NPR Rep. WS Functions"
         ReplicationKeyIndex: Integer;
     begin
         RecRef.Open(tableId); //open RecordRef using table id.
+#IF (BC17 or BC18 or BC19 or BC20)
         if not DataTypeMgmt.FindFieldByName(RecRef, FRef, 'NPR Replication Counter') then
             if not DataTypeMgmt.FindFieldByName(RecRef, FRef, 'Replication Counter') then
                 Error('Replication Counter field not found.');
-
+#ELSE
+        if not DataTypeMgmt.FindFieldByName(RecRef, FRef, 'timestamp') then
+            Error('SystemRowVersion field not found.'); // should not be possible, but just in case
+#ENDIF
         ReplicationKeyIndex := GetReplicationCounterKeyIndex(RecRef, FRef);
         IF ReplicationKeyIndex <= 1 then
             Error(MissingKeyReplicationCounterErr, RecRef.Name, FRef.Name);

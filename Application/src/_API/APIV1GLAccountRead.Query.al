@@ -9,7 +9,6 @@
     OrderBy = ascending(replicationCounter);
     QueryType = API;
     ReadState = ReadShared;
-
     elements
     {
         dataitem(glAccount; "G/L Account")
@@ -254,10 +253,12 @@
                 {
                     Caption = 'Retail Payment', Locked = true;
                 }
-
                 column(replicationCounter; "Replication Counter")
                 {
                     Caption = 'replicationCounter', Locked = true;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Replaced by SystemRowVersion';
+                    ObsoleteTag = '21';
                 }
             }
         }

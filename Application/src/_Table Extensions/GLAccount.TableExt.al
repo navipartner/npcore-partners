@@ -45,6 +45,15 @@ tableextension 6014419 "NPR G/L Account" extends "G/L Account"
         }
 
     }
+
+    keys
+    {
+#IF NOT (BC17 or BC18 or BC19 or BC20)
+        key("NPR Key1"; SystemRowVersion)
+        {
+        }
+#ENDIF
+    }
     var
         _AuxGLAccount: Record "NPR Aux. G/L Account";
 
@@ -80,4 +89,5 @@ tableextension 6014419 "NPR G/L Account" extends "G/L Account"
                 _AuxGLAccount."No." := Rec."No.";
             end;
     end;
+
 }

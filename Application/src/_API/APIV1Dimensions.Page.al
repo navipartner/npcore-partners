@@ -74,7 +74,16 @@ page 6014469 "NPR APIV1 - Dimensions"
                 field(replicationCounter; Rec."NPR Replication Counter")
                 {
                     Caption = 'replicationCounter', Locked = true;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Replaced by SystemRowVersion';
+                    ObsoleteTag = '21';
                 }
+#IF NOT (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'systemRowVersion', Locked = true;
+                }
+#ENDIF
                 part(dimensionValues; "NPR APIV1 - Dimension Values")
                 {
                     Caption = 'Dimension Values', Locked = true;
