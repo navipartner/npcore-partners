@@ -119,7 +119,7 @@
         end;
 
         RecordRef.GetTable(TicketParticipantWks);
-        ResponseMessage := EMailMgt.SendEmail(RecordRef, TicketParticipantWks."Notification Address", true);
+        EMailMgt.AttemptSendEmail(RecordRef, TicketParticipantWks."Notification Address", ResponseMessage);
         exit(ResponseMessage = '');
     end;
 
@@ -158,7 +158,7 @@
         end;
 
         RecordRef.GetTable(TicketNotificationEntry);
-        ResponseMessage := EMailMgt.SendEmail(RecordRef, TicketNotificationEntry."Notification Address", true);
+        EMailMgt.AttemptSendEmail(RecordRef, TicketNotificationEntry."Notification Address", ResponseMessage);
         exit(ResponseMessage = '');
     end;
 

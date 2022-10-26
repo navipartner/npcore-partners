@@ -22,7 +22,18 @@
         AttachmentNoData: Label 'No data in %1';
         NoOutputFromReport: Label 'No output from report.';
         EmailTemplateErr: Label 'Email template doesn''t support email adresses longer than 250 characters';
+        _EmailTemplateDataRecRef: RecordRef;
+        _EmailRecipientAddress: Text;
 
+
+    trigger OnRun()
+    var
+        ErrorMessage: Text;
+    begin
+        ErrorMessage := SendEmail(_EmailTemplateDataRecRef, _EmailRecipientAddress, true);
+        if (ErrorMessage <> '') then
+            Error(ErrorMessage);
+    end;
 
     procedure MakeMessage(Template: Record "NPR E-mail Template Header"; RecordVariant: Variant) EmailMessage: Text
     var
@@ -64,6 +75,28 @@
         if RecRef.RecordId = EmptyRecRef.RecordId then
             exit(true);
         exit(RecRef.IsEmpty());
+    end;
+
+    procedure AttemptSendEmail(var RecRef: RecordRef; RecipientEmail: Text; var ErrorMessage: Text): Boolean;
+    var
+        EmailManager: Codeunit "NPR E-mail Management";
+    begin
+        ErrorMessage := '';
+        ClearLastError();
+
+        EmailManager.SetOnRunParameters(RecRef, RecipientEmail);
+
+        if (EmailManager.Run()) then
+            exit(true);
+
+        ErrorMessage := GetLastErrorText();
+        exit(false);
+    end;
+
+    internal procedure SetOnRunParameters(var RecRef: RecordRef; RecipientEmail: Text)
+    begin
+        _EmailTemplateDataRecRef := RecRef;
+        _EmailRecipientAddress := RecipientEmail;
     end;
 
     procedure SendEmail(var RecRef: RecordRef; RecipientEmail: Text; Silent: Boolean) ErrorMessage: Text
@@ -800,6 +833,8 @@
         EmailLog.SetRange("Primary Key", RecRef.GetPosition(false));
         Page.Run(Page::"NPR E-mail Log", EmailLog);
     end;
+
+
 
     local procedure VerifyEmailAddress(RecipientEmail: Text) NewRecipientEmail: Text
     var

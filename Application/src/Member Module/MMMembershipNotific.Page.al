@@ -171,13 +171,13 @@
         {
             action("Send Notifications")
             {
-                Caption = 'Send Notifications';
+                Caption = 'Send Notification';
                 Image = SendTo;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
 
-                ToolTip = 'Executes the Send Notifications action';
+                ToolTip = 'Executes the Send Notification action for selected record.';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 trigger OnAction()

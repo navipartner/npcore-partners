@@ -193,6 +193,14 @@
                 ToolTip = 'Executes the Renewal Notification List action';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
+            action(ViewNotifications)
+            {
+                Caption = 'View Notifications';
+                ToolTip = 'Navigate to the Notification List Page';
+                Image = Interaction;
+                RunObject = Page "NPR MM Membership Notific.";
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+            }
         }
         area(processing)
         {
@@ -264,6 +272,23 @@
 
                 end;
             }
+
+            action(SendNotifications)
+            {
+                Caption = 'Send Pending Notification (Batch)';
+                ToolTip = 'This action sends all pending notification scheduled to be sent today and handled by "batch" method.';
+                Image = SendToMultiple;
+                ApplicationArea = NPRMembershipAdvanced;
+
+                trigger OnAction()
+                var
+                    NotificationHandler: Codeunit "NPR MM Member Notification";
+                begin
+                    if (Confirm('This action will send emails and text messages based on pending notification entries. Do you want to continue', false)) then
+                        NotificationHandler.HandleBatchNotifications(Today);
+                end;
+            }
+
             action(RefreshRenewNotification)
             {
                 Caption = 'Refresh Renew Notification';
