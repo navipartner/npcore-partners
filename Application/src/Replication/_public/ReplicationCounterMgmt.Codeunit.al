@@ -1,11 +1,16 @@
 ﻿codeunit 6014626 "NPR Replication Counter Mgmt."
 {
     Access = Public;
-    #region General
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Replication Counter is replaced by SystemRowVersion';
+    ObsoleteTag = '21';
     procedure UpdateReplicationCounter(RecRef: RecordRef; ReplicationCounterFieldNo: Integer)
     var
+#IF (BC17 or BC18 or BC19 or BC20)
         FRefReplicationCounter: FieldRef;
+#ENDIF
     begin
+#IF (BC17 or BC18 or BC19 or BC20)
         if not CheckReplicationCounterUpdateIsEnabled() then
             exit;
 
@@ -14,8 +19,10 @@
 
         FRefReplicationCounter := RecRef.Field(ReplicationCounterFieldNo);
         FRefReplicationCounter.Value := NumberSequence.Next('NPRReplicationModule_' + Format(RecRef.Number), true);
+#ENDIF
     end;
 
+#IF (BC17 or BC18 or BC19 or BC20)
     local procedure CheckReplicationCounterUpdateIsEnabled(): Boolean
     var
         ReplicationSetupSourceCompany: Record "NPR Replication Setup (Source)";
@@ -23,7 +30,6 @@
         if ReplicationSetupSourceCompany.Get() then
             exit(ReplicationSetupSourceCompany."Enable Replication Counter");
     end;
-    #endregion
 
     #region CustomTables
     [EventSubscriber(ObjectType::Table, Database::"NPR Variety Group", 'OnBeforeInsertEvent', '', false, false)]
@@ -2686,5 +2692,5 @@
         end;
     end;
     #endregion
-
+#ENDIF
 }

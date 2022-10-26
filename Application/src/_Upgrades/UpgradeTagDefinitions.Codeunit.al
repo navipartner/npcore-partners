@@ -263,7 +263,7 @@
             Codeunit::"NPR UPG DE Audit Setup":
                 Exit('RemoveDEFiskalyPOSWorkflowStep');
             Codeunit::"NPR UPG Types":
-                Exit('NPRUPGTypes-5b2bdcc7-e8b0-4099-8581-aeef6f231f1c');                
+                Exit('NPRUPGTypes-5b2bdcc7-e8b0-4099-8581-aeef6f231f1c');
             Codeunit::"NPR Job Queue Upgrade":
                 Exit('NPRUpgradePriceLogTaskQue');
             Codeunit::"NPR UPG PaymentV2":
@@ -276,6 +276,8 @@
                 Exit('NPRUPGNpXmlTemplateFtpFieldsToNcEndpoint');
             Codeunit::"NPR TM Calendar Upgrade":
                 Exit('NPR_TMCalendarUpgrade_20221011');
+            Codeunit::"NPR Rep. Timestamp Upgrade":
+                Exit('NPR_RepCounterToSQLTimestampUPG_20221025');
         end;
     end;
 }

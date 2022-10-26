@@ -195,7 +195,11 @@ codeunit 85042 "NPR Replication API Tests"
         RepEndpoint."EndPoint ID" := LibraryUtility.GenerateRandomText(50);
         RepEndpoint."Endpoint Method" := RepEndpoint."Endpoint Method"::"Get BC Generic Data";
         RepEndpoint."Table ID" := Database::"Unit of Measure";
+#IF (BC17 or BC18 or BC19 or BC20)
         RepEndpoint.Path := '/navipartner/core/v1.0/companies(%1)/unitsOfMeasure/?$filter=replicationCounter gt %2&$orderby=replicationCounter';
+#ELSE
+        RepEndpoint.Path := '/navipartner/core/v1.0/companies(%1)/unitsOfMeasure/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion';
+#ENDIF
         RepEndpoint."Sequence Order" := 100;
         RepEndpoint."odata.maxpagesize" := 2;
         RepEndpoint."Replication Counter" := 0;

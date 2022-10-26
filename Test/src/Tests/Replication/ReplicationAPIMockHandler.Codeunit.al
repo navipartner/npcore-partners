@@ -61,7 +61,11 @@ codeunit 85043 "Replication API Mock Handler"
                                 '"internationalStandardCode": "",' +
                                 '"symbol": "",' +
                                 '"lastModifiedDateTime": "2020-09-23T15:14:08.447Z",' +
+#IF (BC17 or BC18 or BC19 or BC20)
                                 '"replicationCounter": 1' +
+#ELSE
+                                '"systemRowVersion": 1' +
+#ENDIF
                             '},' +
                             '{' +
                                  '"id": "' + CreateGUID() + '",' +
@@ -70,7 +74,11 @@ codeunit 85043 "Replication API Mock Handler"
                                 '"internationalStandardCode": "",' +
                                 '"symbol": "",' +
                                 '"lastModifiedDateTime": "2020-09-23T15:14:08.447Z",' +
+#IF (BC17 or BC18 or BC19 or BC20)
                                 '"replicationCounter": 2' +
+#ELSE
+                                '"systemRowVersion": 2' +
+#ENDIF
                             '},' +
                         ']' +
                     '}'
@@ -86,7 +94,11 @@ codeunit 85043 "Replication API Mock Handler"
                                 '"internationalStandardCode": "",' +
                                 '"symbol": "",' +
                                 '"lastModifiedDateTime": "2020-09-23T15:14:08.447Z",' +
+#IF (BC17 or BC18 or BC19 or BC20)
                                 '"replicationCounter": 3' +
+#ELSE
+                                '"systemRowVersion": 3' +
+#ENDIF
                             '},' +
                             '{' +
                                  '"id": "",' +
@@ -95,7 +107,11 @@ codeunit 85043 "Replication API Mock Handler"
                                 '"internationalStandardCode": "",' +
                                 '"symbol": "",' +
                                 '"lastModifiedDateTime": "2020-09-23T15:14:08.447Z",' +
+#IF (BC17 or BC18 or BC19 or BC20)
                                 '"replicationCounter": 4' +
+#ELSE
+                                '"systemRowVersion": 4' +
+#ENDIF
                             '},' +
                         ']' +
                     '}'
@@ -111,7 +127,11 @@ codeunit 85043 "Replication API Mock Handler"
                                 '"internationalStandardCode": "",' +
                                 '"symbol": "",' +
                                 '"lastModifiedDateTime": "2020-09-23T15:14:08.447Z",' +
+#IF (BC17 or BC18 or BC19 or BC20)
                                 '"replicationCounter": 5' +
+#ELSE
+                                '"systemRowVersion": 5' +
+#ENDIF
                            '},' +
                            '{' +
                                 '"id": "",' +
@@ -120,7 +140,11 @@ codeunit 85043 "Replication API Mock Handler"
                                 '"internationalStandardCode": "",' +
                                 '"symbol": "",' +
                                 '"lastModifiedDateTime": "2020-09-23T15:14:08.447Z",' +
+#IF (BC17 or BC18 or BC19 or BC20)
                                 '"replicationCounter": 6' +
+#ELSE
+                                '"systemRowVersion": 6' +
+#ENDIF
                            '},' +
                        ']' +
                    '}'

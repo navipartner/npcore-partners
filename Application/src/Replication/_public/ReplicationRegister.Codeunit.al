@@ -27,240 +27,418 @@ codeunit 6014608 "NPR Replication Register"
 
         #region Item related endpoints data
         ItemsEndPointIDLbl: Label 'GetItems', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         ItemsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/items/?$expand=picture&$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        ItemsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/items/?$expand=picture&$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         ItemsEndPointDescriptionLbl: Label 'Gets Items from related company. ', Locked = true;
-
         ItemCategoriesEndPointIDLbl: Label 'GetItemCategories', Locked = true;
         ItemCategoriesEndPointDescriptionLbl: Label 'Gets Item Categories from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         ItemCategoriesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemCategories/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        ItemCategoriesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemCategories/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         VarGroupsEndPointIDLbl: Label 'GetVarietyGroups', Locked = true;
         VarGroupsEndPointDescriptionLbl: Label 'Gets Variety Groups from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         VarGroupsPathLbl: Label '/navipartner/variety/v1.0/companies(%1)/varietyGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        VarGroupsPathLbl: Label '/navipartner/variety/v1.0/companies(%1)/varietyGroups/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         VarietiesEndPointIDLbl: Label 'GetVarieties', Locked = true;
         VarietiesEndPointDescriptionLbl: Label 'Gets Varieties from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         VarietiesPathLbl: Label '/navipartner/variety/v1.0/companies(%1)/varieties/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        VarietiesPathLbl: Label '/navipartner/variety/v1.0/companies(%1)/varieties/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         VarietyTablesEndPointIDLbl: Label 'GetVarietyTables', Locked = true;
         VarietyTablesEndPointDescriptionLbl: Label 'Gets Variety Tables from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         VarietyTablesPathLbl: Label '/navipartner/variety/v1.0/companies(%1)/varietyTables/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        VarietyTablesPathLbl: Label '/navipartner/variety/v1.0/companies(%1)/varietyTables/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         VarietyValuesEndPointIDLbl: Label 'GetVarietyValues', Locked = true;
         VarietyValuesEndPointDescriptionLbl: Label 'Gets Variety Values from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         VarietyValuesPathLbl: Label '/navipartner/variety/v1.0/companies(%1)/varietyValues/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        VarietyValuesPathLbl: Label '/navipartner/variety/v1.0/companies(%1)/varietyValues/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         ItemVariantsEndPointIDLbl: Label 'GetItemVariants', Locked = true;
         ItemVariantsEndPointDescriptionLbl: Label 'Gets Item Variants from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         ItemVariantsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemVariants/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        ItemVariantsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemVariants/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         ItemReferencesEndPointIDLbl: Label 'GetItemReferences', Locked = true;
         ItemReferencesEndPointDescriptionLbl: Label 'Gets Item References from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         ItemReferencesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemReferences/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        ItemReferencesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemReferences/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         ItemTranslationsEndPointIDLbl: Label 'GetItemTranslations', Locked = true;
         ItemTranslationsEndPointDescriptionLbl: Label 'Gets Item Translations from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         ItemTranslationsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemTranslations/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        ItemTranslationsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemTranslations/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         ItemSubstitutionsEndPointIDLbl: Label 'GetItemSubstitutions', Locked = true;
         ItemSubstitutionsEndPointDescriptionLbl: Label 'Gets Item Substitutions from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         ItemSubstitutionsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemSubstitutions/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        ItemSubstitutionsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemSubstitutions/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         ManufacturersEndPointIDLbl: Label 'GetManufacturers', Locked = true;
         ManufacturersEndPointDescriptionLbl: Label 'Gets Manufacturers from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         ManufacturersPathLbl: Label '/navipartner/core/v1.0/companies(%1)/manufacturers/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        ManufacturersPathLbl: Label '/navipartner/core/v1.0/companies(%1)/manufacturers/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         UOMEndPointIDLbl: Label 'GetUnitsOfMeasure', Locked = true;
         UOMEndPointDescriptionLbl: Label 'Gets Units Of Measure from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         UOMPathLbl: Label '/navipartner/core/v1.0/companies(%1)/unitsOfMeasure/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        UOMPathLbl: Label '/navipartner/core/v1.0/companies(%1)/unitsOfMeasure/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         ItemsUOMEndPointIDLbl: Label 'GetItemsUOM', Locked = true;
         ItemsUOMEndPointDescriptionLbl: Label 'Gets Items Units Of Measure from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         ItemsUOMPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemUnitsOfMeasure/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        ItemsUOMPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemUnitsOfMeasure/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         #endregion
 
         #region Customer endpoints data
         CustomersEndPointIDLbl: Label 'GetCustomers', Locked = true;
         CustomersEndPointDescriptionLbl: Label 'Gets Customers from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         CustomersPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customers/?$expand=picture&$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        CustomersPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customers/?$expand=picture&$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         SalePriceListsEndPointIDLbl: Label 'GetSalePriceListHeaders', Locked = true;
         SalePriceListsEndPointDescriptionLbl: Label 'Gets Sales Price List Headers from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         SalePriceListsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/priceLists/?$filter=(priceType eq Microsoft.NAV.priceType''Sale'') and (replicationCounter gt %2)&$orderby=replicationCounter&$schemaVersion=2.0', Locked = true;
-
+#ELSE
+        SalePriceListsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/priceLists/?$filter=(priceType eq Microsoft.NAV.priceType''Sale'') and (systemRowVersion gt %2)&$orderby=systemRowVersion&$schemaVersion=2.0', Locked = true;
+#ENDIF
         SalePriceListLinesEndPointIDLbl: Label 'GetSalePriceListLines', Locked = true;
         SalePriceListLinesEndPointDescriptionLbl: Label 'Gets Sales Price List Lines from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         SalePriceListLinesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/priceListLines/?$filter=(priceType eq Microsoft.NAV.priceType''Sale'') and (replicationCounter gt %2)&$orderby=replicationCounter&$schemaVersion=2.0', Locked = true;
-
+#ELSE
+        SalePriceListLinesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/priceListLines/?$filter=(priceType eq Microsoft.NAV.priceType''Sale'') and (systemRowVersion gt %2)&$orderby=systemRowVersion&$schemaVersion=2.0', Locked = true;
+#ENDIF
         SalespersonsPurchasersEndPointIDLbl: Label 'GetSalespersons/Purchasers', Locked = true;
         SalespersonsPurchasersEndPointDescriptionLbl: Label 'Gets Salespersons/Purchasers from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         SalespersonsPurchasersPathLbl: Label '/navipartner/core/v1.0/companies(%1)/salespersonsPurchasers/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        SalespersonsPurchasersPathLbl: Label '/navipartner/core/v1.0/companies(%1)/salespersonsPurchasers/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         CustPriceGroupsEndPointIDLbl: Label 'GetCustPriceGroups', Locked = true;
         CustPriceGroupsEndPointDescriptionLbl: Label 'Gets Customer Price Groups from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         CustPriceGroupsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customerPriceGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        CustPriceGroupsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customerPriceGroups/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         CustDiscGroupsEndPointIDLbl: Label 'GetCustDiscountGroups', Locked = true;
         CustDiscGroupsEndPointDescriptionLbl: Label 'Gets Customer Discount Groups from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         CustDiscGroupsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customerDiscountGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        CustDiscGroupsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customerDiscountGroups/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         CustPostingGroupsEndPointIDLbl: Label 'GetCustPostingGroups', Locked = true;
         CustPostingGroupsEndPointDescriptionLbl: Label 'Gets Customer Posting Groups from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         CustPostingGroupsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customerPostGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        CustPostingGroupsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customerPostGroups/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         CustBankAccountsEndPointIDLbl: Label 'GetCustBankAccounts', Locked = true;
         CustBankAccountsEndPointDescriptionLbl: Label 'Gets Customer Bank Accounts from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         CustBankAccountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customerBankAccounts/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        CustBankAccountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/customerBankAccounts/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         #endregion
 
         #region Vendor Endpoints data
         VendorsEndPointIDLbl: Label 'GetVendors', Locked = true;
         VendorsEndPointDescriptionLbl: Label 'Gets Vendors from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         VendorsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/vendors/?$expand=picture&$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        VendorsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/vendors/?$expand=picture&$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         VendorBankAccEndPointIDLbl: Label 'GetVendorBankAccounts', Locked = true;
         VendorBankAccEndPointDescriptionLbl: Label 'Gets Vendor Bank Accounts from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         VendorBankAccPathLbl: Label '/navipartner/core/v1.0/companies(%1)/vendorBankAccounts/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        VendorBankAccPathLbl: Label '/navipartner/core/v1.0/companies(%1)/vendorBankAccounts/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         VendorPostGrEndPointIDLbl: Label 'GetVendorPostingGroups', Locked = true;
         VendorPostGrEndPointDescriptionLbl: Label 'Gets Vendor Posting Groups from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         VendorPostGrPathLbl: Label '/navipartner/core/v1.0/companies(%1)/vendorPostGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        VendorPostGrPathLbl: Label '/navipartner/core/v1.0/companies(%1)/vendorPostGroups/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         VendorItemEndPointIDLbl: Label 'GetVendorItems', Locked = true;
         VendorItemEndPointDescriptionLbl: Label 'Gets Vendor Items from related company.', Locked = true;
+
+#IF (BC17 or BC18 or BC19 or BC20)
         VendorItemPathLbl: Label '/navipartner/core/v1.0/companies(%1)/vendorItems/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        VendorItemPathLbl: Label '/navipartner/core/v1.0/companies(%1)/vendorItems/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         #endregion
 
         #region NP RETAIL endpoints data
         PeriodDiscountsEndPointIDLbl: Label 'GetPeriodicDiscountHeaders', Locked = true;
         PeriodDiscountsEndPointDescriptionLbl: Label 'Gets Periodic Discount Headers from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         PeriodDiscountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/periodDiscounts/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        PeriodDiscountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/periodDiscounts/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         PeriodDiscountLinesEndPointIDLbl: Label 'GetPeriodicDiscountLines', Locked = true;
         PeriodDiscountLinesEndPointDescriptionLbl: Label 'Gets Periodic Discount Lines from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         PeriodDiscountLinesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/periodDiscountLines/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        PeriodDiscountLinesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/periodDiscountLines/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MixedDiscountsEndPointIDLbl: Label 'GetMixedDiscounts', Locked = true;
         MixedDiscountsEndPointDescriptionLbl: Label 'Gets Mixed Discounts Headers from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MixedDiscountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscounts/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MixedDiscountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscounts/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MixedDiscountsTIEndPointIDLbl: Label 'GetMixedDisTimeIntervals', Locked = true;
         MixedDiscountsTIEndPointDescriptionLbl: Label 'Gets Mixed Discounts Time Intervals from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MixedDiscountsTIPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscountTimeIntervals/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MixedDiscountsTIPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscountTimeIntervals/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MixedDiscountsLevelsEndPointIDLbl: Label 'GetMixedDisLevels', Locked = true;
         MixedDiscountsLevelsEndPointDescriptionLbl: Label 'Gets Mixed Discounts Levels from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MixedDiscountsLevelsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscountLevels/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MixedDiscountsLevelsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscountLevels/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MixedDiscountsLinesEndPointIDLbl: Label 'GetMixedDiscLines', Locked = true;
         MixedDiscountsLinesEndPointDescriptionLbl: Label 'Gets Mixed Discounts Lines from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
+
         MixedDiscountsLinesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscountLines/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        MixedDiscountsLinesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/mixedDiscountLines/?$filter=systemRowVersion gt %2&$orderby=systemRowVersions', Locked = true;
+#ENDIF
         #endregion
 
         #region DIMENSIONS endpoints data
         DimensionsEndPointIDLbl: Label 'GetDimensions', Locked = true;
         DimensionsEndPointDescriptionLbl: Label 'Gets Dimensions from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         DimensionsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/dimensions/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        DimensionsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/dimensions/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         DimensionValuesEndPointIDLbl: Label 'GetDimensionValues', Locked = true;
         DimensionValuesEndPointDescriptionLbl: Label 'Gets Dimension Values from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         DimensionValuesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/dimensionValues/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        DimensionValuesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/dimensionValues/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         DefaultDimensionsEndPointIDLbl: Label 'GetDefaultDimensions', Locked = true;
         DefaultDimensionsEndPointDescriptionLbl: Label 'Gets Default Dimensions from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         DefaultDimensionsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/defaultDimensions/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        DefaultDimensionsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/defaultDimensions/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         #endregion
 
         #region MISC endpoints data
         LocationsEndPointIDLbl: Label 'GetLocations', Locked = true;
         LocationsEndPointDescriptionLbl: Label 'Gets Locations from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         LocationsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/locations/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        LocationsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/locations/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         ShipmentMethodsEndPointIDLbl: Label 'GetShipmentMethods', Locked = true;
         ShipmentMethodsEndPointDescriptionLbl: Label 'Gets Shipment Methods from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         ShipmentMethodsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/shipmentMethods/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        ShipmentMethodsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/shipmentMethods/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         PaymentTermsEndPointIDLbl: Label 'GetPaymentTerms', Locked = true;
         PaymentTermsEndPointDescriptionLbl: Label 'Gets Payment Terms from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         PaymentTermsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/paymentTerms/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        PaymentTermsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/paymentTerms/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         PaymentMethodsEndPointIDLbl: Label 'GetPaymentMethods', Locked = true;
         PaymentMethodsEndPointDescriptionLbl: Label 'Gets Payment Methods from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         PaymentMethodsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/paymentMethods/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        PaymentMethodsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/paymentMethods/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         CurrenciesEndPointIDLbl: Label 'GetCurrencies', Locked = true;
         CurrenciesEndPointDescriptionLbl: Label 'Gets Currencies from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         CurrenciesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/currencies/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        CurrenciesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/currencies/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         GLAccountsEndPointIDLbl: Label 'GetGLAccounts', Locked = true;
         GLAccountsEndPointDescriptionLbl: Label 'Gets G/L Accounts from related company.', Locked = true;
-        GLAccountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/glAccountsRead/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
 
+#IF (BC17 or BC18 or BC19 or BC20)
+        GLAccountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/glAccountsRead/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        GLAccountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/glAccounts/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         AuxGLAccountsEndPointIDLbl: Label 'GetAuxGLAccounts', Locked = true;
         AuxGLAccountsEndPointDescriptionLbl: Label 'Gets Aux. G/L Accounts from related company.', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         AuxGLAccountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/glAccountsRead/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        AuxGLAccountsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/auxGLAccounts/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         #endregion
 
         #region MAGENTO endpoints data
         MagentoWebSitesEndPointIDLbl: Label 'GetMagentoWebSites', Locked = true;
         MagentoWebSitesEndPointDescriptionLbl: Label 'Gets Magento Web Sites from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoWebSitesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoWebsites/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoWebSitesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoWebsites/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoWebSiteLinksEndPointIDLbl: Label 'GetMagentoWebSiteLinks', Locked = true;
         MagentoWebSiteLinksEndPointDescriptionLbl: Label 'Gets Magento Web Site Links from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoWebSiteLinksPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoWebsiteLinks/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoWebSiteLinksPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoWebsiteLinks/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoStoresEndPointIDLbl: Label 'GetMagentoStores', Locked = true;
         MagentoStoresEndPointDescriptionLbl: Label 'Gets Magento Stores from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoStoresPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoStores/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoStoresPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoStores/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoPicturesEndPointIDLbl: Label 'GetMagentoPictures', Locked = true;
         MagentoPicturesEndPointDescriptionLbl: Label 'Gets Magento Pictures from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoPicturesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoPictures/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoPicturesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoPictures/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoPictureLinksEndPointIDLbl: Label 'GetMagentoPictureLinks', Locked = true;
         MagentoPictureLinksEndPointDescriptionLbl: Label 'Gets Magento Picture Links from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoPictureLinksPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoPictureLinks/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoPictureLinksPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoPictureLinks/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoCategoriesEndPointIDLbl: Label 'GetMagentoCategories', Locked = true;
         MagentoCategoriesEndPointDescriptionLbl: Label 'Gets Magento Categories from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoCategoriesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoCategories/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoCategoriesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoCategories/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoCategoryLinksEndPointIDLbl: Label 'GetMagentoCategoryLinks', Locked = true;
         MagentoCategoryLinksEndPointDescriptionLbl: Label 'Gets Magento Category Links from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoCategoryLinksPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoCategoryLinks/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoCategoryLinksPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoCategoryLinks/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoBrandsEndPointIDLbl: Label 'GetMagentoBrands', Locked = true;
         MagentoBrandsEndPointDescriptionLbl: Label 'Gets Magento Brands from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoBrandsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoBrands/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoBrandsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoBrands/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoAttributesEndPointIDLbl: Label 'GetMagentoAttributes', Locked = true;
         MagentoAttributesEndPointDescriptionLbl: Label 'Gets Magento Attributes from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoAttributesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoAttributes/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoAttributesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoAttributes/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoAttributeLabelsEndPointIDLbl: Label 'GetMagentoAttribLabels', Locked = true;
         MagentoAttributeLabelsEndPointDescriptionLbl: Label 'Gets Magento Attribute Labels from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoAttributeLabelsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoAttributeLabels/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoAttributeLabelsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoAttributeLabels/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoAttributeSetsEndPointIDLbl: Label 'GetMagentoAttribSets', Locked = true;
         MagentoAttributeSetsEndPointDescriptionLbl: Label 'Gets Magento Attribute Sets from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoAttributeSetsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoAttributeSets/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoAttributeSetsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoAttributeSets/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoAttributeSetValuesEndPointIDLbl: Label 'GetMagentoAttrSetValues', Locked = true;
         MagentoAttributeSetValuesEndPointDescriptionLbl: Label 'Gets Magento Attribute Set Values from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoAttributeSetValuesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoAttributeSetValues/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoAttributeSetValuesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoAttributeSetValues/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoItemAttributesEndPointIDLbl: Label 'GetMagentoItemAttributes', Locked = true;
         MagentoItemAttributesEndPointDescriptionLbl: Label 'Gets Magento Item Attributes from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoItemAttributesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoItemAttributes/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoItemAttributesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoItemAttributes/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoItemAttributeValuesEndPointIDLbl: Label 'GetMagentoItemAttrVal', Locked = true;
         MagentoItemAttributeValuesEndPointDescriptionLbl: Label 'Gets Magento Item Attribute Values from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoItemAttributeValuesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoItemAttributeValues/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
-
+#ELSE
+        MagentoItemAttributeValuesPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoItemAttributeValues/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoDisplayGroupsEndPointIDLbl: Label 'GetMagentoDisplayGrp', Locked = true;
         MagentoDisplayGroupsEndPointDescriptionLbl: Label 'Gets Magento Display Groups from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
         MagentoDisplayGroupsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoDisplayGroups/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        MagentoDisplayGroupsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoDisplayGroups/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
     #endregion
 
     #region Register Service with EndPoints
