@@ -104,8 +104,8 @@
 
         foreach xmlStyle in xmlStyleList do begin
             TempRetailList.Number += 1;
-            TempRetailList.Value := xmlStyle;
-            TempRetailList.Choice := xmlStyle;
+            TempRetailList.Value := CopyStr(xmlStyle, 1, MaxStrLen(TempRetailList.Value));
+            TempRetailList.Choice := CopyStr(xmlStyle, 1, MaxStrLen(TempRetailList.Choice));
             TempRetailList.Insert();
         end;
 

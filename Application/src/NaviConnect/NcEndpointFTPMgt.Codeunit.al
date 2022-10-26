@@ -77,7 +77,9 @@
         TempNcEndPointFTP.Init();
         TempNcEndPointFTP.Copy(NcEndpointFTP);
         TempNcEndPointFTP."Output Nc Task Entry No." := NcTask."Entry No.";
+#pragma warning disable AA0139
         TempNcEndPointFTP.Filename := Filename;
+#pragma warning restore AA0139
         NcTriggerSyncMgt.FillFields(NewTask, TempNcEndPointFTP);
         NcTriggerSyncMgt.AddResponse(NcTask, StrSubstNo(TextTaskInsertedLbl, NcEndpointFTP.Code, NcEndpointFTP.Description, NcEndpointFTP.Server, NewTask."Entry No."));
     end;
@@ -356,7 +358,9 @@
 
         if NcEndpointFTP."File Temporary Extension" <> '' then begin
             OriginalFileName := NcTaskOutput.Name;
+#pragma warning disable AA0139
             NcTaskOutput.Name := NcTaskOutput.Name + '.' + NcEndpointFTP."File Temporary Extension";
+#pragma warning restore AA0139
         end;
 
         if NcEndpointFTP.Directory <> '' then
@@ -605,7 +609,9 @@
         AFSFTPClient.Construct(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, NcEndpointFTP.Port, 10000);
         if NcEndpointFTP."File Temporary Extension" <> '' then begin
             OriginalFileName := NcTaskOutput.Name;
+#pragma warning disable AA0139
             NcTaskOutput.Name := NcTaskOutput.Name + '.' + NcEndpointFTP."File Temporary Extension";
+#pragma warning restore AA0139
         end;
 
         if NcEndpointFTP.Directory <> '' then

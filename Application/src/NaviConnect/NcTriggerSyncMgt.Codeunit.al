@@ -1,4 +1,5 @@
-﻿codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
+﻿#pragma warning disable AA0139
+codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
 {
     Access = Internal;
     TableNo = "Job Queue Entry";

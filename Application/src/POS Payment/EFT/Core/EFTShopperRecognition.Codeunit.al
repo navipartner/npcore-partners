@@ -1,8 +1,6 @@
 ﻿codeunit 6184507 "NPR EFT Shopper Recognition"
 {
     Access = Internal;
-    // NPR5.53/TSA /20191126 CASE 378812 Initial Version
-
 
     trigger OnRun()
     begin
@@ -87,8 +85,10 @@
             if (GetShopperReferenceWorker(EntityType, EntityKey, IntegrationType, ContractType, ContractId, TempEFTShopperRecognition)) then
                 exit(ShopperReference = TempEFTShopperRecognition."Shopper Reference");
 
+#pragma warning disable AA0139
         if (ShopperReference = '') then
             ShopperReference := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+#pragma warning restore AA0139
 
         EFTShopperRecognition."Entity Type" := EntityType;
         EFTShopperRecognition.Validate("Entity Key", EntityKey);

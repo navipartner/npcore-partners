@@ -214,6 +214,7 @@
         OutStr.WriteText(Args);
     end;
 
+#pragma warning disable AA0139
     local procedure GetJValueFromArg(JObject: JsonObject; ParameterName: Text; var ParameterValue: Code[20])
     var
         JToken: JsonToken;
@@ -225,6 +226,7 @@
                 ParameterValue := JValue.AsCode();
         end;
     end;
+#pragma warning restore AA0139
 
     local procedure GetJValueFromArg(JObject: JsonObject; ParameterName: Text; var ParameterValue: Text)
     var

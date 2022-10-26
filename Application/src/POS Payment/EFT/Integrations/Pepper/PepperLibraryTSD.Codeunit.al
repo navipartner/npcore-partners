@@ -1,4 +1,4 @@
-﻿
+﻿#pragma warning disable AA0139, AL0432
 codeunit 6184487 "NPR Pepper Library TSD"
 {
     Access = Internal;
