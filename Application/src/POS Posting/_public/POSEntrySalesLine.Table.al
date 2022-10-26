@@ -594,6 +594,18 @@
         key(Key3; Type, "No.", "Document No.")
         {
         }
+        key(Key4; "Serial No.")
+        {
+#if not (BC17 or BC18)
+            IncludedFields = "Item Entry No.";
+#endif
+        }
+        key(Key5; "Item Entry No.")
+        {
+#if not (BC17 or BC18)
+            IncludedFields = "Serial No.";
+#endif
+        }
     }
 
     fieldgroups
