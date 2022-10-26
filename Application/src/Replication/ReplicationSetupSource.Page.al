@@ -1,6 +1,5 @@
 page 6059849 "NPR Replication Setup (Source)"
 {
-
     ApplicationArea = NPRRetail;
     Caption = 'Replication Setup (Source Company)';
     ContextSensitiveHelpPage = 'retail/replication/howto/replicationhowto.html';
@@ -11,6 +10,9 @@ page 6059849 "NPR Replication Setup (Source)"
     PageType = Card;
     SourceTable = "NPR Replication Setup (Source)";
     UsageCategory = Administration;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Replaced by SystemRowVersion';
+    ObsoleteTag = '21';
 
     layout
     {

@@ -109,7 +109,16 @@ page 6014544 "NPR API V1 - Price Lists"
                 field(replicationCounter; Rec."NPR Replication Counter")
                 {
                     Caption = 'replicationCounter', Locked = true;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Replaced by SystemRowVersion';
+                    ObsoleteTag = '21';
                 }
+#IF NOT (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'systemRowVersion', Locked = true;
+                }
+#ENDIF
 
                 part(priceListLines; "NPR API V1 - Price List Lines")
                 {

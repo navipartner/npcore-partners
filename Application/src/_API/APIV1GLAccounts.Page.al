@@ -252,6 +252,12 @@ page 6059846 "NPR APIV1 - GL Accounts"
                 {
                     Caption = 'Last Modified Date', Locked = true;
                 }
+#IF NOT (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'systemRowVersion', Locked = true;
+                }
+#ENDIF
             }
         }
     }

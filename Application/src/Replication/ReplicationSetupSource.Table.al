@@ -3,6 +3,9 @@ table 6014634 "NPR Replication Setup (Source)"
     Access = Internal;
     Caption = 'Replication Setup (Source Company)';
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Replaced by SystemRowVersion';
+    ObsoleteTag = '21';
 
     fields
     {
