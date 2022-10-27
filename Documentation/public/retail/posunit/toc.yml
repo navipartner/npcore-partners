@@ -16,6 +16,8 @@
     href: explanation/POS_unit_Receipt_profile.md
   - name: POS stores
     href: explanation/POS_store.md
+  - name: Item AddOns
+    href: explanation/item_addons.md
 - name: Reference
   items:
   - name: POS Audit Profile (Reference guide)
@@ -28,6 +30,8 @@
     href: reference/POS_End_of_Day_Profile.md
   - name: POS Display Profile
     href: reference/POS_Display_profile.md
+  - name: Item AddOns (reference guide)
+    href: reference/item_addons_ref.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
@@ -74,3 +78,5 @@
     href: howto/Configuration_of_master_slave_POS_units.md
   - name: Set up retail logo
     href: howto/set_up_retail_logo.md
+  - name: Set up Item AddOns
+    href: howto/item_addons_procedure.md
