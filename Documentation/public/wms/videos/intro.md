@@ -22,6 +22,10 @@ This section contains all WMS-related video training materials. The videos mainl
 
 > [!Video https://www.youtube.com/embed/O2Lt-tCaOxY]
 
+### Manage mobile app UI menu
+
+> [!Video https://share.synthesia.io/embeds/videos/d3b750e9-aaef-4336-b8f8-bb7b9d0cb5bc]
+
 ### CS user setup
 
 > [!Video https://www.youtube.com/embed/11YtGLyGVxI]
@@ -37,3 +41,11 @@ This section contains all WMS-related video training materials. The videos mainl
 ### Print buffer
 
 > [!Video https://www.youtube.com/embed/1Bq4jv8hAGo]
+
+### Perform stock count (Business Central)
+
+> [!Video https://share.synthesia.io/embeds/videos/e40343b3-3ccd-489e-812e-c2ae88422ff4]
+
+### Perform stock count - planned
+
+> [!Video https://share.synthesia.io/embeds/videos/3ddb5ff5-5fe0-4b83-adab-0862d81076f7]

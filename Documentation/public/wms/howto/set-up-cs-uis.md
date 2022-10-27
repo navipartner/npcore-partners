@@ -34,10 +34,15 @@ To set up CS UIs, follow the provided steps:
 6. (Optional) Additionally, you can set up the CS UI filters by clicking **CS UI** followed by **Set up CS UI Filters** in the ribbon.
    CS UI filters provide the means of narrowing down the quantity of items which will be retrieved when a certain in-app page is opened. For example, if you open the **Pick List** page in the app, you will only see the list of inventory pick documents, while the other document types will be filtered out.
 
-## Video walkthrough
+## Video walkthroughs
+
+### CS UI setup
 
 > [!Video https://www.youtube.com/embed/O2Lt-tCaOxY]
 
+### Manage mobile app UI menu
+
+> [!Video https://share.synthesia.io/embeds/videos/d3b750e9-aaef-4336-b8f8-bb7b9d0cb5bc]
 ### Related links
 
 - [Capture Service UIs](../explanation/cs-uis.md)
