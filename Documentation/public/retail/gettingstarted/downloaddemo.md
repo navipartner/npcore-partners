@@ -31,6 +31,7 @@ Refer to the [how-to guide](install_major_tom.md) for installing our desktop POS
 ### Install Minor Tom
 
 Refer to the [how-to guide](install_minor_tom.md) for installing the abbreviated version of our desktop POS software. 
+
 ### Install ClickOnce
 
 ClickOnce is a deployment technology that enables you to create self-updating Windows-based applications that can be installed and run with minimal user interaction. 

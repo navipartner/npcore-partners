@@ -80,3 +80,6 @@ You can apply different combinations of options in the **Ticket Package App Setu
 
 - [Entertainment settings (reference guide)](../reference/entertainment_settings.md)
 - [Ticket delivery (reference guide)](../reference/ticket_delivery.md)
+- [Ticket BOM (reference guide)](../../entertainment/ticket/reference/ticket_bom.md)
+- [Ticket schedules (reference guide)](../../entertainment/ticket/reference/admission_schedule.md)
+- [Ticket types (reference guide)](../../entertainment/ticket/reference/ticket_types.md)
