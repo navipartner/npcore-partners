@@ -253,7 +253,7 @@
         GlobalBlueIINBlacklist.DeleteAll(false);
         GlobalBlueIINBlacklist.Reset();
         for i := 1 to (RangeCount) do begin
-            Ranges.Get(1, Range);
+            Ranges.Get(i, Range);
 
             GlobalBlueIINBlacklist.Init();
             GlobalBlueIINBlacklist."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
