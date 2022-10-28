@@ -184,7 +184,6 @@ codeunit 6060162 "NPR POS Action: Get Event B"
     var
         Item: Record Item;
     begin
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
         SaleLinePOS."No." := JobPlanningLine."No.";
         SaleLinePOS."Variant Code" := JobPlanningLine."Variant Code";
         SaleLinePOS.Description := JobPlanningLine.Description;

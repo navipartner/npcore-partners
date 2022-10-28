@@ -78,7 +78,11 @@
                             InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine);
                             InsertPOSTaxAmount(POSSaleLine.SystemId, POSEntry);
                         end;
-                    POSSaleLine."Line Type"::Rounding,
+                    POSSaleLine."Line Type"::Rounding:
+                        begin
+                            InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, true, POSEntrySalesLine);
+                            InsertPOSTaxAmountReverseSign(POSSaleLine.SystemId, POSEntry); 
+                        end;   
                     POSSaleLine."Line Type"::"GL Payment":
                         begin
                             InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine);
@@ -86,6 +90,8 @@
                         end;                           
                     POSSaleLine."Line Type"::"POS Payment":
                         InsertPOSPaymentLine(POSSale, POSSaleLine, POSEntry, POSEntryPaymentLine);
+                    POSSaleLine."Line Type"::Comment:
+                        InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine);
                 end;
             until POSSaleLine.Next() = 0;
         end;
@@ -242,6 +248,8 @@
                     POSEntrySalesLine.Type := POSEntrySalesLine.Type::"G/L Account"
                 else
                     POSEntrySalesLine.Type := POSEntrySalesLine.Type::Payout;
+            POSSaleLine."Line Type"::Comment:
+                POSEntrySalesLine.Type := POSEntrySalesLine.Type::Comment;
         end;
 
         POSEntrySalesLine."Exclude from Posting" := ExcludeFromPosting(POSSaleLine);
@@ -1042,14 +1050,7 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        if SalePOS."Header Type" = SalePOS."Header Type"::Cancelled then
-            exit(true);
-
-        SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
-        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Comment);
-        exit(not SaleLinePOS.IsEmpty());
+        exit(SalePOS."Header Type" = SalePOS."Header Type"::Cancelled);
     end;
 
     local procedure IsUniqueDocumentNo(SalePOS: Record "NPR POS Sale"): Boolean
@@ -1493,14 +1494,7 @@
     var
         ExtSaleLinePOS: Record "NPR External POS Sale Line";
     begin
-        if ExtSalePOS."Header Type" = ExtSalePOS."Header Type"::Cancelled then
-            exit(true);
-
-        ExtSaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
-        ExtSaleLinePOS.SetRange("Register No.", ExtSalePOS."Register No.");
-        ExtSaleLinePOS.SetRange("Sales Ticket No.", ExtSalePOS."Sales Ticket No.");
-        ExtSaleLinePOS.SetRange("Line Type", ExtSaleLinePOS."Line Type"::Comment);
-        exit(not ExtSaleLinePOS.IsEmpty());
+        exit(ExtSalePOS."Header Type" = ExtSalePOS."Header Type"::Cancelled);
     end;
 
     local procedure InsertPOSEntryExt(var POSPeriodRegister: Record "NPR POS Period Register"; var ExtSalePOS: Record "NPR External POS Sale"; var POSEntry: Record "NPR POS Entry"; EntryType: Option)
@@ -1625,6 +1619,8 @@
                         end;
                     ExtSaleLinePOS."Line Type"::"POS Payment":
                         InsertPOSPaymentLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, POSPaymentLine);
+                    ExtSaleLinePOS."Line Type"::Comment:
+                        InsertPOSSaleLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, false, POSSalesLine);
                 end;
             until ExtSaleLinePOS.Next() = 0;
         end;
