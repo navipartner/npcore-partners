@@ -656,6 +656,14 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'View or edit the Retail Replenisment Setup';
                     ApplicationArea = NPRRetail;
                 }
+                action("Item AddOns")
+                {
+                    Caption = 'Item AddOns';
+                    RunObject = page "NPR NpIa Item AddOns";
+
+                    ToolTip = 'Executes the Item AddOns action.';
+                    ApplicationArea = NPRRetail;
+                }
 
             }
 
