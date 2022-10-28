@@ -1217,7 +1217,6 @@ then
         SaleLinePOS.Reset();
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
         SaleLinePOS.SetFilter("Imported from Invoice No.", '<>%1', '');
 
         if SaleLinePOS.FindFirst() then begin

@@ -983,7 +983,6 @@
     begin
         CouponLinePOSCoupon.SetRange("Register No.", SaleLinePOS."Register No.");
         CouponLinePOSCoupon.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        CouponLinePOSCoupon.SetRange("Sale Type", SaleLinePOS."Sale Type");
         CouponLinePOSCoupon.SetRange("Sale Date", SaleLinePOS.Date);
         CouponLinePOSCoupon.SetRange("Sale Line No.", SaleLinePOS."Line No.");
         CouponLinePOSCoupon.SetRange(Type, CouponLinePOSCoupon.Type::Coupon);

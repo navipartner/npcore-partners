@@ -136,6 +136,7 @@
         POSSale.GetCurrentSale(SalePOS);
         SalePOS."Header Type" := SalePOS."Header Type"::Cancelled;
         POSSale.Refresh(SalePOS);
+        POSSale.Modify(false, false);
 
         POSSession.GetSale(POSSale);
         exit(POSSale.TryEndSale(POSSession, false));
