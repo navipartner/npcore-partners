@@ -117,7 +117,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         SaleLinePOS.Validate("No.", POSSalesLine."No.");
         SaleLinePOS.Description := POSSalesLine.Description;
 
-        if SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale then
+        if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::"POS Payment", SaleLinePOS."Line Type"::"GL Payment", SaleLinePOS."Line Type"::Comment]) then
             SaleLinePOS.Validate(Quantity, -POSSalesLine.Quantity);
 
         SaleLinePOS."VAT %" := POSSalesLine."VAT %";
@@ -301,7 +301,6 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         if (SaleLinePOS."Return Sale Sales Ticket No." = '') then begin
             SaleLinePOSCopy.SetRange("Register No.", SaleLinePOS."Register No.");
             SaleLinePOSCopy.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-            SaleLinePOSCopy.SetRange("Sale Type", SaleLinePOSCopy."Sale Type"::Sale);
             SaleLinePOSCopy.SetRange("Line Type", SaleLinePOSCopy."Line Type"::Item);
             SaleLinePOSCopy.SetFilter(Quantity, '<%1', 0);
             SaleLinePOSCopy.SetFilter("Return Sale Sales Ticket No.", '<>%1', '');

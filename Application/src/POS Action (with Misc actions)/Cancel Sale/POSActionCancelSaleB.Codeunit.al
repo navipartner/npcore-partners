@@ -31,9 +31,11 @@ codeunit 6059872 "NPR POSAction: Cancel Sale B"
             Line."Description 2" := CopyStr(AltSaleCancelDescription, MaxStrLen(Line.Description) + 1, MaxStrLen(Line."Description 2"));
         end else
             Line.Description := StrSubstNo(CANCEL_SALELbl, CurrentDateTime);
-        Line."Sale Type" := Line."Sale Type"::Cancelled;
-        POSSaleLine.InsertLine(Line);
 
+        POSSaleLine.InsertLine(Line);
+        SalePOS."Header Type" := SalePOS."Header Type"::Cancelled;
+        POSSale.Refresh(SalePOS);
+        POSSale.Modify(false, false);
         exit(POSSale.TryEndSale(POSSession, false));
     end;
 
