@@ -80,3 +80,5 @@
     href: howto/set_up_retail_logo.md
   - name: Set up Item AddOns
     href: howto/item_addons_procedure.md
+  - name: Set up POS Self-Service Profile
+    href: howto/pos_self_service_prof.md

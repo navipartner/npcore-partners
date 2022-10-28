@@ -21,7 +21,7 @@ A QR code is a machine-readable optical label that can contain information about
 > [!NOTE]
 > The **URL** and the **WebService URL** can be defaulted by clicking **Set Defaults** in the ribbon.
 
-1. Click **Create QR Code**.         
+4. Click **Create QR Code**.         
    The QR code is displayed in the **NPRW CS QR Code FactBox** section of the page.    
 
 ### Related links
