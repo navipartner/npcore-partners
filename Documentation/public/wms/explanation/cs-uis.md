@@ -45,11 +45,11 @@ In the **UI Subform** section of each CS UI, you can add the actual content of e
 
 ## Data pattern code
 
-Data pattern code is the code assigned to a certain product. It consists of some of the product's main characteristics, such as ingredients, year of production, expiration date, and so on. Each of these characteristics has its own ID, and the combination of all of them provides a unique ID for all goods which are placed inside the warehouse. 
+[Data pattern code](../howto/set-up-datapatterncode.md) is the code assigned to a certain product. It consists of some of the product's main characteristics, such as ingredients, year of production, expiration date, and so on. Each of these characteristics has its own ID, and the combination of all of them provides a unique ID for all goods which are placed inside the warehouse. 
 
 ## Handling codeunit
 
-Each UI can be associated with one handling codeunit. Codeunits govern the back-end processes associated with each UI. 
+Each UI can be associated with one [handling codeunit](../reference/handling_codeunits.md). Codeunits govern the back-end processes associated with each UI. 
 
 ### Related links
 
