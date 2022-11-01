@@ -1497,5 +1497,18 @@
         TimeText := FORMAT(000000T + ROUND(TIME - 000000T, 1000));
         exit(0);
     END;
+
+    procedure GetAttributeSetID(POSSalesLineNo: Code[20]; TableNo: Integer; var AttributeSetID: Integer) ReturnValue: Boolean
+    var
+        AttributeKey: Record "NPR Attribute Key";
+    begin
+        AttributeKey.SetCurrentKey("Table ID", "MDR Code PK", "MDR Line PK", "MDR Option PK");
+        AttributeKey.SetRange("Table ID", TableNo);
+        AttributeKey.SetRange("MDR Code PK", POSSalesLineNo);
+        if AttributeKey.FindFirst() then begin
+            ReturnValue := true;
+            AttributeSetID := AttributeKey."Attribute Set ID";
+        end;
+    end;
 }
 
