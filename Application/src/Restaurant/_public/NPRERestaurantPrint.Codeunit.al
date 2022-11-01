@@ -120,6 +120,7 @@
             exit(false);
         end;
 
+        Commit();  //Print routine requires transaction to be ended
         SendToPrint(TempPrintTemplateBuffer);
         exit(true);
     end;
