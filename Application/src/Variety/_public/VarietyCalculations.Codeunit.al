@@ -268,7 +268,11 @@
     local procedure GetQuantityAvailableToPromise(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     var
         AvailableToPromise: Codeunit "Available to Promise";
+#IF (BC17 or BC18 or BC19 or BC20)
         PeriodType: Option Day,Week,Month,Quarter,Year;
+#else
+        PeriodType: Enum "Analysis Period Type";
+#endif
         AvailabilityDate: Date;
         LookaheadDateformula: DateFormula;
         Item: Record Item;
@@ -287,7 +291,11 @@
         Item.SetRange("Drop Shipment Filter", false);
 
         FieldValue := Format(
+#IF (BC17 or BC18 or BC19 or BC20)
           AvailableToPromise.QtyAvailabletoPromise(
+#else
+        AvailableToPromise.CalcQtyAvailabletoPromise(
+#endif
             Item,
             GrossRequirement,
             ScheduledReceipt,
