@@ -36,3 +36,5 @@
   href: fiscalization/toc.yml
 - name: Item worksheets
   href: item_worksheet/toc.yml
+- name: Printing setup
+  href: printing/toc.yml
