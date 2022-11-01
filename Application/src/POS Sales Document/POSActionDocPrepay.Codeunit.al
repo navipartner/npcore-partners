@@ -1,6 +1,7 @@
-﻿codeunit 6150863 "NPR POS Action: Doc. Prepay"
+﻿codeunit 6150863 "NPR POS Action: Doc. Prepay" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'Create a prepayment line for a sales order. Prepayment invoice will be posted & applied immediately upon sale end.';
         TextPrepaymentTitle: Label 'Prepayment';
@@ -20,228 +21,70 @@
         CaptionPdf2NavDocument: Label 'Pdf2Nav Document';
         DescSendDocument: Label 'Handle output via document sending profiles';
         DescPdf2NavDocument: Label 'Handle output via PDF2NAV';
-
-    local procedure ActionCode(): Code[20]
+        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
-        exit('SALES_DOC_PREPAY');
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddBooleanParameter('InputIsAmount', false, CaptionPrepaymentIsAmount, DescPrepaymentIsAmount);
+        WorkflowConfig.AddBooleanParameter('Dialog', true, CaptionPrepaymentDlg, DescPrepaymentDlg);
+        WorkflowConfig.AddDecimalParameter('FixedValue', 0, CaptionFixedPrepaymentValue, DescFixedPrepaymentValue);
+        WorkflowConfig.AddBooleanParameter('SendDocument', false, CaptionSendDocument, DescSendDocument);
+        WorkflowConfig.AddBooleanParameter('Pdf2NavDocument', false, CaptionPdf2NavDocument, DescPdf2NavDocument);
+        WorkflowConfig.AddBooleanParameter('PrintDocument', false, CaptionPrintDoc, DescPrintDoc);
+        WorkflowConfig.AddBooleanParameter('SelectCustomer', true, CaptionSelectCustomer, DescSelectCustomer);
+        WorkflowConfig.AddBooleanParameter('ConfirmInvDiscAmt', false, SalesDocImpMgt.GetConfirmInvDiscAmtLbl(), SalesDocImpMgt.GetConfirmInvDiscAmtDescLbl());
+        WorkflowConfig.AddLabel('prepaymentDialogTitle', TextPrepaymentTitle);
+        WorkflowConfig.AddLabel('prepaymentPctLead', TextPrepaymentPctLead);
+        WorkflowConfig.AddLabel('prepaymentAmountLead', TextPrepaymentAmountLead);
     end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.3');
-    end;
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    var
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple) then begin
-            Sender.RegisterWorkflowStep('prepaymentPct', 'param.Dialog && !param.InputIsAmount && numpad(labels.prepaymentDialogTitle, labels.prepaymentPctLead, param.FixedValue).cancel(abort);');
-            Sender.RegisterWorkflowStep('prepaymentAmount', 'param.Dialog && param.InputIsAmount && numpad(labels.prepaymentDialogTitle, labels.prepaymentAmountLead, param.FixedValue).cancel(abort);');
-            Sender.RegisterWorkflowStep('PrepayDocument', 'respond();');
-            Sender.RegisterWorkflow(false);
-
-            Sender.RegisterBooleanParameter('InputIsAmount', false);
-            Sender.RegisterBooleanParameter('Dialog', true);
-            Sender.RegisterDecimalParameter('FixedValue', 0);
-            Sender.RegisterBooleanParameter('SendDocument', false);
-            Sender.RegisterBooleanParameter('Pdf2NavDocument', false);
-            Sender.RegisterBooleanParameter('PrintDocument', false);
-            Sender.RegisterBooleanParameter('SelectCustomer', true);
-            Sender.RegisterBooleanParameter('ConfirmInvDiscAmt', false);
+        case Step of
+            'prepayDocument':
+                FrontEnd.WorkflowResponse(PrepayDocument(Context, Sale));
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    local procedure GetActionScript(): Text
     begin
-        Captions.AddActionCaption(ActionCode(), 'prepaymentDialogTitle', TextPrepaymentTitle);
-        Captions.AddActionCaption(ActionCode(), 'prepaymentPctLead', TextPrepaymentPctLead);
-        Captions.AddActionCaption(ActionCode(), 'prepaymentAmtLead', TextPrepaymentAmountLead);
+        exit(
+        //###NPR_INJECT_FROM_FILE:POSActionDocPrepay.js###
+'let main=async({workflow:n,captions:a,parameters:l,popup:t})=>{let e;if(l.Dialog){if(l.InputIsAmount){if(e=await t.numpad({caption:a.prepaymentAmountLead,title:a.prepaymentDialogTitle,value:l.FixedValue}),e===null)return}else if(e=await t.numpad({caption:a.prepaymentPctLead,title:a.prepaymentDialogTitle,value:l.FixedValue}),e===null)return}else e=l.FixedValue;return await n.respond("prepayDocument",{prepaymentValue:e})};'
+                );
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure PrepayDocument(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"): JsonObject
     var
         SalesHeader: Record "Sales Header";
-        JSON: Codeunit "NPR POS JSON Management";
+        SalePOS: Record "NPR POS Sale";
+        POSSession: Codeunit "NPR POS Session";
         PrintPrepaymentDocument, SelectCustomer, InputIsAmount, Send, Pdf2Nav, ConfirmInvDiscAmt : Boolean;
         PrepaymentValue: Decimal;
+        POSActionDocPrepayB: Codeunit "NPR POS Action: Doc. Prepay B";
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-        Handled := true;
+        Sale.GetCurrentSale(SalePOS);
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        PrintPrepaymentDocument := JSON.GetBooleanParameterOrFail('PrintDocument', ActionCode());
-        SelectCustomer := JSON.GetBooleanParameterOrFail('SelectCustomer', ActionCode());
-        PrepaymentValue := GetPrepaymentValue(JSON);
-        Send := JSON.GetBooleanParameterOrFail('SendDocument', ActionCode());
-        Pdf2Nav := JSON.GetBooleanParameterOrFail('Pdf2NavDocument', ActionCode());
-        InputIsAmount := JSON.GetBooleanParameterOrFail('InputIsAmount', ActionCode());
-        ConfirmInvDiscAmt := JSON.GetBooleanParameterOrFail('ConfirmInvDiscAmt', ActionCode());
+        PrintPrepaymentDocument := Context.GetBooleanParameter('PrintDocument');
+        SelectCustomer := Context.GetBooleanParameter('SelectCustomer');
+        Send := Context.GetBooleanParameter('SendDocument');
+        Pdf2Nav := Context.GetBooleanParameter('Pdf2NavDocument');
+        InputIsAmount := Context.GetBooleanParameter('InputIsAmount');
+        ConfirmInvDiscAmt := Context.GetBooleanParameter('ConfirmInvDiscAmt');
+        PrepaymentValue := Context.GetDecimal('prepaymentValue');
 
-        if not CheckCustomer(POSSession, SelectCustomer) then
+        if not POSActionDocPrepayB.CheckCustomer(SalePOS, Sale, SelectCustomer) then
             exit;
 
-        if not SelectDocument(POSSession, SalesHeader) then
+        if not POSActionDocPrepayB.SelectDocument(SalePOS, SalesHeader) then
             exit;
 
-        if not ConfirmImportInvDiscAmt(SalesHeader, ConfirmInvDiscAmt) then
+        if not POSActionDocPrepayB.ConfirmImportInvDiscAmt(SalesHeader, ConfirmInvDiscAmt) then
             exit;
 
-        CreatePrepaymentLine(POSSession, SalesHeader, PrintPrepaymentDocument, PrepaymentValue, InputIsAmount, Send, Pdf2Nav);
+        POSActionDocPrepayB.CreatePrepaymentLine(POSSession, SalesHeader, PrintPrepaymentDocument, PrepaymentValue, InputIsAmount, Send, Pdf2Nav);
 
-        POSSession.RequestRefreshData();
-    end;
-
-    local procedure CheckCustomer(POSSession: Codeunit "NPR POS Session"; SelectCustomer: Boolean): Boolean
-    var
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
-        Customer: Record Customer;
-    begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
-            exit(true);
-        end;
-
-        if not SelectCustomer then
-            exit(true);
-
-        if PAGE.RunModal(0, Customer) <> ACTION::LookupOK then
-            exit(false);
-
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
-        SalePOS.Validate("Customer No.", Customer."No.");
-        SalePOS.Modify(true);
-        POSSale.RefreshCurrent();
-        Commit();
-        exit(true);
-    end;
-
-    local procedure SelectDocument(POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"): Boolean
-    var
-        RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
-    begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        if SalePOS."Customer No." <> '' then
-            SalesHeader.SetRange("Bill-to Customer No.", SalePOS."Customer No.");
-        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
-        exit(RetailSalesDocImpMgt.SelectSalesDocument(SalesHeader.GetView(false), SalesHeader));
-    end;
-
-    local procedure ConfirmImportInvDiscAmt(SalesHeader: Record "Sales Header"; ConfirmInvDiscAmt: Boolean): Boolean
-    var
-        SalesLine: Record "Sales Line";
-        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
-    begin
-        if ConfirmInvDiscAmt then begin
-            SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-            SalesLine.SetRange("Document No.", SalesHeader."No.");
-            SalesLine.SetFilter("Inv. Discount Amount", '>%1', 0);
-            SalesLine.CalcSums("Inv. Discount Amount");
-            if SalesLine."Inv. Discount Amount" > 0 then begin
-                if not Confirm(SalesDocImpMgt.GetImportInvDiscAmtQst()) then
-                    exit;
-            end;
-        end;
-        exit(true);
-    end;
-
-    local procedure CreatePrepaymentLine(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; PrepaymentValue: Decimal; ValueIsAmount: Boolean; Send: Boolean; Pdf2Nav: Boolean)
-    var
-        RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
-    begin
-        RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentValue, Print, Send, Pdf2Nav, true, ValueIsAmount);
-    end;
-
-    procedure GetPrepaymentValue(var JSON: Codeunit "NPR POS JSON Management"): Decimal
-    begin
-        if JSON.GetBooleanParameterOrFail('Dialog', ActionCode()) then begin
-            if JSON.GetBooleanParameterOrFail('InputIsAmount', ActionCode()) then begin
-                exit(GetNumpad(JSON, 'prepaymentAmount'));
-            end else begin
-                exit(GetNumpad(JSON, 'prepaymentPct'));
-            end;
-        end else
-            exit(JSON.GetDecimalParameterOrFail('FixedValue', ActionCode()));
-    end;
-
-    local procedure GetNumpad(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Decimal
-    var
-        ReadingErr: Label 'reading in %1';
-    begin
-        JSON.SetScopeRoot();
-        if (not JSON.SetScope('$' + Path)) then
-            exit(0);
-
-        exit(JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode())));
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
-    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    var
-        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'Dialog':
-                Caption := CaptionPrepaymentDlg;
-            'FixedValue':
-                Caption := CaptionFixedPrepaymentValue;
-            'InputIsAmount':
-                Caption := CaptionPrepaymentIsAmount;
-            'PrintDocument':
-                Caption := CaptionPrintDoc;
-            'SelectCustomer':
-                Caption := CaptionSelectCustomer;
-            'SendDocument':
-                Caption := CaptionSendDocument;
-            'Pdf2NavDocument':
-                Caption := CaptionPdf2NavDocument;
-            'ConfirmInvDiscAmt':
-                Caption := SalesDocImpMgt.GetConfirmInvDiscAmtLbl();
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
-    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    var
-        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'Dialog':
-                Caption := DescPrepaymentDlg;
-            'FixedValue':
-                Caption := DescFixedPrepaymentValue;
-            'InputIsAmount':
-                Caption := DescPrepaymentIsAmount;
-            'PrintDocument':
-                Caption := DescPrintDoc;
-            'SelectCustomer':
-                Caption := DescSelectCustomer;
-            'SendDocument':
-                Caption := DescSendDocument;
-            'Pdf2NavDocument':
-                Caption := DescPdf2NavDocument;
-            'ConfirmInvDiscAmt':
-                Caption := SalesDocImpMgt.GetConfirmInvDiscAmtDescLbl();
-        end;
     end;
 }
