@@ -62,6 +62,8 @@
 
 
             trigger OnValidate()
+            var
+                POSSaleTranslation: Codeunit "NPR POS Sale Translation";
             begin
                 InitFromSalePOS();
 
@@ -86,6 +88,7 @@
                             CalculateCostPrice();
                             "Unit Price" := FindItemSalesPrice();
                             Validate(Quantity);
+                            POSSaleTranslation.AssignTranslationOnPOSSaleLine(Rec, SalePOS);
                         end;
                     "Line Type"::"Item Category":
                         begin
