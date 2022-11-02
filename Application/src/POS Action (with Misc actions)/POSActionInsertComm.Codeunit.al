@@ -50,7 +50,7 @@ codeunit 6150795 "NPR POS Action - Insert Comm." implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionInsertComm.js###
-'let main=async({workflow:e,captions:n,parameters:i})=>{let t;return i.EditDescription==i.EditDescription.Yes?t=await popup.input({caption:n.prompt,value:i.DefaultDescription}):t=i.DefaultDescription,await e.respond("InsertComment",{NewDescription:t})};'
+'let main=async({workflow:n,captions:e,parameters:t})=>{let i;if(t.EditDescription==t.EditDescription.Yes?i=await popup.input({caption:e.prompt,value:t.DefaultDescription}):i=t.DefaultDescription,!(i===null||i===""))return await n.respond("InsertComment",{NewDescription:i})};'
         )
     end;
 }
