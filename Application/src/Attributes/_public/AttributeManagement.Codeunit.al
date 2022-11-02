@@ -118,7 +118,7 @@
         SetGenericAttributeValueWorker(TableID, AttributeReference, AttributeID."Key Layout"::DOCUMENTLINE, PKCode, PKLine, PKOption, '', 0, TextValue);
     end;
 
-    internal procedure SetWorksheetLineAttributeValue(TableID: Integer; AttributeReference: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer; var TextValue: Text[250])
+    procedure SetWorksheetLineAttributeValue(TableID: Integer; AttributeReference: Integer; PKTemplate: Code[20]; PKBatch: Code[20]; PKLine: Integer; var TextValue: Text[250])
     var
         AttributeID: Record "NPR Attribute ID";
     begin
