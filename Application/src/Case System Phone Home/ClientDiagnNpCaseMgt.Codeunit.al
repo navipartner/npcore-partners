@@ -1,48 +1,28 @@
 ﻿codeunit 6059999 "NPR Client Diagn. NpCase Mgt."
 {
     Access = Internal;
-    TableNo = "Active Session";
 
-    trigger OnRun()
+    var
+        _ActiveSession: Record "Active Session";
+
+    procedure CollectAndSendClientDiagnostics()
     var
         ClientDiagnostic: Record "NPR Client Diagnostic";
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
     begin
-#if BC17 or BC18 or BC19
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Client Diagn. NpCase Mgt.', 'OnBeforeLogInStart');
-#else
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Client Diagn. NpCase Mgt.', 'OnAfterLogin');
-#endif
-        if NavApp.IsInstalling() then begin
-            LogMessageStopwatch.LogFinish();
+        if not ShouldSendClientDiagnostic(ClientDiagnostic) then
             exit;
-        end;
 
-        if CurrentClientType <> ClientType::Background then begin
-            LogMessageStopwatch.LogFinish();
-            exit;
-        end;
-
-        if not ShouldSendClientDiagnostic(ClientDiagnostic) then begin
-            LogMessageStopwatch.LogFinish();
-            exit;
-        end;
-
-        FrontActiveSession := Rec;
+        FindMySession(_ActiveSession);
 
         if not SendClientDiagnostics() then
-            LogMessageStopwatch.SetError(GetLastErrorText())
+            Error(GetLastErrorText())
         else begin
             ClientDiagnostic."Client Diagnostic Last Sent" := CurrentDateTime();
             if ClientDiagnostic.Modify() then
                 Commit();
         end;
-
-        LogMessageStopwatch.LogFinish();
     end;
-
-    var
-        FrontActiveSession: Record "Active Session";
 
     local procedure ShouldSendClientDiagnostic(var ClientDiagnostic: Record "NPR Client Diagnostic"): Boolean
     var
@@ -151,7 +131,7 @@
 
         XmlDoc.SelectSingleNode('.//*[local-name()="NAVServiceTierUser"]', Node);
         NpXmlDomMgt.AddAttribute(Node, 'username', CopyStr(UserId, 1, 260));
-        NpXmlDomMgt.AddAttribute(Node, 'database_name', FrontActiveSession."Database Name");
+        NpXmlDomMgt.AddAttribute(Node, 'database_name', _ActiveSession."Database Name");
         NpXmlDomMgt.AddAttribute(Node, 'tenant_id', CopyStr(TenantId(), 1, 260));
         NpXmlDomMgt.AddAttribute(Node, 'azure_ad_tenant_id', CopyStr(AzureADTenant.GetAadTenantId(), 1, 260));
 
@@ -170,7 +150,7 @@
         XmlElementLoginInfo: XmlElement;
         UserLoginType: Text[10];
     begin
-        if User.Get(FrontActiveSession."User SID") then;
+        if User.Get(_ActiveSession."User SID") then;
         if IComm.Get() then;
 
         UserLoginType := 'NAV';
@@ -181,11 +161,11 @@
         XmlElementLoginInfo.Add(AddElement('last_logon_date', Format(Today(), 0, 9), MethodNS));
         XmlElementLoginInfo.Add(AddElement('last_logon_time', Format(Time(), 0, 9), MethodNS));
         XmlElementLoginInfo.Add(AddElement('full_name', User."Full Name", MethodNS));
-        XmlElementLoginInfo.Add(AddElement('service_server_name', FrontActiveSession."Server Computer Name", MethodNS));
-        XmlElementLoginInfo.Add(AddElement('service_instance', FrontActiveSession."Server Instance Name", MethodNS));
+        XmlElementLoginInfo.Add(AddElement('service_server_name', _ActiveSession."Server Computer Name", MethodNS));
+        XmlElementLoginInfo.Add(AddElement('service_instance', _ActiveSession."Server Instance Name", MethodNS));
         XmlElementLoginInfo.Add(AddElement('company_name', CompanyName(), MethodNS));
         XmlElementLoginInfo.Add(AddElement('company_id', IComm."Customer No.", MethodNS));
-        XmlElementLoginInfo.Add(AddElement('user_security_id', FrontActiveSession."User SID", MethodNS));
+        XmlElementLoginInfo.Add(AddElement('user_security_id', _ActiveSession."User SID", MethodNS));
         XmlElementLoginInfo.Add(AddElement('windows_security_id', Format(User."Windows Security ID"), MethodNS));
         XmlElementLoginInfo.Add(AddElement('user_login_type', UserLoginType, MethodNS));
         XmlElementLoginInfo.Add(AddElement('application_version', GetRetailVersion() + ' ' + GetBaseAppVersion(), MethodNS));
@@ -231,7 +211,7 @@
         XmlElementLicenseInfo: XmlElement;
         LicenseType: Integer;
     begin
-        if User.Get(FrontActiveSession."User SID") then
+        if User.Get(_ActiveSession."User SID") then
             LicenseType := User."License Type" + 1; //The case system field for license type has ordinal one higher than baseapp.
 
         XmlElementLicenseInfo := XmlElement.Create('license_info', MethodNS);
@@ -249,7 +229,7 @@
         XmlElementComputerInfo: XmlElement;
     begin
         XmlElementComputerInfo := XmlElement.Create('computer_info', MethodNS);
-        XmlElementComputerInfo.Add(AddElement('client_name', FrontActiveSession."Client Computer Name", MethodNS));
+        XmlElementComputerInfo.Add(AddElement('client_name', _ActiveSession."Client Computer Name", MethodNS));
         XmlElementComputerInfo.Add(AddElement('serial_number', SerialNumber(), MethodNS));
         XmlElementComputerInfo.Add(AddElement('os_version', '', MethodNS));
         XmlElementComputerInfo.Add(AddElement('mac_addresses', '', MethodNS));
@@ -282,29 +262,6 @@
                 ActiveSession.Get(ServiceInstanceId(), SessionId());
             end;
         end;
-    end;
-
-#if BC17 or BC18 or BC19
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
-    local procedure OnBeforeLogInStart();
-#else
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', true, false)]
-    local procedure OnAfterLogin();
-#endif
-    var
-        ActiveSession: Record "Active Session";
-        NewSessionId: Integer;
-    begin
-        if not GuiAllowed then //we only want to work on user sessions = GuiAllowed.
-            exit;
-
-        FindMySession(ActiveSession);
-        NewSessionId := 0;
-
-        //call UpsertUser function from another (background) session in order to reduce waiting time during user login,
-        //while sending data from the current (Front or GUI) session instead from the new (backgorund) session.        
-        if not StartSession(NewSessionId, CODEUNIT::"NPR Client Diagn. NpCase Mgt.", CompanyName(), ActiveSession) then
-            exit;
     end;
 }
 
