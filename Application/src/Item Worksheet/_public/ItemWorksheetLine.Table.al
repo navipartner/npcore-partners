@@ -1770,7 +1770,7 @@
         exit(Field."Field Caption");
     end;
 
-    internal procedure SetUpNewLine(LastItemWorksheetLine: Record "NPR Item Worksheet Line")
+    procedure SetUpNewLine(LastItemWorksheetLine: Record "NPR Item Worksheet Line")
     begin
         ItemWorksheetTemplate.Get("Worksheet Template Name");
         ItemWorksheet.Get("Worksheet Template Name", "Worksheet Name");

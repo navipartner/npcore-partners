@@ -37,6 +37,8 @@
     end;
 
     local procedure "Code"()
+    var
+    ItemWorksheetCU:Codeunit "NPR Item Worksheet";
     begin
         if ItemWkshLine.EmptyLine() then
             exit;
@@ -138,7 +140,7 @@
             if not CalledFromTest then
                 ItemWkshLine.Modify(true);
             if ItemWkshLine.Action <> ItemWkshLine.Action::Skip then
-                OnAfterRegisterLine(ItemWkshLine);
+                ItemWorksheetCU.OnAfterRegisterLine(ItemWkshLine);
         end;
         if not CalledFromTest then
             CreateRegisteredWorksheetLines();
@@ -1706,11 +1708,6 @@
         PriceListHeader.Validate("Source Group", PriceListHeader."Source Group"::All);
         PriceListHeader.Validate(Status, PriceListHeader.Status::Active);
         PriceListHeader.Modify(true);
-    end;
-
-    [BusinessEvent(false)]
-    local procedure OnAfterRegisterLine(var ItemWorksheetLine: Record "NPR Item Worksheet Line")
-    begin
     end;
 
     [BusinessEvent(false)]
