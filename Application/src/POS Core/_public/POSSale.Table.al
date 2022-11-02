@@ -80,6 +80,7 @@
                 POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
                 xSaleLinePOS: Record "NPR POS Sale Line";
                 POSSaleLine: Codeunit "NPR POS Sale Line";
+                POSSaleTranslation: Codeunit "NPR POS Sale Translation";
                 FoundPostingProfile: Boolean;
             begin
                 GetPOSUnit();
@@ -192,6 +193,15 @@
 
                 POSSalesDiscountCalcMgt.RecalculateAllSaleLinePOS(Rec);
 
+                case true of
+                    (Rec."Customer Type" = Rec."Customer Type"::Ord) and (Rec."Customer No." <> ''):
+                        POSSaleTranslation.AssignLanguageCodeFrom(Rec, Cust);
+                    (Rec."Customer Type" = Rec."Customer Type"::Cash) and (Rec."Customer No." <> ''):
+                        POSSaleTranslation.AssignLanguageCodeFrom(Rec, Contact);
+                    (Rec."Customer Type" = Rec."Customer Type"::Ord) and (Rec."Customer No." = ''):
+                        POSSaleTranslation.AssignLanguageCodeFrom(Rec, POSStore);                                            
+                end;
+                
                 //Ændring foretaget for at kunne validere på nummer og slette rabatter på linier, ved ændring af kundenummer.
                 Modify();
 
@@ -340,6 +350,12 @@
             Description = 'NPR5.31';
             TableRelation = "Gen. Business Posting Group";
         }
+        field(99; "Language Code"; Code[10])
+        {
+            Caption = 'Language Code';
+            TableRelation = Language;
+            DataClassification = CustomerContent;
+        }        
         field(100; "Saved Sale"; Boolean)
         {
             Caption = 'Saved Sale';
@@ -776,7 +792,8 @@
         "User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
         "Server Instance ID" := Database.ServiceInstanceId();
         "User Session ID" := Database.SessionId();
-
+        "Language Code" := POSStore."Language Code";
+        
         AvoidGUIDCollision();
     end;
 
