@@ -15,6 +15,7 @@
 #endif
     var
         EnvironmentInformation: Codeunit "Environment Information";
+        SessionId: Integer;
     begin
         if NavApp.IsInstalling() then
             exit;
@@ -25,23 +26,7 @@
         if EnvironmentInformation.IsSandbox() then
             exit;
 
-        ValidateBCOnlineTenant();
-        TestUserOnLogin();
-        SendPosUnitQty();
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Session", 'OnInitialize', '', false, false)]
-    local procedure HandleOnInitialize()
-    var
-        EnvironmentInformation: Codeunit "Environment Information";
-    begin
-        if not GuiAllowed then //we only want to work on user sessions = GuiAllowed.
-            exit;
-
-        if EnvironmentInformation.IsSandbox() then
-            exit;
-
-        TestUserOnPOSSessionInitialize();
+        if StartSession(SessionId, Codeunit::"NPR Invoke CaseSystem Login") then;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::User, 'OnAfterDeleteEvent', '', true, false)]
@@ -80,7 +65,6 @@
         TenantDiagnostic."POS Units" := PosUnits;
         TenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
         TenantDiagnostic.Modify();
-        SendPosUnitQty();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Store", 'OnAfterInsertEvent', '', true, false)]
@@ -109,7 +93,6 @@
         TenantDiagnostic."POS Stores" := PosStores;
         TenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
         TenantDiagnostic.Modify();
-        SendPosUnitQty();
     end;
 
     [EventSubscriber(ObjectType::Report, Report::"Copy Company", 'OnAfterCreatedNewCompanyByCopyCompany', '', true, false)]
@@ -124,7 +107,7 @@
             TenantDiagnostic.DeleteAll();
     end;
 
-    local procedure ValidateBCOnlineTenant()
+    procedure ValidateBCOnlineTenant()
     var
         TenantDiagnostic: Record "NPR Tenant Diagnostic";
         EnvironmentInformation: Codeunit "Environment Information";
@@ -144,7 +127,7 @@
         end;
     end;
 
-    local procedure TestUserOnLogin()
+    procedure TestUserOnLogin()
     var
         CheckIsUsingRegularInvoicing, UsingRegularInvoicing, WebServiceCallSucceeded, Handled : Boolean;
     begin
@@ -161,25 +144,6 @@
 
         TestUserExpired(false);
         TestUserLocked(false);
-    end;
-
-    local procedure TestUserOnPOSSessionInitialize()
-    var
-        CheckIsUsingRegularInvoicing, UsingRegularInvoicing, WebServiceCallSucceeded, Handled : Boolean;
-    begin
-        OnShouldCheckIsUsingRegularInvoicing(CheckIsUsingRegularInvoicing);
-        if CheckIsUsingRegularInvoicing then begin
-            IsUsingRegularInvoicing(UsingRegularInvoicing, WebServiceCallSucceeded);
-            if not WebServiceCallSucceeded then
-                exit;
-
-            OnBeforeTestUserOnPOSSessionInitialize(UsingRegularInvoicing, Handled);
-            if Handled then
-                exit;
-        end;
-
-        TestUserExpired(true);
-        TestUserLocked(true);
     end;
 
     local procedure IsUsingRegularInvoicing(var UsingRegularInvoicing: Boolean; var WebServiceCallSucceeded: Boolean)
@@ -391,7 +355,7 @@
         Error(LockedMessage);
     end;
 
-    local procedure SendPosUnitQty()
+    procedure SendPosUnitQty()
     var
         TenantDiagnostic: Record "NPR Tenant Diagnostic";
         PosStore: Record "NPR POS Store";
