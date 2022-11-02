@@ -391,24 +391,7 @@
 
         CheckCouponQuantity(Coupon, Quantity);
 
-        CouponEntry.Init();
-        CouponEntry."Entry No." := 0;
-        CouponEntry."Coupon No." := Coupon."No.";
-        CouponEntry."Entry Type" := CouponEntry."Entry Type"::"Discount Application";
-        CouponEntry."Coupon Type" := Coupon."Coupon Type";
-        CouponEntry.Quantity := -Quantity;
-        CouponEntry."Remaining Quantity" := -Quantity;
-        CouponEntry."Amount per Qty." := SaleLinePOSCoupon."Discount Amount";
-        CouponEntry.Amount := CouponEntry."Amount per Qty." * CouponEntry.Quantity;
-        CouponEntry.Positive := CouponEntry.Quantity > 0;
-        CouponEntry."Posting Date" := SaleLinePOSCoupon."Sale Date";
-        CouponEntry.Open := true;
-        CouponEntry."Register No." := SaleLinePOSCoupon."Register No.";
-        CouponEntry."Document Type" := CouponEntry."Document Type"::"POS Entry";
-        CouponEntry."Document No." := SaleLinePOSCoupon."Sales Ticket No.";
-        CouponEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(CouponEntry."User ID"));
-        CouponEntry."Closed by Entry No." := 0;
-        CouponEntry.Insert();
+        InsertCouponEntry(SaleLinePOSCoupon, Quantity, Coupon, CouponEntry);
 
         ApplyEntry(CouponEntry);
         Coupon.CalcFields("Issue Coupon Module", "Validate Coupon Module", "Apply Discount Module");
@@ -1014,6 +997,28 @@
 
         SaleLinePOS.Validate(Quantity, parQuantity);
         SaleLinePOS.Modify();
+    end;
+
+    local procedure InsertCouponEntry(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; Quantity: Decimal; Coupon: Record "NPR NpDc Coupon"; var CouponEntry: Record "NPR NpDc Coupon Entry")
+    begin
+        CouponEntry.Init();
+        CouponEntry."Entry No." := 0;
+        CouponEntry."Coupon No." := Coupon."No.";
+        CouponEntry."Entry Type" := CouponEntry."Entry Type"::"Discount Application";
+        CouponEntry."Coupon Type" := Coupon."Coupon Type";
+        CouponEntry.Quantity := -Quantity;
+        CouponEntry."Remaining Quantity" := -Quantity;
+        CouponEntry."Amount per Qty." := SaleLinePOSCoupon."Discount Amount";
+        CouponEntry.Amount := CouponEntry."Amount per Qty." * CouponEntry.Quantity;
+        CouponEntry.Positive := CouponEntry.Quantity > 0;
+        CouponEntry."Posting Date" := SaleLinePOSCoupon."Sale Date";
+        CouponEntry.Open := true;
+        CouponEntry."Register No." := SaleLinePOSCoupon."Register No.";
+        CouponEntry."Document Type" := CouponEntry."Document Type"::"POS Entry";
+        CouponEntry."Document No." := SaleLinePOSCoupon."Sales Ticket No.";
+        CouponEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(CouponEntry."User ID"));
+        CouponEntry."Closed by Entry No." := 0;
+        CouponEntry.Insert();
     end;
 
     internal procedure GenerateReferenceNo(Coupon: Record "NPR NpDc Coupon") ReferenceNo: Text
