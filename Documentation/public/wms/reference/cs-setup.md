@@ -109,7 +109,7 @@ From the **CS Setup** you can also set up [CS users](../howto/set-up-cs-users.md
 
 ## Video walkthrough
 
-> [!Video https://www.youtube.com/embed/6EXqbu1jeTI]
+> [!Video https://share.synthesia.io/1c8a0587-a0ea-4e8e-afd7-449c93ddc4d8]
 
 ### Related links
 
