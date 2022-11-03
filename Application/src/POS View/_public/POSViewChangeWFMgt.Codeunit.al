@@ -238,6 +238,7 @@
         TempSaleLinePOS.SetRange("No.", SaleLinePOS."No.");
         TempSaleLinePOS.SetRange("Variant Code", SaleLinePOS."Variant Code");
         TempSaleLinePOS.SetRange("Location Code", SaleLinePOS."Location Code");
+        TempSaleLinePOS.SetRange("Serial No.", SaleLinePOS."Serial No.");
         if TempSaleLinePOS.FindFirst() then begin
             TempSaleLinePOS.Quantity += SaleLinePOS.Quantity;
             TempSaleLinePOS."Quantity (Base)" += SaleLinePOS."Quantity (Base)";
