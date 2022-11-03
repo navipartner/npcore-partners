@@ -42,8 +42,9 @@ codeunit 6059912 "NPR MM Membership Stat. Mgmt."
         MMMembershipEntry.SetRange(Context);
         MMMembershipEntry.SetFilter("Valid From Date", '>%1', RefDate);
         MMMembershipEntry.SetRange("Valid Until Date");
-        MMMembershipEntry.SetFilter(SystemCreatedAt, '<=%1', CreateDateTime(RefDate, 235959T)); // for historical calculation..
+        MMMembershipEntry.SetFilter("Created At", '<=%1', CreateDateTime(RefDate, 235959.999T)); // for historical calculation..
         MMMembershipStatistics."Future Members" := MMMembershipEntry.Count();
+        MMMembershipEntry.SetRange("Created At");
 
         // no of members last year
         RefDateLY := CalcDate('<-1Y>', RefDate);
@@ -106,6 +107,20 @@ codeunit 6059912 "NPR MM Membership Stat. Mgmt."
 
         if GuiAllowed then
             Window.Close();
+    end;
+
+    internal procedure CreateHistoricalDataSingleDate()
+    var
+        DateDialog: Page "Date-Time Dialog";
+        SelectedDate: Date;
+    begin
+        DateDialog.SetDateTime(CreateDateTime(Today() - 1, 000000T));
+        if DateDialog.RunModal() = Action::OK then
+            SelectedDate := DT2Date(DateDialog.GetDateTime())
+        else
+            exit;
+
+        UpdateStatistics(SelectedDate, true);
     end;
 
     internal procedure DeleteHistoricalData()
