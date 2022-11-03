@@ -13,6 +13,7 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         ItemIdentifierType();
         ItemPriceIdentifierType();
         ItemLookupSmartSearch();
+        CustomerNo();
     end;
 
     local procedure SalesDocExpPaymentMethodCode()
@@ -95,7 +96,7 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         POSActionParameter.SetRange(Name, 'itemIdentifyerType');
         if POSActionParameter.FindSet() then
             repeat
-                    POSActionParameter.Rename(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType');
+                POSActionParameter.Rename(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType');
             until POSActionParameter.Next() = 0;
     end;
 
@@ -114,6 +115,24 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
 
         UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ItemPriceIdentifierType'));
         LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure CustomerNo()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Action Parameters', 'CustomerNo');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'CustomerNo')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        UpgradeCustomerNo();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'CustomerNo'));
+        LogMessageStopwatch.LogFinish();
+
     end;
 
     local procedure ItemLookupSmartSearch()
@@ -152,8 +171,21 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         POSActionParameter.SetRange(Name, 'itemIdentifyerType');
         if POSActionParameter.FindSet() then
             repeat
-                    POSActionParameter.Rename(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType');
+                POSActionParameter.Rename(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType');
             until POSActionParameter.Next() = 0;
+    end;
+
+    local procedure UpgradeCustomerNo()
+    var
+        EanBoxParameter: Record "NPR Ean Box Parameter";
+    begin
+        EanBoxParameter.SetRange("Event Code", 'CUSTOMERNO');
+        EanBoxParameter.SetRange("Action Code", 'CUSTOMER_SELECT');
+        EanBoxParameter.SetRange(Name, 'customerNo');
+        if EanBoxParameter.FindSet() then
+            repeat
+                EanBoxParameter.Rename(EanBoxParameter."Setup Code", EanBoxParameter."Event Code", EanBoxParameter."Action Code", 'CustomerNo');
+            until EanBoxParameter.Next() = 0;
     end;
 
     local procedure CurrCodeunitId(): Integer
