@@ -38,7 +38,7 @@ To set up CS UIs, follow the provided steps:
 
 ### CS UI setup
 
-> [!Video https://www.youtube.com/embed/O2Lt-tCaOxY]
+> [!Video https://share.synthesia.io/57815aae-5de8-4d83-86cc-64b1684c068b]
 
 ### Manage mobile app UI menu
 

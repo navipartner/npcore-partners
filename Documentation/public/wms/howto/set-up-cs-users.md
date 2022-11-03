@@ -32,7 +32,7 @@ All users who will should have access to the [mobile apps](/Documentation/public
 
 ## Video walkthrough
 
-> [!Video https://www.youtube.com/embed/11YtGLyGVxI]
+> [!Video https://share.synthesia.io/9b0638e1-9af7-4b50-ac78-7edf867d0fa3]
 
 
 ### Related links
