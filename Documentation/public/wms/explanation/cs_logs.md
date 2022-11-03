@@ -13,7 +13,7 @@ If something goes wrong, and you're not sure what caused it, it's possible to ac
 
 ### Communication Log - video
 
-> [!Video https://www.youtube.com/embed/y7dvMQfFIX4]
+> [!Video https://share.synthesia.io/dd05efc7-b4ed-4dc4-b4e5-26383620bbac]
 
 ## Posting Buffer
 
@@ -24,7 +24,7 @@ The posting buffer keeps track of all transactions handled by the NP WMS module.
 
 ### Posting Buffer - video
 
-> [!Video https://www.youtube.com/embed/n65bodoD-fA]
+> [!Video https://share.synthesia.io/679b6d52-69a0-44d5-ba37-6561a2d55545]
 
 ## Print Buffer 
 
@@ -34,7 +34,7 @@ The documents containing this data are preserved in the **Print Buffer** log, so
 
 ### Print Buffer - video
 
-> [!Video https://www.youtube.com/embed/1Bq4jv8hAGo]
+> [!Video https://share.synthesia.io/6c751793-c9b9-4dcc-af08-bd9bbfbae027]
 
 ### Related links
 

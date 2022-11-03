@@ -76,6 +76,14 @@ Counting is the most commonly used feature in the mobile app. Follow the provide
 > [!Note]
 > You can also access the **Deviation Journals** from the button in the upper-right corner of the **COUNTING** page to see the history of all performed countings, so you can compare them if needed. You can also see this data in the **CS Stock Takes List** in Business Central. 
 
+### Perform stock count (Business Central)
+
+> [!Video https://share.synthesia.io/embeds/videos/e40343b3-3ccd-489e-812e-c2ae88422ff4]
+
+### Perform stock count - planned
+
+> [!Video https://share.synthesia.io/embeds/videos/3ddb5ff5-5fe0-4b83-adab-0862d81076f7]
+
 ### Related links
 
 - [Install WMS and RFID apps on mobile devices](install-mobile-apps.md)

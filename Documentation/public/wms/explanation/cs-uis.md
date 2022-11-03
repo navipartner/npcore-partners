@@ -51,6 +51,14 @@ In the **UI Subform** section of each CS UI, you can add the actual content of e
 
 Each UI can be associated with one [handling codeunit](../reference/handling_codeunits.md). Codeunits govern the back-end processes associated with each UI. 
 
+### CS UI setup
+
+> [!Video https://share.synthesia.io/57815aae-5de8-4d83-86cc-64b1684c068b]
+
+### Manage mobile app UI menu
+
+> [!Video https://share.synthesia.io/embeds/videos/d3b750e9-aaef-4336-b8f8-bb7b9d0cb5bc]
+
 ### Related links
 
 - [Set up UIs](../howto/set-up-cs-uis.md)
