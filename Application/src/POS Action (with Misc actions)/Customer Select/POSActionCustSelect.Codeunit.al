@@ -48,7 +48,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
     begin
         exit(
             //###NPR_INJECT_FROM_FILE:POSActionCustSelect.js###
-            'let main=async({})=>await workflow.respond();'
+'let main=async({})=>await workflow.respond();'
         );
     end;
 
