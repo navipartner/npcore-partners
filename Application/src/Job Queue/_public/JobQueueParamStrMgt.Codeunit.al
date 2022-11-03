@@ -7,7 +7,7 @@
         ParamDict: Dictionary of [Text, Text];
         Initialized: Boolean;
 
-    internal procedure Parse(_ParamString: Text)
+    procedure Parse(_ParamString: Text)
     var
         KeyValueList: List of [Text];
         KeyValuePair: Text;
@@ -22,7 +22,7 @@
         Initialized := true;
     end;
 
-    internal procedure ParamStringContains(SubString: Text): Boolean
+    procedure ParamStringContains(SubString: Text): Boolean
     begin
         MakeSureIsInitialized();
         if (ParamString = '') or (SubString = '') then
@@ -36,7 +36,7 @@
         exit(ParamDict.Count() > 0);
     end;
 
-    internal procedure ContainsParam(ParamKey: Text): Boolean
+    procedure ContainsParam(ParamKey: Text): Boolean
     begin
         MakeSureIsInitialized();
         if ParamKey = '' then
@@ -44,7 +44,7 @@
         exit(ParamDict.ContainsKey(ParamKey));
     end;
 
-    internal procedure GetParamValueAsText(ParamKey: Text): Text
+    procedure GetParamValueAsText(ParamKey: Text): Text
     begin
         MakeSureIsInitialized();
         if ParamKey <> '' then
@@ -53,7 +53,7 @@
         exit('');
     end;
 
-    internal procedure GetParamValueAsBoolean(ParamKey: Text) ParamValue: Boolean
+    procedure GetParamValueAsBoolean(ParamKey: Text) ParamValue: Boolean
     var
         R: Text;
     begin
@@ -69,7 +69,7 @@
             end;
     end;
 
-    internal procedure GetParamValueAsInteger(ParamKey: Text) ParamValue: Integer
+    procedure GetParamValueAsInteger(ParamKey: Text) ParamValue: Integer
     begin
         MakeSureIsInitialized();
         ParamValue := 0;
@@ -78,7 +78,7 @@
                 evaluate(ParamValue, ParamDict.Get(ParamKey));
     end;
 
-    internal procedure ClearParamDict()
+    procedure ClearParamDict()
     begin
         Clear(ParamDict);
         ParamString := '';
