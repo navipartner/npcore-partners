@@ -1,9 +1,6 @@
 ﻿page 6059898 "NPR Data Log Records"
 {
     Extensible = False;
-    // DL1.00/MH/20140801  NP-AddOn: Data Log
-    //   - This Page contains Record ID's of logged Record Changes.
-
     Caption = 'Data Log Records';
     Editable = false;
     PageType = List;

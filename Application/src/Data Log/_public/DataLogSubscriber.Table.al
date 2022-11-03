@@ -1,18 +1,6 @@
 ﻿table 6059896 "NPR Data Log Subscriber"
 {
     Access = Public;
-    // DL1.00/MH/20140801  NP-AddOn: Data Log
-    //   - This Table contains information of Data Log consumers. Update of Subscribers is not mandatory and should be maintained manually.
-    // DL1.01/MH/20140820 Added Field 100 "Direct Data Processing" - defines whether the Data Processing Codeunit should be executed on Runtime.
-    //   - Added Field 110 "Data Processing Codeunit ID".
-    // DL1.02/MH/20140820 Removed reference to Local function, LoadMonTables as Subscriber has now be omitted from the function..
-    // DL1.03/MH/20140909  CASE 184907 Added Last Date Modified
-    //   - Deleted Code from DL1.01 and DL1.02.
-    // DL1.04/MH/20141017  CASE 187739 Added Lookup- and DrillDown Page
-    // DL1.05/MH/20141128  CASE 188079 Added Key: "Last Log Entry No."
-    // DL1.07/MH/20150515  CASE 214248 Removed TableRelation on field 1 Code
-    // DL1.10/MHA/20160412 CASE 239117 Added field 3 Company Name to Primary Key
-
     Caption = 'Data Log Subscriber';
     DrillDownPageID = "NPR Data Log Subscribers";
     LookupPageID = "NPR Data Log Subscribers";
