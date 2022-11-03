@@ -535,15 +535,13 @@
                                     StrSubstNo(PostingSetupNotFoundLbl, POSBalancingLine.FieldCaption("POS Store Code"), POSBalancingLine.FieldCaption("POS Payment Method Code"), POSBalancingLine.FieldCaption("Deposit-To Bin Code"),
                                     POSBalancingLine."POS Store Code", POSBalancingLine."POS Payment Method Code", POSBalancingLine."Deposit-To Bin Code"));
 
-                            if (POSPostingSetup."Account Type" <> POSPostingSetupNewBin."Account Type") or (POSPostingSetup."Account No." <> POSPostingSetupNewBin."Account No.") then begin
-                                AmountToPostToAccount := AmountToPostToAccount - POSBalancingLine."Deposit-To Bin Amount";
-                                POSPostingSetupNewBin.TestField("Account No.");
-                                TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
-                                    POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.",
-                                    POSBalancingLine."Deposit-To Bin Amount", POSBalancingLine."Deposit-To Reference", GenJournalLine);
+                            AmountToPostToAccount := AmountToPostToAccount - POSBalancingLine."Deposit-To Bin Amount";
+                            POSPostingSetupNewBin.TestField("Account No.");
+                            TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
+                                POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.",
+                                POSBalancingLine."Deposit-To Bin Amount", POSBalancingLine."Deposit-To Reference", GenJournalLine);
 
-                                OnAfterMakeGenJournalForDepositToBin(POSBalancingLine, GenJournalLine);
-                            end;
+                            OnAfterMakeGenJournalForDepositToBin(POSBalancingLine, GenJournalLine);
                         end;
 
                         if POSBalancingLine."New Float Amount" <> 0 then begin
