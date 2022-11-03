@@ -231,7 +231,7 @@ xmlport 6060108 "NPR TM Ticket Conf. Change Req"
                             var
                                 TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
                             begin
-                                TicketUid := Ticket."Ticket No. for Printing";
+                                TicketUid := Ticket."External Ticket No.";
                                 BarcodeNo := Ticket."Ticket No. for Printing";
                                 if (BarcodeNo = '') then
                                     BarcodeNo := Ticket."External Ticket No.";
