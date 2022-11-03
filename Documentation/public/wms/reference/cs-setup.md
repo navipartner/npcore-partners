@@ -107,7 +107,6 @@ From the **CS Setup** you can also set up [CS users](../howto/set-up-cs-users.md
 > [!Note]
 > You can also access one of the [logs](../explanation/cs_logs.md) in **CS Setup** if you encounter unforeseen issues in the environment. 
 
-## Video walkthrough
 
 > [!Video https://share.synthesia.io/1c8a0587-a0ea-4e8e-afd7-449c93ddc4d8]
 
