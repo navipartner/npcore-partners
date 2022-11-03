@@ -1,8 +1,6 @@
 ﻿table 6059897 "NPR Data Log Setup (Table)"
 {
     Access = Public;
-    //This Table contains Setup information of which Record Changes to log.
-
     Caption = 'Data Log Setup (Table)';
     DataClassification = CustomerContent;
 

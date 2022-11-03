@@ -1,11 +1,6 @@
 ﻿table 6059898 "NPR Data Log Record"
 {
-    // DL1.00/MH/20140801  NP-AddOn: Data Log
-    //   - This Table contains Record ID's of logged Record Changes.
-    // DL1.04/MH/20141017  CASE 187739 NP-AddOn: Data Log
-    //   - Renamed table from Integration Record.
-    // DL1.06/MH/20150126  CASE 203653 Added Log Date to Key for optimizing Cleanup: Log Date,Table ID.
-
+    Access = Public;
     Caption = 'Data Log Record';
     DataClassification = CustomerContent;
 
