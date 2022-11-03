@@ -81,13 +81,13 @@
                     POSSaleLine."Line Type"::Rounding:
                         begin
                             InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, true, POSEntrySalesLine);
-                            InsertPOSTaxAmountReverseSign(POSSaleLine.SystemId, POSEntry); 
-                        end;   
+                            InsertPOSTaxAmountReverseSign(POSSaleLine.SystemId, POSEntry);
+                        end;
                     POSSaleLine."Line Type"::"GL Payment":
                         begin
                             InsertPOSSaleLine(POSSale, POSSaleLine, POSEntry, false, POSEntrySalesLine);
-                            InsertPOSTaxAmountReverseSign(POSSaleLine.SystemId, POSEntry); 
-                        end;                           
+                            InsertPOSTaxAmountReverseSign(POSSaleLine.SystemId, POSEntry);
+                        end;
                     POSSaleLine."Line Type"::"POS Payment":
                         InsertPOSPaymentLine(POSSale, POSSaleLine, POSEntry, POSEntryPaymentLine);
                     POSSaleLine."Line Type"::Comment:
@@ -97,7 +97,7 @@
         end;
     end;
 
-    internal procedure CreatePOSEntryForCreatedSalesDocument(var POSSale: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header"; Posted: Boolean)    
+    internal procedure CreatePOSEntryForCreatedSalesDocument(var POSSale: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header"; Posted: Boolean)
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
@@ -242,7 +242,7 @@
             POSSaleLine."Line Type"::"Issue Voucher":
                 POSEntrySalesLine.Type := POSEntrySalesLine.Type::Voucher;
             POSSaleLine."Line Type"::Rounding:
-                POSEntrySalesLine.Type := POSEntrySalesLine.Type::Rounding;                    
+                POSEntrySalesLine.Type := POSEntrySalesLine.Type::Rounding;
             POSSaleLine."Line Type"::"GL Payment":
                 if POSSaleLine."Gen. Posting Type" <> POSSaleLine."Gen. Posting Type"::Purchase then
                     POSEntrySalesLine.Type := POSEntrySalesLine.Type::"G/L Account"
@@ -1047,8 +1047,6 @@
     end;
 
     procedure IsCancelledSale(SalePOS: Record "NPR POS Sale"): Boolean
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         exit(SalePOS."Header Type" = SalePOS."Header Type"::Cancelled);
     end;
@@ -1491,8 +1489,6 @@
     end;
 
     local procedure IsCancelledSaleExt(ExtSalePOS: Record "NPR External POS Sale"): Boolean
-    var
-        ExtSaleLinePOS: Record "NPR External POS Sale Line";
     begin
         exit(ExtSalePOS."Header Type" = ExtSalePOS."Header Type"::Cancelled);
     end;
@@ -1612,7 +1608,7 @@
                     ExtSaleLinePOS."Line Type"::Rounding:
                         begin
                             InsertPOSSaleLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, false, POSSalesLine);
-                        end;                        
+                        end;
                     ExtSaleLinePOS."Line Type"::"GL Payment":
                         begin
                             InsertPOSSaleLineExt(ExtSalePOS, ExtSaleLinePOS, POSEntry, true, POSSalesLine);
@@ -1660,11 +1656,11 @@
 
         case ExtSaleLinePOS."Line Type" of
             ExtSaleLinePOS."Line Type"::Item:
-                POSSalesLine.Type := POSSalesLine.Type::Item;        
+                POSSalesLine.Type := POSSalesLine.Type::Item;
             ExtSaleLinePOS."Line Type"::"Customer Deposit":
                 POSSalesLine.Type := POSSalesLine.Type::Customer;
             ExtSaleLinePOS."Line Type"::Rounding:
-                    POSSalesLine.Type := POSSalesLine.Type::Rounding;
+                POSSalesLine.Type := POSSalesLine.Type::Rounding;
             ExtSaleLinePOS."Line Type"::"GL Payment":
                 begin
                     if ExtSaleLinePOS."Gen. Posting Type" <> ExtSaleLinePOS."Gen. Posting Type"::Purchase then
