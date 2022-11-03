@@ -106,6 +106,19 @@ page 6060032 "NPR MM Membership Statistics"
                     MMStatMgmt.CreateHistoricalData();
                 end;
             }
+            action(CreateHistorySingleDate)
+            {
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Caption = 'Create Historical Data (Single Date)';
+                ToolTip = 'Creates historical data for statistics purpose for a single date.';
+                Image = Add;
+                trigger OnAction()
+                var
+                    MMStatMgmt: Codeunit "NPR MM Membership Stat. Mgmt.";
+                begin
+                    MMStatMgmt.CreateHistoricalDataSingleDate();
+                end;
+            }
             action(DeleteHistory)
             {
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
