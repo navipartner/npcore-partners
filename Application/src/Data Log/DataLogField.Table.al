@@ -1,8 +1,6 @@
 ﻿table 6059899 "NPR Data Log Field"
 {
     Access = Internal;
-    //   - This Table contains Field Values of logged Record Changes.
-
     Caption = 'Data Log Field';
     DataClassification = CustomerContent;
 

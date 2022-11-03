@@ -17,8 +17,6 @@
         MonitoredTablesLoaded: Boolean;
         DataLogDisabled: Boolean;
 
-    //--- Debug ---
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterGetDatabaseTableTriggerSetup', '', true, false)]
     local procedure GetDatabaseTableTriggerSetup(TableId: Integer; var OnDatabaseInsert: Boolean; var OnDatabaseModify: Boolean; var OnDatabaseDelete: Boolean; var OnDatabaseRename: Boolean)
     var
@@ -222,8 +220,6 @@
         until TempDataLogSubscriber.Next() = 0;
     end;
 
-    //--- Setup ---
-
     internal procedure InitializeIntegrationRecords(TableID: Integer)
     var
         RecRef: RecordRef;
@@ -269,8 +265,6 @@
     begin
         DataLogDisabled := Disable;
     end;
-
-    //--- Database ---
 
     local procedure InsertDataFields(var RecRef: RecordRef; RecordEntryNo: BigInteger; LastModified: DateTime; LogChanges: Boolean)
     var
