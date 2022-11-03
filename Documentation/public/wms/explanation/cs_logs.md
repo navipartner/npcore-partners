@@ -11,7 +11,6 @@ If something goes wrong, and you're not sure what caused it, it's possible to ac
 >[!Note]
 > When looking for the source of the issue, it's necessary to know the ID of the involved device. The device ID can be found in the **PROFILE** page in the NP WMS app.
 
-### Communication Log - video
 
 > [!Video https://share.synthesia.io/dd05efc7-b4ed-4dc4-b4e5-26383620bbac]
 
@@ -22,7 +21,6 @@ The posting buffer keeps track of all transactions handled by the NP WMS module.
 > [!Note]
 > Failed transactions are usually recorded in the Role Center as well. 
 
-### Posting Buffer - video
 
 > [!Video https://share.synthesia.io/679b6d52-69a0-44d5-ba37-6561a2d55545]
 
@@ -32,7 +30,6 @@ During the inventory pick, you have the option to post a document. If you choose
 
 The documents containing this data are preserved in the **Print Buffer** log, so that they can be reprinted if needed. 
 
-### Print Buffer - video
 
 > [!Video https://share.synthesia.io/6c751793-c9b9-4dcc-af08-bd9bbfbae027]
 

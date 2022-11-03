@@ -29,8 +29,7 @@ All users who will should have access to the [mobile apps](/Documentation/public
     - **Logon Method** - select whether the logon method is automatic or if you're prompted to provide credentials.
     - **User group** - enter or select a valid User Group Code which determines which group the employee belongs to. 
     - **Device Id** - enter or select the device Id of the mobile device attached to the user. There can be only one device per a user. 
-
-## Video walkthrough
+  
 
 > [!Video https://share.synthesia.io/9b0638e1-9af7-4b50-ac78-7edf867d0fa3]
 

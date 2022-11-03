@@ -32,15 +32,11 @@ To perform the planned stock count on the mobile device, follow the provided ste
 > [!Note]
 > Unplanned count is performed similarly to the planned count on mobile devices. However, no Physical Inventory Journals will be created in Business Central. The quantity from the NP apps will be transferred to Business Central, and the difference between the scanned quantities will be posted as Inventory Adjustments. 
 
-## Video walkthroughs
 
-### Perform stock count (Business Central)
+> [!Video https://share.synthesia.io/e40343b3-3ccd-489e-812e-c2ae88422ff4]
 
-> [!Video https://share.synthesia.io/embeds/videos/e40343b3-3ccd-489e-812e-c2ae88422ff4]
 
-### Perform stock count - planned
-
-> [!Video https://share.synthesia.io/embeds/videos/3ddb5ff5-5fe0-4b83-adab-0862d81076f7]
+> [!Video https://share.synthesia.io/3ddb5ff5-5fe0-4b83-adab-0862d81076f7]
 
 ### Related links
 
