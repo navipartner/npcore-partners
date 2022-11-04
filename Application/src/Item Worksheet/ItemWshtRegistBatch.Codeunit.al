@@ -12,12 +12,9 @@
 
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
-        ItemWorksheet: Record "NPR Item Worksheet";
         ItemWkshLine: Record "NPR Item Worksheet Line";
-        RegisteredItemWorksheet: Record "NPR Registered Item Works.";
         ItemWkshCheckLine: Codeunit "NPR Item Wsht.-Check Line";
         Window: Dialog;
-        NextEntryNo: Integer;
         NoOfRecords: Integer;
         StartLineNo: Integer;
         CheckingLinesLbl: Label 'Checking lines        #2######\';
@@ -53,31 +50,15 @@
     end;
 
     local procedure CreateRegisteredWorksheet()
+    var
+        ItemWorksheet: Record "NPR Item Worksheet";
+        ItemWorksheetCU:Codeunit "NPR Item Worksheet";
     begin
-        if NextEntryNo = 0 then begin
-            RegisteredItemWorksheet.LockTable();
-            if RegisteredItemWorksheet.FindLast() then
-                NextEntryNo := RegisteredItemWorksheet."No.";
-            NextEntryNo := NextEntryNo + 1;
-        end;
-
         ItemWkshLine.FindFirst();
         ItemWkshLine.TestField("Worksheet Name");
         ItemWorksheet.Get(ItemWkshLine."Worksheet Template Name", ItemWkshLine."Worksheet Name");
-        RegisteredItemWorksheet.Init();
-        RegisteredItemWorksheet."No." := NextEntryNo;
-        RegisteredItemWorksheet."Worksheet Name" := ItemWorksheet.Name;
-        RegisteredItemWorksheet.Description := ItemWorksheet.Description;
-        RegisteredItemWorksheet."Vendor No." := ItemWorksheet."Vendor No.";
-        RegisteredItemWorksheet."Currency Code" := ItemWorksheet."Currency Code";
-        RegisteredItemWorksheet."Prices Including VAT" := ItemWorksheet."Prices Including VAT";
-        RegisteredItemWorksheet."Print Labels" := ItemWorksheet."Print Labels";
-        RegisteredItemWorksheet."No. Series" := ItemWorksheet."No. Series";
-        RegisteredItemWorksheet."Item Worksheet Template" := ItemWorksheet."Item Template Name";
-        RegisteredItemWorksheet."Registered Date Time" := CurrentDateTime;
-        RegisteredItemWorksheet."Registered by User ID" := CopyStr(UserId, 1, MaxStrLen(RegisteredItemWorksheet."Registered by User ID"));
-        RegisteredItemWorksheet."Item Group" := ItemWorksheet."Item Group";
-        RegisteredItemWorksheet.Insert(true);
+
+        ItemWorksheetCU.InsertRegisteredWorksheet(ItemWorksheet);
     end;
 
     local procedure CheckLines()
