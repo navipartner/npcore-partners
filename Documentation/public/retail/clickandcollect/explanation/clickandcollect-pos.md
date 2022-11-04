@@ -9,7 +9,7 @@ The following POS actions in the **Menu Buttons Setup** administrative section n
 
 In the **POS Parameter Values section**, you can pre-set the order amount percentage that needs to be made by a customer as prepayment. in the **prepaymentPercent** row. If not set, customers will be prompted to insert a percentage which will be taken as prepayment in the sales order.  
 
-- **Process Click N Collect Order** with the **PROCESS_COLLECT_ORD** action code is mainly used for processing collect orders via the POS in the collecting store.
+- **Process Click N Collect Order** with the **PROCESS_COLLECT_ORD** action code is mainly used for displaying a list of collect orders that need processing (orders that have neither been confirmed or rejected).
 - **Pickup Click N Collect Order** with the **DELIVER_COLLECT_ORD** action code is mainly used for delivering the processed collect orders via the POS in the collecting store. 
 
 ### Related links
