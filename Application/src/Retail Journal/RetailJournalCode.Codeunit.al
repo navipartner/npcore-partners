@@ -457,6 +457,7 @@
     procedure CopyPurchaseOrder2RetailJnlLines(var PurchaseLine: Record "Purchase Line"; RetailJnlCode: Code[40])
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
+        ItemWorksheetCU: Codeunit "NPR Item Worksheet";
     begin
         if not SetRetailJnl(RetailJnlCode) then
             exit;
@@ -483,7 +484,7 @@
                 end;
                 RetailJnlLine."Last Direct Cost" := PurchaseLine."Direct Unit Cost";
 
-                OnBeforeRetJnlLineInsertFromPurchLine(PurchaseLine, RetailJnlLine);
+                ItemWorksheetCU.OnBeforeRetJnlLineInsertFromPurchLine(PurchaseLine, RetailJnlLine);
                 RetailJnlLine.Insert();
             until PurchaseLine.Next() = 0;
         RetailJnlLine.CloseGUI();
@@ -663,11 +664,6 @@
             exit;
         REPORT.Run(ReportType, true, false, JournalLine);
         Skip := true;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRetJnlLineInsertFromPurchLine(PurchaseLine: Record "Purchase Line"; var RetailJnlLine: Record "NPR Retail Journal Line")
-    begin
     end;
 
     [IntegrationEvent(false, false)]
