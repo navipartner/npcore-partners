@@ -8,23 +8,23 @@ To set up the Click & Collect module in NP Retail, follow the provided steps:
 
 ![Click & Collect Web Service Example](../images/collect_store_webservice.png "Click & Collect WS")
 
- - Make sure there's a user whose **License Type** is set to **External user** in the environment.      
+ - Make sure there's a user whose **License Type** is set to **External User** in the environment.      
    You need to make sure that a password in **Business Central Password Authentication** is set for the user, as well as adequate permissions in the **User Permission Sets** panel of the **User Card**. 
- - The **Role** in the **My Settings** page needs to be set to **NP Retail** so that you can have access to the necessary configurations for the Click & Collect module.
+ - The **Role** on the **My Settings** page needs to be set to **NP Retail** so that you can have access to the necessary configurations for the Click & Collect module.
 
 The Click & Collect module configuration consists of the following tasks:
 
 - Create a new **Collect Store**.
-- Configure **Collect Workflow Module**.
+- Configure the **Collect Workflow Module**.
 - Create a new **Collect Workflow**.
 
 Each one is individually addressed in further text. 
 
 ## Create a new Collect Store
 
-The following procedure requires necessary steps for creating a collect store that can be successfully used with the Click & Collect module.
+The following procedure contains necessary steps for creating a collect store that can be successfully used with the Click & Collect module.
 
-1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Collect Stores** and choose the related link.            
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Collect Stores**, and choose the related link.            
    The card contains various options for managing collect stores.  
 2. To create a new store card, click **New**.             
    The **Collect Store Card** popup window is displayed. Use the provided fields to create a collect store.       
@@ -33,7 +33,7 @@ The following procedure requires necessary steps for creating a collect store th
   > The **Code** field is required.
 
 3. Provide the company name in the **Company Name** field.      
-   The **Service Url** field is populated automatically according to the value provided in the **Company Name** field.
+   The **Service Url** field is populated automatically if the store is in the same tenant, but it needs to be provided manually if that's not the case. 
 4. Provide the service username and password in the designated fields. 
 5. Activate the **Local Store** toggle switch if you're creating a source collect store, or leave it inactive if you're creating a target/collecting store.    
    If this toggle switch is active, the new **POS Relations** section displays in the **Store Card**. This section can be used for defining which POS store/unit the collect store is associated with.          
@@ -72,7 +72,7 @@ To create a new collect workflow, refer to the provided steps:
 | **E-mail Template/ SMS Template** | Use this field to define the email/SMS template to be sent. | 
 | **Customer Mapping** | Use this field to define how customers should be mapped during the order import in the collecting store. |
 | **Processing Expiry Duration** | Use this field to define the duration of the processing time. |
-| **Auto Post Order** | Define if the sales order will be posted automatically in the local store when the order has been delivered. |
+| **Archive on Delivery** | Define if the collect order will be automatically archived when delivered, rejected or if the order expires. |
 | **Notify Customer via Email/SMS** | If enabled, the customer will receive a notification for each order status. Note that the template definition is very important. If the template hasn't been defined for a status, even if the checkmark is ticked, a notification will not be sent. |
 
 3. Use the options in the **Send Order** section to determine whether the store will receive email notifications about the order, define what the email template looks like, how the customers are mapped during the order import in the collecting store, and so on. 
