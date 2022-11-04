@@ -38,10 +38,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
 
             ItemIdentifierType::SerialNoItemCrossReference:
                 begin
-
-                    TagId := CopyStr(CopyStr(ItemIdentifier, 5), 1, MaxStrLen(TagId));
-
-                    ItemReference.SetRange("Reference No.", CopyStr(TagId, 1, MaxStrLen(ItemReference."Reference No.")));
+                    ItemReference.SetRange("Reference No.", CopyStr(ItemIdentifier, 1, MaxStrLen(ItemReference."Reference No.")));
                     ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"NPR Retail Serial No.");
                     ItemReference.FindFirst();
                     FirstRec := Format(ItemReference);
