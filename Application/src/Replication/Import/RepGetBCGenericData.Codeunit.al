@@ -290,7 +290,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
             GetBLOBResponse(RecRef, BlobURL, TempFoundAPIField, ReplicationEndPoint, Client, Response);
             DestinationFRef := RecRef.Field(FieldNo);
             if Format(DestinationFRef.Value) <> format(EmptyGuid) then
-                Media.Get(Format(DestinationFRef.Value));
+                if Media.Get(Format(DestinationFRef.Value)) then;
             Media.CalcFields(Content);
             Media.Content.CreateInStream(IStr);
             ExistingMediaTempBlob.CreateOutStream(OStr);
@@ -333,7 +333,7 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
             if Format(DestinationFRef.Value) <> format(EmptyGuid) then begin
                 MediaSet.SetRange(ID, Format(DestinationFRef.Value));
                 if MediaSet.FindFirst() and (Format(MediaSet."Media ID") <> format(EmptyGuid)) then
-                    Media.Get(Format(MediaSet."Media ID"));
+                    if Media.Get(Format(MediaSet."Media ID")) then;
             end;
             Media.CalcFields(Content);
             Media.Content.CreateInStream(IStr);
@@ -440,15 +440,14 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         end else
             MediaId := FRef.Value;
 
-        if not IsNullGuid(MediaId) then begin
-            Media.Get(MediaId);
-            if (Media.Content.HasValue()) then begin
-                Media.CalcFields(Content);
-                Media.Content.CreateInStream(IStr);
-                TempBlob.CreateOutStream(OStr);
-                CopyStream(OStr, IStr);
-            end;
-        end;
+        if not IsNullGuid(MediaId) then
+            if Media.Get(MediaId) then
+                if (Media.Content.HasValue()) then begin
+                    Media.CalcFields(Content);
+                    Media.Content.CreateInStream(IStr);
+                    TempBlob.CreateOutStream(OStr);
+                    CopyStream(OStr, IStr);
+                end;
     end;
 
     local procedure UpdateImage(var FRef: FieldRef; IStr: InStream; MimeType: Text)
