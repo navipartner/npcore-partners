@@ -57,6 +57,18 @@
         {
             Caption = 'Quantity to Print';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                Error_BoundsCheck: Label 'Number of prints too high. Split into several requests';
+            begin
+                //Reports with a ton of barcodes fonts or images can bloat NST memory to double digit gigabyte size from 1 user session, eventually leading to a crashed NST for all sessions if max memory is hit. 
+                //This guards against that when printing from RJL. Main purpose is to block accidental barcode scans as this is a very easy way to accidentally trigger huge prints.
+
+                if "Quantity to Print" > 10000 then begin
+                    Rec.FieldError("Quantity to Print", Error_BoundsCheck);
+                end;
+            end;
         }
         field(4; Description; Text[100])
         {
@@ -506,7 +518,7 @@
                     RetailJournalLine."Exchange Label" := ExchangeLabel.Barcode;
                     RetailJournalLine.Validate("Item No.", ExchangeLabel."Item No.");
                     RetailJournalLine.Validate("Variant Code", ExchangeLabel."Variant Code");
-                    RetailJournalLine."Quantity to Print" := ExchangeLabel.Quantity;
+                    RetailJournalLine.Validate("Quantity to Print", ExchangeLabel.Quantity);
 
                     if MultipleLines then
                         RetailJournalLine.Insert(true)

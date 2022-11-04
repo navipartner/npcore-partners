@@ -359,7 +359,7 @@
             repeat
                 RetailJnlLine.InitLine();
                 RetailJnlLine.SetItem(TransferShipmentLine."Item No.", TransferShipmentLine."Variant Code", '');
-                RetailJnlLine."Quantity to Print" := TransferShipmentLine.Quantity;
+                RetailJnlLine.Validate("Quantity to Print", TransferShipmentLine.Quantity);
 
                 RetailJnlLine.Insert();
             until TransferShipmentLine.Next() = 0;
@@ -394,7 +394,7 @@
             repeat
                 RetailJnlLine.InitLine();
                 RetailJnlLine.SetItem(TransferReceiptLine."Item No.", TransferReceiptLine."Variant Code", '');
-                RetailJnlLine."Quantity to Print" := TransferReceiptLine.Quantity;
+                RetailJnlLine.Validate("Quantity to Print", TransferReceiptLine.Quantity);
 
                 RetailJnlLine.Insert();
             until TransferReceiptLine.Next() = 0;
@@ -430,7 +430,7 @@
             repeat
                 RetailJnlLine.InitLine();
                 RetailJnlLine.SetItem(TransferLine."Item No.", TransferLine."Variant Code", '');
-                RetailJnlLine."Quantity to Print" := TransferLine.Quantity;
+                RetailJnlLine.Validate("Quantity to Print", TransferLine.Quantity);
 
                 RetailJnlLine.Insert();
             until TransferLine.Next() = 0;
@@ -476,11 +476,11 @@
                     RetailJnlLine.SetItem(PurchaseLine."No.", PurchaseLine."Variant Code", '');
                 case Selection of
                     1:
-                        RetailJnlLine."Quantity to Print" := PurchaseLine.Quantity;
+                        RetailJnlLine.Validate("Quantity to Print", PurchaseLine.Quantity);
                     2:
-                        RetailJnlLine."Quantity to Print" := PurchaseLine."Qty. to Receive";
+                        RetailJnlLine.Validate("Quantity to Print", PurchaseLine."Qty. to Receive");
                     3:
-                        RetailJnlLine."Quantity to Print" := PurchaseLine."Quantity Received";
+                        RetailJnlLine.Validate("Quantity to Print", PurchaseLine."Quantity Received");
                 end;
                 RetailJnlLine."Last Direct Cost" := PurchaseLine."Direct Unit Cost";
 
@@ -523,7 +523,7 @@
                     RetailJnlLine.SetItem(PurchInvLine."No.", PurchInvLine."Variant Code", PurchInvLine."Item Reference No.")
                 else
                     RetailJnlLine.SetItem(PurchInvLine."No.", PurchInvLine."Variant Code", '');
-                RetailJnlLine."Quantity to Print" := PurchInvLine.Quantity;
+                RetailJnlLine.Validate("Quantity to Print", PurchInvLine.Quantity);
 
                 RetailJnlLine."Last Direct Cost" := PurchInvLine."Direct Unit Cost";
 
@@ -564,7 +564,7 @@
                 RetailJnlLine.InitLine();
 
                 RetailJnlLine.SetItem(WarehouseActivityLine."Item No.", WarehouseActivityLine."Variant Code", '');
-                RetailJnlLine."Quantity to Print" := WarehouseActivityLine.Quantity;
+                RetailJnlLine.Validate("Quantity to Print", WarehouseActivityLine.Quantity);
 
                 RetailJnlLine.Insert();
             until WarehouseActivityLine.Next() = 0;
