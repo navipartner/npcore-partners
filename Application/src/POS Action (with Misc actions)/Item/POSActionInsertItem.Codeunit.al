@@ -350,6 +350,24 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
             InScope := true;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
+    local procedure SetEanBoxEventInScopeSerialNoItemCrossRef(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
+    var
+        ItemReference: Record "Item Reference";
+    begin
+        if EanBoxSetupEvent."Event Code" <> EventCodeSerialNoItemRef() then
+            exit;
+
+        if StrLen(EanBoxValue) > MaxStrLen(ItemReference."Reference No.") then
+            exit;
+
+        ItemReference.SetCurrentKey("Reference Type", "Reference No.");
+        ItemReference.SetRange("Reference No.", UpperCase(EanBoxValue));
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"NPR Retail Serial No.");
+        if not ItemReference.IsEmpty() then
+            InScope := true;
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR POS Action: Insert Item");
