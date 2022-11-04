@@ -460,7 +460,7 @@
         RetailJournalLineOut."Register No." := POSUnit.GetCurrentPOSUnit();
         RetailJournalLineOut.Validate("Item No.", ItemNo);
         RetailJournalLineOut.Validate("Variant Code", VariantCode);
-        RetailJournalLineOut."Quantity to Print" := Quantity;
+        RetailJournalLineOut.Validate("Quantity to Print", Quantity);
         RetailJournalLineOut."Description 2" := Item."Description 2";
 
         if Item."Costing Method" = Item."Costing Method"::Specific then begin
@@ -581,7 +581,7 @@
                 RetailJnlLine."No." := Format(GUID);
                 RetailJnlLine."Line No." := ItemJournalLine."Line No.";
                 RetailJnlLine.Validate("Item No.", ItemJournalLine."Item No.");
-                RetailJnlLine."Quantity to Print" := ItemJournalLine.Quantity;
+                RetailJnlLine.Validate("Quantity to Print", ItemJournalLine.Quantity);
                 RetailJnlLine.Description := ItemJournalLine.Description;
                 RetailJnlLine.Validate("Variant Code", ItemJournalLine."Variant Code");
                 RetailJnlLine.Insert(true);
