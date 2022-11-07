@@ -178,6 +178,7 @@ codeunit 6014641 "NPR BTF Service API"
         Page.Run(Page::"NPR BTF Service Endpoint", ServiceEndPoint);
     end;
 
+    [Obsolete('Use DownloadErrorLog')]
     procedure DownloadErrorLogResponse(ErrorLog: Record "NPR BTF EndPoint Error Log")
     var
         ResponseBlob: Codeunit "Temp Blob";
@@ -193,6 +194,7 @@ codeunit 6014641 "NPR BTF Service API"
         FileMgt.BLOBExport(ResponseBlob, ErrorLog."Response File Name", true);
     end;
 
+    [Obsolete('Use ShowWhoInitiateRequest')]
     procedure ShowWhoInitiateWebReqSending(ErrorLog: Record "NPR BTF EndPoint Error Log")
     var
         PageManagement: Codeunit "Page Management";
@@ -204,6 +206,37 @@ codeunit 6014641 "NPR BTF Service API"
         end;
         PageManagement.PageRun(RecRef);
     end;
+
+    procedure DownloadErrorLog(EntryNo: Integer)
+    var
+        ErrorLog: Record "NPR BTF EndPoint Error Log";
+        ResponseBlob: Codeunit "Temp Blob";
+        FileMgt: Codeunit "File Management";
+        OutStr: OutStream;
+    begin
+        ErrorLog.Get(EntryNo);
+        if not ErrorLog.Response.HasValue() then begin
+            Message(ResponseContentNotFoundMsg, Format(ErrorLog."Initiatied From Rec. ID"));
+            exit;
+        end;
+        ResponseBlob.CreateOutStream(OutStr);
+        ErrorLog.Response.ExportStream(OutStr);
+        FileMgt.BLOBExport(ResponseBlob, ErrorLog."Response File Name", true);
+    end;
+
+    procedure ShowWhoInitiateRequest(EntryNo: Integer)
+    var
+        PageManagement: Codeunit "Page Management";
+        RecRef: RecordRef;
+        ErrorLog: Record "NPR BTF EndPoint Error Log";
+    begin
+        ErrorLog.Get(EntryNo);
+        if not RecRef.Get(ErrorLog."Initiatied From Rec. ID") then begin
+            Message(ResponseContentNotFoundMsg, Format(ErrorLog."Initiatied From Rec. ID"));
+            exit;
+        end;
+        PageManagement.PageRun(RecRef);
+    end;      
 
     procedure GetIntegrationPrefix(): Text
     begin
