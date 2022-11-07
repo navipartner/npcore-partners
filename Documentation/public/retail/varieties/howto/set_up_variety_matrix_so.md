@@ -1,6 +1,6 @@
 # Set up variety matrix facilities on Sales Orders
 
-To set up variety matrix facilities on sales and purchase orders, follow the provided steps: 
+The Variety Matrix is used for configuring detailed item lines on various orders by matching the available attributes. To set up variety matrix facilities on sales orders, follow the provided steps: 
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Variety Setup** and open the related link.   
 2. Enable **Pop up Variety Matrix**.     
