@@ -144,7 +144,7 @@
                 var
                     ServiceAPI: Codeunit "NPR BTF Service API";
                 begin
-                    ServiceAPI.ShowWhoInitiateWebReqSending(Rec);
+                    ServiceAPI.ShowWhoInitiateRequest(Rec."Entry No.");
                 end;
             }
         }
@@ -162,7 +162,7 @@
                 var
                     ServiceAPI: Codeunit "NPR BTF Service API";
                 begin
-                    ServiceAPI.DownloadErrorLogResponse(Rec);
+                    ServiceAPI.DownloadErrorLog(Rec."Entry No.");
                 end;
             }
         }
