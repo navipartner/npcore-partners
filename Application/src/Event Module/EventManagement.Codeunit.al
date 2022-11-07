@@ -2018,7 +2018,12 @@
         JobJnlLine: Record "Job Journal Line";
         DocType: Enum "Sales Document Type";
         PostedDocType: Enum "Job Planning Line Invoice Document Type";
+#if BC17
         LineType: Option;
+#else
+        LineType : Enum "Job Journal Line Type";
+#endif
+
     begin
         POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntrySalesLine.setrange(Type, POSEntrySalesLine.Type::Item);
@@ -2026,7 +2031,12 @@
             exit;
         repeat
             if JobPlanningLineInvoiceExists(Database::"NPR POS Sale", DocType::Quote, POSEntrySalesLine."Document No.", JobPlanningLineInvoice, PostedDocType) then begin
+#if BC17
                 LineType := JobJnlLine."Line Type"::" ";
+#else
+                LineType := JobJnlLine."Line Type"::" ".AsInteger();
+#endif
+
                 JobPlanningLineInvoice.SetRange("Line No.", POSEntrySalesLine."Line No.");
                 ChangeJobPlanInvoiceFromNonpostedToPosted(JobPlanningLineInvoice, PostedDocType, POSEntrySalesLine."Document No.", POSEntry."Posting Date", JobPlanningLineInvoice2);
                 CreateJobJnlLineFromPOSEntrySalesLine(POSEntry, POSEntrySalesLine, JobJnlLine."Entry Type"::Usage, LineType, JobJnlLine);
@@ -2035,7 +2045,11 @@
                 Codeunit.Run(Codeunit::"Job Jnl.-Post Line", JobJnlLine);
                 JobPlanningLineInvoice.SetRange("Line No.");
             end else begin
+#if BC17
                 LineType := JobJnlLine."Line Type"::"Both Budget and Billable";
+#else
+                LineType := JobJnlLine."Line Type"::"Both Budget and Billable".AsInteger();
+#endif
                 CreateJobJnlLineFromPOSEntrySalesLine(POSEntry, POSEntrySalesLine, JobJnlLine."Entry Type"::Usage, LineType, JobJnlLine);
                 Codeunit.Run(Codeunit::"Job Jnl.-Post Line", JobJnlLine);
                 CreateJobJnlLineFromPOSEntrySalesLine(POSEntry, POSEntrySalesLine, JobJnlLine."Entry Type"::Sale, LineType, JobJnlLine);
@@ -2045,7 +2059,11 @@
         until POSEntrySalesLine.Next() = 0;
     end;
 
+#if BC17
     local procedure CreateJobJnlLineFromPOSEntrySalesLine(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; EntryType: Enum "Job Journal Line Entry Type"; LineType: Option; var JobJnlLine: Record "Job Journal Line")
+#else
+    local procedure CreateJobJnlLineFromPOSEntrySalesLine(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; EntryType: Enum "Job Journal Line Entry Type"; LineType: Enum "Job Journal Line Type"; var JobJnlLine: Record "Job Journal Line")
+#endif
     var
         SourceCodeSetup: Record "Source Code Setup";
     begin
@@ -2095,7 +2113,11 @@
         JobJnlLine."Dimension Set ID" := DimensionManagement.GetCombinedDimensionSetID(DimSetEntryIDArray, JobJnlLine."Shortcut Dimension 1 Code", JobJnlLine."Shortcut Dimension 2 Code");
     end;
 
+#if BC17
     local procedure CreateJobPlanningLineInvoiceFromPOSEntrySalesLine(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; PostedDocType: Enum "Job Planning Line Invoice Document Type"; LineType: Option)
+#else
+    local procedure CreateJobPlanningLineInvoiceFromPOSEntrySalesLine(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; PostedDocType: Enum "Job Planning Line Invoice Document Type"; LineType: Enum "Job Planning Line Line Type")
+#endif
     var
         JobPlanningLine: Record "Job Planning Line";
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
@@ -2104,7 +2126,11 @@
         JobPlanningLine.SetAutoCalcFields("Qty. Transferred to Invoice");
         JobPlanningLine.SetRange("Job No.", POSEntry."Event No.");
         JobPlanningLine.SetRange("Job Task No.", POSEntry."Event Task No.");
+#if BC17
         JobPlanningLine.SetRange("Line Type", LineType - 1);
+#else
+        JobPlanningLine.SetRange("Line Type", LineType.AsInteger() -1 );
+#endif
         JobPlanningLine.SetRange("System-Created Entry", true);
         JobPlanningLine.SetRange("Document No.", POSEntry."Document No.");
         JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Item);
