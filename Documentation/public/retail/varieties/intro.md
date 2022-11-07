@@ -8,3 +8,4 @@ NP Retail has a tool that can be used for defining the variants associated with 
 
 - [Create a new variety](howto/create_variety.md)
 - [Assign a variety to an item](howto/assign_variety_to_item.md)
+- [Set up variety matrix facilities on Sales Orders](howto/set_up_variety_matrix_so.md)

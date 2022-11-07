@@ -8,6 +8,8 @@
     href: howto/assign_variety_to_item.md
   - name: Block a variety on an item
     href: howto/block_variety.md
+  - name: Set up variety matrix facilities on Sales Orders
+    href: howto/set_up_variety_matrix_so.md
 - name: Reference
   items:
   - name: Variety setup (reference guide)
