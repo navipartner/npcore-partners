@@ -1084,6 +1084,8 @@
         JSONManagement: Codeunit "JSON Management";
         NodeList: XmlNodeList;
         Node: XmlNode;
+        JObject: JsonObject;
+        JArray: JsonArray;
         XmlAsText: Text;
     begin
         Document2 := Document;
@@ -1095,6 +1097,12 @@
 
         Document2.WriteTo(XmlAsText);
         JsonString := JSONManagement.XMLTextToJSONText(XmlAsText);
+
+        if NpXmlTemplate."JSON Root is Array" then begin
+            JObject.ReadFrom(JsonString);
+            JArray.Add(JObject.Clone());
+            JArray.WriteTo(JsonString);
+        end;
 
         if NpXmlTemplate."Use JSON Numbers" then
             JsonString := JsonString.Replace('"(\d*\.?\d*)"(?!:)', '$1');
