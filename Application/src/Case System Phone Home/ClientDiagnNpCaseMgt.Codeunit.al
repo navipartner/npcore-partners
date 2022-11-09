@@ -8,7 +8,6 @@
     procedure CollectAndSendClientDiagnostics()
     var
         ClientDiagnostic: Record "NPR Client Diagnostic";
-        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
     begin
         if not ShouldSendClientDiagnostic(ClientDiagnostic) then
             exit;

@@ -13,10 +13,12 @@ page 6060031 "NPR RC Membership Statistics"
             cuegroup("Membership Statistics")
             {
                 Caption = 'Membership Statistics';
-                field("Active Members"; Rec."Active Members")
+                field("Active Members"; GetDecimalValueFromIntegerValue(Rec."Active Members"))
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Active Members field';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
                     Caption = 'Active';
                     trigger OnDrillDown()
                     var
@@ -24,10 +26,12 @@ page 6060031 "NPR RC Membership Statistics"
                         Rec.ShowStatisticsRecord();
                     end;
                 }
-                field("First Time Members"; Rec."First Time Members")
+                field("First Time Members"; GetDecimalValueFromIntegerValue(Rec."First Time Members"))
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the First Time Members field';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
                     Caption = 'First Time';
                     trigger OnDrillDown()
                     var
@@ -39,6 +43,8 @@ page 6060031 "NPR RC Membership Statistics"
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the First Time Members (%) field';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>%';
                     Caption = 'First Time (%)';
                     trigger OnDrillDown()
                     var
@@ -46,10 +52,12 @@ page 6060031 "NPR RC Membership Statistics"
                         Rec.ShowStatisticsRecord();
                     end;
                 }
-                field("Recurring Members"; Rec."Recurring Members")
+                field("Recurring Members"; GetDecimalValueFromIntegerValue(Rec."Recurring Members"))
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Recurring Members field';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
                     Caption = 'Recurring';
                     trigger OnDrillDown()
                     var
@@ -62,6 +70,8 @@ page 6060031 "NPR RC Membership Statistics"
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Recurring Members (%) field';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>%';
                     Caption = 'Recurring (%)';
                     trigger OnDrillDown()
                     var
@@ -69,11 +79,13 @@ page 6060031 "NPR RC Membership Statistics"
                         Rec.ShowStatisticsRecord();
                     end;
                 }
-                field("Future Timeslot"; Rec."Future Timeslot")
+                field("Future Timeslot"; GetDecimalValueFromIntegerValue(Rec."Future Timeslot"))
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = Rec."Future Timeslot" > 0;
                     ToolTip = 'Specifies the value of the Future Timeslot field';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
                     Caption = 'Future';
                     trigger OnDrillDown()
                     var
@@ -86,6 +98,8 @@ page 6060031 "NPR RC Membership Statistics"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = Rec."Future Timeslot" > 0;
                     ToolTip = 'Specifies the value of the Future Timeslot (%) field';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>%';
                     Caption = 'Future (%)';
                     trigger OnDrillDown()
                     var
@@ -98,6 +112,8 @@ page 6060031 "NPR RC Membership Statistics"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Compared LY (%)';
                     ToolTip = 'Specifies the value of the No. of. Members compared LY (%) field';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>%';
                     trigger OnDrillDown()
                     var
                     begin
@@ -105,11 +121,13 @@ page 6060031 "NPR RC Membership Statistics"
                     end;
                 }
 
-                field("No. of. Members expire CM"; Rec."No. of. Members expire CM")
+                field("No. of. Members expire CM"; GetDecimalValueFromIntegerValue(Rec."No. of. Members expire CM"))
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Expire CM';
                     ToolTip = 'Specifies the value of the No. of. Members expire CM field';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
                     Visible = Rec."No. of. Members expire CM" > 0;
                     trigger OnDrillDown()
                     var
@@ -124,6 +142,8 @@ page 6060031 "NPR RC Membership Statistics"
                     Caption = 'Expire CM (%)';
                     Visible = Rec."No. of. Members expire CM" > 0;
                     ToolTip = 'Specifies the value of the No. of. Members expire CM field';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>%';
                     trigger OnDrillDown()
                     var
                     begin
@@ -168,6 +188,11 @@ page 6060031 "NPR RC Membership Statistics"
             Rec.Init();
             Rec.Insert();
         end;
+    end;
+
+    procedure GetDecimalValueFromIntegerValue(IntegerValue: Integer): Decimal
+    begin
+        exit(IntegerValue);
     end;
 
 }
