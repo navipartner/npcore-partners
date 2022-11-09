@@ -151,11 +151,11 @@ page 6060032 "NPR MM Membership Statistics"
     trigger OnAfterGetRecord()
     begin
         ActiveMembers := Rec."First Time Members" + Rec."Recurring Members";
-        FirstTimeMembersPct := Rec."First Time Members" / (Rec."First Time Members" + Rec."Recurring Members") * 100;
-        RecurringMembersPct := Rec."Recurring Members" / (Rec."First Time Members" + Rec."Recurring Members") * 100;
-        FutureTimeslotPct := Rec."Future Members" / (Rec."First Time Members" + Rec."Recurring Members") * 100;
-        MembersComparedLYPct := ((Rec."First Time Members" + Rec."Recurring Members") / (Rec."First Time Members Last Year" + Rec."Recurring Members Last Year") - 1) * 100;
-        MembersExpireCM := Rec."No. of Members expire CM" / (Rec."First Time Members" + Rec."Recurring Members") * 100;
+        FirstTimeMembersPct := Rec."First Time Members" / (Rec."First Time Members" + Rec."Recurring Members");
+        RecurringMembersPct := Rec."Recurring Members" / (Rec."First Time Members" + Rec."Recurring Members");
+        FutureTimeslotPct := Rec."Future Members" / (Rec."First Time Members" + Rec."Recurring Members");
+        MembersComparedLYPct := ((Rec."First Time Members" + Rec."Recurring Members") / (Rec."First Time Members Last Year" + Rec."Recurring Members Last Year") - 1);
+        MembersExpireCM := Rec."No. of Members expire CM" / (Rec."First Time Members" + Rec."Recurring Members");
     end;
 
     var
