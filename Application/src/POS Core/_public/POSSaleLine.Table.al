@@ -153,7 +153,7 @@
                 UOMMgt: Codeunit "Unit of Measure Management";
             begin
                 case "Line Type" of
-                    "Line Type"::"GL Payment","Line Type"::"Issue VOucher","Line Type"::Rounding,"Line Type"::"Issue Voucher","Line Type"::"Customer Deposit":
+                    "Line Type"::"GL Payment", "Line Type"::"Issue VOucher", "Line Type"::Rounding, "Line Type"::"Issue Voucher", "Line Type"::"Customer Deposit":
                         begin
                             "Qty. per Unit of Measure" := 1;
                         end;
@@ -190,7 +190,7 @@
                     Validate("Serial No.", "Serial No.");
 
                 case "Line Type" of
-                    "Line Type"::"POS Payment","Line Type"::"GL Payment","Line Type"::Rounding,"Line Type"::"Issue Voucher","Line Type"::"Customer Deposit":
+                    "Line Type"::"POS Payment", "Line Type"::"GL Payment", "Line Type"::Rounding, "Line Type"::"Issue Voucher", "Line Type"::"Customer Deposit":
                         begin
                             if Quantity = 0 then
                                 Error(Err003);
@@ -272,7 +272,7 @@
             begin
                 POSUnitGlobal.Get("Register No.");
                 case "Line Type" of
-                    "Line Type"::"POS Payment","Line Type"::"GL Payment","Line Type"::Rounding,"Line Type"::"Issue Voucher":
+                    "Line Type"::"POS Payment", "Line Type"::"GL Payment", "Line Type"::Rounding, "Line Type"::"Issue Voucher":
                         begin
                             if Quantity <> 0 then begin
                                 "Amount Including VAT" := "Unit Price" * Quantity;
@@ -378,10 +378,10 @@
                 POSSetup.SetPOSUnit(POSUnit);
 
                 case "Line Type" of
-                    "Line Type"::"POS Payment","Line Type"::"GL Payment","Line Type"::Rounding:
+                    "Line Type"::"POS Payment", "Line Type"::"GL Payment", "Line Type"::Rounding:
                         begin
                             Error(Trans0003);
-                        end;                
+                        end;
                     "Line Type"::"Issue VOucher":
                         begin
                             "Discount Type" := "Discount Type"::" ";
@@ -449,7 +449,7 @@
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-        }        
+        }
         field(30; Amount; Decimal)
         {
             AutoFormatExpression = "Currency Code";
@@ -1660,7 +1660,7 @@
             MaintainSIFTIndex = false;
             SumIndexFields = "Amount Including VAT", Amount, Quantity;
             ObsoleteState = Removed;
-            ObsoleteReason = 'Sale Type field not used anymore. For usage of Sale Type refer to NPR POS Sale table';            
+            ObsoleteReason = 'Sale Type field not used anymore. For usage of Sale Type refer to NPR POS Sale table';
         }
         key(Key11; "Register No.", "Sales Ticket No.", Date, "Sale Type", Type)
         {
@@ -1668,7 +1668,7 @@
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
             ObsoleteState = Removed;
-            ObsoleteReason = 'Sale Type field not used anymore. For usage of Sale Type refer to NPR POS Sale table';            
+            ObsoleteReason = 'Sale Type field not used anymore. For usage of Sale Type refer to NPR POS Sale table';
         }
         key(Key12; "Register No.", "Sales Ticket No.", Date, "Line Type", "Discount Type", "Line No.")
         {
@@ -1679,14 +1679,14 @@
         key(Key13; "Register No.", "Sales Ticket No.", "Line Type", "No.", "Item Category Code", Quantity)
         {
             MaintainSIFTIndex = false;
-            SumIndexFields = "Amount Including VAT", Amount, Quantity;      
+            SumIndexFields = "Amount Including VAT", Amount, Quantity;
         }
         key(Key14; "Register No.", "Sales Ticket No.", Date, "Line Type")
         {
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
-        }        
+        }
     }
 
     fieldgroups
@@ -2115,7 +2115,7 @@
         Handled: Boolean;
     begin
         case true of
-            "Line Type" in ["Line Type"::Rounding, "Line Type"::"GL Payment","Line Type"::"Issue Voucher"]:
+            "Line Type" in ["Line Type"::Rounding, "Line Type"::"GL Payment", "Line Type"::"Issue Voucher"]:
                 begin
                     if Rec."Gen. Posting Type" = Rec."Gen. Posting Type"::" " then begin
                         "VAT Calculation Type" := "VAT Calculation Type"::"Normal VAT";
@@ -2325,6 +2325,7 @@
             Item.TestField("Item Tracking Code");
             ItemTrackingCode.Get(Item."Item Tracking Code");
             if ItemTrackingCode."SN Specific Tracking" then begin
+                ItemLedgerEntry.SetAutoCalcFields("Cost Amount (Actual)");
                 ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Serial No.");
                 ItemLedgerEntry.SetRange(Open, true);
                 ItemLedgerEntry.SetRange(Positive, true);
@@ -2334,7 +2335,6 @@
                     Message(TxtNoSerial, "Serial No.");
                     exit(0);
                 end;
-                ItemLedgerEntry.CalcFields("Cost Amount (Actual)");
                 exit(ItemLedgerEntry."Cost Amount (Actual)");
             end;
         end;
