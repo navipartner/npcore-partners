@@ -84,7 +84,7 @@
         ExchangeLabel.FindFirst();
     end;
 
-    local procedure PrintLabels(PrintType: Option Single,LineQuantity,All,Selection,Package; var LineRef: RecordRef; ValidFromDate: Date): Boolean
+    procedure PrintLabels(PrintType: Option Single,LineQuantity,All,Selection,Package; var LineRef: RecordRef; ValidFromDate: Date): Boolean
     var
         ExchangeLabel: Record "NPR Exchange Label";
         SaleLinePOS: Record "NPR POS Sale Line";
