@@ -159,8 +159,9 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl" implements "NPR IPOS Workflow"
             EventCodeParkedSale():
                 begin
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'ScanSalesTicketNo', true, '');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'QuoteInputType', false, 'List');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'Filter', false, 'All');
                 end;
-
         end;
     end;
 
