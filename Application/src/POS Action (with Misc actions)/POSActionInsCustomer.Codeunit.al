@@ -1,141 +1,63 @@
-﻿codeunit 6150726 "NPR POSAction: Ins. Customer"
+﻿codeunit 6150726 "NPR POSAction: Ins. Customer" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'This is a built-in action for setting a customer on the current transaction';
-        Text000: Label 'Required Customer select after Login';
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+        ParameterCustomerType_OptionsLbl: Label 'Contact,Customer', Locked = true;
+        ParamCardPageId_NameCaptionLbl: Label 'CardPageId';
+        ParamCustomerType_NameCaptionLbl: Label 'CustomerType';
+        ParameterCustomerType_CaptionOptionsLbl: Label 'Contact,Customer';
+        ParamCardPageId_DescrptionLbl: Label 'Card Page Id';
+        ParamCustomerType_DescrptionLbl: Label 'Customer Type';
     begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Single)
-        then begin
-            Sender.RegisterWorkflowStep('CreateContact', 'if(param.CustomerType == 0) {respond()}');
-            Sender.RegisterWorkflowStep('CreateCustomer', 'if(param.CustomerType == 1) {respond()}');
-
-            Sender.RegisterOptionParameter('CustomerType', 'Contact,Customer', 'Contact');
-            Sender.RegisterIntegerParameter('CardPageId', 0);
-
-            Sender.RegisterWorkflow(false);
-        end;
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddIntegerParameter(ParameterCardPageId_Name(), 0, ParamCardPageId_NameCaptionLbl, ParamCardPageId_DescrptionLbl);
+        WorkflowConfig.AddOptionParameter(
+            ParameterCustomerType_Name(),
+            ParameterCustomerType_OptionsLbl,
+            SelectStr(2, ParameterCustomerType_OptionsLbl),
+            ParamCustomerType_NameCaptionLbl,
+            ParamCustomerType_DescrptionLbl,
+            ParameterCustomerType_CaptionOptionsLbl);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     var
-        POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
-        JSON: Codeunit "NPR POS JSON Management";
+        PosActionBusinessLogic: Codeunit "NPR POSAction: Ins. Customer-B";
+        CustomerType: Option Contact,Customer;
         CardPageId: Integer;
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
+        CardPageId := Context.GetIntegerParameter(ParameterCardPageId_Name());
+        CustomerType := Context.GetIntegerParameter(ParameterCustomerType_Name());
 
-        Handled := true;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScopeParameters(ActionCode());
-        CardPageId := JSON.GetInteger('CardPageId');
-
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        case WorkflowStep of
-            'CreateContact':
-                OnActionCreateContact(CardPageId, SalePOS);
-            'CreateCustomer':
-                OnActionCreateCustomer(CardPageId, SalePOS);
-            else
-                exit;
+        Sale.GetCurrentSale(SalePOS);
+        case CustomerType of
+            CustomerType::Contact:
+                PosActionBusinessLogic.OnActionCreateContact(CardPageId, SalePOS);
+            CustomerType::Customer:
+                PosActionBusinessLogic.OnActionCreateCustomer(CardPageId, SalePOS);
         end;
-
-        POSSale.Refresh(SalePOS);
-        POSSale.Modify(false, false);
-        POSSession.RequestRefreshData();
     end;
 
-    local procedure OnActionCreateContact(CardPageId: Integer; var SalePOS: Record "NPR POS Sale")
-    var
-        Contact: Record Contact;
+    local procedure GetActionScript(): Text
     begin
-        if (SalePOS."Customer Type" = SalePOS."Customer Type"::Cash) and (SalePOS."Customer No." <> '') then
-            Contact.Get(SalePOS."Customer No.")
-        else begin
-            Contact.Init();
-            Contact."No." := '';
-            Contact.Insert(true);
-            Commit();
-        end;
-
-        Contact.SetRecFilter();
-        if CardPageId > 0 then
-            PAGE.RunModal(CardPageId, Contact)
-        else
-            PageRunModalWithFieldFocus(Contact, Contact.FieldNo(Name));
-
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Cash;
-        SalePOS.Validate("Customer No.", Contact."No.");
-    end;
-
-    local procedure OnActionCreateCustomer(CardPageId: Integer; var SalePOS: Record "NPR POS Sale")
-    var
-        Customer: Record Customer;
-    begin
-        if (SalePOS."Customer Type" = SalePOS."Customer Type"::Ord) and (SalePOS."Customer No." <> '') then
-            Customer.Get(SalePOS."Customer No.")
-        else begin
-            Customer.Init();
-            Customer."No." := '';
-            Customer.Insert(true);
-            Commit();
-        end;
-
-        if CardPageId > 0 then
-            PAGE.RunModal(CardPageId, Customer)
-        else
-            PageRunModalWithFieldFocus(Customer, Customer.FieldNo(Name));
-
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
-        SalePOS.Validate("Customer No.", Customer."No.");
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionCustInsert.js###
+'let main=async({})=>await workflow.respond();'
+        );
     end;
 
     local procedure ActionCode(): Code[20]
-    begin
-        exit('INSERT_CUSTOMER');
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.0');
-    end;
-
-    procedure PageRunModalWithFieldFocus(RecRelatedVariant: Variant; FieldNumber: Integer): Boolean
     var
-        RecordRef: RecordRef;
-        RecordRefVariant: Variant;
-        PageID: Integer;
-        PageMgt: Codeunit "Page Management";
-        DataTypeManagement: Codeunit "Data Type Management";
+        OrdinalIndex: Integer;
+        EnumValueName: Text;
     begin
-        if not GuiAllowed then
-            exit(false);
-
-        if not DataTypeManagement.GetRecordRef(RecRelatedVariant, RecordRef) then
-            exit(false);
-
-        PageID := PageMgt.GetPageID(RecordRef);
-
-        if PageID <> 0 then begin
-            RecordRefVariant := RecordRef;
-            PAGE.RunModal(PageID, RecordRefVariant, FieldNumber);
-            exit(true);
-        end;
-
-        exit(false);
+        OrdinalIndex := Enum::"NPR POS Workflow".Ordinals().IndexOf(Enum::"NPR POS Workflow"::INSERT_CUSTOMER.AsInteger());
+        Enum::"NPR POS Workflow".Names().Get(OrdinalIndex, EnumValueName);
+        exit(UpperCase(CopyStr(EnumValueName, 1, 20)));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnAfterLogin', '', true, true)]
@@ -168,6 +90,8 @@
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertPOSSalesWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
+    var
+        Text000: Label 'Required Customer select after Login';
     begin
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
@@ -185,6 +109,16 @@
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR POSAction: Ins. Customer");
+    end;
+
+    local procedure ParameterCardPageId_Name(): Text[30]
+    begin
+        exit('CardPageId');
+    end;
+
+    local procedure ParameterCustomerType_Name(): Text[30]
+    begin
+        exit('CustomerType');
     end;
 }
 
