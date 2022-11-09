@@ -255,7 +255,7 @@
                 ItemNo := RecRef2.Field(ItemNoField).Value;
                 ItemVariantCode := RecRef2.Field(ItemVariantField).Value;
                 if (ItemVariantCode <> '') then begin
-                    ItemVariant.Get(ItemVariantCode, ItemNo);
+                    ItemVariant.Get(ItemNo, ItemVariantCode);
                     TempVRTBuffer.Get(ItemVariant."NPR Variety 1 Value", ItemVariant."NPR Variety 2 Value",
                                      ItemVariant."NPR Variety 3 Value", ItemVariant."NPR Variety 4 Value");
                     TempVRTBuffer."Record ID (TMP)" := RecRef2.RecordId;
