@@ -798,24 +798,27 @@
 
             TicketAdmissionBOM."Reschedule Policy"::NOT_ALLOWED:
                 exit(false);
-            TicketAdmissionBOM."Reschedule Policy"::UNTIL_USED:
+            TicketAdmissionBOM."Reschedule Policy"::UNTIL_USED: // admitted or expired
                 begin
                     TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                     TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
-                    TicketAccessEntry.SetFilter("Access Date", '=%1', 0D);
-                    if (TicketAccessEntry.IsEmpty()) then
-                        exit(true);
+                    if (not TicketAccessEntry.FindFirst()) then
+                        exit(false); // can not be rescheduled
 
-                    ReferenceDateTime := CurrentDateTime();
+                    if (TicketAccessEntry."Access Date" <> 0D) then
+                        exit(false); // ticket admission was admitted and can not be rescheduled.
+
                     exit(not IsSelectedAdmissionSchEntryExpired(AdmissionScheduleEntry, DT2DATE(ReferenceDateTime), DT2TIME(ReferenceDateTime), ResponseMessage, ResponseCode));
                 end;
             TicketAdmissionBOM."Reschedule Policy"::CUTOFF_HOUR:
                 begin
                     TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                     TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
-                    TicketAccessEntry.SetFilter("Access Date", '=%1', 0D);
-                    if (TicketAccessEntry.IsEmpty()) then
-                        exit(true);
+                    if (not TicketAccessEntry.FindFirst()) then
+                        exit(false); // can not be rescheduled
+
+                    if (TicketAccessEntry."Access Date" <> 0D) then
+                        exit(false); // ticket admission was admitted and can not be rescheduled.
 
                     ReferenceDateTime += TicketAdmissionBOM."Reschedule Cut-Off (Hours)" * 60 * 60 * 1000;
                     exit(not IsSelectedAdmissionSchEntryExpired(AdmissionScheduleEntry, DT2DATE(ReferenceDateTime), DT2TIME(ReferenceDateTime), ResponseMessage, ResponseCode));
@@ -824,8 +827,10 @@
                 begin
                     TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                     TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
-                    TicketAccessEntry.SetFilter("Access Date", '<>%1', 0D);
-                    exit(TicketAccessEntry.IsEmpty());
+                    if (not TicketAccessEntry.FindFirst()) then
+                        exit(false); // can not be rescheduled
+
+                    exit(TicketAccessEntry."Access Date" = 0D); // ticket admission was not admitted and can be rescheduled.
                 end;
         end;
 

@@ -502,7 +502,7 @@
         if (not NpXmlDomMgt.FindNodes(Node, 'Request/Admissions/Admission', AdmissionNodeList)) then
             exit;
 
-        FOR NToken := 1 TO AdmissionNodeList.Count() do begin
+        for NToken := 1 TO AdmissionNodeList.Count() do begin
             AdmissionNodeList.Get(NToken, AdmissionNode);
 
             AdmissionCode := CopyStr(NpXmlDomMgt.GetXmlAttributeText(AdmissionNode, 'Code', true), 1, MaxStrLen(AdmissionCode));
