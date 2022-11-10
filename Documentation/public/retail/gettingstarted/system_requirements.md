@@ -16,9 +16,9 @@ The following article lists all system requirements for running our solutions. T
 
 ### Internet failover (recommended)
 
-It's recommended to have a failover solution in case the internet is down. It should be using an independent network. The solutions for this are as follows:
+It's recommended to have a failover solution in case the Internet is down. It should be using an independent network. The solutions for this are as follows:
 
-- A router with integrated 4G fallback, which switches the cabled Internet connection to 4G when it goes down.
+- A router with integrated 4G fallback, which switches the cabled Internet connection to 4G when it goes down, and/or
 - A backup Internet connection which you can automatically switch over to when the primary Internet connection goes down. 
 
 ### Web client
@@ -88,7 +88,7 @@ All payment terminals can be used as stand-alone solutions. For integrated solut
 
 **Adyen**
 
-All terminals that support the [Adyen Cloud Integration](https://www.adyen.com/pos-payments/terminals) (Android 4.4 or newer, iOS 11 or newer, and Windows 10).
+- All terminals that support the [Adyen Cloud Integration](https://www.adyen.com/pos-payments/terminals) (Android 4.4 or newer, iOS 11 or newer, and Windows 10).
 
 **Nets**
 
@@ -100,7 +100,7 @@ All terminals that support the [Adyen Cloud Integration](https://www.adyen.com/p
 
 **Verifone**
 
-Not supported at this time, but we are actively working on the solution. 
+- Not supported at this time, but we are actively working on the solution. 
 
 ### Printers
 
@@ -154,7 +154,7 @@ Recommended requirements:
 CPU: Intel i5 10th gen
 RAM: 8GB
 SSD: 512GB
-Operating system: Windows 11
+Operating system: Windows 10 Pro
 
 **SmartPhones**
 
