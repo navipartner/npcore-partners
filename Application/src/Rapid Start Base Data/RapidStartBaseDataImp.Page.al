@@ -97,18 +97,12 @@
     var
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-        BaseUri: Text;
         packageName: Text;
-        Secret: Text;
     begin
         packageName := package.Replace('.rapidstart', '');
-        BaseUri := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl');
-        Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
 
         BindSubscription(rapidStartBaseDataMgt);
-        rapidstartBaseDataMgt.ImportPackage(
-            BaseUri + '/pos-test-data/' + package
-            + '?sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageName, AdjustTableNames);
+        rapidstartBaseDataMgt.ImportPackage('https://npretailbasedata.blob.core.windows.net/pos-test-data/' + package, packageName, AdjustTableNames);
 
         CurrPage.Close();
     end;
@@ -120,15 +114,9 @@
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         packageList: List of [Text];
-        BaseUri: Text;
         locPackage: Text;
-        Secret: Text;
     begin
-        BaseUri := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl');
-        Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
-
-        rapidstartBaseDataMgt.GetAllPackagesInBlobStorage(BaseUri + '/pos-test-data/?restype=container&comp=list'
-            + '&sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageList);
+        rapidstartBaseDataMgt.GetAllPackagesInBlobStorage('https://npretailbasedata.blob.core.windows.net/pos-test-data/?restype=container&comp=list', packageList);
         foreach locPackage in packageList do begin
             TempRetailList.Number += 1;
             TempRetailList.Value := CopyStr(locPackage, 1, MaxStrLen(TempRetailList.Value));
