@@ -1403,10 +1403,10 @@
                 EndDateNew := CalcDate(MembershipAlterationSetup."Alteration Date Formula", MemberInfoCapture."Document Date");
 
             else begin
-                    ReasonText := StrSubstNo(INVALID_ACTIVATION_DATE, Format(MembershipAlterationSetup."Alteration Activate From"),
-                      MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format(MembershipAlterationSetup."Alteration Type"));
-                    exit(ExitFalseOrWithError(WithConfirm, ReasonText));
-                end;
+                ReasonText := StrSubstNo(INVALID_ACTIVATION_DATE, Format(MembershipAlterationSetup."Alteration Activate From"),
+                  MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format(MembershipAlterationSetup."Alteration Type"));
+                exit(ExitFalseOrWithError(WithConfirm, ReasonText));
+            end;
 
         end;
 
@@ -1732,10 +1732,10 @@
                 StartDateNew := CalcDate(MembershipAlterationSetup."Alteration Date Formula", MemberInfoCapture."Document Date");
 
             else begin
-                    ReasonText := StrSubstNo(INVALID_ACTIVATION_DATE, Format(MembershipAlterationSetup."Alteration Activate From"),
-                      MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format(MembershipAlterationSetup."Alteration Type"));
-                    exit(ExitFalseOrWithError(WithConfirm, ReasonText));
-                end;
+                ReasonText := StrSubstNo(INVALID_ACTIVATION_DATE, Format(MembershipAlterationSetup."Alteration Activate From"),
+                  MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format(MembershipAlterationSetup."Alteration Type"));
+                exit(ExitFalseOrWithError(WithConfirm, ReasonText));
+            end;
 
         end;
 
@@ -1930,10 +1930,10 @@
                 StartDateNew := MemberInfoCapture."Document Date";
 
             else begin
-                    ReasonText := StrSubstNo(INVALID_ACTIVATION_DATE, Format(MembershipAlterationSetup."Alteration Activate From"),
-                      MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format(MembershipAlterationSetup."Alteration Type"));
-                    exit(ExitFalseOrWithError(WithConfirm, ReasonText));
-                end;
+                ReasonText := StrSubstNo(INVALID_ACTIVATION_DATE, Format(MembershipAlterationSetup."Alteration Activate From"),
+                  MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format(MembershipAlterationSetup."Alteration Type"));
+                exit(ExitFalseOrWithError(WithConfirm, ReasonText));
+            end;
 
         end;
 
@@ -2235,10 +2235,10 @@
                 StartDateNew := CalcDate(MembershipAlterationSetup."Alteration Date Formula", MembershipEntry."Valid Until Date");
 
             else begin
-                    ReasonText := StrSubstNo(INVALID_ACTIVATION_DATE, Format(MembershipAlterationSetup."Alteration Activate From"),
-                      MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format(MembershipAlterationSetup."Alteration Type"));
-                    exit(ExitFalseOrWithError(false, ReasonText));
-                end;
+                ReasonText := StrSubstNo(INVALID_ACTIVATION_DATE, Format(MembershipAlterationSetup."Alteration Activate From"),
+                  MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format(MembershipAlterationSetup."Alteration Type"));
+                exit(ExitFalseOrWithError(false, ReasonText));
+            end;
 
         end;
 
@@ -2780,9 +2780,9 @@
                             Member."Notification Method"::SMS:
                                 MemberCommunication."Preferred Method" := MemberCommunicationSetup."Preferred Method"::SMS;
                             else begin
-                                    MemberCommunication."Preferred Method" := MemberCommunication."Preferred Method"::MANUAL;
-                                    MemberCommunication."Accepted Communication" := MemberCommunication."Accepted Communication"::"OPT-OUT";
-                                end;
+                                MemberCommunication."Preferred Method" := MemberCommunication."Preferred Method"::MANUAL;
+                                MemberCommunication."Accepted Communication" := MemberCommunication."Accepted Communication"::"OPT-OUT";
+                            end;
                         end;
                     end;
                     MemberCommunication."Changed At" := CurrentDateTime();
@@ -3003,6 +3003,14 @@
             MembershipAlterationSetup."Grace Period Relates To"::END_DATE:
                 GracePeriodDate := MembershipEntry."Valid Until Date";
         end;
+
+        if (MembershipAlterationSetup.GracePeriodRelatesToFromDate <> 0D) then
+            if (GracePeriodDate < MembershipAlterationSetup.GracePeriodRelatesToFromDate) then
+                exit(false);
+
+        if (MembershipAlterationSetup.GracePeriodRelatesToUntilDate <> 0D) then
+            if (GracePeriodDate > MembershipAlterationSetup.GracePeriodRelatesToUntilDate) then
+                exit(false);
 
         LowerBoundDate := 0D;
         UpperBoundDate := DMY2Date(31, 12, 9999);
@@ -4564,8 +4572,8 @@
                                 ExtCardNo := StrSubstNo(PlaceHolderLbl, ExtCardNo, GenerateRandom(Left));
                         end;
                     else begin
-                            ExtCardNo := StrSubstNo(PlaceHolderLbl, ExtCardNo, Pattern);
-                        end;
+                        ExtCardNo := StrSubstNo(PlaceHolderLbl, ExtCardNo, Pattern);
+                    end;
                 end;
             end;
 
