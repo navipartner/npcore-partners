@@ -1,4 +1,4 @@
-﻿codeunit 6150726 "NPR POSAction: Ins. Customer" implements "NPR IPOS Workflow"
+codeunit 6150726 "NPR POSAction: Ins. Customer" implements "NPR IPOS Workflow"
 {
     Access = Internal;
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
