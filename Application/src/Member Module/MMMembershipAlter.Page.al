@@ -109,6 +109,18 @@
                     ToolTip = 'Specifies the value of the Grace Period After field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(GracePeriodRelatesToFromDate; Rec.GracePeriodRelatesToFromDate)
+                {
+                    Visible = false;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Grace Period Relates To From Date field.';
+                }
+                field(GracePeriodRelatesToUntilDate; Rec.GracePeriodRelatesToUntilDate)
+                {
+                    Visible = false;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Grace Period Relates To Until Date field.';
+                }
                 field("Price Calculation"; Rec."Price Calculation")
                 {
 
@@ -182,6 +194,11 @@
 
                     ToolTip = 'Specifies the value of the Age Constraint (Years) field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Age Constraint Applies To"; Rec."Age Constraint Applies To")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Age Constraint Applies To field.';
                 }
             }
         }
