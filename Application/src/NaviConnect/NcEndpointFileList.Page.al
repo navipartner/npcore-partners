@@ -44,7 +44,9 @@
                 }
                 field("Client Path"; Rec."Client Path")
                 {
-
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Client Path field is about to be removed because it is not needed anymore.';
+                    ObsoleteTag = 'Client Path, 07/11/2022, BC 21';
                     ToolTip = 'Specifies the value of the Client Path field';
                     ApplicationArea = NPRNaviConnect;
                 }
