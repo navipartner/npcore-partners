@@ -94,7 +94,7 @@
         {
             Caption = 'Age Constraint Applies To';
             DataClassification = CustomerContent;
-            OptionCaption = 'All Members,Youngest Member,Oldest Member,Administrators,Dependants';
+            OptionCaption = 'All Members,Youngest Member,Oldest Member,Administrators,Dependents';
             OptionMembers = ALL,YOUNGEST,OLDEST,ADMINS,DEPENDANTS;
         }
         field(30; "Activate Grace Period"; Boolean)
@@ -140,6 +140,16 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Simple,Advanced';
             OptionMembers = SIMPLE,ADVANCED;
+        }
+        field(48; GracePeriodRelatesToFromDate; Date)
+        {
+            Caption = 'Grace Period Relates To From Date';
+            DataClassification = CustomerContent;
+        }
+        field(49; GracePeriodRelatesToUntilDate; Date)
+        {
+            Caption = 'Grace Period Relates To Until Date';
+            DataClassification = CustomerContent;
         }
         field(50; "Membership Duration"; DateFormula)
         {
