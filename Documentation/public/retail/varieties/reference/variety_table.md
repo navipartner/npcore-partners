@@ -4,7 +4,7 @@ After a new variety is created, it's necessary to also create a variety table. T
 
 The following options are available in the **Variety Table** administrative section:
 
- Field Name      | Description |
+| Field Name      | Description |
 | ----------- | ----------- |
 | **Code**       | Specifies the unique code for a variety.    |
 | **Description**   | Specifies a short description for a variety which informs users about its characteristics.      |
