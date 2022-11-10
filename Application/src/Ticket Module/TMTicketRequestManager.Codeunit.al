@@ -943,6 +943,7 @@
             (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::REGISTERED)) then begin
             if ((MessageToken <> TicketReservationRequest."Session Token ID") and (MessageToken <> '')) then begin
                 TicketReservationRequest.ModifyAll("Expires Date Time", CalculateNewExpireTime());
+                TicketReservationRequest.ModifyAll("Request Status Date Time", CurrentDateTime());
                 TicketReservationRequest.ModifyAll("Session Token ID", MessageToken, false); // Multiple change requests - invalidate the previous one
             end;
             if (MessageToken = '') then begin
