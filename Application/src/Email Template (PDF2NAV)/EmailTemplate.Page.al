@@ -69,6 +69,11 @@
                     ApplicationArea = NPRRetail;
                     ShowMandatory = true;
                 }
+                field("Email Scenario"; Rec."Email Scenario")
+                {
+                    ToolTip = 'Specifies the e-mail scenario that the e-mail will be sent as';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Default Recipient Address"; Rec."Default Recipient Address")
                 {
 

@@ -117,7 +117,7 @@
             ErrorMessage := CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader, RecRef, 0);
 
         if ErrorMessage = '' then
-            ErrorMessage := SendSmtpMessage(RecRef, Silent);
+            ErrorMessage := SendSmtpMessage(RecRef, Silent, EmailTemplateHeader."Email Scenario");
 
         if (ErrorMessage <> '') and not Silent then
             Error(ErrorMessage);
@@ -162,7 +162,7 @@
             ErrorMessage := AddAdditionalReportsToSmtpMessage(EmailTemplateHeader, RecRef);
 
         if ErrorMessage = '' then
-            ErrorMessage := SendSmtpMessage(RecRef, Silent);
+            ErrorMessage := SendSmtpMessage(RecRef, Silent, EmailTemplateHeader."Email Scenario");
 
         if (ErrorMessage <> '') and not Silent then
             Error(ErrorMessage);
@@ -344,6 +344,11 @@
     end;
 
     procedure SendSmtpMessage(var RecRef: RecordRef; Silent: Boolean) ErrorMessage: Text[1024]
+    begin
+        exit(SendSmtpMessage(Recref, Silent, Enum::"Email Scenario"::Default));
+    end;
+
+    procedure SendSmtpMessage(var RecRef: RecordRef; Silent: Boolean; Scenario: Enum "Email Scenario") ErrorMessage: Text[1024]
     var
         TransactionalEmail: Record "NPR Smart Email";
         EmailLog: Record "NPR E-mail Log";
@@ -406,7 +411,7 @@
             MailManagement.SetHideMailDialog(true);
             MailManagement.SetHideEmailSendingError(true);
 
-            EmailSendingHandler.Send(TempEmailItem, TempErrorMessage);
+            EmailSendingHandler.Send(TempEmailItem, TempErrorMessage, Scenario);
         end;
         TempAttachmentBuffer.DeleteAll();
 
@@ -648,6 +653,14 @@
                 begin
                     CustomerNo := RecRef.Field(2).Value;
                     if Customer.Get(CustomerNo) then
+                        exit(Customer."E-Mail")
+                    else
+                        exit('');
+                end;
+            Database::"Sales Invoice Header":
+                begin
+                    CustomerNo := RecRef.Field(4).Value;
+                    if (Customer.Get(CustomerNo)) then
                         exit(Customer."E-Mail")
                     else
                         exit('');

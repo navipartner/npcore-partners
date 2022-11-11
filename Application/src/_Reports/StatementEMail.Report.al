@@ -68,7 +68,7 @@
                                     if EmailMgt.SetupEmailTemplate(RecRef, SendToEmail, true, EmailTemplateHeader) = '' then
                                         if EmailMgt.CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader, RecRef, DATABASE::Customer) = '' then begin
                                             if EmailMgt.AddAttachmentToSmtpMessage(TempEmailAttachment) then begin
-                                                EmailMgt.SendSmtpMessage(RecRef, true);
+                                                EmailMgt.SendSmtpMessage(RecRef, true, EmailTemplateHeader."Email Scenario");
                                                 ReportGenerated := true;
                                             end;
                                         end;
