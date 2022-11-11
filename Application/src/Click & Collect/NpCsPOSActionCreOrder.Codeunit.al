@@ -524,11 +524,11 @@
             HandlePrepayment(Context, POSSession, RetailSalesDocMgt, PrepaymentPct, true, SalePOS);
             NpCsDocument."Prepaid Amount" := POSPrepaymentMgt.GetPrepaymentAmountToPay(SalesHeader);
             NpCsDocument.Modify();
-        end else
+        end else begin
             //End sale
             POSSale.SelectViewForEndOfSale(POSSession);
-
-        NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
+            NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
+        end;
     end;
 
     local procedure ExportToDocument(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")

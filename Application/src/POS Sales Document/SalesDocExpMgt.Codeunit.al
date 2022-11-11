@@ -784,17 +784,13 @@
 
         Commit();
 
-        if POSPrint then begin
+        if POSPrint then
             POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 1);
-        end;
-
-        if Send then begin
+        if Send then
             POSSalesDocumentOutputMgt.SendDocument(SalesHeader, 1);
-        end;
-
-        if Pdf2Nav then begin
+        if Pdf2Nav then
             POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 1);
-        end;
+        SendCollectDocument(SalesHeader);
     end;
 
     local procedure PostPrepaymentRefundBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR POS Sale Line")
@@ -1241,6 +1237,21 @@ then
             SalesHeader.Validate("Applies-to Doc. No.", SaleLinePOS."Imported from Invoice No.");
         end;
 
+    end;
+
+    local procedure SendCollectDocument(SalesHeader: Record "Sales Header")
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
+    begin
+        NpCsDocument.SetRange(Type, NpCsDocument.Type::"Send to Store");
+        NpCsDocument.SetRange("Document Type", SalesHeader."Document Type");
+        NpCsDocument.SetRange("Document No.", SalesHeader."No.");
+        if SalesHeader."External Document No." <> '' then
+            NpCsDocument.SetRange("Reference No.", SalesHeader."External Document No.");
+        if NpCsDocument.FindFirst() then
+            if NpCsDocument."Next Workflow Step" = NpCsDocument."Next Workflow Step"::"Send Order" then
+                NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
     end;
 
     [IntegrationEvent(true, false)]

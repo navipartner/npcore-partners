@@ -31,14 +31,13 @@
         NpCsArchCollectMgt: Codeunit "NPR NpCs Arch. Collect Mgt.";
     begin
         if NpCsDocument.Type = NpCsDocument.Type::"Collect in Store" then begin
-            if IsReadyForArchivation(NpCsDocument) then begin
-                RunCallback(NpCsDocument);
+            RunCallback(NpCsDocument);
+            if IsReadyForArchivation(NpCsDocument) then
                 NpCsArchCollectMgt.ArchiveCollectDocument(NpCsDocument, true);
-            end;
             exit;
         end;
 
-        if not NpCsDocument.Find() then
+        if not NpCsDocument.Get(NpCsDocument."Entry No.") then
             exit;
         case NpCsDocument."Next Workflow Step" of
             NpCsDocument."Next Workflow Step"::"Send Order":
@@ -158,7 +157,7 @@
         NpCsWorkflowModule.Init();
         NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Order Status";
         NpCsWorkflowModule.Code := NpCsDocument."Order Status Module";
-        if NpCsWorkflowModule.Find() then;
+        if NpCsWorkflowModule.Get(NpCsWorkflowModule.Type, NpCsWorkflowModule.Code) then;
 
         Commit();
         ClearLastError();
@@ -218,7 +217,7 @@
         if NpCsStore."Service Url" = '' then
             exit;
 
-        if not NpCsDocument.Find() then begin
+        if not NpCsDocument.Get(NpCsDocument."Entry No.") then begin
             NpCsArchDocument.SetRange(Type, NpCsDocument.Type);
             case NpCsDocument.Type of
                 NpCsDocument.Type::"Send to Store":
@@ -312,7 +311,7 @@
         ReadyForArchivation: Boolean;
         Handled: Boolean;
     begin
-        if not NpCsDocument.FindFirst() then
+        if not NpCsDocument.Get(NpCsDocument."Entry No.") then
             exit(false);
 
         OnIsReadyForArchivation(NpCsDocument, ReadyForArchivation, Handled);
