@@ -40,14 +40,20 @@
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnAfterInsertEvent', '', true, false)]
-    local procedure PosUnitOnAFterInsert(var Rec: Record "NPR POS Unit")
+    local procedure PosUnitOnAfterInsert(var Rec: Record "NPR POS Unit")
     begin
+        if Rec.IsTemporary() then
+            exit;
+
         UpdatePosUnitsInTenantDiagnostic(Rec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnAfterDeleteEvent', '', true, false)]
-    local procedure PosUnitOnAFterDelete(var Rec: Record "NPR POS Unit")
+    local procedure PosUnitOnAfterDelete(var Rec: Record "NPR POS Unit")
     begin
+        if Rec.IsTemporary() then
+            exit;
+
         UpdatePosUnitsInTenantDiagnostic(Rec);
     end;
 
