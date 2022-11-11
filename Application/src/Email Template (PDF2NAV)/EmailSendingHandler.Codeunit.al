@@ -3,6 +3,9 @@
     Access = Internal;
     TableNo = "Email Item";
 
+    var
+        _Scenario: Enum "Email Scenario";
+
     trigger OnRun()
     var
         MailManagement: Codeunit "Mail Management";
@@ -13,9 +16,14 @@
             ErrorMessageMgt.LogSimpleErrorMessage(NotEnabledErr);
         end else begin
             MailManagement.SetHideMailDialog(true);
-            MailManagement.Send(Rec, Enum::"Email Scenario"::Default);
+            MailManagement.Send(Rec, _Scenario);
         end;
         ErrorMessageMgt.Finish(Rec);
+    end;
+
+    procedure SetScenario(Scenario: Enum "Email Scenario")
+    begin
+        _Scenario := Scenario;
     end;
 
     procedure CreateEmailItem(var EmailItem: Record "Email Item"; FromName: Text; FromAddress: Text; Recipients: List of [Text]; Subject: Text; Body: Text; HtmlFormat: Boolean)
@@ -198,6 +206,11 @@
     end;
 
     procedure Send(var EmailItem: Record "Email Item"; var ErrorMessage: Record "Error Message") IsSuccess: Boolean
+    begin
+        exit(Send(EmailItem, ErrorMessage, Enum::"Email Scenario"::Default));
+    end;
+
+    procedure Send(var EmailItem: Record "Email Item"; var ErrorMessage: Record "Error Message"; Scenario: Enum "Email Scenario") IsSuccess: Boolean
     var
         ErrorContextElement: Codeunit "Error Context Element";
         ErrorMessageHandler: Codeunit "Error Message Handler";
@@ -208,6 +221,7 @@
         ErrorMessageMgt.Activate(ErrorMessageHandler);
         ErrorMessageMgt.PushContext(ErrorContextElement, EmailItem.RecordId(), 0, '');
         Commit();
+        EmailSendingHandler.SetScenario(Scenario);
         IsSuccess := EmailSendingHandler.Run(EmailItem);
         if not IsSuccess then begin
             if not ErrorMessageMgt.GetErrorsInContext(EmailItem, ErrorMessage) then begin
