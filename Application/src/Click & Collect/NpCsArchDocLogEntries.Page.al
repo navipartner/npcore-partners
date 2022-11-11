@@ -4,10 +4,8 @@
     Caption = 'Archived Collect Document Log Entries';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpCs Arch. Doc. Log Entry";
-    ApplicationArea = NPRRetail;
 
     layout
     {

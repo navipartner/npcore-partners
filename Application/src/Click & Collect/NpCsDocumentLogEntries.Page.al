@@ -4,11 +4,8 @@
     Caption = 'Collect Document Log Entries';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NpCs Document Log Entry";
-    ApplicationArea = NPRRetail;
-
     layout
     {
         area(content)

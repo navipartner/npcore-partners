@@ -12,7 +12,7 @@
         DeliveryLbl: Label 'Collect %1 %2', Comment = '%1=NpCsDocument."Document Type";%2=NpCsDocument."Reference No."';
         SalesLineTypeNotSupportedErr: Label 'Supported types are %1, %2 and %3.', Comment = '%1=SalesLine.Type::"";%2=SalesLine.Type::Item;%3=SalesLine.Type::"G/L Account"';
         PrepaidAmountLbl: Label 'Prepaid Amount %1', Comment = '%1=POS Menu Button Parameter Value';
-        FoundDeliverReferenceErr: Label 'Collect %1 %2 is already being delivery on current sale', Comment = '%1=NpCsDocument."Document Type";%2=NpCsDocument."Document No."';
+        FoundDeliverReferenceErr: Label 'Collect Reference No. %3 (%1 %2) is already being delivery on current sale', Comment = '%1=NpCsDocument."Document Type";%2=NpCsDocument."Document No.";%3=NpCsDocument."Reference No."';
         OpenDocumentLbl: Label 'Open Document';
         OpenDocumentDescriptionLbl: Label 'Open the selected order before document is delivered';
 
@@ -301,7 +301,7 @@
         NpCsSaleLinePOSReference.SetRange("Document Type", NpCsDocument."Document Type");
         NpCsSaleLinePOSReference.SetRange("Document No.", NpCsDocument."Document No.");
         if not NpCsSaleLinePOSReference.IsEmpty() then
-            Error(FoundDeliverReferenceErr, NpCsDocument."Document Type", NpCsDocument."Document No.");
+            Error(FoundDeliverReferenceErr, NpCsDocument."Document Type", NpCsDocument."Document No.", NpCsDocument."Reference No.");
 
         DeliveryText := StrSubstNo(JSON.GetStringParameter('Delivery Text'), NpCsDocument."Document Type", NpCsDocument."Reference No.");
         if DeliveryText = '' then
