@@ -65,6 +65,11 @@
             Caption = 'From E-mail Name';
             DataClassification = CustomerContent;
         }
+        field(55; "Email Scenario"; Enum "Email Scenario")
+        {
+            Caption = 'Email Scenario';
+            DataClassification = SystemMetadata;
+        }
         field(60; "Report ID"; Integer)
         {
             Caption = 'Report ID';
