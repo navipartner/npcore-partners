@@ -18,16 +18,16 @@
         {
             repeater(Group)
             {
-                field("Document No."; Rec."Document No.")
-                {
-
-                    ToolTip = 'Specifies the value of the Document No. field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Reference No."; Rec."Reference No.")
                 {
 
                     ToolTip = 'Specifies the value of the Reference No. field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Document No."; Rec."Document No.")
+                {
+
+                    ToolTip = 'Specifies the value of the Document No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sell-to Customer Name"; Rec."Sell-to Customer Name")

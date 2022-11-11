@@ -4,7 +4,6 @@
     Caption = 'Collect in Store Order Card';
     SourceTable = "NPR NpCs Document";
     SourceTableView = WHERE(Type = CONST("Collect in Store"));
-
     layout
     {
         area(content)
@@ -588,6 +587,7 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedIsBig = true;
+                PromotedCategory = Process;
                 ShortCutKey = 'Shift+F7';
 
                 ToolTip = 'Executes the Document action';
@@ -607,6 +607,7 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedIsBig = true;
+                PromotedCategory = Process;
                 ShortCutKey = 'Ctrl+F7';
 
                 ToolTip = 'Executes the Log Entries action';
@@ -622,9 +623,9 @@
         }
     }
 
-    trigger OnOpenPage()
+    trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Rec.Reset();
+        Rec.Type := Rec.Type::"Collect in Store";
     end;
 
     var
