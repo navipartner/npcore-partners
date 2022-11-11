@@ -31,6 +31,7 @@
         if SalePOS."Customer No." <> '' then
             SalesHeader.SetRange("Bill-to Customer No.", SalePOS."Customer No.");
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
+        SetFilterSalesHeader(SalePOS, SalesHeader);
         exit(RetailSalesDocImpMgt.SelectSalesDocument(SalesHeader.GetView(false), SalesHeader));
     end;
 
@@ -50,6 +51,25 @@
             end;
         end;
         exit(true);
+    end;
+
+    local procedure SetFilterSalesHeader(SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        FilterSalesNo: text;
+    begin
+        POSSaleLine.SetRange("Register No.", SalePOS."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        POSSaleLine.SetFilter("Sales Document No.", '<>%1', '');
+        if POSSaleLine.FindSet() then
+            repeat
+                if FilterSalesNo = '' then
+                    FilterSalesNo := '<>' + POSSaleLine."Sales Document No."
+                else
+                    FilterSalesNo += '&<>' + POSSaleLine."Sales Document No.";
+            until POSSaleLine.Next() = 0;
+
+        SalesHeader.SetFilter("No.", FilterSalesNo);
     end;
 
     internal procedure CreatePrepaymentLine(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; PrepaymentValue: Decimal; ValueIsAmount: Boolean; Send: Boolean; Pdf2Nav: Boolean)
