@@ -78,4 +78,16 @@
     begin
         RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentValue, Print, Send, Pdf2Nav, true, ValueIsAmount);
     end;
+
+    internal procedure CreatePrepaymentRefundLine(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; DeleteDocumentAfterRefund: Boolean; Send: Boolean; Pdf2Nav: Boolean)
+    var
+        RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
+        NO_PREPAYMENT: Label '%1 %2 has no refundable prepayments!';
+    begin
+        if POSPrepaymentMgt.GetPrepaymentAmountToDeductInclVAT(SalesHeader) <= 0 then
+            Error(NO_PREPAYMENT, SalesHeader."Document Type", SalesHeader."No.");
+
+        RetailSalesDocMgt.CreatePrepaymentRefundLine(POSSession, SalesHeader, Print, Send, Pdf2Nav, true, DeleteDocumentAfterRefund);
+    end;
 }

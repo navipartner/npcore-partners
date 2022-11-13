@@ -9,6 +9,7 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         POSSetup: Record "NPR POS Setup";
         POSStore: Record "NPR POS Store";
         POSUnit: Record "NPR POS Unit";
+        SalesSetup: Record "Sales & Receivables Setup";
         Assert: Codeunit Assert;
         POSActionDocPrepayB: Codeunit "NPR POS Action: Doc. Prepay B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -165,9 +166,7 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        VATPostSetup: Record "VAT Posting Setup";
-        GeneralPostingSetup: Record "General Posting Setup";
-        GLAccount: Record "G/L Account";
+
     begin
         if Initialized then begin
             //Clean any previous mock session
@@ -183,27 +182,61 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
             NPRLibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethodCash, POSPaymentMethodCash."Processing Type"::CASH, '', false);
             LibrarySales.CreateCustomer(Customer);
-            IF GeneralPostingSetup.Get(Customer."Gen. Bus. Posting Group", Item."Gen. Prod. Posting Group") then
-                IF GeneralPostingSetup."Sales Prepayments Account" = '' then begin
-                    LibraryERM.CreateGLAccount(GLAccount);
-                    GLAccount.Validate("VAT Prod. Posting Group", Item."VAT Prod. Posting Group");
-                    GLAccount.Modify();
-                    IF not VATPostSetup.Get(Customer."VAT Bus. Posting Group", Item."VAT Prod. Posting Group") then
-                        LibraryERM.CreateVATPostingSetup(VATPostSetup, Customer."VAT Bus. Posting Group", Item."VAT Prod. Posting Group");
-                    GeneralPostingSetup.Validate("Sales Prepayments Account", GLAccount."No.");
-                    GeneralPostingSetup.Modify();
-                end else begin
-                    GLAccount.Get(GeneralPostingSetup."Sales Prepayments Account");
-                    if GLAccount."VAT Prod. Posting Group" = '' then begin
-                        GLAccount.Validate("VAT Prod. Posting Group", Item."VAT Prod. Posting Group");
-                        GLAccount.Modify();
-                    end
-                end;
+            CheckSalesReceivableSetup();
+            CheckPrepmtAccNo(Customer."Gen. Bus. Posting Group", Item."Gen. Prod. Posting Group");
 
             Initialized := true;
         end;
 
         Commit();
+    end;
+
+    [Test]
+    internal procedure CreateRefundPrepaymentLine()
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        LibrarySales: Codeunit "Library - Sales";
+        AutoQtyOpt: Option Disabled,None,All;
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        SaleEnded: Boolean;
+        POSEntry: Record "NPR POS Entry";
+        PrepaymentValue: Decimal;
+        ValueIsAmount: Boolean;
+        LibraryRandom: Codeunit "Library - Random";
+        ExpectedPrepayAmt: Decimal;
+        PREPAYMENT: Label 'Prepayment of %1 %2';
+        PrepaymentRefundAmount: Decimal;
+        PREPAYMENT_REFUND: Label 'Prepayment refund of %1 %2';
+    begin
+        // [Scenario] Chose order with prepayment ,post it and then refund prepayment
+        // [Given]
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        CreateSalesOrder(SalesHeader); //Sales Order With with one line
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        // Create and post prepayment
+        // parameters
+        PrepaymentValue := 50;
+        POSActionDocPrepayB.CreatePrepaymentLine(POSSession, SalesHeader, false, PrepaymentValue, ValueIsAmount, false, false);
+        // End Sale
+        SalesHeader.CalcFields("Amount Including VAT");
+        SaleEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethodCash.Code, SalesHeader."Amount Including VAT", '');
+        // [When] Chose order with prepayment
+        POSActionDocPrepayB.CreatePrepaymentRefundLine(possession, salesHeader, false, false, false, false);
+        // [Then]
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        Assert.IsTrue(SaleLinePOS."Sales Document Prepay. Refund" = true, 'Prepayment Refund set');
+        Assert.IsTrue(SaleLinePOS."Sales Document No." = SalesHeader."No.", 'Order Set');
+        Assert.IsTrue(SaleLinePOS.Description = StrSubstNo(PREPAYMENT_REFUND, SalesHeader."Document Type", SalesHeader."No."), 'Description Prepayment Refund');
     end;
 
     procedure CreateSalesOrder(var SalesHeader: Record "Sales Header")
@@ -214,5 +247,44 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
     begin
         LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", LibraryRandom.RandInt(100));
+    end;
+
+    local procedure CheckSalesReceivableSetup()
+    begin
+        SalesSetup.Get();
+        If SalesSetup."Posted Prepmt. Inv. Nos." = '' then begin
+            SalesSetup."Posted Prepmt. Inv. Nos." := LibraryERM.CreateNoSeriesCode();
+            SalesSetup.Modify();
+        end;
+    end;
+
+    local procedure CheckPrepmtAccNo(GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20])
+    var
+        VATPostSetup: Record "VAT Posting Setup";
+        GeneralPostingSetup: Record "General Posting Setup";
+        GLAccount: Record "G/L Account";
+    begin
+        IF GeneralPostingSetup.Get(Customer."Gen. Bus. Posting Group", Item."Gen. Prod. Posting Group") then
+            IF GeneralPostingSetup."Sales Prepayments Account" = '' then begin
+                LibraryERM.CreateGLAccount(GLAccount);
+                GLAccount.Validate("Gen. Prod. Posting Group", Item."Gen. Prod. Posting Group");
+                if GLAccount."VAT Prod. Posting Group" = '' then
+                    GLAccount.Validate("VAT Prod. Posting Group", Item."VAT Prod. Posting Group");
+                GLAccount.Modify();
+                IF not VATPostSetup.Get(Customer."VAT Bus. Posting Group", Item."VAT Prod. Posting Group") then
+                    LibraryERM.CreateVATPostingSetup(VATPostSetup, Customer."VAT Bus. Posting Group", Item."VAT Prod. Posting Group");
+                GeneralPostingSetup.Validate("Sales Prepayments Account", GLAccount."No.");
+                GeneralPostingSetup.Modify();
+            end else begin
+                GLAccount.Get(GeneralPostingSetup."Sales Prepayments Account");
+                if GLAccount."Gen. Prod. Posting Group" = '' then begin
+                    GLAccount.Validate("Gen. Prod. Posting Group", Item."Gen. Prod. Posting Group");
+                    GLAccount.Modify();
+                end;
+                if GLAccount."VAT Prod. Posting Group" = '' then begin
+                    GLAccount.Validate("VAT Prod. Posting Group", Item."VAT Prod. Posting Group");
+                    GLAccount.Modify();
+                end;
+            end;
     end;
 }
