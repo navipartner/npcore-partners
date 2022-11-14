@@ -14,6 +14,7 @@ codeunit 85020 "NPR POS End of Day"
         _PrimeNumbers: array[10] of Integer;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure ItemSaleCashPayment_Z()
     var
@@ -147,6 +148,7 @@ codeunit 85020 "NPR POS End of Day"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure ItemReturnCashPayment_Z()
     var
@@ -281,6 +283,7 @@ codeunit 85020 "NPR POS End of Day"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ItemSaleAndReturnCashPayment_Z()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -378,6 +381,7 @@ codeunit 85020 "NPR POS End of Day"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure ItemSaleEftPayment_Z()
     var
@@ -458,6 +462,7 @@ codeunit 85020 "NPR POS End of Day"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure ItemSaleCashAndEftPayment_Z()
     var
@@ -539,6 +544,7 @@ codeunit 85020 "NPR POS End of Day"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure ItemSaleForeignCurrencyPayment_Z()
     var
@@ -618,6 +624,7 @@ codeunit 85020 "NPR POS End of Day"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure ItemSaleVoucherPayment_Z()
     var
@@ -700,6 +707,7 @@ codeunit 85020 "NPR POS End of Day"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure ItemDiscountSaleCashPayment_Z()
     var

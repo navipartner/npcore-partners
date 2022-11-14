@@ -11,6 +11,7 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         POSStore: Record "NPR POS Store";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure QuantityPositive()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -60,6 +61,7 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure QuantityPositiveFail()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -105,6 +107,7 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure QuantityNegative()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -155,6 +158,7 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure QuantityNegativeInput()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -205,6 +209,7 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure QuantityNegativeFail()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -251,6 +256,7 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure QuantityReturnReasonCode()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";

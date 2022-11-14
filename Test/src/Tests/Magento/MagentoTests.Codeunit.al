@@ -3,6 +3,7 @@ codeunit 85055 "NPR MagentoTests"
     Subtype = Test;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TryValidateParrentCategoryId()
     var
         MagentoCategory: Record "NPR Magento Category";
@@ -30,6 +31,7 @@ codeunit 85055 "NPR MagentoTests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TryGetPathWithSameParrentCategory()
     var
         RootMagentoCategory: Record "NPR Magento Category";
@@ -58,6 +60,7 @@ codeunit 85055 "NPR MagentoTests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure InsertRootAndChildCategories()
     var
         MagentoCategory: Record "NPR Magento Category";
@@ -86,6 +89,7 @@ codeunit 85055 "NPR MagentoTests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GetPathWithDifferentParrentCategory()
     var
         MagentoCategory: Record "NPR Magento Category";

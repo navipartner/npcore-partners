@@ -21,6 +21,7 @@ codeunit 85042 "NPR Replication API Tests"
         Initialized: Boolean;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyDataIsReplicatedUOM()
     var
         TempJobQueueEntry: Record "Job Queue Entry" temporary;
@@ -79,6 +80,7 @@ codeunit 85042 "NPR Replication API Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyEncouteredErrorStopsFurtherImportUOM()
     var
         TempJobQueueEntry: Record "Job Queue Entry" temporary;

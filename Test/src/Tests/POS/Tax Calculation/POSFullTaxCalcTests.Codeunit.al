@@ -19,6 +19,7 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
         Initialized: Boolean;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalculateTaxForwardNotSupportedDirectSale()
     var
         POSViewProfile: Record "NPR POS View Profile";
@@ -57,6 +58,7 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalculateTaxBackwardNotSupportedDirectSale()
     var
         POSViewProfile: Record "NPR POS View Profile";
@@ -95,6 +97,7 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalculateTaxForwardNotSupportedDebitSale()
     var
         Customer: Record Customer;
@@ -139,6 +142,7 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalculateTaxBackwardNotSupportedDebitSale()
     var
         Customer: Record Customer;

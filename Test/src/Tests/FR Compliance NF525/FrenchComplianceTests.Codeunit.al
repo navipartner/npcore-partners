@@ -18,6 +18,7 @@ codeunit 85039 "NPR French Compliance Tests"
         _FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PurchaseSignature()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -72,6 +73,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TicketGrandTotalSignature()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -125,6 +127,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ReprintSignature()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -178,6 +181,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoidSignature()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -259,6 +263,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure DailyZReportSignature()
     var
@@ -301,6 +306,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure MonthlyPeriodSignature()
     var
@@ -349,6 +355,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure YearlyPeriodSignature()
     var
@@ -397,6 +404,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure MonthlyPeriodArchiveSignature()
     var
@@ -461,6 +469,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure LoginSetupValidation()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -498,6 +507,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure LoginSignature()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -543,6 +553,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CancelSaleSignature()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -583,6 +594,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoucherAndItemPurchaseSignature()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -621,6 +633,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure BrokenTicketSignatureChain()
     var
@@ -665,6 +678,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PartnerModificationSignature()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -698,6 +712,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure ArchiveSchemaTest()
     var
@@ -756,6 +771,7 @@ codeunit 85039 "NPR French Compliance Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure JETInitSignatureTest()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";

@@ -11,18 +11,21 @@ codeunit 85007 "NPR POS Saved Sale Tests"
         _POSSetup: Record "NPR POS Setup";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SaveAndLoadPOSSale()
     begin
         POSQuote_SaveAndLoad(Today, Today);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SaveAndLoadPOSSaleFromPreviousDate()
     begin
         POSQuote_SaveAndLoad(CalcDate('<-2D>', Today), Today);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SaveAndLoadAndFinishPOSSale()
     var
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";

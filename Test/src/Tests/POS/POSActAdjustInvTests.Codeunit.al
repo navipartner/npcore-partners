@@ -11,6 +11,7 @@ codeunit 85049 "NPR POS Act. Adjust Inv. Tests"
         POSStore: Record "NPR POS Store";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ConfirmYesHandler,ClickOnOKMsg')]
     procedure AdjustInventory()
     var
