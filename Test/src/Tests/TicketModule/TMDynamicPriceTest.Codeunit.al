@@ -4,6 +4,7 @@ codeunit 85047 "NPR TM Dynamic Price Test"
 
     #region BookingDate
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure BookingDatePriority()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
@@ -62,6 +63,7 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeBookingDate_D()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
@@ -108,6 +110,7 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeBookingDate_WD()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
@@ -153,6 +156,7 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeBookingDate_M()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
@@ -195,6 +199,7 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeBookingDate_Q()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
@@ -234,6 +239,7 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeBookingDate_W()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
@@ -278,6 +284,7 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     #region EventDate
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure EventDatePriority()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
@@ -343,6 +350,7 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeEventDate_D()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
@@ -393,6 +401,7 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     #region RelativeUntil
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeUntilEventDate()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";

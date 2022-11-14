@@ -15,6 +15,7 @@ codeunit 85004 "NPR EFT Tests"
         _POSSetup: Record "NPR POS Setup";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure LookupReversedTransaction()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -49,6 +50,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PurchaseSuccess()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -134,6 +136,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PurchaseFailure()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -184,6 +187,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PurchaseError()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -235,6 +239,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PurchaseSuccessThenAutoVoid()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -297,6 +302,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PurchaseWithTip()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -351,6 +357,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PurchaseWithSurcharge()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -405,6 +412,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PurchaseWithCashback()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -457,6 +465,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchaseRequestError()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -501,6 +510,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RefundSuccess()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -552,6 +562,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RefundFailure()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -603,6 +614,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ReferencedRefund()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -650,6 +662,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ReferencedRefundOfNonExistingTrx()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -696,6 +709,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure ReferencedRefundRecoveredPurchase()
     var
@@ -745,6 +759,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure ReferencedRefundRecoveredLookup()
     var
@@ -793,6 +808,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ConfirmNoHandler')]
     procedure ReferencedRefundUnrecoveredPurchase()
     var
@@ -830,6 +846,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ConfirmNoHandler,MessageHandler')]
     procedure ReferencedRefundUnsuccessfulLookup()
     var
@@ -867,6 +884,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoidSuccess()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -914,6 +932,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoidFailure()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -962,6 +981,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoidError()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -1010,6 +1030,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoidOfPurchaseWithTip()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -1060,6 +1081,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoidOfPurchaseWithSurcharge()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -1110,6 +1132,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure DoubleVoid()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -1148,6 +1171,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure VoidRecoveredPurchase()
     var
@@ -1197,6 +1221,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure VoidRecoveredLookup()
     var
@@ -1246,6 +1271,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoidUnrecoveredPurchase()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -1282,6 +1308,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure VoidUnsuccessfulLookup()
     var
@@ -1319,6 +1346,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoidSuccessFromFinishedSale()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -1369,6 +1397,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoidTransactionInParkedSale()
     var
         POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl B";
@@ -1412,6 +1441,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoidRefund()
     var
         POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl";
@@ -1461,6 +1491,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure OpenSuccess()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -1505,6 +1536,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure OpenFailure()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -1548,6 +1580,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CloseSuccess()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -1591,6 +1624,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CloseFailure()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -1634,6 +1668,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure LookupSuccessOfLostPurchaseApproval()
     var
@@ -1683,6 +1718,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure LookupSuccessOfLostPurchaseDecline()
     var
@@ -1731,6 +1767,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure LookupFailureOfLostPurchase()
     var
@@ -1781,6 +1818,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure LookupOfNonExistingTrx()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -1827,6 +1865,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ConfirmYesHandler,MessageHandler')]
     procedure LookupPromptConfirmIfLastTrxHasUnknownResult()
     var
@@ -1880,6 +1919,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ConfirmNoHandler')]
     procedure LookupPromptDeclineIfLastTrxHasUnknownResult()
     var
@@ -1932,6 +1972,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure DoubleLookupOfLostResult()
     var
@@ -1979,6 +2020,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure LookupOfKnownResult()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2018,6 +2060,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure LookupSuccessOfLostPurchaseWithTip()
     var
@@ -2072,6 +2115,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure LookupVoidTransaction()
     var
@@ -2118,6 +2162,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure LookupSuccessOfLostPurchaseFromFinishedSale()
     var
@@ -2178,6 +2223,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure LookupSuccessOfLostPurchaseFromParkedSale()
     var
@@ -2235,6 +2281,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure LookupSuccessOfLostPurchaseFromCancelledSale()
     var
@@ -2294,6 +2341,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure AuxiliarySuccess()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2339,6 +2387,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure AuxiliaryFailure()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2384,6 +2433,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PostedPurchaseSuccessWithTipAndSurchargeAfterSaleEnd()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2465,6 +2515,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure LoadGiftCardSuccess()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2532,6 +2583,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure LoadGiftCardFailure()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2600,6 +2652,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure LoadGiftCardError()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2668,6 +2721,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoidLoadGiftCard()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2726,6 +2780,7 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('MessageHandler')]
     procedure LookupLostLoadGiftCardResult()
     var

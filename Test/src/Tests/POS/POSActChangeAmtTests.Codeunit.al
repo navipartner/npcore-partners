@@ -10,6 +10,7 @@ codeunit 85069 "NPR POS Act. Change Amt. Tests"
         POSStore: Record "NPR POS Store";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeLineAmt()
     var
         Item: Record Item;

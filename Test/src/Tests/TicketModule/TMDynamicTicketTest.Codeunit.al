@@ -9,6 +9,7 @@ codeunit 85056 "NPR TM Dynamic Ticket Test"
         TicketBOMElements, RequiredBOMElements : Integer;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure MakeDynamicTicketReservationAPI()
     var
         TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
@@ -43,6 +44,7 @@ codeunit 85056 "NPR TM Dynamic Ticket Test"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Make2DynamicTicketsReservationAPI()
     var
         TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
@@ -75,6 +77,7 @@ codeunit 85056 "NPR TM Dynamic Ticket Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure MakeDynamicTicketReservationAndChangeAPI()
     var
         TicketReservationReq: Record "NPR TM Ticket Reservation Req.";

@@ -23,6 +23,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateMembership()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
@@ -70,6 +71,7 @@ codeunit 85016 "NPR MM API Smoke Test"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure AddMembershipMember()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
@@ -99,6 +101,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ActivateMembership()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
@@ -118,6 +121,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GetMembershipUsingMember()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
@@ -149,6 +153,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GetMembershipMemberUsingMembership()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
@@ -180,6 +185,7 @@ codeunit 85016 "NPR MM API Smoke Test"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure UpdateMember()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
@@ -212,6 +218,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure UpdateMemberImage()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
@@ -261,6 +268,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure MemberNumberValidation()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
@@ -282,6 +290,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure MembershipNumberValidation()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
@@ -304,6 +313,7 @@ codeunit 85016 "NPR MM API Smoke Test"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure MemberEmailExists()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
@@ -331,6 +341,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure MemberCardNumberValidation()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
@@ -352,6 +363,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure MemberRegisterArrival()
     var
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -385,6 +397,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure MemberCardRegisterArrival()
     var
         MembershipSetup: Record "NPR MM Membership Setup";

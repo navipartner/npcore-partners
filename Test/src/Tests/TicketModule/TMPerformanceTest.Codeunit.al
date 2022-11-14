@@ -11,6 +11,7 @@ codeunit 85050 "NPR TM Performance Test"
         _POSSetup: Record "NPR POS Setup";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Create_10_Tickets_Warmup()
     var
     begin
@@ -18,18 +19,21 @@ codeunit 85050 "NPR TM Performance Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Create_10_Vouchers_NoScan()
     begin
         Create_Vouchers_NoScan(10);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Create_10_Tickets()
     begin
         PosTickets_Create(10);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Create_10_Tickets_FromVoucher()
     begin
         exit; //TODO: [Test result: FAIL] Fixing in progress
@@ -37,12 +41,14 @@ codeunit 85050 "NPR TM Performance Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Cancel_10_Tickets()
     begin
         PosTickets_Cancel(10, false);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure EndSale_10_Tickets()
     var
     begin

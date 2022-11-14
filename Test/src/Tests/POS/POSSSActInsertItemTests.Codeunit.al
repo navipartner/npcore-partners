@@ -16,6 +16,7 @@ codeunit 85080 "NPR POS SSAct InsertItem Tests"
         UsePresetUnitPrice: Boolean;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IncreaseQuantity()
     var
         Item: Record Item;
@@ -70,6 +71,7 @@ codeunit 85080 "NPR POS SSAct InsertItem Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure DecreaseQuantity()
     var
         Item: Record Item;
@@ -120,6 +122,7 @@ codeunit 85080 "NPR POS SSAct InsertItem Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure AddItemLine()
     var
         Item: Record Item;
@@ -170,6 +173,7 @@ codeunit 85080 "NPR POS SSAct InsertItem Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure AddItemLinePresetUnitPrice()
     var
         Item: Record Item;

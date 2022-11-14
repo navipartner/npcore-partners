@@ -14,10 +14,8 @@
         _POSSession: Codeunit "NPR POS Session";
         _Initialized: Boolean;
 
-
-
-
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherInPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction - check NpRv Sales Line
     var
@@ -42,6 +40,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherFinishPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash - check Retail Voucher exist with correct amount
     var
@@ -74,6 +73,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssueMultiplePartialVouchersFinishPOSTransaction()
     // [SCENARIO] Issue Multiple Vouchers In POS Transaction pay with cash - check Retail Voucher exist with correct count
     var
@@ -108,6 +108,7 @@
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherScanVoucherFull()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
@@ -133,6 +134,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherScanVoucherPartial()
     // [SCENARIO] Issue Voucher - partially use voucher end transaction
     var
@@ -159,6 +161,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherScanVoucherIn2TransactionsEnd()
     // [SCENARIO] Issue Voucher - fully use voucher end 2 transaction
     var
@@ -188,6 +191,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherScanVoucherIn2TransactionsDontEnd()
     // [SCENARIO] Issue Voucher - fully use voucher , don't end 2. transaction
     var
@@ -217,6 +221,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherScanVoucherIn2TransactionsDontEndPayWithCash()
     // [SCENARIO] Issue Voucher - fully use voucher , don't end 2. transaction with voucher but with cash
     var
@@ -255,6 +260,7 @@
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherTryScanArhivedVoucher()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
@@ -293,6 +299,7 @@
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherPayWithVoucherFull()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
@@ -318,6 +325,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherPayWithVoucherPartial()
     // [SCENARIO] Issue Voucher - partially use voucher end transaction
     var
@@ -341,6 +349,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherPayWithVoucherIn2TransactionsEnd()
     // [SCENARIO] Issue Voucher - fully use voucher end 2 transaction
     var
@@ -370,6 +379,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherPayWithVoucherIn2TransactionsDontEnd()
     // [SCENARIO] Issue Voucher - fully use voucher , don't end 2. transaction
     var
@@ -399,6 +409,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherPayWithVoucherIn2TransactionsDontEndPayWithCash()
     // [SCENARIO] Issue Voucher - fully use voucher , don't end 2. transaction with voucher but with cash
     var
@@ -437,6 +448,7 @@
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherTryPayWithArhivedVoucher()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
@@ -463,6 +475,7 @@
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherDiscountAmtFinishPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash - check Retail Voucher exist with correct amount
     var
@@ -498,6 +511,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssuePartialVoucherDiscountPctFinishPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash - check Retail Voucher exist with correct amount
     var
@@ -533,6 +547,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssueDefaultVoucherInPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction - check NpRv Sales Line
     var
@@ -557,6 +572,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssueDefaultVoucherFinishPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash - check Retail Voucher exist with correct amount
     var
@@ -590,6 +606,7 @@
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssueDefaultVoucherScanVoucherFull()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
@@ -615,6 +632,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssueDefaultVoucherScanVoucherPartial()
     // [SCENARIO] Issue Voucher - partially use voucher end transaction
     var
@@ -649,6 +667,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssueDefaultVoucherTryScanArhivedVoucher()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
@@ -673,6 +692,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssueDefaultVoucherPayWithVoucherFull()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
@@ -698,6 +718,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssueDefaultVoucherPayWithVoucherPartial()
     // [SCENARIO] Issue Voucher - partially use voucher end transaction
     var
@@ -731,6 +752,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssueDefaultVoucherTryPayWithArhivedVoucher()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
@@ -756,6 +778,7 @@
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssueDefaultVoucherDiscountAmtFinishPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash - check Retail Voucher exist with correct amount
     var
@@ -791,6 +814,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IssueDefaultVoucherDiscountPctFinishPOSTransaction()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash - check Retail Voucher exist with correct amount
     var
@@ -826,6 +850,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TopUpPartialVoucher()
     // [SCENARIO] Issue Voucher In POS Transaction pay with cash -  use voucher for item transaction
     var
@@ -850,6 +875,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TestMaxVoucherCountPerVoucherType()
     // [SCENARIO] Issue Voucher In POS Transaction, set Max Voucher Count on Voucher Type and exceed it
     var
@@ -879,6 +905,7 @@
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TestAmountPerVoucherType()
     // [SCENARIO] Set fixed amount on Voucher Type, create Voucher with random amount and created Voucher should have fixed amount
     var
@@ -905,6 +932,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TestDatesPerVoucherType()
     // [SCENARIO] Set fixed amount on Voucher Type, create Voucher with random amount and created Voucher should have fixed amount
     var
@@ -934,6 +962,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TestStoreGroupPerVoucherType()
     // [SCENARIO] Set Store Group on Voucher Type, try to use voucher in wrong company
     var
@@ -1130,6 +1159,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
 
     [HandlerFunctions('OpenVoucherCardHandler')]
     procedure CheckExistingVoucher()
@@ -1156,6 +1186,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CheckMissingVoucher()
     var
         NpRvVoucher: Record "NPR NpRv Voucher";

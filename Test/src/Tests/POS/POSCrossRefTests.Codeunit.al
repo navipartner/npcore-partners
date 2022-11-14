@@ -24,6 +24,7 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyCrossReferenceSetupRegistered()
     var
         POSCrossRefSetup: Record "NPR POS Cross Ref. Setup";
@@ -47,6 +48,7 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
 
     [HandlerFunctions('TableObjectsModalPageHandler')]
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CrossRefSetupLookupTableName()
     var
         POSCrossRefSetup: Record "NPR POS Cross Ref. Setup";
@@ -69,6 +71,7 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CrossRefSetupValidateUnknownTableNameErr()
     var
         POSCrossRefSetup: Record "NPR POS Cross Ref. Setup";
@@ -87,6 +90,7 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CrossRefSetupValidateTableName()
     var
         POSCrossRefSetup: Record "NPR POS Cross Ref. Setup";
@@ -109,6 +113,7 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyCrossReferenceIsInitializedPOSSaleLine()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -148,6 +153,7 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyCrossReferenceIsUpdatedEndOfSale()
     var
         POSSale: Record "NPR POS Sale";
@@ -175,6 +181,7 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyCrossReferenceIsRemoved()
     var
         POSSale: Record "NPR POS Sale";

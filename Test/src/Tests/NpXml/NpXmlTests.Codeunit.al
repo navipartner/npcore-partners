@@ -13,6 +13,7 @@ codeunit 85021 "NPR NpXml Tests"
         Initialized: Boolean;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ProcessTaskWithUpdItemXmlTemplateUsingAPI()
     var
         Item: Record Item;

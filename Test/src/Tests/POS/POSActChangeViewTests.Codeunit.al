@@ -11,6 +11,7 @@ codeunit 85070 "NPR POS Act. Change View Tests"
         POSStore: Record "NPR POS Store";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeViewLogin()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -40,6 +41,7 @@ codeunit 85070 "NPR POS Act. Change View Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeViewSale()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -68,6 +70,7 @@ codeunit 85070 "NPR POS Act. Change View Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeViewPayment()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -96,6 +99,7 @@ codeunit 85070 "NPR POS Act. Change View Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeViewBalance()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -124,6 +128,7 @@ codeunit 85070 "NPR POS Act. Change View Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeViewLocked()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";

@@ -11,6 +11,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         POSStore: Record "NPR POS Store";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeViewSale()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -33,6 +34,7 @@ codeunit 85073 "NPR POS Self Service Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeViewPayment()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -55,6 +57,7 @@ codeunit 85073 "NPR POS Self Service Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeViewLogin()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -77,6 +80,7 @@ codeunit 85073 "NPR POS Self Service Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure IncreaseQuantity()
     var
         Item: Record Item;
@@ -114,6 +118,7 @@ codeunit 85073 "NPR POS Self Service Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure DecreaseQuantity()
     var
         Item: Record Item;
@@ -152,6 +157,7 @@ codeunit 85073 "NPR POS Self Service Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure DecreaseQuantityToZero()
     var
         Item: Record Item;
@@ -190,6 +196,7 @@ codeunit 85073 "NPR POS Self Service Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure DecreaseQuantityWithZero()
     var
         Item: Record Item;
@@ -228,6 +235,7 @@ codeunit 85073 "NPR POS Self Service Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure DecreaseQuantityWithNegative()
     var
         Item: Record Item;

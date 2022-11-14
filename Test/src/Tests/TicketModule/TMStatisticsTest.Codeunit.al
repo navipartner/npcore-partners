@@ -6,6 +6,7 @@ codeunit 85113 "NPR TM Statistics Test"
         _RevisitPolicy: Option NA,NONINITIAL,DAILY_NONINITIAL,NEVER;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Admission_Policy_Never_01()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -87,6 +88,7 @@ codeunit 85113 "NPR TM Statistics Test"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Admission_Policy_Never_02()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -167,6 +169,7 @@ codeunit 85113 "NPR TM Statistics Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Admission_Policy_Never_03()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -250,6 +253,7 @@ codeunit 85113 "NPR TM Statistics Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Admission_Policy_DailyInitial_01()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -333,6 +337,7 @@ codeunit 85113 "NPR TM Statistics Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Admission_Policy_NonInitial_Admitt()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -417,6 +422,7 @@ codeunit 85113 "NPR TM Statistics Test"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Admission_Policy_NonInitial_Revoke()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -512,6 +518,7 @@ codeunit 85113 "NPR TM Statistics Test"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure Admission_Policy_DailyNonInitial_AdHoc()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;

@@ -3,6 +3,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     Subtype = Test;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ListTicketItems()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
@@ -29,6 +30,7 @@ codeunit 85013 "NPR TM API SmokeTest"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure MakeTicketReservation()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
@@ -56,6 +58,7 @@ codeunit 85013 "NPR TM API SmokeTest"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ConfirmTicketReservation()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -89,6 +92,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PreConfirmTicketReservation()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -120,6 +124,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CancelPrelTicketReservation()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -178,6 +183,7 @@ codeunit 85013 "NPR TM API SmokeTest"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CancelPrelTicketReservationStatistics()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -238,6 +244,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CancelConfirmedTicketReservation()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -275,6 +282,7 @@ codeunit 85013 "NPR TM API SmokeTest"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CancelReservedTicketReservation()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -339,6 +347,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CancelReservedTicketReservationStatistics()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -407,6 +416,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GetTicketPrintURL()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -451,6 +461,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GetComplementaryItem()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -503,6 +514,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure OfflineValidation()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -548,6 +560,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ConsumeComplementaryItem()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -609,6 +622,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure AdmissionCapacity()
     var
         TmpAdmScheduleEntryResponseOut: Record "NPR TM Admis. Schedule Entry" temporary;
@@ -635,6 +649,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ValidateTicketArrival()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -674,6 +689,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ValidateTicketArrivalWithoutPayment()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -713,6 +729,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ValidateTicketDeparture()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -757,6 +774,7 @@ codeunit 85013 "NPR TM API SmokeTest"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ListTickets()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -809,6 +827,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GetTicketChangeRequest()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -859,6 +878,7 @@ codeunit 85013 "NPR TM API SmokeTest"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ConfirmTicketChangeRequest()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -946,6 +966,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ConfirmTicketChangeRequest_2()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -1061,6 +1082,7 @@ codeunit 85013 "NPR TM API SmokeTest"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SetTicketAttribute()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
@@ -1106,6 +1128,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SendETicket()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -1143,6 +1166,7 @@ codeunit 85013 "NPR TM API SmokeTest"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure AdmissionBaseCalendar()
     var
         TicketBom: Record "NPR TM Ticket Admission BOM";

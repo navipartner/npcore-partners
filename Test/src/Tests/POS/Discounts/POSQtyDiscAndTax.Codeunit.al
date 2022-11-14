@@ -25,6 +25,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         Initialized: Boolean;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyDiscountEnabled()
     var
         DiscountPriority: Record "NPR Discount Priority";
@@ -45,6 +46,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RelevantDiscountsFoundForDMLInsert()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -95,6 +97,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineCreatedForNormalTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -162,6 +165,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineCreatedForNormalTaxInDebitSaleForward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -241,6 +245,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineCreatedForNormalTaxInDebitSaleBackward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -319,6 +324,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForNormalTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -419,6 +425,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForNormalTaxInDirectSaleQtyFraction()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -519,6 +526,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForNormalTaxInDebitSaleForward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -631,6 +639,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForNormalTaxInDebitSaleForwardQtyFraction()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -743,6 +752,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForNormalTaxInDebitSaleBackward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -854,6 +864,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForNormalTaxInDebitSaleBackwardQtyFraction()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -965,6 +976,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineCreatedForRevChrgTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -1032,6 +1044,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineCreatedForRevChrgTaxInDebitSaleForward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -1111,6 +1124,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineCreatedForRevChrgTaxInDebitSaleBackward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -1189,6 +1203,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForRevChrgTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -1289,6 +1304,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForRevChrgTaxInDebitSaleForward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -1400,6 +1416,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForRevChrgTaxInDebitSaleBackward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -1511,6 +1528,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineCreatedForSaleTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -1600,6 +1618,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineCreatedForSaleTaxInDirectSaleQtyFraction()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -1689,6 +1708,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineCreatedForSaleTaxInDebitSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -1793,6 +1813,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineCreatedForSaleTaxInDebitSaleQtyFraction()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -1897,6 +1918,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForSaleTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -2018,6 +2040,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForSaleTaxInDirectSaleQtyFraction()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -2139,6 +2162,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForSaleTaxInDebitSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -2269,6 +2293,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForSaleTaxInDebitSaleQtyFraction()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -2399,6 +2424,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RelevantDiscountsFoundForDMLModify()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -2449,6 +2475,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineUpdatedQtyForNormalTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -2523,6 +2550,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineUpdatedQtyForNormalTaxInDebitSaleForward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -2608,6 +2636,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineUpdatedQtyForNormalTaxInDebitSaleBackward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -2692,6 +2721,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForNormalTaxInDirectSaleUpdatedQty()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -2798,6 +2828,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForNormalTaxInDebitSaleForwardUpdatedQty()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -2916,6 +2947,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForNormalTaxInDebitSaleBackwardUpdatedQty()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -3033,6 +3065,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineUpdatedQtyForRevChrgTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -3106,6 +3139,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineUpdatedQtyForRevChrgTaxInDebitSaleForward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -3191,6 +3225,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineUpdatedQtyForRevChrgTaxInDebitSaleBackward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -3275,6 +3310,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForRevChrgTaxInDirectSaleUpdatedQty()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -3381,6 +3417,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForRevChrgTaxInDebitSaleForwardUpdatedQty()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -3498,6 +3535,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForRevChrgTaxInDebitSaleBackwardUpdatedQty()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -3615,6 +3653,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineUpdatedForSaleTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -3709,6 +3748,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineUpdatedForSaleTaxInDebitSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -3820,6 +3860,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForSaleTaxInDirectSaleUpdatedQty()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -3946,6 +3987,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenEndSaleForSaleTaxInDebitSaleUpdatedQty()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -4086,6 +4128,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RelevantDiscountsFoundForDMLDelete()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -4136,6 +4179,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineDeletedForNormalTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -4197,6 +4241,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineDeletedForNormalTaxInDebitSaleForward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -4269,6 +4314,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineDeletedForNormalTaxInDebitSaleBackward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -4341,6 +4387,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineDeletedForRevChrgTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -4402,6 +4449,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineDeletedForRevChrgTaxInDebitSaleForward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -4474,6 +4522,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineDeletedForRevChrgTaxInDebitSaleBackward()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -4546,6 +4595,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineDeletedForSaleTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
@@ -4621,6 +4671,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ApplyDiscountWhenPOSSaleLineDeletedForSaleTaxInDebitSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";

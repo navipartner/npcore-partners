@@ -11,6 +11,7 @@ codeunit 85061 "NPR POS Act. Item Price Tests"
         POSStore: Record "NPR POS Store";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TestGetLineNoOneLine()
     var
         Item: Record Item;
@@ -41,6 +42,7 @@ codeunit 85061 "NPR POS Act. Item Price Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TestGetLineNo()
     var
         Item: Record Item;
@@ -70,6 +72,7 @@ codeunit 85061 "NPR POS Act. Item Price Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TestGetLineOneLine()
     var
         Item: Record Item;
@@ -101,6 +104,7 @@ codeunit 85061 "NPR POS Act. Item Price Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TestDeleteLines()
     var
         Item: Record Item;

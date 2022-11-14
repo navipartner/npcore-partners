@@ -12,6 +12,7 @@ codeunit 85026 "NPR POS Resume Tests"
         _POSSetup: Record "NPR POS Setup";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ResumeDialogHandler')]
     procedure CrashAndResume()
     var

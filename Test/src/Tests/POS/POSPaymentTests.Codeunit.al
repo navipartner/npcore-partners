@@ -13,6 +13,7 @@ codeunit 85006 "NPR POS Payment Tests"
         _POSSetup: Record "NPR POS Setup";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PurchaseBelowTotal()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -51,6 +52,7 @@ codeunit 85006 "NPR POS Payment Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PurchaseEqualTotal()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -118,6 +120,7 @@ codeunit 85006 "NPR POS Payment Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure PurchaseAboveTotal()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";

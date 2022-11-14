@@ -20,6 +20,7 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         LibrarySales: Codeunit "Library - Sales";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure CreatePrepaymentLineWithMaxPrepaymentValue()
     var
         SalePOS: Record "NPR POS Sale";
@@ -68,6 +69,7 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure CreatePrepaymentLineWithPrepaymentPrc()
     var
         SalePOS: Record "NPR POS Sale";
@@ -115,6 +117,7 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure CreatePrepaymentLineWithPrepaymentAmt()
     var
         SalePOS: Record "NPR POS Sale";

@@ -18,6 +18,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         XmlSales, XmlPurch : TextBuilder;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutSellToCustomerXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -41,6 +42,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutSellToCustomerNameXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -64,6 +66,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutSellToCustomerAddressXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -87,6 +90,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutSellToCustomerPostCodeXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -110,6 +114,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutSellToCustomerCityXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -133,6 +138,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutSellToCustomerEMailXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -156,6 +162,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutPricesInclVATXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -179,6 +186,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutCurrencyCodeXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -202,6 +210,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutShipToCustomerNameXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -225,6 +234,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutShipToCustomerAddressXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -248,6 +258,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutShipToCustomerPostCodeXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -271,6 +282,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutShipToCustomerCityXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -294,6 +306,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutOrderDateXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -317,6 +330,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutPaymentMethodCodeXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -341,6 +355,7 @@ codeunit 85008 "NPR E-Commerce Tests"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutPaymentTransactionIdXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -364,6 +379,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutPaymentAmountXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -387,6 +403,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutItemReferenceNoXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -410,6 +427,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutItemUnitPriceXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -433,6 +451,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutItemQtyXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -456,6 +475,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutItemLineAmountXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -479,6 +499,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutItemDescriptionXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -502,6 +523,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutItemDescription2XmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -525,6 +547,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutItemVATPctXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -548,6 +571,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutGLAccReferenceNoXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -571,6 +595,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutGLAccUnitPriceXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -594,6 +619,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutGLAccQtyXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -617,6 +643,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutGLAccLineAmountXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -640,6 +667,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutGLAccDescriptionXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -663,6 +691,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutGLAccDescription2XmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -686,6 +715,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutCommentDescriptionXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -709,6 +739,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrderWithoutCommentDescription2XmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -732,6 +763,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateSalesOrder()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -898,6 +930,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure DeleteSalesOrder()
     var
         ImportEntryCreateDoc: Record "NPR NC Import Entry";
@@ -986,6 +1019,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure UpdateAndPostSalesOrder()
     var
         ImportEntryCreateDoc: Record "NPR NC Import Entry";
@@ -1085,6 +1119,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreateAndPostSalesOrder()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1173,6 +1208,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('OpenSalesOrder')]
     procedure LookupSalesOrder()
     var
@@ -1233,6 +1269,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvWithoutBuyFromVendorXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1256,6 +1293,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvWithoutPostingDateXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1279,6 +1317,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvWithoutItemReferenceNoXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1302,6 +1341,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvWithoutItemDirectUnitCostXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1325,6 +1365,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvWithoutItemQtyXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1348,6 +1389,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvWithoutItemLineAmountXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1371,6 +1413,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvWithoutItemVATPctXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1394,6 +1437,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvWithoutGLAccReferenceNoXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1417,6 +1461,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvWithoutGLAccDirectUnitCostXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1440,6 +1485,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvWithoutGLAccQtyXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1463,6 +1509,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvWithoutGLAccLineAmountXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1486,6 +1533,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvWithoutGLAccDescriptionXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1510,6 +1558,7 @@ codeunit 85008 "NPR E-Commerce Tests"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvWithoutCommentDescriptionXmlTagErr()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1533,6 +1582,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CreatePurchInvoice()
     var
         ImportEntry: Record "NPR NC Import Entry";
@@ -1653,6 +1703,7 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('OpenPurchaseInvoice')]
     procedure LookupPurchInvoice()
     var

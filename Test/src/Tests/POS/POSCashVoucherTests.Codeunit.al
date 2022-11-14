@@ -20,6 +20,7 @@ codeunit 85076 "NPR POS Cash Voucher Tests"
         Initialized: Boolean;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoucherApplicationWithoutCommision()
     var
         SalePOS: Record "NPR POS Sale";
@@ -62,6 +63,7 @@ codeunit 85076 "NPR POS Cash Voucher Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VoucherApplicationWithCommision()
     var
         SalePOS: Record "NPR POS Sale";

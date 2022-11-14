@@ -15,6 +15,7 @@ codeunit 85078 "NPR POS Doc.Pay&Post Tests"
         Initialized: Boolean;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('SelectFromCustomerListPageHandler')]
     internal procedure CheckCustomer()
     var
@@ -46,6 +47,7 @@ codeunit 85078 "NPR POS Doc.Pay&Post Tests"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('SelectDocumentPageHandler')]
     internal procedure SelectDocumentIntoPOS()
     var
@@ -83,6 +85,7 @@ codeunit 85078 "NPR POS Doc.Pay&Post Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure MarkLinesForPostingErr()
     var
         SalePOS: Record "NPR POS Sale";
@@ -109,6 +112,7 @@ codeunit 85078 "NPR POS Doc.Pay&Post Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure MarkLinesForPosting()
     var
         SalePOS: Record "NPR POS Sale";
@@ -133,6 +137,7 @@ codeunit 85078 "NPR POS Doc.Pay&Post Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure CreateDocumentAndPost()
     var
         SalePOS: Record "NPR POS Sale";
@@ -187,6 +192,7 @@ codeunit 85078 "NPR POS Doc.Pay&Post Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure CreateDocumentWithoutPosting()
     var
         SalePOS: Record "NPR POS Sale";

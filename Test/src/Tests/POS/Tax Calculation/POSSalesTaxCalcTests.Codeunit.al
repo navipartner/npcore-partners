@@ -24,6 +24,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TaxCalcBackwardDirectSaleError()
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -70,6 +71,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TaxCalcBackwardDebitSaleError()
     var
         Customer: Record Customer;
@@ -120,6 +122,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TaxCalcDirectSaleUnknownTaxAreaError()
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -168,6 +171,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TaxCalcDebitSaleUnknownTaxAreaError()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -223,6 +227,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TaxCalcDirectSaleUnknownTaxAreaLineError()
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -274,6 +279,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TaxCalcDebitSaleUnknownTaxAreaLineError()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -334,6 +340,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TaxCalcDirectSaleUnknownTaxDetailsError()
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -382,6 +389,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TaxCalcDebitSaleUnknownTaxDetailsError()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -441,6 +449,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SkipTaxCalcForZeroAmountDirectSale()
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -489,6 +498,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SkipTaxCalcForZeroAmountDebitSale()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -547,6 +557,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountDirectSaleForTaxUnliable()
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -625,6 +636,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountDebitSaleForTaxUnliable()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -711,6 +723,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountForSalesTaxTypeUnknownMaximumDirectSale()
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -789,6 +802,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountForSalesTaxTypeUnknownMaximumDebitSale()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -878,6 +892,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountForSalesTaxTypeUnitPriceLowerThenMaxAmtDirectSale()
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -956,6 +971,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountForSalesTaxTypeWhereUnitPriceLowerThenMaxAmtDebitSale()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -1045,6 +1061,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountForSalesTaxTypeUnknownMaximumDirectSaleWithLineDisc()
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -1123,6 +1140,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountForSalesTaxTypeUnknownMaximumDebitSaleWithLineDisc()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -1212,6 +1230,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountForSalesTaxTypeUnitPriceLowerThenMaxAmtDirectSaleWithLineDisc()
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -1290,6 +1309,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountForSalesTaxTypeWhereUnitPriceHigherThenMaxAmtDebitSaleWithLineDisc()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -1379,6 +1399,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountForSalesTaxTypeUnknownMaximumDirectSalePosted()
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -1503,6 +1524,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountForSalesTaxTypeUnknownMaximumDebitSalePosted()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -1639,6 +1661,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountDirectSaleForTaxUnliablePosted()
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -1764,6 +1787,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountDebitSaleForTaxUnliablePosted()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -1894,6 +1918,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountForSalesTaxTypeUnitPriceHigherThenMaxAmtDirectSalePosted()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -2014,6 +2039,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure CalcTaxAmountForSalesTaxTypeWhereUnitPriceHigherThenMaxAmtDebitSalePosted()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";

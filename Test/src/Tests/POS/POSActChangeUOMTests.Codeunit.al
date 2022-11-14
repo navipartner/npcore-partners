@@ -10,6 +10,7 @@ codeunit 85072 "NPR POS Act. Change UOM Tests"
         POSStore: Record "NPR POS Store";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeUOM()
     var
         Item: Record Item;

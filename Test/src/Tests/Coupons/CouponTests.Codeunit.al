@@ -3,7 +3,6 @@ codeunit 85074 "NPR Coupon Tests"
     // [Feature] Coupon Test scenarios
     Subtype = Test;
 
-
     var
         _Item: Record Item;
         _POSSession: Codeunit "NPR POS Session";
@@ -16,6 +15,7 @@ codeunit 85074 "NPR Coupon Tests"
         _Initialized: Boolean;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure UseFreeItemCouponInPOSTransaction()
     // [SCENARIO] Use Free Item Coupon POS Transaction - End transaction
     var
@@ -40,6 +40,7 @@ codeunit 85074 "NPR Coupon Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeCouponLineQtyInPOSTransaction()
     // [SCENARIO] Change Coupon Line Quantity POS Transaction
     var
@@ -81,6 +82,7 @@ codeunit 85074 "NPR Coupon Tests"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeCouponLineQtyInPOSTransactionFail()
     // [SCENARIO] Change Coupon Line Quantity should fail
     var

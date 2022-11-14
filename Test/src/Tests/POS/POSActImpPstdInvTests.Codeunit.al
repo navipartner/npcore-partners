@@ -13,6 +13,7 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
         VATBusinessPostingGroup: Record "VAT Business Posting Group";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ClickOnOKMsg')]
 
     procedure TestPostedInvToPOSNegativeValues()
@@ -74,6 +75,7 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ClickOnOKMsg')]
 
     procedure TestPostedInvToPOSPositiveValues()
@@ -137,6 +139,7 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TestPOSSaleCustomer()
     var
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -161,6 +164,7 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TestUpdateSalesPerson()
     var
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";

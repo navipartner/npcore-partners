@@ -12,6 +12,7 @@
         GlobalItemWorksheetLine: Record "NPR Item Worksheet Line";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ValidateItemWorksheetLineProcessing()
     begin
         ValidateRegisterLine();

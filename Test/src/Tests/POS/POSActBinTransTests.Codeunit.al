@@ -12,6 +12,7 @@ codeunit 85054 "NPR POS Act. Bin Trans. Tests"
         POSStore: Record "NPR POS Store";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
 
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK,ConfirmYesHandler')]
     procedure TransferContentsToBin()

@@ -8,6 +8,7 @@
     /// Read more about self-certification here: https://developer.mobilepay.dk/products/point-of-sale/certification
     /// </summary>
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('DefaultMessageHandler')]
     internal procedure PosOnboardOffboard()
     var
@@ -46,6 +47,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     //[HandlerFunctions('DefaultMessageHandler')]
     internal procedure CompletePayment()
     var
@@ -134,6 +136,7 @@
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure CompleteRefunds()
     var
         MobilePayV10SelfCert: Codeunit "NPR MobilePayV10 SelfCertify";

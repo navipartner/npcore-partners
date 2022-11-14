@@ -3,6 +3,7 @@ codeunit 85019 "NPR Tax Free Tests"
     Subtype = Test;
     EventSubscriberInstance = Manual;
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('AnswerYesConfirmHandlerNo')]
     procedure TryIssueVoucherGlobalBlue()
     var
@@ -75,6 +76,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ExpectedMessage')]
     procedure TryIssueVoucherNotEligableGlobalBlue()
     var
@@ -148,6 +150,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('AnswerYesConfirmHandlerNo')]
     procedure AskToIssueVoucherOnForeignYesGlobalBlue()
     var
@@ -220,6 +223,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SkipIssueVoucherQstIfNotEligibleGlobalBlue()
     var
         Item: Record Item;
@@ -288,6 +292,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ExpectedConfirmHandlerNo')]
     procedure NoVoucherIssuedIfAnswerNoEligibleGlobalBlue()
     var
@@ -357,6 +362,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('AnswerYesConfirmHandlerNo,ExpectedMessage')]
     procedure VoidIssuedVoucherGlobalBlue()
     var
@@ -431,6 +437,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('AnswerYesConfirmHandlerNo')]
     procedure ReissueIssuedVoucherGlobalBlue()
     var
@@ -512,6 +519,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('AnswerYesConfirmHandlerNo,ExpectedMessage')]
     procedure CantReissueVoidedVoucherGlobalBlue()
     var
@@ -601,6 +609,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TestErrorOnMissingDataGlobalBlue()
     var
         TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
@@ -661,6 +670,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TryIssueVoucherPremier()
     var
         Item: Record Item;
@@ -736,6 +746,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ExpectedMessage')]
     procedure TryErroNotEligibleIssueVoucherPremier()
     var
@@ -813,6 +824,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('AnswerYesConfirmHandlerNo')]
     procedure AskToIssueVoucherOnForeignYesPremier()
     var
@@ -889,6 +901,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SkipIssueVoucherQstIfNotEligiblePremier()
     var
         Item: Record Item;
@@ -961,6 +974,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ExpectedConfirmHandlerNo')]
     procedure NoVoucherIssuedIfAnswerNoEligiblePremier()
     var
@@ -1034,6 +1048,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ExpectedMessage')]
     procedure VoidIssuedVoucherPremier()
     var
@@ -1112,6 +1127,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ReissueIssuedVoucherPremier()
     var
         Item: Record Item;
@@ -1190,6 +1206,7 @@ codeunit 85019 "NPR Tax Free Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ExpectedMessage')]
     procedure CantReissueVoidedVoucherPremier()
     var

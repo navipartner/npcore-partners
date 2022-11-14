@@ -14,6 +14,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         _Salesperson: Record "Salesperson/Purchaser";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ExportToOrderWithoutPosting()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -73,6 +74,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ExportToOrderWithFullPosting()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
