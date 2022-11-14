@@ -213,10 +213,14 @@
     }
 
     trigger OnAfterGetCurrRecord()
+#if BC17 or BC18 or BC19 or BC20    
     var
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
+#endif        
     begin
+#if BC17 or BC18 or BC19 or BC20        
         RoleCenterNotificationMgt.HideEvaluationNotificationAfterStartingTrial();
+#endif        
         RecalculateCues();
     end;
 
