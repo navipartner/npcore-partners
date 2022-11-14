@@ -358,13 +358,18 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             {
                 Caption = 'Timeline';
                 Image = Timeline;
-
+#if BC17 or BC18 or BC19 or BC20
                 ToolTip = 'Specifies the timeline from the item.';
+#else
+                ToolTip = 'Specifies the timeline from the item. This action is removed from version BC21 onwards.';
+                Visible = false;
+#endif
                 ApplicationArea = NPRRetail;
-
                 trigger OnAction()
                 begin
+#if BC17 or BC18 or BC19 or BC20
                     Rec.ShowTimelineFromItem(Rec);
+#endif
                 end;
             }
             action("NPR Retail Inventory Set")

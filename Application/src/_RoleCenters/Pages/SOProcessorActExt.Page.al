@@ -126,13 +126,14 @@
             }
         }
     }
+#if BC17 or BC18 or BC19 or BC20    
     trigger OnAfterGetCurrRecord()
     var
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
     begin
         RoleCenterNotificationMgt.HideEvaluationNotificationAfterStartingTrial();
     end;
-
+#endif
     trigger OnAfterGetRecord()
     begin
         CalculateCueFieldValues();
