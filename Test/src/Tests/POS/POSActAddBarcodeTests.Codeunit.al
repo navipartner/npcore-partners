@@ -10,6 +10,7 @@ codeunit 85048 "NPR POS Act. Add Barcode Tests"
         BarCode: Code[50];
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ClickOnOKMsg')]
     procedure CreateItemReference()
     var
@@ -51,6 +52,7 @@ codeunit 85048 "NPR POS Act. Add Barcode Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ClickOnOKErr')]
     procedure TryCreateItemReference()
     var

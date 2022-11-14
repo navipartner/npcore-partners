@@ -19,6 +19,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         _PosUnitNo2: Text;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GLPostingPeriodRegisterCompressed()
     var
         PostGLEntriesJQ: Codeunit "NPR POS Post GL Entries JQ";
@@ -90,6 +91,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GLPostingPOSEntryCompressed()
     var
         PostGLEntriesJQ: Codeunit "NPR POS Post GL Entries JQ";
@@ -125,6 +127,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GLPostingUncompressed()
     var
         PostGLEntriesJQ: Codeunit "NPR POS Post GL Entries JQ";
@@ -160,6 +163,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ItemPosting()
     var
         PostItemEntriesJQ: Codeunit "NPR POS Post Item Entries JQ";
@@ -194,6 +198,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ItemPostingContinueOnError()
     var
         PostItemEntriesJQ: Codeunit "NPR POS Post Item Entries JQ";
@@ -233,6 +238,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GLPostingPeriodRegisterCompressionContinueOnError()
     var
         PostGLEntriesJQ: Codeunit "NPR POS Post GL Entries JQ";
@@ -266,6 +272,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure GLPostingPOSEntryCompressionError()
     var
         PostGLEntriesJQ: Codeunit "NPR POS Post GL Entries JQ";

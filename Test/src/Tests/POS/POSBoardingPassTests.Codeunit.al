@@ -25,6 +25,7 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
         TestMsg: Text;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ClickOnOKMsg1Leg')]
     procedure BoardingPassReqToday1Leg()
     var
@@ -70,6 +71,7 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure BoardingPassInfoCode1Leg()
     var
         SalePOS: Record "NPR POS Sale";
@@ -143,6 +145,7 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ClickOnOKMsg1Leg')]
     procedure BoardingPassReqLEGAirportCode1Leg()
     var
@@ -190,6 +193,7 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('ClickOnOKMsg2Leg')]
     procedure BoardingPassReqToday2Leg()
     var

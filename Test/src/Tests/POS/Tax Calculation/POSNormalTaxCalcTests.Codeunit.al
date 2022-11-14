@@ -23,6 +23,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         CreatedSalesOrderNo: Code[20];
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcForwardForDebitSaleNormalVATLineDiscountManualPosted()
     var
         Customer: Record Customer;
@@ -116,6 +117,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SkipTaxCalcForwardForZeroAmountDebitSaleNormalVAT()
     var
         Customer: Record Customer;
@@ -165,6 +167,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SkipTaxCalcForwardForZeroAmountInclTaxDebitSaleNormalVAT()
     var
         Customer: Record Customer;
@@ -214,6 +217,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcForwardForDirectSaleNormalVAT()
     var
         POSViewProfile: Record "NPR POS View Profile";
@@ -288,6 +292,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDirectSaleNormalVAT()
     var
         POSViewProfile: Record "NPR POS View Profile";
@@ -359,6 +364,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcForwardForDebitSaleNormalVAT()
     var
         Customer: Record Customer;
@@ -437,6 +443,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDebitSaleNormalVAT()
     var
         Customer: Record Customer;
@@ -515,6 +522,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDirectSaleNormalVATLineDiscountManual()
     var
         POSViewProfile: Record "NPR POS View Profile";
@@ -586,6 +594,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcForwardForDebitSaleNormalVATLineDiscountManual()
     var
         Customer: Record Customer;
@@ -665,6 +674,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDebitSaleNormalVATLineDiscountManual()
     var
         Customer: Record Customer;
@@ -743,6 +753,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDirectSaleNormalVATPosted()
     var
         POSViewProfile: Record "NPR POS View Profile";
@@ -828,6 +839,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcForwardForDebitSaleNormalVATPosted()
     var
         Customer: Record Customer;
@@ -921,6 +933,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDebitSaleNormalVATPosted()
     var
         Customer: Record Customer;
@@ -1019,6 +1032,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDirectSaleNormalVATLineDiscountManualPosted()
     var
         POSViewProfile: Record "NPR POS View Profile";
@@ -1105,6 +1119,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDebitSaleNormalVATLineDiscountManualPosted()
     var
         Customer: Record Customer;
@@ -1197,6 +1212,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SkipTaxCalcForwardForZeroAmountDebitSaleReverseVAT()
     var
         Customer: Record Customer;
@@ -1247,6 +1263,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SkipTaxCalcForwardForZeroAmountInclTaxDebitSaleReverseVAT()
     var
         Customer: Record Customer;
@@ -1297,6 +1314,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDirectSaleReverseVAT()
     var
         POSViewProfile: Record "NPR POS View Profile";
@@ -1368,6 +1386,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcForwardForDebitSaleReverseVAT()
     var
         Customer: Record Customer;
@@ -1446,6 +1465,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDebitSaleReverseVAT()
     var
         Customer: Record Customer;
@@ -1524,6 +1544,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDirectSaleReverseVATLineDiscountManual()
     var
         POSViewProfile: Record "NPR POS View Profile";
@@ -1595,6 +1616,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcForwardForDebitSaleReverseVATLineDiscountManual()
     var
         Customer: Record Customer;
@@ -1674,6 +1696,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDebitSaleReverseVATLineDiscountManual()
     var
         Customer: Record Customer;
@@ -1752,6 +1775,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDirectSaleReverseVATPosted()
     var
         POSViewProfile: Record "NPR POS View Profile";
@@ -1837,6 +1861,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcForwardForDebitSaleReverseVATPosted()
     var
         Customer: Record Customer;
@@ -1928,6 +1953,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDebitSaleReverseVATPosted()
     var
         Customer: Record Customer;
@@ -2021,6 +2047,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
 
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDirectSaleReverseVATLineDiscountManualPosted()
     var
         POSViewProfile: Record "NPR POS View Profile";
@@ -2107,6 +2134,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcForwardForDebitSaleReverseVATLineDiscountManualPosted()
     var
         Customer: Record Customer;
@@ -2200,6 +2228,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VerifyTaxCalcBackwardForDebitSaleReverseVATLineDiscountManualPosted()
     var
         Customer: Record Customer;

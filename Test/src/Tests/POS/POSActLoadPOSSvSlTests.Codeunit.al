@@ -10,6 +10,7 @@ codeunit 85086 "NPR POS ActLoadPOSSvSl Tests"
         POSStore: Record "NPR POS Store";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TestLoadFromQuote()
     var
         POSActGetParkedSaleB: Codeunit "NPR POS Action: LoadPOSSvSl B";

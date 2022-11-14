@@ -10,6 +10,7 @@ codeunit 85071 "NPR POS Act. Insert Com. Tests"
         POSStore: Record "NPR POS Store";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure InsertComment()
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";

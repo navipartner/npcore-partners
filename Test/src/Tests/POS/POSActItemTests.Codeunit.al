@@ -12,6 +12,7 @@ codeunit 85085 "NPR POS Act. Item Tests"
         POSStore: Record "NPR POS Store";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure AddSalesLine()
     var
         Item: Record Item;

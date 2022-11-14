@@ -16,432 +16,504 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
         _Item: Record "Item";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario1()
     begin
         NewTransactionPartialPay(100, 0.51, 99.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario2()
     begin
         NewTransactionPartialPay(99.96, 0.01, 100);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario3()
     begin
         NewTransactionFinish(99.76, 109.52, 10, -0.24);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario4()
     begin
         NewTransactionPartialPay(99.76, 0.02, 99.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario5()
     begin
         NewTransactionPartialPay(99.76, 99, 1);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario6()
     begin
         NewTransactionFinish(99.75, 105, 5, 0.25);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario7()
     begin
         NewTransactionPartialPay(99.75, 99, 1);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario8()
     begin
         NewTransactionFinish(99.74, 99.5, 0, -0.24);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario9()
     begin
         NewTransactionPartialPay(99.74, 99, 0.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario10()
     begin
         NewTransactionPartialPay(-3.07, -5.1, 2);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario11()
     begin
         NewTransactionPartialPay(-3.07, -2.1, -1);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario12()
     begin
         NewTransactionPartialPay(-99, -99.5, 0.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario13()
     begin
         NewTransactionPartialPay(-99.01, -200, 101);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario14()
     begin
         NewTransactionPartialPay(-99.01, -99.5, 0.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario15()
     begin
         NewTransactionPartialPay(-99.74, -200, 100.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario16()
     begin
         NewTransactionPartialPay(-99.74, -99, -0.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario17()
     begin
         NewTransactionPartialPay(-99.74, 0, -99.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario18()
     begin
         NewTransactionPartialPay(-99.75, -200, 100);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario19()
     begin
         NewTransactionPartialPay(-99.75, -99, -1);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario20()
     begin
         NewTransactionPartialPay(-99.75, -110, 10);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario21()
     begin
         NewTransactionPartialPay(-99.75, 0, -100);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario22()
     begin
         NewTransactionPartialPay(-99.76, -200, 100);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario23()
     begin
         NewTransactionPartialPay(-99.76, -99, -1);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario24()
     begin
         NewTransactionPartialPay(-99.76, 0, -100);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario25()
     begin
         NewTransactionPartialPay(-99.99, -200, 100);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario26()
     begin
         NewTransactionPartialPay(-100.24, 0, -100);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario27()
     begin
         NewTransactionPartialPay(-100.25, 0, -100.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario28()
     begin
         NewTransactionPartialPay(-100.26, 0, -100.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario29()
     begin
         NewTransactionPartialPay(-499.49, -510, 10.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario30()
     begin
         NewTransactionPartialPay(-499.49, 0, -499.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario31()
     begin
         NewTransactionFinish(499.49, 510, 10.5, 0.01);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario32()
     begin
         NewTransactionPartialPay(100, 99.51, 0.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario33()
     begin
         NewTransactionFinish(100, 100.51, 0.5, 0.01);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario34()
     begin
         NewTransactionFinish(99.99, 200, 100, 0.01);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario35()
     begin
         NewTransactionFinish(99.98, 100, 0, 0.02);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario36()
     begin
         NewTransactionFinish(99.97, 100, 0, 0.03);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario37()
     begin
         NewTransactionPartialPay(99.76, 99.5, 0.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario38()
     begin
         NewTransactionFinish(99.76, 100, 0, 0.24);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario39()
     begin
         NewTransactionFinish(99.76, 200, 100, 0.24);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario40()
     begin
         NewTransactionFinish(99.76, 100.02, 0.5, -0.24);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario41()
     begin
         NewTransactionFinish(99.76, 99.52, 0, -0.24);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario42()
     begin
         NewTransactionPartialPay(99.75, 99.5, 0.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario43()
     begin
         NewTransactionFinish(99.75, 100, 0, 0.25);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario44()
     begin
         NewTransactionFinish(99.75, 200, 100, 0.25);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario45()
     begin
         NewTransactionFinish(99.75, 110, 10, 0.25);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario46()
     begin
         NewTransactionFinish(99.75, 99.76, 0, 0.01);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario47()
     begin
         NewTransactionFinish(99.74, 100, 0.5, -0.24);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario48()
     begin
         NewTransactionFinish(99.74, 200, 100.5, -0.24);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario49()
     begin
         NewTransactionFinish(99.74, 99.5, 0, -0.24);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario50()
     begin
         NewTransactionFinish(99.01, 200, 101, -0.01);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario51()
     begin
         NewTransactionFinish(35.67, 135.67, 100, 0);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario52()
     begin
         NewTransactionFinish(3.07, 5.1, 2, 0.03);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario53()
     begin
         NewTransactionPartialPay(0.49, 0, 0.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario54()
     begin
         NewTransactionFinish(0.01, 0, 0, -0.01);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario55()
     begin
         NewTransactionFinish(-0.01, 0, 0, 0.01);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario56()
     begin
         NewTransactionFinish(-3.07, -3.1, 0, -0.03);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario57()
     begin
         NewTransactionFinish(-99.75, -100, 0, -0.25);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario58()
     begin
         NewTransactionFinish(-99.75, -100, 0, -0.25);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario59()
     begin
         NewTransactionPartialPay(-100, -99.51, -0.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario60()
     begin
         NewTransactionFinish(100, 99.76, 0, -0.24);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario61()
     begin
         NewTransactionFinishForeign(100, 14, 5, 0);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario62()
     begin
         NewTransactionFinishForeign(100, 15, 12.5, 0);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario63()
     begin
         NewTransactionFinishForeign(100, 16, 20, 0);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario64()
     begin
         NewTransactionPartialPayForeign(100, 13, 2.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario65()
     begin
         NewTransactionFinishForeign(99.63, 14, 5.5, -0.13);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario66()
     begin
         NewTransactionFinishForeign(97.75, 14, 7, 0.25);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario67()
     begin
         NewTransactionFinishForeign(105.24, 14, 0, -0.24);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario68()
     begin
         NewTransactionPartialPay(99.74, 0, 99.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario69()
     begin
         NewTransactionPartialPay(99.75, 0, 100);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario70()
     begin
         NewTransactionFinish(900, 900.72, 0.5, 0.22);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario71()
     begin
         NewTransactionPartialPay(-0.72, 0, -0.5);
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RoundingScenario72()
     begin
         NewTransactionFinish(99.76, 109.52, 10, -0.24);

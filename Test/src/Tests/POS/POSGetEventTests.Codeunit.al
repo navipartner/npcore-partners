@@ -26,6 +26,7 @@ codeunit 85087 "NPR POS Get Event Tests"
         ValuesAreDifferentMsg: Label '%1 is not the same.';
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('CancelEventListModalPageHandler')]
     procedure SelectEvent_EventIsNotSelectedFromTheList()
     var
@@ -54,6 +55,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('GetEventListRecordCountModalPageHandler')]
     procedure SelectEvent_EventListIsShowingOnlyEvents()
     var
@@ -89,6 +91,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('GetEventListRecordCountModalPageHandler')]
     procedure SelectEvent_EventListIsShowingOnlyEventsInStatusOrder()
     var
@@ -130,6 +133,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('GetEventListRecordCountModalPageHandler')]
     procedure SelectEvent_EventListIsShowingOnlyNonBlockedEvents()
     var
@@ -168,6 +172,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('GetEventListRecordCountModalPageHandler')]
     procedure SelectEvent_EventListIsShowingOnlyEventsInSetPeriod()
     var
@@ -216,6 +221,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_JobDoesntExist()
     var
         LibraryUtility: Codeunit "Library - Utility";
@@ -241,6 +247,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_JobIsNotEvent()
     var
         LibraryJob: Codeunit "Library - Job";
@@ -267,6 +274,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventIsNotInOrderStatus()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -296,6 +304,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventIsBlocked()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -326,6 +335,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventDoesntHaveACustomer()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -355,6 +365,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventHasABlockedCustomer()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -388,6 +399,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_JobsSetupDoesntHaveADefaultTask()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -419,6 +431,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventDoesntHaveADefaultTask()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -453,6 +466,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventDoesntHaveAnyTask()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -487,6 +501,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('CancelEventTaskLinesModalPageHandler')]
     procedure ImportEvent_NoJobTaskIsSelected()
     var
@@ -521,6 +536,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventHasNoInvoiceableLinesOnDefaultTask()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -565,6 +581,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventHasNoInvoiceableLinesWithLineTypeAtLeastBillable()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -601,6 +618,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventHasNoInvoiceableLinesWithTypeItem()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -637,6 +655,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventHasNoInvoiceableLinesWithTicketStatusRevokedOrConfirmed()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -677,6 +696,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('CancelEventPlanningLinesModalPageHandler')]
     procedure ImportEvent_NoInvoiceableJobPlanningLinesHaveBeenSelected()
     var
@@ -712,6 +732,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventHasNoInvoiceableLinesAndNewOnesCantBeAddedOnPOS()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -746,6 +767,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventHasInvoiceableLinesAndNewOnesCantBeAddedOnPOS()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -780,6 +802,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('CancelVariantSelectionConfirmHandler')]
     procedure ImportEvent_EventHasInvoiceableLinesWithNoVariantsAndSelectionIsNotConfirmed()
     var
@@ -821,6 +844,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('AcceptVariantSelectionConfirmHandler,CancelVariantSelectionModalPageHandler')]
     procedure ImportEvent_EventHasInvoiceableLinesWithNoVariantsAndVariantSelectionIsCanceled()
     var
@@ -862,6 +886,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventIsImportedAndPOSSaleDataIsCorrect()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -905,6 +930,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventIsImportedAndPOSSaleLineDataIsCorrect()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -947,6 +973,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventIsImportedAndJobPlanningLineInvoiceDataIsCorrect()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -990,6 +1017,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventIsImportedAndJobPlanningLineDataIsCorrect()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -1034,6 +1062,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('SelectFirstVariantModalPageHandler,AcceptVariantSelectionConfirmHandler')]
     procedure ImportEvent_EventWithInvoiceableLinesAndDefaultTaskIsImported()
     var
@@ -1099,6 +1128,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('SelectFirstVariantModalPageHandler,AcceptVariantSelectionConfirmHandler')]
     procedure ImportEvent_EventWithInvoiceableLinesAndFirstTaskIsImported()
     var
@@ -1164,6 +1194,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('SelectThirdEventTaskLineModalPageHandler,SelectFirstVariantModalPageHandler,AcceptVariantSelectionConfirmHandler')]
     procedure ImportEvent_EventWithInvoiceableLinesAndSelectionTaskIsImported()
     var
@@ -1231,6 +1262,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('SelectFirstEventPlanningLinesModalPageHandler,SelectFirstVariantModalPageHandler,AcceptVariantSelectionConfirmHandler')]
     procedure ImportEvent_EventWithSelectedInvoiceableLinesAndDefaultTaskIsImported()
     var
@@ -1295,6 +1327,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('SelectFirstEventPlanningLinesModalPageHandler,SelectFirstVariantModalPageHandler,AcceptVariantSelectionConfirmHandler')]
     procedure ImportEvent_EventWithSelectedInvoiceableLinesAndFirstTaskIsImported()
     var
@@ -1359,6 +1392,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('SelectThirdEventTaskLineModalPageHandler,SelectFirstEventPlanningLinesModalPageHandler,SelectFirstVariantModalPageHandler,AcceptVariantSelectionConfirmHandler')]
     procedure ImportEvent_EventWithSelectedInvoiceableLinesAndSelectedTaskIsImported()
     var
@@ -1425,6 +1459,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventWithNoneAndDefaultTaskIsImported()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -1474,6 +1509,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportEvent_EventWithNoneAndFirstTaskIsImported()
     var
         LibraryEvent: Codeunit "NPR Library - Event";
@@ -1523,6 +1559,7 @@ codeunit 85087 "NPR POS Get Event Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('SelectThirdEventTaskLineModalPageHandler')]
     procedure ImportEvent_EventWithNoneAndSelectedTaskIsImported()
     var

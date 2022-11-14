@@ -10,6 +10,7 @@ codeunit 85060 "NPR POS Act. Transfer Ord Test"
         POSUnit: Record "NPR POS Unit";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('OpenTransferOrder')]
     procedure InsertTransferOrder()
     var

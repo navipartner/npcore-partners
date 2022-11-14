@@ -11,6 +11,7 @@ codeunit 85057 "NPR POS Act. Sale Dim. Tests"
         DimSetLbl: Label 'Dimension code %1 set to %2.';
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure AdjustHeaderDim()
     var
         LibraryDim: Codeunit "Library - Dimension";
@@ -43,6 +44,7 @@ codeunit 85057 "NPR POS Act. Sale Dim. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure AdjustLineDim()
     var
         LibraryDim: Codeunit "Library - Dimension";

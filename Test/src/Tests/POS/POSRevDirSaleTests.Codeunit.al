@@ -14,6 +14,7 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
         Item: Record Item;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ReverseSale()
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -60,6 +61,7 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ReverseSaleWithReasonCode()
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -109,6 +111,7 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ReverseSaleWithReasonCodeAndDimensions()
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
