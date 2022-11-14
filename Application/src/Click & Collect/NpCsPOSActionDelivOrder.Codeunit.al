@@ -76,7 +76,7 @@
         if StrLen(POSParameterValue.Value) > MaxStrLen(Location.Code) then
             if Location.Get(UpperCase(POSParameterValue.Value)) then;
 
-        if PAGE.RunModal(0, Location) = ACTION::LookupOK then
+        if Page.RunModal(0, Location) = Action::LookupOK then
             POSParameterValue.Value := Location.Code;
     end;
 
@@ -106,7 +106,7 @@
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
     local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
-        SalesDocImportMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
+        SalesDocImportMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -122,7 +122,7 @@
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
     local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
-        SalesDocImportMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
+        SalesDocImportMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -202,13 +202,12 @@
 
     local procedure DeliverOrder(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; NpCsDocument: Record "NPR NpCs Document")
     var
-        NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref.";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
+        SalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         RemainingAmount: Decimal;
     begin
@@ -238,27 +237,29 @@
 
         POSSession.GetSaleLine(POSSaleLine);
 
-        InsertDocumentReference(JSON, NpCsDocument, POSSaleLine, NpCsSaleLinePOSReference);
+        InsertDeliveryCommentLine(JSON, NpCsDocument, POSSaleLine);
 
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         RemainingAmount := SalesDocImpMgt.GetTotalAmountToBeInvoiced(SalesHeader);
-        SalesHeader.Invoice := true;
-        SalesHeader.Ship := true;
+        SalesHeader.CalcFields("NPR Magento Payment Amount");
+        RemainingAmount -= SalesHeader."NPR Magento Payment Amount";
+        SalesHeader.Invoice := NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS;
+        SalesHeader.Ship := NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS;
         SalesHeader.Receive := false;
         SalesHeader."Print Posted Documents" := false;
-        SalesDocImpMgt.SalesDocumentPaymentAmountToPOSSaleLine(RemainingAmount, SaleLinePOS, SalesHeader, false, false, true);
+        SalesDocImpMgt.SalesDocumentPaymentAmountToPOSSaleLine(RemainingAmount, SaleLinePOS, SalesHeader, false, false, NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS);
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
+        InsertPOSReference(NpCsDocument, SaleLinePOS);
     end;
 
     local procedure DeliverPostedInvoice(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; NpCsDocument: Record "NPR NpCs Document")
     var
-        NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref.";
         SalesInvHeader: Record "Sales Invoice Header";
         SalesInvLine: Record "Sales Invoice Line";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
+        SalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         RemainingAmount: Decimal;
         ConfirmInvDiscAmt: Boolean;
     begin
@@ -281,18 +282,21 @@
                     exit;
             end;
         end;
-        InsertDocumentReference(JSON, NpCsDocument, POSSaleLine, NpCsSaleLinePOSReference);
+        InsertDeliveryCommentLine(JSON, NpCsDocument, POSSaleLine);
 
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         RemainingAmount := SalesDocImpMgt.GetTotalAmountToBeInvoiced(SalesInvHeader);
         SalesDocImpMgt.SalesDocumentPaymentAmountToPOSSaleLine(RemainingAmount, SaleLinePOS, SalesInvHeader, false, false, true);
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
+        InsertPOSReference(NpCsDocument, SaleLinePOS);
+
     end;
 
-    local procedure InsertDocumentReference(JSON: Codeunit "NPR POS JSON Management"; NpCsDocument: Record "NPR NpCs Document"; POSSaleLine: Codeunit "NPR POS Sale Line"; var NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref.")
+    local procedure InsertDeliveryCommentLine(JSON: Codeunit "NPR POS JSON Management"; NpCsDocument: Record "NPR NpCs Document"; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref.";
         DeliveryText: Text;
     begin
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
@@ -312,9 +316,15 @@
         SaleLinePOS.Description := CopyStr(DeliveryText, 1, MaxStrLen(SaleLinePOS.Description));
         POSSaleLine.InsertLine(SaleLinePOS);
 
+        InsertPOSReference(NpCsDocument, SaleLinePOS);
+    end;
+
+    local procedure InsertPOSReference(NpCsDocument: Record "NPR NpCs Document"; SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref.";
+    begin
         if NpCsSaleLinePOSReference.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Sale Type", SaleLinePOS.Date, SaleLinePOS."Line No.") then
             NpCsSaleLinePOSReference.Delete();
-
         NpCsSaleLinePOSReference.Init();
         NpCsSaleLinePOSReference."Register No." := SaleLinePOS."Register No.";
         NpCsSaleLinePOSReference."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
@@ -324,6 +334,7 @@
         NpCsSaleLinePOSReference."Document No." := NpCsDocument."Document No.";
         NpCsSaleLinePOSReference."Document Type" := NpCsDocument."Document Type";
         NpCsSaleLinePOSReference.Insert();
+
     end;
 
     local procedure FindDocument(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; var NpCsDocument: Record "NPR NpCs Document"): Boolean
@@ -342,7 +353,7 @@
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         PageMgt: Codeunit "Page Management";
-        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
+        SalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         OpenDocument, ConfirmInvDiscAmt : Boolean;
     begin
         OpenDocument := JSON.GetBooleanParameterOrFail('OpenDocument', ActionCode());
@@ -423,7 +434,7 @@
                     NpCsDocument.SetCurrentKey("Delivery expires at");
                 end;
         end;
-        if PAGE.RunModal(PAGE::"NPR NpCs Coll. Store Orders", NpCsDocument) = ACTION::LookupOK then
+        if Page.RunModal(Page::"NPR NpCs Coll. Store Orders", NpCsDocument) = Action::LookupOK then
             exit(true);
 
         exit(false);
