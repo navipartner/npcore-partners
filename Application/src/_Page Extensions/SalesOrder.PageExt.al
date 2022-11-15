@@ -246,6 +246,8 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         {
             group("NPR Retail Voucher")
             {
+                Caption = 'Retail Voucher';
+                Image = Voucher;
                 action("NPR Issue Voucher")
                 {
                     Caption = 'Issue Voucher';

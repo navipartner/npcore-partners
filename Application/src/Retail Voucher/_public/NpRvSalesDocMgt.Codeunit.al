@@ -31,53 +31,23 @@
     var
         SalesLine: Record "Sales Line";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         TempNpRvVoucher: Record "NPR NpRv Voucher" temporary;
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        LineNo: Integer;
+        ReferenceNumber: Code[50];
     begin
+        InputVoucherReferenceNumber(NpRvVoucherType, ReferenceNumber);
+
         NpRvVoucherMgt.GenerateTempVoucher(NpRvVoucherType, TempNpRvVoucher);
 
-        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        if SalesLine.FindLast() then;
-        LineNo := SalesLine."Line No." + 10000;
+        if ReferenceNumber <> '' then begin
+            TempNpRvVoucher."Reference No." := ReferenceNumber;
+            TempNpRvVoucher.Description := CopyStr(TempNpRvVoucher."Reference No." + ' ' + NpRvVoucherType.Description, 1, MaxStrLen(NpRvVoucherType.Description));
+        end;
 
-        SalesLine.Init();
-        SalesLine."Document Type" := SalesHeader."Document Type";
-        SalesLine."Document No." := SalesHeader."No.";
-        SalesLine."Line No." := LineNo;
-        SalesLine.Insert(true);
+        InsertSalesLine(SalesHeader, SalesLine, TempNpRvVoucher);
 
-        SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
-        SalesLine.Validate("No.", TempNpRvVoucher."Account No.");
-        SalesLine.Description := TempNpRvVoucher.Description;
-        SalesLine.Validate(Quantity, 1);
-        SalesLine.Modify(true);
-
-        NpRvSalesLine.Init();
-        NpRvSalesLine.Id := CreateGuid();
-        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
-        NpRvSalesLine."External Document No." := SalesHeader."NPR External Order No.";
-        NpRvSalesLine."Document Type" := SalesLine."Document Type";
-        NpRvSalesLine."Document No." := SalesLine."Document No.";
-        NpRvSalesLine."Document Line No." := SalesLine."Line No.";
-        NpRvSalesLine.Type := NpRvSalesLine.Type::"New Voucher";
-        NpRvSalesLine."Voucher Type" := TempNpRvVoucher."Voucher Type";
-        NpRvSalesLine."Voucher No." := TempNpRvVoucher."No.";
-        NpRvSalesLine."Reference No." := TempNpRvVoucher."Reference No.";
-        NpRvSalesLine.Description := TempNpRvVoucher.Description;
-        NpRvSalesLine.Validate("Customer No.", SalesHeader."Sell-to Customer No.");
-        if (not NpRvSalesLine."Send via Print") and (not NpRvSalesLine."Send via SMS") and (NpRvSalesLine."E-mail" <> '') then
-            NpRvSalesLine."Send via E-mail" := true;
-        NpRvSalesLine.Insert(true);
-
-        NpRvSalesLineReference.Init();
-        NpRvSalesLineReference.Id := CreateGuid();
-        NpRvSalesLineReference."Voucher No." := TempNpRvVoucher."No.";
-        NpRvSalesLineReference."Reference No." := TempNpRvVoucher."Reference No.";
-        NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
-        NpRvSalesLineReference.Insert(true);
+        InsertNpRvSalesLine(SalesHeader, SalesLine, NpRvSalesLine, TempNpRvVoucher);
+        InsertNpRVSalesLineReference(NpRvSalesLine, TempNpRvVoucher);
 
         exit(TempNpRvVoucher."No.");
     end;
@@ -813,6 +783,83 @@
         GeneralLedgerSetup.Get();
         if SalesHeader."Currency Code" <> GeneralLedgerSetup."LCY Code" then
             Error(NotSupportedErr);
+    end;
+
+    local procedure InputVoucherReferenceNumber(NpRvVoucherType: Record "NPR NpRv Voucher Type"; var ReferenceNumber: Code[50])
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        InputDialog: Page "NPR Input Dialog";
+        EnterReferenceNumberLbl: Label 'Enter new voucher reference number';
+        AlreadyUsedLbl: Label 'Reference No. %1 is already used.';
+        EmtyReferenceErr: Label 'Voucher reference number must be entered';
+    begin
+        if not NpRvVoucherType."Manual Reference number SO" then
+            exit;
+        InputDialog.LookupMode := true;
+        InputDialog.SetInput(1, ReferenceNumber, EnterReferenceNumberLbl);
+        if InputDialog.RunModal() = ACTION::LookupOK then
+            InputDialog.InputCodeValue(1, ReferenceNumber);
+
+        if ReferenceNumber = '' then
+            Error(EmtyReferenceErr);
+
+        Voucher.SetRange("Reference No.", ReferenceNumber);
+        if Voucher.FindFirst() then
+            Error(AlreadyUsedLbl, ReferenceNumber);
+    end;
+
+    local procedure InsertSalesLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var TempNpRvVoucher: Record "NPR NpRv Voucher" temporary)
+    var
+        LineNo: Integer;
+    begin
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        if SalesLine.FindLast() then;
+        LineNo := SalesLine."Line No." + 10000;
+
+        SalesLine.Init();
+        SalesLine."Document Type" := SalesHeader."Document Type";
+        SalesLine."Document No." := SalesHeader."No.";
+        SalesLine."Line No." := LineNo;
+        SalesLine.Insert(true);
+
+        SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
+        SalesLine.Validate("No.", TempNpRvVoucher."Account No.");
+        SalesLine.Description := TempNpRvVoucher.Description;
+        SalesLine.Validate(Quantity, 1);
+        SalesLine.Modify(true);
+    end;
+
+    local procedure InsertNpRvSalesLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; var TempNpRvVoucher: Record "NPR NpRv Voucher" temporary)
+    begin
+        NpRvSalesLine.Init();
+        NpRvSalesLine.Id := CreateGuid();
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+        NpRvSalesLine."External Document No." := SalesHeader."NPR External Order No.";
+        NpRvSalesLine."Document Type" := SalesLine."Document Type";
+        NpRvSalesLine."Document No." := SalesLine."Document No.";
+        NpRvSalesLine."Document Line No." := SalesLine."Line No.";
+        NpRvSalesLine.Type := NpRvSalesLine.Type::"New Voucher";
+        NpRvSalesLine."Voucher Type" := TempNpRvVoucher."Voucher Type";
+        NpRvSalesLine."Voucher No." := TempNpRvVoucher."No.";
+        NpRvSalesLine."Reference No." := TempNpRvVoucher."Reference No.";
+        NpRvSalesLine.Description := TempNpRvVoucher.Description;
+        NpRvSalesLine.Validate("Customer No.", SalesHeader."Sell-to Customer No.");
+        if (not NpRvSalesLine."Send via Print") and (not NpRvSalesLine."Send via SMS") and (NpRvSalesLine."E-mail" <> '') then
+            NpRvSalesLine."Send via E-mail" := true;
+        NpRvSalesLine.Insert(true);
+    end;
+
+    local procedure InsertNpRVSalesLineReference(var NpRvSalesLine: Record "NPR NpRv Sales Line"; var TempNpRvVoucher: Record "NPR NpRv Voucher" temporary)
+    var
+        NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
+    begin
+        NpRvSalesLineReference.Init();
+        NpRvSalesLineReference.Id := CreateGuid();
+        NpRvSalesLineReference."Voucher No." := TempNpRvVoucher."No.";
+        NpRvSalesLineReference."Reference No." := TempNpRvVoucher."Reference No.";
+        NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
+        NpRvSalesLineReference.Insert(true);
     end;
 
     internal procedure SendVoucher(NpRvVoucher: Record "NPR NpRv Voucher")

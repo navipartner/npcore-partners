@@ -119,6 +119,12 @@
                         ToolTip = 'Specifies the value of the Reference No. Type field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("Manual Reference number SO"; Rec."Manual Reference number SO")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies if vouchers created at sales order will have manually entered reference number.';
+                    }
+
                     group(Control6014407)
                     {
                         ShowCaption = false;
