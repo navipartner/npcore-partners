@@ -9,17 +9,18 @@ Prepaid tickets are created, distributed, and paid in advance. They can be used 
 To issue prepaid tickets from Business Central, follow the provided steps:
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Ticket BOM**, and choose the related link.   
-2. Place the cursor on the item number line you wish to create tickets for, and click the ribbon action **Create Tickets**, followed by **Create Prepaid Tickets**.
-3. Enter the following information:
-   - **Customer No.**
-   - **External Order No.**
+2. Place the cursor on the item number line you wish to create tickets for, and click the ribbon action **Create Tickets**, followed by **Create Prepaid Tickets**.   
+3. You can choose whether the ticket will be tied to a reservation or if it will be open.
+4. Enter the following information:
+   - **Customer No.** - when creating tickets from the back office, this field needs to be populated for tracking purposes. 
+   - **External Order No.** - when customers are creating sales orders to sell tickets, they can provide sales order number or invoice number to later identify this batch of tickets and add them to a specific invoice.
    - **Scheduled Date/Time**
    - **Quantity**
 
 ![postpaid_tickets](../images/postpaid_tickets_1.png)
 
-4. When all lines are correctly populated (not red), click **OK**.
-5. If the tickets need to be distributed to a third party, you can export the generated tickets to Excel.
+5. When all lines are correctly populated (not red), click **OK**.
+6. If the tickets need to be distributed to a third party, you can export the generated tickets to Excel.
 
 If tickets are internal or for an event you control yourself, it is possible to validate the tickets by placing them in the **Offline Ticket Validation** journal. 
 

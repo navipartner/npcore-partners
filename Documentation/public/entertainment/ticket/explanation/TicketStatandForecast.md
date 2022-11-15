@@ -10,17 +10,25 @@ The two reports will give an overview on what has happened and predictions for w
 
 ## Ticket Access Statistics Matrix
 
-The Ticket Access Statistics Matrix is a precise method for determining the exact number of valid admissions recorded (e.g. scanning the ticket upon arrival).
-The aggregated data is permanent, and will not change over time, as opposed to how the flow filters work (like **Admission Forecast Matrix** underneath), so you need to create a new sum every time you wish to execute a new report.
+The Ticket Access Statistics Matrix is a tabular feature that provides a precise method for determining the exact number of valid admissions recorded (e.g. when scanning the ticket upon arrival).
+
+The aggregated data is permanent, and will not change over time, as opposed to how the flow filters work (such as the **Admission Forecast Matrix**), so you need to create a new sum every time you wish to execute a new report.
 
 > [!IMPORTANT]
 > If you do not scan the tickets no data will be available. 
 
-In the **Matrix** you choose x (lines) and y (columns) axis. The available data includes ticket **Items**, and the data from the ticket module (**Ticket type, Admission Data, Admission Hour, Period, Admission Code** and **Variant Code**)
+The available data includes ticket **Items**, and the data from the ticket module (**Ticket Type, Admission Data, Admission Hour, Period, Admission Code**, and **Variant Code**)
 
-In **Metrics** you will see the **Metrix Total** calculated when the report is generated or updated, as well as settings for the components that provide the specifications for the quantitative measurements, for example how the admission count, time specifications, and trend periods should be defined.
+In **Metrics** you will see the **Matrix Total**, which corresponds to the total guest count, and is calculated when the report is generated or updated. You can also view the settings for the components that provide the specifications for the quantitative measurements, for example how the admission count, time specifications, and trend periods should be defined.
 
-In **Matrix Filters** you can filter the general data with setting a specific **Item** filter, **Ticket Type** and **Date and Hour**, as well as **Admission Codes** and **Variants**. 
+In **Matrix Filters** you can filter the general data with setting a specific **Item** filter, **Ticket Type** and **Date and Hour**, as well as **Admission Codes** and **Variants**. Note that you need to close and reopen the **Matrix** for the filters to be applied.
+
+The **Ticket Access Stat. Lines** section contains the list of admissions that correspond to the applied filters. Additionally, if you activate the **Hide Lines Having Zero Admitted** toggle switch (from the **General** section), all lines that contain no data will be filtered out from the results.
+
+You can compare the list of admissions recorded here, and in the report generated in the **Item Sales Statistics** report, to get the overview of the difference between the number of recorded attendances and the number of sold tickets. These numbers usually don't match, since some tickets are set aside for sponsors, partners, and for other purposes, so they are neither purchased nor recorded in the same manner. 
+
+Scenarios in which the numbers of recorded attendances and sold tickets usually have to match are generally tied to venues for which walk-up tickets are sold at the entrance. These tickets are sold and registered on the POS, and ticket sales statistics have to match the ticket access statistics. 
+
 
 ## Admission Forecast Matrix
 
@@ -37,10 +45,10 @@ In **Display Options** you can configure the following:
 | ----------- | ----------- |
 | **Sales**       | Specifies the amount of sold tickets posted.  |
 | **Reservations**  | Specifies the confirmed reservations.      |
-| **Utilization pct.** | Specifies the percentage of the admission has been utilized (0% to 100%). |
-| **Capacity pct.** | Specifies the percentage of the admissions capacity is left (100% to 0%). |
+| **Utilization Pct.** | Specifies the percentage of the admission has been utilized (0% to 100%). |
+| **Capacity Pct.** | Specifies the percentage of the admissions capacity is left (100% to 0%). |
 
-In **Period type**, you can choose between the following options:  
+In **Period Type**, you can choose between the following options:  
 
 | Field Name      | Description |
 | ----------- | ----------- |
