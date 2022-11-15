@@ -1,44 +1,27 @@
-codeunit 6059773 "NPR POS Action: Item Variants"
+codeunit 6059773 "NPR POS Action: Item Variants" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-    local procedure ActionCode(): Text[20]
-    begin
-        exit('ITEM_VARIANTS');
-    end;
 
-    local procedure ActionVersion(): Code[10]
-    begin
-
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This built-in action opens Item Variants page with calculated inventory for current location.';
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescription, ActionVersion()) then begin
-            Sender.RegisterWorkflow20('await workflow.respond();');
-        end;
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        POSStore: Record "NPR POS Store";
-        POSSetup: Codeunit "NPR POS Setup";
-        ItemVariants: Page "NPR Item Variants";
+        POSActionItemVariantB: Codeunit "NPR POS Action: Item Variant B";
     begin
+        POSActionItemVariantB.ShowItemVariants(Setup);
+    end;
 
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        POSSession.GetSetup(POSSetup);
-        POSSetup.GetPOSStore(POSStore);
-        ItemVariants.SetLocationCodeFilter(POSStore."Location Code");
-        ItemVariants.LookupMode(true);
-        ItemVariants.Run();
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionItemVariants.js###
+'let main=async({})=>await workflow.respond();'
+        );
     end;
 }
