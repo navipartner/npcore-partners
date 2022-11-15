@@ -1,6 +1,7 @@
 # Ticket BOM (reference guide)
 
-In this administrative section, the entire sales department of Business Central is joined with the Entertainment part, i.e. this is where the ticket admission schedule lines are connected to the Item entity (by joining the **Item No.** with the created **Admission Code**). This topic contains the most important fields and options that should be defined in the **Ticket BOM** administrative section:
+In this administrative section, the entire sales department of Business Central is joined with the Entertainment part, i.e. this is where the ticket admission schedule lines are connected to the Item entities (by joining the **Item No.** with the created **Admission Code**). All individual tickets stored in the database are listed here, and it's possible to configure them by adding more details or attaching specific behaviors to them. 
+
 
 | Field Name      | Description |
 | ----------- | ----------- |
@@ -35,4 +36,3 @@ In this administrative section, the entire sales department of Business Central 
 | **eTicket Type Code** | Specifies the ticket design options used for displaying the ticket in the eWallet. |
 | **Publish Ticket URL** | Specifies the URL to the server on which you can share the ticket with customers. |
 | **Activation Method** | When the **Ticket Configuration Source** field on the **Ticket Type** specifies the option **TICKET_BOM**, this field's value is used instead of the corresponding field in **Ticket Type**. |
-| 

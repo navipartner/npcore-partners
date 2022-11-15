@@ -1,6 +1,6 @@
 # Ticket types (reference guide)
 
-The most important thing for a ticket is its setup. The first thing that needs to be configured is the **Ticket Type**, which is located in the **NPR Properties** tab in the ticket's **Item Card**.  Defining this field is mandatory if you wish the item to be treated as a ticket entity. 
+The most important thing for a ticket is its setup. Ticket types can be accessed directly from the Role Center, and are used to establish general grouping of tickets. The first thing that needs to be configured is the **Ticket Type**, which is located in the **NPR Properties** tab in the ticket's **Item Card**.  Defining this field is mandatory if you wish the item to be treated as a ticket entity. 
 
 As the ticket isn't an actual product, rather an entry into that "product", you need to establish how that product will be handed over. By setting up the **Ticket Type** in Business Central, you're setting up the ticket logistics - some of the POS aspect included (such as **RP Template Code**, **Print Object ID**, etc.).
 

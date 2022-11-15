@@ -56,6 +56,8 @@
     href: explanation/admission_schedule_lines.md
   - name: Ticketing Base Calendar
     href: explanation/BaseCalendar.md
+  - name: Ticket requests
+    href: explanation/ticket_requests.md
   
 - name: Reference
   items:
