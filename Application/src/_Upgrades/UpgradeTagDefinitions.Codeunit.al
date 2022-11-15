@@ -68,6 +68,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'ItemPriceIdentifierType'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'ItemLookupSmartSearch'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'CustomerNo'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'CustomerNoParam'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Fix POS Entry SystemId"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider", 'NPRShippingProvider'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider", 'NPRPackageDimensions'));
@@ -243,6 +244,8 @@
                         exit('NPR-POSActionItemLookupSmartSearch-20220711');
                     'CustomerNo':
                         exit('NPR-POSActionCustomerNo-20221104');
+                    'CustomerNoParam':
+                        exit('NPR-POSActionCustomerParam-20221115')
                 end;
             Codeunit::"NPR Fix POS Entry SystemId":
                 exit('NPRFixPOSEntrySystemId_20220126');
