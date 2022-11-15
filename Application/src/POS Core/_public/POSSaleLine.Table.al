@@ -1868,6 +1868,7 @@
         SalesLine."Line Discount %" := "Discount %";
         SalesLine."Line Discount Amount" := "Discount Amount";
         SalesLine.Amount := Amount;
+        SalesLine."Line Amount" := "Line Amount";
         SalesLine."Amount Including VAT" := "Amount Including VAT";
         SalesLine."Allow Line Disc." := "Allow Line Discount";
         SalesLine."Customer Price Group" := "Customer Price Group";
