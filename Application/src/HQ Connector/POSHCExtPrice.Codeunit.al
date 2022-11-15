@@ -4,16 +4,16 @@
     var
         InvalidXml: Label 'The response is not in valid XML format.\\%1';
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Price Calc. Mgt.", 'OnFindItemPrice', '', true, true)]
-    local procedure FindHQConnectorPrice(POSPricingProfile: Record "NPR POS Pricing Profile"; SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Pricing Profile", 'OnFindItemPrice', '', true, true)]
+    local procedure FindHQConnectorPrice(ItemPriceCodeunitId: Integer; ItemPriceFunctionName: Text[250]; SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean)
     var
         EndpointSetup: Record "NPR POS HC Endpoint Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
         TempSalesLine: Record "Sales Line" temporary;
     begin
-        if POSPricingProfile."Item Price Codeunit ID" <> GetPublisherCodeunitId() then
+        if ItemPriceCodeunitId <> GetPublisherCodeunitId() then
             exit;
-        if POSPricingProfile."Item Price Function" <> GetPublisherFunction() then
+        if ItemPriceFunctionName <> GetPublisherFunction() then
             exit;
         Handled := true;
 
@@ -242,4 +242,3 @@
         exit('FindHQConnectorPrice');
     end;
 }
-

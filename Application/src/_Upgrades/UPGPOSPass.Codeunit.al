@@ -29,6 +29,7 @@
         POSUnit: Record "NPR POS Unit";
         POSViewProfile: Record "NPR POS View Profile";
         POSSecurityProfile: Record "NPR POS Security Profile";
+        SecurityProfile: Codeunit "NPR POS Security Profile";
     begin
         if not POSUnit.FindSet() then
             exit;
@@ -37,7 +38,7 @@
                 POSViewProfile."Open Register Password" := POSUnit."Open Register Password";
                 POSViewProfile.Modify();
             end;
-            if POSUnit.GetProfile(POSSecurityProfile) and (POSSecurityProfile."Password on Unblock Discount" = '') then begin
+            if not SecurityProfile.IsUnblockDiscountPasswordSetIfProfileExist(POSUnit."POS Security Profile") then begin
                 POSSecurityProfile."Password on Unblock Discount" := POSUnit."Password on Unblock Discount";
                 POSSecurityProfile.Modify();
             end;

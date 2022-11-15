@@ -113,12 +113,9 @@
         exit(ExchangeLabelSetup."Exchange label default date");
     end;
 
+    [Obsolete('Not used anymore. To access security profile use codeunit "NPR POS Secuyrity Profile"')]
     internal procedure CashDrawerPassword(CashDrawerNo: Text): Text
-    var
-        POSSecurtyProfile: Record "NPR POS Security Profile";
     begin
-        GetPOSSecurityProfile(POSSecurtyProfile);
-        exit(POSSecurtyProfile."Unlock Password");
     end;
 
     internal procedure RestaurantCode(): Code[20]
@@ -253,10 +250,9 @@
         exit(POSUnitRec.GetProfile(POSViewProfile));
     end;
 
+    [Obsolete('Use codeunit "NPR POS Security Profile"')]
     internal procedure GetPOSSecurityProfile(var POSSecurtyProfile: Record "NPR POS Security Profile"): Boolean
     begin
-        POSUnitRec.TestField("No.");
-        exit(POSUnitRec.GetProfile(POSSecurtyProfile));
     end;
 
     procedure GetPOSStore(var POSStoreOut: Record "NPR POS Store")
@@ -271,36 +267,17 @@
 
     internal procedure GetLockTimeout() LockTimeoutInSeconds: Integer
     var
-        POSSecurtyProfile: Record "NPR POS Security Profile";
-        Handled: Boolean;
+        SecurityProfile: Codeunit "NPR POS Security Profile";
     begin
-        GetPOSSecurityProfile(POSSecurtyProfile);
-
-        OnGetLockTimeout(POSSecurtyProfile, LockTimeoutInSeconds, Handled);
-        if Handled then
-            exit;
-
-        case POSSecurtyProfile."Lock Timeout" of
-            POSSecurtyProfile."Lock Timeout"::"30S":
-                LockTimeoutInSeconds := 30;
-            POSSecurtyProfile."Lock Timeout"::"60S":
-                LockTimeoutInSeconds := 60;
-            POSSecurtyProfile."Lock Timeout"::"90S":
-                LockTimeoutInSeconds := 90;
-            POSSecurtyProfile."Lock Timeout"::"120S":
-                LockTimeoutInSeconds := 120;
-            POSSecurtyProfile."Lock Timeout"::"600S":
-                LockTimeoutInSeconds := 600;
-            else
-                LockTimeoutInSeconds := 0;
-        end;
+        POSUnitRec.TestField("No.");
+        exit(SecurityProfile.GetLockTimeoutIfProfileExist(POSUnitRec."POS Security Profile"));        
     end;
 
     internal procedure GetKioskUnlockEnabled(): Boolean
     var
-        SSProfile: Record "NPR SS Profile";
+        SelfServiceProfile: Codeunit "NPR SS Profile";        
     begin
-        exit(POSUnitRec.GetProfile(SSProfile) and (SSProfile."Kiosk Mode Unlock PIN" <> ''));
+        exit(SelfServiceProfile.IsUnlockPINEnabledIfProfileExist(POSUnitRec."POS Self Service Profile"));        
     end;
 
     internal procedure GetNamedActionSetup(var POSSetupOut: Record "NPR POS Setup")

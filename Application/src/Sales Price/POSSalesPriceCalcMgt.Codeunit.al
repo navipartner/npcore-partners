@@ -46,14 +46,16 @@
     procedure FindItemPrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
-        POSPricingProfile: Record "NPR POS Pricing Profile";
+        PricingProfile: Codeunit "NPR POS Pricing Profile";
+        ItemPriceFunction: Text[250];        
+        ItemPriceCodeunitId: Integer;         
         Handled: Boolean;
     begin
         if POSUnit.Get(SalePOS."Register No.") then;
-        POSUnit.GetProfile(POSPricingProfile);
-
-        if POSPricingProfile."Item Price Function" <> '' then begin
-            OnFindItemPrice(POSPricingProfile, SalePOS, SaleLinePOS, Handled);
+        PricingProfile.GetItemPriceFunctionIfProfileExist(POSUnit."POS Pricing Profile", ItemPriceCodeunitId, ItemPriceFunction);
+        
+        if ItemPriceFunction <> '' then begin
+            PricingProfile.OnFindItemPrice(ItemPriceCodeunitId, ItemPriceFunction , SalePOS, SaleLinePOS, Handled);
             if Handled then
                 exit;
         end;
@@ -63,22 +65,18 @@
         OnAfterFindSalesLinePrice(SalePOS, SaleLinePOS);
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnFindItemPrice(POSPricingProfile: Record "NPR POS Pricing Profile"; SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean)
-    begin
-    end;
 
     [IntegrationEvent(false, false)]
     internal procedure OnAfterFindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Price Calc. Mgt.", 'OnFindItemPrice', '', true, true)]
-    local procedure FindBestRetailPrice(POSPricingProfile: Record "NPR POS Pricing Profile"; SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Pricing Profile", 'OnFindItemPrice', '', true, true)]
+    local procedure FindBestRetailPrice(ItemPriceCodeunitId: Integer; ItemPriceFunctionName: Text[250]; SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean)
     begin
-        if POSPricingProfile."Item Price Codeunit ID" <> GetPublisherCodeunitId() then
+        if ItemPriceCodeunitId <> GetPublisherCodeunitId() then
             exit;
-        if POSPricingProfile."Item Price Function" <> GetPublisherRetailFunction() then
+        if ItemPriceFunctionName <> GetPublisherRetailFunction() then
             exit;
 
         Handled := true;
@@ -149,9 +147,9 @@
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         Customer: Record Customer;
-        POSPricingProfile: Record "NPR POS Pricing Profile";
         POSUnit: Record "NPR POS Unit";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
+        PricingProfile: Codeunit "NPR POS Pricing Profile";
         LineWithPrice: Interface "Line With Price";
         PriceCalculation: Interface "Price Calculation";
     begin
@@ -159,9 +157,6 @@
             exit;
         if not Item.Get(SaleLinePOS."No.") then
             exit;
-        if POSUnit.Get(SalePOS."Register No.") then;
-        POSUnit.GetProfile(POSPricingProfile);
-
 
         SalesLine.Init();
         SalesLine.Type := SalesLine.Type::Item;
@@ -181,8 +176,8 @@
                 SalesLine."Customer Price Group" := Customer."Customer Price Group";
                 SalesLine."Customer Disc. Group" := Customer."Customer Disc. Group";
             end else begin
-                SalesLine."Customer Price Group" := POSPricingProfile."Customer Price Group";
-                SalesLine."Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
+                if POSUnit.Get(SalePOS."Register No.") then;
+                PricingProfile.GetCustomerGroupsIfProfileExist(POSUnit."POS Pricing Profile", SalesLine."Customer Disc. Group", SalesLine."Customer Price Group");
             end;
 
         SalesLine.GetLineWithPrice(LineWithPrice);
@@ -196,11 +191,11 @@
     procedure SalesLineLineDiscExists(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; ShowAll: Boolean): Boolean
     var
         Customer: Record Customer;
-        POSPricingProfile: Record "NPR POS Pricing Profile";
         POSUnit: Record "NPR POS Unit";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
+        PricingProfile: Codeunit "NPR POS Pricing Profile";
         LineWithPrice: Interface "Line With Price";
         PriceCalculation: Interface "Price Calculation";
     begin
@@ -208,10 +203,7 @@
             exit;
         if not Item.Get(SaleLinePOS."No.") then
             exit;
-        if POSUnit.Get(SalePOS."Register No.") then;
-        POSUnit.GetProfile(POSPricingProfile);
-
-
+        
         SalesLine.Init();
         SalesLine.Type := SalesLine.Type::Item;
         SalesLine."No." := Item."No.";
@@ -229,8 +221,8 @@
                 SalesLine."Customer Price Group" := Customer."Customer Price Group";
                 SalesLine."Customer Disc. Group" := Customer."Customer Disc. Group";
             end else begin
-                SalesLine."Customer Price Group" := POSPricingProfile."Customer Price Group";
-                SalesLine."Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
+                if POSUnit.Get(SalePOS."Register No.") then;
+                PricingProfile.GetCustomerGroupsIfProfileExist(POSUnit."POS Pricing Profile", SalesLine."Customer Disc. Group", SalesLine."Customer Price Group");
             end;
         SalesLine.GetLineWithPrice(LineWithPrice);
         LineWithPrice.SetLine(TempSalesPriceLineDisc."Price Type"::Sale, SalesHeader, SalesLine);
@@ -426,7 +418,6 @@
     end;
 
     procedure FilterPublishedFunction(var EventSubscription: Record "Event Subscription")
-
     begin
         EventSubscription.Reset();
         EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);

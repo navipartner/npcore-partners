@@ -35,11 +35,12 @@
     var
         POSUnit: Record "NPR POS Unit";
         SSProfile: Record "NPR SS Profile";
+        SelfServiceProfile: Codeunit "NPR SS Profile";
     begin
         if not POSUnit.FindSet() then
             exit;
         repeat
-            if not POSUnit.GetProfile(SSProfile) then begin
+            if not SelfServiceProfile.ProfileExist(POSUnit."POS Self Service Profile") then begin
                 SSProfile.Code := POSUnit."No." + '_UPG';
                 SSProfile.Init();
                 SSProfile.Description := CopyStr('Created by running upgrade procedure', 1, MaxStrLen(SSProfile.Description));
@@ -52,6 +53,4 @@
             POSUnit.Modify();
         until POSUnit.Next() = 0;
     end;
-
-
 }

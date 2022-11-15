@@ -44,14 +44,14 @@ codeunit 6150838 "NPR POS Action: Block Discount" implements "NPR IPOS Workflow"
     var
         POSUnit: Record "NPR POS Unit";
         POSSecurityProfile: Record "NPR POS Security Profile";
+        SecurityProfile: Codeunit "NPR POS Security Profile";
         Password: Text;
     begin
 
         Password := Context.GetString('password');
 
         POSSetup.GetPOSUnit(POSUnit);
-        POSUnit.GetProfile(POSSecurityProfile);
-        if (POSSecurityProfile."Password on Unblock Discount" <> Password) then
+        if not SecurityProfile.IsUnblockDiscountPasswordValidIfProfileExist(POSUnit."POS Security Profile", Password) then
             Error('');
     end;
 
@@ -65,14 +65,13 @@ codeunit 6150838 "NPR POS Action: Block Discount" implements "NPR IPOS Workflow"
 
     local procedure ShowPassPropmt(Setup: Codeunit "NPR POS Setup") Response: JsonObject;
     var
-        POSSecurityProfile: Record "NPR POS Security Profile";
         POSUnit: Record "NPR POS Unit";
+        SecurityProfile: Codeunit "NPR POS Security Profile";
     begin
         Setup.GetPOSUnit(POSUnit);
-        POSUnit.GetProfile(POSSecurityProfile);
 
         Response.ReadFrom('{}');
-        Response.Add('ShowPasswordPrompt', POSSecurityProfile."Password on Unblock Discount" <> '');
+        Response.Add('ShowPasswordPrompt', SecurityProfile.IsUnblockDiscountPasswordSetIfProfileExist(POSUnit."POS Security Profile"));
         exit(Response);
     end;
 
