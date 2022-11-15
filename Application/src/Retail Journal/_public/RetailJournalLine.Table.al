@@ -578,7 +578,7 @@
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
         TempSaleLinePOS2: Record "NPR POS Sale Line" temporary;
         POSUnit: Record "NPR POS Unit";
-        POSPricingProfile: Record "NPR POS Pricing Profile";
+        PricingProfile: Codeunit "NPR POS Pricing Profile";
     begin
         TempSaleLinePOS."Line Type" := TempSaleLinePOS."Line Type"::Item;
         TempSaleLinePOS."No." := "Item No.";
@@ -592,16 +592,16 @@
         if not POSUnit.Get(TempSalePOS."Register No.") then
             POSUnit.Init();
 
-        POSUnit.GetProfile(POSPricingProfile);
         if "Customer Price Group" <> '' then
             TempSalePOS."Customer Price Group" := "Customer Price Group"
         else
-            TempSalePOS."Customer Price Group" := POSPricingProfile."Customer Price Group";
+            TempSalePOS."Customer Price Group" := PricingProfile.GetCustomerPriceGroupIfProfileExist(POSUnit."POS Pricing Profile");
 
         if "Customer Disc. Group" <> '' then
             TempSalePOS."Customer Disc. Group" := "Customer Disc. Group"
         else
-            TempSalePOS."Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
+            TempSalePOS."Customer Disc. Group" := PricingProfile.GetCustomerDiscountGroupIfProfileExist(POSUnit."POS Pricing Profile");
+        
         if "Calculation Date" <> 0D then
             TempSalePOS.Date := "Calculation Date";
 

@@ -315,6 +315,8 @@
         Modify();
     end;
 
+
+    [Obsolete('Use codeunit "NPR POS Pricing Profile"')]
     procedure GetProfile(var POSPricingProfile: Record "NPR POS Pricing Profile"): Boolean
     begin
         Clear(POSPricingProfile);
@@ -331,6 +333,7 @@
         exit(POSViewProfile.Get("POS View Profile"));
     end;
 
+    [Obsolete('Use codeunit "NPR Self Service Profile"')]
     procedure GetProfile(var SSProfile: Record "NPR SS Profile"): Boolean
     begin
         Clear(SSProfile);
@@ -339,6 +342,8 @@
         exit(SSProfile.Get("POS Self Service Profile"));
     end;
 
+
+    [Obsolete('Use codeunit "NPR POS Proxy - Display"')]
     procedure GetProfile(var DisplayProfile: Record "NPR Display Setup"): Boolean
     begin
         Clear(DisplayProfile);
@@ -347,6 +352,7 @@
         exit(DisplayProfile.Get("POS Display Profile"));
     end;
 
+    [Obsolete('Use module "Tax Free"')]
     procedure GetProfile(var TaxFreeProfile: Record "NPR Tax Free POS Unit"): Boolean
     begin
         Clear(TaxFreeProfile);
@@ -355,6 +361,7 @@
         exit(TaxFreeProfile.Get("POS Tax Free Profile"));
     end;
 
+    [Obsolete('Use codeunit "NPR POS Security Profile"')]
     procedure GetProfile(var SecurityProfile: Record "NPR POS Security Profile"): Boolean
     begin
         Clear(SecurityProfile);
@@ -379,6 +386,7 @@
         exit(POSEoDProfile.Get("POS End of Day Profile"));
     end;
 
+    [Obsolete('For public access use codeunit "NPR POS Inventory Profile"')]
     procedure GetProfile(var PosInventoryProfile: Record "NPR POS Inventory Profile"): Boolean
     begin
         Clear(PosInventoryProfile);
