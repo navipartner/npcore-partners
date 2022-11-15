@@ -14,6 +14,7 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         ItemPriceIdentifierType();
         ItemLookupSmartSearch();
         CustomerNo();
+        CustomerNoParam();
     end;
 
     local procedure SalesDocExpPaymentMethodCode()
@@ -135,6 +136,24 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
 
     end;
 
+    local procedure CustomerNoParam()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Action Parameters', 'CustomerNoParam');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'CustomerNoParam')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        UpgradeCustomerNoParam();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'CustomerNoParam'));
+        LogMessageStopwatch.LogFinish();
+
+    end;
+
     local procedure ItemLookupSmartSearch()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
@@ -172,6 +191,19 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         if POSActionParameter.FindSet() then
             repeat
                 POSActionParameter.Rename(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType');
+            until POSActionParameter.Next() = 0;
+    end;
+
+    local procedure UpgradeCustomerNoParam()
+    var
+        POSActionParameter: Record "NPR POS Parameter Value";
+    begin
+        POSActionParameter.SetRange("Table No.", Database::"NPR POS Menu Button");
+        POSActionParameter.SetRange("Action Code", 'CUSTOMER_SELECT');
+        POSActionParameter.SetRange(Name, 'customerNo');
+        if POSActionParameter.FindSet() then
+            repeat
+                POSActionParameter.Rename(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'CustomerNo');
             until POSActionParameter.Next() = 0;
     end;
 
