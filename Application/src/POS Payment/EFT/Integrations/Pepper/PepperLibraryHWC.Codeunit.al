@@ -1092,18 +1092,15 @@ codeunit 6184496 "NPR Pepper Library HWC"
     end;
 
     local procedure FindTerminalSetupFromRegister(RegisterNo: Code[10]; var VarPepperTerminal: Record "NPR Pepper Terminal"; var VarPepperInstance: Record "NPR Pepper Instance"; var VarPepperConfiguration: Record "NPR Pepper Config."; var VarPepperVersion: Record "NPR Pepper Version"): Boolean
-    var
-        ErrorText002: Label 'Register %1 is not linked to a Pepper terminal.';
     begin
 
         VarPepperTerminal.Reset();
-        VarPepperTerminal.SetRange("Register No.", RegisterNo);
+        VarPepperTerminal.SetFilter("Register No.", '=%1', RegisterNo);
 
-        if (VarPepperTerminal.Count() > 1) then
-            Error(ErrorText001, RegisterNo);
+        if (VarPepperTerminal.Count() <> 1) then
+            exit(false);
 
-        if (not VarPepperTerminal.FindFirst()) then
-            Error(ErrorText002, RegisterNo);
+        VarPepperTerminal.FindFirst();
 
         VarPepperInstance.Get(VarPepperTerminal."Instance ID");
         VarPepperInstance.TestField("Configuration Code");
