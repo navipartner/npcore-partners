@@ -177,7 +177,10 @@ codeunit 6059783 "NPR POS Item-Check Avail."
 
     local procedure GetPosInvtProfile(PosUnit: Record "NPR POS Unit"; var PosInventoryProfile: Record "NPR POS Inventory Profile"): Boolean
     begin
-        exit(PosUnit.GetProfile(PosInventoryProfile));
+        Clear(PosInventoryProfile);
+        if PosUnit."POS Inventory Profile" = '' then
+            exit;
+        exit(PosInventoryProfile.Get(PosUnit."POS Inventory Profile")); 
     end;
 
     local procedure RaiseNotAvailableEvent(var PosItemAvailability: Record "NPR POS Item Availability"; var Scope: Record "NPR POS Sale Line"; PosInventoryProfile: Record "NPR POS Inventory Profile"; ShowCurrentLineQty: Boolean; AskConfirmation: Boolean) Confirmed: Boolean

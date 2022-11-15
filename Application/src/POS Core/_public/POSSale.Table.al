@@ -74,12 +74,12 @@
                 SaleLinePOS: Record "NPR POS Sale Line";
                 Item: Record Item;
                 Contact: Record Contact;
-                POSPricingProfile: Record "NPR POS Pricing Profile";
                 POSPostingProfile: Record "NPR POS Posting Profile";
                 Cust: Record Customer;
                 POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
                 xSaleLinePOS: Record "NPR POS Sale Line";
                 POSSaleLine: Codeunit "NPR POS Sale Line";
+                PricingProfile: Codeunit "NPR POS Pricing Profile";
                 POSSaleTranslation: Codeunit "NPR POS Sale Translation";
                 FoundPostingProfile: Boolean;
             begin
@@ -87,9 +87,7 @@
                 "POS Store Code" := POSUnit."POS Store Code";
                 GetPOSStore();
 
-                POSUnit.GetProfile(POSPricingProfile);
-                "Customer Price Group" := POSPricingProfile."Customer Price Group";
-                "Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
+                PricingProfile.GetCustomerGroupsIfProfileExist(POSUnit."POS Pricing Profile", Rec."Customer Disc. Group", Rec."Customer Price Group");
 
                 FoundPostingProfile := POSStore.GetProfile(POSPostingProfile);
                 "Gen. Bus. Posting Group" := POSPostingProfile."Gen. Bus. Posting Group";
@@ -779,16 +777,14 @@
 
     trigger OnInsert()
     var
-        POSPricingProfile: Record "NPR POS Pricing Profile";
+        PricingProfile: Codeunit "NPR POS Pricing Profile";
     begin
         GetPOSUnit();
         GetPOSStore();
 
-        POSUnit.GetProfile(POSPricingProfile);
         "Location Code" := POSStore."Location Code";
-        "Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
+        Rec."Customer Disc. Group" :=  PricingProfile.GetCustomerDiscountGroupIfProfileExist(POSUnit."POS Pricing Profile");
         "Event No." := POSUnit.FindActiveEventFromCurrPOSUnit();
-
         "User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
         "Server Instance ID" := Database.ServiceInstanceId();
         "User Session ID" := Database.SessionId();

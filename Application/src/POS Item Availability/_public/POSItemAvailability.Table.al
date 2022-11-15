@@ -1,6 +1,5 @@
 table 6014636 "NPR POS Item Availability"
 {
-    Access = Internal;
     Caption = 'POS Item Availability';
     DataClassification = CustomerContent;
     TableType = Temporary;

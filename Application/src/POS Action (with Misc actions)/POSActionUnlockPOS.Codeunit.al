@@ -50,7 +50,7 @@
         PasswordValid: Boolean;
         SalePOS: Record "NPR POS Sale";
         POSUnit: Record "NPR POS Unit";
-        POSSecurtyProfile: Record "NPR POS Security Profile";
+        ScurityProfile: Codeunit "NPR POS Security Profile";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -61,7 +61,6 @@
         Type := JSON.GetStringOrFail('type', StrSubstNo(ReadingErr, ActionCode()));
 
         Clear(SalespersonPurchaser);
-        POSSetup.GetPOSUnit(POSUnit);
 
         case Type of
             'SalespersonCode':
@@ -72,8 +71,8 @@
                     PasswordValid := SalespersonPurchaser.FindFirst();
 
                     if (not PasswordValid) then begin
-                        POSUnit.GetProfile(POSSecurtyProfile);
-                        PasswordValid := (Password = POSSecurtyProfile."Unlock Password");
+                        POSSetup.GetPOSUnit(POSUnit);
+                        PasswordValid := ScurityProfile.IsUnlockPasswordValidIfProfileExist(POSUnit."POS Security Profile", Password)
                     end;
                     if (DelChr(Password, '<=>', ' ') = '') then
                         PasswordValid := false;

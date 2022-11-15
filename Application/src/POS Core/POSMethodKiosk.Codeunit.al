@@ -15,8 +15,10 @@
         JSON: Codeunit "NPR POS JSON Management";
         Request: Codeunit "NPR Front-End: Generic";
         POSSetup: Codeunit "NPR POS Setup";
+        SelfServiceProfile: Codeunit "NPR SS Profile";
         POSUnit: Record "NPR POS Unit";
-        SSProfile: Record "NPR SS Profile";
+        [NonDebuggable]
+        UnlockPIN: Text[30];
     begin
         if Method <> MethodName() then
             exit;
@@ -25,14 +27,15 @@
 
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
-        POSUnit.GetProfile(SSProfile);
+        UnlockPIN := SelfServiceProfile.GetUnlockPINIfProfileExist(POSUnit."POS Self Service Profile");
         Request.SetMethod(MethodName());
-        Request.GetContent().Add('confirmed', IsValidPIN(JSON.GetStringOrFail('pin', StrSubstNo(ReadingErr, MethodName())), SSProfile."Kiosk Mode Unlock PIN"));
+        Request.GetContent().Add('confirmed', IsValidPIN(JSON.GetStringOrFail('pin', StrSubstNo(ReadingErr, MethodName())), UnlockPIN));
         FrontEnd.InvokeFrontEndMethod(Request);
 
         Handled := true;
     end;
 
+    [NonDebuggable]
     local procedure IsValidPIN(PIN: Text; UnlockPIN: Text): Boolean
     begin
         exit(PIN = UnlockPIN);
