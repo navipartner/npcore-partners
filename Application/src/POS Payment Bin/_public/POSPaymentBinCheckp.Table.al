@@ -75,6 +75,19 @@
             Caption = 'Move to Bin No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Bin" WHERE("Bin Type" = FILTER(<> BANK & <> VIRTUAL));
+            trigger OnValidate()
+            var
+                Bin: Record "NPR POS Payment Bin";
+                POSUnit: Record "NPR POS Unit";
+            begin
+                Bin.Get(Rec."Move to Bin Code");
+                if (Bin."Bin Type" = Bin."Bin Type"::CASH_DRAWER) then begin
+                    if (Bin."Attached to POS Unit No." = '') then
+                        Error('Bin %1 must be attached to a POS Unit.', Bin."No.");
+                    POSUnit.Get(Bin."Attached to POS Unit No.");
+                    POSUnit.TestField(Status, POSUnit.Status::OPEN);
+                end;
+            end;
         }
         field(60; "New Float Amount"; Decimal)
         {
