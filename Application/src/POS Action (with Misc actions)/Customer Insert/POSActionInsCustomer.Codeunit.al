@@ -50,16 +50,6 @@ codeunit 6150726 "NPR POSAction: Ins. Customer" implements "NPR IPOS Workflow"
         );
     end;
 
-    local procedure ActionCode(): Code[20]
-    var
-        OrdinalIndex: Integer;
-        EnumValueName: Text;
-    begin
-        OrdinalIndex := Enum::"NPR POS Workflow".Ordinals().IndexOf(Enum::"NPR POS Workflow"::INSERT_CUSTOMER.AsInteger());
-        Enum::"NPR POS Workflow".Names().Get(OrdinalIndex, EnumValueName);
-        exit(UpperCase(CopyStr(EnumValueName, 1, 20)));
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnAfterLogin', '', true, true)]
     local procedure SelectCustomerRequired(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var

@@ -2,11 +2,6 @@
 {
     Access = Internal;
 
-    local procedure ActionCode(): Code[20]
-    begin
-        exit(Format(Enum::"NPR POS Workflow"::ITEMINVOV));
-    end;
-
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'This built in function opens a page displaying the item inventory per location and variant.';
