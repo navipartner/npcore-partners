@@ -16,7 +16,9 @@ codeunit 6059968 "NPR POS Action Transfer Order"
         TransferHeader.Validate("Shortcut Dimension 1 Code", POSUnit."Global Dimension 1 Code");
         TransferHeader.Modify();
 
-        TransferOrder.SetRecord(TransferHeader);
+        TransferHeader.SetRange("No.", TransferHeader."No.");
+        TransferOrder.SetTableView(TransferHeader);
+
         TransferOrder.Run();
     end;
 }
