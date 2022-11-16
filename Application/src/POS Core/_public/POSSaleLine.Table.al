@@ -2407,7 +2407,11 @@
     var
         NPRVarietySetup: Record "NPR Variety Setup";
         ItemVariant: Record "Item Variant";
+        IsHandled: Boolean;
     begin
+        OnBeforeGetDescription(Rec, IsHandled);
+        if IsHandled then
+            exit;
         if "Variant Code" <> '' then begin
             ItemVariant.Get(Item."No.", "Variant Code");
             Description := ItemVariant.Description;
@@ -2540,5 +2544,10 @@
                 end;
             end;
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetDescription(var POSSaleLine: Record "NPR POS Sale Line"; var IsHandled: Boolean)
+    begin
     end;
 }
