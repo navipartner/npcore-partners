@@ -156,6 +156,7 @@
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
         LogMessage: Text;
         Success: Boolean;
+        PostingScheduled: Boolean;
     begin
         case NpCsDocument."Bill via" of
             NpCsDocument."Bill via"::POS:
@@ -186,14 +187,14 @@
                                     Commit();
                                 end;
                                 if NpCsDocument."Post on" = NpCsDocument."Post on"::Delivery then
-                                    ScheduleDocumentPosting(NpCsDocument);
+                                    PostingScheduled := ScheduleDocumentPosting(NpCsDocument);
                             end;
                     end;
                 end;
         end;
         Commit();
-
-        NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
+        if not PostingScheduled then
+            NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
     end;
 
     internal procedure ExpireDelivery(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)
@@ -210,9 +211,11 @@
 
     //--- Posting ---
 
-    local procedure ScheduleDocumentPosting(var NpCsDocument: Record "NPR NpCs Document")
+    local procedure ScheduleDocumentPosting(var NpCsDocument: Record "NPR NpCs Document"): Boolean
+
     begin
-        TaskScheduler.CreateTask(Codeunit::"NPR NpCs Post Document", 0, true, CompanyName, CurrentDateTime + 10000, NpCsDocument.RecordId);
+        exit(not IsNullGuid(TaskScheduler.CreateTask(Codeunit::"NPR NpCs Post Document", 0, true, CompanyName, CurrentDateTime + 10000, NpCsDocument.RecordId)));
+
     end;
 
     //--- UI ---

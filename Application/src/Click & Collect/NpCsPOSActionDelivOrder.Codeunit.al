@@ -241,8 +241,12 @@
 
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         RemainingAmount := SalesDocImpMgt.GetTotalAmountToBeInvoiced(SalesHeader);
-        SalesHeader.CalcFields("NPR Magento Payment Amount");
-        RemainingAmount -= SalesHeader."NPR Magento Payment Amount";
+        if RemainingAmount > 0 then begin
+            SalesHeader.CalcFields("NPR Magento Payment Amount");
+            RemainingAmount -= SalesHeader."NPR Magento Payment Amount";
+            if RemainingAmount < 0 then
+                RemainingAmount := 0;
+        end;
         SalesHeader.Invoice := NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS;
         SalesHeader.Ship := NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS;
         SalesHeader.Receive := false;
