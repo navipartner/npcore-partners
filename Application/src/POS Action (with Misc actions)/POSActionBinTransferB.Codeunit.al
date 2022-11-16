@@ -85,7 +85,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
 
     procedure UserSelectBin(POSSession: Codeunit "NPR POS Session"): Code[10]
     var
-        POSUnittoBinRelation: Record "NPR POS Unit to Bin Relation";
+        POSUnitToBinRelation: Record "NPR POS Unit to Bin Relation";
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSSetup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
@@ -95,12 +95,12 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
 
-        POSUnittoBinRelation.SetRange("POS Unit No.", POSUnit."No.");
-        if POSUnittoBinRelation.FindSet() then
-                repeat
-                    IF POSPaymentBin.GET(POSUnittoBinRelation."POS Payment Bin No.") then
-                        POSPaymentBin.Mark(true);
-                until POSUnittoBinRelation.Next() = 0;
+        POSUnitToBinRelation.SetRange("POS Unit No.", POSUnit."No.");
+        if POSUnitToBinRelation.FindSet() then
+            repeat
+                IF POSPaymentBin.GET(POSUnitToBinRelation."POS Payment Bin No.") then
+                    POSPaymentBin.Mark(true);
+            until POSUnitToBinRelation.Next() = 0;
 
         POSPaymentBin.MarkedOnly(true);
         POSPaymentBinsPage.Editable(false);
@@ -135,5 +135,24 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         POSSetup.GetPOSUnit(POSUnit);
         POSUnit.TestField("Default POS Payment Bin");
         exit(POSUnit."Default POS Payment Bin");
+    end;
+
+    procedure GetPosUnitFromBin(FromBinNo: Code[10]; var PosUnit: Record "NPR POS Unit")
+    var
+        BlankBinLabel: Label 'From Bin can not be blank.';
+        NotDefaultBinLabel: Label 'The selected from bin %1 is not the default bin on any POS Unit';
+        AmbiguousPosLabel: Label 'Ambiguous POS Unit. The selected from bin %1 is declared default bin on multiple POS Units.';
+    begin
+        if (FromBinNo = '') then
+            Error(BlankBinLabel);
+
+        PosUnit.SetFilter("Default POS Payment Bin", '%1', FromBinNo);
+        if (PosUnit.IsEmpty()) then
+            Error(NotDefaultBinLabel, FromBinNo);
+        if (PosUnit.Count > 1) then
+            Error(AmbiguousPosLabel, FromBinNo);
+
+        PosUnit.FindFirst();
+        PosUnit.TestField(Status, PosUnit.Status::OPEN);
     end;
 }
