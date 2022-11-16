@@ -362,6 +362,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SALES_DOC_PRE_REFUND', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction: DocPrepayRefund";
     }
+    value(69; ITEM_AVAILABILITY)
+    {
+        Caption = 'ITEM_AVAILABILITY', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Check Avail.";
+    }
     value(70; ITEM_VARIANTS)
     {
         Caption = 'ITEM_VARIANTS', Locked = true, MaxLength = 20;

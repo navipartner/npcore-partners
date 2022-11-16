@@ -1,52 +1,26 @@
-codeunit 6059785 "NPR POS Action: Check Avail."
+codeunit 6059785 "NPR POS Action: Check Avail." implements "NPR IPOS Workflow"
 {
     Access = Internal;
-
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This built-in action checks availability of items included in a POS sale.';
-
-    local procedure ActionCode(): Code[20]
     begin
-        exit('ITEM_AVAILABILITY');
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
     end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction20(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion())
-        then begin
-            Sender.RegisterWorkflow20('');
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        SalePOS: Record "NPR POS Sale";
-        PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
-        POSSale: Codeunit "NPR POS Sale";
-        AllInStockMsg: Label 'All items are in stock.';
+        POSActionCheckAvailB: Codeunit "NPR POS Action: Check Avail. B";
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-        Handled := true;
+        POSActionCheckAvailB.CheckAvail(Sale);
+    end;
 
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        Clear(PosItemCheckAvail);
-        if BindSubscription(PosItemCheckAvail) then;
-        PosItemCheckAvail.SetIgnoreProfile(true);
-        PosItemCheckAvail.CheckAvailability_PosSale(SalePOS, false);
-        if not PosItemCheckAvail.GetAvailabilityIssuesFound() then
-            Message(AllInStockMsg);
-        UnbindSubscription(PosItemCheckAvail);
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionCheckAvail.js###
+'let main=async({})=>await workflow.respond();'
+        );
     end;
 }
