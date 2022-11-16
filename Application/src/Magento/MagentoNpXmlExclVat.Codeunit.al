@@ -38,6 +38,7 @@
         VATPostingSetup: Record "VAT Posting Setup";
         MagentoItemCustomOption: Record "NPR Magento Item Custom Option";
         MagentoItemCustomOptValue: Record "NPR Magento Itm Cstm Opt.Value";
+        MagentoStoreItem: Record "NPR Magento Store Item";
         FieldRef: FieldRef;
         DecimalValue: Decimal;
         NotSupportedErr: Label 'Unsupported table: %1 %2 - codeunit 6151454 "NPR Magento NpXml ExclVat" ';
@@ -86,6 +87,21 @@
                         DecimalValue := DecimalValue / (1 + VATPostingSetup."VAT %" / 100);
                     end;
                 end;
+            DATABASE::"NPR Magento Store Item":
+                begin
+                    RecRef.SetTable(MagentoStoreItem);
+                    if MagentoStoreItem.Find() then begin
+                        Item.Get(MagentoStoreItem."Item No.");
+                        if Item."Price Includes VAT" then begin
+                            GetMagentoStore(MagentoStoreItem."Store Code");
+                            if MagentoStore."VAT Bus. Posting Gr. (Price)" <> '' then
+                                VATPostingSetup.Get(MagentoStore."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group")
+                            else
+                                VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group");
+                            DecimalValue := DecimalValue / (1 + VATPostingSetup."VAT %" / 100);
+                        end;
+                    end;
+                end;
             else
                 Error(NotSupportedErr, RecRef.Number, RecRef.Caption);
         end;
@@ -95,4 +111,15 @@
         DecimalExclVat := Format(DecimalValue, 0, 9);
         exit(DecimalExclVat);
     end;
+
+    local procedure GetMagentoStore(MagentoStoreCode: Code[20])
+    begin
+        if MagentoStoreCode <> MagentoStore.Code then
+            MagentoStore.Get(MagentoStoreCode);
+
+        MagentoStore.TestField(Code);
+    end;
+
+    var
+        MagentoStore: Record "NPR Magento Store";
 }
