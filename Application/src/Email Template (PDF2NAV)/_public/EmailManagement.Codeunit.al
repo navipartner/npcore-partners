@@ -330,7 +330,7 @@
                     while not InStream.EOS do begin
                         HtmlLine := '';
                         InStream.ReadText(HtmlLine);
-                        HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef, HtmlLine, EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag") + '<br/>';
+                        HtmlLine := EmailTemplateMgt.MergeMailContent(RecRef, HtmlLine, EmailTemplateHeader."Fieldnumber Start Tag", EmailTemplateHeader."Fieldnumber End Tag");
                         EmailSendingHandler.AppendBodyLine(TempEmailItem, HtmlLine);
                     end;
                     Clear(InStream);
