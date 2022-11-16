@@ -28,6 +28,19 @@ codeunit 6059916 "NPR POS Security Profile"
     end;
 
     [NonDebuggable]
+    procedure UpgradeUnblockPasswordDiscount(POSSecurityProfileCode: Code[20]; Password: Text[4]): Boolean
+    var
+        Rec: Record "NPR POS Security Profile";
+    begin
+        if not Rec.Get(POSSecurityProfileCode) then
+            exit;
+        if Rec."Password on Unblock Discount" <> '' then
+            exit;
+        Rec."Password on Unblock Discount" := Password;
+        Rec.Modify();
+    end;
+
+    [NonDebuggable]
     procedure IsUnblockDiscountPasswordValid(POSSecurityProfileCode: Code[20]; EnteredPassword: Text): Boolean
     var
         Rec: Record "NPR POS Security Profile";
