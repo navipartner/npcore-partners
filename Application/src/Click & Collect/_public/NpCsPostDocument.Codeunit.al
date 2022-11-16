@@ -45,6 +45,8 @@
         LogMessage := StrSubstNo(SalesDocPostedAsLbl, SalesHeader."Document Type", SalesHeader."No.", NpCsDocument."Document Type", NpCsDocument."Document No.");
         NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Order Status";
         NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, not Success, ErrorText);
+
+        NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
     end;
 
     local procedure SkipPosting(NpCsDocument: Record "NPR NpCs Document"): Boolean
