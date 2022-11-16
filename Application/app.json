@@ -48,7 +48,7 @@
   "contextSensitiveHelpUrl": "https://docs.navipartner.com/",  
   "showMyCode": true,
   "runtime": "6.0",
-  "target": "OnPrem",
+  "target": "Cloud",
   "features": [ "TranslationFile", "NoImplicitWith" ],
   "keyVaultUrls": ["https://npcore.vault.azure.net/"],
   "applicationInsightsKey": "c65c1bf1-dc3d-47a1-9789-f4334605dd0c",
