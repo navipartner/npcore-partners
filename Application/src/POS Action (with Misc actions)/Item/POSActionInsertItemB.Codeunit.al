@@ -8,7 +8,6 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
     procedure GetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference)
     var
         FirstRec: Text;
-        TagId: Code[20];
         ItemSearchErrLbl: Label 'Could not find a matching item for input %1';
     begin
         Clear(ItemReference);

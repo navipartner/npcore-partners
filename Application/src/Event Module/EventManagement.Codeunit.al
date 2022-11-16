@@ -2129,7 +2129,7 @@
 #if BC17
         JobPlanningLine.SetRange("Line Type", LineType - 1);
 #else
-        JobPlanningLine.SetRange("Line Type", LineType.AsInteger() -1 );
+        JobPlanningLine.SetRange("Line Type", LineType.AsInteger() - 1);
 #endif
         JobPlanningLine.SetRange("System-Created Entry", true);
         JobPlanningLine.SetRange("Document No.", POSEntry."Document No.");

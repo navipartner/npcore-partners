@@ -21,8 +21,6 @@ codeunit 6059917 "NPR POS Inventory Profile"
     end;
 
     procedure SetxDataset(SalePOS: Record "NPR POS Sale")
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         POSItemCheckAvailability.SetxDataset(SalePOS);
     end;

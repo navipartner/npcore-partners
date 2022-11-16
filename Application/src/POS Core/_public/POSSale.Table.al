@@ -783,7 +783,7 @@
         GetPOSStore();
 
         "Location Code" := POSStore."Location Code";
-        Rec."Customer Disc. Group" :=  PricingProfile.GetCustomerDiscountGroupIfProfileExist(POSUnit."POS Pricing Profile");
+        Rec."Customer Disc. Group" := PricingProfile.GetCustomerDiscountGroupIfProfileExist(POSUnit."POS Pricing Profile");
         "Event No." := POSUnit.FindActiveEventFromCurrPOSUnit();
         "User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
         "Server Instance ID" := Database.ServiceInstanceId();

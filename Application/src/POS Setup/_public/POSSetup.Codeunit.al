@@ -429,6 +429,8 @@
     #endregion "Action Settings"
 
     #region events
+    
+    [Obsolete('Not used anymore.')]
     [IntegrationEvent(true, false)]
     local procedure OnGetLockTimeout(POSSecurtyProfile: Record "NPR POS Security Profile"; var LockTimeoutInSeconds: Integer; var Handled: Boolean)
     begin

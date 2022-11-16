@@ -564,6 +564,8 @@
     begin
     end;
 
+    
+    [Obsolete('Not used anymore.')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestUserOnPOSSessionInitialize(UsingRegularInvoicing: Boolean; var Handled: Boolean)
     begin

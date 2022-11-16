@@ -18,7 +18,6 @@
         ParameterContactLookupPage_NameCaptionLbl: Label 'Contact Lookup Page';
         ParameterContactLookupPage_NameDescriptionLbl: Label 'Custom Contact lookup page';
         ParameterContactTableView_NameCaptionLbl: Label 'Contact Table View';
-        ParameterContactTableView_NameDescriptionLbl: Label 'Pre-filtered Contact list';
         ParameterOperation_NameCaptionLbl: Label 'Operation';
         ParameterOperation_NameDescriptionLbl: Label 'Operation to perform';
         ParameterOperation_OptionCaptionsLbl: Label 'Attach,Remove';
