@@ -96,7 +96,6 @@
     local procedure OnFinishAction()
     var
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         packageName: Text;
     begin
         packageName := package.Replace('.rapidstart', '');
@@ -112,7 +111,6 @@
     var
         TempRetailList: Record "NPR Retail List" temporary;
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         packageList: List of [Text];
         locPackage: Text;
     begin

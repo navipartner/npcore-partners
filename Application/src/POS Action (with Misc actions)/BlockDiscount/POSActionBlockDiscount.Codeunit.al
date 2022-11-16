@@ -43,7 +43,6 @@ codeunit 6150838 "NPR POS Action: Block Discount" implements "NPR IPOS Workflow"
     local procedure VerifyPassword(Context: Codeunit "NPR POS JSON Helper"; POSSetup: Codeunit "NPR POS Setup"): JsonObject
     var
         POSUnit: Record "NPR POS Unit";
-        POSSecurityProfile: Record "NPR POS Security Profile";
         SecurityProfile: Codeunit "NPR POS Security Profile";
         Password: Text;
     begin
