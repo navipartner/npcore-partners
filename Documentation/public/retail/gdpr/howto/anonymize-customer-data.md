@@ -1,6 +1,6 @@
 # Anonymize customer data
 
-In accordance with the General Data Protection Regulation, it is possible to perform anonymization of customer data. Anonymization refers to the process of removing direct and indirect personal identifiers that may be used to lead to identification of an individual being.
+In accordance with the General Data Protection Regulation, it is possible to perform anonymization of customer data. Anonymization refers to the process of removing direct and indirect personal identifiers that may be used to lead to identification of an individual being. This process can be performed when the business relationship with some customers is concluded, and they should no longer be referenced in the documents created in the system. 
 
 To do anonymize customer data, follow the provided steps.
 
@@ -14,11 +14,12 @@ To do anonymize customer data, follow the provided steps.
    The list of customers in the current environment is displayed. 
 4. Open the **Customer Card** of the customer whose data you wish to anonymize. 
 5. Click the **Actions** button in the ribbon, and then **Customer Anonymization** in the dropdown that displays.      
-   If the **Anonymize Customers** checkbox isn't enabled in **User Setup**, or if some documents related to this customer are still in use, this action will not be possible. 
+   If the **Anonymize Customers** checkbox isn't enabled in **User Setup**, or if open documents/entries still exist for this customer, the anonymization will not occur. 
 6. Click **Yes** in the popup window that is displayed.     
-   A confirmation message is displayed and the customer's data is now anonymized.     
-   You can see if the customer is anonymized through the status of the **Anonymized** toggle switch, and you can check when the customer was anonymized in the **Anonymized Date** field. 
+   A confirmation message is displayed and the customer's data is now anonymized, and their data removed.     
+   When the customer is anonymized, all their data is removed. 
 
 ### Related links
+
 - [General Data Protection Regulation](../intro.md)
 - [Automatically anonymize Customers after a certain period](/public/retail/gdpr/howto/anonymize-customers-after-period.md)
