@@ -82,3 +82,5 @@
     href: howto/item_addons_procedure.md
   - name: Set up POS Self-Service Profile
     href: howto/pos_self_service_prof.md
+  - name: Set up salespeople/purchasers
+    href: howto/salespeople_setup.md
