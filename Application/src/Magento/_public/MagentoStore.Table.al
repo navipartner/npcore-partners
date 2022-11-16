@@ -35,6 +35,12 @@
             NotBlank = true;
             TableRelation = Language;
         }
+        field(1030; "VAT Bus. Posting Gr. (Price)"; Code[20])
+        {
+            Caption = 'VAT Bus. Posting Gr. (Price)';
+            TableRelation = "VAT Business Posting Group";
+            DataClassification = CustomerContent;
+        }
         field(6151479; "Replication Counter"; BigInteger)
         {
             Caption = 'Replication Counter';

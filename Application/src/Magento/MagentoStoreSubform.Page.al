@@ -32,6 +32,11 @@
                     ToolTip = 'Specifies the value of the Language Code field';
                     ApplicationArea = NPRRetail;
                 }
+                field("VAT Bus. Posting Gr. (Price)"; Rec."VAT Bus. Posting Gr. (Price)")
+                {
+                    ToolTip = 'Specifies the value of the VAT Bus. Posting Gr. (Price) field.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
