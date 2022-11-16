@@ -59,10 +59,10 @@ page 6059854 "NPR Stripe Plan Subpart"
                 field(Amount; Rec.Amount / 100)
                 {
                     ApplicationArea = NPRRetail;
-                    Caption = 'Starting Unit Price';
+                    Caption = 'Unit Price';
                     DecimalPlaces = 2 : 2;
                     Editable = false;
-                    ToolTip = 'Specifies the starting price of the product per unit.';
+                    ToolTip = 'Specifies the price of the product per unit.';
                     Width = 10;
                 }
                 field(Interval; Rec.Interval)

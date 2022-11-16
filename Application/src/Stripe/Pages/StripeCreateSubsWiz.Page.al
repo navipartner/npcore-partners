@@ -307,8 +307,8 @@ page 6059853 "NPR Stripe Create Subs. Wiz."
     begin
         if (CurrentStep = 5) and (Step = 1) and (Rec."Token Id" = '') then
             Step := 0;
-        CheckCustomerData();
-        CurrentStep += Step;
+        CheckPageData();
+        UpdateCurrentStep(Step);
         SetControls();
     end;
 
@@ -345,27 +345,49 @@ page 6059853 "NPR Stripe Create Subs. Wiz."
                 TopBannerVisible := MediaResourcesDone."Media Reference".HasValue();
     end;
 
-    local procedure CheckCustomerData()
+    local procedure CheckPageData()
     var
         StripePlan: Record "NPR Stripe Plan";
         StripePlanTier: Record "NPR Stripe Plan Tier";
-        NoPlanSelectedErr: Label 'Please select a plan.';
     begin
         case CurrentStep of
             1:
                 begin
-                    if not CurrPage.Plans.Page.HasSelectedPlan() then
-                        Error(NoPlanSelectedErr);
+                    GetStripePlan(StripePlan);
 
-                    CurrPage.Plans.Page.GetSelectedPlan(StripePlan);
-                    StripePlanTier.SetRange("Plan Id", StripePlan.Id);
-                    CurrPage.PlanTiers.Page.SetTableView(StripePlanTier);
+                    if StripePlan."Billing Scheme" = StripePlan."Billing Scheme"::tiered then begin
+                        StripePlanTier.SetRange("Plan Id", StripePlan.Id);
+                        CurrPage.PlanTiers.Page.SetTableView(StripePlanTier);
+                    end;
                 end;
             4:
                 Rec.TestDetails();
             5:
                 CurrPage.CreditCardControl.CreateStripeToken();
         end;
+    end;
+
+    local procedure UpdateCurrentStep(Step: Integer)
+    var
+        StripePlan: Record "NPR Stripe Plan";
+    begin
+        if ((CurrentStep = 1) and (Step = 1)) or ((CurrentStep = 3) and (Step = -1)) then begin
+            GetStripePlan(StripePlan);
+            if StripePlan."Billing Scheme" = StripePlan."Billing Scheme"::per_unit then
+                CurrentStep += Step;
+        end;
+
+        CurrentStep += Step;
+    end;
+
+    local procedure GetStripePlan(var StripePlan: Record "NPR Stripe Plan")
+    var
+        NoPlanSelectedErr: Label 'Please select a plan.';
+    begin
+        if not CurrPage.Plans.Page.HasSelectedPlan() then
+            Error(NoPlanSelectedErr);
+
+        CurrPage.Plans.Page.GetSelectedPlan(StripePlan);
     end;
 
     [NonDebuggable]

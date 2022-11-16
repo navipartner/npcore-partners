@@ -102,7 +102,7 @@ table 6014645 "NPR Stripe Plan"
     var
         StripeProduct: Record "NPR Stripe Product";
         StripeJSONHelper: Codeunit "NPR Stripe JSON Helper";
-        UnitAmount, TrialPeriondDays : JsonValue;
+        UnitAmount, TrialPeriodDays : JsonValue;
     begin
         StripeJSONHelper.SetJsonObject(Data);
         Id := CopyStr(StripeJSONHelper.GetJsonValue('id').AsText(), 1, MaxStrLen(Id));
@@ -128,14 +128,13 @@ table 6014645 "NPR Stripe Plan"
                 end;
         end;
 
-        Amount := StripeJSONHelper.SelectJsonValue('tiers[0].unit_amount').AsDecimal();
         "Currency Code" := CopyStr(StripeJSONHelper.GetJsonValue('currency').AsCode(), 1, MaxStrLen("Currency Code"));
         Evaluate(Interval, StripeJSONHelper.GetJsonValue('interval').AsText());
         "Interval Count" := StripeJSONHelper.GetJsonValue('interval_count').AsInteger();
 
-        TrialPeriondDays := StripeJSONHelper.GetJsonValue('trial_period_days');
-        if not TrialPeriondDays.IsNull() then
-            "Trial Period Days" := TrialPeriondDays.AsInteger();
+        TrialPeriodDays := StripeJSONHelper.GetJsonValue('trial_period_days');
+        if not TrialPeriodDays.IsNull() then
+            "Trial Period Days" := TrialPeriodDays.AsInteger();
 
         exit(true);
     end;
