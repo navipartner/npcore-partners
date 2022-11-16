@@ -50,9 +50,12 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
         POSSession: Codeunit "NPR POS Session";
         POSActionBinTransferB: Codeunit "NPR POS Action: Bin Transfer B";
         PrintTransfer: Boolean;
+        PosUnit: Record "NPR POS Unit";
     begin
         FromBinNo := CopyStr(Context.GetString('FROM_BIN'), 1, MaxStrLen(FromBinNo));
-        CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry(FromBinNo);
+        POSActionBinTransferB.GetPosUnitFromBin(FromBinNo, PosUnit);
+        CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry(PosUnit."No.");
+
         POSActionBinTransferB.TransferContentsToBin(POSSession, FromBinNo, CheckpointEntryNo);
         if Context.GetBooleanParameter(PrintTransferNameLbl, PrintTransfer) and PrintTransfer then
             POSActionBinTransferB.PrintBinTransfer(CheckpointEntryNo);
@@ -90,7 +93,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
 
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionBinTransfer.js###
-'let main=async({parametars:r,context:e})=>(SourceBin=await workflow.respond("SelectBin"),await workflow.respond("Transfer",SourceBin));'
+'let main=async()=>{let e=await workflow.respond("SelectBin");return await workflow.respond("Transfer",e)};'
         );
     end;
 }
