@@ -30,13 +30,10 @@ codeunit 85060 "NPR POS Act. Transfer Ord Test"
         ExistingRecords: Integer;
         UpdateExistingRecords: Integer;
     begin
+        // [Given]
         //initialize POS
         LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
-        POSMenuButton.SetRange("Action Code", 'TRANSFER_ORDER');
-        if POSMenuButton.FindFirst() then;
-        if POSParameterValue.Get(DATABASE::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId, 'DefaultTransferToCode') then;
-
         //count existing 
         TransferHeader.SetRange("Transfer-from Code", POSStore."Location Code");
         TransferHeader.SetRange("Shortcut Dimension 1 Code", POSUnit."Global Dimension 1 Code");
@@ -44,9 +41,9 @@ codeunit 85060 "NPR POS Act. Transfer Ord Test"
             if not Location."Use As In-Transit" and (TransferHeader."Transfer-from Code" <> Location.Code) then
                 TransferHeader.SetRange("Transfer-to Code", POSParameterValue.Value);
         ExistingRecords := TransferHeader.count;
+        // [When]
         POSActionBusinessLogic.CreateTransferOrder(POSStore, POSUnit, POSParameterValue.Value);
-
-        //count updated
+        // [Then]
         UpdateExistingRecords := TransferHeader.Count;
 
         Assert.IsTrue(ExistingRecords + 1 = UpdateExistingRecords, 'New Transfer Order is created');
