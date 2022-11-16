@@ -34,8 +34,10 @@ stages:
         - name: BC1905
 
         - name: vLatest_CLOUD
+          alwaysRun: true
 
         - name: Insider_CLOUD
+          alwaysRun: true
         
       analyzers: ('UICop','CodeCop')
       keyVaultCert:
