@@ -51,6 +51,7 @@
                         ToolTip = 'Specifies the value of the Counted Amount Incl. Float field';
                         ApplicationArea = NPRRetail;
                         AssistEdit = true;
+                        Editable = CountedAmountInclFloatEditable;
 
                         trigger OnAssistEdit()
                         begin
@@ -77,6 +78,7 @@
                         Visible = not IsBlindCount;
                         ToolTip = 'Specifies the value of the Difference field';
                         ApplicationArea = NPRRetail;
+                        Editable = DifferenceAmountEditable;
 
                         trigger OnValidate()
                         begin
@@ -134,6 +136,7 @@
                         ToolTip = 'Specifies the value of the Counted Amount Incl. Float field';
                         ApplicationArea = NPRRetail;
                         AssistEdit = true;
+                        Editable = CountedAmountInclFloatEditable;
 
                         trigger OnAssistEdit()
                         begin
@@ -175,7 +178,7 @@
                     }
                     field("New Float Amount"; Rec."New Float Amount")
                     {
-                        Editable = PageMode = PageMode::FINAL_COUNT;
+                        Editable = (PageMode = PageMode::FINAL_COUNT) and BankDepositAmtEditable;
                         MinValue = 0;
                         Style = Strong;
                         StyleExpr = true;
@@ -201,6 +204,7 @@
                         ToolTip = 'Specifies the amount that should be transferred to the bank.';
                         ApplicationArea = NPRRetail;
                         AssistEdit = true;
+                        Editable = BankDepositAmtEditable;
 
                         trigger OnAssistEdit()
                         var
@@ -235,6 +239,7 @@
                         ToolTip = 'Specifies the value of the Move to Bin Amount field';
                         ApplicationArea = NPRRetail;
                         AssistEdit = true;
+                        Editable = MoveToBinAmtEditable;
 
                         trigger OnAssistEdit()
                         var
@@ -350,6 +355,11 @@
         ShowClosingSection: Boolean;
         ViewMode: Boolean;
         IsBlindCount: Boolean;
+        CountedAmountInclFloatEditable: Boolean;
+        BankDepositAmtEditable: Boolean;
+        DifferenceAmountEditable: Boolean;
+        MoveToBinAmtEditable: Boolean;
+
 
     local procedure OnAssistEditCounting()
     var
@@ -559,6 +569,29 @@
         end;
     end;
 
+    local procedure GetEoDProfile(Rec: Record "NPR POS Payment Bin Checkp."; var POSEODProfile: Record "NPR POS End of Day Profile"): Boolean
+    var
+        POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
+        POSUnit: Record "NPR POS Unit";
+        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+        Found: Boolean;
+    begin
+        clear(POSEODProfile);
+        POSPaymentBinCheckpoint.CopyFilters(Rec);
+        POSPaymentBinCheckpoint.SetLoadFields("Workshift Checkpoint Entry No.");
+        POSWorkshiftCheckpoint.SetLoadFields("POS Unit No.");
+        POSUnit.SetLoadFields("POS End of Day Profile");
+        if POSPaymentBinCheckpoint.Find('-') then
+            repeat
+                if POSPaymentBinCheckpoint."Workshift Checkpoint Entry No." <> 0 then begin
+                    POSWorkshiftCheckpoint.Get(POSPaymentBinCheckpoint."Workshift Checkpoint Entry No.");
+                    if POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.") then
+                        Found := POSUnit.GetProfile(POSEODProfile);
+                end;
+            until Found or (POSPaymentBinCheckpoint.Next() = 0);
+        exit(Found);
+    end;
+
     internal procedure SetBlindCount(HideFields: Boolean)
     begin
         IsBlindCount := HideFields;
@@ -566,8 +599,15 @@
 
     internal procedure DoOnOpenPageProcessing()
     var
+        POSEODProfile: Record "NPR POS End of Day Profile";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
     begin
+        GetEoDProfile(Rec, POSEODProfile);
+        CountedAmountInclFloatEditable := not POSEODProfile."Require Denomin.(Counted Amt.)";
+        BankDepositAmtEditable := not POSEODProfile."Require Denomin.(Bank Deposit)";
+        MoveToBinAmtEditable := not POSEODProfile."Require Denomin. (Move to Bin)";
+        DifferenceAmountEditable := not POSEODProfile.DisableDifferenceField;
+
         if (PageMode in [PageMode::PRELIMINARY_COUNT, PageMode::TRANSFER]) or
            ((PageMode = PageMode::FINAL_COUNT) and not AutoCountCompleted)
         then begin

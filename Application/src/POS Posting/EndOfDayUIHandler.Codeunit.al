@@ -201,6 +201,9 @@
                             end;
                     end;
                     CountingType.Add('disableDifferenceField', EndOfDayProfile.DisableDifferenceField);
+                    CountingType.Add('requireCountedAmtDenominations', EndOfDayProfile."Require Denomin.(Counted Amt.)");
+                    CountingType.Add('requireBankDepositAmtDenominations', EndOfDayProfile."Require Denomin.(Bank Deposit)");
+                    CountingType.Add('requireMoveToBinAmtDenominations', EndOfDayProfile."Require Denomin. (Move to Bin)");
 
                     PaymentMethodDenom.SetFilter("POS Payment Method Code", '=%1', POSPaymentBinCheckPoint."Payment Method No.");
                     PaymentMethodDenom.SetRange(Blocked, false);
