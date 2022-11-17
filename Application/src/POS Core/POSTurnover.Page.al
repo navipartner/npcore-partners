@@ -100,7 +100,6 @@
         POSStore: Record "NPR POS Store";
     begin
         BaseCalculationDate := WorkDate();
-        POSSession.GetSession(POSSession, false);
         POSSession.GetSetup(POSSetup);
 
         POSSetup.GetPOSStore(POSStore);
