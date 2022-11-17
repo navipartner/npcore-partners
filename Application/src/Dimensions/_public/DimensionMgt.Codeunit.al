@@ -156,6 +156,7 @@
         TempDimBuf2.Reset();
     end;
     #endregion
+
     #region TypeToTableEksp
     internal procedure TypeToTableNPR(Type: Option "G/L",Item,"Item Group",Repair,,Payment,"Open/Close",BOM,Customer,Comment): Integer
     begin
@@ -180,7 +181,40 @@
                 exit(DATABASE::"NPR Retail Comment");
         end;
     end;
+    internal procedure LineTypeToTableNPR(POSSaleLineType: enum "NPR POS Sale Line Type"): Integer
+    var
+        TableId: Integer;
+    begin
+        case POSSaleLineType of
+            POSSaleLineType::Item,
+            POSSaleLineType::"BOM List":
+                exit(Database::Item);
+            POSSaleLineType::"Item Category":
+                exit(Database::"Item Category");
+            POSSaleLineType::"POS Payment":
+                exit(Database::"NPR POS Payment Method");
+            POSSaleLineType::"Customer Deposit":
+                exit(Database::Customer); 
+            POSSaleLineType::Comment:
+                exit(Database::"NPR Retail Comment"); 
+            POSSaleLineType::Rounding,
+            POSSaleLineType::"GL Payment",
+            POSSaleLineType::"Issue Voucher":
+                exit(Database::"G/L Account");
+            else begin
+                OnGetTableId(POSSaleLineType.AsInteger(), TableId);
+                exit(TableId);
+            end;
+                 
+        end;
+    end;    
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetTableId(POSSaleLineType: Integer; var TableId: Integer)
+    begin
+    end;
     #endregion
+
     #region DiscountTypeToTableNPR
     internal procedure DiscountTypeToTableNPR(Type: Option " ",Period,Mix,"Multi-Piece","Sales Card",BOM,,Rounding,Combination,Customer): Integer
     begin
