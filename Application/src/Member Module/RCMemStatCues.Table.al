@@ -81,15 +81,21 @@ table 6059790 "NPR RC Mem. Stat. Cues"
 
         Rec."Active Members" := MMMembershipStatistics."First Time Members" + MMMembershipStatistics."Recurring Members";
         Rec."First Time Members" := MMMembershipStatistics."First Time Members";
-        Rec."First Time Members (%)" := Rec."First Time Members" / Rec."Active Members";
+        if Rec."Active Members" > 0 then
+            Rec."First Time Members (%)" := Rec."First Time Members" / Rec."Active Members";
         Rec."Recurring Members" := MMMembershipStatistics."Recurring Members";
-        Rec."Recurring Members (%)" := Rec."Recurring Members" / Rec."Active Members";
+        if Rec."Recurring Members" > 0 then
+            Rec."Recurring Members (%)" := Rec."Recurring Members" / Rec."Active Members";
         Rec."Future Timeslot" := MMMembershipStatistics."Future Members";
-        Rec."Future Timeslot (%)" := Rec."Future Timeslot" / Rec."Active Members";
-        Rec."No. of. Members compared LY" := (Rec."Active Members" / (MMMembershipStatistics."First Time Members Last Year" + MMMembershipStatistics."Recurring Members Last Year") - 1);
+        if Rec."Active Members" > 0 then
+            Rec."Future Timeslot (%)" := Rec."Future Timeslot" / Rec."Active Members";
+        if (MMMembershipStatistics."First Time Members Last Year" + MMMembershipStatistics."Recurring Members Last Year") > 0 then
+            Rec."No. of. Members compared LY" := (Rec."Active Members" / (MMMembershipStatistics."First Time Members Last Year" + MMMembershipStatistics."Recurring Members Last Year") - 1)
+        Else
+            Rec."No. of. Members compared LY" := 1;
         Rec."No. of. Members expire CM" := MMMembershipStatistics."No. of Members expire CM";
-        Rec."No. of. Members expire CM (%)" := Rec."No. of. Members expire CM" / Rec."Active Members";
-
+        if Rec."Active Members" > 0 then
+            Rec."No. of. Members expire CM (%)" := Rec."No. of. Members expire CM" / Rec."Active Members";
     end;
 
     procedure ShowStatisticsRecord()
