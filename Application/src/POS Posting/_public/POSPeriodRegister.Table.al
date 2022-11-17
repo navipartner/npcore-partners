@@ -135,6 +135,8 @@
 
     fieldgroups
     {
+        fieldgroup(Brick; "No.", "Opening Entry No.", "Closing Entry No.")
+        { }
     }
 
     var
