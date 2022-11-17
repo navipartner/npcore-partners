@@ -127,6 +127,33 @@
         {
             Caption = 'Disable Difference Field';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if not DisableDifferenceField then
+                    TestField("Require Denomin.(Counted Amt.)", false);
+            end;
+        }
+        field(90; "Require Denomin.(Counted Amt.)"; Boolean)
+        {
+            Caption = 'Require Denomin.(Counted Amt.)';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Require Denomin.(Counted Amt.)" then
+                    Validate(DisableDifferenceField, true);
+            end;
+        }
+        field(91; "Require Denomin.(Bank Deposit)"; Boolean)
+        {
+            Caption = 'Require Denomin.(Bank Deposit)';
+            DataClassification = CustomerContent;
+        }
+        field(92; "Require Denomin. (Move to Bin)"; Boolean)
+        {
+            Caption = 'Require Denomin. (Move to Bin)';
+            DataClassification = CustomerContent;
         }
     }
 

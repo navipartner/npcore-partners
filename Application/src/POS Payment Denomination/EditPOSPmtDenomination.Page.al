@@ -6,6 +6,7 @@ page 6060033 "NPR Edit POS Pmt. Denomination"
     SourceTable = "NPR POS Pmt. Bin Checkp. Denom";
     UsageCategory = None;
     InsertAllowed = false;
+    DataCaptionExpression = Format(Rec."Attached-to ID");
 
     layout
     {

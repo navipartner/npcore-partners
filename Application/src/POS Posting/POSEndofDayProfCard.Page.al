@@ -91,8 +91,30 @@
                 }
                 field(HideDifferenceField; Rec.DisableDifferenceField)
                 {
-                    ToolTip = 'Hide the difference field on the counting page.';
+                    ToolTip = 'Specifies whether editing of the Difference field is allowed on the counting page.';
                     ApplicationArea = NPRRetail;
+                }
+                group(RequireDenominations)
+                {
+                    Caption = 'Require Denominations';
+                    field("Require Denomin.(Counted Amt.)"; Rec."Require Denomin.(Counted Amt.)")
+                    {
+                        Caption = 'Counted Amount';
+                        ToolTip = 'Specifies whether system will require to specify denominations for the Counted Amount on the counting page. If disabled, system will allow both denominations and direct edit of the amount.';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Require Denomin.(Bank Deposit)"; Rec."Require Denomin.(Bank Deposit)")
+                    {
+                        Caption = 'Bank Deposit Amount';
+                        ToolTip = 'Specifies whether system will require to specify denominations for the Bank Deposit Amount on the counting page. If disabled, system will allow both denominations and direct edit of the amount.';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Require Denomin. (Move to Bin)"; Rec."Require Denomin. (Move to Bin)")
+                    {
+                        Caption = 'Move to Bin Amount';
+                        ToolTip = 'Specifies whether system will require to specify denominations for the Move to Bin Amount on the counting page. If disabled, system will allow both denominations and direct edit of the amount.';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
             }
         }
