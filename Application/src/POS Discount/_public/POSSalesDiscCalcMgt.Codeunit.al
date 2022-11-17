@@ -224,7 +224,7 @@
                         POSSaleTaxCalc.DeleteAllLines(POSSaleTax); 
                 
                 SaleLinePOS.CreateDim(
-                  NPRDimMgt.TypeToTableNPR(SaleLinePOS."Line Type".AsInteger()), SaleLinePOS."No.",
+                  NPRDimMgt.LineTypeToTableNPR(SaleLinePOS."Line Type"), SaleLinePOS."No.",
                   NPRDimMgt.DiscountTypeToTableNPR(SaleLinePOS."Discount Type"), SaleLinePOS."Discount Code",
                   DATABASE::"NPR NPRE Seating", SaleLinePOS."NPRE Seating Code",
                   0, '');

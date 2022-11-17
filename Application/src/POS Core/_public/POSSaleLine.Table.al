@@ -108,7 +108,7 @@
                 end;
 
                 CreateDim(
-                  NPRDimMgt.TypeToTableNPR("Line Type"), "No.",
+                  NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
                   NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
                   DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
                   0, '');
@@ -1080,7 +1080,7 @@
             trigger OnValidate()
             begin
                 CreateDim(
-                    NPRDimMgt.TypeToTableNPR("Line Type"), "No.",
+                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
                     NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
                     DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
                     0, '');
@@ -1187,7 +1187,7 @@
             begin
                 CreateDim(
                   DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
-                  NPRDimMgt.TypeToTableNPR("Line Type"), "No.",
+                  NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
                   NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
                   0, '');
             end;
@@ -1460,7 +1460,7 @@
             trigger OnValidate()
             begin
                 CreateDim(
-                  NPRDimMgt.TypeToTableNPR("Line Type"), "No.",
+                  NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
                   NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
                   DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
                   0, '');

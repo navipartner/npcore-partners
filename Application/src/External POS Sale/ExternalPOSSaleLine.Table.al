@@ -108,7 +108,7 @@
                 end;
 
                 CreateDim(
-                  NPRDimMgt.TypeToTableNPR("Line Type"), "No.",
+                  NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
                    0, '',
                    0, '',
                    0, '');
@@ -528,7 +528,7 @@
             trigger OnValidate()
             begin
                 CreateDim(
-                   NPRDimMgt.TypeToTableNPR("Line Type"), "No.",
+                   NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
                    0, '',
                    0, '',
                    0, '');
