@@ -70,6 +70,7 @@
             POSSession.GetSaleLine(POSSaleLine);
             SetPositionForPOSSaleLine(Context, POSSaleLine);
             OnBeforeDeleteSaleLinePOS(POSSaleLine);
+            HandleLinkedDocuments(POSSaleLine);
             DeleteAccessories(POSSaleLine);
             POSSaleLine.DeleteLine();
         end;
@@ -117,6 +118,34 @@
         Position := Context.GetPositionFromDataSource(POSDataDriverSaleLine.GetSourceNameText());
         IF Position <> '' then
             POSSaleLine.SetPosition(Position);
+    end;
+
+    local procedure HandleLinkedDocuments(POSSaleLine: Codeunit "NPR POS Sale Line")
+    var
+        LinePOS: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.GetCurrentSaleLine(LinePOS);
+        RevertPrepaymentOnDocuments(LinePOS);
+    end;
+
+    local procedure RevertPrepaymentOnDocuments(SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+    begin
+        if not SaleLinePOS."Sales Document Prepayment" then
+            exit;
+
+        if SalesHeader.Get(SaleLinePOS."Sales Document Type", SaleLinePOS."Sales Document No.") then begin
+            SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+            SalesLine.SetRange("Document No.", SalesHeader."No.");
+            if SalesLine.FindSet() then
+                repeat
+                    SalesLine.Validate("Prepayment %", 0);
+                    SalesLine.Modify();
+                until SalesLine.Next() = 0;
+        end;
+
     end;
 
     [IntegrationEvent(false, false)]

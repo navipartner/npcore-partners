@@ -22,6 +22,8 @@ codeunit 6059872 "NPR POSAction: Cancel Sale B"
             WaiterPadManagement.CloseWaiterPad(WaiterPad, true, "NPR NPRE W/Pad Closing Reason"::"Cancelled Sale");
         end;
 
+        HandleLinkedDocuments(SalePOS);
+
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.DeleteAll();
 
@@ -58,5 +60,36 @@ codeunit 6059872 "NPR POSAction: Cancel Sale B"
     procedure SetAlternativeDescription(NewAltSaleCancelDescription: Text)
     begin
         AltSaleCancelDescription := NewAltSaleCancelDescription;
+    end;
+
+    local procedure HandleLinkedDocuments(SalePOS: Record "NPR POS Sale")
+    begin
+        RevertPrepaymentOnDocuments(SalePOS);
+    end;
+
+    local procedure RevertPrepaymentOnDocuments(SalePOS: Record "NPR POS Sale")
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+    begin
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("Sales Document Prepayment", true);
+        if SaleLinePOS.IsEmpty() then
+            exit;
+
+        SaleLinePOS.FindSet();
+        repeat
+            if SalesHeader.Get(SaleLinePOS."Sales Document Type", SaleLinePOS."Sales Document No.") then begin
+                SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+                SalesLine.SetRange("Document No.", SalesHeader."No.");
+                if SalesLine.FindSet() then
+                    repeat
+                        SalesLine.Validate("Prepayment %", 0);
+                        SalesLine.Modify();
+                    until SalesLine.Next() = 0;
+            end;
+        until SaleLinePOS.Next() = 0;
     end;
 }
