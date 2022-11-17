@@ -150,12 +150,29 @@ page 6060032 "NPR MM Membership Statistics"
 
     trigger OnAfterGetRecord()
     begin
+        ClearGlobals();
         ActiveMembers := Rec."First Time Members" + Rec."Recurring Members";
-        FirstTimeMembersPct := Rec."First Time Members" / (Rec."First Time Members" + Rec."Recurring Members");
-        RecurringMembersPct := Rec."Recurring Members" / (Rec."First Time Members" + Rec."Recurring Members");
-        FutureTimeslotPct := Rec."Future Members" / (Rec."First Time Members" + Rec."Recurring Members");
-        MembersComparedLYPct := ((Rec."First Time Members" + Rec."Recurring Members") / (Rec."First Time Members Last Year" + Rec."Recurring Members Last Year") - 1);
-        MembersExpireCM := Rec."No. of Members expire CM" / (Rec."First Time Members" + Rec."Recurring Members");
+        if ActiveMembers > 0 then begin
+            FirstTimeMembersPct := Rec."First Time Members" / ActiveMembers;
+            RecurringMembersPct := Rec."Recurring Members" / ActiveMembers;
+            FutureTimeslotPct := Rec."Future Members" / ActiveMembers;
+            MembersExpireCM := Rec."No. of Members expire CM" / ActiveMembers;
+        end;
+        if (Rec."First Time Members Last Year" + Rec."Recurring Members Last Year") > 0 then
+            MembersComparedLYPct := (ActiveMembers / (Rec."First Time Members Last Year" + Rec."Recurring Members Last Year") - 1)
+        else
+            MembersComparedLYPct := 1;
+    end;
+
+    local procedure ClearGlobals()
+    var
+    begin
+        ActiveMembers := 0;
+        FirstTimeMembersPct := 0;
+        RecurringMembersPct := 0;
+        FutureTimeslotPct := 0;
+        MembersComparedLYPct := 0;
+        MembersExpireCM := 0;
     end;
 
     var
