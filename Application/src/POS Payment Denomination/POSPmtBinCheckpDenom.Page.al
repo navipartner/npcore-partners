@@ -6,6 +6,7 @@ page 6060034 "NPR POS Pmt. Bin Checkp. Denom"
     SourceTable = "NPR POS Pmt. Bin Checkp. Denom";
     UsageCategory = None;
     Editable = false;
+    DataCaptionFields = "Attached-to ID";
 
     layout
     {
