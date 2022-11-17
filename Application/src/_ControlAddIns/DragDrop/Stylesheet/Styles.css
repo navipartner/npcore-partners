@@ -21,6 +21,9 @@
 #drop-img {
     display: none;
     width: 100%;
+    height: 100%;
     background: none;
-    max-width:400px;
+    max-width: 400px;
+    max-height: 240px;
+    object-fit: contain;
 }
