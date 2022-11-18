@@ -45,6 +45,16 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Access Time field';
                 }
+                field(DurationUntilDate; Rec.DurationUntilDate)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies if the validity is limited by duration rather than the scheduled end date.';
+                }
+                field(DurationUntilTime; Rec.DurationUntilTime)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies if the validity is limited by duration rather than the scheduled end time.';
+                }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

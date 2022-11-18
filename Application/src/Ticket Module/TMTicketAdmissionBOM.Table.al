@@ -254,6 +254,12 @@
             Caption = 'Enforce Schedule Sales Limits';
             DataClassification = CustomerContent;
         }
+        field(200; DurationGroupCode; Code[10])
+        {
+            Caption = 'Duration Group Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR TM DurationGroup";
+        }
     }
 
     keys

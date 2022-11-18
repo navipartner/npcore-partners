@@ -99,6 +99,12 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Determines the period during which the ticket is valid. This occurs if the setting on Ticket Type is set to Ticket BOM.';
                 }
+                field(DurationGroupCode; Rec.DurationGroupCode)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Duration Group Code';
+                    ToolTip = 'Determines whether the admission is limited by duration rather than the scheduled end time.';
+                }
                 field("Allow Rescan Within (Sec.)"; Rec."Allow Rescan Within (Sec.)")
                 {
                     ApplicationArea = NPRTicketAdvanced;

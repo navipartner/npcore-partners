@@ -79,6 +79,17 @@
             TableRelation = "NPR TM Admission";
             DataClassification = CustomerContent;
         }
+        field(50; DurationUntilDate; Date)
+        {
+            Caption = 'Duration Until Date';
+            DataClassification = CustomerContent;
+        }
+        field(51; DurationUntilTime; Time)
+        {
+            Caption = 'Duration Until Time';
+            DataClassification = CustomerContent;
+        }
+
     }
 
     keys

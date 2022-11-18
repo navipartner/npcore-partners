@@ -150,6 +150,12 @@ page 6059886 "NPR TM Ticket BOM Card"
                         ToolTip = 'Determines the period during which the ticket is valid.';
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     }
+                    field(DurationGroupCode; Rec.DurationGroupCode)
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        Caption = 'Duration Group Code';
+                        ToolTip = 'Determines whether the admission is limited by duration rather than the scheduled end time.';
+                    }
                     field("Enforce Schedule Sales Limits"; Rec."Enforce Schedule Sales Limits")
                     {
                         ToolTip = 'Determines if the values in the Sales From Date/Sales Until Date columns are enforced.';

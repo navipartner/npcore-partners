@@ -37,6 +37,7 @@
         RESCHEDULE_NOT_ALLOWED: Label 'The ticket reschedule policy for %1 and %2, prevents changes at this time.';
         INVALID_ADMISSION_CODE: Label 'Ticket %1 does not contain entry for admission code %2.';
         NO_DEFAULT_ADMISSION_SELECTED: Label 'When ticket is scanned and no admission code is specified, system attempts to find a default admission. With current setup, a default admission could not be found for item %1.';
+        DURATION_EXCEEDED: Label 'The duration set for admission %1 expired at %2.';
         INVALID_REFERENCE_NO: Label '-1001';
         RESERVATION_NOT_FOUND_NO: Label '-1002';
         NOT_VALID_NO: Label '-1003';
@@ -62,6 +63,7 @@
         INVALID_ADMISSION_CODE_NO: Label '-1032';
         HAS_PAYMENT_NO: Label '-1033';
         ENTRY_NOT_FOUND_NO: Label '-1034';
+        DURATION_EXCEEDED_NO: Label '-1035';
         POSTPAID_RESULT: Label 'Number of postpaid tickets: %1\\Number of invoices: %2\\Invoices created: %3';
         gAccessEntryPaymentType: Option PAYMENT,PREPAID,POSTPAID;
         HANDLE_POSTPAID: Label 'Do you want to generate invoices for postpaid ticket?';
@@ -316,11 +318,12 @@
         ValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo);
         ValidateScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo, EventDate, EventTime);
 
-        RegisterArrival_Worker(TicketAccessEntryNo, AdmissionScheduleEntryNo, EventDate, EventTime);
+        RegisterArrival_Worker(TicketAccessEntryNo, AdmissionScheduleEntryNo, TicketBom.DurationGroupCode, EventDate, EventTime);
 
         ValidateAdmissionDependencies(TicketAccessEntryNo);
 
         ValidateTicketConstraintsExceeded(TicketAccessEntryNo);
+        ValidateAdmissionDurationExceeded(TicketAccessEntryNo, EventDate, EventTime);
 
         AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_FALSE;
         if (TicketBom."POS Sale May Exceed Capacity") then
@@ -1345,11 +1348,15 @@
         ReferenceTime: DateTime;
         AdmissionStartTime: DateTime;
         AdmissionEndTime: DateTime;
+        DurationUntilTime: DateTime;
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
+        ReferenceTime := CreateDateTime(EventDate, EventTime);
 
         // Requirements, should be checked elsewhere
         TicketAccessEntry.Get(TicketAccessEntryNo);
+        DurationUntilTime := CreateDateTime(TicketAccessEntry.DurationUntilDate, TicketAccessEntry.DurationUntilTime);
+
         Ticket.Get(TicketAccessEntry."Ticket No.");
         Admission.Get(AdmissionCode);
 
@@ -1372,7 +1379,6 @@
 
             // find the todays/now entry
             if (AdmissionScheduleEntryNo < 0) then begin
-                ReferenceTime := CreateDateTime(EventDate, EventTime);
                 AdmissionStartTime := CreateDateTime(ReservationSchEntry."Admission Start Date", ReservationSchEntry."Admission Start Time");
                 AdmissionEndTime := CreateDateTime(ReservationSchEntry."Admission End Date", ReservationSchEntry."Admission End Time");
 
@@ -1388,6 +1394,9 @@
 
                 if (ReservationSchEntry."Event Arrival Until Time" <> 0T) then
                     AdmissionEndTime := CreateDateTime(ReservationSchEntry."Admission End Date", ReservationSchEntry."Event Arrival Until Time");
+
+                if (DurationUntilTime <> CreateDateTime(0D, 0T)) then
+                    AdmissionEndTime := DurationUntilTime;
 
                 if (not ((ReferenceTime >= AdmissionStartTime) and (ReferenceTime <= AdmissionEndTime))) then begin
                     ReasonText := StrSubstNo(RESERVATION_NOT_FOR_NOW, DT2Time(AdmissionStartTime), DT2Time(AdmissionEndTime), DT2Date(AdmissionStartTime), AdmissionCode, Time);
@@ -1452,8 +1461,51 @@
             exit(false);
         end;
 
+        if (DurationUntilTime <> CreateDateTime(0D, 0T)) then
+            if (DurationUntilTime < ReferenceTime) then begin
+                ReasonText := StrSubstNo(DURATION_EXCEEDED, AdmissionSchEntry."Admission Code", DurationUntilTime);
+                ReasonCode := DURATION_EXCEEDED_NO;
+                exit(false);
+            end;
+
         exit(true);
     end;
+
+    local procedure GetTicketScheduleReference(TicketAccessEntryNo: Integer; AdmissionCode: Code[20]; var AdmissionScheduleEntryNo: Integer): Boolean
+    var
+        Admission: Record "NPR TM Admission";
+        AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
+        ReservationSchEntry: Record "NPR TM Admis. Schedule Entry";
+        ReservationAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        Ticket: Record "NPR TM Ticket";
+    begin
+
+        AdmissionScheduleEntryNo := 0;
+
+        if (not (Admission.Get(AdmissionCode))) then
+            exit(false);
+
+        Clear(AdmissionSchEntry);
+        if (Admission."Prebook Is Required") then begin
+            if (not GetReservationEntry(TicketAccessEntryNo, ReservationAccessEntry)) then
+                exit(false);
+
+            ReservationSchEntry.SetFilter(Cancelled, '=%1', false);
+            ReservationSchEntry.SetFilter("Admission Is", '=%1', ReservationSchEntry."Admission Is"::Open);
+            ReservationSchEntry.SetFilter("External Schedule Entry No.", '=%1', ReservationAccessEntry."External Adm. Sch. Entry No.");
+            ReservationSchEntry.FindFirst();
+
+            AdmissionScheduleEntryNo := ReservationSchEntry."Entry No.";
+
+        end else begin
+            AdmissionScheduleEntryNo := GetCurrentScheduleEntry(Ticket, AdmissionCode, true);
+            if (not AdmissionSchEntry.Get(AdmissionScheduleEntryNo)) then
+                exit(false);
+        end;
+
+        exit(true);
+    end;
+
 
 
     local procedure ValidateAdmissionDependencies(TicketAccessEntryNo: Integer)
@@ -1663,6 +1715,15 @@
         exit(Admission."Default Schedule");
     end;
 
+    local procedure GetDefaultAdmissionCode(TicketNo: Code[20]): Code[20]
+    var
+        Ticket: Record "NPR TM Ticket";
+    begin
+        if (not Ticket.Get(TicketNo)) then
+            exit('');
+        exit(GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code"));
+    end;
+
     local procedure GetDefaultAdmissionCode(ItemNo: Code[20]; VariantCode: Code[10]): Code[20]
     var
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
@@ -1847,7 +1908,7 @@
 #pragma warning restore
     end;
 
-    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; EventDate: Date; EventTime: Time)
+    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; DurationGroupCode: Code[10]; EventDate: Date; EventTime: Time)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         AdmittedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -1864,6 +1925,8 @@
             TicketAccessEntry."Access Date" := EventDate;
             TicketAccessEntry."Access Time" := EventTime;
             TicketAccessEntry.Modify();
+            if (DurationGroupCode <> '') then
+                SetDuration(TicketAccessEntryNo, TicketAdmissionSchEntryNo, DurationGroupCode, EventDate, EventTime);
         end;
 
         if (AdmissionScheduleEntry.Get(TicketAdmissionSchEntryNo)) then;
@@ -1884,6 +1947,109 @@
 
         if (FirstAdmission) then
             NotifyParticipant.CreateFirstAdmissionNotification(TicketAccessEntry);
+    end;
+
+    local procedure SetDuration(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; DurationGroupCode: Code[10]; EventDate: Date; EventTime: Time)
+    var
+        DurationGroup: Record "NPR TM DurationGroup";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        Admission: Record "NPR TM Admission";
+        Ticket: Record "NPR TM Ticket";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        AdmissionScheduleEntryNo: Integer;
+        ValidUntil: DateTime;
+        ReferenceDateTime: DateTime;
+        UpdateAccessEntry: Boolean;
+    begin
+        if (not DurationGroup.Get(DurationGroupCode)) then
+            exit;
+
+        ReferenceDateTime := CreateDateTime(EventDate, EventTime);
+        ValidUntil := CreateDateTime(0D, 0T);
+
+        TicketAccessEntry.Get(TicketAccessEntryNo);
+        TicketAccessEntry.SetCurrentKey("Ticket No.");
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketAccessEntry."Ticket No.");
+        TicketAccessEntry.FindSet();
+
+        if (DurationGroup.AlignmentSource = DurationGroup.AlignmentSource::SCANNED) then
+            ValidUntil := CalculateDurationValidUntil(DurationGroup, TicketAdmissionSchEntryNo, ReferenceDateTime);
+
+        if (DurationGroup.AlignmentSource = DurationGroup.AlignmentSource::DEFAULT) then
+            if (GetTicketScheduleReference(TicketAccessEntry."Entry No.", GetDefaultAdmissionCode(TicketAccessEntry."Ticket No."), AdmissionScheduleEntryNo)) then
+                ValidUntil := CalculateDurationValidUntil(DurationGroup, AdmissionScheduleEntryNo, ReferenceDateTime);
+
+        Ticket.Get(TicketAccessEntry."Ticket No.");
+
+        repeat
+            TicketBom.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code");
+            UpdateAccessEntry := false;
+
+            if (TicketBom.DurationGroupCode = DurationGroupCode) then begin
+                if (GetTicketScheduleReference(TicketAccessEntry."Entry No.", TicketAccessEntry."Admission Code", AdmissionScheduleEntryNo)) then begin
+
+                    if (DurationGroup.AlignmentSource = DurationGroup.AlignmentSource::INDIVIDUAL) then
+                        ValidUntil := CalculateDurationValidUntil(DurationGroup, AdmissionScheduleEntryNo, ReferenceDateTime);
+
+                    if (Admission.Get(TicketAccessEntry."Admission Code")) then begin
+                        case (DurationGroup.SynchronizedActivation) of
+                            DurationGroup.SynchronizedActivation::LOCATION:
+                                UpdateAccessEntry := (Admission.Type = Admission.Type::LOCATION);
+                            DurationGroup.SynchronizedActivation::OCCASION:
+                                UpdateAccessEntry := (Admission.Type = Admission.Type::OCCASION);
+                            DurationGroup.SynchronizedActivation::ALL_MEMBERS:
+                                UpdateAccessEntry := true;
+                            DurationGroup.SynchronizedActivation::NA:
+                                UpdateAccessEntry := (TicketAccessEntryNo = TicketAccessEntry."Entry No.");
+                        end;
+                    end;
+                end;
+
+                if ((UpdateAccessEntry) and (DT2Date(ValidUntil) > 0D)) then begin
+                    if (TicketAccessEntry.DurationUntilDate = 0D) then begin
+                        TicketAccessEntry.DurationUntilDate := DT2Date(ValidUntil);
+                        TicketAccessEntry.DurationUntilTime := DT2Time(ValidUntil);
+                        TicketAccessEntry.Modify();
+                    end
+                end;
+            end;
+
+        until (TicketAccessEntry.Next() = 0);
+
+    end;
+
+    local procedure CalculateDurationValidUntil(DurationGroup: Record "NPR TM DurationGroup"; AdmSchEntryNo: Integer; ReferenceDateTime: DateTime) ValidUntil: DateTime
+    var
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+    begin
+        if (not AdmissionScheduleEntry.Get(AdmSchEntryNo)) then
+            exit;
+
+        ValidUntil := ReferenceDateTime;
+        if (ReferenceDateTime < CreateDateTime(AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time")) then begin
+            case (DurationGroup.AlignEarlyArrivalOn) of
+                DurationGroup.AlignEarlyArrivalOn::ARRIVAL:
+                    ValidUntil := ReferenceDateTime;
+                DurationGroup.AlignEarlyArrivalOn::SCHEDULE_START:
+                    ValidUntil := CreateDateTime(AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+            end;
+        end;
+
+        if (ReferenceDateTime > CreateDateTime(AdmissionScheduleEntry."Admission End Date", AdmissionScheduleEntry."Admission End Time")) then begin
+            case (DurationGroup.AlignLateArrivalOn) of
+                DurationGroup.AlignLateArrivalOn::ARRIVAL:
+                    ValidUntil := ReferenceDateTime;
+                DurationGroup.AlignLateArrivalOn::SCHEDULE_END:
+                    ValidUntil := CreateDateTime(AdmissionScheduleEntry."Admission End Date", AdmissionScheduleEntry."Admission End Time");
+            end;
+        end;
+
+        ValidUntil += DurationGroup.DurationMinutes * 60 * 1000;
+
+        if (DurationGroup.CapOnEndTime) then
+            if (ValidUntil > CreateDateTime(AdmissionScheduleEntry."Admission End Date", AdmissionScheduleEntry."Admission End Time")) then
+                ValidUntil := CreateDateTime(AdmissionScheduleEntry."Admission End Date", AdmissionScheduleEntry."Admission End Time");
+
     end;
 
 
@@ -2175,8 +2341,8 @@
         DetailedTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type, Open);
         DetailedTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntryNo);
         DetailedTicketAccessEntry.SetFilter(Type, '=%1', DetailedTicketAccessEntry.Type::RESERVATION);
-
-        exit(DetailedTicketAccessEntry.FindFirst());
+        DetailedTicketAccessEntry.SetFilter(Quantity, '>0');
+        exit(DetailedTicketAccessEntry.FindLast());
     end;
 
     procedure GetCurrentScheduleEntry(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; WithCreate: Boolean): Integer
@@ -2709,6 +2875,33 @@
         end;
 
         exit(true);
+    end;
+
+    local procedure ValidateAdmissionDurationExceeded(TicketAccessEntryNo: Integer; EventDate: Date; EventTime: Time)
+    var
+        ErrorMessage: Text;
+    begin
+        if (CheckAdmissionDurationExceeded(TicketAccessEntryNo, EventDate, EventTime, ErrorMessage)) then
+            RaiseError(ErrorMessage, DURATION_EXCEEDED_NO);
+    end;
+
+    local procedure CheckAdmissionDurationExceeded(TicketAccessEntryNo: Integer; EventDate: Date; EventTime: Time; var ErrorMessage: Text): Boolean
+    var
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DurationLimitDateTime: DateTime;
+    begin
+        ErrorMessage := '';
+        TicketAccessEntry.Get(TicketAccessEntryNo);
+        DurationLimitDateTime := CreateDateTime(TicketAccessEntry.DurationUntilDate, TicketAccessEntry.DurationUntilTime);
+        if (DurationLimitDateTime = CreateDateTime(0D, 0T)) then
+            exit(false);
+
+        if (CreateDateTime(EventDate, EventTime) > DurationLimitDateTime) then begin
+            ErrorMessage := StrSubstNo(DURATION_EXCEEDED, TicketAccessEntry."Admission Code", DurationLimitDateTime);
+            exit(true);
+        end;
+
+        exit(false);
     end;
 
     local procedure ValidateTicketConstraintsExceeded(TicketAccessEntryNo: Integer)

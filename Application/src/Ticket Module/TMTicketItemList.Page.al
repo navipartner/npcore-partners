@@ -16,6 +16,7 @@ page 6059888 "NPR TM Ticket Item List"
             repeater(GroupName)
             {
                 Editable = false;
+                Caption = 'Item Information';
                 field("Item No."; Rec."Item No.")
                 {
                     ToolTip = 'Specifies the value of the Item No. field.';
