@@ -14,6 +14,7 @@ page 6059884 "NPR TM Ticket Item Card"
         {
             group(GroupName)
             {
+                Caption = 'Ticket Item';
 
                 field("No."; Rec."Item No.")
                 {

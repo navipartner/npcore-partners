@@ -24,6 +24,9 @@
         MembershipEntry: Record "NPR MM Membership Entry";
         MemberFound: Boolean;
     begin
+        if (not ValidateSearchTerm(SearchTerm)) then
+            exit;
+
         Member.FilterGroup := -1;
         ApplyMemberFilter(SearchTerm, Member);
         Member.SetLoadFields("Entry No.");
@@ -97,6 +100,9 @@
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipFound: Boolean;
     begin
+        if (not ValidateSearchTerm(SearchTerm)) then
+            exit;
+
         if (not MembershipFound) then begin
             Membership.FilterGroup := -1;
             if (StrLen(SearchTerm) <= MaxStrLen(Membership."External Membership No.")) then
@@ -177,6 +183,8 @@
         MemberCard2: Record "NPR MM Member Card";
         MembershipFound: Boolean;
     begin
+        if (not ValidateSearchTerm(SearchTerm)) then
+            exit;
 
         MemberCard.SetLoadFields("Entry No.");
 
@@ -264,5 +272,17 @@
     var
     begin
         exit(ConvertStr(SearchTerm, ' ', '*') + '*');
+    end;
+
+    local procedure ValidateSearchTerm(SearchTerm: Text[100]): Boolean
+    var
+        SEARCH_TERM_TOO_SHORT: Label 'A minimum of 3 characters is required for smart search.';
+    begin
+        if ((StrLen(SearchTerm) < 4) or
+            ((StrLen(SearchTerm) = 4) and (CopyStr(SearchTerm, 4) = '*'))) then begin
+            Message(SEARCH_TERM_TOO_SHORT);
+            exit(false);
+        end;
+        exit(true);
     end;
 }
