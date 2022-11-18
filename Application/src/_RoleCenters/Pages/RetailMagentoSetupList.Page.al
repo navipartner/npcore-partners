@@ -230,7 +230,7 @@
                 }
                 field("Customer Posting Group"; Rec."Customer Posting Group")
                 {
-
+                    Visible = false;
                     ToolTip = 'Specifies the value of the Customer Posting Group field';
                     ApplicationArea = NPRRetail;
                 }
@@ -251,6 +251,7 @@
 
                     ToolTip = 'Specifies the value of the Payment Terms Code field';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 field("Payment Fee Account No."; Rec."Payment Fee Account No.")
                 {

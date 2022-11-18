@@ -654,20 +654,19 @@
                 group(Control6151428)
                 {
                     ShowCaption = false;
-                    Visible = (Rec."Customer Template Code" = '');
+                    Visible = false;
                     field("Customer Posting Group"; Rec."Customer Posting Group")
                     {
-
                         ToolTip = 'Specifies the customer posting group.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Payment Terms Code"; Rec."Payment Terms Code")
                     {
-
                         ToolTip = 'Specifies the payment terms code.';
                         ApplicationArea = NPRRetail;
                     }
                 }
+
                 field("Customer Template Code"; Rec."Customer Template Code")
                 {
 
