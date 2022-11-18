@@ -1,67 +1,68 @@
-﻿codeunit 6151023 "NPR NpRv POS Action Top-up"
+﻿codeunit 6151023 "NPR NpRv POS Action Top-up" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
-        Text000: Label 'Apply Top-up (refill) on existing Retail Voucher.';
-        Text001: Label 'Top-up Retail Voucher';
-        Text002: Label 'Enter Reference No.';
-        Text003: Label 'Enter Amount';
-        Text004: Label 'Enter Discount Amount';
-        Text005: Label 'Enter Discount Percent';
-        Text006: Label 'Top-up is not allowed for Retail Voucher %1';
-        ReadingErr: Label 'reading in %1';
-        SettingScopeErr: Label 'setting scope in %1';
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
+        ActionDescription: Label 'Apply Top-up (refill) on existing Retail Voucher.';
+        AmountRetailVoucher_CptLbl: Label 'Enter Amount';
+        DiscAmountRetailVoucher_CptLbl: Label 'Enter Discount Amount';
+        DiscPercRetailVoucher_CptLbl: Label 'Enter Discount Percent';
+        ParameterAmount_CaptionLbl: Label 'Amount';
+        ParameterDiscAmount_CaptionLbl: Label 'Discount Amount';
+        ParameterDiscType_CaptionLbl: Label 'Discount Type';
+        ParameterDiscType_OptionCaptionLbl: Label 'Amount,Percent,None';
+        ParameterDiscType_OptionsLbl: Label 'Amount,Percent,None', Locked = true;
+        ParameterReferenceNo_CaptionLbl: Label 'Reference No.';
+        ParameterShowVoucherCard_CaptionLbl: Label 'Show Voucher Card';
+        ParameterVoucherType_CaptionLbl: Label 'Voucher Type Filter';
+        ReferenceRetailVoucher_CptLbl: Label 'Enter Reference No.';
+        ReferenceRetailVoucherTitleLbl: Label 'Top-up Retail Voucher';
+        VoucherType: Label 'RETPARTIAL', Locked = true;
     begin
-        if not Sender.DiscoverAction(
-          ActionCode(),
-          Text000,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Multiple) then
-            exit;
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddDecimalParameter('Amount', 0, ParameterAmount_CaptionLbl, ParameterAmount_CaptionLbl);
+        WorkflowConfig.AddDecimalParameter('DiscountAmount', 0, ParameterDiscAmount_CaptionLbl, ParameterDiscAmount_CaptionLbl);
+        WorkflowConfig.AddOptionParameter(
+            'DiscountType',
+            ParameterDiscType_OptionsLbl,
+            SelectStr(3, ParameterDiscType_OptionsLbl),
+            ParameterDiscType_CaptionLbl,
+            ParameterDiscType_CaptionLbl,
+            ParameterDiscType_OptionCaptionLbl);
+        WorkflowConfig.AddTextParameter('ReferenceNo', '', ParameterReferenceNo_CaptionLbl, ParameterReferenceNo_CaptionLbl);
+        WorkflowConfig.AddBooleanParameter('ShowVoucherCard', true, ParameterShowVoucherCard_CaptionLbl, ParameterShowVoucherCard_CaptionLbl);
+        WorkflowConfig.AddTextParameter('VoucherTypeFilter', VoucherType, ParameterVoucherType_CaptionLbl, ParameterVoucherType_CaptionLbl);
 
-        Sender.RegisterWorkflowStep('voucher_input', 'if(!param.ReferenceNo) {input({title: labels.TopupVoucherTitle,caption: labels.ReferenceNo,value: "",notBlank: true}).cancel(abort)} ' +
-                                                    'else {context.$voucher_input = {"input": param.ReferenceNo}};');
-        Sender.RegisterWorkflowStep('validate_voucher', 'respond();');
-        Sender.RegisterWorkflowStep('amt_input', 'if(param.Amount <= 0) {numpad({title: labels.TopupVoucherTitle,caption: labels.Amount,value: 0,notBlank: true}).cancel(abort)} ' +
-                                                'else {context.$amt_input = {"numpad": param.Amount}};');
-        Sender.RegisterWorkflowStep('discount_input',
-          'switch(param.DiscountType + "") {' +
-          '  case "0":' +
-          '    if(param.DiscountAmount <= 0) {numpad({title: labels.TopupVoucherTitle,caption: labels.DiscountAmount,value: 0}).cancel(abort)} ' +
-          '    else {context.$discount_input = {"numpad": param.DiscountAmount}};' +
-          '    break;' +
-          '  case "1":' +
-          '    if(param.DiscountAmount <= 0) {numpad({title: labels.TopupVoucherTitle,caption: labels.DiscountPercent,value: 0}).cancel(abort)}' +
-          '    else {context.$discount_input = {"numpad": param.DiscountAmount}};' +
-          '    break;' +
-          '  default:' +
-          '    goto("show_voucher_card");' +
-          '}');
-        Sender.RegisterWorkflowStep('show_voucher_card', 'if(param.ShowVoucherCard) {respond()}');
-        Sender.RegisterWorkflowStep('topup_voucher', 'respond();');
-        Sender.RegisterWorkflow(false);
-
-        Sender.RegisterTextParameter('VoucherTypeFilter', '');
-        Sender.RegisterTextParameter('ReferenceNo', '');
-        Sender.RegisterDecimalParameter('Amount', 0);
-        Sender.RegisterOptionParameter('DiscountType', 'Amount,Percent,None', 'Amount');
-        Sender.RegisterDecimalParameter('DiscountAmount', 0);
-        Sender.RegisterBooleanParameter('ShowVoucherCard', true);
+        WorkflowConfig.AddLabel('TopupVoucherTitle', ReferenceRetailVoucherTitleLbl);
+        WorkflowConfig.AddLabel('ReferenceNo', ReferenceRetailVoucher_CptLbl);
+        WorkflowConfig.AddLabel('Amount', AmountRetailVoucher_CptLbl);
+        WorkflowConfig.AddLabel('DiscountAmount', DiscAmountRetailVoucher_CptLbl);
+        WorkflowConfig.AddLabel('DiscountPercent', DiscPercRetailVoucher_CptLbl);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    local procedure GetActionScript(): Text
     begin
-        Captions.AddActionCaption(ActionCode(), 'TopupVoucherTitle', Text001);
-        Captions.AddActionCaption(ActionCode(), 'ReferenceNo', Text002);
-        Captions.AddActionCaption(ActionCode(), 'Amount', Text003);
-        Captions.AddActionCaption(ActionCode(), 'DiscountAmount', Text004);
-        Captions.AddActionCaption(ActionCode(), 'DiscountPercent', Text005);
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionTopUpVoucher.js###
+'let main=async({workflow:l,parameters:u,popup:o,captions:e})=>{let t,i,n;if(u.ReferenceNo?t=u.ReferenceNo:t=await o.input({title:e.TopupVoucherTitle,caption:e.ReferenceNo,value:"",notBlank:!0}),t==null||t=="")return;const{VoucherNo:c}=await l.respond("validate_voucher",{referenceNo:t});if(!(c==null||c=="")){if(u.Amount<=0){if(i=await o.numpad({title:e.TopupVoucherTitle,caption:e.Amount,value:0,notBlank:!0}),i==null)return}else i=u.Amount;switch(u.DiscountType.toInt()){case u.DiscountType.Amount:if(u.DiscountAmount<=0){if(n=await o.numpad({title:e.TopupVoucherTitle,caption:e.DiscountAmount,value:0}),n==null)return}else n=u.DiscountAmount;break;case u.DiscountType.Percent:if(u.DiscountAmount<=0){if(n=await o.numpad({title:e.TopupVoucherTitle,caption:e.DiscountPercent,value:0}),n==null)return}else n=u.DiscountAmount;break;default:break}u.ShowVoucherCard&&await l.respond("show_voucher_card",{VoucherNo:c}),await l.respond("topup_voucher",{VoucherNo:c,amount:i,disc_amount:n})}};'
+        );
+    end;
+
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup");
+    var
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        FrontEnd.GetSession(POSSession);
+
+        case Step of
+            'validate_voucher':
+                FrontEnd.WorkflowResponse(OnActionValidateVoucher(Context));
+            'show_voucher_card':
+                FrontEnd.WorkflowResponse(OnActionShowVoucherCard(Context));
+            'topup_voucher':
+                FrontEnd.WorkflowResponse(OnActionTopupVoucher(Context, POSSession));
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, true)]
@@ -78,7 +79,7 @@
 
         Handled := true;
 
-        if PAGE.RunModal(0, NpRvVoucherType) = ACTION::LookupOK then
+        if Page.RunModal(0, NpRvVoucherType) = Action::LookupOK then
             POSParameterValue.Value := NpRvVoucherType.Code;
     end;
 
@@ -102,106 +103,57 @@
         NpRvVoucherType.FindFirst();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnActionValidateVoucher(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
     var
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        JSON: Codeunit "NPR POS JSON Management";
-    begin
-        if Handled then
-            exit;
-
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-        Handled := true;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-
-        case WorkflowStep of
-            'validate_voucher':
-                OnActionValidateVoucher(JSON, FrontEnd);
-            'show_voucher_card':
-                OnActionShowVoucherCard(JSON);
-            'topup_voucher':
-                OnActionTopupVoucher(JSON, POSSession);
-        end;
-    end;
-
-    local procedure OnActionValidateVoucher(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
-        VoucherTypeFilter: Text;
+        POSActionTopupBL: Codeunit "NPR NpRv POS Action Top-up-B";
+        VoucherNo: Code[20];
         ReferenceNo: Text;
-        VoucherTypeCode: Code[20];
-        VoucherReferenceNumber: Text[50];
-        NotFoundErr: Label 'Reference No. %1 and Voucher Type %2 not found';
+        VoucherTypeFilter: Text;
     begin
-        VoucherTypeFilter := JSON.GetStringParameter('VoucherTypeFilter');
+        VoucherTypeFilter := Context.GetStringParameter('VoucherTypeFilter');
 
-        JSON.SetScopeRoot();
-        JSON.SetScope('$voucher_input', StrSubstNo(SettingScopeErr, ActionCode()));
-        ReferenceNo := UpperCase(JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode())));
-        NpRvVoucherMgt.TrimTypeAndReference(VoucherTypeFilter, VoucherTypeCode, ReferenceNo, VoucherReferenceNumber);
+        Context.SetScopeRoot();
+        ReferenceNo := UpperCase(Context.GetString('referenceNo'));
+        VoucherNo := POSActionTopupBL.FindVoucher(VoucherTypeFilter, ReferenceNo);
 
-        NpRvVoucher.SetFilter("Voucher Type", VoucherTypeCode);
-        NpRvVoucher.SetFilter("Reference No.", '=%1', VoucherReferenceNumber);
-        if NpRvVoucher.FindFirst() then
-            NpRvModuleValidGlobal.UpdateVoucherAmount(NpRvVoucher)
-        else
-            if not NpRvVoucherMgt.FindPartnerVoucher(VoucherTypeCode, VoucherReferenceNumber, NpRvVoucher) then
-                Error(NotFoundErr, VoucherReferenceNumber, VoucherTypeCode);
-
-        if not NpRvVoucher."Allow Top-up" then
-            Error(Text006, NpRvVoucher."Reference No.");
-
-        JSON.SetContext('VoucherNo', NpRvVoucher."No.");
-        FrontEnd.SetActionContext(ActionCode(), JSON);
+        Response.Add('VoucherNo', VoucherNo);
     end;
 
-    local procedure OnActionShowVoucherCard(JSON: Codeunit "NPR POS JSON Management")
+    local procedure OnActionShowVoucherCard(Context: Codeunit "NPR POS JSON Helper"): JsonObject;
     var
-        NpRvVoucher: Record "NPR NpRv Voucher";
+        POSActionTopupBL: Codeunit "NPR NpRv POS Action Top-up-B";
         VoucherNo: Text;
     begin
-        JSON.SetScopeRoot();
-        VoucherNo := JSON.GetString('VoucherNo');
-        NpRvVoucher.Get(VoucherNo);
-        PAGE.RunModal(PAGE::"NPR NpRv Voucher Card", NpRvVoucher);
+        Context.SetScopeRoot();
+        VoucherNo := Context.GetString('VoucherNo');
+        POSActionTopupBL.RunVoucherCard(VoucherNo);
     end;
 
-    local procedure OnActionTopupVoucher(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure OnActionTopupVoucher(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"): JsonObject;
     var
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        VoucherNo: Text;
-        DiscountType: Text;
         AmtInput, DiscountAmount, DiscountPct : Decimal;
+        DiscountType: Text;
+        VoucherNo: Text;
     begin
-        JSON.SetScopeRoot();
-        VoucherNo := JSON.GetString('VoucherNo');
-        JSON.SetScopeRoot();
-        JSON.SetScope('$amt_input', StrSubstNo(SettingScopeErr, ActionCode()));
-        AmtInput := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
+        Context.SetScopeRoot();
+        VoucherNo := Context.GetString('VoucherNo');
+        Context.SetScopeRoot();
+        AmtInput := Context.GetDecimal('amount');
 
-        JSON.SetScopeRoot();
-        JSON.SetScopeParameters(ActionCode());
-        DiscountType := JSON.GetStringOrFail('DiscountType', StrSubstNo(ReadingErr, ActionCode()));
+        Context.SetScopeRoot();
+        Context.SetScopeParameters();
+        DiscountType := Context.GetString('DiscountType');
         case DiscountType of
             '0':
                 begin
-                    JSON.SetScopeRoot();
-                    JSON.SetScope('$discount_input', StrSubstNo(SettingScopeErr, ActionCode()));
-                    DiscountAmount := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
+                    Context.SetScopeRoot();
+                    DiscountAmount := Context.GetDecimal('disc_amount');
                 end;
             '1':
                 begin
-                    JSON.SetScopeRoot();
-                    JSON.SetScope('$discount_input', StrSubstNo(SettingScopeErr, ActionCode()));
-                    DiscountPct := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
+                    Context.SetScopeRoot();
+                    DiscountPct := Context.GetDecimal('disc_amount');
                 end;
         end;
 
@@ -210,15 +162,6 @@
 
     local procedure ActionCode(): Code[20]
     begin
-        exit('TOPUP_VOUCHER');
+        exit(Format(Enum::"NPR POS Workflow"::TOPUP_VOUCHER));
     end;
-
-    local procedure ActionVersion(): Code[20]
-    begin
-        exit('1.0');
-    end;
-
-
-
-
 }
