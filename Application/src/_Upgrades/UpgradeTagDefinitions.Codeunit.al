@@ -52,6 +52,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Event Report Layout Upg."));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Sales Pr. Maint. Setup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Customer Templates"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Cust. Config. Temp."));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Retail Journal"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NpRv Print Object Type"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Web Service Pass", 'RemoteEndpoints'));
@@ -203,6 +204,8 @@
                 exit('NPR-482497-AppAreaForUserExperience-20210825');
             Codeunit::"NPR UPG Sales Pr. Maint. Setup":
                 exit('NPRSalesPriceMaintSetupUpgrade-20210901');
+            Codeunit::"NPR UPG Cust. Config. Temp.":
+                exit('NPRCustConfigTemplates-20221109');
             Codeunit::"NPR UPG Customer Templates":
                 exit('NPRCustomerTemplates-20210906');
             Codeunit::"NPR Upgrade Retail Journal":

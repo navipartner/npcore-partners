@@ -409,6 +409,9 @@
             Caption = 'Customer Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Customer Posting Group";
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not use anymore.';
+            ObsoleteTag = '21';
         }
         field(515; "Customer Template Code"; Code[20])
         {
@@ -427,6 +430,9 @@
             Caption = 'Payment Terms Code';
             DataClassification = CustomerContent;
             TableRelation = "Payment Terms";
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not use anymore.';
+            ObsoleteTag = '21';
         }
         field(525; "Payment Fee Account No."; Code[20])
         {

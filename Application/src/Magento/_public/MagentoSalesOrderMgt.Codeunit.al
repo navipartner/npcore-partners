@@ -257,8 +257,6 @@
                 if ConfigTemplateCode = '' then begin
                     Customer.Validate("Gen. Bus. Posting Group", VATBusPostingGroup);
                     Customer.Validate("VAT Bus. Posting Group", VATBusPostingGroup);
-                    Customer.Validate("Customer Posting Group", MagentoSetup."Customer Posting Group");
-                    Customer.Validate("Payment Terms Code", MagentoSetup."Payment Terms Code");
                 end;
         end;
         case MagentoSetup."Customer Update Mode" of
