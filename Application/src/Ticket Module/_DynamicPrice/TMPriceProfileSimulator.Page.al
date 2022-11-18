@@ -5,6 +5,7 @@ page 6059867 "NPR TM Price Profile Simulator"
     PageType = Worksheet;
     UsageCategory = None;
     SourceTable = Date;
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
 
     layout
     {

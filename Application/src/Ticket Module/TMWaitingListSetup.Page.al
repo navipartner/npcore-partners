@@ -8,6 +8,7 @@
     SourceTable = "NPR TM Waiting List Setup";
     UsageCategory = Administration;
     ApplicationArea = NPRTicketAdvanced;
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
 
     layout
     {

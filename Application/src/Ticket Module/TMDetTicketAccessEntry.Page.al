@@ -10,6 +10,7 @@
     SourceTable = "NPR TM Det. Ticket AccessEntry";
     UsageCategory = None;
     PromotedActionCategories = 'New,Process,Report,Navigate';
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
     layout
     {
         area(content)
@@ -225,9 +226,9 @@
                         MembershipCard.Run();
                     end;
                 else begin
-                        MembershipList.SetTableView(Membership);
-                        MembershipList.Run();
-                    end;
+                    MembershipList.SetTableView(Membership);
+                    MembershipList.Run();
+                end;
             end;
     end;
 }

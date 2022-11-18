@@ -11,6 +11,7 @@
     SourceTableView = SORTING("Entry No.") ORDER(Descending);
     UsageCategory = Tasks;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
 
     layout
     {

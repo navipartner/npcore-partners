@@ -12,6 +12,7 @@
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     AdditionalSearchTerms = 'Issued Tickets';
     PromotedActionCategories = 'New,Process,Report,Navigate';
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
 
     layout
     {

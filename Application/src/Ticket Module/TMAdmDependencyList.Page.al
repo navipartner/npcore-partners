@@ -8,7 +8,7 @@
     ShowFilter = false;
     DelayedInsert = true;
     UsageCategory = None;
-    ContextSensitiveHelpPage = 'display/ENT/Ticket+Admission+Dependencies';
+    ContextSensitiveHelpPage = 'entertainment/ticket/explanation/AdmissionDependencyCode.html';
 
     layout
     {

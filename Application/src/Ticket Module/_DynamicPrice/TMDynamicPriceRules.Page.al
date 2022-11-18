@@ -6,6 +6,7 @@ page 6059866 "NPR TM Dynamic Price Rules"
     DelayedInsert = true;
     Extensible = False;
     RefreshOnActivate = true;
+    ContextSensitiveHelpPage = 'entertainment/ticket/explanation/TicketPricing.html';
 
     layout
     {

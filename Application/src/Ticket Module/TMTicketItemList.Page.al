@@ -8,7 +8,7 @@ page 6059888 "NPR TM Ticket Item List"
     SourceTableTemporary = true;
     Caption = 'Ticket Item List';
     Editable = false;
-
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
     layout
     {
         area(Content)

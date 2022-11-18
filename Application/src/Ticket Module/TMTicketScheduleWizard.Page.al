@@ -8,6 +8,7 @@
     SourceTable = "NPR TM Admis. Schedule";
     SourceTableTemporary = true;
     UsageCategory = None;
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
 
     layout
     {

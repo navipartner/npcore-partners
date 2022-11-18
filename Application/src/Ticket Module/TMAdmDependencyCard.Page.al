@@ -5,7 +5,7 @@
     UsageCategory = None;
     SourceTable = "NPR TM Adm. Dependency";
     Caption = 'Admission Dependency Card';
-    ContextSensitiveHelpPage = 'display/ENT/Ticket+Admission+Dependencies';
+    ContextSensitiveHelpPage = 'entertainment/ticket/explanation/AdmissionDependencyCode.html';
 
     layout
     {

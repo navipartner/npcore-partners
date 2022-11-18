@@ -1,15 +1,13 @@
 ﻿page 6151139 "NPR TM Admis. Forecast Lines"
 {
     Extensible = False;
-    // TM1.48/TSA /20200625 CASE 409741 Initial Version
-
     Caption = 'Admission Forecast Lines';
     Editable = false;
     PageType = ListPart;
     UsageCategory = None;
     SourceTable = "NPR TM Admis. Schedule Lines";
     SourceTableTemporary = true;
-
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
     layout
     {
         area(content)

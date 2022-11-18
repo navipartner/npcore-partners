@@ -7,7 +7,7 @@
     SourceTable = "NPR TM Ticket Access Stats";
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
     layout
     {
         area(content)

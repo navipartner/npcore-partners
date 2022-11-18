@@ -6,6 +6,7 @@
     SourceTable = "NPR TM Offline Ticket Valid.";
     UsageCategory = Tasks;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
 
     layout
     {

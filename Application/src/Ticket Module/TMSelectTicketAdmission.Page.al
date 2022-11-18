@@ -6,6 +6,7 @@ page 6059889 "NPR TM Select Ticket Admission"
     Editable = false;
     Extensible = false;
     Caption = 'Select Ticket Admission';
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
 
     layout
     {

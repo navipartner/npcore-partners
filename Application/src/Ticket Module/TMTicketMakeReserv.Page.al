@@ -10,7 +10,7 @@
     SourceTableView = sorting("Session Token ID", "Admission Inclusion");
     SourceTableTemporary = true;
     UsageCategory = None;
-
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
     layout
     {
         area(content)

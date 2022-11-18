@@ -6,6 +6,7 @@ page 6059985 "NPR TM Ticket Admission Sim"
     SourceTableTemporary = true;
     Extensible = False;
     UsageCategory = None;
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
     layout
     {
         area(content)
