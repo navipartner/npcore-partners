@@ -7,6 +7,7 @@ page 6059884 "NPR TM Ticket Item Card"
     SourceTableTemporary = true;
     InsertAllowed = false;
     DeleteAllowed = false;
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
 
     layout
     {

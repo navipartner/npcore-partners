@@ -6,9 +6,10 @@
     PageType = List;
     SourceTable = "NPR TM Ticket Access Entry";
     UsageCategory = ReportsAndAnalysis;
-
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
     PromotedActionCategories = 'New,Process,Report,Navigate';
     ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)

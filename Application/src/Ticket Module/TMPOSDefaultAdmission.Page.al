@@ -7,6 +7,7 @@
     SourceTable = "NPR TM POS Default Admission";
     DelayedInsert = true;
     Caption = 'Default Admissions';
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
     layout
     {
         area(Content)

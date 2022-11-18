@@ -8,6 +8,7 @@
     SourceTable = "NPR TM Ticket Particpt. Wks.";
     UsageCategory = None;
     InsertAllowed = false;
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
 
     layout
     {

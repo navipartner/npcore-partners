@@ -6,6 +6,7 @@
     SourceTable = "NPR TM Seating Setup";
     UsageCategory = Administration;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
 
     layout
     {
