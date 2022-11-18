@@ -32,9 +32,11 @@ stages:
 
         - name: vLatest_CLOUD
           compareAppWithSpecificCompareAppVersion: true
+          alwaysRun: true
 
         - name: Insider_CLOUD
           compareAppWithSpecificCompareAppVersion: true
+          alwaysRun: true
                
     analyzers: ('AppSourceCop','UICop','CodeCop')
     keyVaultCert:
