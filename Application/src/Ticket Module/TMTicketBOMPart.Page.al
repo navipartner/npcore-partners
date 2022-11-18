@@ -5,6 +5,7 @@ page 6059885 "NPR TM Ticket BOM Part"
     UsageCategory = None;
     SourceTable = "NPR TM Ticket Admission BOM";
     CardPageId = "NPR TM Ticket BOM Card";
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
     layout
     {
         area(Content)

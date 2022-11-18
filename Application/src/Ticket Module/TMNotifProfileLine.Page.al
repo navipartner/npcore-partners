@@ -8,7 +8,7 @@
     ShowFilter = false;
     UsageCategory = None;
     DelayedInsert = true;
-
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
     layout
     {
         area(Content)

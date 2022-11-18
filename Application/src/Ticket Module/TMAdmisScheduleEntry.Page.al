@@ -8,6 +8,7 @@
     UsageCategory = Lists;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     PromotedActionCategories = 'New,Process,Report,Navigate';
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
 
     layout
     {

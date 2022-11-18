@@ -10,6 +10,7 @@
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     PromotedActionCategories = 'New,Process,Report,Navigate';
     InsertAllowed = false;
+    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
     layout
     {
         area(content)
