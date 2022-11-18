@@ -32,8 +32,10 @@ stages:
 
         - name: vLatest_CLOUD
           publishAppSourceOfferId: 'nb-retail-appsource'
+          alwaysRun: true
 
         - name: Insider_CLOUD
+          alwaysRun: true
         
       analyzers: ('UICop','CodeCop')
       keyVaultCert:
