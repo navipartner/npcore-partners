@@ -357,6 +357,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ITEMINVOV', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: ItemInv Overv.";
     }
+    value(67; TOPUP_VOUCHER)
+    {
+        Caption = 'TOPUP_VOUCHER', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NpRv POS Action Top-up";
+    }
     value(68; SALES_DOC_PRE_REFUND)
     {
         Caption = 'SALES_DOC_PRE_REFUND', Locked = true, MaxLength = 20;
