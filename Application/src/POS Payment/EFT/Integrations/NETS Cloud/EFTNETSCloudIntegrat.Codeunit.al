@@ -268,6 +268,11 @@
         if not EftTransactionRequest.IsType(IntegrationType()) then
             exit;
 
+        if EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::PAYMENT,
+                                                       EftTransactionRequest."Processing Type"::REFUND,
+                                                       EftTransactionRequest."Processing Type"::GIFTCARD_LOAD] then
+            exit; //printed from within workflow to avoid modal page on background task return
+
         if not Codeunit.Run(Codeunit::"NPR EFT Try Print Receipt", EftTransactionRequest) then
             Message(GetLastErrorText);
     end;
