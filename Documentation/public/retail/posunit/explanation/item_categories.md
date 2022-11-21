@@ -8,4 +8,4 @@ When defining a category, we can set various specificities using the **Item Temp
 
 ### Related links
 
-- [Item categories](../reference/item_categories_ref.md)
+- [Item categories (reference guide)](../reference/item_categories_ref.md)
