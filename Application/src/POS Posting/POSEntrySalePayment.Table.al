@@ -92,9 +92,21 @@ table 6014694 "NPR POS Entry Sale & Payment"
             Caption = 'Unit Price';
             DataClassification = CustomerContent;
         }
+        field(25; "VAT %"; Decimal)
+        {
+            Caption = 'VAT %';
+            DataClassification = CustomerContent;
+            BlankZero = true;
+        }
         field(26; "Line Discount %"; Decimal)
         {
             Caption = 'Line Discount %';
+            DataClassification = CustomerContent;
+            BlankZero = true;
+        }
+        field(28; "Line Discount Amount Incl. VAT"; Decimal)
+        {
+            Caption = 'Line Discount Amount';
             DataClassification = CustomerContent;
             BlankZero = true;
         }
@@ -108,6 +120,14 @@ table 6014694 "NPR POS Entry Sale & Payment"
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser";
+        }
+        field(52; "Post Item Entry Status"; Option)
+        {
+            Caption = 'Post Item Entry Status';
+            Editable = false;
+            DataClassification = CustomerContent;
+            OptionCaption = ' ,Unposted,Error while Posting,Posted,Not To Be Posted';
+            OptionMembers = ,Unposted,"Error while Posting",Posted,"Not To Be Posted";
         }
         field(600; "Entry Date"; Date)
         {
@@ -129,6 +149,12 @@ table 6014694 "NPR POS Entry Sale & Payment"
             Caption = 'Ending Time';
             Editable = false;
             FieldClass = FlowField;
+        }
+        field(5402; "Variant Code"; Code[10])
+        {
+            Caption = 'Variant Code';
+            DataClassification = CustomerContent;
+            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
         }
         field(5407; "Unit of Measure Code"; Code[10])
         {
