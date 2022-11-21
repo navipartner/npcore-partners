@@ -18,8 +18,7 @@ let main = async ({workflow, context, popup, parameters, captions}) => {
     }
     
     // Get account number and description from BC Lookup
-    if (paymentDetails.accountNumber == '') 
-        ({accountNumber: paymentDetails.accountNumber, description: paymentDetails.description} = await workflow.respond('GetAccount'));
+    ({accountNumber: paymentDetails.accountNumber, description: paymentDetails.description} = await workflow.respond('GetAccount'));
         
     // Prompt user for an alternative description 
     paymentDetails.description = await popup.input ({caption: 'Enter Description', title: '', value: paymentDetails.description});

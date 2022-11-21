@@ -52,7 +52,7 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
         if (AccountNo <> '') then
             GLAccount.Get(AccountNo)
         else
-            if PAGE.RunModal(PAGE::"NPR TouchScreen: G/L Accounts", GLAccount) <> ACTION::LookupOK then
+            if (Page.RunModal(PAGE::"NPR TouchScreen: G/L Accounts", GLAccount) <> ACTION::LookupOK) then
                 Error('');
 
         Response.Add('accountNumber', GLAccount."No.");
@@ -94,7 +94,7 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPayinPayout.Codeunit.js###
-'let main=async({workflow:n,context:o,popup:a,parameters:t,captions:i})=>{const e={accountNumber:t.FixedAccountCode??"",description:"<Specify payout description>",amount:o.suggestedAmount??0,reasonCode:t.FixedReasonCode??""};return e.amount==0&&(e.amount=await a.numpad({caption:i.amountLabel,title:""}),e.amount===null||e.amount==0)?{success:!1,endSale:!1}:(e.accountNumber==""&&({accountNumber:e.accountNumber,description:e.description}=await n.respond("GetAccount")),e.description=await a.input({caption:"Enter Description",title:"",value:e.description}),e.description===null?{success:!1,endSale:!1}:((t.LookupReasonCode??!1)&&({reasonCode:e.reasonCode}=await n.respond("GetReason"),e.reasonCode===null&&(e.reasonCode="")),await n.respond("HandlePayment",e)))};'
+'let main=async({workflow:n,context:o,popup:a,parameters:t,captions:i})=>{const e={accountNumber:t.FixedAccountCode??"",description:"<Specify payout description>",amount:o.suggestedAmount??0,reasonCode:t.FixedReasonCode??""};return e.amount==0&&(e.amount=await a.numpad({caption:i.amountLabel,title:""}),e.amount===null||e.amount==0)?{success:!1,endSale:!1}:({accountNumber:e.accountNumber,description:e.description}=await n.respond("GetAccount"),e.description=await a.input({caption:"Enter Description",title:"",value:e.description}),e.description===null?{success:!1,endSale:!1}:((t.LookupReasonCode??!1)&&({reasonCode:e.reasonCode}=await n.respond("GetReason"),e.reasonCode===null&&(e.reasonCode="")),await n.respond("HandlePayment",e)))};'
         );
     end;
 }
