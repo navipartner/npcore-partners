@@ -1,6 +1,7 @@
 # Welcome to the NP Retail product documentation
 
-NP Retail is a cloud-based solution that can be run on any hardware. It combines the POS system, financial management, accounting, management of orders and products, inventory management, reports and statistics in one comprehensive solution that facilitates business processes in small and mid-sized organizations. 
+NP Retail is a cloud-based solution that combines the POS system, financial management, accounting, management of orders and products, inventory management, reports and statistics in one comprehensive solution that facilitates business processes in small and mid-sized organizations. 
+
 
 ## Highlighted articles
 

@@ -48,6 +48,8 @@
     href: reference/cs-setup.md
   - name: Handling codeunits
     href: reference/handling_codeunits.md
+  - name: Recommended WMS hardware
+    href: reference/wms_hardware.md
 
 - name: Videos
   items:
