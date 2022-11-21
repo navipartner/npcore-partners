@@ -1,0 +1,22 @@
+﻿# GraphAPI Setup
+
+GraphAPI Setup is used in Event Management module. Setup is needed to send emails and event requests to participants using GraphAPI.
+Doing the GraphAPI setup is really easy if you need default values. Just open page GraphAPI Setup and run the wizard.
+
+![GraphAPI Setup](images\GraphAPISetup.PNG)
+
+Wizard will suggest default values and they can be used without changing.
+
+
+## **Important notice**
+
+Fields "Client Secret" and "Client Id" contains values that are stored in Azure KeyVault called "NPCore" and correct values are fetched when you run the wizard.
+Those values are defined in Azure App registration called "BC: Graph - Calendar".
+ 
+### **Secret expires ever 2 years and it needs to be refreshed in KeyVault**
+
+- Create new Secret in "Certificates & secrets" section and save the Value. 
+- Update secret "GraphAPISecret" in NPCore keyvault with newly created Value.
+
+
+
