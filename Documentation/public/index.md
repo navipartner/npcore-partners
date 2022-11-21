@@ -98,15 +98,15 @@
   <div class="descriptiontext">        
     <section> </br>
       <p>NaviPartner delivers unified solutions for vertical retail businesses, webshops, warehouses, museums, and attractions. This documentation is intended to assist you in using all of these solutions.</p> </br>
-      <p> The <a href="https://docs.navipartner.com/retail/gettingstarted/intro.html">NP Retail</a> is an extension for Microsoft Business Central that adds Point of Sale capabilities to the ERP system along with auxiliary features such as RFID warehousing, Member & Ticket management, Replenishment, Receipt/Label printing, Webshop integration and much more.</p>
+      <p> The <a href="https://docs.navipartner.com/retail/gettingstarted/intro.html">NP Retail</a> solution is an extension for Microsoft Business Central that adds Point of Sale capabilities to the ERP system along with auxiliary features such as RFID warehousing, Member & Ticket management, Replenishment, Receipt/Label printing, Webshop integration and much more.</p>
       <p> The <a href="https://docs.navipartner.com/ecommerce/intro.html">NP E-commerce</a> solution helps our customers build a foundation for a successful omnichannel online business.</p>
-      <p> The <a href="https://docs.navipartner.com/entertainment/intro.html">NP Entertainment</a> is all-in-one ticketing and membership management system that streamlines sales and validation of tickets and memberships.</p>
-      <p> The <a href="https://docs.navipartner.com/wms/intro.html">NP WMS</a> connects your inventory management in Business Central with your POS solution and your online store, and makes every item visible across the supply chain, distribution centers, and sales channels.</p>
-      <p> The <a href="https://docs.navipartner.com/power_bi/intro.html">Power BI</a> is an all-in-one tool that you can use to analyze data, create dashboards, reports, and provide services for individuals and teams. NaviPartner currently offers the NP Power BI for Retail solution.</p>
+      <p> The <a href="https://docs.navipartner.com/entertainment/intro.html">NP Entertainment</a> solution is an all-in-one ticketing and membership management system that streamlines sales and validation of tickets and memberships.</p>
+      <p> The <a href="https://docs.navipartner.com/wms/intro.html">NP WMS</a> solution connects the inventory management data in Business Central with your POS solution and your online stores, making each item visible across the supply chain, distribution centers, and sales channels.</p>
+      <p> The <a href="https://docs.navipartner.com/power_bi/intro.html">Power BI</a> solution is an all-in-one tool you can use to analyze data, create dashboards, reports, and provide services for individuals and teams. NaviPartner currently provides the NP Power BI for Retail and Entertainment solutions.</p>
       <p>The <a href="https://docs.navipartner.com/api/gettingstarted/intro.html">API documentation</a> comprises technical webservice references and a sandbox for testing purposes.</p>
       <p>The <a href="https://docs.navipartner.com/partner/intro.html">Partner</a> documentation consists of documentation intended for our partners.</p>
-      <p> The <a href="https://docs.navipartner.com/troubleshooting/intro.html">Troubleshooting</a> documentation which provides answers to some of the frequently asked questions.</p>
-      <p>The <a href="https://support.navipartner.com/">Old Documentation</a> section contains articles that have not yet been migrated to this format. As soon as all articles are rewritten and migrated here, the old documentation portal will be obsoleted</p>                           
+      <p> The <a href="https://docs.navipartner.com/troubleshooting/intro.html">Troubleshooting</a> documentation provides answers to some of our customers' frequently asked questions.</p>
+      <p>The <a href="https://support.navipartner.com/">Old Documentation</a> website contains articles that have not yet been migrated to this format. As soon as all articles are rewritten and migrated here, the old documentation portal will be obsoleted</p>                           
     </section>
   </div>
 </div>
