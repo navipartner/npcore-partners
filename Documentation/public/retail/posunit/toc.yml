@@ -18,20 +18,24 @@
     href: explanation/POS_store.md
   - name: Item AddOns
     href: explanation/item_addons.md
+  - name: Item categories
+    href: explanation/item_categories.md
 - name: Reference
   items:
-  - name: POS Audit Profile (Reference guide)
+  - name: POS Audit Profile (reference guide)
     href: reference/POS_audit_profile.md
-  - name: POS View Profile (Reference guide)
+  - name: POS View Profile (reference guide)
     href: reference/POS_view_profile.md
-  - name: POS Payment View Event Setup (Reference guide)
+  - name: POS Payment View Event Setup (reference guide)
     href: reference/POS_Payment_View_Event_Setup.md
-  - name: POS End of Day Profile (Reference guide)
+  - name: POS End of Day Profile (reference guide)
     href: reference/POS_End_of_Day_Profile.md
   - name: POS Display Profile
     href: reference/POS_Display_profile.md
   - name: Item AddOns (reference guide)
     href: reference/item_addons_ref.md
+  - name: Item categories (reference guide)
+    href: reference/item_categories_ref.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
