@@ -1,6 +1,6 @@
 ﻿page 6014694 "NPR GraphApi Setup Wizard"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'GraphApi Setup';
     PageType = NavigatePage;
     SourceTable = "NPR GraphApi Setup";
@@ -8,7 +8,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(StandardBanner)
             {
@@ -64,7 +64,6 @@
                 Caption = '';
                 InstructionalText = 'Enter paramateres of your Azure Application.';
                 Visible = Step2Visible;
-                //You might want to add fields here
 
                 field("Client Id"; Rec."Client Id")
                 {
@@ -128,7 +127,7 @@
     }
     actions
     {
-        area(processing)
+        area(Processing)
         {
             action(ActionBack)
             {
@@ -252,7 +251,7 @@
     begin
         if Backwards then
             Step := Step - 1
-        ELSE
+        else
             Step := Step + 1;
 
         EnableControls();
@@ -298,31 +297,31 @@
 
     local procedure LoadTopBanners();
     begin
-        if MediaRepositoryStandard.GET('AssistedSetup-NoText-400px.png', FORMAT(CurrentClientType())) AND
-           MediaRepositoryDone.GET('AssistedSetupDone-NoText-400px.png', FORMAT(CurrentClientType()))
+        if MediaRepositoryStandard.Get('AssistedSetup-NoText-400px.png', Format(CurrentClientType())) and
+           MediaRepositoryDone.Get('AssistedSetupDone-NoText-400px.png', Format(CurrentClientType()))
         then
-            if MediaResourcesStandard.GET(MediaRepositoryStandard."Media Resources Ref") AND
-               MediaResourcesDone.GET(MediaRepositoryDone."Media Resources Ref")
+            if MediaResourcesStandard.Get(MediaRepositoryStandard."Media Resources Ref") and
+               MediaResourcesDone.Get(MediaRepositoryDone."Media Resources Ref")
             then
                 TopBannerVisible := MediaResourcesDone."Media Reference".HasValue();
     end;
 
     local procedure SetDefaultsValues()
     var
-        ClientIdTxt: Label '476a0575-a8b3-4fcb-bb43-9d85ac787226', Locked = true;
-        ClientSecret: Label 'U7i_7F5SIvY_qrB.v0GYI0Ld39U.Nv36P.', Locked = true;
+        GraphAPIManagement: Codeunit "NPR Graph API Management";
         OAuthAuthorityUrlTxt: Label 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize', Locked = true;
         OAuthTokenUrlTxt: Label 'https://login.microsoftonline.com/common/oauth2/v2.0/token', Locked = true;
         GraphEventUrl: Label 'https://graph.microsoft.com/v1.0/me/events/', Locked = true;
         GraphMeUrl: Label 'https://graph.microsoft.com/v1.0/me', Locked = true;
     begin
-        Rec."Client Id" := ClientIdTxt;
-        Rec."Client Secret" := ClientSecret;
+        Rec."Client Id" := GraphAPIManagement.GetKeyVaultValue('GraphAPIClientId');
+        Rec."Client Secret" := GraphAPIManagement.GetKeyVaultValue('GraphAPISecret');
         Rec."OAuth Authority Url" := OAuthAuthorityUrlTxt;
         Rec."OAuth Token Url" := OAuthTokenUrlTxt;
         Rec."Graph Event Url" := GraphEventUrl;
         Rec."Graph Me Url" := GraphMeUrl;
     end;
+
 
 
 }

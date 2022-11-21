@@ -1,6 +1,7 @@
 ﻿codeunit 6014606 "NPR Graph API Management"
 {
     Access = Internal;
+
     var
         GraphApiSetup: Record "NPR GraphApi Setup";
 
@@ -14,6 +15,7 @@
 #ENDIF
         AccessToken, TokenCache, AuthCodeError : Text;
         AccesTokenMsg: Label 'Access token acquired.';
+        FailErr: Label 'Acquire token failed. Error message: %1';
     begin
         AddScopes(Scopes);
         GetTestGraphAPISetup();
@@ -22,7 +24,7 @@
         OAuth2.AcquireTokenAndTokenCacheByAuthorizationCode(GraphApiSetup."Client Id", GraphApiSetup."Client Secret", GraphApiSetup."OAuth Authority Url", RedirectURL, Scopes, PromptInteraction::Login, AccessToken, TokenCache, AuthCodeError);
 #ENDIF
         if (AccessToken = '') or (AuthCodeError <> '') then
-            Error(AuthCodeError);
+            Error(FailErr, AuthCodeError);
 
         SetAccessToken(EventExchIntEMail, AccessToken, GetRefreshTokenFromTokenCache(TokenCache));
 
@@ -189,23 +191,35 @@
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
         RefreshToken, NewRefreshToken : Text;
-        Scopes: List of [Text];
     begin
         GetTestGraphAPISetup();
-        AddScopes(Scopes);
         RefreshToken := EventExchIntEMail.GetRefreshToken();
+
         PrepareRefreshTokenRequest(RefreshToken, Client, RequestMessage);
 
-        if Client.Send(RequestMessage, ResponseMessage) then begin
-            GetTokensFromResponse(ResponseMessage, AccessToken, NewRefreshToken);
-        end else begin
+        if Client.Send(RequestMessage, ResponseMessage) then
+            if ResponseMessage.IsSuccessStatusCode() then
+                GetTokensFromResponse(ResponseMessage, AccessToken, NewRefreshToken)
+            else begin
+                if SecretProblem(ResponseMessage) then begin
+                    FetchNewSecret();
+
+                    PrepareRefreshTokenRequest(RefreshToken, Client, RequestMessage);
+
+                    if Client.Send(RequestMessage, ResponseMessage) then
+                        if ResponseMessage.IsSuccessStatusCode() then
+                            GetTokensFromResponse(ResponseMessage, AccessToken, NewRefreshToken)
+                end;
+            end;
+
+        if AccessToken = '' then begin
             LogResponse('Refresh Token', EventExchIntEMail."E-Mail", GraphApiSetup."OAuth Token Url", '', ResponseMessage);
+            Commit();
             exit;
         end;
 
         SetAccessToken(EventExchIntEMail, AccessToken, NewRefreshToken);
     end;
-
 
     internal procedure TestConnection(EventExchIntEMail: Record "NPR Event Exch. Int. E-Mail")
     var
@@ -377,10 +391,17 @@
     local procedure GetRefreshTokenRequest(RefreshToken: Text) Request: Text
     var
         TypeHelper: Codeunit "Type Helper";
+        RedirectURL: Text;
+#IF NOT BC17
+        OAuth2: Codeunit OAuth2;
+#ENDIF
     begin
+#IF NOT BC17
+        OAuth2.GetDefaultRedirectURL(RedirectURL);
+#ENDIF
         Request := StrSubstNo('client_id=%1', GraphApiSetup."Client Id");
         Request += '&scope=offline_access%20https%3A%2F%2Fgraph.microsoft.com%2FCalendars.ReadWrite';
-        Request += '&redirect_uri=https%3A%2F%2Flocalhost';
+        Request += StrSubstNo('&redirect_uri=%1', TypeHelper.UrlEncode(RedirectURL));
         Request += '&grant_type=refresh_token';
         Request += StrSubstNo('&client_secret=%1', GraphApiSetup."Client Secret");
         Request += StrSubstNo('&refresh_token=%1', TypeHelper.UrlEncode(RefreshToken));
@@ -400,6 +421,21 @@
         NewRefreshToken := JTRefreshToken.AsValue().AsText();
     end;
 
+    local procedure SecretProblem(ResponseMessage: HttpResponseMessage): Boolean
+    var
+        Response: Text;
+    begin
+        ResponseMessage.Content.ReadAs(Response);
+        exit((StrPos(Response, '7000222') > 0));
+    end;
+
+    local procedure FetchNewSecret()
+    begin
+        GraphApiSetup."Client Secret" := GetKeyVaultValue('GraphAPISecret');
+        GraphApiSetup.Modify();
+        Commit();
+    end;
+
 #IF BC17
     procedure RunGraphAPIWizard(GraphAPIWizard: Notification)
     var
@@ -416,4 +452,17 @@
         GuidedExperience.Run(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR GraphApi Setup Wizard");
     end;
 #ENDIF
+
+
+    procedure GetKeyVaultValue(KeyName: Text) Value: Text[50]
+    var
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        FetchedValue: Text;
+        FetchedTooLongErr: Label 'Fetched value is too long. Please contact administrator.';
+    begin
+        FetchedValue := AzureKeyVaultMgt.GetAzureKeyVaultSecret(KeyName);
+        if StrLen(FetchedValue) > 50 then
+            Error(FetchedTooLongErr);
+        Value := CopyStr(FetchedValue, 1, 50);
+    end;
 }
