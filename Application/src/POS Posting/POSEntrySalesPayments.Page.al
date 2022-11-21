@@ -77,6 +77,11 @@ page 6059982 "NPR POS Entry Sales & Payments"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Description 2 field.';
                 }
+                field("Variant Code"; Rec."Variant Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Variant Code field.';
+                }
                 field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = NPRRetail;
@@ -106,6 +111,21 @@ page 6059982 "NPR POS Entry Sales & Payments"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Unit Price field.';
+                }
+                field("Line Discount Amount Incl. VAT"; Rec."Line Discount Amount Incl. VAT")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Line Discount Amount field.';
+                }
+                field("VAT %"; Rec."VAT %")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the VAT % field.';
+                }
+                field("Post Item Entry Status"; Rec."Post Item Entry Status")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Post Item Entry Status field.';
                 }
             }
         }
@@ -207,6 +227,10 @@ page 6059982 "NPR POS Entry Sales & Payments"
                 Rec."Unit Price" := POSEntrySalesLine.Unit_Price;
                 Rec."Line Discount %" := POSEntrySalesLine.Line_Discount__;
                 Rec."Amount Incl. VAT" := POSEntrySalesLine.Amount_Incl__VAT;
+                Rec."Line Discount Amount Incl. VAT" := POSEntrySalesLine.Line_DIsc_Amount_Incl_Amount;
+                Rec."VAT %" := POSEntrySalesLine.Vat_Pct;
+                Rec."Variant Code" := POSEntrySalesLine.Variant_Code;
+                Rec."Post Item Entry Status" := POSEntrySalesLine.Item_Entry_Post_Status + 1;
                 Rec.Insert();
             end;
         end;
@@ -243,6 +267,7 @@ page 6059982 "NPR POS Entry Sales & Payments"
                 Rec."Unit Price" := POSEntryPaymentLine.Amount;
                 Rec."Line Discount %" := 0;
                 Rec."Amount Incl. VAT" := POSEntryPaymentLine.Amount__Sales_Currency_;
+
                 Rec.Insert();
             end;
         end;

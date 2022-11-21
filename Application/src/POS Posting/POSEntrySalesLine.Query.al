@@ -25,6 +25,16 @@ query 6014419 "NPR POS Entry Sales Line"
             column(Unit_Price; "Unit Price") { }
             column(Line_Discount__; "Line Discount %") { }
             column(Amount_Incl__VAT; "Amount Incl. VAT") { }
+            column(Line_DIsc_Amount_Incl_Amount; "Line Discount Amount Incl. VAT") { }
+            column(Vat_Pct; "VAT %") { }
+            column(Variant_Code; "Variant Code") { }
+
+            dataitem(NPR_POS_Entry; "NPR POS Entry")
+            {
+                DataItemLink = "Entry No." = NPR_POS_Entry_Sales_Line."POS Entry No.";
+                SqlJoinType = InnerJoin;
+                column(Item_Entry_Post_Status; "Post Item Entry Status") { }
+            }
         }
     }
 }
