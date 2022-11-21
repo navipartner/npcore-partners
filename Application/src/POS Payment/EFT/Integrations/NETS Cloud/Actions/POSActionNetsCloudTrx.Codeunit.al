@@ -39,7 +39,6 @@ codeunit 6059906 "NPR POS Action: NetsCloud Trx" implements "NPR IPOS Workflow"
         EntryNo: Integer;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Response: JsonObject;
-        SystemAppVersionCheck: Codeunit "NPR System App. Version Check";
         TrxErrorLbl: Label '%1 %2 failed\%3\%4';
         EFTNETSCloudIntegrat: Codeunit "NPR EFT NETSCloud Integrat.";
     begin
@@ -55,11 +54,12 @@ codeunit 6059906 "NPR POS Action: NetsCloud Trx" implements "NPR IPOS Workflow"
                 begin
                     EFTTransactionRequest.Get(EntryNo);
 
-                    if (not EftTransactionRequest.Successful) and (SystemAppVersionCheck.GetSystemAppVersion() >= SystemAppVersionCheck.GetVersionFromVersionSegments(17, 7)) then begin
-                        //Message crashes POS in BC17.0 - BC17.6
+                    if (not EftTransactionRequest.Successful) then
                         Message(TrxErrorLbl, EftTransactionRequest."Integration Type", Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
-                    end;
 
+                    Commit();
+                    if not Codeunit.Run(Codeunit::"NPR EFT Try Print Receipt", EftTransactionRequest) then
+                        Message(GetLastErrorText);
                     Commit();
                     EFTNETSCloudIntegrat.SignaturePrompt(EFTTransactionRequest);
 

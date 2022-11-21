@@ -430,7 +430,7 @@
         JSON.WriteTo(Body);
 
         Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, Token, GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
+        Response := InvokeAPI(Body, Token, GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 300 * 1000, true);
     end;
 
     [TryFunction]
@@ -489,7 +489,7 @@
         JSON.WriteTo(Body);
 
         Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, Token, GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
+        Response := InvokeAPI(Body, Token, GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 300 * 1000, true);
     end;
 
     [TryFunction]
@@ -504,7 +504,7 @@
         JSON.WriteTo(Body);
 
         Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, Token, GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
+        Response := InvokeAPI(Body, Token, GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 300 * 1000, true);
     end;
 
     [TryFunction]
@@ -520,7 +520,7 @@
         JSON.WriteTo(Body);
 
         Endpoint := StrSubstNo(EndpointLbl, EftTransactionRequest."Hardware ID");
-        Response := InvokeAPI(Body, Token, GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 600 * 1000, true);
+        Response := InvokeAPI(Body, Token, GetServiceURL(EftTransactionRequest), 'POST', Endpoint, 300 * 1000, true);
     end;
 
     [TryFunction]
