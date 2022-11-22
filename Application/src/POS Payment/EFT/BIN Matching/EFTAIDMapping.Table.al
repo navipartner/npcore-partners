@@ -3,7 +3,8 @@ table 6059783 "NPR EFT AID Mapping"
     Access = Internal;
     Caption = 'EFT Application ID Mapping';
     DataClassification = CustomerContent;
-    LookupPageID = "NPR EFT AID Mapping List";
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
 
     fields
     {
@@ -11,17 +12,30 @@ table 6059783 "NPR EFT AID Mapping"
         {
             Caption = 'ApplicationID';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
         }
-        field(2; "Description"; Text[50])
+        field(2; "Description"; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
         }
         field(3; "Bin Group Code"; Code[10])
         {
             Caption = 'Bin Group Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR EFT BIN Group";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
+        }
+        field(4; "RID"; Code[10])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Registered application provider ID';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
         }
     }
 
@@ -29,23 +43,13 @@ table 6059783 "NPR EFT AID Mapping"
     {
         key(Key1; "ApplicationID")
         {
-
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
+        }
+        key(Key2; RID)
+        {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
         }
     }
-
-    procedure RID(): Text
-    var
-        txt: Text;
-    begin
-        txt := Rec.ApplicationID;
-        exit(txt.Substring(1, 10));
-    end;
-
-    procedure PIX(): Text
-    var
-        txt: Text;
-    begin
-        txt := Rec.ApplicationID;
-        exit(txt.Substring(11));
-    end;
 }

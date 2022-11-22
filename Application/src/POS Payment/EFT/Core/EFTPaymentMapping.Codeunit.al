@@ -62,14 +62,17 @@
 
     local procedure MatchApplicationID(EFTTransactionRequest: Record "NPR EFT Transaction Request"; LocationCode: Text; var POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
-        EFTAidMap: Record "NPR EFT AID Mapping";
+        EFTAidMap: Record "NPR EFT Aid Rid Mapping";
         EFTBINGroup: Record "NPR EFT BIN Group";
         EFTBINGroupPaymentLink: Record "NPR EFT BIN Group Paym. Link";
     begin
         if EFTTransactionRequest."Card Application ID" = '' then
             exit(false);
-        if (not EFTAidMap.Get(EFTTransactionRequest."Card Application ID")) then
-            exit(false);
+        if (not EFTAidMap.Get(EFTTransactionRequest."Card Application ID")) then begin
+            EFTAidMap.SetFilter(RID, EFTTransactionRequest."Card Application ID".Substring(1, 10) + '*');
+            if (not EFTAidMap.FindFirst()) then
+                exit(false);
+        end;
         if not EFTBINGroup.Get(EFTAidMap."Bin Group Code") then
             exit(false);
 

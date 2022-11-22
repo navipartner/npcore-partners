@@ -50,6 +50,11 @@
                 ApplicationArea = NPRRetail;
 
             }
+            part(Control6060010; "NPR EFT AID Mapping List")
+            {
+                SubPageLink = "BIN Group Code" = FIELD(Code);
+                ApplicationArea = NPRRetail;
+            }
         }
     }
 }
