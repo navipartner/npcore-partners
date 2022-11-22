@@ -1,74 +1,49 @@
-﻿codeunit 6150802 "NPR POS Action: Run Page"
+﻿codeunit 6150802 "NPR POS Action: Run Page" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-    var
-        ActionDescription: Label 'This is a built-in action for running a page';
-        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Code[20]
     begin
-        exit('RUNPAGE');
+        exit(Format(Enum::"NPR POS Workflow"::RUNPAGE));
     end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('1', 'respond();');
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterIntegerParameter('PageId', 0);
-            Sender.RegisterBooleanParameter('RunModal', false);
-            Sender.RegisterIntegerParameter('TableID', 0);
-            Sender.RegisterTextParameter('TableView', '');
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', false, false)]
-    local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        JSON: Codeunit "NPR POS JSON Management";
-        PageId: Integer;
+        ActionDescription: Label 'This is a built-in action for running a page';
+        ParamPageId_CaptionLbl: Label 'Page ID';
+        ParamRunModal_CaptionLbl: Label 'RunModal';
+        ParamTableId_CaptionLbl: Label 'Table ID';
+        ParamTableView_CaptionLbl: Label 'Table View';
+    begin
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddIntegerParameter(ParamPageID_Name(), 0, ParamPageId_CaptionLbl, ParamPageId_CaptionLbl);
+        WorkflowConfig.AddIntegerParameter(ParamTableID_Name(), 0, ParamTableId_CaptionLbl, ParamTableId_CaptionLbl);
+        WorkflowConfig.AddTextParameter(ParamTableView_Name(), '', ParamTableView_CaptionLbl, ParamTableView_CaptionLbl);
+        WorkflowConfig.AddBooleanParameter(ParamRunModal_Name(), false, ParamRunModal_CaptionLbl, ParamRunModal_CaptionLbl);
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+        //###NPR_INJECT_FROM_FILE:POSActionRunPage.js###
+        'let main=async({})=>await workflow.respond();'
+        );
+    end;
+
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    var
+        BusinessLogicRun: Codeunit "NPR POS Action: Run Page-B";
         RunModal: Boolean;
-        TableID: Integer;
+        PageId: Integer;
+        TableId: Integer;
         TableView: Text;
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScopeParameters(ActionCode());
-
-        PageId := JSON.GetIntegerOrFail('PageId', StrSubstNo(ReadingErr, ActionCode()));
-        RunModal := JSON.GetBooleanOrFail('RunModal', StrSubstNo(ReadingErr, ActionCode()));
-        TableID := JSON.GetInteger('TableID');
-        TableView := JSON.GetString('TableView');
-        RunPage(PageId, RunModal, TableID, TableView);
-        Handled := true;
+        PageId := Context.GetIntegerParameter(ParamPageID_Name());
+        RunModal := Context.GetBooleanParameter(ParamRunModal_Name());
+        TableId := Context.GetIntegerParameter(ParamTableID_Name());
+        TableView := Context.GetStringParameter(ParamTableView_Name());
+        BusinessLogicRun.RunPage(PageId, RunModal, TableId, TableView);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, true)]
@@ -83,7 +58,7 @@
         POSParameterTableIDValue.SetRange(Code, POSParameterValue.Code);
         POSParameterTableIDValue.SetRange(ID, POSParameterValue.ID);
         POSParameterTableIDValue.SetRange("Record ID", POSParameterValue."Record ID");
-        POSParameterTableIDValue.SetRange(Name, 'TableID');
+        POSParameterTableIDValue.SetRange(Name, ParamTableID_Name());
         if POSParameterTableIDValue.FindFirst() then
             if Evaluate(TableID, POSParameterTableIDValue.Value) then
                 if TableID <> 0 then begin
@@ -106,7 +81,7 @@
             POSParameterTableIDValue.SetRange(Code, POSParameterValue.Code);
             POSParameterTableIDValue.SetRange(ID, POSParameterValue.ID);
             POSParameterTableIDValue.SetRange("Record ID", POSParameterValue."Record ID");
-            POSParameterTableIDValue.SetRange(Name, 'TableID');
+            POSParameterTableIDValue.SetRange(Name, ParamTableID_Name());
             if POSParameterTableIDValue.FindFirst() then
                 if Evaluate(TableID, POSParameterTableIDValue.Value) then
                     if TableID <> 0 then begin
@@ -117,28 +92,23 @@
         end;
     end;
 
-    local procedure RunPage(PageId: Integer; RunModal: Boolean; TableID: Integer; TableView: Text)
-    var
-        RecRef: RecordRef;
-        RecRefVar: Variant;
+    local procedure ParamTableID_Name(): Text[20]
     begin
-        if PageId = 0 then
-            exit;
+        exit('TableID');
+    end;
 
-        if (TableID = 0) or (TableView = '') then begin
-            if RunModal then
-                PAGE.RunModal(PageId)
-            else
-                PAGE.Run(PageId);
-        end else begin
-            RecRef.Open(TableID);
-            RecRef.SetView(TableView);
-            if RecRef.FindFirst() then;
-            RecRefVar := RecRef;
-            if RunModal then
-                PAGE.RunModal(PageId, RecRefVar)
-            else
-                PAGE.Run(PageId, RecRefVar);
-        end;
+    local procedure ParamPageID_Name(): Text[20]
+    begin
+        exit('PageId');
+    end;
+
+    local procedure ParamTableView_Name(): Text[20]
+    begin
+        exit('TableView');
+    end;
+
+    local procedure ParamRunModal_Name(): Text[20]
+    begin
+        exit('RunModal');
     end;
 }
