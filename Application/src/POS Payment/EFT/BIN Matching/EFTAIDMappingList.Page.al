@@ -2,11 +2,9 @@ page 6060010 "NPR EFT AID Mapping List"
 {
     Extensible = False;
     Caption = 'EFT AID Mapping List';
-    PageType = List;
-    SourceTable = "NPR EFT AID Mapping";
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
-
+    PageType = ListPart;
+    UsageCategory = none;
+    SourceTable = "NPR EFT Aid Rid Mapping";
 
     layout
     {
@@ -14,16 +12,15 @@ page 6060010 "NPR EFT AID Mapping List"
         {
             repeater(Group)
             {
-                field("ApplicationID"; Rec.ApplicationID)
+                field(RID; Rec.RID)
+                {
+                    ToolTip = 'The Registered application provider ID (RID) identifies a Card Scheme / Payment Network.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("ApplicationID"; Rec.AID)
                 {
 
                     ToolTip = 'Application ID (AID) is an identifier that can determine card scheme (e.g. VISA or MASTERCARD) and the specific product (e.g. credit or debit card)';
-                    ApplicationArea = NPRRetail;
-                }
-                field(Description; Rec.Description)
-                {
-
-                    ToolTip = 'Here you can specify a small helper text to distingush between AID';
                     ApplicationArea = NPRRetail;
                 }
                 field("Bin Group Code"; Rec."Bin Group Code")
