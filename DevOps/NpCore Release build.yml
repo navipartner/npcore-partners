@@ -31,7 +31,6 @@ stages:
         - name: BC1905
 
         - name: vLatest_CLOUD
-          publishAppSourceOfferId: 'nb-retail-appsource'
           alwaysRun: true
 
         - name: Insider_CLOUD
