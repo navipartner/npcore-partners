@@ -49,19 +49,6 @@
     {
         area(navigation)
         {
-            action(ImportFile)
-            {
-                Caption = 'Import File';
-                Image = Import;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                RunObject = XMLport "NPR EFT BIN Import";
-
-                ToolTip = 'Executes the Import File action';
-                ApplicationArea = NPRRetail;
-            }
             action(ShowAllRanges)
             {
                 Caption = 'Show All Ranges';
