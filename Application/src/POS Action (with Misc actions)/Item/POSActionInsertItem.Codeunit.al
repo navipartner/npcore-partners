@@ -72,7 +72,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
             'addSalesLine':
                 FrontEnd.WorkflowResponse(Step_AddSalesLine(Context, FrontEnd, Setup));
             'checkAvailability':
-                FrontEnd.WorkflowResponse(CheckAvailability(Context));
+                CheckAvailability(Context);
         end;
     end;
 
@@ -193,11 +193,13 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
             Response.Add('AddItemAddOn', true);
             BaseLineNo := POSActionInsertItemB.GetLineNo();
             Response.Add('BaseLineNo', BaseLineNo);
-        end;
+        end else
+            if not SkipItemAvailabilityCheck then
+                CheckAvailability(PosInventoryProfile, PosItemCheckAvail);
     end;
 
 
-    local procedure CheckAvailability(Context: Codeunit "NPR POS JSON Helper"): JsonObject
+    local procedure CheckAvailability(Context: Codeunit "NPR POS JSON Helper")
     var
         PosInventoryProfile: Record "NPR POS Inventory Profile";
         SkipItemAvailabilityCheck: Boolean;
@@ -209,10 +211,17 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         if not SkipItemAvailabilityCheck then begin
             POSSession.GetAvailabilityCheckState(PosItemCheckAvail);
             PosItemCheckAvail.GetPosInvtProfile(POSSession, PosInventoryProfile);
-            if PosInventoryProfile."Stockout Warning" then
-                PosItemCheckAvail.DefineScopeAndCheckAvailability(POSSession, false);
-            POSSession.ClearAvailabilityCheckState();
+            CheckAvailability(PosInventoryProfile, PosItemCheckAvail);
         end;
+    end;
+
+    local procedure CheckAvailability(PosInventoryProfile: Record "NPR POS Inventory Profile"; PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.")
+    var
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        if PosInventoryProfile."Stockout Warning" then
+            PosItemCheckAvail.DefineScopeAndCheckAvailability(POSSession, false);
+        POSSession.ClearAvailabilityCheckState();
     end;
 
     procedure ActionCode(): Text
@@ -397,7 +406,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionInsertItem.js###
-'let main=async({workflow:e,context:c,scope:S,popup:i,parameters:n,captions:t})=>{if(e.context.GetPrompt=!1,n.EditDescription&&(e.context.Desc1=await i.input({title:t.editDesc_title,caption:t.editDesc_lead,value:c.defaultDescription}),e.context.Desc1===null)||n.EditDescription2&&(e.context.Desc2=await i.input({title:t.editDesc2_title,caption:t.editDesc2_lead,value:c.defaultDescription}),e.context.Desc2===null))return" ";const{ItemGroupSale:l,useSpecTracking:a,GetPromptSerial:d,Success:u,AddItemAddOn:r,BaseLineNo:s}=await e.respond("addSalesLine");if(!u){if(e.context.GetPrompt=!0,l&&!n.usePreSetUnitPrice&&(e.context.UnitPrice=await i.numpad({title:t.UnitpriceTitle,caption:t.UnitPriceCaption}),e.context.UnitPrice===null)||a&&!n.SelectSerialNo&&(e.context.SerialNo=await i.input({title:t.itemTracking_title,caption:t.itemTracking_lead}),e.context.SerialNo===null)||!a&&d&&(e.context.SerialNo=await i.input({title:t.itemTracking_title,caption:t.itemTracking_lead}),e.context.SerialNo===null))return" ";e.context.useSpecTracking=a,await e.respond("addSalesLine")}r&&await e.run("RUN_ITEM_ADDONS",{context:{BaseLineNo:s},parameters:{SkipItemAvailabilityCheck:!0}}),await e.respond("checkAvailability")};'
+'let main=async({workflow:e,context:c,scope:S,popup:i,parameters:n,captions:t})=>{if(e.context.GetPrompt=!1,n.EditDescription&&(e.context.Desc1=await i.input({title:t.editDesc_title,caption:t.editDesc_lead,value:c.defaultDescription}),e.context.Desc1===null)||n.EditDescription2&&(e.context.Desc2=await i.input({title:t.editDesc2_title,caption:t.editDesc2_lead,value:c.defaultDescription}),e.context.Desc2===null))return" ";const{ItemGroupSale:l,useSpecTracking:a,GetPromptSerial:d,Success:u,AddItemAddOn:r,BaseLineNo:s}=await e.respond("addSalesLine");if(!u){if(e.context.GetPrompt=!0,l&&!n.usePreSetUnitPrice&&(e.context.UnitPrice=await i.numpad({title:t.UnitpriceTitle,caption:t.UnitPriceCaption}),e.context.UnitPrice===null)||a&&!n.SelectSerialNo&&(e.context.SerialNo=await i.input({title:t.itemTracking_title,caption:t.itemTracking_lead}),e.context.SerialNo===null)||!a&&d&&(e.context.SerialNo=await i.input({title:t.itemTracking_title,caption:t.itemTracking_lead}),e.context.SerialNo===null))return" ";e.context.useSpecTracking=a,await e.respond("addSalesLine")}r&&(await e.run("RUN_ITEM_ADDONS",{context:{BaseLineNo:s},parameters:{SkipItemAvailabilityCheck:!0}}),await e.respond("checkAvailability"))};'
         );
     end;
 

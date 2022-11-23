@@ -16,7 +16,7 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
         }
     }
 
-    const { ItemGroupSale, useSpecTracking, GetPromptSerial, Success, AddItemAddOn, BaseLineNo} = await workflow.respond("addSalesLine");
+    const { ItemGroupSale, useSpecTracking, GetPromptSerial, Success, AddItemAddOn, BaseLineNo } = await workflow.respond("addSalesLine");
 
     if (!Success) {
         workflow.context.GetPrompt = true;
@@ -45,12 +45,8 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
         await workflow.respond("addSalesLine");
     }
 
-    if(AddItemAddOn){
-        
-        await workflow.run('RUN_ITEM_ADDONS', {context:{BaseLineNo: BaseLineNo},parameters:{SkipItemAvailabilityCheck:true}});
-  
+    if (AddItemAddOn) {
+        await workflow.run('RUN_ITEM_ADDONS', { context: { BaseLineNo: BaseLineNo }, parameters: { SkipItemAvailabilityCheck: true } });
+        await workflow.respond("checkAvailability");
     }
-
-    await workflow.respond("checkAvailability");
-
 }
