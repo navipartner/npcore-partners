@@ -104,19 +104,15 @@ codeunit 6059818 "NPR POS Statistics Mgt."
 
     local procedure FillDataCurrentDay(var POSTurnoverCalcBuffer: Record "NPR POS Turnover Calc. Buffer"; BaseDate: Date)
     var
-        FromDateCurrent: Date;
-        ToDateCurrent: Date;
-        FromDateLast: Date;
-        ToDateLast: Date;
-        DayLastText: Label 'Day - This Current';
+        DateCurrent: Date;
+        DateLast: Date;
+        DayCurrentText: Label 'Day - This Current';
     begin
-        FromDateCurrent := BaseDate;
-        ToDateCurrent := FromDateCurrent;
-        FromDateLast := CalcDate('<-1Y>', BaseDate);
-        ToDateLast := FromDateLast;
+        DateCurrent := BaseDate;
+        DateLast := CalcDate('<-1Y>', BaseDate);
 
-        CreateHeaderRow(POSTurnoverCalcBuffer, DayLastText, Format(FromDateCurrent), Format(FromDateLast));
-        CreateDataBlock(POSTurnoverCalcBuffer, FromDateCurrent, ToDateCurrent, FromDateLast, ToDateLast);
+        CreateHeaderRow(POSTurnoverCalcBuffer, DayCurrentText, Format(DateCurrent), Format(DateLast));
+        CreateDataBlockDay(POSTurnoverCalcBuffer, DateCurrent, DateLast);
     end;
 
     local procedure FillDataCurrentWeek(var POSTurnoverCalcBuffer: Record "NPR POS Turnover Calc. Buffer"; BaseDate: Date)
@@ -255,6 +251,31 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         CreateBuffer(POSTurnoverCalcBuffer, false, ProfitPctText, FormatDecimal(ProfitPctCurrent), FormatDecimal(ProfitAmountLast), CalcAndFormatDiff(ProfitPctCurrent, ProfitPctLast), StrongLbl);
     end;
 
+    local procedure CreateDataBlockDay(var POSTurnoverCalcBuffer: Record "NPR POS Turnover Calc. Buffer"; DateCurrent: Date; DateLast: Date)
+    var
+        NetAmountCurrent: Decimal;
+        CostAmountCurrent: Decimal;
+        ProfitAmountCurrent: Decimal;
+        ProfitPctCurrent: Decimal;
+        NetAmountLast: Decimal;
+        CostAmountLast: Decimal;
+        ProfitAmountLast: Decimal;
+        ProfitPctLast: Decimal;
+        StrongLbl: Label 'Strong';
+        NetText: Label 'Net';
+        CostOfSalesText: Label 'Cost of Sales';
+        ProfitText: Label 'Profit';
+        ProfitPctText: Label 'Profit %';
+    begin
+        CalcRowDataCurrentDay(DateCurrent, NetAmountCurrent, CostAmountCurrent, ProfitAmountCurrent, ProfitPctCurrent);
+        CalcRowData(DateLast, DateLast, NetAmountLast, CostAmountLast, ProfitAmountLast, ProfitPctLast);
+
+        CreateBuffer(POSTurnoverCalcBuffer, false, NetText, FormatDecimal(NetAmountCurrent), FormatDecimal(NetAmountLast), CalcAndFormatDiff(NetAmountCurrent, NetAmountLast), StrongLbl);
+        CreateBuffer(POSTurnoverCalcBuffer, false, CostOfSalesText, FormatDecimal(CostAmountCurrent), FormatDecimal(CostAmountLast), CalcAndFormatDiff(CostAmountCurrent, CostAmountLast), StrongLbl);
+        CreateBuffer(POSTurnoverCalcBuffer, false, ProfitText, FormatDecimal(ProfitAmountCurrent), FormatDecimal(ProfitAmountLast), CalcAndFormatDiff(ProfitAmountCurrent, ProfitAmountLast), StrongLbl);
+        CreateBuffer(POSTurnoverCalcBuffer, false, ProfitPctText, FormatDecimal(ProfitPctCurrent), FormatDecimal(ProfitAmountLast), CalcAndFormatDiff(ProfitPctCurrent, ProfitPctLast), StrongLbl);
+    end;
+
     local procedure CreateBuffer(var POSTurnoverCalcBuffer: Record "NPR POS Turnover Calc. Buffer"; IsHeader: Boolean; Description: Text[50]; Current: Text[100]; Last: Text[100]; Diff: Text[100]; RowStyle: Text[20])
     begin
         POSTurnoverCalcBuffer.Init();
@@ -284,6 +305,48 @@ codeunit 6059818 "NPR POS Statistics Mgt."
 
         if CostOfSalesAmount <> 0 then
             ProfitPct := Round(100 * ProfitAmount / CostOfSalesAmount, 2);
+    end;
+
+    local procedure CalcRowDataCurrentDay(BaseDate: Date; var NetAmount: Decimal; var CostOfSalesAmount: Decimal; var ProfitAmount: Decimal; var ProfitPct: Decimal)
+    begin
+        NetAmount := 0;
+        CostOfSalesAmount := 0;
+        ProfitAmount := 0;
+
+        CalcDirectSaleAmountsCurrent(BaseDate, NetAmount, CostOfSalesAmount);
+        CalcCreditSaleInvoiceAmounts(BaseDate, BaseDate, NetAmount, CostOfSalesAmount);
+        CalcCreditSaleCrMemoAmounts(BaseDate, BaseDate, NetAmount, CostOfSalesAmount);
+
+        ProfitAmount := NetAmount - CostOfSalesAmount;
+
+        if CostOfSalesAmount <> 0 then
+            ProfitPct := Round(100 * ProfitAmount / CostOfSalesAmount, 2);
+    end;
+
+    local procedure CalcDirectSaleAmountsCurrent(BaseDate: Date; var NetAmount: Decimal; var CostOfSalesAmount: Decimal)
+    var
+        POSEntry: Record "NPR POS Entry";
+        SalesLineEntry: Record "NPR POS Entry Sales Line";
+    begin
+        POSEntry.SetLoadFields("Amount Excl. Tax");
+        if POSStoreCode <> '' then
+            POSEntry.SetRange("POS Store Code", POSStoreCode);
+        if POSUnitNo <> '' then
+            POSEntry.SetRange("POS Unit No.", POSUnitNo);
+        POSEntry.SetRange("Entry Date", BaseDate);
+
+        if POSEntry.FindSet() then begin
+            repeat
+                NetAmount += POSEntry."Amount Excl. Tax";
+
+                SalesLineEntry.SetLoadFields(Quantity, "Unit Cost");
+                SalesLineEntry.SetRange("POS Entry No.", POSEntry."Entry No.");
+                if SalesLineEntry.FindSet() then
+                    repeat
+                        CostOfSalesAmount += SalesLineEntry."Unit Cost" * SalesLineEntry.Quantity;
+                    until SalesLineEntry.Next() = 0;
+            until POSEntry.Next() = 0;
+        end;
     end;
 
     local procedure CalcDirectSaleAmounts(FromDate: Date; ToDate: Date; var NetAmount: Decimal; var CostOfSalesAmount: Decimal)
