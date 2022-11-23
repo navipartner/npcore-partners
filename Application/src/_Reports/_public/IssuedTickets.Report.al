@@ -1,14 +1,23 @@
 ﻿report 6014413 "NPR Issued Tickets"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
-    DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Issued Tickets.rdlc';
+#if not BC17 
+#if BC18 or BC19
+    Extensible = false;
+#else
+    Extensible = true;
+#endif
+#endif
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Issued Tickets';
     DataAccessIntent = ReadOnly;
+#if BC17 or BC18 or BC19
+    DefaultLayout = RDLC;
+    RDLCLayout = './src/_Reports/layouts/Issued Tickets.rdlc';
+#else
+    DefaultRenderingLayout = "RDLC Layout";
+#endif
+
     dataset
     {
         dataitem("TM Ticket"; "NPR TM Ticket")
@@ -55,10 +64,30 @@
             }
         }
     }
+
     requestpage
     {
         SaveValues = true;
     }
+
+#if not (BC17 or BC18 or BC19)
+    rendering
+    {
+        layout("RDLC Layout")
+        {
+            Caption = 'RDLC layout';
+            LayoutFile = './src/_Reports/layouts/Issued Tickets.rdlc';
+            Type = RDLC;
+        }
+        layout("Excel Layout")
+        {
+            Caption = 'Excel layout';
+            LayoutFile = './src/_Reports/layouts/Issued Tickets.xlsx';
+            Type = Excel;
+        }
+    }
+#endif
+
     labels
     {
         PageLbl = 'Page';
