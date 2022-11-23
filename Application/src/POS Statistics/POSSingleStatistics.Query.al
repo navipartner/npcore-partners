@@ -3,7 +3,6 @@ query 6014414 "NPR POS Single Statistics"
     Access = Internal;
     QueryType = Normal;
     Caption = 'POS Single Statistics';
-
     elements
     {
         dataitem(POS_Entry; "NPR POS Entry")

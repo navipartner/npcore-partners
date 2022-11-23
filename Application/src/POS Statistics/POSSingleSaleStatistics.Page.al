@@ -30,7 +30,6 @@ page 6059861 "NPR POS Single Sale Statistics"
                         POSEntry.FilterGroup(2);
                         POSEntry.SetRange("POS Unit No.", Rec."POS Unit No.");
                         POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale");
-                        POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Posted);
                         POSEntry.FilterGroup(0);
 
                         if Page.RunModal(Page::"NPR POS Entry List", POSEntry) = Action::LookupOK then begin
