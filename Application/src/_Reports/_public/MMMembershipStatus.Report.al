@@ -1,14 +1,22 @@
 ﻿report 6060132 "NPR MM Membership Status"
 {
-#IF NOT BC17
-    Extensible = False; 
-#ENDIF
-    DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/MM Membership Status.rdlc';
+#if not BC17 
+#if BC18 or BC19
+    Extensible = false;
+#else
+    Extensible = true;
+#endif
+#endif
     Caption = 'Membership Status';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     DataAccessIntent = ReadOnly;
+#if BC17 or BC18 or BC19
+    DefaultLayout = RDLC;
+    RDLCLayout = './src/_Reports/layouts/MM Membership Status.rdlc';
+#else
+    DefaultRenderingLayout = "RDLC Layout";
+#endif
 
     dataset
     {
@@ -259,9 +267,24 @@
         }
     }
 
-    labels
+#if not (BC17 or BC18 or BC19)
+    rendering
     {
+        layout("RDLC Layout")
+        {
+            Caption = 'RDLC layout';
+            LayoutFile = './src/_Reports/layouts/MM Membership Status.rdlc';
+            Type = RDLC;
+        }
+        layout("Excel Layout")
+        {
+            Caption = 'Excel layout';
+            LayoutFile = './src/_Reports/layouts/MM Membership Status.xlsx';
+            Type = Excel;
+        }
     }
+
+#endif
 
     trigger OnInitReport()
     begin
