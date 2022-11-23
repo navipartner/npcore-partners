@@ -14,7 +14,7 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         POSSingleStatsBuffer."Sales Quantity" := POSEntry."Sales Quantity";
         POSSingleStatsBuffer."Return Sales Quantity" := POSEntry."Return Sales Quantity";
 
-        GetAmountData(POSEntry."Entry No.", POSSingleStatsBuffer);
+        GetAmountData(POSEntry, POSSingleStatsBuffer);
 
         POSSingleStatsBuffer.Insert();
     end;
@@ -55,20 +55,24 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         POSEntry.SetLoadFields("Document No.", "POS Unit No.", "Discount Amount", "Tax Amount", "Amount Incl. Tax", "Sales Quantity", "Return Sales Quantity");
         POSEntry.SetRange("POS Unit No.", POSUnitNo);
         POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale");
-        POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Posted);
 
         exit(POSEntry.FindLast());
     end;
 
-    local procedure GetAmountData(EntryNo: Integer; var POSSingleStatsBuffer: Record "NPR POS Single Stats Buffer")
+    local procedure GetAmountData(POSEntry: Record "NPR POS Entry"; var POSSingleStatsBuffer: Record "NPR POS Single Stats Buffer")
     var
         POSSingleStatsQuery: Query "NPR POS Single Statistics";
     begin
-        POSSingleStatsQuery.SetRange("Entry_No_", EntryNo);
-        POSSingleStatsQuery.Open();
-        while POSSingleStatsQuery.Read() do begin
-            POSSingleStatsBuffer."Cost Amount" -= POSSingleStatsQuery.Cost_Amount_Actual;
-            POSSingleStatsBuffer."Sales Amount" += POSSingleStatsQuery.Sales_Amount_Actual;
+        if POSEntry."Post Entry Status" = POSEntry."Post Entry Status"::Posted then begin
+            POSSingleStatsQuery.SetRange("Entry_No_", POSEntry."Entry No.");
+            POSSingleStatsQuery.Open();
+            while POSSingleStatsQuery.Read() do begin
+                POSSingleStatsBuffer."Cost Amount" -= POSSingleStatsQuery.Cost_Amount_Actual;
+                POSSingleStatsBuffer."Sales Amount" += POSSingleStatsQuery.Sales_Amount_Actual;
+            end;
+        end else begin
+            POSSingleStatsBuffer."Sales Amount" := POSEntry."Amount Excl. Tax";
+            POSSingleStatsBuffer."Cost Amount" := GetCostAmountFromLineEntry(POSEntry);
         end;
 
         if POSSingleStatsBuffer."Sales Amount" <> 0 then
@@ -406,6 +410,29 @@ codeunit 6059818 "NPR POS Statistics Mgt."
             Cost := Item."Last Direct Cost"
         else
             Cost := Item."Unit Cost";
+    end;
+
+    local procedure GetCostAmountFromLineEntry(POSEntry: Record "NPR POS Entry"): Decimal
+    var
+        SalesLineEntry: Record "NPR POS Entry Sales Line";
+        Item: Record Item;
+        CostAmount: Decimal;
+    begin
+        SalesLineEntry.SetLoadFields(Type, "No.", Quantity, "Unit Cost");
+        SalesLineEntry.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if SalesLineEntry.FindSet() then
+            repeat
+                if SalesLineEntry.Type = SalesLineEntry.Type::Item then begin
+                    Item.SetLoadFields("Last Direct Cost", "Unit Cost");
+                    Item.Get(SalesLineEntry."No.");
+                    if Item."Last Direct Cost" <> 0 then
+                        CostAmount += Item."Last Direct Cost" * SalesLineEntry.Quantity
+                    else
+                        CostAmount += Item."Unit Cost" * SalesLineEntry.Quantity;
+                end else
+                    CostAmount += SalesLineEntry."Unit Cost" * SalesLineEntry.Quantity;
+            until SalesLineEntry.Next() = 0;
+        exit(CostAmount);
     end;
 
     procedure FillSalePersonTop20(var SalespersonStatsBuffer: Record "NPR POS Salesperson St Buffer" temporary; FromDate: Date; ToDate: Date)
