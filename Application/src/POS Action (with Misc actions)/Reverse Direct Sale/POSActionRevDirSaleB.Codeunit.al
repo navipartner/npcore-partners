@@ -24,13 +24,13 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
 
         POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
         POSEntry.SetRange("Document No.", SalesTicketNo);
-        if (not POSEntry.FindFirst()) then
+        if POSEntry.IsEmpty() then
             Error(NotFoundErr, SalesTicketNo);
 
         if (IsCompleteReversal(SalesTicketNo)) then
             Error(NothingToReturnErr, SalesTicketNo);
 
-        OnBeforeReverseSalesTicket(POSEntry."Document No.");
+        OnBeforeReverseSalesTicket(SalesTicketNo);
     end;
 
     local procedure CopySalesReceiptForReversal(SalesTicketNo: Code[20]; ObfucationMethod: Option "None",MI; CopyHeaderDim: Boolean; ReturnReasonCode: Code[20])
@@ -184,12 +184,14 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         POSSalesLine: Record "NPR POS Entry Sales Line";
         ItemQty: Decimal;
     begin
-        PosRmaLine.SetFilter("Sales Ticket No.", '=%1', SalesTicketNo);
+        PosRmaLine.SetRange("Sales Ticket No.", SalesTicketNo);
         if (PosRmaLine.IsEmpty()) then
             exit(false); // No return sales for this register yet
 
-        POSSalesLine.SetFilter("Document No.", '=%1', SalesTicketNo);
-        POSSalesLine.SetFilter(Type, '=%1', POSSalesLine.Type::Item);
+        POSSalesLine.SetCurrentKey(Type, "No.", "Document No.");
+        POSSalesLine.SetLoadFields("No.");
+        POSSalesLine.SetRange("Document No.", SalesTicketNo);
+        POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
 
         if (POSSalesLine.FindSet()) then begin
             repeat
