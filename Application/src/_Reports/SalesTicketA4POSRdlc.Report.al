@@ -20,20 +20,22 @@
             {
                 IncludeCaption = true;
             }
-
-            column(Phone_No_CompanyInformation; CompanyInformation."Phone No.")
-            {
-                IncludeCaption = true;
-            }
-            column(E_Mail_CompanyInformation; CompanyInformation."E-Mail")
-            {
-                IncludeCaption = true;
-            }
-            column(Home_Page_CompanyInformation; CompanyInformation."Home Page")
-            {
-                IncludeCaption = true;
-            }
             column(VAT_Registration_No_CompanyInformation; CompanyInformation."VAT Registration No.")
+            {
+                IncludeCaption = true;
+            }
+        }
+        dataitem("POSStoreInfo"; "NPR POS Store")
+        {
+            column(Phone_No_CompanyInformation; POSStoreInfo."Phone No.")
+            {
+                IncludeCaption = true;
+            }
+            column(E_Mail_CompanyInformation; POSStoreInfo."E-Mail")
+            {
+                IncludeCaption = true;
+            }
+            column(Home_Page_CompanyInformation; POSStoreInfo."Home Page")
             {
                 IncludeCaption = true;
             }
