@@ -2414,16 +2414,16 @@
             exit;
         if "Variant Code" <> '' then begin
             ItemVariant.Get(Item."No.", "Variant Code");
-            Description := ItemVariant.Description;
-            "Description 2" := ItemVariant."Description 2";
+            Description := CopyStr(ItemVariant.Description, 1, MaxStrLen(Rec.Description));
+            "Description 2" := CopyStr(ItemVariant."Description 2", 1, MaxStrLen(Rec."Description 2"));
             if NPRVarietySetup.Get() then
                 if NPRVarietySetup."Custom Descriptions" then begin
-                    Description := Item.Description;
-                    "Description 2" := ItemVariant.Description;
+                    Description := CopyStr(Item.Description, 1, MaxStrLen(Rec.Description));
+                    "Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen(Rec."Description 2"));
                 end;
         end else begin
-            Description := Item.Description;
-            "Description 2" := Item."Description 2";
+            Description := CopyStr(Item.Description, 1, MaxStrLen(Rec.Description));
+            "Description 2" := CopyStr(Item."Description 2", 1, MaxStrLen(Rec."Description 2"));
         end;
     end;
 
