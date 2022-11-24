@@ -6,13 +6,8 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
         ParameterOperation_OptionsLbl: Label 'Attach,Remove', Locked = true;
 
     local procedure ActionCode(): Code[20]
-    var
-        OrdinalIndex: Integer;
-        EnumValueName: Text;
     begin
-        OrdinalIndex := Enum::"NPR POS Workflow".Ordinals().IndexOf(Enum::"NPR POS Workflow"::CUSTOMER_SELECT.AsInteger());
-        Enum::"NPR POS Workflow".Names().Get(OrdinalIndex, EnumValueName);
-        exit(UpperCase(CopyStr(EnumValueName, 1, 20)));
+        exit(Format(enum::"NPR POS Workflow"::CUSTOMER_SELECT));
     end;
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
@@ -47,7 +42,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
     local procedure GetActionScript(): Text
     begin
         exit(
-            //###NPR_INJECT_FROM_FILE:POSActionCustSelect.js###
+//###NPR_INJECT_FROM_FILE:POSActionCustSelect.js###
 'let main=async({})=>await workflow.respond();'
         );
     end;
