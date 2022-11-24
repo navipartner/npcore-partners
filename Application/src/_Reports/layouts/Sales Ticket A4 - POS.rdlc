@@ -6963,6 +6963,15 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
       </DefaultValue>
       <Prompt>Picture_CompanyInformationCaption</Prompt>
     </ReportParameter>
+    <ReportParameter Name="VAT_Registration_No_CompanyInformationCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>VAT_Registration_No_CompanyInformationCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>VAT_Registration_No_CompanyInformationCaption</Prompt>
+    </ReportParameter>
     <ReportParameter Name="Phone_No_CompanyInformationCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -6989,15 +6998,6 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
         </Values>
       </DefaultValue>
       <Prompt>Home_Page_CompanyInformationCaption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="VAT_Registration_No_CompanyInformationCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>VAT_Registration_No_CompanyInformationCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>VAT_Registration_No_CompanyInformationCaption</Prompt>
     </ReportParameter>
     <ReportParameter Name="Document_No_POS_EntryCaption">
       <DataType>String</DataType>
@@ -7244,22 +7244,22 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>13</RowIndex>
-          <ParameterName>Phone_No_CompanyInformationCaption</ParameterName>
+          <ParameterName>VAT_Registration_No_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>14</RowIndex>
-          <ParameterName>E_Mail_CompanyInformationCaption</ParameterName>
+          <ParameterName>Phone_No_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>15</RowIndex>
-          <ParameterName>Home_Page_CompanyInformationCaption</ParameterName>
+          <ParameterName>E_Mail_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>16</RowIndex>
-          <ParameterName>VAT_Registration_No_CompanyInformationCaption</ParameterName>
+          <ParameterName>Home_Page_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -7478,6 +7478,9 @@ End Function</Code>
         <Field Name="Picture_CompanyInformation">
           <DataField>Picture_CompanyInformation</DataField>
         </Field>
+        <Field Name="VAT_Registration_No_CompanyInformation">
+          <DataField>VAT_Registration_No_CompanyInformation</DataField>
+        </Field>
         <Field Name="Phone_No_CompanyInformation">
           <DataField>Phone_No_CompanyInformation</DataField>
         </Field>
@@ -7486,9 +7489,6 @@ End Function</Code>
         </Field>
         <Field Name="Home_Page_CompanyInformation">
           <DataField>Home_Page_CompanyInformation</DataField>
-        </Field>
-        <Field Name="VAT_Registration_No_CompanyInformation">
-          <DataField>VAT_Registration_No_CompanyInformation</DataField>
         </Field>
         <Field Name="Entry_Date_POS_Entry">
           <DataField>Entry_Date_POS_Entry</DataField>
