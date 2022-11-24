@@ -244,7 +244,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         exit(ItemTrackingCode."SN Sales Outbound Tracking");
     end;
 
-    procedure SerialNumberCanBeUsedForItem(var ItemRef: Record "Item Reference"; SerialNumber: Code[20]; var UserInformationErrorWarning: Text; SerialSelectionFromList: Boolean) CanBeUsed: Boolean
+    procedure SerialNumberCanBeUsedForItem(var ItemRef: Record "Item Reference"; SerialNumber: Code[50]; var UserInformationErrorWarning: Text; SerialSelectionFromList: Boolean) CanBeUsed: Boolean
     var
         Item: Record Item;
         ItemTrackingCode: Record "Item Tracking Code";
