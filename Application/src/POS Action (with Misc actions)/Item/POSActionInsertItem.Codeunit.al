@@ -84,7 +84,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     local procedure Step_AddSalesLine(Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
     var
         UseSpecificTracking: Boolean;
-        InputSerial: Code[20];
+        InputSerial: Code[50];
         UnitPrice: Decimal;
         ItemIdentifier: Text;
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
@@ -153,7 +153,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         If Not Success then
             If Context.GetBoolean('GetPrompt') = true then begin
                 if SerialSelectionFromList then begin
-                    while not POSActionInsertItemB.SerialNumberCanBeUsedForItem(ItemReference, CopyStr(SerialNumberInput, 1, 20), UserInformationErrorWarning, SerialSelectionFromList) do begin
+                    while not POSActionInsertItemB.SerialNumberCanBeUsedForItem(ItemReference, CopyStr(SerialNumberInput, 1, MaxStrLen(InputSerial)), UserInformationErrorWarning, SerialSelectionFromList) do begin
                         if SerialNumberInput <> '' then
                             Message(UserInformationErrorWarning);
                         SerialNumberInput := '';
@@ -163,7 +163,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                             Error('');
                     end;
                 end else
-                    if not POSActionInsertItemB.SerialNumberCanBeUsedForItem(ItemReference, CopyStr(SerialNumberInput, 1, 20), UserInformationErrorWarning, SerialSelectionFromList) then begin
+                    if not POSActionInsertItemB.SerialNumberCanBeUsedForItem(ItemReference, CopyStr(SerialNumberInput, 1, MaxStrLen(InputSerial)), UserInformationErrorWarning, SerialSelectionFromList) then begin
                         SerialNumberInput := '';
                     end;
                 ValidatedVariantCode := ItemReference."Variant Code";
