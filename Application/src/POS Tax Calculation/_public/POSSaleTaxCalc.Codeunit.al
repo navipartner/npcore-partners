@@ -18,8 +18,8 @@
     var
         POSSaleTax: Record "NPR POS Sale Tax";
     begin
-        if Find(POSSaleTax, SourceRecSysId) then
-            POSSaleTax.Delete(true);
+        if not IsEmpty(POSSaleTax, SourceRecSysId) then
+            POSSaleTax.DeleteAll(true);
     end;
 
     internal procedure DeleteAllLines(POSSaleTax: Record "NPR POS Sale Tax")
@@ -48,6 +48,13 @@
     begin
         POSSaleTax."Source Rec. System Id" := SourceRecSysId;
         exit(POSSaleTax.Find());
+    end;
+
+    internal procedure IsEmpty(var POSSaleTax: Record "NPR POS Sale Tax"; SourceRecSysId: Guid): Boolean
+    begin
+        POSSaleTax.Reset();
+        POSSaleTax.SetRange("Source Rec. System Id", SourceRecSysId);
+        exit(POSSaleTax.IsEmpty());
     end;
 
     internal procedure GetCurrency(var Currency: Record Currency; CurrencyCode: Code[10])
