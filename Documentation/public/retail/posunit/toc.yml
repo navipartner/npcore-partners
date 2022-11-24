@@ -88,3 +88,5 @@
     href: howto/pos_self_service_prof.md
   - name: Set up salespeople/purchasers
     href: howto/salespeople_setup.md
+  - name: Create a POS theme
+    href: howto/pos_theme.md
