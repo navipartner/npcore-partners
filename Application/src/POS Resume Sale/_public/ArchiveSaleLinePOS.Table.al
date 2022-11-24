@@ -46,7 +46,7 @@
             OptionMembers = "G/L Entry",Item,"Item Group",Repair,,Payment,"Open/Close","BOM List",Customer,Comment;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteReason = 'Use Line Type field';           
+            ObsoleteReason = 'Use Line Type field';
         }
         field(6; "No."; Code[20])
         {
@@ -176,7 +176,7 @@
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-        }        
+        }
         field(30; Amount; Decimal)
         {
             AutoFormatExpression = "Currency Code";
@@ -228,7 +228,7 @@
             InitValue = true;
             DataClassification = CustomerContent;
         }
-        field(43; "Serial No."; Code[20])
+        field(43; "Serial No."; Code[50])
         {
             Caption = 'Serial No.';
             DataClassification = CustomerContent;
@@ -1075,7 +1075,7 @@
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
             ObsoleteState = Removed;
-            ObsoleteReason = 'Sale Type field not used anymore';            
+            ObsoleteReason = 'Sale Type field not used anymore';
         }
         key(Key7; "Serial No.")
         {
@@ -1094,7 +1094,7 @@
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
             ObsoleteState = Removed;
-            ObsoleteReason = 'Sale Type field not used anymore';            
+            ObsoleteReason = 'Sale Type field not used anymore';
         }
 
         key(Key10; "Register No.", "Sales Ticket No.", "Sale Type", Type, "No.", "Item Category Code", Quantity)
@@ -1102,26 +1102,26 @@
             MaintainSIFTIndex = false;
             SumIndexFields = "Amount Including VAT", Amount, Quantity;
             ObsoleteState = Removed;
-            ObsoleteReason = 'Sale Type field not used anymore';            
+            ObsoleteReason = 'Sale Type field not used anymore';
         }
         key(Key11; "Register No.", "Sales Ticket No.", Date, "Line Type", "Discount Type", "Line No.")
         {
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
-            SumIndexFields = "Amount Including VAT";       
+            SumIndexFields = "Amount Including VAT";
         }
         key(Key12; "Insurance Category", "Register No.", "Sales Ticket No.", Date, "Line Type")
         {
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
-            SumIndexFields = "Amount Including VAT";            
+            SumIndexFields = "Amount Including VAT";
         }
 
         key(Key13; "Register No.", "Sales Ticket No.", "Line Type", "No.", "Item Category Code", Quantity)
         {
             MaintainSIFTIndex = false;
-            SumIndexFields = "Amount Including VAT", Amount, Quantity;       
-        }                
+            SumIndexFields = "Amount Including VAT", Amount, Quantity;
+        }
     }
 }
 
