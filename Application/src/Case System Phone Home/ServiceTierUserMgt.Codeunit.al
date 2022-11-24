@@ -126,7 +126,7 @@
         if TenantDiagnostic."Last Tenant ID Sent to CS" = TenantId() then
             exit;
 
-        if TryInitAndSendRequest('ValidateBCOnlineTenant', '', '', TenantId(), ResponseMessage) then begin
+        if TryInitAndSendRequestV2('ValidateBCOnlineTenantWithAzureAD', TenantId(), TenantDiagnostic."Azure AD Tenant ID", TenantDiagnostic."Last Tenant ID Sent to CS", ResponseMessage) then begin
             TenantDiagnostic."Last Tenant ID Sent to CS" := TenantId();
             TenantDiagnostic."Last DT Tenant ID Sent to CS" := CurrentDateTime;
             TenantDiagnostic.Modify();
@@ -431,6 +431,15 @@
     end;
 
     [TryFunction]
+    local procedure TryInitAndSendRequestV2(serviceMethod: Text; ThisTenantId: Text; AzureADTenantID: Text; PreviousTenantId: Text; var responseMessage: Text)
+    var
+        Content: HttpContent;
+    begin
+        Content.WriteFrom(InitRequestContentV2(serviceMethod, ThisTenantId, AzureADTenantID, PreviousTenantId));
+        TrySendRequest(Content, serviceMethod, responseMessage)
+    end;
+
+    [TryFunction]
     local procedure TrySendRequest(var Content: HttpContent; serviceMethod: Text; var responseMessage: Text)
     var
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
@@ -474,6 +483,25 @@
         if ThisTenantId <> '' then
             Builder.Append('      <tenantIDIn>' + ThisTenantId + '</tenantIDIn>');
 
+        Builder.Append('    </' + serviceMethod + '>');
+        Builder.Append('  </soapenv:Body>');
+        Builder.Append('</soapenv:Envelope>');
+
+        exit(Builder.ToText());
+    end;
+
+    local procedure InitRequestContentV2(serviceMethod: Text; ThisTenantId: Text; AzureAdTenantId: Text; PreviousTenantId: Text): Text
+    var
+        Builder: TextBuilder;
+    begin
+        Builder.Append('<?xml version="1.0" encoding="UTF-8"?>');
+        Builder.Append('<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" >');
+        Builder.Append('  <soapenv:Header/>');
+        Builder.Append('  <soapenv:Body>');
+        Builder.Append('    <' + serviceMethod + ' xmlns="urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser">');
+        Builder.Append('      <tenantIDIn>' + ThisTenantId + '</tenantIDIn>');
+        Builder.Append('      <azureADTenantIDIn>' + AzureAdTenantId + '</azureADTenantIDIn>');
+        Builder.Append('      <previousTenantIDIn>' + PreviousTenantId + '</previousTenantIDIn>');
         Builder.Append('    </' + serviceMethod + '>');
         Builder.Append('  </soapenv:Body>');
         Builder.Append('</soapenv:Envelope>');
@@ -564,7 +592,6 @@
     begin
     end;
 
-    
     [Obsolete('Not used anymore.')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestUserOnPOSSessionInitialize(UsingRegularInvoicing: Boolean; var Handled: Boolean)
