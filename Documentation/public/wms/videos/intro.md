@@ -4,6 +4,7 @@ This section contains all WMS-related video training materials. The videos mainl
 
 ## Introduction (multilingual)
 
+> [!Video https://share.synthesia.io/22799f74-f30e-4126-b875-9f2ab7ec0275]
 
 
 > [!Video https://share.synthesia.io/5b025a20-4da8-478d-8059-338cd6a83762]

@@ -33,7 +33,7 @@ After the necessary setup is performed, you can explore the rest of the availabl
 
 ## Video introduction
 
-> [!Video https://www.youtube.com/embed/O2Lt-tCaOxY]
+> [!Video https://share.synthesia.io/22799f74-f30e-4126-b875-9f2ab7ec0275]
 
 ### Highlighted articles
 
