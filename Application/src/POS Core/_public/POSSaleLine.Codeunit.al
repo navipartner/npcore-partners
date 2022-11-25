@@ -183,13 +183,6 @@
             Rec."Reason Code" := Line."Reason Code";
         end;
 
-        if Line."Serial No." <> '' then begin //Because existing validation code cant handle blank serial number
-            Rec.Validate("Serial No.", Line."Serial No.");
-        end else begin
-            Rec."Serial No." := Line."Serial No.";
-        end;
-        Rec.Validate("Serial No. not Created", Line."Serial No. not Created");
-
         if IncludeDiscountFields then begin
             Rec.Validate("Discount Type", Line."Discount Type");
             Rec.Validate("Discount Code", Line."Discount Code");
@@ -215,6 +208,10 @@
             end;
         if (Line."Unit Price" <> 0) or Line."Manual Item Sales Price" then
             Rec.Validate("Unit Price", Line."Unit Price");
+
+        if Line."Serial No." <> '' then
+            Rec.Validate("Serial No.", Line."Serial No.");
+        Rec.Validate("Serial No. not Created", Line."Serial No. not Created");
 
         Return := InsertLineInternal(Rec, true);
         Line := Rec;
@@ -346,7 +343,7 @@
                 repeat
                     if SaleLine."Line Type" = SaleLine."Line Type"::Item then
                         ItemCountWhenCalculatedBalance += SaleLine.Quantity;
-                    if SaleLine."Line Type" in [SaleLine."Line Type"::"BOM List",SaleLine."Line Type"::"Customer Deposit",SaleLine."Line Type"::"Issue Voucher",SaleLine."Line Type"::"Item Category",SaleLine."Line Type"::"Issue Voucher",SaleLine."Line Type"::Item,SaleLine."Line Type"::Rounding] then begin
+                    if SaleLine."Line Type" in [SaleLine."Line Type"::"BOM List", SaleLine."Line Type"::"Customer Deposit", SaleLine."Line Type"::"Issue Voucher", SaleLine."Line Type"::"Item Category", SaleLine."Line Type"::"Issue Voucher", SaleLine."Line Type"::Item, SaleLine."Line Type"::Rounding] then begin
                         AmountExclVAT += SaleLine.Amount;
                         TotalAmount += SaleLine."Amount Including VAT";
                     end else
@@ -354,7 +351,6 @@
                             OutPaymentAmount += SaleLine."Amount Including VAT";
                             AmountExclVAT += SaleLine.Amount;
                         end;
-                            
                 until SaleLine.Next() = 0;
                 TotalAmount += OutPaymentAmount;
                 VATAmount := TotalAmount - AmountExclVAT;
@@ -380,7 +376,7 @@
     [Obsolete('Zero reference')]
     procedure GetDepositLine(var LinePOS: Record "NPR POS Sale Line")
     begin
-        
+
     end;
 
     procedure InitPayoutPayInLine(var LinePOS: Record "NPR POS Sale Line")

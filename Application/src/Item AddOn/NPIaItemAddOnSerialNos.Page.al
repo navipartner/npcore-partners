@@ -1,7 +1,7 @@
-﻿page 6151119 "NPR NpIa ItemAddOn Sel. Vars."
+page 6150613 "NPR NpIa ItemAddOn Serial Nos."
 {
     Extensible = False;
-    Caption = 'Select Variants';
+    Caption = 'Select Serial No.';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Worksheet;
@@ -40,17 +40,19 @@
                     ToolTip = 'Specifies a description of the entry of the product transferred from item add-on line option.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Variant Code"; Rec."Variant Code")
+                field("Serial No."; Rec."Serial No.")
                 {
 
-                    ToolTip = 'Specifies the variant of the item on the line.';
+                    ToolTip = 'Specifies the serial no. of the item on the line.';
                     ApplicationArea = NPRRetail;
+
                 }
                 field("Description 2"; Rec."Description 2")
                 {
 
                     ToolTip = 'Specifies an additional description of the entry of the product.';
                     ApplicationArea = NPRRetail;
+                    Editable = false;
                 }
                 field(Quantity; Rec.Quantity)
                 {
@@ -68,19 +70,19 @@
         Ok: Boolean;
     begin
         if CloseAction = ACTION::LookupOK then begin
-            Rec.SetRange("Variant Code", '');
+            Rec.SetRange("Serial No.", '');
             Ok := Rec.IsEmpty();
-            Rec.SetRange("Variant Code");
+            Rec.SetRange("Serial No.");
             if not Ok then
-                Message(VariantIsRequiredMsg);
+                Message(SerialIsRequiredMsg);
         end else
             Ok := true;
         exit(Ok);
     end;
 
     var
-        InstructionTxt: Label 'Some of the Item Add-Ons require a variant code to be specified. Please fill in the variant codes in each of the following lines';
-        VariantIsRequiredMsg: Label 'Variant Code must be specified in all lines.';
+        InstructionTxt: Label 'Some of the Item Add-Ons require a serial no. to be specified. Please fill in the serial nos. in each of the following lines';
+        SerialIsRequiredMsg: Label 'Serial No. must be specified in all lines.';
 
     local procedure GenerateInstructions(): Text
     begin

@@ -257,6 +257,11 @@
             Caption = 'Copy Serial No.';
             DataClassification = CustomerContent;
         }
+        field(230; "Serial No."; Code[50])
+        {
+            Caption = 'Serial No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
