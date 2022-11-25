@@ -1,11 +1,20 @@
 codeunit 6059827 "NPR MPOS Data View Mgt."
 {
 
+    [Obsolete('Use LookUpDataView(Enum "NPR MPOS Data View Type"; Text)')]
     procedure LookupDataViewCode(var DataView: Record "NPR MPOS Data View"; var DataViewCode: Text): Boolean
     var
         IDataViewType: Interface "NPR MPOS IDataViewType";
     begin
         IDataViewType := DataView."Data View Type";
+        exit(IDataViewType.LookupCode(DataViewCode));
+    end;
+
+    procedure LookUpDataView(DataViewType: Enum "NPR MPOS Data View Type"; var DataViewCode: Text): Boolean
+    var
+        IDataViewType: Interface "NPR MPOS IDataViewType";
+    begin
+        IDataViewType := DataViewType;
         exit(IDataViewType.LookupCode(DataViewCode));
     end;
 
@@ -33,12 +42,21 @@ codeunit 6059827 "NPR MPOS Data View Mgt."
         exit(IDataViewCategory.GetView(DataViewType, DataViewCategory, DataViewCode, Request));
     end;
 
+    [Obsolete('Use PreviewCategory(Enum "NPR MPOS Data View Category"; Guid)')]
     procedure Preview(Rec: Record "NPR MPOS Data View")
     var
         IDataViewCategory: Interface "NPR MPOS IDataViewCategory";
     begin
         IDataViewCategory := Rec."Data View Category";
         IDataViewCategory.Preveiw(Rec.SystemId);
+    end;
+
+    procedure PreviewCategory(DataViewCategory: Enum "NPR MPOS Data View Category"; SystemId: Guid)
+    var
+        IDataViewCategory: Interface "NPR MPOS IDataViewCategory";
+    begin
+        IDataViewCategory := DataViewCategory;
+        IDataViewCategory.Preveiw(SystemId);
     end;
 
     procedure FormatResultAsText(DataViews: JsonToken): Text
@@ -58,6 +76,7 @@ codeunit 6059827 "NPR MPOS Data View Mgt."
         exit(Result);
     end;
 
+    [Obsolete('Use DeleteIndentLevels(Integer; Enum "NPR MPOS Data View Type"; Enum "NPR MPOS Data View Category")')]
     procedure DeleteLevels(var Rec: Record "NPR MPOS Data View")
     var
         DataView: Record "NPR MPOS Data View";
@@ -80,4 +99,27 @@ codeunit 6059827 "NPR MPOS Data View Mgt."
                 end;
         end;
     end;
+
+    procedure DeleteIndentLevels(Indent: Integer; DataViewType: Enum "NPR MPOS Data View Type"; DataViewCategory: Enum "NPR MPOS Data View Category")
+    var
+        DataView: Record "NPR MPOS Data View";
+    begin
+        case Indent of
+            0:
+                begin
+                    DataView.SetRange("Data View Type", DataViewType);
+                    DataView.SetRange(Indent, 1);
+                    if not DataView.IsEmpty() then
+                        DataView.DeleteAll(true);
+                end;
+            1:
+                begin
+                    DataView.SetRange("Data View Type", DataViewType);
+                    DataView.SetRange("Data View Category", DataViewCategory);
+                    DataView.SetRange(Indent, 2);
+                    if not DataView.IsEmpty() then
+                        DataView.DeleteAll(true);
+                end;
+        end;
+    end;    
 }

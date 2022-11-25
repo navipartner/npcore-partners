@@ -72,7 +72,7 @@ page 6059870 "NPR MPOS Data Views"
                 var
                     DataViewMgt: Codeunit "NPR MPOS Data View Mgt.";
                 begin
-                    DataViewMgt.Preview(Rec);
+                    DataViewMgt.PreviewCategory(Rec."Data View Category", Rec.SystemId);
                 end;
             }
         }
