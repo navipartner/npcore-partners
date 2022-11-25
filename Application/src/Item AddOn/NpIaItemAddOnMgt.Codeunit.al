@@ -335,6 +335,7 @@
         JToken: JsonToken;
         AddonLineKey: Text;
         SelectedAddonLineKeys: List of [Text];
+        LastErrorText: Text;
     begin
         if SelectedAddOnLines.IsValue then
             if SelectedAddOnLines.AsValue().IsNull then
@@ -370,6 +371,15 @@
             exit(false);
         end;
 
+        if not InputSerialNos(SalePOS, AppliesToLineNo, TempItemAddOnLine) then begin
+            if CompulsoryAddOn then
+                RemoveBaseLine(POSSession, AppliesToLineNo);
+            LastErrorText := GetLastErrorText();
+            if LastErrorText <> '' then
+                Message(LastErrorText);
+            exit(false);
+        end;
+
         POSSession.GetSaleLine(POSSaleLine);
         TempItemAddOnLine.FindSet();
         repeat
@@ -394,6 +404,7 @@
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        LastErrorText: Text;
     begin
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
         ItemAddOnLine.SetRange(Mandatory, true);
@@ -406,9 +417,19 @@
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
+
         if not AskForVariants(SalePOS, AppliesToLineNo, TempItemAddOnLine) then begin
             if CompulsoryAddOn then
                 RemoveBaseLine(POSSession, AppliesToLineNo);
+            exit(false);
+        end;
+
+        if not InputSerialNos(SalePOS, AppliesToLineNo, TempItemAddOnLine) then begin
+            if CompulsoryAddOn then
+                RemoveBaseLine(POSSession, AppliesToLineNo);
+            LastErrorText := GetLastErrorText();
+            if LastErrorText <> '' then
+                Message(LastErrorText);
             exit(false);
         end;
 
@@ -421,6 +442,7 @@
             if SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo) then
                 POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
         end;
+
         exit(true);
     end;
 
@@ -461,6 +483,7 @@
             end;
             SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity);
             SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
+            SaleLinePOS."Serial No." := ItemAddOnLine."Serial No.";
 
             POSSaleLine.SetUsePresetLineNo(true);
             POSSaleLine.InsertLine(SaleLinePOS);
@@ -504,10 +527,12 @@
         SaleLinePOS.Description := ItemAddOnLine.Description;
         if (ItemAddOnLine."Unit Price" <> 0) or (ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::Always) then begin
             SaleLinePOS."Manual Item Sales Price" := true;
+            SaleLinePOS."Serial No." := '';
             SaleLinePOS.Validate("Unit Price", ItemAddOnLine."Unit Price");
         end;
         SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity);
         SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
+        SaleLinePOS.Validate("Serial No.", ItemAddOnLine."Serial No.");
         if PrevRec <> Format(SaleLinePOS) then begin
             SaleLinePOS.Modify(true);
             POSSaleLine.RefreshCurrent();
@@ -907,6 +932,44 @@
                     ItemAddOnLine.Modify();
                 end;
             until TempItemVariantRequestBuffer.Next() = 0;
+    end;
+
+    [TryFunction]
+    local procedure InputSerialNos(SalePOS: Record "NPR POS Sale"; AppliesToLineNo: Integer; var ItemAddOnLine: Record "NPR NpIa Item AddOn Line")
+    var
+        AddOnSaleLinePOS: Record "NPR POS Sale Line";
+        TempItemAddOnSerialBuffer: Record "NPR NpIa Item AddOn Line" temporary;
+        POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
+        Item: Record Item;
+        UseSpecificTracking: Boolean;
+    begin
+        if ItemAddOnLine.FindSet() then
+            repeat
+                if (ItemAddOnLine."Item No." <> '') and (ItemAddOnLine.Quantity > 0) then
+                    if Item.Get(ItemAddOnLine."Item No.") and POSActionInsertItemB.ItemRequiresSerialNumberOnSale(Item, UseSpecificTracking) then begin
+                        TempItemAddOnSerialBuffer := ItemAddOnLine;
+                        if FindAddOnSaleLinePOS(SalePOS, AppliesToLineNo, ItemAddOnLine, AddOnSaleLinePOS) then
+                            if AddOnSaleLinePOS."Serial No." <> '' then
+                                TempItemAddOnSerialBuffer."Serial No." := AddOnSaleLinePOS."Serial No.";
+                        TempItemAddOnSerialBuffer.Insert();
+                    end;
+            until ItemAddOnLine.Next() = 0;
+
+        if TempItemAddOnSerialBuffer.IsEmpty() then
+            exit;
+
+        if Page.RunModal(Page::"NPR NpIa ItemAddOn Serial Nos.", TempItemAddOnSerialBuffer) <> Action::LookupOK then
+            Error('');
+
+        if TempItemAddOnSerialBuffer.FindSet() then
+            repeat
+                TempItemAddOnSerialBuffer.TestField("Serial No.");
+                ItemAddOnLine.Get(TempItemAddOnSerialBuffer."AddOn No.", TempItemAddOnSerialBuffer."Line No.");
+                if ItemAddOnLine."Serial No." <> TempItemAddOnSerialBuffer."Serial No." then begin
+                    ItemAddOnLine."Serial No." := TempItemAddOnSerialBuffer."Serial No.";
+                    ItemAddOnLine.Modify();
+                end;
+            until TempItemAddOnSerialBuffer.Next() = 0;
     end;
 
     local procedure ItemVariantIsRequired(ItemNo: Code[20]): Boolean
