@@ -83,7 +83,7 @@ To create a new collect workflow, refer to the provided steps:
 
 ### Set up the POS Audit Profile
 
-The logic of prepayment of 100% is that all payment is done at the moment when the order is placed. For the system to post and deliver the initial sales order, a "zero" sale needs to be executed at the end of the process. Therefore, it is necessary to tick the **Enable Zero Amount Sales** checkbox in the [POS Audit Profile](../../posunit/reference/POS_audit_profile.md).
+The logic of prepayment of 100% is that all payment is done at the moment when the order is placed. For the system to post and deliver the initial sales order, a "zero" sale needs to be executed at the end of the process. Therefore, it is necessary to tick the **Enable Zero Amount Sales** checkbox in the [POS Audit Profile](../../pos_profiles/reference/POS_audit_profile.md).
 
 ### Related links
 

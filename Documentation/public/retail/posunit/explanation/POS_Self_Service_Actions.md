@@ -13,7 +13,7 @@ The POS is initially locked and self-service users aren't able to perform any co
 
 However, administrators who provide a password or a keycard can access a hidden administration menu, or **Admin View**. The **Admin View** contains some functions previously defined in **POS Menus**.
 
-The POS admin menu is implemented in Major Tom so you can switch to the POS and run a preconfigured POS action. In the backend, it is configured in the [**POS Named Action Profile**](../howto/Named_Action_Code.md) of an unattended POS unit. 
+The POS admin menu is implemented in Major Tom so you can switch to the POS and run a preconfigured POS action. In the backend, it is configured in the [**POS Named Action Profile**](../../pos_profiles/howto/Named_Action_Code.md) of an unattended POS unit. 
 
 ## SS-DELETE-LINE - deletes sales or payment lines from the POS
 

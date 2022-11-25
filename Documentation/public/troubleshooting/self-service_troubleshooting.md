@@ -41,4 +41,4 @@ It's important to check whether all the necessary steps have been taken in the c
     - Adyen Payment Terminal
     - Boca Printer 
 
-For full procedure, refer to the [Self-service profile setup](../retail/posunit/howto/pos_self_service_prof.md).
+For full procedure, refer to the [Self-service profile setup](../retail/pos_profiles/howto/pos_self_service_prof.md).

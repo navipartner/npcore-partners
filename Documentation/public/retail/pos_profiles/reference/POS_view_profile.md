@@ -33,7 +33,6 @@ The following options are available in the **Name and Date Formatting** section:
 
 ### Related links
 
-- [POS unit](../explanation/POSUnit.md)
-- [POS unit receipt profile](../explanation/POS_unit_Receipt_profile.md)
+- [POS unit receipt profile](POS_unit_Receipt_profile.md)
 - [Set up the POS Global Sales Profile](../howto/POS_Global.md)
 - [Set up the POS Named Action Profile](../howto/Named_Action_Code.md)

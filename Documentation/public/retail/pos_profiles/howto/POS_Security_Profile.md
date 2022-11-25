@@ -1,4 +1,4 @@
-# Set up the POS Security Profile
+# Set up POS Security Profile
 
 In **POS security profile** it is possible to set up the administrator password, and the password for unlocking a POS unit after the unit has been locked due to non-activity.
 
@@ -19,11 +19,11 @@ To set up the security profile, follow the provided steps:
 
 ### Related links
 
-- [Balance the POS (Z-report)](../howto/balance_the_pos.md)
+- [Balance the POS (Z-report)](../../posunit/howto/balance_the_pos.md)
 - [POS Display Profile](../reference/POS_Display_profile.md)
-- [POS Unit Receipt Profile](../explanation/POS_unit_Receipt_profile.md)
+- [POS Unit Receipt Profile](../reference/POS_unit_Receipt_profile.md)
 - [POS View Profile](../reference/POS_view_profile.md)
 - [POS Audit Profile](../reference/POS_audit_profile.md)
 - [POS End-of-Day Profile](../reference/POS_End_of_Day_Profile.md)
-- [Set up the POS Global Sales Profile](../howto/POS_Global.md)
-- [Set up POS Posting Profile](../howto/POS_Pos_Prof.md)
+- [Set up the POS Global Sales Profile](POS_Global.md)
+- [Set up POS Posting Profile](/POS_Pos_Prof.md)
