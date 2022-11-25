@@ -11,4 +11,4 @@ In the **POS Unit Display** you can configure device-specific information for th
 ### Related links
 
 - [POS unit](../explanation/POSUnit.md)
-- [POS Display Profile (reference guide)](./POS_Display_profile.md)
+- [POS Display Profile (reference guide)](../../pos_profiles/reference/POS_Display_profile.md)

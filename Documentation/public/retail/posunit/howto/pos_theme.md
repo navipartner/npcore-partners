@@ -18,4 +18,4 @@ To create a POS theme, you need to do the following:
 
 ### Related links
 
-- [POS Self-Service Profile](../howto/pos_self_service_prof.md)
+- [POS Self-Service Profile](../../pos_profiles/howto/pos_self_service_prof.md)

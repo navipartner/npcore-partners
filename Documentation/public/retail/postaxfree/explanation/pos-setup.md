@@ -19,12 +19,10 @@ You can also confirm the prompt that pops up if a customer pays with an EFT card
 >[!Note]
 > All tax-free buttons use the same POS action code - **TAX_FREE**.
 
-    - **Voucher List** - opens up the list of existing tax-free vouchers.
-    - **Unit List** - opens up the setup of tax-free units.
-    - **Audit Roll** - 
-    - **Consolidate** - opens up the consolidate voucher window from which you can search for, and add, sales receipts to consolidate.
-    - **Print Last Voucher** - reprints the last voucher issued in the current session.
-
+  - **Voucher List** - opens up the list of existing tax-free vouchers.
+  - **Unit List** - opens up the setup of tax-free units.
+  - **Consolidate** - opens up the consolidate voucher window from which you can search for, and add, sales receipts to consolidate.
+  - **Print Last Voucher** - reprints the last voucher issued in the current session.
 
 ## Issuing Tax Free for Older Sales
 

@@ -2,6 +2,8 @@
   href: gettingstarted/toc.yml
 - name: POS unit
   href: posunit/toc.yml
+- name: POS profiles
+  href: pos_profiles/toc.yml
 - name: MPOS
   href: MPOS/toc.yml
 - name: POS tax free
