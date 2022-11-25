@@ -9,34 +9,12 @@
     var
         DataSource: Codeunit "NPR Data Source";
     begin
-        case View.Type() of
-            View.Type() ::Login:
-                begin
-                    GetDataSource(BuiltInSale(), DataSource, Setup);
-                    View.AddDataSource(DataSource);
-                end;
-            View.Type() ::Sale:
-                begin
-                    GetDataSource(BuiltInSaleLine(), DataSource, Setup);
-                    View.AddDataSource(DataSource);
-                    GetDataSource(BuiltInSale(), DataSource, Setup);
-                    View.AddDataSource(DataSource);
-                end;
-            View.Type() ::Payment:
-                begin
-                    GetDataSource(BuiltInPaymentLine(), DataSource, Setup);
-                    View.AddDataSource(DataSource);
-                    GetDataSource(BuiltInSale(), DataSource, Setup);
-                    View.AddDataSource(DataSource);
-                end;
-            View.Type() ::BalanceRegister:
-                begin
-                    GetDataSource(BuiltInBalancing(), DataSource, Setup);
-                    View.AddDataSource(DataSource);
-                end;
-        end;
-
-        OnSetupDataSourcesForView(View, Setup);
+        GetDataSource(BuiltInSaleLine(), DataSource, Setup);
+        View.AddDataSource(DataSource);
+        GetDataSource(BuiltInSale(), DataSource, Setup);
+        View.AddDataSource(DataSource);
+        GetDataSource(BuiltInPaymentLine(), DataSource, Setup);
+        View.AddDataSource(DataSource);
     end;
 
     internal procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; Setup: Codeunit "NPR POS Setup")
@@ -285,6 +263,7 @@
     end;
 
     [IntegrationEvent(FALSE, FALSE)]
+    [Obsolete('We are slowly moving the concept of a view out of backend, into frontend with data pulled by frontend instead of pushed out of backend depending on a flag backend remembers between requests.')]
     local procedure OnSetupDataSourcesForView(View: Codeunit "NPR POS View"; Setup: Codeunit "NPR POS Setup")
     begin
     end;
@@ -302,10 +281,5 @@
     local procedure BuiltInPaymentLine(): Text
     begin
         exit('BUILTIN_PAYMENTLINE');
-    end;
-
-    local procedure BuiltInBalancing(): Text
-    begin
-        exit('BUILTIN_REGISTER_BALANCING');
     end;
 }
