@@ -85,7 +85,6 @@
                         begin
                             InitFromItem();
                             UpdateVATSetup();
-                            CalculateCostPrice();
                             "Unit Price" := FindItemSalesPrice();
                             Validate(Quantity);
                             POSSaleTranslation.AssignTranslationOnPOSSaleLine(Rec, SalePOS);
@@ -571,7 +570,7 @@
             trigger OnValidate()
             begin
                 SerialNoValidate();
-                Validate("Unit Cost (LCY)", GetUnitCostLCY());
+                Validate("Unit Cost (LCY)", GetUnitCostLCY(CurrFieldNo <> FieldNo("Serial No.")));
             end;
         }
         field(44; "Customer/Item Discount %"; Decimal)
@@ -1773,20 +1772,8 @@
     end;
 
     procedure CalculateCostPrice()
-    var
-        VATPercent: Decimal;
     begin
-        GetItem();
-
-        if "Price Includes VAT" then
-            VATPercent := "VAT %"
-        else
-            VATPercent := 0;
-
-        if (Item."NPR Group sale") and (Item."Profit %" <> 0) then
-            Validate("Unit Cost (LCY)", ((1 - Item."Profit %" / 100) * "Unit Price" / (1 + VATPercent / 100)) * "Qty. per Unit of Measure")
-        else
-            Validate("Unit Cost (LCY)", Item."Unit Cost" * "Qty. per Unit of Measure");
+        Validate("Unit Cost (LCY)", GetUnitCostLCY(true));
     end;
 
     procedure RemoveBOMDiscount()
@@ -2313,16 +2300,29 @@
     end;
 
     procedure GetUnitCostLCY(): Decimal
+    begin
+        exit(GetUnitCostLCY(false));
+    end;
+
+    local procedure GetUnitCostLCY(Silent: Boolean): Decimal
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
         ItemTrackingCode: Record "Item Tracking Code";
+        ReturnReason: Record "Return Reason";
+        VATPercent: Decimal;
         TxtNoSerial: Label 'No open Item Ledger Entry has been found with the Serial No. %2';
     begin
+        if "Return Reason Code" <> '' then begin
+            ReturnReason.Get("Return Reason Code");
+            if ReturnReason."Inventory Value Zero" then
+                exit(0);
+        end;
+
         if "Custom Cost" then
             exit("Unit Cost");
 
+        GetItem();
         if ("Serial No." <> '') and (Quantity > 0) then begin
-            GetItem();
             Item.TestField("Item Tracking Code");
             ItemTrackingCode.Get(Item."Item Tracking Code");
             if ItemTrackingCode."SN Specific Tracking" then begin
@@ -2333,12 +2333,22 @@
                 ItemLedgerEntry.SetRange("Item No.", "No.");
                 ItemLedgerEntry.SetRange("Serial No.", "Serial No.");
                 if not ItemLedgerEntry.FindFirst() then begin
-                    Message(TxtNoSerial, "Serial No.");
+                    if not Silent then
+                        Message(TxtNoSerial, "Serial No.");
                     exit(0);
                 end;
                 exit(ItemLedgerEntry."Cost Amount (Actual)");
             end;
         end;
+
+        if "Price Includes VAT" then
+            VATPercent := "VAT %"
+        else
+            VATPercent := 0;
+        if (Item."NPR Group sale") and (Item."Profit %" <> 0) then
+            exit(((1 - Item."Profit %" / 100) * "Unit Price" / (1 + VATPercent / 100)) * "Qty. per Unit of Measure")
+        else
+            exit(Item."Unit Cost" * "Qty. per Unit of Measure");
     end;
 
     local procedure UpdateDependingLinesQuantity()
