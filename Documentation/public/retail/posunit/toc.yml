@@ -8,12 +8,8 @@
     href: explanation/POS_Self_Service_Actions.md
   - name: POS menu
     href: explanation/POS_menu.md
-  - name: POS Input Box Profile
-    href: explanation/POS_input_box_profile.md
   - name: POS Posting Setup
     href: explanation/POS_posting_setup.md
-  - name: POS Unit Receipt Text Profile (Reference guide)
-    href: explanation/POS_unit_Receipt_profile.md
   - name: POS stores
     href: explanation/POS_store.md
   - name: Item AddOns
@@ -22,16 +18,8 @@
     href: explanation/item_categories.md
 - name: Reference
   items:
-  - name: POS Audit Profile (reference guide)
-    href: reference/POS_audit_profile.md
-  - name: POS View Profile (reference guide)
-    href: reference/POS_view_profile.md
   - name: POS Payment View Event Setup (reference guide)
     href: reference/POS_Payment_View_Event_Setup.md
-  - name: POS End of Day Profile (reference guide)
-    href: reference/POS_End_of_Day_Profile.md
-  - name: POS Display Profile (reference guide)
-    href: reference/POS_Display_profile.md
   - name: Item AddOns (reference guide)
     href: reference/item_addons_ref.md
   - name: Item categories (reference guide)
@@ -60,18 +48,8 @@
     href: howto/Create_a_new_item_button_in_the_POS.md
   - name: Create a new button in the POS menu
     href: howto/add_button_to_pos_menu.md
-  - name: Set up the POS Named Action Profile
-    href: howto/Named_Action_Code.md
-  - name: Set up the POS Global Sales Profile
-    href: howto/POS_Global.md
-  - name: Set up POS Pricing Profile
-    href: howto/POS_Pricing_profile.md
   - name: Set up POS payment bins
     href: howto/create_pos_payment_bin.md
-  - name: Set up POS Posting Profile
-    href: howto/POS_Pos_Prof.md
-  - name: Set up the POS Security Profile
-    href: howto/POS_Security_Profile.md
   - name: Insert the initial float for a POS unit
     href: howto/insert_the_initial_float.md
   - name: Create a new POS store
@@ -84,8 +62,6 @@
     href: howto/set_up_retail_logo.md
   - name: Set up Item AddOns
     href: howto/item_addons_procedure.md
-  - name: Set up POS Self-Service Profile
-    href: howto/pos_self_service_prof.md
   - name: Set up salespeople/purchasers
     href: howto/salespeople_setup.md
   - name: Create a POS theme

@@ -29,11 +29,11 @@ To set up the POS unit for self-service, you need to take the following steps:
 
 ## Next steps
 
-#### POS view setup
+### POS view setup
 
 The [POS view](../reference/POS_view_profile.md) is configured according to what you require to see on the screen, but for the self-service environment, there are additional features that need to be considered:
 
-##### Timeout
+#### Timeout
 
 If a customer initiates a transaction, and then decides to leave it as-is before finalizing the process, they will be redirected to the login view after the number of seconds you define in the timeout JSON file passes. All elements in the timeout logic are configurable.
 
@@ -74,7 +74,7 @@ Then, the *I$* label follows the standard translation as per codeunit *6150702 N
 > [!Note]
 > A developer needs to define the message in different languages to be used on the self-service. 
 
-##### Login view
+#### Login view
 
 It's recommended to have a simple login view which can be operated easily. 
 
@@ -156,7 +156,7 @@ The login JSON for ticketing service looks like this:
 > [!Important]
 > If you insert a URL in the POS menu button, and you don't have a description in the **Description** field, you need to set **Enabled** to **No** to avoid the issue if you touch the image on the touch screen. 
 
-##### Cart view
+#### Cart view
 
 You can set up what kind of view you're going to have. You can choose between the classic sales grid view with the POS sales lines or a cart view. 
 
@@ -164,29 +164,29 @@ You can set up what kind of view you're going to have. You can choose between th
 
 ![cart_view_json2](../images/cart_view_json2.png)
 
-#### Special buttons for self-service POS 
+### Special buttons for self-service POS 
 
 There are several optional buttons that can be added to the self-service POS screen.
 
 ![ss-special-buttons](../images/ss-special-buttons.png)
 
-##### Increase/decrease quantity
+#### Increase/decrease quantity
 
 The additional logic in the POS menus is that on the POS action type ITEM, you can display a **+** or a **-** sign. With these signs, a customer will be able to increase or decrease quantity on the sales line. It is set on the **POS Menus** line.
 
 ![ss_plus_minus](../images/ss-plus-minus.png)
 
-##### Display-in button
+#### Display-in button
 
 ![ss-display-button](../images/ss-display-button.png)
 
 If you look at the syntax on the **Caption**, you can interpret it as follows:
 
-      <big>, <Small> , <Medium>, <h1>, <h2>		: Size of the letters
-      Day Ticket / From Age 3/100 DKK		: The actual caption (hard-coded) 
-      Sum (12, 6,”31001”)		The sum of all quantities for the item number “31001” in the sales line. (Field 12 = Qty & 6=Number – from Table 6014406 - Sale Line POS)	
+- <big>, <Small> , <Medium>, <h1>, <h2>: Size of the letters
+- Day Ticket / From Age 3/100 DKK: The actual caption (hard-coded) 
+- Sum (12, 6,”31001”): The sum of all quantities for the item number “31001” in the sales line. (Field 12 = Qty & 6=Number – from Table 6014406 - Sale Line POS)	
 
-##### SS-ITEM-ADDON in the self-service environment
+#### SS-ITEM-ADDON in the self-service environment
 
 - **If you have a menu with a list of items that customers can choose from:**
 
@@ -202,13 +202,13 @@ If you look at the syntax on the **Caption**, you can interpret it as follows:
 
    ![ss-item-addon1](../images/ss-item_addon.png)
 
-#### Configuration of the kiosk mode in Major Tom
+### Configuration of the kiosk mode in Major Tom
 
 Major Tom has a kiosk mode that is configured for unattended POS. When you open the configuration view of Major Tom, you can change the display mode to kiosk mode. On selecting the kiosk mode for self-service, you will see a new configuration banner for the kiosk mode. From it, you can reach the self-service configuration view. 
 
-#### SS POS theme
+### SS POS theme
 
-Follow the procedure for [creating POS themes](../howto/pos_theme.md).
+Follow the procedure for [creating POS themes](../../posunit/howto/pos_theme.md)
 
 The POS theme on the self-service POS might differ from that of the classic POS, so each profile needs to be attributed its own POS theme at the POS unit level.
 
@@ -227,24 +227,25 @@ For this to occur, a specific setup needs to be performed in the POS End of Day 
 4. In the **POS Unit Card** select **Unattended** for the **POS Type**.   
    Otherwise, the automatic transfer will not be done. 
 
-#### Hardware
+### Hardware
 
 This hardware is usually self-contained and free-standing, unlike the usual POS hardware placed on desks or counters. Their main function is to provide customers with self-service functionalities.
-##### FLEXI Outdoor Kiosk
+
+#### FLEXI Outdoor Kiosk
 
 The [FLEXI Outdoor Wall (Newline)](https://www.conceptkiosk.com/product/flexi-outdoor-wall-newline/) is a wall-mounted interactive kiosk based on the FLEXI Outdoor unit. This unit is customizable with many of the same components as the FLEXI Outdoor, and the Access Gate editions, despite the smaller size. 
 
-##### Adyen payment terminal
+#### Adyen payment terminal
 
 For always-on or afterhours self-service, the [Adyen](https://www.adyen.com/pos-payments/terminals/verifone-ux-series) UX series is ready to accept payments at any time. It's built with the outdoors and anti-tamper measures in mind to protect information from the elements. 
 
-##### Boca printer
+#### Boca printer
 
 The [Lemur-X](https://tls-bocasystems.com/en/788/lemur-x/) is one of our smallest desktop ticket and label printers. Boca systems offer the Lemur-X as a standard with an adjustable 2''-3.25'' 200 dpi print width, cutter unit, and serial & USB interfaces. The LEDs provide feedback in error conditions. The printer allows you to print on ticket stock with a maximum thickness up to .010''.
 
 
 ### Related links
 
-- [POS self-service actions](../explanation/POS_Self_Service_Actions.md)
-- [Item AddOns](../explanation/item_addons.md)
+- [POS self-service actions](../../posunit/explanation/POS_Self_Service_Actions.md)
+- [Item AddOns](../../posunit/explanation/item_addons.md)
 - [POS Self-Service Profile troubleshooting](../../../troubleshooting/self-service_troubleshooting.md)
