@@ -126,7 +126,7 @@ table 6014672 "NPR MPOS Data View"
         DataViewMgt: Codeunit "NPR MPOS Data View Mgt.";
         DataViewCode: Text;
     begin
-        if DataViewMgt.LookupDataViewCode(Rec, DataViewCode) then begin
+        if DataViewMgt.LookupDataView(Rec."Data View Type", DataViewCode) then begin
             Rec.Validate("Data View Code", DataViewCode);
         end;
     end;
