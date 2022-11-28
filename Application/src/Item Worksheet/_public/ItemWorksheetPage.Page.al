@@ -829,8 +829,15 @@
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
+                    var
+                        ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
+                        ItemWrkshCombineLine: Codeunit "NPR Item Wrksh. Combine Line";
                     begin
-                        ItemWorksheetMgt.CombineLine(Rec, 0);
+                        ItemWorksheetTemplate.Get(Rec."Worksheet Template Name");
+                        if ItemWrkshCombineLine.CanCreateTask(ItemWorksheetTemplate) then
+                            TaskScheduler.CreateTask(Codeunit::"NPR Item Wrksh. Combine Line", 0, true, CompanyName(), CurrentDateTime(), Rec.RecordId)
+                        else
+                            ItemWorksheetMgt.CombineLine(Rec, 0);
                         Commit();
                         Rec.RefreshVariants(0, true);
                         CurrPage.Update();

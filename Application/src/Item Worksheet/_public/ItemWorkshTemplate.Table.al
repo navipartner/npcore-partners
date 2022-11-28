@@ -161,6 +161,11 @@
             OptionCaption = 'All,Item No.,Vendor Item No.,Vendor Bar Code,Internal Bar Code';
             OptionMembers = All,ItemNo,VendorItemNo,VendorBarCode,InternalBarCode;
         }
+        field(141; "Combine as Background Task"; Boolean)
+        {
+            Caption = 'Combine Variants as Background Task';
+            DataClassification = CustomerContent;
+        }        
         field(150; "Match by Item No. Only"; Boolean)
         {
             Caption = 'Match by Item No. Only';

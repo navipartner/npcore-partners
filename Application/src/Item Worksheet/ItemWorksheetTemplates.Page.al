@@ -90,10 +90,14 @@
                 }
                 field("Combine Variants to Item by"; Rec."Combine Variants to Item by")
                 {
-
-                    ToolTip = 'Specifies the value of the Combine Variants to Item by field.';
+                    ToolTip = 'Specifies under which criteria variants should be combined';
                     ApplicationArea = NPRRetail;
                 }
+                field("Combine as Background Task"; Rec."Combine as Background Task")
+                {
+                    ToolTip = 'Specifies whether combining variants process should be executed as a background task.';
+                    ApplicationArea = NPRRetail;
+                }                
                 field("Register Lines"; Rec."Register Lines")
                 {
 
