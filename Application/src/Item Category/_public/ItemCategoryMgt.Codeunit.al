@@ -356,6 +356,7 @@
         ToConfigTemplateHeader: Record "Config. Template Header";
         ToConfigTemplateLine: Record "Config. Template Line";
         ConfigTemplateCode: Code[10];
+        Item: Record Item;
     begin
         if FromItemCategory.IsTemporary() or ToItemCategory.IsTemporary() then
             exit('');
@@ -387,6 +388,8 @@
                 ToConfigTemplateLine.Init();
                 ToConfigTemplateLine.TransferFields(FromConfigTemplateLine);
                 ToConfigTemplateLine."Data Template Code" := ConfigTemplateCode;
+                if (FromConfigTemplateLine."Table ID" = Database::Item) and (FromConfigTemplateLine."Field ID" = Item.FieldNo("Item Category Code")) then
+                    ToConfigTemplateLine."Default Value" := ToItemCategory.Code;
                 ToConfigTemplateLine.Insert(true);
             until FromConfigTemplateLine.Next() = 0;
 
