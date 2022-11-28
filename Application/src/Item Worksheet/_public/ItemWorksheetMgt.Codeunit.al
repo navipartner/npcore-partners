@@ -182,9 +182,11 @@
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
+        ItemWrkshCombineLine: Codeunit "NPR Item Wrksh. Combine Line";
         Window: Dialog;
         NoOfRecords: Integer;
         CombineBy: Option All,ItemNo,VendorItemNo,VendorBarCode,InternalBarCode;
+        CombineLineAsBakcgroundTask, VarietySet: Boolean;
     begin
         ItemWorksheetLine.Reset();
         ItemWorksheetLine.SetFilter("Worksheet Template Name", '=%1', ItemWorksheet."Item Template Name");
@@ -193,21 +195,24 @@
         NoOfRecords := ItemWorksheetLine.Count();
         if GuiAllowed then
             Window.Open(CheckingLinesLbl);
-        if ItemWorksheetLine.FindSet() then
+        if ItemWorksheetLine.FindSet() then begin
+            ItemWorksheetTemplate.Get(ItemWorksheetLine."Worksheet Template Name");
+            CombineBy := ItemWorksheetTemplate."Combine Variants to Item by";
+            CombineLineAsBakcgroundTask := ItemWrkshCombineLine.CanCreateTask(ItemWorksheetTemplate);            
             repeat
                 LineCount := LineCount + 1;
-                if LineCount = 1 then begin
-                    ItemWorksheetTemplate.Get(ItemWorksheetLine."Worksheet Template Name");
-                    CombineBy := ItemWorksheetTemplate."Combine Variants to Item by";
-                end;
-                if GuiAllowed then
+                if GuiAllowed() then
                     Window.Update(1, Round(LineCount / NoOfRecords * 10000, 1));
-                if (ItemWorksheetLine."Variety 1" <> '') or (ItemWorksheetLine."Variety 2" <> '') or
-                   (ItemWorksheetLine."Variety 3" <> '') or (ItemWorksheetLine."Variety 4" <> '') or
-                   (ItemWorksheetLine."Variety Group" <> '') then
-                    CombineLine(ItemWorksheetLine, CombineBy);
+                VarietySet := (ItemWorksheetLine."Variety 1" <> '') or (ItemWorksheetLine."Variety 2" <> '') or (ItemWorksheetLine."Variety 3" <> '') or (ItemWorksheetLine."Variety 4" <> '') or (ItemWorksheetLine."Variety Group" <> '');
+                if VarietySet then begin
+                    if CombineLineAsBakcgroundTask then
+                        TaskScheduler.CreateTask(Codeunit::"NPR Item Wrksh. Combine Line", 0, true, CompanyName(), CurrentDateTime(), ItemWorksheetLine.RecordId)
+                    else
+                        CombineLine(ItemWorksheetLine, CombineBy);
+                end;                    
             until ItemWorksheetLine.Next() = 0;
-        if GuiAllowed then
+        end;
+        if GuiAllowed() then
             Window.Close();
         Commit();
         if GuiAllowed then begin
