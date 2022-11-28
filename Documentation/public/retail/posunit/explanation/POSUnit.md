@@ -11,8 +11,8 @@ As POS units in the NP Retail solution are highly customizable, it's possible to
 ### Related links
 
 - [Create a new POS (using an old one as a reference)](../howto/createnew.md)
-- [POS self-service actions](../explanation/POS_Self_Service_Actions.md)
+- [POS self-service actions](../../pos_profiles/reference/POS_Self_Service_Actions.md)
 - [Balancing the POS](../howto/balance_the_pos.md)
 - [Configure a cash draw opening](../howto/ConfigureCashDrawerOpening.md)
-- [Set up the POS Customer Display](../howto/POSCustomerDisplay.md)
-- [Change the POS unit receipt footer text](../howto/POSUnitReceiptFooter.md)
+- [Set up the POS Customer Display](../../pos_profiles/howto/POSCustomerDisplay.md)
+- [Change the POS unit receipt footer text](../../pos_profiles/howto/POSUnitReceiptFooter.md)

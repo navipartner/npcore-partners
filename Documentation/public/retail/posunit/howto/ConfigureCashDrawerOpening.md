@@ -2,15 +2,16 @@
 
 This topic walks you through the process of setting up the cash drawer to automatically open after each sale using the **POS Scenarios Profile** on the POS unit.
 
-### Prerequisites
+## Prerequisites
 
- - Have at least one existing POS unit in the system.
- - Have a [POS payment bin](create_pos_payment_bin.md) linked to the POS unit.
- - Have the cash drawer connected to the receipt printer.  
+- Have at least one existing POS unit in the system.
+- Have a [POS payment bin](create_pos_payment_bin.md) linked to the POS unit.
+- Have the cash drawer connected to the receipt printer.  
 
  > [!NOTE]
- >  The cable between the cash drawer and receipt printer needs to be installed correctly. The end with the label **Printer** has to go into the receipt printer.
+ > The cable between the cash drawer and receipt printer needs to be installed correctly. The end with the label **Printer** has to go into the receipt printer.
 
+## Procedure
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Unit List** and choose the related link.     
    A list of all existing POS units is displayed.  
@@ -30,4 +31,4 @@ This topic walks you through the process of setting up the cash drawer to automa
 
 - [POS units](../explanation/POSUnit.md)
 - [Create a new POS unit (by using the existing one for reference)](./createnew.md)  
-- [How to set up the POS Customer Display](./POSCustomerDisplay.md)
+- [How to set up the POS Customer Display](../../pos_profiles/howto/POSCustomerDisplay.md)

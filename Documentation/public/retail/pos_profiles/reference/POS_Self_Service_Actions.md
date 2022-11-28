@@ -13,7 +13,7 @@ The POS is initially locked and self-service users aren't able to perform any co
 
 However, administrators who provide a password or a keycard can access a hidden administration menu, or **Admin View**. The **Admin View** contains some functions previously defined in **POS Menus**.
 
-The POS admin menu is implemented in Major Tom so you can switch to the POS and run a preconfigured POS action. In the backend, it is configured in the [**POS Named Action Profile**](../../pos_profiles/howto/Named_Action_Code.md) of an unattended POS unit. 
+The POS admin menu is implemented in Major Tom so you can switch to the POS and run a preconfigured POS action. In the backend, it is configured in the [**POS Named Action Profile**](../howto/Named_Action_Code.md) of an unattended POS unit. 
 
 ## SS-DELETE-LINE - deletes sales or payment lines from the POS
 
@@ -36,7 +36,7 @@ This action resembles the **Item POS Action**, but is built-in for self-service.
 
 ## SS-ITEM-ADDON - sets the item add-on values
 
-This function resembles the [**Item AddOns**](item_addons.md) POS action, which allows you to add a popup which contains a list of items in a menu format (a Burger Menu, for example).
+This function resembles the [**Item AddOns**](../../posunit/explanation/item_addons.md) POS action, which allows you to add a popup which contains a list of items in a menu format (a Burger Menu, for example).
 
 It is also possible to associate a list of items to a main item, whereby when you sell the main item, the menu is automatically shown on the screen for you to select from. This is used for extras that can be ordered when buying the main item. 
 
@@ -110,6 +110,6 @@ In this situation, the same POS action is set in the POS Named Action Profile fo
 
 ### Related links
 
-- [POS units](POSUnit.md)
-- [Configure cash drawer options](../howto/ConfigureCashDrawerOpening.md)
-- [Create a new POS unit](../howto/createnew.md)
+- [POS units](../../posunit/explanation/POSUnit.md)
+- [Configure cash drawer options](../../posunit/howto/ConfigureCashDrawerOpening.md)
+- [Create a new POS unit](../../posunit/howto/createnew.md)

@@ -90,4 +90,4 @@ For example, when selling electrical equipment, and if you want to show an extra
 
 - [Item AddOns](../explanation/item_addons.md)
 - [Item AddOns (reference guide)](../reference/item_addons_ref.md)
-- [POS self-service actions](../explanation/POS_Self_Service_Actions.md)
+- [POS self-service actions](../../pos_profiles/reference/POS_Self_Service_Actions.md)

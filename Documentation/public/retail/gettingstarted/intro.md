@@ -4,7 +4,7 @@ NP Retail is a cloud-based POS solution that uses Microsoft Dynamics 365 Busines
 
 ## Get started
 
-- To start with, we recommend [downloading the demo](downloaddemo.md), and experience first-hand what our solution can do.
+- To start with, we recommend [downloading the demo](downloaddemo.md), and experiencing first-hand what our solution can do.
 
 - Once you're ready for more advanced features, see our guides for setting up desktop software products [Major Tom](install_major_tom.md) and [Minor Tom](install_minor_tom.md).
 
@@ -27,4 +27,4 @@ NP Retail is a cloud-based POS solution that uses Microsoft Dynamics 365 Busines
 | [**Vouchers**](../Vouchers/intro.md) | Create and configure physical and electronic documents that entitle customers to purchase goods. |
 | [**Fiscalization requirements**](../fiscalization/intro.md) | Learn how to achieve compliance with fiscalization requirements imposed by country-specific fiscal laws. |
 | [**MPOS**](../MPOS/Intro.md) | Set up various components of our Mobile Point of Sale module. |
-| [**Item worksheets**] | Configure functionalities that help maintain item data easily and efficiently, with minimum data entry time. |
+| [**Item worksheets**](../item_worksheet/explanation/creating_item_worksheet_lines.md) | Configure functionalities that help maintain item data easily and efficiently, with minimum data entry time. |
