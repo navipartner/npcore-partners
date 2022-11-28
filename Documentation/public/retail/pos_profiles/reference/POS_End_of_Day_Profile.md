@@ -1,6 +1,6 @@
 # POS End of Day Profile (reference guide)
 
-In the POS End of Day profile it is defined how and how often the End of Day will be performed, and which . The following fields should be set up to define it: 
+The End of Day profile can be used to summarize all data such as transactions, sales order statuses etc. that have been accumulated by the end of a single business day. You can define in what manner and how often the end-of-day process will be performed. The following fields should be set up:
 
 | Field Name      | Description |
 | ----------- | ----------- |

@@ -14,6 +14,10 @@
     href: howto/POS_Security_Profile.md
   - name: Set up POS Self-Service Profile
     href: howto/pos_self_service_prof.md
+  - name: Set up the POS Customer Display
+    href: howto/POSCustomerDisplay.md
+  - name: Change the POS unit receipt footer text
+    href: howto/POSUnitReceiptFooter.md
 - name: Reference
   items:
   - name: POS Audit Profile (reference guide)
@@ -28,3 +32,5 @@
     href: reference/POS_unit_Receipt_profile.md
   - name: POS View Profile (reference guide)
     href: reference/POS_view_profile.md
+  - name: POS self-service actions
+    href: reference/POS_Self_Service_Actions.md

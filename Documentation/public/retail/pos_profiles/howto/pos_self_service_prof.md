@@ -246,6 +246,6 @@ The [Lemur-X](https://tls-bocasystems.com/en/788/lemur-x/) is one of our smalles
 
 ### Related links
 
-- [POS self-service actions](../../posunit/explanation/POS_Self_Service_Actions.md)
+- [POS self-service actions](../reference/POS_Self_Service_Actions.md)
 - [Item AddOns](../../posunit/explanation/item_addons.md)
 - [POS Self-Service Profile troubleshooting](../../../troubleshooting/self-service_troubleshooting.md)

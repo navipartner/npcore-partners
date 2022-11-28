@@ -35,4 +35,4 @@ Receipt footers are useful when you wish to include the company's name, phone, a
 - [Create a new POS unit by using an existing one as reference](./createnew.md)
 - [POS units](../explanation/POSUnit.md)
 - [POS unit receipt profile](../../pos_profiles/reference/POS_unit_Receipt_profile.md)
-- [Change the POS unit receipt footer text](./POSUnitReceiptFooter.md)
+- [Change the POS unit receipt footer text](../../pos_profiles/howto/POSUnitReceiptFooter.md)
