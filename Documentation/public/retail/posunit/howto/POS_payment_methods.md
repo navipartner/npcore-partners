@@ -2,11 +2,7 @@
 
 POS payment methods are methods used in the POS for creating payment lines (like cash and credit cards). Every POS payment method that is created can be set up in buttons and used for conducting payments during a sale.
 
-The **POS Payment Method List** is an administrative section which contains all payment methods created for the POS.
-
-![POS_payment_method](../images/POS_payment_method.PNG)
-
-All of these payment methods have their own cards where all necessary parameters are set up. To open a certain payment method card, highlight its line, and click **Manage** in the ribbon, followed by **View** in the dropdown. 
+All payment methods have their own cards where all necessary parameters are set up. To open a certain payment method card, highlight its line, and click **Manage** in the ribbon, followed by **View** in the dropdown. 
 
 To create new POS payment method, follow the provided steps:
 
@@ -41,4 +37,4 @@ To create new POS payment method, follow the provided steps:
 
 ### Related links
 
-- [EFT setup](../../eft/explanation/EFT_setup.md
+- [EFT setup](../../eft/explanation/EFT_setup.md)

@@ -1,4 +1,5 @@
 # Replication Module Introduction
+
 You can use the Replication Module to import data from one company to another (companies can be in the same database or in different Business Central databases).
 
 Depending on how you set up the Replication Module, you can:
@@ -15,4 +16,4 @@ Import of new or modified records is handled by making API requests to the From 
 
 ### Related links
 
-- [Replication Module configuration](./howto/replicationhowto.md)
+- [Replication Module configuration](../howto/replicationhowto.md)

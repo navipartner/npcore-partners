@@ -65,7 +65,7 @@ However, there are special cases when the field names are different. You can use
 
 **Example:**
 
-![ReplicationSetupEndpointsFieldMappings.jpg](images/ReplicationSetupEndpointsFieldMappings.jpg)
+![ReplicationSetupEndpointsFieldMappings.jpg](../images/ReplicationSetupEndpointsFieldMappings.jpg)
 
 ### Check Missing Fields
 
@@ -75,6 +75,6 @@ This report uses web requests to compare the metadata of the Business Central AP
 
 ### Related links
 
-- [**Replication module introduction**](../intro.md)
+- [**Replication module introduction**](../explanation/replication_module.md)
 
 

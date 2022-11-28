@@ -10,8 +10,6 @@
   href: postaxfree/toc.yml  
 - name: Electronic funds transfer
   href: eft/toc.yml
-- name: Data replication module
-  href: replication/toc.yml
 - name: Discounts
   href: Discounts/toc.yml
 - name: Events
@@ -24,6 +22,8 @@
   href: loyalty/toc.yml
 - name: End user communication
   href: sms/toc.yml
+- name: Companies
+  href: companies/toc.yml
 - name: GDPR in NP Retail
   href: gdpr/toc.yml
 - name: Click & Collect module

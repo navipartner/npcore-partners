@@ -1,4 +1,4 @@
-# Getting started with the POS solution
+# POS units
 
 [POS units](./explanation/POSUnit.md) are a central part of the retail solution. They consist of [hardware](../gettingstarted/system_requirements.md) and software components that enable services and item sale transactions at retail locations. The transactions can be recorded and a receipt can be printed out or sent to the buyer via email or text. 
 
