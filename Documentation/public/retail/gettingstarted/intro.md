@@ -17,7 +17,8 @@ NP Retail is a cloud-based POS solution that uses Microsoft Dynamics 365 Busines
 | ----------- | ----------- |
 | [**POS Unit**](../../retail/posunit/intro.md) | Learn more about the main component of our retail solution, and refer to our extensive list of related step-by-step configurations. |
 | [**POS Profiles**](../pos_profiles/intro.md) | Refer to these articles for help when performing basic POS unit configurations. |
-| [**Replication module**](../../retail/replication/intro.md) | The SaaS replication solution provides more effective means of importing data from one company to another. |
+| [**Replication module**](../companies/explanation/replication_module.md) | The SaaS replication solution provides more effective means of importing data from one company to another. |
+| [**Retail inventory sets**](../companies/howto/retail_inventory_sets.md) | You can create a setup which enables you to check the inventory status of companies related to the company in which the requested item is out of stock.  |
 | [**Electronic Funds Transfer (EFT)**](../../retail/eft/intro.md) | Learn how to set up electronic payment integrations in NP Retail. |
 | [**POS Tax Free**](../postaxfree/intro.md) | Set up the tax-free shopping which enables international shoppers to claim back the VAT on their purchases on our POS solution. | 
 | [**POS Menu**](../../retail/posunit/explanation/POS_menu.md) | Define main menus, submenus, and buttons in the POS unit. |
