@@ -509,6 +509,7 @@
             group("NpRv Vouchers")
             {
                 Caption = 'NpRv Vouchers';
+                Image = Voucher;
                 action("Voucher Lines")
                 {
                     Caption = 'Voucher Lines';
@@ -928,6 +929,7 @@
             group(Send)
             {
                 Caption = 'Send';
+                Image = SendTo;
                 action(SendSMS)
                 {
                     Caption = 'Send SMS';
@@ -945,6 +947,7 @@
             group(PDF2NAV)
             {
                 Caption = 'PDF2NAV';
+                Image = SendEmailPDF;
                 action(EmailLog)
                 {
                     Caption = 'E-mail Log';
