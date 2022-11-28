@@ -414,6 +414,7 @@
                 group(Ticketing)
                 {
                     Caption = 'Ticketing';
+                    Image = Report;
                     action("NPR TM Ticket Reservation List")
                     {
                         Caption = 'List of Attendees';
@@ -434,6 +435,7 @@
                 group(Membership)
                 {
                     Caption = 'Membership';
+                    Image = Report;
                     action("NPR MM Membership Status")
                     {
                         Caption = 'Membership Status';
@@ -454,6 +456,7 @@
                 group(LoyaltyProcessing)
                 {
                     Caption = 'Loyalty';
+                    Image = Report;
                     action("NPR MM Membersh. Points Summ.")
                     {
                         Caption = 'Membership Point Summary';
