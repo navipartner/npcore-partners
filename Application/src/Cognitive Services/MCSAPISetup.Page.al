@@ -4,11 +4,10 @@
 
     Caption = 'MCS API Setup';
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR MCS API Setup";
     DelayedInsert = true;
-    ApplicationArea = NPRRetail;
+
     layout
     {
         area(content)
