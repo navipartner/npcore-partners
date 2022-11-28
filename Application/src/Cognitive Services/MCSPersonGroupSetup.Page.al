@@ -5,9 +5,7 @@
     Caption = 'MCS Person Group Setup';
     PageType = List;
     SourceTable = "NPR MCS Person Groups Setup";
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
-
+    UsageCategory = None;
 
     layout
     {

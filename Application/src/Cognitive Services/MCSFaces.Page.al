@@ -8,9 +8,7 @@
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "NPR MCS Faces";
-    UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
-
+    UsageCategory = None;
 
     layout
     {

@@ -5,10 +5,7 @@
     Caption = 'MCS Person';
     PageType = List;
     SourceTable = "NPR MCS Person";
-    UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
-
-
+    UsageCategory = None;
     layout
     {
         area(content)

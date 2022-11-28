@@ -5,10 +5,7 @@
     Caption = 'MCS Person Business Entities';
     PageType = List;
     SourceTable = "NPR MCS Person Bus. Entit.";
-    UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
-
-
+    UsageCategory = None;
     layout
     {
         area(content)
