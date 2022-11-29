@@ -1055,6 +1055,20 @@
                 ToolTip = 'Opens the Event Subscriptions page.';
                 ApplicationArea = NPRRetail;
             }
+            action("NPR Update Description")
+            {
+                Caption = 'Update Magento Description';
+                Promoted = true;
+                PromotedCategory = Process;
+                Image = Import;
+                ApplicationArea = All;
+                ToolTip = 'Executes the Update Magento Description action.';
+
+                trigger OnAction()
+                begin
+                    Xmlport.Run(Xmlport::"NPR ImportMagentoDescription", false, true);
+                end;
+            }
         }
     }
 

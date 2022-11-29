@@ -186,11 +186,10 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Image = Import;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Update Magento Description action.';
-
-                trigger OnAction()
-                begin
-                    Xmlport.Run(Xmlport::"NPR ImportMagentoDescription", false, true);
-                end;
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Action moved to page Magento Setup';
+                ObsoleteTag = '21';
+                Visible = false;
             }
             action("NPR POS Sales Entries")
             {
