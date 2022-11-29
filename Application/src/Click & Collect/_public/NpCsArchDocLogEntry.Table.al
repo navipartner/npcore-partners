@@ -1,10 +1,9 @@
 ﻿table 6151203 "NPR NpCs Arch. Doc. Log Entry"
 {
-    Access = Internal;
     Caption = 'Collect Document Log Entry';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR NpCs Arch.Doc.Log Entries";
-    LookupPageID = "NPR NpCs Arch.Doc.Log Entries";
+    DrillDownPageId = "NPR NpCs Arch.Doc.Log Entries";
+    LookupPageId = "NPR NpCs Arch.Doc.Log Entries";
 
     fields
     {
@@ -37,7 +36,7 @@
             Caption = 'Log Message';
             DataClassification = CustomerContent;
         }
-        field(25; "Error Message"; BLOB)
+        field(25; "Error Message"; Blob)
         {
             Caption = 'Error Message';
             DataClassification = CustomerContent;
@@ -85,7 +84,7 @@
         }
     }
 
-    procedure GetErrorMessage() FullLogMessage: Text
+    internal procedure GetErrorMessage() FullLogMessage: Text
     var
         InStr: InStream;
         TextBuffer: Text;
@@ -95,7 +94,7 @@
             exit('');
 
         CalcFields("Error Message");
-        "Error Message".CreateInStream(InStr, TEXTENCODING::UTF8);
+        "Error Message".CreateInStream(InStr, TextEncoding::UTF8);
         while not InStr.EOS do begin
             InStr.Read(TextBuffer);
             FullLogMessage += TextBuffer;

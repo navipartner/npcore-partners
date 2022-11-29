@@ -1,10 +1,9 @@
 ﻿table 6151199 "NPR NpCs Document Log Entry"
 {
-    Access = Internal;
     Caption = 'Collect Document Log Entry';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR NpCs Document Log Entries";
-    LookupPageID = "NPR NpCs Document Log Entries";
+    DrillDownPageId = "NPR NpCs Document Log Entries";
+    LookupPageId = "NPR NpCs Document Log Entries";
 
     fields
     {
@@ -30,14 +29,14 @@
         {
             Caption = 'Workflow Module';
             DataClassification = CustomerContent;
-            TableRelation = "NPR NpCs Workflow Module".Code WHERE(Type = FIELD("Workflow Type"));
+            TableRelation = "NPR NpCs Workflow Module".Code where(Type = field("Workflow Type"));
         }
         field(20; "Log Message"; Text[250])
         {
             Caption = 'Log Message';
             DataClassification = CustomerContent;
         }
-        field(25; "Error Message"; BLOB)
+        field(25; "Error Message"; Blob)
         {
             Caption = 'Error Message';
             DataClassification = CustomerContent;
@@ -91,7 +90,7 @@
             "User ID" := CopyStr(UserId, 1, MaxStrLen("User ID"));
     end;
 
-    procedure GetErrorMessage() FullLogMessage: Text
+    internal procedure GetErrorMessage() FullLogMessage: Text
     var
         InStr: InStream;
         TextBuffer: Text;
@@ -101,7 +100,7 @@
             exit('');
 
         CalcFields("Error Message");
-        "Error Message".CreateInStream(InStr, TEXTENCODING::UTF8);
+        "Error Message".CreateInStream(InStr, TextEncoding::UTF8);
         while not InStr.EOS do begin
             InStr.Read(TextBuffer);
             FullLogMessage += TextBuffer;

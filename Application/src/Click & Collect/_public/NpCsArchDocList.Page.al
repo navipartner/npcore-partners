@@ -1,6 +1,5 @@
 ﻿page 6151211 "NPR NpCs Arch. Doc. List"
 {
-    Extensible = False;
     Caption = 'Archived Collect Document List';
     InsertAllowed = false;
     PageType = List;
@@ -11,7 +10,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -213,17 +212,17 @@
 
     actions
     {
-        area(navigation)
+        area(Navigation)
         {
             action("Log Entries")
             {
                 Caption = 'Log Entries';
                 Image = Log;
-                RunObject = Page "NPR NpCs Arch.Doc.Log Entries";
-                RunPageLink = "Document Entry No." = FIELD("Entry No.");
-                RunPageView = SORTING("Entry No.")
-                              ORDER(Descending);
-                ShortCutKey = 'Ctrl+F7';
+                RunObject = page "NPR NpCs Arch.Doc.Log Entries";
+                RunPageLink = "Document Entry No." = field("Entry No.");
+                RunPageView = sorting("Entry No.")
+                              order(descending);
+                ShortcutKey = 'Ctrl+F7';
 
                 ToolTip = 'Executes the Log Entries action';
                 ApplicationArea = NPRRetail;

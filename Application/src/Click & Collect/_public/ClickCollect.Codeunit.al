@@ -47,12 +47,30 @@ codeunit 6059847 "NPR Click & Collect"
         NpCsWorkflowMgt.RunCallback(NpCsDocument);
     end;
 
+    procedure InsertLogEntryWithTypeSendOrder(NpCsDocument: Record "NPR NpCs Document"; LogMessage: Text; ErrorEntry: Boolean; ErrorMessage: Text)
+    var
+        NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
+        NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
+    begin
+        NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Send Order";
+        NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, ErrorEntry, ErrorMessage);
+    end;
+
     procedure InsertLogEntryWithTypeOrderStatus(NpCsDocument: Record "NPR NpCs Document"; LogMessage: Text; ErrorEntry: Boolean; ErrorMessage: Text)
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
     begin
         NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Order Status";
+        NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, ErrorEntry, ErrorMessage);
+    end;
+
+    procedure InsertLogEntryWithTypePostProcessing(NpCsDocument: Record "NPR NpCs Document"; LogMessage: Text; ErrorEntry: Boolean; ErrorMessage: Text)
+    var
+        NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
+        NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
+    begin
+        NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Post Processing";
         NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, ErrorEntry, ErrorMessage);
     end;
 

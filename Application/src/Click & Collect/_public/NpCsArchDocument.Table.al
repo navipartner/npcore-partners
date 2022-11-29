@@ -1,10 +1,9 @@
 ﻿table 6151202 "NPR NpCs Arch. Document"
 {
-    Access = Internal;
     Caption = 'Collect Document';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR NpCs Arch. Doc. List";
-    LookupPageID = "NPR NpCs Arch. Doc. List";
+    DrillDownPageId = "NPR NpCs Arch. Doc. List";
+    LookupPageId = "NPR NpCs Arch. Doc. List";
 
     fields
     {
@@ -31,11 +30,11 @@
             Caption = 'Document No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
-            TableRelation = IF ("Document Type" = FILTER(Quote | Order | Invoice | "Credit Memo" | "Blanket Order" | "Return Order")) "Sales Header"."No." WHERE("Document Type" = FIELD("Document Type"))
-            ELSE
-            IF ("Document Type" = CONST("Posted Invoice")) "Sales Invoice Header"
-            ELSE
-            IF ("Document Type" = CONST("Posted Credit Memo")) "Sales Cr.Memo Header";
+            TableRelation = if ("Document Type" = filter(Quote | Order | Invoice | "Credit Memo" | "Blanket Order" | "Return Order")) "Sales Header"."No." where("Document Type" = field("Document Type"))
+            else
+            if ("Document Type" = const("Posted Invoice")) "Sales Invoice Header"
+            else
+            if ("Document Type" = const("Posted Credit Memo")) "Sales Cr.Memo Header";
         }
         field(10; "Reference No."; Code[50])
         {
@@ -78,7 +77,7 @@
             Caption = 'From Store Code';
             DataClassification = CustomerContent;
         }
-        field(35; "Callback Data"; BLOB)
+        field(35; "Callback Data"; Blob)
         {
             Caption = 'Callback Data';
             DataClassification = CustomerContent;
@@ -167,25 +166,25 @@
         {
             Caption = 'E-mail Template (Pending)';
             DataClassification = CustomerContent;
-            TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
+            TableRelation = "NPR E-mail Template Header".Code where("Table No." = const(6151198));
         }
         field(140; "E-mail Template (Confirmed)"; Code[20])
         {
             Caption = 'E-mail Template (Confirmed)';
             DataClassification = CustomerContent;
-            TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
+            TableRelation = "NPR E-mail Template Header".Code where("Table No." = const(6151198));
         }
         field(145; "E-mail Template (Rejected)"; Code[20])
         {
             Caption = 'E-mail Template (Rejected)';
             DataClassification = CustomerContent;
-            TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
+            TableRelation = "NPR E-mail Template Header".Code where("Table No." = const(6151198));
         }
         field(150; "E-mail Template (Expired)"; Code[20])
         {
             Caption = 'E-mail Template (Expired)';
             DataClassification = CustomerContent;
-            TableRelation = "NPR E-mail Template Header".Code WHERE("Table No." = CONST(6151198));
+            TableRelation = "NPR E-mail Template Header".Code where("Table No." = const(6151198));
         }
         field(155; "Notify Customer via Sms"; Boolean)
         {
@@ -196,25 +195,25 @@
         {
             Caption = 'Sms Template (Pending)';
             DataClassification = CustomerContent;
-            TableRelation = "NPR SMS Template Header".Code WHERE("Table No." = CONST(6151198));
+            TableRelation = "NPR SMS Template Header".Code where("Table No." = const(6151198));
         }
         field(165; "Sms Template (Confirmed)"; Code[10])
         {
             Caption = 'Sms Template (Confirmed)';
             DataClassification = CustomerContent;
-            TableRelation = "NPR SMS Template Header".Code WHERE("Table No." = CONST(6151198));
+            TableRelation = "NPR SMS Template Header".Code where("Table No." = const(6151198));
         }
         field(170; "Sms Template (Rejected)"; Code[10])
         {
             Caption = 'Sms Template (Rejected)';
             DataClassification = CustomerContent;
-            TableRelation = "NPR SMS Template Header".Code WHERE("Table No." = CONST(6151198));
+            TableRelation = "NPR SMS Template Header".Code where("Table No." = const(6151198));
         }
         field(175; "Sms Template (Expired)"; Code[10])
         {
             Caption = 'Sms Template (Expired)';
             DataClassification = CustomerContent;
-            TableRelation = "NPR SMS Template Header".Code WHERE("Table No." = CONST(6151198));
+            TableRelation = "NPR SMS Template Header".Code where("Table No." = const(6151198));
         }
         field(195; "Delivery Expiry Duration"; Duration)
         {
@@ -252,7 +251,7 @@
         {
             Caption = 'Prepayment Account No.';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account" WHERE("Direct Posting" = CONST(true));
+            TableRelation = "G/L Account" where("Direct Posting" = const(true));
 
             ValidateTableRelation = false;
         }
@@ -267,15 +266,15 @@
         {
             Caption = 'Delivery Document No.';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Delivery Document Type" = CONST("Sales Shipment")) "Sales Shipment Header"
-            ELSE
-            IF ("Delivery Document Type" = CONST("Sales Invoice")) "Sales Invoice Header"
-            ELSE
-            IF ("Delivery Document Type" = CONST("Sales Return Receipt")) "Return Receipt Header"
-            ELSE
-            IF ("Delivery Document Type" = CONST("Sales Credit Memo")) "Sales Cr.Memo Header"
-            ELSE
-            IF ("Delivery Document Type" = CONST("POS Entry")) "NPR POS Entry";
+            TableRelation = if ("Delivery Document Type" = const("Sales Shipment")) "Sales Shipment Header"
+            else
+            if ("Delivery Document Type" = const("Sales Invoice")) "Sales Invoice Header"
+            else
+            if ("Delivery Document Type" = const("Sales Return Receipt")) "Return Receipt Header"
+            else
+            if ("Delivery Document Type" = const("Sales Credit Memo")) "Sales Cr.Memo Header"
+            else
+            if ("Delivery Document Type" = const("POS Entry")) "NPR POS Entry";
         }
         field(235; "Archive on Delivery"; Boolean)
         {
@@ -302,7 +301,7 @@
             Caption = 'Processing Print Template';
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
-            TableRelation = "NPR RP Template Header" WHERE("Table ID" = CONST(6151198));
+            TableRelation = "NPR RP Template Header" where("Table ID" = const(6151198));
         }
         field(300; "Bill via"; Option)
         {
@@ -317,14 +316,14 @@
             Caption = 'Delivery Print Template (POS)';
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
-            TableRelation = "NPR RP Template Header" WHERE("Table ID" = CONST(6151198));
+            TableRelation = "NPR RP Template Header" where("Table ID" = const(6151198));
         }
         field(310; "Delivery Print Template (S.)"; Code[20])
         {
             Caption = 'Delivery Template (Sales Document)';
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
-            TableRelation = "NPR RP Template Header" WHERE("Table ID" = CONST(6151198));
+            TableRelation = "NPR RP Template Header" where("Table ID" = const(6151198));
         }
         field(315; "Salesperson Code"; Code[20])
         {
