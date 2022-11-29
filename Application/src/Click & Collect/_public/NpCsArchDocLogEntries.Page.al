@@ -1,14 +1,14 @@
-﻿page 6151201 "NPR NpCs Document Log Entries"
+﻿page 6151212 "NPR NpCs Arch.Doc.Log Entries"
 {
-    Extensible = False;
-    Caption = 'Collect Document Log Entries';
+    Caption = 'Archived Collect Document Log Entries';
     Editable = false;
     PageType = List;
     UsageCategory = None;
-    SourceTable = "NPR NpCs Document Log Entry";
+    SourceTable = "NPR NpCs Arch. Doc. Log Entry";
+
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -73,7 +73,7 @@
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             action("View Error Message")
             {
@@ -94,4 +94,3 @@
         }
     }
 }
-
