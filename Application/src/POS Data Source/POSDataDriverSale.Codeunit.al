@@ -104,7 +104,7 @@
         DataRow.Add(GetLastSalePaidText(), LastSalePayment);
         DataRow.Add(GetLastSaleChangeText(), LastSaleReturnAmount);
         DataRow.Add(GetLastSaleDateText(), LastSaleDateText);
-        DataRow.Add(GetCompanyNameText(), CompanyName);
+        DataRow.Add(GetCompanyNameText(), GetCompanyDisplayName());
 
         Sale.GetCurrentSale(SalePOS);
 
@@ -115,15 +115,15 @@
         POSUnit.SetLoadFields(Name);
         if not POSUnit.Get(SalePOS."Register No.") then
             clear(POSUnit);
-        
+
         if SalePOS."Customer No." <> '' then begin
             Customer.SetLoadFields(Name, "Customer Posting Group");
             if not Customer.Get(SalePOS."Customer No.") then
                 Clear(Customer);
         end;
 
-        if SalePOS."Contact No." <> '' then begin      
-            Contact.SetLoadFields(Name);  
+        if SalePOS."Contact No." <> '' then begin
+            Contact.SetLoadFields(Name);
             if not Contact.Get(SalePOS."Contact No.") then
                 if Customer."No." <> '' then begin
                     ContactBusinessRelation.SetCurrentKey("Link to Table", "No.");
@@ -227,12 +227,20 @@
         exit('CustomerPostingGroup');
     end;
 
-
     local procedure GetCustomerTypeString(SalePOS: Record "NPR POS Sale"): Text
     begin
         if SalePOS."Customer No." = '' then
             exit('')
         else
             exit(Format(SalePOS."Customer Type"))
+    end;
+
+    local procedure GetCompanyDisplayName(): Text
+    var
+        Company: Record Company;
+    begin
+        if Company.Get(CompanyName()) and (Company."Display Name" <> '') then
+            exit(Company."Display Name");
+        exit(CompanyName());
     end;
 }
