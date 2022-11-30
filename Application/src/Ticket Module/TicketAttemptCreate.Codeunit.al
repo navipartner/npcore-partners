@@ -55,17 +55,26 @@
         if (not IsSuccess) then
             ResponseMessage := GetLastErrorText();
 
+        if (_AttemptFunction = _AttemptFunction::REUSE) then
+            _ReusedTokenId := _TicketAttemptCreate.GetReusedTokenId();
+
         Commit();
         exit(IsSuccess);
     end;
 
-    procedure AttemptValidateRequestForTicketReuse(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; ReusedTokenId: Text; var ResponseMessage: Text): Boolean
+    procedure AttemptValidateRequestForTicketReuse(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; var ReusedTokenId: Text; var ResponseMessage: Text): Boolean
+    var
+        Successful: Boolean;
     begin
 
         TempTicketReservationRequest.Copy(TmpTicketReservationRequest, true);
         _AttemptFunction := _AttemptFunction::REUSE;
 
-        exit(InvokeAttemptAction(ResponseMessage));
+        Successful := InvokeAttemptAction(ResponseMessage);
+        if (Successful) then
+            ReusedTokenId := _ReusedTokenId;
+
+        exit(Successful);
     end;
 
     procedure AttemptValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; var ResponseMessage: Text): Boolean
@@ -134,6 +143,7 @@
 
             TicketReservationRequest.SetFilter("External Member No.", '=%1', TmpTicketReservationRequest."External Member No.");
             TicketReservationRequest.SetFilter("Created Date Time", '%1..%2', CreateDateTime(Today, 0T), CreateDateTime(Today, 235959T));
+            TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::CONFIRMED);
             TicketReservationRequest.SetFilter(Quantity, '=%1', TmpTicketReservationRequest.Quantity);
 
             IsRepeatedEntry := (IsRepeatedEntry and (TmpTicketReservationRequest."External Member No." <> ''));
@@ -216,4 +226,9 @@
     end;
 
     #endregion
+
+    internal procedure GetReusedTokenId(): Text
+    begin
+        exit(_ReusedTokenId);
+    end;
 }
