@@ -56,6 +56,10 @@ page 6060013 "NPR APIV1 - Magento Picture"
                 {
                     Caption = 'Image', Locked = true;
                 }
+                field(magentoUrl; MagentoUrl)
+                {
+                    Caption = 'Magento Url', Locked = true;
+                }
                 field(replicationCounter; Rec."Replication Counter")
                 {
                     Caption = 'replicationCounter', Locked = true;
@@ -80,17 +84,24 @@ page 6060013 "NPR APIV1 - Magento Picture"
 
     var
         TempNPRBlob: Record "NPR BLOB buffer" temporary;
+        MagentoSetup: Record "NPR Magento Setup";
+        MagentoUrl: Text;
 
     trigger OnInit()
     begin
         CurrentTransactionType := TransactionType::Update;
     end;
 
+    trigger OnOpenPage()
+    begin
+        MagentoSetup.Get();
+    end;
+
     trigger OnAfterGetRecord()
     var
         OStr: OutStream;
     begin
-
+        BuildMagentoUrl();
         // get Media fields
         TempNPRBlob.Init();
         if Rec.Image.HasValue() then begin
@@ -108,6 +119,14 @@ page 6060013 "NPR APIV1 - Magento Picture"
         TenantMedia.CalcFields(Content);
         TenantMedia.Content.CreateInStream(IStr);
         CopyStream(OStr, IStr);
+    end;
+
+    local procedure BuildMagentoUrl()
+    begin
+        Clear(MagentoUrl);
+        if Rec.Name = '' then
+            exit;
+        MagentoUrl := MagentoSetup."Magento Url" + 'media/catalog/' + Rec.GetMagentoType() + '/api/' + Rec.Name;
     end;
 
 }
