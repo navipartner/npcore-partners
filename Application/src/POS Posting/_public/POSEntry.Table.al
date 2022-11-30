@@ -571,6 +571,7 @@
         key(Key13; "Posting Date", "Sales Document Type", "Sales Document No.")
         { }
         key(Key14; "Post Item Entry Status") { }
+        key(Key15; "Posting Date", "Amount Excl. Tax", "Return Sales Quantity", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code") { }
     }
 
     fieldgroups
