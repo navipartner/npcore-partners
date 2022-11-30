@@ -3,6 +3,7 @@
     Access = Internal;
 
     Subtype = Upgrade;
+    EventSubscriberInstance = Manual;
 
 
     trigger OnUpgradePerCompany()
