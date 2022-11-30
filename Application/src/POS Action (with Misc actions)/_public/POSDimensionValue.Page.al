@@ -1,7 +1,6 @@
 page 6150624 "NPR POS Dimension Value"
 {
     Caption = 'Dimension Value List';
-    //  DataCaptionExpression = GetFormCaption;
     Editable = true;
     SourceTable = "Dimension Value";
     PageType = List;
@@ -9,6 +8,7 @@ page 6150624 "NPR POS Dimension Value"
     DeleteAllowed = false;
     InsertAllowed = false;
     ModifyAllowed = false;
+    ApplicationArea = NPRRetail;
 
     layout
     {
