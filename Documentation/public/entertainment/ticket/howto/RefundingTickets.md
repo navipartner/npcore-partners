@@ -1,8 +1,8 @@
-# Refunding tickets
+# Refund tickets
 
 Tickets can either be refunded from the POS or from Business Central.
 
-## Refunding tickets in POS
+## Refund tickets in POS
 
 In the POS system you can revoke and refund tickets:  
 
@@ -14,7 +14,7 @@ In the POS system you can revoke and refund tickets:
    Make sure that **Boolean** is set to **False**.
 6. When you click the button in the POS system a popup window will open, and you need to input the customers external ticket number.
 
-## Refunding tickets in BC17
+## Refund tickets in BC17
 
 You can refund tickets (web orders) directly from BC without accessing the POS (e.g. quickpay):
 

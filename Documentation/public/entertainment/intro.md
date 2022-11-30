@@ -12,7 +12,7 @@ All data from the ticket sales, stores, and cafés is collected and managed in B
 
 ### Highlighted articles
 
-- [Restaurant module](../entertainment/restaurant/intro.md)
-- [Ticket module](../entertainment/ticket/intro.md)
-- [Ticket Designer](../entertainment/ticket/tutorial/TicketDesigner.md)
-- [Set up tickets using the Ticket Setup Wizard](../entertainment/ticket/tutorial/ticket_tutorial.md)
+| Module     | Description |
+| ----------- | ----------- |
+| [**Ticket**](../entertainment/ticket/intro.md) | Learn what tickets are, and how they relate to our solutions. |
+| [**Membership**](../entertainment/membership/intro.md) | Learn more about our membership module, which automates processes related to handling loyalty cards and memberships. |
