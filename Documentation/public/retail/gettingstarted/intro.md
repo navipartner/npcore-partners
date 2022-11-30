@@ -8,7 +8,7 @@ NP Retail is a cloud-based POS solution that uses Microsoft Dynamics 365 Busines
 
 - Once you're ready for more advanced features, see our guides for setting up desktop software products [Major Tom](install_major_tom.md) and [Minor Tom](install_minor_tom.md).
 
-- If you're unsure whether our solution is supported by your hardware components, refer to the [system requirements](system_requirements.md)
+- If you're unsure whether our solution is supported by your hardware components, refer to the [system requirements](system_requirements.md).
 
 ### Highlighted articles
 
