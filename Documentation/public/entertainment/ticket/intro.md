@@ -9,16 +9,14 @@ The ticket information structure is complex and consists of several entities whi
 
 ### Highlighted articles
 
-- [Ticket designer](./tutorial/TicketDesigner.md)
-- [Ticket admission](./explanation/admission.md)
-- [Dynamic ticket](explanation/DynamicTicket.md)
-- [Location vs. reservation](./explanation/locationVsReservation.md)
-- [Authorization code](./explanation/AuthorizationCode.md)
-- [Admission dependency code](./explanation/AdmissionDependencyCode.md)
-- [Change ticket reservation](./howto/ChangeTicketReservation.md)
-- [Create notification profile](./howto/CreateNotificationProfile.md)
-- [Refund tickets](./howto/RefundingTickets.md)
-- [Set up refund policy](./howto/SetUpRefundPolicy.md)
-- [Create setup for a ticket](./tutorial/ticket_tutorial.md)
-- [Create prepaid tickets](howto/create_prepaid_ticket.md)
-- [Create postpaid tickets](howto/create_postpaid_ticket.md)
+| Module     | Description |
+| ----------- | ----------- |
+| [**Ticket Designer**](tutorial/TicketDesigner.md) | Refer to this tutorial to learn what kind of tools can be used in the Ticket Designer, and what the associated shortcuts are. | 
+| [**Ticket Setup Wizard**](tutorial/ticket_tutorial.md) | Use this guide while creating tickets with the Ticket Setup Wizard, to help walk you through the entire process. |
+| [**Ticket Notification Profile**](howto/CreateNotificationProfile.md) | This guide walks you through the process of creating a ticket notification profile. |
+| [**Ticket BOM**](reference/ticket_bom.md) | See how each of the fields in the **Ticket BOM** page can contribute to the ticket configuration you wish to establish. |
+| [**Prepaid tickets**](howto/create_prepaid_ticket.md) | Follow the steps provided in this article to create prepaid tickets in Business Central. |
+| [**Postpaid tickets**](howto/create_postpaid_ticket.md) | Follow the steps provided in this article to create postpaid tickets in Business Central. |
+| [**Ticket refund**](howto/RefundingTickets.md) | See which options are available when it comes to refunding tickets from Business Central and POS. |
+| [**Base Calendar for Admission**](explanation/BaseCalendar.md) | Learn what admission base calendars are, and what customizations can be performed in regards to it. |
+| [**Ticket Statistics and forecast**](explanation/TicketStatandForecast.md) | Learn how you can generate ticket-related statistics. |

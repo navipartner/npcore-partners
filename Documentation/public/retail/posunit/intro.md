@@ -4,7 +4,7 @@
 
 ### Highlighted articles
 
-| POS Profile     | Description |
+| Module     | Description |
 | ----------- | ----------- |
 | [**Create a new POS**](./howto/createnew.md) | Use an existing POS unit as a reference model for creating a new POS unit, and establish connection between the two, if needed. |
 | [**Set up job queue to automatically post POS entries**](howto/Set_up_job_queue_to_post_POS_entries.md) or [**Manually post POS entries and check if they are posted**](howto/manually_post_POS_entries.md) | After the sale is finalized, the POS entry is created, but it needs to be posted. Choose whether you want to do this manually each time, or if you wish to set up a job to do it for you. |
