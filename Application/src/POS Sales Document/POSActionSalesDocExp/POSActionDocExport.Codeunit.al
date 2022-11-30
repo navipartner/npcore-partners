@@ -1,4 +1,4 @@
-﻿codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
+codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
 {
     Access = Internal;
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
