@@ -95,39 +95,35 @@
                 Editable = false;
                 field("Period Start"; Rec."Period Start")
                 {
-
                     ToolTip = 'Specifies the beginning of the period.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Period Name"; Rec."Period Name")
                 {
-
                     ToolTip = 'Specifies the name of the period.';
                     ApplicationArea = NPRRetail;
                 }
 
                 field(totalCount; totalCount)
                 {
-
                     Caption = 'Number of Transactions';
                     ToolTip = 'Specifies the total number of the transactions.';
                     ApplicationArea = NPRRetail;
                 }
                 field(CalculatedAverage; CalcAverage())
                 {
-
                     Caption = 'Average of Transactions';
                     ToolTip = 'Specifies the average value of the transactions.';
                     ApplicationArea = NPRRetail;
                 }
-            }
-        }
-    }
+                field(ReturnSalesQuantity; ReturnSalesQuantity)
+                {
+                    Caption = 'Return Sales Quantity';
+                    ToolTip = 'Specifies the value of the Return Sales Quantity field';
+                    ApplicationArea = NPRRetail;
+                }
 
-    actions
-    {
-        area(processing)
-        {
+            }
         }
     }
 
@@ -183,23 +179,29 @@
         Dim2Filter: Code[20];
         PeriodType: Option Day,Week,Month,Year;
         TotalCount: Decimal;
-        POSEntry: Record "NPR POS Entry";
+        POSEntry: Query "NPR Sales Ticket Statistics";
+        ReturnSalesQuantity: Decimal;
 
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            POSEntry.SetRange("Posting Date", Rec."Period Start", Rec."Period End")
+            POSEntry.SetRange(Posting_Date_Filter, Rec."Period Start", Rec."Period End")
         else
-            POSEntry.SetRange("Posting Date", 0D, Rec."Period End");
+            POSEntry.SetRange(Posting_Date_Filter, 0D, Rec."Period End");
     end;
 
     internal procedure CalcAverage() Result: Decimal
     var
         totalAmount: Decimal;
     begin
-        POSEntry.CalcSums("Amount Excl. Tax", "Amount Incl. Tax");
-        totalAmount := POSEntry."Amount Excl. Tax";
-        totalCount := POSEntry.Count();
+        if POSEntry.Open() then begin
+            if POSEntry.Read()
+            then begin
+                TotalAmount := POSEntry.Amount_Excl_Tax;
+                TotalCount := POSEntry.NumberOfEntries;
+                ReturnSalesQuantity := POSEntry.Return_Sales_Quantity * -1;
+            end;
+        end;
 
         if totalCount <> 0 then
             Result := TotalAmount / TotalCount
@@ -210,13 +212,13 @@
     internal procedure SetDimensionFilters()
     begin
         if Dim1Filter <> '' then
-            POSEntry.SetRange("Shortcut Dimension 1 Code", Dim1Filter)
+            POSEntry.SetRange(Shortcut_Dim_1_Code_Filter, Dim1Filter)
         else
-            POSEntry.SetRange("Shortcut Dimension 1 Code");
+            POSEntry.SetRange(Shortcut_Dim_1_Code_Filter);
 
         if Dim2Filter <> '' then
-            POSEntry.SetFilter("Shortcut Dimension 2 Code", Dim2Filter)
+            POSEntry.SetFilter(Shortcut_Dim_2_Code_Filter, Dim2Filter)
         else
-            POSEntry.SetRange("Shortcut Dimension 2 Code");
+            POSEntry.SetRange(Shortcut_Dim_2_Code_Filter);
     end;
 }
