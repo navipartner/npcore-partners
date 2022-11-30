@@ -377,6 +377,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ITEM_VARIANTS', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Item Variants";
     }
+    value(71; SALES_DOC_IMP)
+    {
+        Caption = 'SALES_DOC_IMP', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Doc. Import";
+    }
     value(72; SALES_DOC_SHOW)
     {
         Caption = 'SALES_DOC_SHOW', Locked = true, MaxLength = 20;

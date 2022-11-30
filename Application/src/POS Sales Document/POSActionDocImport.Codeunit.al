@@ -1,267 +1,81 @@
-﻿codeunit 6150861 "NPR POS Action: Doc. Import"
+codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'Import an open standard NAV sales document to current POS sale and delete the document.';
-        CaptionDocType: Label 'Document Type';
-        CaptionLocationFrom: Label 'Location From';
-        CaptionLocationFilter: Label 'Location Filter';
-        CaptionSalesView: Label 'Doc. View';
-        CaptionSelectCustomer: Label 'Select Customer';
-        DescSalesView: Label 'Pre-filtered list of sales documents';
-        DescSelectCustomer: Label 'Prompt for customer selection if none on sale';
-        DescDocType: Label 'Filter on Document Type';
-        DescLocationFrom: Label 'Select the source to get location from to use as a filtering criteria for sales document list';
-        DescLocationFilter: Label 'A string, which will be used as a location filter for sales document list, if ''Location From'' parameter is set to ''Location Filter Parameter''';
-        OptionDocType: Label 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
-        OptionLocationFrom: Label 'POS Store,Location Filter Parameter';
-        EnableSalesPersonFromOrderDescLbl: Label 'Keeps salesperson from sales order';
-
-    local procedure ActionCode(): Code[20]
+        ParamDocType_CptLbl: Label 'Document Type';
+        ParamDocTypeOpt_Lbl: Label 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order', Locked = true;
+        ParamDocTypeOpt_CptLbl: Label 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
+        ParamDocType_DescLbl: Label 'Filter on Document Type';
+        ParamSelectCust_Lbl: Label 'Select Customer';
+        ParamSelectCust_DescLbl: Label 'Prompt for customer selection if none on sale';
+        ParamSalesDocView_CptLbl: Label 'Sales Document View String';
+        ParamSalesDocView_DescLbl: Label 'Pre-filtered list of sales documents';
+        ParamLocationFrom_CptLbl: Label 'Location From';
+        ParamLocationFrom_DescLbl: Label 'Pre-filtered location option';
+        ParamLocationFrom_OptionsLbl: Label 'POS Store,Location Filter Parameter', Locked = true;
+        ParamLocationFrom_OptionsCptLbl: Label 'POS Store, Location Filter Parameter';
+        ParamLocation_CptLbl: Label 'Location Filter';
+        ParamLocation_DescLbl: Label 'Pre-filtered location';
+        ParamConfirmDiscAmt_CptLbl: Label 'Confirm Invoice Discount Amount';
+        ParamConfirmDiscAmt_DescLbl: Label 'Enable/Disable Invoice Discount Amount confirmation';
+        ParamEnableSalesPerson_CptLbl: Label 'Enable Salesperson from Order';
+        ParamEnableSalesPerson_DescLbl: Label 'Keeps salesperson from sales order';
     begin
-        exit('SALES_DOC_IMP');
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddOptionParameter('DocumentType',
+                                         ParamDocTypeOpt_Lbl,
+                                         SelectStr(2, ParamDocTypeOpt_Lbl),
+                                         ParamDocType_CptLbl,
+                                         ParamDocType_DescLbl,
+                                         ParamDocTypeOpt_CptLbl);
+        WorkflowConfig.AddBooleanParameter('SelectCustomer', true, ParamSelectCust_Lbl, ParamSelectCust_DescLbl);
+        WorkflowConfig.AddTextParameter('SalesDocViewString', '', ParamSalesDocView_CptLbl, ParamSalesDocView_DescLbl);
+        WorkflowConfig.AddOptionParameter('LocationFrom',
+                                  ParamLocationFrom_OptionsLbl,
+                                  SelectStr(1, ParamLocationFrom_OptionsLbl),
+                                  ParamLocationFrom_CptLbl,
+                                  ParamLocationFrom_DescLbl,
+                                  ParamLocationFrom_OptionsCptLbl);
+        WorkflowConfig.AddTextParameter('LocationFilter', '', ParamLocation_CptLbl, ParamLocation_DescLbl);
+        WorkflowConfig.AddBooleanParameter('ConfirmInvDiscAmt', false, ParamConfirmDiscAmt_CptLbl, ParamConfirmDiscAmt_DescLbl);
+        WorkflowConfig.AddBooleanParameter('EnableSalesPersonFromOrder', false, ParamEnableSalesPerson_CptLbl, ParamEnableSalesPerson_DescLbl);
     end;
 
-    local procedure ActionVersion(): Text[30]
+
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     begin
-        exit('1.5');
+        ImportDoc(Context, Sale);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple) then begin
-            Sender.RegisterWorkflowStep('ImportDocument', 'respond();');
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterDataSourceBinding(ThisDataSource());
-
-            Sender.RegisterOptionParameter('DocumentType', 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order', 'Order');
-            Sender.RegisterBooleanParameter('SelectCustomer', true);
-            Sender.RegisterTextParameter('SalesDocViewString', '');
-            Sender.RegisterOptionParameter('LocationFrom', 'POS Store,Location Filter Parameter', 'POS Store');
-            Sender.RegisterTextParameter('LocationFilter', '');
-            Sender.RegisterBooleanParameter('ConfirmInvDiscAmt', false);
-            Sender.RegisterBooleanParameter('EnableSalesPersonFromOrder', false);
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure ImportDoc(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale")
     var
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        JSON: Codeunit "NPR POS JSON Management";
-        POSSale: Codeunit "NPR POS Sale";
-        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
-        SelectCustomer, ConfirmInvDiscAmt : Boolean;
+        SelectCustomer, ConfirmInvDiscAmt, SalesPersonFromOrder : Boolean;
         DocumentType: Integer;
         LocationSource: Option "POS Store","Location Filter Parameter";
         LocationFilter: Text;
         SalesDocViewString: Text;
-        SalesPersonFromOrder: Boolean;
+        POSActionDocImpB: Codeunit "NPR POS Action: Doc. Import B";
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-        Handled := true;
+        SelectCustomer := Context.GetBooleanParameter('SelectCustomer');
+        DocumentType := Context.GetIntegerParameter('DocumentType');
+        SalesDocViewString := Context.GetStringParameter('SalesDocViewString');
+        LocationSource := Context.GetIntegerParameter('LocationFrom');
+        LocationFilter := Context.GetStringParameter('LocationFilter');
+        SalesPersonFromOrder := Context.GetBooleanParameter('EnableSalesPersonFromOrder');
+        ConfirmInvDiscAmt := Context.GetBooleanParameter('ConfirmInvDiscAmt');
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        SelectCustomer := JSON.GetBooleanParameterOrFail('SelectCustomer', ActionCode());
-        DocumentType := JSON.GetIntegerParameterOrFail('DocumentType', ActionCode());
-        SalesDocViewString := JSON.GetStringParameter('SalesDocViewString');
-        LocationSource := JSON.GetIntegerParameterOrFail('LocationFrom', ActionCode());
-        LocationFilter := JSON.GetStringParameter('LocationFilter');
-        SalesPersonFromOrder := JSON.GetBooleanParameterOrFail('EnableSalesPersonFromOrder', ActionCode());
-
-        if not CheckCustomer(POSSession, SelectCustomer) then
-            exit;
-
-        if not
-            SelectDocument(
-              POSSession,
-              SalesHeader,
-              DocumentType,
-              SalesDocViewString,
-              LocationSource,
-              LocationFilter)
-        then
-            exit;
-
-        SalesHeader.TestField("Bill-to Customer No.");
-        ConfirmInvDiscAmt := JSON.GetBooleanParameterOrFail('ConfirmInvDiscAmt', ActionCode());
-        if ConfirmInvDiscAmt then begin
-            SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-            SalesLine.SetRange("Document No.", SalesHeader."No.");
-            SalesLine.SetFilter("Inv. Discount Amount", '>%1', 0);
-            SalesLine.CalcSums("Inv. Discount Amount");
-            if SalesLine."Inv. Discount Amount" > 0 then begin
-                if not Confirm(SalesDocImpMgt.GetImportInvDiscAmtQst()) then
-                    exit;
-            end;
-        end;
-        POSSession.GetSale(POSSale);
-        SetPosSaleCustomer(POSSale, SalesHeader."Bill-to Customer No.");
-
-        ImportFromDocument(POSSession, SalesHeader);
-
-        if SalesPersonFromOrder then
-            UpdateSalesPerson(POSSale, SalesHeader);
-
-    end;
-
-    local procedure UpdateSalesPerson(POSSale: Codeunit "NPR POS Sale"; SalesHeader: Record "Sales Header")
-    var
-        SalePOS: Record "NPR POS Sale";
-    begin
-        POSSale.GetCurrentSale(SalePOS);
-        SalePOS.Validate("Salesperson Code", SalesHeader."Salesperson Code");
-        SalePOS.Modify();
-        POSSale.RefreshCurrent();
-    end;
-
-    local procedure CheckCustomer(POSSession: Codeunit "NPR POS Session"; SelectCustomer: Boolean): Boolean
-    var
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
-        Customer: Record Customer;
-    begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
-            exit(true);
-        end;
-
-        if not SelectCustomer then
-            exit(true);
-
-        if PAGE.RunModal(0, Customer) <> ACTION::LookupOK then
-            exit(false);
-
-        SetPosSaleCustomer(POSSale, Customer."No.");
-        Commit();
-        exit(true);
-    end;
-
-    local procedure SetPosSaleCustomer(POSSale: Codeunit "NPR POS Sale"; CustomerNo: Code[20])
-    var
-        SalePOS: Record "NPR POS Sale";
-    begin
-        POSSale.GetCurrentSale(SalePOS);
-        if SalePOS."Customer No." <> '' then
-            exit;
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
-        SalePOS.Validate("Customer No.", CustomerNo);
-        SalePOS.Modify(true);
-        POSSale.RefreshCurrent();
-        POSSale.SetModified();
-    end;
-
-    local procedure SelectDocument(POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"; DocumentType: Integer; SalesDocViewString: Text; LocationSource: Option "POS Store","Location Filter Parameter"; LocationFilter: Text): Boolean
-    var
-        RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
-        POSSale: Codeunit "NPR POS Sale";
-        POSStore: Record "NPR POS Store";
-        SalePOS: Record "NPR POS Sale";
-    begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        if SalesDocViewString <> '' then
-            SalesHeader.SetView(SalesDocViewString);
-        SalesHeader.FilterGroup(2);
-        if SalePOS."Customer No." <> '' then
-            SalesHeader.SetRange("Bill-to Customer No.", SalePOS."Customer No.");
-        SalesHeader.SetRange("Document Type", DocumentType);
-        case LocationSource of
-            LocationSource::"POS Store":
-                begin
-                    POSStore.Get(SalePOS."POS Store Code");
-                    LocationFilter := POSStore."Location Code";
-                end;
-        end;
-        if LocationFilter <> '' then
-            SalesHeader.SetFilter("Location Code", LocationFilter);
-        SalesHeader.FilterGroup(0);
-        if SalesHeader.FindFirst() then;
-        exit(RetailSalesDocImpMgt.SelectSalesDocument('', SalesHeader));
-    end;
-
-    local procedure ImportFromDocument(POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header")
-    var
-        RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
-    begin
-        RetailSalesDocImpMgt.SalesDocumentToPOS(POSSession, SalesHeader);
-        POSSession.RequestRefreshData();
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
-    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    var
-        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'DocumentType':
-                Caption := CaptionDocType;
-            'SelectCustomer':
-                Caption := CaptionSelectCustomer;
-            'SalesDocViewString':
-                Caption := CaptionSalesView;
-            'LocationFrom':
-                Caption := CaptionLocationFrom;
-            'LocationFilter':
-                Caption := CaptionLocationFilter;
-            'ConfirmInvDiscAmt':
-                Caption := SalesDocImpMgt.GetConfirmInvDiscAmtLbl();
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
-    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    var
-        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'DocumentType':
-                Caption := DescDocType;
-            'SelectCustomer':
-                Caption := DescSelectCustomer;
-            'SalesDocViewString':
-                Caption := DescSalesView;
-            'LocationFrom':
-                Caption := DescLocationFrom;
-            'LocationFilter':
-                Caption := DescLocationFilter;
-            'ConfirmInvDiscAmt':
-                Caption := SalesDocImpMgt.GetConfirmInvDiscAmtDescLbl();
-            'EnableSalesPersonFromOrder':
-                Caption := EnableSalesPersonFromOrderDescLbl;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', false, false)]
-    local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'DocumentType':
-                Caption := OptionDocType;
-            'LocationFrom':
-                Caption := OptionLocationFrom;
-        end;
+        POSActionDocImpB.ImportDocument(SelectCustomer,
+                                        ConfirmInvDiscAmt,
+                                        DocumentType,
+                                        LocationSource,
+                                        LocationFilter,
+                                        SalesDocViewString,
+                                        SalesPersonFromOrder,
+                                        Sale);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
@@ -365,5 +179,18 @@
             SalesHeader.SetFilter("Location Code", LocationFilter);
 
         DataRow.Add('OpenOrdersQty', SalesHeader.Count());
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionDocImport.js###
+'let main=async({})=>await workflow.respond();'
+       )
+    end;
+
+    procedure ActionCode(): Text
+    begin
+        exit(Format(enum::"NPR POS Workflow"::SALES_DOC_IMP));
     end;
 }
