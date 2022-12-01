@@ -914,6 +914,14 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'View or edit the Coupon Types';
                 }
+                action("Voucher Types")
+                {
+                    Caption = 'Voucher Types';
+                    Image = List;
+                    RunObject = page "NPR NpRv Voucher Types";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'View or edit the Voucher Types';
+                }
                 action("Voucher List")
                 {
                     Visible = false;

@@ -193,6 +193,7 @@
                     var
                         CouponList: Record "NPR NpDc Coupon";
                     begin
+                        CouponList.SetRange(Open, true);
                         Page.RunModal(Page::"NPR NpDc Coupons", CouponList);
                         CurrPage.Update(false);
                     end;
@@ -208,6 +209,7 @@
                     var
                         VoucherList: Record "NPR NpRv Voucher";
                     begin
+                        VoucherList.SetRange(Open, true);
                         Page.RunModal(Page::"NPR NpRv Vouchers", VoucherList);
                         CurrPage.Update(false);
                     end;
