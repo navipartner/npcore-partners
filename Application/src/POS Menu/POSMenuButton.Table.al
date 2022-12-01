@@ -234,8 +234,6 @@
             Caption = 'POS View Profile';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS View Profile";
-            ObsoleteReason = 'Removed because it was not used. Removed in Case 510270.';
-            ObsoleteState = Removed;
         }
         field(42; "Register No."; Code[10])
         {

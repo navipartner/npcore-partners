@@ -22,22 +22,27 @@
             {
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies a Code to identify the POS Menu';
+                    ToolTip = 'Specifies a code to identify this POS menu.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Caption; Rec.Caption)
                 {
-                    ToolTip = 'Specifies what the caption is';
+                    ToolTip = 'Specifies a text that describes the POS menu.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
-                    ToolTip = 'Specifies what POS Unit is assigned';
+                    ToolTip = 'Specifies the POS unit this POS menu will only be used for. Leave blank, if you want the POS menu to be used for any POS unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-                    ToolTip = 'Specifies what salesperson is assigned';
+                    ToolTip = 'Specifies the salesperson code this POS menu will only be used for. Leave blank, if you want the POS menu to be used for any salesperson.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Register Type"; Rec."Register Type")
+                {
+                    ToolTip = 'Specifies the POS view profile this POS menu will only be used for. Leave blank, if you want the POS menu to be used for any POS view profile.';
                     ApplicationArea = NPRRetail;
                 }
             }

@@ -85,6 +85,7 @@
         Menu.SetCurrentKey("Register No.", "Salesperson Code");
         Menu.SetFilter("Register No.", '%1|%2', POSUnit."No.", '');
         Menu.SetFilter("Salesperson Code", '%1|%2', Salesperson.Code, '');
+        Menu.SetFilter("Register Type", '%1|%2', POSViewProfile.Code, '');
 
         if Menu.FindSet() then
             repeat
@@ -107,6 +108,7 @@
         MenuButton.SetRange("Parent ID", 0);
         MenuButton.SetRange(Blocked, false);
         Menu.CopyFilter("Register No.", MenuButton."Register No.");
+        Menu.CopyFilter("Register Type", MenuButton."Register Type");
 
         InitializeMenuButtons(MenuButton, MenuObj, POSSession, tmpPOSParameterValue);
     end;
