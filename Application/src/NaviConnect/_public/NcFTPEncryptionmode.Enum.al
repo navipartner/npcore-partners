@@ -1,9 +1,8 @@
 enum 6151501 "NPR Nc FTP Encryption mode"
 {
-#IF NOT BC17
-    Access = Internal;       
-#ENDIF
+#if BC17
     Extensible = true;
+#endif
 
     value(0; "None")
     {
