@@ -1,5 +1,4 @@
-#IF NOT BC17
-codeunit 85065 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provider"
+codeunit 88000 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Provider"
 {
     SingleInstance = true;
 
@@ -10,16 +9,16 @@ codeunit 85065 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
             IsInitialized := true;
         end;
 
-        CreateDirectSalesWithTicketIssue();
+        CreateDirectSalesWithCash();
     end;
 
     var
-        Item: Record Item;
-        BarCodeItemReference: Record "Item Reference";
+        Item, Item2 : Record Item;
+        BarCodeItemReference, BarCodeItemReference2 : Record "Item Reference";
         POSPaymentMethod: Record "NPR POS Payment Method";
         BCPTTestContext: Codeunit "BCPT Test Context";
         POSSession: Codeunit "NPR POS Session";
-        LibraryRandom: Codeunit "Library - Random";
+        LibraryRandom: Codeunit "NPR Library - Random";
         POSMockLibrary: Codeunit "NPR Library - POS Mock";
         POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
@@ -36,17 +35,10 @@ codeunit 85065 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
         NoSeriesLine: Record "No. Series Line";
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
-        AuxiliaryItem: Record "NPR Auxiliary Item";
-        TicketType: Record "NPR TM Ticket Type";
     begin
         POSPaymentMethod.Get('K');
-        Item.Get('31001');
-        AuxiliaryItem.Get('31001');
-        if AuxiliaryItem."TM Ticket Type" = '' then begin
-            TicketType.Get('ENTRY');
-            AuxiliaryItem.Validate("TM Ticket Type", TicketType.Code);
-            AuxiliaryItem.Modify();
-        end;
+        Item.Get('100CHIMSTA');
+        Item2.Get('100DFTBLK');
 
         POSUnit.Get('01');
         POSMasterDataLibrary.OpenPOSUnit(POSUnit);
@@ -67,6 +59,7 @@ codeunit 85065 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
             NoOfLinesPerSale := 1000;
 
         CreateBarCodeItemReference(BarCodeItemReference, Item);
+        CreateBarCodeItemReference(BarCodeItemReference2, Item2);
 
         POSAuditProfile.Get(POSUnit."POS Audit Profile");
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
@@ -94,15 +87,15 @@ codeunit 85065 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
         end;
     end;
 
-    local procedure CreateDirectSalesWithTicketIssue()
+    local procedure CreateDirectSalesWithCash()
     var
         i: Integer;
     begin
         for i := 1 to NoOfSales do
-            CreateDirectSaleWithTicketIssue();
+            CreateDirectSaleWithCash();
     end;
 
-    local procedure CreateDirectSaleWithTicketIssue()
+    local procedure CreateDirectSaleWithCash()
     var
         AmountToPay: Decimal;
     begin
@@ -128,8 +121,13 @@ codeunit 85065 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
         for i := 1 to NoOfLinesPerSale do begin
             if i = 1 then
                 BCPTTestContext.StartScenario('Add Sale Line');
-            POSMockLibrary.CreateItemLine(POSSession, Item, BarCodeItemReference, ItemIdentifierType::ItemCrossReference, 1);
-            AmountToPay += Item."Unit Price";
+            if i mod 2 = 1 then begin
+                POSMockLibrary.CreateItemLine(POSSession, Item, BarCodeItemReference, ItemIdentifierType::ItemCrossReference, 1);
+                AmountToPay += Item."Unit Price";
+            end else begin
+                POSMockLibrary.CreateItemLine(POSSession, Item2, BarCodeItemReference2, ItemIdentifierType::ItemCrossReference, 1);
+                AmountToPay += Item2."Unit Price";
+            end;
             if i = 1 then
                 BCPTTestContext.EndScenario('Add Sale Line');
             Commit();
@@ -223,4 +221,3 @@ codeunit 85065 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
         Error(ParamValidationErr, GetDefaultAllowGapsInSaleFiscalNoSeriesParameter());
     end;
 }
-#ENDIF

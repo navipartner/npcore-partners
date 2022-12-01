@@ -1,5 +1,4 @@
-#IF NOT BC17
-codeunit 85058 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Provider"
+codeunit 88005 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provider"
 {
     SingleInstance = true;
 
@@ -10,16 +9,16 @@ codeunit 85058 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Prov
             IsInitialized := true;
         end;
 
-        CreateDirectSalesWithCash();
+        CreateDirectSalesWithTicketIssue();
     end;
 
     var
-        Item, Item2 : Record Item;
-        BarCodeItemReference, BarCodeItemReference2 : Record "Item Reference";
+        Item: Record Item;
+        BarCodeItemReference: Record "Item Reference";
         POSPaymentMethod: Record "NPR POS Payment Method";
         BCPTTestContext: Codeunit "BCPT Test Context";
         POSSession: Codeunit "NPR POS Session";
-        LibraryRandom: Codeunit "Library - Random";
+        LibraryRandom: Codeunit "NPR Library - Random";
         POSMockLibrary: Codeunit "NPR Library - POS Mock";
         POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
@@ -36,10 +35,22 @@ codeunit 85058 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Prov
         NoSeriesLine: Record "No. Series Line";
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
+        // AuxiliaryItem: Record "NPR Auxiliary Item";
+        TicketType: Record "NPR TM Ticket Type";
     begin
         POSPaymentMethod.Get('K');
-        Item.Get('100CHIMSTA');
-        Item2.Get('100DFTBLK');
+        Item.Get('31001');
+        if Item."NPR Ticket Type" = '' then begin
+            TicketType.Get('ENTRY');
+            Item.Validate("NPR Ticket Type", TicketType.Code);
+            Item.Modify();
+        end;
+        // AuxiliaryItem.Get('31001');
+        // if AuxiliaryItem."TM Ticket Type" = '' then begin
+        //     TicketType.Get('ENTRY');
+        //     AuxiliaryItem.Validate("TM Ticket Type", TicketType.Code);
+        //     AuxiliaryItem.Modify();
+        // end;
 
         POSUnit.Get('01');
         POSMasterDataLibrary.OpenPOSUnit(POSUnit);
@@ -60,7 +71,6 @@ codeunit 85058 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Prov
             NoOfLinesPerSale := 1000;
 
         CreateBarCodeItemReference(BarCodeItemReference, Item);
-        CreateBarCodeItemReference(BarCodeItemReference2, Item2);
 
         POSAuditProfile.Get(POSUnit."POS Audit Profile");
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
@@ -88,15 +98,15 @@ codeunit 85058 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Prov
         end;
     end;
 
-    local procedure CreateDirectSalesWithCash()
+    local procedure CreateDirectSalesWithTicketIssue()
     var
         i: Integer;
     begin
         for i := 1 to NoOfSales do
-            CreateDirectSaleWithCash();
+            CreateDirectSaleWithTicketIssue();
     end;
 
-    local procedure CreateDirectSaleWithCash()
+    local procedure CreateDirectSaleWithTicketIssue()
     var
         AmountToPay: Decimal;
     begin
@@ -122,13 +132,8 @@ codeunit 85058 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Prov
         for i := 1 to NoOfLinesPerSale do begin
             if i = 1 then
                 BCPTTestContext.StartScenario('Add Sale Line');
-            if i mod 2 = 1 then begin
-                POSMockLibrary.CreateItemLine(POSSession, Item, BarCodeItemReference, ItemIdentifierType::ItemCrossReference, 1);
-                AmountToPay += Item."Unit Price";
-            end else begin
-                POSMockLibrary.CreateItemLine(POSSession, Item2, BarCodeItemReference2, ItemIdentifierType::ItemCrossReference, 1);
-                AmountToPay += Item2."Unit Price";
-            end;
+            POSMockLibrary.CreateItemLine(POSSession, Item, BarCodeItemReference, ItemIdentifierType::ItemCrossReference, 1);
+            AmountToPay += Item."Unit Price";
             if i = 1 then
                 BCPTTestContext.EndScenario('Add Sale Line');
             Commit();
@@ -222,4 +227,3 @@ codeunit 85058 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Prov
         Error(ParamValidationErr, GetDefaultAllowGapsInSaleFiscalNoSeriesParameter());
     end;
 }
-#ENDIF

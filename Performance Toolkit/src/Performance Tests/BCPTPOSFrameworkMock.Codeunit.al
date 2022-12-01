@@ -1,4 +1,4 @@
-codeunit 85005 "NPR POS Framework: Mock" implements "NPR Framework Interface"
+codeunit 88106 "NPR BCPT POS Framework: Mock" implements "NPR Framework Interface"
 {
     /*
         Use manually bound event subscribers on this mock to validate front end invocations.

@@ -9,6 +9,10 @@
 			"path": ".\\Test"
 		},
 		{
+			"name": "PERFORMANCE TOOLKIT",
+			"path": ".\\Performance Toolkit"
+		},
+		{
 			"name": "DOCUMENTATION",
 			"path": ".\\Documentation"
 		}
