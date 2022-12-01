@@ -1,5 +1,4 @@
-#IF NOT BC17
-codeunit 85075 "NPR BCPT Membership Event Subs"
+codeunit 88100 "NPR BCPT Membership Event Subs"
 {
     EventSubscriberInstance = Manual;
 
@@ -21,4 +20,3 @@ codeunit 85075 "NPR BCPT Membership Event Subs"
         exit(Format(CreateGuid()) + '@test.navipartner.com');
     end;
 }
-#ENDIF
