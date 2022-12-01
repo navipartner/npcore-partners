@@ -26,23 +26,24 @@ codeunit 6059793 "NPR POS Action: Cash Payment" implements "NPR POS IPaymentWFHa
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         SalePOS: Record "NPR POS Sale";
-        AmountToCapture: Decimal;
+        AmountToCapture, DefaultAmountToCapture : Decimal;
         POSPaymentLine: Record "NPR POS Sale Line";
     begin
         POSPaymentMethod.Get(Context.GetString('paymentType'));
         AmountToCapture := Context.GetDecimal('amountToCapture');
+        DefaultAmountToCapture := Context.GetDecimal('amountToCapture');
 
         POSSale.GetCurrentSale(SalePOS);
 
         Clear(POSPaymentLine);
 
         Response.ReadFrom('{}');
-        Response.Add('success', CapturePayment(SalePOS, POSPaymentLine, POSPayment, POSPaymentMethod, AmountToCapture));
+        Response.Add('success', CapturePayment(SalePOS, POSPaymentLine, POSPayment, POSPaymentMethod, AmountToCapture, DefaultAmountToCapture));
         Response.Add('tryEndSale', true);
         exit(Response);
     end;
 
-    internal procedure CapturePayment(SalePOS: Record "NPR POS Sale"; POSPaymentLine: Record "NPR POS Sale Line"; POSPayment: Codeunit "NPR POS Payment Line"; POSPaymentMethod: Record "NPR POS Payment Method"; AmountToCapture: Decimal) IsCaptured: Boolean
+    internal procedure CapturePayment(SalePOS: Record "NPR POS Sale"; POSPaymentLine: Record "NPR POS Sale Line"; POSPayment: Codeunit "NPR POS Payment Line"; POSPaymentMethod: Record "NPR POS Payment Method"; AmountToCapture: Decimal; DefaultAmountToCapture: Decimal) IsCaptured: Boolean
     begin
         POSPaymentMethod.TestField("Code");
 
@@ -55,7 +56,7 @@ codeunit 6059793 "NPR POS Action: Cash Payment" implements "NPR POS IPaymentWFHa
         if (AmountToCapture = 0) then
             exit(true);
 
-        POSPayment.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCapture);
+        POSPayment.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCapture, DefaultAmountToCapture);
 
         if (POSPaymentMethod."Fixed Rate" <> 0) then begin
             POSPaymentLine."Amount Including VAT" := 0;
