@@ -16,6 +16,7 @@
         Filename: Text;
         ListOfDirectory: List of [Text];
     begin
+        ClearLastError();
         case true of
             ImportType."Ftp Filename" <> '':
                 if TryImportNewEntry(TempImportEntry, ImportType, ImportType."Ftp Filename") then
@@ -37,7 +38,13 @@
                 exit(false);
         end;
 
-        exit(true);
+        if GetLastErrorText() = '' then
+            exit(true);
+
+        if GuiAllowed then
+            Error(GetLastErrorText());
+
+        exit(false);
     end;
 
     local procedure SaveNewEntry(var ImportEntryTmp: Record "NPR Nc Import Entry" temporary)
