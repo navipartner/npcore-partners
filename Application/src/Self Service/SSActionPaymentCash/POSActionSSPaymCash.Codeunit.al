@@ -60,13 +60,15 @@ codeunit 6151334 "NPR POS Action SS Paym. Cash"
     local procedure CaptureCashPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
         AmountToCapture: Decimal;
+        DefaultAmountToCapture: Decimal;
     begin
         AmountToCapture := AmountToCaptureLCY;
+        DefaultAmountToCapture := AmountToCapture;
 
         if AmountToCaptureLCY = 0 then
             exit(true);
 
-        POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCaptureLCY);
+        POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCaptureLCY, DefaultAmountToCapture);
 
         if (POSPaymentMethod."Fixed Rate" <> 0) then begin
             POSLine."Amount Including VAT" := 0;

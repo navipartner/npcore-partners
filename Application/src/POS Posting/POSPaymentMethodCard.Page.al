@@ -170,7 +170,6 @@
                     ToolTip = 'Specifies if refund is allowed for selected POS Payment Method.';
                     ApplicationArea = NPRRetail;
                 }
-
             }
             group(EFT)
             {
@@ -252,6 +251,18 @@
 
                 ToolTip = 'Executes the Denominations action';
                 ApplicationArea = NPRRetail;
+            }
+            action("POS Payment Method Items")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'POS Payment Method Items';
+                Image = SetupLines;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "NPR POS Payment Method Items";
+                RunPageLink = "POS Payment Method Code" = field(Code);
+                ToolTip = 'Opens the POS Payment Method Items list where items that can be used for this POS Payment Method are specified. This is applicable only when there are specified items.';
             }
             group(History)
             {
