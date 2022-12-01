@@ -1,5 +1,4 @@
-#IF NOT BC17
-codeunit 85062 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
+codeunit 88006 "NPR BCPT POS DS Create Member" implements "BCPT Test Param. Provider"
 {
     SingleInstance = true;
 
@@ -10,42 +9,39 @@ codeunit 85062 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
             IsInitialized := true;
         end;
 
-        CreateCreditSales();
+        CreateDirectSalesWithCreateMember();
     end;
 
     var
-        Item, Item2 : Record Item;
-        BarCodeItemReference, BarCodeItemReference2 : Record "Item Reference";
+        Item: Record Item;
+        BarCodeItemReference: Record "Item Reference";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         BCPTTestContext: Codeunit "BCPT Test Context";
         POSSession: Codeunit "NPR POS Session";
-        LibraryRandom: Codeunit "Library - Random";
+        LibraryRandom: Codeunit "NPR Library - Random";
         POSMockLibrary: Codeunit "NPR Library - POS Mock";
         POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
-        NoOfSales, NoOfLinesPerSale : Integer;
+        NoOfSales: Integer;
         NoOfSalesParamLbl: Label 'NoOfSales', Locked = true;
-        NoOfLinesPerSaleParamLbl: Label 'NoOfLinesPerSale', Locked = true;
         PostSaleParamLbl: Label 'PostSale', Locked = true;
         AllowGapsInSaleFiscalNoSeriesParamLbl: Label 'AllowGapsInSaleFiscalNoSeries', Locked = true;
         ParamValidationErr: Label 'Parameter is not defined in the correct format. The expected format is "%1"', Comment = '%1 - expected format';
 
     local procedure InitTest();
     var
-        Salesperson: Record "Salesperson/Purchaser";
         NoSeriesLine: Record "No. Series Line";
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
-        Item.Get('100CHIMSTA');
-        Item2.Get('100DFTBLK');
+        POSPaymentMethod.Get('K');
+        Item.Get('320102');
 
         POSUnit.Get('01');
         POSMasterDataLibrary.OpenPOSUnit(POSUnit);
-        Salesperson.Get('1');
-        POSMockLibrary.InitializePOSSession(POSSession, POSUnit, Salesperson);
+        POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
 
         if Evaluate(NoOfSales, BCPTTestContext.GetParameter(NoOfSalesParamLbl)) then;
-        if Evaluate(NoOfLinesPerSale, BCPTTestContext.GetParameter(NoOfLinesPerSaleParamLbl)) then;
         if Evaluate(PostSale, BCPTTestContext.GetParameter(PostSaleParamLbl)) then;
         if Evaluate(AllowGapsInSaleFiscalNoSeries, BCPTTestContext.GetParameter(AllowGapsInSaleFiscalNoSeriesParamLbl)) then;
 
@@ -53,13 +49,8 @@ codeunit 85062 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
             NoOfSales := 1;
         if NoOfSales > 1000 then
             NoOfSales := 1000;
-        if NoOfLinesPerSale < 1 then
-            NoOfLinesPerSale := 1;
-        if NoOfLinesPerSale > 1000 then
-            NoOfLinesPerSale := 1000;
 
         CreateBarCodeItemReference(BarCodeItemReference, Item);
-        CreateBarCodeItemReference(BarCodeItemReference2, Item2);
 
         POSAuditProfile.Get(POSUnit."POS Audit Profile");
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
@@ -87,20 +78,21 @@ codeunit 85062 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         end;
     end;
 
-    local procedure CreateCreditSales()
+    local procedure CreateDirectSalesWithCreateMember()
     var
         i: Integer;
     begin
         for i := 1 to NoOfSales do
-            CreateCreditSale();
+            CreateDirectSaleWithCreateMember();
     end;
 
-    local procedure CreateCreditSale()
+    local procedure CreateDirectSaleWithCreateMember()
+    var
+        AmountToPay: Decimal;
     begin
         StartSale();
-        CreateLinesPerSale();
-        SelectCustomerForSale();
-        ExportSale();
+        AmountToPay := CreateSaleLine();
+        PaySale(AmountToPay);
     end;
 
     local procedure StartSale()
@@ -112,54 +104,25 @@ codeunit 85062 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         BCPTTestContext.UserWait();
     end;
 
-    local procedure CreateLinesPerSale()
+    local procedure CreateSaleLine() AmountToPay: Decimal
     var
-        i: Integer;
+        BCPTMembershipEventSubs: Codeunit "NPR BCPT Membership Event Subs";
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
     begin
-        for i := 1 to NoOfLinesPerSale do begin
-            if i = 1 then
-                BCPTTestContext.StartScenario('Add Sale Line');
-            if i mod 2 = 1 then
-                POSMockLibrary.CreateItemLine(POSSession, Item, BarCodeItemReference, ItemIdentifierType::ItemCrossReference, 1)
-            else
-                POSMockLibrary.CreateItemLine(POSSession, Item2, BarCodeItemReference2, ItemIdentifierType::ItemCrossReference, 1);
-            if i = 1 then
-                BCPTTestContext.EndScenario('Add Sale Line');
-            Commit();
-            BCPTTestContext.UserWait();
-        end;
-    end;
-
-    local procedure SelectCustomerForSale()
-    var
-        Customer: Record Customer;
-        POSSale: Record "NPR POS Sale";
-        SalePOS: Codeunit "NPR POS Sale";
-        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
-    begin
-        BCPTTestContext.StartScenario('Select Customer');
-        POSSession.GetSale(SalePOS);
-        SalePOS.GetCurrentSale(POSSale);
-        Customer.Get('10000');
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
-        BCPTTestContext.EndScenario('Select Customer');
+        BCPTTestContext.StartScenario('Add Sale Line');
+        BindSubscription(BCPTMembershipEventSubs);
+        POSMockLibrary.CreateItemLine(POSSession, Item, BarCodeItemReference, ItemIdentifierType::ItemCrossReference, 1);
+        AmountToPay := Item."Unit Price";
+        BCPTTestContext.EndScenario('Add Sale Line');
         Commit();
         BCPTTestContext.UserWait();
     end;
 
-    local procedure ExportSale()
-    var
-        SalePOS: Codeunit "NPR POS Sale";
-        SalesDocumentExportMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+    local procedure PaySale(AmountToPay: Decimal)
     begin
-        BCPTTestContext.StartScenario('Export Sale');
-        POSSession.GetSale(SalePOS);
-        SalesDocumentExportMgt.SetDocumentTypeOrder();
-        SalesDocumentExportMgt.SetInvoice(true);
-        SalesDocumentExportMgt.SetShip(true);
-        SalesDocumentExportMgt.ProcessPOSSale(SalePOS);
-        BCPTTestContext.EndScenario('Export Sale');
+        BCPTTestContext.StartScenario('Pay Sale');
+        POSMockLibrary.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '', PostSale);
+        BCPTTestContext.EndScenario('Pay Sale');
         Commit();
         BCPTTestContext.UserWait();
     end;
@@ -168,24 +131,18 @@ codeunit 85062 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
     begin
         exit(
             GetDefaultNoOfSalesParameter() + ',' +
-            GetDefaultNoOfLinesPerSaleParameter() + ',' +
             GetDefaultPostSaleParameter() + ',' +
             GetDefaultAllowGapsInSaleFiscalNoSeriesParameter());
     end;
 
     local procedure GetDefaultNoOfSalesParameter(): Text[1000]
     begin
-        exit(CopyStr(NoOfSalesParamLbl + '=' + Format(1), 1, 1000));
-    end;
-
-    local procedure GetDefaultNoOfLinesPerSaleParameter(): Text[1000]
-    begin
-        exit(CopyStr(NoOfLinesPerSaleParamLbl + '=' + Format(5), 1, 1000));
+        exit(CopyStr(NoOfSalesParamLbl + '=' + Format(10), 1, 1000));
     end;
 
     local procedure GetDefaultPostSaleParameter(): Text[1000]
     begin
-        exit(CopyStr(PostSaleParamLbl + '=' + Format(true), 1, 1000));
+        exit(CopyStr(PostSaleParamLbl + '=' + Format(false), 1, 1000));
     end;
 
     local procedure GetDefaultAllowGapsInSaleFiscalNoSeriesParameter(): Text[1000]
@@ -196,9 +153,8 @@ codeunit 85062 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
     procedure ValidateParameters(Parameters: Text[1000])
     begin
         ValidateNoOfSalesParameter(SelectStr(1, Parameters));
-        ValidateNoOfLinesPerSaleParameter(SelectStr(2, Parameters));
-        ValidatePostSaleParameter(SelectStr(3, Parameters));
-        ValidateAllowGapsInSaleFiscalNoSeriesParameter(SelectStr(4, Parameters));
+        ValidatePostSaleParameter(SelectStr(2, Parameters));
+        ValidateAllowGapsInSaleFiscalNoSeriesParameter(SelectStr(3, Parameters));
     end;
 
     local procedure ValidateNoOfSalesParameter(Parameter: Text[1000])
@@ -209,16 +165,6 @@ codeunit 85062 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
                 exit;
         end;
         Error(ParamValidationErr, GetDefaultNoOfSalesParameter());
-    end;
-
-    local procedure ValidateNoOfLinesPerSaleParameter(Parameter: Text[1000])
-    begin
-        if StrPos(Parameter, NoOfLinesPerSaleParamLbl) > 0 then begin
-            Parameter := DelStr(Parameter, 1, StrLen(NoOfLinesPerSaleParamLbl + '='));
-            if Evaluate(NoOfLinesPerSale, Parameter) then
-                exit;
-        end;
-        Error(ParamValidationErr, GetDefaultNoOfLinesPerSaleParameter());
     end;
 
     local procedure ValidatePostSaleParameter(Parameter: Text[1000])
@@ -241,4 +187,3 @@ codeunit 85062 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         Error(ParamValidationErr, GetDefaultAllowGapsInSaleFiscalNoSeriesParameter());
     end;
 }
-#ENDIF

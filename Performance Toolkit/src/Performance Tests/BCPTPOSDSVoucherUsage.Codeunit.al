@@ -1,5 +1,4 @@
-#IF NOT BC17
-codeunit 85059 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provider"
+codeunit 88004 "NPR BCPT POS DS Voucher Usage" implements "BCPT Test Param. Provider"
 {
     SingleInstance = true;
 
@@ -10,48 +9,39 @@ codeunit 85059 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
             IsInitialized := true;
         end;
 
-        CreateDirectSalesWithEFT();
+        CreateDirectSalesWithVoucherUsage();
     end;
 
     var
-        EFTSetup: Record "NPR EFT Setup";
-        Item, Item2 : Record Item;
-        BarCodeItemReference, BarCodeItemReference2 : Record "Item Reference";
-        POSPaymentMethod: Record "NPR POS Payment Method";
+        Item: Record Item;
+        BarCodeItemReference: Record "Item Reference";
+        VoucherType: Record "NPR NpRv Voucher Type";
         BCPTTestContext: Codeunit "BCPT Test Context";
         POSSession: Codeunit "NPR POS Session";
-        LibraryRandom: Codeunit "Library - Random";
+        LibraryRandom: Codeunit "NPR Library - Random";
         POSMockLibrary: Codeunit "NPR Library - POS Mock";
-        LibraryEFT: Codeunit "NPR Library - EFT";
         POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
-        NoOfSales, NoOfLinesPerSale : Integer;
+        NoOfSales: Integer;
         NoOfSalesParamLbl: Label 'NoOfSales', Locked = true;
-        NoOfLinesPerSaleParamLbl: Label 'NoOfLinesPerSale', Locked = true;
         PostSaleParamLbl: Label 'PostSale', Locked = true;
         AllowGapsInSaleFiscalNoSeriesParamLbl: Label 'AllowGapsInSaleFiscalNoSeries', Locked = true;
         ParamValidationErr: Label 'Parameter is not defined in the correct format. The expected format is "%1"', Comment = '%1 - expected format';
 
-
     local procedure InitTest();
     var
-        NoSeriesLine: Record "No. Series Line";
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
-        EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
+        NoSeriesLine: Record "No. Series Line";
     begin
-        POSPaymentMethod.Get('T');
+        VoucherType.Get('CREDITVOUCHER');
         Item.Get('100CHIMSTA');
-        Item2.Get('100DFTBLK');
 
         POSUnit.Get('01');
         POSMasterDataLibrary.OpenPOSUnit(POSUnit);
         POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
-        if not EFTSetup.Get(POSPaymentMethod.Code, POSUnit."No.") then
-            LibraryEFT.CreateMockEFTSetup(EFTSetup, POSUnit."No.", POSPaymentMethod.Code);
 
         if Evaluate(NoOfSales, BCPTTestContext.GetParameter(NoOfSalesParamLbl)) then;
-        if Evaluate(NoOfLinesPerSale, BCPTTestContext.GetParameter(NoOfLinesPerSaleParamLbl)) then;
         if Evaluate(PostSale, BCPTTestContext.GetParameter(PostSaleParamLbl)) then;
         if Evaluate(AllowGapsInSaleFiscalNoSeries, BCPTTestContext.GetParameter(AllowGapsInSaleFiscalNoSeriesParamLbl)) then;
 
@@ -59,13 +49,8 @@ codeunit 85059 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
             NoOfSales := 1;
         if NoOfSales > 1000 then
             NoOfSales := 1000;
-        if NoOfLinesPerSale < 1 then
-            NoOfLinesPerSale := 1;
-        if NoOfLinesPerSale > 1000 then
-            NoOfLinesPerSale := 1000;
 
         CreateBarCodeItemReference(BarCodeItemReference, Item);
-        CreateBarCodeItemReference(BarCodeItemReference2, Item2);
 
         POSAuditProfile.Get(POSUnit."POS Audit Profile");
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
@@ -93,20 +78,20 @@ codeunit 85059 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
         end;
     end;
 
-    local procedure CreateDirectSalesWithEFT()
+    local procedure CreateDirectSalesWithVoucherUsage()
     var
         i: Integer;
     begin
         for i := 1 to NoOfSales do
-            CreateDirectSaleWithEFT();
+            CreateDirectSaleWithVoucherUsage();
     end;
 
-    local procedure CreateDirectSaleWithEFT()
+    local procedure CreateDirectSaleWithVoucherUsage()
     var
         AmountToPay: Decimal;
     begin
         StartSale();
-        AmountToPay := CreateLinesPerSale();
+        AmountToPay := CreateSaleLine();
         PaySale(AmountToPay);
     end;
 
@@ -119,47 +104,27 @@ codeunit 85059 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
         BCPTTestContext.UserWait();
     end;
 
-    local procedure CreateLinesPerSale() AmountToPay: Decimal
+    local procedure CreateSaleLine() AmountToPay: Decimal
     var
-        i: Integer;
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
     begin
-        for i := 1 to NoOfLinesPerSale do begin
-            if i = 1 then
-                BCPTTestContext.StartScenario('Add Sale Line');
-            if i mod 2 = 1 then begin
-                POSMockLibrary.CreateItemLine(POSSession, Item, BarCodeItemReference, ItemIdentifierType::ItemCrossReference, 1);
-                AmountToPay += Item."Unit Price";
-            end else begin
-                POSMockLibrary.CreateItemLine(POSSession, Item2, BarCodeItemReference2, ItemIdentifierType::ItemCrossReference, 1);
-                AmountToPay += Item2."Unit Price";
-            end;
-            if i = 1 then
-                BCPTTestContext.EndScenario('Add Sale Line');
-            Commit();
-            BCPTTestContext.UserWait();
-        end;
+        BCPTTestContext.StartScenario('Add Sale Line');
+        POSMockLibrary.CreateItemLine(POSSession, Item, BarCodeItemReference, ItemIdentifierType::ItemCrossReference, 1);
+        AmountToPay := Item."Unit Price";
+        BCPTTestContext.EndScenario('Add Sale Line');
+        Commit();
+        BCPTTestContext.UserWait();
     end;
 
     local procedure PaySale(AmountToPay: Decimal)
     var
-        POSSale: Record "NPR POS Sale";
-        SalePOS: Codeunit "NPR POS Sale";
-        EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
-        EFTTests: Codeunit "NPR EFT Tests";
-        EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        POSActionPayment: Codeunit "NPR POS Action: Payment";
+        Voucher: Record "NPR NpRv Voucher";
     begin
+        Voucher.SetRange("Voucher Type", VoucherType.Code);
+        Voucher.SetFilter(Amount, '%1..', AmountToPay);
+        Voucher.FindLast();
         BCPTTestContext.StartScenario('Pay Sale');
-        BindSubscription(EFTTestMockIntegration);
-        EFTTestMockIntegration.SetCreateRequestHandler(0);
-        EFTTestMockIntegration.SetDeviceResponseHandler(0);
-        EFTTestMockIntegration.SetPaymentConfirmationHandler(0);
-        POSSession.ClearActionState();
-        POSSession.BeginAction(POSActionPayment.ActionCode()); // Required for EFT payments as they depend on outer PAYMENT workflow session state.
-        POSSession.GetSale(SalePOS);
-        SalePOS.GetCurrentSale(POSSale);
-        EFTTransactionMgt.StartPayment(EFTSetup, AmountToPay, '', POSSale);
+        POSMockLibrary.PayAndTryEndSaleAndStartNew(POSSession, VoucherType."Payment Type", AmountToPay, Voucher."Reference No.", PostSale);
         BCPTTestContext.EndScenario('Pay Sale');
         Commit();
         BCPTTestContext.UserWait();
@@ -169,19 +134,13 @@ codeunit 85059 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
     begin
         exit(
             GetDefaultNoOfSalesParameter() + ',' +
-            GetDefaultNoOfLinesPerSaleParameter() + ',' +
             GetDefaultPostSaleParameter() + ',' +
             GetDefaultAllowGapsInSaleFiscalNoSeriesParameter());
     end;
 
     local procedure GetDefaultNoOfSalesParameter(): Text[1000]
     begin
-        exit(CopyStr(NoOfSalesParamLbl + '=' + Format(10), 1, 1000));
-    end;
-
-    local procedure GetDefaultNoOfLinesPerSaleParameter(): Text[1000]
-    begin
-        exit(CopyStr(NoOfLinesPerSaleParamLbl + '=' + Format(5), 1, 1000));
+        exit(CopyStr(NoOfSalesParamLbl + '=' + Format(1), 1, 1000));
     end;
 
     local procedure GetDefaultPostSaleParameter(): Text[1000]
@@ -197,9 +156,8 @@ codeunit 85059 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
     procedure ValidateParameters(Parameters: Text[1000])
     begin
         ValidateNoOfSalesParameter(SelectStr(1, Parameters));
-        ValidateNoOfLinesPerSaleParameter(SelectStr(2, Parameters));
-        ValidatePostSaleParameter(SelectStr(3, Parameters));
-        ValidateAllowGapsInSaleFiscalNoSeriesParameter(SelectStr(4, Parameters));
+        ValidatePostSaleParameter(SelectStr(2, Parameters));
+        ValidateAllowGapsInSaleFiscalNoSeriesParameter(SelectStr(3, Parameters));
     end;
 
     local procedure ValidateNoOfSalesParameter(Parameter: Text[1000])
@@ -210,16 +168,6 @@ codeunit 85059 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
                 exit;
         end;
         Error(ParamValidationErr, GetDefaultNoOfSalesParameter());
-    end;
-
-    local procedure ValidateNoOfLinesPerSaleParameter(Parameter: Text[1000])
-    begin
-        if StrPos(Parameter, NoOfLinesPerSaleParamLbl) > 0 then begin
-            Parameter := DelStr(Parameter, 1, StrLen(NoOfLinesPerSaleParamLbl + '='));
-            if Evaluate(NoOfLinesPerSale, Parameter) then
-                exit;
-        end;
-        Error(ParamValidationErr, GetDefaultNoOfLinesPerSaleParameter());
     end;
 
     local procedure ValidatePostSaleParameter(Parameter: Text[1000])
@@ -242,4 +190,3 @@ codeunit 85059 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
         Error(ParamValidationErr, GetDefaultAllowGapsInSaleFiscalNoSeriesParameter());
     end;
 }
-#ENDIF
