@@ -48,12 +48,12 @@
         }
         field(9; "Voucher List"; Integer)
         {
-            CalcFormula = Count("NPR NpRv Voucher");
+            CalcFormula = Count("NPR NpRv Voucher" where(Open = const(true)));
             FieldClass = FlowField;
         }
         field(10; "Coupon List"; Integer)
         {
-            CalcFormula = Count("NPR NpDc Coupon");
+            CalcFormula = Count("NPR NpDc Coupon" where(Open = const(true)));
             FieldClass = FlowField;
         }
         field(11; "EFT Reconciliation Errors"; Integer)
