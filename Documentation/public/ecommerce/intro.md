@@ -6,7 +6,10 @@ Customers can also activate loyalty programs which give them rights for accumula
 
 ### Highlighted articles
 
-- [Create a new brand](./howto/create_brand.md)
-- [Edit a brand](howto/edit_brand.md)
-- [Delete a brand](howto/delete_brand.md)
-- [Brands reference guide](reference/brands_reference_table.md)
+| Module     | Description |
+| ----------- | ----------- |
+| [**Create a new brand**](./howto/create_brand.md) | Follow the step-by-step guide for creating a new brand from the Magento Admin Panel. |
+| [**Edit a brand**](howto/edit_brand.md) | Learn how you can edit an existing brand from the Magento Admin Panel. |
+| [**Delete a brand**](howto/delete_brand.md) | Follow the step-by-step guide for deleting the existing brands from the Magento Admin Panel. |
+| [**Brands - reference guide**](reference/brands_reference_table.md) | Learn what each field in the **Brands** page can be used for. |
+| [**Ticketing setup - Magento and Business Central**](howto/ticketing_web.md) | Follow the how-to guide for the necessary ticketing configurations both in Business Central and Magento. |
