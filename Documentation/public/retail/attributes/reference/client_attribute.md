@@ -2,6 +2,8 @@
 
 The following fields and options are available in the **Client Attributes** administrative sections:
 
+| Field     | Description |
+| ----------- | ----------- |
 | **Code** | Specifies the unique code that is used to identify a client attribute. |
 | **Description** | Specifies additional information about this client attribute. |
 | **Name** | Specifies the name of the attribute. |
@@ -28,3 +30,7 @@ From it, you can associate the attribute code to the table IDs which they will b
 | **Attribute Code** | Specifies the code used for referencing the specific client attribute. |
 | **Shortcut Attribute ID** | There can be a maximum of 20 shortcut IDs that can be predefined. |
 | **Entity Attribute ID** | |
+
+### Related links
+
+- [Set up client attributes](../howto/create_client_atr.md)

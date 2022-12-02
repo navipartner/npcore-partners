@@ -11,3 +11,7 @@ To create client attributes, follow the provided steps:
 4. Associate the created client attributes with the table's ID, and enable the attribute on the required page from **Client Attribute IDs**.
 5. Define the associated values in **Client Attribute Value Lookup** (reached via the **Related** dropdown in the ribbon) where needed.    
    It's possible to define values if the attribute is either of the **Code** or the **Lookup** type. 
+
+### Related links
+
+- [Client attributes (reference guide)](../reference/client_attribute.md)
