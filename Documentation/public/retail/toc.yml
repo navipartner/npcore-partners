@@ -32,6 +32,8 @@
   href: attributes/toc.yml
 - name: Reports
   href: reports/toc.yml
+- name: Service Module
+  href: service_module/toc.yml
 - name: Webshop integrations
   href: webshopintegrations/toc.yml
 - name: Varieties in NP Retail
