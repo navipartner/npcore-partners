@@ -6,7 +6,7 @@ page 6059982 "NPR POS Entry Sales & Payments"
     SourceTable = "NPR POS Entry Sale & Payment";
     SourceTableView = sorting("POS Entry No.") order(descending);
     SourceTableTemporary = true;
-    Caption = 'POS Entry Sales & Payments';
+    Caption = 'POS Entry Sales and Payments';
     Extensible = False;
     Editable = false;
 
