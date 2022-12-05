@@ -1,6 +1,12 @@
 ﻿codeunit 6184601 "NPR Consignor Mgt." implements "NPR IShipping Provider Interface"
 {
     Access = Internal;
+
+    var
+        PackageProviderSetup: Record "NPR Shipping Provider Setup";
+        PackageMgt: Codeunit "NPR Package Management";
+        Text001: Label 'Not available for Consignor';
+
     [EventSubscriber(ObjectType::Table, Database::"NPR Consignor Entry", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnAfterInsertConsignorEntry(var Rec: Record "NPR Consignor Entry"; RunTrigger: Boolean)
     begin
@@ -21,14 +27,14 @@
         if not JobQueueEntry.WritePermission then
             exit;
 
-        NpXmlTemplate.SetRange("Table No.", DATABASE::"NPR Consignor Entry");
+        NpXmlTemplate.SetRange("Table No.", Database::"NPR Consignor Entry");
         NpXmlTemplate.SetRange("Transaction Task", true);
         NpXmlTemplate.SetFilter("Task Processor Code", '<>%1', '');
         if not NpXmlTemplate.FindFirst() then
             exit;
 
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", CODEUNIT::"NPR Nc Task List Processing");
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Nc Task List Processing");
         JobQueueEntry.SetFilter("Parameter String", '*processor?' + NpXmlTemplate."Task Processor Code" + '*');
         if JobQueueEntry.IsEmpty then
             exit;
@@ -41,17 +47,17 @@
 
     procedure CheckBalance()
     begin
-        message(Text001);
+        Message(Text001);
     end;
 
-    Procedure SendDocument(var ShipmentDocument: Record "NPR shipping provider Document")
+    procedure SendDocument(var ShipmentDocument: Record "NPR Shipping Provider Document")
     begin
-        message(Text001);
+        Message(Text001);
     end;
 
-    procedure PrintDocument(var ShipmentDocument: Record "NPR shipping provider Document")
+    procedure PrintDocument(var ShipmentDocument: Record "NPR Shipping Provider Document")
     begin
-        message(Text001);
+        Message(Text001);
     end;
 
     procedure PrintShipmentDocument(var SalesShipmentHeader: Record "Sales Shipment Header")
@@ -61,6 +67,48 @@
         ConsignorEntry.InsertFromShipmentHeader(SalesShipmentHeader."No.");
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', false, false)]
+    local procedure C80OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20]);
     var
-        Text001: Label 'Not available for Consignor';
+        SalesShptHeader: Record "Sales Shipment Header";
+        SalesSetup: Record "Sales & Receivables Setup";
+        ShipmentDocument: Record "NPR Shipping Provider Document";
+        ConsignorEntry: Record "NPR Consignor Entry";
+                            
+        RecRef: RecordRef;
+        
+    begin
+        if not InitPackageProvider() then
+            exit;
+
+        if not SalesHeader.Ship then
+            exit;
+
+        if (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) or
+            ((SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) and SalesSetup."Shipment on Invoice") then begin
+            if SalesShptHeader.Get(SalesShptHdrNo) then begin
+                RecRef.GetTable(SalesShptHeader);
+                PackageMgt.PostDimension(RecRef);
+                if not PackageMgt.AddEntry(RecRef, GuiAllowed, false, ShipmentDocument) then
+                    exit;
+                ConsignorEntry.InsertFromShipmentHeader(SalesShptHeader."No.");
+
+            end;
+        end;
+    end;
+
+    local procedure InitPackageProvider(): Boolean;
+    begin
+        if not PackageProviderSetup.Get() then
+            exit(false);
+
+        if not PackageProviderSetup."Enable Shipping" then
+            exit(false);
+
+        if PackageProviderSetup."Shipping Provider" <> PackageProviderSetup."Shipping Provider"::Consignor then
+            exit(false);
+
+        exit(true);
+    end;
+
 }
