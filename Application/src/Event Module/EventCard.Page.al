@@ -1257,7 +1257,7 @@
                 field("NPR Allow POS Add. New Lines"; Rec."NPR Allow POS Add. New Lines")
                 {
                     ToolTip = 'Specify whether new lines can be added to this event from POS.';
-                    ApplicationArea = NPRetail;
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

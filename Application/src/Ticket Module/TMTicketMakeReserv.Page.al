@@ -34,17 +34,17 @@
                 field("Admission Created"; Rec."Admission Created")
                 {
                     ToolTip = 'Specifies the value of the Admission Created field';
-                    ApplicationArea = NPRetail;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Inclusion Status"; Rec."Admission Inclusion Status")
                 {
                     ToolTip = 'Specifies the value of the Admission Inclusion Status field.';
-                    ApplicationArea = NPRetail;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Authorization Code"; Rec."Authorization Code")
                 {
                     ToolTip = 'Specifies the value of the Authorization Code field';
-                    ApplicationArea = NPRetail;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {

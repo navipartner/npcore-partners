@@ -65,7 +65,7 @@ page 6060034 "NPR POS Pmt. Bin Checkp. Denom"
                         field(TotalCurrencyAmount; TotalCurrencyAmount)
                         {
                             ShowCaption = false;
-                            ApplicationArea = All;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the total payment amount.';
                             AutoFormatType = 1;
                             Editable = false;

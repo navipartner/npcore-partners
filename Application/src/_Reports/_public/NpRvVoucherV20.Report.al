@@ -3,7 +3,7 @@ report 6014452 "NPR NpRv VoucherV20"
 #if (BC17 or BC18 or BC19)
     UsageCategory = None;
 #else
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     Caption = 'NpRv VoucherV20';
     UsageCategory = ReportsAndAnalysis;
     DefaultRenderingLayout = "Excel Layout";
