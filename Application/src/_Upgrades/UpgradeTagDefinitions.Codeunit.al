@@ -192,7 +192,7 @@
             Codeunit::"NPR UPG Pos Menus":
                 case UpgradeStep of
                     'AdjustSplitBillPOSActionParameters':
-                        exit('NPRSplitBillActionToWF2-938526df-0edf-4c2c-9db8-19e28af11c5a');
+                        exit('NPRSplitBillActionParamFix_20221201');
                     'AdjustDeletePOSLinePOSActionParameters':
                         exit('NPRDeletePOSLineActionToWF2-938526df-0edf-4c2c-9db8-19e28af11c5a');
                     'PosMenuPaymentButtonsAutoEnabled':

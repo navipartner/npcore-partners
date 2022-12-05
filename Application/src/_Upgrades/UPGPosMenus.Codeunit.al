@@ -103,8 +103,8 @@
                     repeat
                         ParamValue := TempParamValue;
                         case TempParamValue.Name of
-                            'InputType':
-                                ParamValue.Name := 'SeatingSelectionMethod';
+                            'SeatingSelectionMethod':
+                                ParamValue.Name := 'InputType';
                             'FixedSeatingCode':
                                 ParamValue.Name := 'SeatingCode';
                         end;
