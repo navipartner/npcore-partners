@@ -185,7 +185,7 @@
                 field("Ticket Reservation Entry No."; Rec."Ticket Reservation Entry No.")
                 {
                     ToolTip = 'Specifies the value of the Ticket Reservation Entry No. field.';
-                    ApplicationArea = NPRetail;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }

@@ -38,14 +38,14 @@ page 6150624 "NPR POS Dimension Value"
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = Dimensions;
+                    ApplicationArea = NPRRetail;
                     Style = Strong;
                     StyleExpr = Emphasize;
                     ToolTip = 'Specifies the code for the dimension value.';
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = Dimensions;
+                    ApplicationArea = NPRRetail;
                     Style = Strong;
                     StyleExpr = Emphasize;
                     ToolTip = 'Specifies a descriptive name for the dimension value.';
@@ -53,7 +53,7 @@ page 6150624 "NPR POS Dimension Value"
             }
             usercontrol(SetFieldFocus; "NPR Dimensions SearchFocus")
             {
-                ApplicationArea = all;
+                ApplicationArea = NPRRetail;
                 trigger SearchDimensions()
                 begin
                     if CurrentClientType in [ClientType::Phone, ClientType::Tablet] then

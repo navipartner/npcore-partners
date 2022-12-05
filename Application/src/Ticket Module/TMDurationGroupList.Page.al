@@ -2,7 +2,7 @@ page 6060149 "NPR TM DurationGroupList"
 {
     Extensible = False;
     PageType = List;
-    ApplicationArea = All;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     UsageCategory = Administration;
     SourceTable = "NPR TM DurationGroup";
     ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';

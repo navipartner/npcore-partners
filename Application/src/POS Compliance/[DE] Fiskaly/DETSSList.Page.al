@@ -5,7 +5,7 @@ page 6059882 "NPR DE TSS List"
     PageType = List;
     SourceTable = "NPR DE TSS";
     UsageCategory = Administration;
-    ApplicationArea = NPRetail;
+    ApplicationArea = NPRRetail;
 
     layout
     {

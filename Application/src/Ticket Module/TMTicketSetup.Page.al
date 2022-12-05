@@ -17,17 +17,17 @@
             {
                 field("Authorization Code Scheme"; Rec."Authorization Code Scheme")
                 {
-                    ApplicationArea = NPRTicketEssentials, NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Authorization Code Scheme field';
                 }
                 field("Retire Used Tickets After"; Rec."Retire Used Tickets After")
                 {
-                    ApplicationArea = NPRTicketEssentials, NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the amount of time until a used ticket and its associated information may be deleted. Does not affect generated statistics.';
                 }
                 field("Duration Retire Tickets (Min.)"; Rec."Duration Retire Tickets (Min.)")
                 {
-                    ApplicationArea = NPRTicketEssentials, NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the max duration (in minutes) the retire ticket job is allowed to run. Specify -1 for indefinite. ';
                 }
 

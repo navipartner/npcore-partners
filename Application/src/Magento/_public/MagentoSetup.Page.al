@@ -1061,7 +1061,7 @@
                 Promoted = true;
                 PromotedCategory = Process;
                 Image = Import;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 ToolTip = 'Executes the Update Magento Description action.';
 
                 trigger OnAction()

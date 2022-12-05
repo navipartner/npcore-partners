@@ -7,7 +7,7 @@ pageextension 6014413 "NPR Job Queue Entries" extends "Job Queue Entries"
             field("NPR Notify On Success"; Rec."Notify On Success")
             {
                 ToolTip = 'Specifies the value of the Notify On Success field.';
-                ApplicationArea = NPRetail;
+                ApplicationArea = NPRRetail;
             }
             field("NPR Notif. Profile on Error"; Rec."NPR Notif. Profile on Error")
             {

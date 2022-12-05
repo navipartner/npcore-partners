@@ -1,6 +1,6 @@
 page 6060032 "NPR MM Membership Statistics"
 {
-    ApplicationArea = All;
+    ApplicationArea = NPRMembershipEssential;
     Caption = 'Membership Statistics';
     Editable = false;
     Extensible = false;

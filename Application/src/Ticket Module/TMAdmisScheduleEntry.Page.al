@@ -319,7 +319,7 @@
                 }
                 field(DynamicPriceProfileCode; Rec."Dynamic Price Profile Code")
                 {
-                    ApplicationArea = NPRTicketDynamicPrices, NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Dynamic Price Profile Code field';
                     trigger OnValidate()
                     var

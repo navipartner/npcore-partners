@@ -6,7 +6,7 @@
     SourceTable = "Application Area Setup";
     UsageCategory = Administration;
     AdditionalSearchTerms = 'NaviPartner Setup';
-    ApplicationArea = NPRRetail;
+    ApplicationArea = All;
 
     layout
     {

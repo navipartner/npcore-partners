@@ -61,12 +61,12 @@
                 }
                 field(Limit; Rec.Limit)
                 {
-                    ApplicationArea = NPRTickedAdvanced;
+                    ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the limit that will be used to evaluate the dependency rule.';
                 }
                 field("Response Message"; Rec."Response Message")
                 {
-                    ApplicationArea = NPRTickedAdvanced;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies a custom response message that will be shown when the rule is violated.';
                 }
