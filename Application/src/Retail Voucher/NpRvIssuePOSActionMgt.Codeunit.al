@@ -1,106 +1,175 @@
-﻿codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
+codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
-        Text000: Label 'This action Issues Retail Vouchers.';
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        ActionDescription: Label 'This action Issues Retail Vouchers.';
+        ParameterAmount_CaptionLbl: Label 'Amount';
+        ParameterContactInfo_CaptLbl: Label 'Contact Info';
+        ParameterDiscAmount_CaptionLbl: Label 'Discount Amount';
+        ParameterDiscType_CaptionLbl: Label 'Discount Type';
+        ParameterDiscType_OptionCaptionLbl: Label 'Amount,Percent,None';
+        ParameterDiscType_OptionsLbl: Label 'Amount,Percent,None', Locked = true;
+        ParameterQuantity_CptLbl: Label 'Quantity';
+        ParameterScanReference_CaptLbl: Label 'Scan Reference Nos';
+        ParameterVoucherTypeCode_CaptLbl: Label 'Voucher Type Code';
         Text001: Label 'Select Voucher Type';
         Text002: Label 'Issue Retail Vouchers';
         Text003: Label 'Enter Quantity';
         Text004: Label 'Enter Amount';
         Text005: Label 'Enter Discount Amount';
         Text006: Label 'Enter Discount Percent';
-        QtyNotPositiveErr: Label 'You must specify a positive quantity.';
-        ConfirmReenterQtyMsg: Label '\Do you want to re-enter the quantity?';
-        ReadingErr: Label 'reading in %1 of %2';
-        SettingScopeErr: Label 'setting scope in %1';
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
     begin
-        DiscoverIssueVoucherAction(Sender);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+
+        WorkflowConfig.AddLabel('IssueVoucherPrompt', Text001);
+        WorkflowConfig.AddLabel('IssueVoucherTitle', Text002);
+        WorkflowConfig.AddLabel('Quantity', Text003);
+        WorkflowConfig.AddLabel('Amount', Text004);
+        WorkflowConfig.AddLabel('DiscountAmount', Text005);
+        WorkflowConfig.AddLabel('DiscountPercent', Text006);
+        WorkflowConfig.AddLabel('SendViaEmail', NpRvVoucher.FieldCaption("Send via E-mail"));
+        WorkflowConfig.AddLabel('Email', NpRvVoucher.FieldCaption("E-mail"));
+        WorkflowConfig.AddLabel('SendViaSMS', NpRvVoucher.FieldCaption("Send via SMS"));
+        WorkflowConfig.AddLabel('Phone', NpRvVoucher.FieldCaption("Phone No."));
+
+        WorkflowConfig.AddDecimalParameter('Amount', 0, ParameterAmount_CaptionLbl, ParameterAmount_CaptionLbl);
+        WorkflowConfig.AddBooleanParameter('ContactInfo', true, ParameterContactInfo_CaptLbl, ParameterContactInfo_CaptLbl);
+        WorkflowConfig.AddDecimalParameter('DiscountAmount', 0, ParameterDiscAmount_CaptionLbl, ParameterDiscAmount_CaptionLbl);
+        WorkflowConfig.AddOptionParameter(
+            'DiscountType',
+            ParameterDiscType_OptionsLbl,
+            SelectStr(3, ParameterDiscType_OptionsLbl),
+            ParameterDiscType_CaptionLbl,
+            ParameterDiscType_CaptionLbl,
+            ParameterDiscType_OptionCaptionLbl);
+        WorkflowConfig.AddIntegerParameter('Quantity', 0, ParameterQuantity_CptLbl, ParameterQuantity_CptLbl);
+        WorkflowConfig.AddBooleanParameter('ScanReferenceNos', false, ParameterScanReference_CaptLbl, ParameterScanReference_CaptLbl);
+        WorkflowConfig.AddTextParameter('VoucherTypeCode', '', ParameterVoucherTypeCode_CaptLbl, ParameterVoucherTypeCode_CaptLbl);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    local procedure GetActionScript(): Text
     begin
-        InitializeIssueVoucherCaptions(Captions);
+        exit(
+        //###NPR_INJECT_FROM_FILE:POSActionIssueVoucher.js###
+'let main=async({workflow:u,parameters:e,popup:o,captions:n})=>{let l,t,d,i;if(e.VoucherTypeCode?l={VoucherTypeCode:e.VoucherTypeCode}:l=await u.respond("voucher_type_input"),l==null||l=="")return;for(;t<=0||t==null;){if(e.Quantity<=0?t=await o.numpad({title:n.IssueVoucherTitle,caption:n.Quantity,value:1,notBlank:!0}):t=e.Quantity,t==null)return;await u.respond("check_qty",{qty_input:t})}switch(e.Amount<=0?d=await o.numpad({title:n.IssueVoucherTitle,caption:n.Amount,value:0,notBlank:!0}):d=e.Amount,e.DiscountType.toInt()){case e.DiscountType.Amount:if(e.DiscountAmount<=0){if(i=await o.numpad({title:n.IssueVoucherTitle,caption:n.DiscountAmount,value:0}),i==null)return}else i=e.DiscountAmount;break;case e.DiscountType.Percent:if(e.DiscountAmount<=0){if(i=await o.numpad({title:n.IssueVoucherTitle,caption:n.DiscountPercent,value:0}),i==null)return}else i=e.DiscountAmount;break;default:break}let{SendToEmail:c,SendToPhoneNo:a,SendMethodPrint:S,SendMethodEmail:h,SendMethodSMS:y}=await u.respond("select_send_method",{VoucherTypeCode:l});h&&(c=await o.input({title:n.SendViaEmail,caption:n.Email,value:c,notBlank:!0})),y&&(a=await o.input({title:n.SendViaSMS,caption:n.Phone,value:a,notBlank:!0})),await u.respond("issue_voucher",{VoucherTypeCode:l,qty_input:t,amt_input:d,DiscountType:e.DiscountType,discount_input:i,SendMethodPrint:S,SendToEmail:c,SendToPhoneNo:a,SendMethodEmail:h,SendMethodSMS:y}),e.ContactInfo&&await u.respond("contact_info"),e.ScanReferenceNos&&await u.respond("scan_reference_nos")};'
+        );
     end;
 
-    local procedure DiscoverIssueVoucherAction(var Sender: Record "NPR POS Action")
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup");
     var
-        NpRvVoucher: Record "NPR NpRv Voucher";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        IssueVoucherMgtB: Codeunit "NPR NpRv Issue POSAction Mgt-B";
     begin
-        if not Sender.DiscoverAction(
-          IssueVoucherActionCode(),
-          Text000,
-          IssueVoucherActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Multiple) then
-            exit;
-
-        Sender.RegisterWorkflowStep('voucher_type_input', 'if (!param.VoucherTypeCode) {respond()} else {context.VoucherTypeCode = param.VoucherTypeCode}');
-        Sender.RegisterWorkflowStep('qty_input', 'if(param.Quantity <= 0) {intpad({title: labels.IssueVoucherTitle,caption: labels.Quantity,value: 1,notBlank: true}).cancel(abort)} ' +
-                                                'else {context.$qty_input = {"numpad": param.Quantity}};');
-        Sender.RegisterWorkflowStep('check_qty', 'respond();');
-        Sender.RegisterWorkflowStep('amt_input', 'if(param.Amount <= 0) {numpad({title: labels.IssueVoucherTitle,caption: labels.Amount,value: 0,notBlank: true}).cancel(abort)} ' +
-                                                'else {context.$amt_input = {"numpad": param.Amount}};');
-        Sender.RegisterWorkflowStep('discount_input',
-          'switch(param.DiscountType + "") {' +
-          '  case "0":' +
-          '    if(param.DiscountAmount <= 0) {numpad({title: labels.IssueVoucherTitle,caption: labels.DiscountAmount,value: 0}).cancel(abort)} ' +
-          '    else {context.$discount_input = {"numpad": param.DiscountAmount}};' +
-          '    break;' +
-          '  case "1":' +
-          '    if(param.DiscountAmount <= 0) {numpad({title: labels.IssueVoucherTitle,caption: labels.DiscountPercent,value: 0}).cancel(abort)}' +
-          '    else {context.$discount_input = {"numpad": param.DiscountAmount}};' +
-          '    break;' +
-          '  default:' +
-          '    goto("select_send_method");' +
-          '}');
-        Sender.RegisterWorkflowStep('select_send_method', 'respond();');
-        Sender.RegisterWorkflowStep('send_method_email',
-          'context.$send_method_email = {input: context.SendToEmail};' +
-          'if (context.SendMethodEmail) {' +
-          '  input({' +
-          '    title: "' + NpRvVoucher.FieldCaption("Send via E-mail") + '"' +
-          '    ,caption: "' + NpRvVoucher.FieldCaption("E-mail") + '"' +
-          '    ,value: context.SendToEmail' +
-          '    ,notBlank: true' +
-          '  }).cancel(abort)' +
-          '};');
-        Sender.RegisterWorkflowStep('send_method_sms',
-        'context.$send_method_sms = {input: context.SendToPhoneNo};' +
-        'if (context.SendMethodSMS) {' +
-        '  input({' +
-        '    title: "' + NpRvVoucher.FieldCaption("Send via SMS") + '"' +
-        '    ,caption: "' + NpRvVoucher.FieldCaption("Phone No.") + '"' +
-        '    ,value: context.SendToPhoneNo' +
-        '    ,notBlank: true' +
-        '  }).cancel(abort)' +
-        '};');
-        Sender.RegisterWorkflowStep('issue_voucher', 'respond ();');
-        Sender.RegisterWorkflowStep('contact_info', 'if(param.ContactInfo) {respond()}');
-        Sender.RegisterWorkflowStep('scan_reference_nos', 'if(param.ScanReferenceNos) {respond()}');
-        Sender.RegisterWorkflow(false);
-
-        Sender.RegisterTextParameter('VoucherTypeCode', '');
-        Sender.RegisterIntegerParameter('Quantity', 0);
-        Sender.RegisterDecimalParameter('Amount', 0);
-        Sender.RegisterOptionParameter('DiscountType', 'Amount,Percent,None', 'Amount');
-        Sender.RegisterDecimalParameter('DiscountAmount', 0);
-        Sender.RegisterBooleanParameter('ContactInfo', true);
-        Sender.RegisterBooleanParameter('ScanReferenceNos', false);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        case Step of
+            'check_qty':
+                CheckQty(Context);
+            'voucher_type_input':
+                FrontEnd.WorkflowResponse(VoucherTypeInput(Context));
+            'select_send_method':
+                FrontEnd.WorkflowResponse(SelectSendMethod(Context, Sale));
+            'issue_voucher':
+                IssueVoucher(Context, Sale, SaleLine);
+            'contact_info':
+                IssueVoucherMgtB.ContactInfo(SaleLinePOS);
+            'scan_reference_nos':
+                IssueVoucherMgtB.ScanReferenceNos(SaleLinePOS, SaleLinePOS.Quantity);
+        end;
     end;
 
-    local procedure InitializeIssueVoucherCaptions(var Captions: Codeunit "NPR POS Caption Management")
+    local procedure IssueVoucher(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line")
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        TempVoucher: Record "NPR NpRv Voucher" temporary;
+        VoucherType: Record "NPR NpRv Voucher Type";
+        IssueVoucherMgtB: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        Amount: Decimal;
+        Discount: Decimal;
+        Quantity: Integer;
+        DiscountType: Text;
     begin
-        Captions.AddActionCaption(IssueVoucherActionCode(), 'IssueVoucherPrompt', Text001);
-        Captions.AddActionCaption(IssueVoucherActionCode(), 'IssueVoucherTitle', Text002);
-        Captions.AddActionCaption(IssueVoucherActionCode(), 'Quantity', Text003);
-        Captions.AddActionCaption(IssueVoucherActionCode(), 'Amount', Text004);
-        Captions.AddActionCaption(IssueVoucherActionCode(), 'DiscountAmount', Text005);
-        Captions.AddActionCaption(IssueVoucherActionCode(), 'DiscountPercent', Text006);
+        Context.SetScopePath('VoucherTypeCode');
+        VoucherType.Get(UpperCase(Context.GetString('VoucherTypeCode')));
+
+        Context.SetScopeRoot();
+        Quantity := Context.GetInteger('qty_input');
+        Amount := Context.GetDecimal('amt_input');
+        Context.SetScopeParameters();
+        DiscountType := Context.GetString('DiscountType');
+        if DiscountType <> '2' then begin
+            Context.SetScopeRoot();
+            Discount := Context.GetDecimal('discount_input');
+        end;
+
+        IssueVoucherMgtB.IssueVoucherCreate(POSSaleLine, TempVoucher, VoucherType, DiscountType, Quantity, Amount, Discount);
+        IssueVoucherMgtB.CreateNpRvSalesLine(POSSale, NpRvSalesLine, TempVoucher, VoucherType, POSSaleLine);
+
+        Context.SetScopeRoot();
+        NpRvSalesLine."Send via Print" := Context.GetBoolean('SendMethodPrint');
+        NpRvSalesLine."Send via E-mail" := Context.GetBoolean('SendMethodEmail');
+        NpRvSalesLine."Send via SMS" := Context.GetBoolean('SendMethodSMS');
+        NpRvSalesLine."E-mail" := CopyStr(Context.GetString('SendToEmail'), 1, MaxStrLen(NpRvSalesLine."E-mail"));
+        NpRvSalesLine."Phone No." := CopyStr(Context.GetString('SendToPhoneNo'), 1, MaxStrLen(NpRvSalesLine."Phone No."));
+        NpRvSalesLine.Modify();
+
+        IssueVoucherMgtB.CreateNpRvSalesLineRef(NpRvSalesLine, TempVoucher);
+    end;
+
+    local procedure SelectSendMethod(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale") Response: JsonObject
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        NpRvModuleSendDefault: Codeunit "NPR NpRv Module Send: Def.";
+        IssueVoucherMgtB: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        Selection: Integer;
+        Email: Text;
+        PhoneNo: Text;
+    begin
+        Context.SetScopePath('VoucherTypeCode');
+        VoucherType.Get(UpperCase(Context.GetString('VoucherTypeCode')));
+
+        IssueVoucherMgtB.FindSendMethod(POSSale, Email, PhoneNo);
+        Response.Add('SendToEmail', Email);
+        Response.Add('SendToPhoneNo', PhoneNo);
+
+        Selection := NpRvModuleSendDefault.SelectSendMethod(VoucherType);
+        Response.Add('SendMethodPrint', Selection = VoucherType."Send Method via POS"::Print);
+        Response.Add('SendMethodEmail', Selection = VoucherType."Send Method via POS"::"E-mail");
+        Response.Add('SendMethodSMS', Selection = VoucherType."Send Method via POS"::SMS);
+        exit(Response);
+    end;
+
+    local procedure VoucherTypeInput(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
+    var
+        VoucherTypeCode: Text;
+        IssueVoucherMgtB: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+    begin
+        if not IssueVoucherMgtB.SelectVoucherType(VoucherTypeCode) then
+            Error('');
+        Context.SetScopeParameters();
+        Context.SetContext('VoucherTypeCode', VoucherTypeCode);
+        Response.Add('VoucherTypeCode', VoucherTypeCode);
+    end;
+
+    local procedure CheckQty(Context: Codeunit "NPR POS JSON Helper")
+    var
+        Qty: Decimal;
+        ConfirmReenterQtyMsg: Label '\Do you want to re-enter the quantity?';
+        QtyNotPositiveErr: Label 'You must specify a positive quantity.';
+    begin
+        Context.SetScopeRoot();
+        Qty := Context.GetDecimal('qty_input');
+        if Qty <= 0 then
+            if not Confirm(QtyNotPositiveErr + ConfirmReenterQtyMsg, true) then
+                Error('');
+    end;
+
+    local procedure IssueVoucherActionCode(): Code[20]
+    begin
+        exit(Format(Enum::"NPR POS Workflow"::ISSUE_VOUCHER));
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, true)]
@@ -117,7 +186,7 @@
 
         Handled := true;
 
-        if PAGE.RunModal(0, NpRvVoucherType) = ACTION::LookupOK then
+        if Page.RunModal(0, NpRvVoucherType) = Action::LookupOK then
             POSParameterValue.Value := NpRvVoucherType.Code;
     end;
 
@@ -146,298 +215,5 @@
         NpRvVoucherType.Get(POSParameterValue.Value);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeSetQuantity', '', true, true)]
-    local procedure OnBeforeSetQuantity(var Sender: Codeunit "NPR POS Sale Line"; SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
-    begin
-        ScanReferenceNos(SaleLinePOS, NewQuantity);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        JSON: Codeunit "NPR POS JSON Management";
-    begin
-        if Handled then
-            exit;
-
-        if not Action.IsThisAction(IssueVoucherActionCode()) then
-            exit;
-        Handled := true;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-
-        case WorkflowStep of
-            'check_qty':
-                CheckQty(JSON, FrontEnd);
-            'voucher_type_input':
-                VoucherTypeInput(JSON, FrontEnd);
-            'select_send_method':
-                SelectSendMethod(JSON, POSSession, FrontEnd);
-            'issue_voucher':
-                IssueVoucher(JSON, POSSession);
-            'contact_info':
-                ContactInfo(SaleLinePOS);
-            'scan_reference_nos':
-                ScanReferenceNos(SaleLinePOS, SaleLinePOS.Quantity);
-        end;
-    end;
-
-
-    local procedure OverrideVoucherAmount(VoucherType: Record "NPR NpRv Voucher Type"; var SaleLinePOS: Record "NPR POS Sale Line")
-    begin
-        if VoucherType."Voucher Amount" = 0 then
-            exit;
-        SaleLinePOS."Unit Price" := VoucherType."Voucher Amount";
-    end;
-
-    local procedure ContactInfo(SaleLinePOS: Record "NPR POS Sale Line")
-    var
-        NpRvSalesLine: Record "NPR NpRv Sales Line";
-    begin
-        NpRvSalesLine.SetRange("Register No.", SaleLinePOS."Register No.");
-        NpRvSalesLine.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        NpRvSalesLine.SetRange("Sale Date", SaleLinePOS.Date);
-        NpRvSalesLine.SetRange("Sale Line No.", SaleLinePOS."Line No.");
-        if not NpRvSalesLine.FindSet() then
-            exit;
-
-        repeat
-            PAGE.RunModal(PAGE::"NPR NpRv Sales Line Card", NpRvSalesLine);
-            Commit();
-        until NpRvSalesLine.Next() = 0;
-    end;
-
-    local procedure IssueVoucher(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
-    var
-        NpRvSalesLine: Record "NPR NpRv Sales Line";
-        NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
-        VoucherType: Record "NPR NpRv Voucher Type";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        TempVoucher: Record "NPR NpRv Voucher" temporary;
-        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        VoucherTypeCode: Text;
-        DiscountType: Text;
-    begin
-        VoucherTypeCode := UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, 'IssueVoucher', IssueVoucherActionCode())));
-        VoucherType.Get(VoucherTypeCode);
-
-        NpRvVoucherMgt.GenerateTempVoucher(VoucherType, TempVoucher);
-
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"Issue Voucher");
-        SaleLinePOS.Validate("No.", VoucherType."Account No.");
-        SaleLinePOS.Description := VoucherType.Description;
-        JSON.SetScopeRoot();
-        JSON.SetScope('$qty_input', StrSubstNo(SettingScopeErr, IssueVoucherActionCode()));
-        SaleLinePOS.Quantity := JSON.GetIntegerOrFail('numpad', StrSubstNo(ReadingErr, 'IssueVoucher', IssueVoucherActionCode()));
-        if SaleLinePOS.Quantity < 0 then
-            Error(QtyNotPositiveErr);
-
-        POSSaleLine.InsertLine(SaleLinePOS);
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-
-        JSON.SetScopeRoot();
-        JSON.SetScope('$amt_input', StrSubstNo(SettingScopeErr, IssueVoucherActionCode()));
-        SaleLinePOS."Unit Price" := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'IssueVoucher', IssueVoucherActionCode()));
-
-        JSON.SetScopeRoot();
-        JSON.SetScopeParameters(IssueVoucherActionCode());
-        DiscountType := JSON.GetStringOrFail('DiscountType', StrSubstNo(ReadingErr, 'IssueVoucher', IssueVoucherActionCode()));
-        case DiscountType of
-            '0':
-                begin
-                    JSON.SetScopeRoot();
-                    JSON.SetScope('$discount_input', StrSubstNo(SettingScopeErr, IssueVoucherActionCode()));
-                    SaleLinePOS."Discount Amount" := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'IssueVoucher', IssueVoucherActionCode())) * SaleLinePOS.Quantity;
-                end;
-            '1':
-                begin
-                    JSON.SetScopeRoot();
-                    JSON.SetScope('$discount_input', StrSubstNo(SettingScopeErr, IssueVoucherActionCode()));
-                    SaleLinePOS."Discount %" := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'IssueVoucher', IssueVoucherActionCode()));
-                end;
-        end;
-        SaleLinePOS."Price Includes VAT" := true;
-
-        OverrideVoucherAmount(VoucherType, SaleLinePOS);
-
-        SaleLinePOS.UpdateAmounts(SaleLinePOS);
-        if SaleLinePOS."Discount Amount" > 0 then
-            SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
-        SaleLinePOS.Description := TempVoucher.Description;
-        SaleLinePOS.Modify(true);
-        POSSession.RequestRefreshData();
-
-        NpRvSalesLine.Init();
-        NpRvSalesLine.Id := CreateGuid();
-        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
-        NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
-        NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
-        NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
-        NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
-        NpRvSalesLine."Voucher No." := TempVoucher."No.";
-        NpRvSalesLine."Reference No." := TempVoucher."Reference No.";
-        NpRvSalesLine.Description := TempVoucher.Description;
-        NpRvSalesLine.Type := NpRvSalesLine.Type::"New Voucher";
-        NpRvSalesLine."Voucher Type" := VoucherType.Code;
-        NpRvSalesLine.Description := VoucherType.Description;
-        NpRvSalesLine."Starting Date" := CurrentDateTime;
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        case SalePOS."Customer Type" of
-            SalePOS."Customer Type"::Ord:
-                begin
-                    NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");
-                end;
-            SalePOS."Customer Type"::Cash:
-                begin
-                    NpRvSalesLine.Validate("Contact No.", SalePOS."Customer No.");
-                end;
-        end;
-        JSON.SetScopeRoot();
-        NpRvSalesLine."Send via Print" := JSON.GetBoolean('SendMethodPrint');
-        NpRvSalesLine."Send via E-mail" := JSON.GetBoolean('SendMethodEmail');
-        NpRvSalesLine."Send via SMS" := JSON.GetBoolean('SendMethodSMS');
-        if JSON.SetScope('$send_method_email') then
-            NpRvSalesLine."E-mail" := CopyStr(JSON.GetString('input'), 1, MaxStrLen(NpRvSalesLine."E-mail"));
-        JSON.SetScopeRoot();
-        if JSON.SetScope('$send_method_sms') then
-            NpRvSalesLine."Phone No." := CopyStr(JSON.GetString('input'), 1, MaxStrLen(NpRvSalesLine."Phone No."));
-        NpRvSalesLine.Insert();
-
-        NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine, NpRvSalesLineReference);
-        if NpRvSalesLineReference.IsEmpty then begin
-            NpRvSalesLineReference.Init();
-            NpRvSalesLineReference.Id := CreateGuid();
-            NpRvSalesLineReference."Voucher No." := TempVoucher."No.";
-            NpRvSalesLineReference."Reference No." := TempVoucher."Reference No.";
-            NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
-            NpRvSalesLineReference.Insert(true);
-        end;
-        POSSession.RequestRefreshData();
-    end;
-
-    local procedure ScanReferenceNos(SaleLinePOS: Record "NPR POS Sale Line"; Quantity: Decimal)
-    var
-        NpRvSalesLine: Record "NPR NpRv Sales Line";
-        NpRvSalesLineReferences: Page "NPR NpRv Sales Line Ref.";
-    begin
-        if not GuiAllowed then
-            exit;
-
-        NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
-        NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::"New Voucher");
-        if not NpRvSalesLine.FindFirst() then
-            exit;
-
-        NpRvSalesLineReferences.SetNpRvSalesLine(NpRvSalesLine, Quantity);
-        NpRvSalesLineReferences.RunModal();
-    end;
-
-    local procedure SelectSendMethod(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        Contact: Record Contact;
-        Customer: Record Customer;
-        VoucherType: Record "NPR NpRv Voucher Type";
-        SalePOS: Record "NPR POS Sale";
-        NpRvModuleSendDefault: Codeunit "NPR NpRv Module Send: Def.";
-        POSSale: Codeunit "NPR POS Sale";
-        Email: Text;
-        PhoneNo: Text;
-        VoucherTypeCode: Text;
-        Selection: Integer;
-    begin
-        VoucherTypeCode := CopyStr(UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, 'SelectSendMethod', IssueVoucherActionCode()))), 1, MaxStrLen(VoucherType.Code));
-        VoucherType.Get(VoucherTypeCode);
-
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        if SalePOS."Customer No." <> '' then begin
-            case SalePOS."Customer Type" of
-                SalePOS."Customer Type"::Ord:
-                    begin
-                        if Customer.Get(SalePOS."Customer No.") then begin
-                            Email := Customer."E-Mail";
-                            PhoneNo := Customer."Phone No.";
-                        end;
-                    end;
-                SalePOS."Customer Type"::Cash:
-                    begin
-                        if Contact.Get(SalePOS."Customer No.") then begin
-                            Email := Contact."E-Mail";
-                            PhoneNo := Contact."Mobile Phone No.";
-                            if PhoneNo = '' then
-                                PhoneNo := Contact."Phone No.";
-                        end;
-                    end;
-            end;
-        end;
-        JSON.SetContext('SendToEmail', Email);
-        JSON.SetContext('SendToPhoneNo', PhoneNo);
-
-        Selection := NpRvModuleSendDefault.SelectSendMethod(VoucherType);
-        JSON.SetContext('SendMethodPrint', Selection = VoucherType."Send Method via POS"::Print);
-        JSON.SetContext('SendMethodEmail', Selection = VoucherType."Send Method via POS"::"E-mail");
-        JSON.SetContext('SendMethodSMS', Selection = VoucherType."Send Method via POS"::SMS);
-        FrontEnd.SetActionContext(IssueVoucherActionCode(), JSON);
-    end;
-
-    local procedure VoucherTypeInput(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        VoucherTypeCode: Text;
-    begin
-        if not SelectVoucherType(VoucherTypeCode) then
-            Error('');
-
-        JSON.SetScopeParameters(IssueVoucherActionCode());
-        JSON.SetContext('VoucherTypeCode', VoucherTypeCode);
-        FrontEnd.SetActionContext(IssueVoucherActionCode(), JSON);
-    end;
-
-    local procedure CheckQty(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        Qty: Decimal;
-    begin
-        JSON.SetScopeRoot();
-        JSON.SetScope('$qty_input', StrSubstNo(SettingScopeErr, IssueVoucherActionCode()));
-        Qty := JSON.GetIntegerOrFail('numpad', StrSubstNo(ReadingErr, 'CheckQty', IssueVoucherActionCode()));
-        if Qty <= 0 then begin
-            if Confirm(QtyNotPositiveErr + ConfirmReenterQtyMsg, true) then
-                FrontEnd.ContinueAtStep('qty_input')
-            else
-                Error('');
-        end;
-    end;
-
-    local procedure SelectVoucherType(var VoucherTypeCode: Text): Boolean
-    var
-        VoucherType: Record "NPR NpRv Voucher Type";
-    begin
-        VoucherTypeCode := '';
-        if PAGE.RunModal(0, VoucherType) <> ACTION::LookupOK then
-            exit(false);
-
-        VoucherTypeCode := VoucherType.Code;
-        exit(true);
-    end;
-
-    local procedure IssueVoucherActionCode(): Code[20]
-    begin
-        exit('ISSUE_VOUCHER');
-    end;
-
-    local procedure IssueVoucherActionVersion(): Code[20]
-    begin
-        exit('1.1');
-    end;
 }
 
