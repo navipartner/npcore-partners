@@ -9,7 +9,6 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         HideZeroAmountName: Label 'Hide Zero Amount Dialog';
         HideZeroAmountDesc: Label 'Hide the amount dialog when amount is zero';
         PaymentMethodCodeName: Label 'Payment Method Code';
-        PaymentMethodCodeDesc: Label 'Payment Method Code when the workflow is invoked directly.';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
