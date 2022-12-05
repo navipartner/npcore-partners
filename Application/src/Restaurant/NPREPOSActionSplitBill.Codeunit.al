@@ -1,6 +1,7 @@
 ﻿codeunit 6150670 "NPR NPRE POS Action: SplitBill"
 {
     Access = Internal;
+
     var
         ReadingErr: Label 'reading in %1 of %2';
 
@@ -11,7 +12,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('2.0');
+        exit('2.1');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
@@ -28,7 +29,7 @@
                 '  if ($parameters.SeatingCode) {' +
                 '    $context.seatingCode = $parameters.SeatingCode;' +
                 '  } else {' +
-                '    switch($parameters.SeatingSelectionMethod + "") {' +
+                '    switch($parameters.InputType + "") {' +
                 '      case "0":' +
                 '        $context.seatingCode = await popup.stringpad({caption: $labels.SeatingIDLbl});' +
                 '        break;' +
@@ -60,7 +61,7 @@
                 '  });' +
                 'if (result) {await workflow.respond("DoSplit", result)};');
 
-            Sender.RegisterOptionParameter('SeatingSelectionMethod', 'stringPad,intPad,List', 'stringPad');
+            Sender.RegisterOptionParameter('InputType', 'stringPad,intPad,List', 'stringPad');
             Sender.RegisterTextParameter('WaiterPadCode', '');
             Sender.RegisterTextParameter('SeatingCode', '');
             Sender.RegisterTextParameter('SeatingFilter', '');
@@ -440,7 +441,7 @@
                 Caption := CaptionSeatingCode;
             'SeatingFilter':
                 Caption := CaptionSeatingFilter;
-            'SeatingSelectionMethod':
+            'InputType':
                 Caption := CaptionSeatingSelectionMethod;
             'WaiterPadCode':
                 Caption := CaptionWaiterPadCode;
@@ -472,7 +473,7 @@
                 Caption := DescSeatingCode;
             'SeatingFilter':
                 Caption := DescSeatingFilter;
-            'SeatingSelectionMethod':
+            'InputType':
                 Caption := DescSeatingSelectionMethod;
             'WaiterPadCode':
                 Caption := DescWaiterPadCode;
@@ -491,7 +492,7 @@
         CASE POSParameterValue.Name OF
             'IncludeAllWPads':
                 Caption := OptionIncludeAllWPads;
-            'SeatingSelectionMethod':
+            'InputType':
                 Caption := OptionSeatingSelectionMethod;
         end;
     end;
