@@ -13,22 +13,22 @@ page 6060085 "NPR Package Dimension Details"
             {
                 field("Sales Line No."; Rec."Sales Line No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Sales Line No. field.';
                 }
                 field("Item No."; Rec."Item No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Item No. field.';
                 }
                 field("Item Quantity"; Rec."Item Quantity")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Item Quantity field.';
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Variant Code field.';
                 }
 

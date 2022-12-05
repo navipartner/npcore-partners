@@ -151,7 +151,7 @@
                 field("Additional Experienc Item No."; Rec."Additional Experience Item No.")
                 {
                     ToolTip = 'Specifies the value of the Additional Experience Item No. field. This Item will be used to post POS Line when adding additional experience to existing ticket.';
-                    ApplicationArea = NPRetail;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
             }
         }

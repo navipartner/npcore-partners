@@ -68,7 +68,7 @@ page 6060033 "NPR Edit POS Pmt. Denomination"
                         field(TotalCurrencyAmount; TotalCurrencyAmount)
                         {
                             ShowCaption = false;
-                            ApplicationArea = All;
+                            ApplicationArea = NPRRetail;
                             ToolTip = 'Specifies the total payment amount.';
                             AutoFormatType = 1;
                             Editable = false;

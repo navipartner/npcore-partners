@@ -973,7 +973,7 @@
                 RunPageMode = Create;
 
                 ToolTip = 'Create Purchase Quote.';
-                ApplicationArea = NPRetail;
+                ApplicationArea = NPRRetail;
             }
             action("&Purchase Order")
             {

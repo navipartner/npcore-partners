@@ -46,6 +46,18 @@ stages:
       azureKeyVaultClientId: b38b8bef-17d2-4368-84ce-f9880a45eed0
     runtests: TRUE
     objectVisibilityCheck: TRUE
+    applicationAreaCheck:
+      enabled: true
+      allowedApplicationAreas: ("NPRRetail", 
+                                "NPRTicketEssential", 
+                                "NPRTicketAdvanced",
+                                "NPRTicketDynamicPrice",
+                                "NPRTicketWallet",
+                                "NPRMembershipEssential",
+                                "NPRMembershipAdvanced",
+                                "NPRNaviConnect")
+      exceptions: (@{Type = "Page"; Id = 6151231; Name = "NPR App. Area Setup" })
+
     generatePermissions:
       enabled: true
       alObjectsFolder: $(Build.Repository.LocalPath)/Application/src/

@@ -184,7 +184,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Promoted = true;
                 PromotedCategory = Process;
                 Image = Import;
-                ApplicationArea = All;
+                ApplicationArea = NPRRetail;
                 ToolTip = 'Executes the Update Magento Description action.';
                 ObsoleteState = Pending;
                 ObsoleteReason = 'Action moved to page Magento Setup';

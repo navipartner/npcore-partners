@@ -1,7 +1,7 @@
 page 6060004 "NPR POS Unit Display"
 {
     PageType = List;
-    ApplicationArea = All;
+    ApplicationArea = NPRRetail;
     UsageCategory = Lists;
     SourceTable = "NPR POS Unit Display";
     Caption = 'POS Unit Display';
@@ -18,7 +18,7 @@ page 6060004 "NPR POS Unit Display"
             {
                 field("POS Unit No."; Rec.POSUnit)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the number of the POS unit you want to configure.';
 #IF NOT BC17
                     AboutTitle = 'POS Unit No.';
@@ -27,7 +27,7 @@ page 6060004 "NPR POS Unit Display"
                 }
                 field("MediaDownloaded"; Rec."Media Downloaded")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether the device occupying the provided POS Unit No. has downloaded the media. Disable if media should be downloaded again.';
 #IF NOT BC17
                     AboutTitle = 'Media Downloaded';
@@ -36,7 +36,7 @@ page 6060004 "NPR POS Unit Display"
                 }
                 field("Screen No."; Rec."Screen No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies which screen the customer display should occupy. 0 is the default value, and in most cases the secondary screen is selected if only two screens are connected to the device.';
 #IF NOT BC17
                     AboutTitle = 'Screen number';
