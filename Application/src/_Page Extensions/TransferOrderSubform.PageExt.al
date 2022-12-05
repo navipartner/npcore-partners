@@ -2,6 +2,29 @@ pageextension 6014463 "NPR Transfer Order Subform" extends "Transfer Order Subfo
 {
     layout
     {
+        modify("Item No.")
+        {
+            trigger OnAfterValidate()
+            var
+                Item: Record Item;
+                NPRVarietySetup: Record "NPR Variety Setup";
+                VRTWrapper: Codeunit "NPR Variety Wrapper";
+            begin
+                if not NPRVarietySetup.Get() then
+                    exit;
+                if not NPRVarietySetup."Variety Enabled" then
+                    exit;
+                if not NPRVarietySetup."Pop up Variety Matrix" then
+                    exit;
+                if Item.Get(Rec."Item No.") then begin
+                    Item.CalcFields("NPR Has Variants");
+                    if Item."NPR Has Variants" then begin
+                        CurrPage.Update(); //required when the Item No. is first added, since the following line will show an error if quantity is set on the matrix page
+                        VRTWrapper.TransferLineShowVariety(Rec, 0);
+                    end;
+                end;
+            end;
+        }
         addafter("Item No.")
         {
             field("NPR Cross-Reference No."; Rec."NPR Cross-Reference No.")
