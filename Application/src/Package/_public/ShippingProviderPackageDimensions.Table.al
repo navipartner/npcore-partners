@@ -9,7 +9,7 @@ table 6014691 "NPR Package Dimension"
 
     fields
     {
-        field(1; "Document Type"; Enum "NPR ShipProviderDocumentType")
+        field(1; "Document Type"; enum "NPR ShipProviderDocumentType")
         {
             Caption = 'Document Type';
             DataClassification = CustomerContent;
@@ -82,6 +82,15 @@ table 6014691 "NPR Package Dimension"
             Caption = 'Package Description';
             DataClassification = CustomerContent;
         }
+        field(25; Items; Integer)
+        {
+            Caption = 'Items';
+            FieldClass = FlowField;
+            Editable = false;
+            CalcFormula = count("NPR Package Dimension Details" where("Document Type" = field("Document Type"), "Document No." = field("Document No."), "Package Dimension Line No." = field("Line No.")));
+
+        }
+
     }
     keys
     {
@@ -90,6 +99,17 @@ table 6014691 "NPR Package Dimension"
             Clustered = true;
         }
     }
+
+    trigger OnDelete()
+    var
+        NPRPackageDimDetails: Record "NPR Package Dimension Details";
+    begin
+        NPRPackageDimDetails.SetRange("Document Type", "Document Type");
+        NPRPackageDimDetails.SetRange("Document No.", "Document No.");
+        NPRPackageDimDetails.setrange("Package Dimension Line No.", "Line No.");
+        NPRPackageDimDetails.deleteall(true);
+    end;
+
     local procedure CalcVolume()
     begin
         Volume := Length * Width * Height;

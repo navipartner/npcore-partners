@@ -6,12 +6,11 @@ page 6059910 "NPR Package Dimensions"
     PageType = List;
     SourceTable = "NPR Package Dimension";
     UsageCategory = Lists;
-    DelayedInsert = true;
     AutoSplitKey = true;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(General)
             {
@@ -61,7 +60,28 @@ page 6059910 "NPR Package Dimensions"
                     ToolTip = 'Specifies the value of the Package Description field.';
                     ApplicationArea = NPRRetail;
                 }
+                field(Items; Rec.Items)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Items field.';
+                }
+
             }
         }
+
     }
+    trigger OnClosePage()
+    var
+        PackageDimension: Record "NPR Package Dimension";
+    begin
+        PackageDimension.Reset();
+        PackageDimension.SetRange("Document Type", Rec."Document Type");
+        PackageDimension.SetRange("Document No.", Rec."Document No.");
+        PackageDimension.SetFilter(Quantity, '0');
+        if PackageDimension.FindFirst() then
+            Message(CheckQty);
+    end;
+
+    var
+        CheckQty: label 'Please note there are lines with Quantity 0. these will not be sent to Posted Documents. ';
 }

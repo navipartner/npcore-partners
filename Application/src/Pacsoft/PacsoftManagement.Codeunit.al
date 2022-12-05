@@ -9,7 +9,7 @@
     var
 
         PackageProviderSetup: Record "NPR Shipping Provider Setup";
-        SendShipmentAgainQst: Label 'The shipment was already sent to Pacsoft, do you wish to send it again?';
+        SendShipmentAgainQst: label 'The shipment was already sent to Pacsoft, do you wish to send it again?';
 
     procedure SendDocuments()
     var
@@ -27,7 +27,7 @@
     procedure SendDocument(var ShipmentDocument: Record "NPR Shipping Provider Document"; WithDialog: Boolean)
     var
         OutStr: OutStream;
-        DocumentSentMsg: Label 'Document sent.';
+        DocumentSentMsg: label 'Document sent.';
     begin
         if not InitPackageProvider() then exit;
 
@@ -70,7 +70,7 @@
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
-        XMLResponce: XMLport "NPR Pacsoft Response";
+        XMLResponce: xmlport "NPR Pacsoft Response";
         InStr: InStream;
         URI: Text[250];
     begin
@@ -138,10 +138,10 @@
         ShipDocService: Record "NPR Pacsoft Shipm. Doc. Serv.";
         CustomsItemRows: Record "NPR Pacsoft Customs Item Rows";
         CompanyInfo: Record "Company Information";
-        TextNoNotification: Label 'Please select a Notification service';
-        TextNoItemRows: Label 'Please fill at least one Customs Item Row.';
-        TextBeforeToday: Label 'must be today or later.';
-        TextNoCustomsDocument: Label 'can not be blank.';
+        TextNoNotification: label 'Please select a Notification service';
+        TextNoItemRows: label 'Please fill at least one Customs Item Row.';
+        TextBeforeToday: label 'must be today or later.';
+        TextNoCustomsDocument: label 'can not be blank.';
         Found: Boolean;
     begin
         if ShipmentDocument."Entry No." = 0 then exit;
@@ -269,7 +269,7 @@
             exit(false);
 
         if not PackageProviderSetup."Enable Shipping" then
-            exit(False);
+            exit(false);
 
         if PackageProviderSetup."Shipping Provider" <> PackageProviderSetup."Shipping Provider"::Pacsoft then
             exit(false);
@@ -281,7 +281,7 @@
         message(Text001);
     end;
 
-    Procedure SendDocument(var ShipmentDocument: Record "NPR shipping provider Document")
+    procedure SendDocument(var ShipmentDocument: Record "NPR shipping provider Document")
     var
         OutStr: OutStream;
     begin
@@ -331,7 +331,28 @@
         ShipmentDocument.AddEntry(RecRef, true);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', false, false)]
+    local procedure SalesPostOnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20])
     var
-        Text001: Label 'Not available for Pacsoft';
+
+        SalesShptHeader: Record "Sales Shipment Header";
+        SalesSetup: Record "Sales & Receivables Setup";
+        ShipmentDocument: Record "NPR Shipping Provider Document";
+        RecRefShipment: RecordRef;
+    begin
+        if not InitPackageProvider() then
+            exit;
+        SalesSetup.Get();
+        if SalesHeader.Ship then
+            if (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) or
+                ((SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) and SalesSetup."Shipment on Invoice") then
+                if SalesShptHeader.Get(SalesShptHdrNo) then begin
+                    RecRefShipment.GetTable(SalesShptHeader);
+                    ShipmentDocument.AddEntry(RecRefShipment, false);
+                end;
+    end;
+
+    var
+        Text001: label 'Not available for Pacsoft';
 }
 
