@@ -64,7 +64,7 @@ codeunit 88103 "NPR Library - POS Mock"
         // Invoke the business logic of the PAYMENT action
         POSSession.ClearActionState();
         POSSession.StoreActionState('ContextId', POSSession.BeginAction(POSActionPayment.ActionCode())); // Is done at start of payment action
-        POSActionPayment.CapturePayment(POSPaymentMethod, POSSession, FrontEnd, Amount, VoucherNo, Handled); // Capture step of payment action
+        POSActionPayment.CapturePayment(POSPaymentMethod, POSSession, FrontEnd, Amount, Amount, VoucherNo, Handled); // Capture step of payment action
         if VoucherNo <> '' then
             IssueReturnVoucherFromPaymentMethod(POSSession, VoucherNo);
 
