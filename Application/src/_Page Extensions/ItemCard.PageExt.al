@@ -554,9 +554,14 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     ApplicationArea = NPRRetail;
                 }
             }
+
             group("NPR Extra Fields")
             {
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Not in use anymore';
+
                 Caption = 'Extra Fields';
+
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
                     CaptionClass = '6014555,27,1,2';
@@ -711,6 +716,11 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 SubPageLink = "No." = field("No.");
                 ApplicationArea = NPRRetail;
             }
+        }
+
+        modify(ItemAttributesFactbox)
+        {
+            Visible = false;
         }
     }
     actions
