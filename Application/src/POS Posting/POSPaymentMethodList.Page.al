@@ -96,6 +96,12 @@
                     ToolTip = 'Specifies the value of the Rounding Type field.';
                     ApplicationArea = NPRRetail;
                 }
+                field("NPR Warning pop-up on Return"; Rec."NPR Warning pop-up on Return")
+                {
+                    Visible = false;
+                    ToolTip = 'Specifies pop up warning on return';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

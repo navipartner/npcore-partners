@@ -1,10 +1,12 @@
 ﻿codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
 {
     Access = Internal;
+
     var
         POSSalePatternGuideLbl: Label '[PS] ~ POS Store Code\[PU] ~ POS Unit No.\[S] ~ Sales Ticket No.\[N] ~ Random Number\[N*3] ~ 3 Random Numbers\[AN] ~ Random Char\[AN*3] ~ 3 Random Chars';
         POSSaleLinePatternGuideLbl: Label '[PS] ~ POS Store Code\[PU] ~ POS Unit No.\[S] ~ Sales Ticket No.\[N] ~ Random Number\[N*3] ~ 3 Random Numbers\[AN] ~ Random Char\[AN*3] ~ 3 Random Chars\[NL] ~ Natural Line No.\[L] ~ Line No.';
 
+    [Obsolete('Pending removal use InsertPOSSalesEntries instead')]
     procedure InsertPosSalesEntries(var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary)
     var
         TempNpGpPOSSalesEntry2: Record "NPR NpGp POS Sales Entry" temporary;
@@ -19,6 +21,7 @@
         until TempNpGpPOSSalesEntry2.Next() = 0;
     end;
 
+    [Obsolete('Pending removal use InsertPOSSalesEntry instead')]
     local procedure InsertPosSalesEntry(var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary)
     var
         NpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry";
@@ -68,6 +71,80 @@
             repeat
                 InsertPosInfoPosEntry(NpGpPOSSalesEntry, TempNpGpPOSInfoPOSEntry2);
             until TempNpGpPOSInfoPOSEntry2.Next() = 0;
+    end;
+
+    procedure InsertPOSSalesEntries(var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary; var TempNpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line" temporary)
+    var
+        TempNpGpPOSSalesEntry2: Record "NPR NpGp POS Sales Entry" temporary;
+    begin
+        TempNpGpPOSSalesEntry2.Copy(TempNpGpPOSSalesEntry, true);
+        Clear(TempNpGpPOSSalesEntry2);
+        if not TempNpGpPOSSalesEntry2.FindSet() then
+            exit;
+
+        repeat
+            InsertPOSSalesEntry(TempNpGpPOSSalesEntry2, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry, TempNpGpPOSPaymentLine);
+        until TempNpGpPOSSalesEntry2.Next() = 0;
+    end;
+
+    local procedure InsertPOSSalesEntry(var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary; var TempNpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line" temporary)
+    var
+        NpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry";
+        TempNpGpPOSSalesLine2: Record "NPR NpGp POS Sales Line" temporary;
+        TempNpGpPOSInfoPOSEntry2: Record "NPR NpGp POS Info POS Entry" temporary;
+        TempNpGpPOSPaymentLine2: Record "NPR NpGp POS Payment Line" temporary;
+        DataLogMgt: Codeunit "NPR Data Log Management";
+        RecRef: RecordRef;
+    begin
+        if TempNpGpPOSSalesEntry."POS Store Code" = '' then
+            exit;
+        if TempNpGpPOSSalesEntry."POS Unit No." = '' then
+            exit;
+        if TempNpGpPOSSalesEntry."Document No." = '' then
+            exit;
+
+        if not IncludeEntryType(TempNpGpPOSSalesEntry) then
+            exit;
+
+        NpGpPOSSalesEntry.SetCurrentKey("POS Store Code", "POS Unit No.", "Document No.");
+        NpGpPOSSalesEntry.SetRange("POS Store Code", TempNpGpPOSSalesEntry."POS Store Code");
+        NpGpPOSSalesEntry.SetRange("POS Unit No.", TempNpGpPOSSalesEntry."POS Unit No.");
+        NpGpPOSSalesEntry.SetRange("Document No.", TempNpGpPOSSalesEntry."Document No.");
+        if NpGpPOSSalesEntry.FindFirst() then
+            exit;
+
+        NpGpPOSSalesEntry.Init();
+        NpGpPOSSalesEntry := TempNpGpPOSSalesEntry;
+        NpGpPOSSalesEntry."Entry No." := 0;
+        DataLogMgt.DisableDataLog(true);
+        NpGpPOSSalesEntry.Insert(true);
+        DataLogMgt.DisableDataLog(false);
+        RecRef.GetTable(NpGpPOSSalesEntry);
+        DataLogMgt.LogDatabaseInsert(RecRef);
+
+        TempNpGpPOSSalesLine2.Copy(TempNpGpPOSSalesLine, true);
+        Clear(TempNpGpPOSSalesLine2);
+        TempNpGpPOSSalesLine2.SetRange("POS Entry No.", TempNpGpPOSSalesEntry."Entry No.");
+        if TempNpGpPOSSalesLine2.FindSet() then
+            repeat
+                InsertPosSalesLine(NpGpPOSSalesEntry, TempNpGpPOSSalesLine2);
+            until TempNpGpPOSSalesLine2.Next() = 0;
+
+        TempNpGpPOSInfoPOSEntry2.Copy(TempNpGpPOSInfoPOSEntry, true);
+        Clear(TempNpGpPOSInfoPOSEntry2);
+        TempNpGpPOSInfoPOSEntry2.SetRange("POS Entry No.", TempNpGpPOSSalesEntry."Entry No.");
+        if TempNpGpPOSInfoPOSEntry2.FindSet() then
+            repeat
+                InsertPosInfoPosEntry(NpGpPOSSalesEntry, TempNpGpPOSInfoPOSEntry2);
+            until TempNpGpPOSInfoPOSEntry2.Next() = 0;
+
+        TempNpGpPOSPaymentLine2.Copy(TempNpGpPOSPaymentLine, true);
+        Clear(TempNpGpPOSPaymentLine2);
+        TempNpGpPOSPaymentLine2.SetRange("POS Entry No.", TempNpGpPOSSalesEntry."Entry No.");
+        if TempNpGpPOSPaymentLine2.FindSet() then
+            repeat
+                InsertPosInfoPosPaymentLine(NpGpPOSSalesEntry, TempNpGpPOSPaymentLine2);
+            until TempNpGpPOSPaymentLine2.Next() = 0;
     end;
 
     local procedure InsertPosSalesLine(NpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry"; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)
@@ -191,8 +268,8 @@
                     Rec."Pattern Guide" := CopyStr(POSSaleLinePatternGuideLbl, 1, MaxStrLen(Rec."Pattern Guide"));
                 end;
             else begin
-                    OnAfterValidateSetupTableName(Rec, xRec);
-                end;
+                OnAfterValidateSetupTableName(Rec, xRec);
+            end;
         end;
     end;
 
@@ -334,6 +411,19 @@
         SaleLinePOS2.SetFilter("Line No.", '<%1', SaleLinePOS."Line No.");
         NaturalLineNo := SaleLinePOS2.Count() + 1;
         exit(NaturalLineNo);
+    end;
+
+    local procedure InsertPosInfoPosPaymentLine(NpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry"; var TempNpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line" temporary)
+    var
+        NpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line";
+    begin
+        if NpGpPOSPaymentLine.Get(TempNpGpPOSPaymentLine."POS Entry No.", TempNpGpPOSPaymentLine."Line No.") then
+            exit;
+
+        NpGpPOSPaymentLine.Init();
+        NpGpPOSPaymentLine := TempNpGpPOSPaymentLine;
+        NpGpPOSPaymentLine."POS Entry No." := NpGpPOSSalesEntry."Entry No.";
+        NpGpPOSPaymentLine.Insert(true);
     end;
 
     #endregion

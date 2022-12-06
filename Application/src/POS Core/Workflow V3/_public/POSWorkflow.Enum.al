@@ -337,6 +337,12 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'CHECK_VOUCHER', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR NpRvCheckVoucher";
     }
+
+    value(63; CROSS_REF_RETURN)
+    {
+        Caption = 'CROSS_REF_RETURN', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: NpGp Return";
+    }
     value(61; SALES_DOC_PREPAY)
     {
         Caption = 'SALES_DOC_PREPAY', Locked = true, MaxLength = 20;
