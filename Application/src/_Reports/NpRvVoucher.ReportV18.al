@@ -4,8 +4,8 @@ report 6151013 "NPR NpRv Voucher"
 #IF NOT BC17
     Extensible = False;
 #ENDIF
-    RDLCLayout = './src/_Reports/layouts/NpRv Voucher.rdlc';
-    WordLayout = './src/_Reports/layouts/NpRv Voucher.docx';
+    RDLCLayout = './src/_Reports/layouts/NpRv Voucher2.rdlc';
+    WordLayout = './src/_Reports/layouts/NpRv Voucher2.docx';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'NpRv Voucher';
