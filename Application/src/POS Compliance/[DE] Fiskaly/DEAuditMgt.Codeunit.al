@@ -40,7 +40,7 @@
 
     procedure OnActionLearnMore()
     var
-        LearnMoreLinkLbl: Label 'https://docs.navipartner.com/retail/fiscalization/howto/germany.html';
+        LearnMoreLinkLbl: Label 'https://docs.navipartner.com/retail/fiscalization/germany/howto/setup.html';
     begin
         Hyperlink(LearnMoreLinkLbl);
     end;
