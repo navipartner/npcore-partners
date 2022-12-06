@@ -9,7 +9,6 @@ codeunit 85074 "NPR Coupon Tests"
         _POSSetup: Record "NPR POS Setup";
         _POSStore: Record "NPR POS Store";
         _POSUnit: Record "NPR POS Unit";
-
         _POSPaymentMethodCash: Record "NPR POS Payment Method";
         _CouponType: Record "NPR NpDc Coupon Type";
         _Initialized: Boolean;
@@ -21,7 +20,7 @@ codeunit 85074 "NPR Coupon Tests"
     var
         SalePOS: Record "NPR POS Sale";
         LibraryCoupon: Codeunit "NPR Library Coupon";
-        Assert: Codeunit "Assert";
+        Assert: Codeunit Assert;
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
@@ -36,7 +35,7 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
         TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, '');
         // [THEN]
-        Assert.Istrue(TransactionEnded, 'Transaction end not according to test scenario.');
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
     end;
 
     [Test]
@@ -46,7 +45,7 @@ codeunit 85074 "NPR Coupon Tests"
     var
         SalePOS: Record "NPR POS Sale";
         LibraryCoupon: Codeunit "NPR Library Coupon";
-        Assert: Codeunit "Assert";
+        Assert: Codeunit Assert;
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
@@ -77,7 +76,7 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.AreEqual(POSSaleLine.Quantity, CouponQty, 'Discount line quantity not according test scenario.');
         // finish transaction
         TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, '');
-        Assert.Istrue(TransactionEnded, 'Transaction end not according to test scenario.');
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
     end;
 
 
@@ -88,7 +87,7 @@ codeunit 85074 "NPR Coupon Tests"
     var
         SalePOS: Record "NPR POS Sale";
         LibraryCoupon: Codeunit "NPR Library Coupon";
-        Assert: Codeunit "Assert";
+        Assert: Codeunit Assert;
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
@@ -115,6 +114,51 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.ExpectedError(StrSubstNo(QtyErr, CouponQty, CouponQty + 1));
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueCoupon()
+    var
+        CouponTypeCode: Code[20];
+        Quantity: Integer;
+        NpDcModuleIssueOnSaleB: Codeunit "NPR NpDc Module Issue: OnSaleB";
+        InstantIssue: Boolean;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        DiscountPct: Decimal;
+        LibraryUtility: Codeunit "Library - Utility";
+        CouponType: Record "NPR NpDc Coupon Type";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NewDiscCouponCpt: Label 'New Discount Coupon: %1';
+        Assert: Codeunit Assert;
+    begin
+        Initialize();
+        //[GIVEN] given
+        Quantity := Random(10) + 1;
+        DiscountPct := Random(100);
+        InstantIssue := false;
+
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        CouponTypeCode := LibraryUtility.GenerateRandomCode(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type");
+        LibraryCoupon.CreateDiscountPctCouponType(CouponTypeCode, DiscountPct);
+        Commit();
+        //[WHEN] when
+        NpDcModuleIssueOnSaleB.IssueCoupon(CouponTypeCode, Quantity, InstantIssue, POSSale);
+
+        POSSale.GetCurrentSale(SalePOS);
+
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+
+        //[THEN] then
+        Assert.IsTrue(SaleLinePOS.Count = Quantity, 'Quantity ok.');
+        Assert.IsTrue(SaleLinePOS.FindFirst(), 'Line found');
+        Assert.IsTrue(SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Comment, 'Comment Type');
+        Assert.IsTrue(SaleLinePOS.Description = CopyStr(StrSubstNo(NewDiscCouponCpt, CouponType.Description), 1, MaxStrLen(SaleLinePOS.Description)), 'New description inserted');
+    end;
+
     local procedure Initialize()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -125,8 +169,6 @@ codeunit 85074 "NPR Coupon Tests"
             _POSSession.ClearAll();
             Clear(_POSSession);
         end;
-
-
 
         if not _Initialized then begin
             NPRLibraryPOSMasterData.CreatePOSSetup(_POSSetup);
@@ -151,6 +193,5 @@ codeunit 85074 "NPR Coupon Tests"
     begin
         LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(_CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), _CouponType, DiscountPct);
         LibraryCoupon.SetExtraItemCoupon(_CouponType, ItemNo);
-
     end;
 }
