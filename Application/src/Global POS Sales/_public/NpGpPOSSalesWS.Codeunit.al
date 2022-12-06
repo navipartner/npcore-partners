@@ -5,12 +5,13 @@
         TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary;
         TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary;
         TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary;
+        TempNpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line" temporary;
         NpGpPOSSalesInitMgt: Codeunit "NPR NpGp POS Sales Init Mgt.";
     begin
         sales_entries.Import();
-        sales_entries.GetSourceTables(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry);
+        sales_entries.GetSourceTables(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry, TempNpGpPOSPaymentLine);
 
-        NpGpPOSSalesInitMgt.InsertPosSalesEntries(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry);
+        NpGpPOSSalesInitMgt.InsertPOSSalesEntries(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry, TempNpGpPOSPaymentLine);
     end;
 
     procedure GetGlobalSale(referenceNumber: Text; fullSale: Boolean; var npGpPOSEntries: XMLport "NPR NpGp POS Entries")
@@ -19,9 +20,11 @@
         TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary;
         NpGpPOSSalesLineReturn: Record "NPR NpGp POS Sales Line";
         TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary;
+        TempNpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line" temporary;
         NpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry";
         NpGpPOSSalesLine: Record "NPR NpGp POS Sales Line";
         NpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry";
+        NpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line";
     begin
         NpGpPOSSalesLine.SetRange("Global Reference", referenceNumber);
         NpGpPOSSalesLine.SetFilter(Quantity, '>0');
@@ -63,9 +66,16 @@
                     TempNpGpPOSInfoPOSEntry := NpGpPOSInfoPOSEntry;
                     TempNpGpPOSInfoPOSEntry.Insert();
                 until NpGpPOSInfoPOSEntry.Next() = 0;
+
+            NpGpPOSPaymentLine.SetRange("POS Entry No.", NpGpPOSSalesEntry."Entry No.");
+            if NpGpPOSPaymentLine.FindSet() then
+                repeat
+                    TempNpGpPOSPaymentLine := NpGpPOSPaymentLine;
+                    TempNpGpPOSPaymentLine.Insert();
+                until NpGpPOSPaymentLine.Next() = 0;
         end;
 
-        npGpPOSEntries.SetSourceTables(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry);
+        npGpPOSEntries.SetSourceTables(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry, TempNpGpPOSPaymentLine);
     end;
 }
 

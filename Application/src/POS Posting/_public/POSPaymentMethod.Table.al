@@ -31,9 +31,9 @@
 
             trigger OnValidate()
             begin
-                if Rec."Currency Code" <> '' then                
+                if Rec."Currency Code" <> '' then
                     Rec."Use Stand. Exc. Rate for Bal." := ConfirmUsageOfStandardExchangeRate();
-            end;            
+            end;
         }
         field(20; "Vouched By"; Option)
         {
@@ -82,10 +82,10 @@
 
             trigger OnValidate()
             begin
-                if Rec."Use Stand. Exc. Rate for Bal." then                
+                if Rec."Use Stand. Exc. Rate for Bal." then
                     Rec."Use Stand. Exc. Rate for Bal." := ConfirmUsageOfStandardExchangeRate();
             end;
-        }        
+        }
         field(35; "Bin for Virtual-Count"; Code[10])
         {
             Caption = 'Bin for Virtual-Count';
@@ -258,6 +258,11 @@
             DataClassification = CustomerContent;
             Editable = false;
         }
+        field(700; "NPR Warning pop-up on Return"; Boolean)
+        {
+            Caption = 'Warning pop-up on Return';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -334,12 +339,12 @@
             exit;
 
         GLSetup.Get();
-        Currency.Get(Rec."Currency Code");            
+        Currency.Get(Rec."Currency Code");
         exit(Confirm(EnableStandardExchRateQst,
                         false,
                         Rec."Currency Code",
                         Round(1 / CurrExchRate.ExchangeRate(Today(), Rec."Currency Code"), Currency."Amount Rounding Precision", Currency.InvoiceRoundingDirection()),
-                        GLSetup."LCY Code"));        
+                        GLSetup."LCY Code"));
     end;
 }
 

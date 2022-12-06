@@ -8,7 +8,6 @@
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -31,6 +30,11 @@
                 {
 
                     ToolTip = 'Specifies the document number.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Customer No."; Rec."Customer No.")
+                {
+                    ToolTip = 'Specifies the value of the Customer No.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
@@ -123,19 +127,30 @@
                     ToolTip = 'Specifies the entry type.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Original Company"; Rec."Original Company")
+                {
+                    ToolTip = 'Specifies the Original Company.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("System Id"; Rec.SystemId)
                 {
 
                     ToolTip = 'Specifies the system ID.';
                     ApplicationArea = NPRRetail;
                 }
+
             }
             part("POS Sales Lines"; "NPR NpGp POSSalesEntry Subpage")
             {
                 Caption = 'POS Sales Lines';
                 SubPageLink = "POS Entry No." = FIELD("Entry No.");
                 ApplicationArea = NPRRetail;
-
+            }
+            part("POS Payment Lines"; "NPR NpGp POSPaymeLines Subpage")
+            {
+                Caption = 'POS Payment Lines';
+                SubPageLink = "POS Entry No." = FIELD("Entry No.");
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -152,7 +167,6 @@
 
                 ToolTip = 'Displays the global POS informattion entries page.';
                 ApplicationArea = NPRRetail;
-                //RunPageLink = "POS Entry No."=FIELD("Entry No.");
             }
         }
     }

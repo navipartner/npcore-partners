@@ -27,9 +27,11 @@
         ContentHeaders: HttpHeaders;
         XmlDoc: XmlDocument;
         OutStr: OutStream;
+        InStr: InStream;
         Response: Text;
         ServiceName: Text;
         XmlText: Text;
+        TempBlob: Codeunit "Temp Blob";
     begin
         if NcTask.Type <> NcTask.Type::Insert then
             exit;
@@ -48,9 +50,10 @@
         NpGpGlobalSalesSetup.TestField("Service Url");
 
         ServiceName := GetServiceName(NpGpGlobalSalesSetup."Service Url");
-        InitReqBody(POSEntry, ServiceName, XmlDoc);
+        InitReqBody(POSEntry, ServiceName, XmlText);
         Clear(NcTask."Data Output");
         Clear(NcTask.Response);
+        XmlDocument.ReadFrom(XmlText, XmlDoc);
         NcTask."Data Output".CreateOutStream(OutStr, TEXTENCODING::UTF8);
         XmlDoc.WriteTo(OutStr);
 
@@ -58,7 +61,9 @@
 
         Commit();
 
-        XmlDoc.WriteTo(XmlText);
+        TempBlob.CreateOutStream(OutStr, TextEncoding::UTF8);
+        //XmlDoc.WriteTo(XmlText);
+        TempBlob.CreateInStream(InStr, TextEncoding::UTF8);
         RequestMessage.Content.WriteFrom(XmlText);
 
         RequestMessage.GetHeaders(RequestHeaders);
@@ -68,9 +73,9 @@
             ContentHeaders.Remove('Content-Type');
         ContentHeaders.Add('Content-Type', 'text/xml; charset=utf-8');
 
-        if RequestHeaders.Contains('SOAPAction') then
-            RequestHeaders.Remove('SOAPAction');
-        RequestHeaders.Add('SOAPAction', 'InsertPosSalesEntries');
+        if ContentHeaders.Contains('SOAPAction') then
+            ContentHeaders.Remove('SOAPAction');
+        ContentHeaders.Add('SOAPAction', 'InsertPosSalesEntries');
 
         NpGpGlobalSalesSetup.SetRequestHeadersAuthorization(RequestHeaders);
 
@@ -88,102 +93,115 @@
         NcTask.Modify();
     end;
 
-    local procedure InitReqBody(POSEntry: Record "NPR POS Entry"; ServiceName: Text; var XmlDoc: XmlDocument)
+    local procedure InitReqBody(POSEntry: Record "NPR POS Entry"; ServiceName: Text; var Xml: Text)
     var
         POSSalesLine: Record "NPR POS Entry Sales Line";
         POSInfoPOSEntry: Record "NPR POS Info POS Entry";
         POSCrossReference: Record "NPR POS Cross Reference";
-        Xml: Text;
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
     begin
         Xml :=
-          '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
+          '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:glob="urn:microsoft-dynamics-schemas/codeunit/' + ServiceName + '" xmlns:glob1="urn:microsoft-dynamics-nav/xmlports/global_pos_sales">' +
              '<soapenv:Body>' +
-               '<InsertPosSalesEntries xmlns="urn:microsoft-dynamics-schemas/codeunit/' + ServiceName + '">' +
-                 '<sales_entries>' +
-                   '<sales_entry xmlns="urn:microsoft-dynamics-nav/xmlports/global_pos_sales" ' +
+               '<glob:InsertPosSalesEntries>' +
+                 '<glob:sales_entries>' +
+                   '<glob1:sales_entry' +
                    '  pos_store_code="' + POSEntry."POS Store Code" + '"' +
                    '  pos_unit_no="' + POSEntry."POS Unit No." + '"' +
                    '  document_no="' + POSEntry."Document No." + '"' +
                    '  company="' + XmlEscape(CompanyName) + '">' +
-                     '<entry_time>' + Format(CreateDateTime(POSEntry."Entry Date", POSEntry."Ending Time"), 0, 9) + '</entry_time>' +
-                     '<entry_type>' + Format(POSEntry."Entry Type", 0, 2) + '</entry_type>' +
-                     '<retail_id>' + Format(POSEntry.SystemId) + '</retail_id>' +
-                     '<posting_date>' + Format(POSEntry."Posting Date", 0, 9) + '</posting_date>' +
-                     '<fiscal_no>' + POSEntry."Fiscal No." + '</fiscal_no>' +
-                     '<salesperson_code>' + POSEntry."Salesperson Code" + '</salesperson_code>' +
-                     '<currency_code>' + POSEntry."Currency Code" + '</currency_code>' +
-                     '<currency_factor>' + Format(POSEntry."Currency Factor", 0, 9) + '</currency_factor>' +
-                     '<sales_amount>' + Format(POSEntry."Item Sales (LCY)", 0, 9) + '</sales_amount>' +
-                     '<discount_amount>' + Format(POSEntry."Discount Amount", 0, 9) + '</discount_amount>' +
-                     '<total_amount>' + Format(POSEntry."Amount Excl. Tax", 0, 9) + '</total_amount>' +
-                     '<total_tax_amount>' + Format(POSEntry."Tax Amount", 0, 9) + '</total_tax_amount>' +
-                     '<total_amount_incl_tax>' + Format(POSEntry."Amount Incl. Tax", 0, 9) + '</total_amount_incl_tax>' +
-                     '<sales_lines>';
+                     '<glob1:entry_time>' + Format(CreateDateTime(POSEntry."Entry Date", POSEntry."Ending Time"), 0, 9) + '</glob1:entry_time>' +
+                     '<glob1:entry_type>' + Format(POSEntry."Entry Type", 0, 2) + '</glob1:entry_type>' +
+                     '<glob1:customer_no>' + Format(POSEntry."Customer No.") + '</glob1:customer_no>' +
+                     '<glob1:retail_id>' + Format(POSEntry.SystemId) + '</glob1:retail_id>' +
+                     '<glob1:posting_date>' + Format(POSEntry."Posting Date", 0, 9) + '</glob1:posting_date>' +
+                     '<glob1:fiscal_no>' + POSEntry."Fiscal No." + '</glob1:fiscal_no>' +
+                     '<glob1:salesperson_code>' + POSEntry."Salesperson Code" + '</glob1:salesperson_code>' +
+                     '<glob1:currency_code>' + POSEntry."Currency Code" + '</glob1:currency_code>' +
+                     '<glob1:currency_factor>' + Format(POSEntry."Currency Factor", 0, 9) + '</glob1:currency_factor>' +
+                     '<glob1:sales_amount>' + Format(POSEntry."Item Sales (LCY)", 0, 9) + '</glob1:sales_amount>' +
+                     '<glob1:discount_amount>' + Format(POSEntry."Discount Amount", 0, 9) + '</glob1:discount_amount>' +
+                     '<glob1:total_amount>' + Format(POSEntry."Amount Excl. Tax", 0, 9) + '</glob1:total_amount>' +
+                     '<glob1:total_tax_amount>' + Format(POSEntry."Tax Amount", 0, 9) + '</glob1:total_tax_amount>' +
+                     '<glob1:total_amount_incl_tax>' + Format(POSEntry."Amount Incl. Tax", 0, 9) + '</glob1:total_amount_incl_tax>' +
+                     '<glob1:sales_lines>';
 
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         if POSSalesLine.FindSet() then
             repeat
                 if POSCrossReference.GetBySystemId(POSSalesLine.SystemId) then;
                 Xml +=
-                            '<sales_line line_no="' + Format(POSSalesLine."Line No.", 0, 9) + '">' +
-                              '<retail_id>' + Format(POSSalesLine.SystemId) + '</retail_id>' +
-                              '<type>' + Format(POSSalesLine.Type, 0, 2) + '</type>' +
-                              '<no>' + POSSalesLine."No." + '</no>' +
-                              '<variant_code>' + POSSalesLine."Variant Code" + '</variant_code>' +
-                              '<cross_reference_no>' + POSSalesLine."Cross-Reference No." + '</cross_reference_no>' +
-                              '<bom_item_no>' + POSSalesLine."BOM Item No." + '</bom_item_no>' +
-                              '<location_code>' + POSSalesLine."Location Code" + '</location_code>' +
-                              '<description><![CDATA[' + POSSalesLine.Description + ']]></description>' +
-                              '<description_2></description_2>' +
-                              '<quantity>' + Format(POSSalesLine.Quantity, 0, 9) + '</quantity>' +
-                              '<unit_of_measure_code>' + POSSalesLine."Unit of Measure Code" + '</unit_of_measure_code>' +
-                              '<qty_per_unit_of_measure>' + Format(POSSalesLine."Qty. per Unit of Measure", 0, 9) + '</qty_per_unit_of_measure>' +
-                              '<quantity_base>' + Format(POSSalesLine."Quantity (Base)", 0, 9) + '</quantity_base>' +
-                              '<unit_price>' + Format(POSSalesLine."Unit Price", 0, 9) + '</unit_price>' +
-                              '<currency_code>' + POSSalesLine."Currency Code" + '</currency_code>' +
-                              '<vat_pct>' + Format(POSSalesLine."VAT %", 0, 9) + '</vat_pct>' +
-                              '<line_discount_pct>' + Format(POSSalesLine."Line Discount %", 0, 9) + '</line_discount_pct>' +
-                              '<line_discount_amount_excl_vat>' + Format(POSSalesLine."Line Discount Amount Excl. VAT", 0, 9) + '</line_discount_amount_excl_vat>' +
-                              '<line_discount_amount_incl_vat>' + Format(POSSalesLine."Line Discount Amount Incl. VAT", 0, 9) + '</line_discount_amount_incl_vat>' +
-                              '<line_amount>' + Format(POSSalesLine."Line Amount", 0, 9) + '</line_amount>' +
-                              '<amount_excl_vat>' + Format(POSSalesLine."Amount Excl. VAT", 0, 9) + '</amount_excl_vat>' +
-                              '<amount_incl_vat>' + Format(POSSalesLine."Amount Incl. VAT", 0, 9) + '</amount_incl_vat>' +
-                              '<line_discount_amount_excl_vat_lcy>' + Format(POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)", 0, 9) + '</line_discount_amount_excl_vat_lcy>' +
-                              '<line_discount_amount_incl_vat_lcy>' + Format(POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)", 0, 9) + '</line_discount_amount_incl_vat_lcy>' +
-                              '<amount_excl_vat_lcy>' + Format(POSSalesLine."Amount Excl. VAT (LCY)", 0, 9) + '</amount_excl_vat_lcy>' +
-                              '<amount_incl_vat_lcy>' + Format(POSSalesLine."Amount Incl. VAT (LCY)", 0, 9) + '</amount_incl_vat_lcy>' +
-                              '<global_reference>' + POSCrossReference."Reference No." + '</global_reference>' +
-                              '<extension_fields/>' +
-                            '</sales_line>';
+                            '<glob1:sales_line line_no="' + Format(POSSalesLine."Line No.", 0, 9) + '">' +
+                              '<glob1:retail_id>' + Format(POSSalesLine.SystemId) + '</glob1:retail_id>' +
+                              '<glob1:type>' + Format(POSSalesLine.Type, 0, 2) + '</glob1:type>' +
+                              '<glob1:no>' + POSSalesLine."No." + '</glob1:no>' +
+                              '<glob1:variant_code>' + POSSalesLine."Variant Code" + '</glob1:variant_code>' +
+                              '<glob1:cross_reference_no>' + POSSalesLine."Cross-Reference No." + '</glob1:cross_reference_no>' +
+                              '<glob1:bom_item_no>' + POSSalesLine."BOM Item No." + '</glob1:bom_item_no>' +
+                              '<glob1:location_code>' + POSSalesLine."Location Code" + '</glob1:location_code>' +
+                              '<glob1:description><![CDATA[' + POSSalesLine.Description + ']]></glob1:description>' +
+                              '<glob1:description_2></glob1:description_2>' +
+                              '<glob1:quantity>' + Format(POSSalesLine.Quantity, 0, 9) + '</glob1:quantity>' +
+                              '<glob1:unit_of_measure_code>' + POSSalesLine."Unit of Measure Code" + '</glob1:unit_of_measure_code>' +
+                              '<glob1:qty_per_unit_of_measure>' + Format(POSSalesLine."Qty. per Unit of Measure", 0, 9) + '</glob1:qty_per_unit_of_measure>' +
+                              '<glob1:quantity_base>' + Format(POSSalesLine."Quantity (Base)", 0, 9) + '</glob1:quantity_base>' +
+                              '<glob1:unit_price>' + Format(POSSalesLine."Unit Price", 0, 9) + '</glob1:unit_price>' +
+                              '<glob1:currency_code>' + POSSalesLine."Currency Code" + '</glob1:currency_code>' +
+                              '<glob1:vat_pct>' + Format(POSSalesLine."VAT %", 0, 9) + '</glob1:vat_pct>' +
+                              '<glob1:line_discount_pct>' + Format(POSSalesLine."Line Discount %", 0, 9) + '</glob1:line_discount_pct>' +
+                              '<glob1:line_discount_amount_excl_vat>' + Format(POSSalesLine."Line Discount Amount Excl. VAT", 0, 9) + '</glob1:line_discount_amount_excl_vat>' +
+                              '<glob1:line_discount_amount_incl_vat>' + Format(POSSalesLine."Line Discount Amount Incl. VAT", 0, 9) + '</glob1:line_discount_amount_incl_vat>' +
+                              '<glob1:line_amount>' + Format(POSSalesLine."Line Amount", 0, 9) + '</glob1:line_amount>' +
+                              '<glob1:amount_excl_vat>' + Format(POSSalesLine."Amount Excl. VAT", 0, 9) + '</glob1:amount_excl_vat>' +
+                              '<glob1:amount_incl_vat>' + Format(POSSalesLine."Amount Incl. VAT", 0, 9) + '</glob1:amount_incl_vat>' +
+                              '<glob1:line_discount_amount_excl_vat_lcy>' + Format(POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)", 0, 9) + '</glob1:line_discount_amount_excl_vat_lcy>' +
+                              '<glob1:line_discount_amount_incl_vat_lcy>' + Format(POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)", 0, 9) + '</glob1:line_discount_amount_incl_vat_lcy>' +
+                              '<glob1:amount_excl_vat_lcy>' + Format(POSSalesLine."Amount Excl. VAT (LCY)", 0, 9) + '</glob1:amount_excl_vat_lcy>' +
+                              '<glob1:amount_incl_vat_lcy>' + Format(POSSalesLine."Amount Incl. VAT (LCY)", 0, 9) + '</glob1:amount_incl_vat_lcy>' +
+                              '<glob1:global_reference>' + POSCrossReference."Reference No." + '</glob1:global_reference>' +
+                              '<glob1:extension_fields/>' +
+                            '</glob1:sales_line>';
             until POSSalesLine.Next() = 0;
         Xml +=
-                     '</sales_lines>' +
-                     '<pos_info_entries>';
+                     '</glob1:sales_lines>' +
+                     '<glob1:pos_info_entries>';
         POSInfoPOSEntry.SetRange("POS Entry No.", POSEntry."Entry No.");
         if POSInfoPOSEntry.FindSet() then
             repeat
                 Xml +=
-                            '<pos_info_entry pos_info_code="' + POSInfoPOSEntry."POS Info Code" + '" entry_no="' + Format(POSInfoPOSEntry."Entry No.", 0, 9) + '">' +
-                              '<sales_line_no>' + Format(POSInfoPOSEntry."Sales Line No.", 0, 9) + '</sales_line_no>' +
-                              '<pos_info>' + POSInfoPOSEntry."POS Info" + '</pos_info>' +
-                              '<no>' + POSInfoPOSEntry."No." + '</no>' +
-                              '<quantity>' + Format(POSInfoPOSEntry.Quantity, 0, 9) + '</quantity>' +
-                              '<price>' + Format(POSInfoPOSEntry.Price, 0, 9) + '</price>' +
-                              '<net_amount>' + Format(POSInfoPOSEntry."Net Amount", 0, 9) + '</net_amount>' +
-                              '<gross_amount>' + Format(POSInfoPOSEntry."Gross Amount", 0, 9) + '</gross_amount>' +
-                              '<discount_amount>' + Format(POSInfoPOSEntry."Discount Amount", 0, 9) + '</discount_amount>' +
-                          '</pos_info_entry>';
+                            '<glob1:pos_info_entry pos_info_code="' + POSInfoPOSEntry."POS Info Code" + '" entry_no="' + Format(POSInfoPOSEntry."Entry No.", 0, 9) + '">' +
+                              '<glob1:sales_line_no>' + Format(POSInfoPOSEntry."Sales Line No.", 0, 9) + '</glob1:sales_line_no>' +
+                              '<glob1:pos_info>' + POSInfoPOSEntry."POS Info" + '</glob1:pos_info>' +
+                              '<glob1:no>' + POSInfoPOSEntry."No." + '</glob1:no>' +
+                              '<glob1:quantity>' + Format(POSInfoPOSEntry.Quantity, 0, 9) + '</glob1:quantity>' +
+                              '<glob1:price>' + Format(POSInfoPOSEntry.Price, 0, 9) + '</glob1:price>' +
+                              '<glob1:net_amount>' + Format(POSInfoPOSEntry."Net Amount", 0, 9) + '</glob1:net_amount>' +
+                              '<glob1:gross_amount>' + Format(POSInfoPOSEntry."Gross Amount", 0, 9) + '</glob1:gross_amount>' +
+                              '<glob1:discount_amount>' + Format(POSInfoPOSEntry."Discount Amount", 0, 9) + '</glob1:discount_amount>' +
+                          '</glob1:pos_info_entry>';
             until POSInfoPOSEntry.Next() = 0;
-        Xml += '</pos_info_entries>' +
-                   '</sales_entry>' +
-                 '</sales_entries>' +
-               '</InsertPosSalesEntries>' +
+        Xml +=
+                 '</glob1:pos_info_entries>' +
+                 '<glob1:pos_payment_lines>';
+        POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if POSPaymentLine.FindSet() then
+            repeat
+                Xml +=
+                    '<glob1:payment_line payline_no="' + Format(POSPaymentLine."Line No.", 0, 9) + '">' +
+                      '<glob1:paydoc_no>' + Format(POSPaymentLine."Document No.") + '</glob1:paydoc_no>' +
+                      '<glob1:payMethod>' + Format(POSPaymentLine."POS Payment Method Code") + '</glob1:payMethod>' +
+                      '<glob1:payDesc>' + Format(POSPaymentLine.Description) + '</glob1:payDesc>' +
+                      '<glob1:payAmount>' + Format(POSPaymentLine."Payment Amount") + '</glob1:payAmount>' +
+                    '</glob1:payment_line>';
+            until POSPaymentLine.Next() = 0;
+        Xml += '</glob1:pos_payment_lines>' +
+                   '</glob1:sales_entry>' +
+                 '</glob:sales_entries>' +
+               '</glob:InsertPosSalesEntries>' +
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        XmlDocument.ReadFrom(Xml, XmlDoc);
-
-        OnInitReqBody(POSEntry, XmlDoc);
+        OnInitRequestBody(POSEntry, Xml);
     end;
 
     procedure InitGlobalPosSalesService()
@@ -261,6 +279,12 @@
         exit(Output);
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnInitRequestBody(POSEntry: Record "NPR POS Entry"; var Xml: Text)
+    begin
+    end;
+
+    [Obsolete('Pending removal use OnInitRequestBody instead')]
     [IntegrationEvent(false, false)]
     local procedure OnInitReqBody(POSEntry: Record "NPR POS Entry"; var XmlDoc: XmlDocument)
     begin
