@@ -33,6 +33,11 @@
             ObsoleteState = Removed;
             ObsoleteReason = 'Use systemID instead';
         }
+        field(20; "Customer No."; Code[20])
+        {
+            Caption = 'Customer No';
+            DataClassification = CustomerContent;
+        }
         field(100; "POS Store Code"; Code[10])
         {
             Caption = 'POS Store Code';

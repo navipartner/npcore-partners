@@ -35,6 +35,10 @@ xmlport 6151167 "NPR NpGp POS Entries"
                 fieldelement(entry_type; TempNpGpPOSSalesEntry."Entry Type")
                 {
                 }
+                fieldelement(customer_no; TempNpGpPOSSalesEntry."Customer No.")
+                {
+
+                }
                 fieldelement(retail_id; TempNpGpPOSSalesEntry.SystemId)
                 {
                 }
@@ -250,6 +254,39 @@ xmlport 6151167 "NPR NpGp POS Entries"
                         end;
                     }
                 }
+                textelement(pos_payment_lines)
+                {
+                    tableelement(tempnpgppospaymentlines; "NPR NpGp POS Payment Line")
+                    {
+                        LinkFields = "POS Entry No." = FIELD("Entry No.");
+                        LinkTable = TempNpGpPOSSalesEntry;
+                        MinOccurs = Zero;
+                        XmlName = 'payment_line';
+                        UseTemporary = true;
+                        fieldattribute(payline_no; TempNpGpPOSPaymentLines."Line No.")
+                        {
+                        }
+                        fieldelement(paydoc_no; TempNpGpPOSPaymentLines."Document No.")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(payMethod; TempNpGpPOSPaymentLines."POS Payment Method Code")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(payDesc; TempNpGpPOSPaymentLines.Description)
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(payAmount; TempNpGpPOSPaymentLines."Payment Amount")
+                        {
+                        }
+                        trigger OnBeforeInsertRecord()
+                        begin
+                            TempNpGpPOSPaymentLines."POS Entry No." := TempNpGpPOSSalesEntry."Entry No.";
+                        end;
+                    }
+                }
 
                 trigger OnBeforeInsertRecord()
                 begin
@@ -275,18 +312,20 @@ xmlport 6151167 "NPR NpGp POS Entries"
     var
         EntryNo: BigInteger;
 
-    internal procedure GetSourceTables(var TempNpGpPOSSalesEntryTo: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLineTo: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntryTo: Record "NPR NpGp POS Info POS Entry" temporary)
+    internal procedure GetSourceTables(var TempNpGpPOSSalesEntryTo: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLineTo: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntryTo: Record "NPR NpGp POS Info POS Entry" temporary; var TempNpGpPOSPaymentLinesTo: Record "NPR NpGp POS Payment Line" temporary)
     begin
         TempNpGpPOSSalesEntryTo.Copy(TempNpGpPOSSalesEntry, true);
         TempNpGpPOSSalesLineTo.Copy(TempNpGpPOSSalesLine, true);
         TempNpGpPOSInfoPOSEntryTo.Copy(TempNpGpPOSInfoPOSEntry, true);
+        TempNpGpPOSPaymentLinesTo.Copy(TempNpGpPOSPaymentLines, true);
     end;
 
-    internal procedure SetSourceTables(var TempNpGpPOSSalesEntryFrom: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLineFrom: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntryFrom: Record "NPR NpGp POS Info POS Entry" temporary)
+    internal procedure SetSourceTables(var TempNpGpPOSSalesEntryFrom: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLineFrom: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntryFrom: Record "NPR NpGp POS Info POS Entry" temporary; var TempNpGpPOSPaymentLinesFrom: Record "NPR NpGp POS Payment Line" temporary)
     begin
         TempNpGpPOSSalesEntry.Copy(TempNpGpPOSSalesEntryFrom, true);
         TempNpGpPOSSalesLine.Copy(TempNpGpPOSSalesLineFrom, true);
         TempNpGpPOSInfoPOSEntry.Copy(TempNpGpPOSInfoPOSEntryFrom, true);
+        TempNpGpPOSPaymentLines.Copy(TempNpGpPOSPaymentLinesFrom, true);
     end;
 }
 

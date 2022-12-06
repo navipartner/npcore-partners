@@ -493,5 +493,123 @@
         end else
             Error(ErrLength);
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
+    local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
+    var
+        SingleSale_Lbl: Label 'Print Exchange Label Single Sale';
+        AllLines_Lbl: Label 'Print Exchange Label All Lines';
+        LineQty_Lbl: Label 'Print Exchange Label Line Quantity';
+    begin
+        if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
+            exit;
+
+        case Rec."Subscriber Function" of
+            'PrintExchangeLabelOnSaleSingle':
+                begin
+                    Rec.Description := CopyStr(SingleSale_Lbl, 1, MaxStrLen(Rec.Description));
+                    Rec."Sequence No." := CurrCodeunitId();
+                    Rec.Enabled := false;
+                end;
+            'PrintExchangeLabelOnSaleLineAllLines':
+                begin
+                    Rec.Description := CopyStr(AllLines_Lbl, 1, MaxStrLen(Rec.Description));
+                    Rec."Sequence No." := CurrCodeunitId();
+                    Rec.Enabled := false;
+                end;
+            'PrintExchangeLabelOnSaleLineQty':
+                begin
+                    Rec.Description := CopyStr(LineQty_Lbl, 1, MaxStrLen(Rec.Description));
+                    Rec."Sequence No." := CurrCodeunitId();
+                    Rec.Enabled := false;
+                end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnPaymentView', '', true, true)]
+    local procedure PrintExchangeLabelOnSaleSingle(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
+    var
+        Setting: Option Single,"Line Quantity","All Lines",Selection,Package;
+        PreventNegativeQty: Boolean;
+        ValidFromDate: Date;
+        PrintLines: Record "NPR POS Sale Line";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
+            exit;
+
+        if POSSalesWorkflowStep."Subscriber Function" <> 'PrintExchangeLabelOnSaleSingle' then
+            exit;
+
+        Setting := Setting::Single;
+        ValidFromDate := WorkDate();
+
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        PrintLines := SaleLinePOS;
+        PrintLines.SetRecFilter();
+
+        PrintLabelsFromPOSWithoutPrompts(Setting, PrintLines, ValidFromDate);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnPaymentView', '', true, true)]
+    local procedure PrintExchangeLabelOnSaleLineQty(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
+    var
+        Setting: Option Single,"Line Quantity","All Lines",Selection,Package;
+        PreventNegativeQty: Boolean;
+        ValidFromDate: Date;
+        PrintLines: Record "NPR POS Sale Line";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
+            exit;
+
+        if POSSalesWorkflowStep."Subscriber Function" <> 'PrintExchangeLabelOnSaleLineQty' then
+            exit;
+
+        Setting := Setting::"Line Quantity";
+        ValidFromDate := WorkDate();
+
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        PrintLines := SaleLinePOS;
+        PrintLines.SetRecFilter();
+
+        PrintLabelsFromPOSWithoutPrompts(Setting, PrintLines, ValidFromDate);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnPaymentView', '', true, true)]
+    local procedure PrintExchangeLabelOnSaleLineAllLines(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
+    var
+        Setting: Option Single,"Line Quantity","All Lines",Selection,Package;
+        PreventNegativeQty: Boolean;
+        ValidFromDate: Date;
+        PrintLines: Record "NPR POS Sale Line";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
+            exit;
+
+        if POSSalesWorkflowStep."Subscriber Function" <> 'PrintExchangeLabelOnSaleLineAllLines' then
+            exit;
+
+        Setting := Setting::"All Lines";
+        ValidFromDate := WorkDate();
+
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        PrintLines := SaleLinePOS;
+        PrintLines.SetRecFilter();
+
+        PrintLabelsFromPOSWithoutPrompts(Setting, PrintLines, ValidFromDate);
+    end;
+
+    local procedure CurrCodeunitId(): Integer
+    begin
+        exit(CODEUNIT::"NPR Exchange Label Mgt.");
+    end;
 }
 

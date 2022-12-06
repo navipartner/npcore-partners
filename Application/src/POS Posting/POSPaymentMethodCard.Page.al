@@ -84,7 +84,7 @@
                 {
                     ToolTip = 'Specify whether fixed rate should be applied on transaction amount.';
                     ApplicationArea = NPRRetail;
-                }                
+                }
                 field("Post Condensed"; Rec."Post Condensed")
                 {
                     ToolTip = 'Enable "Post Condensed" to be able to set placeholders in "Condensed Posting Description".';
@@ -118,6 +118,11 @@
                 {
 
                     ToolTip = 'Specifies if there is limit for Minimum Amount for selected POS Payment Method on Web Orders.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("NPR Warning pop-up on Return"; Rec."NPR Warning pop-up on Return")
+                {
+                    ToolTip = 'Specifies pop up warning on return';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -307,7 +312,7 @@
 
     var
         IsPostCondensed: Boolean;
-    
+
     trigger OnAfterGetCurrRecord()
     begin
         IsPostCondensed := Rec."Post Condensed";

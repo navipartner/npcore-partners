@@ -78,7 +78,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
         CopyHeaderDim := Context.GetBooleanParameter('CopyHeaderDimensions');
         ReturnReasonCode := CopyStr(Context.GetString('ReturnReasonCode'), 1, MaxStrLen(ReturnReasonCode));
 
-        POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyHeaderDim, ReturnReasonCode)
+        POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyHeaderDim, ReturnReasonCode);
     end;
 
     local procedure SelectReturnReason() Response: Text
@@ -96,7 +96,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionRevDirSale.js###
-'let main=async({workflow:e,context:i,scope:p,popup:r,parameters:c,captions:a})=>{if(e.context.receipt=await r.input({title:a.title,caption:a.receiptprompt}),e.context.receipt===null)return" ";var n=await e.respond("reason");if(n){var t=await e.respond("SelectReturnReason");if(t===null)return" "}else var t="";await e.respond("handle",{PromptForReason:n,ReturnReasonCode:t})};'
+'let main=async({workflow:e,context:i,scope:p,popup:r,parameters:c,captions:a})=>{if(e.context.receipt=await r.input({title:a.title,caption:a.receiptprompt}),e.context.receipt!==null){var n=await e.respond("reason");if(n){var t=await e.respond("SelectReturnReason");if(t===null)return}else var t="";await e.respond("handle",{PromptForReason:n,ReturnReasonCode:t})}};'
         );
     end;
 }
