@@ -407,6 +407,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'MERGE_SIMILAR_LINES', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction: Merg.Smlr.Lines";
     }
+    value(80; ISSUE_COUPON)
+    {
+        Caption = 'ISSUE_COUPON', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NpDc Module Issue: OnSale";
+    }
     value(6014600; BALANCE_V4)
     {
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;
