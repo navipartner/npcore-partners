@@ -164,7 +164,6 @@ page 6059882 "NPR DE TSS List"
                 trigger OnAction()
                 var
                     ConnectionParameters: Record "NPR DE Audit Setup";
-                    DESecretMgt: Codeunit "NPR DE Secret Mgt.";
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
                     AlreadyAssignedQst: Label 'An admin PIN has already been assigned to selected Technical Security System (TSS). If you continue, system will assign a new PIN.\Are you sure you want to continue?';
                 begin
@@ -190,20 +189,62 @@ page 6059882 "NPR DE TSS List"
                 trigger OnAction()
                 var
                     ConnectionParameters: Record "NPR DE Audit Setup";
-                    DESecretMgt: Codeunit "NPR DE Secret Mgt.";
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
-                    AdminPinNotAssignedErr: Label 'Please assign admin PIN to selected Technical Security System (TSS) first.';
                 begin
                     Rec.TestField(SystemId);
                     Rec.testfield("Fiskaly TSS Created at");
                     Rec.TestField("Fiskaly TSS State", Rec."Fiskaly TSS State"::UNINITIALIZED);
-                    if not DESecretMgt.HasSecretKey(Rec.AdminPINSecretLbl()) then
-                        Error(AdminPinNotAssignedErr);
+                    DEFiskalyCommunication.CheckAdminPINAssigned(Rec);
                     ConnectionParameters.GetSetup(Rec);
 
                     CurrPage.SaveRecord();
                     DEFiskalyCommunication.TSS_AuthenticateAdmin(Rec, ConnectionParameters);
                     DEFiskalyCommunication.UpdateTSS_State(Rec, Rec."Fiskaly TSS State"::INITIALIZED, true, ConnectionParameters);
+                    CurrPage.Update(false);
+                end;
+            }
+            action(ShowClientsAtFiskaly)
+            {
+                Caption = 'Show Clients at Fiskaly';
+                ToolTip = 'Downloads a list of Fiskaly clients associated with this Technical Security System (TSS).';
+                Image = LaunchWeb;
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
+                begin
+                    CurrPage.SaveRecord();
+                    DEFiskalyCommunication.ShowTSSClientListAtFiskaly(Rec);
+                end;
+            }
+            action(DisableTSS)
+            {
+                Caption = 'Disable TSS';
+                ToolTip = 'Disables selected Technical Security System (TSS) at Fiskaly.';
+                Image = Reject;
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    ConnectionParameters: Record "NPR DE Audit Setup";
+                    DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
+                    ConfirmDisableQst: Label 'The operation cannot be undone. Are you sure you want to disable TSS %1?', Comment = '%1 - Technical Security System (TSS) Code';
+                    IncorrectStateErr: Label 'Only a TSS in the state "UNINITIALIZED" or "INITIALIZED" can be disabled.';
+                begin
+                    Rec.TestField(SystemId);
+                    Rec.TestField("Fiskaly TSS Created at");
+                    if not (Rec."Fiskaly TSS State" in [Rec."Fiskaly TSS State"::UNINITIALIZED, Rec."Fiskaly TSS State"::INITIALIZED]) then
+                        Error(IncorrectStateErr);
+                    if not Confirm(ConfirmDisableQst, false, Rec.Code) then
+                        exit;
+
+                    DEFiskalyCommunication.CheckAdminPINAssigned(Rec);
+                    ConnectionParameters.GetSetup(Rec);
+
+                    CurrPage.SaveRecord();
+                    DEFiskalyCommunication.TSS_AuthenticateAdmin(Rec, ConnectionParameters);
+                    DEFiskalyCommunication.UpdateTSS_State(Rec, Rec."Fiskaly TSS State"::DISABLED, true, ConnectionParameters);
                     CurrPage.Update(false);
                 end;
             }

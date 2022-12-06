@@ -165,6 +165,15 @@
         SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, 'POST', StrSubstNo('/tss/%1/admin/logout', Format(DETSS.SystemId, 0, 4)));
     end;
 
+    procedure CheckAdminPINAssigned(DETSS: Record "NPR DE TSS")
+    var
+        DESecretMgt: Codeunit "NPR DE Secret Mgt.";
+        AdminPinNotAssignedErr: Label 'Please assign admin PIN to Technical Security System (TSS) %1 first.', Comment = 'TSS Code';
+    begin
+        if not DESecretMgt.HasSecretKey(DETSS.AdminPINSecretLbl()) then
+            Error(AdminPinNotAssignedErr, DETSS.Code);
+    end;
+
     procedure UpdateTSS_State(var DETSS: Record "NPR DE TSS"; NewState: Enum "NPR DE TSS State"; UpdateBCInfo: Boolean; ConnectionParameters: Record "NPR DE Audit Setup")
     var
         RequestBody: JsonObject;
@@ -217,14 +226,16 @@
             exit;
         foreach TssObject in TssObjects.AsArray() do begin
             TssObject.SelectToken('_id', JToken);
-            FindOrCreateNewDeTss(DETSS, JToken.AsValue().AsText());
+            FindOrCreateNewDeTss(DETSS, JToken.AsValue().AsText(), true);
             UpdateDeTssWithDataFromFiskaly(DETSS, TssObject, ConnectionParameters);
         end;
     end;
 
-    local procedure FindOrCreateNewDeTss(var DETSS: Record "NPR DE TSS"; TSS_Id: Guid)
+    local procedure FindOrCreateNewDeTss(var DETSS: Record "NPR DE TSS"; TSS_Id: Guid; CreateIfDoesNotExist: Boolean)
     begin
         if DETSS.GetBySystemId(TSS_Id) then
+            exit;
+        if not CreateIfDoesNotExist then
             exit;
         DETSS.Code := '0001';
         while DETSS.Find() do
@@ -305,6 +316,7 @@
             CreateTSS(DETSS, ConnectionParameters);
             Commit();
         end;
+        CheckAdminPINAssigned(DETSS);
         TSS_AuthenticateAdmin(DETSS, ConnectionParameters);
 
         RequestBody.Add('serial_number', PosUnitAuxDE."Serial Number");
@@ -320,7 +332,48 @@
         TSS_LogoutAdmin(DETSS, ConnectionParameters);
     end;
 
-    procedure GetTSSClientList(DETSS: Record "NPR DE TSS")
+    procedure UpdateTSSClient_State(var PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info"; NewState: Enum "NPR DE TSS Client State")
+    var
+        ConnectionParameters: Record "NPR DE Audit Setup";
+        PosUnitAuxDE2: Record "NPR DE POS Unit Aux. Info";
+        DETSS: Record "NPR DE TSS";
+        RequestBody: JsonObject;
+        ResponseJson: JsonToken;
+        ClientUpdateErr: Label 'Error while trying to update a Fiskaly client.\%1';
+    begin
+        PosUnitAuxDE.TestField(SystemId);
+        PosUnitAuxDE.TestField("Fiskaly Client Created at");
+        PosUnitAuxDE.TestField("TSS Code");
+        DETSS.Get(PosUnitAuxDE."TSS Code");
+        CheckAdminPINAssigned(DETSS);
+        ConnectionParameters.GetSetup(DETSS);
+        TSS_AuthenticateAdmin(DETSS, ConnectionParameters);
+
+        RequestBody.Add('state', Enum::"NPR DE TSS Client State".Names().Get(Enum::"NPR DE TSS Client State".Ordinals().IndexOf(NewState.AsInteger())));
+
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, 'PATCH', StrSubstNo('/tss/%1/client/%2', Format(DETSS.SystemId, 0, 4), Format(PosUnitAuxDE.SystemId, 0, 4))) then
+            Error(ClientUpdateErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
+        UpdateDeTssClientWithDataFromFiskaly(PosUnitAuxDE, ResponseJson);
+        if PosUnitAuxDE.IsTemporary() then begin
+            if PosUnitAuxDE2.Get(PosUnitAuxDE."POS Unit No.") then
+                UpdateDeTssClientWithDataFromFiskaly(PosUnitAuxDE2, ResponseJson);
+        end;
+
+        TSS_LogoutAdmin(DETSS, ConnectionParameters);
+    end;
+
+    procedure ShowTSSClientListAtFiskaly(DETSS: Record "NPR DE TSS")
+    var
+        TempPosUnitAuxDE: Record "NPR DE POS Unit Aux. Info" temporary;
+        NoClietsFoundErr: Label 'No registered clients found at Fiskaly for TSS %1.', Comment = '%1 - TSS Code';
+    begin
+        GetTSSClientList(DETSS, TempPosUnitAuxDE);
+        if TempPosUnitAuxDE.IsEmpty() then
+            Error(NoClietsFoundErr, DETSS.Code);
+        Page.RunModal(Page::"NPR DE Fiskaly TSS Clients", TempPosUnitAuxDE);
+    end;
+
+    procedure GetTSSClientList(DETSS: Record "NPR DE TSS"; var PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info")
     var
         ConnectionParameters: Record "NPR DE Audit Setup";
         RequestBody: JsonObject;
@@ -330,12 +383,12 @@
         ConnectionParameters.GetSetup(DETSS);
         if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, 'GET', StrSubstNo('/tss/%1/client', Format(DETSS.SystemId, 0, 4))) then
             Error(TSSClientListAccessErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
-        UpdateDeTssClientFromFiskaly(ResponseJson);
+        UpdateDeTssClientFromFiskaly(PosUnitAuxDE, ResponseJson);
     end;
 
-    local procedure UpdateDeTssClientFromFiskaly(ResponseJson: JsonToken)
+    local procedure UpdateDeTssClientFromFiskaly(var PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info"; ResponseJson: JsonToken)
     var
-        PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info";
+        PosUnitAuxDE2: Record "NPR DE POS Unit Aux. Info";
         JToken: JsonToken;
         TssClient: JsonToken;
         TssClients: JsonToken;
@@ -346,7 +399,11 @@
             exit;
         foreach TssClient in TssClients.AsArray() do begin
             TssClient.SelectToken('_id', JToken);
-            if not PosUnitAuxDE.GetBySystemId(JToken.AsValue().AsText()) then begin
+            if PosUnitAuxDE2.GetBySystemId(JToken.AsValue().AsText()) then begin
+                PosUnitAuxDE := PosUnitAuxDE2;
+                if PosUnitAuxDE.IsTemporary() then
+                    PosUnitAuxDE.Insert(false, true);
+            end else begin
                 PosUnitAuxDE."POS Unit No." := '_UKN000001';
                 while PosUnitAuxDE.Find() do
                     PosUnitAuxDE."POS Unit No." := IncStr(PosUnitAuxDE."POS Unit No.");
@@ -368,7 +425,7 @@
         PosUnitAuxDE."Fiskaly Client Created at" := TypeHelper.EvaluateUnixTimestamp(JToken.AsValue().AsBigInteger());
 
         ResponseJson.SelectToken('tss_id', JToken);
-        FindOrCreateNewDeTss(DETSS, JToken.AsValue().AsText());
+        FindOrCreateNewDeTss(DETSS, JToken.AsValue().AsText(), not PosUnitAuxDE.IsTemporary());
         PosUnitAuxDE."TSS Code" := DETSS."Code";
 
         ResponseJson.SelectToken('serial_number', JToken);
@@ -382,7 +439,8 @@
             PosUnitAuxDE."Fiskaly Client State" :=
                 Enum::"NPR DE TSS Client State".FromInteger(Enum::"NPR DE TSS Client State".Ordinals().Get(Enum::"NPR DE TSS Client State".Names().IndexOf(State)));
         PosUnitAuxDE.Modify();
-        Commit();
+        if not PosUnitAuxDE.IsTemporary() then
+            Commit();
     end;
     #endregion
 
