@@ -35,14 +35,26 @@ codeunit 6059813 "NPR Stripe Subs Usage Handler"
 
     local procedure ShouldUpdateSubscriptionUsage(StripeSubscription: Record "NPR Stripe Subscription"; StripePOSUser: Record "NPR Stripe POS User") ShouldUpdate: Boolean
     var
+        User: Record User;
         StripeSubscriptionUsage: Record "NPR Stripe Subscription Usage";
+#IF CLOUD
+        AzureADUserManagement: Codeunit "Azure AD User Management";
+#ENDIF
         Handled: Boolean;
     begin
         OnBeforeShouldUpdateSubscriptionUsage(StripeSubscription, StripePOSUser, ShouldUpdate, Handled);
         if Handled then
             exit(ShouldUpdate);
 
+        User.SetRange("User Name", StripePOSUser."User ID");
+        if not User.FindFirst() then
+            exit(false);
+
         ShouldUpdate := not StripeSubscriptionUsage.Get(StripeSubscription.Id, StripePOSUser."User ID", StripeSubscription."Current Period Start");
+#IF CLOUD
+        if ShouldUpdate then
+            ShouldUpdate := not AzureADUserManagement.IsUserDelegated(User."User Security ID");
+#ENDIF
     end;
 
     local procedure InserSubscriptionUsage(StripeSubscription: Record "NPR Stripe Subscription"; StripePOSUser: Record "NPR Stripe POS User")
