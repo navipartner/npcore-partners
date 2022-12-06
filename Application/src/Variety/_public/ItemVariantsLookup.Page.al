@@ -1,6 +1,6 @@
 ﻿page 6059805 "NPR Item Variants Lookup"
 {
-    Extensible = False;
+    Extensible = true;
     Caption = 'Item Variants Lookup';
     PageType = List;
     SourceTable = "NPR Item Variant Buffer";
@@ -10,7 +10,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Control1)
             {
