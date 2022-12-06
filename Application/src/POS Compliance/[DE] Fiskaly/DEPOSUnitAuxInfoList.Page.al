@@ -14,42 +14,42 @@
             {
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ToolTip = 'Specifies the value of POS Unit No.';
+                    ToolTip = 'Specifies the POS Unit this Fiskaly client is created for.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Cash Register Brand"; Rec."Cash Register Brand")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of Cash Register Brand';
+                    ToolTip = 'Specifies the POS unit cash register brand.';
                 }
                 field("Cash Register Model"; Rec."Cash Register Model")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of Cash Register Model';
+                    ToolTip = 'Specifies the POS unit cash register model.';
                 }
                 field("Serial Number"; Rec."Serial Number")
                 {
-                    ToolTip = 'Specifies the value of Serial Number for DE Fiskaly';
+                    ToolTip = 'Specifies the POS unit cash register serial number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("TSS Code"; Rec."TSS Code")
                 {
-                    ToolTip = 'Specifies the Technical Security System (TSS) the entry is related to at Fiskaly.';
+                    ToolTip = 'Specifies the Technical Security System (TSS) the Fiskaly client is linked to.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Client ID"; Rec.SystemId)
                 {
-                    ToolTip = 'Specifies the value of Client ID for DE Fiskaly';
+                    ToolTip = 'Specifies the Fiskaly client ID.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Fiskaly Client Created at"; Rec."Fiskaly Client Created at")
                 {
-                    ToolTip = 'Specifies the date/time the Client was created at Fiskaly.';
+                    ToolTip = 'Specifies the date/time the client was created at Fiskaly.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Fiskaly Client State"; Rec."Fiskaly Client State")
                 {
-                    ToolTip = 'Specifies last known state of the Client at Fiskaly.';
+                    ToolTip = 'Specifies last known state of the Fiskaly client.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Cash Register Created"; Rec."Cash Register Created")
@@ -79,6 +79,7 @@
                 trigger OnAction()
                 var
                     DETSS: Record "NPR DE TSS";
+                    PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info";
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
                     Window: Dialog;
                     NoSyncedTssErr: Label 'No TSS has been synched to Fiskaly.';
@@ -89,7 +90,7 @@
                         Error(NoSyncedTssErr);
                     Window.Open(WorkingLbl);
                     repeat
-                        DEFiskalyCommunication.GetTSSClientList(DETSS);
+                        DEFiskalyCommunication.GetTSSClientList(DETSS, PosUnitAuxDE);
                     until DETSS.Next() = 0;
                     Window.Close();
                     CurrPage.Update(false);
