@@ -315,6 +315,11 @@
         }
         key(Key4; "Retail ID")
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaced by Key5: "Retail ID", "Document Source", Type';
+        }
+        key(Key5; "Retail ID", "Document Source", Type)
+        {
         }
     }
 
