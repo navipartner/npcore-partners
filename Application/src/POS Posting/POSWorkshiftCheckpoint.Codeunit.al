@@ -29,7 +29,7 @@
         // Pos Entry No:  can be zero
     end;
 
-    procedure BinTransfer(UsePosEntry: Boolean; WithPosting: Boolean; UnitNo: Code[10])
+    procedure BinTransfer(UsePosEntry: Boolean; WithPosting: Boolean; POSStoreCode: Code[10]; UnitNo: Code[10])
     var
         CheckPointEntryNo: Integer;
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
@@ -37,7 +37,7 @@
         POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
     begin
 
-        CheckPointEntryNo := POSCheckpointMgr.CreateEndWorkshiftCheckpoint_POSEntry(UnitNo);
+        CheckPointEntryNo := POSCheckpointMgr.CreateEndWorkshiftCheckpoint_POSEntry(POSStoreCode, UnitNo);
         POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
         Commit();
 
@@ -265,7 +265,7 @@
 
         //Create checkpoints for managed POS Units
         IsManager := CreateCheckpointForManagedPosUnits(UnitNo, Mode);
-        CheckPointEntryNo := CreateEndWorkshiftCheckpoint_POSEntry(UnitNo);
+        CheckPointEntryNo := CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."POS Store Code", POSUnit."No.");
 
 
         POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
@@ -350,7 +350,7 @@
             POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::XREPORT);
             POSWorkshiftCheckpoint.SetFilter(Open, '=%1', true);
             if (not POSWorkshiftCheckpoint.FindLast()) then begin
-                CheckPointEntryNo := CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."No.");
+                CheckPointEntryNo := CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."POS Store Code", POSUnit."No.");
                 POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
                 POSWorkshiftCheckpoint.Type := POSWorkshiftCheckpoint.Type::XREPORT;
                 POSWorkshiftCheckpoint.Modify();
@@ -363,7 +363,7 @@
             PaymentBinCheckpoint.TransferToPaymentBin(POSWorkshiftCheckpoint."Entry No.", POSUnit."No.", MasterPosUnit."No.");
 
             // Create a new check point now with zero in the bins
-            CheckPointEntryNo := CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."No.");
+            CheckPointEntryNo := CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."POS Store Code", POSUnit."No.");
             POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
             POSWorkshiftCheckpoint.Type := POSWorkshiftCheckpoint.Type::WORKSHIFT_CLOSE;
             POSWorkshiftCheckpoint.Open := true;
@@ -556,7 +556,7 @@
 
     end;
 
-    procedure CreateEndWorkshiftCheckpoint_POSEntry(POSUnitNo: Code[10]) CheckpointEntryNo: Integer
+    procedure CreateEndWorkshiftCheckpoint_POSEntry(POSStoreCode: Code[10]; POSUnitNo: Code[10]) CheckpointEntryNo: Integer
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
     begin
@@ -570,7 +570,7 @@
         Commit();
 
         if (POSUnitNo <> '') then
-            CalculateCheckpointStatistics(POSUnitNo, POSWorkshiftCheckpoint);
+            CalculateCheckpointStatistics(POSStoreCode, POSUnitNo, POSWorkshiftCheckpoint);
 
         POSWorkshiftCheckpoint.Modify();
         Commit();
@@ -705,7 +705,7 @@
 
     end;
 
-    local procedure CalculateCheckpointStatistics(POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure CalculateCheckpointStatistics(POSStoreCode: Code[10]; POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         PreviousUnitCheckpoint: Record "NPR POS Workshift Checkpoint";
         FromEntryNo: Integer;
@@ -736,10 +736,10 @@
         if (EntriesToBalance.IsEmpty()) then
             exit;
 
-        CalculateWorkshiftSummary(POSUnitNo, POSWorkshiftCheckpoint, FromEntryNo);
+        CalculateWorkshiftSummary(POSStoreCode, POSUnitNo, POSWorkshiftCheckpoint, FromEntryNo);
     end;
 
-    local procedure CalculateWorkshiftSummary(POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FromPosEntryNo: Integer)
+    local procedure CalculateWorkshiftSummary(POSStoreCode: Code[10]; POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FromPosEntryNo: Integer)
     var
         POSSalesLine: Record "NPR POS Entry Sales Line";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
@@ -747,9 +747,9 @@
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
 
-        SetGeneralStatistics(POSUnitNo, POSWorkshiftCheckpoint, FromPosEntryNo);
+        SetGeneralStatistics(POSStoreCode, POSUnitNo, POSWorkshiftCheckpoint, FromPosEntryNo);
         GetTransferStatistics(POSWorkshiftCheckpoint, FromPosEntryNo);
-        AggregateVat_PE(POSWorkshiftCheckpoint."Entry No.", POSUnitNo, FromPosEntryNo);
+        AggregateVat_PE(POSWorkshiftCheckpoint."Entry No.", POSStoreCode, POSUnitNo, FromPosEntryNo);
 
         POSSalesLine.SetFilter("POS Entry No.", '%1..', FromPosEntryNo);
         POSSalesLine.SetFilter("POS Unit No.", '=%1', POSUnitNo);
@@ -774,32 +774,29 @@
         FinalizeCheckpoint(POSWorkshiftCheckpoint);
     end;
 
-    local procedure SetGeneralStatistics(POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FromPosEntryNo: Integer)
+    local procedure SetGeneralStatistics(POSStoreCode: Code[10]; POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FromPosEntryNo: Integer)
     var
         POSEntry: Record "NPR POS Entry";
         DocDeleted: Boolean;
     begin
+        POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
+        POSEntry.SetRange("POS Store Code", POSStoreCode);
+        POSEntry.SetRange("POS Unit No.", POSUnitNo);
+        POSEntry.SetFilter("Entry No.", '%1..', FromPosEntryNo);
+        POSEntry.SetRange("System Entry", false);
 
         // Number of sales
-        POSEntry.SetFilter("Entry No.", '%1..', FromPosEntryNo);
-        POSEntry.SetFilter("POS Unit No.", '=%1', POSUnitNo);
         POSEntry.SetFilter("Entry Type", '=%1', POSEntry."Entry Type"::"Direct Sale");
-        POSEntry.SetFilter("System Entry", '=%1', false);
         POSWorkshiftCheckpoint."Direct Sales Count" := POSEntry.Count();
 
         // Number of cancelled sales
-        POSEntry.SetFilter("Entry No.", '%1..', FromPosEntryNo);
-        POSEntry.SetFilter("POS Unit No.", '=%1', POSUnitNo);
         POSEntry.SetFilter("Entry Type", '=%1', POSEntry."Entry Type"::"Cancelled Sale");
-        POSEntry.SetFilter("System Entry", '=%1', false);
         POSWorkshiftCheckpoint."Cancelled Sales Count" := POSEntry.Count();
 
         // Number of sales moved to ERP
-        POSEntry.SetFilter("Entry No.", '%1..', FromPosEntryNo);
-        POSEntry.SetFilter("POS Unit No.", '=%1', POSUnitNo);
         POSEntry.SetFilter("Entry Type", '=%1', POSEntry."Entry Type"::"Credit Sale");
-        POSEntry.SetFilter("System Entry", '=%1', false);
         POSWorkshiftCheckpoint."Credit Sales Count" := 0;
+        POSEntry.SetLoadFields("Sales Document Type", "Sales Document No.");
         if POSEntry.FindSet() then
             repeat
                 CheckIsPosted(POSEntry."Sales Document Type", POSEntry."Sales Document No.", DocDeleted);
@@ -1281,7 +1278,7 @@
     end;
 
 
-    local procedure AggregateVat_PE(WorkshiftCheckpointEntryNo: Integer; PosUnitNo: Code[10]; FromPosEntryNo: Integer)
+    local procedure AggregateVat_PE(WorkshiftCheckpointEntryNo: Integer; POSStoreCode: Code[10]; POSUnitNo: Code[10]; FromPosEntryNo: Integer)
     var
         TempPOSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp." temporary;
         POSTaxAmountLine: Record "NPR POS Entry Tax Line";
@@ -1289,25 +1286,24 @@
         POSEntry: Record "NPR POS Entry";
         TempEntryNo: Integer;
     begin
-
+        POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
+        POSEntry.SetRange("POS Store Code", POSStoreCode);
+        POSEntry.SetRange("POS Unit No.", PosUnitNo);
         POSEntry.SetFilter("Entry No.", '%1..', FromPosEntryNo);
-        POSEntry.SetFilter("POS Unit No.", '=%1', PosUnitNo);
         POSEntry.SetFilter("Entry Type", '=%1', POSEntry."Entry Type"::"Direct Sale");
         if (POSEntry.IsEmpty()) then
             exit;
 
+        POSEntry.SetLoadFields("Entry No.");
         POSEntry.FindSet();
         repeat
-
             POSTaxAmountLine.SetFilter("POS Entry No.", '=%1', POSEntry."Entry No.");
             if (POSTaxAmountLine.FindSet()) then begin
                 repeat
-
                     TempPOSWorkshiftTaxCheckpoint.Reset();
                     TempPOSWorkshiftTaxCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftCheckpointEntryNo);
                     TempPOSWorkshiftTaxCheckpoint.SetFilter("Tax Area Code", '=%1', POSTaxAmountLine."Tax Area Code");
                     TempPOSWorkshiftTaxCheckpoint.SetFilter("Tax Calculation Type", '=%1', POSTaxAmountLine."Tax Calculation Type");
-
                     TempPOSWorkshiftTaxCheckpoint.SetFilter("VAT Identifier", '=%1', POSTaxAmountLine."VAT Identifier");
                     TempPOSWorkshiftTaxCheckpoint.SetFilter("Tax Jurisdiction Code", '=%1', POSTaxAmountLine."Tax Jurisdiction Code");
                     TempPOSWorkshiftTaxCheckpoint.SetFilter("Tax Group Code", '=%1', POSTaxAmountLine."Tax Group Code");
@@ -1318,13 +1314,10 @@
 
                         TempPOSWorkshiftTaxCheckpoint.Init();
                         TempPOSWorkshiftTaxCheckpoint."Workshift Checkpoint Entry No." := WorkshiftCheckpointEntryNo;
-
                         TempPOSWorkshiftTaxCheckpoint."Tax Calculation Type" := POSTaxAmountLine."Tax Calculation Type";
-
                         TempPOSWorkshiftTaxCheckpoint."VAT Identifier" := POSTaxAmountLine."VAT Identifier";
                         TempPOSWorkshiftTaxCheckpoint."Tax Jurisdiction Code" := POSTaxAmountLine."Tax Jurisdiction Code";
                         TempPOSWorkshiftTaxCheckpoint."Tax Group Code" := POSTaxAmountLine."Tax Group Code";
-
                         TempPOSWorkshiftTaxCheckpoint."Tax Area Code" := POSTaxAmountLine."Tax Area Code";
                         TempPOSWorkshiftTaxCheckpoint."Tax %" := POSTaxAmountLine."Tax %";
                         TempPOSWorkshiftTaxCheckpoint.Insert();
@@ -1335,7 +1328,6 @@
                     TempPOSWorkshiftTaxCheckpoint."Line Amount" += POSTaxAmountLine."Line Amount";
                     TempPOSWorkshiftTaxCheckpoint."Amount Including Tax" += POSTaxAmountLine."Amount Including Tax";
                     TempPOSWorkshiftTaxCheckpoint.Modify();
-
                 until (POSTaxAmountLine.Next() = 0);
             end;
         until (POSEntry.Next() = 0);
@@ -1356,7 +1348,4 @@
     local procedure OnAfterCreateBalancingEntry(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     begin
     end;
-
-
 }
-

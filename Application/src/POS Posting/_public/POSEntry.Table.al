@@ -538,7 +538,11 @@
             ObsoleteReason = 'Not used';
         }
         key(Key4; "Document No.")
-        { }
+        {
+#if not (BC17 or BC18)
+            IncludedFields = "Entry Type";
+#endif
+        }
 
         key(Key5; "Customer No.", "Post Entry Status")
         {
@@ -563,7 +567,11 @@
         key(Key9; "POS Store Code", "Post Entry Status")
         { }
         key(Key10; "POS Store Code", "POS Unit No.")
-        { }
+        {
+#if not (BC17 or BC18)
+            IncludedFields = "System Entry", "Entry Type", "Entry Date";
+#endif
+        }
         key(Key11; "POS Period Register No.")
         { }
         key(Key12; "Customer No.", "Sales Document Type", "Document Date")

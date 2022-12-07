@@ -33,7 +33,8 @@ codeunit 85054 "NPR POS Act. Bin Trans. Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
 
         FromBinNo := POSActionBinTransferB.GetDefaultUnitBin(POSSession);
-        CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry(FromBinNo);
+        POSActionBinTransferB.GetPosUnitFromBin(FromBinNo, PosUnit);
+        CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."POS Store Code", POSUnit."No.");
 
         POSActionBinTransferB.TransferContentsToBin(POSSession, FromBinNo, CheckpointEntryNo);
 
