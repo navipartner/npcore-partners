@@ -53,33 +53,25 @@
                     end;
                 }
             }
-            cuegroup(Control1)
+            cuegroup(Videos)
             {
-                Caption = 'Actions';
+                Caption = 'Videos';
+                Visible = ShowProductVideosActivities;
                 actions
                 {
-                    action("New Sales Order")
+                    action(ProductVideos)
                     {
-                        Caption = 'New Sales Order';
-
-                        RunObject = Page "Sales Order";
-                        RunPageMode = Create;
-
-                        Image = TileNew;
-                        ToolTip = 'Create a new sales order.';
-
+                        Caption = 'Product Videos';
+                        Image = TileVideo;
+                        ToolTip = 'Open a list of videos that showcase some of the product capabilities.';
                         ApplicationArea = NPRRetail;
-                    }
-                    action("New Sales Quote")
-                    {
-                        Caption = 'New Sales Quote';
-                        RunObject = Page "Sales Quote";
-                        RunPageMode = Create;
 
-                        Image = TileNew;
-                        ToolTip = 'Create a new sales quote.';
-
-                        ApplicationArea = NPRRetail;
+                        trigger OnAction()
+                        var
+                            Video: Codeunit Video;
+                        begin
+                            Video.Show("Video Category"::NPR);
+                        end;
                     }
                 }
             }
@@ -247,6 +239,8 @@
             Rec.Init();
             Rec.Insert();
         end;
+
+        ShowProductVideosActivities := ClientTypeManagement.GetCurrentClientType() <> CLIENTTYPE::Phone;
     end;
 
     trigger OnAfterGetCurrRecord()
@@ -292,6 +286,9 @@
     end;
 
     var
-        BackgroundTaskResults: Dictionary of [Text, Text];
+        ClientTypeManagement: Codeunit "Client Type Management";
+        ShowProductVideosActivities: Boolean;
         BackgroundTaskId: Integer;
+        BackgroundTaskResults: Dictionary of [Text, Text];
+
 }
