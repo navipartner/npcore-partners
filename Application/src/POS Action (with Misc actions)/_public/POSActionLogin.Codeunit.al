@@ -259,6 +259,7 @@
         POSEntry.SetFilter("Entry No.", '>%1', POSWorkshiftCheckpoint."POS Entry No.");
         POSEntry.SetRange("System Entry", false);
         POSEntry.SetFilter("Entry Type", '<>%1', POSEntry."Entry Type"::"Cancelled Sale");
+        POSEntry.SetLoadFields("Entry Date");
         if not POSEntry.FindFirst() then
             exit(0);
 
