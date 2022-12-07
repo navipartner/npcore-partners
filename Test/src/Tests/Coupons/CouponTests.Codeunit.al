@@ -115,6 +115,35 @@ codeunit 85074 "NPR Coupon Tests"
     end;
 
     [Test]
+    [HandlerFunctions('OpenPageHandler')]
+    procedure VerifyCoupon()
+    var
+        SalePOS: Record "NPR POS Sale";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        NPNpDCCouponCheck: Codeunit "NPR NP NpDC Coupon Verify B";
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryCoupon.IssueCouponMultipleQuantity(_CouponType, 1, TempCoupon);
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        //[WHEN] when
+        NPNpDCCouponCheck.VerifyCoupon(TempCoupon."Reference No.");
+    end;
+
+    [ModalPageHandler]
+    procedure OpenPageHandler(var CouponCard: TestPage "NPR NpDc Coupon Card")
+    var
+        Assert: Codeunit "Assert";
+    begin
+        Assert.IsTrue(true, 'Page opened.');
+    end;
+
+    [Test]
     [TestPermissions(TestPermissions::Disabled)]
     procedure IssueCoupon()
     var
@@ -179,12 +208,10 @@ codeunit 85074 "NPR Coupon Tests"
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethodCash, _POSPaymentMethodCash."Processing Type"::CASH, '', false);
             CreateDiscountType(100, _Item."No.");
 
-
             _Initialized := true;
         end;
         Commit();
     end;
-
 
     local procedure CreateDiscountType(DiscountPct: Decimal; ItemNo: Code[20])
     var

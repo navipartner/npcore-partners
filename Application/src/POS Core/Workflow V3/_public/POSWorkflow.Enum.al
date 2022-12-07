@@ -78,7 +78,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(6184484; EFT_PEPPER_AUX)
     {
         Caption = 'EFT_PEPPER_AUX', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action Pepper AUX";
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Pepper Aux";
     }
     value(6184485; EFT_PEPPER_INSTALL)
     {
@@ -417,6 +417,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     {
         Caption = 'ISSUE_COUPON', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR NpDc Module Issue: OnSale";
+    }
+    value(79; CHECK_COUPON)
+    {
+        Caption = 'CHECK_COUPON', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NP NpDC Coupon Verify";
     }
     value(6014600; BALANCE_V4)
     {

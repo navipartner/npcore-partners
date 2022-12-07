@@ -1,5 +1,4 @@
 let main = async ({workflow, parameters,popup, captions, context}) => {
-    debugger;
     if (parameters.DepositType == 1){
         context.PromptValue = await popup.input({caption: captions.InvoiceNoPrompt})
     }
