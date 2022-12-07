@@ -1,6 +1,7 @@
 ﻿codeunit 6014660 "NPR POS Action Create Member"
 {
     Access = Internal;
+
     var
         ActionVersion: Label '2.0', Locked = true, MaxLength = 20;
         ActionCode: Label 'MM_CREATE_MEMBER', Locked = true, MaxLength = 20;
@@ -57,7 +58,7 @@
     begin
         POSSession.GetSale(PosSaleMgr);
         PosSaleMgr.GetCurrentSale(POSSale);
-        ;
+
         if (CreateMembershipAndAssignToSales(POSSale, CopyStr(Context.GetStringParameter('MembershipSalesSetupItemNumber'), 1, 20))) then begin
             PosSaleMgr.Refresh(POSSale);
             PosSaleMgr.Modify(false, false);
@@ -65,7 +66,7 @@
         end;
     end;
 
-    procedure CreateMembershipAndAssignToSales(POSSale: Record "NPR POS Sale"; ItemNumber: Code[20]): Boolean
+    procedure CreateMembershipAndAssignToSales(var POSSale: Record "NPR POS Sale"; ItemNumber: Code[20]): Boolean
     begin
         exit(AssignToSales(POSSale, CreateMembership(ItemNumber)));
     end;
