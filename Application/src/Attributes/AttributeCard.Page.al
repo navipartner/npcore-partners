@@ -127,6 +127,26 @@
                     ToolTip = 'Specifies the value of the Import File Column No. field';
                     ApplicationArea = NPRRetail;
                 }
+                group(HeyLoyaltyIntegration)
+                {
+                    Caption = 'HeyLoyalty Integration';
+
+                    field("HeyLoyalty Field ID"; Rec."HeyLoyalty Field ID")
+                    {
+                        ToolTip = 'Specifies the field id used to store the attribute values at HeyLoyalty.';
+                        ApplicationArea = NPRHeyLoyalty;
+                    }
+                    field("Default HeyLoyalty Value"; Rec."HeyLoyalty Default Value")
+                    {
+                        ToolTip = 'Specifies the default attribute value to be sent to HeyLoyalty in cases, when the attribute has no value assigned for the object in BC.';
+                        ApplicationArea = NPRHeyLoyalty;
+                    }
+                    field("HL Auto Create New Values"; Rec."HL Auto Create New Values")
+                    {
+                        ToolTip = 'Specifies if new attribute values should be automatically created in BC for each non-existing attribute value received from HeyLoyalty.';
+                        ApplicationArea = NPRHeyLoyalty;
+                    }
+                }
             }
         }
     }
