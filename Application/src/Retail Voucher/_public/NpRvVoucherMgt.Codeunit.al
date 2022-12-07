@@ -29,7 +29,7 @@
             exit;
 
         SetSalesLineFilter(Rec, NpRvSalesLine);
-        if NpRvSalesLine.IsEmpty then
+        if NpRvSalesLine.IsEmpty() then
             exit;
         DeleteExternalVoucher(Rec, NpRvSalesLine);
         NpRvSalesLine.DeleteAll();
@@ -56,7 +56,7 @@
         NpRvSalesLine: Record "NPR NpRv Sales Line";
     begin
         SetSalesLineFilter(SaleLinePos, NpRvSalesLine);
-        if NpRvSalesLine.IsEmpty then
+        if NpRvSalesLine.IsEmpty() then
             exit;
 
         NpRvSalesLine.SetFilter(Type, '%1|%2|%3', NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up", NpRvSalesLine.Type::"Partner Issue Voucher");
@@ -79,7 +79,7 @@
         NpRvSalesLine: Record "NPR NpRv Sales Line";
     begin
         SetSalesLineFilter(SaleLinePos, NpRvSalesLine);
-        if NpRvSalesLine.IsEmpty then
+        if NpRvSalesLine.IsEmpty() then
             exit;
 
         NpRvSalesLine.SetFilter(Type, '%1|%2|%3', NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up", NpRvSalesLine.Type::"Partner Issue Voucher");
@@ -930,7 +930,7 @@
     local procedure SetSalesLineFilter(SaleLinePOS: Record "NPR POS Sale Line"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     begin
         Clear(NpRvSalesLine);
-        NpRvSalesLine.SetCurrentKey("Retail ID");
+        NpRvSalesLine.SetCurrentKey("Retail ID", "Document Source", Type);
         NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
     end;
