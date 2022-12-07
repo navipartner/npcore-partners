@@ -488,9 +488,11 @@
                             SerialNoInfo.TestField(Blocked, false);
                     end;
                 end;
+                NpRvSalesLine.SetCurrentKey("Retail ID", "Document Source");
                 NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
                 NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
-                if NpRvSalesLine.FindSet() then
+                NpRvSalesLine.SetLoadFields("Document Source", "Document Type", "Document No.", "Document Line No.");
+                if NpRvSalesLine.FindSet(true) then
                     repeat
                         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
                         NpRvSalesLine."Document Type" := SalesLine."Document Type";
