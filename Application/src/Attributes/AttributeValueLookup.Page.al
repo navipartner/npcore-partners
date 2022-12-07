@@ -42,6 +42,11 @@
                     ToolTip = 'Specifies the value of the Attribute Value Description field';
                     ApplicationArea = NPRRetail;
                 }
+                field("HeyLoyalty Value"; Rec."HeyLoyalty Value")
+                {
+                    ToolTip = 'Specifies the id used for the attribute value at HeyLoyalty.';
+                    ApplicationArea = NPRHeyLoyalty;
+                }
             }
         }
     }

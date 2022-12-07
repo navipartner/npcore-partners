@@ -374,6 +374,11 @@
 
             end;
         }
+        field(800; "HeyLoyalty Name"; Text[50])
+        {
+            Caption = 'HeyLoyalty Name';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

@@ -120,7 +120,21 @@
             Description = 'NPR5.39';
             DataClassification = CustomerContent;
         }
-
+        field(800; "HeyLoyalty Field ID"; Text[50])
+        {
+            Caption = 'HeyLoyalty Field ID';
+            DataClassification = CustomerContent;
+        }
+        field(801; "HeyLoyalty Default Value"; Text[50])
+        {
+            Caption = 'Default HeyLoyalty Value';
+            DataClassification = CustomerContent;
+        }
+        field(802; "HL Auto Create New Values"; Boolean)
+        {
+            Caption = 'Auto Create New Values';
+            DataClassification = CustomerContent;
+        }
         field(6151479; "Replication Counter"; BigInteger)
         {
             Caption = 'Replication Counter';

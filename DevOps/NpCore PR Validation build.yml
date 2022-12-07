@@ -55,9 +55,9 @@ stages:
                                 "NPRTicketWallet",
                                 "NPRMembershipEssential",
                                 "NPRMembershipAdvanced",
-                                "NPRNaviConnect")
+                                "NPRNaviConnect",
+                                "NPRHeyLoyalty")
       exceptions: (@{Type = "Page"; Id = 6151231; Name = "NPR App. Area Setup" })
-
     generatePermissions:
       enabled: true
       alObjectsFolder: $(Build.Repository.LocalPath)/Application/src/

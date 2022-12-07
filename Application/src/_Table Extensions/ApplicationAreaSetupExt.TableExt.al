@@ -42,5 +42,10 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NPR Membership Advanced';
             DataClassification = CustomerContent;
         }
+        field(6060108; "NPR HeyLoyalty"; Boolean)
+        {
+            Caption = 'NPR HeyLoyalty Integration';
+            DataClassification = CustomerContent;
+        }
     }
 }
