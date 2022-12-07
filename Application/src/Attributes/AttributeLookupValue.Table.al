@@ -31,6 +31,11 @@
             Caption = 'Attribute Value Description';
             DataClassification = CustomerContent;
         }
+        field(800; "HeyLoyalty Value"; Text[50])
+        {
+            Caption = 'HeyLoyalty Value';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
