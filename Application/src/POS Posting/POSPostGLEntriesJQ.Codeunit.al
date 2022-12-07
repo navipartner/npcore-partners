@@ -22,8 +22,9 @@ codeunit 6014699 "NPR POS Post GL Entries JQ"
         POSPostEntries.SetPostItemEntries(false);
         POSPostEntries.SetPostPerPeriodRegister(true);
 
-        POSEntry.SetFilter("Post Entry Status", '<%1', 2);
         POSEntry.SetCurrentKey("Post Entry Status");
+        POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting");
+        POSEntry.SetLoadFields("POS Period Register No.");
         if not POSEntry.FindSet() then
             exit;
 
