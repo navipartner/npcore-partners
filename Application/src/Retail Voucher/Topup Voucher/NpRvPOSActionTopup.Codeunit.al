@@ -1,4 +1,4 @@
-﻿codeunit 6151023 "NPR NpRv POS Action Top-up" implements "NPR IPOS Workflow"
+codeunit 6151023 "NPR NpRv POS Action Top-up" implements "NPR IPOS Workflow"
 {
     Access = Internal;
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
