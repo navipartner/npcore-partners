@@ -292,8 +292,10 @@
         POSSale.GetCurrentSale(SalePOS);
         Clear(SalePOS."Sales Document No.");
         Clear(SalePOS."Sales Document Type");
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
-        SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
+        if (SalePOS."Customer Type" <> SalePOS."Customer Type"::Ord) or (SalePOS."Customer No." <> SalesHeader."Bill-to Customer No.") then begin
+            SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
+            SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
+        end;
         SalePOS.Modify();
         POSSale.RefreshCurrent();
 
