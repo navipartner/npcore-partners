@@ -74,9 +74,8 @@
         SalesSetup: Record "Sales & Receivables Setup";
         ShipmentDocument: Record "NPR Shipping Provider Document";
         ConsignorEntry: Record "NPR Consignor Entry";
-                            
         RecRef: RecordRef;
-        
+
     begin
         if not InitPackageProvider() then
             exit;
@@ -89,8 +88,7 @@
             if SalesShptHeader.Get(SalesShptHdrNo) then begin
                 RecRef.GetTable(SalesShptHeader);
                 PackageMgt.PostDimension(RecRef);
-                if not PackageMgt.AddEntry(RecRef, GuiAllowed, false, ShipmentDocument) then
-                    exit;
+                PackageMgt.AddEntry(RecRef, GuiAllowed, false, ShipmentDocument);
                 ConsignorEntry.InsertFromShipmentHeader(SalesShptHeader."No.");
 
             end;
