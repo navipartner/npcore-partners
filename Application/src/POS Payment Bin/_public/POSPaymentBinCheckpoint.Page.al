@@ -569,27 +569,21 @@
         end;
     end;
 
-    local procedure GetEoDProfile(Rec: Record "NPR POS Payment Bin Checkp."; var POSEODProfile: Record "NPR POS End of Day Profile"): Boolean
+    local procedure SetEndOfDayOptions()
     var
-        POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSUnit: Record "NPR POS Unit";
-        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-        Found: Boolean;
+        EodProfile: Record "NPR POS End of Day Profile";
     begin
-        clear(POSEODProfile);
-        POSPaymentBinCheckpoint.CopyFilters(Rec);
-        POSPaymentBinCheckpoint.SetLoadFields("Workshift Checkpoint Entry No.");
-        POSWorkshiftCheckpoint.SetLoadFields("POS Unit No.");
-        POSUnit.SetLoadFields("POS End of Day Profile");
-        if POSPaymentBinCheckpoint.Find('-') then
-            repeat
-                if POSPaymentBinCheckpoint."Workshift Checkpoint Entry No." <> 0 then begin
-                    POSWorkshiftCheckpoint.Get(POSPaymentBinCheckpoint."Workshift Checkpoint Entry No.");
-                    if POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.") then
-                        Found := POSUnit.GetProfile(POSEODProfile);
-                end;
-            until Found or (POSPaymentBinCheckpoint.Next() = 0);
-        exit(Found);
+
+        if (POSUnit.Get(GetPosUnitNo())) then
+            if (POSUnit."POS End of Day Profile" <> '') then
+                if (not EodProfile.Get(POSUnit."POS End of Day Profile")) then
+                    EodProfile.Init();
+
+        CountedAmountInclFloatEditable := not EodProfile."Require Denomin.(Counted Amt.)";
+        BankDepositAmtEditable := not EodProfile."Require Denomin.(Bank Deposit)";
+        MoveToBinAmtEditable := not EodProfile."Require Denomin. (Move to Bin)";
+        DifferenceAmountEditable := not EodProfile.DisableDifferenceField;
     end;
 
     internal procedure SetBlindCount(HideFields: Boolean)
@@ -599,14 +593,9 @@
 
     internal procedure DoOnOpenPageProcessing()
     var
-        POSEODProfile: Record "NPR POS End of Day Profile";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
     begin
-        GetEoDProfile(Rec, POSEODProfile);
-        CountedAmountInclFloatEditable := not POSEODProfile."Require Denomin.(Counted Amt.)";
-        BankDepositAmtEditable := not POSEODProfile."Require Denomin.(Bank Deposit)";
-        MoveToBinAmtEditable := not POSEODProfile."Require Denomin. (Move to Bin)";
-        DifferenceAmountEditable := not POSEODProfile.DisableDifferenceField;
+        SetEndOfDayOptions();
 
         if (PageMode in [PageMode::PRELIMINARY_COUNT, PageMode::TRANSFER]) or
            ((PageMode = PageMode::FINAL_COUNT) and not AutoCountCompleted)
