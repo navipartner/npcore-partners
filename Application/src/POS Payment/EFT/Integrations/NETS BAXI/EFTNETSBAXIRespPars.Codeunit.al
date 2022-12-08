@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
+﻿codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
 {
     Access = Internal;
 
@@ -9,125 +8,95 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
     end;
 
     var
-        ResponseType: Text;
-        StargateEnvelope: DotNet NPRNetResponseEnvelope0;
-        SerializedResponse: Text;
-        EftTransactionEntryNo: Integer;
-        ERR_RESPONSE_TYPE: Label 'Critical error:\Unknown NETS BAXI response type: %1\Cannot establish response context';
-        CARD_BALANCE: Label 'Card Balance: %1';
+        _ResponseType: Text;
+        _Response: Codeunit "NPR POS JSON Helper";
+        _EftTransactionEntryNo: Integer;
+        _ERR_RESPONSE_TYPE: Label 'Critical error:\Unknown NETS BAXI response type: %1\Cannot establish response context';
+        _CARD_BALANCE: Label 'Card Balance: %1';
 
     local procedure ParseResponse()
     begin
-        case ResponseType of
+        case _ResponseType of
             'Open':
-                ParseOpenResponse(StargateEnvelope);
+                ParseOpenResponse(_Response);
             'Close':
-                ParseCloseResponse(StargateEnvelope);
+                ParseCloseResponse(_Response);
             'GetLastResult':
-                ParseGetLastResponse(StargateEnvelope);
-            'TransactionResponse':
-                ParseTransactionResponse(SerializedResponse);
-            'BalanceEnquiry':
-                ParseTransactionResponse(SerializedResponse);
-            'Deposit':
-                ParseTransactionResponse(SerializedResponse);
-            'Reconciliation':
-                ParseAdministrationResponse(StargateEnvelope);
-            'DownloadDataset':
-                ParseAdministrationResponse(StargateEnvelope);
-            'DownloadSoftware':
-                ParseAdministrationResponse(StargateEnvelope);
+                ParseGetLastResponse(_Response);
+            'Transaction':
+                ParseTransactionResponse(_Response);
+            'Administration':
+                ParseAdministrationResponse(_Response);
             else
-                Error(ERR_RESPONSE_TYPE, ResponseType);
+                Error(_ERR_RESPONSE_TYPE, _ResponseType);
         end;
+
     end;
 
-    procedure SetResponseEnvelope(ResponseTypeIn: Text; StargateEnvelopeIn: DotNet NPRNetResponseEnvelope0)
+    procedure SetResponse(ResponseTypeIn: Text; Response: Codeunit "NPR POS JSON Helper")
     begin
-        ResponseType := ResponseTypeIn;
-        StargateEnvelope := StargateEnvelopeIn;
-    end;
-
-    procedure SetResponseEvent(ResponseTypeIn: Text; SerializedResponseIn: Text)
-    begin
-        ResponseType := ResponseTypeIn;
-        SerializedResponse := SerializedResponseIn;
+        _ResponseType := ResponseTypeIn;
+        _Response := Response;
     end;
 
     procedure TryGetEftTransactionEntryNo(var EftEntryNoOut: Integer): Boolean
     begin
-        if EftTransactionEntryNo = 0 then
+        if _EftTransactionEntryNo = 0 then
             exit(false);
-        EftEntryNoOut := EftTransactionEntryNo;
+        EftEntryNoOut := _EftTransactionEntryNo;
         exit(true);
     end;
 
-    local procedure ParseOpenResponse(Envelope: DotNet NPRNetResponseEnvelope0)
+    local procedure ParseOpenResponse(Response: Codeunit "NPR POS JSON Helper")
     var
-        POSStargateManagement: Codeunit "NPR POS Stargate Management";
-        OpenResponse: DotNet NPRNetOpenResponse;
-        POSSession: Codeunit "NPR POS Session";
-        POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        POSSession.GetSession(POSSession, true);
-        POSSession.GetFrontEnd(POSFrontEndManagement, true);
+        _EftTransactionEntryNo := Response.GetInteger('EntryNo');
+        EFTTransactionRequest.Get(_EftTransactionEntryNo);
 
-        POSStargateManagement.DeserializeEnvelope(Envelope, OpenResponse, POSFrontEndManagement);
-        EftTransactionEntryNo := OpenResponse.EftEntryNo;
-
-        EFTTransactionRequest.Get(EftTransactionEntryNo);
-        EFTTransactionRequest.Successful := OpenResponse.Success;
+        Response.SetScopePath('OpenResponse');
+        EFTTransactionRequest.Successful := Response.GetBoolean('Success');
         if not EFTTransactionRequest.Successful then begin
-            EFTTransactionRequest."Client Error" := CopyStr(OpenResponse.ErrorMessage, 1, MaxStrLen(EFTTransactionRequest."Client Error"));
-            EFTTransactionRequest."Result Description" := CopyStr(OpenResponse.ErrorMessage, 1, MaxStrLen(EFTTransactionRequest."Result Description"));
+            EFTTransactionRequest."Client Error" := CopyStr(Response.GetString('ErrorMessage'), 1, MaxStrLen(EFTTransactionRequest."Client Error"));
+            EFTTransactionRequest."Result Description" := CopyStr(Response.GetString('ErrorMessage'), 1, MaxStrLen(EFTTransactionRequest."Result Description"));
         end;
-        EFTTransactionRequest."Client Assembly Version" := OpenResponse.ExecutingAssemblyVersion;
+        EFTTransactionRequest."Client Assembly Version" := Response.GetString('ExecutingAssemblyVersion');
         EFTTransactionRequest.Modify(true);
     end;
 
-    local procedure ParseCloseResponse(Envelope: DotNet NPRNetResponseEnvelope0)
+    local procedure ParseCloseResponse(Response: Codeunit "NPR POS JSON Helper")
     var
-        POSStargateManagement: Codeunit "NPR POS Stargate Management";
-        CloseResponse: DotNet NPRNetCloseResponse;
-        POSSession: Codeunit "NPR POS Session";
-        POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        POSSession.GetSession(POSSession, true);
-        POSSession.GetFrontEnd(POSFrontEndManagement, true);
+        _EftTransactionEntryNo := Response.GetInteger('EntryNo');
+        EFTTransactionRequest.Get(_EftTransactionEntryNo);
 
-        POSStargateManagement.DeserializeEnvelope(Envelope, CloseResponse, POSFrontEndManagement);
-        EftTransactionEntryNo := CloseResponse.EftEntryNo;
-
-        EFTTransactionRequest.Get(EftTransactionEntryNo);
-
-        if (not IsNull(CloseResponse.AutoReconciliationResponse)) then begin
-            EFTTransactionRequest.Successful := CloseResponse.AutoReconciliationResponse.Result = 1;
+        if (Response.TrySetScope('AdministrationResponse')) then begin
+            EFTTransactionRequest.Successful := Response.GetInteger('Result') = 1;
             if not EFTTransactionRequest.Successful then begin
-                EFTTransactionRequest."Client Error" := CopyStr(CloseResponse.AutoReconciliationResponse.ErrorMessage, 1, MaxStrLen(EFTTransactionRequest."Client Error"));
-                EFTTransactionRequest."Result Description" := CopyStr(CloseResponse.AutoReconciliationResponse.ErrorMessage, 1, MaxStrLen(EFTTransactionRequest."Result Description"));
+                EFTTransactionRequest."Client Error" := CopyStr(Response.GetString('ErrorMessage'), 1, MaxStrLen(EFTTransactionRequest."Client Error"));
+                EFTTransactionRequest."Result Description" := CopyStr(Response.GetString('ErrorMessage'), 1, MaxStrLen(EFTTransactionRequest."Result Description"));
             end;
-            EFTTransactionRequest."Hardware ID" := CloseResponse.AutoReconciliationResponse.TerminalID;
-            EFTTransactionRequest."Reconciliation ID" := CloseResponse.AutoReconciliationResponse.SessionNumber;
-            ParseReceipts(EFTTransactionRequest, CloseResponse.AutoReconciliationResponse.Receipt1, CloseResponse.AutoReconciliationResponse.Receipt2);
+            EFTTransactionRequest."Hardware ID" := Response.GetString('TerminalID');
+            EFTTransactionRequest."Reconciliation ID" := Response.GetString('SessionNumber');
+            ParseReceipts(EFTTransactionRequest, Response.GetString('Receipt1'), Response.GetString('Receipt2'));
+            EFTTransactionRequest."Client Assembly Version" := Response.GetString('ExecutingAssemblyVersion');
         end else begin
-            EFTTransactionRequest.Successful := CloseResponse.Success;
+            Response.SetScope('CloseResponse');
+            EFTTransactionRequest.Successful := Response.GetBoolean('Success');
             if not EFTTransactionRequest.Successful then begin
-                EFTTransactionRequest."Client Error" := CopyStr(CloseResponse.ErrorMessage, 1, MaxStrLen(EFTTransactionRequest."Client Error"));
-                EFTTransactionRequest."Result Description" := CopyStr(CloseResponse.ErrorMessage, 1, MaxStrLen(EFTTransactionRequest."Result Description"));
+                EFTTransactionRequest."Client Error" := CopyStr(Response.GetString('ErrorMessage'), 1, MaxStrLen(EFTTransactionRequest."Client Error"));
+                EFTTransactionRequest."Result Description" := CopyStr(Response.GetString('ErrorMessage'), 1, MaxStrLen(EFTTransactionRequest."Result Description"));
             end;
+            EFTTransactionRequest."Client Assembly Version" := Response.GetString('ExecutingAssemblyVersion');
         end;
 
-        EFTTransactionRequest."Client Assembly Version" := CloseResponse.ExecutingAssemblyVersion;
         EFTTransactionRequest.Modify(true);
     end;
 
-    local procedure ParseTransactionResponse(Data: Text)
+    local procedure ParseTransactionResponse(Response: Codeunit "NPR POS JSON Helper")
     var
-        TransactionResponse: DotNet NPRNetTransactionResponse2;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        JSONSerializer: DotNet NPRNetSerializer;
         TrxTimestamp: Text;
         DateTime: DateTime;
         Year: Integer;
@@ -135,29 +104,30 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
         Day: Integer;
         TrxTime: Time;
         VoidedEftTrxReq: Record "NPR EFT Transaction Request";
+        OrganisationNumber: Text;
     begin
-        TransactionResponse := JSONSerializer.DeserializeAsType(Data, GetDotNetType(TransactionResponse));
-        EftTransactionEntryNo := TransactionResponse.EftEntryNo;
+        _EftTransactionEntryNo := Response.GetInteger('EntryNo');
+        EFTTransactionRequest.Get(_EftTransactionEntryNo);
 
-        EFTTransactionRequest.Get(EftTransactionEntryNo);
-        EFTTransactionRequest."Result Code" := TransactionResponse.Result;
+        Response.SetScope('TransactionResponse');
+        EFTTransactionRequest."Result Code" := Response.GetInteger('Result');
 
         if EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::AUXILIARY] then begin
             EFTTransactionRequest.Successful := (EFTTransactionRequest."Result Code" = 1);
         end else begin
-            EFTTransactionRequest.Successful := (EFTTransactionRequest."Result Code" = 0) and (TransactionResponse.ReceivedExternalResponse);
+            EFTTransactionRequest.Successful := (EFTTransactionRequest."Result Code" = 0) and (Response.GetBoolean('ReceivedExternalResponse'));
         end;
 
         EFTTransactionRequest."External Result Known" :=
-          ((EFTTransactionRequest."Result Code" <> 99) and (TransactionResponse.ReceivedExternalResponse))
-          or (not TransactionResponse.ExternalRequestSent);
+          ((EFTTransactionRequest."Result Code" <> 99) and (Response.GetBoolean('ReceivedExternalResponse')))
+          or (not Response.GetBoolean('ExternalRequestSent'));
 
-        EFTTransactionRequest."Card Number" := TransactionResponse.TruncatedPan;
-        EFTTransactionRequest."Card Issuer ID" := Format(TransactionResponse.IssuerId);
-        EFTTransactionRequest."Reconciliation ID" := TransactionResponse.SessionNumber;
-        EFTTransactionRequest."Hardware ID" := TransactionResponse.TerminalID;
+        EFTTransactionRequest."Card Number" := Response.GetString('TruncatedPan');
+        EFTTransactionRequest."Card Issuer ID" := Format(Response.GetInteger('IssuerId'));
+        EFTTransactionRequest."Reconciliation ID" := Response.GetString('SessionNumber');
+        EFTTransactionRequest."Hardware ID" := Response.GetString('TerminalID');
 
-        case TransactionResponse.VerificationMethod of
+        case Response.GetInteger('VerificationMethod') of
             0:
                 EFTTransactionRequest."Authentication Method" := EFTTransactionRequest."Authentication Method"::PIN;
             1:
@@ -175,7 +145,7 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
             EFTTransactionRequest."Signature Type" := EFTTransactionRequest."Signature Type"::"On Receipt";
         end;
 
-        TrxTimestamp := TransactionResponse.Timestamp;
+        TrxTimestamp := Response.GetString('Timestamp');
         //NETS documentation does not detail when exactly they send an ISO 8601 datetime string versus purely numbers, but both were observed during development..
         if StrPos(TrxTimestamp, 'Z') > 0 then begin
             Evaluate(DateTime, TrxTimestamp, 9);
@@ -193,30 +163,30 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
                 EFTTransactionRequest."Transaction Time" := TrxTime;
             end;
 
-        EFTTransactionRequest."Authorisation Number" := TransactionResponse.StanAuth;
-        EFTTransactionRequest."Reference Number Output" := TransactionResponse.StanAuth;
-        EFTTransactionRequest."External Transaction ID" := TransactionResponse.StanAuth;
-        EFTTransactionRequest."Card Name" := TransactionResponse.CardIssuerName;
-        EFTTransactionRequest."Card Application ID" := TransactionResponse.AID;
+        EFTTransactionRequest."Authorisation Number" := Response.GetString('StanAuth');
+        EFTTransactionRequest."Reference Number Output" := Response.GetString('StanAuth');
+        EFTTransactionRequest."External Transaction ID" := Response.GetString('StanAuth');
+        EFTTransactionRequest."Card Name" := Response.GetString('CardIssuerName');
+        EFTTransactionRequest."Card Application ID" := Response.GetString('AID');
 
-        if TransactionResponse.ResponseCode <> '' then begin
-            EFTTransactionRequest."Result Description" := CopyStr('(' + TransactionResponse.ResponseCode + ')', 1, MaxStrLen(EFTTransactionRequest."Result Description"));
-            EFTTransactionRequest."Result Display Text" := CopyStr('(' + TransactionResponse.ResponseCode + ')', 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
+        if Response.GetString('ResponseCode') <> '' then begin
+            EFTTransactionRequest."Result Description" := CopyStr('(' + Response.GetString('ResponseCode') + ')', 1, MaxStrLen(EFTTransactionRequest."Result Description"));
+            EFTTransactionRequest."Result Display Text" := CopyStr('(' + Response.GetString('ResponseCode') + ')', 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
         end;
 
         if EFTTransactionRequest.Successful then begin
-            if TransactionResponse.TipAmount <> 0 then begin
-                EFTTransactionRequest."Tip Amount" := TransactionResponse.TipAmount / 100;
+            if Response.GetInteger('TipAmount') <> 0 then begin
+                EFTTransactionRequest."Tip Amount" := Response.GetInteger('TipAmount') / 100;
             end;
-            if TransactionResponse.SurchargeAmount <> 0 then begin
-                EFTTransactionRequest."Fee Amount" := TransactionResponse.SurchargeAmount / 100;
+            if Response.GetInteger('SurchargeAmount') <> 0 then begin
+                EFTTransactionRequest."Fee Amount" := Response.GetInteger('SurchargeAmount') / 100;
             end;
-            EFTTransactionRequest."Amount Output" := TransactionResponse.TotalAmount / 100;
+            EFTTransactionRequest."Amount Output" := Response.GetInteger('TotalAmount') / 100;
         end;
 
-        ParseReceipts(EFTTransactionRequest, TransactionResponse.Receipt1, TransactionResponse.Receipt2);
+        ParseReceipts(EFTTransactionRequest, Response.GetString('Receipt1'), Response.GetString('Receipt2'));
 
-        ParseOptionalData(EFTTransactionRequest, TransactionResponse.OptionalData);
+        ParseOptionalData(EFTTransactionRequest, Response.GetString('OptionalData'));
 
         case EFTTransactionRequest."Processing Type" of
             EFTTransactionRequest."Processing Type"::PAYMENT:
@@ -241,7 +211,7 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
                     1: //Balance Enquiry
                         begin
                             if EFTTransactionRequest.Successful then begin
-                                EFTTransactionRequest."Result Display Text" := CopyStr(StrSubstNo(CARD_BALANCE, EFTTransactionRequest."Amount Output"), 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
+                                EFTTransactionRequest."Result Display Text" := CopyStr(StrSubstNo(_CARD_BALANCE, EFTTransactionRequest."Amount Output"), 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
                                 //TODO:
                                 //Undocumented by NETS where balance & expiry date is located in json respose.
                                 //Test gift card is currently expired so cannot be check myself at this time.
@@ -250,46 +220,40 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
                 end;
         end;
 
-        EFTTransactionRequest."Client Assembly Version" := TransactionResponse.ExecutingAssemblyVersion;
+        EFTTransactionRequest."Client Assembly Version" := Response.GetString('ExecutingAssemblyVersion');
         EFTTransactionRequest.Modify(true);
+
+        if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::PAYMENT then begin
+            if Response.GetString('OrganisationNumber', OrganisationNumber) then;
+            EmitTelemetry(EFTTransactionRequest, OrganisationNumber);
+        end;
     end;
 
-    local procedure ParseAdministrationResponse(Envelope: DotNet NPRNetResponseEnvelope0)
+    local procedure ParseAdministrationResponse(Response: Codeunit "NPR POS JSON Helper")
     var
-        POSStargateManagement: Codeunit "NPR POS Stargate Management";
-        AdminResponse: DotNet NPRNetAdministrationResponse;
-        POSSession: Codeunit "NPR POS Session";
-        POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        POSSession.GetSession(POSSession, true);
-        POSSession.GetFrontEnd(POSFrontEndManagement, true);
+        _EftTransactionEntryNo := Response.GetInteger('EntryNo');
+        EFTTransactionRequest.Get(_EftTransactionEntryNo);
 
-        POSStargateManagement.DeserializeEnvelope(Envelope, AdminResponse, POSFrontEndManagement);
-        EftTransactionEntryNo := AdminResponse.EftEntryNo;
-
-        EFTTransactionRequest.Get(EftTransactionEntryNo);
-        EFTTransactionRequest.Successful := AdminResponse.Result = 1;
+        Response.SetScope('AdministrationResponse');
+        EFTTransactionRequest.Successful := Response.GetInteger('Result') = 1;
         if not EFTTransactionRequest.Successful then begin
-            EFTTransactionRequest."Client Error" := CopyStr(AdminResponse.ErrorMessage, 1, MaxStrLen(EFTTransactionRequest."Client Error"));
-            EFTTransactionRequest."Result Description" := CopyStr(AdminResponse.ErrorMessage, 1, MaxStrLen(EFTTransactionRequest."Result Description"));
+            EFTTransactionRequest."Client Error" := CopyStr(Response.GetString('ErrorMessage'), 1, MaxStrLen(EFTTransactionRequest."Client Error"));
+            EFTTransactionRequest."Result Description" := CopyStr(Response.GetString('ErrorMessage'), 1, MaxStrLen(EFTTransactionRequest."Result Description"));
         end;
 
-        EFTTransactionRequest."Hardware ID" := AdminResponse.TerminalID;
-        EFTTransactionRequest."Reconciliation ID" := AdminResponse.SessionNumber;
-        EFTTransactionRequest."Client Assembly Version" := AdminResponse.ExecutingAssemblyVersion;
+        EFTTransactionRequest."Hardware ID" := Response.GetString('TerminalID');
+        EFTTransactionRequest."Reconciliation ID" := Response.GetString('SessionNumber');
+        EFTTransactionRequest."Client Assembly Version" := Response.GetString('ExecutingAssemblyVersion');
 
-        ParseReceipts(EFTTransactionRequest, AdminResponse.Receipt1, AdminResponse.Receipt2);
+        ParseReceipts(EFTTransactionRequest, Response.GetString('Receipt1'), Response.GetString('Receipt2'));
 
         EFTTransactionRequest.Modify(true);
     end;
 
-    local procedure ParseGetLastResponse(Envelope: DotNet NPRNetResponseEnvelope0)
+    local procedure ParseGetLastResponse(Response: Codeunit "NPR POS JSON Helper")
     var
-        POSStargateManagement: Codeunit "NPR POS Stargate Management";
-        GetLastResponse: DotNet NPRNetGetLastResponse;
-        POSSession: Codeunit "NPR POS Session";
-        POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         TrxTimestamp: Text;
         DateTime: DateTime;
@@ -300,23 +264,20 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         VoidedEftTrxReq: Record "NPR EFT Transaction Request";
     begin
-        POSSession.GetSession(POSSession, true);
-        POSSession.GetFrontEnd(POSFrontEndManagement, true);
+        _EftTransactionEntryNo := Response.GetInteger('EntryNo');
+        EFTTransactionRequest.Get(_EftTransactionEntryNo);
 
-        POSStargateManagement.DeserializeEnvelope(Envelope, GetLastResponse, POSFrontEndManagement);
-        EftTransactionEntryNo := GetLastResponse.EftEntryNo;
-        EFTTransactionRequest.Get(EftTransactionEntryNo);
-
-        EFTTransactionRequest.Successful := GetLastResponse.GetLastResult = 1; //Lookup successful, not the actual trx.
-        EFTTransactionRequest."External Result Known" := (GetLastResponse.GetLastResult <> 99) and (GetLastResponse.ExternalResponseReceived);
+        Response.SetScope('GetLastResultResponse');
+        EFTTransactionRequest.Successful := Response.GetInteger('GetLastResult') = 1; //Lookup successful, not the actual trx.
+        EFTTransactionRequest."External Result Known" := (Response.GetInteger('GetLastResult') <> 99) and (Response.GetBoolean('ExternalResponseReceived'));
 
         if EFTTransactionRequest.Successful then begin
-            EFTTransactionRequest."Card Number" := GetLastResponse.TruncatedPan;
-            EFTTransactionRequest."Reconciliation ID" := GetLastResponse.SessionNumber;
-            EFTTransactionRequest."Card Issuer ID" := Format(GetLastResponse.IssuerId);
-            EFTTransactionRequest."Hardware ID" := GetLastResponse.TerminalID;
+            EFTTransactionRequest."Card Number" := Response.GetString('TruncatedPan');
+            EFTTransactionRequest."Reconciliation ID" := Response.GetString('SessionNumber');
+            EFTTransactionRequest."Card Issuer ID" := Format(Response.GetInteger('IssuerId'));
+            EFTTransactionRequest."Hardware ID" := Response.GetString('TerminalID');
 
-            case GetLastResponse.VerificationMethod of
+            case Response.GetInteger('VerificationMethod') of
                 0:
                     EFTTransactionRequest."Authentication Method" := EFTTransactionRequest."Authentication Method"::PIN;
                 1:
@@ -334,7 +295,7 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
                 EFTTransactionRequest."Signature Type" := EFTTransactionRequest."Signature Type"::"On Receipt";
             end;
 
-            TrxTimestamp := GetLastResponse.Timestamp;
+            TrxTimestamp := Response.GetString('Timestamp');
             //NETS documentation does not detail when exactly they send an ISO 8601 datetime string versus purely numbers, but both were observed during development..
             if StrPos(TrxTimestamp, 'Z') > 0 then begin
                 Evaluate(DateTime, TrxTimestamp, 9);
@@ -352,30 +313,30 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
                     EFTTransactionRequest."Transaction Time" := TrxTime;
                 end;
 
-            EFTTransactionRequest."Authorisation Number" := GetLastResponse.StanAuth;
-            EFTTransactionRequest."Reference Number Output" := GetLastResponse.StanAuth;
-            EFTTransactionRequest."External Transaction ID" := GetLastResponse.StanAuth;
-            EFTTransactionRequest."Card Name" := GetLastResponse.CardIssuerName;
-            EFTTransactionRequest."Card Application ID" := GetLastResponse.AID;
+            EFTTransactionRequest."Authorisation Number" := Response.GetString('StanAuth');
+            EFTTransactionRequest."Reference Number Output" := Response.GetString('StanAuth');
+            EFTTransactionRequest."External Transaction ID" := Response.GetString('StanAuth');
+            EFTTransactionRequest."Card Name" := Response.GetString('CardIssuerName');
+            EFTTransactionRequest."Card Application ID" := Response.GetString('AID');
 
-            if GetLastResponse.Result = 0 then begin
-                if GetLastResponse.TipAmount <> 0 then begin
-                    EFTTransactionRequest."Tip Amount" := GetLastResponse.TipAmount / 100;
+            if Response.GetInteger('Result') = 0 then begin
+                if Response.GetInteger('TipAmount') <> 0 then begin
+                    EFTTransactionRequest."Tip Amount" := Response.GetInteger('TipAmount') / 100;
                 end;
-                if GetLastResponse.SurchargeAmount <> 0 then begin
-                    EFTTransactionRequest."Fee Amount" := GetLastResponse.SurchargeAmount / 100;
+                if Response.GetInteger('SurchargeAmount') <> 0 then begin
+                    EFTTransactionRequest."Fee Amount" := Response.GetInteger('SurchargeAmount') / 100;
                 end;
-                EFTTransactionRequest."Amount Output" := GetLastResponse.TotalAmount / 100;
+                EFTTransactionRequest."Amount Output" := Response.GetInteger('TotalAmount') / 100;
             end else begin
-                if GetLastResponse.ResponseCode <> '' then begin
-                    EFTTransactionRequest."Result Description" := CopyStr('(' + GetLastResponse.ResponseCode + ')', 1, MaxStrLen(EFTTransactionRequest."Result Description"));
-                    EFTTransactionRequest."Result Display Text" := CopyStr('(' + GetLastResponse.ResponseCode + ')', 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
+                if Response.GetString('ResponseCode') <> '' then begin
+                    EFTTransactionRequest."Result Description" := CopyStr('(' + Response.GetString('ResponseCode') + ')', 1, MaxStrLen(EFTTransactionRequest."Result Description"));
+                    EFTTransactionRequest."Result Display Text" := CopyStr('(' + Response.GetString('ResponseCode') + ')', 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
                 end;
             end;
 
-            ParseReceipts(EFTTransactionRequest, GetLastResponse.Receipt1, GetLastResponse.Receipt2);
+            ParseReceipts(EFTTransactionRequest, Response.GetString('Receipt1'), Response.GetString('Receipt2'));
 
-            ParseOptionalData(EFTTransactionRequest, GetLastResponse.OptionalData);
+            ParseOptionalData(EFTTransactionRequest, Response.GetString('OptionalData'));
 
             OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
             case OriginalEFTTransactionRequest."Processing Type" of
@@ -399,7 +360,7 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
             end;
         end;
 
-        EFTTransactionRequest."Client Assembly Version" := GetLastResponse.ExecutingAssemblyVersion;
+        EFTTransactionRequest."Client Assembly Version" := Response.GetString('ExecutingAssemblyVersion');
         EFTTransactionRequest.Modify(true);
     end;
 
@@ -425,23 +386,31 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
         end;
     end;
 
-    local procedure ParseReceipt(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; Receipt: Text; var LastReceiptNo: Integer; var LastReceiptEntryNo: Integer; WriteToStream: OutStream)
+    local procedure ParseReceipt(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; Receipt: Text; var LastReceiptNo: Integer; var LastReceiptEntryNo: Integer; OStream: OutStream)
     var
-        StringReader: DotNet NPRNetStringReader;
-        ReceiptLine: DotNet NPRNetString;
+        TempBlob: Codeunit "Temp Blob";
+        OStream2: OutStream;
+        IStream: InStream;
+        DotNetEncoding: Codeunit DotNet_Encoding;
+        DotNetStreamReader: Codeunit DotNet_StreamReader;
+        ReceiptLine: Text;
     begin
-        WriteToStream.Write(Receipt);
+        OStream.Write(Receipt);
 
-        StringReader := StringReader.StringReader(Receipt);
-        ReceiptLine := StringReader.ReadLine();
-        if not IsNull(ReceiptLine) then begin
+        TempBlob.CreateOutStream(OStream2, TextEncoding::UTF8);
+        OStream2.Write(Receipt);
+        TempBlob.CreateInStream(IStream, TextEncoding::UTF8);
+
+        DotNetEncoding.UTF8();
+        DotNetStreamReader.StreamReader(IStream, DotNetEncoding);
+
+        if not DotNetStreamReader.EndOfStream() then
             LastReceiptNo += 1;
-        end;
 
-        while (not IsNull(ReceiptLine)) do begin
+        while (not DotNetStreamReader.EndOfStream()) do begin
             LastReceiptEntryNo += 1;
+            ReceiptLine := DotNetStreamReader.ReadLine();
             InsertReceiptLine(ReceiptLine, LastReceiptNo, LastReceiptEntryNo, EFTTransactionRequest);
-            ReceiptLine := StringReader.ReadLine();
         end;
     end;
 
@@ -483,43 +452,50 @@ codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
 
     local procedure ParseOptionalData(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; OptionalData: Text)
     var
-        JObject: DotNet NPRNetJObject;
-        JToken: DotNet NPRNetJToken;
-        DecimalBuffer: Decimal;
-        JValue: DotNet NPRNetJValue;
-        CultureInfo: DotNet NPRNetCultureInfo;
+        JObject: JsonObject;
+        JToken: JsonToken;
+        JToken2: JsonToken;
     begin
-        if not TryParseOptionalData(JObject, OptionalData) then
+        if not JObject.ReadFrom(OptionalData) then
             exit;
 
-        if TrySelectToken(JObject, 'od.dcc', JToken, false) then begin
-            EFTTransactionRequest."DCC Used" := true;
-            EFTTransactionRequest."DCC Currency Code" := Format(JToken.Item('ccura'));
+        if not JObject.SelectToken('od.dcc', JToken) then
+            exit;
 
-            if TrySelectValue(JToken, 'cam', JValue, false) then begin
-                Evaluate(DecimalBuffer, JValue.ToString(CultureInfo.InvariantCulture), 9);
-                EFTTransactionRequest."DCC Amount" := DecimalBuffer / 100;
-            end;
+        EFTTransactionRequest."DCC Used" := true;
+        JToken.AsObject().Get('ccura', JToken2);
+        EFTTransactionRequest."DCC Currency Code" := JToken2.AsValue().AsText();
+
+        if not JToken.AsObject().Get('cam', JToken2) then
+            exit;
+
+        EFTTransactionRequest."DCC Amount" := JToken2.AsValue().AsInteger() / 100;
+    end;
+
+    local procedure EmitTelemetry(EFTTransactionRequest: Record "NPR EFT Transaction Request"; OrganizationNumber: Text)
+    var
+        EFTTransactionRequest2: Record "NPR EFT Transaction Request";
+        LogDict: Dictionary of [Text, Text];
+    begin
+        //if first successful transaction of the day, call home to telemetry with terminal details for baxi terminal tracking
+        if not EftTransactionRequest.Successful then
+            exit;
+
+        EFTTransactionRequest2.SetCurrentKey("Register No.", "Integration Type", "Processing Type");
+        EFTTransactionRequest2.SetRange("Register No.", EftTransactionRequest."Register No.");
+        EFTTransactionRequest2.SetRange("Integration Type", EftTransactionRequest."Integration Type");
+        EFTTransactionRequest2.SetRange("Processing Type", EftTransactionRequest."Processing Type");
+        EFTTransactionRequest2.SetFilter("Entry No.", '<%1', EftTransactionRequest."Entry No.");
+        EFTTransactionRequest2.SetRange(Successful, true);
+
+        if EFTTransactionRequest2.FindLast() then begin
+            if EftTransactionRequest."Transaction Date" = EFTTransactionRequest2."Transaction Date" then
+                exit;
         end;
-    end;
 
-    [TryFunction]
-    local procedure TryParseOptionalData(var JObject: DotNet NPRNetJObject; OptionalData: Text)
-    begin
-        JObject := JObject.Parse(OptionalData);
-    end;
-
-    local procedure TrySelectToken(JObject: DotNet NPRNetJObject; Path: Text; var JToken: DotNet NPRNetJToken; WithError: Boolean): Boolean
-    begin
-        JToken := JObject.SelectToken(Path, WithError);
-        exit(not IsNull(JToken));
-    end;
-
-    local procedure TrySelectValue(JObject: DotNet NPRNetJObject; Path: Text; var JValue: DotNet NPRNetJValue; WithError: Boolean): Boolean
-    begin
-        JValue := JObject.SelectToken(Path, WithError);
-        exit(not IsNull(JValue));
+        LogDict.Add('Hardware ID', EftTransactionRequest."Hardware ID");
+        LogDict.Add('POS Unit', EftTransactionRequest."Register No.");
+        LogDict.Add('OrganizationNumber', OrganizationNumber);
+        Session.LogMessage('NPR_BAXI_NATIVE_METADATA', '', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, LogDict);
     end;
 }
-
-#endif

@@ -1,7 +1,6 @@
 ﻿page 6184509 "NPR EFT NETS BAXI Paym. Setup"
 {
     Extensible = False;
-
     Caption = 'EFT NETS BAXI Payment Setup';
     PageType = Card;
     UsageCategory = None;
@@ -109,12 +108,6 @@
                     ToolTip = 'Specifies the value of the Auto Reconcile On EOD field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Force Abort Minimum Seconds"; Rec."Force Abort Minimum Seconds")
-                {
-
-                    ToolTip = 'Specifies the value of the Force Abort Minimum Seconds field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Administration Timeout Seconds"; Rec."Administration Timeout Seconds")
                 {
 
@@ -147,4 +140,3 @@
     {
     }
 }
-
