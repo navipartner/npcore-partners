@@ -83,9 +83,9 @@
     begin
         ErrorMessage := '';
         ClearLastError();
-
         EmailManager.SetOnRunParameters(RecRef, RecipientEmail);
 
+        Commit();
         if (EmailManager.Run()) then
             exit(true);
 
