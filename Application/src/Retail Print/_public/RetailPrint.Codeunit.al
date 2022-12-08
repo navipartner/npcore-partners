@@ -15,4 +15,18 @@ codeunit 6059844 "NPR Retail Print"
     begin
         BarcodeLookupMgt.EnterTransferItemCrossRef(TransferLine);
     end;
+
+    procedure ItemToRetailJnlLine(ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; PK: Code[40]; var RetailJournalLineOut: Record "NPR Retail Journal Line")
+    var
+        LabelLibrary: Codeunit "NPR Label Library";
+    begin
+        LabelLibrary.ItemToRetailJnlLine(ItemNo, VariantCode, Quantity, PK, RetailJournalLineOut);
+    end;
+
+    procedure PrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer)
+    var
+        LabelLibrary: Codeunit "NPR Label Library";
+    begin
+        LabelLibrary.PrintRetailJournal(JournalLine, ReportType);
+    end;
 }
