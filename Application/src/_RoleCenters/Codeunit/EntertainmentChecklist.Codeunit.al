@@ -25,7 +25,7 @@ codeunit 6060003 "NPR Entertainment Checklist"
     local procedure GetUpgradeTag(): Code[250]
     begin
         //For Any change, increase version
-        exit('NPR-Checklist-v1.0');
+        exit('NPR-Checklist-Entertainment-v1.0');
     end;
 
     local procedure CreateChecklistItems();
@@ -64,8 +64,8 @@ codeunit 6060003 "NPR Entertainment Checklist"
         GuidedExperience.InsertAssistedSetup(WelcomeVideoENTxt, WelcomeVideoENTxt, '', 2, ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", "Assisted Setup Group"::GettingStarted, '', "Video Category"::GettingStarted, '');
 
         //In case that new language needs to be added, Language ID can be founded in table Windows Language (2000000045), Use just languages with filter "Localization Exist" and "Globally Enabled" set to true
-#region Languages
-#region English
+        #region Languages
+        #region English
         if CheckLanguageId(1033) then begin
             GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 1033, WelcomeVideoENTxt);
             GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 1033, '');
@@ -90,8 +90,8 @@ codeunit 6060003 "NPR Entertainment Checklist"
             GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 7177, WelcomeVideoENTxt);
             GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 7177, '');
         end;
-#endregion
-#endregion
+        #endregion
+        #endregion
 
         Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 1000, TempAllProfile, false);
         Checklist.InitializeGuidedExperienceItems();
