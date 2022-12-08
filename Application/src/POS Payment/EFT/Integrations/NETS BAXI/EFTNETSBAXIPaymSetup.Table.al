@@ -1,8 +1,6 @@
 ﻿table 6184518 "NPR EFT NETS BAXI Paym. Setup"
 {
     Access = Internal;
-    // NPR5.54/JAKUBV/20200408  CASE 364340 Transport NPR5.54 - 8 April 2020
-
     Caption = 'EFT NETS BAXI Payment Setup';
     DataClassification = CustomerContent;
 
@@ -115,6 +113,8 @@
             Caption = 'Force Abort Minimum Seconds';
             DataClassification = CustomerContent;
             InitValue = 5;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Force abort no longer supported';
         }
         field(310; "Administration Timeout Seconds"; Integer)
         {

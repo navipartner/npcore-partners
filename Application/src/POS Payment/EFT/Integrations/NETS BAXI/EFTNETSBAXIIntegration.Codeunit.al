@@ -1,20 +1,12 @@
-﻿#if not CLOUD
-codeunit 6184540 "NPR EFT NETS BAXI Integration"
+﻿codeunit 6184540 "NPR EFT NETS BAXI Integration"
 {
     Access = Internal;
-    // NPR5.54/MMV /20200129 CASE 364340 Created object
-
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         Description: Label 'NETS BAXI .NET';
         BALANCE_ENQUIRY: Label 'Balance Enquiry';
         DOWNLOAD_DATASET: Label 'Download Dataset';
         DOWNLOAD_SOFTWARE: Label 'Download Software';
-        SIGNATURE_APPROVAL: Label 'Customer must sign the receipt. Please confirm that signature is valid';
         TRX_ERROR: Label '%1 %2 failed\%3\%4';
         VOID_SUCCESS: Label 'Transaction %1 voided successfully';
         CARD: Label 'Card: %1';
@@ -36,6 +28,7 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
         tmpEFTIntegrationType.Code := IntegrationType();
         tmpEFTIntegrationType.Description := Description;
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR EFT NETS BAXI Integration";
+        tmpEFTIntegrationType."Version 2" := true;
         tmpEFTIntegrationType.Insert();
     end;
 
@@ -89,7 +82,11 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
 
         CreateGenericRequest(EftTransactionRequest);
 
-        EftTransactionRequest.Recoverable := true;
+        //lookup disabled until NETS adds idempotent request ID we can match against later in GetLast response in their SDK. 
+        //We have seen issues in prod with out of sync transaction being looked up due to this limitation in their SDK.
+        EftTransactionRequest.Recoverable := false;
+
+
         EftTransactionRequest."Auto Voidable" := true;
         EftTransactionRequest."Manual Voidable" := true;
         EftTransactionRequest.Insert(true);
@@ -128,7 +125,9 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
             EftTransactionRequest."Fee Amount" := OriginalEftTransactionRequest."Fee Amount"; //Refund original
         end;
 
-        EftTransactionRequest.Recoverable := true;
+        //lookup disabled until NETS adds idempotent request ID we can match against later in GetLast response in their SDK. 
+        //We have seen issues in prod with out of sync transaction being looked up due to this limitation in their SDK.
+        EftTransactionRequest.Recoverable := false;
         EftTransactionRequest."Auto Voidable" := true;
         EftTransactionRequest."Manual Voidable" := true;
         EftTransactionRequest.Insert(true);
@@ -154,7 +153,10 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
             EftTransactionRequest."Fee Amount" := OriginalEftTransactionRequest."Fee Amount"; //Void original
         end;
 
-        EftTransactionRequest.Recoverable := true;
+        //lookup disabled until NETS adds idempotent request ID we can match against later in GetLast response in their SDK. 
+        //We have seen issues in prod with out of sync transaction being looked up due to this limitation in their SDK.
+        EftTransactionRequest.Recoverable := false;
+
         EftTransactionRequest.Insert(true);
 
         ErrorIfNotLatestFinancialTransaction(EftTransactionRequest, false);
@@ -202,47 +204,47 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
 
         CreateGenericRequest(EftTransactionRequest);
 
-        EftTransactionRequest.Recoverable := true;
+        //lookup disabled until NETS adds idempotent request ID we can match against later in GetLast response in their SDK. 
+        //We have seen issues in prod with out of sync transaction being looked up incorrectly due to this limitation in their SDK.
+        EftTransactionRequest.Recoverable := false;
+
         EftTransactionRequest."Manual Voidable" := true;
         EftTransactionRequest."Auto Voidable" := true;
         EftTransactionRequest.Insert(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnQueueCloseBeforeRegisterBalance', '', false, false)]
-    local procedure OnQueueCloseBeforeRegisterBalance(POSSession: Codeunit "NPR POS Session"; var tmpEFTSetup: Record "NPR EFT Setup" temporary)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnEndOfDayCloseEft', '', false, false)]
+    local procedure OnQueueCloseBeforeRegisterBalance(EndOfDayType: Option; var EftWorkflows: Dictionary of [Text, JsonObject])
     var
-        EFTSetup: Record "NPR EFT Setup";
         POSSetup: Codeunit "NPR POS Setup";
-        EFTNETSBAXIPaymentSetup: Record "NPR EFT NETS BAXI Paym. Setup";
+        POSSession: Codeunit "NPR POS Session";
+        Sale: codeunit "NPR POS Sale";
+        PosSale: Record "NPR POS Sale";
+        EFTSetup: Record "NPR EFT Setup";
+        Request: JsonObject;
+        EftTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
+        Mechanism: Enum "NPR EFT Request Mechanism";
+        Workflow: Text;
+        Context: JsonObject;
     begin
+        if not (EndOfDayType = 1) then
+            exit;
+
         POSSession.GetSetup(POSSetup);
+        POSSession.GetSale(Sale);
+        Sale.GetCurrentSale(PosSale);
 
         EFTSetup.SetFilter("POS Unit No.", POSSetup.GetPOSUnitNo());
         EFTSetup.SetRange("EFT Integration Type", IntegrationType());
-        if not EFTSetup.FindFirst() then begin
+        if (not EFTSetup.FindFirst()) then begin
             EFTSetup.SetRange("POS Unit No.", '');
-            if not EFTSetup.FindFirst() then
+            if (not EFTSetup.FindFirst()) then
                 exit;
         end;
 
-        GetPaymentTypeParameters(EFTSetup, EFTNETSBAXIPaymentSetup);
-        if not EFTNETSBAXIPaymentSetup."Auto Reconcile On EOD" then
-            exit;
-
-        tmpEFTSetup := EFTSetup;
-        tmpEFTSetup.Insert();
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnSendEftDeviceRequest', '', false, false)]
-    local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
-    var
-        EFTNETSBAXIProtocol: Codeunit "NPR EFT NETS BAXI Protocol";
-    begin
-        if not EftTransactionRequest.IsType(IntegrationType()) then
-            exit;
-        Handled := true;
-
-        EFTNETSBAXIProtocol.SendEftDeviceRequest(EftTransactionRequest);
+        EftTransactionMgt.PrepareEndWorkshift(EFTSetup, PosSale, Request, Mechanism, Workflow);
+        Context.Add('request', Request);
+        EftWorkflows.Add(Workflow, Context);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnAfterFinancialCommit', '', false, false)]
@@ -255,18 +257,15 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
             Message(GetLastErrorText);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnAfterPaymentConfirm', '', false, false)]
-    local procedure OnAfterPaymentConfirm(EftTransactionRequest: Record "NPR EFT Transaction Request"; var DoNotResume: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnPrepareRequestSend', '', false, false)]
+    local procedure OnCreateHwcEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Request: JsonObject; var RequestMechanism: Enum "NPR EFT Request Mechanism"; var Workflow: Text)
+    var
+        EFTNETSBAXIProtocol: Codeunit "NPR EFT NETS BAXI Protocol";
     begin
-        if not EftTransactionRequest.IsType(IntegrationType()) then
+        if (not EftTransactionRequest.IsType(IntegrationType())) then
             exit;
-
-        if EftTransactionRequest."Signature Type" = EftTransactionRequest."Signature Type"::"On Receipt" then begin
-            if not Confirm(SIGNATURE_APPROVAL) then begin
-                DoNotResume := true;
-                VoidTransactionAfterSignatureDecline(EftTransactionRequest);
-            end;
-        end;
+        RequestMechanism := RequestMechanism::POSWorkflow;
+        EFTNETSBAXIProtocol.ConstructHwcRequest(EftTransactionRequest, Request, Workflow);
     end;
 
     procedure HandleProtocolResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
@@ -307,13 +306,8 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
         POSPaymentMethod: Record "NPR POS Payment Method";
         EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
     begin
-
-        /*
-        TODO: Cleanup workaround to BC17 message bug
-
         if not EftTransactionRequest.Successful then
             Message(TRX_ERROR, EftTransactionRequest."Integration Type", Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
-        */
 
         if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, POSPaymentMethod) then begin
             EftTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;
@@ -409,22 +403,10 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
 
-        EFTTransactionRequest."Integration Version Code" := '1.9.0.821';
+        EFTTransactionRequest."Integration Version Code" := '1.11.3.0';
         GetPaymentTypeParameters(EFTSetup, EFTNETSBAXIPaymentSetup);
         if EFTNETSBAXIPaymentSetup."Host Environment" <> EFTNETSBAXIPaymentSetup."Host Environment"::Production then
             EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::"TEST Remote";
-    end;
-
-    procedure VoidTransactionAfterSignatureDecline(EFTTransactionRequest: Record "NPR EFT Transaction Request")
-    var
-        EFTSetup: Record "NPR EFT Setup";
-        VoidEFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-    begin
-        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
-        EFTFrameworkMgt.CreateVoidRequest(VoidEFTTransactionRequest, EFTSetup, EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.", EFTTransactionRequest."Entry No.", false);
-        Commit();
-        EFTFrameworkMgt.SendRequest(VoidEFTTransactionRequest);
     end;
 
     procedure GetPOSDescription(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
@@ -478,4 +460,3 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
         Error(ERROR_ONLY_LAST, Format(EFTTransactionRequestIn."Processing Type"), EFTTransactionRequestIn."Hardware ID");
     end;
 }
-#endif

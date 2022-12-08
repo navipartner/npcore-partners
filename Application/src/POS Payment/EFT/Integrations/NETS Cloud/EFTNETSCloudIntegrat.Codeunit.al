@@ -515,6 +515,7 @@
         //because we are not receiving events from it. We have observed "terminal busy" errors for this scenario.
         //Sleeping 5 seconds is a pragmatic workaround to reduce impact of this problem.
         //A manual "void last" is the solution if this fails but it will confuse sales person.
+        //The real fix requires a better API from NETS
 
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         POSSession.GetSale(POSSale);
