@@ -4,7 +4,7 @@ There are several configurations required for CleanCash to enable it running wit
 
 ## Prerequisites
 
-There's internal setup that needs to be performed by NaviPartner employees before you can perform the following procedure. 
+There's a setup segment that needs to be performed in the Case System before you can start configuring options in Business Central. 
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Unit List**, and open the related link.   
 2. Select the POS unit you want to edit, or create a new one.
@@ -33,7 +33,7 @@ To test the solution in a pre-live database or a test company, you need to use t
 
 To check if the solution behaves as expected, navigate to the **CleanCash Transactions** page, and check if the following columns are populated:
 
-- **CleanCash POS Id.** = retailtest
-- **CleanCash Unit Id.**
+- **CleanCash POS Id** = retailtest
+- **CleanCash Unit Id**
 - **CleanCash Code** = A unique number provided by the box.
 

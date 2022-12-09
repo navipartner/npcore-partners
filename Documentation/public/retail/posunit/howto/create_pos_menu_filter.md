@@ -19,13 +19,13 @@ To create POS menu filters, follow the provided steps:
    - The **Filter** for the **Field number 70 - Open** line should be set to **Yes**.
      As a result, the values will be set to be included in the generic filter, and you can close the **Generic Filter Page**.
 
-   ![generic_filter_page](../images/generic_filter_page.PNG)
+   <img src="../images/generic_filter_page.PNG" width="550">
 
 9. In the **POS Menu Filter** page, click **Display Filter** in the **Actions** dropdown to get the SQL format for the filter.     
     SORTING(No.) WHERE(Voucher Type=FILTER(CREDITVOUCHER),Open=FILTER(Yes))
-   
-   > [!Note]
-   > If you're having difficulty writing down a filter on any table in the SQL statement, you can always use the **POS Menu Filters** function to generate it, and then paste it on the POS action you're using, such as [**LOOKUP**](../reference/sql_pos_action_filter.md).
+    
+    **NOTE:**
+    If you're having difficulty writing down a filter on any table in the SQL statement, you can always use the **POS Menu Filters** function to generate it, and then paste it on the POS action you're using, such as [**LOOKUP**](../reference/sql_pos_action_filter.md).
 
 10. Click **Test & Activate** in the ribbon to check if everything is in order, and activate the selected behavior of the button.     
     The results will be displayed in a page format. If you're satisfied with the filter, you can now go to the **Menu Buttons Setup** to configure the button.
