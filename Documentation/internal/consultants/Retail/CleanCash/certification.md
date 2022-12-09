@@ -46,5 +46,5 @@ It's necessary to create and enlist each individual POS unit/cash register with 
     **NOTE:**
     Bear in mind that URLs can be different, even within the same shop. Retail Innovation uses more than one server to handle CleanCash.
 
-6. Create a Service Contract for the new register.    
+6. Contact Hosting to create a Service Contract for the new register.    
    There is a chance that it's necessary to update a customer's existing service contract. 
