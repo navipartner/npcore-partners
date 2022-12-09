@@ -39,7 +39,6 @@ You can set up the content of customer display in **Display Setup**. Here, it is
 
 ### Related links
 
-- [POS units](../../posunit/explanation/POSUnit.md)
 - [Create a new POS unit (by using the existing one for reference)](../../posunit/howto/createnew.md)   
 - [Configure an opening mechanism for a POS unit cash drawer](../../posunit/howto/ConfigureCashDrawerOpening.md)
 - [POS menu](../../posunit/explanation/POS_menu.md)
