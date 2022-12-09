@@ -6,12 +6,29 @@ codeunit 6059780 "NPR Scanner Import Mgt."
     var
         CannotFindItemErr: Label 'Cannot find item with reference %1.', Comment = '%1 = Item Reference';
         ItemNo: Code[20];
+        VariantCode: Code[20];
     begin
         if TryGetItemNoFromItem(ScannedCode, ItemNo) then
             exit(ItemNo);
 
-        if TryGetItemNoFromItemReference(ScannedCode, ItemNo) then
+        if TryGetItemNoFromItemReference(ScannedCode, ItemNo, VariantCode) then
             exit(ItemNo);
+
+        Error(CannotFindItemErr, ScannedCode);
+    end;
+
+    procedure GetItemNoAndVariantCodeFromScannedCode(ScannedCode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[20])
+    var
+        CannotFindItemErr: Label 'Cannot find item with reference %1.', Comment = '%1 = Item Reference';
+    begin
+        ItemNo := '';
+        VariantCode := '';
+
+        if TryGetItemNoFromItem(ScannedCode, ItemNo) then
+            exit;
+
+        if TryGetItemNoFromItemReference(ScannedCode, ItemNo, VariantCode) then
+            exit;
 
         Error(CannotFindItemErr, ScannedCode);
     end;
@@ -30,7 +47,7 @@ codeunit 6059780 "NPR Scanner Import Mgt."
         exit(true);
     end;
 
-    local procedure TryGetItemNoFromItemReference(ScannedCode: Text[50]; var ItemNo: Code[20]): Boolean
+    local procedure TryGetItemNoFromItemReference(ScannedCode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[20]): Boolean
     var
         ItemReference: Record "Item Reference";
     begin
@@ -43,6 +60,7 @@ codeunit 6059780 "NPR Scanner Import Mgt."
             exit(false);
 
         ItemNo := ItemReference."Item No.";
+        VariantCode := ItemReference."Variant Code";
         exit(true);
     end;
 
