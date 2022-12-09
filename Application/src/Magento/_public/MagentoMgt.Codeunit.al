@@ -189,8 +189,6 @@
 
         Clear(XmlDoc);
         HttpWebResponse.Content.ReadAs(Response);
-        XmlDocument.ReadFrom(Response, XmlDoc);
-
         if not HttpWebResponse.IsSuccessStatusCode then
             Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
 
