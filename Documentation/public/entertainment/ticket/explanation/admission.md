@@ -14,7 +14,7 @@ The following fields and options are available for setup:
 
 | Field name      | Description |
 | ----------- | ----------- |
-| **Admission Code** | Specifies the location (along with the description); you can also define the  |
+| **Admission Code** | Specifies the code which represents the type of venue (along with the description); you can also define whether it's an event or a fixed location.   |
 | **Type** | Specifies whether this is an event or a fixed location. If a reservation is required on the ticket, the type has to be **Event**. |
 | **Capacity Limits By** | The available options are: **Admission** - the column is going to look into the **Max Capacity Per Sch. Entry**; **Schedule** - the column is going to look into the configured schedules. Each admission can have multiple schedules, which are opening hours. |
 | **Default Schedule** | This controls how a schedule is selected. **Today** - selects the next available schedule for the current day; **Next available** - selects the next available schedule regardless of whether this schedule is valid for the current day; **Scheduled Entry Required** - forces a prompt to select a specific schedule. |

@@ -110,6 +110,5 @@ In this situation, the same POS action is set in the POS Named Action Profile fo
 
 ### Related links
 
-- [POS units](../../posunit/explanation/POSUnit.md)
 - [Configure cash drawer options](../../posunit/howto/ConfigureCashDrawerOpening.md)
 - [Create a new POS unit](../../posunit/howto/createnew.md)

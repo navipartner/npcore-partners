@@ -21,7 +21,6 @@ Sales receipts are created per each POS unit separately, but in most cases all P
 
 ### Related links
 
-- [POS units](../../posunit/explanation/POSUnit.md)
 - [Create a new POS unit (by using the existing one for reference)](../../posunit/howto/createnew.md)
 - [Configure a receipt printout for a POS unit](../../posunit/howto/receipt-printout.md)  
 - [POS unit receipt text profile](../reference/POS_unit_Receipt_profile.md) 
