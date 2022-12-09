@@ -29,6 +29,5 @@ This topic walks you through the process of setting up the cash drawer to automa
 
 ### Related links
 
-- [POS units](../explanation/POSUnit.md)
 - [Create a new POS unit (by using the existing one for reference)](./createnew.md)  
 - [How to set up the POS Customer Display](../../pos_profiles/howto/POSCustomerDisplay.md)

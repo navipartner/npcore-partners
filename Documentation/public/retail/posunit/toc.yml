@@ -2,9 +2,7 @@
   href: intro.md
 - name: Explanation
   items:
-  - name: POS (Point of Sale) units
-    href: explanation/POSUnit.md
-  - name: POS menu
+  - name: POS layout, sections and contents
     href: explanation/POS_menu.md
   - name: POS Posting Setup
     href: explanation/POS_posting_setup.md

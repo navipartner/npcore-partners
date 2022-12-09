@@ -36,4 +36,5 @@ All data you provide is automatically saved.
 ### Related links
 
 - [POS menu](../explanation/POS_menu.md)
+- [POS actions](../reference/pos_actions.md)
 - [Create a new item button in the POS](Create_a_new_item_button_in_the_POS.md)

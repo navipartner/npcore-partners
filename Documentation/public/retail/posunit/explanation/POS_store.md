@@ -13,7 +13,6 @@ POS stores can also have different accounts for postings of payments which can b
 ### Related links
 
 - [Create new POS store](../howto/Create_new_POS_store.md)
-- [POS units](../explanation/POSUnit.md)
 - [POS posting setup](../explanation/POS_posting_setup.md)
 - [POS Posting Setup](POS_posting_setup.md)
 - [Set up the POS Posting Profile](../../pos_profiles/howto/POS_Pos_Prof.md)

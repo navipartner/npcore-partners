@@ -23,3 +23,8 @@ Follow the provided steps to set up salespeople/purchasers:
 
 > [!Note]
 > It's not possible to delete former employees from this list, or reuse codes for new employees, as this can create distortions in the statistics, and in the book entries. 
+
+### Related links
+
+- [Create a POS store](Create_new_POS_store.md)
+- [Create a POS unit](createnew.md)

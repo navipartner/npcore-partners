@@ -65,7 +65,6 @@ In this example, you will initially only see the button for **Statistics**, but 
 
 ### Related links
 
-- [POS unit](POSUnit.md)
 - [Create a new button in the POS menu](../howto/add_button_to_pos_menu.md)
 - [SQL statements for Lookup POS action](../reference/sql_pos_action_filter.md)
 - [Create POS menu filters](../howto/create_pos_menu_filter.md)

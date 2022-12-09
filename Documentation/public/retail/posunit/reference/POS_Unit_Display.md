@@ -10,6 +10,5 @@ In the **POS Unit Display** you can configure device-specific information for th
 
 ### Related links
 
-- [POS unit](../explanation/POSUnit.md)
 - [POS Display Profile (reference guide)](../../pos_profiles/reference/POS_Display_profile.md)
 - [Set up the POS customer display](../../pos_profiles/howto/POSCustomerDisplay.md)
