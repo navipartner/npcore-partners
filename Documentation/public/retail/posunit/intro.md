@@ -18,3 +18,4 @@
 | [**Configure a receipt printout for a POS unit**](howto/receipt-printout.md) | Customize the sales report content that is printed out, depending on the scenario in place. |
 | [**Set up salespeople/purchasers**](howto/salespeople_setup.md) | Select which employees will be authorized to access the POS unit features, and to which degree. |
 | [**Item addons**](explanation/item_addons.md) | Learn more about the feature that allows you to associate a set of items to another (main) item in a menu format. | 
+| [**Create POS menu filters**](howto/create_pos_menu_filter.md) | Set up POS menu filters which offer a curated list of options retrieved from the data tables in Business Central. |

@@ -22,6 +22,12 @@
     href: reference/item_addons_ref.md
   - name: Item categories (reference guide)
     href: reference/item_categories_ref.md
+  - name: POS actions (reference guide)
+    href: reference/pos_actions.md
+  - name: Payment types (reference guide)
+    href: reference/payment_types.md
+  - name: POS unit display (reference guide)
+    href: reference/POS_Unit_Display.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
@@ -60,3 +66,5 @@
     href: howto/salespeople_setup.md
   - name: Create a POS theme
     href: howto/pos_theme.md
+  - name: Create POS menu filters
+    href: howto/create_pos_menu_filter.md
