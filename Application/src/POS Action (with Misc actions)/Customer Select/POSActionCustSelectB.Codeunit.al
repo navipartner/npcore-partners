@@ -21,6 +21,7 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
             if CheckCustomerBalanceOverDue(Customer."No.", BalanceAmt) then
                 if not Confirm(StrSubstNo(customerCreditWarningLbl, BalanceAmt)) then
                     exit;
+
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
