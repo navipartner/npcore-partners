@@ -88,25 +88,5 @@
             }
         }
     }
-
-    actions
-    {
-        area(navigation)
-        {
-            action("Trigger Links")
-            {
-                Caption = 'Trigger Links';
-                Image = Link;
-
-                ToolTip = 'Executes the Trigger Links action';
-                ApplicationArea = NPRNaviConnect;
-
-                trigger OnAction()
-                begin
-                    Rec.ShowEndpointTriggerLinks();
-                end;
-            }
-        }
-    }
 }
 
