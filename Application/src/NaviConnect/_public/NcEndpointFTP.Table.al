@@ -141,35 +141,9 @@
         }
     }
 
-    trigger OnDelete()
-    begin
-        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode(), Code);
-    end;
-
-    trigger OnRename()
-    begin
-        NcTriggerTaskMgt.VerifyNoEndpointTriggerLinksExist(GetEndpointTypeCode(), Code);
-    end;
-
-    var
-        NcTriggerTaskMgt: Codeunit "NPR Nc Trigger Task Mgt.";
-
     internal procedure GetEndpointTypeCode(): Code[20]
     begin
         exit('FTP');
-    end;
-
-    [Obsolete('Task Queue module is about to be removed from NpCore so NC Trigger is also going to be removed.', 'BC 20')]
-    internal procedure ShowEndpointTriggerLinks()
-    var
-        NcEndpointTriggerLink: Record "NPR Nc Endpoint Trigger Link";
-        NcEndpointTriggerLinks: Page "NPR Nc Endpoint Trigger Links";
-    begin
-        Clear(NcEndpointTriggerLinks);
-        NcEndpointTriggerLink.Reset();
-        NcEndpointTriggerLink.SetRange("Endpoint Code", Code);
-        NcEndpointTriggerLinks.SetTableView(NcEndpointTriggerLink);
-        NcEndpointTriggerLinks.RunModal();
     end;
 
     local procedure UpdateNcEndpoint()

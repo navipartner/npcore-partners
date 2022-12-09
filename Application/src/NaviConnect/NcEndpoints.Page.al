@@ -43,12 +43,6 @@
                     ToolTip = 'Specifies the value of the Enabled field';
                     ApplicationArea = NPRNaviConnect;
                 }
-                field("Linked Endpoints"; Rec."Linked Endpoints")
-                {
-
-                    ToolTip = 'Specifies the value of the Linked Endpoints field';
-                    ApplicationArea = NPRNaviConnect;
-                }
             }
         }
     }
@@ -72,27 +66,6 @@
                 begin
                     Rec.SetupEndpoint();
                 end;
-            }
-            action("Trigger Links")
-            {
-                Caption = 'Trigger Links';
-                Image = Links;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                RunObject = Page "NPR Nc Endpoint Trigger Links";
-                RunPageLink = "Endpoint Code" = FIELD(Code);
-                RunPageView = SORTING("Endpoint Code", "Trigger Code")
-                              ORDER(Ascending);
-
-                ToolTip = 'Executes the Trigger Links action';
-                ApplicationArea = NPRNaviConnect;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Trigger is also going to be removed.';
-                ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
-
-
             }
             action("Init Endpoint")
             {

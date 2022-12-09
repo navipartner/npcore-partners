@@ -2,9 +2,9 @@
 {
     Caption = 'Nc Trigger';
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Trigger is also going to be removed.';
-    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
+    ObsoleteState = Removed;
+    ObsoleteReason = 'NC Collector module removed from NpCore. We switched to Job Queue instead of using Task Queue.';
+    ObsoleteTag = 'BC 21 - Task Queue deprecating starting from 28/06/2022';
 
     fields
     {
