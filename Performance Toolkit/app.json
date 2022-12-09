@@ -36,5 +36,6 @@
   "resourceExposurePolicy": {"allowDebugging": true},
   "runtime": "10.0",
   "keyVaultUrls": ["https://npcore.vault.azure.net/"],
-  "preprocessorSymbols": ["BC21"]
+  "preprocessorSymbols": ["BC21"],
+  "applicationInsightsConnectionString": "InstrumentationKey=b045aeb7-9532-4dd6-bc93-109731e0ba61;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/"
 }
