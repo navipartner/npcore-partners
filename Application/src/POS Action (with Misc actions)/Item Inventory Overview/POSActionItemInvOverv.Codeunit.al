@@ -1,4 +1,4 @@
-﻿codeunit 6150828 "NPR POS Action: ItemInv Overv." implements "NPR IPOS Workflow"
+codeunit 6150828 "NPR POS Action: ItemInv Overv." implements "NPR IPOS Workflow"
 {
     Access = Internal;
 

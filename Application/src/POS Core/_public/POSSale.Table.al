@@ -86,6 +86,7 @@
                 GetPOSUnit();
                 "POS Store Code" := POSUnit."POS Store Code";
                 GetPOSStore();
+                CheckCustomerOnConnectedSO();
 
                 PricingProfile.GetCustomerGroupsIfProfileExist(POSUnit."POS Pricing Profile", Rec."Customer Disc. Group", Rec."Customer Price Group");
 
@@ -197,9 +198,9 @@
                     (Rec."Customer Type" = Rec."Customer Type"::Cash) and (Rec."Customer No." <> ''):
                         POSSaleTranslation.AssignLanguageCodeFrom(Rec, Contact);
                     (Rec."Customer Type" = Rec."Customer Type"::Ord) and (Rec."Customer No." = ''):
-                        POSSaleTranslation.AssignLanguageCodeFrom(Rec, POSStore);                                            
+                        POSSaleTranslation.AssignLanguageCodeFrom(Rec, POSStore);
                 end;
-                
+
                 //Ændring foretaget for at kunne validere på nummer og slette rabatter på linier, ved ændring af kundenummer.
                 Modify();
 
@@ -353,7 +354,7 @@
             Caption = 'Language Code';
             TableRelation = Language;
             DataClassification = CustomerContent;
-        }        
+        }
         field(100; "Saved Sale"; Boolean)
         {
             Caption = 'Saved Sale';
@@ -411,7 +412,7 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Sale,Annullment';
             OptionMembers = Sale,Annullment;
-        }        
+        }
         field(110; "Header Type"; Enum "NPR POS Sale Type")
         {
             Caption = 'Sale Type';
@@ -789,7 +790,7 @@
         "Server Instance ID" := Database.ServiceInstanceId();
         "User Session ID" := Database.SessionId();
         "Language Code" := POSStore."Language Code";
-        
+
         AvoidGUIDCollision();
     end;
 
@@ -958,6 +959,23 @@
                 Session.LogMessage('NPR_3b1ef24f-53d4-4570-a227-14ad27ff9f7c', 'GUID collision avoided.', Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
             Rec.SystemId := CreateGuid();
 
+        end;
+    end;
+
+    local procedure CheckCustomerOnConnectedSO()
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        CustomerExistLbl: Label 'You are trying to select customer that is different from the existing customer on selected sales order.';
+    begin
+        if xRec."Customer No." <> "Customer No." then begin
+            SaleLinePOS.SetLoadFields("Register No.", "Sales Ticket No.", "Sales Document No.");
+            SaleLinePOS.SetRange("Register No.", "Register No.");
+            SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
+            SaleLinePOS.SetFilter("Sales Document No.", '<>%1', '');
+            SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"Customer Deposit");
+            SaleLinePOS.SetFilter("No.", '<>%1', "Customer No.");
+            if not SaleLinePOS.IsEmpty() then
+                Error(CustomerExistLbl);
         end;
     end;
 }
