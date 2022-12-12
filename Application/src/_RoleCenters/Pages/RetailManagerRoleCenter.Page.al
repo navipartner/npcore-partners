@@ -290,6 +290,14 @@
                             ToolTip = 'View the report of sales for a specified month, along with the comparison with the last year''s report for the same month.';
                             ApplicationArea = NPRRetail;
                         }
+                        action("Sales Statistics by POS Store/Unit")
+                        {
+                            Caption = 'Sales Statistics by POS Store/Unit';
+                            Image = Report;
+                            RunObject = Report "NPR Sales Statistics A4 POS";
+                            ToolTip = 'Executes the Sales Statistics by POS Store/Unit action.';
+                            ApplicationArea = NPRRetail;
+                        }
                     }
                     group(Salespersons)
                     {

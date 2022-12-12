@@ -5,7 +5,7 @@ report 6014462 "NPR Sales Statistics A4 POS"
 #endif
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/SalesStatisticsA4POS.rdlc';
-    Caption = 'Sales Statistics A4 POS';
+    Caption = 'Sales Statistics by POS Store/Unit';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
