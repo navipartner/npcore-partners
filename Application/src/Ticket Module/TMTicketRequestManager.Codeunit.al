@@ -966,6 +966,8 @@
             TicketChangeRequest."Request Status" := TicketChangeRequest."Request Status"::REGISTERED;
             TicketChangeRequest."Request Status Date Time" := CurrentDateTime();
             TicketChangeRequest."Expires Date Time" := CalculateNewExpireTime();
+            TicketChangeRequest."DIY Print Order Requested" := false;
+            TicketChangeRequest."DIY Print Order At" := CreateDateTime(0D, 0T);
             TicketChangeRequest."Admission Created" := false;
             TicketChangeRequest."Superseeds Entry No." := Ticket."Ticket Reservation Entry No.";
             TicketChangeRequest."Receipt No." := '';
@@ -1096,13 +1098,15 @@
             TicketChangeRequest."Request Status" := TicketChangeRequest."Request Status"::WIP;
             TicketChangeRequest."Request Status Date Time" := CURRENTDATETIME();
             TicketChangeRequest."Expires Date Time" := CalculateNewExpireTime();
+            TicketChangeRequest."DIY Print Order Requested" := false;
+            TicketChangeRequest."DIY Print Order At" := CreateDateTime(0D, 0T);
             TicketChangeRequest."Admission Created" := false;
             TicketChangeRequest."Superseeds Entry No." := Ticket."Ticket Reservation Entry No.";
             TicketChangeRequest."Receipt No." := '';
             TicketChangeRequest."Line No." := 0;
+
             TicketBom.Get(TicketChangeRequest."Item No.", TicketChangeRequest."Variant Code", TicketChangeRequest."Admission Code");
             TicketChangeRequest."Primary Request Line" := TicketBom.Default;
-
 
             TicketAccessEntry.SetFilter(TicketAccessEntry."Ticket No.", '=%1', Ticket."No.");
             if (TicketReservationRequest."Admission Code" <> '') then
