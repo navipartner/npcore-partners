@@ -804,6 +804,7 @@
 
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
         SaleLinePOS.Description := Coupon.Description;
+        SaleLinePOS.Quantity := 1;
         SaleLineOut.InsertLine(SaleLinePOS);
         POSSession.RequestRefreshData();
 
