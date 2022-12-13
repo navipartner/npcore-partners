@@ -608,11 +608,26 @@
                 end;
             end;
 
-            if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::"BOM List", SaleLinePOS."Line Type"::Comment, SaleLinePOS."Line Type"::"POS Payment", SaleLinePOS."Line Type"::Rounding, SaleLinePOS."Line Type"::"Customer Deposit"]) then begin
-                SaleLinePOS.TestField("Gen. Bus. Posting Group");
-                SaleLinePOS.TestField("Gen. Prod. Posting Group");
-                SaleLinePOS.TestField("VAT Bus. Posting Group");
-                SaleLinePOS.TestField("VAT Prod. Posting Group");
+            case SaleLinePOS."Line Type" of
+                SaleLinePOS."Line Type"::Item,
+                SaleLinePOS."Line Type"::"Item Category":
+                    begin
+                        SaleLinePOS.TestField("Gen. Bus. Posting Group");
+                        SaleLinePOS.TestField("Gen. Prod. Posting Group");
+                        SaleLinePOS.TestField("VAT Bus. Posting Group");
+                        SaleLinePOS.TestField("VAT Prod. Posting Group");
+                    end;
+                SaleLinePOS."Line Type"::Rounding,
+                SaleLinePOS."Line Type"::"GL Payment",
+                SaleLinePOS."Line Type"::"Issue Voucher":
+                    begin
+                        if SaleLinePOS."Gen. Posting Type" <> SaleLinePOS."Gen. Posting Type"::" " then begin
+                            SaleLinePOS.TestField("Gen. Bus. Posting Group");
+                            SaleLinePOS.TestField("Gen. Prod. Posting Group");
+                            SaleLinePOS.TestField("VAT Bus. Posting Group");
+                            SaleLinePOS.TestField("VAT Prod. Posting Group");                            
+                        end;
+                    end;                    
             end;
 
             if (SaleLinePOS."Discount %" = 0) and
