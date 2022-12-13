@@ -174,6 +174,11 @@
             Caption = 'Manual Reference number on Sales Orders';
             DataClassification = CustomerContent;
         }
+        field(302; "Validate Customer No."; Boolean)
+        {
+            Caption = 'Validate Customer No.';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Voucher Qty. (Open)"; Integer)
         {
             CalcFormula = Count("NPR NpRv Voucher" WHERE("Voucher Type" = FIELD(Code),

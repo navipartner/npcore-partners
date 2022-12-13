@@ -1154,6 +1154,7 @@
         VoucherType.Get(VoucherTypeCode);
         CheckVoucherType(VoucherType, SalePOS);
 
+
         PrepareVoucherBuffer(TempNpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber);
         ValidateVoucher(TempNpRvVoucherBuffer);
 
@@ -1170,6 +1171,8 @@
             POSPaymentLine.ReverseUnrealizedSalesVAT(POSLine);
             POSLine.Modify();
         end;
+
+        CheckCustomer(VoucherType, Voucher, SalePOS);
 
         POSSession.RequestRefreshData();
         InsertNpRvSalesLine(TempNpRvVoucherBuffer, SalePOS, NpRvSalesLine, VoucherType, POSLine);
@@ -1291,6 +1294,18 @@
             exit;
         if not POSStoreGroupLine.Get(VoucherType."POS Store Group", SalePOS."POS Store Code") then
             Error(NotAllowedErr, VoucherType.TableCaption(), VoucherType.Code, SalePOS."POS Store Code");
+    end;
+
+    local procedure CheckCustomer(VoucherType: Record "NPR NpRv Voucher Type"; Voucher: Record "NPR NpRv Voucher"; var SalePOS: Record "NPR POS Sale")
+    var
+        WrongCustomerTok: Label 'Voucher %1 is issued for customer %2 and cannot be used by customer %3.';
+    begin
+        if not VoucherType."Validate Customer No." then
+            exit;
+        if Voucher."Customer No." = '' then
+            exit;
+        if SalePOS."Customer No." <> Voucher."Customer No." then
+            Error(WrongCustomerTok, Voucher."Reference No.", Voucher."Customer No.", SalePOS."Customer No.");
     end;
 
     procedure CheckVoucherTypeQty(VoucherTypeCode: Code[20])
