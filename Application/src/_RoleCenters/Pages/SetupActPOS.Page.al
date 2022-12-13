@@ -20,11 +20,6 @@
                     ToolTip = 'Specifies the number of the User Setups. By clicking you can view the list of User Setups.';
                     ApplicationArea = NPRRetail;
                 }
-                field("POS Users"; Rec."POS Users")
-                {
-                    ToolTip = 'Specifies the number of the POS Users. By clicking you can view the list of POS Users.';
-                    ApplicationArea = NPRRetail;
-                }
                 field(Salespersons; SalesPersonCountAsDec)
                 {
                     Caption = 'Salespersons';
