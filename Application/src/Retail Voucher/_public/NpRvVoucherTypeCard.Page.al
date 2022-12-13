@@ -243,6 +243,11 @@
                 group(Control6014428)
                 {
                     ShowCaption = false;
+                    field("Validate Customer No."; Rec."Validate Customer No.")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Validate Customer No. field. If this field is selected and voucher was issued to a customer this voucher can be spend only by that customer.';
+                    }
                     field("Valid Period"; Rec."Valid Period")
                     {
 
