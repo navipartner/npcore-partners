@@ -15,6 +15,7 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         ItemLookupSmartSearch();
         CustomerNo();
         CustomerNoParam();
+        POSWorkflow();
     end;
 
     local procedure SalesDocExpPaymentMethodCode()
@@ -154,6 +155,24 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
 
     end;
 
+    local procedure POSWorkflow()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Action Parameters', 'POSWorkflow');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'POSWorkflow')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        UpgradePOSWorkflow();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'POSWorkflow'));
+        LogMessageStopwatch.LogFinish();
+
+    end;
+
     local procedure ItemLookupSmartSearch()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
@@ -217,6 +236,34 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         if EanBoxParameter.FindSet() then
             repeat
                 EanBoxParameter.Rename(EanBoxParameter."Setup Code", EanBoxParameter."Event Code", EanBoxParameter."Action Code", 'CustomerNo');
+            until EanBoxParameter.Next() = 0;
+    end;
+
+    local procedure UpgradePOSWorkflow()
+    var
+        EanBoxParameter: Record "NPR Ean Box Parameter";
+    begin
+        EanBoxParameter.SetRange("Event Code", 'MEMBER_ARRIVAL');
+        EanBoxParameter.SetRange("Action Code", 'MM_MEMBER_ARRIVAL');
+        EanBoxParameter.SetRange(Name, 'POSWorkflow');
+        EanBoxParameter.SetRange(OptionValueInteger, -1);
+        if EanBoxParameter.FindSet() then
+            repeat
+                case EanBoxParameter.Value of
+                    'POSSales':
+                        begin
+                            EanBoxParameter.OptionValueInteger := 0;
+                        end;
+                    'Automatic':
+                        begin
+                            EanBoxParameter.OptionValueInteger := 1;
+                        end;
+                    'With Guests':
+                        begin
+                            EanBoxParameter.OptionValueInteger := 2;
+                        end;
+                end;
+                EanBoxParameter.Modify();
             until EanBoxParameter.Next() = 0;
     end;
 

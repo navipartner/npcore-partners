@@ -118,7 +118,7 @@
         // END;
         InitPOSParameterValue(TempPOSParameterValue);
         TempPOSParameterValue.LookupValue();
-        Value := TempPOSParameterValue.Value;
+        Validate(Value, TempPOSParameterValue.Value);
     end;
 
     local procedure ValidateValue()
