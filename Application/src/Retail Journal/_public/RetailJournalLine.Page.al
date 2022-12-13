@@ -23,7 +23,7 @@
                     trigger OnValidate()
                     begin
                         Clear(Item);
-                        if Item.Get(Rec."Item No.") then;
+                        TryToGetItem(Rec."Item No.");
                     end;
                 }
                 field("Calculation Date"; Rec."Calculation Date")
@@ -111,6 +111,9 @@
 
                     ToolTip = 'Specifies the value of the Inventory field';
                     ApplicationArea = NPRRetail;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the NPR Retail Jnl. Line FactBox';
+                    Visible = false;
                 }
                 field("Register No."; Rec."Register No.")
                 {
@@ -260,18 +263,27 @@
 
                     ToolTip = 'Specifies the value of the Net Change field';
                     ApplicationArea = NPRRetail;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the NPR Retail Jnl. Line FactBox';
+                    Visible = false;
                 }
                 field("Purchases (Qty.)"; Rec."Purchases (Qty.)")
                 {
 
                     ToolTip = 'Specifies the value of the Purchases (Qty.) field';
                     ApplicationArea = NPRRetail;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the NPR Retail Jnl. Line FactBox';
+                    Visible = false;
                 }
                 field("Sales (Qty.)"; Rec."Sales (Qty.)")
                 {
 
                     ToolTip = 'Specifies the value of the Sales (Qty.) field';
                     ApplicationArea = NPRRetail;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the NPR Retail Jnl. Line FactBox';
+                    Visible = false;
                 }
                 field("Cannot edit unit price"; Rec."Cannot edit unit price")
                 {
@@ -311,7 +323,7 @@
     var
         RecRef: RecordRef;
     begin
-        if not Item.Get(Rec."Item No.") then
+        if not TryToGetItem(Rec."Item No.") then
             Item.Init();
         Rec.calcProfit();
         RecRef.GetTable(Rec);
@@ -476,6 +488,12 @@
 
         Rec.FilterGroup(0);
         CurrPage.Update(false);
+    end;
+
+    local procedure TryToGetItem(ItemNo: Code[20]): Boolean
+    begin
+        Item.SetLoadFields("Unit Cost", "Unit Price");
+        exit(Item.Get(ItemNo));
     end;
 }
 
