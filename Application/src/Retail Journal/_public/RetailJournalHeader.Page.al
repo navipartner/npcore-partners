@@ -198,7 +198,6 @@
                     Visible = false;
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Not used';
-
                     ShowCaption = false;
                 }
             }
@@ -208,27 +207,28 @@
                               "Location Filter" = FIELD("Location Code");
                 SubPageView = SORTING("No.", "Line No.");
                 ApplicationArea = NPRRetail;
-
             }
         }
         area(factboxes)
         {
             part(Control6150641; "NPR Item Details - Invoicing")
             {
-
                 Provider = SubLine;
                 SubPageLink = "No." = FIELD("Item No.");
                 ApplicationArea = NPRRetail;
-
+            }
+            part(RetailJnlLineFactBox; "NPR Retail Jnl. Line FactBox")
+            {
+                Provider = SubLine;
+                SubPageLink = "No." = FIELD("No."), "Line No." = field("Line No.");
+                ApplicationArea = NPRRetail;
             }
             part(Control6150645; "NPR NP Attributes FactBox")
             {
                 Provider = SubLine;
                 SubPageLink = "No." = FIELD("Item No.");
                 ApplicationArea = NPRRetail;
-
             }
-
         }
     }
 
