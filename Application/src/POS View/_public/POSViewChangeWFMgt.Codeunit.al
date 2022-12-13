@@ -143,7 +143,7 @@
     local procedure TestItemInventory(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
-        ErrorMessage: Text;
+        TempErrorMessage: Record "Error Message" temporary;
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
@@ -152,27 +152,31 @@
 
         if not SetupSalesItems(POSSession, TempSaleLinePOS) then
             exit;
-        if not FindNotInStockLines(TempSaleLinePOS) then
-            exit;
+        FindNotInStockLines(TempSaleLinePOS, TempErrorMessage);
 
-        ErrorMessage := GetInventoryErrorMessage(TempSaleLinePOS);
-        Error(ErrorMessage);
+        if TempErrorMessage.HasErrors(false) then
+            TempErrorMessage.ShowErrorMessages(true);
     end;
 
-    local procedure FindNotInStockLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
+    local procedure FindNotInStockLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var ErrorMessage: Record "Error Message")
+    var        
+        Msg: Text;
     begin
         if not TempSaleLinePOS.FindSet() then
-            exit(false);
+            exit;
 
         repeat
             TempSaleLinePOS."MR Anvendt antal" := CalcInventory(TempSaleLinePOS);
-            if TempSaleLinePOS."MR Anvendt antal" >= TempSaleLinePOS."Quantity (Base)" then
-                TempSaleLinePOS.Delete()
-            else
-                TempSaleLinePOS.Modify();
+            if TempSaleLinePOS."MR Anvendt antal" < TempSaleLinePOS."Quantity (Base)" then begin
+                Clear(Msg);
+                Msg := TempSaleLinePOS."No.";
+                Msg += ' ' + TempSaleLinePOS.Description;
+                if TempSaleLinePOS."Description 2" <> '' then
+                    Msg += ' ' + TempSaleLinePOS."Description 2";
+                Msg += ': ' + Format(TempSaleLinePOS."MR Anvendt antal");  
+                ErrorMessage.LogSimpleMessage(ErrorMessage."Message Type"::Error, Msg);              
+            end;
         until TempSaleLinePOS.Next() = 0;
-
-        exit(not TempSaleLinePOS.IsEmpty());
     end;
 
     local procedure CalcInventory(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Decimal
