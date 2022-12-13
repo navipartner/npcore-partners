@@ -78,7 +78,7 @@ codeunit 6060004 "NPR NpDc Module Issue: OnSaleB"
         Coupon."Max Use per Sale" := NpDcSaleLinePOSNewCoupon."Max Use per Sale";
         Coupon.Insert(true);
 
-        CouponMgt.PostIssueCoupon2(Coupon, NpDcSaleLinePOSNewCoupon.Quantity, NpDcSaleLinePOSNewCoupon."Discount Type");
+        CouponMgt.PostIssueCoupon2(Coupon, NpDcSaleLinePOSNewCoupon.Quantity, NpDcSaleLinePOSNewCoupon."Amount per Qty.");
 
         TempCoupon.Init();
         TempCoupon := Coupon;
