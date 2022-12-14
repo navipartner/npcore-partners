@@ -316,6 +316,13 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SS-QTY-', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR SS Action - Qty Decrease";
     }
+
+    value(64; CREATE_COLLECT_ORD)
+    {
+        Caption = 'CREATE_COLLECT_ORD', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NpCs POSAction Cre. Order";
+    }
+
     value(57; EFT_NETS_CLOUD_TRX)
     {
         Caption = 'EFT_NETS_CLOUD_TRX', Locked = true, MaxLength = 20;
