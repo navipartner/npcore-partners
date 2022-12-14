@@ -554,7 +554,7 @@
             Line := XMLNode.AsXmlElement().InnerText();
             case CopyStr(Line, 1, 2) of
                 '01':
-                    PrintThermalLine(Printer, 'm', 'Control', false, 'LEFT', true, false); //Tax free logo bitmap
+                    PrintThermalLine(Printer, 'TAXFREE', 'LOGO', false, 'LEFT', true, false); //Tax free logo bitmap
                 '02':
                     PrintThermalLine(Printer, CopyStr(Line, 3), 'B21', true, 'LEFT', true, false);
                 '03':
@@ -581,7 +581,7 @@
                 '12':
                     PrintThermalLine(Printer, ' ', 'A11', false, 'LEFT', true, false);
                 '13':
-                    PrintThermalLine(Printer, 'P', 'Control', false, 'LEFT', true, false);
+                    PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
                 '14':
                     PrintThermalLine(Printer, CopyStr(Line, 3), 'A11', false, 'LEFT', false, false);
                 '21': //URL for phone scan of voucher encoded as QR
@@ -594,8 +594,8 @@
                     ; //remaining print is base64 encoded
                 '70':
                     begin //Store logo bitmap
-                        PrintThermalLine(Printer, 'h', 'Control', false, 'LEFT', true, false);
-                        PrintThermalLine(Printer, 'G', 'Control', false, 'LEFT', true, false);
+                        PrintThermalLine(Printer, 'STOREDLOGO_1', 'COMMAND', false, 'LEFT', true, false);
+                        PrintThermalLine(Printer, 'STOREDLOGO_2', 'COMMAND', false, 'LEFT', true, false);
                     end;
                 '71':
                     ; //Store signature bitmap

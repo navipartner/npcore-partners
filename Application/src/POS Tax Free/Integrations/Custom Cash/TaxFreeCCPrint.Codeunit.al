@@ -85,8 +85,8 @@
                 end;
             end;
         end;
-        Printer.SetFont('Control');
-        Printer.AddLine('P');
+        Printer.SetFont('COMMAND');
+        Printer.AddLine('PAPERCUT');
         Printer.ProcessBuffer(CODEUNIT::"NPR Tax Free Receipt", Enum::"NPR Line Printer Device"::Epson);
     end;
 
