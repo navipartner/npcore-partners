@@ -194,10 +194,10 @@
         JToken: JsonToken;
     begin
         Request.Get('CardDigits', JToken);
-        EftTransactionRequest."Card Number" := copystr(format(JToken.AsValue().AsInteger()), 1, MaxStrLen(EftTransactionRequest."Card Number"));
+        EftTransactionRequest."Card Number" := CopyStr(format(JToken.AsValue().AsText()), 1, MaxStrLen(EftTransactionRequest."Card Number"));
 
         Request.Get('CardHolder', JToken);
-        EftTransactionRequest."Card Name" := copystr(JToken.AsValue().AsText(), 1, MaxStrLen(EftTransactionRequest."Card Name"));
+        EftTransactionRequest."Card Name" := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(EftTransactionRequest."Card Name"));
 
         Request.Get('ApprovalCode', JToken);
         EftTransactionRequest."Authorisation Number" := copystr(JToken.AsValue().AsText(), 1, MaxStrLen(EftTransactionRequest."Authorisation Number"));

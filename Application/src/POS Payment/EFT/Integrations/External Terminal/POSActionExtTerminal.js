@@ -1,10 +1,16 @@
 let main = async ({ context, workflow, popup, captions }) => {
+  debugger;
   let result = { "success": false, "tryEndSale": false };
 
   if (context.request.AmountIn > 0) {
     if (context.request.PromptCardDigits) {
-      context.request.CardDigits = await popup.intpad({ caption: captions.PromptCardDigits });
-      if (context.request.CardDigits === null || context.request.CardDigits === 0) return (result);
+      context.request.CardDigits = await popup.stringpad({ caption: captions.PromptCardDigits });
+      if (context.request.CardDigits === null || context.request.CardDigits === "") return (result);
+      var isNumber = /^(\d+,)*(\d+)$/.test(context.request.CardDigits);
+      if (!isNumber) {
+        await popup.error('Please enter numbers only.')
+        return (result);
+      };
     };
 
     if (context.request.PromptCardHolder) {
@@ -27,4 +33,4 @@ let main = async ({ context, workflow, popup, captions }) => {
   result.success = success;
   result.tryEndSale = endSale;
   return (result);
-}
+};
