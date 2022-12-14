@@ -90,7 +90,7 @@ table 6014680 "NPR POS Entry Media Info"
         CheckOverrideImage(POSEntryMediaInfo);
 
         Clear(Camera);
-        Camera.SetQuality(50);
+        Camera.SetQuality(100);
         Camera.RunModal();
         if not Camera.HasPicture() then
             Error('');
