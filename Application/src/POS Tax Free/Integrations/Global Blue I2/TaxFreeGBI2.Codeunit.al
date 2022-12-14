@@ -621,8 +621,8 @@
         end;
 
         if StringUpper.Contains('<TEAROFF>') or StringUpper.Contains('<TEAROFF/>') then begin
-            Printer.SetFont('Control');
-            Printer.AddLine('P');
+            Printer.SetFont('COMMAND');
+            Printer.AddLine('PAPERCUT');
             exit;
         end;
 
