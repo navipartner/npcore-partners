@@ -5518,12 +5518,6 @@ End Function
         <Field Name="SalespersonSumarylbl">
           <DataField>SalespersonSumarylbl</DataField>
         </Field>
-        <Field Name="PrintVouchers_">
-          <DataField>PrintVouchers_</DataField>
-        </Field>
-        <Field Name="PrintTurnover_">
-          <DataField>PrintTurnover_</DataField>
-        </Field>
         <Field Name="PrintDiscountAmt_">
           <DataField>PrintDiscountAmt_</DataField>
         </Field>
@@ -5533,32 +5527,8 @@ End Function
         <Field Name="PrintDiscountTotal_">
           <DataField>PrintDiscountTotal_</DataField>
         </Field>
-        <Field Name="PrintCounting_">
-          <DataField>PrintCounting_</DataField>
-        </Field>
-        <Field Name="PrintClosing_">
-          <DataField>PrintClosing_</DataField>
-        </Field>
-        <Field Name="PrintVAT_">
-          <DataField>PrintVAT_</DataField>
-        </Field>
-        <Field Name="PrintAttachedBins_">
-          <DataField>PrintAttachedBins_</DataField>
-        </Field>
-        <Field Name="PrintEmptyLines_">
-          <DataField>PrintEmptyLines_</DataField>
-        </Field>
         <Field Name="PrintNetTurnover_">
           <DataField>PrintNetTurnover_</DataField>
-        </Field>
-        <Field Name="PrintDiscount_">
-          <DataField>PrintDiscount_</DataField>
-        </Field>
-        <Field Name="PrintCountedAmtInclFloat_">
-          <DataField>PrintCountedAmtInclFloat_</DataField>
-        </Field>
-        <Field Name="PrintEFT_">
-          <DataField>PrintEFT_</DataField>
         </Field>
         <Field Name="SalesCount_">
           <DataField>SalesCount_</DataField>

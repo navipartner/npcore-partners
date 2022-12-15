@@ -154,7 +154,6 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
         NpGpUserSaleReturn: Page "NPR NpGp User Sale Return";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
-        JSON: Codeunit "NPR POS JSON Helper";
         XmlDoc: XmlDocument;
         Response: Text;
         ServiceName: Text;
@@ -169,7 +168,6 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
         RequestHeaders: HttpHeaders;
         ContentHeaders: HttpHeaders;
         ContextXMLText: Text;
-        ResponseXMLText: Text;
         Position1, Position2, Length : Integer;
         POSSession: Codeunit "NPR POS Session";
         RefNoBlankErr: Label 'The reference number can not be blank or empty';
@@ -268,7 +266,6 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
-        JSON: Codeunit "NPR POS JSON Helper";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";

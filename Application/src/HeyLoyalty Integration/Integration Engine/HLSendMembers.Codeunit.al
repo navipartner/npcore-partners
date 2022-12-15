@@ -14,7 +14,6 @@ codeunit 6059997 "NPR HL Send Members"
 
     var
         HLIntegrationEvents: Codeunit "NPR HL Integration Events";
-        QueryingHeyLoyaltyLbl: Label 'Querying HeyLoyalty...';
 
     local procedure SendMember(var NcTask: Record "NPR Nc Task")
     var
