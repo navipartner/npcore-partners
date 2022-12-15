@@ -14,7 +14,6 @@
     var
         Text000: Label 'When POS View is changed to Payment';
         Text001: Label 'Block payment if Sale contains Items with insufficient Inventory';
-        Text002: Label 'Insufficient Inventory:';
         Text003: Label 'When POS View is changed from Login to Sale';
 
     // Discovery
@@ -252,27 +251,5 @@
             TempSaleLinePOS := SaleLinePOS;
             TempSaleLinePOS.Insert();
         end;
-    end;
-
-    local procedure GetInventoryErrorMessage(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary) ErrorMessage: Text
-    begin
-        ErrorMessage := Text002;
-        if TempSaleLinePOS.FindSet() then
-            repeat
-                ErrorMessage += NewLine() + TempSaleLinePOS."No.";
-                ErrorMessage += ' ' + TempSaleLinePOS.Description;
-                if TempSaleLinePOS."Description 2" <> '' then
-                    ErrorMessage += ' ' + TempSaleLinePOS."Description 2";
-                ErrorMessage += ': ' + Format(TempSaleLinePOS."MR Anvendt antal");
-            until TempSaleLinePOS.Next() = 0;
-
-        exit(ErrorMessage);
-    end;
-
-    local procedure NewLine() CRLF: Text[2]
-    begin
-        CRLF[1] := 13;
-        CRLF[2] := 10;
-        exit(CRLF);
     end;
 }

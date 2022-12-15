@@ -155,10 +155,10 @@ page 6150720 "NPR HL Integration Setup"
 
     trigger OnOpenPage()
     begin
-        Rec.Reset;
-        if not Rec.Get then begin
-            Rec.Init;
-            Rec.Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
         UpdateControlVisibility();
     end;

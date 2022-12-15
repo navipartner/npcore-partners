@@ -25,10 +25,8 @@ report 6014461 "NPR HL Import Members"
     var
         Headers: Dictionary of [Integer, Text];
         Window: Dialog;
-        EntryNo: Integer;
         RecNo: Integer;
         TotalRecNo: Integer;
-        CellValueAsText: Text[250];
         DialogTxt01Lbl: Label 'Importing HeyLoyalty Members...\\';
         DialogTxt02Lbl: Label '@1@@@@@@@@@@@@@@@@@@@@@@@@@';
         NothingToImportErr: Label 'There is nothing to do.';
@@ -77,16 +75,6 @@ report 6014461 "NPR HL Import Members"
             SheetName := TempExcelBuffer.SelectSheetsNameStream(ExcelFileStream);
         if SheetName = '' then
             Error('');
-    end;
-
-    local procedure GetCellValueAsText(RowNo: Integer; ColumnNo: Integer; MaxLength: Integer; var CellValueAsText: Text[250]): Boolean
-    begin
-        if not TempExcelBuffer.Get(RowNo, ColumnNo) then
-            exit(false);
-        CellValueAsText := DelChr(TempExcelBuffer."Cell Value as Text", '<>');
-        if MaxLength > 1 then
-            CellValueAsText := CopyStr(CellValueAsText, 1, MaxLength);
-        exit(CellValueAsText <> '');
     end;
 
     [TryFunction]

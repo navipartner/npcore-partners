@@ -397,12 +397,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
                 column(SalespersonSumarylbl; SalespersonSumarylbl)
                 {
                 }
-                column(PrintVouchers_; PrintVouchers)
-                {
-                }
-                column(PrintTurnover_; PrintTurnOver)
-                {
-                }
                 column(PrintDiscountAmt_; PrintDiscountAmt)
                 {
                 }
@@ -412,31 +406,7 @@ report 6014462 "NPR Sales Statistics A4 POS"
                 column(PrintDiscountTotal_; PrintDiscountTotal)
                 {
                 }
-                column(PrintCounting_; PrintCounting)
-                {
-                }
-                column(PrintClosing_; PrintClosing)
-                {
-                }
-                column(PrintVAT_; PrintVAT)
-                {
-                }
-                column(PrintAttachedBins_; PrintAttachedBins)
-                {
-                }
-                column(PrintEmptyLines_; PrintEmptyLines)
-                {
-                }
                 column(PrintNetTurnover_; PrintNetTurnover)
-                {
-                }
-                column(PrintDiscount_; PrintDiscount)
-                {
-                }
-                column(PrintCountedAmtInclFloat_; PrintCountedAmtInclFloat)
-                {
-                }
-                column(PrintEFT_; PrintEFT)
                 {
                 }
                 column(SalesCount_; SalesCount_)
@@ -583,8 +553,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
                         begin
                             VarTax := 1;
                             VarMain := 0;
-                            VarBin := 0;
-                            VarAttachedBin := 0;
                         end;
                     }
                     dataitem("POS Payment Line"; "NPR POS Entry Payment Line")
@@ -773,101 +741,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
         }
     }
 
-    requestpage
-    {
-        SaveValues = true;
-
-        layout
-        {
-            area(Content)
-            {
-                group("Print Options")
-                {
-                    Caption = 'Print Options';
-                    field(PrintTurnOver; PrintTurnOver)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Print TurnOver';
-                        ToolTip = 'Specifies the value of the Print TurnOver field.';
-                    }
-                    field(PrintDiscount; PrintDiscount)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Print Discount';
-                        ToolTip = 'Specifies the value of the Print Discount field.';
-                    }
-                    field(PrintVAT; PrintVAT)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Print VAT';
-                        ToolTip = 'Specifies the value of the Print VAT field.';
-                    }
-                    field(PrintEFT; PrintEFT)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Print EFT';
-                        ToolTip = 'Specifies the value of the Print EFT field.';
-                    }
-                    field(PrintVouchers; PrintVouchers)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Print Vouchers';
-                        ToolTip = 'Specifies the value of the Print Vouchers field.';
-                    }
-                    field(PrintCounting; PrintCounting)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Print Counting';
-                        ToolTip = 'Specifies the value of the Print Counting field.';
-                    }
-                    field(PrintCountedAmtInclFloat; PrintCountedAmtInclFloat)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Print Counted Amt Incl Float';
-                        ToolTip = 'Specifies the value of the Print Counted Amt Incl Float field.';
-                    }
-                    field("Print Closing"; PrintClosing)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Print Closing';
-                        ToolTip = 'Specifies the value of the Print Closing field.';
-                    }
-                    field(PrintAttachedBins; PrintAttachedBins)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Print Attached Bins';
-                        ToolTip = 'Specifies the value of the Print Attached Bins field.';
-                    }
-                    field(PrintEmptyLines; PrintEmptyLines)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Print Lines where Value is Zero.';
-                        ToolTip = 'Specifies the value of the Print Lines where Value is Zero. field.';
-                    }
-                }
-            }
-        }
-
-        actions
-        {
-        }
-
-        trigger OnOpenPage()
-        var
-            UserSetup: Record "User Setup";
-        begin
-            PrintTurnOver := true;
-            PrintDiscount := true;
-            PrintVAT := true;
-            PrintEFT := true;
-            PrintVouchers := true;
-            PrintCounting := true;
-            PrintCountedAmtInclFloat := true;
-            PrintClosing := true;
-            PrintAttachedBins := true;
-        end;
-    }
-
     labels
     {
         ProfitExclVatLbl = 'Price Excl. VAT';
@@ -902,36 +775,19 @@ report 6014462 "NPR Sales Statistics A4 POS"
 
     var
         CompanyInfo: Record "Company Information";
-        ILEntry: Record "Item Ledger Entry";
         POSEntry: Record "NPR POS Entry";
-        POSEntryPayment2: Record "NPR POS Entry";
-        PosEntrySalesPerson: Record "NPR POS Entry";
         POSEntryValue: Record "NPR POS Entry";
-        NPRPOSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSSalesLineValue: Record "NPR POS Entry Sales Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
         Salesperson: Record "Salesperson/Purchaser";
-        PrintAttachedBins: Boolean;
-        PrintClosing: Boolean;
-        PrintCountedAmtInclFloat: Boolean;
-        PrintCounting: Boolean;
-        PrintDiscount: Boolean;
         PrintDiscountAmt: Boolean;
         PrintDiscountPerc: Boolean;
         PrintDiscountTotal: Boolean;
-        PrintEFT: Boolean;
-        PrintEmptyLines: Boolean;
         PrintNetTurnover: Boolean;
         PrintReceipts: Boolean;
         PrintSales: Boolean;
         PrintTerminals: Boolean;
-        PrintTurnOver: Boolean;
-        PrintVAT: Boolean;
-        PrintVouchers: Boolean;
-        VarPrintAmt: Boolean;
-        VarPrintPerc: Boolean;
-        VarPrintTotal: Boolean;
         AdjitemCostTotal: Decimal;
         AdjProfitLCY: Decimal;
         AdjProfitPct: Decimal;
@@ -940,9 +796,7 @@ report 6014462 "NPR Sales Statistics A4 POS"
         CashDraweropnCount_: Decimal;
         CreditItemQuantitySum: Decimal;
         CreditItemSalesLCY: Decimal;
-        CreditNetSalesLCY: Decimal;
         CreditNetTurnOverLCY: Decimal;
-        CreditRealAmtLCY: Decimal;
         CreditRealReturnAmtLCY: Decimal;
         CreditRealSaleAmtLCY: Decimal;
         CreditTurnoverLCY: Decimal;
@@ -954,7 +808,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
         DirectItemReturnsQuantity: Decimal;
         DirectItemSalesLCY: Decimal;
         DirectItemSalesQuantity: Decimal;
-        DirectNegativeTurnoverLCY: Decimal;
         DirectNetTurnoverLCY: Decimal;
         DirectReturnSalesLCY: Decimal;
         DirectSalesLCY: Decimal;
@@ -965,7 +818,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
         IssuesVouchersLCy: Decimal;
         itemCostTotal: Decimal;
         ItemLineSalesQty: Decimal;
-        itemLinesSalesQTY: Decimal;
         ItemQty: Decimal;
         ItemQtySalesTicket: Decimal;
         LocalCurrencyLCY: Decimal;
@@ -977,36 +829,26 @@ report 6014462 "NPR Sales Statistics A4 POS"
         ReturnSalesCount_: Decimal;
         RoundingLCY: Decimal;
         SalesCount_: Decimal;
-        SumOfILELineCurrentYear: Decimal;
         TotalDiscountLCY: Decimal;
-        TotalNetDiscountLCY: Decimal;
         TurnoverAvgSalesTicket: Decimal;
         TurnoverLCY: Decimal;
         DirectItemReturnsLineCount: Integer;
         DirectItemSalesLineCount: Integer;
         I: Integer;
         ItemLines: Integer;
-        NoOfSalesTicket: Integer;
-        salesCountSP: Integer;
-        VarAttachedBin: Integer;
-        VarBin: Integer;
-        VarDenomination: Integer;
         VarMain: Integer;
         VarTax: Integer;
         AmtInclTaxlbl_: Label 'Amount Including Tax';
         AttachedPaymentBinslbl: Label 'Attached Payment Bins';
-        BalancedByLbl: Label 'Register Balanced By';
         BOMDiscountLCYlbl_: Label 'BOM Discount (LCY)';
         BOMDiscountPerclbl_: Label 'BOM Discount %';
         CampaignDiscountLCYlbl_: Label 'Campaign Discount (LCY)';
         CampaignDiscountPerclbl_: Label 'Campaign Discount %';
         CancelledSalesCountlbl_: Label 'Cancelled Sales Count';
-        CashDrawerOpenCountlbl_: Label 'Cash Drawer Open Count';
         CashMovementLCYlbl_: Label 'Local Currency (LCY)';
         CashTerminalLCYlbl_: Label 'Cash Terminal (LCY)';
         ClosingDatelbl: Label 'Date Filter';
         Closinglbl: Label 'Closing';
-        CountedAmtInclFloatlbl: Label 'Counted Amount Incl Float';
         Countinglbl: Label 'Counting';
         CreatedCreditVoucherLCYlbl_: Label 'Created Credit Voucher (LCY)';
         CreditNetTurnOverLCYlbl_: Label 'Credit Net Turnover (LCY)';
@@ -1025,7 +867,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
         DirectNetTurnoverLCYlbl_: Label 'Direct Net Turnover (LCY)';
         DirectReturnSalesLCYlbl_: Label 'Direct Item Returns (LCY)';
         DirectSalesLCYlbl_: Label 'Direct Item Sales (LCY)';
-        DirectTurnoverlbl: Label 'Direct Turnover (LCY)';
         DirectTurnoverLCYlbl_: Label 'Direct Turnover (LCY)';
         DiscountAmtlbl: Label 'Discount Amount';
         Discountlbl: Label 'Discount';
@@ -1037,8 +878,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
         GLPaymentLCYlbl_: Label 'GL Payment (LCY)';
         InvoicedSalesLCYlbl_: Label 'Credit Net Sales Amount (LCY)';
         IssuedVoucherLCYlbl_: Label 'Issued Vouchers (LCY)';
-        LblXReport: Label 'X-Report';
-        LblZReport: Label 'Z-Report';
         LineDiscountLCYlbl_: Label 'Line Discount (LCY)';
         LineDiscountPerclbl_: Label 'Line Discount %';
         LocalCurrencyLCYlbl_: Label 'Local Currency (LCY)';
@@ -1046,12 +885,10 @@ report 6014462 "NPR Sales Statistics A4 POS"
         MixDiscountLCYlbl_: Label 'Mix Discount (LCY)';
         MixDiscountPerclbl_: Label 'Mix Discount %';
         NetCostLCYlbl_: Label 'Net Cost (LCY)';
-        NetTurnoverlbl: Label 'Net Turnover';
         NetTurnoverLCYlbl_: Label 'Net Turnover (LCY)';
         OpeningHrsLbl: Label 'Opening Hours';
         OtherCreditCardLCYlbl_: Label 'Other Credit Card (LCY)';
         POSUnitLbl: Label 'POS Unit';
-        PrintDiscountlbl: Label 'Print Discount';
         ProfitAmountLCYlbl_: Label 'Profit Amount (LCY)';
         ProfitPerclbl_: Label 'Profit %';
         QtyDiscountLCYlbl_: Label 'Quantity Discount (LCY)';
@@ -1079,7 +916,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
         TaxTypelbl_: Label 'Tax Type';
         TerminalCardLCYlbl_: Label 'EFT (LCY)';
         Terminalslbl: Label 'Terminals';
-        Text000: Label 'You need to select Print Discount first.';
         TotalDiscountLClbl_: Label 'Total Discount (LCY)';
         TotalDiscountLCYlbl_: Label 'Total Discount (LCY)';
         TotalDiscountPerclbl_: Label 'Total Discount %';
@@ -1088,17 +924,8 @@ report 6014462 "NPR Sales Statistics A4 POS"
         VATIdentifierlbl_: Label 'VAT Identifier';
         VATTaxSummarylbl: Label 'VAT & TAX Summary';
         Voucherslbl: Label 'Vouchers';
-        WithLbl: Label 'With';
         Workshiftlbl: Label 'Workshift';
-        VarBalancedBy: Text;
         VarReportTitle: Text;
-
-    local procedure "Pct."(Tal1: Decimal; Tal2: Decimal): Decimal
-    begin
-        if Tal2 = 0 then
-            exit(0);
-        exit(Tal1 / Tal2 * 100);
-    end;
 
     procedure Divider("Tal 1": Decimal; "Tal 2": Decimal): Decimal
     begin
