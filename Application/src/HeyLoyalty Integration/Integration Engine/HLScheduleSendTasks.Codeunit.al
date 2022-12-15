@@ -69,7 +69,7 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
         if not NcTaskSetup.IsEmpty() then
             exit;
 
-        NcTaskSetup.Init;
+        NcTaskSetup.Init();
         NcTaskSetup."Entry No." := 0;
         NcTaskSetup."Task Processor Code" := TaskProcessorCode;
         NcTaskSetup."Table No." := TableId;
@@ -78,7 +78,7 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
             TableId = Database::"NPR HL HeyLoyalty Member":
                 NcTaskSetup."Codeunit ID" := Codeunit::"NPR HL Send Members";
         end;
-        NcTaskSetup.Insert;
+        NcTaskSetup.Insert();
     end;
 
     procedure NowWithDelayInSeconds(NoOfSeconds: Integer): DateTime
@@ -95,7 +95,7 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
     var
         NcTask2: Record "NPR Nc Task";
     begin
-        NcTask.Init;
+        NcTask.Init();
         NcTask."Entry No." := 0;
         NcTask."Task Processor Code" := GetHeyLoyaltyTaskProcessorCode();
         NcTask.Type := TaskType;

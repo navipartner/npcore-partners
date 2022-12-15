@@ -48,7 +48,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return" implements "NPR IPOS Workflow"
     var
         POSAction: Record "NPR POS Action";
         Invoice: Boolean;
-        ShowMsg: Boolean;
         NegBalDocType: Option ReturnOrder,CreditMemo,Restrict;
         ForcePricesIncVAT: Boolean;
         Ask: Boolean;
@@ -95,7 +94,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return" implements "NPR IPOS Workflow"
             exit;
 
         Invoice := false;
-        ShowMsg := true;
         NegBalDocType := NegBalDocType::ReturnOrder;
         ForcePricesIncVAT := false;
         Ask := false;
@@ -197,10 +195,7 @@ codeunit 6151169 "NPR POS Action: NpGp Return" implements "NPR IPOS Workflow"
         POSSession: Codeunit "NPR POS Session";
     begin
         POSActionNpGpReturnB.CheckSetup(POSSession);
-        FindReference(Context, POSSession, TempNpGpPOSSalesLine, TempNpGpPOSSalesEntry, TempNpGpPOSPaymentLine);
-        // if CompanyName = TempNpGpPOSSalesEntry."Original Company" then begin
-        //     Error(UseNormalReverseAction)
-        // end else
+        FindReference(Context, TempNpGpPOSSalesLine, TempNpGpPOSSalesEntry, TempNpGpPOSPaymentLine);
         CreateGlobalReverseSale(Context, TempNpGpPOSSalesLine, TempNpGpPOSSalesEntry, TempNpGpPOSPaymentLine);
 
         POSSession.ChangeViewSale();
@@ -219,7 +214,7 @@ codeunit 6151169 "NPR POS Action: NpGp Return" implements "NPR IPOS Workflow"
             Error(ReasonRequiredErr);
     end;
 
-    local procedure FindReference(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line" temporary)
+    local procedure FindReference(Context: Codeunit "NPR POS JSON Helper"; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line" temporary)
     var
         ReferenceNumber: Text;
         FullSale: Boolean;
@@ -232,12 +227,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return" implements "NPR IPOS Workflow"
 
     local procedure CreateGlobalReverseSale(Context: Codeunit "NPR POS JSON Helper"; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry"; var TempNpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line" temporary)
     var
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        Item: Record Item;
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
         ReturnReasonCode: Code[10];
         FullSale: Boolean;
     begin

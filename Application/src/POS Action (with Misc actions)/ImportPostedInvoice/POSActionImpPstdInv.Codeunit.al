@@ -57,13 +57,13 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
     begin
         case Step of
             'SelectInvoice':
-                FrontEnd.WorkflowResponse(Step_SelectInvoice(Context, FrontEnd, Setup));
+                Step_SelectInvoice(Context);
             'ScanLabel':
-                FrontEnd.WorkflowResponse(Step_ScanLabel(Context, FrontEnd, Setup, Sale));
+                Step_ScanLabel(Context, Sale);
         end;
     end;
 
-    local procedure Step_SelectInvoice(Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
+    local procedure Step_SelectInvoice(Context: Codeunit "NPR POS JSON Helper")
     var
         SalesInvHeader: Record "Sales Invoice Header";
         POSSale: Codeunit "NPR POS Sale";
@@ -116,7 +116,7 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
             POSActImpPstdInvB.UpdateSalesPerson(POSSale, SalesInvHeader);
     end;
 
-    local procedure Step_ScanLabel(Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup"; Sale: Codeunit "NPR POS Sale") Response: JsonObject
+    local procedure Step_ScanLabel(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale")
     var
         OrderNo: Code[20];
         SelectCustomer: Boolean;

@@ -19,10 +19,12 @@ page 6150624 "NPR POS Dimension Value"
             {
                 Editable = true;
                 ApplicationArea = NPRRetail;
+                Caption = 'Search Box';
+                ToolTip = 'This is a search box for general search.';
 
                 trigger OnValidate();
                 begin
-                    FilterList;
+                    FilterList();
                     Clear(SearchBox);
                     if CurrentClientType in [ClientType::Phone, ClientType::Tablet] then
                         CurrPage.SetFieldFocus.SetFocusOnFieldPhone('SearchBox')
@@ -135,7 +137,6 @@ page 6150624 "NPR POS Dimension Value"
 
     var
         GLSetup: Record "General Ledger Setup";
-        Text000: Label 'Shortcut Dimension %1';
         [InDataSet]
         Emphasize: Boolean;
         [InDataSet]

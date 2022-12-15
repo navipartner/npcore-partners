@@ -36,7 +36,7 @@ page 6059928 "NPR APIV1 PBIItemCategory"
                 {
                     Caption = 'Parent Category', Locked = true;
                 }
-                field(hasChildren; Rec.HasChildren)
+                field(hasChildren; Rec.HasChildren())
                 {
                     Caption = 'Has Children', locked = true;
                 }

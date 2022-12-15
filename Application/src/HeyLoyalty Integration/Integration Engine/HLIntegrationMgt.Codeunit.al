@@ -95,7 +95,6 @@ codeunit 6059993 "NPR HL Integration Mgt."
     local procedure TrySendHeyLoyaltyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: text; Url: Text; var ResponseText: Text)
     var
         Client: HttpClient;
-        Content: HttpContent;
         Headers: HttpHeaders;
         RequestMsg: HttpRequestMessage;
         ResponseMsg: HttpResponseMessage;

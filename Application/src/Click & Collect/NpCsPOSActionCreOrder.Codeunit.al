@@ -270,17 +270,6 @@
         NpCsPOSActionCreOrderB.ExportToDocument(CustomerNo, RetailSalesDocMgt, checkCustomerCredit);
     end;
 
-    local procedure HandlePrepayment(Context: codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; PrepaymentPct: Decimal; PrintPrepaymentInvoice: Boolean; PreviousSalePOS: Record "NPR POS Sale")
-    var
-        NpCsPOSActionCreOrderB: Codeunit "NPR NpCs POSAction Cr. Order B";
-        PrepaymentFailedLbl: Label 'Sale was exported correctly but prepayment in new sale failed: %1', Comment = '%1=GetLastErrorText()';
-    begin
-        if not NpCsPOSActionCreOrderB.HandlePrepayment(RetailSalesDocMgt, PrepaymentPct, PrintPrepaymentInvoice, PreviousSalePOS) then begin
-            Context.SetContext('HandlePrepaymentFailed', true);
-            Context.SetContext('HandlePrepaymentFailReasonMsg', Strsubstno(PrepaymentFailedLbl, GetLastErrorText()));
-        end;
-    end;
-
     procedure ActionCode(): Text
     begin
         exit(Format(enum::"NPR POS Workflow"::CREATE_COLLECT_ORD));

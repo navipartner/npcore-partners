@@ -167,7 +167,6 @@
 
     procedure CheckAdminPINAssigned(DETSS: Record "NPR DE TSS")
     var
-        DESecretMgt: Codeunit "NPR DE Secret Mgt.";
         AdminPinNotAssignedErr: Label 'Please assign admin PIN to Technical Security System (TSS) %1 first.', Comment = 'TSS Code';
     begin
         if not DESecretMgt.HasSecretKey(DETSS.AdminPINSecretLbl()) then

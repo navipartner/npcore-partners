@@ -530,7 +530,6 @@
     local procedure PrintExchangeLabelOnSaleSingle(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
         Setting: Option Single,"Line Quantity","All Lines",Selection,Package;
-        PreventNegativeQty: Boolean;
         ValidFromDate: Date;
         PrintLines: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -557,7 +556,6 @@
     local procedure PrintExchangeLabelOnSaleLineQty(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
         Setting: Option Single,"Line Quantity","All Lines",Selection,Package;
-        PreventNegativeQty: Boolean;
         ValidFromDate: Date;
         PrintLines: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -584,7 +582,6 @@
     local procedure PrintExchangeLabelOnSaleLineAllLines(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
         Setting: Option Single,"Line Quantity","All Lines",Selection,Package;
-        PreventNegativeQty: Boolean;
         ValidFromDate: Date;
         PrintLines: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";

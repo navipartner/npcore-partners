@@ -28,13 +28,13 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale" implements "NPR IPOS Workflow"
     begin
         case Step of
             'coupon_type_input':
-                FrontEnd.WorkflowResponse(OnActionCouponTypeInput(Context));
+                FrontEnd.WorkflowResponse(OnActionCouponTypeInput());
             'issue_coupon':
                 OnActionIssueCoupon(Context, Sale);
         end;
     end;
 
-    local procedure OnActionCouponTypeInput(JSON: Codeunit "NPR POS JSON Helper") Response: JsonObject
+    local procedure OnActionCouponTypeInput() Response: JsonObject
     var
         CouponTypeCode: Text;
         NpDcModuleIssueOnSaleB: Codeunit "NPR NpDc Module Issue: OnSaleB";

@@ -326,7 +326,6 @@ codeunit 6059995 "NPR HL Member Mgt."
     var
         xHLMember: Record "NPR HL HeyLoyalty Member";
         MembershipSetup: Record "NPR MM Membership Setup";
-        DataLogMgt: Codeunit "NPR Data Log Management";
         UpsertMemberBatch: Codeunit "NPR HL Upsert Member Batch";
         HLMemberFieldsJToken: JsonToken;
         ResponseFieldNames: List of [Text];
