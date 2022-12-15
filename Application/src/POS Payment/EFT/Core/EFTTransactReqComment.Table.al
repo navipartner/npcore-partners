@@ -1,8 +1,6 @@
 ﻿table 6184496 "NPR EFT Transact. Req. Comment"
 {
     Access = Internal;
-    // NPR5.20/BR  /20160316  CASE 231481 Object Created
-    // NPR5.30/BR  /20170113  CASE 263458 Renamed Object from Pepper to EFT
 
     Caption = 'EFT Transact. Req. Comment';
     DataClassification = CustomerContent;
@@ -20,7 +18,7 @@
             Caption = 'Line No.';
             DataClassification = CustomerContent;
         }
-        field(30; Comment; Text[80])
+        field(30; Comment; Text[1024])
         {
             Caption = 'Comment';
             DataClassification = CustomerContent;

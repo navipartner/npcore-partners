@@ -42,9 +42,9 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
 
                         _dialogRef.updateStatus (captions.statusFinalizing);
                         _bcResponse = await workflow.respond ("FinalizeTransactionRequest", {hwcResponse: hwcResponse});
-                        _hwcResponse = hwcResponse;
-
+                        _hwcResponse.Success = (hwcResponse.ResultCode > 0) ? true : false;
                         debugger;
+
                         if (_bcResponse.hasOwnProperty('WorkflowName')) {
                             // If Pepper TRX fails due to terminal not open and status allows auto-open, the start workshift workflow will be run.
 
@@ -52,7 +52,9 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
                                 _dialogRef.close();
                             }
                             let swr = await workflow.run(_bcResponse.WorkflowName, { context: { request: _bcResponse }});
-                            _hwcResponse = {"Success": swr.success}, _bcResponse = {"Success": swr.endSale};
+                            _hwcResponse.Success = swr.success;
+                            _bcResponse.Success = swr.endSale;
+                            debugger;
                             
                             hwc.unregisterResponseHandler(_contextId);
                         } else {

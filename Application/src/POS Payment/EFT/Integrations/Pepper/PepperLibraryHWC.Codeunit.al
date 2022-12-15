@@ -84,6 +84,48 @@ codeunit 6184496 "NPR Pepper Library HWC"
         exit(true);
     end;
 
+    procedure AppendAdditionalParameters(EntryNo: Integer; AdditionalParameters: Text; var HwcResponse: JsonObject)
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        CurrentParameters: Text;
+        OStream: OutStream;
+        IStream: InStream;
+    begin
+        EFTTransactionRequest.SetAutoCalcFields("Additional Info");
+        EFTTransactionRequest.Get(EntryNo);
+
+        CurrentParameters := '';
+        if (EFTTransactionRequest."Additional Info".HasValue()) then begin
+            EFTTransactionRequest."Additional Info".CreateInStream(IStream);
+            IStream.ReadText(CurrentParameters);
+        end;
+
+        EFTTransactionRequest."Additional Info".CreateOutStream(OStream);
+        OStream.WriteText(CurrentParameters + AdditionalParameters);
+        EFTTransactionRequest.Modify();
+
+        MakeHwcDeviceRequest(EFTTransactionRequest, HwcResponse);
+    end;
+
+    local procedure TransferAdditionalInfo(SourceEntryNo: Integer; var TargetRequest: Record "NPR EFT Transaction Request")
+    var
+        SourceRequest: Record "NPR EFT Transaction Request";
+        AdditionalInfo: Text;
+        OStream: OutStream;
+        IStream: InStream;
+    begin
+        SourceRequest.SetAutoCalcFields("Additional Info");
+        SourceRequest.Get(SourceEntryNo);
+        if (not SourceRequest."Additional Info".HasValue()) then
+            exit;
+
+        SourceRequest."Additional Info".CreateInStream(IStream);
+        IStream.ReadText(AdditionalInfo);
+
+        TargetRequest."Additional Info".CreateOutStream(OStream);
+        OStream.WriteText(AdditionalInfo);
+    end;
+
     local procedure BeginWorkshift(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ForceDownloadLicense: Boolean; var HwcRequest: JsonObject)
     var
         PepperConfigManagement: Codeunit "NPR Pepper Config. Mgt.";
@@ -226,14 +268,16 @@ codeunit 6184496 "NPR Pepper Library HWC"
             EftRetryTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
             if (not EftRetryTransactionRequest.Successful) then begin
                 EftRetryTransactionRequest."Entry No." := 0;
-                if (EFTTransactionRequest."Initiated from Entry No." <> 0) then
+                if (EFTTransactionRequest."Initiated from Entry No." <> 0) then begin
                     EftRetryTransactionRequest."Initiated from Entry No." := EFTTransactionRequest."Initiated from Entry No.";
+                    TransferAdditionalInfo(EFTTransactionRequest."Initiated from Entry No.", EftRetryTransactionRequest);
+                end;
 
                 EftRetryTransactionRequest.Started := CurrentDateTime;
                 EftRetryTransactionRequest.Insert();
 
                 MakeHwcDeviceRequest(EftRetryTransactionRequest, Result);
-                Result.Add('Success', false);
+                Result.Add('Success', true);
                 Result.Add('Message', ContinueTransaction);
                 exit;
             end;
@@ -485,7 +529,9 @@ codeunit 6184496 "NPR Pepper Library HWC"
         PepperTrxTransaction: Codeunit "NPR Pepper Transaction HWC";
         TransactionDateText: Text[8];
         TransactionTimeText: Text[6];
+        CommentText: Text;
         RetryTransaction: Boolean;
+        FoundTrxToRecover: Boolean;
         PaymentType: Code[10];
         RetryOriginalTransaction: Label 'Retry original transaction.';
         VoidTransaction: Label 'Voiding transaction due to incorrect signature.';
@@ -499,14 +545,24 @@ codeunit 6184496 "NPR Pepper Library HWC"
             // Dress the recovery transaction and swap to lost transaction
             EftRecoveredTransactionRequest.SetFilter("Integration Type", '=%1', GetIntegrationType());
             EftRecoveredTransactionRequest.SetFilter("Register No.", '=%1', EFTTransactionRequest."Register No.");
+            EftRecoveredTransactionRequest.SetFilter("Processing Type", '=%1|=%2', EftRecoveredTransactionRequest."Processing Type"::PAYMENT, EftRecoveredTransactionRequest."Processing Type"::REFUND);
             EftRecoveredTransactionRequest.SetFilter("Pepper Trans. Subtype Code", '<>%1 & <>%2', '0', '');
             EftRecoveredTransactionRequest.SetFilter("Financial Impact", '=%1', false);
             EftRecoveredTransactionRequest.SetFilter("Amount Output", '=%1', 0);
-            EftRecoveredTransactionRequest.SetFilter("Amount Input", '=%1', CalcAmountInCurrency(PepperTrxTransaction.GetTrx_Amount(), EFTTransactionRequest."Currency Code"));
+            EftRecoveredTransactionRequest.SetFilter("Result Code", '=%1', -910); // PENDING
             EftRecoveredTransactionRequest.SetFilter(Successful, '=%1', false);
             EftRecoveredTransactionRequest.SetFilter(Recovered, '=%1', false);
-            if (EftRecoveredTransactionRequest.FindLast()) then begin
-                EFTTransactionRequest.TransferFields(EftRecoveredTransactionRequest, false);
+            EftRecoveredTransactionRequest.SetFilter("Sales Ticket No.", '=%1', EFTTransactionRequest."Sales Ticket No.");
+
+            FoundTrxToRecover := EftRecoveredTransactionRequest.FindFirst();
+            if (not FoundTrxToRecover) then begin
+                EftRecoveredTransactionRequest.SetFilter("Sales Ticket No.", '=%1', '');
+                FoundTrxToRecover := EftRecoveredTransactionRequest.FindLast();
+            end;
+
+            if (FoundTrxToRecover) then begin
+                if (EFTTransactionRequest."Sales Ticket No." = EftRecoveredTransactionRequest."Sales Ticket No.") then
+                    EFTTransactionRequest.TransferFields(EftRecoveredTransactionRequest, false);
 
                 EftRecoveredTransactionRequest.Recovered := true;
                 EftRecoveredTransactionRequest."Result Code" := PepperTrxTransaction.GetTrx_ResultCode();
@@ -561,6 +617,15 @@ codeunit 6184496 "NPR Pepper Library HWC"
             EFTTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EFTTransactionRequest), 1, MaxStrLen(EFTTransactionRequest."POS Description"));
         end;
 
+        if (PepperTrxTransaction.GetTrx_JournalLevel(CommentText)) then
+            AddToCommentBatch(StrSubstNo('Journal: %1', CommentText));
+
+        if (PepperTrxTransaction.GetTrx_ReferralText(CommentText)) then
+            AddToCommentBatch(StrSubstNo('Referral: %1', CommentText));
+
+        if (PepperTrxTransaction.GetTrx_AdditionalParameters(CommentText)) then
+            AddToCommentBatch(StrSubstNo('Additional Parameters: %1', CommentText));
+
         EFTTransactionRequest.Finished := CurrentDateTime;
         EFTTransactionRequest."External Result Known" := true;
         EFTTransactionRequest."Manual Voidable" := true;
@@ -575,6 +640,7 @@ codeunit 6184496 "NPR Pepper Library HWC"
             if (AttemptOpenAndRetry(EFTTransactionRequest)) then begin
                 CreateBeginWorkshiftRequest(EFTTransactionRequest."Register No.", EftBeginWorkshiftTransaction);
                 EftBeginWorkshiftTransaction."Initiated from Entry No." := EFTTransactionRequest."Entry No.";
+                EftBeginWorkshiftTransaction."Sales Ticket No." := EFTTransactionRequest."Sales Ticket No.";
                 EftBeginWorkshiftTransaction.Modify();
 
                 MakeHwcDeviceRequest(EftBeginWorkshiftTransaction, Result);
@@ -597,6 +663,7 @@ codeunit 6184496 "NPR Pepper Library HWC"
                 EftRetryTransactionRequest."Entry No." := 0;
                 EftRetryTransactionRequest."Initiated from Entry No." := EFTTransactionRequest."Initiated from Entry No.";
                 EftRetryTransactionRequest.Started := CurrentDateTime;
+                TransferAdditionalInfo(EFTTransactionRequest."Initiated from Entry No.", EftRetryTransactionRequest);
                 EftRetryTransactionRequest.Insert();
 
                 MakeHwcDeviceRequest(EftBeginWorkshiftTransaction, Result);
@@ -944,6 +1011,8 @@ codeunit 6184496 "NPR Pepper Library HWC"
         RecoveryTransactionRequest."Initiated from Entry No." := SourceTransactionRequest."Entry No.";
         if (RecoveryTransactionRequest."Initiated from Entry No." <> 0) then
             RecoveryTransactionRequest."Initiated from Entry No." := SourceTransactionRequest."Initiated from Entry No.";
+
+        RecoveryTransactionRequest."Sales Ticket No." := SourceTransactionRequest."Sales Ticket No.";
 
         exit(RecoveryTransactionRequest.Insert());
     end;

@@ -28,6 +28,7 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
 
                         _dialogRef.updateStatus (captions.statusFinalizing);
                         _bcResponse = await workflow.respond ("FinalizeOpenRequest", {hwcResponse: hwcResponse});
+                        _hwcResponse.Success = (hwcResponse.ResultCode == 10) ? true : false;
 
                         debugger;
                         if (_bcResponse.hasOwnProperty('WorkflowName')) {
@@ -36,11 +37,15 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
                             if (hwcResponse.ResultCode == 10 && hwcResponse.StartWorkshiftResponse.RecoveryRequired)
                                 await popup.message ({title: captions.workflowTitle, caption: "<center><font color=red size=72>&#x2757;</font><h3>"+ _bcResponse.Message +"</h3></center>"});
 
-
                             if (_dialogRef) {
                                 _dialogRef.close(); 
                             }
                             let recovery = await workflow.run(_bcResponse.WorkflowName, { context: { request: _bcResponse } });
+
+                            if (hwcResponse.StartWorkshiftResponse.RecoveryRequired) {
+                                _bcResponse.Success = false;
+                                _hwcResponse.Success = recovery.Success
+                            }
                             debugger;
                         
                         } else {
@@ -53,7 +58,6 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
                             if ((context.showSuccessMessage == undefined && _bcResponse.Success) || (context.showSuccessMessage && _bcResponse.Success))
                                 popup.message({ caption: "<center><font color=green size=72>&#x2713;</font><h3>"+_bcResponse.Message+"</h3></center>", title: captions.workflowTitle, });
 
-                            _hwcResponse = hwcResponse;
                         };
 
                         hwc.unregisterResponseHandler(_contextId);
@@ -86,7 +90,8 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
             _dialogRef.close();
         }
 
-        return ({"success": _hwcResponse.Success, "endSale": true});
+        debugger;
+        return ({"success": _hwcResponse.Success, "endSale": _bcResponse.Success});
     }
     catch (e) {
         console.error ("[Pepper] Error: ", e);

@@ -85,6 +85,13 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'EFT_PEPPER_INSTALL', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Pepper Install";
     }
+
+    value(6060014; EFT_PEPPER_PAYMENT)
+    {
+        Caption = 'EFT_PEPPER_PAYMENT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Pepper Payment";
+    }
+
     value(11; CUSTOMER_SELECT)
     {
         Caption = 'CUSTOMER_SELECT', Locked = true, MaxLength = 20;
