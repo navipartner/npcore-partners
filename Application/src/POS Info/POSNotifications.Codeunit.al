@@ -5,7 +5,6 @@ codeunit 6184852 "NPR POS Notifications"
     [EventSubscriber(ObjectType::Page, Page::"NPR Activities", 'OnOpenPageEvent', '', false, false)]
     local procedure MissingNotifOnAfterGetCurrRecordEvent()
     begin
-        SendOrRecallMissingNotificationPOSUnit();
         SendOrRecallCancelSaleMissingNotification();
         SendDeleteItemNotification();
         SendDeleteItemOnPOSNotification();
@@ -17,11 +16,6 @@ codeunit 6184852 "NPR POS Notifications"
     var
         MyNotifications: Record "My Notifications";
     begin
-        MyNotifications.InsertDefaultWithTableNum(POSUnitNotificationIdLbl,
-            POSUnitMissingNotificationMsg,
-            POSUnitNotificationDescriptionTxt,
-            Database::"NPR POS Unit");
-
         MyNotifications.InsertDefaultWithTableNum(CancelSalesNotificationIdLbl,
             CancelSaleNotificationMsg,
             CancelSaleNotificationDescriptionTxt,
@@ -41,58 +35,11 @@ codeunit 6184852 "NPR POS Notifications"
     [EventSubscriber(ObjectType::Table, Database::"My Notifications", 'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterInsertNotificationSetDisable(var Rec: Record "My Notifications")
     begin
-        if (Rec."Notification Id" = POSUnitNotificationIdLbl) or (Rec."Notification Id" = CancelSalesNotificationIdLbl) or
-            (Rec."Notification Id" = DeleteItemNotificationIdLbl) or (Rec."Notification Id" = DeleteItemOnPOSNotificationIdLbl) then begin
+        if (Rec."Notification Id" = CancelSalesNotificationIdLbl) or (Rec."Notification Id" = DeleteItemNotificationIdLbl)
+        or (Rec."Notification Id" = DeleteItemOnPOSNotificationIdLbl) then begin
             Rec.Enabled := false;
             Rec.Modify();
         end;
-    end;
-
-    local procedure SendPOSUnitMissingNotification()
-    var
-        MyNotification: Notification;
-        OpenPOSUnitLbl: Label 'OpenPOSUnitPage', Locked = true;
-    begin
-        MyNotification.ID := POSUnitNotificationIdLbl;
-        MyNotification.Message := POSUnitMissingNotificationMsg;
-        MyNotification.Scope := NotificationScope::LocalScope;
-        MyNotification.AddAction(OpenPOSUnitTxt, Codeunit::"NPR POS Notifications", OpenPOSUnitLbl);
-        MyNotification.Send();
-    end;
-
-    procedure OpenPOSUnitPage(MyNotification: Notification)
-    begin
-        Page.Run(Page::"NPR POS Unit List");
-    end;
-
-    local procedure SendOrRecallMissingNotificationPOSUnit()
-    var
-        POSUnit: Record "NPR POS Unit";
-    begin
-        if not IsPOSUnitNotificationEnabled() then
-            exit;
-
-        if POSUnit.IsEmpty() then
-            SendPOSUnitMissingNotification()
-        else
-            RecallPOSUnitMissingNotification();
-    end;
-
-    local procedure RecallPOSUnitMissingNotification()
-    var
-        MyNotification: Notification;
-    begin
-        MyNotification.ID := POSUnitNotificationIdLbl;
-        MyNotification.Recall();
-    end;
-
-    //add isEnabled function
-    local procedure IsPOSUnitNotificationEnabled(): Boolean
-    var
-        MyNotifications: Record "My Notifications";
-        POSUnit: Record "NPR POS Unit";
-    begin
-        exit(MyNotifications.IsEnabledForRecord(POSUnitNotificationIdLbl, POSUnit));
     end;
 
     local procedure SendOrRecallCancelSaleMissingNotification()
@@ -339,12 +286,7 @@ codeunit 6184852 "NPR POS Notifications"
     end;
 
     var
-        POSUnitNotificationIdLbl: Label '407f8cda-a82f-46d2-967e-85bb9153aca2', Locked = true;
-        POSUnitNotificationDescriptionTxt: Label 'Show warning when POS unit list is empty.';
-        OpenPOSUnitTxt: Label 'Open POS unit list';
         OpenCancelSalesTxt: Label 'Open cancel sales list';
-        POSUnitMissingNotificationMsg: Label 'NPR POS unit list is empty.';
-
         CancelSalesNotificationIdLbl: Label '4a420aab-74af-4c4b-987d-f3fd1db13c27', Locked = true;
         CancelSaleNotificationDescriptionTxt: Label 'Show warning when a POS sale is canceled.';
         CancelSaleNotificationMsg: Label 'NPR POS sales has been canceled.';
