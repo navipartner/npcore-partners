@@ -83,6 +83,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Types"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG PaymentV2"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR TM Calendar Upgrade"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Login"));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -293,6 +294,8 @@
                 Exit('NPR_TMCalendarUpgrade_20221011');
             Codeunit::"NPR Rep. Timestamp Upgrade":
                 Exit('NPR_RepCounterToSQLTimestampUPG_20221025');
+            Codeunit::"NPR UPG Login":
+                exit('NPRUPGLogin-20221213');
         end;
     end;
 }
