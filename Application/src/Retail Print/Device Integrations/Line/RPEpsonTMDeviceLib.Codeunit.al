@@ -290,6 +290,8 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
                 PrintNVGraphicsDataNew(6, 0, 48, 69, 48, 48, 1, 1);
             'STOREDLOGO_2':
                 PrintNVGraphicsData(1, 0);
+            'CLEARFORMAT':
+                InitializePrinter();
         end;
     end;
 
@@ -786,6 +788,7 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
         AddOption(RetailList, 'PAPERCUT', '');
         AddOption(RetailList, 'STOREDLOGO_1', '');
         AddOption(RetailList, 'STOREDLOGO_2', '');
+        AddOption(RetailList, 'CLEARFORMAT', '');
     end;
 
     local procedure ConstructDeviceSettingList(var tmpRetailList: Record "NPR Retail List" temporary)
