@@ -19,12 +19,6 @@
                 {
                     ToolTip = 'Specifies the value of the Item No. field';
                     ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-                        Clear(Item);
-                        TryToGetItem(Rec."Item No.");
-                    end;
                 }
                 field("Calculation Date"; Rec."Calculation Date")
                 {
@@ -65,24 +59,23 @@
                 }
                 field(Barcode; Rec.Barcode)
                 {
-
                     ToolTip = 'Specifies the value of the Barcode field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-
                     ToolTip = 'Specifies the value of the Unit Price field';
                     ApplicationArea = NPRRetail;
                 }
-                field(ItemUnitPrice; Item."Unit Price")
+                field(ItemUnitPrice; '')
                 {
-
                     Caption = 'Unit price(Item Card)';
                     Editable = false;
-                    Visible = true;
+                    Visible = false;
                     ToolTip = 'Specifies the value of the Unit price(Item Card) field';
                     ApplicationArea = NPRRetail;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Already available on Item Details - Invoicing FactBox';
                 }
                 field("Last Direct Cost"; Rec."Last Direct Cost")
                 {
@@ -90,25 +83,24 @@
                     ToolTip = 'Specifies the value of the Last Direct Cost field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Unit Cost"; Item."Unit Cost")
+                field("Unit Cost"; '')
                 {
-
                     Caption = 'Unit cost';
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Unit cost field';
                     ApplicationArea = NPRRetail;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Already available on Item Details - Invoicing FactBox';
                 }
                 field("Profit % (new)"; Rec."Profit % (new)")
                 {
-
                     Visible = true;
                     ToolTip = 'Specifies the value of the Profit % (new) field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Inventory; Rec.Inventory)
                 {
-
                     ToolTip = 'Specifies the value of the Inventory field';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
@@ -117,150 +109,127 @@
                 }
                 field("Register No."; Rec."Register No.")
                 {
-
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer Price Group"; Rec."Customer Price Group")
                 {
-
                     ToolTip = 'Specifies the value of the Customer Price Group field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer Disc. Group"; Rec."Customer Disc. Group")
                 {
-
                     ToolTip = 'Specifies the value of the Customer Disc. Group field';
                     ApplicationArea = NPRRetail;
                 }
                 field("New Item No."; Rec."New Item No.")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the New Item No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Serial No."; Rec."Serial No.")
                 {
-
                     ToolTip = 'Specifies the value of the Serial No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-
                     ToolTip = 'Specifies the value of the Variant Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Description 2 field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Base Unit of measure"; Rec."Base Unit of measure")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Base Unit of measure field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Purch. Unit of measure"; Rec."Purch. Unit of measure")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Purch. Unit of measure field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales Unit of measure"; Rec."Sales Unit of measure")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sales Unit of measure field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Quantity for Discount Calc"; Rec."Quantity for Discount Calc")
                 {
-
                     ToolTip = 'Specifies the value of the Quantity for Discount Calculation field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Type"; Rec."Discount Type")
                 {
-
                     ToolTip = 'Specifies the value of the Discount Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Code"; Rec."Discount Code")
                 {
-
                     ToolTip = 'Specifies the value of the Discount Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Code 2"; Rec."Variant Code")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Pct."; Rec."Discount Pct.")
                 {
-
                     ToolTip = 'Specifies the value of the Discount % field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Price Incl. Vat"; Rec."Discount Price Incl. Vat")
                 {
-
                     ToolTip = 'Specifies the value of the Discount Price Incl. Vat field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Price Excl. VAT"; Rec."Discount Price Excl. VAT")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Discount Price Excl. VAT field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Unit List Price"; Rec."Unit List Price")
                 {
-
                     ToolTip = 'Specifies the value of the Unit List Price field';
                     ApplicationArea = NPRRetail;
                 }
                 field("VAT %"; Rec."VAT %")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the VAT % field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item group Field"; Rec."Item group")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Item group field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Vendor No."; Rec."Vendor No.")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Vendor No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Vendor Name"; Rec."Vend Name")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Vendor Name field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Net Change"; Rec."Net Change")
                 {
-
                     ToolTip = 'Specifies the value of the Net Change field';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
@@ -269,7 +238,6 @@
                 }
                 field("Purchases (Qty.)"; Rec."Purchases (Qty.)")
                 {
-
                     ToolTip = 'Specifies the value of the Purchases (Qty.) field';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
@@ -278,7 +246,6 @@
                 }
                 field("Sales (Qty.)"; Rec."Sales (Qty.)")
                 {
-
                     ToolTip = 'Specifies the value of the Sales (Qty.) field';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
@@ -287,14 +254,12 @@
                 }
                 field("Cannot edit unit price"; Rec."Cannot edit unit price")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Can''t edit unit price field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Exchange Label"; Rec."Exchange Label")
                 {
-
                     ToolTip = 'Specifies the value of the Exchange Label field';
                     ApplicationArea = NPRRetail;
 
@@ -307,7 +272,6 @@
                 }
                 field("RFID Tag Value"; Rec."RFID Tag Value")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the RFID Tag Value field';
                     ApplicationArea = NPRRetail;
@@ -315,16 +279,11 @@
             }
         }
     }
-    actions
-    {
-    }
 
     trigger OnAfterGetRecord()
     var
         RecRef: RecordRef;
     begin
-        if not TryToGetItem(Rec."Item No.") then
-            Item.Init();
         Rec.calcProfit();
         RecRef.GetTable(Rec);
         Print := LabelLibrary.SelectionContains(RecRef);
@@ -337,12 +296,10 @@
         RecRef.GetTable(Rec);
         if LabelLibrary.SelectionContains(RecRef) then
             LabelLibrary.ToggleLine(RecRef);
-        Clear(Item);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Clear(Item);
         Print := false;
         Rec.SetupNewLine(xRec);
     end;
@@ -353,7 +310,6 @@
     end;
 
     var
-        Item: Record Item;
         Print: Boolean;
         LabelLibrary: Codeunit "NPR Label Library";
         Caption_DeletePrintedLines: Label 'Delete printed lines?';
@@ -489,11 +445,4 @@
         Rec.FilterGroup(0);
         CurrPage.Update(false);
     end;
-
-    local procedure TryToGetItem(ItemNo: Code[20]): Boolean
-    begin
-        Item.SetLoadFields("Unit Cost", "Unit Price");
-        exit(Item.Get(ItemNo));
-    end;
 }
-
