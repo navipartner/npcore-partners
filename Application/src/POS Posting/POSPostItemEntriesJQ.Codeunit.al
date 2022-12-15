@@ -21,6 +21,7 @@ codeunit 6059770 "NPR POS Post Item Entries JQ"
         POSPostEntries.SetJobQueuePosting(true);
 
         POSEntry.SetCurrentKey("Post Item Entry Status");
+        POSEntry.SetLoadFields("POS Period Register No.");
         for POSItemEntryStatus := POSEntry."Post Item Entry Status"::"Error while Posting" downto POSEntry."Post Item Entry Status"::Unposted do begin
             POSEntry.SetRange("Post Item Entry Status", POSItemEntryStatus);
             if POSEntry.FindSet() then
