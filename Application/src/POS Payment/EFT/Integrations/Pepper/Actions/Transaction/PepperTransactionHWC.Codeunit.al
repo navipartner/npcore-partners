@@ -10,6 +10,8 @@ codeunit 6184478 "NPR Pepper Transaction HWC"
         _TrxResult: JsonObject;
         _InitializedRequest: Boolean;
         _InitializedResponse: Boolean;
+        _AdditionalParameters: Text;
+
 
     procedure InitializeProtocol()
     var
@@ -32,7 +34,20 @@ codeunit 6184478 "NPR Pepper Transaction HWC"
     end;
 
     procedure AssembleHwcRequest(): JsonObject
+    var
+        AdditionalParameters: Text;
+        XmlWrapperText: Label '<xml>%1</xml>';
     begin
+
+        if (_Transaction.Contains('AdditionalParameters')) then
+            AdditionalParameters := AsText(_Transaction, 'AdditionalParameters', 0);
+
+        if (_AdditionalParameters <> '') then
+            AdditionalParameters += _AdditionalParameters;
+
+        if (AdditionalParameters <> '') then
+            _Transaction.Add('XmlAdditionalParameters', StrSubstNo(XmlWrapperText, AdditionalParameters));
+
         _Envelope.Add('TransactionRequest', _Transaction);
         exit(_Envelope)
     end;
@@ -66,12 +81,24 @@ codeunit 6184478 "NPR Pepper Transaction HWC"
     end;
 
     procedure SetTransactionEntryNo(EntryNo: Integer)
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        IStream: InStream;
     begin
 
         if (not _InitializedRequest) then
             InitializeProtocol();
 
         _Envelope.Add('EntryNo', EntryNo);
+
+        EFTTransactionRequest.SetAutoCalcFields("Additional Info");
+        EFTTransactionRequest.Get(EntryNo);
+
+        if (EFTTransactionRequest."Additional Info".HasValue()) then begin
+            EFTTransactionRequest."Additional Info".CreateInStream(IStream);
+            IStream.ReadText(_AdditionalParameters);
+        end;
+
     end;
 
     procedure SetRecovery() SuccessCode: Integer
@@ -93,7 +120,7 @@ codeunit 6184478 "NPR Pepper Transaction HWC"
 
     procedure SetPaymentOfGoods(OriginalAmountInDecimal: Decimal; PepperAmountInCents: Integer; CashBackAmountInCents: Integer; Currency: Code[10]; TrackPresence: Integer; CardInformation: Text[40]; TrxRefNbr: Text[12]; MbxPosRefNbr: Text[20]; Offline: Boolean) SuccessCode: Integer
     var
-        XmlParamsLbl: Label '<xml><CashBackAmount>%1</CashBackAmount></xml>', Locked = true;
+        XmlParamsLbl: Label '<CashBackAmount>%1</CashBackAmount>', Locked = true;
     begin
         if (not _InitializedRequest) then
             InitializeProtocol();
@@ -115,7 +142,7 @@ codeunit 6184478 "NPR Pepper Transaction HWC"
         _Transaction.Add('Amount', Format(PepperAmountInCents));
 
         if (CashBackAmountInCents <> 0) then begin
-            _Transaction.Add('XmlAdditionalParameters', StrSubstNo(XmlParamsLbl, CashBackAmountInCents));
+            _Transaction.Add('AdditionalParameters', StrSubstNo(XmlParamsLbl, CashBackAmountInCents));
         end;
 
         _Transaction.Add('Currency', Currency);
@@ -242,21 +269,22 @@ codeunit 6184478 "NPR Pepper Transaction HWC"
         exit(Amount);
     end;
 
-    procedure GetTrx_ReferralText() ReferralText: Text[20]
+    procedure GetTrx_ReferralText(var ReferralText: Text[20]): Boolean
     begin
         if (not _InitializedResponse) then
-            exit('');
+            exit(false);
 
-        exit(AsText(_TrxResult, 'ReferralText', MaxStrLen(ReferralText)));
+        ReferralText := AsText(_TrxResult, 'ReferralText', MaxStrLen(ReferralText));
+        Exit(ReferralText <> '');
     end;
 
-    procedure GetTrx_JournalLevel() Level: Integer
+    procedure GetTrx_JournalLevel(Level: Text[10]): Boolean
     begin
         if (not _InitializedResponse) then
-            exit(0);
+            exit(false);
 
-        if (Evaluate(Level, AsText(_TrxResult, 'JournalLevel', 0))) then;
-        exit(Level);
+        Level := AsText(_TrxResult, 'JournalLevel', MaxStrLen(Level));
+        exit(Level <> '');
     end;
 
     procedure GetTrx_CustomerReceipt() ReceiptText: Text
@@ -273,6 +301,18 @@ codeunit 6184478 "NPR Pepper Transaction HWC"
             exit('');
 
         exit(AsText(_Transaction, 'ReceiptTwo', 0));
+    end;
+
+    procedure GetTrx_AdditionalParameters(var AdditionalParameter: Text): Boolean
+    begin
+        if (not _InitializedResponse) then
+            exit(false);
+
+        AdditionalParameter := AsText(_TrxResult, 'AdditionalParameters', 0);
+        if (AdditionalParameter = '') then
+            exit(false);
+
+        exit(not (StrPos(AdditionalParameter, '<xml></xml>') > 0));
     end;
 
     [Obsolete('Not required')]
