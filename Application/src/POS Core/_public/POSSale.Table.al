@@ -758,6 +758,7 @@
         key(Key1; "Register No.", "Sales Ticket No.")
         {
         }
+        key(ByUserID; "User ID") { }
     }
 
     fieldgroups
