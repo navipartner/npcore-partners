@@ -1,6 +1,10 @@
 ﻿codeunit 6150900 "NPR POS Package Handler"
 {
     Access = Internal;
+
+    var
+        FileNameLbl: Label '%1 - %2', Locked = true;
+
     procedure ExportPOSMenuPackageToFile(var POSMenu: Record "NPR POS Menu")
     var
         ManagedPackageBuilder: Codeunit "NPR Managed Package Builder";
@@ -9,7 +13,6 @@
         i: Integer;
         FileName: Text;
         POSParameterValue: Record "NPR POS Parameter Value";
-        FileNameLbl: Label '%1 - %2', Locked = true;
     begin
         if not POSMenu.FindSet() then
             exit;
@@ -44,5 +47,29 @@
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR POS Parameter Value");
         ManagedPackageMgt.ImportFromFile();
     end;
-}
 
+    procedure ExportPOSLayoutsToFile(var POSLayout: Record "NPR POS Layout")
+    var
+        ManagedPackageBuilder: Codeunit "NPR Managed Package Builder";
+        POSLayouts: Page "NPR POS Layouts";
+        FileName: Text;
+    begin
+        ManagedPackageBuilder.AddRecord(POSLayout);
+
+        if POSLayout.Count() = 1 then
+            FileName := StrSubstNo(FileNameLbl, POSLayout.TableCaption(), POSLayout.Code)
+        else
+            FileName := POSLayouts.Caption();
+        ManagedPackageBuilder.ExportToFile(FileName, '1.0', FileName, Database::"NPR POS Layout");
+    end;
+
+    procedure ImportPOSLayoutsFromFile()
+    var
+        ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";
+        LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst;
+    begin
+        ManagedPackageMgt.AddExpectedTableID(Database::"NPR POS Layout");
+        ManagedPackageMgt.SetLoadMethod(LoadMethod::InsertOrModify);
+        ManagedPackageMgt.ImportFromFile();
+    end;
+}

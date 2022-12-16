@@ -728,7 +728,6 @@
     procedure SetOptions(Setup: Codeunit "NPR POS Setup")
     var
         POSSetup: Record "NPR POS Setup";
-        POSViewProfile: Record "NPR POS View Profile";
         POSActionParameterMgt: Codeunit "NPR POS Action Param. Mgt.";
         Options: JsonObject;
     begin
@@ -748,8 +747,8 @@
         Setup.GetNamedActionSetup(POSSetup);
         Options.Add('adminMenuWorkflow_parameters', POSActionParameterMgt.GetParametersAsJson(POSSetup.RecordId, POSSetup.FieldNo("Admin Menu Action Code")));
         Options.Add('nprVersion', GetDisplayVersion());
-        Setup.GetPOSViewProfile(POSViewProfile);
         Options.Add('taxationType', GetTaxEnvironmentType());
+        Options.Add('selectedPosLayoutCode', Setup.GetPosLayoutCode());
         Options.Add('lineOrderOnScreen', 0);
 
         OnSetOptions(Setup, Options);

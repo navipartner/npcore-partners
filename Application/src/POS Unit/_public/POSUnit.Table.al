@@ -96,6 +96,12 @@
             OptionCaption = 'Full/Fixed,Unattended,mPos,External';
             OptionMembers = "FULL/FIXED",UNATTENDED,MPOS,EXTERNAL;
         }
+        field(70; "POS Layout Code"; Code[20])
+        {
+            Caption = 'POS Layout Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Layout".Code;
+        }
         field(200; "Ean Box Sales Setup"; Code[20])
         {
             Caption = 'POS Input Box Profile';

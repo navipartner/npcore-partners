@@ -177,10 +177,16 @@
     internal procedure GetSelectionFilter(): Text
     var
         POSUnit: Record "NPR POS Unit";
+    begin
+        CurrPage.SetSelectionFilter(POSUnit);
+        exit(GetSelectionFilter(POSUnit));
+    end;
+
+    internal procedure GetSelectionFilter(var POSUnit: Record "NPR POS Unit"): Text
+    var
         SelectionFilterManagement: Codeunit SelectionFilterManagement;
         RecRef: RecordRef;
     begin
-        CurrPage.SetSelectionFilter(POSUnit);
         RecRef.GetTable(POSUnit);
         exit(SelectionFilterManagement.GetSelectionFilter(RecRef, POSUnit.FieldNo("No.")));
     end;

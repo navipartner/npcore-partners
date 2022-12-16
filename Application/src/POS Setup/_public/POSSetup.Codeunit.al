@@ -270,19 +270,24 @@
         SecurityProfile: Codeunit "NPR POS Security Profile";
     begin
         POSUnitRec.TestField("No.");
-        exit(SecurityProfile.GetLockTimeoutIfProfileExist(POSUnitRec."POS Security Profile"));        
+        exit(SecurityProfile.GetLockTimeoutIfProfileExist(POSUnitRec."POS Security Profile"));
     end;
 
     internal procedure GetKioskUnlockEnabled(): Boolean
     var
-        SelfServiceProfile: Codeunit "NPR SS Profile";        
+        SelfServiceProfile: Codeunit "NPR SS Profile";
     begin
-        exit(SelfServiceProfile.IsUnlockPINEnabledIfProfileExist(POSUnitRec."POS Self Service Profile"));        
+        exit(SelfServiceProfile.IsUnlockPINEnabledIfProfileExist(POSUnitRec."POS Self Service Profile"));
     end;
 
     internal procedure GetNamedActionSetup(var POSSetupOut: Record "NPR POS Setup")
     begin
         POSSetupOut := Setup;
+    end;
+
+    internal procedure GetPosLayoutCode(): Code[20]
+    begin
+        exit(POSUnitRec."POS Layout Code");
     end;
 
     #endregion "Get Record => functions"

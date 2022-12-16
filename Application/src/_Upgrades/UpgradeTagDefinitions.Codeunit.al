@@ -40,6 +40,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Item Group"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Magento Passwords"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSLayoutArchive'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddJobQueues'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddTaskCountResetJQ'));
@@ -170,7 +171,12 @@
             Codeunit::"NPR Upgrade Magento Passwords":
                 exit('Magento_Password_IsolatedStorage_20210129');
             Codeunit::"NPR Reten. Pol. Install":
-                exit('NPR-RetenPolTables-20221020');
+                case UpgradeStep of
+                    '':
+                        exit('NPR-RetenPolTables-20221020');
+                    'POSLayoutArchive':
+                        exit('NPR-RetenPolTables-POSLayoutArchive-20221207');
+                end;
             Codeunit::"NPR Job Queue Install":
                 Case UpgradeStep of
                     'AddJobQueues':
