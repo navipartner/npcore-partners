@@ -8,7 +8,9 @@
     end;
 
     var
+        NpRegex: Codeunit "NPR RegEx";
         InvalidRefNoErr: Label 'Invalid EAN13: %1.', Comment = '%1=ReferenceNo';
+        DuplicateRefNoErr: Label 'System could not generate a unique reference number for voucher %1 (voucher type %2) using reference number generation pattern %3. Please consider changing the pattern for the voucher type, and try again.', Comment = '%1 - voucher number, %2 - voucher type, %3 - reference number pattern';
 
     internal procedure ResetInUseQty(Voucher: Record "NPR NpRv Voucher")
     var
@@ -646,10 +648,9 @@
 
     internal procedure ArchiveClosedVoucher(var Voucher: Record "NPR NpRv Voucher")
     var
+        ArchVoucher: Record "NPR NpRv Arch. Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
-        VoucherType: Record "NPR NpRv Voucher Type";
         NpRvSendingLog: Record "NPR NpRv Sending Log";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
         if not Voucher.Find() then
             exit;
@@ -660,34 +661,37 @@
         if Voucher."Allow Top-up" then
             exit;
 
-        VoucherType.Get(Voucher."Voucher Type");
-        VoucherType.TestField("Arch. No. Series");
-        Voucher."Arch. No." := Voucher."No.";
-        if Voucher."No. Series" <> VoucherType."Arch. No. Series" then
-            Voucher."Arch. No." := NoSeriesMgt.GetNextNo(VoucherType."Arch. No. Series", Today, true);
-
-        InsertArchivedVoucher(Voucher);
+        InsertArchivedVoucher(Voucher, ArchVoucher);
         VoucherEntry.SetRange("Voucher No.", Voucher."No.");
         if VoucherEntry.FindSet() then begin
             repeat
-                InsertArchivedVoucherEntry(Voucher, VoucherEntry);
+                InsertArchivedVoucherEntry(ArchVoucher, VoucherEntry);
             until VoucherEntry.Next() = 0;
             VoucherEntry.DeleteAll();
         end;
         NpRvSendingLog.SetRange("Voucher No.", Voucher."No.");
         if NpRvSendingLog.FindSet() then begin
             repeat
-                InsertArchivedSendingLog(Voucher, NpRvSendingLog);
+                InsertArchivedSendingLog(ArchVoucher, NpRvSendingLog);
             until NpRvSendingLog.Next() = 0;
             NpRvSendingLog.DeleteAll();
         end;
+        OnAfterArchiveVoucher(Voucher, ArchVoucher);
         Voucher.Delete();
     end;
 
-    local procedure InsertArchivedVoucher(var Voucher: Record "NPR NpRv Voucher")
+    local procedure InsertArchivedVoucher(Voucher: Record "NPR NpRv Voucher"; var ArchVoucher: Record "NPR NpRv Arch. Voucher")
     var
-        ArchVoucher: Record "NPR NpRv Arch. Voucher";
+        VoucherType: Record "NPR NpRv Voucher Type";
+        NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
+        VoucherType.Get(Voucher."Voucher Type");
+        Voucher."Arch. No." := Voucher."No.";
+        if (Voucher."No. Series" <> VoucherType."Arch. No. Series") and (VoucherType."Arch. No. Series" <> '') then begin
+            Voucher."Arch. No. Series" := VoucherType."Arch. No. Series";
+            Voucher."Arch. No." := NoSeriesMgt.GetNextNo(VoucherType."Arch. No. Series", Today, true);
+        end;
+
         ArchVoucher.Init();
         ArchVoucher."No." := Voucher."Arch. No.";
         ArchVoucher."Voucher Type" := Voucher."Voucher Type";
@@ -721,10 +725,11 @@
         ArchVoucher."Send via Print" := Voucher."Send via Print";
         ArchVoucher."Send via E-mail" := Voucher."Send via E-mail";
         ArchVoucher."Send via SMS" := Voucher."Send via SMS";
+        OnBeforeInsertArchivedVoucher(Voucher, ArchVoucher);
         ArchVoucher.Insert();
     end;
 
-    local procedure InsertArchivedVoucherEntry(Voucher: Record "NPR NpRv Voucher"; VoucherEntry: Record "NPR NpRv Voucher Entry")
+    local procedure InsertArchivedVoucherEntry(ArchVoucher: Record "NPR NpRv Arch. Voucher"; VoucherEntry: Record "NPR NpRv Voucher Entry")
     var
         ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
     begin
@@ -733,7 +738,7 @@
         ArchVoucherEntry.Init();
         ArchVoucherEntry."Entry No." := 0;
         ArchVoucherEntry."Original Entry No." := VoucherEntry."Entry No.";
-        ArchVoucherEntry."Arch. Voucher No." := Voucher."Arch. No.";
+        ArchVoucherEntry."Arch. Voucher No." := ArchVoucher."No.";
         ArchVoucherEntry."Entry Type" := VoucherEntry."Entry Type";
         ArchVoucherEntry."Voucher Type" := VoucherEntry."Voucher Type";
         ArchVoucherEntry.Positive := VoucherEntry.Positive;
@@ -756,13 +761,13 @@
         ArchVoucherEntry.Insert();
     end;
 
-    local procedure InsertArchivedSendingLog(Voucher: Record "NPR NpRv Voucher"; NpRvSendingLog: Record "NPR NpRv Sending Log")
+    local procedure InsertArchivedSendingLog(ArchVoucher: Record "NPR NpRv Arch. Voucher"; NpRvSendingLog: Record "NPR NpRv Sending Log")
     var
         NpRvArchSendingLog: Record "NPR NpRv Arch. Sending Log";
     begin
         NpRvArchSendingLog.Init();
         NpRvArchSendingLog."Entry No." := 0;
-        NpRvArchSendingLog."Arch. Voucher No." := Voucher."Arch. No.";
+        NpRvArchSendingLog."Arch. Voucher No." := ArchVoucher."No.";
         NpRvArchSendingLog."Sending Type" := NpRvSendingLog."Sending Type";
         NpRvArchSendingLog."Log Message" := NpRvSendingLog."Log Message";
         NpRvArchSendingLog."Log Date" := NpRvSendingLog."Log Date";
@@ -794,6 +799,7 @@
 
         UnarchiveVoucherEntries(ArchVoucher."No.", Voucher."No.", RemoveLastEntry);
         UnarchiveVoucherSendingLogs(ArchVoucher."No.", Voucher."No.");
+        OnAfterUnArchiveVoucher(ArchVoucher, Voucher);
 
         ArchVoucher.Delete();
     end;
@@ -985,52 +991,33 @@
 
     local procedure GenerateReferenceNoPattern(Voucher: Record "NPR NpRv Voucher") ReferenceNo: Text
     var
-        Voucher2: Record "NPR NpRv Voucher";
         VoucherType: Record "NPR NpRv Voucher Type";
         i: Integer;
-        NpRegex: Codeunit "NPR RegEx";
     begin
         VoucherType.Get(Voucher."Voucher Type");
         if VoucherType."Reference No. Type" <> VoucherType."Reference No. Type"::Pattern then
             exit('');
 
         for i := 1 to 100 do begin
-            ReferenceNo := VoucherType."Reference No. Pattern";
-            ReferenceNo := NpRegex.RegExReplaceN(ReferenceNo);
-            ReferenceNo := NpRegex.RegExReplaceAN(ReferenceNo);
-            ReferenceNo := NpRegex.RegExReplaceS(ReferenceNo, Voucher."No.");
-            ReferenceNo := UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(Voucher."Reference No.")));
-
-            Voucher2.SetFilter("No.", '<>%1', Voucher."No.");
-            Voucher2.SetRange("Reference No.", ReferenceNo);
-            if Voucher2.IsEmpty then
-                exit(ReferenceNo);
-
-            if ReferenceNo = VoucherType."Reference No. Pattern" then
+            ReferenceNo := GenerateReferenceNo(VoucherType."Reference No. Pattern", Voucher."No.", MaxStrLen(Voucher."Reference No."));
+            if CheckReferenceNoHasNotBeenUsedBefore(Voucher."No.", ReferenceNo) then
                 exit(ReferenceNo);
         end;
-
-        exit(ReferenceNo);
+        Error(DuplicateRefNoErr, Voucher."No.", VoucherType.Code, VoucherType."Reference No. Pattern");
     end;
 
     local procedure GenerateReferenceNoEAN13(Voucher: Record "NPR NpRv Voucher") ReferenceNo: Text
     var
-        Voucher2: Record "NPR NpRv Voucher";
         VoucherType: Record "NPR NpRv Voucher Type";
         i: Integer;
         CheckSum: Integer;
-        NpRegex: Codeunit "NPR RegEx";
     begin
         VoucherType.Get(Voucher."Voucher Type");
         if VoucherType."Reference No. Type" <> VoucherType."Reference No. Type"::EAN13 then
             exit('');
 
         for i := 1 to 100 do begin
-            ReferenceNo := VoucherType."Reference No. Pattern";
-            ReferenceNo := NpRegex.RegExReplaceN(ReferenceNo);
-            ReferenceNo := NpRegex.RegExReplaceAN(ReferenceNo);
-            ReferenceNo := NpRegex.RegExReplaceS(ReferenceNo, Voucher."No.");
-            ReferenceNo := UpperCase(CopyStr(ReferenceNo, 1, MaxStrLen(Voucher."Reference No.")));
+            ReferenceNo := GenerateReferenceNo(VoucherType."Reference No. Pattern", Voucher."No.", MaxStrLen(Voucher."Reference No."));
             if StrLen(ReferenceNo) < 12 then
                 ReferenceNo := CopyStr(ReferenceNo, 1, 2) + PadStr('', 12 - StrLen(ReferenceNo), '0') + CopyStr(ReferenceNo, 3);
             if StrLen(ReferenceNo) > 12 then
@@ -1039,16 +1026,33 @@
                 Error(InvalidRefNoErr, ReferenceNo);
             ReferenceNo := ReferenceNo + Format(CheckSum);
 
-            Voucher2.SetFilter("No.", '<>%1', Voucher."No.");
-            Voucher2.SetRange("Reference No.", ReferenceNo);
-            if Voucher2.IsEmpty then
-                exit(ReferenceNo);
-
-            if ReferenceNo = VoucherType."Reference No. Pattern" then
+            if CheckReferenceNoHasNotBeenUsedBefore(Voucher."No.", ReferenceNo) then
                 exit(ReferenceNo);
         end;
+        Error(DuplicateRefNoErr, Voucher."No.", VoucherType.Code, VoucherType."Reference No. Pattern");
+    end;
 
-        exit(ReferenceNo);
+    local procedure GenerateReferenceNo(ReferenceNoPattern: Code[20]; VoucherNo: Code[20]; MaxLenght: Integer) ReferenceNo: Text
+    begin
+        ReferenceNo := ReferenceNoPattern;
+        ReferenceNo := NpRegex.RegExReplaceN(ReferenceNo);
+        ReferenceNo := NpRegex.RegExReplaceAN(ReferenceNo);
+        ReferenceNo := NpRegex.RegExReplaceS(ReferenceNo, VoucherNo);
+        ReferenceNo := UpperCase(CopyStr(ReferenceNo, 1, MaxLenght));
+    end;
+
+    local procedure CheckReferenceNoHasNotBeenUsedBefore(ExcludeVoucherNo: Code[20]; ReferenceNoToCheck: Text): Boolean
+    var
+        ArchVoucher: Record "NPR NpRv Arch. Voucher";
+        Voucher: Record "NPR NpRv Voucher";
+    begin
+        Voucher.SetFilter("No.", '<>%1', ExcludeVoucherNo);
+        Voucher.SetRange("Reference No.", ReferenceNoToCheck);
+        if not Voucher.IsEmpty() then
+            exit(false);
+
+        ArchVoucher.SetRange("Reference No.", ReferenceNoToCheck);
+        exit(ArchVoucher.IsEmpty());
     end;
 
     [TryFunction]
@@ -1059,10 +1063,9 @@
 
     internal procedure ArchiveRetailVoucher(var RetailVoucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal)
     var
+        ArchVoucher: Record "NPR NpRv Arch. Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
     begin
-        RetailVoucher."Arch. No." := RetailVoucher."No.";
-
         VoucherEntry.Init();
         VoucherEntry."Entry No." := 0;
         VoucherEntry."Voucher No." := RetailVoucher."No.";
@@ -1078,8 +1081,9 @@
         VoucherEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(VoucherEntry."User ID"));
         VoucherEntry."Closed by Entry No." := 0;
 
-        InsertArchivedVoucher(RetailVoucher);
-        InsertArchivedVoucherEntry(RetailVoucher, VoucherEntry);
+        InsertArchivedVoucher(RetailVoucher, ArchVoucher);
+        InsertArchivedVoucherEntry(ArchVoucher, VoucherEntry);
+        OnAfterArchiveVoucher(RetailVoucher, ArchVoucher);
     end;
 
     internal procedure OpenRetailVoucher(RetailVoucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal)
@@ -1553,4 +1557,18 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertArchivedVoucher(Voucher: Record "NPR NpRv Voucher"; var ArchVoucher: Record "NPR NpRv Arch. Voucher")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterArchiveVoucher(Voucher: Record "NPR NpRv Voucher"; ArchVoucher: Record "NPR NpRv Arch. Voucher")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterUnArchiveVoucher(ArchVoucher: Record "NPR NpRv Arch. Voucher"; Voucher: Record "NPR NpRv Voucher")
+    begin
+    end;
 }
