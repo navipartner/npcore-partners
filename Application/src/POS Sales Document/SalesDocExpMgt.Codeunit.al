@@ -865,7 +865,6 @@
         SaleLinePOS."Sales Document Print" := false;
         SaleLinePOS."Sales Document Send" := false;
         SaleLinePOS."Sales Document Pdf2Nav" := false;
-        SaleLinePOS.Modify(true);
 
         SalesPost.Run(SalesHeader);
 
