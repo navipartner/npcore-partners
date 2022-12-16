@@ -83,7 +83,6 @@
             Caption = 'Client Short Date Pattern';
             DataClassification = CustomerContent;
         }
-
         field(25; "Client Day Names"; Text[250])
         {
             Caption = 'Client Day Names';

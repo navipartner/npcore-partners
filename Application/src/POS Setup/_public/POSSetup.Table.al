@@ -223,10 +223,6 @@
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     begin
         TestField("Primary Key");
@@ -241,4 +237,3 @@
         ParamMgt.EditParametersForField(ActionCode, RecordId, Field);
     end;
 }
-
