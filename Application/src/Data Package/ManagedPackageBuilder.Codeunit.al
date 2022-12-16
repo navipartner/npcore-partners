@@ -47,10 +47,11 @@
             clear(JObject);
             JObject.Add('Record', RecRef.Number);
             clear(JObjectRec);
-            for i := 1 to RecRef.FieldCount do begin
-                ConvertHelper.FieldRefToVariant(RecRef.FieldIndex(i), FieldValue);
-                ConvertHelper.AddToJObject(JObjectRec, Format(RecRef.FieldIndex(i).Number), FieldValue);
-            end;
+            for i := 1 to RecRef.FieldCount do
+                if RecRef.FieldIndex(i).Class = RecRef.FieldIndex(i).Class::Normal then begin  //do not include flow fields
+                    ConvertHelper.FieldRefToVariant(RecRef.FieldIndex(i), FieldValue);
+                    ConvertHelper.AddToJObject(JObjectRec, Format(RecRef.FieldIndex(i).Number), FieldValue);
+                end;
             JObject.Add('Fields', JObjectRec);
             GlobalJArray.Add(JObject);
         until RecRef.Next() = 0;

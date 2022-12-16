@@ -180,7 +180,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Refresh Invalid Action Parameters action';
                 ApplicationArea = NPRRetail;
 
