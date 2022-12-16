@@ -31,10 +31,7 @@ codeunit 85011 "NPR Library - Ticket Module"
 
         // Used for testing dynamic prices
 
-        CreateNoSerie('ATF-TM-ATF001', 'QWETMATF9000001');
-        CreateNoSerie('ATF-TM-TICKET', 'QWE9000001');
-        CreateNoSerie('ATF-TM-PK10', 'QWEPK10000');         // Code 10 number series
-        CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
+        CreateNumberSeries();
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY, '', ''));
@@ -73,10 +70,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         // Used for smoke testing
         // This scenario creates a ticket which is always available today.
 
-        CreateNoSerie('ATF-TM-ATF001', 'QWETMATF9000001');
-        CreateNoSerie('ATF-TM-TICKET', 'QWE9000001');
-        CreateNoSerie('ATF-TM-PK10', 'QWEPK10000');         // Code 10 number series
-        CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
+        CreateNumberSeries();
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY, '', ''));
@@ -116,10 +110,7 @@ codeunit 85011 "NPR Library - Ticket Module"
 
         SlotSize := Round((24 * 60 * 60 - 2) / NumberOfTimeSlots, 0.001); // -2 => 00:00:01 -> 23:59:59 intervall
 
-        CreateNoSerie('ATF-TM-ATF001', 'QWETMATF9000001');
-        CreateNoSerie('ATF-TM-TICKET', 'QWE9000001');
-        CreateNoSerie('ATF-TM-PK10', 'QWEPK10000');         // Code 10 number series
-        CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
+        CreateNumberSeries();
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY, '', ''));
@@ -160,10 +151,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         // Used for smoke testing
         // This scenario creates a ticket which is always available today.
 
-        CreateNoSerie('ATF-TM-ATF001', 'QWETMATF9000001');
-        CreateNoSerie('ATF-TM-TICKET', 'QWE9000001');
-        CreateNoSerie('ATF-TM-PK10', 'QWEPK10000');         // Code 10 number series
-        CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
+        CreateNumberSeries();
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::MULTIPLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY, '', ''));
@@ -208,10 +196,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         // Used for smoke testing
         // This scenario creates a ticket which is always available today.
 
-        CreateNoSerie('ATF-TM-ATF001', 'QWETMATF9000001');
-        CreateNoSerie('ATF-TM-TICKET', 'QWE9000001');
-        CreateNoSerie('ATF-TM-PK10', 'QWEPK10000');         // Code 10 number series
-        CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
+        CreateNumberSeries();
 
         AdmissionBaseCalendarCode := CreateBaseCalendar(GenerateCode10());
         TicketBaseCalendarCode := CreateBaseCalendar(GenerateCode10());
@@ -598,10 +583,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         // Used for smoke testing
         // This scenario creates a ticket which is always available today.
 
-        CreateNoSerie('ATF-TM-ATF001', 'QWETMATF9000001');
-        CreateNoSerie('ATF-TM-TICKET', 'QWE9000001');
-        CreateNoSerie('ATF-TM-PK10', 'QWEPK10000');         // Code 10 number series
-        CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
+        CreateNumberSeries();
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         ItemNo := CreateItem('', TicketTypeCode, Random(200) + 100);
@@ -649,6 +631,14 @@ codeunit 85011 "NPR Library - Ticket Module"
             AdmissionInclusion := 0
         else
             AdmissionInclusion := 2;
+    end;
+
+    local procedure CreateNumberSeries()
+    begin
+        CreateNoSerie('ATF-TM-ATF001', 'QWETMATF9000001');
+        CreateNoSerie('ATF-TM-TICKET', 'QWE9000001');
+        CreateNoSerie('ATF-TM-PK10', 'Q & K10000');           // Code 10 number series - yes the & is intensional to fuck with incorrect filtering
+        CreateNoSerie('ATF-TM-PK20', 'Q & EPK2000000000');    // Code 20 number series - yes the & is intensional to fuck with incorrect filtering;
     end;
 
 }

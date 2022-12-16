@@ -409,7 +409,8 @@
         // Create Ticket Content
         TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
         TicketBom.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
-        TicketBom.SetFilter("Admission Code", ReservationRequest."Admission Code");
+        if (ReservationRequest."Admission Code" <> '') then
+            TicketBom.SetFilter("Admission Code", '=%1', ReservationRequest."Admission Code");
         if (TicketBom.FindSet()) then begin
 
             ValidateTicketBomSalesDateLimit(TicketBom, QuantityPerTicket, Today);
