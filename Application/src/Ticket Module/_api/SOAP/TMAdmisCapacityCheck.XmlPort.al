@@ -340,7 +340,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
             exit;
         end;
 
-        AdmissionScheduleEntry.SetFilter("Admission Code", TmpAdmissionScheduleEntry."Admission Code");
+        AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', TmpAdmissionScheduleEntry."Admission Code");
         AdmissionScheduleEntry.SetFilter("Admission Start Date", '>=%1', Today);
 
         if (TmpAdmissionScheduleEntry."Admission Start Date" > 0D) then begin

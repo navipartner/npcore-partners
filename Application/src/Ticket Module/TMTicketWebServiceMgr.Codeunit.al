@@ -756,9 +756,7 @@
             end;
         end;
 
-        //if (not TicketRequestManager.TranslateBarcodeToItemVariant (TicketReservationRequest."External Item Code", ItemNo, VariantCode, ExternalItemType)) then begin
         if (not TicketRequestManager.TranslateBarcodeToItemVariant(TicketReservationRequest."External Item Code", TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", ExternalItemType)) then begin
-
             TicketReservationResponse."Response Message" := StrSubstNo(InvalidItem, TicketReservationRequest."External Item Code");
             TicketReservationResponse.Status := false;
         end;

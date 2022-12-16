@@ -786,8 +786,8 @@
         CreateNoSerie('MC-DEMO01', 'MC-DEMO-00001');
 
         CreateNoSerie('MM-ATF001', 'MMATF0000001');
-        CreateNoSerie('MM-PK10', 'MM-PK10000');         // Code 10 number series
-        CreateNoSerie('MM-PK20', 'MM-PK2000000000');    // Code 20 number series
+        CreateNoSerie('MM-PK10', 'MM & 10000');         // Code 10 number series
+        CreateNoSerie('MM-PK20', 'MM & 2000000000');    // Code 20 number series
     end;
 
     procedure GenerateCode10(): Code[20]
