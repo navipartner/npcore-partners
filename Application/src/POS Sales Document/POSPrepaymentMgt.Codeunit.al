@@ -48,7 +48,7 @@
         if not SalesLine.FindSet(true) then
             exit;
         repeat
-            RemainingPrepmtAmtToInvoice += Round(CalcRemainingLinePrepmtAmtToInvoice(SalesLine), Currency."Amount Rounding Precision");
+            RemainingPrepmtAmtToInvoice += CalcRemainingLinePrepmtAmtToInvoice(SalesLine, SalesHeader."Prices Including VAT", Currency."Amount Rounding Precision");
         until SalesLine.Next() = 0;
 
         case true of
@@ -68,10 +68,11 @@
         SalesLine.SuspendStatusCheck(true);
         SalesLine.FindSet(true);
         repeat
-            LinePrepayment := CalcRemainingLinePrepmtAmtToInvoice(SalesLine) * SplitRatio + RemainderAmt;
+            LinePrepayment := CalcRemainingLinePrepmtAmtToInvoice(SalesLine, SalesHeader."Prices Including VAT", Currency."Amount Rounding Precision") * SplitRatio + RemainderAmt;
             RemainderAmt := LinePrepayment - Round(LinePrepayment, Currency."Amount Rounding Precision");
             LinePrepayment := Round(LinePrepayment, Currency."Amount Rounding Precision");
-            SalesLine.Validate("Prepayment %", Round((SalesLine."Prepmt. Amount Inv. Incl. VAT" + LinePrepayment) * 100 / SalesLine."Amount Including VAT", 0.00001));
+            SalesLine.Validate("Prepayment %",
+                Round((CalcAmtIncludingVAT(SalesLine."Prepmt. Amt. Inv.", SalesLine."Prepayment VAT %", SalesHeader."Prices Including VAT", Currency."Amount Rounding Precision") + LinePrepayment) * 100 / SalesLine."Amount Including VAT", 0.00001));
             if LinePrepayment = 0 then begin
                 SalesLine."Prepayment Amount" := 0;
                 SalesLine."Prepmt. Amt. Incl. VAT" := 0;
@@ -113,15 +114,25 @@
         exit(SalesLine."Prepmt. Amt. Incl. VAT");
     end;
 
-    local procedure CalcRemainingLinePrepmtAmtToInvoice(SalesLine: Record "Sales Line"): Decimal
+    local procedure CalcRemainingLinePrepmtAmtToInvoice(SalesLine: Record "Sales Line"; PricesInclidingVAT: Boolean; RoundingPrecision: Decimal): Decimal
     var
         RemainingLineAmtToInvoice: Decimal;
     begin
         if (SalesLine.Quantity <> 0) and (SalesLine."Quantity Invoiced" <> 0) then
-            RemainingLineAmtToInvoice := SalesLine."Amount Including VAT" * (SalesLine.Quantity - SalesLine."Quantity Invoiced") / SalesLine.Quantity
+            RemainingLineAmtToInvoice := Round(SalesLine."Amount Including VAT" * (SalesLine.Quantity - SalesLine."Quantity Invoiced") / SalesLine.Quantity, RoundingPrecision)
         else
             RemainingLineAmtToInvoice := SalesLine."Amount Including VAT";
-        exit(RemainingLineAmtToInvoice - SalesLine."Prepmt. Amount Inv. Incl. VAT" + SalesLine."Prepmt Amt Deducted");
+
+        exit(RemainingLineAmtToInvoice - CalcAmtIncludingVAT(SalesLine."Prepmt. Amt. Inv." - SalesLine."Prepmt Amt Deducted", SalesLine."Prepayment VAT %", PricesInclidingVAT, RoundingPrecision));
+    end;
+
+    local procedure CalcAmtIncludingVAT(Amount: Decimal; VATRate: Decimal; PricesInclidingVAT: Boolean; RoundingPrecision: Decimal) AmountInclVAT: Decimal
+    begin
+        if PricesInclidingVAT or (VATRate = 0) then
+            AmountInclVAT := Amount
+        else
+            AmountInclVAT := Amount * (1 + VATRate / 100);
+        AmountInclVAT := Round(AmountInclVAT, RoundingPrecision);
     end;
 
     procedure GetPrepaymentAmountToPay(SalesHeader: Record "Sales Header"): Decimal
