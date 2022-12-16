@@ -12,6 +12,9 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             var
                 RegisterCodeAlreadyUsedErr: Label 'Pos unit Password %1 is already in use.', Comment = '%1 = POS Unit Password';
             begin
+                if Rec."NPR Register Password" = '' then
+                    exit;
+                    
                 Rec.SetRange("NPR Register Password", Rec."NPR Register Password");
                 if not Rec.IsEmpty() then
                     Error(RegisterCodeAlreadyUsedErr, Rec."NPR Register Password");
