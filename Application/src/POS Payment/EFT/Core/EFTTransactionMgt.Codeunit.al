@@ -172,6 +172,32 @@
             Error('EFT Integration %1 is not subscribing to OnSendRequestSynchronously correctly.', EFTTransactionRequest."Integration Type");
     end;
 
+    procedure GetEFTReceiptText(SalesTicketNo: Code[20]; ReceiptNo: Integer): Text
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTReceipt: Record "NPR EFT Receipt";
+        EFTReceiptText: Text;
+        NewLine: Text;
+    begin
+        EFTTransactionRequest.SetRange("Sales Ticket No.", SalesTicketNo);
+        EFTTransactionRequest.SetRange(Successful, true);
+
+        if not EFTTransactionRequest.FindFirst() then
+            exit;
+
+        NewLine[1] := 13; // CR
+        NewLine[2] := 10; // LF
+
+        EFTReceipt.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
+        EFTReceipt.SetRange("Receipt No.", ReceiptNo);
+
+        if EFTReceipt.FindSet() then
+            repeat
+                EFTReceiptText += EFTReceipt.Text + Format(NewLine);
+            until EFTReceipt.Next = 0;
+        exit(EFTReceiptText);
+    end;
+
     #region Response Handlers
     procedure HandleGenericWorkflowResponse(EftTrxRequest: Record "NPR EFT Transaction Request"; IntegrationRequest: JsonObject; IntegrationResponse: JsonObject; Result: JsonObject)
     var
@@ -189,6 +215,7 @@
         EftTrxRequest.Find('='); //Refresh
         EftFramework.EftIntegrationResponseReceived(EftTrxRequest);
     end;
+
     procedure HandleIntegrationResponse(EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         POSSession: Codeunit "NPR POS Session";
@@ -533,7 +560,7 @@
 
         LineAmount := EFTTransactionRequest."Result Amount" * -1;
 
-        SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"Issue Voucher");        
+        SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"Issue Voucher");
         SaleLinePOS.Validate("No.", GetPOSPostingSetupAccountNo(POSSession, EFTTransactionRequest."Original POS Payment Type Code"));
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS."EFT Approved" := EFTTransactionRequest.Successful;
