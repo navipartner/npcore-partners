@@ -137,11 +137,13 @@
             exit;
 
         if SalesHeader.Get(SaleLinePOS."Sales Document Type", SaleLinePOS."Sales Document No.") then begin
+            SalesLine.SetHideValidationDialog(true);
+            SalesLine.SuspendStatusCheck(true);
             SalesLine.SetRange("Document Type", SalesHeader."Document Type");
             SalesLine.SetRange("Document No.", SalesHeader."No.");
             if SalesLine.FindSet() then
                 repeat
-                    SalesLine.Validate("Prepayment %", 0);
+                    SalesLine.Validate("Prepmt. Line Amount", SalesLine."Prepmt. Amt. Inv.");
                     SalesLine.Modify();
                 until SalesLine.Next() = 0;
         end;
