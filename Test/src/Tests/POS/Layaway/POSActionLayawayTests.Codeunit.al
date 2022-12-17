@@ -14,6 +14,7 @@ codeunit 85101 "NPR POS Action Layaway Tests"
         LibraryInventory: Codeunit "Library - Inventory";
         LibrarySales: Codeunit "Library - Sales";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LayawayCreateBussLogic: Codeunit "NPR POS Act.: Layaway Create-B";
         POSSale: Codeunit "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
         Initialized: Boolean;
@@ -26,7 +27,6 @@ codeunit 85101 "NPR POS Action Layaway Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
-        LayawayCreateBussLogic: Codeunit "NPR POS Act.: Layaway Create-B";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
         //[Given] Init Data
@@ -49,6 +49,57 @@ codeunit 85101 "NPR POS Action Layaway Tests"
         Assert.IsTrue(SalesInvHeader."Amount Including VAT" = Round(Item."Unit Price" * 0.1, 0.01), StrSubstNo('Downpayment percent is not calculated. %1', System.Round(Item."Unit Price" * 0.1, 2)));
         if not SalesHeader.Get("Sales Document Type"::Order, SalesInvHeader."Prepayment Order No.") then
             Assert.AssertRecordNotFound();
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('SOListHandler,PrepaymentInvListHandler')]
+    procedure ShowLayaway()
+    var
+        SalePOS: Record "NPR POS Sale";
+        ShowLayawayBL: Codeunit "NPR POS Action: LayawayShow-B";
+    begin
+        //[Given] Init Data
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        CheckPrepmtAccNo(SalePOS, Item."Gen. Prod. Posting Group");
+        LayawayCreateBussLogic.CreateLayaway(POSSession, 10, 1, '', PaymentTerms.Code, PaymentTerms.Code, false, false);
+
+        //[When]
+        ShowLayawayBL.RunDocument(true, PaymentTerms.Code, POSSale);
+
+    end;
+
+    [ModalPageHandler]
+    procedure SOListHandler(var SOList: TestPage "Sales Order List")
+    var
+        SalesHeader: Record "Sales Header";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalesInvHeader: Record "Sales Invoice Header";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+    begin
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        SalesInvHeader.Get(SaleLinePOS."Posted Sales Document No.");
+        SalesHeader.Get("Sales Document Type"::Order, SalesInvHeader."Prepayment Order No.");
+        SOList.GoToRecord(SalesHeader);
+        SOList.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure PrepaymentInvListHandler(var PrepayInv: TestPage "NPR POS Prepaym. Invoices")
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalesInvHeader: Record "Sales Invoice Header";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+    begin
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        SalesInvHeader.Get(SaleLinePOS."Posted Sales Document No.");
+        Assert.IsTrue(PrepayInv.GoToRecord(SalesInvHeader), '');
     end;
 
     internal procedure Initialize()

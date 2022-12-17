@@ -422,30 +422,35 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ISSUE_VOUCHER', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR NpRv Issue POSAction Mgt.";
     }
+    value(77; EFT_NETS_BAXI_NATIVE)
+    {
+        Caption = 'EFT_NETS_BAXI_NATIVE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: EFT Nets Baxi";
+    }
     value(78; MERGE_SIMILAR_LINES)
     {
         Caption = 'MERGE_SIMILAR_LINES', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction: Merg.Smlr.Lines";
-    }
-    value(81; LAYAWAY_CREATE)
-    {
-        Caption = 'LAYAWAY_CREATE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Layaway Create";
-    }
-    value(80; ISSUE_COUPON)
-    {
-        Caption = 'ISSUE_COUPON', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NpDc Module Issue: OnSale";
     }
     value(79; CHECK_COUPON)
     {
         Caption = 'CHECK_COUPON', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR NP NpDC Coupon Verify";
     }
-    value(77; EFT_NETS_BAXI_NATIVE)
+    value(80; ISSUE_COUPON)
     {
-        Caption = 'EFT_NETS_BAXI_NATIVE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: EFT Nets Baxi";
+        Caption = 'ISSUE_COUPON', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NpDc Module Issue: OnSale";
+    }
+    value(81; LAYAWAY_CREATE)
+    {
+        Caption = 'LAYAWAY_CREATE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Layaway Create";
+    }
+    value(82; LAYAWAY_SHOW)
+    {
+        Caption = 'LAYAWAY_SHOW', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: LayawayShow";
     }
     value(6014600; BALANCE_V4)
     {
