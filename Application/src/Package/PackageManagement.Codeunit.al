@@ -346,7 +346,6 @@ codeunit 6059947 "NPR Package Management"
         PackageDimension."Line No." := 10000;
         PackageDimension.Quantity := Rec."npr Kolli";
         PackageDimension.Insert(true);
-        commit();
     end;
 
     local procedure UpdatePackageCode(Rec: Record "Sales Header");
