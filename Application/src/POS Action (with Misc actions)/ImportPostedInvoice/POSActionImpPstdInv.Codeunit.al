@@ -132,18 +132,16 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
         SalesInvHeader: Record "Sales Invoice Header";
         POSSession: Codeunit "NPR POS Session";
     begin
-
         SetParameters(Context, SelectCustomer, SalesDocViewString, LocationSource, LocationFilter, SalesPersonFromInv, ConfirmInvDiscAmt, NegativeValues, AppliesToInvoice, ShowMsg, TransferDim);
         OrderNo := CopyStr(Context.GetString('OrdNo'), 1, MaxStrLen(OrderNo));
 
-        POSSession.GetSale(Sale);
         if not
             SelectDocument(
-              POSSession,
-              SalesInvHeader,
-              SalesDocViewString,
-              LocationSource,
-              LocationFilter, OrderNo)
+            POSSession,
+            SalesInvHeader,
+            SalesDocViewString,
+            LocationSource,
+            LocationFilter, OrderNo)
         then
             exit;
 
@@ -299,7 +297,7 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionImportPostedI.js###
-'let main=async({workflow:e,context:t,parameters:i,captions:a})=>{i.ScanExchangeLabel?(t.OrdNo=await popup.input({title:a.editScanLabel_title,caption:a.editScanLabel_title}),await e.respond("ScanLabel")):await e.respond("SelectInvoice")};'
+'let main=async({workflow:e,context:a,captions:i,parameters:t})=>{if(t.ScanExchangeLabel)if(a.OrdNo=await popup.input({title:i.editScanLabel_title,caption:i.editScanLabel_title}),a.OrdNo)await e.respond("ScanLabel");else return" ";else await e.respond("SelectInvoice")};'
         )
     end;
 }

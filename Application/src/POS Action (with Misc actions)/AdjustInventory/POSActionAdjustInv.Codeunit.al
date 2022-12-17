@@ -6,7 +6,6 @@ codeunit 6150848 "NPR POS Action: Adjust Inv." implements "NPR IPOS Workflow"
     var
         ParametarOptionsLbl: Label 'perform only Negative Adjustment,perform only Positive Adjustment,perform both Negative and Positive Adjustment', Locked = true;
         ActionDescription: Label 'Post Inventory Adjustment directly from POS';
-        ParameterFixedReturnReason_NameLbl: Label 'FixedReturnReason';
         ParameterFixedReturnReason_CptLbl: Label 'Fixed Return Reason';
         ParameterFixedReturnReason_DescLbl: Label 'Pre-defined Return Reason';
         ParameterLookupReturnReason_NameLbl: Label 'LookupReturnReason';
@@ -18,10 +17,10 @@ codeunit 6150848 "NPR POS Action: Adjust Inv." implements "NPR IPOS Workflow"
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddLabel('QtyCaption', InventoryQtyLbl);
-        WorkflowConfig.AddTextParameter(ParameterFixedReturnReason_NameLbl, '', ParameterFixedReturnReason_CptLbl, ParameterFixedReturnReason_DescLbl);
-        WorkflowConfig.AddBooleanParameter(ParameterLookupReturnReason_NameLbl, false, ParameterLookupReturnReason_NameLbl, ParameterLookupReturnReason_DescLbl);
+        WorkflowConfig.AddTextParameter('FixedReturnReason', '', ParameterFixedReturnReason_CptLbl, ParameterFixedReturnReason_DescLbl);
+        WorkflowConfig.AddBooleanParameter('LookupReturnReason', false, ParameterLookupReturnReason_NameLbl, ParameterLookupReturnReason_DescLbl);
         WorkflowConfig.AddOptionParameter(
-            ParameterInputAdjustment_NameLbl,
+            'InputAdjustment',
             ParametarOptionsLbl,
             SelectStr(3, ParametarOptionsLbl),
             ParameterInputAdjustment_NameLbl,
