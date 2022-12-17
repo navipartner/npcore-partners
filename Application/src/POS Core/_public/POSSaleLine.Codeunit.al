@@ -607,10 +607,14 @@
     end;
 
     procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean; FromVATBusPostingGr: Code[20]; FromVATProdPostingGr: Code[20]; SaleLinePOS: Record "NPR POS Sale Line"; var UnitPrice: Decimal)
+    begin
+        DoConvertPriceToVAT(FromPricesInclVAT, FromVATBusPostingGr, FromVATProdPostingGr, SaleLinePOS, UnitPrice);
+    end;
+
+    procedure DoConvertPriceToVAT(FromPricesInclVAT: Boolean; FromVATBusPostingGr: Code[20]; FromVATProdPostingGr: Code[20]; SaleLinePOS: Record "NPR POS Sale Line"; var UnitPrice: Decimal) PriceRecalculated: Boolean
     var
         Currency: Record Currency;
         VATPostingSetup: Record "VAT Posting Setup";
-        PriceRecalculated: Boolean;
     begin
         PriceRecalculated := false;
         if FromPricesInclVAT then begin

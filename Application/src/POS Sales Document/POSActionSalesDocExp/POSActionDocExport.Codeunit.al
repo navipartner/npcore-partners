@@ -51,7 +51,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         DescPrepaymentDlg: Label 'Ask user for prepayment percentage. Will be paid in new sale.';
         DescFixedPrepaymentPct: Label 'Prepayment percentage to use either silently or as dialog default value.';
         DescTransferSalesperson: Label 'Transfer salesperson from sale to exported document';
-        DescTransferPostingSetup: Label 'Transfer posting setup from sale to exported document';
+        DescTransferPostingSetup: Label 'Transfer general, VAT and specific posting groups from POS sale to exported document. Please note that deactivating this can lead to differencies in VAT calculation between the POS sale and the exported document.';
         DescTransferDim: Label 'Transfer dimensions from sale to exported document';
         DescTransferTaxSetup: Label 'Transfer tax setup from sale to exported document';
         DescAutoResrvSalesLine: Label 'Automatically reserve items on exported document';
