@@ -29,6 +29,7 @@
 
     local procedure CreateAdjCostJobQueue()
     var
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
         NotBeforeDateTime: DateTime;
         NextRunDateFormula: DateFormula;
     begin
@@ -36,6 +37,7 @@
         if AdjCostJobQueueExists(NotBeforeDateTime) then
             exit;
 
+        JobQueueMgt.SetJobTimeout(4 * 60 * 60 * 1000);  //4 hours
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntryGlobal."Object Type to Run"::Report,
             Report::"Adjust Cost - Item Entries",
@@ -57,6 +59,7 @@
 
     local procedure CreatePostInvCostToGLJobQueue()
     var
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
         NotBeforeDateTime: DateTime;
         NextRunDateFormula: DateFormula;
     begin
@@ -120,6 +123,8 @@
     end;
 
     local procedure GetTimingParameters(var NotBeforeDateTime: DateTime; var NextRunDateFormula: DateFormula)
+    var
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
         NotBeforeDateTime := JobQueueMgt.NowWithDelayInSeconds(600);
         Evaluate(NextRunDateFormula, '<1D>');
@@ -219,5 +224,4 @@
     var
         JobQueueEntryGlobal: Record "Job Queue Entry";
         SalesSetup: Record "Sales & Receivables Setup";
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
 }

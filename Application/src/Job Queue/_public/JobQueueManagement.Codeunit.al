@@ -9,6 +9,7 @@
     var
         JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
+        JobTimeout: Duration;
         ShowAutoCreatedClause: Boolean;
         ParamNameAndValueLbl: Label '%1=%2', Locked = true;
 
@@ -232,6 +233,10 @@
         Parameters."Parameter String" := CopyStr(ParameterString, 1, MaxStrLen(Parameters."Parameter String"));
         Parameters.Description := CopyStr(JobDescription, 1, MaxStrLen(Parameters.Description));
         Parameters."Job Queue Category Code" := JobQueueCatagoryCode;
+#IF NOT BC17
+        if JobTimeout <> 0 then
+            Parameters."Job Timeout" := JobTimeout;
+#ENDIF
 
         exit(InitRecurringJobQueueEntry(Parameters, JobQueueEntryOut));
     end;
@@ -303,6 +308,10 @@
         if Parameters.Description <> '' then
             JobQueueEntry.Description := Parameters.Description;
         JobQueueEntry."Job Queue Category Code" := Parameters."Job Queue Category Code";
+#IF NOT BC17
+        if Parameters."Job Timeout" <> 0 then
+            JobQueueEntry."Job Timeout" := Parameters."Job Timeout";
+#ENDIF
         OnBeforeInsertRecurringJobQueueEntry(JobQueueEntry);
         JobQueueEntry.Insert(true);
 
@@ -495,6 +504,11 @@
             if JobQueueEntry."NPR Auto-Resched. Delay (sec.)" < 300 then
                 JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 300;
         end;
+    end;
+
+    procedure SetJobTimeout(NewTimeout: Duration)
+    begin
+        JobTimeout := NewTimeout;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]

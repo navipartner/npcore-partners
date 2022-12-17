@@ -57,6 +57,11 @@
             SetCustomCUforPostInvtCostToGL();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'CustomCUforPostInvtCostToGL'));
         end;
+
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateAdjCostJobQueueTimeout')) then begin
+            UpdateAdjCostJobQueueTimeout();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateAdjCostJobQueueTimeout'));
+        end;
 #endif
 
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AutoRescheduleRetenPolicy')) then begin
@@ -311,6 +316,23 @@
                 JobQueueEntry2."Object ID to Run" := Codeunit::"NPR Post Inventory Cost to G/L";
                 JobQueueEntry2."Parameter String" := '';
                 JobQueueEntry2.Modify();
+            until JobQueueEntry.Next() = 0;
+    end;
+
+    local procedure UpdateAdjCostJobQueueTimeout()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobTimeout: Duration;
+    begin
+        JobTimeout := 4 * 60 * 60 * 1000;  //4 hours
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Report);
+        JobQueueEntry.SetRange("Object ID to Run", Report::"Adjust Cost - Item Entries");
+        if JobQueueEntry.FindSet(true) then
+            repeat
+                if (JobQueueEntry."Job Timeout" > JobTimeout) or (JobQueueEntry."Job Timeout" = 0) then begin
+                    JobQueueEntry."Job Timeout" := JobTimeout;
+                    JobQueueEntry.Modify();
+                end;
             until JobQueueEntry.Next() = 0;
     end;
 #endif
