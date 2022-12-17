@@ -202,6 +202,7 @@
         Type: Option Proforma,Draft;
     begin
         POSSale.GetCurrentSale(SalePOS);
+        SalePOS.TestField("Customer No.");
         CreateSalesHeader(SalePOS, SalesHeader);
 
         if CustomerCreditCheck then
@@ -209,7 +210,6 @@
 
         if WarningCustomerCreditCheck then
             DoCustomerWarningCreditCheck(SalesHeader);
-
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -299,16 +299,12 @@
     begin
         SalesHeader.Init();
         SalesHeader."Document Type" := DocumentType;
-        SalesHeader."Document Date" := WorkDate();
+        SalesHeader."No." := '';
         SalesHeader."Posting Date" := Today();
         SalesHeader."Salesperson Code" := SalePOS."Salesperson Code";
-        SalesHeader."Sell-to Customer No." := SalePOS."Customer No.";
+        SalesHeader.SetRange("Sell-to Customer No.", SalePOS."Customer No.");
         SalesHeader.Insert(true);
-        if SalePOS."Customer No." <> '' then begin
-            SalesHeader.Validate("Sell-to Customer No.", SalePOS."Customer No.");
-        end;
 
-        SalesHeader.Validate("Sell-to Customer No.");
         SalesHeader.Validate("Currency Code", '');
         if Customer.Get(SalesHeader."Bill-to Customer No.") then begin
             GLSetup.Get();
@@ -398,6 +394,7 @@
         ItemTrackingCode: Record "Item Tracking Code";
         ItemTrackingSetup: Record "Item Tracking Setup";
         ItemTrackingManagement: Codeunit "Item Tracking Management";
+        SalesPriceRecalculated: Boolean;
     begin
         if SaleLinePOS.FindSet() then
             repeat
@@ -418,20 +415,16 @@
                         SalesLine.Type := SalesLine.Type::Item;
                 end;
                 SalesLine."Line No." := SaleLinePOS."Line No.";
-                SaleLinePOS.TransferToSalesLine(SalesLine);
-                SalesLine."Line No." := SaleLinePOS."Line No.";
+                SalesPriceRecalculated := SaleLinePOS.TransferToSalesLine(SalesLine, TransferPostingSetup);
                 SalesLine.Insert(true);
                 if SalesLine.Type <> SalesLine.Type::" " then begin
-                    if SalesHeader."Document Type" in
-                      [SalesHeader."Document Type"::"Return Order", SalesHeader."Document Type"::"Credit Memo"] then
+                    if SalesHeader.IsCreditDocType() or (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment") then
                         SalesLine.Validate(Quantity, -SaleLinePOS.Quantity)
-                    else begin
-                        SalesLine.Validate(Quantity, SaleLinePOS.Quantity);
-                        if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"GL Payment" then
-                            SalesLine.Validate(Quantity, -SaleLinePOS.Quantity);
-                    end;
+                    else
+                        if SalesLine.Quantity <> SaleLinePOS.Quantity then
+                            SalesLine.Validate(Quantity, SaleLinePOS.Quantity);
 
-                    if SalesLine."Unit Price" <> SaleLinePOS."Unit Price" then begin
+                    if (SalesLine."Unit Price" <> SaleLinePOS."Unit Price") and not SalesPriceRecalculated then begin
                         SalesLine."Line Discount %" := SaleLinePOS."Discount %";
                         SalesLine.Validate("Unit Price", SaleLinePOS."Unit Price");
                     end;
@@ -616,15 +609,6 @@
 
     local procedure TransferInfoFromSaleLinePOS(var SaleLinePOS: Record "NPR POS Sale Line"; var SalesLine: Record "Sales Line")
     begin
-        if TransferPostingSetup then begin
-            if SaleLinePOS."Posting Group" <> '' then
-                SalesLine.Validate("Posting Group", SaleLinePOS."Posting Group");
-            if SaleLinePOS."Gen. Prod. Posting Group" <> '' then
-                SalesLine.Validate("Gen. Prod. Posting Group", SaleLinePOS."Gen. Prod. Posting Group");
-            if SaleLinePOS."Gen. Bus. Posting Group" <> '' then
-                SalesLine.Validate("Gen. Bus. Posting Group", SaleLinePOS."Gen. Bus. Posting Group");
-        end;
-
         if TransferDimensions then begin
             SalesLine."Dimension Set ID" := SaleLinePOS."Dimension Set ID";
             SalesLine."Shortcut Dimension 1 Code" := SaleLinePOS."Shortcut Dimension 1 Code";
@@ -637,7 +621,6 @@
             if SaleLinePOS."Tax Liable" then
                 SalesLine.Validate("Tax Liable", true);
         end;
-
     end;
 
     procedure ReserveSalesLines(var SalesHeader: Record "Sales Header"; WithError: Boolean)
