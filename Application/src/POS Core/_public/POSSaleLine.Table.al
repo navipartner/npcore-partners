@@ -1743,7 +1743,6 @@
     var
         Item: Record Item;
         POSUnitGlobal: Record "NPR POS Unit";
-        CustomerGlobal: Record Customer;
         SalePOS: Record "NPR POS Sale";
         Currency: Record Currency;
         DimMgt: Codeunit DimensionManagement;
@@ -1828,7 +1827,13 @@
         UpdateAmounts(SaleLinePOS);
     end;
 
+    [Obsolete('Use the version with 2 parameters instead.')]
     procedure TransferToSalesLine(var SalesLine: Record "Sales Line"): Boolean
+    begin
+        exit(TransferToSalesLine(SalesLine, true));
+    end;
+
+    procedure TransferToSalesLine(var SalesLine: Record "Sales Line"; TransferPostingGroups: Boolean) SalesPriceRecalculated: Boolean
     var
         Txt001: Label 'Deposit';
     begin
@@ -1846,34 +1851,68 @@
         end;
 
         SalesLine.Validate("No.", "No.");
+        if TransferPostingGroups then begin
+            if "Posting Group" <> '' then
+                SalesLine."Posting Group" := "Posting Group";
+            if "Gen. Bus. Posting Group" <> '' then
+                SalesLine."Gen. Bus. Posting Group" := "Gen. Bus. Posting Group";
+            if "Gen. Prod. Posting Group" <> '' then
+                SalesLine."Gen. Prod. Posting Group" := "Gen. Prod. Posting Group";
+            if ("VAT Bus. Posting Group" <> '') and (SalesLine."VAT Bus. Posting Group" <> "VAT Bus. Posting Group") then begin
+                SalesLine."VAT Bus. Posting Group" := "VAT Bus. Posting Group";
+                if ("VAT Prod. Posting Group" = '') or (SalesLine."VAT Prod. Posting Group" = "VAT Prod. Posting Group") then
+                    SalesLine.Validate("VAT Prod. Posting Group");
+            end;
+            if ("VAT Prod. Posting Group" <> '') and (SalesLine."VAT Prod. Posting Group" <> "VAT Prod. Posting Group") then
+                SalesLine.Validate("VAT Prod. Posting Group", "VAT Prod. Posting Group");
+        end;
+
         SalesLine."Location Code" := "Location Code";
-        SalesLine."Posting Group" := "Posting Group";
+        SalesLine.Validate("Variant Code", "Variant Code");
         SalesLine.Validate("Unit of Measure Code", "Unit of Measure Code");
         SalesLine.Validate(Quantity, Quantity);
         SalesLine.Description := Description;
-        SalesLine."Unit Price" := "Unit Price";
-        SalesLine."Line Discount %" := "Discount %";
-        SalesLine."Line Discount Amount" := "Discount Amount";
-        SalesLine.Amount := Amount;
-        SalesLine."Line Amount" := "Line Amount";
-        SalesLine."Amount Including VAT" := "Amount Including VAT";
-        SalesLine."Allow Line Disc." := "Allow Line Discount";
-        SalesLine."Customer Price Group" := "Customer Price Group";
-        if CustomerGlobal."Bill-to Customer No." <> '' then
-            SalesLine."Bill-to Customer No." := CustomerGlobal."Bill-to Customer No."
-        else
-            SalesLine."Bill-to Customer No." := SalesLine."Sell-to Customer No.";
+        SalesLine."Description 2" := "Description 2";
 
-        SalesLine."Currency Code" := "Currency Code";
-        SalesLine."VAT Base Amount" := "VAT Base Amount";
+        SalesLine."Unit Price" := "Unit Price";
+        SalesPriceRecalculated := SalesLine_AjdustPriceForVAT(Rec, SalesLine);
+        SalesLine."Allow Line Disc." := "Allow Line Discount";
+        SalesLine."Line Discount %" := "Discount %";
+        if not SalesPriceRecalculated then begin
+            SalesLine."Line Discount Amount" := "Discount Amount";
+            SalesLine.Amount := Amount;
+            SalesLine."Line Amount" := "Line Amount";
+            SalesLine."Amount Including VAT" := "Amount Including VAT";
+            SalesLine."VAT Base Amount" := "VAT Base Amount";
+            SalesLine."VAT Calculation Type" := "VAT Calculation Type";
+            SalesLine."VAT %" := "VAT %";
+        end;
+        SalesLine."Customer Price Group" := "Customer Price Group";
         SalesLine."Unit Cost" := "Unit Cost";
+        SalesLine."Unit Cost (LCY)" := "Unit Cost (LCY)";
+        SalesLine.Validate("Unit Price");
         SalesLine."NPR Discount Type" := "Discount Type";
         SalesLine."NPR Discount Code" := "Discount Code";
-        SalesLine."VAT Calculation Type" := "VAT Calculation Type";
-        SalesLine."Unit Cost (LCY)" := "Unit Cost (LCY)";
-        SalesLine.Validate("Variant Code", "Variant Code");
-        SalesLine.Description := Description;
-        SalesLine."Description 2" := "Description 2";
+    end;
+
+    local procedure SalesLine_AjdustPriceForVAT(FromSaleLinePOS: Record "NPR POS Sale Line"; var SalesLine: Record "Sales Line") PriceRecalculated: Boolean
+    var
+        SalesHeader: Record "Sales Header";
+        ToSaleLinePOS: Record "NPR POS Sale Line";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+    begin
+        ToSaleLinePOS := FromSaleLinePOS;
+        ToSaleLinePOS."VAT Bus. Posting Group" := SalesLine."VAT Bus. Posting Group";
+        ToSaleLinePOS."VAT Prod. Posting Group" := SalesLine."VAT Prod. Posting Group";
+        ToSaleLinePOS."VAT Calculation Type" := SalesLine."VAT Calculation Type";
+        ToSaleLinePOS."VAT %" := SalesLine."VAT %";
+        if SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") then
+            ToSaleLinePOS."Price Includes VAT" := SalesHeader."Prices Including VAT";
+
+        exit(
+            POSSaleLine.DoConvertPriceToVAT(
+                FromSaleLinePOS."Price Includes VAT", FromSaleLinePOS."VAT Bus. Posting Group", FromSaleLinePOS."VAT Prod. Posting Group",
+                ToSaleLinePOS, SalesLine."Unit Price"));
     end;
 
     procedure CheckSerialNoApplication(ItemNo: Code[20]; SerialNo: Code[50])
