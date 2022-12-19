@@ -274,6 +274,8 @@
 
     fieldgroups
     {
+        fieldgroup(DropDown; Code, "Processing Type") { }
+        fieldgroup(Brick; Code, "Processing Type") { }
     }
 
     trigger OnInsert()
