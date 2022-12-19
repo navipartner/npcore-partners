@@ -16,7 +16,8 @@
 
         RetailSalesCue.SetRange("Date Filter", Today());
         RetailSalesCue.CalcFields("Import Pending", "Task List", "Daily Sales Orders", "Sales Orders", "Shipped Sales Orders", "Sales Return Orders",
-                                    "Pending Inc. Documents", "Processed Error Tasks", "Failed Webshop Payments", "Sales Quotes", "Magento Orders", "Daily Sales Invoices", "Tasks Unprocessed");
+                                    "Pending Inc. Documents", "Processed Error Tasks", "Failed Webshop Payments", "Sales Quotes", "Magento Orders",
+                                    "Daily Sales Invoices", "Tasks Unprocessed", "Posted Sales Invoices");
 
         Result.Add(Format(RetailSalesCue.FieldNo("Import Pending")), Format(RetailSalesCue."Import Pending", 0, 9));
         Result.Add(Format(RetailSalesCue.FieldNo("Task List")), Format(RetailSalesCue."Task List", 0, 9));
@@ -31,6 +32,7 @@
         Result.Add(Format(RetailSalesCue.FieldNo("Magento Orders")), Format(RetailSalesCue."Magento Orders", 0, 9));
         Result.Add(Format(RetailSalesCue.FieldNo("Daily Sales Invoices")), Format(RetailSalesCue."Daily Sales Invoices", 0, 9));
         Result.Add(Format(RetailSalesCue.FieldNo("Tasks Unprocessed")), Format(RetailSalesCue."Tasks Unprocessed", 0, 9));
+        Result.Add(Format(RetailSalesCue.FieldNo("Posted Sales Invoices")), Format(RetailSalesCue."Posted Sales Invoices", 0, 9));
 
         Page.SetBackgroundTaskResult(Result);
     end;
