@@ -17,8 +17,9 @@
                 {
                     Caption = 'Unposted Item Transactions';
                     ToolTip = 'Specifies the number of the unposted item transactions. By clicking, you can drill down to a list of unposted item transactions.';
-
                     ApplicationArea = NPRRetail;
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     var
@@ -34,8 +35,9 @@
                 {
                     Caption = 'Unposted G/L Transactions';
                     ToolTip = 'Specifies the number of the unposted G/L transactions. By clicking, you can drill down to the list of unposted G/L transactions.';
-
                     ApplicationArea = NPRRetail;
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     var
@@ -55,10 +57,11 @@
                 {
                     Caption = 'Failed Item Transactions';
                     ToolTip = 'Specifies the number of the failed item transactions. By clicking, you can drill down to the list of the failed item transactions.';
-
                     ApplicationArea = NPRRetail;
                     Style = Unfavorable;
                     StyleExpr = FailedItemTransExists;
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     var
@@ -73,10 +76,11 @@
                 {
                     Caption = 'Failed G/L Transaction';
                     ToolTip = 'Specifies the number of the Failed G/L transactions. By clicking, you can drill down to the list of the Failed G/L transactions.';
-
                     ApplicationArea = NPRRetail;
                     Style = Unfavorable;
                     StyleExpr = FailedGLPostTransExists;
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     var
@@ -97,8 +101,9 @@
                 {
                     Caption = 'EFT Reconciliation Errors';
                     ToolTip = 'Specifies the number of Reconciliation EFT Errors in the last 30 days. By clicking, you can drill down to the list of Reconciliation EFT Errors in the last 30 days.';
-
                     ApplicationArea = NPRRetail;
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     var
@@ -115,8 +120,9 @@
                 {
                     Caption = 'Unfinished EFT Requests';
                     ToolTip = 'Specifies the number of Unfinished EFT Requests in last 30 days. By clicking, you can drill down to the list of Unfinished EFT Requests in last 30 days.';
-
                     ApplicationArea = NPRRetail;
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     var
@@ -133,8 +139,9 @@
                 {
                     Caption = 'EFT Requests with Unknown Result';
                     ToolTip = 'Specifies the number of Unfinished EFT Requests in last 30 days. By clicking, you can drill down to the list of Unfinished EFT Requests in last 30 days.';
-
                     ApplicationArea = NPRRetail;
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     var
@@ -157,8 +164,9 @@
                 {
                     Caption = 'Campaign Discounts';
                     ToolTip = 'Specifies the number of the Campaign Discounts. By clicking, you can drill down to the list of the Campaign Discounts.';
-
                     ApplicationArea = NPRRetail;
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -170,8 +178,9 @@
                 {
                     Caption = 'Mix Discounts';
                     ToolTip = 'Specifies the number of the Mix Discounts. By clicking, you can drill down to the list of the Mix Discounts.';
-
                     ApplicationArea = NPRRetail;
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     var
@@ -186,8 +195,9 @@
                 {
                     Caption = 'Coupon List';
                     ToolTip = 'Specifies the number of the Coupon List. By clicking, you can drill down to the list of the Coupon List.';
-
                     ApplicationArea = NPRRetail;
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     var
@@ -202,8 +212,9 @@
                 {
                     Caption = 'Voucher List';
                     ToolTip = 'Specifies the number of the Voucher List. By clicking, you can drill down to the list of the Voucher List.';
-
                     ApplicationArea = NPRRetail;
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     var
@@ -255,7 +266,7 @@
             BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
     end;
 
-    local procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Integer
+    local procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Decimal
     begin
         if not BackgroundTaskResults.ContainsKey(FieldNo) then
             exit(0);
