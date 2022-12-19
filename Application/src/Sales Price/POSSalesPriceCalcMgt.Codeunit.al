@@ -140,6 +140,7 @@
         CalcBestLineDisc(TempSalesPriceLineDisc);
 
         SaleLinePOS."Discount %" := TempSalesPriceLineDisc."Line Discount %";
+        SaleLinePOS."Discount Code" := TempSalesPriceLineDisc."Source No.";
     end;
 
     local procedure SalesLinePriceExists(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
