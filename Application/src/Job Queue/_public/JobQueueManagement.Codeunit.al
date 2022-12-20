@@ -237,6 +237,7 @@
         if JobTimeout <> 0 then
             Parameters."Job Timeout" := JobTimeout;
 #ENDIF
+        Clear(JobTimeout);
 
         exit(InitRecurringJobQueueEntry(Parameters, JobQueueEntryOut));
     end;
@@ -256,20 +257,8 @@
         if Handled then
             exit(Success);
 
-        JobQueueEntry.LockTable(true);
-        JobQueueEntry.SetRange("Object Type to Run", Parameters."Object Type to Run");
-        JobQueueEntry.SetRange("Object ID to Run", Parameters."Object ID to Run");
-        JobQueueEntry.SetRange("Parameter String", Parameters."Parameter String");
-        JobQueueEntry.SetRange("Job Queue Category Code", Parameters."Job Queue Category Code");
-        if Format(Parameters."Record ID to Process") <> '' then
-            JobQueueEntry.SetFilter("Record ID to Process", Format(Parameters."Record ID to Process"));
-        if JobQueueEntry.FindSet() then
-            repeat
-                if not JobQueueEntry.IsExpired(Parameters."Earliest Start Date/Time") then begin
-                    JobQueueEntryOut := JobQueueEntry;
-                    exit(true);
-                end;
-            until JobQueueEntry.Next() = 0;
+        if JobQueueEntryExists(Parameters, JobQueueEntryOut) then
+            exit(true);
 
         JobQueueEntry.Init();
         JobQueueEntry.Validate("Object Type to Run", Parameters."Object Type to Run");
@@ -317,6 +306,32 @@
 
         JobQueueEntryOut := JobQueueEntry;
         exit(true);
+    end;
+
+    procedure JobQueueEntryExists(Parameters: Record "Job Queue Entry"; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.LockTable(true);
+        JobQueueEntry.SetRange("Object Type to Run", Parameters."Object Type to Run");
+        JobQueueEntry.SetRange("Object ID to Run", Parameters."Object ID to Run");
+        JobQueueEntry.SetRange("Parameter String", Parameters."Parameter String");
+        JobQueueEntry.SetRange("Job Queue Category Code", Parameters."Job Queue Category Code");
+        if Format(Parameters."Record ID to Process") <> '' then
+            JobQueueEntry.SetFilter("Record ID to Process", Format(Parameters."Record ID to Process"));
+        if JobQueueEntry.IsEmpty() then
+            JobQueueEntry.SetRange("Job Queue Category Code");
+        if JobQueueEntry.IsEmpty() then
+            exit(false);
+        JobQueueEntry.Find('-');
+        repeat
+            if not JobQueueEntry.IsExpired(Parameters."Earliest Start Date/Time") then begin
+                JobQueueEntryOut := JobQueueEntry;
+                JobQueueEntryOut.Mark(true);
+                exit(true);
+            end;
+        until JobQueueEntry.Next() = 0;
+        exit(false);
     end;
 
     procedure StartJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
@@ -382,53 +397,45 @@
     internal procedure AddPosItemPostingJobQueue()
     var
         JobQueueEntry: Record "Job Queue Entry";
-        JobQueueCategoryCode: Code[10];
         JobQueueDescrLbl: Label 'POS Item posting', MaxLength = 250;
     begin
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR POS Post Item Entries JQ");
-        if not JobQueueEntry.IsEmpty() then
-            exit;
+        SetJobTimeout(4, 0);  //4 hours
 
-        JobQueueCategoryCode := CreateAndAssignJobQueueCategory();
-        JobQueueEntry.ScheduleJobQueueEntryForLater(Codeunit::"NPR POS Post Item Entries JQ", CurrentDateTime() + 360 * 1000, JobQueueCategoryCode, '');
-
-        JobQueueEntry.Validate(Description, JobQueueDescrLbl);
-        JobQueueEntry.Validate("Run on Mondays", true);
-        JobQueueEntry.Validate("Run on Tuesdays", true);
-        JobQueueEntry.Validate("Run on Wednesdays", true);
-        JobQueueEntry.Validate("Run on Thursdays", true);
-        JobQueueEntry.Validate("Run on Fridays", true);
-        JobQueueEntry.Validate("Run on Saturdays", true);
-        JobQueueEntry.Validate("Run on Sundays", true);
-        JobQueueEntry.Validate("No. of Minutes between Runs", 1);
-        JobQueueEntry.Validate(Status, JobQueueEntry.Status::Ready);
-        JobQueueEntry.Modify();
+        if InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::codeunit,
+            Codeunit::"NPR POS Post Item Entries JQ",
+            '',
+            JobQueueDescrLbl,
+            NowWithDelayInSeconds(360),
+            1,
+            CreateAndAssignJobQueueCategory(),
+            JobQueueEntry)
+        then
+            StartJobQueueEntry(JobQueueEntry);
     end;
 
     internal procedure AddPosPostingJobQueue()
     var
         JobQueueEntry: Record "Job Queue Entry";
-        DF: DateFormula;
-        ParamString: Text[250];
-        JobQueueCategoryCode: Code[10];
+        NextRunDateFormula: DateFormula;
         JobQueueDescrLbl: Label 'POS posting', MaxLength = 250;
     begin
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR POS Post GL Entries JQ");
-        if not JobQueueEntry.IsEmpty() then
-            exit;
+        Evaluate(NextRunDateFormula, '<1D>');
+        SetJobTimeout(4, 0);  //4 hours
 
-        JobQueueCategoryCode := CreateAndAssignJobQueueCategory();
-        JobQueueEntry.ScheduleJobQueueEntryForLater(Codeunit::"NPR POS Post GL Entries JQ", CurrentDateTime() + 360 * 1000, JobQueueCategoryCode, ParamString);
-
-        JobQueueEntry.Validate("Job Queue Category Code", JobQueueCategoryCode);
-        JobQueueEntry.Validate(Description, JobQueueDescrLbl);
-        evaluate(DF, '<+1D>');
-        JobQueueEntry.Validate("Next Run Date Formula", DF);
-        JobQueueEntry.Validate("Starting Time", 230000T);
-        JobQueueEntry.Validate(Status, JobQueueEntry.Status::Ready);
-        JobQueueEntry.Modify(true);
+        if InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::codeunit,
+            Codeunit::"NPR POS Post GL Entries JQ",
+            '',
+            JobQueueDescrLbl,
+            NowWithDelayInSeconds(360),
+            230000T,
+            0T,
+            NextRunDateFormula,
+            CreateAndAssignJobQueueCategory(),
+            JobQueueEntry)
+        then
+            StartJobQueueEntry(JobQueueEntry);
     end;
 
     internal procedure CreateAndAssignJobQueueCategory(): Code[10]
@@ -504,6 +511,11 @@
             if JobQueueEntry."NPR Auto-Resched. Delay (sec.)" < 300 then
                 JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 300;
         end;
+    end;
+
+    procedure SetJobTimeout(NoOfHours: Integer; NoOfMinutes: Integer)
+    begin
+        SetJobTimeout(NoOfHours * 60 * 60 * 1000 + NoOfMinutes * 60 * 1000);
     end;
 
     procedure SetJobTimeout(NewTimeout: Duration)
