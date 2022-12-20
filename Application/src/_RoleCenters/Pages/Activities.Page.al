@@ -42,8 +42,14 @@
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
+                    var
+                        PaymentLine: Record "NPR Magento Payment Line";
                     begin
-                        Page.RunModal(Page::"NPR Magento Payment Line List");
+                        PaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
+                        PaymentLine.SetFilter("Payment Gateway Code", '<>%1', '');
+                        PaymentLine.SetRange("Date Captured", 0D);
+
+                        Page.RunModal(Page::"NPR Magento Payment Line List", PaymentLine);
                         CurrPage.Update(false);
                     end;
                 }
