@@ -37,7 +37,7 @@
         if AdjCostJobQueueExists(NotBeforeDateTime) then
             exit;
 
-        JobQueueMgt.SetJobTimeout(4 * 60 * 60 * 1000);  //4 hours
+        JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntryGlobal."Object Type to Run"::Report,
             Report::"Adjust Cost - Item Entries",
@@ -105,21 +105,12 @@
     local procedure JobQueueEntryExists(ObjectTypeToRun: Integer; ObjectIdToRun: Integer; AtDateTime: DateTime): Boolean
     var
         JobQueueEntry: Record "Job Queue Entry";
-        Found: Boolean;
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
-        JobQueueEntry.SetRange("Object Type to Run", ObjectTypeToRun);
-        JobQueueEntry.SetRange("Object ID to Run", ObjectIdToRun);
-        if JobQueueEntry.IsEmpty() then
-            exit(false);
-        JobQueueEntry.FindSet();
-        Repeat
-            Found := not JobQueueEntry.IsExpired(AtDateTime);
-            if Found then begin
-                JobQueueEntryGlobal := JobQueueEntry;
-                JobQueueEntryGlobal.Mark(true);
-            end;
-        until Found or (JobQueueEntry.Next() = 0);
-        exit(Found);
+        JobQueueEntry."Object Type to Run" := ObjectTypeToRun;
+        JobQueueEntry."Object ID to Run" := ObjectIdToRun;
+        JobQueueEntry."Earliest Start Date/Time" := AtDateTime;
+        exit(JobQueueMgt.JobQueueEntryExists(JobQueueEntry, JobQueueEntryGlobal));
     end;
 
     local procedure GetTimingParameters(var NotBeforeDateTime: DateTime; var NextRunDateFormula: DateFormula)
