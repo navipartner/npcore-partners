@@ -2,7 +2,6 @@
 {
     Extensible = False;
     Caption = 'Collect Document List';
-    InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
 
@@ -233,26 +232,6 @@
     {
         area(processing)
         {
-            action(New)
-            {
-                Caption = 'New';
-                Image = NewDocument;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = New;
-                PromotedIsBig = true;
-                ShortCutKey = 'Ctrl+Insert';
-                ToolTip = 'Create new Collect in Store Order';
-                ApplicationArea = NPRRetail;
-
-
-                trigger OnAction()
-                var
-                    NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
-                begin
-                    NpCsCollectMgt.NewCollectOrder();
-                end;
-            }
             action("Run Next Workflow Step")
             {
                 Caption = 'Run Next Workflow Step';
@@ -266,7 +245,6 @@
                     NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
                 begin
                     NpCsWorkflowMgt.ScheduleRunWorkflow(Rec);
-                    //NpCsCollectMgt.RunLog(Rec, true);
                 end;
             }
             group("Send Order")
@@ -379,5 +357,13 @@
             }
         }
     }
+
+    trigger OnNewRecord(BelowxRec: Boolean)
+    var
+        NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
+    begin
+        NpCsCollectMgt.NewCollectOrder();
+    end;
+
 }
 
