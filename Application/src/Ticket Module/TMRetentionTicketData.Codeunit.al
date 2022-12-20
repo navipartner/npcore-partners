@@ -256,6 +256,7 @@
         JobQueueDescrLbl: Label 'Remove obsolete tickets and schedules', MaxLength = 250;
     begin
         Evaluate(NextRunDateFormula, '<1D>');
+        JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
 
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
