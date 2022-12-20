@@ -20,8 +20,6 @@
                     Caption = 'Task List';
                     ToolTip = 'Specifies the number of the tasks assigned to the current user.';
                     ApplicationArea = NPRRetail;
-                    AutoFormatType = 11;
-                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     var
@@ -77,9 +75,9 @@
                 {
                     Caption = 'Daily Sales Orders';
                     ToolTip = 'Specifies the number of the daily sales orders that have been registered on today''s date.';
+
+
                     ApplicationArea = NPRRetail;
-                    AutoFormatType = 11;
-                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -90,9 +88,9 @@
                 {
                     Caption = 'Sales Orders';
                     ToolTip = 'Specifies the number of the sales orders that have been registered.';
+
+
                     ApplicationArea = NPRRetail;
-                    AutoFormatType = 11;
-                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -104,9 +102,9 @@
                     Caption = 'Shipped Sales Orders';
                     ShowCaption = true;
                     ToolTip = 'Specifies the number of the sales orders that have been shipped.';
+
+
                     ApplicationArea = NPRRetail;
-                    AutoFormatType = 11;
-                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -119,28 +117,12 @@
                     ShowCaption = true;
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Displays the number of the Sales Return Orders. If you click you can drilldown to the list of the Sales Return Orders.';
-                    AutoFormatType = 11;
-                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+
 
                     trigger OnDrillDown()
                     begin
                         DrillDownSalesOrderList(Rec.FieldNo("Sales Return Orders"));
                     end;
-                }
-                field(PostedSalesInvoices; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Posted Sales Invoices"))))
-                {
-                    Caption = 'Posted Sales Invoices';
-                    ShowCaption = true;
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Displays the number of the Posted Sales Invoices. If you click you can drilldown to the list of the Posted Sales Invoices.';
-                    AutoFormatType = 11;
-                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
-
-                    trigger OnDrillDown()
-                    begin
-                        DrillDownSalesInvoiceList();
-                    end;
-
                 }
                 field(SalesCreditMemos; Rec."Sales Credit Memos")
                 {
@@ -157,6 +139,7 @@
                     ShowCaption = true;
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the number of the Collect Documents. If you click you can drilldown to the list of Collect Documents.';
+
                 }
             }
             cuegroup("Incoming Documents")
@@ -205,7 +188,7 @@
             BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
     end;
 
-    local procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Decimal
+    local procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Integer
     begin
         if not BackgroundTaskResults.ContainsKey(FieldNo) then
             exit(0);
@@ -226,14 +209,6 @@
                 SalesHeader.SetRange("Document Type", "Sales Document Type"::"Return Order");
         end;
         Page.RunModal(Page::"Sales Order List", SalesHeader);
-        CurrPage.Update(false);
-    end;
-
-    local procedure DrillDownSalesInvoiceList()
-    var
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-    begin
-        Page.RunModal(Page::"Posted Sales Invoices", SalesInvoiceHeader);
         CurrPage.Update(false);
     end;
 
