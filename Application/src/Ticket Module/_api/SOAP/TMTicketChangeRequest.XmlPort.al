@@ -38,211 +38,212 @@ xmlport 6060107 "NPR TM Ticket Change Request"
                     }
                 }
 
-            }
-            tableelement(tmpResult; "NPR TM Ticket Reservation Req.")
-            {
-                XmlName = 'Result';
-                UseTemporary = true;
-                MinOccurs = Zero;
-                MaxOccurs = Once;
-
-                textelement(ResponseCode)
+                tableelement(tmpResult; "NPR TM Ticket Reservation Req.")
                 {
-                    MinOccurs = Zero;
-                    MaxOccurs = Once;
-                }
-
-                textelement(ResponseMessage)
-                {
-                    MinOccurs = Zero;
-                    MaxOccurs = Once;
-                }
-
-                textelement(ExpiresAt)
-                {
-                    XmlName = 'ExpiresAt';
+                    XmlName = 'Result';
+                    UseTemporary = true;
                     MinOccurs = Zero;
                     MaxOccurs = Once;
 
-                    textattribute(ExpiresAtUTC)
+                    textelement(ResponseCode)
                     {
-                        XmlName = 'UTC';
-                        trigger OnBeforePassVariable()
-                        begin
-                            ExpiresAtUTC := Format(tmpResult."Expires Date Time", 0, 9);
-                        end;
-                    }
-                }
-
-                textelement(Ticket)
-                {
-                    XmlName = 'Ticket';
-                    MinOccurs = Zero;
-                    MaxOccurs = Once;
-
-                    textattribute(ChangeRequestToken)
-                    {
-                        XmlName = 'ChangeRequestToken';
-                        Occurrence = Required;
+                        MinOccurs = Zero;
+                        MaxOccurs = Once;
                     }
 
-                    textelement(Admissions)
+                    textelement(ResponseMessage)
                     {
-                        XmlName = 'Admissions';
+                        MinOccurs = Zero;
+                        MaxOccurs = Once;
+                    }
+
+                    textelement(ExpiresAt)
+                    {
+                        XmlName = 'ExpiresAt';
                         MinOccurs = Zero;
                         MaxOccurs = Once;
 
-                        tableelement(tmpChangeRequest; "NPR TM Ticket Reservation Req.")
+                        textattribute(ExpiresAtUTC)
                         {
-                            XmlName = 'Admission';
-                            UseTemporary = true;
-                            MinOccurs = Once;
-                            MaxOccurs = Unbounded;
+                            XmlName = 'UTC';
+                            trigger OnBeforePassVariable()
+                            begin
+                                ExpiresAtUTC := Format(tmpResult."Expires Date Time", 0, 9);
+                            end;
+                        }
+                    }
 
-                            fieldattribute(AdmissionCode; tmpChangeRequest."Admission Code")
+                    textelement(Ticket)
+                    {
+                        XmlName = 'Ticket';
+                        MinOccurs = Zero;
+                        MaxOccurs = Once;
+
+                        textattribute(ChangeRequestToken)
+                        {
+                            XmlName = 'ChangeRequestToken';
+                            Occurrence = Required;
+                        }
+
+                        textelement(Admissions)
+                        {
+                            XmlName = 'Admissions';
+                            MinOccurs = Zero;
+                            MaxOccurs = Once;
+
+                            tableelement(tmpChangeRequest; "NPR TM Ticket Reservation Req.")
                             {
-                                XmlName = 'Code';
-                                Occurrence = Required;
-                            }
+                                XmlName = 'Admission';
+                                UseTemporary = true;
+                                MinOccurs = Once;
+                                MaxOccurs = Unbounded;
 
-                            textelement(SceduleEntry)
-                            {
-                                fieldattribute(EntryNo; tmpChangeRequest."External Adm. Sch. Entry No.")
+                                fieldattribute(AdmissionCode; tmpChangeRequest."Admission Code")
                                 {
-                                    XmlName = 'ExternalEntryNo';
+                                    XmlName = 'Code';
                                     Occurrence = Required;
                                 }
 
-                                textattribute(ReservationType)
+                                textelement(ScheduleEntry)
                                 {
-                                    XmlName = 'ReservationType';
-                                    Occurrence = Required;
-                                }
+                                    XmlName = 'ScheduleEntry';
 
-                                textattribute(AdmissionStartDate)
-                                {
-                                    XmlName = 'Date';
-                                    Occurrence = Optional;
-                                }
-
-                                textattribute(AdmissionStartTime)
-                                {
-                                    XmlName = 'StartTime';
-                                    Occurrence = Optional;
-                                }
-
-                                textattribute(AdmissionEndTime)
-                                {
-                                    XmlName = 'EndTime';
-                                    Occurrence = Optional;
-                                }
-
-                                textattribute(ValidFrom)
-                                {
-                                    XmlName = 'ValidFrom';
-                                    Occurrence = Optional;
-                                }
-
-                                textattribute(ValidUntil)
-                                {
-                                    XmlName = 'ValidUntil';
-                                    Occurrence = Optional;
-                                }
-
-                                textattribute(CanReschedule)
-                                {
-                                    XmlName = 'CanReschedule';
-                                    Occurrence = Required;
-                                }
-                                textattribute(admission_price)
-                                {
-                                    XmlName = 'admission_price';
-                                    trigger OnBeforePassVariable()
-                                    begin
-                                        admission_price := Format(AdmissionPrice, 0, 9);
-                                    end;
-                                }
-                                textelement(admission_is)
-                                {
-                                    XmlName = 'admission_is';
-                                    textattribute(admission_is_id)
+                                    fieldattribute(EntryNo; tmpChangeRequest."External Adm. Sch. Entry No.")
                                     {
-                                        XmlName = 'option_value';
+                                        XmlName = 'ExternalEntryNo';
+                                        Occurrence = Required;
+                                    }
+
+                                    textattribute(ReservationType)
+                                    {
+                                        XmlName = 'ReservationType';
+                                        Occurrence = Required;
+                                    }
+
+                                    textattribute(AdmissionStartDate)
+                                    {
+                                        XmlName = 'Date';
+                                        Occurrence = Optional;
+                                    }
+
+                                    textattribute(AdmissionStartTime)
+                                    {
+                                        XmlName = 'StartTime';
+                                        Occurrence = Optional;
+                                    }
+
+                                    textattribute(AdmissionEndTime)
+                                    {
+                                        XmlName = 'EndTime';
+                                        Occurrence = Optional;
+                                    }
+
+                                    textattribute(ValidFrom)
+                                    {
+                                        XmlName = 'ValidFrom';
+                                        Occurrence = Optional;
+                                    }
+
+                                    textattribute(ValidUntil)
+                                    {
+                                        XmlName = 'ValidUntil';
+                                        Occurrence = Optional;
+                                    }
+
+                                    textattribute(CanReschedule)
+                                    {
+                                        XmlName = 'CanReschedule';
+                                        Occurrence = Required;
+                                    }
+                                    textattribute(admission_price)
+                                    {
+                                        XmlName = 'admission_price';
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            admission_price := Format(AdmissionPrice, 0, 9);
+                                        end;
+                                    }
+                                    textelement(admission_is)
+                                    {
+                                        XmlName = 'admission_is';
+                                        textattribute(admission_is_id)
+                                        {
+                                            XmlName = 'option_value';
+
+                                            trigger OnBeforePassVariable()
+                                            begin
+
+                                                admission_is_id := Format(tmpChangeRequest."Admission Inclusion", 0, 9);
+                                            end;
+                                        }
+
 
                                         trigger OnBeforePassVariable()
                                         begin
 
-                                            admission_is_id := Format(tmpChangeRequest."Admission Inclusion", 0, 9);
+                                            admission_is := Format(tmpChangeRequest."Admission Inclusion");
                                         end;
                                     }
 
-
-                                    trigger OnBeforePassVariable()
-                                    begin
-
-                                        admission_is := Format(tmpChangeRequest."Admission Inclusion");
-                                    end;
                                 }
 
-                            }
+                                textelement(AdmissionDescription)
+                                {
+                                    XmlName = 'Description';
+                                    MinOccurs = Once;
+                                    MaxOccurs = Once;
+                                }
 
-                            textelement(AdmissionDescription)
-                            {
-                                XmlName = 'Description';
-                                MinOccurs = Once;
-                                MaxOccurs = Once;
-                            }
+                                trigger OnAfterGetRecord()
+                                var
+                                    AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                                    Admission: Record "NPR TM Admission";
+                                    Ticket: Record "NPR TM Ticket";
+                                    TicketManagement: Codeunit "NPR TM Ticket Management";
+                                    TicketPrice: Codeunit "NPR TM Dynamic Price";
+                                    BasePrice, AddonPrice : Decimal;
+                                begin
+                                    AdmissionPrice := 0;
+                                    Admission.Get(tmpChangeRequest."Admission Code");
+                                    AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', tmpChangeRequest."External Adm. Sch. Entry No.");
+                                    AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+                                    AdmissionScheduleEntry.FindLast();
 
-                            trigger OnAfterGetRecord()
-                            var
-                                AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-                                Admission: Record "NPR TM Admission";
-                                Ticket: Record "NPR TM Ticket";
-                                TicketManagement: Codeunit "NPR TM Ticket Management";
-                                TicketPrice: Codeunit "NPR TM Dynamic Price";
-                                BasePrice, AddonPrice : Decimal;
-                            begin
-                                AdmissionPrice := 0;
-                                Admission.Get(tmpChangeRequest."Admission Code");
-                                AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', tmpChangeRequest."External Adm. Sch. Entry No.");
-                                AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-                                AdmissionScheduleEntry.FindLast();
+                                    ReservationType := 'Open';
+                                    AdmissionDescription := Admission.Description;
+                                    AdmissionStartDate := '';
+                                    AdmissionStartTime := '';
+                                    AdmissionEndTime := '';
+                                    ValidFrom := '';
+                                    ValidUntil := '';
 
-                                ReservationType := 'Open';
-                                AdmissionDescription := Admission.Description;
-                                AdmissionStartDate := '';
-                                AdmissionStartTime := '';
-                                AdmissionEndTime := '';
-                                ValidFrom := '';
-                                ValidUntil := '';
+                                    CanReschedule := Format(TicketManagement.IsRescheduleAllowed(TicketNumber, tmpChangeRequest."External Adm. Sch. Entry No.", tmpChangeRequest."Request Status Date Time"));
 
-                                CanReschedule := Format(TicketManagement.IsRescheduleAllowed(TicketNumber, tmpChangeRequest."External Adm. Sch. Entry No.", tmpChangeRequest."Request Status Date Time"));
-
-                                if (Admission.Type = Admission.Type::OCCASION) then begin
-                                    ReservationType := 'Reservation';
-                                    AdmissionStartDate := Format(AdmissionScheduleEntry."Admission Start Date", 0, 9);
-                                    AdmissionStartTime := Format(AdmissionScheduleEntry."Admission Start Time", 0, 9);
-                                    AdmissionEndTime := Format(AdmissionScheduleEntry."Admission End Time", 0, 9);
-                                end else begin
-                                    Ticket.SetFilter("External Ticket No.", '=%1', TicketNumber);
-                                    if (not (Ticket.FindFirst())) then
-                                        Ticket.Init();
-                                    ValidFrom := Format(Ticket."Valid From Date", 0, 9);
-                                    ValidUntil := Format(Ticket."Valid To Date", 0, 9)
+                                    if (Admission.Type = Admission.Type::OCCASION) then begin
+                                        ReservationType := 'Reservation';
+                                        AdmissionStartDate := Format(AdmissionScheduleEntry."Admission Start Date", 0, 9);
+                                        AdmissionStartTime := Format(AdmissionScheduleEntry."Admission Start Time", 0, 9);
+                                        AdmissionEndTime := Format(AdmissionScheduleEntry."Admission End Time", 0, 9);
+                                    end else begin
+                                        Ticket.SetFilter("External Ticket No.", '=%1', TicketNumber);
+                                        if (not (Ticket.FindFirst())) then
+                                            Ticket.Init();
+                                        ValidFrom := Format(Ticket."Valid From Date", 0, 9);
+                                        ValidUntil := Format(Ticket."Valid To Date", 0, 9)
+                                    end;
+                                    TicketPrice.CalculateScheduleEntryPrice(tmpChangeRequest."Item No.", tmpChangeRequest."Variant Code", tmpChangeRequest."Admission Code", tmpChangeRequest."External Adm. Sch. Entry No.", Today(), Time(), BasePrice, AddonPrice);
+                                    AdmissionPrice := BasePrice + AddonPrice;
                                 end;
-                                TicketPrice.CalculateScheduleEntryPrice(tmpChangeRequest."Item No.", tmpChangeRequest."Variant Code", tmpChangeRequest."Admission Code", tmpChangeRequest."External Adm. Sch. Entry No.", Today(), Time(), BasePrice, AddonPrice);
-                                AdmissionPrice := BasePrice + AddonPrice;
-                            end;
+                            }
                         }
                     }
+
+                    trigger OnAfterGetRecord()
+                    begin
+
+                    end;
                 }
-
-                trigger OnAfterGetRecord()
-                begin
-
-                end;
             }
-
         }
     }
 
