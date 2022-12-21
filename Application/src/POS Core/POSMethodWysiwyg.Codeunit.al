@@ -1,6 +1,7 @@
 ﻿codeunit 6150740 "NPR POS Method - Wysiwyg"
 {
     Access = Internal;
+
     var
         ReadingErr: Label 'executing WYSIWYG editor';
         SettingScopeErr: Label 'setting scope in WYSIWYG editor';
@@ -38,7 +39,7 @@
         Request.GetContent().Add('requestId', JSON.GetStringOrFail('requestId', ReadingErr));
         Request.GetContent().Add('success', Success);
 
-        FrontEnd.InvokeFrontEndMethod(Request);
+        FrontEnd.InvokeFrontEndMethod2(Request);
 
         Handled := true;
     end;
