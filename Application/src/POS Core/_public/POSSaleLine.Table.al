@@ -2548,7 +2548,7 @@
         NPRSalePOS: Record "NPR POS Sale";
         ItemTrackingCode: Record "Item Tracking Code";
         Positive: Boolean;
-        Txt004: Label '%2 %1 has already sold!';
+        Txt004: Label '%2 %1 is not in the stock!';
         Txt005: Label '%2 %1 is already in stock!';
         TotalNonAppliedQuantity: Decimal;
     begin
@@ -2581,16 +2581,12 @@
             CheckSerialNoAuditRoll("No.", "Serial No.", Positive);
             if Positive then begin
                 TotalNonAppliedQuantity := TotalItemLedgerEntryQuantity - TotalAuditRollQuantity - Quantity;
-                if (TotalNonAppliedQuantity < 0) then begin
-                    Message(Txt004, "Serial No.", FieldName("Serial No."));
-                    "Serial No." := '';
-                end;
+                if (TotalNonAppliedQuantity < 0) then
+                    Error(Txt004, "Serial No.", FieldName("Serial No."));
             end else begin
                 TotalNonAppliedQuantity := TotalItemLedgerEntryQuantity - TotalAuditRollQuantity - Quantity;
-                if TotalNonAppliedQuantity > 1 then begin
-                    Message(Txt005, "Serial No.", FieldName("Serial No."));
-                    "Serial No." := '';
-                end;
+                if TotalNonAppliedQuantity > 1 then
+                    Error(Txt005, "Serial No.", FieldName("Serial No."));
             end;
         end;
     end;

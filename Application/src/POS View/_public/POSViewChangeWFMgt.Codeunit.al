@@ -158,7 +158,7 @@
     end;
 
     local procedure FindNotInStockLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var ErrorMessage: Record "Error Message")
-    var        
+    var
         Msg: Text;
     begin
         if not TempSaleLinePOS.FindSet() then
@@ -172,8 +172,8 @@
                 Msg += ' ' + TempSaleLinePOS.Description;
                 if TempSaleLinePOS."Description 2" <> '' then
                     Msg += ' ' + TempSaleLinePOS."Description 2";
-                Msg += ': ' + Format(TempSaleLinePOS."MR Anvendt antal");  
-                ErrorMessage.LogSimpleMessage(ErrorMessage."Message Type"::Error, Msg);              
+                Msg += ': ' + Format(TempSaleLinePOS."MR Anvendt antal");
+                ErrorMessage.LogSimpleMessage(ErrorMessage."Message Type"::Error, Msg);
             end;
         until TempSaleLinePOS.Next() = 0;
     end;
@@ -188,7 +188,8 @@
         Item.SetRange("Variant Filter", TempSaleLinePOS."Variant Code");
         Item.SetRange("Location Filter", TempSaleLinePOS."Location Code");
         if TempSaleLinePOS."Serial No." <> '' then
-            Item.SetRange("Serial No. Filter", TempSaleLinePOS."Serial No.");
+            if SpecificItemTrackingExist(Item) then
+                Item.SetRange("Serial No. Filter", TempSaleLinePOS."Serial No.");
         Item.CalcFields(Inventory);
         exit(Item.Inventory);
     end;
@@ -252,4 +253,18 @@
             TempSaleLinePOS.Insert();
         end;
     end;
+
+    local procedure SpecificItemTrackingExist(Item: Record Item): Boolean
+    var
+        ItemTrackingCode: Record "Item Tracking Code";
+    begin
+        if Item."Item Tracking Code" = '' then
+            exit(false);
+        if not ItemTrackingCode.Get(Item."Item Tracking Code") then
+            exit(false);
+        if ItemTrackingCode."SN Specific Tracking" then
+            exit(true);
+        exit(false);
+    end;
+
 }
