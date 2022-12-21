@@ -3,11 +3,9 @@
     Access = Internal;
     Caption = 'Nc Collector';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Nc Collector List";
-    LookupPageID = "NPR Nc Collector List";
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';
-    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
+    ObsoleteState = Removed;
+    ObsoleteReason = 'NC Collector module removed from NpCore. We switched to Job Queue instead of using Task Queue.';
+    ObsoleteTag = 'BC 21 - Task Queue deprecating starting from 28/06/2022';
 
     fields
     {
@@ -27,17 +25,6 @@
             Caption = 'Table No.';
             DataClassification = CustomerContent;
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
-
-            trigger OnValidate()
-            var
-                NcCollectorFilter: Record "NPR Nc Collector Filter";
-            begin
-                if "Table No." <> xRec."Table No." then begin
-                    NcCollectorFilter.SetRange("Collector Code", Code);
-                    if not NcCollectorFilter.IsEmpty() then
-                        Error(RemoveFiltersErr);
-                end;
-            end;
         }
         field(35; "Table Name"; Text[30])
         {
@@ -51,31 +38,16 @@
         {
             Caption = 'Active';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                CheckCriteriaActiveCollector();
-            end;
         }
         field(50; "Max. Lines per Collection"; Integer)
         {
             Caption = 'Max. Lines per Collection';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                CheckCriteriaActiveCollector();
-            end;
         }
         field(70; "Wait to Send"; Duration)
         {
             Caption = 'Wait to Send';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                CheckCriteriaActiveCollector();
-            end;
         }
         field(80; "Delete Obsolete Lines"; Boolean)
         {
@@ -140,28 +112,5 @@
         {
         }
     }
-
-    trigger OnDelete()
-    var
-        NcCollection: Record "NPR Nc Collection";
-        NcCollectorFilter: Record "NPR Nc Collector Filter";
-    begin
-        NcCollection.SetRange("Collector Code", Code);
-        if not NcCollection.IsEmpty then
-            Error(CannotDeleteErr, TableCaption, Code, NcCollection.TableCaption);
-        NcCollectorFilter.SetRange("Collector Code", Code);
-        NcCollectorFilter.DeleteAll(true);
-    end;
-
-    var
-        RemoveFiltersErr: Label 'Please remove filters first.';
-        CannotDeleteErr: Label 'You cannot delete %1 %2 because there are %3 records for this record.';
-        ActivationNotAllowedErr: Label 'Collector %1 must have a value in field %2 and-or field %3 to be active. ';
-
-    local procedure CheckCriteriaActiveCollector()
-    begin
-        if Active and ("Wait to Send" = 0) and ("Max. Lines per Collection" = 0) then
-            Error(ActivationNotAllowedErr, Code, FieldCaption("Wait to Send"), FieldCaption("Max. Lines per Collection"));
-    end;
 }
 

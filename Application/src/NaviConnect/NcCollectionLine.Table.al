@@ -3,11 +3,9 @@
     Access = Internal;
     Caption = 'Nc Collection Line';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Nc Collection Lines";
-    LookupPageID = "NPR Nc Collection Lines";
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';
-    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
+    ObsoleteState = Removed;
+    ObsoleteReason = 'NC Collector module removed from NpCore. We switched to Job Queue instead of using Task Queue.';
+    ObsoleteTag = 'BC 21 - Task Queue deprecating starting from 28/06/2022';
 
     fields
     {
@@ -21,13 +19,11 @@
         {
             Caption = 'Collector Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Nc Collector";
         }
         field(20; "Collection No."; BigInteger)
         {
             Caption = 'Collection No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Nc Collection";
         }
         field(30; "Type of Change"; Option)
         {
@@ -99,7 +95,6 @@
         {
             Caption = 'Request No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Nc Collector Request";
         }
     }
 
@@ -115,10 +110,5 @@
         {
         }
     }
-
-    trigger OnInsert()
-    begin
-        "Date Created" := CurrentDateTime();
-    end;
 }
 
