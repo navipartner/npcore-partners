@@ -724,7 +724,7 @@
         Request.SetHandler('Display');
         Request.SetRequest(SecondaryMonitorRequest);
         if (POSSession.IsActiveSession(FrontEnd)) then
-            FrontEnd.InvokeFrontEndMethod(Request);
+            FrontEnd.InvokeFrontEndMethod2(Request);
 
 
         case DisplayHandlerAction of
@@ -748,7 +748,7 @@
         DisplayHandler();
         Request.SetHandler('Display');
         Request.SetRequest(SecondaryMonitorRequest);
-        FrontEnd.InvokeFrontEndMethod(Request);
+        FrontEnd.InvokeFrontEndMethod2(Request);
     end;
 
     internal procedure EndSale(var FrontEnd: Codeunit "NPR POS Front End Management"; EndSaleDescription: Text; RegisterNo: Code[10])
@@ -762,7 +762,7 @@
         DisplayHandler();
         Request.SetHandler('Display');
         Request.SetRequest(SecondaryMonitorRequest);
-        FrontEnd.InvokeFrontEndMethod(Request);
+        FrontEnd.InvokeFrontEndMethod2(Request);
     end;
 
     internal procedure Payments(var FrontEnd: Codeunit "NPR POS Front End Management"; PaymentDescription: Text)
@@ -775,7 +775,7 @@
 
         Request.SetHandler('Display');
         Request.SetRequest(SecondaryMonitorRequest);
-        FrontEnd.InvokeFrontEndMethod(Request);
+        FrontEnd.InvokeFrontEndMethod2(Request);
 
     end;
 
@@ -787,7 +787,7 @@
         DisplayHandler();
         Request.SetHandler('Display');
         Request.SetRequest(SecondaryMonitorRequest);
-        FrontEnd.InvokeFrontEndMethod(Request);
+        FrontEnd.InvokeFrontEndMethod2(Request);
     end;
 
     local procedure SetAction(ActionIn: Option OpenDisplay,CloseDisplay,UpdateDisplay,ShowReceipt,UpdateReceipt,CloseReceipt,DownloadFiles,DownloadHtmlFile)

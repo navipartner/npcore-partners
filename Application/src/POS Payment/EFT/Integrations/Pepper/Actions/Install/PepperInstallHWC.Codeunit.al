@@ -104,7 +104,7 @@ codeunit 6184480 "NPR Pepper Install HWC"
         Request.SetRequest(FileRequest);
 
         POSSession.GetFrontEnd(FrontEnd);
-        FrontEnd.InvokeFrontEndMethod(Request);
+        FrontEnd.InvokeFrontEndMethod2(Request);
     end;
 
     procedure SetResponse(HwcResponse: JsonObject)

@@ -1,6 +1,7 @@
 ﻿codeunit 6150741 "NPR POS Method - Kiosk"
 {
     Access = Internal;
+
     var
         ReadingErr: Label 'reading in %1';
 
@@ -30,7 +31,7 @@
         UnlockPIN := SelfServiceProfile.GetUnlockPINIfProfileExist(POSUnit."POS Self Service Profile");
         Request.SetMethod(MethodName());
         Request.GetContent().Add('confirmed', IsValidPIN(JSON.GetStringOrFail('pin', StrSubstNo(ReadingErr, MethodName())), UnlockPIN));
-        FrontEnd.InvokeFrontEndMethod(Request);
+        FrontEnd.InvokeFrontEndMethod2(Request);
 
         Handled := true;
     end;

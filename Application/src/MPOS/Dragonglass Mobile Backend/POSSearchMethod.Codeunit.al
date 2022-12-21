@@ -71,6 +71,6 @@
 
         UpdateSearchRequest.SetResults(Results);
         UpdateSearchRequest.SetHasMore(HasMore);
-        FrontEnd.InvokeFrontEndMethod(UpdateSearchRequest);
+        FrontEnd.InvokeFrontEndMethod2(UpdateSearchRequest);
     end;
 }

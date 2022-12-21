@@ -21,7 +21,7 @@ codeunit 6014582 "NPR Print Method Mgt."
             HWCPOSRequest.SetHandler('RawPrint');
             HWCPOSRequest.SetRequest(Request);
             POSSession.GetFrontEnd(POSFrontEnd, true);
-            POSFrontEnd.InvokeFrontEndMethod(HWCPOSRequest);
+            POSFrontEnd.InvokeFrontEndMethod2(HWCPOSRequest);
         end else begin
             //print to hardware connector via modal page
             HardwareConnectorMgt.SendRawPrintRequest(PrinterName, PrintJobBase64);
@@ -62,7 +62,7 @@ codeunit 6014582 "NPR Print Method Mgt."
             HWCPOSRequest.SetHandler('FilePrint');
             HWCPOSRequest.SetRequest(Request);
             POSSession.GetFrontEnd(POSFrontEnd, true);
-            POSFrontend.InvokeFrontEndMethod(HWCPOSRequest);
+            POSFrontend.InvokeFrontEndMethod2(HWCPOSRequest);
         end else begin
             //print to hardware connector via modal page
             HardwareConnectorMgt.SendFilePrintRequest(PrinterName, Stream, FileExtension);

@@ -28,7 +28,7 @@
         RequestBody.Add('TimeoutMs', 2000);
         HWCRequest.SetHandler('OPOSCashDrawer');
         HWCRequest.SetRequest(RequestBody);
-        POSFrontEnd.InvokeFrontEndMethod(HWCRequest);
+        POSFrontEnd.InvokeFrontEndMethod2(HWCRequest);
 
         Ejected := true;
     end;

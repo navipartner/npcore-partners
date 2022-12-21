@@ -229,7 +229,7 @@
         Request.GetContent().Add('waiterPads', WaiterPadList);
         Request.GetContent().Add('waiterPadSeatingLinks', WaiterPadSeatingList);
 
-        FrontEnd.InvokeFrontEndMethod(Request);
+        FrontEnd.InvokeFrontEndMethod2(Request);
     end;
 
     procedure RefreshRestaurantLayout(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]);
@@ -346,7 +346,7 @@
         Request.GetContent().Add('locations', LocationList);
         Request.GetContent().Add('statuses', StatusContent);
 
-        FrontEnd.InvokeFrontEndMethod(Request);
+        FrontEnd.InvokeFrontEndMethod2(Request);
 
         RefreshStatus(POSSession, FrontEnd, RestaurantCode, '');
     end;
@@ -427,7 +427,7 @@
             until WaiterPad.Next() = 0;
 
         Request.GetContent().Add('waiterPads', WaiterPadList);
-        FrontEnd.InvokeFrontEndMethod(Request);
+        FrontEnd.InvokeFrontEndMethod2(Request);
     end;
 
     procedure RefreshStatus(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; LocationCode: Code[20]);
@@ -468,7 +468,7 @@
         Request.GetContent().Add('seating', SeatingStatus);
         Request.GetContent().Add('waiterPad', WaiterPadStatus);
 
-        FrontEnd.InvokeFrontEndMethod(Request);
+        FrontEnd.InvokeFrontEndMethod2(Request);
     end;
 
     procedure SetRestaurant(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20])
@@ -485,7 +485,7 @@
 
         Request.SetMethod('SetRestaurant');
         Request.GetContent().Add('restaurantId', RestaurantCode);
-        FrontEnd.InvokeFrontEndMethod(Request);
+        FrontEnd.InvokeFrontEndMethod2(Request);
 
         RefreshRestaurantLayout(POSSession, FrontEnd, RestaurantCode);
     end;
