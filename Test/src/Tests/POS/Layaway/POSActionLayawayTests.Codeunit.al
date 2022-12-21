@@ -5,6 +5,7 @@ codeunit 85101 "NPR POS Action Layaway Tests"
     var
         Customer: Record Customer;
         Item: Record Item;
+        POSPaymentMethod: Record "NPR POS Payment Method";
         POSSetup: Record "NPR POS Setup";
         POSStore: Record "NPR POS Store";
         POSUnit: Record "NPR POS Unit";
@@ -18,31 +19,26 @@ codeunit 85101 "NPR POS Action Layaway Tests"
         POSSale: Codeunit "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
         Initialized: Boolean;
+        CreatedSalesHeader: Code[20];
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     procedure CreateLayaway()
     var
-        SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
         //[Given] Init Data
-        Initialize();
-        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        SalePOS.Validate("Customer No.", Customer."No.");
-        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
-        CheckPrepmtAccNo(SalePOS, Item."Gen. Prod. Posting Group");
+        InitDataForLayway();
 
         //[When]
         LayawayCreateBussLogic.CreateLayaway(POSSession, 10, 1, '', PaymentTerms.Code, PaymentTerms.Code, false, false);
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        //[Given]
+        //[Then]
         if not SalesInvHeader.Get(SaleLinePOS."Posted Sales Document No.") then
             Assert.AssertRecordNotFound();
         SalesInvHeader.CalcFields("Amount Including VAT");
@@ -72,6 +68,81 @@ codeunit 85101 "NPR POS Action Layaway Tests"
         ShowLayawayBL.RunDocument(true, PaymentTerms.Code, POSSale);
 
     end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ChooseSOListHandler,ClickOnOKMsg')]
+    procedure CancelLayaway()
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesHeader: Record "Sales Header";
+        SalesInvHeader: Record "Sales Invoice Header";
+        LayawayCancelB: Codeunit "NPR POS Act.:Layaway Cancel-B";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+    begin
+        //[Given] Init Data
+        InitDataForLayway();
+        LayawayCreateBussLogic.CreateLayaway(POSSession, 10, 1, '', PaymentTerms.Code, PaymentTerms.Code, false, false);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        SalesInvHeader.Get(SaleLinePOS."Posted Sales Document No.");
+        SalesHeader.Get("Sales Document Type"::Order, SalesInvHeader."Prepayment Order No.");
+        CreatedSalesHeader := SalesHeader."No.";
+        LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, SaleLinePOS."Amount Including VAT", '', false);
+
+        PostPosEntry();
+
+        //[When]
+        POSSession.GetSale(POSSale);
+        POSSession.GetSaleLine(POSSaleLine);
+        LayawayCancelB.CancelLayaway(POSSale, POSSaleLine, '', PaymentTerms.Code, false, true, false);
+
+        //[Then]
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"Customer Deposit");
+        SaleLinePOS.FindFirst();
+        Assert.IsTrue(SaleLinePOS."Buffer Document Type" = SaleLinePOS."Buffer Document Type"::"Credit Memo", 'Credit Memo is not created.');
+        Assert.IsTrue(SalesCrMemoHeader.Get(SaleLinePOS."Buffer Document No."), 'Credit Memo is not find');
+        Assert.IsTrue(SalesCrMemoHeader."Prepayment Order No." = CreatedSalesHeader, 'Credit Memo is not created with Prepayment Order No.');
+        SalesHeader.Reset();
+        Assert.IsFalse(SalesHeader.Get(Enum::"Sales Document Type"::Order, CreatedSalesHeader), 'Order is not deleted.');
+    end;
+
+    local procedure PostPosEntry()
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSPostEntries: Codeunit "NPR POS Post Entries";
+    begin
+        POSEntry.SetRange("POS Unit No.", POSUnit."No.");
+        POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Unposted);
+        if POSEntry."Post Item Entry Status" < POSEntry."Post Item Entry Status"::Posted then
+            POSPostEntries.SetPostItemEntries(true);
+        if POSEntry."Post Entry Status" < POSEntry."Post Entry Status"::Posted then
+            POSPostEntries.SetPostPOSEntries(true);
+        POSPostEntries.SetStopOnError(true);
+        POSPostEntries.SetPostCompressed(false);
+        POSPostEntries.Run(POSEntry);
+    end;
+
+    [ModalPageHandler]
+    procedure ChooseSOListHandler(var SOList: TestPage "Sales List")
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        SalesHeader.Get("Sales Document Type"::Order, CreatedSalesHeader);
+        SOList.GoToRecord(SalesHeader);
+        SOList.OK().Invoke();
+    end;
+
+    [MessageHandler]
+    procedure ClickOnOKMsg(Msg: Text[1024])
+    var
+        Text001: Label 'Layaway order credited and deleted.\Refund line has been created for total paid amount minus fees.';
+    begin
+        Assert.IsTrue(Msg = Text001, Msg);
+    end;
+
 
     [ModalPageHandler]
     procedure SOListHandler(var SOList: TestPage "Sales Order List")
@@ -106,7 +177,6 @@ codeunit 85101 "NPR POS Action Layaway Tests"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-
     begin
         if Initialized then begin
             //Clean any previous mock session
@@ -120,6 +190,7 @@ codeunit 85101 "NPR POS Action Layaway Tests"
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
+            NPRLibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
             LibrarySales.CreateCustomer(Customer);
             NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
             CreatePaymentTerm(PaymentTerms);
@@ -136,10 +207,13 @@ codeunit 85101 "NPR POS Action Layaway Tests"
         SalesSetup: Record "Sales & Receivables Setup";
     begin
         SalesSetup.Get();
-        if SalesSetup."Posted Prepmt. Inv. Nos." = '' then begin
+        if (SalesSetup."Posted Prepmt. Inv. Nos." <> '') and (SalesSetup."Posted Prepmt. Cr. Memo Nos." <> '') then
+            exit;
+        if SalesSetup."Posted Prepmt. Inv. Nos." = '' then
             SalesSetup."Posted Prepmt. Inv. Nos." := LibraryERM.CreateNoSeriesCode();
-            SalesSetup.Modify();
-        end;
+        if SalesSetup."Posted Prepmt. Cr. Memo Nos." = '' then
+            SalesSetup."Posted Prepmt. Cr. Memo Nos." := LibraryERM.CreateNoSeriesCode();
+        SalesSetup.Modify();
     end;
 
     local procedure CheckPrepmtAccNo(SalePOS: Record "NPR POS Sale"; GenProdPostingGroup: Code[20])
@@ -180,6 +254,18 @@ codeunit 85101 "NPR POS Action Layaway Tests"
         Evaluate(DateFormulaVariable, 'CM');
         PaymentTerms."Due Date Calculation" := DateFormulaVariable;
         PaymentTerms.Modify(true);
+    end;
+
+    local procedure InitDataForLayway()
+    var
+        SalePOS: Record "NPR POS Sale";
+    begin
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+        CheckPrepmtAccNo(SalePOS, Item."Gen. Prod. Posting Group");
     end;
 
 }
