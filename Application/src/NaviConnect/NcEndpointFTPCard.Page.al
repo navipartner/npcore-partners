@@ -41,7 +41,6 @@
                 {
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Option type to be removed. Use new enum field "Protocol Type" instead.';
-                    ObsoleteTag = '20';
                     Visible = false;
                     ToolTip = 'Specifies the value of the Type field';
                     ApplicationArea = NPRNaviConnect;

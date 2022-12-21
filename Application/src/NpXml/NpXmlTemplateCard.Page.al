@@ -304,7 +304,6 @@
                     {
                         ObsoleteState = Pending;
                         ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-                        ObsoleteTag = '20';
                         Visible = false;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the FTP Server field';
@@ -314,7 +313,6 @@
                     {
                         ObsoleteState = Pending;
                         ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-                        ObsoleteTag = '20';
                         Visible = false;
                         ToolTip = 'Specifies the value of the FTP Username field';
                         ApplicationArea = NPRRetail;
@@ -323,7 +321,6 @@
                     {
                         ObsoleteState = Pending;
                         ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-                        ObsoleteTag = '20';
                         Visible = false;
                         ToolTip = 'Specifies the value of the FTP Password field';
                         ApplicationArea = NPRRetail;
@@ -332,7 +329,6 @@
                     {
                         ObsoleteState = Pending;
                         ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-                        ObsoleteTag = '20';
                         Visible = false;
                         ToolTip = 'Specifies the value of the FTP Port field';
                         ApplicationArea = NPRRetail;
@@ -341,7 +337,6 @@
                     {
                         ObsoleteState = Pending;
                         ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-                        ObsoleteTag = '20';
                         Visible = false;
                         ToolTip = 'Specifies the value of the FTP Passive field';
                         ApplicationArea = NPRRetail;
@@ -350,7 +345,6 @@
                     {
                         ObsoleteState = Pending;
                         ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-                        ObsoleteTag = '20';
                         Visible = false;
                         ToolTip = 'Specifies which mode of encryption is used between client and server';
                         ApplicationArea = NPRRetail;
@@ -359,7 +353,6 @@
                     {
                         ObsoleteState = Pending;
                         ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-                        ObsoleteTag = '20';
                         Visible = false;
                         ToolTip = 'Specifies the value of the FTP Directory field';
                         ApplicationArea = NPRRetail;
@@ -368,7 +361,6 @@
                     {
                         ObsoleteState = Pending;
                         ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-                        ObsoleteTag = '20';
                         Visible = false;
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the FTP Filename (Fixed) field';
@@ -378,7 +370,6 @@
                     {
                         ObsoleteState = Pending;
                         ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-                        ObsoleteTag = '20';
                         Visible = false;
                         ApplicationArea = NPRRetail;
                         Importance = Additional;

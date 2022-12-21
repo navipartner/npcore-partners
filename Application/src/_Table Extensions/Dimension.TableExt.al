@@ -8,7 +8,6 @@ tableextension 6014453 "NPR Dimension" extends Dimension
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
-            ObsoleteTag = '21';
         }
     }
 
@@ -18,7 +17,6 @@ tableextension 6014453 "NPR Dimension" extends Dimension
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
-            ObsoleteTag = '21';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)
         key("NPR Key2"; SystemRowVersion)

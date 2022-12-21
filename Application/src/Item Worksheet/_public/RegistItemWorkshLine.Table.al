@@ -825,7 +825,6 @@
             DataClassification = CustomerContent;
             ObsoleteState = No;
             //ObsoleteReason = 'Product Groups became first level children of Item Categories.';
-            //ObsoleteTag = '15.0';
         }
         field(5900; "Service Item Group"; Code[10])
         {

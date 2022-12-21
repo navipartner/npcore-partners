@@ -209,7 +209,6 @@
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
-            ObsoleteTag = '21';
         }
     }
 
@@ -225,7 +224,6 @@
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
-            ObsoleteTag = '21';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)
         key(Key4; SystemRowVersion)

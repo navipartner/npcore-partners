@@ -3,7 +3,7 @@
     Access = Public;
     ObsoleteState = Pending;
     ObsoleteReason = 'Replication Counter is replaced by SystemRowVersion';
-    ObsoleteTag = '21';
+
     procedure UpdateReplicationCounter(RecRef: RecordRef; ReplicationCounterFieldNo: Integer)
     var
 #IF (BC17 or BC18 or BC19 or BC20)

@@ -261,7 +261,6 @@
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-            ObsoleteTag = '20';
             Caption = 'FTP Server';
             DataClassification = CustomerContent;
         }
@@ -269,7 +268,6 @@
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-            ObsoleteTag = '20';
             Caption = 'FTP Username';
             DataClassification = CustomerContent;
             Description = 'NC1.21';
@@ -278,7 +276,6 @@
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-            ObsoleteTag = '20';
             Caption = 'FTP Password';
             DataClassification = CustomerContent;
             Description = 'NC1.21';
@@ -287,7 +284,6 @@
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-            ObsoleteTag = '20';
             Caption = 'FTP Directory';
             DataClassification = CustomerContent;
             Description = 'NC1.21';
@@ -296,7 +292,6 @@
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-            ObsoleteTag = '20';
             Caption = 'FTP Filename (Fixed)';
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
@@ -305,7 +300,6 @@
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-            ObsoleteTag = '20';
             Caption = 'FTP Files temporrary extension';
             DataClassification = CustomerContent;
             CharAllowed = 'az';
@@ -314,7 +308,6 @@
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-            ObsoleteTag = '20';
             Caption = 'FTP Port';
             DataClassification = CustomerContent;
             MinValue = 0;
@@ -323,7 +316,6 @@
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-            ObsoleteTag = '20';
             Caption = 'FTP Passive';
             DataClassification = CustomerContent;
         }
@@ -331,7 +323,6 @@
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'FTP Parameters will not be keept on XML Template. Use NC Endpoints instead.';
-            ObsoleteTag = '20';
             Caption = 'FTP Encryption mode';
             DataClassification = CustomerContent;
             InitValue = "None";
