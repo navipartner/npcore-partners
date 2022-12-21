@@ -3,11 +3,9 @@
     Access = Internal;
     Caption = 'Nc Collection';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Nc Collection List";
-    LookupPageID = "NPR Nc Collection List";
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Task Queue module is about to be removed from NpCore so NC Collector is also going to be removed.';
-    ObsoleteTag = 'BC 20 - Task Queue deprecating starting from 28/06/2022';
+    ObsoleteState = Removed;
+    ObsoleteReason = 'NC Collector module removed from NpCore. We switched to Job Queue instead of using Task Queue.';
+    ObsoleteTag = 'BC 21 - Task Queue deprecating starting from 28/06/2022';
 
     fields
     {
@@ -21,7 +19,6 @@
         {
             Caption = 'Collector Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Nc Collector";
         }
         field(30; Status; Option)
         {
@@ -73,37 +70,5 @@
         }
     }
 
-    trigger OnDelete()
-    var
-        NcCollectionLine: Record "NPR Nc Collection Line";
-    begin
-        NcCollectionLine.Reset();
-        NcCollectionLine.SetFilter("Collection No.", '=%1', "No.");
-        NcCollectionLine.DeleteAll(true);
-    end;
-
-    trigger OnInsert()
-    begin
-        "Creation Date" := CurrentDateTime();
-    end;
-
-    trigger OnModify()
-    begin
-        case Status of
-            Status::"Ready to Send":
-                if "Ready to Send Date" = 0DT then
-                    "Ready to Send Date" := CurrentDateTime();
-            Status::Sent:
-                if "Sent Date" = 0DT then
-                    "Sent Date" := CurrentDateTime();
-            else
-                OnModifyRec(Rec, xRec);
-        end;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnModifyRec(var CurrRec: Record "NPR Nc Collection"; var xCurrRec: Record "NPR Nc Collection")
-    begin
-    end;
 }
 

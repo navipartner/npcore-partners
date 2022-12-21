@@ -41,7 +41,7 @@
             Editable = false;
             FieldClass = FlowField;
             ObsoleteState = Removed;
-            ObsoleteReason = 'NC Collector module removed from NpCore. We switched to Job Queue instead of using Task Queue.';
+            ObsoleteReason = 'NC Trigger module removed from NpCore. We switched to Job Queue instead of using Task Queue.';
             ObsoleteTag = 'BC 21 - Task Queue deprecating starting from 28/06/2022';
         }
     }
