@@ -11,7 +11,6 @@
     DataAccessIntent = ReadOnly;
     ObsoleteState = Pending;
     ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead.';
-    ObsoleteTag = '20';
 
     dataset
     {
@@ -100,9 +99,9 @@
                                         end;
                                     //start and end time before and after current group
                                     else begin
-                                            InsertTmpTQ(TempDateTimeGroup."Entry No.", TempDateTimeGroup."Starting Time", TempDateTimeGroup."Ending Time", TaskLog);
-                                            TempDateTimeGroup."Task Duration" += TempDateTimeGroup."Ending Time" - TempDateTimeGroup."Starting Time";
-                                        end;
+                                        InsertTmpTQ(TempDateTimeGroup."Entry No.", TempDateTimeGroup."Starting Time", TempDateTimeGroup."Ending Time", TaskLog);
+                                        TempDateTimeGroup."Task Duration" += TempDateTimeGroup."Ending Time" - TempDateTimeGroup."Starting Time";
+                                    end;
 
                                 end;
                                 TempDateTimeGroup.Modify();

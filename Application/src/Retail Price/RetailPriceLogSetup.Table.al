@@ -20,7 +20,6 @@
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead. There is a new field here, "Job Queue Activated';
-            ObsoleteTag = '20';
             Caption = 'Task Queue Activated';
             DataClassification = CustomerContent;
         }

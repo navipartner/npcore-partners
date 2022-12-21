@@ -472,7 +472,6 @@
             DataClassification = CustomerContent;
             ObsoleteState = No;
             //ObsoleteReason = 'Product Groups became first level children of Item Categories.';
-            //ObsoleteTag = '15.0';
         }
         field(5706; "Transfer-from Code"; Code[10])
         {

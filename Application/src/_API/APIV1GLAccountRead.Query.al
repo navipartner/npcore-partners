@@ -258,7 +258,6 @@
                     Caption = 'replicationCounter', Locked = true;
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by SystemRowVersion';
-                    ObsoleteTag = '21';
                 }
             }
         }

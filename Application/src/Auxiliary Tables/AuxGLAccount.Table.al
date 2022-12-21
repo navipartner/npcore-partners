@@ -34,7 +34,6 @@
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
-            ObsoleteTag = '21';
         }
     }
 
@@ -49,7 +48,6 @@
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
-            ObsoleteTag = '21';
         }
         key(Key3; "Retail Payment")
         {

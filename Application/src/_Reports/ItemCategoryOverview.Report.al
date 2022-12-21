@@ -1,7 +1,7 @@
 report 6014408 "NPR Item Category Overview"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Category Overview.rdlc';
@@ -11,7 +11,6 @@ report 6014408 "NPR Item Category Overview"
     DataAccessIntent = ReadOnly;
     ObsoleteReason = 'Not used.';
     ObsoleteState = Pending;
-    ObsoleteTag = '17.0';
 
     dataset
     {
