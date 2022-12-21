@@ -25,7 +25,7 @@ codeunit 6060010 "NPR Retail Checklist"
     local procedure GetUpgradeTag(): Code[250]
     begin
         //For Any change, increase version
-        exit('NPR-Checklist-v1.1');
+        exit('NPR-Checklist-v1.2');
     end;
 
     local procedure CreateChecklistItems();
@@ -59,37 +59,37 @@ codeunit 6060010 "NPR Retail Checklist"
 
     local procedure CreateWelcomeVideoExperience()
     var
-        WelcomeVideoENTxt: Label 'Welcome Video', Locked = true;
+        WelcomeVideoENTxt: Label 'Welcome Video Retail', Locked = true;
     begin
         //Global Language
-        GuidedExperience.InsertAssistedSetup(WelcomeVideoENTxt, WelcomeVideoENTxt, '', 2, ObjectType::Codeunit, Codeunit::"NPR Welcome Video", "Assisted Setup Group"::GettingStarted, '', "Video Category"::GettingStarted, '');
+        GuidedExperience.InsertAssistedSetup(WelcomeVideoENTxt, WelcomeVideoENTxt, WelcomeVideoENTxt, 2, ObjectType::Codeunit, Codeunit::"NPR Welcome Video", "Assisted Setup Group"::GettingStarted, '', "Video Category"::GettingStarted, '');
 
         //In case that new language needs to be added, Language ID can be founded in table Windows Language (2000000045), Use just languages with filter "Localization Exist" and "Globally Enabled" set to true
         #region Languages
         #region English
         if CheckLanguageId(1033) then begin
             GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 1033, WelcomeVideoENTxt);
-            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 1033, '');
+            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 1033, WelcomeVideoENTxt);
         end;
         if CheckLanguageId(2057) then begin
             GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 2057, WelcomeVideoENTxt);
-            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 2057, '');
+            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 2057, WelcomeVideoENTxt);
         end;
         if CheckLanguageId(3081) then begin
             GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 3081, WelcomeVideoENTxt);
-            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 3081, '');
+            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 3081, WelcomeVideoENTxt);
         end;
         if CheckLanguageId(4105) then begin
             GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 4105, WelcomeVideoENTxt);
-            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 4105, '');
+            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 4105, WelcomeVideoENTxt);
         end;
         if CheckLanguageId(5129) then begin
             GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 5129, WelcomeVideoENTxt);
-            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 5129, '');
+            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 5129, WelcomeVideoENTxt);
         end;
         if CheckLanguageId(7177) then begin
             GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 7177, WelcomeVideoENTxt);
-            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 7177, '');
+            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 7177, WelcomeVideoENTxt);
         end;
         #endregion
         #endregion
