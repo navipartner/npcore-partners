@@ -82,7 +82,9 @@
 
     local procedure TrySendVoucherViaPrint(var Voucher: Record "NPR NpRv Voucher")
     var
+        NpRvSendingLog: Record "NPR NpRv Sending Log";
         RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
         if not Voucher.Find() or (Voucher."Print Object Type" = Voucher."Print Object Type"::No_Print) then
             exit;
@@ -107,6 +109,7 @@
                         Report.Run(Voucher."Print Object ID", false, false, Voucher);
                 end;
         end;
+        NpRvVoucherMgt.LogSending(Voucher, NpRvSendingLog."Sending Type"::Print, StrSubstNo(Text001, Voucher."Print Template Code"), '', '');
     end;
 
     procedure SendVoucherViaEmail(Voucher: Record "NPR NpRv Voucher") LastErrorText: Text
@@ -131,7 +134,9 @@
     local procedure TrySendVoucherViaEmail(var Voucher: Record "NPR NpRv Voucher")
     var
         EmailTemplateHeader: Record "NPR E-mail Template Header";
+        NpRvSendingLog: Record "NPR NpRv Sending Log";
         EmailManagement: Codeunit "NPR E-mail Management";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         RecRef: RecordRef;
     begin
         if Voucher.Find() then;
@@ -147,6 +152,7 @@
         else
             EmailManagement.SendEmailTemplate(RecRef, EmailTemplateHeader, Voucher."E-mail", true);
         Voucher."E-mail Template Code" := EmailTemplateHeader.Code;
+        NpRvVoucherMgt.LogSending(Voucher, NpRvSendingLog."Sending Type"::"E-mail", StrSubstNo(Text002, Voucher."E-mail Template Code"), Voucher."E-mail", '');
     end;
 
     procedure SendVoucherViaSMS(Voucher: Record "NPR NpRv Voucher") LastErrorText: Text
@@ -172,6 +178,8 @@
     var
         SMSTemplateHeader: Record "NPR SMS Template Header";
         SMSManagement: Codeunit "NPR SMS Management";
+        NpRvSendingLog: Record "NPR NpRv Sending Log";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         SMSMessage: Text;
     begin
         if Voucher.Find() then;
@@ -183,6 +191,7 @@
 
         SMSMessage := SMSManagement.MakeMessage(SMSTemplateHeader, Voucher);
         SMSManagement.SendSMS(Voucher."Phone No.", SMSTemplateHeader."Alt. Sender", SMSMessage);
+        NpRvVoucherMgt.LogSending(Voucher, NpRvSendingLog."Sending Type"::SMS, StrSubstNo(Text003, Voucher."SMS Template Code"), Voucher."Phone No.", '');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnInitVoucherModules', '', true, true)]
