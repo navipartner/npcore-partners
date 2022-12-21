@@ -147,7 +147,6 @@ page 6014506 "NPR APIV1 - Item Variants"
                     Caption = 'replicationCounter', Locked = true;
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by SystemRowVersion';
-                    ObsoleteTag = '21';
                 }
 #IF NOT (BC17 or BC18 or BC19 or BC20)
                 field(systemRowVersion; Rec.SystemRowVersion)

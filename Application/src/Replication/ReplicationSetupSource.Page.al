@@ -12,7 +12,6 @@ page 6059849 "NPR Replication Setup (Source)"
     UsageCategory = Administration;
     ObsoleteState = Pending;
     ObsoleteReason = 'Replaced by SystemRowVersion';
-    ObsoleteTag = '21';
 
     layout
     {

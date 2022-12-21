@@ -14,7 +14,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             begin
                 if Rec."NPR Register Password" = '' then
                     exit;
-                    
+
                 Rec.SetRange("NPR Register Password", Rec."NPR Register Password");
                 if not Rec.IsEmpty() then
                     Error(RegisterCodeAlreadyUsedErr, Rec."NPR Register Password");
@@ -182,7 +182,6 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
-            ObsoleteTag = '21';
         }
     }
 
@@ -192,7 +191,6 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
-            ObsoleteTag = '21';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)
         key("NPR Key2"; SystemRowVersion)

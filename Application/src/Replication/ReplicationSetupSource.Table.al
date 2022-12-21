@@ -5,7 +5,6 @@ table 6014634 "NPR Replication Setup (Source)"
     DataClassification = CustomerContent;
     ObsoleteState = Pending;
     ObsoleteReason = 'Replaced by SystemRowVersion';
-    ObsoleteTag = '21';
 
     fields
     {

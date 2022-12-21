@@ -180,7 +180,6 @@
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
-            ObsoleteTag = '21';
         }
         field(6151480; "Print Object Type"; Enum "NPR Print Object Type")
         {
@@ -208,7 +207,6 @@
         {
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
-            ObsoleteTag = '21';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)
         key(Key3; SystemRowVersion)
