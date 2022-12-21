@@ -52,6 +52,6 @@
             until Item.Next() = 0;
 
         UpdatePreSearchRequest.SetResults(Results);
-        FrontEnd.InvokeFrontEndMethod(UpdatePreSearchRequest);
+        FrontEnd.InvokeFrontEndMethod2(UpdatePreSearchRequest);
     end;
 }

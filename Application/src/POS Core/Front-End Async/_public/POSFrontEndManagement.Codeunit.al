@@ -399,7 +399,14 @@
         _Framework.InvokeFrontEndAsync(Request.GetJson());
     end;
 
+    [Obsolete('This procedure will be internal for future releases without option to access externally')]
     procedure InvokeFrontEndMethod(Request: Interface "NPR Front-End Async Request")
+    begin
+        MakeSureFrameworkIsAvailable(true);
+        InvokeFrontEndAsync(Request);
+    end;
+
+    internal procedure InvokeFrontEndMethod2(Request: Interface "NPR Front-End Async Request")
     begin
         MakeSureFrameworkIsAvailable(true);
         InvokeFrontEndAsync(Request);

@@ -81,7 +81,7 @@ codeunit 6059860 "NPR End Of Day Worker"
 
             Request.SetMethod('BalanceSetContext'); // ==> Transfer control to codeunit 6014568 "NPR End Of Day UI Handler" on next ping
             Request.GetContent().Add('balancingContext', BalancingContext);
-            FrontEnd.InvokeFrontEndMethod(Request);
+            FrontEnd.InvokeFrontEndMethod2(Request);
 
             POSSession.ChangeViewBalancing();
         end;
