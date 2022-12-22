@@ -10,6 +10,8 @@
     DeleteAllowed = false;
     UsageCategory = None;
 
+
+
     layout
     {
         area(content)
@@ -113,11 +115,13 @@
     begin
         if TempPOSUnit.FindSet() then
             repeat
-                Rec.Copy(TempPOSUnit);
-                Rec."POS Store Code" := '';
-                Rec.Insert(false);
-                Rec."POS Store Code" := TempPOSUnit."POS Store Code";
-                Rec.Modify(false);
+                if TempPOSUnit.Status <> TempPOSUnit.Status::INACTIVE then begin
+                    Rec.Copy(TempPOSUnit);
+                    Rec."POS Store Code" := '';
+                    Rec.Insert(false);
+                    Rec."POS Store Code" := TempPOSUnit."POS Store Code";
+                    Rec.Modify(false);
+                end;
             until TempPOSUnit.Next() = 0;
 
         if Rec.FindSet() then;

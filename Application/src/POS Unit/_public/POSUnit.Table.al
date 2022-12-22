@@ -28,7 +28,7 @@
             var
                 StoreCodeChangeLabel: Label 'It is not recommended to change the store code during an active workshift. You can close the workshift from the POS unit using the Z-Report (end-of-day) functionality.';
             begin
-                if (Status <> Status::CLOSED) then
+                if not (Status in [Status::CLOSED, Status::INACTIVE]) then
                     Error(StoreCodeChangeLabel);
             end;
         }
@@ -43,8 +43,8 @@
             Caption = 'Status';
             DataClassification = CustomerContent;
             InitValue = CLOSED;
-            OptionCaption = 'Open,Closed,End of Day';
-            OptionMembers = OPEN,CLOSED,EOD;
+            OptionCaption = 'Open,Closed,End of Day,Inactive';
+            OptionMembers = OPEN,CLOSED,EOD,INACTIVE;
         }
         field(30; "Global Dimension 1 Code"; Code[20])
         {
