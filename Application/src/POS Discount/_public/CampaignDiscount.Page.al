@@ -383,6 +383,21 @@
                             end;
                         end;
                     }
+
+                    action(TransferFromCustomerPriceGroup)
+                    {
+                        Caption = 'Transfer from Customer Price Group';
+                        Image = TransferToLines;
+                        ToolTip = 'Executes the Transfer from Customer Price Group action - system will create lines based on Sales Price List lines';
+                        ApplicationArea = NPRRetail;
+
+                        trigger OnAction()
+                        var
+                            PeriodDiscountManagement: Codeunit "NPR Period Discount Management";
+                        begin
+                            PeriodDiscountManagement.AddLinesBasedOnSalesPriceList(Rec);
+                        end;
+                    }
                     action("Transfer all Items")
                     {
                         Caption = 'Transfer all Items';

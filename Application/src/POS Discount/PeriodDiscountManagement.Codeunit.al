@@ -323,4 +323,113 @@
         if not TempCustDiscGroup.Find() then
             TempCustDiscGroup.Insert();
     end;
+
+    #region AddPeriodDiscountLinesFromPriceList
+    procedure AddLinesBasedOnSalesPriceList(PeriodDiscount: Record "NPR Period Discount")
+    var
+        PriceListHeader: Record "Price List Header";
+    begin
+        PeriodDiscount.TestField(Status, PeriodDiscount.Status::Await);
+
+        SelectPriceListHeader(PriceListHeader);
+        AddPeriodDiscountLinesFromPriceList(PeriodDiscount, PriceListHeader);
+    end;
+
+    local procedure SelectPriceListHeader(var PriceListHeader: Record "Price List Header")
+    var
+        SalesPriceLists: Page "Sales Price Lists";
+    begin
+        PriceListHeader.Reset();
+        PriceListHeader.SetFilter("Source Group", '%1|%2', PriceListHeader."Source Group"::All, PriceListHeader."Source Group"::Customer);
+        PriceListHeader.SetRange("Source Type", PriceListHeader."Source Type"::"Customer Price Group");
+
+        if PriceListHeader.Count = 1 then begin
+            PriceListHeader.FindFirst();
+            exit;
+        end;
+
+        SalesPriceLists.SetTableView(PriceListHeader);
+        SalesPriceLists.LookupMode(true);
+        SalesPriceLists.Editable(false);
+        if SalesPriceLists.RunModal() <> Action::LookupOK then
+            Error('');
+
+        SalesPriceLists.GetRecord(PriceListHeader);
+    end;
+
+    local procedure AddPeriodDiscountLinesFromPriceList(PeriodDiscount: Record "NPR Period Discount"; PriceListHeader: Record "Price List Header")
+    var
+        PeriodDiscountLine: Record "NPR Period Discount Line";
+        PriceListLine: Record "Price List Line";
+        LinesAddedCount: Integer;
+        SuccessfullyAddedLinesLbl: Label 'Successfully added %1 lines.', Comment = '%1-line count';
+    begin
+        PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
+        PriceListLine.SetFilter("Asset Type", '%1|%2', PriceListLine."Asset Type"::Item, PriceListLine."Asset Type"::"Item Discount Group");
+        PriceListLine.SetFilter("Asset No.", '<>%1', '');
+        if PriceListLine.FindSet() then
+            repeat
+                case PriceListLine."Asset Type" of
+                    PriceListLine."Asset Type"::Item:
+                        if CreatePeriodDiscountLine(PeriodDiscount.Code, PriceListLine."Asset No.", PriceListLine."Variant Code") then
+                            LinesAddedCount += 1;
+                    PriceListLine."Asset Type"::"Item Discount Group":
+                        CreatePeriodDiscountLinesBasedOnItemDiscGroup(PeriodDiscount.Code, PriceListLine, LinesAddedCount);
+                end;
+            until PriceListLine.Next() = 0;
+
+        Message(SuccessfullyAddedLinesLbl, LinesAddedCount);
+    end;
+
+    local procedure CreatePeriodDiscountLinesBasedOnItemDiscGroup(PeriodDiscountCode: Code[20]; PriceListLine: Record "Price List Line"; var LinesAddedCount: Integer)
+    var
+        Item: Record Item;
+    begin
+        PriceListLine.TestField("Asset Type", PriceListLine."Asset Type"::"Item Discount Group");
+        PriceListLine.TestField("Asset No.");
+
+        Item.SetLoadFields("No.");
+        Item.SetRange("Item Disc. Group", PriceListLine."Asset No.");
+        if Item.FindSet() then
+            repeat
+                if CreatePeriodDiscountLine(PeriodDiscountCode, Item."No.", '') then
+                    LinesAddedCount += 1;
+            until Item.Next() = 0;
+    end;
+
+    local procedure CreatePeriodDiscountLine(PeriodDiscountCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[20]): Boolean
+    var
+        PeriodDiscountLine: Record "NPR Period Discount Line";
+        Item: Record Item;
+    begin
+        if CheckPeriodDiscountLineAlreadyExist(PeriodDiscountCode, ItemNo, VariantCode) then
+            exit(false);
+
+        if not Item.Get(ItemNo) then
+            exit(false);
+
+        if Item."Unit Price" = 0 then
+            exit(false);
+
+        PeriodDiscountLine.Init();
+        PeriodDiscountLine.Validate(Code, PeriodDiscountCode);
+        PeriodDiscountLine.Validate("Item No.", ItemNo);
+        if VariantCode <> '' then
+            PeriodDiscountLine.Validate("Variant Code", VariantCode);
+
+        PeriodDiscountLine.TestField(Code);
+        PeriodDiscountLine.TestField("Item No.");
+        exit(PeriodDiscountLine.Insert(true));
+    end;
+
+    local procedure CheckPeriodDiscountLineAlreadyExist(PeriodDiscountCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[20]): Boolean
+    var
+        PeriodDiscountLine: Record "NPR Period Discount Line";
+    begin
+        PeriodDiscountLine.SetRange(Code, PeriodDiscountCode);
+        PeriodDiscountLine.SetRange("Item No.", ItemNo);
+        PeriodDiscountLine.SetRange("Variant Code", VariantCode);
+        exit(not PeriodDiscountLine.IsEmpty);
+    end;
+    #endregion
 }
