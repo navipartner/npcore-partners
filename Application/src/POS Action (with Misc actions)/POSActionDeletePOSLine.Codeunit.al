@@ -66,7 +66,7 @@
     begin
         POSSession.GetCurrentView(CurrentView);
 
-        if (CurrentView.Type() = CurrentView.Type() ::Sale) then begin
+        if (CurrentView.GetType() = CurrentView.GetType() ::Sale) then begin
             POSSession.GetSaleLine(POSSaleLine);
             SetPositionForPOSSaleLine(Context, POSSaleLine);
             OnBeforeDeleteSaleLinePOS(POSSaleLine);
@@ -75,7 +75,7 @@
             POSSaleLine.DeleteLine();
         end;
 
-        if (CurrentView.Type() = CurrentView.Type() ::Payment) then begin
+        if (CurrentView.GetType() = CurrentView.GetType() ::Payment) then begin
             POSSession.GetPaymentLine(POSPaymentLine);
             POSPaymentLine.RefreshCurrent();
             POSPaymentLine.DeleteLine();

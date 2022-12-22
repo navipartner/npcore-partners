@@ -26,7 +26,7 @@ codeunit 6059880 "NPR POS Action: Change View-B"
             ViewType::Login:
                 begin
 
-                    if (CurrentView.Type() = CurrentView.Type() ::Sale) or (CurrentView.Type() = CurrentView.Type() ::Payment) then begin
+                    if (CurrentView.GetType() = CurrentView.GetType() ::Sale) or (CurrentView.GetType() = CurrentView.GetType() ::Payment) then begin
                         POSSession.GetSaleLine(POSSaleLine);
 
                         // if there are lines to delete

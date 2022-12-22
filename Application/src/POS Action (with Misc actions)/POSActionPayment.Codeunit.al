@@ -100,7 +100,7 @@
         end;
 
         POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.Type() = CurrentView.Type() ::Sale) then
+        if (CurrentView.GetType() = CurrentView.GetType() ::Sale) then
             POSSession.ChangeViewPayment();
 
         JSON.InitializeJObjectParser(Parameters, FrontEnd);

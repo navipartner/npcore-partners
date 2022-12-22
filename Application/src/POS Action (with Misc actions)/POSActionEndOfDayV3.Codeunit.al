@@ -137,19 +137,19 @@
                             POSEndOfDay.CloseWorkshift(POSUnit."No.", SalespersonPurchaser.Code, SalePOS."Dimension Set ID");
 
                         else begin
-                                if (UseBusinessCentralUI(POSUnit."No.")) then begin
-                                    PreliminaryEndOfDay(POSUnit."No.", SalePOS."Dimension Set ID");
-                                    POSManagePOSUnit.ReOpenLastPeriodRegister(POSUnit."No.");
-                                end;
-                                if (not UseBusinessCentralUI(POSUnit."No.")) then POSEndOfDay.CreateReport(EndOfDayType, POSUnit."No.", SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
+                            if (UseBusinessCentralUI(POSUnit."No.")) then begin
+                                PreliminaryEndOfDay(POSUnit."No.", SalePOS."Dimension Set ID");
+                                POSManagePOSUnit.ReOpenLastPeriodRegister(POSUnit."No.");
                             end;
+                            if (not UseBusinessCentralUI(POSUnit."No.")) then POSEndOfDay.CreateReport(EndOfDayType, POSUnit."No.", SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
+                        end;
                     end;
                 end;
 
             'EndOfWorkflow':
                 begin
                     POSSession.GetCurrentView(CurrentView);
-                    if (CurrentView.Type() <> CurrentView.Type() ::Login) then
+                    if (CurrentView.GetType() <> CurrentView.GetType() ::Login) then
                         POSSession.ChangeViewLogin();
                 end;
         end;

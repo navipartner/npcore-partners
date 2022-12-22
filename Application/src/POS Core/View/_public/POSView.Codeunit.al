@@ -27,11 +27,23 @@
         _canCache := NewCanCache;
     end;
 
+    internal procedure GetType(): Enum "NPR View Type";
+    begin
+        exit(_type);
+    end;
+
+    [Obsolete('This procedure will be internal for future releases -GetType, without option to access externally')]
     procedure Type(): Enum "NPR View Type";
     begin
         exit(_type);
     end;
 
+    internal procedure SetType2(NewType: Enum "NPR View Type");
+    begin
+        _type := NewType;
+    end;
+
+    [Obsolete('This procedure will be internal for future releases -SetType2, without option to access externally')]
     procedure SetType(NewType: Enum "NPR View Type");
     begin
         _type := NewType;

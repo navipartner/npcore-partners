@@ -1,6 +1,7 @@
 ﻿codeunit 6150782 "NPR Front-End: SetView" implements "NPR Front-End Async Request"
 {
     Access = Internal;
+
     var
         _view: Codeunit "NPR POS View";
         _content: JsonObject;
@@ -9,7 +10,7 @@
     var
         ViewType: Enum "NPR View Type";
     begin
-        _view.SetType(ViewType::Login);
+        _view.SetType2(ViewType::Login);
         _view.SetCanCache(true);
     end;
 
@@ -17,7 +18,7 @@
     var
         ViewType: Enum "NPR View Type";
     begin
-        _view.SetType(ViewType::Sale);
+        _view.SetType2(ViewType::Sale);
         _view.SetCanCache(true);
     end;
 
@@ -25,7 +26,7 @@
     var
         ViewType: Enum "NPR View Type";
     begin
-        _view.SetType(ViewType::Payment);
+        _view.SetType2(ViewType::Payment);
         _view.SetCanCache(true);
     end;
 
@@ -33,7 +34,7 @@
     var
         ViewType: Enum "NPR View Type";
     begin
-        _view.SetType(ViewType::BalanceRegister);
+        _view.SetType2(ViewType::BalanceRegister);
         _view.SetCanCache(true);
     end;
 
@@ -41,7 +42,7 @@
     var
         ViewType: Enum "NPR View Type";
     begin
-        _view.SetType(ViewType::Locked);
+        _view.SetType2(ViewType::Locked);
         _view.SetCanCache(true);
     end;
 
@@ -49,7 +50,7 @@
     var
         ViewType: Enum "NPR View Type";
     begin
-        _view.SetType(ViewType::Restaurant);
+        _view.SetType2(ViewType::Restaurant);
         _view.SetCanCache(true);
     end;
 

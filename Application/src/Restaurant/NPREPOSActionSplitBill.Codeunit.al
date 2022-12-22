@@ -395,7 +395,7 @@
     begin
         POSSession.GetSale(POSSale);
         POSSession.GetCurrentView(CurrentView);
-        if CurrentView.Type() = CurrentView.Type() ::Sale then begin
+        if CurrentView.GetType() = CurrentView.GetType() ::Sale then begin
             POSSale.GetCurrentSale(SalePOS);
             WaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS, false);
             POSSale.Refresh(SalePOS);
@@ -406,7 +406,7 @@
         if ReturnToDefaultView then
             POSSale.SelectViewForEndOfSale(POSSession)
         else begin
-            if CurrentView.Type() = CurrentView.Type() ::Sale then begin
+            if CurrentView.GetType() = CurrentView.GetType() ::Sale then begin
                 CurrentWaiterPad.Find();
                 if not CurrentWaiterPad.Closed then
                     WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(CurrentWaiterPad, POSSession);
