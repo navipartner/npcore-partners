@@ -580,7 +580,7 @@
             until POSParameterValue.Next() = 0;
     end;
 
-    local procedure StoreActionOtherConfiguration(ActionIn: Interface "NPR IAction"; POSSession: Codeunit "NPR POS Session")
+    procedure StoreActionOtherConfiguration(ActionIn: Interface "NPR IAction"; POSSession: Codeunit "NPR POS Session")
     var
         POSAction: Record "NPR POS Action";
     begin

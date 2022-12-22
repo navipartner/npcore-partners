@@ -345,6 +345,8 @@ codeunit 6059925 "NPR POS Layout Assistant"
                         Workflow.Content().Add('DataBinding', true);
                     if POSAction."Custom JavaScript Logic".HasValue() then
                         Workflow.Content().Add('CustomJavaScript', POSAction.GetCustomJavaScriptLogic());
+                    if POSAction."Blocking UI" then
+                        Workflow.Content().Add('Blocking', true);
 
                     Clear(ActionWorkflow);
                     ActionWorkflow.Add('Name', Workflow.Name());
