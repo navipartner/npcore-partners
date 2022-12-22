@@ -26,14 +26,18 @@
     href: reference/payment_types.md
   - name: POS unit display (reference guide)
     href: reference/POS_Unit_Display.md
+  - name: POS counting screen (reference guide)
+    href: reference/counting_reference.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
     href: howto/createnew.md
   - name: Configure a receipt printout for a POS unit
     href: howto/receipt-printout.md
-  - name: Balance the POS (Z-report)
+  - name: Balance the POS (V3 Z-report)
     href: howto/balance_the_pos.md
+  - name: Configure the V4 POS balancing feature
+    href: howto/balance_pos_v4.md
   - name: Configure an opening mechanism for a POS unit cash drawer
     href: howto/ConfigureCashDrawerOpening.md
   - name: Create a POS payment method
