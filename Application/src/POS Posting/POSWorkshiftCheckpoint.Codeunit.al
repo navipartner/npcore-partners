@@ -331,7 +331,7 @@
 
         // When Z-report, all slave units need to be status closed.
         if (Mode = EodWorkshiftMode::ZREPORT) then begin
-            POSUnit.SetFilter(Status, '<>%1', POSUnit.Status::CLOSED);
+            POSUnit.SetFilter(Status, '<>%1&<>%2', POSUnit.Status::CLOSED, POSUnit.Status::INACTIVE);
             if (POSUnit.FindFirst()) then
                 Error(POS_UNIT_SLAVE_STATUS, POSUnit."No.", POSUnit.Status);
 
@@ -410,7 +410,7 @@
 
         // When Z-report, all slave units need to be status closed.
         if (Mode = EodWorkshiftMode::ZREPORT) then begin
-            POSUnit.SetFilter(Status, '<>%1', POSUnit.Status::CLOSED);
+            POSUnit.SetFilter(Status, '<>%1&<>%2', POSUnit.Status::CLOSED, POSUnit.Status::INACTIVE);
             if (POSUnit.FindFirst()) then
                 Error(POS_UNIT_SLAVE_STATUS, POSUnit."No.", POSUnit.Status);
 

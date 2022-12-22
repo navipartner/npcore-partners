@@ -62,6 +62,7 @@
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
         POSUIManagement: Codeunit "NPR POS UI Management";
         OpeningEntryNo: Integer;
+        InactivePosUnitLbl: Label 'POS Unit %1 is inactive. It can not be used to complete the action', Comment = '%1-POS Unit code';
     begin
         DATABASE.SelectLatestVersion();
         POSSession.GetSetup(POSSetup);
@@ -93,6 +94,9 @@
 
             POSUnit.Status::EOD:
                 Error('This unit is busy with another process right now. Please try again later. <br>Thank-you for your patience.');
+
+            POSUnit.Status::INACTIVE:
+                Error(InactivePosUnitLbl, POSUnit."No.");
         end;
 
         POSCreateEntry.InsertUnitLoginEntry(POSSetup.GetPOSUnitNo(), POSSetup.Salesperson());

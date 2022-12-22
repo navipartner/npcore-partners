@@ -91,6 +91,8 @@
 
         Setup.GetPOSUnit(POSUnit);
         POSUnit.Get(POSUnit."No.");
+        if POSUnit.Status = POSUnit.Status::INACTIVE then
+            POSUnit.FieldError(Status);
 
         Setup.GetSalespersonRecord(SalespersonPurchaser);
         CheckPosUnitGroup(SalespersonPurchaser, POSUnit."No.");
