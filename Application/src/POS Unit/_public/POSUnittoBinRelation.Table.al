@@ -23,8 +23,8 @@
             Caption = 'POS Unit Status';
             Editable = false;
             FieldClass = FlowField;
-            OptionCaption = 'Open,Closed,End of Day';
-            OptionMembers = OPEN,CLOSED,ENDOFDAY;
+            OptionCaption = 'Open,Closed,End of Day,Inactive';
+            OptionMembers = OPEN,CLOSED,ENDOFDAY,INACTIVE;
         }
         field(11; "POS Unit Name"; Text[50])
         {

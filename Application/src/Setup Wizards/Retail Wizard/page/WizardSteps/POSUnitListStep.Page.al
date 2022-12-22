@@ -496,12 +496,14 @@
         Rec.DeleteAll();
         if TempPOSUnit.FindSet() then
             repeat
-                Rec := TempPOSUnit;
-                Rec."POS Store Code" := '';
-                Rec.Insert();
+                if TempPOSUnit.Status <> TempPOSUnit.Status::INACTIVE then begin
+                    Rec := TempPOSUnit;
+                    Rec."POS Store Code" := '';
+                    Rec.Insert();
 
-                Rec."POS Store Code" := TempPOSUnit."POS Store Code";
-                Rec.Modify();
+                    Rec."POS Store Code" := TempPOSUnit."POS Store Code";
+                    Rec.Modify();
+                end;
             until TempPOSUnit.Next() = 0;
     end;
 

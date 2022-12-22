@@ -31,7 +31,7 @@
         }
         field(50; "POS Units"; Integer)
         {
-            CalcFormula = Count("NPR POS Unit");
+            CalcFormula = Count("NPR POS Unit" where("Status" = filter(<> 'INACTIVE')));
             Caption = 'POS Units';
             FieldClass = FlowField;
         }
