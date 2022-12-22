@@ -4,6 +4,8 @@ codeunit 88000 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Prov
 
     trigger OnRun();
     begin
+        SelectLatestVersion();
+
         if not IsInitialized then begin
             InitTest();
             IsInitialized := true;

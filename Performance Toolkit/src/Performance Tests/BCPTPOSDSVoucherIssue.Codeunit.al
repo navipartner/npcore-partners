@@ -4,6 +4,8 @@ codeunit 88003 "NPR BCPT POS DS Voucher Issue" implements "BCPT Test Param. Prov
 
     trigger OnRun();
     begin
+        SelectLatestVersion();
+
         if not IsInitialized then begin
             InitTest();
             IsInitialized := true;

@@ -4,6 +4,8 @@ codeunit 88005 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
 
     trigger OnRun();
     begin
+        SelectLatestVersion();
+
         if not IsInitialized then begin
             InitTest();
             IsInitialized := true;
@@ -35,7 +37,6 @@ codeunit 88005 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
         NoSeriesLine: Record "No. Series Line";
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
-        // AuxiliaryItem: Record "NPR Auxiliary Item";
         TicketType: Record "NPR TM Ticket Type";
     begin
         POSPaymentMethod.Get('K');
@@ -45,12 +46,6 @@ codeunit 88005 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
             Item.Validate("NPR Ticket Type", TicketType.Code);
             Item.Modify();
         end;
-        // AuxiliaryItem.Get('31001');
-        // if AuxiliaryItem."TM Ticket Type" = '' then begin
-        //     TicketType.Get('ENTRY');
-        //     AuxiliaryItem.Validate("TM Ticket Type", TicketType.Code);
-        //     AuxiliaryItem.Modify();
-        // end;
 
         POSUnit.Get('01');
         POSMasterDataLibrary.OpenPOSUnit(POSUnit);
