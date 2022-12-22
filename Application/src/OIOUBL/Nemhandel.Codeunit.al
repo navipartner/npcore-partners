@@ -22,7 +22,8 @@ codeunit 6060024 "NPR Nemhandel"
     begin
         if GLN = '' then
             exit;
-        OIOUBLSetup.Get();
+        if not OIOUBLSetup.Get() then
+            exit;
         if not OIOUBLSetup."Use Nemhandel Lookup" then
             exit;
         if VATRegNo <> '' then begin
@@ -87,7 +88,8 @@ codeunit 6060024 "NPR Nemhandel"
     begin
         if VATRegNoSrvConfig.VATRegNoSrvIsEnabled() then
             exit;
-        OIOUBLSetup.Get();
+        if not OIOUBLSetup.Get() then
+            exit;
         if not OIOUBLSetup."Use Nemhandel Lookup" then
             exit;
         CompanyInformation.Get();
