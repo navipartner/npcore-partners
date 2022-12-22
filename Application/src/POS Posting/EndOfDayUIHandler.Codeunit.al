@@ -379,44 +379,57 @@
             TempBinCheckpoint."Move To Bin Code" := CopyStr(GetValueAsText(CountedPayment.AsObject(), 'moveToBinNo'), 1, MaxStrLen(TempBinCheckpoint."Bank Deposit Bin Code"));
             TempBinCheckpoint."Move To Bin Reference" := CopyStr(GetValueAsText(CountedPayment.AsObject(), 'moveToBinTransId'), 1, MaxStrLen(TempBinCheckpoint."Bank Deposit Reference"));
             TempBinCheckpoint.Insert();
+
+            TransferDenominations(CountedPayment, 'bankDepositAmountCoinTypes', Enum::"NPR Denomination Target"::BankDeposit, TempBinCheckpoint);
+            TransferDenominations(CountedPayment, 'moveToBinAmountCoinTypes', Enum::"NPR Denomination Target"::MoveToBin, TempBinCheckpoint);
         end;
     end;
 
     local procedure TransferCountingToBinCheckpointRec(Counting: JsonArray; var TempBinCheckpoint: Record "NPR POS Payment Bin Checkp." temporary)
     var
-        POSPmtBinCheckpDenom: Record "NPR POS Pmt. Bin Checkp. Denom";
         CountedPayment: JsonToken;
         ManualCountComment: Label 'Counted by %1', MaxLength = 25;
-        Denominations: JsonArray;
-        CoinTypesToken, Denomination : JsonToken;
-        Qty: Decimal;
     begin
         foreach CountedPayment in Counting do begin
             TempBinCheckpoint.Get(GetValueAsInteger(CountedPayment.AsObject(), 'id'));
-
             TempBinCheckpoint."Counted Amount Incl. Float" := GetValueAsDecimal(CountedPayment.AsObject(), 'countedAmount');
             TempBinCheckpoint.Comment := StrSubstNo(ManualCountComment, CopyStr(UserId, 1, 25));
             TempBinCheckpoint.Modify();
 
-            if (CountedPayment.AsObject().Get('coinTypes', CoinTypesToken)) then
-                if (CoinTypesToken.IsArray) then begin
-                    Denominations := CoinTypesToken.AsArray();
-                    foreach Denomination in Denominations do begin
-                        Qty := GetValueAsInteger(Denomination.AsObject(), 'quantity');
-                        if Qty <> 0 then begin
-                            POSPmtBinCheckpDenom."POS Pmt. Bin Checkp. Entry No." := TempBinCheckpoint."Entry No.";
-                            POSPmtBinCheckpDenom."Attached-to ID" := Enum::"NPR Denomination Target"::Counted;
-                            POSPmtBinCheckpDenom."Denomination Type" := Enum::"NPR Denomination Type".FromInteger(GetValueAsInteger(Denomination.AsObject(), 'type'));
-                            POSPmtBinCheckpDenom.Denomination := GetValueAsDecimal(Denomination.AsObject(), 'value');
-                            POSPmtBinCheckpDenom."Denomination Variant ID" := GetValueAsCode20(Denomination.AsObject(), 'variantId');
-                            if not POSPmtBinCheckpDenom.Find() then
-                                POSPmtBinCheckpDenom.Insert();
-                            POSPmtBinCheckpDenom."Currency Code" := TempBinCheckpoint."Currency Code";
-                            POSPmtBinCheckpDenom.Quantity := Qty;
-                            POSPmtBinCheckpDenom.Modify();
-                        end;
-                    end;
-                end;
+            TransferDenominations(CountedPayment, 'coinTypes', Enum::"NPR Denomination Target"::Counted, TempBinCheckpoint);
+        end;
+    end;
+
+    local procedure TransferDenominations(CountedPayment: JsonToken; JsonPath: Text; DenominationTarget: Enum "NPR Denomination Target"; PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.")
+    var
+        POSPmtBinCheckpDenom: Record "NPR POS Pmt. Bin Checkp. Denom";
+        Denomination: JsonToken;
+        Denominations: JsonToken;
+        Qty: Decimal;
+    begin
+        POSPmtBinCheckpDenom.SetRange("POS Pmt. Bin Checkp. Entry No.", PmtBinCheckpoint."Entry No.");
+        POSPmtBinCheckpDenom.SetRange("Attached-to ID", DenominationTarget);
+        if not POSPmtBinCheckpDenom.IsEmpty() then
+            POSPmtBinCheckpDenom.DeleteAll();
+
+        if not (CountedPayment.SelectToken(JsonPath, Denominations) and Denominations.IsArray()) then
+            exit;
+
+        foreach Denomination in Denominations.AsArray() do begin
+            Qty := GetValueAsInteger(Denomination.AsObject(), 'quantity');
+            if Qty <> 0 then begin
+                POSPmtBinCheckpDenom.Init();
+                POSPmtBinCheckpDenom."POS Pmt. Bin Checkp. Entry No." := PmtBinCheckpoint."Entry No.";
+                POSPmtBinCheckpDenom."Attached-to ID" := DenominationTarget;
+                POSPmtBinCheckpDenom."Denomination Type" := Enum::"NPR Denomination Type".FromInteger(GetValueAsInteger(Denomination.AsObject(), 'type'));
+                POSPmtBinCheckpDenom.Denomination := GetValueAsDecimal(Denomination.AsObject(), 'value');
+                POSPmtBinCheckpDenom."Denomination Variant ID" := GetValueAsCode20(Denomination.AsObject(), 'variation');
+                if not POSPmtBinCheckpDenom.Find() then
+                    POSPmtBinCheckpDenom.Insert();
+                POSPmtBinCheckpDenom."Currency Code" := PmtBinCheckpoint."Currency Code";
+                POSPmtBinCheckpDenom.Validate(Quantity, Qty);
+                POSPmtBinCheckpDenom.Modify();
+            end;
         end;
     end;
 
