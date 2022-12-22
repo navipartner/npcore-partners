@@ -721,6 +721,7 @@
         RetrieveReusableWorkflowParameters(FieldNumber, POSUnit."POS Named Actions Profile", TempPOSParameterValue);
         WorkflowAction.ConfigureFromMenuButton(Button, POSSession, WorkflowAction);
         TempPOSParameterValue.AddParametersToAction(WorkflowAction);
+        Button.StoreActionOtherConfiguration(WorkflowAction, POSSession);
 
         FrontEnd.ConfigureReusableWorkflow(WorkflowAction);
     end;
