@@ -940,7 +940,7 @@
 
     var
         EMAIL_EXISTS: Label '%1 is already in use by member [%2] %3.\\If you are certain that the existing member should be blocked from the existing membership and re-registered with the new membership, press Yes.';
-        MISSING_REQUIRED_FIELDS: Label 'All required fields do not have values.\\ The following fields must be set: %1';
+        MISSING_REQUIRED_FIELDS: Label 'All fields do not have valid values.\\ The following fields needs attention: %1';
         EMAIL_INVALID_CONFIRM: Label 'The %1 seems invalid, do you want to correct it?';
         EmailMandatory: Boolean;
         PhoneNoMandatory: Boolean;
@@ -1043,6 +1043,7 @@
         Customer: Record Customer;
         Member: Record "NPR MM Member";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        ValidEmail: Boolean;
     begin
 
         MissingInformation := false;
@@ -1082,6 +1083,13 @@
                                 SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption(Birthday), true);
                                 Message(AGE_VERIFICATION, MemberInfoCapture."First Name", MembershipSalesSetup."Age Constraint (Years)");
                             end;
+                    end;
+
+                    if (MemberInfoCapture."E-Mail Address" <> '') then begin
+                        ValidEmail := (StrPos(Rec."E-Mail Address", '@') > 1);
+                        if (ValidEmail) then
+                            ValidEmail := (StrPos(CopyStr(Rec."E-Mail Address", StrPos(Rec."E-Mail Address", '@')), '.') > 1);
+                        SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), not ValidEmail);
                     end;
 
                 end;
@@ -1135,12 +1143,17 @@
             end;
         end else begin
             SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), (MemberInfoCapture."E-Mail Address" = ''));
+            if (MemberInfoCapture."E-Mail Address" <> '') then begin
+                ValidEmail := (StrPos(Rec."E-Mail Address", '@') > 1);
+                if (ValidEmail) then
+                    ValidEmail := (StrPos(CopyStr(Rec."E-Mail Address", StrPos(Rec."E-Mail Address", '@')), '.') > 1);
+                SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), not ValidEmail);
+            end;
 
             if (SetAddGuardianMode) then begin
                 MissingInformation := false;
                 SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Guardian External Member No."), (MemberInfoCapture."Guardian External Member No." = ''));
             end;
-
         end;
 
         if (MissingInformation) then
