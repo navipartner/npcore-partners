@@ -1,4 +1,4 @@
-# Balance the POS (Z-report)
+# Balance the POS V3 (Z-report)
 
 The Z-report, or the end-of-day report, calculates and displays the payments received through that register for the entirety of a day. 
 
