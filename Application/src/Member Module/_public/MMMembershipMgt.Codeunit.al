@@ -262,7 +262,10 @@
                             MagentoSetup."Magento Version"::"1":
                                 Contact."NPR Magento Contact" := false;
                             MagentoSetup."Magento Version"::"2":
-                                Contact."NPR Magento Account Status" := Contact."NPR Magento Account Status"::BLOCKED;
+                                begin
+                                    Contact."NPR Magento Contact" := false;
+                                    Contact."NPR Magento Account Status" := Contact."NPR Magento Account Status"::BLOCKED;
+                                end;
                         end;
                         Contact.Modify(true);
                     end;
@@ -423,7 +426,10 @@
                         MagentoSetup."Magento Version"::"1":
                             Contact."NPR Magento Contact" := false;
                         MagentoSetup."Magento Version"::"2":
-                            Contact."NPR Magento Account Status" := Contact."NPR Magento Account Status"::BLOCKED;
+                            begin
+                                Contact."NPR Magento Contact" := false;
+                                Contact."NPR Magento Account Status" := Contact."NPR Magento Account Status"::BLOCKED;
+                            end;
                     end;
 
                     Contact.Modify(true);
@@ -3870,11 +3876,13 @@
             MagentoSetup."Magento Version"::"2":
                 begin
                     Contact."NPR Magento Contact" := true;
-                    if ((not Member.Blocked) and (Member."E-Mail Address" <> '')) then begin
-                        Contact."NPR Magento Account Status" := Contact."NPR Magento Account Status"::ACTIVE;
-                    end else begin
+                    Contact."NPR Magento Account Status" := Contact."NPR Magento Account Status"::ACTIVE;
+
+                    if (Member."Block Reason" = Member."Block Reason"::ANONYMIZED) then
+                        Contact."NPR Magento Contact" := false;
+
+                    if ((Member.Blocked) or (Member."E-Mail Address" = '')) then
                         Contact."NPR Magento Account Status" := Contact."NPR Magento Account Status"::BLOCKED;
-                    end;
                 end;
         end;
 
