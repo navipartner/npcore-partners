@@ -67,7 +67,7 @@
             exit;
 
         POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.Type() = CurrentView.Type() ::Sale) then
+        if (CurrentView.GetType() = CurrentView.GetType() ::Sale) then
             POSSession.ChangeViewPayment();
 
         POSSession.GetSetup(Setup);
@@ -466,7 +466,7 @@
 
         Commit();
     end;
-    #endif
+#endif
     #endregion
 
     #region Subscriber

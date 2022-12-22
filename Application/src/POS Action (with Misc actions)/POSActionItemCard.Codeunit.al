@@ -57,7 +57,7 @@
         JSON.InitializeJObjectParser(Context, FrontEnd);
         POSSession.GetCurrentView(CurrentView);
 
-        if (CurrentView.Type() = CurrentView.Type() ::Sale) then begin
+        if (CurrentView.GetType() = CurrentView.GetType() ::Sale) then begin
             POSSession.GetSale(POSSale);  //Ensure the sale still exists (haven't been seized and finished/cancelled by another session)
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetCurrentSaleLine(LinePOS);

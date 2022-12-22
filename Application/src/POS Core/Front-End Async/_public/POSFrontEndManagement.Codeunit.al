@@ -322,7 +322,7 @@
                 OnBeforeChangeToLoginView(_POSSession);
             DefaultView.Type::Sale:
                 begin
-                    if CurrView.Type() = CurrView.Type() ::Login then
+                    if CurrView.GetType() = CurrView.GetType() ::Login then
                         POSViewChangeWorkflowMgt.InvokeOnAfterLoginWorkflow(_POSSession);
 
                     OnBeforeChangeToSaleView(_POSSession);

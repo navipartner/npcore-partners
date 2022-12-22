@@ -1,6 +1,7 @@
 ﻿codeunit 6150803 "NPR POSAction: Zoom"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'Zoom a sales line.';
 
@@ -38,7 +39,7 @@
     begin
 
         POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.Type() <> CurrentView.Type() ::Sale) then
+        if (CurrentView.GetType() <> CurrentView.GetType() ::Sale) then
             exit;
 
         POSSession.GetSaleLine(SaleLine);
