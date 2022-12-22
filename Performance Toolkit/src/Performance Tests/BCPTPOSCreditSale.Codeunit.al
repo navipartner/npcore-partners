@@ -4,6 +4,8 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
 
     trigger OnRun();
     begin
+        SelectLatestVersion();
+
         if not IsInitialized then begin
             InitTest();
             IsInitialized := true;

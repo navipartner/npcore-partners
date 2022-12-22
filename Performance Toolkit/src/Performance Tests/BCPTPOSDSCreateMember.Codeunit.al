@@ -4,6 +4,8 @@ codeunit 88006 "NPR BCPT POS DS Create Member" implements "BCPT Test Param. Prov
 
     trigger OnRun();
     begin
+        SelectLatestVersion();
+
         if not IsInitialized then begin
             InitTest();
             IsInitialized := true;
