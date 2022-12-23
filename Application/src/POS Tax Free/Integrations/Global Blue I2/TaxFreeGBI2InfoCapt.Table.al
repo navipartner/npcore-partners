@@ -72,9 +72,9 @@
                     Validate("Country Of Residence Code", 0);
                     Validate("Mobile No. Country", '');
                 end else begin
-                    GlobalBlueCountries.SetFilter(Name, '@' + "Country Of Residence");
+                    GlobalBlueCountries.SetFilter(Name, '''@' + "Country Of Residence" + '''');
                     if not GlobalBlueCountries.FindFirst() then begin
-                        GlobalBlueCountries.SetFilter(Name, '@' + "Country Of Residence" + '*');
+                        GlobalBlueCountries.SetFilter(Name, '''@' + "Country Of Residence" + '*''');
                         GlobalBlueCountries.FindFirst();
                     end;
                     GlobalBlueBlockedCountries.SetRange("Shop Country Code", "Shop Country Code");
@@ -148,9 +148,9 @@
                 if "Mobile No. Country" = '' then
                     Validate("Mobile No. Prefix", 0)
                 else begin
-                    GlobalBlueCountries.SetFilter(Name, '@' + "Mobile No. Country");
+                    GlobalBlueCountries.SetFilter(Name, '''@' + "Mobile No. Country" + '''');
                     if not GlobalBlueCountries.FindFirst() then begin
-                        GlobalBlueCountries.SetFilter(Name, '@' + "Mobile No. Country" + '*');
+                        GlobalBlueCountries.SetFilter(Name, '''@' + "Mobile No. Country" + '*''');
                         GlobalBlueCountries.FindFirst();
                     end;
 
@@ -177,9 +177,9 @@
                     Validate("Passport Country Code", 0);
                 end else begin
                     GlobalBlueCountries.SetFilter("Passport Code", '<>%1', 0);
-                    GlobalBlueCountries.SetFilter(Name, '@' + "Passport Country");
+                    GlobalBlueCountries.SetFilter(Name, '''@' + "Passport Country" + '''');
                     if not GlobalBlueCountries.FindFirst() then begin
-                        GlobalBlueCountries.SetFilter(Name, '@' + "Passport Country" + '*');
+                        GlobalBlueCountries.SetFilter(Name, '''@' + "Passport Country" + '*''');
                         GlobalBlueCountries.FindFirst();
                     end;
 
@@ -230,9 +230,9 @@
                 if "Final Destination Country" = '' then begin
                     Validate("Final Destination Country Code", 0);
                 end else begin
-                    GlobalBlueCountries.SetFilter(Name, '@' + "Final Destination Country");
+                    GlobalBlueCountries.SetFilter(Name, '''@' + "Final Destination Country" + '''');
                     if not GlobalBlueCountries.FindFirst() then begin
-                        GlobalBlueCountries.SetFilter(Name, '@' + "Final Destination Country" + '*');
+                        GlobalBlueCountries.SetFilter(Name, '''@' + "Final Destination Country" + '*''');
                         GlobalBlueCountries.FindFirst();
                     end;
 
