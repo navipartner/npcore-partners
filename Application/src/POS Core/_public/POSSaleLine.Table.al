@@ -1895,7 +1895,7 @@
         SalesLine."NPR Discount Code" := "Discount Code";
     end;
 
-    local procedure SalesLine_AjdustPriceForVAT(FromSaleLinePOS: Record "NPR POS Sale Line"; var SalesLine: Record "Sales Line") PriceRecalculated: Boolean
+    local procedure SalesLine_AjdustPriceForVAT(FromSaleLinePOS: Record "NPR POS Sale Line"; var SalesLine: Record "Sales Line"): Boolean
     var
         SalesHeader: Record "Sales Header";
         ToSaleLinePOS: Record "NPR POS Sale Line";

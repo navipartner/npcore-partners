@@ -529,7 +529,7 @@ codeunit 6184496 "NPR Pepper Library HWC"
         PepperTrxTransaction: Codeunit "NPR Pepper Transaction HWC";
         TransactionDateText: Text[8];
         TransactionTimeText: Text[6];
-        CommentText: Text;
+        LocalCommentText: Text;
         RetryTransaction: Boolean;
         FoundTrxToRecover: Boolean;
         PaymentType: Code[10];
@@ -617,14 +617,14 @@ codeunit 6184496 "NPR Pepper Library HWC"
             EFTTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EFTTransactionRequest), 1, MaxStrLen(EFTTransactionRequest."POS Description"));
         end;
 
-        if (PepperTrxTransaction.GetTrx_JournalLevel(CommentText)) then
-            AddToCommentBatch(StrSubstNo('Journal: %1', CommentText));
+        if (PepperTrxTransaction.GetTrx_JournalLevel(LocalCommentText)) then
+            AddToCommentBatch(StrSubstNo('Journal: %1', LocalCommentText));
 
-        if (PepperTrxTransaction.GetTrx_ReferralText(CommentText)) then
-            AddToCommentBatch(StrSubstNo('Referral: %1', CommentText));
+        if (PepperTrxTransaction.GetTrx_ReferralText(LocalCommentText)) then
+            AddToCommentBatch(StrSubstNo('Referral: %1', LocalCommentText));
 
-        if (PepperTrxTransaction.GetTrx_AdditionalParameters(CommentText)) then
-            AddToCommentBatch(StrSubstNo('Additional Parameters: %1', CommentText));
+        if (PepperTrxTransaction.GetTrx_AdditionalParameters(LocalCommentText)) then
+            AddToCommentBatch(StrSubstNo('Additional Parameters: %1', LocalCommentText));
 
         EFTTransactionRequest.Finished := CurrentDateTime;
         EFTTransactionRequest."External Result Known" := true;
