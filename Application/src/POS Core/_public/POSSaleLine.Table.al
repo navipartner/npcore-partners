@@ -2059,6 +2059,10 @@
     var
         TableID: array[10] of Integer;
         No: array[10] of Code[20];
+#IF NOT (BC17 or BC18 or BC19)
+        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
+        i: Integer;
+#endif
     begin
         GetPOSHeader();
 
@@ -2075,11 +2079,25 @@
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
+
+#IF NOT (BC17 or BC18 or BC19)
+        for i := 1 to ArrayLen(TableID) do
+            if (TableID[i] <> 0) and (No[i] <> '') then
+                DimMgt.AddDimSource(DefaultDimSource, TableID[i], No[i]);
+#endif
+
+#IF NOT (BC17 or BC18 or BC19)
+        "Dimension Set ID" :=
+                DimMgt.GetRecDefaultDimID(
+                Rec, CurrFieldNo, DefaultDimSource, SalePOS.GetPOSSourceCode(),
+                "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", SalePOS."Dimension Set ID", DATABASE::"NPR POS Store");
+#else
         "Dimension Set ID" :=
                 DimMgt.GetRecDefaultDimID(
                 Rec, CurrFieldNo, TableID, No, SalePOS.GetPOSSourceCode(),
                 "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", SalePOS."Dimension Set ID", DATABASE::"NPR POS Store");
 
+#endif
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
     end;
 
