@@ -181,6 +181,7 @@
                 exit(DATABASE::"NPR Retail Comment");
         end;
     end;
+
     internal procedure LineTypeToTableNPR(POSSaleLineType: enum "NPR POS Sale Line Type"): Integer
     var
         TableId: Integer;
@@ -194,9 +195,9 @@
             POSSaleLineType::"POS Payment":
                 exit(Database::"NPR POS Payment Method");
             POSSaleLineType::"Customer Deposit":
-                exit(Database::Customer); 
+                exit(Database::Customer);
             POSSaleLineType::Comment:
-                exit(Database::"NPR Retail Comment"); 
+                exit(Database::"NPR Retail Comment");
             POSSaleLineType::Rounding,
             POSSaleLineType::"GL Payment",
             POSSaleLineType::"Issue Voucher":
@@ -205,9 +206,9 @@
                 OnGetTableId(POSSaleLineType.AsInteger(), TableId);
                 exit(TableId);
             end;
-                 
+
         end;
-    end;    
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnGetTableId(POSSaleLineType: Integer; var TableId: Integer)
@@ -378,6 +379,10 @@
         TableID: array[10] of Integer;
         No: array[10] of Code[20];
         DimensionMgt: Codeunit DimensionManagement;
+#IF NOT (BC17 or BC18 or BC19)
+        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
+        i: Integer;
+#endif
     begin
         TableID[1] := Type1;
         No[1] := No1;
@@ -393,11 +398,25 @@
         POSEntrySalesLine."Shortcut Dimension 1 Code" := '';
         POSEntrySalesLine."Shortcut Dimension 2 Code" := '';
 
+#IF NOT (BC17 or BC18 or BC19)
+        for i := 1 to ArrayLen(TableID) do
+            if (TableID[i] <> 0) and (No[i] <> '') then
+                DimMgt.AddDimSource(DefaultDimSource, TableID[i], No[i]);
+#endif
+
+#IF NOT (BC17 or BC18 or BC19)
+        POSEntrySalesLine."Dimension Set ID" :=
+          DimensionMgt.GetDefaultDimID(
+            DefaultDimSource, GetPOSSourceCode(POSEntry."POS Unit No."),
+            POSEntrySalesLine."Shortcut Dimension 1 Code", POSEntrySalesLine."Shortcut Dimension 2 Code",
+            POSEntry."Dimension Set ID", DATABASE::Customer);
+#else
         POSEntrySalesLine."Dimension Set ID" :=
           DimensionMgt.GetDefaultDimID(
             TableID, No, GetPOSSourceCode(POSEntry."POS Unit No."),
             POSEntrySalesLine."Shortcut Dimension 1 Code", POSEntrySalesLine."Shortcut Dimension 2 Code",
             POSEntry."Dimension Set ID", DATABASE::Customer);
+#endif
         DimensionMgt.UpdateGlobalDimFromDimSetID(POSEntrySalesLine."Dimension Set ID", POSEntrySalesLine."Shortcut Dimension 1 Code", POSEntrySalesLine."Shortcut Dimension 2 Code");
     end;
 
