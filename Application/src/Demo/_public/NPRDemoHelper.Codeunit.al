@@ -2,7 +2,7 @@ codeunit 6059865 NPRDemoHelper
 {
     Access = Public;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     Procedure ResetLogs()
     begin
         DemoHelperImple.ResetLogs();

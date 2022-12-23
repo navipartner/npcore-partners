@@ -23,7 +23,7 @@
 
         ImportListErr: Label 'There are one or more Import List entries with Processing Runtime Error for this Replication Endpoint.';
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
     begin
         SendWebRequests(ImportType, '');
@@ -319,7 +319,7 @@
 
 #IF (BC17 or BC18 or BC19 or BC20)
         if SelectJsonToken(JTokenEntity.AsObject(), '$.replicationCounter') = '' then
-            Error(ReplicationCounterCannotBeEmptyErr,'Replication Counter');
+            Error(ReplicationCounterCannotBeEmptyErr, 'Replication Counter');
 #ELSE
         if SelectJsonToken(JTokenEntity.AsObject(), '$.systemRowVersion') = '' then
             Error(ReplicationCounterCannotBeEmptyErr, 'System Row Version');

@@ -14,7 +14,7 @@
         NaviConnectSetup.Insert();
     end;
 #pragma warning disable AA0139
-    [Obsolete('Task Que module to be removed from NP Retail. We are now using Job Que instead.', '20.0')]
+    [Obsolete('Task Que module to be removed from NP Retail. We are now using Job Que instead.')]
     procedure SetupTaskQueue()
     var
         SyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -50,7 +50,7 @@
         SetTaskLineEnabled(TaskCode, TaskCode, TaskLineNo, NaviConnectSetup."Task Queue Enabled");
     end;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     local procedure SetTaskLineEnabled(TemplateName: Code[10]; BatchName: Code[10]; LineNo: Integer; Enabled: Boolean)
     var
         TaskLine: Record "NPR Task Line";
@@ -71,7 +71,7 @@
         end;
     end;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     local procedure SetupTaskWorkerGroup(GroupCode: Code[10]; GroupDescription: Text[50])
     var
         TaskWorkerGroup: Record "NPR Task Worker Group";
@@ -88,7 +88,7 @@
         end;
     end;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     local procedure SetupTaskTemplate(TemplateName: Code[10]; TemplateDescription: Text[50]; GroupCode: Code[10])
     var
         TaskTemplate: Record "NPR Task Template";
@@ -104,7 +104,7 @@
         end;
     end;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     local procedure SetupTaskBatch(TemplateName: Code[10]; BatchName: Code[10]; BatchDescription: Text[50]; GroupCode: Code[10])
     var
         TaskBatch: Record "NPR Task Batch";
@@ -120,7 +120,7 @@
         end;
     end;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     local procedure SetupTaskLineMinute(TemplateName: Code[10]; BatchName: Code[10]; LineNo: Integer; TaskDescription: Text[50]; GroupCode: Code[10])
     var
         TaskLine: Record "NPR Task Line";
@@ -152,7 +152,7 @@
         end;
     end;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     local procedure SetupTaskLineDay(TemplateName: Code[10]; BatchName: Code[10]; LineNo: Integer; TaskDescription: Text[50]; GroupCode: Code[10])
     var
         TaskLine: Record "NPR Task Line";
@@ -185,7 +185,7 @@
         end;
     end;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     local procedure SetupTaskLineParameterBool(TemplateName: Code[10]; BatchName: Code[10]; LineNo: Integer; ParameterName: Code[20]; ParameterValue: Boolean)
     var
         TaskLine: Record "NPR Task Line";
@@ -196,7 +196,7 @@
         end;
     end;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     local procedure SetupTaskLineParameterInt(TemplateName: Code[10]; BatchName: Code[10]; LineNo: Integer; ParameterName: Code[20]; ParameterValue: Integer)
     var
         TaskLine: Record "NPR Task Line";
@@ -207,7 +207,7 @@
         end;
     end;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     local procedure SetupCleanUpTask(TemplateName: Code[10]; BatchName: Code[10]; LineNo: Integer; TaskDescription: Text[50]; GroupCode: Code[10])
     var
         TaskLine: Record "NPR Task Line";
@@ -252,7 +252,7 @@
         exit('');
     end;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     local procedure FindLineNo(TemplateName: Code[10]; BatchName: Code[10]; TaskDescription: Text; var LineNo: Integer)
     var
         TaskLine: Record "NPR Task Line";

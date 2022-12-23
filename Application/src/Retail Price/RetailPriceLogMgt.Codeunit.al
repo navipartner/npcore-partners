@@ -64,7 +64,7 @@
         EnableChangeLogSetupTable(DATABASE::"NPR Period Discount Line");
     end;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     local procedure EnableTaskQueue()
     var
         TaskBatch: Record "NPR Task Batch";
