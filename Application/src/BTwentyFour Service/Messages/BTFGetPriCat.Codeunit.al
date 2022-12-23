@@ -11,7 +11,7 @@
         PriCatNotFoundInContentLbl: Label 'Price Catalogue or it''s lines not found in the content';
         NextEndPointNotFoundLbl: Label 'Next Service EndPoint has not been connected to %1 or it is but it''s not enabled.', Comment = '%1=ServiceEndPoint."EndPoint ID"';
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
     var
         ServiceAPI: Codeunit "NPR BTF Service API";

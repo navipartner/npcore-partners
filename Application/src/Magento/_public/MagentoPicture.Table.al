@@ -142,7 +142,7 @@
         Text000: Label 'Picture Size exceeds max.';
         ErrorCannotAccesUrl: Label 'Cannot access URL %1.\\Failed with HTTP status code %2';
 
-    [Obsolete('Use method with TempBlob instead of using Image media field', 'v20')]
+    [Obsolete('Use method with TempBlob instead of using Image media field')]
     procedure DownloadPicture(var TempMagentoPicture: Record "NPR Magento Picture" temporary): Boolean
     var
         Stream: InStream;
