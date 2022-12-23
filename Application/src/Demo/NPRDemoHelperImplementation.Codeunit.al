@@ -2,7 +2,7 @@ codeunit 6059866 "NPRDemoHelperImplementation"
 {
     Access = Internal;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.', '20.0')]
+    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
     procedure ResetLogs()
     var
         DataLogField: Record "NPR Data Log Field";
