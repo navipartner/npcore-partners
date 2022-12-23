@@ -194,7 +194,7 @@
         if EFTReceipt.FindSet() then
             repeat
                 EFTReceiptText += EFTReceipt.Text + Format(NewLine);
-            until EFTReceipt.Next = 0;
+            until EFTReceipt.Next() = 0;
         exit(EFTReceiptText);
     end;
 

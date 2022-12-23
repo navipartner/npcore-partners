@@ -359,7 +359,6 @@
 
     local procedure AddPeriodDiscountLinesFromPriceList(PeriodDiscount: Record "NPR Period Discount"; PriceListHeader: Record "Price List Header")
     var
-        PeriodDiscountLine: Record "NPR Period Discount Line";
         PriceListLine: Record "Price List Line";
         LinesAddedCount: Integer;
         SuccessfullyAddedLinesLbl: Label 'Successfully added %1 lines.', Comment = '%1-line count';
