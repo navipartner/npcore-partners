@@ -293,9 +293,8 @@
 
     fieldgroups
     {
-        fieldgroup(Brick; "POS Store Code", Name)
-        {
-        }
+        fieldgroup(Brick; "No.", "POS Store Code", Name) { }
+        fieldgroup(DropDown; "No.", "POS Store Code", Name) { }
     }
 
     trigger OnDelete()
