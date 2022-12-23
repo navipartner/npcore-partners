@@ -66,7 +66,6 @@ codeunit 6059925 "NPR POS Layout Assistant"
         POSLayout: JsonToken;
         POSLayouts: JsonToken;
         JToken: JsonToken;
-        TypeOfChange: Text;
     begin
         POSLayouts := GetJsonToken(Context.AsToken(), 'layouts');
         if not POSLayouts.IsArray() then
@@ -88,7 +87,6 @@ codeunit 6059925 "NPR POS Layout Assistant"
     local procedure NewPOSLayout(POSLayoutJToken: JsonToken)
     var
         POSLayout: Record "NPR POS Layout";
-        NoSeriesManagement: Codeunit NoSeriesManagement;
     begin
         POSLayout.Code := CopyStr(GetJText(POSLayoutJToken, 'id', false), 1, MaxStrLen(POSLayout.Code));
         if (POSLayout.Code = '') or POSLayout.Find() then begin
@@ -416,8 +414,6 @@ codeunit 6059925 "NPR POS Layout Assistant"
     end;
 
     local procedure GetJsonToken(Token: JsonToken; TokenKey: Text) TokenOut: JsonToken
-    var
-        TokenNotFound: Label 'Could not find a Json token with key %1';
     begin
         if not GetJsonToken(Token, TokenKey, TokenOut) then
             RequiredValueMissingError(Token, TokenKey);
