@@ -14,7 +14,6 @@ report 6014446 "NPR S.Person POS Sales Stats"
     {
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
         {
-            CalcFields = "NPR Sales (LCY)";
             RequestFilterFields = "Code", "Date Filter", "NPR Global Dimension 1 Filter";
             column(COMPANYNAME; COMPANYNAME)
             {
@@ -27,8 +26,9 @@ report 6014446 "NPR S.Person POS Sales Stats"
             }
             trigger OnAfterGetRecord()
             begin
+                NPRGetVESalesLCY(SalesLCY);
                 TempCustAmount.Init();
-                TempCustAmount."Amount (LCY)" := "NPR Sales (LCY)";
+                TempCustAmount."Amount (LCY)" := SalesLCY;
                 TempCustAmount."Customer No." := Code;
                 TempCustAmount.Insert();
             end;
@@ -52,43 +52,43 @@ report 6014446 "NPR S.Person POS Sales Stats"
             column(Name; "Salesperson/Purchaser".Name)
             {
             }
-            column(SalesLcy; "Salesperson/Purchaser"."NPR Sales (LCY)")
+            column(SalesLcy; SalesLCY)
             {
                 AutoFormatType = 1;
             }
-            column(SalesLcyLast; SalespersonLastYear."NPR Sales (LCY)")
+            column(SalesLcyLast; SalesLCYSalesPersonLastYear)
             {
                 AutoFormatType = 1;
             }
-            column(GMargin; "Salesperson/Purchaser"."NPR Sales (LCY)" - "Salesperson/Purchaser"."NPR COGS (LCY)")
+            column(GMargin; SalesLCY - COGSLCY)
             {
                 AutoFormatType = 1;
             }
-            column(GMarginLast; SalespersonLastYear."NPR Sales (LCY)" - SalespersonLastYear."NPR COGS (LCY)")
+            column(GMarginLast; SalesLCYSalesPersonLastYear - COGSLCYSalesPersonLastYear)
             {
                 AutoFormatType = 1;
             }
-            column(GMarginPct; CalcPct("Salesperson/Purchaser"."NPR Sales (LCY)" - "Salesperson/Purchaser"."NPR COGS (LCY)", "Salesperson/Purchaser"."NPR Sales (LCY)"))
+            column(GMarginPct; CalcPct(SalesLCY - COGSLCY, SalesLCY))
             {
                 AutoFormatType = 1;
             }
-            column(GMarginPctLast; CalcPct(SalespersonLastYear."NPR Sales (LCY)" - SalespersonLastYear."NPR COGS (LCY)", SalespersonLastYear."NPR Sales (LCY)"))
+            column(GMarginPctLast; CalcPct(SalesLCYSalesPersonLastYear - COGSLCYSalesPersonLastYear, SalesLCYSalesPersonLastYear))
             {
                 AutoFormatType = 1;
             }
-            column(Discount; "Salesperson/Purchaser"."NPR Discount Amount")
+            column(Discount; DiscountAmount)
             {
                 AutoFormatType = 1;
             }
-            column(DiscountLast; SalespersonLastYear."NPR Discount Amount")
+            column(DiscountLast; DiscountAmountSalesPersonLastYear)
             {
                 AutoFormatType = 1;
             }
-            column(AvgDisc; CalcPct("Salesperson/Purchaser"."NPR Discount Amount", "Salesperson/Purchaser"."NPR Sales (LCY)" + "Salesperson/Purchaser"."NPR Discount Amount"))
+            column(AvgDisc; CalcPct(DiscountAmount, SalesLCY + DiscountAmount))
             {
                 AutoFormatType = 1;
             }
-            column(AvgDiscLast; CalcPct(SalespersonLastYear."NPR Discount Amount", SalespersonLastYear."NPR Sales (LCY)" + SalespersonLastYear."NPR Discount Amount"))
+            column(AvgDiscLast; CalcPct(DiscountAmountSalesPersonLastYear, SalesLCYSalesPersonLastYear + DiscountAmountSalesPersonLastYear))
             {
                 AutoFormatType = 1;
             }
@@ -103,10 +103,14 @@ report 6014446 "NPR S.Person POS Sales Stats"
                         CurrReport.Break();
 
                 "Salesperson/Purchaser".Get(TempCustAmount."Customer No.");
-                "Salesperson/Purchaser".CalcFields("NPR Sales (LCY)", "NPR Discount Amount", "NPR COGS (LCY)", "NPR Item Group Sales (LCY)");
+                "Salesperson/Purchaser".NPRGetVESalesLCY(SalesLCY);
+                "Salesperson/Purchaser".NPRGetVEDiscountAmount(DiscountAmount);
+                "Salesperson/Purchaser".NPRGetVECOGSLCY(COGSLCY);
                 if "Salesperson/Purchaser".GetFilter("Date Filter") <> '' then begin
                     SalespersonLastYear.Get(TempCustAmount."Customer No.");
-                    SalespersonLastYear.CalcFields("NPR Sales (LCY)", "NPR Discount Amount", "NPR COGS (LCY)");
+                    SalespersonLastYear.NPRGetVESalesLCY(SalesLCYSalesPersonLastYear);
+                    SalespersonLastYear.NPRGetVEDiscountAmount(DiscountAmountSalesPersonLastYear);
+                    SalespersonLastYear.NPRGetVECOGSLCY(COGSLCYSalesPersonLastYear);
                 end;
             end;
 
@@ -333,6 +337,12 @@ report 6014446 "NPR S.Person POS Sales Stats"
         POSEntryLastYear: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
         TempPOSSalesLine: Record "NPR POS Entry Sales Line" temporary;
+        SalesLCY: Decimal;
+        SalesLCYSalesPersonLastYear: Decimal;
+        DiscountAmount: Decimal;
+        DiscountAmountSalesPersonLastYear: Decimal;
+        COGSLCY: Decimal;
+        COGSLCYSalesPersonLastYear: Decimal;
         TempPOSSalesLineLY: Record "NPR POS Entry Sales Line" temporary;
 
     local procedure CalcPct(Tal1: Decimal; Tal2: Decimal): Decimal

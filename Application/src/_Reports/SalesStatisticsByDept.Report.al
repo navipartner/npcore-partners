@@ -98,6 +98,10 @@
             }
 
             trigger OnAfterGetRecord()
+            var
+                TempValueEntry: Record "Value Entry" temporary;
+                SalesAmount: Decimal;
+                CostAmount: Decimal;
             begin
                 VELocLastYearTotalCost := 0;
 
@@ -111,25 +115,28 @@
                 LastYearShow := true;
 
                 Clear(ValueEntry);
-                ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                ValueEntry.SetRange("Global Dimension 1 Code", Code);
+                ValueEntry.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+                ValueEntry.SetRange(Filter_Dim_1_Code, Code);
 
                 if dateFilter <> '' then
-                    ValueEntry.SetFilter("Posting Date", dateFilter);
+                    ValueEntry.SetFilter(Filter_DateTime, dateFilter);
                 if dim1Filter <> '' then
-                    ValueEntry.SetFilter("Global Dimension 1 Code", dim1Filter);
+                    ValueEntry.SetFilter(Filter_Dim_1_Code, dim1Filter);
                 if dim2Filter <> '' then
-                    ValueEntry.SetFilter("Global Dimension 2 Code", dim2Filter);
-                //TODO:Temporary Aux Value Entry Reimplementation
-                // if vendorFilter <> '' then
-                //     ValueEntry.SetFilter("NPR Vendor No.", vendorFilter);
+                    ValueEntry.SetFilter(Filter_Dim_2_Code, dim2Filter);
+                if vendorFilter <> '' then
+                    ValueEntry.SetFilter(Filter_Vendor_No, vendorFilter);
                 if SalesPerson <> '' then
-                    ValueEntry.SetFilter("Salespers./Purch. Code", SalesPerson);
-
-                ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)", "Purchase Amount (Actual)");
+                    ValueEntry.SetFilter(Filter_Salespers_Purch_Code, SalesPerson);
+                ValueEntry.Open();
+                while ValueEntry.Read() do begin
+                    SalesAmount += ValueEntry.Sum_Sales_Amount_Actual;
+                    CostAmount += ValueEntry.Sum_Cost_Amount_Actual;
+                end;
 
                 Clear(ILEByDeptQuery);
                 Clear(ILEByPersonQuery);
+                VELocQty := 0;
                 case SalesPerson <> '' of
                     true:
                         begin
@@ -142,10 +149,8 @@
                                 ILEByPersonQuery.SetFilter(Filter_Global_Dimension_1_Code, dim1Filter);
                             if dim2Filter <> '' then
                                 ILEByPersonQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
-                            if vendorFilter <> '' then begin
-                                ILEByPersonQuery.SetRange(Filter_Source_Type, ItemLedgerSourceTypeOption::Vendor);
-                                ILEByPersonQuery.SetFilter(Filter_Source_No, vendorFilter);
-                            end;
+                            if vendorFilter <> '' then
+                                ILEByPersonQuery.SetFilter(Filter_Vendor_No_, vendorFilter);
                             ILEByPersonQuery.SetFilter(Filter_SalesPers_Purch_Code, SalesPerson);
                             ILEByPersonQuery.Open();
                             while ILEByPersonQuery.Read() do
@@ -163,18 +168,16 @@
                                 ILEByDeptQuery.SetFilter(Filter_Global_Dimension_1_Code, dim1Filter);
                             if dim2Filter <> '' then
                                 ILEByDeptQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
-                            if vendorFilter <> '' then begin
-                                ILEByDeptQuery.SetRange(Filter_Source_Type, ItemLedgerSourceTypeOption::Vendor);
-                                ILEByDeptQuery.SetFilter(Filter_Source_No, vendorFilter);
-                            end;
+                            if vendorFilter <> '' then
+                                ILEByDeptQuery.SetFilter(Vendor_No_, vendorFilter);
                             ILEByDeptQuery.Open();
                             while ILEByDeptQuery.Read() do
-                                VELocQty := -ILEByDeptQuery.Quantity;
+                                VELocQty += -ILEByDeptQuery.Quantity;
                             ILEByDeptQuery.Close();
                         end;
                 end;
-                VELocCost := -ValueEntry."Cost Amount (Actual)";
-                VELocSales := ValueEntry."Sales Amount (Actual)";
+                VELocCost := -CostAmount;
+                VELocSales := SalesAmount;
 
                 VETotalSalesPerc := pct(VELocSales, VETotalSales);
                 VETotalProfit := VELocSales - VELocCost;
@@ -186,30 +189,35 @@
 
                 //Second body :
                 Clear(ValueEntryLastYear);
-                ValueEntryLastYear.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                ValueEntryLastYear.SetRange("Global Dimension 1 Code", Code);
+                ValueEntryLastYear.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+                ValueEntryLastYear.SetRange(Filter_Dim_1_Code, Code);
 
-                if dateFilter <> '' then
-                    ValueEntryLastYear.SetFilter("Posting Date", dateFilter);
                 if dim1Filter <> '' then
-                    ValueEntryLastYear.SetFilter("Global Dimension 1 Code", dim1Filter);
+                    ValueEntryLastYear.SetFilter(Filter_Dim_1_Code, dim1Filter);
                 if dim2Filter <> '' then
-                    ValueEntryLastYear.SetFilter("Global Dimension 2 Code", dim2Filter);
-                //TODO:Temporary Aux Value Entry Reimplementation
-                // if vendorFilter <> '' then
-                //     ValueEntryLastYear.SetFilter("NPR Vendor No.", vendorFilter);
+                    ValueEntryLastYear.SetFilter(Filter_Dim_2_Code, dim2Filter);
+                if vendorFilter <> '' then
+                    ValueEntryLastYear.SetFilter(Filter_Vendor_No, vendorFilter);
                 if SalesPerson <> '' then
-                    ValueEntryLastYear.SetFilter("Salespers./Purch. Code", SalesPerson);
+                    ValueEntryLastYear.SetFilter(Filter_Salespers_Purch_Code, SalesPerson);
 
                 if dateFilter <> '' then begin
-                    ValueEntryLastYear.SetRange("Posting Date",
-                    CalcDate('<-1Y>', ValueEntryLastYear.GetRangeMin("Posting Date")),
-                    CalcDate('<-1Y>', ValueEntryLastYear.GetRangeMax("Posting Date")));
+                    TempValueEntry.SetFilter("Posting Date", dateFilter);
+                    ValueEntryLastYear.SetRange(Filter_DateTime,
+                    CalcDate('<-1Y>', TempValueEntry.GetRangeMin("Posting Date")),
+                    CalcDate('<-1Y>', TempValueEntry.GetRangeMax("Posting Date")));
+                end;
+                Clear(CostAmount);
+                Clear(SalesAmount);
+                ValueEntryLastYear.Open();
+                while ValueEntryLastYear.Read() do begin
+                    SalesAmount += ValueEntryLastYear.Sum_Sales_Amount_Actual;
+                    CostAmount += ValueEntryLastYear.Sum_Cost_Amount_Actual;
                 end;
 
-                ValueEntryLastYear.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)", "Purchase Amount (Actual)");
                 Clear(ILEByDeptLastYearQuery);
                 Clear(ILEByPersonLastYearQuery);
+                VELocLastYearTotalQty := 0;
                 case SalesPerson <> '' of
                     true:
                         begin
@@ -222,10 +230,8 @@
                                 ILEByPersonLastYearQuery.SetFilter(Filter_Global_Dimension_1_Code, dim1Filter);
                             if dim2Filter <> '' then
                                 ILEByPersonLastYearQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
-                            if vendorFilter <> '' then begin
-                                ILEByPersonLastYearQuery.SetRange(Filter_Source_Type, ItemLedgerSourceTypeOption::Vendor);
-                                ILEByPersonLastYearQuery.SetFilter(Filter_Source_No, vendorFilter);
-                            end;
+                            if vendorFilter <> '' then
+                                ILEByPersonLastYearQuery.SetFilter(Filter_Vendor_No_, vendorFilter);
                             if SalesPerson <> '' then
                                 ILEByPersonLastYearQuery.SetFilter(Filter_SalesPers_Purch_Code, SalesPerson);
 
@@ -236,7 +242,7 @@
                             end;
                             ILEByPersonLastYearQuery.Open();
                             while ILEByPersonLastYearQuery.Read() do
-                                VELocLastYearTotalQty := -ILEByPersonLastYearQuery.Quantity;
+                                VELocLastYearTotalQty += -ILEByPersonLastYearQuery.Quantity;
                             ILEByPersonLastYearQuery.Close();
                         end;
                     false:
@@ -250,11 +256,8 @@
                                 ILEByDeptLastYearQuery.SetFilter(Filter_Global_Dimension_1_Code, dim1Filter);
                             if dim2Filter <> '' then
                                 ILEByDeptLastYearQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
-                            if vendorFilter <> '' then begin
-                                ILEByDeptLastYearQuery.SetRange(Filter_Source_Type, ItemLedgerSourceTypeOption::Vendor);
-                                ILEByDeptLastYearQuery.SetFilter(Filter_Source_No, vendorFilter);
-                            end;
-
+                            if vendorFilter <> '' then
+                                ILEByDeptLastYearQuery.SetFilter(Vendor_No_, vendorFilter);
                             if dateFilter <> '' then begin
                                 ILEByDeptLastYearQuery.SetRange(Filter_Posting_Date,
                                 CalcDate('<-1Y>', dateMin),
@@ -262,12 +265,12 @@
                             end;
                             ILEByDeptLastYearQuery.Open();
                             while ILEByDeptLastYearQuery.Read() do
-                                VELocLastYearTotalQty := -ILEByDeptLastYearQuery.Quantity;
+                                VELocLastYearTotalQty += -ILEByDeptLastYearQuery.Quantity;
                             ILEByDeptLastYearQuery.Close();
                         end;
                 end;
-                VELocLastYearTotalCost := -ValueEntryLastYear."Cost Amount (Actual)";
-                VELocLastYearTotalSales := ValueEntryLastYear."Sales Amount (Actual)";
+                VELocLastYearTotalCost := -CostAmount;
+                VELocLastYearTotalSales := SalesAmount;
                 VELocLastYearTotalProfit := VELocLastYearTotalSales - VELocLastYearTotalCost;
                 VELocLastYearTotalSalesPerc := pct(VELocLastYearTotalSales, VELastYearTotalSales);
                 VELocLastYearTotalProfit := VELocLastYearTotalSales - VELocLastYearTotalCost;
@@ -312,27 +315,32 @@
             }
 
             trigger OnAfterGetRecord()
+            var
+                SalesAmount: Decimal;
+                CostAmount: Decimal;
             begin
-                ValueEntry.Reset();
                 Clear(ValueEntry);
-                ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                ValueEntry.SetFilter("Global Dimension 1 Code", '<>%1', '');
+                ValueEntry.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+                ValueEntry.SetFilter(Filter_Dim_1_Code, '<>%1', '');
                 if dateFilter <> '' then
-                    ValueEntry.SetFilter("Posting Date", dateFilter);
+                    ValueEntry.SetFilter(Filter_DateTime, dateFilter);
                 if dim1Filter <> '' then
-                    ValueEntry.SetFilter("Global Dimension 1 Code", dim1Filter);
+                    ValueEntry.SetFilter(Filter_Dim_1_Code, dim1Filter);
                 if dim2Filter <> '' then
-                    ValueEntry.SetFilter("Global Dimension 2 Code", dim2Filter);
-                //TODO:Temporary Aux Value Entry Reimplementation
-                // if vendorFilter <> '' then
-                //     ValueEntry.SetFilter("NPR Vendor No.", vendorFilter);
+                    ValueEntry.SetFilter(Filter_Dim_2_Code, dim2Filter);
+                if vendorFilter <> '' then
+                    ValueEntry.SetFilter(Filter_Vendor_No, vendorFilter);
                 if SalesPerson <> '' then
-                    ValueEntry.SetFilter("Salespers./Purch. Code", SalesPerson);
-
-                ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)", "Purchase Amount (Actual)");
+                    ValueEntry.SetFilter(Filter_Salespers_Purch_Code, SalesPerson);
+                ValueEntry.Open();
+                while ValueEntry.Read() do begin
+                    SalesAmount += ValueEntry.Sum_Sales_Amount_Actual;
+                    CostAmount += ValueEntry.Sum_Cost_Amount_Actual;
+                end;
 
                 Clear(ILEByDeptQuery);
                 Clear(ILEByPersonQuery);
+                VETotalQuantity := 0;
                 case SalesPerson <> '' of
                     true:
                         begin
@@ -344,15 +352,13 @@
                                 ILEByPersonQuery.SetFilter(Filter_Global_Dimension_1_Code, dim1Filter);
                             if dim2Filter <> '' then
                                 ILEByPersonQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
-                            if vendorFilter <> '' then begin
-                                ILEByPersonQuery.SetRange(Filter_Source_Type, ItemLedgerSourceTypeOption::Vendor);
-                                ILEByPersonQuery.SetFilter(Filter_Source_No, vendorFilter);
-                            end;
+                            if vendorFilter <> '' then
+                                ILEByPersonQuery.SetFilter(Filter_Vendor_No_, vendorFilter);
                             if SalesPerson <> '' then
                                 ILEByPersonQuery.SetFilter(Filter_SalesPers_Purch_Code, SalesPerson);
                             ILEByPersonQuery.Open();
                             while ILEByPersonQuery.Read() do
-                                VETotalQuantity := -ILEByPersonQuery.Quantity;
+                                VETotalQuantity += -ILEByPersonQuery.Quantity;
                             ILEByPersonQuery.Close();
                         end;
                     false:
@@ -365,18 +371,16 @@
                                 ILEByDeptQuery.SetFilter(Filter_Global_Dimension_1_Code, dim1Filter);
                             if dim2Filter <> '' then
                                 ILEByDeptQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
-                            if vendorFilter <> '' then begin
-                                ILEByDeptQuery.SetRange(Filter_Source_Type, ItemLedgerSourceTypeOption::Vendor);
-                                ILEByDeptQuery.SetFilter(Filter_Source_No, vendorFilter);
-                            end;
+                            if vendorFilter <> '' then
+                                ILEByDeptQuery.SetFilter(Vendor_No_, vendorFilter);
                             ILEByDeptQuery.Open();
                             while ILEByDeptQuery.Read() do
-                                VETotalQuantity := -ILEByDeptQuery.Quantity;
+                                VETotalQuantity += -ILEByDeptQuery.Quantity;
                             ILEByDeptQuery.Close();
                         end;
                 end;
-                VETotalCost := -ValueEntry."Cost Amount (Actual)";
-                VETotalSales := ValueEntry."Sales Amount (Actual)";
+                VETotalCost := -CostAmount;
+                VETotalSales := SalesAmount;
                 VETotalGlobalProfit := VETotalSales - VETotalCost;
 
                 VETotalSalesPerc := pct(VETotalSales, VETotalSales);
@@ -417,33 +421,39 @@
             }
 
             trigger OnAfterGetRecord()
+            var
+                TempValueEntry: Record "Value Entry" temporary;
+                CostAmount: Decimal;
+                SalesAmount: Decimal;
             begin
                 //-Past year
                 if lastYear and (dateFilter <> '') then begin
-                    ValueEntryLastYear.Reset();
                     Clear(ValueEntryLastYear);
-                    ValueEntryLastYear.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                    ValueEntryLastYear.SetFilter("Global Dimension 1 Code", '<>%1', '');
+                    ValueEntryLastYear.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+                    ValueEntryLastYear.SetFilter(Filter_Dim_1_Code, '<>%1', '');
 
-                    if dateFilter <> '' then
-                        ValueEntryLastYear.SetFilter("Posting Date", dateFilter);
                     if dim1Filter <> '' then
-                        ValueEntryLastYear.SetFilter("Global Dimension 1 Code", dim1Filter);
+                        ValueEntryLastYear.SetFilter(Filter_Dim_1_Code, dim1Filter);
                     if dim2Filter <> '' then
-                        ValueEntryLastYear.SetFilter("Global Dimension 2 Code", dim2Filter);
-                    //TODO:Temporary Aux Value Entry Reimplementation
-                    // if vendorFilter <> '' then
-                    //     ValueEntryLastYear.SetFilter("NPR Vendor No.", vendorFilter);
+                        ValueEntryLastYear.SetFilter(Filter_Dim_2_Code, dim2Filter);
+                    if vendorFilter <> '' then
+                        ValueEntryLastYear.SetFilter(Filter_Vendor_No, vendorFilter);
 
                     if dateFilter <> '' then begin
-                        ValueEntryLastYear.SetRange("Posting Date",
-                        CalcDate('<-1Y>', ValueEntryLastYear.GetRangeMin("Posting Date")),
-                        CalcDate('<-1Y>', ValueEntryLastYear.GetRangeMax("Posting Date")));
+                        TempValueEntry.SetFilter("Posting Date", dateFilter);
+                        ValueEntryLastYear.SetRange(Filter_DateTime,
+                        CalcDate('<-1Y>', TempValueEntry.GetRangeMin("Posting Date")),
+                        CalcDate('<-1Y>', TempValueEntry.GetRangeMax("Posting Date")));
+                    end;
+                    ValueEntryLastYear.Open();
+                    while ValueEntryLastYear.Read() do begin
+                        CostAmount += ValueEntryLastYear.Sum_Cost_Amount_Actual;
+                        SalesAmount += ValueEntryLastYear.Sum_Sales_Amount_Actual;
                     end;
 
-                    ValueEntryLastYear.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)", "Purchase Amount (Actual)");
                     Clear(ILEByDeptLastYearQuery);
                     Clear(ILEByPersonLastYearQuery);
+                    VELastYearTotalQty := 0;
                     case SalesPerson <> '' of
                         true:
                             begin
@@ -456,10 +466,8 @@
                                     ILEByPersonLastYearQuery.SetFilter(Filter_Global_Dimension_1_Code, dim1Filter);
                                 if dim2Filter <> '' then
                                     ILEByPersonLastYearQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
-                                if vendorFilter <> '' then begin
-                                    ILEByPersonLastYearQuery.SetRange(Filter_Source_Type, ItemLedgerSourceTypeOption::Vendor);
-                                    ILEByPersonLastYearQuery.SetFilter(Filter_Source_No, vendorFilter);
-                                end;
+                                if vendorFilter <> '' then
+                                    ILEByPersonLastYearQuery.SetFilter(Filter_Vendor_No_, vendorFilter);
                                 if SalesPerson <> '' then
                                     ILEByPersonLastYearQuery.SetFilter(Filter_SalesPers_Purch_Code, SalesPerson);
 
@@ -470,7 +478,7 @@
                                 end;
                                 ILEByPersonLastYearQuery.Open();
                                 while ILEByPersonLastYearQuery.Read() do
-                                    VELastYearTotalQty := -ILEByPersonLastYearQuery.Quantity;
+                                    VELastYearTotalQty += -ILEByPersonLastYearQuery.Quantity;
                                 ILEByPersonLastYearQuery.Close();
                             end;
                         false:
@@ -484,11 +492,8 @@
                                     ILEByDeptLastYearQuery.SetFilter(Filter_Global_Dimension_1_Code, dim1Filter);
                                 if dim2Filter <> '' then
                                     ILEByDeptLastYearQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
-                                if vendorFilter <> '' then begin
-                                    ILEByDeptLastYearQuery.SetRange(Filter_Source_Type, ItemLedgerSourceTypeOption::Vendor);
-                                    ILEByDeptLastYearQuery.SetFilter(Filter_Source_No, vendorFilter);
-                                end;
-
+                                if vendorFilter <> '' then
+                                    ILEByDeptLastYearQuery.SetFilter(Vendor_No_, vendorFilter);
                                 if dateFilter <> '' then begin
                                     ILEByDeptLastYearQuery.SetRange(Filter_Posting_Date,
                                     CalcDate('<-1Y>', dateMin),
@@ -496,12 +501,12 @@
                                 end;
                                 ILEByDeptLastYearQuery.Open();
                                 while ILEByDeptLastYearQuery.Read() do
-                                    VELastYearTotalQty := -ILEByDeptLastYearQuery.Quantity;
+                                    VELastYearTotalQty += -ILEByDeptLastYearQuery.Quantity;
                                 ILEByDeptLastYearQuery.Close();
                             end;
                     end;
-                    VELastYearTotalCost := -ValueEntryLastYear."Cost Amount (Actual)";
-                    VELastYearTotalSales := ValueEntryLastYear."Sales Amount (Actual)";
+                    VELastYearTotalCost := -CostAmount;
+                    VELastYearTotalSales := SalesAmount;
                     VELastYearTotalGlobalProfit := VELastYearTotalSales - VELastYearTotalCost;
 
                     VELastYearTotalSalesPerc := pct(VELastYearTotalSales, VELastYearTotalSales);
@@ -620,6 +625,10 @@
     end;
 
     trigger OnPreReport()
+    var
+        TempValueEntry: Record "Value Entry" temporary;
+        CostAmount: Decimal;
+        SalesAmount: Decimal;
     begin
         if SalesPerson = '' then
             FilterList := "Item Category".GetFilters
@@ -633,25 +642,29 @@
         vendorFilter := "Item Category".GetFilter("NPR Vendor Filter");
 
         Clear(ValueEntry);
-        ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-        ValueEntry.SetFilter("Global Dimension 1 Code", '<>%1', '');
+        ValueEntry.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+        ValueEntry.SetFilter(Filter_Dim_1_Code, '<>%1', '');
 
         if dateFilter <> '' then
-            ValueEntry.SetFilter("Posting Date", dateFilter);
+            ValueEntry.SetFilter(Filter_DateTime, dateFilter);
         if dim1Filter <> '' then
-            ValueEntry.SetFilter("Global Dimension 1 Code", dim1Filter);
+            ValueEntry.SetFilter(Filter_Dim_1_Code, dim1Filter);
         if dim2Filter <> '' then
-            ValueEntry.SetFilter("Global Dimension 2 Code", dim2Filter);
-        //TODO:Temporary Aux Value Entry Reimplementation
-        // if vendorFilter <> '' then
-        //     ValueEntry.SetFilter("NPR Vendor No.", vendorFilter);
+            ValueEntry.SetFilter(Filter_Dim_2_Code, dim2Filter);
+        if vendorFilter <> '' then
+            ValueEntry.SetFilter(Filter_Vendor_No, vendorFilter);
         if SalesPerson <> '' then
-            ValueEntry.SetFilter("Salespers./Purch. Code", SalesPerson);
+            ValueEntry.SetFilter(Filter_Salespers_Purch_Code, SalesPerson);
+        ValueEntry.Open();
+        while ValueEntry.Read() do begin
+            CostAmount += ValueEntry.Sum_Cost_Amount_Actual;
+            SalesAmount += ValueEntry.Sum_Sales_Amount_Actual;
+        end;
 
-        ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)", "Purchase Amount (Actual)");
 
         Clear(ILEByDeptQuery);
         Clear(ILEByPersonQuery);
+        VETotalQuantity := 0;
         case SalesPerson <> '' of
             true:
                 begin
@@ -664,14 +677,12 @@
                         ILEByPersonQuery.SetFilter(Filter_Global_Dimension_1_Code, dim1Filter);
                     if dim2Filter <> '' then
                         ILEByPersonQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
-                    if vendorFilter <> '' then begin
-                        ILEByPersonQuery.SetRange(Filter_Source_Type, ItemLedgerSourceTypeOption::Vendor);
-                        ILEByPersonQuery.SetFilter(Filter_Source_No, vendorFilter);
-                    end;
+                    if vendorFilter <> '' then
+                        ILEByPersonQuery.SetFilter(Filter_Vendor_No_, vendorFilter);
                     ILEByPersonQuery.SetFilter(Filter_SalesPers_Purch_Code, SalesPerson);
                     ILEByPersonQuery.Open();
                     while ILEByPersonQuery.Read() do
-                        VETotalQuantity := -ILEByPersonQuery.Quantity;
+                        VETotalQuantity += -ILEByPersonQuery.Quantity;
                     ILEByPersonQuery.Close();
                 end;
             false:
@@ -685,47 +696,48 @@
                         ILEByDeptQuery.SetFilter(Filter_Global_Dimension_1_Code, dim1Filter);
                     if dim2Filter <> '' then
                         ILEByDeptQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
-                    if vendorFilter <> '' then begin
-                        ILEByDeptQuery.SetRange(Filter_Source_Type, ItemLedgerSourceTypeOption::Vendor);
-                        ILEByDeptQuery.SetFilter(Filter_Source_No, vendorFilter);
-                    end;
+                    if vendorFilter <> '' then
+                        ILEByDeptQuery.SetFilter(Vendor_No_, vendorFilter);
                     ILEByDeptQuery.Open();
                     while ILEByDeptQuery.Read() do
-                        VETotalQuantity := -ILEByDeptQuery.Quantity;
+                        VETotalQuantity += -ILEByDeptQuery.Quantity;
                     ILEByDeptQuery.Close();
                 end;
         end;
-        VETotalCost := -ValueEntry."Cost Amount (Actual)";
-        VETotalSales := ValueEntry."Sales Amount (Actual)";
+        VETotalCost := -CostAmount;
+        VETotalSales := SalesAmount;
         VETotalGlobalProfit := VETotalSales - VETotalCost;
 
         //-Past year
         if lastYear and (dateFilter <> '') then begin
             Clear(ValueEntryLastYear);
-            ValueEntryLastYear.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-            ValueEntryLastYear.SetFilter("Global Dimension 1 Code", '<>%1', '');
+            ValueEntryLastYear.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+            ValueEntryLastYear.SetFilter(Filter_Dim_1_Code, '<>%1', '');
 
-            if dateFilter <> '' then
-                ValueEntryLastYear.SetFilter("Posting Date", dateFilter);
             if dim1Filter <> '' then
-                ValueEntryLastYear.SetFilter("Global Dimension 1 Code", dim1Filter);
+                ValueEntryLastYear.SetFilter(Filter_Dim_1_Code, dim1Filter);
             if dim2Filter <> '' then
-                ValueEntryLastYear.SetFilter("Global Dimension 2 Code", dim2Filter);
-            //TODO:Temporary Aux Value Entry Reimplementation
-            // if vendorFilter <> '' then
-            //     ValueEntryLastYear.SetFilter("NPR Vendor No.", vendorFilter);
+                ValueEntryLastYear.SetFilter(Filter_Dim_2_Code, dim2Filter);
+            if vendorFilter <> '' then
+                ValueEntryLastYear.SetFilter(Filter_Vendor_No, vendorFilter);
             if SalesPerson <> '' then
-                ValueEntryLastYear.SetFilter("Salespers./Purch. Code", SalesPerson);
+                ValueEntryLastYear.SetFilter(Filter_Salespers_Purch_Code, SalesPerson);
 
             if dateFilter <> '' then begin
-                ValueEntryLastYear.SetRange("Posting Date",
-                CalcDate('<-1Y>', ValueEntryLastYear.GetRangeMin("Posting Date")),
-                CalcDate('<-1Y>', ValueEntryLastYear.GetRangeMax("Posting Date")));
+                TempValueEntry.SetFilter("Posting Date", dateFilter);
+                ValueEntryLastYear.SetRange(Filter_DateTime,
+                CalcDate('<-1Y>', TempValueEntry.GetRangeMin("Posting Date")),
+                CalcDate('<-1Y>', TempValueEntry.GetRangeMax("Posting Date")));
             end;
-            ValueEntryLastYear.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)", "Purchase Amount (Actual)");
+            ValueEntryLastYear.Open();
+            while ValueEntryLastYear.Read() do begin
+                CostAmount += ValueEntryLastYear.Sum_Cost_Amount_Actual;
+                SalesAmount += ValueEntryLastYear.Sum_Sales_Amount_Actual;
+            end;
 
             Clear(ILEByDeptLastYearQuery);
             Clear(ILEByPersonLastYearQuery);
+            VELastYearTotalQty := 0;
             case SalesPerson <> '' of
                 true:
                     begin
@@ -738,10 +750,8 @@
                             ILEByPersonLastYearQuery.SetFilter(Filter_Global_Dimension_1_Code, dim1Filter);
                         if dim2Filter <> '' then
                             ILEByPersonLastYearQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
-                        if vendorFilter <> '' then begin
-                            ILEByPersonLastYearQuery.SetRange(Filter_Source_Type, ItemLedgerSourceTypeOption::Vendor);
-                            ILEByPersonLastYearQuery.SetFilter(Filter_Source_No, vendorFilter);
-                        end;
+                        if vendorFilter <> '' then
+                            ILEByPersonLastYearQuery.SetFilter(Filter_Vendor_No_, vendorFilter);
                         if SalesPerson <> '' then
                             ILEByPersonLastYearQuery.SetFilter(Filter_SalesPers_Purch_Code, SalesPerson);
 
@@ -752,7 +762,7 @@
                         end;
                         ILEByPersonLastYearQuery.Open();
                         while ILEByPersonLastYearQuery.Read() do
-                            VELastYearTotalQty := -ILEByPersonLastYearQuery.Quantity;
+                            VELastYearTotalQty += -ILEByPersonLastYearQuery.Quantity;
                         ILEByPersonLastYearQuery.Close();
                     end;
                 false:
@@ -766,11 +776,8 @@
                             ILEByDeptLastYearQuery.SetFilter(Filter_Global_Dimension_1_Code, dim1Filter);
                         if dim2Filter <> '' then
                             ILEByDeptLastYearQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
-                        if vendorFilter <> '' then begin
-                            ILEByDeptLastYearQuery.SetRange(Filter_Source_Type, ItemLedgerSourceTypeOption::Vendor);
-                            ILEByDeptLastYearQuery.SetFilter(Filter_Source_No, vendorFilter);
-                        end;
-
+                        if vendorFilter <> '' then
+                            ILEByDeptLastYearQuery.SetFilter(Vendor_No_, vendorFilter);
                         if dateFilter <> '' then begin
                             ILEByDeptLastYearQuery.SetRange(Filter_Posting_Date,
                             CalcDate('<-1Y>', dateMin),
@@ -778,12 +785,12 @@
                         end;
                         ILEByDeptLastYearQuery.Open();
                         while ILEByDeptLastYearQuery.Read() do
-                            VELastYearTotalQty := -ILEByDeptLastYearQuery.Quantity;
+                            VELastYearTotalQty += -ILEByDeptLastYearQuery.Quantity;
                         ILEByDeptLastYearQuery.Close();
                     end;
             end;
-            VELastYearTotalCost := -ValueEntryLastYear."Cost Amount (Actual)";
-            VELastYearTotalSales := ValueEntryLastYear."Sales Amount (Actual)";
+            VELastYearTotalCost := -CostAmount;
+            VELastYearTotalSales := SalesAmount;
             VELastYearTotalGlobalProfit := VELastYearTotalSales - VELastYearTotalCost;
 
             VELastYearTotalSalesPerc := pct(VELastYearTotalSales, VELastYearTotalSales);
@@ -803,9 +810,8 @@
         ILEByDeptQuery: Query "NPR Sales Statistics By Dept";
         ILEByPersonLastYearQuery: Query "NPR Sales Statistics By Person";
         ILEByPersonQuery: Query "NPR Sales Statistics By Person";
-        ItemLedgerSourceTypeOption: Option " ",Customer,Vendor,Item;
-        ValueEntryLastYear: Record "Value Entry";
-        ValueEntry: Record "Value Entry";
+        ValueEntryLastYear: Query "NPR Value Entry With Vendor";
+        ValueEntry: Query "NPR Value Entry With Vendor";
         CurrentYearShow: Boolean;
         firstDimValue: Boolean;
         isGroupedByLocation: Boolean;

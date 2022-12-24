@@ -247,16 +247,11 @@
         }
         field(201; Turnover; Decimal)
         {
-            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)"
-                            WHERE(
-                                //TODO:Temporary Aux Value Entry Reimplementation
-                                // "NPR Discount Type" = CONST(Period),
-                                // "NPR Discount Code" = FIELD(Code),
-                                "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"),
-                                "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code")));
             Caption = 'Sold Amount';
             Editable = false;
-            FieldClass = FlowField;
+            DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented directly';
         }
         field(310; "Customer Disc. Group Filter"; Text[250])
         {

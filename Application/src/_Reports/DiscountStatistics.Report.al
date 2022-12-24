@@ -1,7 +1,7 @@
 ﻿report 6014402 "NPR Discount Statistics"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Discount Statistics.rdlc';
@@ -13,6 +13,13 @@
 
     dataset
     {
+        dataitem(DiscountTypeFilter; "NPR POS Entry Sales Line")
+        {
+            DataItemTableView = sorting("POS Entry No.");
+            RequestFilterFields = "Discount Type";
+            RequestFilterHeading = 'Discount Type';
+            UseTemporary = true;
+        }
         dataitem(Item; Item)
         {
             DataItemTableView = SORTING("No.");
@@ -25,12 +32,6 @@
             {
             }
             column(COMPANYNAME; CompanyName)
-            {
-            }
-            column(Register_Filter_Caption; Register_Filter_Caption_Lbl)
-            {
-            }
-            column(RegisterFilter; POSUnitFilter)
             {
             }
             column(Date_Filter_Caption; Date_Filter_Caption_Lbl)
@@ -109,8 +110,6 @@
                     DataItemLink = "Item No." = FIELD("No.");
                     DataItemLinkReference = Item;
                     DataItemTableView = SORTING("Item No.", "Posting Date", "Item Ledger Entry Type") WHERE("Item Ledger Entry Type" = CONST(Sale));
-                    //TODO:Temporary Aux Value Entry Reimplementation
-                    // RequestFilterFields = "NPR Discount Type";
                     column(Entry_No_Caption; Entry_No_Caption_Lbl)
                     {
                     }
@@ -144,21 +143,14 @@
                     column(Total_VE_Discount_Amt; Total_VE_Discount_Amt)
                     {
                     }
-                    //TODO:Temporary Aux Value Entry Reimplementation
-                    // column(GroupSale; "NPR Group Sale")
-                    column(GroupSale; TempAuxValueEntry)
+                    column(Document_No_; "Document No.")
                     {
-                    }
-                    dataitem("Value Entry"; "Value Entry")
-                    {
-                        DataItemLink = "Entry No." = FIELD("Entry No.");
-                        DataItemLinkReference = ValueEntry;
-                        column(Document_No_; "Document No.")
-                        {
-                        }
                     }
                     trigger OnAfterGetRecord()
+                    var
                     begin
+                        if not IncludeValueEntry(ValueEntry) then
+                            CurrReport.Skip();
                         Total_VE_Qty += -(ValueEntry."Invoiced Quantity");
                         Total_VE_Sales_Amt += ValueEntry."Sales Amount (Actual)";
                         Total_VE_Discount_Amt += ValueEntry."Discount Amount";
@@ -168,8 +160,6 @@
                     begin
                         SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
                         Item.CopyFilter("Date Filter", ValueEntry."Posting Date");
-                        //TODO:Temporary Aux Value Entry Reimplementation
-                        // Item.CopyFilter("Vendor No.", ValueEntry."NPR Vendor No.");
                     end;
                 }
 
@@ -189,6 +179,7 @@
             begin
             end;
         }
+
     }
 
     requestpage
@@ -229,8 +220,33 @@
         DateFilter := Item.GetFilter("Date Filter");
         SupplierFilter := Item.GetFilter("Vendor No.");
         ItemNoFilter := Item.GetFilter("No.");
-        //TODO:Temporary Aux Value Entry Reimplementation
-        // DiscountFilter := ValueEntry.GetFilter("NPR Discount Type");
+        DiscountFilter := DiscountTypeFilter.GetFilter("Discount Type");
+        if DiscountFilter <> '' then
+            ShowDiscountType0 := IsOption0InFilter(DiscountFilter);
+    end;
+
+    local procedure IsOption0InFilter(FilterString: text): Boolean
+    var
+        TempPosEntrySalesLine: Record "NPR POS Entry Sales Line" temporary;
+    begin
+        TempPosEntrySalesLine."Discount Type" := TempPosEntrySalesLine."Discount Type"::" ";
+        TempPosEntrySalesLine.Insert(false);
+        TempPosEntrySalesLine.SetFilter("Discount Type", FilterString);
+        exit(not TempPosEntrySalesLine.IsEmpty);
+    end;
+
+    local procedure IncludeValueEntry(ValueEntry: Record "Value Entry"): Boolean
+    var
+        PosEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        if DiscountFilter = '' then
+            exit(true);
+        PosEntrySalesLine.SetRange("Item Entry No.", ValueEntry."Item Ledger Entry No.");
+        if not PosEntrySalesLine.IsEmpty then begin
+            PosEntrySalesLine.SetFilter("Discount Type", DiscountFilter);
+            exit(not PosEntrySalesLine.IsEmpty);
+        end else
+            exit(ShowDiscountType0 and (ValueEntry."Discount Amount" <> 0));
     end;
 
     var
@@ -239,7 +255,6 @@
         DateFilter: Text;
         DiscountFilter: Text;
         ItemNoFilter: Text;
-        POSUnitFilter: Text;
         SalesPersonFilter: Text;
         SupplierFilter: Text;
         Total_VE_Discount_Amt: Decimal;
@@ -255,12 +270,10 @@
         CurrReportPageNoCaptionLbl: Label 'Page';
         PageNoCaptionLbl: Label 'Page';
         Quantity_Caption_Lbl: Label 'Quantity';
-        Register_Filter_Caption_Lbl: Label 'Register Filter';
         Sales_Amount_Caption_Lbl: Label 'Sales Amount';
         Salesperson_Filter_Caption_Lbl: Label 'Salesperson/purchaser';
         Total_Caption_Lbl: Label 'Total';
         Vendor_Filter_Caption_Lbl: Label 'Vendor filter';
-        //TODO:Temporary Aux Value Entry Reimplementation
-        TempAuxValueEntry:Integer;
+        ShowDiscountType0: Boolean;
 }
 

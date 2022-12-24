@@ -203,14 +203,11 @@
         }
         field(201; Turnover; Decimal)
         {
-            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)");
-            //TODO:Temporary Aux Value Entry Reimplementation
-            // WHERE(
-            //     "NPR Discount Type" = CONST(Mixed),
-            //     "NPR Discount Code" = FIELD(Code)));
             Caption = 'Turnover';
             Editable = false;
-            FieldClass = FlowField;
+            DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Aux Value Entry has been removed and this field directly reimplemented on references.';
         }
         field(310; "Customer Disc. Group Filter"; Text[250])
         {

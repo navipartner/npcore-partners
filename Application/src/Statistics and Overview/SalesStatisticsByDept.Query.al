@@ -25,9 +25,20 @@ query 6014421 "NPR Sales Statistics By Dept"
             filter(Filter_Source_No; "Source No.")
             {
             }
+            filter(Filter_Item_Category_Code;"Item Category Code")
+            {
+            }
             column(Quantity; Quantity)
             {
                 Method = Sum;
+            }
+            dataitem(Item;Item)
+            {
+                DataItemLink = "No." = Item_Ledger_Entry."Item No.";
+                SqlJoinType = InnerJoin;
+                filter(Vendor_No_;"Vendor No.")
+                {
+                }
             }
         }
     }

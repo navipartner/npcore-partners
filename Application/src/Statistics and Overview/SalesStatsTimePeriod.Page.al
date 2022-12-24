@@ -1,7 +1,7 @@
 ﻿page 6014591 "NPR Sales Stats Time Period"
 {
     Extensible = False;
-    Caption = 'Sales Statistics by Date Time';
+    Caption = 'Sales Statistics by Date';
     PageType = Card;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
@@ -11,40 +11,20 @@
     {
         area(content)
         {
-            group("Start Date & Time")
+            group("Start & End Date")
             {
-                Caption = 'Start Date & Time';
+                Caption = 'Start & End Date';
                 field(StartDate; StartDate)
                 {
-
                     Caption = 'Start Date';
                     ShowCaption = true;
                     ToolTip = 'Specifies the value of the Start Date field';
                     ApplicationArea = NPRRetail;
                 }
-                field(StartTime; StartTime)
-                {
-
-                    Caption = 'Start Time';
-                    ToolTip = 'Specifies the value of the Start Time field';
-                    ApplicationArea = NPRRetail;
-                }
-            }
-            group("End Date & Time")
-            {
-                Caption = 'End Date & Time';
                 field(EndDate; EndDate)
                 {
-
                     Caption = 'End Date';
                     ToolTip = 'Specifies the value of the End Date field';
-                    ApplicationArea = NPRRetail;
-                }
-                field(EndTime; EndTime)
-                {
-
-                    Caption = 'End Time';
-                    ToolTip = 'Specifies the value of the End Time field';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -104,7 +84,7 @@
 
                 trigger OnAction()
                 begin
-                    CurrPage.SaleStatisticsSubform.PAGE.PopulateTemp(StartDate, EndDate, StartTime, EndTime, StatisticsBy, ItemNoFilter, ItemCategoryCodeFilter, Dim1Filter, Dim2Filter);
+                    CurrPage.SaleStatisticsSubform.PAGE.PopulateTemp(StartDate, EndDate, StatisticsBy, ItemNoFilter, ItemCategoryCodeFilter, Dim1Filter, Dim2Filter);
                     CurrPage.Update();
                 end;
             }
@@ -116,9 +96,7 @@
         ItemNoFilter: Code[20];
         ItemCategoryCodeFilter: Code[20];
         StartDate: Date;
-        StartTime: Time;
         EndDate: Date;
-        EndTime: Time;
         Dim1Filter: Text;
         Dim2Filter: Text;
 }

@@ -8,9 +8,10 @@
     UsageCategory = None;
     SourceTable = "Salesperson/Purchaser";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Search E-Mail")
-                      ORDER(Descending)
-                      WHERE("NPR Sales (Qty.)" = FILTER(<> 0));
+#pragma warning disable AL0254
+    SourceTableView = SORTING("NPR Maximum Cash Returnsale")
+#pragma warning restore AL0254
+                      ORDER(Descending);
 
     layout
     {
@@ -37,7 +38,7 @@
 
                     ApplicationArea = NPRRetail;
                 }
-                field("Sales (LCY)"; Rec."NPR Sales (LCY)")
+                field("Sales (LCY)"; SalesLCY)
                 {
 
                     BlankZero = true;
@@ -45,7 +46,7 @@
                     ToolTip = 'Specifies the actual sales amount for each salesperson.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Sales (Qty.)"; Rec."NPR Sales (Qty.)")
+                field("Sales (Qty.)"; Rec."NPR Maximum Cash Returnsale")
                 {
 
                     ToolTip = 'Specifies the quantity of NPR sales for each salesperson.';
@@ -153,33 +154,52 @@
         UpdateList();
     end;
 
+    trigger OnAfterGetRecord()
+    begin
+        Rec.NPRGetVESalesLCY(SalesLCY);
+    end;
+
     var
-        Query1: Query "NPR Retail Top 10 S.Persons";
         SalesPerson: Record "Salesperson/Purchaser";
         StartDate: Date;
         Enddate: Date;
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
+        SalesLCY: Decimal;
         CurrDate: Date;
 
     local procedure UpdateList()
+    var
+        TempSalespersonPurchaser: Record "Salesperson/Purchaser" temporary;
+        StartNo: Integer;
     begin
-        Rec.DeleteAll();
+        TempSalespersonPurchaser.DeleteAll();
         Setdate();
-        Clear(Query1);
-        Query1.SetFilter(Query1.Date_Filter, '%1..%2', StartDate, Enddate);
-        Query1.Open();
-        while Query1.Read() do begin
-            SalesPerson.Get(Query1.Code);
-            Rec.TransferFields(SalesPerson);
+        CalculateSalesPersonSalesQty(TempSalespersonPurchaser);
+        TempSalespersonPurchaser.SetAscending("NPR Maximum Cash Returnsale", false);
+        TempSalespersonPurchaser.SetFilter("NPR Maximum Cash Returnsale", '<>%1', 0);
+        if TempSalespersonPurchaser.IsEmpty() then
+            exit;
+        TempSalespersonPurchaser.FindSet();
+        StartNo := 0;
+        repeat
+            Rec.TransferFields(TempSalespersonPurchaser);
             if Rec.Insert() then;
-            Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
-            Rec.CalcFields("NPR Sales (Qty.)");
+            StartNo += 1;
+        until (TempSalespersonPurchaser.Next() = 0) or (StartNo < 10);
+    end;
 
-            Rec."Search E-Mail" := Format(Round(-Rec."NPR Sales (Qty.)", 0.01) * 100, 20, 1);
-            Rec."Search E-Mail" := PadStr('', 15 - StrLen(Rec."Search E-Mail"), '0') + Rec."Search E-Mail";
-            Rec.Modify();
-        end;
-        Query1.Close();
+    local procedure CalculateSalesPersonSalesQty(TempSalesPersonPurchaser: Record "Salesperson/Purchaser" temporary)
+    var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+    begin
+        SalespersonPurchaser.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
+        if not SalespersonPurchaser.FindSet() then
+            exit;
+        repeat
+            TempSalesPersonPurchaser.TransferFields(SalespersonPurchaser);
+            SalespersonPurchaser.NPRGetVESalesQty(TempSalesPersonPurchaser."NPR Maximum Cash Returnsale");
+            if TempSalesPersonPurchaser.Insert() then;
+        until SalespersonPurchaser.Next() = 0;
     end;
 
     local procedure Setdate()
