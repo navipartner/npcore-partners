@@ -224,17 +224,18 @@
     var
         SalesPerson: Record "Salesperson/Purchaser";
         SalesAmt: Decimal;
+        SalesLCY: Decimal;
     begin
         SalesAmt := 0;
         SalesPerson.Reset();
         if SalesPerson.FindSet() then begin
-            SalesPerson.CalcFields("NPR Sales (LCY)");
-            SalesAmt := SalesPerson."NPR Sales (LCY)";
+            SalesPerson.NPRGetVESalesLCY(SalesLCY);
+            SalesAmt := SalesLCY;
             TopSalesPerson := SalesPerson.Name;
             repeat
-                SalesPerson.CalcFields("NPR Sales (LCY)");
-                if SalesAmt < SalesPerson."NPR Sales (LCY)" then begin
-                    SalesAmt := SalesPerson."NPR Sales (LCY)";
+                SalesPerson.NPRGetVESalesLCY(SalesLCY);
+                if SalesAmt < SalesLCY then begin
+                    SalesAmt := SalesLCY;
                     TopSalesPerson := SalesPerson.Name;
                 end;
             until SalesPerson.Next() = 0;

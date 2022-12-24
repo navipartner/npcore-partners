@@ -46,19 +46,23 @@
                 }
                 field("Sales (LCY)"; Rec."Sales (LCY)")
                 {
-
                     ToolTip = 'Specifies the value of the Sales (LCY) field';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
                         ValueEntry: Record "Value Entry";
-                        AuxValueEntries: Page "NPR Aux. Value Entries";
+                        ValueEntries: Page "Value Entries";
                     begin
-                        SetValueEntryFilter(ValueEntry, Rec."No.");
-                        AuxValueEntries.SetTableView(ValueEntry);
-                        AuxValueEntries.Editable(false);
-                        AuxValueEntries.RunModal();
+                        case Statistics of
+                            Statistics::Item:
+                                begin
+                                    SetValueEntryFilter(ValueEntry, Rec."No.");
+                                    ValueEntries.SetTableView(ValueEntry);
+                                    ValueEntries.Editable(false);
+                                    ValueEntries.RunModal();
+                                end;
+                        end;
                     end;
                 }
             }
@@ -99,18 +103,16 @@
         ItemCategoryCodeFilter: Text;
         Statistics: Option ,Item,"Item Category";
 
-    internal procedure PopulateTemp(StartDate: Date; EndDate: Date; StartTime: Time; EndTime: Time; VarStatisticsBy: Option ,Item,"Item Category"; VarItemFilter: Text; VarItemCatFilter: Text; VarDim1Filter: Text; VarDim2Filter: Text)
+    internal procedure PopulateTemp(StartDate: Date; EndDate: Date; VarStatisticsBy: Option ,Item,"Item Category"; VarItemFilter: Text; VarItemCatFilter: Text; VarDim1Filter: Text; VarDim2Filter: Text)
     var
         ItemQtyQuery: Query "NPR Sales Stat. -Item Cat Qty";
         ItemCatQtyQuery: Query "NPR Sales Stat. -Item Cat Qty";
-        ItemAmtQuery: Query "NPR Sales Stats: Item Cat.";
-        ItemCatAmtQuery: Query "NPR Sales Stats: Item Cat.";
+        ItemAmtQuery: Query "NPR Value Entry With Item Cat";
+        ItemCatAmtQuery: Query "NPR Value Entry With Item Cat";
         Item: Record Item;
         ItemCategory: Record "Item Category";
     begin
         TempRec.DeleteAll();
-        StartDateTime := CreateDateTime(StartDate, StartTime);
-        EndDateTime := CreateDateTime(EndDate, EndTime);
         ItemNoFilter := VarItemFilter;
         ItemCategoryCodeFilter := VarItemCatFilter;
         Dim1Filter := VarDim1Filter;
@@ -121,7 +123,6 @@
                 begin
                     ItemQtyQuery.SetRange(ItemQtyQuery.Filter_Entry_Type, ItemQtyQuery.Filter_Entry_Type::Sale);
                     ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_Date, '%1..%2', StartDate, EndDate);
-                    ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_Time, '%1..%2', StartTime, EndTime);
                     ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_Item_No, ItemNoFilter);
                     ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
                     ItemQtyQuery.SetFilter(ItemQtyQuery.Filter_Dim_1_Code, Dim1Filter);
@@ -139,8 +140,7 @@
                     ItemAmtQuery.SetRange(ItemAmtQuery.Filter_Entry_Type, ItemAmtQuery.Filter_Entry_Type::Sale);
                     ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_DateTime, '%1..%2', DT2Date(StartDateTime), DT2Date(EndDateTime));
                     ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_Item_No, ItemNoFilter);
-                    //TODO:Temporary Aux Value Entry Reimplementation
-                    // ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
+                    ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
                     ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_Dim_1_Code, Dim1Filter);
                     ItemAmtQuery.SetFilter(ItemAmtQuery.Filter_Dim_2_Code, Dim2Filter);
                     ItemAmtQuery.Open();
@@ -156,7 +156,6 @@
                 begin
                     ItemCatQtyQuery.SetRange(ItemCatQtyQuery.Filter_Entry_Type, ItemCatQtyQuery.Filter_Entry_Type::Sale);
                     ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_Date, '%1..%2', StartDate, EndDate);
-                    ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_Time, '%1..%2', StartTime, EndTime);
                     ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_Item_No, ItemNoFilter);
                     ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
                     ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_Dim_1_Code, Dim1Filter);
@@ -172,20 +171,18 @@
                     end;
 
                     ItemCatAmtQuery.SetRange(ItemCatAmtQuery.Filter_Entry_Type, ItemCatAmtQuery.Filter_Entry_Type::Sale);
-                    ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_DateTime, '%1..%2', DT2Date(StartDateTime), DT2Date(EndDateTime));
+                    ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_DateTime, '%1..%2', StartDate, EndDate);
                     ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_Item_No, ItemNoFilter);
-                    //TODO:Temporary Aux Value Entry Reimplementation
-                    // ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
+                    ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
                     ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_Dim_1_Code, Dim1Filter);
                     ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_Dim_2_Code, Dim2Filter);
-                    //TODO:Temporary Aux Value Entry Reimplementation
-                    // ItemCatAmtQuery.Open();
-                    // while ItemCatAmtQuery.Read() do begin
-                    //     if TempRec.Get(ItemCatAmtQuery.Item_Category_Code) then begin
-                    //         TempRec."Sales (LCY)" := ItemCatAmtQuery.Sum_Sales_Amount_Actual;
-                    //         TempRec.Modify();
-                    //     end
-                    // end;
+                    ItemCatAmtQuery.Open();
+                    while ItemCatAmtQuery.Read() do begin
+                        if TempRec.Get(ItemCatAmtQuery.Item_Category_Code) then begin
+                            TempRec."Sales (LCY)" := ItemCatAmtQuery.Sum_Sales_Amount_Actual;
+                            TempRec.Modify();
+                        end
+                    end;
                 end;
         end;
         CurrPage.Update();
@@ -223,9 +220,6 @@
         case Statistics of
             Statistics::Item:
                 ValueEntry.SetRange("Item No.", varNo);
-        //TODO:Temporary Aux Value Entry Reimplementation
-        // Statistics::"Item Category":
-        //     ValueEntry.SetRange("NPR Item Category Code", varNo);
         end;
 
         if Dim1Filter <> '' then
@@ -237,24 +231,6 @@
             ValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
         else
             ValueEntry.SetRange("Global Dimension 2 Code");
-    end;
-
-    internal procedure GetGlobals(var InStartDate: Date; var InEndDate: Date; var InStartTime: Time; var InEndTime: Time; var InVarStatisticsBy: Option; var InVarItemFilter: Text; var InVarItemCatFilter: Text; var InVarDim1Filter: Text; var InVarDim2Filter: Text)
-    begin
-        InStartDate := DT2Date(StartDateTime);
-        InEndDate := DT2Date(EndDateTime);
-        InStartTime := DT2Time(StartDateTime);
-        InEndTime := DT2Time(EndDateTime);
-        InVarStatisticsBy := Statistics;
-        InVarItemFilter := ItemNoFilter;
-        InVarItemCatFilter := ItemCategoryCodeFilter;
-        InVarDim1Filter := Dim1Filter;
-        InVarDim2Filter := Dim2Filter;
-    end;
-
-    internal procedure SetTempRec(var NewTempRec: Record "NPR Sales Stats Time Period")
-    begin
-        TempRec.Copy(NewTempRec, true);
     end;
 }
 

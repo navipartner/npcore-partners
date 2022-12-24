@@ -79,6 +79,8 @@ report 6014429 "NPR Sales per month year"
             }
 
             trigger OnAfterGetRecord()
+            var
+                SalesLCY: Decimal;
             begin
                 if CurrentDate = EndDate then
                     CurrReport.Break();
@@ -95,8 +97,8 @@ report 6014429 "NPR Sales per month year"
                 if SalesPersonPurchaser.Find('-') then begin
                     SalesAllPersons := 0;
                     repeat
-                        SalesPersonPurchaser.CalcFields("NPR Sales (LCY)");
-                        SalesAllPersons := SalesAllPersons + SalesPersonPurchaser."NPR Sales (LCY)";
+                        SalesPersonPurchaser.NPRGetVESalesLCY(SalesLCY);
+                        SalesAllPersons := SalesAllPersons + SalesLCY;
                     until SalesPersonPurchaser.Next() = 0;
                 end;
 
@@ -113,8 +115,8 @@ report 6014429 "NPR Sales per month year"
                 if SalesPersonPurchaser.Find('-') then begin
                     SalesAllPersonsLastYear := 0;
                     repeat
-                        SalesPersonPurchaser.CalcFields("NPR Sales (LCY)");
-                        SalesAllPersonsLastYear := SalesAllPersonsLastYear + SalesPersonPurchaser."NPR Sales (LCY)";
+                        SalesPersonPurchaser.NPRGetVESalesLCY(SalesLCY);
+                        SalesAllPersonsLastYear := SalesAllPersonsLastYear + SalesLCY;
                     until SalesPersonPurchaser.Next() = 0;
                 end;
 

@@ -43,7 +43,6 @@
             }
             dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
             {
-                CalcFields = "NPR Sales (LCY)", "NPR Sales (Qty.)";
                 DataItemLink = "NPR Item Filter" = FIELD("No.");
                 DataItemTableView = SORTING(Code);
                 PrintOnlyIfDetail = false;
@@ -54,16 +53,18 @@
                 column(Name_SalespersonPurchaser; "Salesperson/Purchaser".Name)
                 {
                 }
-                column(SalesLCY_SalespersonPurchaser; "Salesperson/Purchaser"."NPR Sales (LCY)")
+                column(SalesLCY_SalespersonPurchaser; SalesLCY)
                 {
                 }
-                column(SalesQty_SalespersonPurchaser; "Salesperson/Purchaser"."NPR Sales (Qty.)")
+                column(SalesQty_SalespersonPurchaser; SalesQty)
                 {
                 }
 
                 trigger OnAfterGetRecord()
                 begin
-                    if "NPR Sales (LCY)" = 0 then
+                    NPRGetVESalesLCY(SalesLCY);
+                    NPRGetVESalesQty(SalesQty);
+                    if SalesLCY = 0 then
                         CurrReport.Skip();
 
                     if SortOrder then begin
@@ -72,13 +73,13 @@
                         case SortBy of
                             SortBy::Turnover:
                                 begin
-                                    TempItemAmount.Amount := Abs("NPR Sales (LCY)");
-                                    TempItemAmount."Amount 2" := Abs("NPR Sales (Qty.)");
+                                    TempItemAmount.Amount := Abs(SalesLCY);
+                                    TempItemAmount."Amount 2" := Abs(SalesQty);
                                 end;
                             SortBy::"Qty.":
                                 begin
-                                    TempItemAmount.Amount := Abs("NPR Sales (Qty.)");
-                                    TempItemAmount."Amount 2" := Abs("NPR Sales (LCY)");
+                                    TempItemAmount.Amount := Abs(SalesQty);
+                                    TempItemAmount."Amount 2" := Abs(SalesLCY);
                                 end;
                         end;
                         TempItemAmount.Insert();
@@ -247,5 +248,7 @@
         SortByTxtConst: Label 'Sort By:';
         SortBy: Option "Qty.",Turnover;
         SortingStigende: Option stigende,faldende;
+        SalesLCY: Decimal;
+        SalesQty: Decimal;
 }
 

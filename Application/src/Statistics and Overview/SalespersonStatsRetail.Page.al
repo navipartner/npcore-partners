@@ -30,17 +30,6 @@
                     Caption = 'Sale (QTY)';
                     ToolTip = 'Specifies the value of the Sale (QTY) field';
                     ApplicationArea = NPRRetail;
-
-                    trigger OnDrillDown()
-                    var
-                        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
-                        POSEntrySalesLineList: Page "NPR POS Entry Sales Line List";
-                    begin
-                        SetItemLedgerEntryFilter(POSEntrySalesLine);
-                        POSEntrySalesLineList.SetTableView(POSEntrySalesLine);
-                        POSEntrySalesLineList.Editable(false);
-                        POSEntrySalesLineList.RunModal();
-                    end;
                 }
                 field("-LastYear Sale Quantity"; -"LastYear Sale Quantity")
                 {
@@ -60,12 +49,12 @@
                     trigger OnDrillDown()
                     var
                         ValueEntry: Record "Value Entry";
-                        AuxValueEntries: Page "NPR Aux. Value Entries";
+                        ValueEntries: Page "Value Entries";
                     begin
                         SetValueEntryFilter(ValueEntry);
-                        AuxValueEntries.SetTableView(ValueEntry);
-                        AuxValueEntries.Editable(false);
-                        AuxValueEntries.RunModal();
+                        ValueEntries.SetTableView(ValueEntry);
+                        ValueEntries.Editable(false);
+                        ValueEntries.RunModal();
                     end;
                 }
                 field("<Control61506191>"; -"LastYear Sale Amount")
@@ -164,18 +153,17 @@
 
     internal procedure Calc()
     var
-        ValueEntry: Record "Value Entry";
-        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        CostAmount: Decimal;
+        SalesAmount: Decimal;
+        Quantity: Decimal;
     begin
-        SetValueEntryFilter(ValueEntry);
-        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
+        CalcCostAndSalesAmountFromVE(CostAmount, SalesAmount);
 
-        SetItemLedgerEntryFilter(POSEntrySalesLine);
-        POSEntrySalesLine.CalcSums(Quantity);
+        GetQuantityFromILEQuery(Quantity, '');
 
-        "Sale Quantity" := POSEntrySalesLine.Quantity;
-        "Sale Amount" := ValueEntry."Sales Amount (Actual)";
-        "Profit Amount" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
+        "Sale Quantity" := Quantity;
+        "Sale Amount" := SalesAmount;
+        "Profit Amount" := SalesAmount + CostAmount;
         if "Sale Amount" <> 0 then
             "Profit %" := "Profit Amount" / "Sale Amount" * 100
         else
@@ -184,15 +172,13 @@
         // Calc last year
         LastYear := true;
 
-        SetValueEntryFilter(ValueEntry);
-        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
+        CalcCostAndSalesAmountFromVE(CostAmount, SalesAmount);
 
-        SetItemLedgerEntryFilter(POSEntrySalesLine);
-        POSEntrySalesLine.CalcSums(Quantity);
+        GetQuantityFromILEQuery(Quantity, '');
 
-        "LastYear Sale Quantity" := POSEntrySalesLine.Quantity;
-        "LastYear Sale Amount" := ValueEntry."Sales Amount (Actual)";
-        "LastYear Profit Amount" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
+        "LastYear Sale Quantity" := Quantity;
+        "LastYear Sale Amount" := SalesAmount;
+        "LastYear Profit Amount" := SalesAmount + CostAmount;
         if "LastYear Sale Amount" <> 0 then
             "LastYear Profit %" := "LastYear Profit Amount" / "LastYear Sale Amount" * 100
         else
@@ -201,34 +187,42 @@
         LastYear := false;
     end;
 
-    internal procedure SetItemLedgerEntryFilter(var POSEntrySalesLine: Record "NPR POS Entry Sales Line")
+    internal procedure GetQuantityFromILEQuery(var Quantity: Decimal; SalesPersonCodeFilter: Code[20])
+    var
+        SalesStatisticsByPerson: Query "NPR Sales Statistics By Person";
     begin
-        POSEntrySalesLine.SetRange("Salesperson Code", Rec.Code);
-        if not LastYear then
-            POSEntrySalesLine.SetFilter("Entry Date", '%1..%2', Periodestart, Periodeslut)
+        Quantity := 0;
+        if SalesPersonCodeFilter <> '' then
+            SalesStatisticsByPerson.SetRange(Filter_SalesPers_Purch_Code, SalesPersonCodeFilter)
         else
-            POSEntrySalesLine.SetFilter("Entry Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
+            SalesStatisticsByPerson.SetRange(Filter_SalesPers_Purch_Code, Rec.Code);
+        if not LastYear then
+            SalesStatisticsByPerson.SetFilter(Filter_Posting_Date, '%1..%2', Periodestart, Periodeslut)
+        else
+            SalesStatisticsByPerson.SetFilter(Filter_Posting_Date, '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
 
         if ItemCategoryFilter <> '' then
-            POSEntrySalesLine.SetRange("Item Category Code", ItemCategoryFilter)
+            SalesStatisticsByPerson.SetRange(Filter_Item_Category_Code, ItemCategoryFilter)
         else
-            POSEntrySalesLine.SetRange("Item Category Code");
+            SalesStatisticsByPerson.SetRange(Filter_Item_Category_Code);
 
-        if ItemNoFilter <> '' then begin
-            POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
-            POSEntrySalesLine.SetRange("No.", ItemNoFilter)
-        end else
-            POSEntrySalesLine.SetRange("No.");
+        if ItemNoFilter <> '' then
+            SalesStatisticsByPerson.SetRange(Filter_Item_No_, ItemNoFilter)
+        else
+            SalesStatisticsByPerson.SetRange(Filter_Item_No_);
 
         if Rec."NPR Global Dimension 1 Filter" <> '' then
-            POSEntrySalesLine.SetRange("Shortcut Dimension 1 Code", Rec."NPR Global Dimension 1 Filter")
+            SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_1_Code, Rec."NPR Global Dimension 1 Filter")
         else
-            POSEntrySalesLine.SetRange("Shortcut Dimension 1 Code");
+            SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_1_Code);
 
         if "Global Dimension 2 Filter" <> '' then
-            POSEntrySalesLine.SetRange("Shortcut Dimension 2 Code", "Global Dimension 2 Filter")
+            SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_2_Code, "Global Dimension 2 Filter")
         else
-            POSEntrySalesLine.SetRange("Shortcut Dimension 2 Code");
+            SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_2_Code);
+        SalesStatisticsByPerson.Open();
+        while SalesStatisticsByPerson.Read() do
+            Quantity := SalesStatisticsByPerson.Quantity;
     end;
 
     internal procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
@@ -245,12 +239,6 @@
         else
             ValueEntry.SetRange("Item No.");
 
-        //TODO:Temporary Aux Value Entry Reimplementation
-        // if ItemCategoryFilter <> '' then
-        //     ValueEntry.SetRange("NPR Item Category Code", ItemCategoryFilter)
-        // else
-        //     ValueEntry.SetRange("NPR Item Category Code");
-
         if Rec."NPR Global Dimension 1 Filter" <> '' then
             ValueEntry.SetRange("Global Dimension 1 Code", Rec."NPR Global Dimension 1 Filter")
         else
@@ -260,6 +248,78 @@
             ValueEntry.SetRange("Global Dimension 2 Code", "Global Dimension 2 Filter")
         else
             ValueEntry.SetRange("Global Dimension 2 Code");
+    end;
+
+    internal procedure CalcCostAndSalesAmountFromVE(var CostAmount: Decimal; var SalesAmount: Decimal)
+    var
+        ValueEntry: Record "Value Entry";
+        ValueEntryWithItemCat: Query "NPR Value Entry With Item Cat";
+    begin
+        Clear(CostAmount);
+        Clear(SalesAmount);
+        case ItemCategoryFilter <> '' of
+            true:
+                begin
+                    ValueEntryWithItemCat.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+                    ValueEntryWithItemCat.SetRange(Filter_Sales_Person, Rec.Code);
+                    if not LastYear then
+                        ValueEntryWithItemCat.SetFilter(Filter_DateTime, '%1..%2', Periodestart, Periodeslut)
+                    else
+                        ValueEntryWithItemCat.SetFilter(Filter_DateTime, '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
+
+                    if ItemNoFilter <> '' then
+                        ValueEntryWithItemCat.SetRange(Filter_Item_No, ItemNoFilter)
+                    else
+                        ValueEntryWithItemCat.SetRange(Filter_Item_No);
+
+                    if ItemCategoryFilter <> '' then
+                        ValueEntryWithItemCat.SetRange(Filter_Item_Category_Code, ItemCategoryFilter)
+                    else
+                        ValueEntryWithItemCat.SetRange(Filter_Item_Category_Code);
+
+                    if Rec."NPR Global Dimension 1 Filter" <> '' then
+                        ValueEntryWithItemCat.SetRange(Filter_Dim_1_Code, Rec."NPR Global Dimension 1 Filter")
+                    else
+                        ValueEntryWithItemCat.SetRange(Filter_Dim_1_Code);
+
+                    if "Global Dimension 2 Filter" <> '' then
+                        ValueEntryWithItemCat.SetRange(Filter_Dim_2_Code, "Global Dimension 2 Filter")
+                    else
+                        ValueEntryWithItemCat.SetRange(Filter_Dim_2_Code);
+                    ValueEntryWithItemCat.Open();
+                    while ValueEntryWithItemCat.Read() do begin
+                        SalesAmount += ValueEntryWithItemCat.Sum_Sales_Amount_Actual;
+                        CostAmount += ValueEntryWithItemCat.Sum_Cost_Amount_Actual;
+                    end;
+                end;
+            false:
+                begin
+                    ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+                    ValueEntry.SetRange("Salespers./Purch. Code", Rec.Code);
+                    if not LastYear then
+                        ValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
+                    else
+                        ValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
+
+                    if ItemNoFilter <> '' then
+                        ValueEntry.SetRange("Item No.", ItemNoFilter)
+                    else
+                        ValueEntry.SetRange("Item No.");
+
+                    if Rec."NPR Global Dimension 1 Filter" <> '' then
+                        ValueEntry.SetRange("Global Dimension 1 Code", Rec."NPR Global Dimension 1 Filter")
+                    else
+                        ValueEntry.SetRange("Global Dimension 1 Code");
+
+                    if "Global Dimension 2 Filter" <> '' then
+                        ValueEntry.SetRange("Global Dimension 2 Code", "Global Dimension 2 Filter")
+                    else
+                        ValueEntry.SetRange("Global Dimension 2 Code");
+                    ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
+                    CostAmount := ValueEntry."Cost Amount (Actual)";
+                    SalesAmount := ValueEntry."Sales Amount (Actual)";
+                end;
+        end;
     end;
 
     internal procedure InitForm()
@@ -286,8 +346,8 @@
         "Count": Integer;
         Dlg: Dialog;
         SalesPerson: Record "Salesperson/Purchaser";
-        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         txtDlg: Label 'Processing SalesPerson #1######## @2@@@@@@@@';
+        Quantity: Decimal;
     begin
         HideEmpty := not HideEmpty;
 
@@ -301,10 +361,8 @@
 
                     Dlg.Update(1, SalesPerson.Name);
                     Dlg.Update(2, Round(Count / SalesPerson.Count() * 10000, 1, '='));
-                    SetItemLedgerEntryFilter(POSEntrySalesLine);
-                    POSEntrySalesLine.SetRange("Salesperson Code", SalesPerson.Code);
-                    POSEntrySalesLine.CalcSums(Quantity);
-                    if POSEntrySalesLine.Quantity <> 0 then begin
+                    GetQuantityFromILEQuery(Quantity, SalesPerson.Code);
+                    if Quantity <> 0 then begin
                         Rec.Get(SalesPerson.Code);
                         Rec.Mark(true);
                     end;

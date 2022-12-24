@@ -15,7 +15,6 @@
     {
         dataitem(Vendor; Vendor)
         {
-            CalcFields = "NPR Stock", "Purchases (LCY)", "NPR Sales (LCY)";
             DataItemTableView = SORTING("No.");
             RequestFilterFields = "No.";
             column(Name_CompanyInfo; CompanyInfo.Name)
@@ -33,13 +32,13 @@
             column(PurchasesLCY_Vendor; PurchaseLCY)
             {
             }
-            column(Stock_VendorAllYear; VendorAllYear."NPR Stock")
+            column(Stock_VendorAllYear; VendorAllYearStock)
             {
             }
             column(PurchasesLCY_VendorAllYear; VendorAllYear."Purchases (LCY)")
             {
             }
-            column(SalesLCY_VendorAllYear; VendorAllYear."NPR Sales (LCY)")
+            column(SalesLCY_VendorAllYear; VendorAllYearSalesLCY)
             {
             }
             column(CoverageAllYear; CoverageAllYear)
@@ -180,9 +179,11 @@
                 VendorAllYear.SetRange("No.", "No.");
                 VendorAllYear.SetFilter("Date Filter", '%1..%2', DMY2Date(1, 1, Year), Today);
                 if VendorAllYear.FindSet() then begin
-                    VendorAllYear.CalcFields("NPR Stock", "Purchases (LCY)", "NPR Sales (LCY)");
-                    CoverageAllYear := CalcCoverage(VendorAllYear."Purchases (LCY)", VendorAllYear."NPR Sales (LCY)");
-                    CoverRateAllYear := CalcCoverageRate(CoverageAllYear, VendorAllYear."NPR Sales (LCY)");
+                    VendorAllYear.CalcFields("Purchases (LCY)");
+                    VendorAllYear.NPRGetVESalesLCYSalesQtyCOGSLCY(VendorAllYearSalesLCY, VendorAllYearSalesQty, VendorAllYearCOGSLCY);
+                    VendorAllYear.NPRGetVEStock(VendorAllYearStock);
+                    CoverageAllYear := CalcCoverage(VendorAllYear."Purchases (LCY)", VendorAllYearSalesLCY);
+                    CoverRateAllYear := CalcCoverageRate(CoverageAllYear, VendorAllYearSalesLCY);
                 end;
             end;
 
@@ -274,6 +275,10 @@
         IPctCap: Label 'in %';
         ZeroIPctCap: Label 'Zero point in %';
         CoverageAllYear: Decimal;
+        VendorAllYearSalesLCY: Decimal;
+        VendorAllYearSalesQty: Decimal;
+        VendorAllYearCOGSLCY: Decimal;
+        VendorAllYearStock: Decimal;
         CoverRateAllYear: Decimal;
 
     local procedure CalcCoverage(PurchasePrice: Decimal; SalesPrice: Decimal): Decimal

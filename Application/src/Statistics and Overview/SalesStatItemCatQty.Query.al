@@ -44,9 +44,6 @@
                 filter(Filter_Date; "Entry Date")
                 {
                 }
-                filter(Filter_Time; "Ending Time")
-                {
-                }
             }
         }
     }
