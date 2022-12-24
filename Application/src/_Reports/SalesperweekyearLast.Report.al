@@ -96,8 +96,8 @@
                 if SalesPersonPurchaser.Find('-') then begin
                     SalesAllPersons := 0;
                     repeat
-                        SalesPersonPurchaser.CalcFields("NPR Sales (LCY)");
-                        SalesAllPersons := SalesAllPersons + SalesPersonPurchaser."NPR Sales (LCY)";
+                        SalesPersonPurchaser.NPRGetVESalesLCY(SalesLCY);
+                        SalesAllPersons := SalesAllPersons + SalesLCY;
                     until SalesPersonPurchaser.Next() = 0;
                 end;
 
@@ -114,8 +114,8 @@
                 if SalesPersonPurchaser.Find('-') then begin
                     SalesAllPersonsLastYear := 0;
                     repeat
-                        SalesPersonPurchaser.CalcFields("NPR Sales (LCY)");
-                        SalesAllPersonsLastYear := SalesAllPersonsLastYear + SalesPersonPurchaser."NPR Sales (LCY)";
+                        SalesPersonPurchaser.NPRGetVESalesLCY(SalesLCY);
+                        SalesAllPersonsLastYear := SalesAllPersonsLastYear + SalesLCY;
                     until SalesPersonPurchaser.Next() = 0;
                 end;
 
@@ -320,5 +320,6 @@
         LastWeekText: Text[50];
         Title: Text[50];
         Report_Caption_Lbl: Label 'Sales Per Month Current Year/Last Year';
+        SalesLCY: Decimal;
 }
 

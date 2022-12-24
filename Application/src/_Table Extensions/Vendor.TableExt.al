@@ -4,30 +4,16 @@ tableextension 6014424 "NPR Vendor" extends Vendor
     {
         field(6014400; "NPR Sales (LCY)"; Decimal)
         {
-            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)"
-                            WHERE(
-                                "Item Ledger Entry Type" = CONST(Sale),
-                                //TODO:Temporary Aux Value Entry Reimplementation
-                                // "NPR Vendor No." = FIELD("No."),
-                                // "NPR Item Category Code" = FIELD("NPR Item Category Filter"),
-                                "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                "Posting Date" = FIELD("Date Filter"),
-                                "Salespers./Purch. Code" = FIELD("NPR Salesperson Filter")));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
             Caption = 'Sales (LCY)';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
         }
         field(6014401; "NPR COGS (LCY)"; Decimal)
         {
-            CalcFormula = - Sum("Value Entry"."Cost Amount (Actual)"
-                                WHERE(
-                                    "Item Ledger Entry Type" = CONST(Sale),
-                                    //TODO:Temporary Aux Value Entry Reimplementation
-                                    // "NPR Vendor No." = FIELD("No."),
-                                    // "NPR Item Category Code" = FIELD("NPR Item Category Filter"),
-                                    "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                    "Posting Date" = FIELD("Date Filter"),
-                                    "Salespers./Purch. Code" = FIELD("NPR Salesperson Filter")));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
             Caption = 'COGS (LCY)';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
@@ -49,15 +35,8 @@ tableextension 6014424 "NPR Vendor" extends Vendor
         }
         field(6014404; "NPR Sales (Qty.)"; Decimal)
         {
-            CalcFormula = - Sum("Value Entry"."Invoiced Quantity"
-                                WHERE(
-                                    "Item Ledger Entry Type" = CONST(Sale),
-                                    //TODO:Temporary Aux Value Entry Reimplementation
-                                    // "NPR Vendor No." = FIELD("No."),
-                                    // "NPR Item Category Code" = FIELD("NPR Item Category Filter"),
-                                    "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                    "Posting Date" = FIELD("Date Filter"),
-                                    "Salespers./Purch. Code" = FIELD("NPR Salesperson Filter")));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
             Caption = 'Sales (Qty.)';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
@@ -71,14 +50,8 @@ tableextension 6014424 "NPR Vendor" extends Vendor
         }
         field(6014406; "NPR Stock"; Decimal)
         {
-            CalcFormula = Sum("Value Entry"."Cost Amount (Actual)"
-                            WHERE(
-                                //TODO:Temporary Aux Value Entry Reimplementation
-                                // "NPR Vendor No." = FIELD("No."),
-                                // "NPR Item Category Code" = FIELD("NPR Item Category Filter"),
-                                "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                "Posting Date" = FIELD("Date Filter"),
-                                "Salespers./Purch. Code" = FIELD("NPR Salesperson Filter")));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
             Caption = 'Stock';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
@@ -138,5 +111,43 @@ tableextension 6014424 "NPR Vendor" extends Vendor
         }
 #ENDIF
     }
+
+    internal procedure NPRGetVESalesLCYSalesQtyCOGSLCY(var SalesLCY: Decimal; var SalesQty: Decimal; var COGSLCY: Decimal)
+    var
+        ValueEntryWithVendor: Query "NPR Value Entry With Vendor";
+    begin
+        SalesLCY := 0;
+        SalesQty := 0;
+        COGSLCY := 0;
+        ValueEntryWithVendor.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+        ValueEntryWithVendor.SetFilter(Filter_Vendor_No, "No.");
+        ValueEntryWithVendor.SetRange(Filter_Item_Category_Code, "NPR Item Category Filter");
+        ValueEntryWithVendor.SetRange(Filter_Dim_1_Code, "Global Dimension 1 Code");
+        ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1', "Date Filter");
+        ValueEntryWithVendor.SetFilter(Filter_Salespers_Purch_Code, "NPR Salesperson Filter");
+        ValueEntryWithVendor.Open();
+        while ValueEntryWithVendor.Read() do begin
+            SalesLCY += ValueEntryWithVendor.Sum_Sales_Amount_Actual;
+            SalesQty += -ValueEntryWithVendor.Sum_Invoiced_Quantity;
+            COGSLCY += -ValueEntryWithVendor.Sum_Cost_Amount_Actual;
+        end;
+        ValueEntryWithVendor.Close();
+    end;
+
+    internal procedure NPRGetVEStock(var Stock: Decimal)
+    var
+        ValueEntryWithVendor: Query "NPR Value Entry With Vendor";
+    begin
+        Stock := 0;
+        ValueEntryWithVendor.SetFilter(Filter_Vendor_No, "No.");
+        ValueEntryWithVendor.SetRange(Filter_Item_Category_Code, "NPR Item Category Filter");
+        ValueEntryWithVendor.SetRange(Filter_Dim_1_Code, "Global Dimension 1 Code");
+        ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1', "Date Filter");
+        ValueEntryWithVendor.SetFilter(Filter_Salespers_Purch_Code, "NPR Salesperson Filter");
+        ValueEntryWithVendor.Open();
+        while ValueEntryWithVendor.Read() do
+            Stock += ValueEntryWithVendor.Sum_Sales_Amount_Actual;
+        ValueEntryWithVendor.Close();
+    end;
 }
 

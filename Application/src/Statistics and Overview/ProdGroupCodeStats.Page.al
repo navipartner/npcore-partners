@@ -202,6 +202,8 @@
     var
         ValueEntry: Record "Value Entry";
         ItemLedgerEntry: Record "Item Ledger Entry";
+        CostAmount: Decimal;
+        SalesAmount: Decimal;
     begin
         //Calc()
 
@@ -209,9 +211,8 @@
         ItemLedgerEntry.CalcFields("Sales Amount (Actual)");
 
         ItemLedgerEntryNo := ItemLedgerEntry."Entry No.";
-        SetValueEntryFilter(ValueEntry);
+        CalcCostAndSalesAmountFromVE(CostAmount, SalesAmount);
 
-        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
         "Sale Quantity" := 0;
 
         "Sale Quantity" := ItemLedgerEntry.Quantity;
@@ -230,8 +231,7 @@
         // Calc last year
         LastYear := true;
 
-        SetValueEntryFilter(ValueEntry);
-        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
+        CalcCostAndSalesAmountFromVE(CostAmount, SalesAmount);
 
         SetItemLedgerEntryFilter(ItemLedgerEntry);
         ItemLedgerEntry.CalcSums(Quantity);
@@ -289,12 +289,6 @@
         else
             ValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
 
-        //TODO:Temporary Aux Value Entry Reimplementation
-        // if ItemCategoryCode <> '' then
-        //     ValueEntry.SetRange("NPR Item Category Code", ItemCategoryCode)
-        // else
-        //     ValueEntry.SetRange("NPR Item Category Code");
-
         if Dim1Filter <> '' then
             ValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
         else
@@ -306,6 +300,70 @@
             ValueEntry.SetRange("Global Dimension 2 Code");
         if ItemLedgerEntryNo <> 0 then
             ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntryNo);
+    end;
+
+    internal procedure CalcCostAndSalesAmountFromVE(var CostAmount: Decimal; var SalesAmount: Decimal)
+    var
+        ValueEntry: Record "Value Entry";
+        ValueEntryWithItemCat: Query "NPR Value Entry With Item Cat";
+    begin
+        //SetValueEntryFilter
+        Clear(CostAmount);
+        Clear(SalesAmount);
+        case ItemCategoryCode <> '' of
+            true:
+                begin
+                    ValueEntryWithItemCat.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+                    ValueEntryWithItemCat.SetRange(Filter_Item_No, Rec."No.");
+                    if not LastYear then
+                        ValueEntryWithItemCat.SetFilter(Filter_DateTime, '%1..%2', Periodestart, Periodeslut)
+                    else
+                        ValueEntryWithItemCat.SetFilter(Filter_DateTime, '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
+
+                    ValueEntryWithItemCat.SetRange(Filter_Item_Category_Code, ItemCategoryCode);
+
+                    if Dim1Filter <> '' then
+                        ValueEntryWithItemCat.SetRange(Filter_Dim_1_Code, Dim1Filter)
+                    else
+                        ValueEntryWithItemCat.SetRange(Filter_Dim_1_Code);
+
+                    if Dim2Filter <> '' then
+                        ValueEntryWithItemCat.SetRange(Filter_Dim_2_Code, Dim2Filter)
+                    else
+                        ValueEntryWithItemCat.SetRange(Filter_Dim_2_Code);
+                    if ItemLedgerEntryNo <> 0 then
+                        ValueEntryWithItemCat.SetRange(Filter_Entry_No, ItemLedgerEntryNo);
+                    ValueEntryWithItemCat.Open();
+                    while ValueEntryWithItemCat.Read() do begin
+                        CostAmount += ValueEntryWithItemCat.Sum_Cost_Amount_Actual;
+                        SalesAmount += ValueEntryWithItemCat.Sum_Sales_Amount_Actual;
+                    end;
+                end;
+            false:
+                begin
+                    ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+                    ValueEntry.SetRange("Item No.", Rec."No.");
+                    if not LastYear then
+                        ValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
+                    else
+                        ValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
+
+                    if Dim1Filter <> '' then
+                        ValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
+                    else
+                        ValueEntry.SetRange("Global Dimension 1 Code");
+
+                    if Dim2Filter <> '' then
+                        ValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
+                    else
+                        ValueEntry.SetRange("Global Dimension 2 Code");
+                    if ItemLedgerEntryNo <> 0 then
+                        ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntryNo);
+                    ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
+                    CostAmount := ValueEntry."Cost Amount (Actual)";
+                    SalesAmount := ValueEntry."Sales Amount (Actual)";
+                end;
+        end;
     end;
 
     internal procedure ChangeEmptyFilter(): Boolean

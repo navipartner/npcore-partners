@@ -1,8 +1,8 @@
 ﻿report 6014529 "NPR Vendor/Salesperson"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/VendorSalesperson.rdlc';
     Caption = 'Vendor/Salesperson';
@@ -64,6 +64,9 @@
                 RequestFilterFields = "Code", "Date Filter";
 
                 trigger OnAfterGetRecord()
+                var
+                    SalesLCY: Decimal;
+                    COGSLCY: Decimal;
                 begin
                     currentRec += 1;
 
@@ -78,9 +81,10 @@
                     if Item.Find('-') then
                         repeat
                             SetFilter("NPR Item Filter", Item."No.");
-                            CalcFields("NPR Sales (LCY)", "NPR COGS (LCY)");
-                            TotalSale += "NPR Sales (LCY)";
-                            TotalCOGS += "NPR COGS (LCY)";
+                            NPRGetVESalesLCY(SalesLCY);
+                            NPRGetVECOGSLCY(COGSLCY);
+                            TotalSale += SalesLCY;
+                            TotalCOGS += COGSLCY;
 
                         until Item.Next() = 0 else
                         CurrReport.Skip();

@@ -14,8 +14,7 @@
     {
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
         {
-            CalcFields = "NPR COGS (LCY)", "NPR Sales (LCY)";
-            RequestFilterFields = "Code", "Date Filter", "NPR Global Dimension 1 Filter";
+            RequestFilterFields = "Code", "Date Filter", "NPR Global Dimension 1 Filter", "NPR Item Category Filter";
             column(COMPANYNAME; CompanyName)
             {
             }
@@ -99,7 +98,6 @@
             }
             dataitem("Item Category"; "Item Category")
             {
-                CalcFields = "NPR Sales (LCY)", "NPR Consumption (Amount)";
                 DataItemLink = "NPR Salesperson/Purch. Filter" = FIELD(Code), "NPR Date Filter" = FIELD("Date Filter");
                 DataItemTableView = SORTING("Code");
                 column(No_ItemCategory; "Item Category"."Code")
@@ -129,17 +127,17 @@
                     SalesLCYGP := 0;
                     CogsLCYGP := 0;
 
-                    ValueEntry.Reset();
-                    ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                    ValueEntry.SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
-                    //TODO:Temporary Aux Value Entry Reimplementation
-                    // ValueEntry.SetRange("NPR Item Category Code", "Item Category".Code);
-                    ValueEntry.SetFilter("Posting Date", SPDateFilter);
-                    ValueEntry.SetFilter("Global Dimension 1 Code", SPGlobalDim1Filter);
-                    ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
-
-                    SalesLCYGP := ValueEntry."Sales Amount (Actual)";
-                    CogsLCYGP := -ValueEntry."Cost Amount (Actual)";
+                    Clear(ValueEntryWithItemCat);
+                    ValueEntryWithItemCat.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+                    ValueEntryWithItemCat.SetRange(Filter_Sales_Person, "Salesperson/Purchaser".Code);
+                    ValueEntryWithItemCat.SetRange(Filter_Item_Category_Code, "Item Category".Code);
+                    ValueEntryWithItemCat.SetFilter(Filter_DateTime, SPDateFilter);
+                    ValueEntryWithItemCat.SetFilter(Filter_Dim_1_Code, SPGlobalDim1Filter);
+                    ValueEntryWithItemCat.Open();
+                    while ValueEntryWithItemCat.Read() do begin
+                        SalesLCYGP += ValueEntryWithItemCat.Sum_Sales_Amount_Actual;
+                        CogsLCYGP += -ValueEntryWithItemCat.Sum_Cost_Amount_Actual;
+                    end;
 
                     if SalesLCYGP = 0 then
                         CurrReport.Skip();
@@ -208,20 +206,9 @@
                             CurrReport.Break();
 
                     "Item Category".Get(TempItemAmount."Item No.");
-                    SalesLCYGPINT := 0;
-                    CogsLCYGPINT := 0;
 
-                    ValueEntry.Reset();
-                    ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                    ValueEntry.SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
-                    //TODO:Temporary Aux Value Entry Reimplementation
-                    // ValueEntry.SetRange("NPR Item Category Code", TempItemAmount."Item No.");
-                    ValueEntry.SetFilter("Posting Date", SPDateFilter);
-                    ValueEntry.SetFilter("Global Dimension 1 Code", SPGlobalDim1Filter);
-                    ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
-
-                    SalesLCYGP := ValueEntry."Sales Amount (Actual)";
-                    CogsLCYGP := -ValueEntry."Cost Amount (Actual)";
+                    SalesLCYGPINT := -TempItemAmount.Amount;
+                    CogsLCYGPINT := TempItemAmount."Amount 2";
 
                     Clear(dg);
                     Clear(SalesPct);
@@ -238,17 +225,17 @@
                 SalesLCY := 0;
                 CogsLCY := 0;
 
-                ValueEntry.Reset();
-                ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                ValueEntry.SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
-                CopyFilter("Date Filter", ValueEntry."Posting Date");
-                //TODO:Temporary Aux Value Entry Reimplementation
-                // CopyFilter("NPR Item Category Filter", ValueEntry."NPR Item Category Code");
-                CopyFilter("NPR Global Dimension 1 Filter", ValueEntry."Global Dimension 1 Code");
-                ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Expected)");
-
-                SalesLCY := ValueEntry."Sales Amount (Actual)";
-                CogsLCY := -ValueEntry."Cost Amount (Actual)";
+                Clear(ValueEntryWithItemCat);
+                ValueEntryWithItemCat.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+                ValueEntryWithItemCat.SetRange(Filter_Sales_Person, "Salesperson/Purchaser".Code);
+                ValueEntryWithItemCat.SetFilter(Filter_Item_Category_Code, SPItemCategoryFilter);
+                ValueEntryWithItemCat.SetFilter(Filter_DateTime, SPDateFilter);
+                ValueEntryWithItemCat.SetFilter(Filter_Dim_1_Code, SPGlobalDim1Filter);
+                ValueEntryWithItemCat.Open();
+                while ValueEntryWithItemCat.Read() do begin
+                    SalesLCY += ValueEntryWithItemCat.Sum_Sales_Amount_Actual;
+                    CogsLCY += -ValueEntryWithItemCat.Sum_Cost_Amount_Actual;
+                end;
 
                 TempItemAmount.DeleteAll();
 
@@ -277,7 +264,7 @@
                 else
                     SortingText := '';
                 SPDateFilter := "Salesperson/Purchaser".GetFilter("Date Filter");
-                SPGlobalDim1Filter := "Salesperson/Purchaser".GetFilter("Global Dimension 1 Code");
+                SPGlobalDim1Filter := "Salesperson/Purchaser".GetFilter("NPR Global Dimension 1 Filter");
                 SPItemCategoryFilter := "Salesperson/Purchaser".GetFilter("NPR Item Category Filter");
             end;
         }
@@ -360,7 +347,7 @@
     var
         CompanyInformation: Record "Company Information";
         TempItemAmount: Record "Item Amount" temporary;
-        ValueEntry: Record "Value Entry";
+        ValueEntryWithItemCat: Query "NPR Value Entry With Item Cat";
         ShowMainTotal: Boolean;
         [InDataSet]
         ShowMainTotalVisible: Boolean;

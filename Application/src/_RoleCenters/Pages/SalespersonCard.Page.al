@@ -87,37 +87,36 @@
                 Caption = 'Retail';
                 field("Hide Register Imbalance"; Rec."NPR Hide Register Imbalance")
                 {
-
                     ToolTip = 'Specifies the NPR Hide Register Imbalance of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
-                field("Sales (Qty.)"; Rec."NPR Sales (Qty.)")
+                field("Sales (Qty.)"; SalesQty)
                 {
-
+                    Caption = 'Sales (Qty.)';
                     ToolTip = 'Specifies the NPR Sales (Qty.) of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
-                field("Discount Amount"; Rec."NPR Discount Amount")
+                field("Discount Amount"; DiscountAmount)
                 {
-
+                    Caption = 'Discount Amount';
                     ToolTip = 'Specifies the NPR Discount Amount of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
-                field("Item Group Sales (LCY)"; Rec."NPR Item Group Sales (LCY)")
+                field("Item Group Sales (LCY)"; ItemGroupSalesLCY)
                 {
-
+                    Caption = 'Item Group Sales (LCY)';
                     ToolTip = 'Specifies the NPR Item Group Sales (LCY) of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
-                field("Sales (LCY)"; Rec."NPR Sales (LCY)")
+                field("Sales (LCY)"; SalesLCY)
                 {
-
+                    Caption = 'Sales (LCY)';
                     ToolTip = 'Specifies the NPR Sales (LCY) of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
-                field("COGS (LCY)"; Rec."NPR COGS (LCY)")
+                field("COGS (LCY)"; COGSLCY)
                 {
-
+                    Caption = 'COGS (LCY)';
                     ToolTip = 'Specifies the NPR COGS (LCY) of the salesperson/purchaser';
                     ApplicationArea = NPRRetail;
                 }
@@ -179,5 +178,20 @@
         }
     }
 
+    trigger OnAfterGetRecord()
+    begin
+        Rec.NPRGetVESalesLCY(SalesLCY);
+        Rec.NPRGetVESalesQty(SalesQty);
+        Rec.NPRGetVEDiscountAmount(DiscountAmount);
+        Rec.NPRGetVECOGSLCY(COGSLCY);
+        Rec.NPRGetVEItemGroupSalesLCY(ItemGroupSalesLCY);
+    end;
+
+    var
+        SalesLCY: Decimal;
+        SalesQty: Decimal;
+        DiscountAmount: Decimal;
+        ItemGroupSalesLCY: Decimal;
+        COGSLCY: Decimal;
 }
 

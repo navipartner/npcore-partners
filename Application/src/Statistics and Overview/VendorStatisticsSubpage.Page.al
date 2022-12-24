@@ -5,9 +5,10 @@
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
-
     SourceTable = Vendor;
     ApplicationArea = NPRRetail;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Vendor Statistics part with Vendor No. with Sale is not possible anymore.';
 
     layout
     {
@@ -253,18 +254,10 @@
     begin
         //SetValueEntryFilter
         ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-        //TODO:Temporary Aux Value Entry Reimplementation
-        // ValueEntry.SetRange("NPR Vendor No.", Rec."No.");
         if not LastYear then
             ValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
             ValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
-
-        //TODO:Temporary Aux Value Entry Reimplementation
-        // if ItemCategoryFilter <> '' then
-        //     ValueEntry.SetRange("NPR Item Category Code", ItemCategoryFilter)
-        // else
-        //     ValueEntry.SetRange("NPR Item Category Code");
 
         if Dim1Filter <> '' then
             ValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)

@@ -74,9 +74,8 @@
                         ToolTip = 'Specifies the Phone No. of the vendor';
                         ApplicationArea = NPRRetail;
                     }
-                    field("Sales (LCY)"; Rec."NPR Sales (LCY)")
+                    field("Sales (LCY)"; SalesLCY)
                     {
-
                         BlankZero = true;
                         Caption = 'Sales Amount (Actual)';
                         Editable = false;
@@ -178,12 +177,20 @@
         UpdateList();
     end;
 
+    trigger OnAfterGetRecord()
+    begin
+        Rec.NPRGetVESalesLCYSalesQtyCOGSLCY(SalesLCY, SalesQty, COGSLCY);
+    end;
+
     var
         Cust: Record Customer;
         TopTenVendorsQuery: Query "NPR Top 10 Vendor";
         CurrDate: Date;
         Enddate: Date;
         StartDate: Date;
+        SalesLCY: Decimal;
+        SalesQty: Decimal;
+        COGSLCY: Decimal;
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
 
     local procedure UpdateList()
@@ -204,8 +211,8 @@
                 Rec."Phone No." := Cust."Phone No.";
                 if not Rec.Insert() then;
                 Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
-                Rec.CalcFields("NPR Sales (LCY)");
-                Rec."Search Name" := Format(-Rec."NPR Sales (LCY)" * 100, 20, 1);
+                Rec.NPRGetVESalesLCYSalesQtyCOGSLCY(SalesLCY, SalesQty, COGSLCY);
+                Rec."Search Name" := Format(-SalesLCY * 100, 20, 1);
                 Rec."Search Name" := PadStr('', 15 - StrLen(Rec."Search Name"), '0') + Rec."Search Name";
                 Rec.Modify();
             end;

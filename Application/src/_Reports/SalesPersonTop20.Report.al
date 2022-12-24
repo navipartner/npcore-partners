@@ -15,13 +15,15 @@
     {
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
         {
-            CalcFields = "NPR Sales (LCY)", "NPR Discount Amount", "NPR COGS (LCY)";
             RequestFilterFields = "Code", "Date Filter", "NPR Global Dimension 1 Filter";
 
             trigger OnAfterGetRecord()
             begin
+                "Salesperson/Purchaser".NPRGetVESalesLCY(SalesLCY);
+                "Salesperson/Purchaser".NPRGetVEDiscountAmount(DiscountAmount);
+                "Salesperson/Purchaser".NPRGetVECOGSLCY(COGSLCY);
                 if OnlySales then
-                    if "Salesperson/Purchaser"."NPR Sales (LCY)" = 0 then
+                    if SalesLCY = 0 then
                         CurrReport.Skip();
 
                 TempSalesPerson.Init();
@@ -32,10 +34,10 @@
                 else
                     Multipl := 1;
 
-                Db := ("NPR Sales (LCY)" - "NPR COGS (LCY)");
+                Db := (SalesLCY - COGSLCY);
 
-                if "Salesperson/Purchaser"."NPR Sales (LCY)" <> 0 then
-                    Dg := (Db / "Salesperson/Purchaser"."NPR Sales (LCY)") * 100
+                if SalesLCY <> 0 then
+                    Dg := (Db / SalesLCY) * 100
 
                 else
                     Dg := 0;
@@ -43,13 +45,13 @@
                 case ShowType of
                     ShowType::Turnover:
                         begin
-                            TempSalesPerson."Amount (LCY)" := Multipl * "NPR Sales (LCY)";
-                            TempSalesPerson."Amount 2 (LCY)" := Multipl * "NPR Discount Amount";
+                            TempSalesPerson."Amount (LCY)" := Multipl * SalesLCY;
+                            TempSalesPerson."Amount 2 (LCY)" := Multipl * DiscountAmount;
                         end;
                     ShowType::Discount:
                         begin
-                            TempSalesPerson."Amount (LCY)" := Multipl * "NPR Discount Amount";
-                            TempSalesPerson."Amount 2 (LCY)" := Multipl * "NPR Sales (LCY)";
+                            TempSalesPerson."Amount (LCY)" := Multipl * DiscountAmount;
+                            TempSalesPerson."Amount 2 (LCY)" := Multipl * SalesLCY;
                         end;
                     ShowType::"Contribution Margin":
                         TempSalesPerson."Amount (LCY)" := Multipl * Db;
@@ -68,16 +70,16 @@
                     TempSalesPerson.Delete();
                 end;
 
-                SalesTotal += "NPR Sales (LCY)";
+                SalesTotal += SalesLCY;
 
                 if SalesTotal <> 0 then
-                    SalesPct := (("Salesperson/Purchaser"."NPR Sales (LCY)") / SalesTotal) * 100;
+                    SalesPct := ((SalesLCY) / SalesTotal) * 100;
 
-                if "Salesperson/Purchaser"."NPR Sales (LCY)" <> 0 then
-                    DgTotal += (Db / "Salesperson/Purchaser"."NPR Sales (LCY)") * 100;
+                if SalesLCY <> 0 then
+                    DgTotal += (Db / SalesLCY) * 100;
 
-                if "Salesperson/Purchaser"."NPR Discount Amount" <> 0 then
-                    DiscountPctTotal += "Salesperson/Purchaser"."NPR Discount Amount" / ("Salesperson/Purchaser"."NPR Sales (LCY)" + "Salesperson/Purchaser"."NPR Discount Amount") * 100;
+                if DiscountAmount <> 0 then
+                    DiscountPctTotal += DiscountAmount / (SalesLCY + DiscountAmount) * 100;
             end;
 
             trigger OnPreDataItem()
@@ -121,12 +123,11 @@
             {
                 IncludeCaption = true;
             }
-            column(Salesperson_Purchaser_Sales_LCY_; "Salesperson/Purchaser"."NPR Sales (LCY)")
+            column(Salesperson_Purchaser_Sales_LCY_; SalesLCY)
             {
             }
-            column(Salesperson_Purchaser_Discount_Amount; "Salesperson/Purchaser"."NPR Discount Amount")
+            column(Salesperson_Purchaser_Discount_Amount; DiscountAmount)
             {
-                IncludeCaption = true;
             }
             column(DiscountPct; DiscountPct)
             {
@@ -180,18 +181,21 @@
                     if TempSalesPerson.Next() = 0 then
                         CurrReport.Break();
 
-                if "Salesperson/Purchaser".Get(TempSalesPerson."Vendor No.") then
-                    "Salesperson/Purchaser".CalcFields("NPR Sales (LCY)", "NPR Discount Amount", "NPR COGS (LCY)");
+                if "Salesperson/Purchaser".Get(TempSalesPerson."Vendor No.") then begin
+                    "Salesperson/Purchaser".NPRGetVESalesLCY(SalesLCY);
+                    "Salesperson/Purchaser".NPRGetVEDiscountAmount(DiscountAmount);
+                    "Salesperson/Purchaser".NPRGetVECOGSLCY(COGSLCY);
+                end;
 
-                Db := "Salesperson/Purchaser"."NPR Sales (LCY)" - "Salesperson/Purchaser"."NPR COGS (LCY)";
+                Db := SalesLCY - COGSLCY;
                 J := IncStr(J);
-                if "Salesperson/Purchaser"."NPR Sales (LCY)" <> 0 then
-                    Dg := (Db / "Salesperson/Purchaser"."NPR Sales (LCY)") * 100
+                if SalesLCY <> 0 then
+                    Dg := (Db / SalesLCY) * 100
                 else
                     Dg := 0;
 
-                if "Salesperson/Purchaser"."NPR Discount Amount" <> 0 then
-                    DiscountPct := "Salesperson/Purchaser"."NPR Discount Amount" / ("Salesperson/Purchaser"."NPR Sales (LCY)" + "Salesperson/Purchaser"."NPR Discount Amount") * 100
+                if DiscountAmount <> 0 then
+                    DiscountPct := DiscountAmount / (SalesLCY + DiscountAmount) * 100
                 else
                     DiscountPct := 0;
             end;
@@ -281,5 +285,8 @@
         ShowType: Option Turnover,Discount,"Contribution Margin","Contribution Ratio";
         J: Text[30];
         SalespersonFilter: Text;
+        SalesLCY: Decimal;
+        DiscountAmount: Decimal;
+        COGSLCY: Decimal;
 }
 

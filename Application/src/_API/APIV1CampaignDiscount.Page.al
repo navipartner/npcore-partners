@@ -83,9 +83,11 @@ page 6014470 "NPR APIV1 - Campaign Discount"
                 {
                     Caption = 'quantitySold', Locked = true;
                 }
-                field(turnover; Rec.Turnover)
+                field(turnover; TurnoverValue)
                 {
                     Caption = 'turnover', Locked = true;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Aux table are obsoleted. This field can be got only trough calculation. But could make this API slower. Please make separe API if needed.';
                 }
                 field(monday; Rec.Monday)
                 {
@@ -147,9 +149,11 @@ page 6014470 "NPR APIV1 - Campaign Discount"
         }
     }
 
+    var
+        TurnoverValue: Decimal;
+
     trigger OnInit()
     begin
         CurrentTransactionType := TransactionType::Update;
     end;
-
 }

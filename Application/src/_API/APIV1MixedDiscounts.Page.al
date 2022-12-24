@@ -134,7 +134,7 @@ page 6014477 "NPR APIV1 - Mixed Discounts"
                 {
                     Caption = 'totalDiscountAmount', Locked = true;
                 }
-                field(turnover; Rec.Turnover)
+                field(turnover; TurnoverValue)
                 {
                     Caption = 'turnover', Locked = true;
                 }
@@ -186,9 +186,22 @@ page 6014477 "NPR APIV1 - Mixed Discounts"
         }
     }
 
+    var
+        TurnoverValue: Decimal;
+
     trigger OnInit()
     begin
         CurrentTransactionType := TransactionType::Update;
+    end;
+
+    trigger OnAfterGetRecord()
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        POSEntrySalesLine.SetRange("Discount Type", POSEntrySalesLine."Discount Type"::Mix);
+        POSEntrySalesLine.SetRange("Discount Code", Rec.Code);
+        POSEntrySalesLine.CalcSums("Amount Excl. VAT");
+        TurnoverValue := POSEntrySalesLine."Amount Excl. VAT";
     end;
 
 }

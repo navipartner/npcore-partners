@@ -1852,30 +1852,16 @@
       </DefaultValue>
       <Prompt>Salesperson_Purchaser_NameCaption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="Salesperson_Purchaser_Discount_AmountCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Salesperson_Purchaser_Discount_AmountCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Salesperson_Purchaser_Discount_AmountCaption</Prompt>
-    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>2</NumberOfRows>
+      <NumberOfRows>1</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>0</RowIndex>
           <ParameterName>Salesperson_Purchaser_NameCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>1</RowIndex>
-          <ParameterName>Salesperson_Purchaser_Discount_AmountCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>

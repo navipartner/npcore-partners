@@ -2230,38 +2230,6 @@
                     <VerticalAlign>Middle</VerticalAlign>
                   </Style>
                 </Textbox>
-                <Textbox Name="Textbox90">
-                  <CanGrow>true</CanGrow>
-                  <KeepTogether>true</KeepTogether>
-                  <Paragraphs>
-                    <Paragraph>
-                      <TextRuns>
-                        <TextRun>
-                          <Value>=Fields!Register_Filter_Caption.Value</Value>
-                          <Style>
-                            <FontSize>8pt</FontSize>
-                          </Style>
-                        </TextRun>
-                      </TextRuns>
-                      <Style />
-                    </Paragraph>
-                  </Paragraphs>
-                  <rd:DefaultName>Textbox90</rd:DefaultName>
-                  <Top>0.88457in</Top>
-                  <Left>0.06778in</Left>
-                  <Height>0.15416in</Height>
-                  <Width>1.47917in</Width>
-                  <ZIndex>6</ZIndex>
-                  <Style>
-                    <Border>
-                      <Style>None</Style>
-                    </Border>
-                    <PaddingLeft>2pt</PaddingLeft>
-                    <PaddingRight>2pt</PaddingRight>
-                    <PaddingTop>2pt</PaddingTop>
-                    <PaddingBottom>2pt</PaddingBottom>
-                  </Style>
-                </Textbox>
                 <Textbox Name="Textbox91">
                   <CanGrow>true</CanGrow>
                   <KeepTogether>true</KeepTogether>
@@ -2412,38 +2380,6 @@
                   <Height>0.15416in</Height>
                   <Width>1.47917in</Width>
                   <ZIndex>11</ZIndex>
-                  <Style>
-                    <Border>
-                      <Style>None</Style>
-                    </Border>
-                    <PaddingLeft>2pt</PaddingLeft>
-                    <PaddingRight>2pt</PaddingRight>
-                    <PaddingTop>2pt</PaddingTop>
-                    <PaddingBottom>2pt</PaddingBottom>
-                  </Style>
-                </Textbox>
-                <Textbox Name="Textbox108">
-                  <CanGrow>true</CanGrow>
-                  <KeepTogether>true</KeepTogether>
-                  <Paragraphs>
-                    <Paragraph>
-                      <TextRuns>
-                        <TextRun>
-                          <Value>=Fields!RegisterFilter.Value</Value>
-                          <Style>
-                            <FontSize>8pt</FontSize>
-                          </Style>
-                        </TextRun>
-                      </TextRuns>
-                      <Style />
-                    </Paragraph>
-                  </Paragraphs>
-                  <rd:DefaultName>Textbox90</rd:DefaultName>
-                  <Top>0.88457in</Top>
-                  <Left>1.58862in</Left>
-                  <Height>0.15416in</Height>
-                  <Width>1.22917in</Width>
-                  <ZIndex>12</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -2900,12 +2836,6 @@ End Function
         <Field Name="COMPANYNAME">
           <DataField>COMPANYNAME</DataField>
         </Field>
-        <Field Name="Register_Filter_Caption">
-          <DataField>Register_Filter_Caption</DataField>
-        </Field>
-        <Field Name="RegisterFilter">
-          <DataField>RegisterFilter</DataField>
-        </Field>
         <Field Name="Date_Filter_Caption">
           <DataField>Date_Filter_Caption</DataField>
         </Field>
@@ -3022,9 +2952,6 @@ End Function
         </Field>
         <Field Name="Total_VE_Discount_AmtFormat">
           <DataField>Total_VE_Discount_AmtFormat</DataField>
-        </Field>
-        <Field Name="GroupSale">
-          <DataField>GroupSale</DataField>
         </Field>
         <Field Name="Document_No_">
           <DataField>Document_No_</DataField>

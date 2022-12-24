@@ -13,7 +13,6 @@ report 6014448 "NPR Item Cat. Inv. Value"
     {
         dataitem("Item Category"; "Item Category")
         {
-            CalcFields = "NPR Sales (LCY)", "NPR Consumption (Amount)";
             RequestFilterFields = "Code", "NPR Date Filter", "NPR Vendor Filter", "NPR Global Dimension 1 Filter", "NPR Location Filter";
             column(CompanyInfoName; CompanyInfo.Name)
             {
@@ -40,13 +39,13 @@ report 6014448 "NPR Item Cat. Inv. Value"
             column(PurchaseQuantity; "NPR Purchases (Qty.)")
             {
             }
-            column(PurchaseLCY; "NPR Purchases (LCY)")
+            column(PurchaseLCY; PurchaseLCY)
             {
             }
             column(SalesQty; "NPR Sales (Qty.)")
             {
             }
-            column(SaleLCY; "NPR Sales (LCY)")
+            column(SaleLCY; SaleLCY)
             {
             }
             column(ItemCategoryMovementAtStartOf; ItemCategoryMovementAtStartOf)
@@ -74,18 +73,21 @@ report 6014448 "NPR Item Cat. Inv. Value"
             {
             }
             trigger OnAfterGetRecord()
+            var
+                ConsumptionAmount: Decimal;
+                InventoryValue: Decimal;
             begin
-
+                "Item Category".NPRGetVESalesLCYAndConsumptionAmount(SaleLCY, ConsumptionAmount);
                 ItemCategoryLast.Get("Code");
                 ItemCategoryLast.SetFilter("NPR Date Filter", '..%1', GetRangeMax("NPR Date Filter"));
                 ItemCategoryLast.SetFilter("NPR Global Dimension 1 Filter", GetFilter("NPR Global Dimension 1 Filter"));
                 ItemCategoryLast.SetFilter("NPR Vendor Filter", GetFilter("NPR Vendor Filter"));
                 ItemCategoryLast.SETFILTER("NPR Location Filter", GETFILTER("NPR Location Filter"));
 
-                ItemCategoryLast.CalcFields("NPR Movement", "NPR Inventory Value");
-
+                ItemCategoryLast.CalcFields("NPR Movement");
+                ItemCategoryLast.NPRGetVEInventoryValue(InventoryValue);
                 ItemCategoryMovementAtEndOf := ItemCategoryLast."NPR Movement";
-                ItemCategoryInventoryAtEndOf := ItemCategoryLast."NPR Inventory Value";
+                ItemCategoryInventoryAtEndOf := InventoryValue;
 
                 ItemCategoryFirst.Get("Code");
                 ItemCategoryFirst.SetFilter("NPR Date Filter", '..%1', GetRangeMin("NPR Date Filter") - 1);
@@ -93,13 +95,14 @@ report 6014448 "NPR Item Cat. Inv. Value"
                 ItemCategoryFirst.SetFilter("NPR Vendor Filter", GetFilter("NPR Vendor Filter"));
                 ItemCategoryFirst.SETFILTER("NPR Location Filter", GETFILTER("NPR Location Filter"));
 
-                ItemCategoryFirst.CalcFields("NPR Movement", "NPR Inventory Value");
+                ItemCategoryFirst.CalcFields("NPR Movement");
+                ItemCategoryFirst.NPRGetVEInventoryValue(InventoryValue);
                 ItemCategoryMovementAtStartOf := ItemCategoryFirst."NPR Movement";
-                ItemCategoryInventoryAtStartOf := ItemCategoryFirst."NPR Inventory Value";
+                ItemCategoryInventoryAtStartOf := InventoryValue;
 
-                Profit := "NPR Sales (LCY)" - "NPR Consumption (Amount)";
-                if "NPR Sales (LCY)" <> 0 then
-                    Dg := Profit / "NPR Sales (LCY)" * 100
+                Profit := SaleLCY - ConsumptionAmount;
+                if SaleLCY <> 0 then
+                    Dg := Profit / SaleLCY * 100
                 else
                     Clear(Dg);
             end;
@@ -167,6 +170,8 @@ report 6014448 "NPR Item Cat. Inv. Value"
         ItemCategoryInventoryAtStartOf: Decimal;
         ItemCategoryMovementAtEndOf: Decimal;
         ItemCategoryMovementAtStartOf: Decimal;
+        PurchaseLCY: Decimal;
+        SaleLCY: Decimal;
         AppliedFilters: Text[200];
         PeriodDateFilter: Text;
         Profit: Decimal;

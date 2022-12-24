@@ -14,7 +14,7 @@
     {
         dataitem(Vendor; Vendor)
         {
-            CalcFields = "NPR Sales (LCY)", "Balance (LCY)", "NPR COGS (LCY)";
+            CalcFields = "Balance (LCY)";
             DataItemTableView = SORTING("No.");
             RequestFilterFields = "No.", "Date Filter", "Global Dimension 1 Filter";
             column(COMPANYNAME; CompanyName)
@@ -34,13 +34,14 @@
             }
             dataitem("<Kreditorsidsteaar>"; Vendor)
             {
-                CalcFields = "NPR Sales (LCY)", "Balance (LCY)", "NPR COGS (LCY)";
+                CalcFields = "Balance (LCY)";
                 DataItemLink = "No." = FIELD("No.");
                 DataItemTableView = SORTING("No.");
 
                 trigger OnAfterGetRecord()
                 begin
-                    if ("NPR Sales (LCY)" = 0) and ("Balance (LCY)" = 0) and ("NPR Sales (LCY)" - "NPR COGS (LCY)" = 0) then
+                    NPRGetVESalesLCYSalesQtyCOGSLCY(KreditorsidsteaarSalesLCY, KreditorsidsteaarSalesQty, KreditorsidsteaarCOGS);
+                    if (KreditorsidsteaarSalesLCY = 0) and ("Balance (LCY)" = 0) and (KreditorsidsteaarSalesLCY - KreditorsidsteaarCOGS = 0) then
                         CurrReport.Skip();
 
                     TempVendorAmountLastYear.Init();
@@ -49,17 +50,17 @@
                     case ShowType of
                         ShowType::"Item Sales":
                             begin
-                                TempVendorAmountLastYear."Amount (LCY)" := Multipl * "NPR Sales (LCY)";
+                                TempVendorAmountLastYear."Amount (LCY)" := Multipl * KreditorsidsteaarSalesLCY;
                             end;
                         ShowType::Gains:
                             begin
-                                TempVendorAmountLastYear."Amount (LCY)" := Multipl * ("NPR Sales (LCY)" - "NPR COGS (LCY)");
+                                TempVendorAmountLastYear."Amount (LCY)" := Multipl * (KreditorsidsteaarSalesLCY - KreditorsidsteaarCOGS);
                             end;
                     end;
 
                     TempVendorAmountLastYear.Insert();
-                    SalesLastYear += "NPR Sales (LCY)";
-                    DbLastYear += "NPR Sales (LCY)" - "NPR COGS (LCY)";
+                    SalesLastYear += KreditorsidsteaarSalesLCY;
+                    DbLastYear += KreditorsidsteaarSalesLCY - KreditorsidsteaarCOGS;
                 end;
 
                 trigger OnPreDataItem()
@@ -72,7 +73,7 @@
             trigger OnAfterGetRecord()
             begin
                 VendorInt += 1;
-
+                NPRGetVESalesLCYSalesQtyCOGSLCY(SalesLCY, SalesQty, COGSLCY);
 
 
                 TempVendorAmount.Init();
@@ -80,11 +81,11 @@
                 case ShowType of
                     ShowType::"Item Sales":
                         begin
-                            TempVendorAmount."Amount (LCY)" := Multipl * "NPR Sales (LCY)";
+                            TempVendorAmount."Amount (LCY)" := Multipl * SalesLCY;
                         end;
                     ShowType::Gains:
                         begin
-                            TempVendorAmount."Amount (LCY)" := Multipl * ("NPR Sales (LCY)" - "NPR COGS (LCY)");
+                            TempVendorAmount."Amount (LCY)" := Multipl * (SalesLCY - COGSLCY);
                         end;
                 end;
 
@@ -98,9 +99,9 @@
 
                 //Item sales
                 if VendorInt = 1 then
-                    MaxAmt := "NPR Sales (LCY)";
+                    MaxAmt := SalesLCY;
 
-                MaxAmount := "NPR Sales (LCY)";
+                MaxAmount := SalesLCY;
 
                 if MaxAmount > MaxAmt then
                     MaxAmt := MaxAmount;
@@ -143,10 +144,10 @@
             column(Name_Vendor; Vendor.Name)
             {
             }
-            column(SalesLCY_Vendor; Vendor."NPR Sales (LCY)")
+            column(SalesLCY_Vendor; SalesLCY)
             {
             }
-            column(COGSLCY_Vendor; Vendor."NPR COGS (LCY)")
+            column(COGSLCY_Vendor; COGSLCY)
             {
             }
             column(ProfitPct; ProfitPct)
@@ -158,7 +159,7 @@
             column(PctOfTotal; StrSubstNo(Pct1Lbl, PctOfTotal))
             {
             }
-            column(Stock_Vendor; Vendor3."NPR Stock")
+            column(Stock_Vendor; Vendor3Stock)
             {
             }
             column(PctOfTotalInventory; StrSubstNo(Pct1Lbl, PctOfTotalInventory))
@@ -179,10 +180,10 @@
             column(Show_Type; ShowType)
             {
             }
-            column(Sales_LCY_Vendor2; Vendor2."NPR Sales (LCY)")
+            column(Sales_LCY_Vendor2; Vendor2SalesLCY)
             {
             }
-            column(Profit_Vendor2; Vendor2."NPR Sales (LCY)" - Vendor2."NPR COGS (LCY)")
+            column(Profit_Vendor2; Vendor2SalesLCY - Vendor2COGS)
             {
             }
             column(VendorSales; VendorSales)
@@ -221,7 +222,7 @@
             column(IndexDb_2; IndexDb[2])
             {
             }
-            column(Qty_Vendor; Vendor."NPR Sales (Qty.)")
+            column(Qty_Vendor; SalesQty)
             {
             }
             column(StockQty; StockQty)
@@ -248,11 +249,12 @@
                 TempVendorAmount."Amount (LCY)" := Multipl * TempVendorAmount."Amount (LCY)";
 
                 Vendor.Get(TempVendorAmount."Vendor No.");
-                Vendor.CalcFields("NPR Sales (LCY)", "Balance (LCY)", "NPR COGS (LCY)", "NPR Sales (Qty.)");
-                ProfitPct := "Pct."(Vendor."NPR Sales (LCY)" - Vendor."NPR COGS (LCY)", Vendor."NPR Sales (LCY)");
+                Vendor.CalcFields("Balance (LCY)");
+                Vendor.NPRGetVESalesLCYSalesQtyCOGSLCY(SalesLCY, SalesQty, COGSLCY);
+                ProfitPct := "Pct."(SalesLCY - COGSLCY, SalesLCY);
 
                 if (MaxAmt <> 0) then
-                    Share := Round(Vendor."NPR Sales (LCY)" * 100 / MaxAmt, 1)
+                    Share := Round(SalesLCY * 100 / MaxAmt, 1)
                 else
                     Share := 0;
 
@@ -261,7 +263,9 @@
                 // Sales last year and db
                 Vendor2.Get(TempVendorAmount."Vendor No.");
                 Vendor2.SetRange("Date Filter", StartDateLastYear, EndDateLastYear);
-                Vendor2.CalcFields("NPR Sales (LCY)", "NPR COGS (LCY)", "Balance (LCY)");
+                Vendor2.CalcFields("Balance (LCY)");
+                Vendor2.NPRGetVESalesLCYSalesQtyCOGSLCY(Vendor2SalesLCY, Vendor2SalesQty, Vendor2COGS);
+
 
                 // Read last year's ranking
                 TempVendorAmountLastYear.SetFilter("Vendor No.", TempVendorAmount."Vendor No.");
@@ -271,15 +275,15 @@
                 case ShowType of
                     ShowType::"Item Sales":
                         begin
-                            AmountLastYear := Vendor2."NPR Sales (LCY)";
-                            PctOfTotal := "Pct."(Vendor."NPR Sales (LCY)", VendorSales);
-                            Index := "Pct."(Vendor."NPR Sales (LCY)", AmountLastYear);
+                            AmountLastYear := Vendor2SalesLCY;
+                            PctOfTotal := "Pct."(SalesLCY, VendorSales);
+                            Index := "Pct."(SalesLCY, AmountLastYear);
                         end;
                     ShowType::Gains:
                         begin
-                            AmountLastYear := Vendor2."NPR Sales (LCY)" - Vendor2."NPR COGS (LCY)";
-                            PctOfTotal := "Pct."(Vendor."NPR Sales (LCY)" - Vendor."NPR COGS (LCY)", VendorProfit);
-                            Index := "Pct."(Vendor."NPR Sales (LCY)" - Vendor."NPR COGS (LCY)", AmountLastYear);
+                            AmountLastYear := Vendor2SalesLCY - Vendor2COGS;
+                            PctOfTotal := "Pct."(SalesLCY - COGSLCY, VendorProfit);
+                            Index := "Pct."(SalesLCY - COGSLCY, AmountLastYear);
                         end;
                 end;
 
@@ -290,29 +294,29 @@
                 Vendor.CopyFilter("NPR Item Category Filter", Vendor3."NPR Item Category Filter");
 
                 Vendor3.Get(TempVendorAmount."Vendor No.");
-                Vendor3.CalcFields("NPR Stock");
-                PctOfTotalInventory := "Pct."(Vendor3."NPR Stock", InventoryTotal);
+                Vendor3.NPRGetVEStock(Vendor3Stock);
+                PctOfTotalInventory := "Pct."(Vendor3Stock, InventoryTotal);
 
-                DgLastYear := "Pct."(Vendor2."NPR Sales (LCY)" - Vendor2."NPR COGS (LCY)", Vendor2."NPR Sales (LCY)");
+                DgLastYear := "Pct."(Vendor2SalesLCY - Vendor2COGS, Vendor2SalesLCY);
 
-                SalesPct := "Pct."(Vendor."NPR Sales (LCY)", VendorSales);
-                ProfitPct2 := "Pct."(Vendor2."NPR Sales (LCY)" - Vendor2."NPR COGS (LCY)", DbLastYear);
-                SalesPct2 := "Pct."(Vendor2."NPR Sales (LCY)", SalesLastYear);
-                IndexSales[1] := "Pct."(Vendor."NPR Sales (LCY)", Vendor2."NPR Sales (LCY)");
+                SalesPct := "Pct."(SalesLCY, VendorSales);
+                ProfitPct2 := "Pct."(Vendor2SalesLCY - Vendor2COGS, DbLastYear);
+                SalesPct2 := "Pct."(Vendor2SalesLCY, SalesLastYear);
+                IndexSales[1] := "Pct."(SalesLCY, Vendor2SalesLCY);
                 IndexSales[2] := "Pct."(VendorSales, SalesLastYear);
-                IndexDb[1] := "Pct."(Vendor."NPR Sales (LCY)" - Vendor."NPR COGS (LCY)", Vendor2."NPR Sales (LCY)" - Vendor2."NPR COGS (LCY)");
+                IndexDb[1] := "Pct."(SalesLCY - COGSLCY, Vendor2SalesLCY - Vendor2COGS);
                 IndexDb[2] := "Pct."(VendorProfit, DbLastYear);
                 Clear(StockQty);
-                ValueEntry2.SetFilter("Posting Date", '..%1', Vendor.GetRangeMax("Date Filter"));
-                Vendor.CopyFilter("Global Dimension 1 Filter", ValueEntry2."Global Dimension 1 Code");
-                //TODO:Temporary Aux Value Entry Reimplementation
-                // Vendor.CopyFilter("NPR Item Category Filter", ValueEntry2."NPR Item Category Code");
-                // ValueEntry2.SetFilter("NPR Vendor No.", Vendor."No.");
-                Vendor.CopyFilter("NPR Salesperson Filter", ValueEntry2."Salespers./Purch. Code");
-
-                ValueEntry2.CalcSums("Cost per Unit");
-                if ValueEntry2."Cost per Unit" <> 0 then
-                    StockQty := ValueEntry2."Cost Amount (Actual)" / ValueEntry2."Cost per Unit";
+                ValueEntry2Query.SetFilter(Filter_DateTime, '..%1', Vendor.GetRangeMax("Date Filter"));
+                ValueEntry2Query.SetFilter(ValueEntry2Query.Filter_Dim_1_Code, Vendor."Global Dimension 1 Filter");
+                ValueEntry2Query.SetFilter(Filter_Vendor_No, Vendor."No.");
+                ValueEntry2Query.SetFilter(Filter_Salespers_Purch_Code, Vendor."NPR Salesperson Filter");
+                ValueEntry2Query.SetFilter(Filter_Cost_Amount_Actual, '<>%1', 0);
+                ValueEntry2Query.Open();
+                while ValueEntry2Query.Read() do begin
+                    if ValueEntry2Query.Cost_per_Unit <> 0 then
+                        StockQty += ValueEntry2Query.Sum_Cost_Amount_Actual / ValueEntry2Query.Cost_per_Unit;
+                end;
             end;
 
             trigger OnPreDataItem()
@@ -334,8 +338,8 @@
                 Vendor3.SetFilter("Date Filter", '..%1', Vendor.GetRangeMax("Date Filter"));
                 if Vendor3.FindFirst() then
                     repeat
-                        Vendor3.CalcFields("NPR Stock");
-                        InventoryTotal += Vendor3."NPR Stock";
+                        Vendor3.NPRGetVEStock(Vendor3Stock);
+                        InventoryTotal += Vendor3Stock;
                     until Vendor3.Next() = 0;
 
                 Clear(Index);
@@ -444,7 +448,7 @@
     var
         CompanyInfo: Record "Company Information";
         ValueEntry: Record "Value Entry";
-        ValueEntry2: Record "Value Entry";
+        ValueEntry2Query: Query "NPR Value Entry With Vendor";
         Vendor2: Record Vendor;
         Vendor3: Record Vendor;
         TempVendorAmount: Record "Vendor Amount" temporary;
@@ -489,6 +493,16 @@
         ShowType: Option "Item Sales",,Gains,Margin;
         j: Text[30];
         VendorDateFilter: Text;
+        Vendor2SalesLCY: Decimal;
+        Vendor2SalesQty: Decimal;
+        Vendor2COGS: Decimal;
+        Vendor3Stock: Decimal;
+        SalesLCY: Decimal;
+        SalesQty: Decimal;
+        COGSLCY: Decimal;
+        KreditorsidsteaarSalesLCY: Decimal;
+        KreditorsidsteaarSalesQty: Decimal;
+        KreditorsidsteaarCOGS: Decimal;
         Pct1Lbl: Label '%1%', locked = true;
 # pragma warning disable AA0228
     local procedure "Pct."(Tal1: Decimal; Tal2: Decimal): Decimal
