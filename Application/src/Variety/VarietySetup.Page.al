@@ -17,27 +17,27 @@
             {
                 field("Variety Enabled"; Rec."Variety Enabled")
                 {
-                    ToolTip = 'Specifies the value of the Variety Enabled field';
+                    ToolTip = 'Enable the variety.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Journal Blocking"; Rec."Item Journal Blocking")
                 {
-                    ToolTip = 'Specifies the value of the Item Journal Blocking field';
+                    ToolTip = 'Specifies if the items without variants are allowed.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Description"; Rec."Variant Description")
                 {
-                    ToolTip = 'Specifies the value of the Variant Description field';
+                    ToolTip = 'Specifies the first variant description';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Description 2"; Rec."Variant Description 2")
                 {
-                    ToolTip = 'Specifies the value of the Variant Description 2 field';
+                    ToolTip = 'Specifies the second variant description.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Create Variant Code From"; Rec."Create Variant Code From")
                 {
-                    ToolTip = 'Specifies the value of the Create Variant Code From field';
+                    ToolTip = 'Specifies the subscriber codeunit that can create variant codes';
                     ApplicationArea = NPRRetail;
                 }
                 field("Custom Descriptions"; Rec."Custom Descriptions")
@@ -66,18 +66,18 @@
                 Caption = 'Barcode (Item Ref.)';
                 field("Create Item Cross Ref. auto."; Rec."Create Item Cross Ref. auto.")
                 {
-                    ToolTip = 'Specifies the value of the Create Item Cross Ref. auto. field';
+                    ToolTip = 'Specifies if the item cross references should be created automatically or not';
                     ApplicationArea = NPRRetail;
                 }
                 field("Barcode Type (Item Cross Ref.)"; Rec."Barcode Type (Item Cross Ref.)")
                 {
                     Editable = Rec."Create Item Cross Ref. auto.";
-                    ToolTip = 'Specifies the value of the Barcode Type (Item Cross Ref.) field';
+                    ToolTip = 'Specifies the barcode type for the item cross reference';
                     ApplicationArea = NPRRetail;
                 }
                 field("Internal EAN No. Series"; Rec."Internal EAN No. Series")
                 {
-                    ToolTip = 'Specifies the value of the Internal EAN No. Series field';
+                    ToolTip = 'Specifies the number series used for the internal EAN number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("External EAN No. Series"; Rec."External EAN No. Series")
@@ -87,12 +87,12 @@
                 }
                 field("EAN-Internal"; Rec."EAN-Internal")
                 {
-                    ToolTip = 'Specifies the value of the EAN-Internal field';
+                    ToolTip = 'Specifies the length of the EAN-Internal number';
                     ApplicationArea = NPRRetail;
                 }
                 field("EAN-External"; Rec."EAN-External")
                 {
-                    ToolTip = 'Specifies the value of the EAN-External field';
+                    ToolTip = 'Specifies the length of the EAN-External number';
                     ApplicationArea = NPRRetail;
                 }
                 group(ItemReferences)
@@ -181,7 +181,7 @@
                     PromotedCategory = New;
                     PromotedIsBig = true;
 
-                    ToolTip = 'Executes the EAN13 Internal action';
+                    ToolTip = 'Create a new number series for EAN13 Internal.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -199,7 +199,8 @@
                     PromotedOnly = true;
                     PromotedCategory = New;
                     PromotedIsBig = true;
-                    ToolTip = 'Executes the EAN13 External action';
+
+                    ToolTip = 'Create a new number series for EAN13 External.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -217,7 +218,7 @@
                 {
                     Caption = 'Show Original Setup';
                     Image = History;
-                    ToolTip = 'Executes the Show Original Setup action';
+                    ToolTip = 'Display the original setup for the EAN number series.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -236,7 +237,7 @@
                     PromotedCategory = Category4;
                     RunObject = Page "Item Reference Entries";
                     RunPageView = SORTING("Reference Type", "Reference No.");
-                    ToolTip = 'Executes the Item Cross Reference action';
+                    ToolTip = 'Displays the item reference entries';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -251,7 +252,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
-                    ToolTip = 'Executes the Item Variant Descriptions action';
+                    ToolTip = 'Update all item variant descriptions with the values from the variety setup.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -288,7 +289,7 @@
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Report "NPR Update Barcodes";
-                    ToolTip = 'Executes the Barcodes action';
+                    ToolTip = 'Update all item barcodes with the values from the variety setup.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -307,7 +308,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety";
-                    ToolTip = 'Executes the Variety action';
+                    ToolTip = 'Display the Variety page in which all varieties are listed. You can create new varieties if needed.';
                     ApplicationArea = NPRRetail;
                 }
                 action("Field Setup")
@@ -318,7 +319,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Fields Setup";
-                    ToolTip = 'Executes the Field Setup action';
+                    ToolTip = 'Display the Variety Field Setup page in which all field setups for varieties are listed. You can create new field setups for varieties.';
                     ApplicationArea = NPRRetail;
                 }
                 action(Groups)
@@ -329,7 +330,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Group";
-                    ToolTip = 'Executes the Groups action';
+                    ToolTip = 'Display the Variety Group page in which all variety groups are listed. You can create new variety groups.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -340,7 +341,7 @@
                     Caption = 'Setup Wizard';
                     Image = Setup;
 
-                    ToolTip = 'Executes the Setup Wizard action';
+                    ToolTip = 'Execute the Setup Wizard for the variety creation.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

@@ -20,8 +20,7 @@ page 6014423 "NPR Report Selection: Retail"
                 ShowCaption = false;
                 field(ReportType2; ReportTypeEnum)
                 {
-
-                    ToolTip = 'Specifies the value of the Report Type field';
+                    ToolTip = 'Specifies the report type of the report selection - retail';
                     Caption = 'Report Type';
                     ApplicationArea = NPRRetail;
 
@@ -37,51 +36,44 @@ page 6014423 "NPR Report Selection: Retail"
                 ShowCaption = false;
                 field(Sequence; Rec.Sequence)
                 {
-
-                    ToolTip = 'Specifies the value of the Sequence field';
+                    ToolTip = 'Specifies the sequence of the report type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
-
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ToolTip = 'Specifies the POS unit number for this sequence';
                     ApplicationArea = NPRRetail;
                 }
                 field("Report ID"; Rec."Report ID")
                 {
-
-                    ToolTip = 'Specifies the value of the Report ID field';
+                    ToolTip = 'Specifies the Report ID for this sequence';
                     ApplicationArea = NPRRetail;
                 }
                 field("Report Name"; Rec."Report Name")
                 {
-
-                    ToolTip = 'Specifies the value of the Report Name field';
+                    ToolTip = 'Specifies the report name for this sequence';
                     ApplicationArea = NPRRetail;
                 }
                 field("Codeunit ID"; Rec."Codeunit ID")
                 {
-
-                    ToolTip = 'Specifies the value of the Codeunit ID field';
+                    ToolTip = 'Specifies the codeunit ID for this sequence';
                     ApplicationArea = NPRRetail;
                 }
                 field("Codeunit Name"; Rec."Codeunit Name")
                 {
-
-                    ToolTip = 'Specifies the value of the Codeunit Name field';
+                    ToolTip = 'Specifies the codeunit name for this sequence';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print Template"; Rec."Print Template")
                 {
 
                     Width = 20;
-                    ToolTip = 'Specifies the value of the Print Template field';
+                    ToolTip = 'Specifies the print template for this sequence';
                     ApplicationArea = NPRRetail;
                 }
                 field(Optional; Rec.Optional)
                 {
-
-                    ToolTip = 'Specifies the value of the Optional field';
+                    ToolTip = 'Specifies this sequence is optional or not';
                     ApplicationArea = NPRRetail;
                 }
             }

@@ -16,20 +16,17 @@
             {
                 field("Table Name"; Rec."Table Name")
                 {
-
-                    ToolTip = 'Specifies the value of the Table Name field';
+                    ToolTip = 'Specifies the table name for the POS cross reference';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reference No."; Rec."Reference No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Reference No. field';
+                    ToolTip = 'Specifies the reference number';
                     ApplicationArea = NPRRetail;
                 }
                 field("Record Value"; Rec."Record Value")
                 {
-
-                    ToolTip = 'Specifies the value of the Record Value field';
+                    ToolTip = 'Specifies the record value';
                     ApplicationArea = NPRRetail;
                 }
             }

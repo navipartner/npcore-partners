@@ -22,27 +22,24 @@
             {
                 field(Priority; Rec.Priority)
                 {
-
-                    ToolTip = 'Specifies the value of the Priority field';
+                    ToolTip = 'Specifies the priority of the discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Table ID"; Rec."Table ID")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Table ID field';
+                    ToolTip = 'Specifies the table ID of the discount priority';
                     ApplicationArea = NPRRetail;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-
-                    ToolTip = 'Specifies the value of the Table Name field';
+                    ToolTip = 'Specifies the table name of the discount priority';
                     ApplicationArea = NPRRetail;
                 }
                 field(Disabled; Rec.Disabled)
                 {
-
-                    ToolTip = 'Specifies the value of the Disabled field';
+                    ToolTip = 'Specifies if this discount priority is disabled or not';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Calc. Codeunit ID"; Rec."Discount Calc. Codeunit ID")
@@ -50,27 +47,26 @@
 
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Discount Calc. Codeunit ID field';
+                    ToolTip = 'Specifies the ID of the codeunit that calculates the discount for the stated discount priority.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Calc. Codeunit Name"; Rec."Discount Calc. Codeunit Name")
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Discount Calc. Codeunit Name field';
+                    ToolTip = 'Specifies the name of the codeunit that calculates the discount for the stated discount priority.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Cross Line Calculation"; Rec."Cross Line Calculation")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Cross Line Calculation field';
+                    ToolTip = 'Specifies if cross line calculation is allowed or not';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount No. Series"; Rec."Discount No. Series")
                 {
-
-                    ToolTip = 'Specifies the value of the Discount No. Series field';
+                    ToolTip = 'Specifies the number series of the discount for the stated discount priority.';
                     ApplicationArea = NPRRetail;
                 }
             }
