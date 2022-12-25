@@ -18,24 +18,18 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code for the global POS sales setup';
                     ApplicationArea = NPRRetail;
-                    ;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
-
-                    ToolTip = 'Specifies the value of the Company Name field';
+                    ToolTip = 'Specifies the company name for the global POS sales setup';
                     ApplicationArea = NPRRetail;
-                    ;
                 }
                 field("Service Url"; Rec."Service Url")
                 {
-
-                    ToolTip = 'Specifies the value of the Service Url field';
+                    ToolTip = 'Specifies the service URL for the global POS sales setup';
                     ApplicationArea = NPRRetail;
-                    ;
                 }
             }
         }

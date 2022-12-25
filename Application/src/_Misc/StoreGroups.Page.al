@@ -16,20 +16,17 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of the store group';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the store group';
                     ApplicationArea = NPRRetail;
                 }
                 field("Blank Location"; Rec."Blank Location")
                 {
-
-                    ToolTip = 'Specifies the value of the Blank Location field';
+                    ToolTip = 'Specifies if a blank location is allowed or not';
                     ApplicationArea = NPRRetail;
                 }
             }

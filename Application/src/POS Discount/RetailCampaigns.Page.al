@@ -21,21 +21,19 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of the retail campaign';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the retail campaign';
                     ApplicationArea = NPRRetail;
                 }
                 field("Magento Category Id"; Rec."Magento Category Id")
                 {
 
                     Visible = MagentoEnabled;
-                    ToolTip = 'Specifies the value of the Magento Category Id field';
+                    ToolTip = 'Specifies the Magento Category ID of the retail campaign.';
                     ApplicationArea = NPRRetail;
                 }
             }

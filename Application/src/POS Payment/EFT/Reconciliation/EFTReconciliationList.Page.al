@@ -18,47 +18,47 @@
                 field(No; Rec."No.")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the number of the EFT reconciliation';
                 }
                 field(ProviderCode; Rec."Provider Code")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Provider field';
+                    ToolTip = 'Specifies the provider of the EFT reconciliation';
                 }
                 field(Status; Rec.Status)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Status field';
+                    ToolTip = 'Specifies the status of the EFT Reconciliation';
                 }
                 field(AccountID; Rec."Account ID")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Account ID field';
+                    ToolTip = 'Specifies the account id of the EFT reconciliation';
                 }
                 field(AdvisID; Rec."Advis ID")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Advis ID field';
+                    ToolTip = 'Specifies the Advis ID used for EFT reconciliation.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the EFT reconciliation';
                 }
                 field(BankTransferDate; Rec."Bank Transfer Date")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Bank Transfer Date field';
+                    ToolTip = 'Specifies the bank transfer date of the EFT reconciliation';
                 }
                 field(TransactionAmount; Rec."Transaction Amount")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Transaction Amount field';
+                    ToolTip = 'Specifies the transaction amount of the EFT reconciliation';
                 }
                 field(TransactionFeeAmount; Rec."Transaction Fee Amount")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Transaction Fee Amount field';
+                    ToolTip = 'Specifies the transaction fee amount of the EFT reconciliation';
                 }
             }
         }

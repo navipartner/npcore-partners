@@ -17,39 +17,34 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of the smart email';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the smart email';
                     ApplicationArea = NPRRetail;
                 }
                 field(Provider; Rec.Provider)
                 {
-
-                    ToolTip = 'Specifies the value of the Provider field';
+                    ToolTip = 'Specifies the provider for the smart email';
                     ApplicationArea = NPRRetail;
                 }
                 field("Merge Table ID"; Rec."Merge Table ID")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Merge Table ID field';
+                    ToolTip = 'Specifies the ID of the table in which the smart email is going to be merged.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Table Caption"; Rec."Table Caption")
                 {
-
-                    ToolTip = 'Specifies the value of the Table Caption field';
+                    ToolTip = 'Specifies the name of the table in which the smart email is going to be merged.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Smart Email Name"; Rec."Smart Email Name")
                 {
-
-                    ToolTip = 'Specifies the value of the Smart Email Name field';
+                    ToolTip = 'Specifies the smart email name';
                     ApplicationArea = NPRRetail;
                 }
             }

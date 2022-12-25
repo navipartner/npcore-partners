@@ -20,72 +20,61 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of the coupon type';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the coupon type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Type"; Rec."Discount Type")
                 {
-
-                    ToolTip = 'Specifies the value of the Discount Type field';
+                    ToolTip = 'Specifies the discount type of the coupon type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount %"; Rec."Discount %")
                 {
-
                     BlankZero = true;
-                    ToolTip = 'Specifies the value of the Discount % field';
+                    ToolTip = 'Specifies the discount in percentage of the coupon type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
-
                     BlankZero = true;
-                    ToolTip = 'Specifies the value of the Discount Amount field';
+                    ToolTip = 'Specifies the discount amount of the coupon type';
                     ApplicationArea = NPRRetail;
                 }
                 field(Enabled; Rec.Enabled)
                 {
-
-                    ToolTip = 'Specifies the value of the Enabled field';
+                    ToolTip = 'Specifies if the coupon type is enabled or not';
                     ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-
-                    ToolTip = 'Specifies the value of the Starting Date field';
+                    ToolTip = 'Specifies the starting date of the coupon type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
-
-                    ToolTip = 'Specifies the value of the Ending Date field';
+                    ToolTip = 'Specifies the ending date of the coupon type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Application Sequence No."; Rec."Application Sequence No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Application Sequence No. field';
+                    ToolTip = 'Specifies the application sequence number of the coupon type';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field("Coupon Qty. (Open)"; Rec."Coupon Qty. (Open)")
                 {
-
-                    ToolTip = 'Specifies the value of the Coupon Qty. (Open) field';
+                    ToolTip = 'Specifies the quantity of the coupons that are open for the coupon type';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field("Arch. Coupon Qty."; Rec."Arch. Coupon Qty.")
                 {
-
-                    ToolTip = 'Specifies the value of the Arch. Coupon Qty. field';
+                    ToolTip = 'Specifies the quantity of the coupons that are archived for the coupon type';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
@@ -102,7 +91,7 @@
                 Caption = 'Issue Coupons';
                 Image = PostedVoucherGroup;
 
-                ToolTip = 'Executes the Issue Coupons action';
+                ToolTip = 'Enable issuing coupons for the selected coupon type. If clicked, the page in which you can enter the number of coupons to be issued is displayed.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -123,7 +112,7 @@
                 RunPageLink = "Coupon Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
 
-                ToolTip = 'Executes the Coupons action';
+                ToolTip = 'Displays all coupons which belong to the selected coupon type.';
                 ApplicationArea = NPRRetail;
             }
             action(Comments)
@@ -139,7 +128,7 @@
                               Integer = CONST(0),
                               "Integer 2" = CONST(0);
 
-                ToolTip = 'Executes the Co&mments action';
+                ToolTip = 'Displays all comments associated with the selected coupon type.';
                 ApplicationArea = NPRRetail;
             }
         }

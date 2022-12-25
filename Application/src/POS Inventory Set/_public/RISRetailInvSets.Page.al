@@ -17,17 +17,17 @@
             {
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of the retail inventory set';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the retail inventory set';
                     ApplicationArea = NPRRetail;
                 }
                 field("Client Type"; Rec."Client Type")
                 {
-                    ToolTip = 'Specifies the value of the web service client type.';
+                    ToolTip = 'Specifies the web service client type of the retail inventory set';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -47,7 +47,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Test Retail Inventory action';
+                ToolTip = 'Perform a test for the retail inventory. If clicked, a page which contains the retail items is displayed.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

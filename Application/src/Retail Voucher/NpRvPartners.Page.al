@@ -18,25 +18,22 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of the partner';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the name of the partner';
                     ApplicationArea = NPRRetail;
                 }
                 field("Service Url"; Rec."Service Url")
                 {
-
-                    ToolTip = 'Specifies the value of the Service Url field';
+                    ToolTip = 'Specifies the service URL of the partner.';
                     ApplicationArea = NPRRetail;
                 }
                 field(AuthType; Rec.AuthType)
                 {
-                    ToolTip = 'Specifies the Authorization Type';
+                    ToolTip = 'Specifies the authorization type that the partner will use';
                     ApplicationArea = NPRRetail;
                 }
             }

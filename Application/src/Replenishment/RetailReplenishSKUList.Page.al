@@ -18,74 +18,62 @@
             {
                 field("Item No."; Rec."Item No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Item No. field';
+                    ToolTip = 'Specifies the item number';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Variant Code field';
+                    ToolTip = 'Specifies the variant code for the item selected';
                     ApplicationArea = NPRRetail;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Location Code field';
+                    ToolTip = 'Specifies the location code for the item selected';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the item selected';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reordering Policy"; Rec."Reordering Policy")
                 {
-
-                    ToolTip = 'Specifies the value of the Reordering Policy field';
+                    ToolTip = 'Specifies the reordering policy of the item selected';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reorder Point"; Rec."Reorder Point")
                 {
-
-                    ToolTip = 'Specifies the value of the Reorder Point field';
+                    ToolTip = 'Specifies the reorder point of the item selected';
                     ApplicationArea = NPRRetail;
                 }
                 field("Replenishment System"; Rec."Replenishment System")
                 {
-
-                    ToolTip = 'Specifies the value of the Replenishment System field';
+                    ToolTip = 'Specifies the replenishment system of the item selected';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reorder Quantity"; Rec."Reorder Quantity")
                 {
-
-                    ToolTip = 'Specifies the value of the Reorder Quantity field';
+                    ToolTip = 'Specifies the reorder quantity of the item selected';
                     ApplicationArea = NPRRetail;
                 }
                 field("Maximum Inventory"; Rec."Maximum Inventory")
                 {
-
-                    ToolTip = 'Specifies the value of the Maximum Inventory field';
+                    ToolTip = 'Specifies the maximum inventory of the item selected';
                     ApplicationArea = NPRRetail;
                 }
                 field("Minimum Order Quantity"; Rec."Minimum Order Quantity")
                 {
-
-                    ToolTip = 'Specifies the value of the Minimum Order Quantity field';
+                    ToolTip = 'Specifies the minimum order quantity of the item selected';
                     ApplicationArea = NPRRetail;
                 }
                 field("Maximum Order Quantity"; Rec."Maximum Order Quantity")
                 {
-
-                    ToolTip = 'Specifies the value of the Maximum Order Quantity field';
+                    ToolTip = 'Specifies the maximum order quantity of the item selected';
                     ApplicationArea = NPRRetail;
                 }
                 field("Safety Stock Quantity"; Rec."Safety Stock Quantity")
                 {
-
-                    ToolTip = 'Specifies the value of the Safety Stock Quantity field';
+                    ToolTip = 'Specifies the safety stock quantity.';
                     ApplicationArea = NPRRetail;
                 }
             }

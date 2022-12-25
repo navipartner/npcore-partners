@@ -26,28 +26,28 @@
 
                     Caption = 'Mix No.';
                     Editable = false;
-                    ToolTip = 'Specifies the number of the mixed discount.';
+                    ToolTip = 'Specifies the number of the mix discount';
                     ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the status of the mixed discount.';
+                    ToolTip = 'Specifies the status of the mix discount';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the description of the mixed discount.';
+                    ToolTip = 'Specifies the description of the mix discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Mix Type"; Rec."Mix Type")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the type of the mixed discount.';
+                    ToolTip = 'Specifies the mix type of the mix discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Min. Quantity"; Rec."Min. Quantity")
@@ -55,14 +55,14 @@
 
                     BlankZero = true;
                     Editable = false;
-                    ToolTip = 'Specifies the minimum quantity of the mixed discount.';
+                    ToolTip = 'Specifies the minimum quantity of the mix discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Type"; Rec."Discount Type")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the discount type of the mixed discount.';
+                    ToolTip = 'Specifies the discount type of the mix discount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Total Amount"; Rec."Total Amount")
@@ -70,7 +70,7 @@
 
                     BlankZero = true;
                     Editable = false;
-                    ToolTip = 'Specifies the total amount of the mixed discount.';
+                    ToolTip = 'Specifies the total amount of the mix discount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Total Discount %"; Rec."Total Discount %")
@@ -78,7 +78,7 @@
 
                     BlankZero = true;
                     Editable = false;
-                    ToolTip = 'Specifies the total discount in percentage.';
+                    ToolTip = 'Specifies the total discount amount of the mix discount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Total Discount Amount"; Rec."Total Discount Amount")
@@ -86,14 +86,14 @@
 
                     BlankZero = true;
                     Editable = false;
-                    ToolTip = 'Specifies the total discount amount.';
+                    ToolTip = 'Specifies the total discount amount of the mix discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Starting date"; Rec."Starting date")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the start date of the mixed discount.';
+                    ToolTip = 'Specifies the start date of the mix discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Starting time"; Rec."Starting time")
@@ -101,14 +101,14 @@
 
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the start time of the mixed discount.';
+                    ToolTip = 'Specifies the start time of the mix discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ending date"; Rec."Ending date")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the end date of the mixed discount.';
+                    ToolTip = 'Specifies the end date of the mix discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ending time"; Rec."Ending time")
@@ -116,7 +116,7 @@
 
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the end time of the mixed discount.';
+                    ToolTip = 'Specifies the end time of the mix discount.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Created the"; Rec."Created the")
@@ -124,7 +124,7 @@
 
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the creation date of the mixed discount';
+                    ToolTip = 'Specifies the date on which the mix discount was created.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Last Date Modified"; Rec."Last Date Modified")
@@ -132,14 +132,14 @@
 
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the date when the mixed discount was last modified.';
+                    ToolTip = 'Specifies the last date on which the mix discount has been modified.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Lot; Rec.Lot)
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the lot of the mixed discount.';
+                    ToolTip = 'Specifies the lot of the mix discount';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -159,7 +159,7 @@
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
 
-                ToolTip = 'View the dimensions or enter a new dimension for the selected record.';
+                ToolTip = 'Displays the dimensions of the selected mix discount. You can manage the dimensions for the selected mix discount';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

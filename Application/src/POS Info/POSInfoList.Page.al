@@ -22,44 +22,37 @@
                 Caption = 'Group';
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of the POS info';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the POS info';
                     ApplicationArea = NPRRetail;
                 }
                 field("Message"; Rec.Message)
                 {
-
-                    ToolTip = 'Specifies the value of the Message field';
+                    ToolTip = 'Specifies the message of the POS info';
                     ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-
-                    ToolTip = 'Specifies the value of the Type field';
+                    ToolTip = 'Specifies the type of the POS info';
                     ApplicationArea = NPRRetail;
                 }
                 field("Input Type"; Rec."Input Type")
                 {
-
-                    ToolTip = 'Specifies the value of the Input Type field';
+                    ToolTip = 'Specifies the input type for the POS info';
                     ApplicationArea = NPRRetail;
                 }
                 field("Input Mandatory"; Rec."Input Mandatory")
                 {
-
-                    ToolTip = 'Specifies the value of the Input Mandatory field';
+                    ToolTip = 'Specifies whether the input is mandatory for the POS.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Copy from Header"; Rec."Copy from Header")
                 {
-
-                    ToolTip = 'Specifies the value of the Copy from Header field';
+                    ToolTip = 'Specifies whether the information from the header should be copied to the POS Info Card.';
                     ApplicationArea = NPRRetail;
                 }
             }

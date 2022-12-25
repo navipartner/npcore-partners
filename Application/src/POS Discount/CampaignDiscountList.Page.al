@@ -30,49 +30,49 @@
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies code of the period discount.';
+                    ToolTip = 'Specifies the code of the campaign discount';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the description of the period discount.';
+                    ToolTip = 'Specifies the description of the campaign discount';
                     ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the status of the period discount.';
+                    ToolTip = 'Specifies the status of the campaign discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the starting date of the period discount.';
+                    ToolTip = 'Specifies the starting date of the campaign discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the closing date of the period discount.';
+                    ToolTip = 'Specifies the closing date of the campaign discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Period Type"; Rec."Period Type")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the period type.';
+                    ToolTip = 'Specifies the period type of the campaign discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Period Description"; Rec."Period Description")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the period description.';
+                    ToolTip = 'Specifies the period description of the campaign discount';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -92,7 +92,7 @@
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
 
-                ToolTip = 'View existing dimensions or enter a new dimension for the selected record.';
+                ToolTip = 'Displays the dimensions of the selected campaign discount. You can manage the dimensions for the selected campaign discount';
                 ApplicationArea = NPRRetail;
             }
         }

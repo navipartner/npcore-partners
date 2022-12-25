@@ -18,126 +18,107 @@
                 ShowCaption = false;
                 field(Name; Rec.Name)
                 {
-
-                    ToolTip = 'Specifies the value of the Name field.';
+                    ToolTip = 'Specifies the name of the item worksheet template';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field.';
+                    ToolTip = 'Specifies the description of the item worksheet template.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item No. Creation by"; Rec."Item No. Creation by")
                 {
-
-                    ToolTip = 'Specifies the value of the Item No. Creation by field.';
+                    ToolTip = 'Specifies how the item numbers should be created';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item No. Prefix"; Rec."Item No. Prefix")
                 {
-
-                    ToolTip = 'Specifies the value of the Item No. Prefix field.';
+                    ToolTip = 'Specifies where to get the prefix for item numbers if the prefix is needed for item numbering';
                     ApplicationArea = NPRRetail;
                 }
                 field("Prefix Code"; Rec."Prefix Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Prefix Code field.';
+                    ToolTip = 'Specifies the prefix code used on the item number';
                     ApplicationArea = NPRRetail;
                 }
                 field("No. Series"; Rec."No. Series")
                 {
-
-                    ToolTip = 'Specifies the value of the No. Series field.';
+                    ToolTip = 'Specifies the number series used for item numbering.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Error Handling"; Rec."Error Handling")
                 {
-
-                    ToolTip = 'Specifies the value of the Error Handling field.';
+                    ToolTip = 'Specifies how the errors are going to be handled during item import';
                     ApplicationArea = NPRRetail;
                 }
                 field("Test Validation"; Rec."Test Validation")
                 {
-
-                    ToolTip = 'Specifies the value of the Test Validation field.';
+                    ToolTip = 'Specifies if and where the test validation should be performed before the item import.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Create Internal Barcodes"; Rec."Create Internal Barcodes")
                 {
-
-                    ToolTip = 'Specifies the value of the Create Internal Barcodes field.';
+                    ToolTip = 'Specifies if internal barcodes should be created or not. If yes, the manner in which they are created also needs to be specified.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Create Vendor  Barcodes"; Rec."Create Vendor  Barcodes")
                 {
-
-                    ToolTip = 'Specifies the value of the Create Vendor  Barcodes field.';
+                    ToolTip = 'Specifies if vendor barcodes should be created or not. If yes, the manner in which they are created also needs to be specified.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales Price Handling"; Rec."Sales Price Handling")
                 {
-
-                    ToolTip = 'Specifies the value of the Sales Price Handling field.';
+                    ToolTip = 'Specifies how the sales prices are going to be handled';
                     ApplicationArea = NPRRetail;
                 }
                 field("Purchase Price Handling"; Rec."Purchase Price Handling")
                 {
-
-                    ToolTip = 'Specifies the value of the Purchase Price Handling field.';
+                    ToolTip = 'Specifies how the purchase prices are going to be handled';
                     ApplicationArea = NPRRetail;
                 }
                 field("Combine Variants to Item by"; Rec."Combine Variants to Item by")
                 {
-                    ToolTip = 'Specifies under which criteria variants should be combined';
+                    ToolTip = 'Specifies how the variants are going to be combined for each item';
                     ApplicationArea = NPRRetail;
                 }
                 field("Combine as Background Task"; Rec."Combine as Background Task")
                 {
                     ToolTip = 'Specifies whether combining variants process should be executed as a background task.';
                     ApplicationArea = NPRRetail;
-                }                
+                }
                 field("Register Lines"; Rec."Register Lines")
                 {
-
-                    ToolTip = 'Specifies the value of the Register Lines field.';
+                    ToolTip = 'Create a Registered Item Worksheet record and the associated records when the lines are registered successfully.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Delete Processed Lines"; Rec."Delete Processed Lines")
                 {
-
-                    ToolTip = 'Specifies the value of the Delete Processed Lines field.';
+                    ToolTip = 'Delete the lines in the Item Worksheet as soon as they are registered successfully.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Delete Unvalidated Duplicates"; Rec."Delete Unvalidated Duplicates")
                 {
-
-                    ToolTip = 'Specifies the value of the Delete Unvalidated Duplicates field.';
+                    ToolTip = 'Delete all non-validated duplicates.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Allow Web Service Update"; Rec."Allow Web Service Update")
                 {
-
-                    ToolTip = 'Specifies the value of the Allow Web Service Update field.';
+                    ToolTip = 'Specifies if the item worksheet template will allow web service update or not.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Info Query Name"; Rec."Item Info Query Name")
                 {
-
-                    ToolTip = 'Specifies the value of the Item Info Query Name field.';
+                    ToolTip = 'Specifies the item info query name of the item worksheet template';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Info Query Type"; Rec."Item Info Query Type")
                 {
-
-                    ToolTip = 'Specifies the value of the Item Info Query Type field.';
+                    ToolTip = 'Specifies the item info query type of the item worksheet template';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Info Query By"; Rec."Item Info Query By")
                 {
-
-                    ToolTip = 'Specifies the value of the Item Info Query By field.';
+                    ToolTip = 'Specifies how the web service should do the query for items';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -161,7 +142,7 @@
                 RunPageView = SORTING("Item Template Name", Name)
                               ORDER(Ascending);
 
-                ToolTip = 'Executes the Worksheets action.';
+                ToolTip = 'Displays all the worksheets for the seletem item worksheet template';
                 ApplicationArea = NPRRetail;
             }
             action("Field Setup")
@@ -169,7 +150,7 @@
                 Caption = 'Field Setup';
                 Image = MapAccounts;
 
-                ToolTip = 'Executes the Field Setup action.';
+                ToolTip = 'Displays the field setup for the selected item worksheet template';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
