@@ -157,6 +157,7 @@
         ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByPeriod());
     end;
 
+#IF NOT CLOUD
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'OnDrillDownVarietyMatrix', '', true, false)]
     local procedure LookupAvailabilityByTimeLine(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     var
@@ -172,6 +173,7 @@
         ItemAvailByTimeline.SetItem(Item);
         ItemAvailByTimeline.Run();
     end;
+#ENDIF
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Matrix Management", 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetItemReference(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
