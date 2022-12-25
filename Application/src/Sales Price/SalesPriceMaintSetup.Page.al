@@ -16,57 +16,57 @@
             {
                 field(Id; Rec.Id)
                 {
-                    ToolTip = 'Specifies the value of the Id field';
+                    ToolTip = 'Specifies the ID of the sales price maintenance';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales Type"; Rec."Sales Type")
                 {
-                    ToolTip = 'Specifies the value of the Sales Type field';
+                    ToolTip = 'Specifies the sales type of the sales price maintenance';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales Code"; Rec."Sales Code")
                 {
-                    ToolTip = 'Specifies the value of the Sales Code field';
+                    ToolTip = 'Specifies the sales code of the sales price maintenance';
                     ApplicationArea = NPRRetail;
                 }
                 field("Price List Code"; Rec."Price List Code")
                 {
-                    ToolTip = 'Specifies the value of the Price List Code field';
+                    ToolTip = 'Specifies the price list code of the sales price maintenance';
                     ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-                    ToolTip = 'Specifies the value of the Currency Code field';
+                    ToolTip = 'Specifies the currency code of the sales price maintenance';
                     ApplicationArea = NPRRetail;
                 }
                 field("Prices Including VAT"; Rec."Prices Including VAT")
                 {
-                    ToolTip = 'Specifies the value of the Prices Including VAT field';
+                    ToolTip = 'Specifies if the prices should include VAT or not for the sales price maintenance';
                     ApplicationArea = NPRRetail;
                 }
                 field("VAT Bus. Posting Gr. (Price)"; Rec."VAT Bus. Posting Gr. (Price)")
                 {
-                    ToolTip = 'Specifies the value of the VAT Bus. Posting Gr. (Price) field';
+                    ToolTip = 'Specifies the VAT business posting group for the sales price maintenance.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Allow Invoice Disc."; Rec."Allow Invoice Disc.")
                 {
-                    ToolTip = 'Specifies the value of the Allow Invoice Disc. field';
+                    ToolTip = 'Specifies if an invoice discount should be allowed or not';
                     ApplicationArea = NPRRetail;
                 }
                 field("Allow Line Disc."; Rec."Allow Line Disc.")
                 {
-                    ToolTip = 'Specifies the value of the Allow Line Disc. field';
+                    ToolTip = 'Specifies if an invoice line discount should be allowed or not';
                     ApplicationArea = NPRRetail;
                 }
                 field("Internal Unit Price"; Rec."Internal Unit Price")
                 {
-                    ToolTip = 'Specifies the value of the Internal Unit Price field';
+                    ToolTip = 'Specifies the internal unit price for the sales price maintenance';
                     ApplicationArea = NPRRetail;
                 }
                 field(Factor; Rec.Factor)
                 {
-                    ToolTip = 'Specifies the value of the Factor field';
+                    ToolTip = 'Specifies the factor for the unit price';
                     ApplicationArea = NPRRetail;
                 }
             }

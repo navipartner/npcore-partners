@@ -21,14 +21,12 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of the client attribute';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the name of the client attribute';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -48,7 +46,7 @@
                 RunPageView = SORTING("Attribute Code")
                               ORDER(Ascending);
 
-                ToolTip = 'Executes the Attribute ID action';
+                ToolTip = 'Displays the attributes configured for the selected client attribute. You can add or edit attributes.';
                 ApplicationArea = NPRRetail;
             }
             action(Translations)
@@ -59,7 +57,7 @@
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code", "Language ID");
 
-                ToolTip = 'Executes the Translations action';
+                ToolTip = 'Displays the translations configured for the selected client attribute. You can add or edit translations.';
                 ApplicationArea = NPRRetail;
             }
             action(Values)
@@ -70,7 +68,7 @@
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code");
 
-                ToolTip = 'Executes the Values action';
+                ToolTip = 'Displays the values configured for the selected client attribute. You can add or edit values.';
                 ApplicationArea = NPRRetail;
             }
         }

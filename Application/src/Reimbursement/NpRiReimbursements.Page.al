@@ -17,117 +17,106 @@
             {
                 field("Party Type"; Rec."Party Type")
                 {
-
-                    ToolTip = 'Specifies the value of the Party Type field';
+                    ToolTip = 'Specifies the party type of the reimbursement';
                     ApplicationArea = NPRRetail;
                 }
                 field("Party No."; Rec."Party No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Party No. field';
+                    ToolTip = 'Specifies the party number of the reimbursement';
                     ApplicationArea = NPRRetail;
                 }
                 field("Template Code"; Rec."Template Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Template Code field';
+                    ToolTip = 'Specifies the template code of the reimbursement';
                     ApplicationArea = NPRRetail;
                 }
                 field("Data Collection Module"; Rec."Data Collection Module")
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Data Collection Module field';
+                    ToolTip = 'Specifies the data collection module of the reimbursement';
                     ApplicationArea = NPRRetail;
                 }
                 field("Data Collection Company"; Rec."Data Collection Company")
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Data Collection Company field';
+                    ToolTip = 'Specifies the data collection company of the reimbursement';
                     ApplicationArea = NPRRetail;
                 }
                 field("Data Collection Summary"; Rec."Data Collection Summary")
                 {
-
-                    ToolTip = 'Specifies the value of the Data Collection Summary field';
+                    ToolTip = 'Specifies the data collection summary of the reimbursement';
                     ApplicationArea = NPRRetail;
                 }
                 field("From Date"; Rec."From Date")
                 {
-
-                    ToolTip = 'Specifies the value of the From Date field';
+                    ToolTip = 'Specifies from which date this reimbursement is active.';
                     ApplicationArea = NPRRetail;
                 }
                 field("To Date"; Rec."To Date")
                 {
-
-                    ToolTip = 'Specifies the value of the To Date field';
+                    ToolTip = 'Specifies the date until which this reimbursement is active.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Last Data Collect Entry No."; Rec."Last Data Collect Entry No.")
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Last Data Collect Entry No. field';
+                    ToolTip = 'Specifies the last data collect entry number of the reimbursement';
                     ApplicationArea = NPRRetail;
                 }
                 field("Last Data Collection at"; Rec."Last Data Collection at")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Last Data Collection at field';
+                    ToolTip = 'Specifies when the last data collection for the reimbursement has been performed.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reimbursement Module"; Rec."Reimbursement Module")
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Reimbursement Module field';
+                    ToolTip = 'Specifies the reimbursement module applied to the reimbursement.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reimbursement Summary"; Rec."Reimbursement Summary")
                 {
-
-                    ToolTip = 'Specifies the value of the Reimbursement Summary field';
+                    ToolTip = 'Specifies the reimbursement summary of the reimbursement';
                     ApplicationArea = NPRRetail;
                 }
                 field("Last Posting Date"; Rec."Last Posting Date")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Last Posting Date field';
+                    ToolTip = 'Specifies the last posting date of the reimbursement';
                     ApplicationArea = NPRRetail;
                 }
                 field("Last Reimbursement at"; Rec."Last Reimbursement at")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Last Reimbursement at field';
+                    ToolTip = 'Specifies when the previous data reimbursement was performed.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reimbursement Date"; Rec."Reimbursement Date")
                 {
-
-                    ToolTip = 'Specifies the value of the Reimbursement Date field';
+                    ToolTip = 'Specifies the reimbursement date';
                     ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
-
-                    ToolTip = 'Specifies the value of the Posting Date field';
+                    ToolTip = 'Specifies the posting date of the reimbursement';
                     ApplicationArea = NPRRetail;
                 }
                 field(Balance; Rec.Balance)
                 {
-
-                    ToolTip = 'Specifies the value of the Balance field';
+                    ToolTip = 'Specifies the balance of the reimbursement';
                     ApplicationArea = NPRRetail;
                 }
                 field(Deactivated; Rec.Deactivated)
                 {
-
-                    ToolTip = 'Specifies the value of the Deactivated field';
+                    ToolTip = 'Deactivate the reimbursement.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -147,7 +136,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Run Data Collection action';
+                ToolTip = 'Run data collection for the selected reimbursement.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -169,7 +158,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Run Reimbursement action';
+                ToolTip = 'Execute the selected reimbursement.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -195,7 +184,7 @@
                               "Template Code" = FIELD("Template Code");
                 ShortCutKey = 'Ctrl+F7';
 
-                ToolTip = 'Executes the Entries action';
+                ToolTip = 'Displays the entries for the selected reimbursement.';
                 ApplicationArea = NPRRetail;
             }
         }

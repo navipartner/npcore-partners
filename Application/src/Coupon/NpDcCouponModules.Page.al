@@ -18,32 +18,27 @@
             {
                 field(Type; Rec.Type)
                 {
-
-                    ToolTip = 'Specifies the value of the Type field';
+                    ToolTip = 'Specifies the type of the action executed on the coupon type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of the coupon type';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the coupon type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Event Codeunit ID"; Rec."Event Codeunit ID")
                 {
-
-                    ToolTip = 'Specifies the value of the Event Codeunit ID field';
+                    ToolTip = 'Specifies the codeunit ID executed for a specific coupon module.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Event Codeunit Name"; Rec."Event Codeunit Name")
                 {
-
-                    ToolTip = 'Specifies the value of the Event Codeunit Name field';
+                    ToolTip = 'Specifies the codeunit name executed for the action';
                     ApplicationArea = NPRRetail;
                 }
             }

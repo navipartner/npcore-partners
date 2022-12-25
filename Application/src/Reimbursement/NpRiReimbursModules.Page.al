@@ -18,33 +18,31 @@
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of the reimbursement module';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the reimbursement module';
                     ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Type field';
+                    ToolTip = 'Specifies the type of the reimbursement module';
                     ApplicationArea = NPRRetail;
                 }
                 field("Subscriber Codeunit ID"; Rec."Subscriber Codeunit ID")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Subscriber Codeunit ID field';
+                    ToolTip = 'Specifies the subscriber codeunit ID executed for the reimbursement module';
                     ApplicationArea = NPRRetail;
                 }
                 field("Subscriber Codeunit Name"; Rec."Subscriber Codeunit Name")
                 {
-
-                    ToolTip = 'Specifies the value of the Subscriber Codeunit Name field';
+                    ToolTip = 'Specifies the subscriber codeunit name executed for the reimbursement module';
                     ApplicationArea = NPRRetail;
                 }
             }
