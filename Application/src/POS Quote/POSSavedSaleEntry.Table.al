@@ -136,7 +136,8 @@
         POSQuoteLine: Record "NPR POS Saved Sale Line";
     begin
         POSQuoteLine.SetRange("Quote Entry No.", "Entry No.");
-        POSQuoteLine.DeleteAll(not SkipLineDeleteTriggerValue);
+        if not POSQuoteLine.IsEmpty() then
+            POSQuoteLine.DeleteAll(not SkipLineDeleteTriggerValue);
     end;
 
     var

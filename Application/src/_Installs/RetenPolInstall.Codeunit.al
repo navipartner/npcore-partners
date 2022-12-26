@@ -38,8 +38,6 @@
 
             AddAllowedTable(Database::"NPR POS Posting Log", Enum::"Retention Period Enum"::"6 Months", Enum::"Reten. Pol. Deleting"::Default);
 
-            AddAllowedTable(Database::"NPR POS Saved Sale Entry", Enum::"Retention Period Enum"::"3 Months", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR POS Saved Sale Line", Enum::"Retention Period Enum"::"3 Months", Enum::"Reten. Pol. Deleting"::Default);
             AddAllowedTable(Database::"NPR NpCs Arch. Document", Enum::"Retention Period Enum"::"1 Year", Enum::"Reten. Pol. Deleting"::Default);
 
             AddAllowedTable(Database::"NPR Exchange Label", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
@@ -70,6 +68,11 @@
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSLayoutArchive')) then begin
             AddAllowedTable(Database::"NPR POS Layout Archive", Enum::"Retention Period Enum"::"6 Months", Enum::"Reten. Pol. Deleting"::Default);
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSLayoutArchive'));
+        end;
+
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSSavedSales')) then begin
+            AddPosSavedSalesRetentionPolicy();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSSavedSales'));
         end;
 
         LogMessageStopwatch.LogFinish();
@@ -128,6 +131,40 @@
         RetentionPolicySetup.Validate("Retention Period", RetentionPeriodCode);
         RetentionPolicySetup.Validate(Enabled, true);
         RetentionPolicySetup.Insert(true);
+    end;
+
+    local procedure AddPosSavedSalesRetentionPolicy()
+    var
+        POSSavedSaleEntry: Record "NPR POS Saved Sale Entry";
+        RetentionPolicySetup: Record "Retention Policy Setup";
+        RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
+        RecRef: RecordRef;
+        RtnPeriodEnum: Enum "Retention Period Enum";
+        TableFilters: JsonArray;
+    begin
+        if RetentionPolicySetup.Get(Database::"NPR POS Saved Sale Line") then
+            RetentionPolicySetup.Delete(true);
+        if RetenPolAllowedTables.IsAllowedTable(Database::"NPR POS Saved Sale Line") then
+            RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR POS Saved Sale Line");
+
+        if RetentionPolicySetup.Get(Database::"NPR POS Saved Sale Entry") then
+            RetentionPolicySetup.Delete(true);
+        if RetenPolAllowedTables.IsAllowedTable(Database::"NPR POS Saved Sale Entry") then
+            RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR POS Saved Sale Entry");
+
+        POSSavedSaleEntry.SetRange("Contains EFT Approval", true);
+        RtnPeriodEnum := RtnPeriodEnum::"Never Delete";
+        RecRef.GetTable(POSSavedSaleEntry);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, true, RecRef);
+
+        POSSavedSaleEntry.SetRange("Contains EFT Approval", false);
+        RtnPeriodEnum := RtnPeriodEnum::"3 Months";
+        RecRef.GetTable(POSSavedSaleEntry);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, false, RecRef);
+
+        RetenPolAllowedTables.AddAllowedTable(Database::"NPR POS Saved Sale Entry", RecRef.SystemCreatedAtNo(), TableFilters);
+
+        CreateRetentionPolicySetup(Database::"NPR POS Saved Sale Entry", GetRetentionPeriodCode(RtnPeriodEnum));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnBeforeOnRun', '', false, false)]
