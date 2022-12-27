@@ -905,39 +905,22 @@
                     ToolTip = 'Displays the mixed discount list.';
                     ApplicationArea = NPRRetail;
                 }
+
                 action("Coupon List")
                 {
-                    Visible = false;
                     Caption = 'Coupon List';
+                    Image = List;
                     RunObject = page "NPR NpDc Coupons";
-
-                    ToolTip = 'Displays the coupon list.';
                     ApplicationArea = NPRRetail;
-                }
-                action("Coupon Types")
-                {
-                    Caption = 'Coupon Types';
-                    Image = List;
-                    RunObject = page "NPR NpDc Coupon Types";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'View or edit the Coupon Types';
-                }
-                action("Voucher Types")
-                {
-                    Caption = 'Voucher Types';
-                    Image = List;
-                    RunObject = page "NPR NpRv Voucher Types";
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'View or edit the Voucher Types';
+                    ToolTip = 'View or edit the Coupon List';
                 }
                 action("Voucher List")
                 {
-                    Visible = false;
                     Caption = 'Voucher List';
+                    Image = List;
                     RunObject = page "NPR NpRv Vouchers";
-
-                    ToolTip = 'Displays the voucher list.';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'View or edit the Voucher List';
                 }
             }
         }
