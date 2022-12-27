@@ -318,6 +318,51 @@
         UpdateItemRefDescriptions(Rec, Rec.FieldNo("Description 2"));
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Item Reference", 'OnAfterValidateEvent', 'Variant Code', false, false)]
+    local procedure ItemRefOnAfterValidateVariantCode(var Rec: Record "Item Reference"; var xRec: Record "Item Reference"; CurrFieldNo: Integer)
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        UpdateItemRefDescriptions(Rec, CurrFieldNo);
+    end;
+
+    local procedure UpdateItemRefDescriptions(var ItemRef: Record "Item Reference"; ChangedFieldNo: Integer)
+    var
+        VRTSetup: Record "NPR Variety Setup";
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+    begin
+        if not (VRTSetup.Get()) then
+            exit;
+        if not (ChangedFieldNo = ItemRef.FieldNo("Variant Code")) then
+            exit;
+        if not Item.Get(ItemRef."Item No.") then
+            exit;
+        if not ItemVariant.Get(ItemRef."Item No.", ItemRef."Variant Code") then
+            exit;
+
+        case VRTSetup."Item Cross Ref. Description(V)" of
+            VRTSetup."Item Cross Ref. Description(V)"::ItemDescription1:
+                ItemRef.Description := Item.Description;
+            VRTSetup."Item Cross Ref. Description(V)"::ItemDescription2:
+                ItemRef.Description := Item."Description 2";
+            VRTSetup."Item Cross Ref. Description(V)"::VariantDescription1:
+                ItemRef.Description := ItemVariant.Description;
+            VRTSetup."Item Cross Ref. Description(V)"::VariantDescription2:
+                ItemRef.Description := ItemVariant."Description 2";
+        end;
+        case VRTSetup."Item Ref. Description 2 (V)" of
+            VRTSetup."Item Ref. Description 2 (V)"::ItemDescription1:
+                ItemRef."Description 2" := CopyStr(Item.Description, 1, MaxStrLen(ItemRef."Description 2"));
+            VRTSetup."Item Ref. Description 2 (V)"::ItemDescription2:
+                ItemRef."Description 2" := Item."Description 2";
+            VRTSetup."Item Ref. Description 2 (V)"::VariantDescription1:
+                ItemRef."Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen(ItemRef."Description 2"));
+            VRTSetup."Item Ref. Description 2 (V)"::VariantDescription2:
+                ItemRef."Description 2" := ItemVariant."Description 2";
+        end;
+    end;
+
     local procedure UpdateItemRefDescriptions(Item: Record Item; ChangedFieldNo: Integer)
     var
         ItemReference: Record "Item Reference";
