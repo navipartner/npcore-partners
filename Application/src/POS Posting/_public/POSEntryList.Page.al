@@ -284,12 +284,8 @@
                 PromotedIsBig = true;
                 ToolTip = 'Displays the POS posting log entries.';
                 ApplicationArea = NPRRetail;
-                trigger OnAction()
-                var
-                    POSPostingLog: Record "NPR POS Posting Log";
-                begin
-                    POSPostingLog.OpenPOSPostingLog(Rec, false);
-                end;
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Action will be removed.';
             }
             action("Sales Lines")
             {
@@ -771,22 +767,9 @@
                 PromotedIsBig = true;
                 ToolTip = 'Posts the selected entry.';
                 ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    POSPostEntries: Codeunit "NPR POS Post Entries";
-                    POSEntryToPost: Record "NPR POS Entry";
-                begin
-                    POSEntryToPost.SetRange("Entry No.", Rec."Entry No.");
-                    if Rec."Post Item Entry Status" < Rec."Post Item Entry Status"::Posted then
-                        POSPostEntries.SetPostItemEntries(true);
-                    if Rec."Post Entry Status" < Rec."Post Entry Status"::Posted then
-                        POSPostEntries.SetPostPOSEntries(true);
-                    POSPostEntries.SetStopOnError(true);
-                    POSPostEntries.SetPostCompressed(false);
-                    POSPostEntries.Run(POSEntryToPost);
-                    CurrPage.Update(false);
-                end;
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Action will be removed.';
+                Visible = false;
             }
             action("Post Range")
             {
@@ -798,16 +781,9 @@
                 PromotedIsBig = true;
                 ToolTip = 'Gives the opportunity to post for a specific range of transactions.';
                 ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    POSPostingAction: Report "NPR POS Posting Action";
-                begin
-                    POSPostingAction.SetPOSEntries(Rec);
-                    POSPostingAction.SetGlobalValues(false, false, true, false, false, true);
-                    POSPostingAction.RunModal();
-                    CurrPage.Update(false);
-                end;
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Action will be removed.';
+                Visible = false;
             }
             action(Action6014435)
             {
