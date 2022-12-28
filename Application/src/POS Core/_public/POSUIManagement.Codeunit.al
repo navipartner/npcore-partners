@@ -228,84 +228,9 @@
         FrontEnd.ConfigureTheme(Theme);
     end;
 
+    [Obsolete('Pending removal, not used')]
     procedure InitializeAdministrativeTemplates(POSUnit: Record "NPR POS Unit")
-    var
-        AdminTemplate: Record "NPR POS Admin. Template";
-        AdminTemplateScope: Record "NPR POS Admin. Template Scope";
-        TempAdminTemplateScope: Record "NPR POS Admin. Template Scope" temporary;
-        Templates: JsonArray;
-        Template: JsonObject;
     begin
-        AdminTemplateScope.SetCurrentKey("Applies To", "Applies To Code");
-        AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::All);
-        if AdminTemplateScope.FindSet() then
-            repeat
-                TempAdminTemplateScope := AdminTemplateScope;
-                TempAdminTemplateScope.Insert();
-            until AdminTemplateScope.Next() = 0;
-
-        AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::"POS Unit");
-        AdminTemplateScope.SetRange("Applies To Code", POSUnit."No.");
-        if AdminTemplateScope.FindSet() then
-            repeat
-                TempAdminTemplateScope := AdminTemplateScope;
-                TempAdminTemplateScope.Insert();
-            until AdminTemplateScope.Next() = 0;
-
-        AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::User);
-        AdminTemplateScope.SetRange("Applies To Code", UserId);
-        if AdminTemplateScope.FindSet() then
-            repeat
-                TempAdminTemplateScope := AdminTemplateScope;
-                TempAdminTemplateScope.Insert();
-            until AdminTemplateScope.Next() = 0;
-
-        if TempAdminTemplateScope.IsEmpty then
-            exit;
-
-        TempAdminTemplateScope.FindSet();
-        repeat
-            if AdminTemplate.Get(TempAdminTemplateScope."POS Admin. Template Id") and (AdminTemplate.Status <> AdminTemplate.Status::Draft) then begin
-                Template := CreateAdministrativeTemplatePolicy(AdminTemplate.Id, AdminTemplate."Persist on Client", TempAdminTemplateScope."Applies To");
-                case AdminTemplate.Status of
-                    AdminTemplate.Status::Active:
-                        begin
-                            ApplyAdministrativeTemplatePasswordPolicy(Template, 'roleCenter', AdminTemplate."Role Center", AdminTemplate."Role Center Password");
-                            ApplyAdministrativeTemplatePasswordPolicy(Template, 'configuration', AdminTemplate.Configuration, AdminTemplate."Configuration Password");
-                        end;
-                    AdminTemplate.Status::Retired:
-                        Template.Add('retired', true);
-                end;
-            end;
-            Templates.Add(Template);
-        until TempAdminTemplateScope.Next() = 0;
-        FrontEnd.ApplyAdministrativeTemplates(Templates);
-    end;
-
-    local procedure CreateAdministrativeTemplatePolicy(Id: Guid; Persist: Boolean; AppliesTo: Integer) Template: JsonObject;
-    begin
-        Template.Add('id', Id);
-        Template.Add('persist', Persist);
-        Template.Add('strength', AppliesTo);
-    end;
-
-    local procedure ApplyAdministrativeTemplatePasswordPolicy(Template: JsonObject; PolicyName: Text; Policy: Option "Not Defined",Visible,Disabled,Hidden,Password; Password: Text)
-    var
-        PolicyObject: JsonObject;
-    begin
-        case Policy of
-            Policy::Disabled:
-                Template.Add(PolicyName, 'deny');
-            Policy::Hidden:
-                Template.Add(PolicyName, 'hide');
-            Policy::Visible:
-                Template.Add(PolicyName, 'allow');
-            Policy::Password:
-                begin
-                    PolicyObject.Add('password', Password);
-                    Template.Add(PolicyName, PolicyObject);
-                end;
-        end;
     end;
 
     procedure ConfigureFonts()
