@@ -17,25 +17,21 @@
             {
                 field("Membership Code"; Rec."Membership Code")
                 {
-
                     ToolTip = 'Specifies the value of the Membership Code field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Message Type"; Rec."Message Type")
                 {
-
                     ToolTip = 'Specifies the value of the Message Type field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Preferred Method"; Rec."Preferred Method")
                 {
-
                     ToolTip = 'Specifies the value of the Preferred Method field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Notification Engine"; Rec."Notification Engine")
                 {
-
                     ToolTip = 'Specifies the value of the Notification Engine field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
@@ -69,7 +65,6 @@
                     Rec.CalcFields("Sender Template");
                     if (not REc."Sender Template".HasValue()) then begin
 
-
                         if (Rec."Notification Engine" = Rec."Notification Engine"::M2_EMAILER) then
                             if (Rec."Message Type" = REc."Message Type"::WELCOME) then
                                 PassData := MemberNotification.GetDefaultM2WelcomeEmailTemplate();
@@ -92,14 +87,12 @@
                 end;
             }
 
-
             action(ImportSenderTemplateFile)
             {
                 Caption = 'Import Sender Template File';
                 ToolTip = 'Define information sent to wallet.';
                 Image = ImportCodes;
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-
 
                 trigger OnAction()
                 var
@@ -124,6 +117,44 @@
                 end;
             }
 
+            action(UpdateMembershipMembers)
+            {
+                Caption = 'Update Members';
+                ToolTip = 'This action will iterate all members for the selected membership and apply the default settings non-destructively.';
+                Image = ImportCodes;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Scope = Repeater;
+
+                trigger OnAction()
+                var
+                    MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                    Membership: Record "NPR MM Membership";
+                    ApplyDefault: Label 'Apply the default communication setup to %1 memberships?';
+                    MembershipCount, ProcessCount : Integer;
+                    Window: Dialog;
+                    MembershipUpdate: Label 'Processing #1###### of #2######', Comment = 'Do not translate the #1###### and #2###### part of the string.';
+                begin
+                    Membership.SetFilter("Membership Code", '=%1', Rec."Membership Code");
+                    MembershipCount := Membership.Count();
+                    if (not Confirm(ApplyDefault, true, MembershipCount)) then
+                        exit;
+
+                    Window.Open(MembershipUpdate);
+                    Window.Update(1, ProcessCount);
+                    Window.Update(2, MembershipCount);
+
+                    repeat
+                        MembershipManagement.CreateMembershipCommunicationDefaultSetup(Membership."Entry No.");
+                        ProcessCount += 1;
+                        if (ProcessCount mod 10 = 0) then begin
+                            Commit();
+                            Window.Update(1, ProcessCount);
+                        end;
+                    until (Membership.Next() = 0);
+
+                    Window.Close();
+                end;
+            }
         }
     }
 }
