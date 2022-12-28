@@ -147,8 +147,6 @@
         _FrontEnd.ConfigureSecureMethods();
         DebugWithTimestamp('InitializeTheme');
         UI.InitializeTheme(_POSUnit);
-        DebugWithTimestamp('InitializeAdminTemplates');
-        UI.InitializeAdministrativeTemplates(_POSUnit);
         DebugWithTimestamp('InitializeTelemetricsMetadata');
         _FrontEnd.InitializeTelemetricsMetadata();
         _InitializedUI := true;

@@ -532,14 +532,9 @@
     end;
 #endif
 
+    [Obsolete('Pending removal, not used')]
     procedure ApplyAdministrativeTemplates(Templates: JsonArray)
-    var
-        Request: Codeunit "NPR Front-End: ApplAdminTempl.";
     begin
-        MakeSureFrameworkIsAvailable(true);
-        Request.Initialize('1.0');
-        Request.SetTemplates(Templates);
-        InvokeFrontEndAsync(Request);
     end;
 
     [Obsolete('Action sequences are no longer supported')]
