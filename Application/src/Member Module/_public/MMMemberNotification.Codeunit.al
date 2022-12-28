@@ -18,6 +18,7 @@
         BAD_REFERENCE: Label 'The field reference {:%1} in the textline "%2" does correspond to a valid field number.';
         INLINE_NOTIFICATION: Label 'Sends Inline Member Notifications on End of Sales.';
         REFRESH_NOTIFICATION: Label 'Renew Memberships %#1 ';
+        _NOTIFICATION_ACTION: Option IGNORE,SEND,CANCEL;
 
     internal procedure HandleBatchNotifications(ReferenceDate: Date)
     var
@@ -45,22 +46,22 @@
 
     internal procedure HandleMembershipNotification(MembershipNotification: Record "NPR MM Membership Notific.")
     var
-        NotificationStatus: Integer;
+        NotificationAction: Integer;
     begin
 
-        NotificationStatus := NotificationIsValid(MembershipNotification);
-        if (NotificationStatus = 1) then begin
+        NotificationAction := NotificationIsValid(MembershipNotification);
+        if (NotificationAction = _NOTIFICATION_ACTION::SEND) then begin
             CreateRecipients(MembershipNotification);
             NotifyRecipients(MembershipNotification);
             CreateNextNotification(MembershipNotification);
             MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PROCESSED;
         end;
 
-        if (NotificationStatus = -1) then begin
+        if (NotificationAction = _NOTIFICATION_ACTION::CANCEL) then
             MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
-        end;
 
-        if (NotificationStatus <> 0) then begin
+
+        if (NotificationAction <> _NOTIFICATION_ACTION::IGNORE) then begin
             MembershipNotification."Notification Processed At" := CurrentDateTime;
             MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
             MembershipNotification.Modify();
@@ -80,19 +81,19 @@
     begin
 
         if (MembershipNotification.Blocked) then
-            exit(0);
+            exit(_NOTIFICATION_ACTION::IGNORE);
 
         if (MembershipNotification."Notification Status" <> MembershipNotification."Notification Status"::PENDING) then
-            exit(0);
+            exit(_NOTIFICATION_ACTION::IGNORE);
 
         if (not NotificationSetup.Get(MembershipNotification."Notification Code")) then
-            exit(0);
+            exit(_NOTIFICATION_ACTION::IGNORE);
 
         if (NotificationSetup."Cancel Overdue Notif. (Days)" = 0) then
             NotificationSetup."Cancel Overdue Notif. (Days)" := 7; // notification older than 7 days will be cancelled unless setup sets a different value
 
         if (MembershipNotification."Date To Notify" + Abs(NotificationSetup."Cancel Overdue Notif. (Days)") < Today) then
-            exit(-1);
+            exit(_NOTIFICATION_ACTION::CANCEL);
 
         case MembershipNotification."Notification Trigger" of
             MembershipNotification."Notification Trigger"::RENEWAL:
@@ -103,12 +104,12 @@
                         StartDate := Today();
 
                     if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
-                        exit(-1); // membership is valid, cancel notification
+                        exit(_NOTIFICATION_ACTION::CANCEL); // membership is valid, cancel notification
 
                     if (FromDate > Today) then
-                        exit(-1); // Valid in the future, but not on startdate, cancel notification
+                        exit(_NOTIFICATION_ACTION::CANCEL); // Valid in the future, but not on startdate, cancel notification
 
-                    exit(1); // Send notification
+                    exit(_NOTIFICATION_ACTION::SEND); // Send notification
                 end;
 
             MembershipNotification."Notification Trigger"::WELCOME:
@@ -119,15 +120,15 @@
                         StartDate := Today();
 
                     if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
-                        exit(1); // valid, send notification
+                        exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
 
                     if (FromDate > Today) then
-                        exit(0); //wait until membership becomes active
+                        exit(_NOTIFICATION_ACTION::IGNORE); //wait until membership becomes active
 
                     if (FromDate = 0D) then
-                        exit(0); //wait until membership becomes active, not yet activated
+                        exit(_NOTIFICATION_ACTION::IGNORE); //wait until membership becomes active, not yet activated
 
-                    exit(-1); // Cancel welcome notification
+                    exit(_NOTIFICATION_ACTION::CANCEL); // Cancel welcome notification
                 end;
             MembershipNotification."Notification Trigger"::WALLET_CREATE,
             MembershipNotification."Notification Trigger"::WALLET_UPDATE:
@@ -138,23 +139,23 @@
                         StartDate := Today();
 
                     if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
-                        exit(1); // valid, send notification
+                        exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
 
-                    exit(0); // Wait for the membership to become active
+                    exit(_NOTIFICATION_ACTION::IGNORE); // Wait for the membership to become active
                 end;
             MembershipNotification."Notification Trigger"::COUPON:
                 begin
                     if (not Coupon.Get(MembershipNotification."Coupon No.")) then
-                        exit(0); // Coupon not created yet or not valid
+                        exit(_NOTIFICATION_ACTION::IGNORE); // Coupon not created yet or not valid
 
                     if ((Coupon."Ending Date" > CreateDateTime(0D, 0T)) and (Coupon."Ending Date" < CurrentDateTime())) then
-                        exit(-1); // Coupon has expired - cancel notification
+                        exit(_NOTIFICATION_ACTION::CANCEL); // Coupon has expired - cancel notification
 
-                    exit(1); // Send
+                    exit(_NOTIFICATION_ACTION::SEND); // Send
                 end;
         end;
 
-        exit(-1);
+        exit(_NOTIFICATION_ACTION::CANCEL);
     end;
 
     local procedure CreateRecipients(MembershipNotification: Record "NPR MM Membership Notific.")
@@ -530,7 +531,7 @@
 
         MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PENDING;
         MembershipNotification."Notification Code" := NotificationSetup.Code;
-        MembershipNotification."Date To Notify" := Today + NotificationSetup."Days Past";
+        MembershipNotification."Date To Notify" := Today() + NotificationSetup."Days Past";
         MembershipNotification."Notification Trigger" := MembershipNotification."Notification Trigger"::WELCOME;
         MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
         MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
@@ -1067,7 +1068,7 @@
         Template :=
         '{' + CRLF +
           ' "membership": {' + CRLF +
-          '   "information: "FieldNumbers are based on table 6060139 - NPR MM Member Notification Entry.",' + CRLF +
+          '   "information": "FieldNumbers are based on table 6060139 - NPR MM Member Notification Entry.",' + CRLF +
           '   "membership_number": "{[101]}",' + CRLF +
           '   "member_number": "{[100]}",' + CRLF +
           '   "contact_number": "{[106]}",' + CRLF +

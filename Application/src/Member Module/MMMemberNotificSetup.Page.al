@@ -5,7 +5,6 @@
     Caption = 'Member Notification Setup';
     PageType = List;
     UsageCategory = Administration;
-
     SourceTable = "NPR MM Member Notific. Setup";
     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
@@ -152,55 +151,61 @@
 
         area(navigation)
         {
-            action(EMailTemplates)
+            group(Setup)
             {
-                Caption = 'E-Mail Templates';
-                Image = InteractionTemplate;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedIsBig = true;
-                RunObject = Page "NPR E-mail Templates";
-                RunPageView = WHERE("Table No." = CONST(6060139));
+                Caption = 'Setup';
 
-                ToolTip = 'Executes the E-Mail Templates action';
-                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-            }
-            action(SMSTemplate)
-            {
-                Caption = 'SMS Template';
-                Image = InteractionTemplate;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedIsBig = true;
-                RunObject = Page "NPR SMS Template List";
-                RunPageView = WHERE("Table No." = CONST(6060139));
-
-                ToolTip = 'Executes the SMS Template action';
-                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                action(EMailTemplates)
+                {
+                    Caption = 'E-Mail Templates';
+                    ToolTip = 'Executes the E-Mail Templates action';
+                    Image = InteractionTemplate;
+                    Ellipsis = true;
+                    RunObject = Page "NPR E-mail Templates";
+                    RunPageView = WHERE("Table No." = CONST(6060139));
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                action(SMSTemplate)
+                {
+                    Caption = 'SMS Template';
+                    ToolTip = 'Executes the SMS Template action';
+                    Image = InteractionTemplate;
+                    Ellipsis = true;
+                    RunObject = Page "NPR SMS Template List";
+                    RunPageView = WHERE("Table No." = CONST(6060139));
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                action(MemberComSetup)
+                {
+                    Caption = 'Member Communication Setup';
+                    ToolTip = 'Navigate to Member Communication Setup Page';
+                    Ellipsis = true;
+                    Image = Interaction;
+                    RunObject = Page "NPR MM Member Comm. Setup";
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
             }
 
             action(RenewNotificationsList)
             {
-                Caption = 'Renewal Notification List';
+                Caption = 'View Renewal Notifications';
+                ToolTip = 'Navigate to the Notification List Page';
                 Ellipsis = true;
-                Image = Note;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
+                Image = Interaction;
                 RunObject = Page "NPR MM Membership Notific.";
                 RunPageLink = "Notification Trigger" = CONST(RENEWAL);
-
-                ToolTip = 'Executes the Renewal Notification List action';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action(ViewNotifications)
             {
                 Caption = 'View Notifications';
                 ToolTip = 'Navigate to the Notification List Page';
+                Ellipsis = true;
                 Image = Interaction;
                 RunObject = Page "NPR MM Membership Notific.";
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
+
         }
         area(processing)
         {
@@ -273,102 +278,100 @@
                 end;
             }
 
-            action(SendNotifications)
+            group(Notifications)
             {
-                Caption = 'Send Pending Notification (Batch)';
-                ToolTip = 'This action sends all pending notification scheduled to be sent today and handled by "batch" method.';
-                Image = SendToMultiple;
-                ApplicationArea = NPRMembershipAdvanced;
+                Caption = 'Notifications';
+                action(SendNotifications)
+                {
+                    Caption = 'Send Pending Notification (Batch)';
+                    ToolTip = 'This action sends all pending notification scheduled to be sent today and handled by "batch" method.';
+                    Image = SendToMultiple;
+                    ApplicationArea = NPRMembershipAdvanced;
 
-                trigger OnAction()
-                var
-                    NotificationHandler: Codeunit "NPR MM Member Notification";
-                begin
-                    if (Confirm('This action will send emails and text messages based on pending notification entries. Do you want to continue', false)) then
-                        NotificationHandler.HandleBatchNotifications(Today);
-                end;
-            }
+                    trigger OnAction()
+                    var
+                        NotificationHandler: Codeunit "NPR MM Member Notification";
+                    begin
+                        if (Confirm('This action will send emails and text messages based on pending notification entries. Do you want to continue', false)) then
+                            NotificationHandler.HandleBatchNotifications(Today);
+                    end;
+                }
 
-            action(RefreshRenewNotification)
-            {
-                Caption = 'Refresh Renew Notification';
-                Image = Recalculate;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
+                action(RefreshRenewNotification)
+                {
+                    Caption = 'Recreate All Renew Notifications';
+                    Image = Recalculate;
+                    ToolTip = 'Executes the Refresh Renew Notification action';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
-                ToolTip = 'Executes the Refresh Renew Notification action';
-                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    trigger OnAction()
+                    var
+                        MemberNotification: Codeunit "NPR MM Member Notification";
+                        MembershipSetup: Record "NPR MM Membership Setup";
+                    begin
 
-                trigger OnAction()
-                var
-                    MemberNotification: Codeunit "NPR MM Member Notification";
-                    MembershipSetup: Record "NPR MM Membership Setup";
-                begin
-
-                    Rec.TestField(Type, Rec.Type::RENEWAL);
-                    if (Rec."Membership Code" <> '') then begin
-                        if (not Confirm(REFRESH_ALL_RENEW, true, Rec.FieldCaption("Membership Code"), Rec."Membership Code")) then
-                            Error('');
-
-                        MemberNotification.RefreshAllMembershipRenewalNotifications(Rec."Membership Code");
-
-                    end else
-                        if (Rec."Community Code" <> '') then begin
-                            if (not Confirm(REFRESH_ALL_RENEW, true, Rec.FieldCaption("Community Code"), Rec."Community Code")) then
+                        Rec.TestField(Type, Rec.Type::RENEWAL);
+                        if (Rec."Membership Code" <> '') then begin
+                            if (not Confirm(REFRESH_ALL_RENEW, true, Rec.FieldCaption("Membership Code"), Rec."Membership Code")) then
                                 Error('');
 
-                            MembershipSetup.SetFilter("Community Code", '=%1', Rec."Community Code");
-                            MembershipSetup.FindSet();
-                            repeat
-                                MemberNotification.RefreshAllMembershipRenewalNotifications(MembershipSetup.Code);
-                            until (MembershipSetup.Next() = 0);
-                        end;
+                            MemberNotification.RefreshAllMembershipRenewalNotifications(Rec."Membership Code");
 
-                end;
+                        end else
+                            if (Rec."Community Code" <> '') then begin
+                                if (not Confirm(REFRESH_ALL_RENEW, true, Rec.FieldCaption("Community Code"), Rec."Community Code")) then
+                                    Error('');
+
+                                MembershipSetup.SetFilter("Community Code", '=%1', Rec."Community Code");
+                                MembershipSetup.FindSet();
+                                repeat
+                                    MemberNotification.RefreshAllMembershipRenewalNotifications(MembershipSetup.Code);
+                                until (MembershipSetup.Next() = 0);
+                            end;
+
+                    end;
+                }
             }
-            action(SetJobQueueEntry)
+            group(JobQueue)
             {
-                Caption = 'Create Job Queue Entry for Member Notification';
-                ToolTip = 'Create Job Queue Entry for processing notifications with processing method - batch';
-                Image = ResetStatus;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Caption = 'Job Queue Management';
+                action(SetJobQueueEntry)
+                {
+                    Caption = 'Create Job Queue Entry for Member Notification';
+                    ToolTip = 'Create Job Queue Entry for processing notifications with processing method - batch';
+                    Image = ResetStatus;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
-                trigger OnAction()
-                var
-                    JobQueueEntry: Record "Job Queue Entry";
-                    JobQueueManagement: Codeunit "NPR Job Queue Management";
-                    JobQueueDescriptionLbl: Label 'Member Notifications - AutoCreated';
-                    JobQueueCreatedMsg: Label 'Member Notifications job successfully created';
-                begin
-                    JobQueueManagement.InitRecurringJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR MM Member Notification", '', JobQueueDescriptionLbl, CurrentDateTime, 15, '', JobQueueEntry);
-                    JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
-                    Message(JobQueueCreatedMsg);
-                end;
-            }
-            action(RemoveJobQueueEntry)
-            {
-                Caption = 'Remove Job Queue Entry for Member Notification';
-                ToolTip = 'Remove all Job Queue Entries for processing notifications with processing method - batch from the list of jobs';
-                Image = ReopenCancelled;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    trigger OnAction()
+                    var
+                        JobQueueEntry: Record "Job Queue Entry";
+                        JobQueueManagement: Codeunit "NPR Job Queue Management";
+                        JobQueueDescriptionLbl: Label 'Member Notifications - AutoCreated';
+                        JobQueueCreatedMsg: Label 'Member Notifications job successfully created';
+                    begin
+                        JobQueueManagement.InitRecurringJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR MM Member Notification", '', JobQueueDescriptionLbl, CurrentDateTime, 15, '', JobQueueEntry);
+                        JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+                        Message(JobQueueCreatedMsg);
+                    end;
+                }
+                action(RemoveJobQueueEntry)
+                {
+                    Caption = 'Remove Job Queue Entry for Member Notification';
+                    ToolTip = 'Remove all Job Queue Entries for processing notifications with processing method - batch from the list of jobs';
+                    Image = ReopenCancelled;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
-                trigger OnAction()
-                var
-                    JobQueueEntry: Record "Job Queue Entry";
-                    JobQueueRemovedMsg: Label 'Member Notifications job successfully removed';
-                begin
-                    JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-                    JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR MM Member Notification");
-                    JobQueueEntry.DeleteTasks();
-                    Message(JobQueueRemovedMsg);
-                end;
+                    trigger OnAction()
+                    var
+                        JobQueueEntry: Record "Job Queue Entry";
+                        JobQueueRemovedMsg: Label 'Member Notifications job successfully removed';
+                    begin
+                        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+                        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR MM Member Notification");
+                        JobQueueEntry.DeleteTasks();
+                        Message(JobQueueRemovedMsg);
+                    end;
+                }
             }
         }
     }
