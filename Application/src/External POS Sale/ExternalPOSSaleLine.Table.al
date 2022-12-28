@@ -46,7 +46,7 @@
             OptionMembers = "G/L Entry",Item,"Item Group",Repair,,Payment,"Open/Close","BOM List",Customer,Comment;
             ObsoleteState = Removed;
             ObsoleteReason = 'Use Line Type';
-        }        
+        }
         field(51; "Line Type"; Enum "NPR POS Sale Line Type")
         {
             Caption = 'Type';
@@ -1039,6 +1039,10 @@
     var
         TableID: array[10] of Integer;
         No: array[10] of Code[20];
+#IF NOT (BC17 or BC18 or BC19)
+        DimSource: List of [Dictionary of [Integer, Code[20]]];
+        i: Integer;
+#ENDIF
     begin
         GetPOSHeader();
 
@@ -1056,11 +1060,23 @@
         Rec."Shortcut Dimension 1 Code" := '';
         Rec."Shortcut Dimension 2 Code" := '';
 
+#IF NOT (BC17 or BC18 or BC19)
+        for i := 1 to ArrayLen(TableID) do
+            if (TableID[i] <> 0) and (No[i] <> '') then
+                DimMgt.AddDimSource(DimSource, TableID[i], No[i]);
+
+        Rec."Dimension Set ID" :=
+          DimMgt.GetDefaultDimID(DimSource, ExtSalePOS.GetPOSSourceCode(),
+            Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code",
+            ExtSalePOS."Dimension Set ID", DATABASE::Customer);
+#ELSE
         "Dimension Set ID" :=
           DimMgt.GetDefaultDimID(
             TableID, No, ExtSalePOS.GetPOSSourceCode(),
             Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code",
             ExtSalePOS."Dimension Set ID", DATABASE::Customer);
+#ENDIF
+
         DimMgt.UpdateGlobalDimFromDimSetID(Rec."Dimension Set ID", Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code");
     end;
 

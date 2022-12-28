@@ -349,6 +349,10 @@
         TableID: array[10] of Integer;
         No: array[10] of Code[20];
         OldDimSetID: Integer;
+#IF NOT (BC17 or BC18 or BC19)
+        DimSource: List of [Dictionary of [Integer, Code[20]]];
+        i: Integer;
+#ENDIF
     begin
         TableID[1] := Type1;
         No[1] := No1;
@@ -363,8 +367,18 @@
         Rec."Shortcut Dimension 1 Code" := '';
         Rec."Shortcut Dimension 2 Code" := '';
         OldDimSetID := Rec."Dimension Set ID";
+
+#IF NOT (BC17 or BC18 or BC19)
+        for i := 1 to ArrayLen(TableID) do
+            if (TableID[i] <> 0) and (No[i] <> '') then
+                DimMgt.AddDimSource(DimSource, TableID[i], No[i]);
+
+        Rec."Dimension Set ID" :=
+          DimMgt.GetDefaultDimID(DimSource, GetPOSSourceCode(), Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code", 0, 0);
+#ELSE
         Rec."Dimension Set ID" :=
           DimMgt.GetDefaultDimID(TableID, No, GetPOSSourceCode(), Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code", 0, 0);
+#ENDIF
 
         if (OldDimSetID <> "Dimension Set ID") then begin
             if SalesLinesExist() then
