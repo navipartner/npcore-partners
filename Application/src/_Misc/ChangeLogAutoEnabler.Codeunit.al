@@ -2,7 +2,11 @@
 {
     Access = Internal;
 
+#IF NOT CLOUD
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterInitialization', '', true, false)]
+#ELSE
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', true, false)]
+#ENDIF
     local procedure OnAfterInitialization()
     var
         ChangeLogSetup: Record "Change Log Setup";
