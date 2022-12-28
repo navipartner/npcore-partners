@@ -1,13 +1,14 @@
 ﻿table 6150733 "NPR POS Admin. Template"
 {
     Access = Internal;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used.';
     // NPR5.51/JAKUBV/20190903  CASE 352582 Transport NPR5.51 - 3 September 2019
 
     Caption = 'POS Administrative Template';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Admin. Template List";
     LookupPageID = "NPR POS Admin. Template List";
-
     fields
     {
         field(1; Id; Guid)
@@ -80,11 +81,7 @@
     }
 
     trigger OnDelete()
-    var
-        Scope: Record "NPR POS Admin. Template Scope";
     begin
-        Scope.SetRange("POS Admin. Template Id", Id);
-        Scope.DeleteAll();
     end;
 
     trigger OnInsert()

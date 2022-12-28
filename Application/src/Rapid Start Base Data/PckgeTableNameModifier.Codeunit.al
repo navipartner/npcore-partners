@@ -306,8 +306,6 @@
                 exit('POS Stargate Assembly Map');
             'NPR POS Sales WF Set Entry':
                 exit('POS Sales Workflow Set Entry');
-            'NPR POS Admin. Template':
-                exit('POS Administrative Template');
             'NPR HC Paym.Type Post.Setup':
                 exit('HC Payment Type Posting Setup');
             'NPR Upgrade History':

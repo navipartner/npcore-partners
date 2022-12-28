@@ -7,34 +7,8 @@
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
-
-    SourceTable = "NPR POS Admin. Template Scope";
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used.';
     ApplicationArea = NPRRetail;
-
-    layout
-    {
-        area(content)
-        {
-            repeater(Group)
-            {
-                field("Applies To"; Rec."Applies To")
-                {
-
-                    ToolTip = 'Specifies the value of the Applies To field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Applies To Code"; Rec."Applies To Code")
-                {
-
-                    ToolTip = 'Specifies the value of the Applies To Code field';
-                    ApplicationArea = NPRRetail;
-                }
-            }
-        }
-    }
-
-    actions
-    {
-    }
 }
 

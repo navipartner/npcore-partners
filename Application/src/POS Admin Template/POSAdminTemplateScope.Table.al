@@ -3,6 +3,8 @@
     Access = Internal;
     Caption = 'POS Admin. Template Scope';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used.';
 
     fields
     {
@@ -10,7 +12,6 @@
         {
             Caption = 'POS Admin. Template Id';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Admin. Template";
         }
         field(2; "Applies To"; Option)
         {
