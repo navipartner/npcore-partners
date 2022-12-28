@@ -2751,11 +2751,27 @@
         end;
     end;
 
+    internal procedure CreateMembershipCommunicationDefaultSetup(MembershipEntryNo: Integer)
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+        Membership: Record "NPR MM Membership";
+    begin
+
+        if (not (Membership.Get(MembershipEntryNo))) then
+            exit;
+
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        if (not MembershipRole.FindSet()) then
+            exit;
+
+        repeat
+            CreateMembershipMemberDefaultCommunicationSetup(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.");
+        until (MembershipRole.Next() = 0);
+    end;
+
     internal procedure CreateMemberCommunicationDefaultSetup(MemberEntryNo: Integer)
     var
         MembershipRole: Record "NPR MM Membership Role";
-        MemberCommunication: Record "NPR MM Member Communication";
-        MemberCommunicationSetup: Record "NPR MM Member Comm. Setup";
         Member: Record "NPR MM Member";
     begin
 
@@ -2767,39 +2783,54 @@
             exit;
 
         repeat
+            CreateMembershipMemberDefaultCommunicationSetup(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.");
+        until (MembershipRole.Next() = 0);
+    end;
 
-            MemberCommunication.Init();
-            MemberCommunication."Member Entry No." := MembershipRole."Member Entry No.";
-            MemberCommunication."Membership Entry No." := MembershipRole."Membership Entry No.";
+    internal procedure CreateMembershipMemberDefaultCommunicationSetup(MembershipEntryNo: Integer; MemberEntryNo: Integer)
+    var
+        MemberCommunication: Record "NPR MM Member Communication";
+        MemberCommunicationSetup: Record "NPR MM Member Comm. Setup";
+        Member: Record "NPR MM Member";
+        Membership: Record "NPR MM Membership";
+    begin
 
-            MembershipRole.CalcFields("Membership Code");
-            MemberCommunicationSetup.SetFilter("Membership Code", '=%1', MembershipRole."Membership Code");
-            if (MemberCommunicationSetup.FindSet()) then begin
-                repeat
-                    MemberCommunication."Message Type" := MemberCommunicationSetup."Message Type";
-                    MemberCommunication."Preferred Method" := MemberCommunicationSetup."Preferred Method";
+        Member.Get(MemberEntryNo);
+        if (Member.Blocked) then
+            exit;
 
-                    if (MemberCommunicationSetup."Preferred Method" = MemberCommunicationSetup."Preferred Method"::MEMBER) then begin
-                        case Member."Notification Method" of
-                            Member."Notification Method"::EMAIL:
-                                MemberCommunication."Preferred Method" := MemberCommunicationSetup."Preferred Method"::EMAIL;
-                            Member."Notification Method"::SMS:
-                                MemberCommunication."Preferred Method" := MemberCommunicationSetup."Preferred Method"::SMS;
-                            else begin
-                                MemberCommunication."Preferred Method" := MemberCommunication."Preferred Method"::MANUAL;
-                                MemberCommunication."Accepted Communication" := MemberCommunication."Accepted Communication"::"OPT-OUT";
-                            end;
+        Membership.Get(MembershipEntryNo);
+        if (Membership.Blocked) then
+            exit;
+
+        MemberCommunication.Init();
+        MemberCommunication."Membership Entry No." := MembershipEntryNo;
+        MemberCommunication."Member Entry No." := MemberEntryNo;
+
+        MemberCommunicationSetup.SetFilter("Membership Code", '=%1', Membership."Membership Code");
+        if (MemberCommunicationSetup.FindSet()) then begin
+            repeat
+                MemberCommunication."Message Type" := MemberCommunicationSetup."Message Type";
+                MemberCommunication."Preferred Method" := MemberCommunicationSetup."Preferred Method";
+
+                if (MemberCommunicationSetup."Preferred Method" = MemberCommunicationSetup."Preferred Method"::MEMBER) then begin
+                    case Member."Notification Method" of
+                        Member."Notification Method"::EMAIL:
+                            MemberCommunication."Preferred Method" := MemberCommunicationSetup."Preferred Method"::EMAIL;
+                        Member."Notification Method"::SMS:
+                            MemberCommunication."Preferred Method" := MemberCommunicationSetup."Preferred Method"::SMS;
+                        else begin
+                            MemberCommunication."Preferred Method" := MemberCommunication."Preferred Method"::MANUAL;
+                            MemberCommunication."Accepted Communication" := MemberCommunication."Accepted Communication"::"OPT-OUT";
                         end;
                     end;
-                    MemberCommunication."Changed At" := CurrentDateTime();
+                end;
+                MemberCommunication."Changed At" := CurrentDateTime();
 
-                    if (not MemberCommunication.Insert()) then;
+                if (not MemberCommunication.Insert()) then;
 
-                until (MemberCommunicationSetup.Next() = 0);
-            end;
-
-        until (MembershipRole.Next() = 0);
-
+            until (MemberCommunicationSetup.Next() = 0);
+        end;
     end;
 
     internal procedure GetCommunicationMethod_Welcome(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
