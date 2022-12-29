@@ -1,6 +1,5 @@
 ﻿page 6151119 "NPR NpIa ItemAddOn Sel. Vars."
 {
-    Extensible = False;
     Caption = 'Select Variants';
     DeleteAllowed = false;
     InsertAllowed = false;

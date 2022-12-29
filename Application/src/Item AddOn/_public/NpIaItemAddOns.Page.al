@@ -1,6 +1,5 @@
 ﻿page 6151125 "NPR NpIa Item AddOns"
 {
-    Extensible = False;
     Caption = 'Item AddOns';
     CardPageID = "NPR NpIa Item AddOn Card";
     Editable = false;

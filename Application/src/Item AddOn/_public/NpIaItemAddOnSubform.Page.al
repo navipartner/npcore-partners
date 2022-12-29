@@ -1,6 +1,6 @@
 ﻿page 6151127 "NPR NpIa Item AddOn Subform"
 {
-    Extensible = False;
+
     AutoSplitKey = true;
     Caption = 'Lines';
     DelayedInsert = true;
