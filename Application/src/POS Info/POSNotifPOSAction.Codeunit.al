@@ -16,9 +16,21 @@ codeunit 6184854 "NPR POS Notif. POS Action"
         MyNotifications: Record "My Notifications";
     begin
         MyNotifications.InsertDefaultWithTableNum(NotificationIdLbl,
-            NewNotificationMsg,
             NotificationDescriptionTxt,
+            NewNotificationMsg,
             Database::"NPR POS Bin Entry");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"My Notifications", 'OnAfterInsertEvent', '', false, false)]
+    local procedure OnAfterInsertNotificationSetDisable(var Rec: Record "My Notifications")
+    begin
+        if Rec."Notification Id" <> NotificationIdLbl then
+            exit;
+        if not Rec.Enabled then
+            exit;
+
+        Rec.Enabled := false;
+        Rec.Modify();
     end;
 
     local procedure SendNotification()
@@ -157,6 +169,6 @@ codeunit 6184854 "NPR POS Notif. POS Action"
 
     var
         NotificationIdLbl: Label 'cc0c0ffc-8edc-4158-920d-a2b66550aab6', Locked = true;
-        NotificationDescriptionTxt: Label 'Difference at the end of the day.';
-        NewNotificationMsg: Label 'Show warning if there is a difference at the end of the day';
+        NotificationDescriptionTxt: Label 'NPR Difference at the end of the day.';
+        NewNotificationMsg: Label 'Display a warning if the difference between the provided filter and the actual end-of-day amount is higher or lower than expected.';
 }
