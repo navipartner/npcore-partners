@@ -1,4 +1,4 @@
-codeunit 6060023 "NPR Upgrade My Notifications"
+codeunit 6060023 "NPR UPG My Notifications"
 {
     Access = Internal;
     Subtype = Upgrade;
@@ -12,7 +12,7 @@ codeunit 6060023 "NPR Upgrade My Notifications"
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Upgrade My Notifications', 'OnUpgradePerCompany');
 
         // Check whether the tag has been used before, and if so, don't run upgrade code
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Upgrade My Notifications")) then begin
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG My Notifications")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -21,7 +21,7 @@ codeunit 6060023 "NPR Upgrade My Notifications"
         DoUpgrade();
 
         // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
-        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Upgrade My Notifications"));
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG My Notifications"));
 
         LogMessageStopwatch.LogFinish();
     end;
@@ -31,6 +31,7 @@ codeunit 6060023 "NPR Upgrade My Notifications"
         DeletePOSUnitNotification();
         DeleteDeletedItemNotification();
         DeleteDeletedItemOnPOSNotification();
+        ModifyEndOfDayNotification();
     end;
 
     local procedure DeletePOSUnitNotification()
@@ -85,5 +86,29 @@ codeunit 6060023 "NPR Upgrade My Notifications"
             exit;
 
         RecordLink.DeleteAll();
+    end;
+
+    local procedure ModifyEndOfDayNotification()
+    var
+        MyNotifications: Record "My Notifications";
+        OutStream: OutStream;
+        NotificationIdLbl: Label 'cc0c0ffc-8edc-4158-920d-a2b66550aab6', Locked = true;
+        NotificationDescriptionTxt: Label 'NPR Difference at the end of the day.';
+        NewNotificationMsg: Label 'Display a warning if the difference between the provided filter and the actual end-of-day amount is higher or lower than expected.';
+    begin
+        MyNotifications.SetRange("Notification Id", NotificationIdLbl);
+        if MyNotifications.IsEmpty then
+            exit;
+
+        if MyNotifications.FindSet(true, false) then
+            repeat
+                if MyNotifications.Name <> NotificationDescriptionTxt then begin
+                    MyNotifications.Name := NotificationDescriptionTxt;
+                    MyNotifications.Description.CreateOutStream(OutStream, TextEncoding::UTF8);
+                    MyNotifications.Enabled := false;
+                    OutStream.Write(NewNotificationMsg);
+                    MyNotifications.Modify(false);
+                end;
+            until MyNotifications.Next() = 0;
     end;
 }
