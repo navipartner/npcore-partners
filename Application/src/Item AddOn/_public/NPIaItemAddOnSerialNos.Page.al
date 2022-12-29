@@ -1,6 +1,5 @@
 page 6150613 "NPR NpIa ItemAddOn Serial Nos."
 {
-    Extensible = False;
     Caption = 'Select Serial No.';
     DeleteAllowed = false;
     InsertAllowed = false;

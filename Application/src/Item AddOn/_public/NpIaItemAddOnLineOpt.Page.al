@@ -1,6 +1,5 @@
 ﻿page 6151128 "NPR NpIa ItemAddOn Line Opt."
 {
-    Extensible = False;
     UsageCategory = None;
     AutoSplitKey = true;
     Caption = 'Item AddOn Line Options';
