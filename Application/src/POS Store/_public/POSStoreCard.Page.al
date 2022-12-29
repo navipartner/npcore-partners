@@ -86,6 +86,11 @@
                     ToolTip = 'Specifies the POS store''s location code, which is used for registering the store''s inventory. This field needs to be populated if your company has more than one store, if not, the location code is optional.';
                     ApplicationArea = NPRRetail;
                 }
+                field(Inactive; Rec.Inactive)
+                {
+                    ToolTip = 'Defines is POS Store inactive';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Language Code"; Rec."Language Code")
                 {
 

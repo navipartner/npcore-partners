@@ -322,6 +322,28 @@
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to POS Posting Profile';
         }
+        field(870; Inactive; Boolean)
+        {
+            Caption = 'Inactive';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                POSUnit: Record "NPR POS Unit";
+                ActivePosUnitError: Label 'There are still active POS Unit(s) with status Open or EOD. Please, close them first.';
+            begin
+                if Rec.Inactive then begin
+                    POSUnit.SetRange("POS Store Code", Rec.Code);
+                    POSUnit.SetFilter(Status, '%1|%2', POSUnit.Status::OPEN, POSUnit.Status::EOD);
+                    if not POSUnit.IsEmpty then
+                        Error(ActivePosUnitError);
+
+                    POSUnit.SetRange(Status);
+                    POSUnit.ModifyAll(Status, POSUnit.Status::INACTIVE);
+                end;
+
+            end;
+        }
     }
 
     keys

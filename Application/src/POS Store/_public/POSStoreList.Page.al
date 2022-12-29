@@ -18,14 +18,17 @@
             {
                 field("Code"; Rec.Code)
                 {
-
                     ToolTip = 'Defines code of POS Store';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-
                     ToolTip = 'Defines name of POS Store';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Inactive; Rec.Inactive)
+                {
+                    ToolTip = 'Defines is POS Store inactive';
                     ApplicationArea = NPRRetail;
                 }
                 field("Post Code"; Rec."Post Code")
