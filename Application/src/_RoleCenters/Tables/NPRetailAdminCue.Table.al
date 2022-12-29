@@ -23,7 +23,7 @@
         }
         field(40; "POS Stores"; Integer)
         {
-            CalcFormula = Count("NPR POS Store");
+            CalcFormula = Count("NPR POS Store" where(Inactive = filter(false)));
             Caption = 'POS Stores';
             FieldClass = FlowField;
         }

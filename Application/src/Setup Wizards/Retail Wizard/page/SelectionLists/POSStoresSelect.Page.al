@@ -61,8 +61,10 @@
         Rec.DeleteAll();
         if TempPOSStore.FindSet() then
             repeat
-                Rec.Copy(TempPOSStore);
-                Rec.Insert();
+                if not TempPOSStore.Inactive then begin
+                    Rec.Copy(TempPOSStore);
+                    Rec.Insert();
+                end;
             until TempPOSStore.Next() = 0;
     end;
 }
