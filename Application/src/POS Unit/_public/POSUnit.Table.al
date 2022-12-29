@@ -26,10 +26,16 @@
             TableRelation = "NPR POS Store";
             trigger OnValidate()
             var
+                POSStore: Record "NPR POS Store";
                 StoreCodeChangeLabel: Label 'It is not recommended to change the store code during an active workshift. You can close the workshift from the POS unit using the Z-Report (end-of-day) functionality.';
             begin
                 if not (Status in [Status::CLOSED, Status::INACTIVE]) then
                     Error(StoreCodeChangeLabel);
+
+                if (xRec."POS Store Code" <> Rec."POS Store Code") and (Rec."POS Store Code" <> '') then
+                    if POSStore.Get(Rec."POS Store Code") then
+                        if POSStore.Inactive then
+                            Rec.Status := Rec.Status::INACTIVE;
             end;
         }
         field(11; "Default POS Payment Bin"; Code[10])
@@ -45,6 +51,17 @@
             InitValue = CLOSED;
             OptionCaption = 'Open,Closed,End of Day,Inactive';
             OptionMembers = OPEN,CLOSED,EOD,INACTIVE;
+
+            trigger OnValidate()
+            var
+                POSStore: Record "NPR POS Store";
+            begin
+                if (xRec.Status = Rec.Status::INACTIVE) and (xRec.Status <> Rec.Status) then begin
+                    if POSStore.Get(Rec."POS Store Code") then
+                        if POSStore.Inactive then
+                            POSStore.FieldError(Inactive);
+                end;
+            end;
         }
         field(30; "Global Dimension 1 Code"; Code[20])
         {
