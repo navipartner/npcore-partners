@@ -4,7 +4,7 @@ codeunit 6184496 "NPR Pepper Library HWC"
 
     var
         Text103: Label 'This result code was not found for Transaction Type %1, so taken from %2 %3.';
-        ErrorText001: Label 'Register %1 is linked to multiple Pepper terminals.';
+        ErrorText001: Label 'Payment Method %1 and POS Unit %2 resolves to multiple EFT terminal types.';
 
         _PepperSetupInitialized: Boolean;
         _PepperTerminal: Record "NPR Pepper Terminal";
@@ -2111,32 +2111,56 @@ codeunit 6184496 "NPR Pepper Library HWC"
     local procedure OnAfterEFTSetupInsert(var Rec: Record "NPR EFT Setup"; RunTrigger: Boolean)
     var
         EFTSetup: Record "NPR EFT Setup";
+        EftSetup2: Record "NPR EFT Setup";
     begin
 
         if (Rec.IsTemporary or (not RunTrigger)) then
             exit;
-        EFTSetup.SetRange("POS Unit No.", Rec."POS Unit No.");
-        EFTSetup.SetRange("EFT Integration Type", GetIntegrationType());
-        EFTSetup.SetFilter("Payment Type POS", '<>%1', Rec."Payment Type POS");
-        if (not EFTSetup.IsEmpty) then
-            Error(ErrorText001, Rec."POS Unit No.");
 
+        // If there is no Pepper setup, exit fast
+        if (Rec."POS Unit No." <> '') then
+            EFTSetup.SetFilter("POS Unit No.", '=%1', Rec."POS Unit No.");
+        EFTSetup.SetFilter("EFT Integration Type", '=%1', GetIntegrationType());
+        if (not EFTSetup.FindSet()) then
+            exit;
+
+        // Check that same payment type is not shared across different integrations. 'T' can't be not be both Pepper and Nets at the same time.
+        if (Rec."POS Unit No." <> '') then
+            EFTSetup2.SetFilter("POS Unit No.", '=%1', Rec."POS Unit No.");
+        repeat
+            EftSetup2.SetFilter("Payment Type POS", '=%1', EFTSetup."Payment Type POS");
+            EftSetup2.SetFilter("EFT Integration Type", '<>%1', GetIntegrationType());
+            if (not EFTSetup2.IsEmpty) then
+                Error(ErrorText001, EFTSetup."Payment Type POS", Rec."POS Unit No.");
+        until (EFTSetup.Next() = 0);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR EFT Setup", 'OnAfterRenameEvent', '', false, false)]
     local procedure OnAfterEFTSetupRename(var Rec: Record "NPR EFT Setup"; var xRec: Record "NPR EFT Setup"; RunTrigger: Boolean)
     var
         EFTSetup: Record "NPR EFT Setup";
+        EftSetup2: Record "NPR EFT Setup";
     begin
 
         if (Rec.IsTemporary or (not RunTrigger)) then
             exit;
-        EFTSetup.SetRange("POS Unit No.", Rec."POS Unit No.");
-        EFTSetup.SetRange("EFT Integration Type", GetIntegrationType());
-        EFTSetup.SetFilter("Payment Type POS", '<>%1', Rec."Payment Type POS");
-        if (not EFTSetup.IsEmpty) then
-            Error(ErrorText001, Rec."POS Unit No.");
 
+        // If there is no Pepper setup, exit fast
+        if (Rec."POS Unit No." <> '') then
+            EFTSetup.SetFilter("POS Unit No.", '=%1', Rec."POS Unit No.");
+        EFTSetup.SetFilter("EFT Integration Type", '=%1', GetIntegrationType());
+        if (not EFTSetup.FindSet()) then
+            exit;
+
+        // Check that same payment type is not shared across different integrations. 'T' can't be not be both Pepper and Nets at the same time.
+        if (Rec."POS Unit No." <> '') then
+            EFTSetup2.SetFilter("POS Unit No.", '=%1', Rec."POS Unit No.");
+        repeat
+            EftSetup2.SetFilter("Payment Type POS", '=%1', EFTSetup."Payment Type POS");
+            EftSetup2.SetFilter("EFT Integration Type", '<>%1', GetIntegrationType());
+            if (not EFTSetup2.IsEmpty) then
+                Error(ErrorText001, EFTSetup."Payment Type POS", Rec."POS Unit No.");
+        until (EFTSetup.Next() = 0);
     end;
     #endregion Subscribers
 }
