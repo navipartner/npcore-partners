@@ -271,47 +271,47 @@
         NewPictureType := StrMenu(SelectPictureTypeLbl) - 1;
     end;
 
-    internal procedure SetAutoOverwrite(NewAutoOverwrite: Boolean)
+    procedure SetAutoOverwrite(NewAutoOverwrite: Boolean)
     begin
         AutoOverwrite := NewAutoOverwrite;
     end;
 
-    internal procedure SetHidePicture(NewHidePicture: Boolean)
+    procedure SetHidePicture(NewHidePicture: Boolean)
     begin
         HidePicture := NewHidePicture;
     end;
 
-    internal procedure SetItemNo(ItemNo: Code[20])
+    procedure SetItemNo(ItemNo: Code[20])
     begin
         PictureType := Rec.Type::Item.AsInteger();
         PictureLinkNo := ItemNo;
     end;
 
-    internal procedure SetItemGroupNo(ItemGroupNo: Code[20]; NewIsIconPicture: Boolean)
+    procedure SetItemGroupNo(ItemGroupNo: Code[20]; NewIsIconPicture: Boolean)
     begin
         PictureType := Rec.Type::"Item Group".AsInteger();
         PictureLinkNo := ItemGroupNo;
         IsIconPicture := NewIsIconPicture;
     end;
 
-    internal procedure SetBrandCode(BrandCode: Code[20]; NewIsLogoPicture: Boolean)
+    procedure SetBrandCode(BrandCode: Code[20]; NewIsLogoPicture: Boolean)
     begin
         PictureType := Rec.Type::Brand.AsInteger();
         PictureLinkNo := BrandCode;
         IsLogoPicture := NewIsLogoPicture;
     end;
 
-    internal procedure SetRecordPosition(PictureType: Integer; PictureName: Text)
+    procedure SetRecordPosition(PictureType: Integer; PictureName: Text)
     begin
         if Rec.Get(PictureType, PictureName) then;
     end;
 
-    internal procedure SetVariantValueCode(NewVariantValueCode: Code[20])
+    procedure SetVariantValueCode(NewVariantValueCode: Code[20])
     begin
         PictureLinkVariantValueCode := NewVariantValueCode;
     end;
 
-    internal procedure SetVarietyFilters(NewVarietyTypeCode: Code[10]; NewVarietyTableCode: Code[40]; NewVarietyValueCode: Code[50])
+    procedure SetVarietyFilters(NewVarietyTypeCode: Code[10]; NewVarietyTableCode: Code[40]; NewVarietyValueCode: Code[50])
     begin
         VarietyTypeCode := NewVarietyTypeCode;
         VarietyTableCode := NewVarietyTableCode;
