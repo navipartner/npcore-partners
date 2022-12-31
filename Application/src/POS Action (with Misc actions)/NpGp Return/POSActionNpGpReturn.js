@@ -1,4 +1,5 @@
 let main = async ({ workflow, context, popup, parameters, captions}) => {
+    debugger;
 
     if (parameters.ReferenceBarcode === "")
     {
@@ -7,11 +8,20 @@ let main = async ({ workflow, context, popup, parameters, captions}) => {
             return;
         }
     }
+    if (parameters.AskReturnReason){
+        const{ReturnReasonCode} = await workflow.respond("PromptForReason");
+        await workflow.respond("handle",{ReturnReasonCode:ReturnReasonCode});
+    }
+    else
+        await workflow.respond("handle"); 
 
-    const{ReturnReasonCode} = await workflow.respond("PromptForReason");
-    await workflow.respond("handle",{ReturnReasonCode:ReturnReasonCode});
+    if (parameters.ExportReturnOrd){ 
+        const{workflowName,workflowVersion} = await workflow.respond("GetExportReturnOrdVersion");
+        if (workflowVersion == 1) await workflow.respond("ExportReturnOrderLegacy");
 
-    if (parameters.ExportReturnOrd){
-        await workflow.respond("ExportReturnOrder");        
+        if (workflowVersion >=2) { 
+            const{expParameters} = await workflow.respond("ExportReturnOrderv3"); 
+            await workflow.run(workflowName, { parameters: expParameters });  
+        }   
     }
 }
