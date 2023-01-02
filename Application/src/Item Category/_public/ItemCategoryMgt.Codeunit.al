@@ -530,6 +530,665 @@
 
     #endregion
 
+
+    #region Item Category Report Managment
+
+    #region Insert to Item Category Buffer
+
+    procedure InsertItemCategoryToBuffer(ItemRootCategoryCode: Code[20]; var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; SalespersonCode: Code[20]; GlobalDimension1Code: Code[20]; GlobalDimension2Code: Code[20]; CalcFieldsDict: Dictionary of [Integer, Decimal])
+    var
+        ItemCategory: Record "Item Category";
+    begin
+        if not ItemCategory.Get(ItemRootCategoryCode) then
+            exit;
+        ItemCategoryBuffer."Entry No." := GetItemCategoryBufferEntryNo(ItemCategoryBuffer);
+        ItemCategoryBuffer.Code := ItemCategory.Code;
+        ItemCategoryBuffer."Parent Category" := ItemCategory."Parent Category";
+        ItemCategoryBuffer."Code with Indentation" := ItemCategory.Code;
+        ItemCategoryBuffer.Description := ItemCategory.Description;
+        ItemCategoryBuffer.Indentation := ItemCategory.Indentation;
+        ItemCategoryBuffer."Presentation Order" := ItemCategory."Presentation Order";
+        ItemCategoryBuffer."Has Children" := ItemCategory."Has Children";
+        ItemCategoryBuffer."Last Modified Date Time" := ItemCategory."Last Modified Date Time";
+        ItemCategoryBuffer."Salesperson Code" := SalespersonCode;
+        ItemCategoryBuffer."Global Dimension 1 Code" := GlobalDimension1Code;
+        ItemCategoryBuffer."Global Dimension 2 Code" := GlobalDimension2Code;
+        ItemCategoryBuffer.Insert();
+        InsertCalcFieldsInItemCategoryBuffer(ItemCategoryBuffer, CalcFieldsDict);
+    end;
+
+    procedure InsertItemCategoryToBuffer(ItemRootCategoryCode: Code[20]; var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; SalespersonCode: Code[20]; GlobalDimension1Code: Code[20]; GlobalDimension2Code: Code[20])
+    var
+        ItemCategory: Record "Item Category";
+    begin
+        if not ItemCategory.Get(ItemRootCategoryCode) then
+            exit;
+        ItemCategoryBuffer.Init();
+        ItemCategoryBuffer."Entry No." := GetItemCategoryBufferEntryNo(ItemCategoryBuffer);
+        ItemCategoryBuffer.Code := ItemCategory.Code;
+        ItemCategoryBuffer."Parent Category" := ItemCategory."Parent Category";
+        ItemCategoryBuffer."Code with Indentation" := ItemCategory.Code;
+        ItemCategoryBuffer.Description := ItemCategory.Description;
+        ItemCategoryBuffer.Indentation := ItemCategory.Indentation;
+        ItemCategoryBuffer."Presentation Order" := ItemCategory."Presentation Order";
+        ItemCategoryBuffer."Has Children" := ItemCategory."Has Children";
+        ItemCategoryBuffer."Last Modified Date Time" := ItemCategory."Last Modified Date Time";
+        ItemCategoryBuffer."Salesperson Code" := SalespersonCode;
+        ItemCategoryBuffer."Salesperson Code" := SalespersonCode;
+        ItemCategoryBuffer."Global Dimension 1 Code" := GlobalDimension1Code;
+        ItemCategoryBuffer."Global Dimension 2 Code" := GlobalDimension2Code;
+        ItemCategoryBuffer."Calc Field 1" := 0;
+        ItemCategoryBuffer."Calc Field 2" := 0;
+        ItemCategoryBuffer."Calc Field 3" := 0;
+        ItemCategoryBuffer."Calc Field 4" := 0;
+        ItemCategoryBuffer."Calc Field 5" := 0;
+        ItemCategoryBuffer."Calc Field 6" := 0;
+        ItemCategoryBuffer."Calc Field 7" := 0;
+        ItemCategoryBuffer."Calc Field 8" := 0;
+        ItemCategoryBuffer."Calc Field 9" := 0;
+        ItemCategoryBuffer."Calc Field 10" := 0;
+        ItemCategoryBuffer.Insert();
+    end;
+
+    procedure InsertItemCategoryToBuffer(ItemRootCategoryCode: Code[20]; var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary)
+    var
+        ItemCategory: Record "Item Category";
+    begin
+        if not ItemCategory.Get(ItemRootCategoryCode) then
+            exit;
+        ItemCategoryBuffer.Init();
+        ItemCategoryBuffer."Entry No." := GetItemCategoryBufferEntryNo(ItemCategoryBuffer);
+        ItemCategoryBuffer.Code := ItemCategory.Code;
+        ItemCategoryBuffer."Parent Category" := ItemCategory."Parent Category";
+        ItemCategoryBuffer."Code with Indentation" := ItemCategory.Code;
+        ItemCategoryBuffer.Description := ItemCategory.Description;
+        ItemCategoryBuffer.Indentation := ItemCategory.Indentation;
+        ItemCategoryBuffer."Presentation Order" := ItemCategory."Presentation Order";
+        ItemCategoryBuffer."Has Children" := ItemCategory."Has Children";
+        ItemCategoryBuffer."Last Modified Date Time" := ItemCategory."Last Modified Date Time";
+        ItemCategoryBuffer."Calc Field 1" := 0;
+        ItemCategoryBuffer."Calc Field 2" := 0;
+        ItemCategoryBuffer."Calc Field 3" := 0;
+        ItemCategoryBuffer."Calc Field 4" := 0;
+        ItemCategoryBuffer."Calc Field 5" := 0;
+        ItemCategoryBuffer."Calc Field 6" := 0;
+        ItemCategoryBuffer."Calc Field 7" := 0;
+        ItemCategoryBuffer."Calc Field 8" := 0;
+        ItemCategoryBuffer."Calc Field 9" := 0;
+        ItemCategoryBuffer."Calc Field 10" := 0;
+        ItemCategoryBuffer.Insert();
+    end;
+
+    procedure InsertUncatagorizedToItemCategoryBuffer(ItemCategoryCode: Code[20]; Description: Text[100]; var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; SalespersonCode: Code[20]; CalcFieldsDict: Dictionary of [Integer, Decimal])
+    begin
+        ItemCategoryBuffer.Init();
+        ItemCategoryBuffer."Entry No." := GetItemCategoryBufferEntryNo(ItemCategoryBuffer);
+        ItemCategoryBuffer.Code := ItemCategoryCode;
+        ItemCategoryBuffer."Parent Category" := '';
+        ItemCategoryBuffer."Code with Indentation" := ItemCategoryCode;
+        ItemCategoryBuffer.Description := Description;
+        ItemCategoryBuffer.Indentation := 0;
+        ItemCategoryBuffer."Presentation Order" := 1;
+        ItemCategoryBuffer."Has Children" := false;
+        ItemCategoryBuffer."Salesperson Code" := SalespersonCode;
+        ItemCategoryBuffer.Insert();
+        InsertCalcFieldsInItemCategoryBuffer(ItemCategoryBuffer, CalcFieldsDict);
+    end;
+
+    procedure AddItemCategoryParentsToBuffer(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary)
+    var
+        TempItemCategoryBuffer: Record "NPR Item Category Buffer" temporary;
+    begin
+        if ItemCategoryBuffer.IsEmpty() then
+            exit;
+
+        ItemCategoryBuffer.Reset();
+
+        if ItemCategoryBuffer.FindSet() then
+            repeat
+                TempItemCategoryBuffer.Init();
+                TempItemCategoryBuffer := ItemCategoryBuffer;
+                TempItemCategoryBuffer.Insert();
+            until ItemCategoryBuffer.Next() = 0;
+
+        TempItemCategoryBuffer.SetFilter("Parent Category", '<>%1', '');
+
+        if TempItemCategoryBuffer.FindSet() then
+            repeat
+                InsertItemCategoryParentsToBuffer(ItemCategoryBuffer, TempItemCategoryBuffer);
+            until TempItemCategoryBuffer.Next() = 0;
+
+        UpdateParentsCalcFieldsValues(ItemCategoryBuffer);
+    end;
+
+    local procedure InsertItemCategoryParentsToBuffer(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; CurrItemCategoryBuffer: Record "NPR Item Category Buffer" temporary)
+    var
+        ItemCategory: Record "Item Category";
+        TempItemCategoryBuffer: Record "NPR Item Category Buffer" temporary;
+        ItemCategoryCode: Code[20];
+    begin
+        ItemCategoryCode := CurrItemCategoryBuffer."Parent Category";
+
+        ItemCategoryBuffer.Reset();
+        if ItemCategoryBuffer.FindSet() then
+            repeat
+                TempItemCategoryBuffer.Init();
+                TempItemCategoryBuffer := ItemCategoryBuffer;
+                TempItemCategoryBuffer.Insert();
+            until ItemCategoryBuffer.Next() = 0;
+
+        repeat
+            if ItemCategory.Get(ItemCategoryCode) then;
+
+            TempItemCategoryBuffer.SetRange(Code, ItemCategoryCode);
+            TempItemCategoryBuffer.SetRange("Salesperson Code", CurrItemCategoryBuffer."Salesperson Code");
+            TempItemCategoryBuffer.SetRange("Global Dimension 1 Code", CurrItemCategoryBuffer."Global Dimension 1 Code");
+            TempItemCategoryBuffer.SetRange("Global Dimension 2 Code", CurrItemCategoryBuffer."Global Dimension 2 Code");
+
+            if not TempItemCategoryBuffer.FindFirst() then begin
+                ItemCategoryBuffer.Reset();
+                InsertItemCategoryToBuffer(ItemCategoryCode, ItemCategoryBuffer, CurrItemCategoryBuffer."Salesperson Code", CurrItemCategoryBuffer."Global Dimension 1 Code", CurrItemCategoryBuffer."Global Dimension 2 Code");
+            end;
+
+            ItemCategoryCode := ItemCategory."Parent Category";
+        until ItemCategoryCode = '';
+    end;
+
+    local procedure GetItemCategoryBufferEntryNo(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary): Integer
+    begin
+        ItemCategoryBuffer.Reset();
+
+        if ItemCategoryBuffer.FindLast() then
+            exit(ItemCategoryBuffer."Entry No." + 10000);
+        exit(10000);
+    end;
+
+    #endregion
+
+    #region Sorting and Formating
+
+    procedure SortItemCategoryBuffer(var ItemCategoryBuffer: Record "NPR Item Category Buffer"; FieldNo: Integer; Ascending: Boolean)
+    begin
+        if ItemCategoryBuffer.IsEmpty() then
+            exit;
+
+        if CheckIfCalcFieldExistsInItemCategoryBuffer(FieldNo) = 0 then
+            exit;
+
+        ChangeItemCategoryBufferPresentationOrder(ItemCategoryBuffer, FieldNo, Ascending);
+    end;
+
+    local procedure ChangeItemCategoryBufferPresentationOrder(var ItemCategoryBuffer: Record "NPR Item Category Buffer"; FieldNo: Integer; Ascending: Boolean)
+    var
+        PresentationOrder: Integer;
+        TempItemCategoryBuffer2: Record "NPR Item Category Buffer" temporary;
+        TempNewItemCategoryBuffer: Record "NPR Item Category Buffer" temporary;
+    begin
+        PresentationOrder := 1;
+        if ItemCategoryBuffer.FindSet() then
+            repeat
+                TempItemCategoryBuffer2.Init();
+                TempItemCategoryBuffer2 := ItemCategoryBuffer;
+                TempItemCategoryBuffer2.Insert();
+            until ItemCategoryBuffer.Next() = 0;
+
+        SetSortOrderOnCalcField(TempItemCategoryBuffer2, FieldNo, Ascending);
+
+        TempItemCategoryBuffer2.SetFilter("Parent Category", '%1', '');
+        if TempItemCategoryBuffer2.FindSet() then
+            repeat
+                TempNewItemCategoryBuffer.Init();
+                TempNewItemCategoryBuffer := TempItemCategoryBuffer2;
+                TempNewItemCategoryBuffer."Presentation Order" := PresentationOrder;
+                PresentationOrder += 1;
+                TempNewItemCategoryBuffer.Insert();
+                SortItemCategoryBufferChilds(TempNewItemCategoryBuffer.Code, TempNewItemCategoryBuffer, ItemCategoryBuffer, PresentationOrder, FieldNo, Ascending);
+            until TempItemCategoryBuffer2.Next() = 0;
+
+        ItemCategoryBuffer.DeleteAll();
+
+        TempNewItemCategoryBuffer.Reset();
+        if TempNewItemCategoryBuffer.FindSet() then
+            repeat
+                ItemCategoryBuffer.Init();
+                ItemCategoryBuffer := TempNewItemCategoryBuffer;
+                ItemCategoryBuffer.Insert();
+            until TempNewItemCategoryBuffer.Next() = 0;
+    end;
+
+    local procedure SortItemCategoryBufferChilds(ItemCategoryCode: Code[20]; var NewItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; var ItemCategoryBufferSet: Record "NPR Item Category Buffer" temporary; var PresentationOrder: Integer; FieldNo: Integer; Ascending: Boolean)
+    var
+        TempItemCategoryBuffer: Record "NPR Item Category Buffer" temporary;
+    begin
+        if ItemCategoryBufferSet.FindSet() then
+            repeat
+                TempItemCategoryBuffer.Init();
+                TempItemCategoryBuffer := ItemCategoryBufferSet;
+                TempItemCategoryBuffer.Insert();
+            until ItemCategoryBufferSet.Next() = 0;
+
+        SetSortOrderOnCalcField(TempItemCategoryBuffer, FieldNo, Ascending);
+
+        TempItemCategoryBuffer.SetRange("Parent Category", ItemCategoryCode);
+        if TempItemCategoryBuffer.FindSet() then
+            repeat
+                NewItemCategoryBuffer.Init();
+                NewItemCategoryBuffer := TempItemCategoryBuffer;
+                NewItemCategoryBuffer."Presentation Order" := PresentationOrder;
+                PresentationOrder += 1;
+                if NewItemCategoryBuffer.Insert() then;
+                SortItemCategoryBufferChilds(TempItemCategoryBuffer.Code, NewItemCategoryBuffer, ItemCategoryBufferSet, PresentationOrder, FieldNo, Ascending);
+            until TempItemCategoryBuffer.Next() = 0;
+    end;
+
+    procedure FormatIndentationInItemCategories(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; NumberOfSpaces: Integer)
+    begin
+        ItemCategoryBuffer.Reset();
+        if ItemCategoryBuffer.FindSet() then
+            repeat
+                ItemCategoryBuffer."Code with Indentation" := ItemCategoryBuffer.Code;
+                ItemCategoryBuffer."Code with Indentation" := ItemCategoryBuffer."Code with Indentation".PadLeft(StrLen(ItemCategoryBuffer."Code with Indentation") + ItemCategoryBuffer."Indentation" * NumberOfSpaces, ' ');
+                ItemCategoryBuffer.Modify();
+            until ItemCategoryBuffer.Next() = 0;
+    end;
+
+    procedure SetOrderNoInItemCategoryBuffer(var ItemCategoryBuffer: Record "NPR Item Category Buffer")
+    var
+        Index: Integer;
+    begin
+        if ItemCategoryBuffer.IsEmpty() then
+            exit;
+
+        Index := 1;
+        ItemCategoryBuffer.SetRange(Indentation, 0);
+
+        ItemCategoryBuffer.SetCurrentKey("Presentation Order");
+        ItemCategoryBuffer.SetAscending("Presentation Order", true);
+
+        ItemCategoryBuffer.FindSet();
+        repeat
+            ItemCategoryBuffer."Order No." := Index;
+            ItemCategoryBuffer.Modify();
+            Index += 1;
+        until ItemCategoryBuffer.Next() = 0;
+
+        ItemCategoryBuffer.Reset();
+        ItemCategoryBuffer.SetFilter(Indentation, '>%1', 0);
+        ItemCategoryBuffer.ModifyAll("Order No.", 0);
+    end;
+
+    local procedure SetSortOrderOnCalcField(var ItemCategoryBuffer: Record "NPR Item Category Buffer"; FieldNo: Integer; Ascending: Boolean): Integer
+    begin
+        case FieldNo of
+            ItemCategoryBuffer.FieldNo("Calc Field 1"):
+                begin
+                    ItemCategoryBuffer.SetCurrentKey("Calc Field 1");
+                    ItemCategoryBuffer.SetAscending("Calc Field 1", Ascending);
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 2"):
+                begin
+                    ItemCategoryBuffer.SetCurrentKey("Calc Field 2");
+                    ItemCategoryBuffer.SetAscending("Calc Field 2", Ascending);
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 3"):
+                begin
+                    ItemCategoryBuffer.SetCurrentKey("Calc Field 3");
+                    ItemCategoryBuffer.SetAscending("Calc Field 3", Ascending);
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 4"):
+                begin
+                    ItemCategoryBuffer.SetCurrentKey("Calc Field 4");
+                    ItemCategoryBuffer.SetAscending("Calc Field 4", Ascending);
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 5"):
+                begin
+                    ItemCategoryBuffer.SetCurrentKey("Calc Field 5");
+                    ItemCategoryBuffer.SetAscending("Calc Field 5", Ascending);
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 6"):
+                begin
+                    ItemCategoryBuffer.SetCurrentKey("Calc Field 6");
+                    ItemCategoryBuffer.SetAscending("Calc Field 6", Ascending);
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 7"):
+                begin
+                    ItemCategoryBuffer.SetCurrentKey("Calc Field 7");
+                    ItemCategoryBuffer.SetAscending("Calc Field 7", Ascending);
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 8"):
+                begin
+                    ItemCategoryBuffer.SetCurrentKey("Calc Field 8");
+                    ItemCategoryBuffer.SetAscending("Calc Field 8", Ascending);
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 9"):
+                begin
+                    ItemCategoryBuffer.SetCurrentKey("Calc Field 9");
+                    ItemCategoryBuffer.SetAscending("Calc Field 9", Ascending);
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 10"):
+                begin
+                    ItemCategoryBuffer.SetCurrentKey("Calc Field 10");
+                    ItemCategoryBuffer.SetAscending("Calc Field 10", Ascending);
+                end;
+        end;
+    end;
+
+    #endregion
+
+    #region Item Category Buffer. Calc Fields Mgt.
+
+    procedure ClearCalcFieldsDictionary(var CalcFieldsDict: Dictionary of [Integer, Decimal])
+    var
+        DictKey: Integer;
+    begin
+        foreach DictKey in CalcFieldsDict.Keys() do begin
+            CalcFieldsDict.Remove(DictKey);
+        end;
+    end;
+
+    procedure SetCalcFieldValue(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; FieldNo: Integer; Value: Decimal)
+    begin
+        if CheckIfCalcFieldExistsInItemCategoryBuffer(FieldNo) = 0 then
+            Error('Codeunit:''NPR Item Category Mgt.''\Procedure:''SetCalcFieldValue''\Field with id %1 does not exists in table Item Category Buffer.', FieldNo);
+        case FieldNo of
+            ItemCategoryBuffer.FieldNo("Calc Field 1"):
+                begin
+                    ItemCategoryBuffer."Calc Field 1" += Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 2"):
+                begin
+                    ItemCategoryBuffer."Calc Field 2" += Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 3"):
+                begin
+                    ItemCategoryBuffer."Calc Field 3" += Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 4"):
+                begin
+                    ItemCategoryBuffer."Calc Field 4" += Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 5"):
+                begin
+                    ItemCategoryBuffer."Calc Field 5" += Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 6"):
+                begin
+                    ItemCategoryBuffer."Calc Field 6" += Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 7"):
+                begin
+                    ItemCategoryBuffer."Calc Field 7" += Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 8"):
+                begin
+                    ItemCategoryBuffer."Calc Field 8" += Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 9"):
+                begin
+                    ItemCategoryBuffer."Calc Field 9" += Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 10"):
+                begin
+                    ItemCategoryBuffer."Calc Field 10" += Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+        end;
+    end;
+
+    local procedure InsertCalcFieldValue(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; FieldNo: Integer; Value: Decimal)
+    begin
+        if CheckIfCalcFieldExistsInItemCategoryBuffer(FieldNo) = 0 then
+            Error('Codeunit:''NPR Item Category Mgt.''\Procedure:''InsertCalcFieldValue''\Field with id %1 does not exists in table Item Category Buffer.', FieldNo);
+        case FieldNo of
+            ItemCategoryBuffer.FieldNo("Calc Field 1"):
+                begin
+                    ItemCategoryBuffer."Calc Field 1" := Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 2"):
+                begin
+                    ItemCategoryBuffer."Calc Field 2" := Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 3"):
+                begin
+                    ItemCategoryBuffer."Calc Field 3" := Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 4"):
+                begin
+                    ItemCategoryBuffer."Calc Field 4" := Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 5"):
+                begin
+                    ItemCategoryBuffer."Calc Field 5" := Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 6"):
+                begin
+                    ItemCategoryBuffer."Calc Field 6" := Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 7"):
+                begin
+                    ItemCategoryBuffer."Calc Field 7" := Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 8"):
+                begin
+                    ItemCategoryBuffer."Calc Field 8" := Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 9"):
+                begin
+                    ItemCategoryBuffer."Calc Field 9" := Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+            ItemCategoryBuffer.FieldNo("Calc Field 10"):
+                begin
+                    ItemCategoryBuffer."Calc Field 10" := Value;
+                    ItemCategoryBuffer.Modify();
+                end;
+        end;
+    end;
+
+    local procedure GetCalcFieldValue(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; FieldNo: Integer): Decimal
+    begin
+        if CheckIfCalcFieldExistsInItemCategoryBuffer(FieldNo) = 0 then
+            Error('Codeunit:''NPR Item Category Mgt.''\Procedure:''GetCalcFieldValue''\Field with id %1 does not exists in table Item Category Buffer.', FieldNo);
+
+        case FieldNo of
+            ItemCategoryBuffer.FieldNo("Calc Field 1"):
+                exit(ItemCategoryBuffer."Calc Field 1");
+            ItemCategoryBuffer.FieldNo("Calc Field 2"):
+                exit(ItemCategoryBuffer."Calc Field 2");
+            ItemCategoryBuffer.FieldNo("Calc Field 3"):
+                exit(ItemCategoryBuffer."Calc Field 3");
+            ItemCategoryBuffer.FieldNo("Calc Field 4"):
+                exit(ItemCategoryBuffer."Calc Field 4");
+            ItemCategoryBuffer.FieldNo("Calc Field 5"):
+                exit(ItemCategoryBuffer."Calc Field 5");
+            ItemCategoryBuffer.FieldNo("Calc Field 6"):
+                exit(ItemCategoryBuffer."Calc Field 6");
+            ItemCategoryBuffer.FieldNo("Calc Field 7"):
+                exit(ItemCategoryBuffer."Calc Field 7");
+            ItemCategoryBuffer.FieldNo("Calc Field 8"):
+                exit(ItemCategoryBuffer."Calc Field 8");
+            ItemCategoryBuffer.FieldNo("Calc Field 9"):
+                exit(ItemCategoryBuffer."Calc Field 9");
+            ItemCategoryBuffer.FieldNo("Calc Field 10"):
+                exit(ItemCategoryBuffer."Calc Field 10");
+        end;
+    end;
+
+    local procedure InsertCalcFieldsInItemCategoryBuffer(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; CalcFieldsDictionary: Dictionary of [Integer, Decimal])
+    var
+        DictKey: Integer;
+        Value: Decimal;
+    begin
+        foreach DictKey in CalcFieldsDictionary.Keys() do begin
+            if CheckIfCalcFieldExistsInItemCategoryBuffer(DictKey) = 0 then
+                Error('Codeunit:''NPR Item Category Mgt.''\Procedure:''InsertCalcFieldsInItemCategoryBuffer''\Field with id %1 does not exists in table Item Category Buffer.', DictKey);
+
+            Value := CalcFieldsDictionary.Get(DictKey);
+            InsertCalcFieldValue(ItemCategoryBuffer, DictKey, Value);
+        end;
+    end;
+
+    procedure SetCalcFieldsInItemCategoryBuffer(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; CalcFieldsDictionary: Dictionary of [Integer, Decimal])
+    var
+        DictKey: Integer;
+        Value: Decimal;
+    begin
+        foreach DictKey in CalcFieldsDictionary.Keys() do begin
+            if CheckIfCalcFieldExistsInItemCategoryBuffer(DictKey) = 0 then
+                Error('Codeunit:''NPR Item Category Mgt.''\Procedure:''SetCalcFieldsInItemCategoryBuffer''\Field with id %1 does not exists in table Item Category Buffer.', DictKey);
+
+            Value := CalcFieldsDictionary.Get(DictKey);
+            SetCalcFieldValue(ItemCategoryBuffer, DictKey, Value);
+        end;
+    end;
+
+    local procedure CheckIfCalcFieldExistsInItemCategoryBuffer(FieldNo: Integer): Integer
+    var
+        ItemCategoryBuffer: Record "NPR Item Category Buffer";
+    begin
+        case FieldNo of
+            ItemCategoryBuffer.FieldNo("Calc Field 1"):
+                exit(ItemCategoryBuffer.FieldNo("Calc Field 1"));
+            ItemCategoryBuffer.FieldNo("Calc Field 2"):
+                exit(ItemCategoryBuffer.FieldNo("Calc Field 2"));
+            ItemCategoryBuffer.FieldNo("Calc Field 3"):
+                exit(ItemCategoryBuffer.FieldNo("Calc Field 3"));
+            ItemCategoryBuffer.FieldNo("Calc Field 4"):
+                exit(ItemCategoryBuffer.FieldNo("Calc Field 4"));
+            ItemCategoryBuffer.FieldNo("Calc Field 5"):
+                exit(ItemCategoryBuffer.FieldNo("Calc Field 5"));
+            ItemCategoryBuffer.FieldNo("Calc Field 6"):
+                exit(ItemCategoryBuffer.FieldNo("Calc Field 6"));
+            ItemCategoryBuffer.FieldNo("Calc Field 7"):
+                exit(ItemCategoryBuffer.FieldNo("Calc Field 7"));
+            ItemCategoryBuffer.FieldNo("Calc Field 8"):
+                exit(ItemCategoryBuffer.FieldNo("Calc Field 8"));
+            ItemCategoryBuffer.FieldNo("Calc Field 9"):
+                exit(ItemCategoryBuffer.FieldNo("Calc Field 9"));
+            ItemCategoryBuffer.FieldNo("Calc Field 10"):
+                exit(ItemCategoryBuffer.FieldNo("Calc Field 10"));
+            else
+                exit(0);
+        end;
+    end;
+
+    local procedure UpdateParentsCalcFieldsValues(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary)
+    var
+        TempItemCategoryBuffer: Record "NPR Item Category Buffer" temporary;
+        CalcFields: Array[10] of Decimal;
+    begin
+        ItemCategoryBuffer.Reset();
+        if ItemCategoryBuffer.FindSet() then
+            repeat
+                TempItemCategoryBuffer.Init();
+                TempItemCategoryBuffer := ItemCategoryBuffer;
+                TempItemCategoryBuffer.Insert();
+            until ItemCategoryBuffer.Next() = 0;
+
+        ItemCategoryBuffer.Reset();
+        if ItemCategoryBuffer.FindSet() then
+            repeat
+                CalcFields[1] := GetTotalCalcFieldValuesDict(ItemCategoryBuffer, TempItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 1"));
+                CalcFields[2] := GetTotalCalcFieldValuesDict(ItemCategoryBuffer, TempItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 2"));
+                CalcFields[3] := GetTotalCalcFieldValuesDict(ItemCategoryBuffer, TempItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 3"));
+                CalcFields[4] := GetTotalCalcFieldValuesDict(ItemCategoryBuffer, TempItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 4"));
+                CalcFields[5] := GetTotalCalcFieldValuesDict(ItemCategoryBuffer, TempItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 5"));
+                CalcFields[6] := GetTotalCalcFieldValuesDict(ItemCategoryBuffer, TempItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 6"));
+                CalcFields[7] := GetTotalCalcFieldValuesDict(ItemCategoryBuffer, TempItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 7"));
+                CalcFields[8] := GetTotalCalcFieldValuesDict(ItemCategoryBuffer, TempItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 8"));
+                CalcFields[9] := GetTotalCalcFieldValuesDict(ItemCategoryBuffer, TempItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 9"));
+                CalcFields[10] := GetTotalCalcFieldValuesDict(ItemCategoryBuffer, TempItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 10"));
+                InsertCalcFieldValue(ItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 1"), CalcFields[1]);
+                InsertCalcFieldValue(ItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 2"), CalcFields[2]);
+                InsertCalcFieldValue(ItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 3"), CalcFields[3]);
+                InsertCalcFieldValue(ItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 4"), CalcFields[4]);
+                InsertCalcFieldValue(ItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 5"), CalcFields[5]);
+                InsertCalcFieldValue(ItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 6"), CalcFields[6]);
+                InsertCalcFieldValue(ItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 7"), CalcFields[7]);
+                InsertCalcFieldValue(ItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 8"), CalcFields[8]);
+                InsertCalcFieldValue(ItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 9"), CalcFields[9]);
+                InsertCalcFieldValue(ItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 10"), CalcFields[10]);
+            until ItemCategoryBuffer.Next() = 0;
+    end;
+
+    local procedure GetTotalCalcFieldValuesDict(var CurrItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; var ItemCategoryBufferFull: Record "NPR Item Category Buffer" temporary; FieldNo: Integer) Amount: Decimal
+    var
+        TempItemCategoryBuffer: Record "NPR Item Category Buffer" temporary;
+    begin
+
+        if ItemCategoryBufferFull.FindSet() then
+            repeat
+                TempItemCategoryBuffer.Init();
+                TempItemCategoryBuffer := ItemCategoryBufferFull;
+                TempItemCategoryBuffer.Insert();
+            until ItemCategoryBufferFull.Next() = 0;
+
+        TempItemCategoryBuffer.SetRange("Parent Category", CurrItemCategoryBuffer.Code);
+        TempItemCategoryBuffer.SetRange("Salesperson Code", CurrItemCategoryBuffer."Salesperson Code");
+
+        Amount := GetCalcFieldValue(CurrItemCategoryBuffer, FieldNo);
+
+        if TempItemCategoryBuffer.FindSet() then
+            repeat
+                Amount += GetTotalCalcFieldValuesDict(TempItemCategoryBuffer, ItemCategoryBufferFull, FieldNo);
+            until TempItemCategoryBuffer.Next() = 0;
+        exit(Amount);
+    end;
+
+    #endregion
+
+
+    procedure DeleteItemCategoryBuffer(ItemCategoryCode: Code[20]; SalespersonCode: Code[20]; GlobalDimensionCode1: Code[20]; GlobalDimensionCode2: Code[20]; var ItemCatagoryBuffer: Record "NPR Item Category Buffer" temporary; var ItemCategoryBufferFull: Record "NPR Item Category Buffer" temporary)
+    var
+        TempItemCategoryBuffer: Record "NPR Item Category Buffer" temporary;
+    begin
+        if ItemCategoryBufferFull.FindSet() then
+            repeat
+                TempItemCategoryBuffer.Init();
+                TempItemCategoryBuffer := ItemCategoryBufferFull;
+                TempItemCategoryBuffer.Insert();
+            until ItemCategoryBufferFull.Next() = 0;
+
+        TempItemCategoryBuffer.SetRange("Parent Category", ItemCategoryCode);
+        TempItemCategoryBuffer.SetRange("Salesperson Code", SalespersonCode);
+        TempItemCategoryBuffer.SetRange("Global Dimension 1 Code", GlobalDimensionCode1);
+        TempItemCategoryBuffer.SetRange("Global Dimension 2 Code", GlobalDimensionCode2);
+
+        if TempItemCategoryBuffer.FindSet() then
+            repeat
+                DeleteItemCategoryBuffer(TempItemCategoryBuffer.Code, SalespersonCode, GlobalDimensionCode1, GlobalDimensionCode2, ItemCatagoryBuffer, ItemCategoryBufferFull);
+            until TempItemCategoryBuffer.Next() = 0;
+
+        ItemCatagoryBuffer.Reset();
+
+        ItemCatagoryBuffer.SetRange(Code, ItemCategoryCode);
+        ItemCatagoryBuffer.SetRange("Salesperson Code", SalespersonCode);
+        ItemCatagoryBuffer.SetRange("Global Dimension 1 Code", GlobalDimensionCode1);
+        ItemCatagoryBuffer.SetRange("Global Dimension 2 Code", GlobalDimensionCode2);
+
+        if ItemCatagoryBuffer.FindFirst() then
+            ItemCatagoryBuffer.Delete();
+    end;
+
+    #endregion
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertItemFromTemplate(var Item: Record Item; ConfigTemplateHeader: Record "Config. Template Header")
     begin
