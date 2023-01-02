@@ -38,11 +38,12 @@ codeunit 85053 "NPR Library - Boarding Pass"
             NewString += ' ';
     end;
 
-    local procedure DateToJulianDate(CalcDate: Date) JulianDate: Integer
+    local procedure DateToJulianDate(CalcDate: Date) JulianDate: Code[3]
     var
         DateFormulaLbl: Label '<-CY>', Locked = true;
     begin
-        JulianDate := CalcDate - CALCDATE(DateFormulaLbl, CalcDate) + 1;
+        JulianDate := FORMAT(CalcDate - CALCDATE(DateFormulaLbl, CalcDate) + 1);
+        JulianDate := PADSTR('', 3 - strlen(JulianDate), '0') + JulianDate;
     end;
 
     procedure GenerateTravelLeg(FromAirportCode: Code[3]; ToAirPortCode: Code[3]; OperatorFlightNo: Code[8]; FlightDate: Date) LegString: Text;
@@ -57,7 +58,7 @@ codeunit 85053 "NPR Library - Boarding Pass"
         TB.Append(FromAirportCode); // From City Airport Code [3]
         TB.Append(ToAirPortCode); // To City Airport Code [3]
         TB.Append(OperatorFlightNo); // Flight Number [8]
-        TB.Append(FORMAT(DateToJulianDate(FlightDate))); // Flight Date [3]
+        TB.Append(DateToJulianDate(FlightDate)); // Flight Date [3]
         TB.Append(LibraryRandom.RandText(1)); //Compartment Code
         TB.Append(LibraryRandom.RandText(4)); //Seat Number
         TB.Append(LibraryRandom.RandText(5)); //CheckIn Sequence Number
