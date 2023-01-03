@@ -16,6 +16,8 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
         ParamObfucationMethod_OptCptLbl: Label 'None, MI';
         ParamCopyHdrDim_CptLbl: Label 'Copy Header Dimensions';
         ParamCopyHdrDim_DescLbl: Label 'Defines if header dimenions will be copied';
+        ParamPayLines_CptLbl: Label 'Include Payment Lines';
+        ParamPayLines_DescLbl: Label 'Include/Disclude Payment Lines';
         Title: Label 'Reverse Sale';
         ReceiptPrompt: Label 'Receipt Number';
         ReasonPrompt: Label 'Return Reason';
@@ -40,6 +42,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
                        ParamObfucationMethod_DescLbl,
                        ParamObfucationMethod_OptCptLbl);
         WorkflowConfig.AddBooleanParameter('CopyHeaderDimensions', false, ParamCopyHdrDim_CptLbl, ParamCopyHdrDim_DescLbl);
+        WorkflowConfig.AddBooleanParameter('IncludePaymentLines', false, ParamPayLines_CptLbl, ParamPayLines_DescLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -71,14 +74,16 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
         ObfucationMethod: Option "None",MI;
         CopyHeaderDim: Boolean;
         ReturnReasonCode: Code[20];
+        IncludePaymentLines: Boolean;
         POSActionRevDirSaleB: Codeunit "NPR POS Action: Rev.Dir.Sale B";
     begin
         SalesTicketNo := Context.GetString('receipt');
         ObfucationMethod := Context.GetIntegerParameter('ObfucationMethod');
         CopyHeaderDim := Context.GetBooleanParameter('CopyHeaderDimensions');
         ReturnReasonCode := CopyStr(Context.GetString('ReturnReasonCode'), 1, MaxStrLen(ReturnReasonCode));
+        IncludePaymentLines := Context.GetBooleanParameter('IncludePaymentLines');
 
-        POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyHeaderDim, ReturnReasonCode);
+        POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyHeaderDim, ReturnReasonCode, IncludePaymentLines);
     end;
 
     local procedure SelectReturnReason() Response: Text
