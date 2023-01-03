@@ -73,7 +73,7 @@
                 }
                 field("POS Layout Code"; Rec."POS Layout Code")
                 {
-                    ShowMandatory = true;
+                    ShowMandatory = false;
                     ToolTip = 'Specifies the layout system applies on front-end for the POS unit.';
                     ApplicationArea = NPRRetail;
                 }
