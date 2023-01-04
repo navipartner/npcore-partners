@@ -449,6 +449,7 @@
     local procedure InsertPOSAddOnLine(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; SalePOS: Record "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line"; AppliesToLineNo: Integer; var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        ItemAddOn: Codeunit "NPR NpIa Item AddOn";
         LineNo: Integer;
         PrevRec: Text;
     begin
@@ -471,7 +472,7 @@
             POSSaleLine.ForceInsertWithAutoSplitKey(true);
             POSSaleLine.GetNewSaleLine(SaleLinePOS);
 
-            BeforeInsertPOSAddOnLine(SalePOS, AppliesToLineNo, ItemAddOnLine);
+            ItemAddOn.BeforeInsertPOSAddOnLine(SalePOS, AppliesToLineNo, ItemAddOnLine);
             SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
             SaleLinePOS."Variant Code" := ItemAddOnLine."Variant Code";
             SaleLinePOS.Validate("No.", ItemAddOnLine."Item No.");
@@ -520,7 +521,7 @@
 
         PrevRec := Format(SaleLinePOS);
 
-        BeforeInsertPOSAddOnLine(SalePOS, AppliesToLineNo, ItemAddOnLine);
+        ItemAddOn.BeforeInsertPOSAddOnLine(SalePOS, AppliesToLineNo, ItemAddOnLine);
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
         SaleLinePOS."Variant Code" := ItemAddOnLine."Variant Code";
         SaleLinePOS.Validate("No.", ItemAddOnLine."Item No.");
@@ -655,21 +656,6 @@
             POSSession.RequestRefreshData();
             Commit();
         end;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure BeforeInsertPOSAddOnLine(SalePOS: Record "NPR POS Sale"; AppliesToLineNo: Integer; var NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    internal procedure HasBeforeInsertSetup(NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var HasSetup: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    internal procedure RunBeforeInsertSetup(NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var Handled: Boolean)
-    begin
     end;
 
     local procedure GetItemAddOnComment(ItemAddOn: Record "NPR NpIa Item AddOn"; SaleLinePOS: Record "NPR POS Sale Line") Comment: Text
