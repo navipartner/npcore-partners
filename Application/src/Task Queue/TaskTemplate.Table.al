@@ -1,18 +1,11 @@
 ﻿table 6059900 "NPR Task Template"
 {
     Access = Internal;
-    // TQ1.11/JDH/20140905 CASE 190421 BullZip PDF Printer Added
-    // TQ1.16/JDH/20140916 CASE 179044 Alignment to 2013
-    // TQ1.16/JDH/20140923 CASE 179044 Added SMTP mail support
-    // TQ1.27/JDH/20150701 CASE 217903 Deleted unused Variables and fields
-    // TQ1.28/MHA/20151216  CASE 229609 Task Queue
-    // TQ1.33/BHR /20180824  CASE 322752 Replace record Object to Allobj -fields 5,6
-
     Caption = 'Task Template';
-    LookupPageID = "NPR Task Template";
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Task Queue module is about to be removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Task Queue module removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteTag = 'BC 21 - Task Queue deprecating starting from 28/06/2022';
 
     fields
     {
@@ -30,20 +23,12 @@
         field(5; "Test Report ID"; Integer)
         {
             Caption = 'Test Report ID';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Report));
             DataClassification = CustomerContent;
         }
         field(6; "Page ID"; Integer)
         {
             Caption = 'Form ID';
-            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Page));
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Page ID" = 0 then
-                    Validate(Type);
-            end;
         }
         field(9; Type; Option)
         {
@@ -51,53 +36,6 @@
             OptionCaption = 'General,NaviPartner';
             OptionMembers = General,NaviPartner;
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                NASGroup: Record "NPR Task Worker Group";
-            begin
-                //"Test Report ID" := REPORT::"General Journal - Test";
-                //"Posting Report ID" := REPORT::"G/L Register";
-                case Type of
-                    Type::General:
-                        begin
-                            "Page ID" := PAGE::"NPR Task Journal";
-                            "Mail Program" := "Mail Program"::JMail;
-                            case NASGroup.Count() of
-                                0:
-                                    begin
-                                        NASGroup.InsertDefault();
-                                        NASGroup.FindFirst();
-                                        "Task Worker Group" := NASGroup.Code;
-                                    end;
-                                1:
-                                    begin
-                                        NASGroup.FindFirst();
-                                        "Task Worker Group" := NASGroup.Code;
-                                    end;
-                            end;
-                        end;
-                    Type::NaviPartner:
-                        begin
-                            //"Page ID" :=  PAGE::Page6059910;
-                            "Mail Program" := "Mail Program"::JMail;
-                            case NASGroup.Count() of
-                                0:
-                                    begin
-                                        NASGroup.InsertDefault();
-                                        NASGroup.FindFirst();
-                                        "Task Worker Group" := NASGroup.Code;
-                                    end;
-                                1:
-                                    begin
-                                        NASGroup.FindFirst();
-                                        "Task Worker Group" := NASGroup.Code;
-                                    end;
-                            end;
-                        end;
-
-                end;
-            end;
         }
         field(15; "Test Report Name"; Text[250])
         {
@@ -118,7 +56,6 @@
         field(19; "Task Worker Group"; Code[10])
         {
             Caption = 'Task Worker Group';
-            TableRelation = "NPR Task Worker Group";
             DataClassification = CustomerContent;
         }
         field(30; "Mail Program"; Option)
@@ -147,29 +84,5 @@
         {
         }
     }
-
-    fieldgroups
-    {
-        fieldgroup(DropDown; Name, Description, Type)
-        {
-        }
-    }
-
-    trigger OnDelete()
-    begin
-        TaskLine.SetRange("Journal Template Name", Name);
-        TaskLine.DeleteAll(true);
-        TaskBatch.SetRange("Journal Template Name", Name);
-        TaskBatch.DeleteAll();
-    end;
-
-    trigger OnInsert()
-    begin
-        Validate("Page ID");
-    end;
-
-    var
-        TaskBatch: Record "NPR Task Batch";
-        TaskLine: Record "NPR Task Line";
 }
 
