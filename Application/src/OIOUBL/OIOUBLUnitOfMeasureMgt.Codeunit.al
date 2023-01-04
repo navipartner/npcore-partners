@@ -44,7 +44,9 @@ codeunit 6060018 "NPR OIOUBL Unit Of Measure Mgt"
         foreach UnitCode in UnitCodes do begin
             IsValid := StrLen(UnitCode) <= 10;
             if IsValid then
+#pragma warning disable AA0139
                 IsValid := IntCodeDictionary.ContainsKey(UnitCode);
+#pragma warning restore
             if IsValid then
                 ValidUnitCodes.Add(UnitCode)
             else

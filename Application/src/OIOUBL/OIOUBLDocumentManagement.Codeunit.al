@@ -3,11 +3,11 @@ codeunit 6060016 "NPR OIOUBL Document Management"
     Access = Internal;
 
     var
-        DocNameSpaceCBC: Label 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2', Locked = true;
-        DocNameSpaceCAC: Label 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2', Locked = true;
+        DocNameSpaceCBCLbl: Label 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2', Locked = true;
+        DocNameSpaceCACLbl: Label 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2', Locked = true;
 
 
-    procedure GetDefaultFilename(RecRef: RecordRef) Filename: Text
+    procedure GetDefaultFilename(RecRef: RecordRef) Filename: Text[250]
     var
         OIOUBLSetup: Record "NPR OIOUBL Setup";
         CompanyInformation: Record "Company Information";
@@ -31,10 +31,10 @@ codeunit 6060016 "NPR OIOUBL Document Management"
         OIOUBLSetup.Get();
 
         if OIOUBLSetup."Filename Pattern" <> '' then
-            Filename := StrSubstNo(OIOUBLSetup."Filename Pattern", RecRef.Field(3).Value, DocumentType)
+            Filename := CopyStr(StrSubstNo(OIOUBLSetup."Filename Pattern", RecRef.Field(3).Value, DocumentType), 1, MaxStrLen(Filename))
         else begin
             CompanyInformation.Get();
-            Filename := StrSubstNo(FilenamePatternLbl, CompanyInformation.GetVATRegistrationNumber(), DocumentType, RecRef.Field(3).Value);
+            Filename := CopyStr(StrSubstNo(FilenamePatternLbl, CompanyInformation.GetVATRegistrationNumber(), DocumentType, RecRef.Field(3).Value), 1, MaxStrLen(Filename));
         end;
 
     end;
@@ -95,8 +95,8 @@ codeunit 6060016 "NPR OIOUBL Document Management"
         SourceTempBlob.CreateInStream(IStream, TextEncoding::UTF8);
         XmlDocument.ReadFrom(IStream, Document);
         NamespaceManager.AddNamespace('inv2', 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2');
-        NamespaceManager.AddNamespace('cbc', DocNameSpaceCBC);
-        NamespaceManager.AddNamespace('cac', DocNameSpaceCAC);
+        NamespaceManager.AddNamespace('cbc', DocNameSpaceCBCLbl);
+        NamespaceManager.AddNamespace('cac', DocNameSpaceCACLbl);
 
         if OIOUBLSetup."Include PDF Invoice" then begin
             SourceTableRecRef.SetTable(SalesInvoiceHeader);
@@ -123,7 +123,7 @@ codeunit 6060016 "NPR OIOUBL Document Management"
                     TempBlob.CreateOutStream(ReportOutStream);
                     ReportLayoutSelection.SetTempLayoutSelected(TempReportSelections."Custom Report Layout Code");
                     if Report.SaveAs(TempReportSelections."Report ID", '', ReportFormat::Pdf, ReportOutStream, RecRef) then begin
-                        GenerateAdditionalDocumentReference(AdditionalDocumentReferenceElement, TempBlob, Id, 'application/pdf', DocNameSpaceCBC, DocNameSpaceCAC);
+                        GenerateAdditionalDocumentReference(AdditionalDocumentReferenceElement, TempBlob, Id, 'application/pdf', DocNameSpaceCBCLbl, DocNameSpaceCACLbl);
                         Element.AddAfterSelf(AdditionalDocumentReferenceElement);
                     end;
                     ReportLayoutSelection.SetTempLayoutSelected('');
@@ -162,7 +162,7 @@ codeunit 6060016 "NPR OIOUBL Document Management"
                             if Node.SelectSingleNode('cac:Price/cbc:PriceAmount', NamespaceManager, PriceNode) then begin
                                 Element := PriceNode.AsXmlElement();
                                 AttributeCollection := Element.Attributes();
-                                Element.ReplaceWith(XmlElement.Create('PriceAmount', DocNameSpaceCBC, AttributeCollection, Format(PriceAmount, 0, 9)));
+                                Element.ReplaceWith(XmlElement.Create('PriceAmount', DocNameSpaceCBCLbl, AttributeCollection, Format(PriceAmount, 0, 9)));
                                 XmlChanged := true;
                             end;
                     end;
@@ -213,8 +213,8 @@ codeunit 6060016 "NPR OIOUBL Document Management"
         SourceTempBlob.CreateInStream(IStream, TextEncoding::UTF8);
         XmlDocument.ReadFrom(IStream, Document);
         NamespaceManager.AddNamespace('cr2', 'urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2');
-        NamespaceManager.AddNamespace('cbc', DocNameSpaceCBC);
-        NamespaceManager.AddNamespace('cac', DocNameSpaceCAC);
+        NamespaceManager.AddNamespace('cbc', DocNameSpaceCBCLbl);
+        NamespaceManager.AddNamespace('cac', DocNameSpaceCACLbl);
 
         if OIOUBLSetup."Include PDF Cr. Memo" then begin
             SourceTableRecRef.SetTable(SalesCrMemoHeader);
@@ -241,7 +241,7 @@ codeunit 6060016 "NPR OIOUBL Document Management"
                     TempBlob.CreateOutStream(ReportOutStream);
                     ReportLayoutSelection.SetTempLayoutSelected(TempReportSelections."Custom Report Layout Code");
                     if Report.SaveAs(TempReportSelections."Report ID", '', ReportFormat::Pdf, ReportOutStream, RecRef) then begin
-                        GenerateAdditionalDocumentReference(AdditionalDocumentReferenceElement, TempBlob, Id, 'application/pdf', DocNameSpaceCBC, DocNameSpaceCAC);
+                        GenerateAdditionalDocumentReference(AdditionalDocumentReferenceElement, TempBlob, Id, 'application/pdf', DocNameSpaceCBCLbl, DocNameSpaceCACLbl);
                         Element.AddAfterSelf(AdditionalDocumentReferenceElement);
                     end;
                     ReportLayoutSelection.SetTempLayoutSelected('');
@@ -280,7 +280,7 @@ codeunit 6060016 "NPR OIOUBL Document Management"
                             if Node.SelectSingleNode('cac:Price/cbc:PriceAmount', NamespaceManager, PriceNode) then begin
                                 Element := PriceNode.AsXmlElement();
                                 AttributeCollection := Element.Attributes();
-                                Element.ReplaceWith(XmlElement.Create('PriceAmount', DocNameSpaceCBC, AttributeCollection, Format(PriceAmount, 0, 9)));
+                                Element.ReplaceWith(XmlElement.Create('PriceAmount', DocNameSpaceCBCLbl, AttributeCollection, Format(PriceAmount, 0, 9)));
                                 XmlChanged := true;
                             end;
                     end;
@@ -331,8 +331,8 @@ codeunit 6060016 "NPR OIOUBL Document Management"
         SourceTempBlob.CreateInStream(IStream, TextEncoding::UTF8);
         XmlDocument.ReadFrom(IStream, Document);
         NamespaceManager.AddNamespace('inv2', 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2');
-        NamespaceManager.AddNamespace('cbc', DocNameSpaceCBC);
-        NamespaceManager.AddNamespace('cac', DocNameSpaceCAC);
+        NamespaceManager.AddNamespace('cbc', DocNameSpaceCBCLbl);
+        NamespaceManager.AddNamespace('cac', DocNameSpaceCACLbl);
 
         if OIOUBLSetup."Include PDF Invoice" then begin
             SourceTableRecRef.SetTable(ServiceInvoiceHeader);
@@ -359,7 +359,7 @@ codeunit 6060016 "NPR OIOUBL Document Management"
                     TempBlob.CreateOutStream(ReportOutStream);
                     ReportLayoutSelection.SetTempLayoutSelected(TempReportSelections."Custom Report Layout Code");
                     if Report.SaveAs(TempReportSelections."Report ID", '', ReportFormat::Pdf, ReportOutStream, RecRef) then begin
-                        GenerateAdditionalDocumentReference(AdditionalDocumentReferenceElement, TempBlob, Id, 'application/pdf', DocNameSpaceCBC, DocNameSpaceCAC);
+                        GenerateAdditionalDocumentReference(AdditionalDocumentReferenceElement, TempBlob, Id, 'application/pdf', DocNameSpaceCBCLbl, DocNameSpaceCACLbl);
                         Element.AddAfterSelf(AdditionalDocumentReferenceElement);
                     end;
                     ReportLayoutSelection.SetTempLayoutSelected('');
@@ -398,7 +398,7 @@ codeunit 6060016 "NPR OIOUBL Document Management"
                             if Node.SelectSingleNode('cac:Price/cbc:PriceAmount', NamespaceManager, PriceNode) then begin
                                 Element := PriceNode.AsXmlElement();
                                 AttributeCollection := Element.Attributes();
-                                Element.ReplaceWith(XmlElement.Create('PriceAmount', DocNameSpaceCBC, AttributeCollection, Format(PriceAmount, 0, 9)));
+                                Element.ReplaceWith(XmlElement.Create('PriceAmount', DocNameSpaceCBCLbl, AttributeCollection, Format(PriceAmount, 0, 9)));
                                 XmlChanged := true;
                             end;
                     end;
@@ -450,8 +450,8 @@ codeunit 6060016 "NPR OIOUBL Document Management"
         SourceTempBlob.CreateInStream(IStream, TextEncoding::UTF8);
         XmlDocument.ReadFrom(IStream, Document);
         NamespaceManager.AddNamespace('cr2', 'urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2');
-        NamespaceManager.AddNamespace('cbc', DocNameSpaceCBC);
-        NamespaceManager.AddNamespace('cac', DocNameSpaceCAC);
+        NamespaceManager.AddNamespace('cbc', DocNameSpaceCBCLbl);
+        NamespaceManager.AddNamespace('cac', DocNameSpaceCACLbl);
 
         if OIOUBLSetup."Include PDF Cr. Memo" then begin
             SourceTableRecRef.SetTable(ServiceCrMemoHeader);
@@ -478,7 +478,7 @@ codeunit 6060016 "NPR OIOUBL Document Management"
                     TempBlob.CreateOutStream(ReportOutStream);
                     ReportLayoutSelection.SetTempLayoutSelected(TempReportSelections."Custom Report Layout Code");
                     if Report.SaveAs(TempReportSelections."Report ID", '', ReportFormat::Pdf, ReportOutStream, RecRef) then begin
-                        GenerateAdditionalDocumentReference(AdditionalDocumentReferenceElement, TempBlob, Id, 'application/pdf', DocNameSpaceCBC, DocNameSpaceCAC);
+                        GenerateAdditionalDocumentReference(AdditionalDocumentReferenceElement, TempBlob, Id, 'application/pdf', DocNameSpaceCBCLbl, DocNameSpaceCACLbl);
                         Element.AddAfterSelf(AdditionalDocumentReferenceElement);
                     end;
                     ReportLayoutSelection.SetTempLayoutSelected('');
@@ -517,7 +517,7 @@ codeunit 6060016 "NPR OIOUBL Document Management"
                             if Node.SelectSingleNode('cac:Price/cbc:PriceAmount', NamespaceManager, PriceNode) then begin
                                 Element := PriceNode.AsXmlElement();
                                 AttributeCollection := Element.Attributes();
-                                Element.ReplaceWith(XmlElement.Create('PriceAmount', DocNameSpaceCBC, AttributeCollection, Format(PriceAmount, 0, 9)));
+                                Element.ReplaceWith(XmlElement.Create('PriceAmount', DocNameSpaceCBCLbl, AttributeCollection, Format(PriceAmount, 0, 9)));
                                 XmlChanged := true;
                             end;
                     end;

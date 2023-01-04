@@ -12,14 +12,14 @@
         RecordNotFoundErr: Label 'Document %1 not found.';
         NoOutputErr: Label 'No output from Report %1.';
 
-    procedure LookupPrinter(var PrinterId: Text): Boolean
+    procedure LookupPrinter(var PrinterId: Text[250]): Boolean
     var
         PrinterName: Text;
     begin
         exit(LookupPrinterIdAndName(PrinterId, PrinterName));
     end;
 
-    procedure LookupPrinterIdAndName(var PrinterID: Text; var PrinterName: Text): Boolean
+    procedure LookupPrinterIdAndName(var PrinterID: Text[250]; var PrinterName: Text): Boolean
     var
         TempRetailList: Record "NPR Retail List" temporary;
         PrintNodeAPI: Codeunit "NPR PrintNode API Mgt.";
@@ -35,7 +35,9 @@
             TempRetailList.Number += 1;
             Hostname := GetString(JToken.AsObject(), 'computer.name', false);
             TempRetailList.Choice := CopyStr(GetString(JToken.AsObject(), 'name', false) + ' (' + Hostname + ')', 1, MaxStrLen(TempRetailList.Choice));
+#pragma warning disable AA0139                    
             TempRetailList.Value := GetString(JToken.AsObject(), 'id', true);
+#pragma warning restore                    
             TempRetailList.Insert();
         end;
         if TempRetailList.IsEmpty then
@@ -163,7 +165,7 @@
         NaviDocsManagement.AddHandlingProfileToLibrary(NaviDocsHandlingProfileCode(), NaviDocsHandlingProfileTxt, true, false, false, false);
     end;
 
-    local procedure NaviDocsHandlingProfileCode(): Text
+    local procedure NaviDocsHandlingProfileCode(): Code[20]
     begin
         exit('PRINTNODE-PDF');
     end;
@@ -174,7 +176,7 @@
         TempBlob: Codeunit "Temp Blob";
         PrintNodeAPIMgt: Codeunit "NPR PrintNode API Mgt.";
         RecRef: RecordRef;
-        PrinterId: Text;
+        PrinterId: Code[20];
         OStream: OutStream;
     begin
         if IsDocumentHandled or (ProfileCode <> NaviDocsHandlingProfileCode()) then
@@ -243,7 +245,7 @@
     [EventSubscriber(ObjectType::Table, Database::"NPR Object Output Selection", 'OnLookupOutputPath', '', false, false)]
     local procedure OnLookupObjectOutputPath(var ObjectOutputSelection: Record "NPR Object Output Selection")
     var
-        ID: Text;
+        ID: Text[250];
     begin
         if ObjectOutputSelection."Output Type" <> ObjectOutputSelection."Output Type"::"PrintNode Raw" then
             exit;
