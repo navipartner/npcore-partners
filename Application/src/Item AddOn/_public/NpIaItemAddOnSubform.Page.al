@@ -157,10 +157,10 @@
 
                 trigger OnAction()
                 var
-                    NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+                    ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn";
                     Handled: Boolean;
                 begin
-                    NpIaItemAddOnMgt.RunBeforeInsertSetup(Rec, Handled);
+                    ItemAddOnMgt.RunBeforeInsertSetup(Rec, Handled);
                 end;
             }
         }
@@ -176,10 +176,10 @@
 
     local procedure SetHasBeforeInsertSetup()
     var
-        NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+        ItemAddOn: Codeunit "NPR NpIa Item AddOn";
     begin
         HasBeforeInsertSetup := false;
-        NpIaItemAddOnMgt.HasBeforeInsertSetup(Rec, HasBeforeInsertSetup);
+        ItemAddOn.CheckIfHasSetupBeforeInsertSetup(Rec, HasBeforeInsertSetup);
     end;
 }
 
