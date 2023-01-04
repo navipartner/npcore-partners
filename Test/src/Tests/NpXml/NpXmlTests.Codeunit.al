@@ -106,7 +106,6 @@ codeunit 85021 "NPR NpXml Tests"
             NcSetup.Insert();
         end;
 
-        NcSetup."Task Queue Enabled" := true;
         NcSetup."Task Worker Group" := 'NC';
         NcSetup.Modify(true);
     end;

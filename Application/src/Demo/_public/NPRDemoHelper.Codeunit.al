@@ -2,12 +2,6 @@ codeunit 6059865 NPRDemoHelper
 {
     Access = Public;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
-    Procedure ResetLogs()
-    begin
-        DemoHelperImple.ResetLogs();
-    end;
-
     Procedure CreateMPOSUser(Username: Text; Password: Text; Company_Name: text; URL: text; POSUnit: code[20])
     begin
         DemoHelperImple.CreateMPOSUser(Username, Password, Company_Name, URL, PosUnit);

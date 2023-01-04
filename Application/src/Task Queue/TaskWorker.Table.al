@@ -1,15 +1,12 @@
 ﻿table 6059907 "NPR Task Worker"
 {
     Access = Internal;
-    // TQ1.24/JDH/20150320 CASE 208247 Added Captions
-    // TQ1.28/MHA/20151216  CASE 229609 Task Queue
-    // TQ1.34/JDH /20181011 CASE 326930 New key
-
     Caption = 'Task Worker';
     DataPerCompany = false;
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Task Queue module is about to be removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Task Queue module removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteTag = 'BC 21 - Task Queue deprecating starting from 28/06/2022';
 
     fields
     {
@@ -79,7 +76,6 @@
         field(30; "Task Worker Group"; Code[10])
         {
             Caption = 'Task Worker Group';
-            TableRelation = "NPR Task Worker Group";
             DataClassification = CustomerContent;
         }
         field(31; "Current Language ID"; Integer)
@@ -117,10 +113,6 @@
         key(Key2; "Last HeartBeat (When Idle)")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
