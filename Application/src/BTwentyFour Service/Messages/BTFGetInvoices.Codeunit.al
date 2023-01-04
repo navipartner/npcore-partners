@@ -11,13 +11,12 @@
         ErrorLogInfoLbl: Label 'Error encountered. Check out error log for more details.';
         NextEndPointNotFoundLbl: Label 'Next Service EndPoint has not been connected to %1 or it is but it''s not enabled.', Comment = '%1=ServiceEndPoint."EndPoint ID"';
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
+#IF BC17
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.')]
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
-    var
-        ServiceAPI: Codeunit "NPR BTF Service API";
     begin
-        ServiceAPI.SendWebRequests(ImportType, TaskLine.RecordID(), '');
     end;
+#ENDIF
 
     procedure Update(JobQueueEntry: Record "Job Queue Entry"; ImportType: Record "NPR Nc Import Type")
     var

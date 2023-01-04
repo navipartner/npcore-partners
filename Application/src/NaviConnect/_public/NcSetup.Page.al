@@ -27,24 +27,11 @@
                     ApplicationArea = NPRNaviConnect;
                 }
             }
-            group("Task Queue")
+            field("Task Worker Group"; Rec."Task Worker Group")
             {
-                ObsoleteState = Pending;
-                ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead.';
-                Caption = 'Task Queue';
-                field("Task Queue Enabled"; Rec."Task Queue Enabled")
-                {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead.';
-                    ToolTip = 'Specifies the value of the Task Queue Enabled field';
-                    ApplicationArea = NPRNaviConnect;
-                }
-                field("Task Worker Group"; Rec."Task Worker Group")
-                {
 
-                    ToolTip = 'Specifies the value of the Task Worker Group field';
-                    ApplicationArea = NPRNaviConnect;
-                }
+                ToolTip = 'Specifies the value of the Task Worker Group field';
+                ApplicationArea = NPRNaviConnect;
             }
         }
     }
@@ -53,28 +40,6 @@
     {
         area(processing)
         {
-            action("Setup Task Queue")
-            {
-                ObsoleteState = Pending;
-                ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead.';
-                Caption = 'Setup Task Queue';
-                Image = Setup;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-
-                ToolTip = 'Executes the Setup Task Queue action';
-                ApplicationArea = NPRNaviConnect;
-
-                trigger OnAction()
-                var
-                    NaviConnectMgt: Codeunit "NPR Nc Setup Mgt.";
-                begin
-                    CurrPage.Update(true);
-                    NaviConnectMgt.SetupTaskQueue();
-                end;
-            }
             action("Setup Job Queue")
             {
                 Caption = 'Setup Job Queue';

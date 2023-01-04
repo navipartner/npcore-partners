@@ -17,8 +17,9 @@
         }
         field(300; "Task Queue Enabled"; Boolean)
         {
-            ObsoleteState = Pending;
-            ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead.';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Task Queue module removed from NP Retail. We are now using Job Queue instead.';
+            ObsoleteTag = 'BC 21 - Task Queue deprecating starting from 28/06/2022';
             Caption = 'Task Queue Enabled';
             DataClassification = CustomerContent;
             Description = 'NC1.11,NC1.12,NC1.16,NC1.17';
@@ -28,8 +29,6 @@
             Caption = 'Task Worker Group';
             DataClassification = CustomerContent;
             Description = 'NC1.09,NC1.11,NC1.12,NC1.17';
-            TableRelation = "NPR Task Worker Group";
-            ValidateTableRelation = false;
         }
         field(310; "Max Task Count per Batch"; Integer)
         {

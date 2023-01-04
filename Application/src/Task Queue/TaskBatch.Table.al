@@ -1,19 +1,12 @@
 ﻿table 6059901 "NPR Task Batch"
 {
     Access = Internal;
-    // TQ1.16/JDH /20140923  CASE 179044 Added SMTP mail support
-    // TQ1.21/JDH /20141219  CASE 202183 Added field "Delete Log After"
-    // TQ1.27/JDH /20150701  CASE 217903 Deleted unused Variables and fields
-    // TQ1.28/MHA /20151216  CASE 229609 Task Queue
-    // TQ1.29/JDH /20161101  CASE 242044 Setting the "delete log after" to 90 days
-    // TQ1.32/MHA /20180319  CASE 308403 Updated Hardcoded Dates with DMY2DATE to be Culture neutral in SetupNewBatch()
-
     Caption = 'Task Batch';
     DataCaptionFields = Name, Description;
-    LookupPageID = "NPR Task Batch";
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Task Queue module is about to be removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Task Queue module removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteTag = 'BC 21 - Task Queue deprecating starting from 28/06/2022';
 
     fields
     {
@@ -21,7 +14,6 @@
         {
             Caption = 'Journal Template Name';
             NotBlank = true;
-            TableRelation = "NPR Task Template";
             DataClassification = CustomerContent;
         }
         field(2; Name; Code[10])
@@ -38,7 +30,6 @@
         field(19; "Task Worker Group"; Code[10])
         {
             Caption = 'Task Worker Group';
-            TableRelation = "NPR Task Worker Group";
             DataClassification = CustomerContent;
         }
         field(21; "Template Type"; Option)
@@ -72,33 +63,11 @@
         {
             Caption = 'Common Companies';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                TaskJnlMgt: Codeunit "NPR Task Jnl. Management";
-            begin
-                if not "Common Companies" then
-                    exit;
-
-                TestField("Task Worker Group");
-                TestField("Mail Program");
-                TestField("Master Company");
-                TaskJnlMgt.SetupCommonBatch(Rec);
-            end;
         }
         field(41; "Master Company"; Text[30])
         {
             Caption = 'Master Company';
-            TableRelation = Company;
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Master Company" = '' then
-                    exit;
-
-                TestField("Common Companies", false);
-            end;
         }
         field(80; "Delete Log After"; Duration)
         {
@@ -113,66 +82,5 @@
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    begin
-        TaskLine.SetRange("Journal Template Name", "Journal Template Name");
-        TaskLine.SetRange("Journal Batch Name", Name);
-        TaskLine.DeleteAll(true);
-    end;
-
-    trigger OnInsert()
-    begin
-        LockTable();
-        TaskTemplate.Get("Journal Template Name");
-    end;
-
-    var
-        TaskTemplate: Record "NPR Task Template";
-        TaskLine: Record "NPR Task Line";
-
-    procedure SetupNewBatch()
-    var
-        Date1: DateTime;
-        Date2: DateTime;
-    begin
-        TaskTemplate.Get("Journal Template Name");
-        "Mail Program" := TaskTemplate."Mail Program";
-        "Mail From Address" := TaskTemplate."Mail From Address";
-        "Mail From Name" := TaskTemplate."Mail From Name";
-        //-TQ1.09
-        "Task Worker Group" := TaskTemplate."Task Worker Group";
-        //+TQ1.09
-        //-TQ1.21
-        //-TQ1.29
-        //EVALUATE("Delete Log After", '200 '+ Text002);
-        //hack to have duration set correctly to 90 days - an integer will have an overflow, and other datatypes fails with a duration variable
-        //-TQ1.32 [308403]
-        //Date1:= CREATEDATETIME(010416D, 0T);
-        //Date2 := CREATEDATETIME(300616D, 0T);
-        Date1 := CreateDateTime(DMY2Date(1, 4, 2016), 0T);
-        Date2 := CreateDateTime(DMY2Date(30, 6, 2016), 0T);
-        //-TQ1.32 [308403]
-        "Delete Log After" := Date2 - Date1;
-        //+TQ1.29
-        //+TQ1.21
-    end;
-
-    procedure ModifyLines(i: Integer)
-    begin
-        TaskLine.LockTable();
-        TaskLine.SetRange("Journal Template Name", "Journal Template Name");
-        TaskLine.SetRange("Journal Batch Name", Name);
-        if TaskLine.Find('-') then
-            repeat
-                case i of
-                end;
-                TaskLine.Modify(true);
-            until TaskLine.Next() = 0;
-    end;
 }
 

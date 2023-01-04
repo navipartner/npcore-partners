@@ -13,9 +13,6 @@
 
         EnableChangeLog();
 
-        if RetailPriceLogSetup."Task Queue Activated" then
-            EnableTaskQueue();
-
         if RetailPriceLogSetup."Job Queue Activated" then
             CreatePriceLogJobQueue(RetailPriceLogSetup."Job Queue Category Code");
 
@@ -62,67 +59,6 @@
     begin
         EnableChangeLogSetupField(DATABASE::"NPR Period Discount Line", PeriodDiscountLine.FieldNo("Campaign Unit Price"));
         EnableChangeLogSetupTable(DATABASE::"NPR Period Discount Line");
-    end;
-
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
-    local procedure EnableTaskQueue()
-    var
-        TaskBatch: Record "NPR Task Batch";
-        TaskLine: Record "NPR Task Line";
-        TaskQueue: Record "NPR Task Queue";
-        TaskWorkerGroup: Record "NPR Task Worker Group";
-        LineNo: Integer;
-    begin
-        TaskLine.SetRange("Object Type", TaskLine."Object Type"::Codeunit);
-        TaskLine.SetRange("Object No.", CODEUNIT::"NPR Retail Price Log Mgt.");
-        if TaskLine.FindFirst() then
-            exit;
-
-        TaskWorkerGroup.SetFilter("Max. Concurrent Threads", '>%1', 0);
-        if not TaskWorkerGroup.FindFirst() then
-            exit;
-
-        if not TaskBatch.FindFirst() then
-            exit;
-
-        TaskLine.Reset();
-        TaskLine.SetRange("Journal Template Name", TaskBatch."Journal Template Name");
-        TaskLine.SetRange("Journal Batch Name", TaskBatch.Name);
-        if TaskLine.FindLast() then;
-        LineNo := TaskLine."Line No." + 10000;
-
-        TaskLine.Init();
-        TaskLine."Journal Template Name" := TaskBatch."Journal Template Name";
-        TaskLine."Journal Batch Name" := TaskBatch.Name;
-        TaskLine."Line No." := LineNo;
-        TaskLine.Description := 'Retail Price Log update';
-        TaskLine.Enabled := true;
-        TaskLine."Object Type" := TaskLine."Object Type"::Codeunit;
-        TaskLine."Object No." := CODEUNIT::"NPR Retail Price Log Mgt.";
-        TaskLine."Call Object With Task Record" := false;
-        TaskLine.Priority := TaskLine.Priority::Medium;
-        TaskLine."Task Worker Group" := TaskWorkerGroup.Code;
-        TaskLine.Recurrence := TaskLine.Recurrence::Custom;
-        TaskLine."Recurrence Interval" := 15 * 60 * 1000;
-        TaskLine."Recurrence Method" := TaskLine."Recurrence Method"::Static;
-        TaskLine."Recurrence Calc. Interval" := 0;
-        TaskLine."Run on Monday" := true;
-        TaskLine."Run on Tuesday" := true;
-        TaskLine."Run on Wednesday" := true;
-        TaskLine."Run on Thursday" := true;
-        TaskLine."Run on Friday" := true;
-        TaskLine."Run on Saturday" := true;
-        TaskLine."Run on Sunday" := true;
-        TaskLine.Insert(true);
-
-        if not TaskQueue.Get(CompanyName, TaskLine."Journal Template Name", TaskLine."Journal Batch Name", TaskLine."Line No.") then begin
-            TaskQueue.SetupNewLine(TaskLine, false);
-            TaskQueue."Next Run time" := CurrentDateTime;
-            TaskQueue.Insert();
-        end else begin
-            TaskQueue."Next Run time" := CurrentDateTime;
-            TaskQueue.Modify();
-        end;
     end;
 
     internal procedure CreatePriceLogJobQueue(JobCategory: Code[10])

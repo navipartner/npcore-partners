@@ -2,16 +2,13 @@
 {
     Access = Internal;
 
-    [Obsolete('Task Queue module to be removed from NP Retail. We are now using Job Queue instead.')]
+#IF BC17    
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.')]
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
     var
-        NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
     begin
-        if TaskLine.GetParameterBool(NcSyncMgt."Parameter.DownloadFtp"()) then begin
-            NcSyncMgt.DownloadFtpType(ImportType);
-            Commit();
-        end;
     end;
+#ENDIF
 
     procedure Update(JobQueueEntry: Record "Job Queue Entry"; ImportType: Record "NPR Nc Import Type")
     var

@@ -17,7 +17,6 @@ report 6014436 "NPR Update Retention Policy"
         tabledata "NPR POS Saved Sale Line" = rd,
         tabledata "NPR NpCs Arch. Document" = rd,
         tabledata "NPR Nc Task" = rd,
-        tabledata "NPR Task Log (Task)" = rd,
         tabledata "NPR Exchange Label" = rd,
         tabledata "NPR NpGp POS Sales Entry" = rd,
         tabledata "NPR POS Entry Output Log" = rd,
@@ -47,7 +46,6 @@ report 6014436 "NPR Update Retention Policy"
         SuccessfullyProcessedCount := 0;
 
         AddAllowedTable(Database::"NPR Nc Task", RtnPeriodEnum::"1 Week");
-        AddAllowedTable(Database::"NPR Task Log (Task)", RtnPeriodEnum::"1 Week");
 
         AddAllowedTable(Database::"NPR Data Log Record", RtnPeriodEnum::"1 Week");
         AddAllowedTable(Database::"NPR Data Log Field", RtnPeriodEnum::"1 Week");

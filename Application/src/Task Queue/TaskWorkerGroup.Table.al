@@ -1,21 +1,12 @@
 ﻿table 6059906 "NPR Task Worker Group"
 {
     Access = Internal;
-    // TQ1.18/MH/20141110  CASE 198170 Renamed field 50 from "Max. Cuncurrent Threads" to Max. Concurrent Threads.
-    //                                 Data Per Company set to NO - Group is now common to all companies
-    // TQ1.21/JDH/20141212 CASE 198170 Keep Alive time set to 10 min default
-    // TQ1.24/JDH/20150320 CASE 208247 Added Captions
-    // TQ1.25/MH/20150422  CASE 210797 Removed KeepAlive functionality - Deleted field 32 "Keep Alive Time"
-    // TQx.xx/RMT/20150806 CASE 219843 Set "Max. Concurrent Threads" when default
-    // TQ1.28/MHA/20151216  CASE 219843 Task Queue
-
     Caption = 'Task Worker Group';
     DataPerCompany = false;
-    DrillDownPageID = "NPR Task Worker Group";
-    LookupPageID = "NPR Task Worker Group";
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Task Queue module is about to be removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Task Queue module removed from NP Retail. We are now using Job Queue instead.';
+    ObsoleteTag = 'BC 21 - Task Queue deprecating starting from 28/06/2022';
 
     fields
     {
@@ -48,16 +39,6 @@
             OptionCaption = 'Process Task and End';
             OptionMembers = ExecuteTasksAndDie;
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                //-TQ1.25
-                ////-TQ1.21
-                //IF ("Thread Handling" = "Thread Handling"::KeepAliveFor) AND ("Keep Alive Time" = 0) THEN
-                //  "Keep Alive Time" := 1000 * 60 * 10; //10 min
-                ////+TQ1.21
-                //+TQ1.25
-            end;
         }
         field(30; "Min Interval Between Check"; Duration)
         {
@@ -90,7 +71,6 @@
             CalcFormula = Count("NPR Task Worker" WHERE("Task Worker Group" = FIELD(Code)));
             Caption = 'No. of Active Threads';
             FieldClass = FlowField;
-            TableRelation = "NPR Task Worker" WHERE("Task Worker Group" = FIELD(Code));
         }
     }
 
@@ -100,40 +80,5 @@
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    var
-        Text001: Label 'STD';
-        Text002: Label 'Standard Group';
-
-    procedure Initialize(NASGroupID: Code[10]; Desc: Text[30]; IsDefault: Boolean)
-    begin
-        if Get(NASGroupID) then
-            exit;
-
-        Init();
-        Code := NASGroupID;
-        Description := Desc;
-        "Language ID" := GlobalLanguage;
-        "Min Interval Between Check" := 10 * 1000;
-        "Max Interval Between Check" := 60 * 1000;
-        Default := IsDefault;
-        //-TQ1.16
-        //-TQ1.28
-        //IF NASGroupID = 'MASTER' THEN
-        if (NASGroupID = 'MASTER') or Default then
-            //+TQ1.28
-            "Max. Concurrent Threads" := 1;
-        //+TQ1.16
-        Insert();
-    end;
-
-    procedure InsertDefault()
-    begin
-        Initialize(Text001, Text002, true);
-    end;
 }
 
