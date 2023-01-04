@@ -16,11 +16,13 @@
             trigger OnLookup()
             var
                 PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
-                PrinterId: Text;
+                PrinterId: Text[250];
                 PrinterName: Text;
             begin
                 if PrintNodeMgt.LookupPrinterIdAndName(PrinterId, PrinterName) then begin
+#pragma warning disable AA0139                    
                     Id := PrinterId;
+#pragma warning restore                    
                     Name := CopyStr(PrinterName, 1, MaxStrLen(Name));
                 end;
             end;

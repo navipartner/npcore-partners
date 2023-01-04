@@ -249,17 +249,17 @@
         if not JObject.ReadFrom(PrinterJson) then
             exit;
         TempRetailList.Number := 1;
-        TempRetailList.Choice := SelectStr(1, DuplexOptionTxt);
-        TempRetailList.Value := SelectStr(1, DuplexValueText());
+        TempRetailList.Choice := CopyStr(SelectStr(1, DuplexOptionTxt), 1, MaxStrLen(TempRetailList.Choice));
+        TempRetailList.Value := CopyStr(SelectStr(1, DuplexValueText()), 1, MaxStrLen(TempRetailList."Value"));
         TempRetailList.Insert();
         if GetBoolean(JObject, Attribute) then begin
             TempRetailList.Number := 2;
-            TempRetailList.Choice := SelectStr(2, DuplexOptionTxt);
-            TempRetailList.Value := SelectStr(2, DuplexValueText());
+            TempRetailList.Choice := CopyStr(SelectStr(2, DuplexOptionTxt), 1, MaxStrLen(TempRetailList.Choice));
+            TempRetailList.Value := CopyStr(SelectStr(2, DuplexValueText()), 1, MaxStrLen(TempRetailList."Value"));
             TempRetailList.Insert();
             TempRetailList.Number := 3;
-            TempRetailList.Choice := SelectStr(3, DuplexOptionTxt);
-            TempRetailList.Value := SelectStr(3, DuplexValueText());
+            TempRetailList.Choice := CopyStr(SelectStr(3, DuplexOptionTxt), 1, MaxStrLen(TempRetailList.Choice));
+            TempRetailList.Value := CopyStr(SelectStr(3, DuplexValueText()), 1, MaxStrLen(TempRetailList."Value"));
             TempRetailList.Insert();
         end;
 
@@ -268,16 +268,16 @@
     local procedure GetRotateOptions(var TempRetailList: Record "NPR Retail List" temporary)
     begin
         TempRetailList.Number := 1;
-        TempRetailList.Choice := SelectStr(1, RotateOptionTxt);
-        TempRetailList.Value := SelectStr(1, RotateValueText());
+        TempRetailList.Choice := CopyStr(SelectStr(1, RotateOptionTxt), 1, MaxStrLen(TempRetailList.Choice));
+        TempRetailList.Value := CopyStr(SelectStr(1, RotateValueText()), 1, MaxStrLen(TempRetailList."Value"));
         TempRetailList.Insert();
         TempRetailList.Number := 2;
-        TempRetailList.Choice := SelectStr(2, RotateOptionTxt);
-        TempRetailList.Value := SelectStr(2, RotateValueText());
+        TempRetailList.Choice := CopyStr(SelectStr(2, RotateOptionTxt), 1, MaxStrLen(TempRetailList.Choice));
+        TempRetailList.Value := CopyStr(SelectStr(2, RotateValueText()), 1, MaxStrLen(TempRetailList."Value"));
         TempRetailList.Insert();
         TempRetailList.Number := 3;
-        TempRetailList.Choice := SelectStr(3, RotateOptionTxt);
-        TempRetailList.Value := SelectStr(3, RotateValueText());
+        TempRetailList.Choice := CopyStr(SelectStr(3, RotateOptionTxt), 1, MaxStrLen(TempRetailList.Choice));
+        TempRetailList.Value := CopyStr(SelectStr(3, RotateValueText()), 1, MaxStrLen(TempRetailList."Value"));
         TempRetailList.Insert();
 
     end;
