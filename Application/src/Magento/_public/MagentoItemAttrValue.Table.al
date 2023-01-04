@@ -123,6 +123,9 @@
         {
         }
 #ENDIF
+        key(key4; "Item No.", "Variant Code", "Attribute Set ID", Selected)
+        {
+        }
     }
 
     var
