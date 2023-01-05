@@ -7,12 +7,9 @@
     PageType = ListPart;
     SourceTable = "Salesperson/Purchaser";
     SourceTableTemporary = true;
-    UsageCategory = None;
-#pragma warning disable AL0254
-    SourceTableView = SORTING("NPR Maximum Cash Returnsale")
-#pragma warning restore AL0254
-                      ORDER(Descending);
-
+    UsageCategory = None;    
+    SourceTableView = sorting("NPR Maximum Cash Returnsale") order (Descending);
+                      
     layout
     {
         area(content)

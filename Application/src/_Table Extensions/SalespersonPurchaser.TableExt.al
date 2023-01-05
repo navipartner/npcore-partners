@@ -165,6 +165,10 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         {
         }
 #ENDIF
+        key("NPR Key3"; "NPR Maximum Cash Returnsale")
+        {           
+        }
+
     }
 
     local procedure CheckPosUnitGroupLines()

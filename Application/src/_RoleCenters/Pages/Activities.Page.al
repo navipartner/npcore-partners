@@ -130,15 +130,6 @@
                         DrillDownSalesOrderList(Rec.FieldNo("Sales Return Orders"));
                     end;
                 }
-                field(SalesCreditMemos; Rec."Sales Credit Memos")
-                {
-                    Caption = 'Sales Credit Memos';
-                    ShowCaption = true;
-                    ApplicationArea = NPRRetail;
-                    DrillDownPageId = "Sales Credit Memos";
-                    ToolTip = 'Displays the number of the Sales Credit Memos. If you click you can drilldown to the list of the Sales Credit Memos.';
-
-                }
                 field(CollectDocumentList; Rec."Collect Document List")
                 {
                     Caption = 'Collect Document List';
