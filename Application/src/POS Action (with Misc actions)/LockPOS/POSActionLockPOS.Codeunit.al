@@ -1,4 +1,4 @@
-﻿codeunit 6150835 "NPR POS Action: Lock POS" implements "NPR IPOS Workflow"
+codeunit 6150835 "NPR POS Action: Lock POS" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
