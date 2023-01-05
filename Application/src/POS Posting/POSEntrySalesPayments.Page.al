@@ -127,6 +127,11 @@ page 6059982 "NPR POS Entry Sales & Payments"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Post Item Entry Status field.';
                 }
+                field("Post Entry Status"; Rec."Post Entry Status")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Post Entry Status field.';
+                }
             }
         }
     }
@@ -180,6 +185,21 @@ page 6059982 "NPR POS Entry Sales & Payments"
                 }
             }
         }
+        area(Navigation)
+        {
+            action("EFT Transaction Requests")
+            {
+                Caption = 'EFT Transaction Requests';
+                Image = CreditCardLog;
+                RunObject = Page "NPR EFT Transaction Requests";
+                RunPageLink = "Sales Ticket No." = FIELD("Document No.");
+                ToolTip = 'Displays the EFT transactions requests.';
+                ApplicationArea = NPRRetail;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+            }
+        }
     }
 
     trigger OnOpenPage()
@@ -231,6 +251,7 @@ page 6059982 "NPR POS Entry Sales & Payments"
                 Rec."VAT %" := POSEntrySalesLine.Vat_Pct;
                 Rec."Variant Code" := POSEntrySalesLine.Variant_Code;
                 Rec."Post Item Entry Status" := POSEntrySalesLine.Item_Entry_Post_Status + 1;
+                Rec."Post Entry Status" := POSEntrySalesLine.Entry_Post_Status;
                 Rec.Insert();
             end;
         end;
@@ -267,6 +288,7 @@ page 6059982 "NPR POS Entry Sales & Payments"
                 Rec."Unit Price" := POSEntryPaymentLine.Amount;
                 Rec."Line Discount %" := 0;
                 Rec."Amount Incl. VAT" := POSEntryPaymentLine.Amount__Sales_Currency_;
+                Rec."Post Entry Status" := POSEntryPaymentLine.Entry_Post_Status;
 
                 Rec.Insert();
             end;

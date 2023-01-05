@@ -34,6 +34,7 @@ query 6014419 "NPR POS Entry Sales Line"
                 DataItemLink = "Entry No." = NPR_POS_Entry_Sales_Line."POS Entry No.";
                 SqlJoinType = InnerJoin;
                 column(Item_Entry_Post_Status; "Post Item Entry Status") { }
+                column(Entry_Post_Status; "Post Entry Status") { }
             }
         }
     }

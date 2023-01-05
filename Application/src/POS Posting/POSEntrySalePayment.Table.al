@@ -129,6 +129,14 @@ table 6014694 "NPR POS Entry Sale & Payment"
             OptionCaption = ' ,Unposted,Error while Posting,Posted,Not To Be Posted';
             OptionMembers = ,Unposted,"Error while Posting",Posted,"Not To Be Posted";
         }
+        field(53; "Post Entry Status"; Option)
+        {
+            Caption = 'Post Entry Status';
+            Editable = false;
+            DataClassification = CustomerContent;
+            OptionCaption = 'Unposted,Error while Posting,Posted,Not To Be Posted';
+            OptionMembers = Unposted,"Error while Posting",Posted,"Not To Be Posted";
+        }
         field(600; "Entry Date"; Date)
         {
             CalcFormula = Lookup("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));
