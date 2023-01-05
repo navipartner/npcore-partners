@@ -876,6 +876,15 @@
                     ApplicationArea = NPRRetail;
                 }
 
+                action("Sales Credit Memos")
+                {
+                    Caption = 'Sales Credit Memos';
+                    Image = RegisteredDocs;
+                    RunObject = Page "Sales Credit Memos";
+                    ToolTip = 'View Sales Credit Memos that have been done.';
+                    ApplicationArea = NPRRetail;
+                }
+
                 action("Posted Sales Credit Memos List")
                 {
                     Caption = 'Posted Sales Credit Memos List';
