@@ -189,7 +189,7 @@
 
     trigger OnPreReport()
     begin
-        ItemFilter := Item.GetFilters;
+        ItemFilter := CopyStr(Item.GetFilters(), 1, MaxStrLen(ItemFilter));
     end;
 
     var

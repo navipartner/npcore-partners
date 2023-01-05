@@ -409,7 +409,7 @@ report 6014418 "NPR Sale Time Report POS"
                 end;
         end;
 
-        DateFilter := "POS Entry".GetFilter("Entry Date");
+        DateFilter := CopyStr("POS Entry".GetFilter("Entry Date"), 1, MaxStrLen(DateFilter));
         if DateFilter = '' then
             DateFilter := Format(Today);
     end;

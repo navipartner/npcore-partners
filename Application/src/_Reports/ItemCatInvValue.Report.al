@@ -155,9 +155,9 @@ report 6014448 "NPR Item Cat. Inv. Value"
         end;
 
         if "Item Category".GetFilters <> '' then
-            AppliedFilters := StrSubstNo('%1', "Item Category".GetFilters)
+            AppliedFilters := StrSubstNo('%1', CopyStr("Item Category".GetFilters(), 1, MaxStrLen(AppliedFilters)))
         else
-            AppliedFilters := "Item Category".GetFilters;
+            AppliedFilters := CopyStr("Item Category".GetFilters(), 1, MaxStrLen(AppliedFilters));
     end;
 
     var
