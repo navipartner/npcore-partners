@@ -269,7 +269,7 @@
                 //-NPR5.31 [263093]
                 "Customer Disc. Group Filter" := UpperCase("Customer Disc. Group Filter");
                 CustomerDiscountGroup.SetFilter(Code, "Customer Disc. Group Filter");
-                "Customer Disc. Group Filter" := CustomerDiscountGroup.GetFilter(Code);
+                "Customer Disc. Group Filter" := CopyStr(CustomerDiscountGroup.GetFilter(Code), 1, MaxStrLen("Customer Disc. Group Filter"));
                 //+NPR5.31 [263093]
             end;
         }

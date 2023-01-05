@@ -45,7 +45,7 @@
                             if ("Variant Code" <> '') and ItemVariant.Get("No.", "Variant Code") then
                                 "Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen("Description 2"));
                             "Vendor No." := Item."Vendor No.";
-                            "Vendor Item No." := Item."Vendor Item No.";
+                            "Vendor Item No." := CopyStr(Item."Vendor Item No.", 1, MaxStrLen("Vendor Item No."));
                         end;
                     "Disc. Grouping Type"::"Item Group":
                         begin

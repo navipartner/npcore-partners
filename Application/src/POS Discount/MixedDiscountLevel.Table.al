@@ -97,7 +97,7 @@
         exit(Field."Field Caption");
     end;
 
-    local procedure GetCaptionClass(FieldNumber: Integer): Text[80]
+    local procedure GetCaptionClass(FieldNumber: Integer): Text
     var
         MixedDiscount: Record "NPR Mixed Discount";
     begin

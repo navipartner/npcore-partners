@@ -26,7 +26,7 @@
 
                 Item.Get("Item No.");
                 "Vendor No." := Item."Vendor No.";
-                "Vendor Item No." := Item."Vendor Item No.";
+                "Vendor Item No." := CopyStr(Item."Vendor Item No.", 1, MaxStrLen("Vendor Item No."));
             end;
         }
         field(3; Description; Text[100])
