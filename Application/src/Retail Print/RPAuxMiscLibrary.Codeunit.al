@@ -248,12 +248,26 @@
         POSEntryOutputLog: Record "NPR POS Entry Output Log";
         POSEntryOutputLog2: Record "NPR POS Entry Output Log";
         RecRef: RecordRef;
+        EntryNo: Integer;
+        POSEntry: Record "NPR POS Entry";
     begin
         RecRef := RecID.GetRecord();
-        RecRef.SetTable(POSEntryOutputLog);
-        POSEntryOutputLog.Find();
+        case RecRef.Number of
+            Database::"NPR POS Entry Output Log":
+                begin
+                    RecRef.SetTable(POSEntryOutputLog);
+                    POSEntryOutputLog.Find();
+                    EntryNo := POSEntryOutputLog."POS Entry No.";
+                end;
+            Database::"NPR POS Entry":
+                begin
+                    RecRef.SetTable(POSEntry);
+                    POSEntry.Find();
+                    EntryNo := POSEntry."Entry No.";
+                end;
+        end;
 
-        POSEntryOutputLog2.SetRange("POS Entry No.", POSEntryOutputLog."POS Entry No.");
+        POSEntryOutputLog2.SetRange("POS Entry No.", EntryNo);
         POSEntryOutputLog2.SetRange("Output Method", POSEntryOutputLog2."Output Method"::Print);
         POSEntryOutputLog2.SetFilter("Output Type", '=%1|=%2', POSEntryOutputLog2."Output Type"::SalesReceipt, POSEntryOutputLog2."Output Type"::LargeSalesReceipt);
 

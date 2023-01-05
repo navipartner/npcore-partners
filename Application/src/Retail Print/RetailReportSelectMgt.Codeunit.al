@@ -92,8 +92,7 @@
         POSEntryOutputLogMgt: Codeunit "NPR POS Entry Output Log Mgt.";
     begin
         if ReportSelection.FindSet() then begin
-            POSEntryOutputLogMgt.LogOutput(RecRefIn, ReportSelection); //logs the print attempt before it is finalized, in case of error later it won't be rolled back.
-            Commit(); //printing should not read dirty data, worst case sending it out of the ERP system and rolling it back later
+            Commit();
 
             repeat
                 RecRef := RecRefIn.Duplicate();
@@ -114,6 +113,9 @@
                     OnAfterRunReportSelectionRecord(ReportSelection, RecRefIn);
                 end;
             until ReportSelection.Next() = 0;
+
+            POSEntryOutputLogMgt.LogOutput(RecRefIn, ReportSelection);
+            Commit();
 
             OnAfterRunReportSelectionType(ReportSelection, RecRefIn);
         end
