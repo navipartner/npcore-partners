@@ -22,6 +22,7 @@ query 6014420 "NPR POS Entry Payment Line"
             {
                 DataItemLink = "Entry No." = NPR_POS_Entry_Payment_Line."POS Entry No.";
                 column(Salesperson_Code; "Salesperson Code") { }
+                column(Entry_Post_Status; "Post Entry Status") { }
             }
         }
     }
