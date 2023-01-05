@@ -339,6 +339,33 @@
                         MatrixPrintMgt.OnBuildFunctionCodeunitList(TempAllObj);
                 end;
 
+                if TempAllObj.IsEmpty() then
+                    exit;
+                if Page.RunModal(Page::"All Objects", TempAllObj) <> Action::LookupOK then
+                    exit;
+
+                Rec."Processing Codeunit" := TempAllObj."Object ID";
+                Rec.Modify();
+            end;
+
+            trigger OnValidate()
+            var
+                TempAllObj: Record AllObj temporary;
+                PrintTemplateHeader: Record "NPR RP Template Header";
+                MatrixPrintMgt: Codeunit "NPR RP Matrix Print Mgt.";
+                LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
+            begin
+                PrintTemplateHeader.Get(Rec."Template Code");
+
+                case PrintTemplateHeader."Printer Type" of
+                    PrintTemplateHeader."Printer Type"::Line:
+                        LinePrintMgt.OnBuildFunctionCodeunitList(TempAllObj);
+                    PrintTemplateHeader."Printer Type"::Matrix:
+                        MatrixPrintMgt.OnBuildFunctionCodeunitList(TempAllObj);
+                end;
+
+                TempAllObj.SetRange("Object ID", Rec."Processing Codeunit");
+                TempAllObj.FindFirst();
             end;
         }
         field(36; "Processing Function ID"; Code[30])
@@ -362,6 +389,33 @@
                         MatrixPrintMgt.OnBuildFunctionList(Rec."Processing Codeunit", TempRetailList);
                 end;
 
+                if TempRetailList.IsEmpty() then
+                    exit;
+                if Page.RunModal(0, TempRetailList) <> Action::LookupOK then
+                    exit;
+
+                Rec."Processing Function ID" := TempRetailList.Choice;
+                Rec.Modify();
+            end;
+
+            trigger OnValidate()
+            var
+                TempRetailList: Record "NPR Retail List" temporary;
+                PrintTemplateHeader: Record "NPR RP Template Header";
+                MatrixPrintMgt: Codeunit "NPR RP Matrix Print Mgt.";
+                LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
+            begin
+                PrintTemplateHeader.Get(Rec."Template Code");
+
+                case PrintTemplateHeader."Printer Type" of
+                    PrintTemplateHeader."Printer Type"::Line:
+                        LinePrintMgt.OnBuildFunctionList(Rec."Processing Codeunit", TempRetailList);
+                    PrintTemplateHeader."Printer Type"::Matrix:
+                        MatrixPrintMgt.OnBuildFunctionList(Rec."Processing Codeunit", TempRetailList);
+                end;
+
+                TempRetailList.SetRange(Value, TempRetailList.Value);
+                TempRetailList.FindFirst();
             end;
         }
         field(37; "Processing Value"; Text[250])
