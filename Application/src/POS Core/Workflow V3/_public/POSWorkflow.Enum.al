@@ -462,6 +462,16 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'LOCK_POS', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Lock POS";
     }
+    value(97; NOTIFICATIONCARD)
+    {
+        Caption = 'NOTIFICATIONCARD', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Notif. Card";
+    }
+    value(98; NOTIFICATIONLIST)
+    {
+        Caption = 'NOTIFICATIONLIST', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Notif. List";
+    }
     value(6014600; BALANCE_V4)
     {
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;
