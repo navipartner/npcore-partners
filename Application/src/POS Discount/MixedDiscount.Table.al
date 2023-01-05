@@ -223,7 +223,7 @@
             begin
                 "Customer Disc. Group Filter" := UpperCase("Customer Disc. Group Filter");
                 CustomerDiscountGroup.SetFilter(Code, "Customer Disc. Group Filter");
-                "Customer Disc. Group Filter" := CustomerDiscountGroup.GetFilter(Code);
+                "Customer Disc. Group Filter" := CopyStr(CustomerDiscountGroup.GetFilter(Code), 1, MaxStrLen("Customer Disc. Group Filter"));
             end;
         }
         field(316; "Global Dimension 1 Code"; Code[20])

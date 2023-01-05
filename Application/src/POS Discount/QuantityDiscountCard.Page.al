@@ -212,7 +212,7 @@
         Rec.SetRange("Item No.", Rec.GetFilter("Item No."));
         if Rec.IsEmpty then begin
             Rec.Init();
-            Rec."Main No." := Rec.GetFilter("Item No.");
+            Rec."Main No." := CopyStr(Rec.GetFilter("Item No."), 1, MaxStrLen(Rec."Main No."));
             Rec.Insert(true);
         end;
         UpdateStatus();

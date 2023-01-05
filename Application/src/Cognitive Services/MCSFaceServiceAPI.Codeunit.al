@@ -256,7 +256,7 @@
             PersonIdentified := PersonId <> '';
 
             if PersonId = '' then
-                PersonId := CreatePerson(PersonGroups.PersonGroupId, PersonName, UserData);
+                PersonId := CopyStr(CreatePerson(PersonGroups.PersonGroupId, PersonName, UserData), 1, MaxStrLen(PersonId));
             AddPersonFace(PersonGroups.PersonGroupId, PersonId, ImageInStream);
 
             JsonObj.Get('faceRectangle', JsonTokValue);
