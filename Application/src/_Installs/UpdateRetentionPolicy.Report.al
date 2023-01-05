@@ -10,7 +10,7 @@ report 6014436 "NPR Update Retention Policy"
 
     Permissions =
         tabledata "Retention Period" = rim,
-        tabledata "Retention Policy Setup" = rim,
+        tabledata "Retention Policy Setup" = rimd,
         tabledata "NPR Data Log Field" = rd,
         tabledata "NPR Tax Free Voucher" = rd,
         tabledata "NPR POS Saved Sale Entry" = rd,

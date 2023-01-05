@@ -6,7 +6,7 @@
     Subtype = Install;
     Permissions =
         tabledata "Retention Period" = ri,
-        tabledata "Retention Policy Setup" = ri;
+        tabledata "Retention Policy Setup" = rid;
 
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
