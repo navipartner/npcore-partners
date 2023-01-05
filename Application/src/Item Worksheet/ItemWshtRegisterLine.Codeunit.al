@@ -38,7 +38,7 @@
 
     local procedure "Code"()
     var
-    ItemWorksheetCU:Codeunit "NPR Item Worksheet";
+        ItemWorksheetCU: Codeunit "NPR Item Worksheet";
     begin
         if ItemWkshLine.EmptyLine() then
             exit;
@@ -347,7 +347,7 @@
         end;
     end;
 
-    local procedure FindNewVarietyNames(ItemWkshLine: Record "NPR Item Worksheet Line"; VarietyNo: Integer; Variety: Code[20]; VarietyTableFrom: Code[40]; VarietyTableTo: Code[40]; CreateCopy: Boolean): Code[40]
+    local procedure FindNewVarietyNames(NprItemWorksheetLine: Record "NPR Item Worksheet Line"; VarietyNo: Integer; Variety: Code[20]; VarietyTableFrom: Code[40]; VarietyTableTo: Code[40]; CreateCopy: Boolean): Code[40]
     var
         VarietyGroup: Record "NPR Variety Group";
         VarietyTableOld: Record "NPR Variety Table";
@@ -360,12 +360,12 @@
         if CreateCopy then begin
             VarietyTableOld.Get(Variety, VarietyTableFrom);
             if (VarietyTableTo = '') or (VarietyTableFrom = VarietyTableTo) then begin
-                if ItemWkshLine."Variety Group" <> '' then begin
-                    VarietyGroup.Get(ItemWkshLine."Variety Group");
+                if NprItemWorksheetLine."Variety Group" <> '' then begin
+                    VarietyGroup.Get(NprItemWorksheetLine."Variety Group");
                 end else begin
                     VarietyGroup.Init();
                 end;
-                SuffixCode := ItemWkshLine."Item No.";
+                SuffixCode := NprItemWorksheetLine."Item No.";
                 case VarietyNo of
                     1:
                         if (VarietyGroup."Copy Naming Variety 1" = VarietyGroup."Copy Naming Variety 1"::TableCodeAndNoSeries) and
@@ -441,41 +441,41 @@
         end;
     end;
 
-    local procedure CreateVariant(var ItemWkshVariantLine: Record "NPR Item Worksh. Variant Line")
+    local procedure CreateVariant(var NprItemWkshVariantLine: Record "NPR Item Worksh. Variant Line")
     begin
-        if VarietyCloneData.GetFromVariety(ItemVariant, ItemWkshVariantLine."Item No.", ItemWkshVariantLine."Variety 1 Value",
-                                     ItemWkshVariantLine."Variety 2 Value", ItemWkshVariantLine."Variety 3 Value",
-                                     ItemWkshVariantLine."Variety 4 Value") then
+        if VarietyCloneData.GetFromVariety(ItemVariant, NprItemWkshVariantLine."Item No.", NprItemWkshVariantLine."Variety 1 Value",
+                                     NprItemWkshVariantLine."Variety 2 Value", NprItemWkshVariantLine."Variety 3 Value",
+                                     NprItemWkshVariantLine."Variety 4 Value") then
             Error(VariantExistErr);
 
-        ItemWkshVariantLine.CalcFields("Variety 1 Table", "Variety 2 Table", "Variety 3 Table", "Variety 4 Table",
+        NprItemWkshVariantLine.CalcFields("Variety 1 Table", "Variety 2 Table", "Variety 3 Table", "Variety 4 Table",
                                        "Variety 1", "Variety 2", "Variety 3", "Variety 4");
         ItemVariant.Init();
-        ItemVariant."Item No." := ItemWkshVariantLine."Item No.";
-        if ItemWkshVariantLine."Variant Code" = '' then begin
-            ItemVariant.Code := VarietyCloneData.GetNextVariantCode(ItemWkshVariantLine."Item No.",
-                                                                    ItemWkshVariantLine."Variety 1 Value", ItemWkshVariantLine."Variety 2 Value",
-                                                                    ItemWkshVariantLine."Variety 3 Value", ItemWkshVariantLine."Variety 4 Value");
-            ItemWkshVariantLine."Variant Code" := ItemVariant.Code;
+        ItemVariant."Item No." := NprItemWkshVariantLine."Item No.";
+        if NprItemWkshVariantLine."Variant Code" = '' then begin
+            ItemVariant.Code := VarietyCloneData.GetNextVariantCode(NprItemWkshVariantLine."Item No.",
+                                                                    NprItemWkshVariantLine."Variety 1 Value", NprItemWkshVariantLine."Variety 2 Value",
+                                                                    NprItemWkshVariantLine."Variety 3 Value", NprItemWkshVariantLine."Variety 4 Value");
+            NprItemWkshVariantLine."Variant Code" := ItemVariant.Code;
         end else begin
-            ItemVariant.Code := ItemWkshVariantLine."Variant Code";
+            ItemVariant.Code := NprItemWkshVariantLine."Variant Code";
         end;
-        ItemVariant."NPR Variety 1" := ItemWkshVariantLine."Variety 1";
-        ItemVariant."NPR Variety 1 Table" := ItemWkshVariantLine."Variety 1 Table";
-        ItemVariant."NPR Variety 1 Value" := ItemWkshVariantLine."Variety 1 Value";
-        ItemVariant."NPR Variety 2" := ItemWkshVariantLine."Variety 2";
-        ItemVariant."NPR Variety 2 Table" := ItemWkshVariantLine."Variety 2 Table";
-        ItemVariant."NPR Variety 2 Value" := ItemWkshVariantLine."Variety 2 Value";
-        ItemVariant."NPR Variety 3" := ItemWkshVariantLine."Variety 3";
-        ItemVariant."NPR Variety 3 Table" := ItemWkshVariantLine."Variety 3 Table";
-        ItemVariant."NPR Variety 3 Value" := ItemWkshVariantLine."Variety 3 Value";
-        ItemVariant."NPR Variety 4" := ItemWkshVariantLine."Variety 4";
-        ItemVariant."NPR Variety 4 Table" := ItemWkshVariantLine."Variety 4 Table";
-        ItemVariant."NPR Variety 4 Value" := ItemWkshVariantLine."Variety 4 Value";
-        ItemVariant."NPR Blocked" := ItemWkshVariantLine.Blocked;
+        ItemVariant."NPR Variety 1" := NprItemWkshVariantLine."Variety 1";
+        ItemVariant."NPR Variety 1 Table" := NprItemWkshVariantLine."Variety 1 Table";
+        ItemVariant."NPR Variety 1 Value" := NprItemWkshVariantLine."Variety 1 Value";
+        ItemVariant."NPR Variety 2" := NprItemWkshVariantLine."Variety 2";
+        ItemVariant."NPR Variety 2 Table" := NprItemWkshVariantLine."Variety 2 Table";
+        ItemVariant."NPR Variety 2 Value" := NprItemWkshVariantLine."Variety 2 Value";
+        ItemVariant."NPR Variety 3" := NprItemWkshVariantLine."Variety 3";
+        ItemVariant."NPR Variety 3 Table" := NprItemWkshVariantLine."Variety 3 Table";
+        ItemVariant."NPR Variety 3 Value" := NprItemWkshVariantLine."Variety 3 Value";
+        ItemVariant."NPR Variety 4" := NprItemWkshVariantLine."Variety 4";
+        ItemVariant."NPR Variety 4 Table" := NprItemWkshVariantLine."Variety 4 Table";
+        ItemVariant."NPR Variety 4 Value" := NprItemWkshVariantLine."Variety 4 Value";
+        ItemVariant."NPR Blocked" := NprItemWkshVariantLine.Blocked;
 
-        if ItemWkshVariantLine.Description <> '' then begin
-            ItemVariant.Description := ItemWkshVariantLine.Description;
+        if NprItemWkshVariantLine.Description <> '' then begin
+            ItemVariant.Description := NprItemWkshVariantLine.Description;
         end else begin
             GetItem(ItemVariant."Item No.");
             VarietyCloneData.FillDescription(ItemVariant, Item);

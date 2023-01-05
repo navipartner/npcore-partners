@@ -57,23 +57,23 @@
         ExportExcelItemWorksheet.Run();
     end;
 
-    internal procedure ImportFromExcel(ItemWorksheet: Record "NPR Item Worksheet")
+    internal procedure ImportFromExcel(NprItemWorksheet: Record "NPR Item Worksheet")
     var
         ImportExcelItemWorksheet: Report "NPR Import Excel Item Worksh.";
     begin
-        ItemWorksheet.SetRange("Item Template Name", ItemWorksheet."Item Template Name");
-        ItemWorksheet.SetRange(Name, ItemWorksheet.Name);
-        ImportExcelItemWorksheet.SetTableView(ItemWorksheet);
+        NprItemWorksheet.SetRange("Item Template Name", NprItemWorksheet."Item Template Name");
+        NprItemWorksheet.SetRange(Name, NprItemWorksheet.Name);
+        ImportExcelItemWorksheet.SetTableView(NprItemWorksheet);
         ImportExcelItemWorksheet.Run();
     end;
 
-    internal procedure SelectExcelToMap(ItemWorksheet: Record "NPR Item Worksheet")
+    internal procedure SelectExcelToMap(NprItemWorksheet: Record "NPR Item Worksheet")
     var
         MapExcelItemWorksheet: Report "NPR Map Excel Item Worksh.";
     begin
-        ItemWorksheet.SetRange("Item Template Name", ItemWorksheet."Item Template Name");
-        ItemWorksheet.SetRange(Name, ItemWorksheet.Name);
-        MapExcelItemWorksheet.SetTableView(ItemWorksheet);
+        NprItemWorksheet.SetRange("Item Template Name", NprItemWorksheet."Item Template Name");
+        NprItemWorksheet.SetRange(Name, NprItemWorksheet.Name);
+        MapExcelItemWorksheet.SetTableView(NprItemWorksheet);
         MapExcelItemWorksheet.Run();
     end;
 
