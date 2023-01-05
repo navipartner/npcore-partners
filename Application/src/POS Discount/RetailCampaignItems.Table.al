@@ -434,7 +434,7 @@
                                     "Ending Time" := PeriodDiscountLine."Ending Time";
                                     if Item.Get("Item No.") then begin
                                         "Unit Cost" := Item."Unit Cost";
-                                        "Vendor Item No." := Item."Vendor Item No.";
+                                        "Vendor Item No." := CopyStr(Item."Vendor Item No.", 1, MaxStrLen("Vendor Item No."));
                                         "Vendor No." := Item."Vendor No.";
                                         "Units per Parcel" := Item."Units per Parcel";
 
@@ -494,7 +494,7 @@
                                     "Unit Cost" := MixedDiscountLine."Unit cost";
                                     if Item.Get("Item No.") then begin
                                         "Unit Cost" := Item."Unit Cost";
-                                        "Vendor Item No." := Item."Vendor Item No.";
+                                        "Vendor Item No." := CopyStr(Item."Vendor Item No.", 1, MaxStrLen("Vendor Item No."));
                                         "Vendor No." := Item."Vendor No.";
                                         "Units per Parcel" := Item."Units per Parcel";
                                         if not Item.Blocked then begin
