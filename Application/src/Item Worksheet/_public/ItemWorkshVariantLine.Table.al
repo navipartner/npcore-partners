@@ -965,7 +965,7 @@
         exit(StatusCommentText);
     end;
 
-    local procedure SetExtraVarityFilter(var ItemWorksheetLine: Record "NPR Item Worksheet Line"; var ItemWorksheetVarietyMapping: Record "NPR Item Worksh. Vrty Mapping")
+    local procedure SetExtraVarityFilter(var NprItemWorksheetLine: Record "NPR Item Worksheet Line"; var ItemWorksheetVarietyMapping: Record "NPR Item Worksh. Vrty Mapping")
     var
         ItemWorksheetVarietyMapping2: Record "NPR Item Worksh. Vrty Mapping";
         RecRef: RecordRef;
@@ -975,13 +975,13 @@
         ItemWorksheetVarietyMapping2.SetFilter("Item Wksh. Maping Field", '>%1', 0);
         if ItemWorksheetVarietyMapping2.FindSet() then begin
             repeat
-                RecRef.GetTable(ItemWorksheetLine);
+                RecRef.GetTable(NprItemWorksheetLine);
                 FldRef := RecRef.Field(1);
-                FldRef.SetFilter('%1', ItemWorksheetLine."Worksheet Template Name");
+                FldRef.SetFilter('%1', NprItemWorksheetLine."Worksheet Template Name");
                 FldRef := RecRef.Field(2);
-                FldRef.SetFilter('%1', ItemWorksheetLine."Worksheet Name");
+                FldRef.SetFilter('%1', NprItemWorksheetLine."Worksheet Name");
                 FldRef := RecRef.Field(3);
-                FldRef.SetFilter('%1', ItemWorksheetLine."Line No.");
+                FldRef.SetFilter('%1', NprItemWorksheetLine."Line No.");
                 FldRef := RecRef.Field(ItemWorksheetVarietyMapping2."Item Wksh. Maping Field");
                 FldRef.SetFilter('%1', ItemWorksheetVarietyMapping2."Item Wksh. Maping Field Value");
                 if RecRef.FindFirst() then begin

@@ -211,85 +211,85 @@
         ItemWkshtLine.Modify();
     end;
 
-    local procedure CheckItemWorksheetVariantLine(ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line"; var ItemWkshtLine: Record "NPR Item Worksheet Line"; StopOnError: Boolean)
+    local procedure CheckItemWorksheetVariantLine(NprItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line"; var ItemWkshtLine: Record "NPR Item Worksheet Line"; StopOnError: Boolean)
     var
         ItemVariant: Record "Item Variant";
         ItemWorksheetVariantLine2: Record "NPR Item Worksh. Variant Line";
         VarietyCloneData: Codeunit "NPR Variety Clone Data";
     begin
-        if ItemWorksheetVariantLine.Action = ItemWorksheetVariantLine.Action::Skip then
+        if NprItemWorksheetVariantLine.Action = NprItemWorksheetVariantLine.Action::Skip then
             exit;
-        if ItemWorksheetVariantLine."Item No." <> ItemWkshtLine."Item No." then
-            ProcessError(ItemWkshtLine, StrSubstNo(Text100, ItemWorksheetVariantLine.FieldCaption("Item No."), ItemWorksheetVariantLine.TableCaption, ItemWorksheetVariantLine."Worksheet Template Name", ItemWorksheetVariantLine."Worksheet Name", ItemWorksheetVariantLine."Worksheet Line No.", ItemWorksheetVariantLine."Line No."), StopOnError);
+        if NprItemWorksheetVariantLine."Item No." <> ItemWkshtLine."Item No." then
+            ProcessError(ItemWkshtLine, StrSubstNo(Text100, NprItemWorksheetVariantLine.FieldCaption("Item No."), NprItemWorksheetVariantLine.TableCaption, NprItemWorksheetVariantLine."Worksheet Template Name", NprItemWorksheetVariantLine."Worksheet Name", NprItemWorksheetVariantLine."Worksheet Line No.", NprItemWorksheetVariantLine."Line No."), StopOnError);
 
-        if ItemWorksheetVariantLine.Action = ItemWorksheetVariantLine.Action::Update then
-            if not ItemVariant.Get(ItemWorksheetVariantLine."Existing Item No.", ItemWorksheetVariantLine."Existing Variant Code") then
-                ProcessError(ItemWkshtLine, StrSubstNo(Text101, ItemWorksheetVariantLine.FieldCaption("Item No."), ItemWorksheetVariantLine.TableCaption, ItemWorksheetVariantLine."Worksheet Template Name", ItemWorksheetVariantLine."Worksheet Name", ItemWorksheetVariantLine."Worksheet Line No.", ItemWorksheetVariantLine."Line No."), StopOnError);
+        if NprItemWorksheetVariantLine.Action = NprItemWorksheetVariantLine.Action::Update then
+            if not ItemVariant.Get(NprItemWorksheetVariantLine."Existing Item No.", NprItemWorksheetVariantLine."Existing Variant Code") then
+                ProcessError(ItemWkshtLine, StrSubstNo(Text101, NprItemWorksheetVariantLine.FieldCaption("Item No."), NprItemWorksheetVariantLine.TableCaption, NprItemWorksheetVariantLine."Worksheet Template Name", NprItemWorksheetVariantLine."Worksheet Name", NprItemWorksheetVariantLine."Worksheet Line No.", NprItemWorksheetVariantLine."Line No."), StopOnError);
 
-        if ItemWorksheetVariantLine.Action = ItemWorksheetVariantLine.Action::CreateNew then
-            if VarietyCloneData.GetFromVariety(ItemVariant, ItemWorksheetVariantLine."Item No.", ItemWorksheetVariantLine."Variety 1 Value",
-                                 ItemWorksheetVariantLine."Variety 2 Value", ItemWorksheetVariantLine."Variety 3 Value",
-                                 ItemWorksheetVariantLine."Variety 4 Value") then
+        if NprItemWorksheetVariantLine.Action = NprItemWorksheetVariantLine.Action::CreateNew then
+            if VarietyCloneData.GetFromVariety(ItemVariant, NprItemWorksheetVariantLine."Item No.", NprItemWorksheetVariantLine."Variety 1 Value",
+                                 NprItemWorksheetVariantLine."Variety 2 Value", NprItemWorksheetVariantLine."Variety 3 Value",
+                                 NprItemWorksheetVariantLine."Variety 4 Value") then
                 ProcessError(ItemWkshtLine, StrSubstNo(Text106,
-                                         ItemWkshtLine."Variety 1", ItemWorksheetVariantLine."Variety 1 Value",
-                                         ItemWkshtLine."Variety 2", ItemWorksheetVariantLine."Variety 2 Value",
-                                         ItemWkshtLine."Variety 3", ItemWorksheetVariantLine."Variety 3 Value",
-                                         ItemWkshtLine."Variety 4", ItemWorksheetVariantLine."Variety 4 Value"), StopOnError);
-        if (ItemWorksheetVariantLine.Action <> ItemWorksheetVariantLine.Action::Skip) and (ItemWkshtLine.Status <> ItemWkshtLine.Status::Error) then begin
+                                         ItemWkshtLine."Variety 1", NprItemWorksheetVariantLine."Variety 1 Value",
+                                         ItemWkshtLine."Variety 2", NprItemWorksheetVariantLine."Variety 2 Value",
+                                         ItemWkshtLine."Variety 3", NprItemWorksheetVariantLine."Variety 3 Value",
+                                         ItemWkshtLine."Variety 4", NprItemWorksheetVariantLine."Variety 4 Value"), StopOnError);
+        if (NprItemWorksheetVariantLine.Action <> NprItemWorksheetVariantLine.Action::Skip) and (ItemWkshtLine.Status <> ItemWkshtLine.Status::Error) then begin
             ItemWorksheetVariantLine2.Reset();
-            ItemWorksheetVariantLine2.SetRange("Worksheet Template Name", ItemWorksheetVariantLine."Worksheet Template Name");
-            ItemWorksheetVariantLine2.SetRange("Worksheet Name", ItemWorksheetVariantLine."Worksheet Name");
-            ItemWorksheetVariantLine2.SetRange("Worksheet Line No.", ItemWorksheetVariantLine."Worksheet Line No.");
+            ItemWorksheetVariantLine2.SetRange("Worksheet Template Name", NprItemWorksheetVariantLine."Worksheet Template Name");
+            ItemWorksheetVariantLine2.SetRange("Worksheet Name", NprItemWorksheetVariantLine."Worksheet Name");
+            ItemWorksheetVariantLine2.SetRange("Worksheet Line No.", NprItemWorksheetVariantLine."Worksheet Line No.");
             ItemWorksheetVariantLine2.SetFilter("Heading Text", '%1', '');
-            ItemWorksheetVariantLine2.SetFilter(Action, '<>%1', ItemWorksheetVariantLine.Action::Skip);
-            ItemWorksheetVariantLine2.SetFilter("Line No.", '>%1', ItemWorksheetVariantLine."Line No.");
-            ItemWorksheetVariantLine2.SetRange("Variety 1 Value", ItemWorksheetVariantLine."Variety 1 Value");
-            ItemWorksheetVariantLine2.SetRange("Variety 2 Value", ItemWorksheetVariantLine."Variety 2 Value");
-            ItemWorksheetVariantLine2.SetRange("Variety 3 Value", ItemWorksheetVariantLine."Variety 3 Value");
-            ItemWorksheetVariantLine2.SetRange("Variety 4 Value", ItemWorksheetVariantLine."Variety 4 Value");
+            ItemWorksheetVariantLine2.SetFilter(Action, '<>%1', NprItemWorksheetVariantLine.Action::Skip);
+            ItemWorksheetVariantLine2.SetFilter("Line No.", '>%1', NprItemWorksheetVariantLine."Line No.");
+            ItemWorksheetVariantLine2.SetRange("Variety 1 Value", NprItemWorksheetVariantLine."Variety 1 Value");
+            ItemWorksheetVariantLine2.SetRange("Variety 2 Value", NprItemWorksheetVariantLine."Variety 2 Value");
+            ItemWorksheetVariantLine2.SetRange("Variety 3 Value", NprItemWorksheetVariantLine."Variety 3 Value");
+            ItemWorksheetVariantLine2.SetRange("Variety 4 Value", NprItemWorksheetVariantLine."Variety 4 Value");
             if ItemWorksheetVariantLine2.FindFirst() then begin
                 ProcessError(ItemWkshtLine, StrSubstNo(Text114,
-                                         ItemWkshtLine."Variety 1", ItemWorksheetVariantLine."Variety 1 Value",
-                                         ItemWkshtLine."Variety 2", ItemWorksheetVariantLine."Variety 2 Value",
-                                         ItemWkshtLine."Variety 3", ItemWorksheetVariantLine."Variety 3 Value",
-                                         ItemWkshtLine."Variety 4", ItemWorksheetVariantLine."Variety 4 Value"), StopOnError);
+                                         ItemWkshtLine."Variety 1", NprItemWorksheetVariantLine."Variety 1 Value",
+                                         ItemWkshtLine."Variety 2", NprItemWorksheetVariantLine."Variety 2 Value",
+                                         ItemWkshtLine."Variety 3", NprItemWorksheetVariantLine."Variety 3 Value",
+                                         ItemWkshtLine."Variety 4", NprItemWorksheetVariantLine."Variety 4 Value"), StopOnError);
             end else begin
-                if ItemWorksheetVariantLine."Vendors Bar Code" <> '' then begin
+                if NprItemWorksheetVariantLine."Vendors Bar Code" <> '' then begin
                     ItemWorksheetVariantLine2.SetRange("Variety 1 Value");
                     ItemWorksheetVariantLine2.SetRange("Variety 2 Value");
                     ItemWorksheetVariantLine2.SetRange("Variety 3 Value");
                     ItemWorksheetVariantLine2.SetRange("Variety 4 Value");
-                    ItemWorksheetVariantLine2.SetRange("Vendors Bar Code", ItemWorksheetVariantLine."Vendors Bar Code");
+                    ItemWorksheetVariantLine2.SetRange("Vendors Bar Code", NprItemWorksheetVariantLine."Vendors Bar Code");
                     if ItemWorksheetVariantLine2.FindFirst() then begin
-                        ProcessError(ItemWkshtLine, StrSubstNo(Text115, ItemWorksheetVariantLine."Vendors Bar Code"), StopOnError);
+                        ProcessError(ItemWkshtLine, StrSubstNo(Text115, NprItemWorksheetVariantLine."Vendors Bar Code"), StopOnError);
                     end else begin
-                        if ItemWorksheetVariantLine."Internal Bar Code" <> '' then begin
-                            ItemWorksheetVariantLine2.SetRange("Internal Bar Code", ItemWorksheetVariantLine."Internal Bar Code");
+                        if NprItemWorksheetVariantLine."Internal Bar Code" <> '' then begin
+                            ItemWorksheetVariantLine2.SetRange("Internal Bar Code", NprItemWorksheetVariantLine."Internal Bar Code");
                             if ItemWorksheetVariantLine2.FindFirst() then begin
-                                ProcessError(ItemWkshtLine, StrSubstNo(Text116, ItemWorksheetVariantLine."Internal Bar Code"), StopOnError);
+                                ProcessError(ItemWkshtLine, StrSubstNo(Text116, NprItemWorksheetVariantLine."Internal Bar Code"), StopOnError);
                             end;
                         end;
                     end;
                 end;
             end;
-            ItemWorksheetVariantLine.CalcFields("Variety 1", "Variety 2", "Variety 3", "Variety 4");
-            if (ItemWorksheetVariantLine."Variety 1 Value" = '') and (ItemWorksheetVariantLine."Variety 1" <> '') then
-                ProcessError(ItemWkshtLine, StrSubstNo(Text121, 1, ItemWorksheetVariantLine."Variety 1"), StopOnError);
-            if (ItemWorksheetVariantLine."Variety 2 Value" = '') and (ItemWorksheetVariantLine."Variety 2" <> '') then
-                ProcessError(ItemWkshtLine, StrSubstNo(Text121, 2, ItemWorksheetVariantLine."Variety 2"), StopOnError);
-            if (ItemWorksheetVariantLine."Variety 3 Value" = '') and (ItemWorksheetVariantLine."Variety 3" <> '') then
-                ProcessError(ItemWkshtLine, StrSubstNo(Text121, 3, ItemWorksheetVariantLine."Variety 3"), StopOnError);
-            if (ItemWorksheetVariantLine."Variety 4 Value" = '') and (ItemWorksheetVariantLine."Variety 4" <> '') then
-                ProcessError(ItemWkshtLine, StrSubstNo(Text121, 4, ItemWorksheetVariantLine."Variety 4"), StopOnError);
+            NprItemWorksheetVariantLine.CalcFields("Variety 1", "Variety 2", "Variety 3", "Variety 4");
+            if (NprItemWorksheetVariantLine."Variety 1 Value" = '') and (NprItemWorksheetVariantLine."Variety 1" <> '') then
+                ProcessError(ItemWkshtLine, StrSubstNo(Text121, 1, NprItemWorksheetVariantLine."Variety 1"), StopOnError);
+            if (NprItemWorksheetVariantLine."Variety 2 Value" = '') and (NprItemWorksheetVariantLine."Variety 2" <> '') then
+                ProcessError(ItemWkshtLine, StrSubstNo(Text121, 2, NprItemWorksheetVariantLine."Variety 2"), StopOnError);
+            if (NprItemWorksheetVariantLine."Variety 3 Value" = '') and (NprItemWorksheetVariantLine."Variety 3" <> '') then
+                ProcessError(ItemWkshtLine, StrSubstNo(Text121, 3, NprItemWorksheetVariantLine."Variety 3"), StopOnError);
+            if (NprItemWorksheetVariantLine."Variety 4 Value" = '') and (NprItemWorksheetVariantLine."Variety 4" <> '') then
+                ProcessError(ItemWkshtLine, StrSubstNo(Text121, 4, NprItemWorksheetVariantLine."Variety 4"), StopOnError);
 
-            if (ItemWorksheetVariantLine."Variety 1 Value" <> '') and (ItemWorksheetVariantLine."Variety 1" = '') then
-                ProcessError(ItemWkshtLine, StrSubstNo(Text122, 1, ItemWorksheetVariantLine."Variety 1 Value"), StopOnError);
-            if (ItemWorksheetVariantLine."Variety 2 Value" <> '') and (ItemWorksheetVariantLine."Variety 2" = '') then
-                ProcessError(ItemWkshtLine, StrSubstNo(Text122, 2, ItemWorksheetVariantLine."Variety 2 Value"), StopOnError);
-            if (ItemWorksheetVariantLine."Variety 3 Value" <> '') and (ItemWorksheetVariantLine."Variety 3" = '') then
-                ProcessError(ItemWkshtLine, StrSubstNo(Text122, 3, ItemWorksheetVariantLine."Variety 3 Value"), StopOnError);
-            if (ItemWorksheetVariantLine."Variety 4 Value" <> '') and (ItemWorksheetVariantLine."Variety 4" = '') then
-                ProcessError(ItemWkshtLine, StrSubstNo(Text122, 4, ItemWorksheetVariantLine."Variety 4 Value"), StopOnError);
+            if (NprItemWorksheetVariantLine."Variety 1 Value" <> '') and (NprItemWorksheetVariantLine."Variety 1" = '') then
+                ProcessError(ItemWkshtLine, StrSubstNo(Text122, 1, NprItemWorksheetVariantLine."Variety 1 Value"), StopOnError);
+            if (NprItemWorksheetVariantLine."Variety 2 Value" <> '') and (NprItemWorksheetVariantLine."Variety 2" = '') then
+                ProcessError(ItemWkshtLine, StrSubstNo(Text122, 2, NprItemWorksheetVariantLine."Variety 2 Value"), StopOnError);
+            if (NprItemWorksheetVariantLine."Variety 3 Value" <> '') and (NprItemWorksheetVariantLine."Variety 3" = '') then
+                ProcessError(ItemWkshtLine, StrSubstNo(Text122, 3, NprItemWorksheetVariantLine."Variety 3 Value"), StopOnError);
+            if (NprItemWorksheetVariantLine."Variety 4 Value" <> '') and (NprItemWorksheetVariantLine."Variety 4" = '') then
+                ProcessError(ItemWkshtLine, StrSubstNo(Text122, 4, NprItemWorksheetVariantLine."Variety 4 Value"), StopOnError);
         end;
     end;
 

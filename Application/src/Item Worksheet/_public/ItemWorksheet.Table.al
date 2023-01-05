@@ -197,23 +197,23 @@
             until ItemWorksheetLine.Next() = 0;
     end;
 
-    internal procedure CheckLines(ItemWorksheetLine: Record "NPR Item Worksheet Line")
+    internal procedure CheckLines(NprItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
         ItemWorksheetLine2: Record "NPR Item Worksheet Line";
         ItemWkshCheckLine: Codeunit "NPR Item Wsht.-Check Line";
         Window: Dialog;
         LineCount: Integer;
     begin
-        if ItemWorksheetLine.IsEmpty then
+        if NprItemWorksheetLine.IsEmpty then
             exit;
 
         if GuiAllowed then
             Window.Open(CheckingLinesLbl);
         LineCount := 0;
-        ItemWorksheetTemplate.Get(ItemWorksheetLine."Worksheet Template Name");
+        ItemWorksheetTemplate.Get(NprItemWorksheetLine."Worksheet Template Name");
         ItemWorksheetLine2.Reset();
-        ItemWorksheetLine2.SetRange("Worksheet Template Name", ItemWorksheetLine."Worksheet Template Name");
-        ItemWorksheetLine2.SetRange("Worksheet Name", ItemWorksheetLine."Worksheet Name");
+        ItemWorksheetLine2.SetRange("Worksheet Template Name", NprItemWorksheetLine."Worksheet Template Name");
+        ItemWorksheetLine2.SetRange("Worksheet Name", NprItemWorksheetLine."Worksheet Name");
         if ItemWorksheetLine2.FindSet() then
             repeat
                 LineCount := LineCount + 1;
