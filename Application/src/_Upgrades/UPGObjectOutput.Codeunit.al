@@ -76,6 +76,7 @@ codeunit 6059857 "NPR UPG Object Output"
         ObjectOutputSelection: Record "NPR Object Output Selection";
         ObjectOutputSelection2: Record "NPR Object Output Selection";
         PrinterSelection: Record "Printer Selection";
+        PrintNodePrinter: Record "NPR PrintNode Printer";
     begin
         ObjectOutputSelection.SetRange("Output Type", ObjectOutputSelection."Output Type"::"PrintNode PDF");
         ObjectOutputSelection.SetRange("Object Type", ObjectOutputSelection."Object Type"::Report);
@@ -93,6 +94,14 @@ codeunit 6059857 "NPR UPG Object Output"
                 ObjectOutputSelection2 := ObjectOutputSelection;
                 ObjectOutputSelection2.Delete();
             until ObjectOutputSelection.Next() = 0;
-        end
+        end;
+
+        if PrintNodePrinter.FindSet(true) then begin
+            repeat
+                PrintNodePrinter."BC Paper Source" := PrintNodePrinter."BC Paper Source"::AutomaticFeed;
+                PrintNodePrinter."BC Paper Size" := PrintNodePrinter."BC Paper Size"::A4;
+                PrintNodePrinter.Modify();
+            until PrintNodePrinter.Next() = 0;
+        end;
     end;
 }
