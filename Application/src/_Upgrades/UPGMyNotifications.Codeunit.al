@@ -1,4 +1,4 @@
-codeunit 6060023 "NPR Upgrade My Notifications"
+codeunit 6060023 "NPR UPG My Notifications"
 {
     Access = Internal;
     Subtype = Upgrade;
@@ -9,10 +9,10 @@ codeunit 6060023 "NPR Upgrade My Notifications"
         UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Upgrade My Notifications', 'OnUpgradePerCompany');
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG My Notifications', 'OnUpgradePerCompany');
 
         // Check whether the tag has been used before, and if so, don't run upgrade code
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Upgrade My Notifications")) then begin
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG My Notifications")) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -21,7 +21,7 @@ codeunit 6060023 "NPR Upgrade My Notifications"
         DoUpgrade();
 
         // Insert the upgrade tag in table 9999 "Upgrade Tags" for future reference
-        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Upgrade My Notifications"));
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG My Notifications"));
 
         LogMessageStopwatch.LogFinish();
     end;
@@ -32,6 +32,7 @@ codeunit 6060023 "NPR Upgrade My Notifications"
         DeleteDeletedItemNotification();
         DeleteDeletedItemOnPOSNotification();
         DeleteEndOfDayNotification();
+        DeleteCancelSaleNotification();
     end;
 
     local procedure DeletePOSUnitNotification()
@@ -94,6 +95,18 @@ codeunit 6060023 "NPR Upgrade My Notifications"
         EndOfDayPOSNotificationIdLbl: Label 'cc0c0ffc-8edc-4158-920d-a2b66550aab6', Locked = true;
     begin
         MyNotifications.SetRange("Notification Id", EndOfDayPOSNotificationIdLbl);
+        if MyNotifications.IsEmpty then
+            exit;
+
+        MyNotifications.DeleteAll();
+    end;
+
+    local procedure DeleteCancelSaleNotification()
+    var
+        MyNotifications: Record "My Notifications";
+        CancelSaleNotificationIdLbl: Label '4a420aab-74af-4c4b-987d-f3fd1db13c27', Locked = true;
+    begin
+        MyNotifications.SetRange("Notification Id", CancelSaleNotificationIdLbl);
         if MyNotifications.IsEmpty then
             exit;
 
