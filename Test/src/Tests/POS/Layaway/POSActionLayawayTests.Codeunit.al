@@ -109,6 +109,63 @@ codeunit 85101 "NPR POS Action Layaway Tests"
         Assert.IsFalse(SalesHeader.Get(Enum::"Sales Document Type"::Order, CreatedSalesHeader), 'Order is not deleted.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('ChooseSOListHandler')]
+    procedure PayLayaway()
+    var
+        CustLedgEntry: Record "Cust. Ledger Entry";        
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesHeader: Record "Sales Header";
+        SalesInvHeader: Record "Sales Invoice Header";
+        LayawayCancelB: Codeunit "NPR POS Action: Layaway Pay-B";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        AmountToPay, PaidAmount : Decimal;
+    begin
+        //[Given] Init Data
+        InitDataForLayway();
+        LayawayCreateBussLogic.CreateLayaway(POSSession, 10, 1, '', PaymentTerms.Code, PaymentTerms.Code, false, false);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        SalesInvHeader.Get(SaleLinePOS."Posted Sales Document No.");
+        SalesHeader.Get("Sales Document Type"::Order, SalesInvHeader."Prepayment Order No.");
+        CreatedSalesHeader := SalesHeader."No.";
+        PaidAmount := SaleLinePOS."Amount Including VAT";
+        SalesHeader.CalcFields("Amount Including VAT");
+        AmountToPay := SalesHeader."Amount Including VAT" - PaidAmount;
+
+        LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, SaleLinePOS."Amount Including VAT", '', false);
+
+        PostPosEntry();
+
+        //[When]
+        POSSession.GetSale(POSSale);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        LayawayCancelB.PayLayaway(POSSession, '', 0, false, false);
+
+        //[Then]
+        CustLedgEntry.SetRange("Document Type", CustLedgEntry."Document Type"::Invoice);
+        CustLedgEntry.SetRange("Document No.", SalesInvHeader."No.");
+        CustLedgEntry.SetRange("Customer No.", SalesInvHeader."Bill-to Customer No.");
+        CustLedgEntry.FindFirst();
+        Assert.IsTrue(CustLedgEntry.Open = false, 'Cust Ledger Entry is not closed.');
+        
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        SaleLinePOS.FindFirst();
+        Assert.IsTrue(SaleLinePOS."Amount Including VAT" = AmountToPay, 'Amount of prepayment invoice is not paid');
+
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        SaleLinePOS.SetRange("Sales Document Type", SaleLinePOS."Sales Document Type"::Order);
+        SaleLinePOS.SetRange("Sales Document No.", CreatedSalesHeader);
+        SaleLinePOS.SetRange("Amount Including VAT", 0);
+        if SaleLinePOS.IsEmpty() then
+            Assert.AssertNothingInsideFilter();
+    end;
+
     local procedure PostPosEntry()
     var
         POSEntry: Record "NPR POS Entry";
@@ -267,5 +324,4 @@ codeunit 85101 "NPR POS Action Layaway Tests"
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
         CheckPrepmtAccNo(SalePOS, Item."Gen. Prod. Posting Group");
     end;
-
 }
