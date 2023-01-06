@@ -7,7 +7,7 @@ codeunit 6014495 "NPR HWC Report Printer"
     var
         Payload: JsonObject;
         HWCPrinter: Record "NPR HWC Printer";
-        HardwareConnectorLbl: Label 'Hardware Connector Printer: %1';
+        HardwareConnectorLbl: Label 'Hardware Connector Printer: %1', Locked = true;
     begin
         if HWCPrinter.FindSet() then
             repeat
