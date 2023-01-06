@@ -196,6 +196,7 @@
         TempSalespersonPurchaser.DeleteAll();
         Setdate();
         CalculateSalesPersonSalesQty(TempSalespersonPurchaser);
+        TempSalespersonPurchaser.SetCurrentKey("NPR Maximum Cash Returnsale");
         TempSalespersonPurchaser.SetAscending("NPR Maximum Cash Returnsale", false);
         TempSalespersonPurchaser.SetFilter("NPR Maximum Cash Returnsale", '<>%1', 0);
         if TempSalespersonPurchaser.IsEmpty() then
