@@ -7,7 +7,6 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>7d3ed668-5d89-4134-9d99-c444b33a0604</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -642,6 +641,7 @@
                           <PaddingRight>2pt</PaddingRight>
                         </Style>
                       </Textbox>
+                      <rd:Selected>true</rd:Selected>
                     </CellContents>
                   </TablixHeader>
                 </TablixMember>
@@ -672,7 +672,7 @@
                     </SortExpression>
                   </SortExpressions>
                   <TablixHeader>
-                    <Size>1.49729cm</Size>
+                    <Size>1.73542cm</Size>
                     <CellContents>
                       <Textbox Name="PostingDate">
                         <CanGrow>true</CanGrow>
@@ -925,7 +925,7 @@
                                           <TablixMembers>
                                             <TablixMember>
                                               <TablixHeader>
-                                                <Size>1.55292cm</Size>
+                                                <Size>1.23542cm</Size>
                                                 <CellContents>
                                                   <Textbox Name="QtyBase">
                                                     <CanGrow>true</CanGrow>
@@ -962,7 +962,7 @@
                                               <TablixMembers>
                                                 <TablixMember>
                                                   <TablixHeader>
-                                                    <Size>1.92334cm</Size>
+                                                    <Size>1.87042cm</Size>
                                                     <CellContents>
                                                       <Textbox Name="SalesAmtLCY">
                                                         <CanGrow>true</CanGrow>
@@ -999,7 +999,7 @@
                                                   <TablixMembers>
                                                     <TablixMember>
                                                       <TablixHeader>
-                                                        <Size>2.05103cm</Size>
+                                                        <Size>1.9452cm</Size>
                                                         <CellContents>
                                                           <Textbox Name="SalesAmtLCYInclVAT">
                                                             <CanGrow>true</CanGrow>
@@ -1036,7 +1036,7 @@
                                                       <TablixMembers>
                                                         <TablixMember>
                                                           <TablixHeader>
-                                                            <Size>2.05563cm</Size>
+                                                            <Size>1.79105cm</Size>
                                                             <CellContents>
                                                               <Textbox Name="CostAmtLCY">
                                                                 <CanGrow>true</CanGrow>
@@ -1145,7 +1145,7 @@
                                                                   <TablixMembers>
                                                                     <TablixMember>
                                                                       <TablixHeader>
-                                                                        <Size>2.10855cm</Size>
+                                                                        <Size>1.73813cm</Size>
                                                                         <CellContents>
                                                                           <Textbox Name="CoverageMargin">
                                                                             <CanGrow>true</CanGrow>
@@ -1258,7 +1258,7 @@
             </Filters>
             <Top>1.52639cm</Top>
             <Height>0.9cm</Height>
-            <Width>29.58251cm</Width>
+            <Width>28.70939cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1275,7 +1275,7 @@
                   <Width>15.1cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>9.98251cm</Width>
+                  <Width>9.10939cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -1542,7 +1542,7 @@
               </Filter>
             </Filters>
             <Height>1.35cm</Height>
-            <Width>29.58251cm</Width>
+            <Width>28.70939cm</Width>
             <ZIndex>1</ZIndex>
             <Visibility>
               <Hidden>=Sum(iif(IsNothing(Fields!LineNo.Value),1,0)) = 0</Hidden>
@@ -1557,7 +1557,7 @@
         <Height>2.42639cm</Height>
         <Style />
       </Body>
-      <Width>29.58251cm</Width>
+      <Width>28.70939cm</Width>
       <Page>
         <PageHeight>21cm</PageHeight>
         <PageWidth>29.7cm</PageWidth>
