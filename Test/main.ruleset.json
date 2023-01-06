@@ -18,6 +18,11 @@
             "justification": "The value of the Tooltip property of Fields must be filled."
         },        
         {
+            "id": "AA0021",
+            "action": "Hidden",
+            "justification": "Variable declarations should be ordered by type."
+        },
+        {
             "id": "AS0018",
             "action":"Hidden",
             "justification": "A procedure belonging to the public API should not be removed."
