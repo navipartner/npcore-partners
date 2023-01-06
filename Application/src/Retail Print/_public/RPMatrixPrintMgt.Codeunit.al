@@ -80,9 +80,21 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
     /// </summary>
     /// <param name="CodeunitID">Parameter is only to have an object that users can setup output config for. It can be empty.</param>
     /// <param name="PrinterDevice">Which driver to use for job generation</param>
-    internal procedure ProcessBuffer(CodeunitID: Integer; PrinterDevice: Enum "NPR Matrix Printer Device")
+    internal procedure ProcessBuffer(CodeunitID: Integer; PrinterDevice: Enum "NPR Matrix Printer Device"; var PrinterDeviceSettings: Record "NPR Printer Device Settings")
+    var
+        TempDeviceSettings: Record "NPR RP Device Settings" temporary;
     begin
-        PrintBuffer('', CodeunitId, 0, 1, PrinterDevice);
+
+        if PrinterDeviceSettings.FindSet() then
+            repeat
+                TempDeviceSettings.Init();
+                TempDeviceSettings.Template := '';
+                TempDeviceSettings.Name := PrinterDeviceSettings.Name;
+                TempDeviceSettings.Value := PrinterDeviceSettings.Value;
+                TempDeviceSettings.Insert()
+            until PrinterDeviceSettings.Next() = 0;
+
+        PrintBuffer('', CodeunitId, 0, 1, PrinterDevice, TempDeviceSettings);
     end;
     #endregion    
 
@@ -208,9 +220,8 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
         ProcessLayout(DataJoinBuffer, DataItems, TemplateHeader);
     end;
 
-    local procedure PrintBuffer(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; NoOfPrints: Integer; MatrixPrinter: Interface "NPR IMatrix Printer")
+    local procedure PrintBuffer(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; NoOfPrints: Integer; MatrixPrinter: Interface "NPR IMatrix Printer"; var DeviceSettings: Record "NPR RP Device Settings")
     var
-        DeviceSettings: Record "NPR RP Device Settings";
         ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
         OutputLogging: Codeunit "NPR RP Templ. Output Log Mgt.";
     begin
@@ -226,6 +237,8 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
 
         ObjectOutputMgt.PrintMatrixJob(TemplateCode, CodeunitId, ReportId, MatrixPrinter, NoOfPrints);
         OutputLogging.LogMatrixPrintJob(TemplateCode, CodeunitId, MatrixPrinter, NoOfPrints);
+
+        TempGlobalBuffer.DeleteAll();
     end;
 
     local procedure EvaluateFields(var TemplateLine: Record "NPR RP Template Line"; var DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt."): Text[30]
