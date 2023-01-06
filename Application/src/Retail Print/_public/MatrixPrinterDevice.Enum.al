@@ -1,9 +1,7 @@
 enum 6014491 "NPR Matrix Printer Device" implements "NPR IMatrix Printer"
 {
     Extensible = false;
-#if not BC17
-    Access = Internal;
-#endif
+
     value(0; Zebra)
     {
         Caption = 'Zebra';
