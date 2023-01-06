@@ -54,7 +54,6 @@
     local procedure ImportSalesOrder(XmlElement: XmlElement): Boolean
     var
         SalesHeader: Record "Sales Header";
-        ReleaseSalesDoc: Codeunit "Release Sales Document";
         MailErrorMessage: Text;
     begin
         if XmlElement.IsEmpty then
@@ -62,31 +61,43 @@
         if OrderExists(XmlElement) then
             exit(false);
 
-        InsertSalesHeader(XmlElement, SalesHeader);
-        InsertSalesLines(XmlElement, SalesHeader);
-        InsertPaymentLines(XmlElement, SalesHeader);
-        InsertComments(XmlElement, SalesHeader);
-        UpdateExtCouponReservations(SalesHeader);
-        OnBeforeRelease(CurrImportType, CurrImportEntry, XmlElement, SalesHeader);
-
-        if MagentoSetup."Release Order on Import" then
-            ReleaseSalesDoc.PerformManualRelease(SalesHeader);
-        InsertCollectDocument(XmlElement, SalesHeader);
-
-        UpdateRetailVoucherCustomerInfo(SalesHeader);
-
-        OnBeforeCommit(CurrImportType, CurrImportEntry, XmlElement, SalesHeader);
+        InsertSalesOrder(XmlElement, SalesHeader);
 
         Commit();
+
         if MagentoSetup."Send Order Confirmation" then
             MailErrorMessage := SendOrderConfirmation(XmlElement, SalesHeader);
         Commit();
+
         PostOnImport(SalesHeader);
         Commit();
+
         if MailErrorMessage <> '' then
             Error(Error003, CopyStr(MailErrorMessage, 1, 900));
 
         exit(true);
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    local procedure InsertSalesOrder(Element: XmlElement; var SalesHeader: Record "Sales Header")
+    var
+        ReleaseSalesDoc: Codeunit "Release Sales Document";
+    begin
+        InsertSalesHeader(Element, SalesHeader);
+        InsertSalesLines(Element, SalesHeader);
+        InsertPaymentLines(Element, SalesHeader);
+        InsertComments(Element, SalesHeader);
+        UpdateExtCouponReservations(SalesHeader);
+        OnBeforeRelease(CurrImportType, CurrImportEntry, Element, SalesHeader);
+
+        if MagentoSetup."Release Order on Import" then
+            ReleaseSalesDoc.PerformManualRelease(SalesHeader);
+
+        InsertCollectDocument(Element, SalesHeader);
+
+        UpdateRetailVoucherCustomerInfo(SalesHeader);
+
+        OnBeforeCommit(CurrImportType, CurrImportEntry, Element, SalesHeader);
     end;
 
     local procedure InsertCollectDocument(XmlElement: XmlElement; var SalesHeader: Record "Sales Header")
