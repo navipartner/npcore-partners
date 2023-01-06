@@ -259,7 +259,7 @@
     var
         Payload: JsonObject;
         PrintNodePrinter: Record "NPR PrintNode Printer";
-        PrintNodePrinterLbl: Label 'Print Node Printer: %1';
+        PrintNodePrinterLbl: Label 'Print Node Printer: %1', Locked = true;
     begin
         if PrintNodePrinter.FindSet() then
             repeat
