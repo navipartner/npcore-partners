@@ -488,17 +488,23 @@ tableextension 6014427 "NPR Item" extends Item
     {
         key("NPR Key1"; "NPR Group sale", "NPR Item Group")
         {
+#IF NOT CLOUD
             Enabled = false;
             //Obsoleting keys generates an error when using CurrentKeyIndex with RecRef.
             //See details: https://github.com/microsoft/AL/issues/6734
-            //ObsoleteState = Removed;
-            //ObsoleteReason = 'Not used anymore.';
+#ELSE
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+#ENDIF
         }
         key("NPR Key2"; "NPR Primary Key Length")
         {
+#IF NOT CLOUD
             Enabled = false;
-            //ObsoleteState = Removed;
-            //ObsoleteReason = 'Not used anymore.';
+#ELSE
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+#ENDIF
         }
         key("NPR Key3"; "NPR Replication Counter")
         {
