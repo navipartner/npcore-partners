@@ -166,6 +166,19 @@
             Caption = 'Additional Experience Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item;
+
+            trigger OnValidate()
+            var
+                TicketBom: Record "NPR TM Ticket Admission BOM";
+                CanNotBlank: Label 'This field can be cleared when all %4 records and field %1 has value %2, check item %3.', Comment = '1=field name, 2=value, 3=item number, 4=table name';
+            begin
+                if ((Rec."Additional Experience Item No." = '') and (xRec."Additional Experience Item No." <> '')) then begin
+                    TicketBom.SetFilter("Admission Code", '=%1', Rec."Admission Code");
+                    TicketBom.SetFilter("Admission Inclusion", '<>%1', TicketBom."Admission Inclusion"::REQUIRED);
+                    if (TicketBom.FindFirst()) then
+                        Error(CanNotBlank, TicketBom.FieldCaption("Admission Inclusion"), TicketBom."Admission Inclusion"::REQUIRED, TicketBom."Item No.", TicketBom.TableCaption());
+                end;
+            end;
         }
 
     }

@@ -430,14 +430,14 @@
 
     end;
 
-    procedure OfflineTicketValidation(var OfflineTicketValidation: XmlPort "NPR TM Offline Ticket Valid.") Success: Boolean
+    procedure OfflineTicketValidation(var OfflineTicketValidationXmlPort: XmlPort "NPR TM Offline Ticket Valid.") Success: Boolean
     var
         ImportEntry: Record "NPR Nc Import Entry";
         OutStr: OutStream;
         FileNameLbl: Label 'OfflineTicketValidation-%1.xml', Locked = true;
     begin
 
-        OfflineTicketValidation.Import();
+        OfflineTicketValidationXmlPort.Import();
 
         InsertImportEntry('OfflineTicketValidation', ImportEntry);
         ImportEntry."Document ID" := CreateDocumentId();
@@ -446,12 +446,12 @@
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        OfflineTicketValidation.SetDestination(OutStr);
-        OfflineTicketValidation.Export();
+        OfflineTicketValidationXmlPort.SetDestination(OutStr);
+        OfflineTicketValidationXmlPort.Export();
         ImportEntry.Modify(true);
         Commit();
 
-        OfflineTicketValidation.ProcessImportedRecords();
+        OfflineTicketValidationXmlPort.ProcessImportedRecords();
 
         Commit();
         exit(true);
@@ -523,18 +523,18 @@
 
     end;
 
-    procedure SendETicket(var SendETicket: XmlPort "NPR TM Send eTicket")
+    procedure SendETicket(var SendETicketXmlPort: XmlPort "NPR TM Send eTicket")
     begin
 
-        SendETicket.Import();
-        SendETicket.CreateResponse();
+        SendETicketXmlPort.Import();
+        SendETicketXmlPort.CreateResponse();
 
     end;
 
-    procedure ListTicketItems(var ListTicketItems: XmlPort "NPR TM List Ticket Items")
+    procedure ListTicketItems(var ListTicketItemsXmlPort: XmlPort "NPR TM List Ticket Items")
     begin
 
-        ListTicketItems.CreateResponse();
+        ListTicketItemsXmlPort.CreateResponse();
 
     end;
 
