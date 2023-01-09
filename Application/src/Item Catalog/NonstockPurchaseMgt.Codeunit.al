@@ -1,6 +1,7 @@
 ﻿codeunit 6060064 "NPR Nonstock Purchase Mgt."
 {
     Access = Internal;
+
     var
         ItemUnitofMeasure: Record "Item Unit of Measure";
         UnitofMeasure: Record "Unit of Measure";
@@ -31,9 +32,14 @@
             NonstockItem.SetRange("Vendor Item No.", ItemRef);
             if not NonstockItem.FindFirst() then begin
                 NonstockItem.SetRange("Vendor Item No.");
-                NonstockItem.SetRange("Bar Code", ItemRef);
-                if not NonstockItem.FindFirst() then
+                if StrLen(ItemRef) <= MaxStrLen(NonstockItem."Bar Code") then begin
+                    NonstockItem.SetRange("Bar Code", ItemRef);
+                    if not NonstockItem.FindFirst() then
+                        exit;
+                end
+                else
                     exit;
+
             end;
             Execute := true;
         end;
