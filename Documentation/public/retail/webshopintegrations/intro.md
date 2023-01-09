@@ -2,5 +2,6 @@
 
 Webshop integrations entail exchange of information between this application and another website or application. Some of the applications NP Retail can be integrated with are e-commerce and retail point-of-sale systems that offer help in operating online stores.
 
+- [Magento integration](./magento/magentointegration.md)
 - [Shopify integration](./shopify/shopifyintegration.md)
 - [Payment Gateways](payment_gateway/paymentgateway.md)

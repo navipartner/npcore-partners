@@ -1,5 +1,13 @@
 - name: Introduction
   href: intro.md
+- name: Magento integration
+  items:
+  - name: Introduction
+    href: magento/magentointegration.md
+  - name: How-to
+    items:
+    - name: Create Azure Active Directory Application
+      href: magento/howto/create-azure-ad-app.md
 - name: Shopify Integration
   items:
   - name: Introduction
