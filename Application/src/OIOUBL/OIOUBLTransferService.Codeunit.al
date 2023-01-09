@@ -68,12 +68,16 @@ codeunit 6060015 "NPR OIOUBL Transfer Service"
     local procedure IsNPTransferAllowed(): Boolean
     var
         OIOUBLSetup: Record "NPR OIOUBL Setup";
+        NPREnvironmentInformation: Record "NPR Environment Information";
         Company: Record Company;
         EnvironmentInformation: Codeunit "Environment Information";
     begin
         OIOUBLSetup.SetRange(Enabled, true);
         if OIOUBLSetup.IsEmpty then
             exit(false);
+
+        if NPREnvironmentInformation.Get() then
+            exit(NPREnvironmentInformation."Environment Type" = "NPR Environment Type"::PROD);
 
         if not EnvironmentInformation.IsSaaS() then
             exit(true);
