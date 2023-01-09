@@ -839,6 +839,7 @@
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
         Ticket: Record "NPR TM Ticket";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Token: Text[100];
         ResponseMessage: Text;
         HaveSalesTicket: Boolean;
@@ -859,8 +860,21 @@
             HaveSalesTicket := true;
         end;
 
-        if (Token <> '') then
-            AcquireTicketAdmissionSchedule(Token, SaleLinePOS, HaveSalesTicket, ResponseMessage); //-+TM1.45 [380754]
+        if (Token <> '') then begin
+            TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+            TicketReservationRequest.SetFilter("Admission Inclusion", '<>%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
+            if (not TicketReservationRequest.IsEmpty()) then begin
+                TicketReservationRequest.Reset();
+                TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+                TicketReservationRequest.SetFilter("Request Status", '<>%1', TicketReservationRequest."Request Status"::REGISTERED);
+                if (not TicketReservationRequest.IsEmpty()) then begin
+                    AddAdditionalExperience(POSSession, ExternalTicketNumber);
+                    exit;
+                end;
+            end;
+
+            AcquireTicketAdmissionSchedule(Token, SaleLinePOS, HaveSalesTicket, ResponseMessage);
+        end
     end;
 
     local procedure ReconfirmReservation(POSSession: Codeunit "NPR POS Session")
@@ -1310,8 +1324,11 @@
     local procedure AddAdditionalExperience(POSSession: Codeunit "NPR POS Session"; ExternalTicketNumber: Code[50])
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         SaleLinePOS: Record "NPR POS Sale Line";
         Ticket: Record "NPR TM Ticket";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        NoExperiencesToConfigure: Label 'There are no additional experiences to configure for this ticket.';
         Token: Text[100];
         ResponseMessage: Text;
         HaveSalesTicket: Boolean;
@@ -1322,6 +1339,7 @@
                 Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
 
             Ticket.TestField(Blocked, false);
+            TicketRequestManager.GetTicketToken(Ticket."No.", Token);
             HaveSalesTicket := false;
 
         end else begin
@@ -1331,15 +1349,21 @@
             HaveSalesTicket := true;
         end;
 
-        AquireAdditionalExperience(Ticket, Token, POSSession, HaveSalesTicket, ResponseMessage);
+        if (Token <> '') then begin
+            TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+            TicketReservationRequest.SetFilter("Admission Inclusion", '<>%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
+            if (TicketReservationRequest.IsEmpty()) then
+                Error(NoExperiencesToConfigure);
+
+            AcquireAdditionalExperience(Ticket, POSSession, HaveSalesTicket, ResponseMessage);
+        end;
     end;
 
-
-    local procedure AquireAdditionalExperience(Ticket: Record "NPR TM Ticket"; Token: Text[100]; POSSession: Codeunit "NPR POS Session"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
+    local procedure AcquireAdditionalExperience(Ticket: Record "NPR TM Ticket"; POSSession: Codeunit "NPR POS Session"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
     var
         TicketRetailManagement: Codeunit "NPR TM Ticket Retail Mgt.";
     begin
-        LookupOK := TicketRetailManagement.AquireAdditionalExperiences(Ticket, Token, POSSession, HaveSalesLine, ResponseMessage);
+        LookupOK := TicketRetailManagement.AcquireAdditionalExperiences(Ticket, POSSession, HaveSalesLine, ResponseMessage);
         exit(LookupOK);
     end;
 

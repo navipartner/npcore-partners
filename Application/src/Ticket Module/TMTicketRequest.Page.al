@@ -214,8 +214,24 @@
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Scope = Repeater;
-                    RunObject = Page "NPR TM Ticket List";
-                    RunPageLink = "Ticket Reservation Entry No." = FIELD("Entry No.");
+
+                    trigger OnAction()
+                    var
+                        Ticket: Record "NPR TM Ticket";
+                        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+                        TicketList: Page "NPR TM Ticket List";
+                    begin
+                        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', Rec."Entry No.");
+
+                        TicketRequest.SetCurrentKey("Session Token ID");
+                        TicketRequest.SetFilter("Session Token ID", '=%1', Rec."Session Token ID");
+                        TicketRequest.SetFilter("Primary Request Line", '=%1', true);
+                        if (TicketRequest.FindFirst()) then
+                            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
+
+                        TicketList.SetTableView(Ticket);
+                        TicketList.Run();
+                    end;
 
                 }
                 action("Navi&gate")

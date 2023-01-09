@@ -114,6 +114,18 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Required,Optional and Selected,Optional and not Selected';
             OptionMembers = REQUIRED,SELECTED,NOT_SELECTED;
+
+            trigger OnValidate()
+            var
+                Admission: Record "NPR TM Admission";
+            begin
+                // Change from required to optional 
+                if ((Rec."Admission Inclusion" <> Rec."Admission Inclusion"::REQUIRED) and
+                    (xRec."Admission Inclusion" = xRec."Admission Inclusion"::REQUIRED)) then begin
+                    Admission.Get(Rec."Admission Code");
+                    Admission.TestField("Additional Experience Item No.");
+                end;
+            end;
         }
         field(55; "Admission Unit Price"; Decimal)
         {
