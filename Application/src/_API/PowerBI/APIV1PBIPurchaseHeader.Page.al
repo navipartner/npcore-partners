@@ -40,6 +40,74 @@ page 6060037 "NPR APIV1 PBIPurchase Header"
                 {
                     Caption = 'Status', Locked = true;
                 }
+                field(buyFromVendorNo; Rec."Buy-from Vendor No.")
+                {
+                    Caption = 'Buy-from Vendor No.', Locked = true;
+                }
+                field(dimensionSetId; Rec."Dimension Set ID")
+                {
+                    Caption = 'Dimension Set ID', Locked = true;
+                }
+                field(documentDate; Rec."Document Date")
+                {
+                    Caption = 'Document Date', Locked = true;
+                }
+                field(documentType; Rec."Document Type")
+                {
+                    Caption = 'Document Type', Locked = true;
+                }
+                field(dueDate; Rec."Due Date")
+                {
+                    Caption = 'Due Date', Locked = true;
+                }
+                field(expectedReceiptDate; Rec."Expected Receipt Date")
+                {
+                    Caption = 'Expected Receipt Date', Locked = true;
+                }
+                field(genBusPostingGroup; Rec."Gen. Bus. Posting Group")
+                {
+                    Caption = 'Gen. Bus. Posting Group', Locked = true;
+                }
+                field(invoice; Rec."Invoice")
+                {
+                    Caption = 'Invoice', Locked = true;
+                }
+                field(orderDate; Rec."Order Date")
+                {
+                    Caption = 'Order Date', Locked = true;
+                }
+                field(paymentDiscountPct; Rec."Payment Discount %")
+                {
+                    Caption = 'Payment Discount %', Locked = true;
+                }
+                field(pmtDiscountDate; Rec."Pmt. Discount Date")
+                {
+                    Caption = 'Pmt. Discount Date', Locked = true;
+                }
+                field(postingNo; Rec."Posting No.")
+                {
+                    Caption = 'Posting No.', Locked = true;
+                }
+                field(receive; Rec."Receive")
+                {
+                    Caption = 'Receive', Locked = true;
+                }
+                field(receivingNo; Rec."Receiving No.")
+                {
+                    Caption = 'Receiving No.', Locked = true;
+                }
+                field(shortcutDimension1Code; Rec."Shortcut Dimension 1 Code")
+                {
+                    Caption = 'Shortcut Dimension 1 Code', Locked = true;
+                }
+                field(shortcutDimension2Code; Rec."Shortcut Dimension 2 Code")
+                {
+                    Caption = 'Shortcut Dimension 2 Code', Locked = true;
+                }
+                field(transactionType; Rec."Transaction Type")
+                {
+                    Caption = 'Transaction Type', Locked = true;
+                }
             }
         }
     }
