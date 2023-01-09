@@ -223,15 +223,16 @@
         end;
     end;
 
-    procedure AquireAdditionalExperiences(Ticket: Record "NPR TM Ticket"; Token: Text[100]; POSSession: Codeunit "NPR POS Session"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
+    procedure AcquireAdditionalExperiences(Ticket: Record "NPR TM Ticket"; POSSession: Codeunit "NPR POS Session"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         PageAction: Action;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        DisplayTicketeservationRequest: Page "NPR TM Ticket Make Reserv.";
+        DisplayTicketReservationRequest: Page "NPR TM Ticket Make Reserv.";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         ResolvedByTable: Integer;
         ResultCode: Integer;
+        Token: Text[100];
     begin
 
         TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
@@ -248,18 +249,18 @@
 
         ResultCode := 0;
         repeat
-            Clear(DisplayTicketeservationRequest);
-            DisplayTicketeservationRequest.LoadTicketRequest(Token);
-            DisplayTicketeservationRequest.SetTicketItem(Ticket."Item No.", Ticket."Variant Code");
-            DisplayTicketeservationRequest.AllowQuantityChange(true);
-            DisplayTicketeservationRequest.LookupMode(true);
-            DisplayTicketeservationRequest.Editable(true);
+            Clear(DisplayTicketReservationRequest);
+            DisplayTicketReservationRequest.LoadTicketRequest(Token);
+            DisplayTicketReservationRequest.SetTicketItem(Ticket."Item No.", Ticket."Variant Code");
+            DisplayTicketReservationRequest.AllowQuantityChange(true);
+            DisplayTicketReservationRequest.LookupMode(true);
+            DisplayTicketReservationRequest.Editable(true);
 
             if (ResultCode <> 0) then
                 if (not Confirm(SCHEDULE_ERROR, true, ResponseMessage)) then
                     exit(false);
 
-            PageAction := DisplayTicketeservationRequest.RunModal();
+            PageAction := DisplayTicketReservationRequest.RunModal();
             if (PageAction <> Action::LookupOK) then begin
                 ResponseMessage := ABORTED;
                 TicketRequestManager.DeleteReservationRequest(Token, true);
@@ -267,7 +268,7 @@
             end;
 
 
-            ResultCode := DisplayTicketeservationRequest.FinalizeChangeRequestDynamicTicket(Ticket."No.", POSSession, true, ResponseMessage); //finalize should happen after the POS transaction is finished
+            ResultCode := DisplayTicketReservationRequest.FinalizeChangeRequestDynamicTicket(Ticket."No.", POSSession, true, ResponseMessage); //finalize should happen after the POS transaction is finished
             if (ResultCode = 11) then begin
                 ResponseMessage := ''; // Silent error downstream
                 exit(false);
