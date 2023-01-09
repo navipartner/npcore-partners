@@ -38,7 +38,7 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
             until NpCsStorePOSRelation.Next() = 0;
 
             if TempNpCsStore.FindFirst() then;
-            if PAGE.RunModal(0, TempNpCsStore) <> ACTION::LookupOK then
+            if Page.RunModal(0, TempNpCsStore) <> Action::LookupOK then
                 exit;
 
             StoreCode := TempNpCsStore.Code;
@@ -84,14 +84,14 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
             if Customer.Get(SalePOS."Customer No.") then;
 
         if Customer."No." = '' then begin
-            if PAGE.RunModal(0, Customer) <> ACTION::LookupOK then
+            if Page.RunModal(0, Customer) <> Action::LookupOK then
                 exit;
         end;
 
         CustomerNo := Customer."No.";
     end;
 
-    procedure SelectWorkflow(StoreCode: Text) WorkflowCode: Text
+    procedure SelectWorkflow(StoreCode: Text) WorkflowCode: Code[20]
     var
         NpCsStore: Record "NPR NpCs Store";
         NpCsStoreWorkflowRelation: Record "NPR NpCs Store Workflow Rel.";
@@ -120,7 +120,7 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
             until NpCsStoreWorkflowRelation.Next() = 0;
 
             if TempNpCsWorkflow.FindFirst() then;
-            if PAGE.RunModal(0, TempNpCsWorkflow) <> ACTION::LookupOK then
+            if Page.RunModal(0, TempNpCsWorkflow) <> Action::LookupOK then
                 exit;
 
             WorkflowCode := TempNpCsWorkflow.Code;
@@ -238,7 +238,7 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
         RetailSalesDocMgt.SetDocumentTypeOrder();
     end;
 
-    procedure SelectToStoreCode(var TempNpCsStore: Record "NPR NpCs Store" temporary; FromStoreCode: Code[20])
+    procedure SelectToStoreCode(var TempNpCsStore: Record "NPR NpCs Store" temporary; FromStoreCode: Code[20]): Boolean
     var
         FromNpCsStore: Record "NPR NpCs Store";
         TempNpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary;
@@ -311,11 +311,12 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
         NpCsStoresbyDistance.SetShowInventory(true);
         NpCsStoresbyDistance.SetFromStoreCode(FromNpCsStore.Code);
         NpCsStoresbyDistance.LookupMode(true);
-        if NpCsStoresbyDistance.RunModal() <> ACTION::LookupOK then
-            exit;
+        if NpCsStoresbyDistance.RunModal() <> Action::LookupOK then
+            exit(false);
 
         NpCsStoresbyDistance.GetRecord(TempNpCsStore);
         TempNpCsStore.Find();
+        exit(true);
     end;
 
 
