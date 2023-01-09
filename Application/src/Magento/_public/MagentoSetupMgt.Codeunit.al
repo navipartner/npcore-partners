@@ -812,4 +812,19 @@
     end;
 
     #endregion
+
+    #region Azure AD application
+    internal procedure CreateAzureADApplication()
+    var
+        PermissionSets: List of [Code[20]];
+        AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
+        AppDisplayNameLbl: Label 'NaviPartner Magento 2 integration';
+        SecretDisplayNameLbl: Label 'NaviPartner M2 integration - %1', Comment = '%1 = today''s date';
+    begin
+        PermissionSets.Add('D365 BUS FULL ACCESS');
+        PermissionSets.Add('NP RETAIL');
+
+        AADApplicationMgt.CreateAzureADApplicationAndSecret(AppDisplayNameLbl, StrSubstNo(SecretDisplayNameLbl, Format(Today(), 0, 9)), PermissionSets);
+    end;
+    #endregion
 }
