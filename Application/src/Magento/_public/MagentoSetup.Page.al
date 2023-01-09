@@ -964,6 +964,58 @@
                         end;
                     }
                 }
+                group("Azure Active Directory OAuth")
+                {
+                    Caption = 'Azure Active Directory OAuth';
+                    Visible = HasAzureADConnection;
+                    Image = XMLSetup;
+
+                    action("Create Azure AD App")
+                    {
+                        Caption = 'Create Azure AD App';
+                        ToolTip = 'Running this action will create an Azure AD App and a accompaning client secret.';
+                        Image = Setup;
+                        ApplicationArea = NPRRetail;
+
+                        trigger OnAction()
+                        var
+                            MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
+                        begin
+                            MagentoSetupMgt.CreateAzureADApplication();
+                        end;
+                    }
+                    action("Create Azure AD App Secret")
+                    {
+                        Caption = 'Create Azure AD App Secret';
+                        ToolTip = 'Running this action will create a client secret for an existing Azure AD App.';
+                        Image = Setup;
+                        ApplicationArea = NPRRetail;
+
+                        trigger OnAction()
+                        var
+                            AppInfo: ModuleInfo;
+                            AADApplication: Record "AAD Application";
+                            AADApplicationList: Page "AAD Application List";
+                            AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
+                            NoAppsToManageErr: Label 'No AAD Apps with App Name like %1 to manage';
+                            SecretDisplayNameLbl: Label 'NaviPartner M2 integration - %1', Comment = '%1 = today''s date';
+                        begin
+                            NavApp.GetCurrentModuleInfo(AppInfo);
+
+                            AADApplication.SetFilter("App Name", '@' + AppInfo.Name);
+                            if (AADApplication.IsEmpty()) then
+                                Error(NoAppsToManageErr, AppInfo.Name);
+
+                            AADApplicationList.LookupMode(true);
+                            AADApplicationList.SetTableView(AADApplication);
+                            if (AADApplicationList.RunModal() <> Action::LookupOK) then
+                                exit;
+
+                            AADApplicationList.GetRecord(AADApplication);
+                            AADApplicationMgt.CreateAzureADSecret(AADApplication."Client Id", StrSubstNo(SecretDisplayNameLbl, Format(Today(), 0, 9)));
+                        end;
+                    }
+                }
             }
             action("Setup Import Types")
             {
@@ -1090,6 +1142,8 @@
     end;
 
     trigger OnOpenPage()
+    var
+        AzureADTenant: Codeunit "Azure AD Tenant";
     begin
         if not Rec.Get() then
             Rec.Insert();
@@ -1099,6 +1153,8 @@
         Rec.UpdateXmlEnabledFields();
 
         WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible);
+
+        HasAzureADConnection := (AzureADTenant.GetAadTenantId() <> '');
     end;
 
     var
@@ -1111,6 +1167,7 @@
         Text00201: Label 'Items';
         HasSetupCategories: Boolean;
         HasSetupBrands: Boolean;
+        HasAzureADConnection: Boolean;
         VariantSystem: Boolean;
         PictureVarietyType: Boolean;
         Text003: Label 'Category update initiated';
