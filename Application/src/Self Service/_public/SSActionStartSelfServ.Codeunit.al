@@ -1,51 +1,36 @@
-﻿codeunit 6151286 "NPR SS Action: Start SelfServ."
+﻿codeunit 6151286 "NPR SS Action: Start SelfServ." implements "NPR IPOS Workflow"
 {
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
-        ActionDescription: Label 'This built in actions starts the POS in SelfService mode';
-
-    local procedure ActionCode(): Text[20]
+        ActionDescriptionLbl: Label 'This built in actions starts the POS in SelfService mode';
+        ParamSalesPerson_CaptLbl: Label 'Sales Person Code';
+        ParamSalesPerson_DescLbl: Label 'Specifies Sales Person Code';
+        ParamLanguageCode_CaptLbl: Label 'Language Code';
+        ParamLanguageCode_DescLbl: Label 'Specifies Language Code';
     begin
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
 
-        exit('SS-START-POS');
+        WorkflowConfig.AddTextParameter('SalespersonCode', '', ParamSalesPerson_CaptLbl, ParamSalesPerson_DescLbl);
+        WorkflowConfig.AddTextParameter('LanguageCode', '', ParamLanguageCode_CaptLbl, ParamLanguageCode_DescLbl);
+        WorkflowConfig.SetWorkflowTypeUnattended();
     end;
 
-    local procedure ActionVersion(): Text[30]
+    local procedure GetActionScript(): Text
     begin
-
-        exit('1.2');
+        exit(
+       //###NPR_INJECT_FROM_FILE:POSActionPaymentCashSS.js###
+       'let main=async({})=>{await workflow.respond()};'
+        );
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-
-        if Sender.DiscoverAction20(
-          ActionCode(),
-          ActionDescription,
-          ActionVersion())
-        then begin
-            Sender.RegisterWorkflow20('await workflow.respond();');
-
-            Sender.RegisterTextParameter('SalespersonCode', '');
-            Sender.RegisterTextParameter('LanguageCode', '');
-
-            Sender.SetWorkflowTypeUnattended();
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup");
     var
+        POSSession: Codeunit "NPR POS Session";
         SalespersonCode: Code[20];
         LanguageCode: Code[10];
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        SalesPersonCode := CopyStr(Context.GetStringParameterOrFail('SalespersonCode', ActionCode()), 1, MaxStrLen(SalespersonCode));
-
+        SalesPersonCode := CopyStr(Context.GetStringParameter('SalespersonCode'), 1, MaxStrLen(SalespersonCode));
         LanguageCode := CopyStr(Context.GetStringParameter('LanguageCode'), 1, MaxStrLen(LanguageCode));
         StartSelfService(POSSession, SalesPersonCode, LanguageCode);
     end;

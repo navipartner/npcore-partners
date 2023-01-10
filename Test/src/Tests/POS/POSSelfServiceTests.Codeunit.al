@@ -3,19 +3,17 @@ codeunit 85073 "NPR POS Self Service Tests"
     Subtype = Test;
 
     var
-        Assert: Codeunit "Assert";
-        Initialized: Boolean;
-        POSUnit: Record "NPR POS Unit";
-        POSSession: Codeunit "NPR POS Session";
-        POSSetup: Record "NPR POS Setup";
         POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        Assert: Codeunit Assert;
+        POSSession: Codeunit "NPR POS Session";
+        Initialized: Boolean;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     procedure ChangeViewSale()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSSale: Codeunit "NPR POS Sale";
         CurrentView: Codeunit "NPR POS View";
     begin
         // [Given] POS & Payment setup
@@ -29,7 +27,7 @@ codeunit 85073 "NPR POS Self Service Tests"
 
         //[Then]
         POSSession.GetCurrentView(CurrentView);
-        Assert.IsTrue(CurrentView.Type() = CurrentView.Type() ::Sale, Format(CurrentView.Type()));
+        Assert.IsTrue(CurrentView.GetType() = CurrentView.GetType() ::Sale, Format(CurrentView.GetType()));
 
     end;
 
@@ -38,7 +36,6 @@ codeunit 85073 "NPR POS Self Service Tests"
     procedure ChangeViewPayment()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSSale: Codeunit "NPR POS Sale";
         CurrentView: Codeunit "NPR POS View";
     begin
         // [Given] POS & Payment setup
@@ -52,7 +49,7 @@ codeunit 85073 "NPR POS Self Service Tests"
 
         //[Then]
         POSSession.GetCurrentView(CurrentView);
-        Assert.IsTrue(CurrentView.Type() = CurrentView.Type() ::Payment, Format(CurrentView.Type()));
+        Assert.IsTrue(CurrentView.GetType() = CurrentView.GetType() ::Payment, Format(CurrentView.GetType()));
 
     end;
 
@@ -61,7 +58,6 @@ codeunit 85073 "NPR POS Self Service Tests"
     procedure ChangeViewLogin()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSSale: Codeunit "NPR POS Sale";
         CurrentView: Codeunit "NPR POS View";
     begin
         // [Given] POS & Payment setup
@@ -75,7 +71,7 @@ codeunit 85073 "NPR POS Self Service Tests"
 
         //[Then]
         POSSession.GetCurrentView(CurrentView);
-        Assert.IsTrue(CurrentView.Type() = CurrentView.Type() ::Login, Format(CurrentView.Type()));
+        Assert.IsTrue(CurrentView.GetType() = CurrentView.GetType() ::Login, Format(CurrentView.GetType()));
 
     end;
 
@@ -84,15 +80,15 @@ codeunit 85073 "NPR POS Self Service Tests"
     procedure IncreaseQuantity()
     var
         Item: Record Item;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        POSSale: Codeunit "NPR POS Sale";
-        LibraryRandom: Codeunit "Library - Random";
         SaleLinePOS: Record "NPR POS Sale Line";
+        LibraryRandom: Codeunit "Library - Random";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
         SSActionQtyIncrease: Codeunit "NPR SS Action - Qty Increase";
-        NewQuantity: Decimal;
         GivenQuantity: Decimal;
+        NewQuantity: Decimal;
     begin
         // [SCENARIO]
         //Increase Quantity on Line
@@ -122,15 +118,15 @@ codeunit 85073 "NPR POS Self Service Tests"
     procedure DecreaseQuantity()
     var
         Item: Record Item;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        POSSale: Codeunit "NPR POS Sale";
-        LibraryRandom: Codeunit "Library - Random";
         SaleLinePOS: Record "NPR POS Sale Line";
+        LibraryRandom: Codeunit "Library - Random";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
         SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease";
-        NewQuantity: Decimal;
         GivenQuantity: Decimal;
+        NewQuantity: Decimal;
     begin
         // [SCENARIO]
         //Decrease Quantity on Line ,GivenQuantity >= NewQuantity
@@ -161,15 +157,15 @@ codeunit 85073 "NPR POS Self Service Tests"
     procedure DecreaseQuantityToZero()
     var
         Item: Record Item;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        POSSale: Codeunit "NPR POS Sale";
-        LibraryRandom: Codeunit "Library - Random";
         SaleLinePOS: Record "NPR POS Sale Line";
+        LibraryRandom: Codeunit "Library - Random";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
         SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease";
-        NewQuantity: Decimal;
         GivenQuantity: Decimal;
+        NewQuantity: Decimal;
     begin
         // [SCENARIO]
         //Decrease Quantity on Line ,GivenQuantity <= NewQuantity
@@ -200,15 +196,14 @@ codeunit 85073 "NPR POS Self Service Tests"
     procedure DecreaseQuantityWithZero()
     var
         Item: Record Item;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        POSSale: Codeunit "NPR POS Sale";
-        LibraryRandom: Codeunit "Library - Random";
         SaleLinePOS: Record "NPR POS Sale Line";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
         SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease";
-        NewQuantity: Decimal;
         GivenQuantity: Decimal;
+        NewQuantity: Decimal;
     begin
         // [SCENARIO]
         //Decrease Quantity on Line , NewQuantity=0
@@ -239,15 +234,14 @@ codeunit 85073 "NPR POS Self Service Tests"
     procedure DecreaseQuantityWithNegative()
     var
         Item: Record Item;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        POSSale: Codeunit "NPR POS Sale";
         LibraryRandom: Codeunit "Library - Random";
-        SaleLinePOS: Record "NPR POS Sale Line";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
         SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease";
-        NewQuantity: Decimal;
         GivenQuantity: Decimal;
+        NewQuantity: Decimal;
     begin
         // [SCENARIO]
         //Decrease Quantity on Line , NewQuantity<0
@@ -268,4 +262,35 @@ codeunit 85073 "NPR POS Self Service Tests"
         asserterror SSActionQtyDecrease.DecreaseSalelineQuantity(POSSession, NewQuantity, POSSaleLine);
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure StartSelfService()
+    var
+        Language: Record Language;
+        POSEntry: Record "NPR POS Entry";
+        Salesperson: Record "Salesperson/Purchaser";
+        LibrarySales: Codeunit "Library - Sales";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        CurrentView: Codeunit "NPR POS View";
+        SelfService: Codeunit "NPR SS Action: Start SelfServ.";
+    begin
+        // [SCENARIO]
+        //Start Self Service
+        // [Given] Initialize
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
+        LibraryPOSMock.InitializePOSSession(POSSession, POSUnit);
+        Language.SetRange("Windows Language ID", 1033);
+        Language.FindFirst();
+        LibrarySales.CreateSalesperson(Salesperson);
+
+        //[When] Active self service
+        SelfService.StartSelfService(POSSession, Salesperson.Code, Language.Code);
+
+        //[Then]
+        POSSession.GetCurrentView(CurrentView);
+        Assert.IsTrue(CurrentView.GetType() = CurrentView.GetType() ::Sale, 'Self Service is not started.');
+
+        POSEntry.FindLast();
+        Assert.IsTrue(POSEntry."System Entry" = true, 'POS Entry is not created.');
+    end;
 }
