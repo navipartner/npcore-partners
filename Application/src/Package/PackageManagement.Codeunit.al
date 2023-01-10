@@ -143,8 +143,9 @@ codeunit 6059947 "NPR Package Management"
         ShipToAddress: Record "Ship-to Address";
         SalesShipmentLine: Record "Sales Shipment Line";
         DocFound: Boolean;
-
     begin
+        if not InitPackageProvider() then
+            exit;
 
         ShipmentDocument.SETRANGE("Table No.", RecRef.NUMBER);
         ShipmentDocument.SETRANGE(RecordID, RecRef.RECORDID);
