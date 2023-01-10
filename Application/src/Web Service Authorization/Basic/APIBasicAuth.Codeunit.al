@@ -11,12 +11,12 @@ codeunit 6014609 "NPR API Basic Auth" implements "NPR API IAuthorization"
     var
         Base64Convert: Codeunit "Base64 Convert";
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
-        StrSubStNoText1: Label '%1:%2', Locked = true;
-        StrSubStNoText2: Label 'Basic %1', Locked = true;
+        StrSubStNoTextLbl1: Label '%1:%2', Locked = true;
+        StrSubStNoTextLbl2: Label 'Basic %1', Locked = true;
     begin
-        AuthText := StrSubstNo(StrSubStNoText1, AuthParamBuff."Basic UserName", WebServiceAuthHelper.GetApiPassword(AuthParamBuff."Basic Password Key"));
+        AuthText := StrSubstNo(StrSubStNoTextLbl1, AuthParamBuff."Basic UserName", WebServiceAuthHelper.GetApiPassword(AuthParamBuff."Basic Password Key"));
         AuthText := Base64Convert.ToBase64(AuthText);
-        AuthText := StrSubstNo(StrSubStNoText2, AuthText);
+        AuthText := StrSubstNo(StrSubStNoTextLbl2, AuthText);
     end;
 
     [NonDebuggable]
