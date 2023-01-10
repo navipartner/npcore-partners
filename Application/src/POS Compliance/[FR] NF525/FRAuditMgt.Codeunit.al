@@ -959,7 +959,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
             POSAuditLogAdditionalInfo."Store Address 2" := POSStore."Address 2";
             POSAuditLogAdditionalInfo."Store Post Code" := POSStore."Post Code";
             POSAuditLogAdditionalInfo."Store City" := POSStore.City;
-            POSAuditLogAdditionalInfo."Store Siret" := POSStore."Registration No.";
+            POSAuditLogAdditionalInfo."Store Siret" := CopyStr(POSStore."Registration No.", 1, MaxStrLen(POSAuditLogAdditionalInfo."Store Siret"));
             POSAuditLogAdditionalInfo."Store Country/Region Code" := POSStore."Country/Region Code";
             POSAuditLogAdditionalInfo."Salesperson Name" := SalespersonPurchaser.Name;
         end;

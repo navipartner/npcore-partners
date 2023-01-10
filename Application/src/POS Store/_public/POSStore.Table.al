@@ -146,7 +146,7 @@
             begin
             end;
         }
-        field(28; "Registration No."; Text[20])
+        field(28; "Registration No."; Text[50])
         {
             Caption = 'Registration No.';
             DataClassification = CustomerContent;
