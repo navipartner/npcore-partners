@@ -21,27 +21,30 @@ Prior to the installation of the Power BI app, request a free BC account from th
 ## Procedure
 
 1. Log into your Power BI account. 
-2. Go to the [Microsoft app store](https://apps.microsoft.com/store/apps) and find our product **NP BI RETAIL**. Click **Free trial** to run the installation wizard.    
-   <img src="./../images/Pic2.png" width="270">
+2. Go to the [Microsoft app store](https://apps.microsoft.com/store/apps) and find our product **NP Power BI for Retail**. Click **Free trial** to run the installation wizard.    
+   
+   <img src="./../images/power_bi_retail.png" width="270">
+   
 3. Once the installation wizard is displayed, click **Install**.     
-   ![Install_Power_BI](./../images/Pic3.jpg)              
+   ![Install_Power_BI](./../images/power_bi_retail2.png)              
    When the application is installed, it will be added to your list in the **Apps** section.      
-   ![Microsoft_Apps](./../images/Pic3a.png)
-4. If you've already installed the application, you can update it to the new version by selecting the first option in the update app pop-up window, or install a new copy by selecting the third option. After selecting the third option, you need to  add a new name of the installation app, and confirm it.    
-   ![Update_app](./../images/Pic4.jpg)
+   ![Microsoft_Apps](./../images/power_bi_retail3.png)
+4. If you've already installed the application, you can update it to the new version by selecting the first option in the update app pop-up window, or install a new copy by selecting the third option. After selecting the third option, you need to add a new name of the installation app, and confirm it.    
+   ![Update_app](./../images/power_bi_retail4.png)
 5. Once the app is installed, click on the application name to open its content.     
    You can review the contents with the test data or connect to your test database from Business Central. 
 6. To connect to your data from the Business Central, you need to click **Connect your data** in the alert ribbon.      
-    ![Power_BI_alert](./../images/pic5.png)
-7. In the **Connect to NP Power BI for Retail** popup window populate the three fields as indicated in the provided screenshots.   
-   ![connect_to_BC_retail_demo](./../images/app_store_instructions.PNG)    
+    ![Power_BI_alert](./../images/power_bi_retail5.png)
+7. In the **Connect to NP Power BI for Retail** pop-up window populate the three fields as indicated in the provided screenshots.   
+   ![connect_to_BC_retail_demo](./../images/power_bi_retail6.PNG)    
 
 > [!Note]
 > Ensure that you don't have any blank characters in the beginning and the end of the text you provide.
 
-8. Choose the **Basic** authentication type, and provide the username and password you've received when requesting a free BC account. 
-9. Click **Sign in and connect** to synchronize your Power BI app with the data from Business Central.     
-    This action may take some time, and after it's completed you will be able to see the refreshed data from your demo database. 
+8. Choose the **OAuth2** authentication method, and the **Organizational** privacy level settings.
+9.  Click **Sign in and connect** to synchronize your Power BI app with the data from Business Central.     
+    This step may take some time, and after it's completed you will be able to see your own data in the report.    
+    The data will be automatically refreshed once per day by default, but this can be changed in the dataset settings, based on your preferences. 
 
 ### Related links
 
