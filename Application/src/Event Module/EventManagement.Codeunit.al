@@ -2021,7 +2021,7 @@
 #if BC17
         LineType: Option;
 #else
-        LineType : Enum "Job Journal Line Type";
+        LineType: Enum "Job Journal Line Type";
 #endif
 
     begin
@@ -2031,12 +2031,7 @@
             exit;
         repeat
             if JobPlanningLineInvoiceExists(Database::"NPR POS Sale", DocType::Quote, POSEntrySalesLine."Document No.", JobPlanningLineInvoice, PostedDocType) then begin
-#if BC17
                 LineType := JobJnlLine."Line Type"::" ";
-#else
-                LineType := JobJnlLine."Line Type"::" ".AsInteger();
-#endif
-
                 JobPlanningLineInvoice.SetRange("Line No.", POSEntrySalesLine."Line No.");
                 ChangeJobPlanInvoiceFromNonpostedToPosted(JobPlanningLineInvoice, PostedDocType, POSEntrySalesLine."Document No.", POSEntry."Posting Date", JobPlanningLineInvoice2);
                 CreateJobJnlLineFromPOSEntrySalesLine(POSEntry, POSEntrySalesLine, JobJnlLine."Entry Type"::Usage, LineType, JobJnlLine);
@@ -2045,11 +2040,7 @@
                 Codeunit.Run(Codeunit::"Job Jnl.-Post Line", JobJnlLine);
                 JobPlanningLineInvoice.SetRange("Line No.");
             end else begin
-#if BC17
                 LineType := JobJnlLine."Line Type"::"Both Budget and Billable";
-#else
-                LineType := JobJnlLine."Line Type"::"Both Budget and Billable".AsInteger();
-#endif
                 CreateJobJnlLineFromPOSEntrySalesLine(POSEntry, POSEntrySalesLine, JobJnlLine."Entry Type"::Usage, LineType, JobJnlLine);
                 Codeunit.Run(Codeunit::"Job Jnl.-Post Line", JobJnlLine);
                 CreateJobJnlLineFromPOSEntrySalesLine(POSEntry, POSEntrySalesLine, JobJnlLine."Entry Type"::Sale, LineType, JobJnlLine);
