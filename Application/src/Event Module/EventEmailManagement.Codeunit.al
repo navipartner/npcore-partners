@@ -1,6 +1,7 @@
 ﻿codeunit 6060153 "NPR Event Email Management"
 {
     Access = Internal;
+
     var
         EventMgt: Codeunit "NPR Event Management";
         EventEWSMgt: Codeunit "NPR Event EWS Management";
@@ -158,6 +159,7 @@
         EmailMessage: Codeunit "Email Message";
         Email: Codeunit Email;
         BCCRecipients: List of [Text];
+        EmailAction: Enum "Email Action";
 #ENDIF
         EmailAccount: Record "Email Account";
     begin
@@ -208,9 +210,9 @@
 #endif
 
         if EventExchIntTemplate."Open E-mail dialog" then
-            Email.OpenInEditorModally(EmailMessage, EmailAccount)
+            exit(Email.OpenInEditorModally(EmailMessage, EmailAccount) = EmailAction::Sent)
         else
-            Email.Send(EmailMessage, EmailAccount);
+            exit(Email.Send(EmailMessage, EmailAccount));
 #ENDIF
     end;
 
