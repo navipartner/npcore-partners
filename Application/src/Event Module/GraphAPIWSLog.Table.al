@@ -42,6 +42,11 @@
             DataClassification = CustomerContent;
             Caption = 'E-Mail';
         }
+        field(70; "Job No."; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Job No.';
+        }
 
     }
 
@@ -116,11 +121,12 @@
         exit(TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.LFSeparator()));
     end;
 
-    procedure LogCall(LogDescription: Text; CallRequest: Text; CallResponse: Text; CallURL: Text; Email: Text[250])
+    procedure LogCall(JobNo: Code[20]; LogDescription: Text; CallRequest: Text; CallResponse: Text; CallURL: Text; Email: Text[250])
     var
         Log: Record "NPR GraphAPI WS Log";
     begin
         Log.Init();
+        Log."Job No." := JobNo;
         Log."Call Date Time" := CurrentDateTime();
         Log."Call Description" := CopyStr(LogDescription, 1, MaxStrLen(Log."Call Description"));
         Log."Call URL" := CopyStr(CallURL, 1, MaxStrLen(Log."Call URL"));

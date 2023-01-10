@@ -21,6 +21,12 @@
                     ApplicationArea = NPRRetail;
                     Editable = false;
                 }
+                field("Job No."; Rec."Job No.")
+                {
+                    ToolTip = 'Specifies the value of the Job No. field.';
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                }
                 field("Call Description"; Rec."Call Description")
                 {
                     ToolTip = 'Specifies the value of the Call Description field.';
