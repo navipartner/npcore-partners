@@ -1,6 +1,7 @@
 ﻿codeunit 6060152 "NPR Event Calendar Mgt."
 {
     Access = Internal;
+
     var
         JobsSetup: Record "Jobs Setup";
         EventMgt: Codeunit "NPR Event Management";
@@ -425,7 +426,7 @@
                 exit(true);
             end;
             if ActionToTake = ActionToTake::Remove then begin
-                if not GraphAPIManagement.DeleteEvent(EventExchIntEmail, CalendarItemID) then
+                if not GraphAPIManagement.DeleteEvent(Job."No.", EventExchIntEmail, CalendarItemID) then
                     exit(false);
                 ProcessCalendarItemID(0, RecRef, '');
                 ResetAtendeeResponse(RecRef, Job, JobPlanningLine);
@@ -447,9 +448,9 @@
 
         EventRequest := GraphAPIManagement.CreateEventRequest(Subject, StartingDateTime, EndingDateTime, TimeZoneId, ShowAsBusy, ReminderMinutesBeforeStart, JAAttendees, EventBodyText, CalendarCategory);
         if CalendarItemID = '' then begin
-            CalendarItemID := GraphAPIManagement.SendEventRequest(EventExchIntEmail, EventRequest);
+            CalendarItemID := GraphAPIManagement.SendEventRequest(Job."No.", EventExchIntEmail, EventRequest);
         end else
-            GraphAPIManagement.SendEventRequestUpdate(EventExchIntEmail, EventRequest, CalendarItemID);
+            GraphAPIManagement.SendEventRequestUpdate(Job."No.", EventExchIntEmail, EventRequest, CalendarItemID);
         ProcessCalendarItemID(1, RecRef, CalendarItemID);
 
         if EventEWSMgt.IncludeAttachmentCheck(Job, 1) then
@@ -460,32 +461,15 @@
 
     procedure GetCalendarAttendeeResponses(Job: Record Job)
     var
-        EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail";
-        GraphAPIManagement: Codeunit "NPR Graph API Management";
-        EventContent, Response, Email : Text;
-        JOEventContent: JsonObject;
-        JToken, JTAttendee, JTResponse, JTEmail : JsonToken;
-        JArray: JsonArray;
-        i: Integer;
+        JobPlanningLine: Record "Job Planning Line";
     begin
-        Job.TestField("NPR Calendar Item ID");
-
-        EventExchIntEmail.Get(Job."NPR Organizer E-Mail");
-
-        EventContent := GraphAPIManagement.GetEventContent(EventExchIntEmail, Job."NPR Calendar Item ID");
-        If EventContent = '' then
-            exit;
-        JOEventContent.ReadFrom(EventContent);
-        JOEventContent.SelectToken('attendees', JToken);
-        JArray := JToken.AsArray();
-        for i := 0 to JArray.Count() - 1 do begin
-            JArray.Get(i, JTAttendee);
-            if JTAttendee.SelectToken('status.response', JTResponse) then
-                Response := JTResponse.AsValue().AsText();
-            if JTAttendee.SelectToken('emailAddress.address', JTEmail) then
-                Email := JTEmail.AsValue().AsText();
-            UpdateJobLineResponse(Job, Email, Response);
-        end;
+        JobPlanningLine.SetRange("Job No.", Job."No.");
+        JobPlanningLine.SetFilter("NPR Calendar Item ID", '<>%1', '');
+        if JobPlanningLine.FindSet() then
+            repeat
+                GetCalendarAttendeeResponse(JobPlanningLine);
+                Commit();
+            until JobPlanningLine.Next() = 0;
     end;
 
     procedure GetCalendarAttendeeResponse(var JobPlanningLine: Record "Job Planning Line"): Boolean
@@ -505,7 +489,7 @@
         JobPlanningLine.TestField("NPR Calendar Item ID");
         EventExchIntEmail.Get(Job."NPR Organizer E-Mail");
 
-        EventContent := GraphAPIManagement.GetEventContent(EventExchIntEmail, JobPlanningLine."NPR Calendar Item ID");
+        EventContent := GraphAPIManagement.GetEventContent(Job."No.", EventExchIntEmail, JobPlanningLine."NPR Calendar Item ID");
         if EventContent = '' then
             exit(false);
         JOEventContent.ReadFrom(EventContent);
@@ -719,21 +703,6 @@
             Subject := Job.Description;
     end;
 
-    local procedure UpdateJobLineResponse(Job: Record Job; Email: Text; Response: Text)
-    var
-        JobPlanningLine: Record "Job Planning Line";
-    begin
-        If Email = '' then
-            exit;
-        JobPlanningLine.SetRange("Job No.", Job."No.");
-        JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Resource);
-        JobPlanningLine.SetRange("NPR Resource E-Mail", Email);
-        if JobPlanningLine.FindFirst() then begin
-            JobPlanningLine."NPR Meeting Request Response" := ConvertResponse(Response);
-            JobPlanningLine.Modify();
-        end;
-    end;
-
     local procedure ConvertResponse(Response: Text) MeetingRequestResponse: Enum "NPR Meeting Request Response"
     begin
         case Response of
@@ -771,7 +740,7 @@
                 if EventEWSMgt.CreateAttachment(EventReportLayout, Job, EventReportLayout.Usage::Team - 1, AttachmentTempBlob, AttachmentName, AttachmentExtension) then
                     AttachmentTempBlob.CreateInStream(AttachmentStream);
                 AttachmentRequest := GraphAPIManagement.CreateAttachmentRequest(Base64Convert.ToBase64(AttachmentStream), AttachmentName);
-                GraphAPIManagement.AddAttachment(EventExchIntEmail, AttachmentRequest, CalendarItemID);
+                GraphAPIManagement.AddAttachment(Job."No.", EventExchIntEmail, AttachmentRequest, CalendarItemID);
             until EventReportLayout.Next() = 0;
     end;
 

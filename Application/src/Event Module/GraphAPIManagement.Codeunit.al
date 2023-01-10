@@ -17,6 +17,7 @@
         AccesTokenMsg: Label 'Access token acquired.';
         FailErr: Label 'Acquire token failed. Error message: %1';
     begin
+        EventExchIntEMail.TestField("Time Zone No.");
         AddScopes(Scopes);
         GetTestGraphAPISetup();
 #IF NOT BC17
@@ -31,7 +32,7 @@
         Message(AccesTokenMsg);
     end;
 
-    internal procedure DeleteEvent(EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; CalendarItemID: Text): Boolean
+    internal procedure DeleteEvent(JobNo: Code[20]; EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; CalendarItemID: Text): Boolean
     var
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
@@ -48,7 +49,7 @@
                 Message(DeletedMsg);
                 exit(true);
             end else begin
-                LogResponse('Delete Event', EventExchIntEMail."E-Mail", URL, '', ResponseMessage);
+                LogResponse(JobNo, 'Delete Event', EventExchIntEMail."E-Mail", URL, '', ResponseMessage);
                 exit(false);
             end;
     end;
@@ -98,7 +99,7 @@
             exit(false);
     end;
 
-    internal procedure GetEventContent(EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; CalendarItemID: Text) ResponseContent: Text
+    internal procedure GetEventContent(JobNo: Code[20]; EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; CalendarItemID: Text) ResponseContent: Text
     var
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
@@ -113,12 +114,12 @@
         if Client.Send(RequestMessage, ResponseMessage) then
             ResponseMessage.Content.ReadAs(ResponseContent)
         else begin
-            LogResponse('Get Event Content', EventExchIntEMail."E-Mail", URL, '', ResponseMessage);
+            LogResponse(JobNo, 'Get Event Content', EventExchIntEMail."E-Mail", URL, '', ResponseMessage);
             Message(ErrorMsg, CalendarItemID);
         end;
     end;
 
-    internal procedure SendEventRequest(EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; Request: Text) CalendarItemID: Text
+    internal procedure SendEventRequest(JobNo: Code[20]; EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; Request: Text) CalendarItemID: Text
     var
         AccessToken: Text;
         Client: HttpClient;
@@ -134,10 +135,10 @@
             if ResponseMessage.IsSuccessStatusCode() then
                 GetEventID(CalendarItemID, ResponseMessage)
             else
-                LogResponse('Event Create', EventExchIntEMail."E-Mail", GraphApiSetup."Graph Event Url", Request, ResponseMessage);
+                LogResponse(JobNo, 'Event Create', EventExchIntEMail."E-Mail", GraphApiSetup."Graph Event Url", Request, ResponseMessage);
     end;
 
-    internal procedure SendEventRequestUpdate(EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; Request: Text; CalendarItemID: Text)
+    internal procedure SendEventRequestUpdate(JobNo: Code[20]; EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; Request: Text; CalendarItemID: Text)
     var
         AccessToken, URL : Text;
         Client: HttpClient;
@@ -155,10 +156,10 @@
             if ResponseMessage.IsSuccessStatusCode() then
                 Message(UpdatedMsg)
             else
-                LogResponse('Event Update', EventExchIntEMail."E-Mail", URL, Request, ResponseMessage);
+                LogResponse(JobNo, 'Event Update', EventExchIntEMail."E-Mail", URL, Request, ResponseMessage);
     end;
 
-    internal procedure AddAttachment(EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; Request: Text; CalendarItemID: Text)
+    internal procedure AddAttachment(JobNo: Code[20]; EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; Request: Text; CalendarItemID: Text)
     var
         AccessToken, URL : Text;
         Client: HttpClient;
@@ -172,7 +173,7 @@
         SetMessageContent(Request, Content, RequestMessage);
         if Client.Send(RequestMessage, ResponseMessage) then
             if not ResponseMessage.IsSuccessStatusCode() then
-                LogResponse('Add Event Attachment', EventExchIntEMail."E-Mail", URL, Request, ResponseMessage);
+                LogResponse(JobNo, 'Add Event Attachment', EventExchIntEMail."E-Mail", URL, Request, ResponseMessage);
     end;
 
     internal procedure CreateAttachmentRequest(AttachmentBase64: Text; AttachmentName: Text) Request: Text
@@ -213,7 +214,7 @@
             end;
 
         if AccessToken = '' then begin
-            LogResponse('Refresh Token', EventExchIntEMail."E-Mail", GraphApiSetup."OAuth Token Url", '', ResponseMessage);
+            LogResponse('', 'Refresh Token', EventExchIntEMail."E-Mail", GraphApiSetup."OAuth Token Url", '', ResponseMessage);
             Commit();
             exit;
         end;
@@ -237,7 +238,7 @@
             ResponseMessage.Content.ReadAs(Response);
             Message(OkLbl, GetEmail(Response));
         end else begin
-            LogResponse('Test Connection', EventExchIntEMail."E-Mail", GraphApiSetup."Graph Me Url", '', ResponseMessage);
+            LogResponse('', 'Test Connection', EventExchIntEMail."E-Mail", GraphApiSetup."Graph Me Url", '', ResponseMessage);
             Message(BadResponseErr);
         end;
     end;
@@ -255,6 +256,7 @@
         NoAccessTokenErr: Label 'There is not valid access token. Run Get Access Token action first.';
     begin
         EventExchIntEMail.Get(EventExchIntEMail."E-Mail");
+        EventExchIntEMail.TestField("Time Zone No.");
         if not EventExchIntEMail."Access Token".HasValue() then
             Error(NoAccessTokenErr);
 
@@ -302,13 +304,13 @@
         RequestMessage.Content := Content;
     end;
 
-    local procedure LogResponse(Description: Text; EMail: Text[50]; URL: Text; Request: Text; ResponseMessage: HttpResponseMessage)
+    local procedure LogResponse(JobNo: Code[20]; Description: Text; EMail: Text[50]; URL: Text; Request: Text; ResponseMessage: HttpResponseMessage)
     var
         GraphAPIWSLog: Record "NPR GraphAPI WS Log";
         Response: Text;
     begin
         ResponseMessage.Content.ReadAs(Response);
-        GraphAPIWSLog.LogCall(Description, Request, Response, URL, EMail);
+        GraphAPIWSLog.LogCall(JobNo, Description, Request, Response, URL, EMail);
     end;
 
     local procedure SetAccessToken(var EventExchIntEMail: Record "NPR Event Exch. Int. E-Mail"; NewAccessToken: Text; NewRefreshToken: Text)

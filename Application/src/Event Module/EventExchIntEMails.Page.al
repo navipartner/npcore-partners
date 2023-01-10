@@ -1,7 +1,7 @@
 ﻿page 6151586 "NPR Event Exch. Int. E-Mails"
 {
     Extensible = False;
-    Caption = 'Event Exch. Int. E-Mails';
+    Caption = 'Event E-Mails';
     DelayedInsert = true;
     PageType = List;
     SourceTable = "NPR Event Exch. Int. E-Mail";
@@ -55,7 +55,6 @@
                     ToolTip = 'Specifies the value of the Time Zone Display Name field';
                     ApplicationArea = NPRRetail;
                 }
-
             }
         }
     }
