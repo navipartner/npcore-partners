@@ -44,3 +44,5 @@
   href: item_worksheet/toc.yml
 - name: Printing setup
   href: printing/toc.yml
+- name: Stocktaking and physical inventory
+  href: physical_inventory/toc.yml
