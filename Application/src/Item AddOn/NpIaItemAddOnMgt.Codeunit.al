@@ -332,6 +332,7 @@
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        ItemAddOnUnit: Codeunit "NPR NpIa Item AddOn";
         JToken: JsonToken;
         AddonLineKey: Text;
         SelectedAddonLineKeys: List of [Text];
@@ -356,6 +357,9 @@
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
         ItemAddOnLine.SetRange(Mandatory, true);
         ItemAddOnLine.SetRange(Type, ItemAddOnLine.Type::Quantity);
+
+        ItemAddOnUnit.FilterItemAddOnLine(ItemAddOnLine, ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn);
+
         if not ItemAddOnLine.IsEmpty then
             CopyItemAddOnLinesToTemp(ItemAddOnLine, TempItemAddOnLine, false);
 
@@ -404,6 +408,7 @@
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        ItemAddOnUnit: Codeunit "NPR NpIa Item AddOn";
         LastErrorText: Text;
     begin
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
@@ -411,6 +416,9 @@
         if NotRequiringComments then
             ItemAddOnLine.SetRange("Comment Enabled", false);
         ItemAddOnLine.SetRange(Type, ItemAddOnLine.Type::Quantity);
+        
+        ItemAddOnUnit.FilterItemAddOnLine(ItemAddOnLine, ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn);
+
         if ItemAddOnLine.IsEmpty() then
             exit(false);
         CopyItemAddOnLinesToTemp(ItemAddOnLine, TempItemAddOnLine, true);
@@ -678,21 +686,29 @@
     end;
 
     procedure FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS: Record "NPR POS Sale Line"; var SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn")
+    var
+        ItemAddOn: Codeunit "NPR NpIa Item AddOn";
     begin
         Clear(SaleLinePOSAddOn);
         SaleLinePOSAddOn.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOSAddOn.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
         SaleLinePOSAddOn.SetRange("Sale Date", SaleLinePOS.Date);
         SaleLinePOSAddOn.SetRange("Sale Line No.", SaleLinePOS."Line No.");
+
+        ItemAddOn.FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
     end;
 
     procedure FilterAttachedItemAddonLines(SaleLinePOS: Record "NPR POS Sale Line"; AppliesToLineNo: Integer; var SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn")
+    var
+        ItemAddOn: Codeunit "NPR NpIa Item AddOn";    
     begin
         Clear(SaleLinePOSAddOn);
         SaleLinePOSAddOn.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOSAddOn.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
         SaleLinePOSAddOn.SetRange("Sale Date", SaleLinePOS.Date);
         SaleLinePOSAddOn.SetRange("Applies-to Line No.", AppliesToLineNo);
+
+        ItemAddOn.FilterAttachedItemAddonLines(SaleLinePOS, AppliesToLineNo, SaleLinePOSAddOn);
     end;
 
     procedure AttachedIteamAddonLinesExist(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
@@ -969,7 +985,9 @@
 
     local procedure CopyItemAddOnLinesToTemp(var FromItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var ToItemAddOnLine: Record "NPR NpIa Item AddOn Line"; NewDataSet: Boolean)
     var
+        ItemAddOn: Codeunit "NPR NpIa Item AddOn";
         MustBeTempMsg: Label '%1: function call on a non-temporary variable. This is a programming bug, not a user error. Please contact system vendor.';
+        IsHandled: Boolean;
     begin
         if not ToItemAddOnLine.IsTemporary then
             Error(MustBeTempMsg, 'CU6151125.CopyItemAddOnLinesToTemp');
@@ -981,8 +999,11 @@
         if FromItemAddOnLine.FindSet() then
             repeat
                 ToItemAddOnLine := FromItemAddOnLine;
-                if not ToItemAddOnLine.Find() then
-                    ToItemAddOnLine.Insert();
+                
+                ItemAddOn.CopyItemAddOnLinesToTempBeforeInsert(FromItemAddOnLine, ToItemAddOnLine, IsHandled);
+                if not IsHandled then
+                    if not ToItemAddOnLine.Find() then
+                        ToItemAddOnLine.Insert();
             until FromItemAddOnLine.Next() = 0;
     end;
 
