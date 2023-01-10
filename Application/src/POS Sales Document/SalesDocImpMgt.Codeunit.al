@@ -22,11 +22,11 @@
 
     procedure SalesDocumentToPOSCustom(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"; DeleteDocument: Boolean; ShowSuccessMessage: Boolean)
     var
-        SaleLinePOS: Record "NPR POS Sale Line";
         SalesLine: Record "Sales Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
+        Item: Record Item;
     begin
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
@@ -48,50 +48,21 @@
             exit;
 
         repeat
-            POSSaleLine.GetNewSaleLine(SaleLinePOS);
-
-            SaleLinePOS.SetSkipCalcDiscount(true); //Prevent overwrite of any discounts from sales document, until lines are added,deleted,removed.            
-            SaleLinePOS.SetSkipUpdateDependantQuantity(true);
-
             case SalesLine.Type of
                 SalesLine.Type::Item:
                     begin
-                        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
-                        SaleLinePOS.Validate("No.", SalesLine."No.");
-                        SaleLinePOS.Validate("Unit of Measure Code", SalesLine."Unit of Measure Code");
+                        Item.Get(SalesLine."No.");
+                        if SpecificItemTrackingExist(Item) then
+                            InsertItemWithTrackingLine(SalesLine, POSSaleLine)
+                        else
+                            InsertLine(SalesLine, POSSaleLine, SalesHeader);
                     end;
                 SalesLine.Type::" ":
                     begin
-                        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
-                        SaleLinePOS.Description := SalesLine.Description;
+                        InsertLine(SalesLine, POSSaleLine, SalesHeader);
                     end;
             end;
 
-            SaleLinePOS.SetSkipUpdateDependantQuantity(false);
-
-            SaleLinePOS.Description := SalesLine.Description;
-            SaleLinePOS."Description 2" := SalesLine."Description 2";
-            SaleLinePOS."Variant Code" := SalesLine."Variant Code";
-
-            if SalesHeader."Document Type" in [SalesHeader."Document Type"::"Return Order", SalesHeader."Document Type"::"Credit Memo"] then
-                SaleLinePOS.Validate(Quantity, -SalesLine.Quantity)
-            else
-                SaleLinePOS.Validate(Quantity, SalesLine.Quantity);
-
-            SaleLinePOS.Validate("Unit Price", SalesLine."Unit Price");
-            SaleLinePOS."Bin Code" := SalesLine."Bin Code";
-            SaleLinePOS."Location Code" := SalesLine."Location Code";
-            SaleLinePOS."Discount Type" := SalesLine."NPR Discount Type";
-            SaleLinePOS."Discount Code" := SalesLine."NPR Discount Code";
-            SaleLinePOS."Allow Line Discount" := SalesLine."Allow Line Disc.";
-            SaleLinePOS."Discount %" := SalesLine."Line Discount %";
-            SaleLinePOS."Discount Amount" := SalesLine."Line Discount Amount";
-            SaleLinePOS.UpdateAmounts(SaleLinePOS);
-            SaleLinePOS."Shortcut Dimension 1 Code" := SalesLine."Shortcut Dimension 1 Code";
-            SaleLinePOS."Shortcut Dimension 2 Code" := SalesLine."Shortcut Dimension 2 Code";
-            SaleLinePOS."Dimension Set ID" := SalesLine."Dimension Set ID";
-            POSSaleLine.InsertLineRaw(SaleLinePOS, false);
-            SaleLinePOS.SetSkipCalcDiscount(false);
         until SalesLine.Next() = 0;
 
         if DeleteDocument then begin
@@ -106,6 +77,106 @@
             else
                 Message(StrSubstNo(DOCUMENT_IMPORTED, SalesHeader."Document Type", SalesHeader."No."));
         end;
+    end;
+
+    local procedure SpecificItemTrackingExist(Item: Record Item): Boolean
+    var
+        ItemTrackingCode: Record "Item Tracking Code";
+    begin
+        if Item."Item Tracking Code" = '' then
+            exit(false);
+        if not ItemTrackingCode.Get(Item."Item Tracking Code") then
+            exit(false);
+        if ItemTrackingCode."SN Specific Tracking" then
+            exit(true);
+        if ItemTrackingCode."SN Sales Outbound Tracking" then
+            exit(true);
+        exit(false);
+    end;
+
+    local procedure InitNewLine(var POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        POSSaleLine.GetNewSaleLine(SaleLinePOS);
+
+        SaleLinePOS.SetSkipCalcDiscount(true); //Prevent overwrite of any discounts from sales document, until lines are added,deleted,removed.            
+        SaleLinePOS.SetSkipUpdateDependantQuantity(true);
+    end;
+
+    local procedure FromSaleLineToSaleLinePOS(SalesLine: Record "Sales Line"; var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        SaleLinePOS.SetSkipUpdateDependantQuantity(false);
+        SaleLinePOS.Description := SalesLine.Description;
+        SaleLinePOS."Description 2" := SalesLine."Description 2";
+        SaleLinePOS."Variant Code" := SalesLine."Variant Code";
+
+        SaleLinePOS.Validate("Unit Price", SalesLine."Unit Price");
+        SaleLinePOS."Bin Code" := SalesLine."Bin Code";
+        SaleLinePOS."Location Code" := SalesLine."Location Code";
+        SaleLinePOS."Discount Type" := SalesLine."NPR Discount Type";
+        SaleLinePOS."Discount Code" := SalesLine."NPR Discount Code";
+        SaleLinePOS."Allow Line Discount" := SalesLine."Allow Line Disc.";
+        SaleLinePOS."Discount %" := SalesLine."Line Discount %";
+        SaleLinePOS."Discount Amount" := SalesLine."Line Discount Amount";
+        SaleLinePOS.UpdateAmounts(SaleLinePOS);
+        SaleLinePOS."Shortcut Dimension 1 Code" := SalesLine."Shortcut Dimension 1 Code";
+        SaleLinePOS."Shortcut Dimension 2 Code" := SalesLine."Shortcut Dimension 2 Code";
+        SaleLinePOS."Dimension Set ID" := SalesLine."Dimension Set ID";
+    end;
+
+    local procedure InsertItemWithTrackingLine(SalesLine: Record "Sales Line"; var POSSaleLine: Codeunit "NPR POS Sale Line")
+    var
+        ReservationEntry: Record "Reservation Entry";
+        SaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        ReservationEntry.SetRange("Item No.", SalesLine."No.");
+        ReservationEntry.SetRange("Source ID", SalesLine."Document No.");
+        ReservationEntry.SetRange("Source Type", DATABASE::"Sales Line");
+        ReservationEntry.SetRange("Source Ref. No.", SalesLine."Line No.");
+        ReservationEntry.SetRange("Source Subtype", SalesLine."Document Type");
+        if ReservationEntry.FindSet() then
+            repeat
+                InitNewLine(POSSaleLine, SaleLinePOS);
+
+                SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
+                SaleLinePOS.Validate("No.", SalesLine."No.");
+                SaleLinePOS.Validate("Unit of Measure Code", SalesLine."Unit of Measure Code");
+
+                SaleLinePOS.Validate(Quantity, -ReservationEntry.Quantity);
+                FromSaleLineToSaleLinePOS(SalesLine, SaleLinePOS);
+
+                SaleLinePOS."Serial No." := ReservationEntry."Serial No.";
+                POSSaleLine.InsertLineRaw(SaleLinePOS, false);
+                SaleLinePOS.SetSkipCalcDiscount(false);
+
+            until ReservationEntry.Next() = 0;
+    end;
+
+    local procedure InsertLine(SalesLine: Record "Sales Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; SalesHeader: Record "Sales Header")
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        InitNewLine(POSSaleLine, SaleLinePOS);
+
+        case SalesLine.Type of
+            SalesLine.Type::Item:
+                begin
+                    SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
+                    SaleLinePOS.Validate("No.", SalesLine."No.");
+                    SaleLinePOS.Validate("Unit of Measure Code", SalesLine."Unit of Measure Code");
+                end;
+            SalesLine.Type::" ":
+                SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
+        end;
+
+        if SalesHeader."Document Type" in [SalesHeader."Document Type"::"Return Order", SalesHeader."Document Type"::"Credit Memo"] then
+            SaleLinePOS.Validate(Quantity, -SalesLine.Quantity)
+        else
+            SaleLinePOS.Validate(Quantity, SalesLine.Quantity);
+
+        FromSaleLineToSaleLinePOS(SalesLine, SaleLinePOS);
+
+        POSSaleLine.InsertLineRaw(SaleLinePOS, false);
+        SaleLinePOS.SetSkipCalcDiscount(false);
     end;
 
     procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Invoice: Boolean; Ship: Boolean; Receive: Boolean; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; SyncPost: Boolean)
