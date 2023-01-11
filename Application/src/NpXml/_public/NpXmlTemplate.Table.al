@@ -191,7 +191,7 @@
             Editable = false;
             FieldClass = FlowField;
         }
-        field(4910; "Before Transfer Function"; Text[80])
+        field(4910; "Before Transfer Function"; Text[250])
         {
             Caption = 'Before Transfer Function';
             DataClassification = CustomerContent;
@@ -246,7 +246,9 @@
                         if StrLen("File Path") = 1 then
                             "File Path" := ''
                         else
+#pragma warning disable AA0139
                             "File Path" := CopyStr("File Path", 1, StrLen("File Path") - 1);
+#pragma warning restore
                     end;
                 end;
             end;
@@ -671,7 +673,9 @@
             exit;
 
         SetNextTemplateVersionNo(Rec);
-        "Last Modified by" := UserId;
+#pragma warning disable AA0139        
+        "Last Modified by" := UserId();
+#pragma warning restore
         "Last Modified at" := CreateDateTime(Today, Time);
         if "Version Description" = xRec."Version Description" then
             "Version Description" := '';
