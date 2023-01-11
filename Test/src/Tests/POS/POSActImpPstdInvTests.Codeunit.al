@@ -47,7 +47,7 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
 
         POSActImpPstdInvB.SetPosSaleCustomer(POSSale, SalesInvHdr."Bill-to Customer No.");
 
-        POSActImpPstdInvB.PostedInvToPOS(POSSession, SalesInvHdr, true, true, true, true);
+        POSActImpPstdInvB.PostedInvToPOS(POSSession, SalesInvHdr, true, true, true, true,'');
 
         SalesInvLine.SetRange("Document No.", SalesInvHdr."No.");
         SalesInvLine.FindFirst();
@@ -111,7 +111,7 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
 
         POSActImpPstdInvB.SetPosSaleCustomer(POSSale, SalesInvHdr."Bill-to Customer No.");
 
-        POSActImpPstdInvB.PostedInvToPOS(POSSession, SalesInvHdr, false, true, true, true);
+        POSActImpPstdInvB.PostedInvToPOS(POSSession, SalesInvHdr, false, true, true, true,'');
 
         SalesInvLine.SetRange("Document No.", SalesInvHdr."No.");
         SalesInvLine.FindFirst();
