@@ -156,9 +156,10 @@
     }
 
     trigger OnInsert()
-    var
+    var       
         ExchangeLabelMgt: Codeunit "NPR Exchange Label Mgt.";
         NewNo: Code[20];
+
     begin
         if "No." = '' then begin
             NoSeriesMgt.InitSeries(GetNoSeriesCode(), xRec."No. Series", 0D, NewNo, "No. Series");
@@ -169,6 +170,21 @@
 
         Barcode := ExchangeLabelMgt.GetLabelBarcode(Rec);
         "Printed Date" := CurrentDateTime;
+
+        if "Table No." <> Database::"Sales Line" then
+            exit;
+
+        InsertExchLabelBarcode(Barcode);
+    end;
+
+    local procedure InsertExchLabelBarcode(Barcode: Code[20])
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(SalesHeader."Document Type"::Order, Rec."Sales Header No.") then
+            exit;        
+        SalesHeader."NPR Exchange Label Barcode" := Barcode;
+        SalesHeader.Modify();        
     end;
 
     var

@@ -159,6 +159,11 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             Caption = 'Magento Coupon';
             DataClassification = CustomerContent;
         }
+        field(6151425; "NPR Exchange Label Barcode"; Code[20])
+        {
+            Caption = 'Exchange Label Barcode';
+            DataClassification = CustomerContent;
+        }
     }
 }
 
