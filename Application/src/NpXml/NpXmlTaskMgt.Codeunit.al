@@ -144,8 +144,9 @@
             exit;
 
         Checked := true;
-
+#pragma warning disable AA0139
         if not NcTaskMgt.RestoreRecordFromDataLog(TempTask."Entry No.", TempTask."Company Name", PrevRecRef) then
+#pragma warning restore
             exit;
 
         if not NcTaskMgt.GetRecRef(TempTask, RecRef) then

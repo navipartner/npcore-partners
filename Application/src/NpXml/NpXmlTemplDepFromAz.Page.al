@@ -64,7 +64,7 @@
             BaseURL := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl') + '/npxml/' + XmlTemplate.Substring(1, XmlTemplate.LastIndexOf('/'));
             TemplateCode := XmlTemplate.Substring(XmlTemplate.LastIndexOf('/') + 1);
             TemplateCode := TemplateCode.Substring(1, TemplateCode.IndexOf('.xml') - 1);
-            NpXmlTemplateMgt.ImportNpXmlTemplateUrl(TemplateCode, BaseURL);
+            NpXmlTemplateMgt.ImportNpXmlTemplateUrl(CopyStr(TemplateCode, 1, 20), BaseURL);
         end;
         CurrPage.Close();
     end;
@@ -89,8 +89,8 @@
 
         foreach package in packageList do begin
             TempRetailList.Number += 1;
-            TempRetailList.Value := package;
-            TempRetailList.Choice := package;
+            TempRetailList.Value := CopyStr(package, 1, MaxStrLen(TempRetailList.Value));
+            TempRetailList.Choice := CopyStr(package, 1, MaxStrLen(TempRetailList.Choice));
             TempRetailList.Insert();
         end;
 

@@ -349,7 +349,7 @@
             DataClassification = CustomerContent;
             Description = 'NC1.07';
         }
-        field(5205; "Enum List (,)"; Text[250])
+        field(5205; "Enum List (,)"; Text[2047])
         {
             Caption = 'Enum List';
             DataClassification = CustomerContent;

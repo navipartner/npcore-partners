@@ -91,7 +91,9 @@
         end;
         NpXm1TemplateHistory."Version Description" := VersionDescription;
         NpXm1TemplateHistory."Event Type" := EventType;
-        NpXm1TemplateHistory."Changed by" := UserId;
+#pragma warning disable AA0139
+        NpXm1TemplateHistory."Changed by" := UserId();
+#pragma warning restore
         NpXm1TemplateHistory."Change at" := CreateDateTime(Today, Time);
         NpXm1TemplateHistory.Insert();
     end;

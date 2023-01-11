@@ -169,7 +169,9 @@
         TempNpXmlCustomValueBuffer.DeleteAll();
         TempNpXmlCustomValueBuffer.Init();
         TempNpXmlCustomValueBuffer."Table No." := RecRef.Number;
+#pragma warning disable AA0139
         TempNpXmlCustomValueBuffer."Record Position" := RecRef.GetPosition(false);
+#pragma warning restore
         TempNpXmlCustomValueBuffer."Xml Template Code" := NPXmlElement."Xml Template Code";
         TempNpXmlCustomValueBuffer."Xml Element Line No." := NPXmlElement."Line No.";
         TempNpXmlCustomValueBuffer.Insert();
