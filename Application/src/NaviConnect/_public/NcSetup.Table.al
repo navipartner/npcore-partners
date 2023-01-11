@@ -19,7 +19,6 @@
         {
             ObsoleteState = Removed;
             ObsoleteReason = 'Task Queue module removed from NP Retail. We are now using Job Queue instead.';
-            ObsoleteTag = 'BC 21 - Task Queue deprecating starting from 28/06/2022';
             Caption = 'Task Queue Enabled';
             DataClassification = CustomerContent;
             Description = 'NC1.11,NC1.12,NC1.16,NC1.17';
