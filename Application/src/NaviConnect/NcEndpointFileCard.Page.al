@@ -47,7 +47,6 @@
                 {
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Client Path field is about to be removed because it is not needed anymore.';
-                    ObsoleteTag = 'Client Path, 07/11/2022, BC 21';
                     ToolTip = 'Client Path can only be used with Manual Export';
                     ApplicationArea = NPRNaviConnect;
                 }

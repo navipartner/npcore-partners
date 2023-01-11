@@ -8,7 +8,6 @@
 #ELSE
     ObsoleteState = Removed;
     ObsoleteReason = 'Task Queue module removed from NP Retail. We are now using Job Queue instead.';
-    ObsoleteTag = 'BC 21 - Task Queue deprecating starting from 28/06/2022';
 #ENDIF
     fields
     {
