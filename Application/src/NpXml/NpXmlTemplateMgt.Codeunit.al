@@ -1,6 +1,7 @@
 ﻿codeunit 6151556 "NPR NpXml Template Mgt."
 {
     Access = Internal;
+
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Text300: Label 'Please enter a Version Description';
@@ -185,7 +186,7 @@
         if FilePath = '' then
             exit(false);
 
-        TemplateCode := FileMgt.GetFileNameWithoutExtension(FilePath);
+        TemplateCode := CopyStr(FileMgt.GetFileNameWithoutExtension(FilePath), 1, MaxStrLen(TemplateCode));
         if not NpXmlTemplate.Get(TemplateCode) then begin
             TempBlob.CreateInStream(InStr);
             XmlDocument.ReadFrom(InStr, Document);
@@ -310,7 +311,7 @@
                     FieldReference := RecRef.Field(FieldID);
                     //-=Temporary disabled as we haven't updated yet our xml templates with new table names=-
                     //if XmlElementField.GetAttribute('field_name') = Format(FieldRef.Name, 0, 9) then
-                    AssignValue(FieldReference, XmlElementField.InnerText);
+                    AssignValue(FieldReference, CopyStr(XmlElementField.InnerText, 1, 250));
                 end;
             end;
         end;
@@ -343,7 +344,7 @@
             NPXmlElement.Init();
             NPXmlElement."Xml Template Code" := NPXmlTemplate.Code;
             NPXmlElement."Line No." := LineNo;
-            NPXmlElement."Element Name" := Element.Name;
+            NPXmlElement."Element Name" := CopyStr(Element.Name, 1, MaxStrLen(NPXmlElement."Element Name"));
             NPXmlElement.Active := true;
             NPXmlElement.Level := Level;
             NPXmlElement."Table No." := NPXmlTemplate."Table No.";
@@ -362,7 +363,7 @@
                     NPXmlAttribute."Xml Element Line No." := NPXmlElement."Line No.";
                     NPXmlAttribute."Line No." := LineNo;
                     LineNo += 10000;
-                    NPXmlAttribute."Attribute Name" := Attribute.Name;
+                    NPXmlAttribute."Attribute Name" := CopyStr(Attribute.Name, 1, MaxStrLen(NPXmlAttribute."Attribute Name"));
                     NPXmlAttribute."Table No." := NPXmlElement."Table No.";
                     Field.SetRange(TableNo, NPXmlElement."Table No.");
                     Field.SetFilter(FieldName, '@' + NPXmlAttribute."Attribute Name");
@@ -501,7 +502,9 @@
             TempBlob.ToRecordRef(RecRef, NpXmlTemplateArchive.FieldNo("Archived Template"));
             RecRef.SetTable(NpXmlTemplateArchive);
 
-            NpXmlTemplateArchive."Archived by" := UserId;
+#pragma warning disable AA0139
+            NpXmlTemplateArchive."Archived by" := UserId();
+#pragma warning restore
             NpXmlTemplateArchive."Archived at" := CreateDateTime(Today, Time);
             NpXmlTemplateArchive.Insert();
         end;
@@ -660,7 +663,7 @@
                     FieldReference := RecRef.Field(FieldId);
                     NpXmlDomMgt.GetAttributeFromElement(XmlElementField, 'field_name', Attribute, true);
                     if Attribute.Value = Format(FieldReference.Name, 0, 9) then
-                        AssignValue(FieldReference, XmlElementField.InnerText);
+                        AssignValue(FieldReference, CopyStr(XmlElementField.InnerText, 1, 250));
                 end;
             end;
         end;
@@ -873,10 +876,10 @@
                             TempNpXmlFieldValueBuffer."Entry No." := i;
                             TempNpXmlFieldValueBuffer."Field Value" := Format(i);
                             if Position > 1 then begin
-                                TempNpXmlFieldValueBuffer.Description := CopyStr(OptionCaption, 1, Position - 1);
+                                TempNpXmlFieldValueBuffer.Description := CopyStr(CopyStr(OptionCaption, 1, Position - 1), 1, MaxStrLen(TempNpXmlFieldValueBuffer.Description));
                                 OptionCaption := DelStr(OptionCaption, 1, Position);
                             end else begin
-                                TempNpXmlFieldValueBuffer.Description := OptionCaption;
+                                TempNpXmlFieldValueBuffer.Description := CopyStr(OptionCaption, 1, MaxStrLen(TempNpXmlFieldValueBuffer.Description));
                                 OptionCaption := '';
                             end;
                             TempNpXmlFieldValueBuffer.Insert();

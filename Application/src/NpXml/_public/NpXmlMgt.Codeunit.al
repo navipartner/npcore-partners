@@ -271,10 +271,10 @@
                 if (NpXmlAttribute."Default Value" <> '') and (AttributeValue = '') then
                     AttributeValue := NpXmlAttribute."Default Value";
                 if NpXmlAttribute.Namespace = '' then
-                    NpXmlDomMgt.AddAttribute(Node, NpXmlAttribute."Attribute Name", AttributeValue)
+                    NpXmlDomMgt.AddAttribute(Node, NpXmlAttribute."Attribute Name", CopyStr(AttributeValue, 1, 260))
                 else begin
                     NpXmlNamespace.Get(NpXmlAttribute."Xml Template Code", NpXmlAttribute.Namespace);
-                    NpXmlDomMgt.AddAttributeNamespace(Node, NpXmlAttribute.Namespace, NpXmlAttribute."Attribute Name", NpXmlNamespace.Namespace, AttributeValue);
+                    NpXmlDomMgt.AddAttributeNamespace(Node, NpXmlAttribute.Namespace, NpXmlAttribute."Attribute Name", NpXmlNamespace.Namespace, CopyStr(AttributeValue, 1, 260));
                 end;
             until NpXmlAttribute.Next() = 0;
 
@@ -406,7 +406,7 @@
         end;
     end;
 
-    local procedure ExportToFile(NPXmlTemplate: Record "NPR NpXml Template"; var XmlDoc: XmlDocument; Filename: Text[250])
+    local procedure ExportToFile(NPXmlTemplate: Record "NPR NpXml Template"; var XmlDoc: XmlDocument; Filename: Text)
     var
         "Field": Record "Field";
         TempBlob: Codeunit "Temp Blob";
@@ -452,11 +452,11 @@
         Text2Request(RequestText, Request);
     end;
 
-    local procedure FinalizeDoc(var XmlDoc: XmlDocument; NPXmlTemplate: Record "NPR NpXml Template"; Filename: Text[1024])
+    local procedure FinalizeDoc(var XmlDoc: XmlDocument; NPXmlTemplate: Record "NPR NpXml Template"; Filename: Text)
     var
         Transfered: Boolean;
     begin
-        Transfered := TransferXml(NPXmlTemplate, XmlDoc, Filename);
+        Transfered := TransferXml(NPXmlTemplate, XmlDoc, CopyStr(Filename, 1, 250));
         if Transfered then
             exit;
 
@@ -930,7 +930,7 @@
         Window.Open(Title);
     end;
 
-    local procedure UpdateDialog(Counter: Integer; Total: Integer; StartTime: Time; RecordPosition: Text[1024])
+    local procedure UpdateDialog(Counter: Integer; Total: Integer; StartTime: Time; RecordPosition: Text)
     var
         Runtime: Decimal;
         ProgressIndicatorLbl: Label '%1 out of %2';
@@ -953,12 +953,12 @@
         exit(GuiAllowed and not HideDialog);
     end;
 
-    internal procedure GetAutomaticUsername(): Text
+    internal procedure GetAutomaticUsername(): Text[250]
     var
         ActiveSession: Record "Active Session";
     begin
         ActiveSession.Get(ServiceInstanceId(), SessionId());
-        exit(LowerCase(ReplaceSpecialChar(ActiveSession."Database Name" + '_' + CompanyName)));
+        exit(CopyStr(LowerCase(ReplaceSpecialChar(ActiveSession."Database Name" + '_' + CompanyName)), 1, 250));
     end;
 
     internal procedure GetBasicAuthInfo(Username: Text; Password: Text): Text
@@ -976,7 +976,7 @@
         exit(Format(Char));
     end;
 
-    local procedure GetFilename(XmlEntityType: Text[50]; PrimaryKeyValue: Text; RecordCounter: Integer): Text[1024]
+    local procedure GetFilename(XmlEntityType: Text[50]; PrimaryKeyValue: Text; RecordCounter: Integer): Text
     var
         Path: Text[1024];
     begin
@@ -1006,7 +1006,7 @@
         exit(NpXmlNamespaces.Namespace);
     end;
 
-    local procedure PadStrLeft(InputStr: Text[1024]; StrLength: Integer; PadChr: Char): Text[1024]
+    local procedure PadStrLeft(InputStr: Text[1024]; StrLength: Integer; PadChr: Char): Text
     var
         PadLength: Integer;
         i: Integer;

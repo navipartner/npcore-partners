@@ -276,7 +276,7 @@
         if MaxLength > 0 then
             TextValue := CopyStr(TextValue, 1, MaxLength);
 
-        ReturnValue := UpperCase(CopyStr(TextValue, 1, MaxStrLen(ReturnValue)));
+        ReturnValue := CopyStr(UpperCase(TextValue), 1, MaxStrLen(ReturnValue));
 
         exit(ReturnValue);
     end;
@@ -444,7 +444,7 @@
         if MaxLength > 0 then
             TextValue := CopyStr(TextValue, 1, MaxLength);
 
-        ReturnValue := UpperCase(CopyStr(TextValue, 1, MaxStrLen(ReturnValue)));
+        ReturnValue := CopyStr(UpperCase(TextValue), 1, MaxStrLen(ReturnValue));
 
         exit(ReturnValue);
     end;

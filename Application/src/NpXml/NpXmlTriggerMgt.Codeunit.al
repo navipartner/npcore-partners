@@ -1,6 +1,7 @@
 ﻿codeunit 6151553 "NPR NpXml Trigger Mgt."
 {
     Access = Internal;
+
     var
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
         NpXmlValueMgt: Codeunit "NPR NpXml Value Mgt.";
@@ -37,7 +38,9 @@
                 TempUniqueTaskBuffer.Init();
                 TempUniqueTaskBuffer."Table No." := RecRef2.Number;
                 TempUniqueTaskBuffer."Task Processor Code" := TaskProcessor.Code;
+#pragma warning disable AA0139
                 TempUniqueTaskBuffer."Record Position" := RecRef2.GetPosition(false);
+#pragma warning restore
                 TempUniqueTaskBuffer."Codeunit ID" := CODEUNIT::"NPR NpXml Task Mgt.";
                 TempUniqueTaskBuffer."Processing Code" := NpXmlTemplateTrigger."Xml Template Code";
                 if NcTaskMgt.ReqisterUniqueTask(TempUniqueTaskBuffer, UniqueTaskBuffer) then
@@ -280,7 +283,9 @@
                     TempUniqueTaskBuffer.Init();
                     TempUniqueTaskBuffer."Table No." := RecRef2.Number;
                     TempUniqueTaskBuffer."Task Processor Code" := TaskProcessor.Code;
+#pragma warning disable AA0139
                     TempUniqueTaskBuffer."Record Position" := RecRef2.GetPosition(false);
+#pragma warning restore
                     TempUniqueTaskBuffer."Codeunit ID" := CODEUNIT::"NPR NpXml Task Mgt.";
                     TempUniqueTaskBuffer."Processing Code" := NpXmlTemplateTrigger."Xml Template Code";
                     if NcTaskMgt.ReqisterUniqueTask(TempUniqueTaskBuffer, UniqueTaskBuffer) then
