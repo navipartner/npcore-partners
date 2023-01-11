@@ -54,7 +54,7 @@
         Item.SetLoadFields("No.", Description, "Description 2", "Unit Price");
         if Item.FindSet(false) then begin
             repeat
-                if IsMatch(SearchTerm, Item.Description) then begin
+                if IsMatch(SearchTerm, Item.Description) or IsMatch(SearchTerm, Item."No.") then begin
                     Clear(Result);
                     Result.Add('no', Item."No.");
                     Result.Add('name', Item.Description);
