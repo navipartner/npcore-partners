@@ -99,7 +99,7 @@ codeunit 6059931 "NPR SS Action: Insert Item B."
         POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
 
         if SaleLinePOS.Quantity - Abs(DecreaseByQty) < ItemMinQuantity then begin
-            SSActionDeletePOSLine.DeletePosLine(POSSession);
+            SSActionDeletePOSLine.DeletePOSLine(POSSaleLine);
         end else begin
             SSActionQtyDecrease.DecreaseSalelineQuantity(POSSession, Abs(DecreaseByQty), POSSaleLine);
         end;

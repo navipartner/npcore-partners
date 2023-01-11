@@ -1,60 +1,44 @@
-﻿codeunit 6151282 "NPR SS Action: Delete POS Line"
+﻿codeunit 6151282 "NPR SS Action: Delete POS Line" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'This built in function deletes sales or payment line from the POS';
-
-    local procedure ActionCode(): Text[20]
     begin
-        exit('SS-DELETE-LINE');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.SetWorkflowTypeUnattended();
     end;
 
-    local procedure ActionVersion(): Text[30]
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup");
     begin
-        exit('1.0');
+        DeletePOSLine(SaleLine);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    local procedure GetActionScript(): Text
     begin
-
-        if Sender.DiscoverAction20(
-          ActionCode(),
-          ActionDescription,
-          ActionVersion())
-        then begin
-            Sender.RegisterWorkflow20('workflow.respond();');
-            Sender.RegisterDataBinding();
-            Sender.SetWorkflowTypeUnattended();
-        end;
+        exit(
+        //###NPR_INJECT_FROM_FILE:POSActionSSDeleteLine.js###
+        'let main=async({})=>await workflow.respond();'
+        )
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        DeletePosLine(POSSession);
-
-        Handled := true;
-    end;
-
+    [Obsolete('Use procedure DeletePOSLine instead')]
     procedure DeletePosLine(POSSession: Codeunit "NPR POS Session")
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSActionDeletePOSLine: Codeunit "NPR POSAction: Delete POS Line";
     begin
-        POSSession.GetSaleLine(POSSaleLine);
+    end;
+
+    procedure DeletePOSLine(POSSaleLine: Codeunit "NPR POS Sale Line")
+    var
+        POSActionDeletePOSLine: Codeunit "NPR POSAction: Delete POS Line";
+    begin
         POSActionDeletePOSLine.OnBeforeDeleteSaleLinePOS(POSSaleLine);
         DeleteAccessories(POSSaleLine);
         POSSaleLine.DeleteLine();
-
-        POSSession.GetSale(POSSale);
-        POSSale.SetModified();
-
-        POSSession.RequestRefreshData();
     end;
 
     procedure DeleteAccessories(POSSaleLine: Codeunit "NPR POS Sale Line")
