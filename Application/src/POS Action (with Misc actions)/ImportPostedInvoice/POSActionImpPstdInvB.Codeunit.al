@@ -2,7 +2,7 @@ codeunit 6059875 "NPR POS Action: Imp. PstdInv B"
 {
     Access = Internal;
 
-    procedure PostedInvToPOS(var POSSession: Codeunit "NPR POS Session"; var SalesInvHeader: Record "Sales Invoice Header"; NegativeValues: Boolean; ShowSuccessMessage: Boolean; AppliesToInvoice: Boolean; TransferDim: Boolean)
+    procedure PostedInvToPOS(var POSSession: Codeunit "NPR POS Session"; var SalesInvHeader: Record "Sales Invoice Header"; NegativeValues: Boolean; ShowSuccessMessage: Boolean; AppliesToInvoice: Boolean; TransferDim: Boolean; PostedSalesLineFilter: Text)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SalesInvLine: Record "Sales Invoice Line";
@@ -20,6 +20,8 @@ codeunit 6059875 "NPR POS Action: Imp. PstdInv B"
 
         SalesInvLine.SetRange("Document No.", SalesInvHeader."No.");
         SalesInvLine.SetFilter(Type, '%1|%2', SalesInvLine.Type::Item, SalesInvLine.Type::" ");
+        if PostedSalesLineFilter <> '' then
+            SalesInvLine.SetFilter("Line No.", PostedSalesLineFilter);
         SalesInvLine.FindSet();
 
         repeat

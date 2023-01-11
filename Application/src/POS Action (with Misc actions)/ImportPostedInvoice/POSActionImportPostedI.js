@@ -2,8 +2,8 @@
 let main = async ({workflow,context,captions,parameters}) => {
     
     if (parameters.ScanExchangeLabel) {
-        context.OrdNo = await popup.input ({title: captions.editScanLabel_title, caption: captions.editScanLabel_title});
-        if (context.OrdNo) {
+        context.Barcode = await popup.input ({title: captions.editScanLabel_title, caption: captions.editScanLabel_title});
+        if (context.Barcode) {
             await workflow.respond("ScanLabel"); 
              
         }

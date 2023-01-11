@@ -97,20 +97,35 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
         if ConfirmInvDiscAmt then
             if not ConfirmDiscount(SalesInvHeader) then
                 exit;
-        AddSalesInvoiceToPOSLine(POSSale, SalesInvHeader, NegativeValues, ShowMsg, AppliesToInvoice, TransferDim, SalesPersonFromInv);
+        AddSalesInvoiceToPOSLine(POSSale, SalesInvHeader, NegativeValues, ShowMsg, AppliesToInvoice, TransferDim, SalesPersonFromInv, false);
     end;
 
-    local procedure AddSalesInvoiceToPOSLine(var POSSale: Codeunit "NPR POS Sale"; var SalesInvHeader: Record "Sales Invoice Header"; NegativeValues: Boolean; ShowMsg: Boolean; AppliesToInvoice: Boolean; TransferDim: Boolean; SalesPersonFromInv: Boolean)
+    local procedure AddSalesInvoiceToPOSLine(var POSSale: Codeunit "NPR POS Sale"; var SalesInvHeader: Record "Sales Invoice Header"; NegativeValues: Boolean; ShowMsg: Boolean; AppliesToInvoice: Boolean; TransferDim: Boolean; SalesPersonFromInv: Boolean; ChooseLines: Boolean)
     var
         POSSession: Codeunit "NPR POS Session";
         POSActImpPstdInvB: Codeunit "NPR POS Action: Imp. PstdInv B";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        PostedSalesInvoiceLines: Page "Posted Sales Invoice Lines";
+        RecRef: RecordRef;
+        PostedSalesLineFilter: Text;
+        SelectionFilterManagement: Codeunit SelectionFilterManagement;
     begin
+        if ChooseLines then begin
+            SalesInvoiceLine.SetRange("Document No.", SalesInvHeader."No.");
+            PostedSalesInvoiceLines.SetTableView(SalesInvoiceLine);
+            PostedSalesInvoiceLines.LookupMode(true);
+            if PostedSalesInvoiceLines.RunModal() = Action::LookupOK then begin
+                PostedSalesInvoiceLines.SetSelectionFilter(SalesInvoiceLine);
+                RecRef.GetTable(SalesInvoiceLine);
+                PostedSalesLineFilter := SelectionFilterManagement.GetSelectionFilter(RecRef, SalesInvoiceLine.FieldNo("Line No."));
+            end;
+        end;
         POSSession.GetSale(POSSale);
         POSActImpPstdInvB.SetPosSaleCustomer(POSSale, SalesInvHeader."Bill-to Customer No.");
         if TransferDim then
             POSActImpPstdInvB.SetPosSaleDimension(POSSale, SalesInvHeader);
 
-        POSActImpPstdInvB.PostedInvToPOS(POSSession, SalesInvHeader, NegativeValues, ShowMsg, AppliesToInvoice, TransferDim);
+        POSActImpPstdInvB.PostedInvToPOS(POSSession, SalesInvHeader, NegativeValues, ShowMsg, AppliesToInvoice, TransferDim, PostedSalesLineFilter);
 
         if SalesPersonFromInv then
             POSActImpPstdInvB.UpdateSalesPerson(POSSale, SalesInvHeader);
@@ -118,7 +133,7 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
 
     local procedure Step_ScanLabel(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale")
     var
-        OrderNo: Code[20];
+        Barcode: Code[13];
         SelectCustomer: Boolean;
         ConfirmInvDiscAmt: Boolean;
         LocationSource: Option "POS Store","Location Filter Parameter";
@@ -133,7 +148,7 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
         POSSession: Codeunit "NPR POS Session";
     begin
         SetParameters(Context, SelectCustomer, SalesDocViewString, LocationSource, LocationFilter, SalesPersonFromInv, ConfirmInvDiscAmt, NegativeValues, AppliesToInvoice, ShowMsg, TransferDim);
-        OrderNo := CopyStr(Context.GetString('OrdNo'), 1, MaxStrLen(OrderNo));
+        Barcode := CopyStr(Context.GetString('Barcode'), 1, MaxStrLen(Barcode));
 
         if not
             SelectDocument(
@@ -141,7 +156,7 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
             SalesInvHeader,
             SalesDocViewString,
             LocationSource,
-            LocationFilter, OrderNo)
+            LocationFilter, Barcode)
         then
             exit;
 
@@ -149,7 +164,7 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
             if not ConfirmDiscount(SalesInvHeader) then
                 exit;
 
-        AddSalesInvoiceToPOSLine(Sale, SalesInvHeader, NegativeValues, ShowMsg, AppliesToInvoice, TransferDim, SalesPersonFromInv);
+        AddSalesInvoiceToPOSLine(Sale, SalesInvHeader, NegativeValues, ShowMsg, AppliesToInvoice, TransferDim, SalesPersonFromInv, true);
     end;
 
     local procedure SetParameters(Context: Codeunit "NPR POS JSON Helper"; var SelectCustomer: Boolean; var SalesDocViewString: Text; var LocationSource: Option "POS Store","Location Filter Parameter"; var LocationFilter: Text; var SalesPersonFromInv: Boolean; var ConfirmInvDiscAmt: Boolean; var NegativeValues: Boolean; var AppliesToInvoice: Boolean; var ShowMsg: Boolean; var TransferDim: Boolean)
@@ -194,8 +209,9 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
         exit(true);
     end;
 
-    local procedure SelectDocument(POSSession: Codeunit "NPR POS Session"; var SalesInvHeader: Record "Sales Invoice Header"; SalesDocViewString: Text; LocationSource: Option "POS Store","Location Filter Parameter"; LocationFilter: Text; OrderNo: Code[20]): Boolean
+    local procedure SelectDocument(POSSession: Codeunit "NPR POS Session"; var SalesInvHeader: Record "Sales Invoice Header"; SalesDocViewString: Text; LocationSource: Option "POS Store","Location Filter Parameter"; LocationFilter: Text; Barcode: Code[20]): Boolean
     var
+        ExchangeLabel: Record "NPR Exchange Label";
         POSSale: Codeunit "NPR POS Sale";
         POSStore: Record "NPR POS Store";
         SalePOS: Record "NPR POS Sale";
@@ -217,8 +233,14 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
         end;
         if LocationFilter <> '' then
             SalesInvHeader.SetFilter("Location Code", LocationFilter);
-        if OrderNo <> '' then
-            SalesInvHeader.SetRange("Order No.", OrderNo);
+        if Barcode <> '' then begin
+            ExchangeLabel.Reset();
+            ExchangeLabel.SetCurrentKey(Barcode);
+            ExchangeLabel.SetRange(Barcode, Barcode);
+            if ExchangeLabel.FindFirst() then
+                if ExchangeLabel."Table No." = Database::"Sales Line" then
+                    SalesInvHeader.SetRange("Order No.", ExchangeLabel."Sales Header No.");
+        end;
         SalesInvHeader.FilterGroup(0);
         if SalesInvHeader.FindFirst() then;
         exit(PAGE.RunModal(0, SalesInvHeader) = ACTION::LookupOK);
@@ -297,7 +319,7 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionImportPostedI.js###
-'let main=async({workflow:e,context:a,captions:i,parameters:t})=>{if(t.ScanExchangeLabel)if(a.OrdNo=await popup.input({title:i.editScanLabel_title,caption:i.editScanLabel_title}),a.OrdNo)await e.respond("ScanLabel");else return" ";else await e.respond("SelectInvoice")};'
+'let main=async({workflow:e,context:a,captions:i,parameters:t})=>{if(t.ScanExchangeLabel)if(a.Barcode=await popup.input({title:i.editScanLabel_title,caption:i.editScanLabel_title}),a.Barcode)await e.respond("ScanLabel");else return" ";else await e.respond("SelectInvoice")};'
         )
     end;
 }
