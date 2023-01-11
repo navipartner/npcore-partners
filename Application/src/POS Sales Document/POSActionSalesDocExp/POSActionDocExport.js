@@ -12,7 +12,7 @@ let main = async ({ workflow, parameters, captions }) => {
             return;
     };
     if (parameters.AskAttention) {
-        attention = await popup.input(captions.AskAttention);
+        attention = await popup.input(captions.Attention);
         if (attention === "" || attention === null)
             return;
     };

@@ -206,7 +206,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionDocExport.js###
-'let main=async({workflow:p,parameters:t,captions:e})=>{debugger;let l,n,a,i;if(t.ConfirmExport&&!await popup.confirm(e.confirmLead,e.confirmTitle)||t.AskExtDocNo&&(a=await popup.input(e.ExtDocNo),a===""||a===null)||t.AskAttention&&(n=await popup.input(e.AskAttention),n===""||n===null)||t.AskYourRef&&(i=await popup.input(e.YourRef),i===""||i===null))return;const{createdSalesHeader:u,createdSalesHeaderDocumentType:m,additionalParameters:r}=await p.respond("exportDocument",{extDocNo:a,attention:n,yourref:i});let o;r.prompt_prepayment?r.prepayment_is_amount?o=await popup.numpad(e.prepaymentAmountLead,e.prepaymentDialogTitle):o=await popup.numpad(e.prepaymentPctLead,e.prepaymentDialogTitle):o=t.FixedPrepaymentValue,await p.respond("endSaleAndDocumentPayment",{additionalParameters:r,createdSalesHeader:u,createdSalesHeaderDocumentType:m,prepaymentAmt:o})};'
+'let main=async({workflow:p,parameters:t,captions:e})=>{debugger;let l,n,a,i;if(t.ConfirmExport&&!await popup.confirm(e.confirmLead,e.confirmTitle)||t.AskExtDocNo&&(a=await popup.input(e.ExtDocNo),a===""||a===null)||t.AskAttention&&(n=await popup.input(e.Attention),n===""||n===null)||t.AskYourRef&&(i=await popup.input(e.YourRef),i===""||i===null))return;const{createdSalesHeader:u,createdSalesHeaderDocumentType:m,additionalParameters:r}=await p.respond("exportDocument",{extDocNo:a,attention:n,yourref:i});let o;r.prompt_prepayment?r.prepayment_is_amount?o=await popup.numpad(e.prepaymentAmountLead,e.prepaymentDialogTitle):o=await popup.numpad(e.prepaymentPctLead,e.prepaymentDialogTitle):o=t.FixedPrepaymentValue,await p.respond("endSaleAndDocumentPayment",{additionalParameters:r,createdSalesHeader:u,createdSalesHeaderDocumentType:m,prepaymentAmt:o})};'
         )
     end;
 
@@ -440,7 +440,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         Attention: Text;
         YourRef: Text;
     begin
-        if Context.GetString('extdocno', ExtDocNo) then;
+        if Context.GetString('extDocNo', ExtDocNo) then;
         if Context.GetString('attention', Attention) then;
         if Context.GetString('yourref', YourRef) then;
 
