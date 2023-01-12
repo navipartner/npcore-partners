@@ -260,10 +260,21 @@
         Payload: JsonObject;
         PrintNodePrinter: Record "NPR PrintNode Printer";
         PrintNodePrinterLbl: Label 'Print Node Printer: %1', Locked = true;
+        BooleanString: Text;
     begin
         if PrintNodePrinter.FindSet() then
             repeat
-                Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3}]}', CopyStr(StrSubstNo(PrintNodePrinterLbl, PrintNodePrinter.Name), 1, 250), PrintNodePrinter."BC Paper Source".AsInteger(), PrintNodePrinter."BC Paper Size".AsInteger()));
+                if PrintNodePrinter."BC Paper Size" = PrintNodePrinter."BC Paper Size"::Custom then begin
+                    if PrintNodePrinter."BC Landscape" then
+                        BooleanString := 'true'
+                    else
+                        BooleanString := 'false';
+
+                    Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3,"units":"%4","height":%5,"width":%6,"landscape":%7}]}',
+                                                CopyStr(StrSubstNo(PrintNodePrinterLbl, PrintNodePrinter.Name), 1, 250), PrintNodePrinter."BC Paper Source".AsInteger(), PrintNodePrinter."BC Paper Size".AsInteger(), PrintNodePrinter."BC Paper Unit", PrintNodePrinter."BC Paper Height", PrintNodePrinter."BC Paper Width", BooleanString));
+                end else begin
+                    Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3}]}', CopyStr(StrSubstNo(PrintNodePrinterLbl, PrintNodePrinter.Name), 1, 250), PrintNodePrinter."BC Paper Source".AsInteger(), PrintNodePrinter."BC Paper Size".AsInteger()));
+                end;
                 Printers.Add('NPR_PRINTNODE_' + PrintNodePrinter.ID, Payload);
                 Clear(Payload);
             until PrintNodePrinter.Next() = 0;

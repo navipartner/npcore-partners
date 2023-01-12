@@ -8,12 +8,18 @@ codeunit 6014495 "NPR HWC Report Printer"
         Payload: JsonObject;
         HWCPrinter: Record "NPR HWC Printer";
         HardwareConnectorLbl: Label 'Hardware Connector Printer: %1', Locked = true;
+        BooleanString: Text;
     begin
         if HWCPrinter.FindSet() then
             repeat
                 if HWCPrinter."Paper Size" = HWCPrinter."Paper Size"::Custom then begin
-                    Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3,"units":%4,"height":"%5","width":"%6","landscape":"%7"}]}',
-                                                CopyStr(StrSubstNo(HardwareConnectorLbl, HWCPrinter.Name), 1, 250), HWCPrinter."Paper Source".AsInteger(), HWCPrinter."Paper Size".AsInteger(), HWCPrinter."Paper Unit".AsInteger(), HWCPrinter."Paper Height", HWCPrinter."Paper Width", HWCPrinter.Landscape));
+                    if HWCPrinter.Landscape then
+                        BooleanString := 'true'
+                    else
+                        BooleanString := 'false';
+
+                    Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3,"units":"%4","height":%5,"width":%6,"landscape":%7}]}',
+                                                CopyStr(StrSubstNo(HardwareConnectorLbl, HWCPrinter.Name), 1, 250), HWCPrinter."Paper Source".AsInteger(), HWCPrinter."Paper Size".AsInteger(), HWCPrinter."Paper Unit", HWCPrinter."Printer Paper Height", HWCPrinter."Printer Paper Width", BooleanString));
                 end else begin
                     Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3}]}', CopyStr(StrSubstNo(HardwareConnectorLbl, HWCPrinter.Name), 1, 250), HWCPrinter."Paper Source".AsInteger(), HWCPrinter."Paper Size".AsInteger()));
                 end;

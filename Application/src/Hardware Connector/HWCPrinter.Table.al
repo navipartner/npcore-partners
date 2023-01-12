@@ -32,13 +32,17 @@ table 6014668 "NPR HWC Printer"
         }
         field(7; "Paper Height"; Decimal)
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Payload requires integers, hence use new field: Printer Paper Height.';
             Caption = 'Printer Paper Height';
             DecimalPlaces = 0 : 2;
             DataClassification = CustomerContent;
         }
         field(8; "Paper Width"; Decimal)
         {
+            ObsoleteState = Pending;
             Caption = 'Printer Paper Width';
+            ObsoleteReason = 'Payload requires integers, hence use new field: Printer Paper Width.';
             DecimalPlaces = 0 : 2;
             DataClassification = CustomerContent;
         }
@@ -53,6 +57,16 @@ table 6014668 "NPR HWC Printer"
             Caption = 'Landscape';
             DataClassification = CustomerContent;
         }
+        field(11; "Printer Paper Height"; Integer)
+        {
+            Caption = 'Printer Paper Height';
+            DataClassification = CustomerContent;
+        }
+        field(12; "Printer Paper Width"; Integer)
+        {
+            Caption = 'Printer Paper Width';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -62,4 +76,24 @@ table 6014668 "NPR HWC Printer"
             Clustered = true;
         }
     }
+
+    trigger OnInsert()
+    begin
+        CheckCustomSetup();
+    end;
+
+    trigger OnModify()
+    begin
+        CheckCustomSetup();
+    end;
+
+    local procedure CheckCustomSetup()
+    var
+        ErrCustomHeightWidth: Label 'When using paper size: Custom, you must enter values greater than 0 for both height and width.';
+    begin
+        if "Paper size" = "Paper Size"::Custom then begin
+            if not (("Printer Paper Height" > 0) and ("Printer Paper Width" > 0)) then
+                Error(ErrCustomHeightWidth);
+        end;
+    end;
 }

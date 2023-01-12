@@ -41,11 +41,15 @@ table 6014689 "NPR MPOS Report Printer"
         field(7; "Paper Height"; Decimal)
         {
             Caption = 'Printer Paper Height';
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Payload requires integers, hence use new field: Printer Paper Height.';
             DecimalPlaces = 0 : 2;
             DataClassification = CustomerContent;
         }
         field(8; "Paper Width"; Decimal)
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Payload requires integers, hence use new field: Printer Paper Width.';
             Caption = 'Printer Paper Width';
             DecimalPlaces = 0 : 2;
             DataClassification = CustomerContent;
@@ -61,13 +65,43 @@ table 6014689 "NPR MPOS Report Printer"
             Caption = 'Landscape';
             DataClassification = CustomerContent;
         }
+        field(11; "Printer Paper Width"; Integer)
+        {
+            Caption = 'Printer Paper Width';
+            DataClassification = CustomerContent;
+        }
+        field(12; "Printer Paper Height"; Integer)
+        {
+            Caption = 'Printer Paper Height';
+            DataClassification = CustomerContent;
+        }
     }
-
     keys
     {
-        key(pk; ID)
+        key(pk;
+        ID)
         {
             Clustered = true;
         }
     }
+
+    trigger OnInsert()
+    begin
+        CheckCustomSetup();
+    end;
+
+    trigger OnModify()
+    begin
+        CheckCustomSetup();
+    end;
+
+    local procedure CheckCustomSetup()
+    var
+        ErrCustomHeightWidth: Label 'When using paper size: Custom, you must enter values greater than 0 for both height and width.';
+    begin
+        if "Paper size" = "Paper Size"::Custom then begin
+            if not (("Printer Paper Height" > 0) and ("Printer Paper Width" > 0)) then
+                Error(ErrCustomHeightWidth);
+        end;
+    end;
 }

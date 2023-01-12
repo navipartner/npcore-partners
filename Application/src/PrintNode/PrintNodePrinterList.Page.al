@@ -47,7 +47,6 @@
                 field(Settings; Rec.Settings.HasValue)
                 {
                     Caption = 'Settings Stored';
-
                     ToolTip = 'Specifies the value of the Settings Stored field';
                     ApplicationArea = NPRRetail;
                 }
@@ -57,10 +56,33 @@
                     ToolTip = 'The paper size sent to the Business Central reporting engine';
                     ApplicationArea = NPRRetail;
                 }
+                field("BC Paper Height"; Rec."BC Paper Height")
+                {
+                    Caption = 'BC Paper Height';
+                    ToolTip = 'The paper height sent to the Business Central reporting engine';
+                    ApplicationArea = NPRRetail;
+                }
+                field("BC Paper Width"; Rec."BC Paper Width")
+                {
+                    Caption = 'BC Paper Width';
+                    ToolTip = 'The paper width sent to the Business Central reporting engine';
+                    ApplicationArea = NPRRetail;
+                }
+                field("BC Paper Unit"; Rec."BC Paper Unit")
+                {
+                    ToolTip = 'The paper unit sent to the Business Central reporting engine';
+                    ApplicationArea = NPRRetail;
+                }
                 field("BC Paper Source"; Rec."BC Paper Source")
                 {
                     Caption = 'BC Paper Source';
                     ToolTip = 'The paper source sent to the Business Central reporting engine';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Landscape; Rec."BC Landscape")
+                {
+                    Caption = 'BC Landscape';
+                    ToolTip = 'Check if printer should print as landscape';
                     ApplicationArea = NPRRetail;
                 }
             }

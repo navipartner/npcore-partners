@@ -63,6 +63,27 @@
             InitValue = "A4";
             DataClassification = CustomerContent;
         }
+        field(50; "BC Paper Height"; Integer)
+        {
+            Caption = 'Printer Paper Height sent to Business Central reporting engine';
+            DataClassification = CustomerContent;
+        }
+        field(60; "BC Paper Width"; Integer)
+        {
+            Caption = 'Printer Paper Width sent to Business Central reporting engine';
+            DataClassification = CustomerContent;
+        }
+        field(65; "BC Paper Unit"; Enum "NPR Printer Paper Unit")
+        {
+            Caption = 'Printer Paper Unit sent to Business Central reporting engine';
+            InitValue = "Millimeters";
+            DataClassification = CustomerContent;
+        }
+        field(70; "BC Landscape"; Boolean)
+        {
+            Caption = 'Printer Landscape (orientation) sent to Business Central reporting engine';
+            DataClassification = CustomerContent;
+        }
         field(100; Settings; Blob)
         {
             Caption = 'Settings';
@@ -76,5 +97,25 @@
         {
         }
     }
+
+    trigger OnInsert()
+    begin
+        CheckCustomSetup();
+    end;
+
+    trigger OnModify()
+    begin
+        CheckCustomSetup();
+    end;
+
+    local procedure CheckCustomSetup()
+    var
+        ErrCustomHeightWidth: Label 'When using paper size: Custom, you must enter values greater than 0 for both height and width.';
+    begin
+        if "BC Paper size" = "BC Paper Size"::Custom then begin
+            if not (("BC Paper Height" > 0) and ("BC Paper Width" > 0)) then
+                Error(ErrCustomHeightWidth);
+        end;
+    end;
 }
 

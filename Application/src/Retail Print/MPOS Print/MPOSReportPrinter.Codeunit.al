@@ -8,12 +8,18 @@ codeunit 6059855 "NPR MPOS Report Printer"
         Payload: JsonObject;
         MPOSReportPrinter: Record "NPR MPOS Report Printer";
         HardwareConnectorLbl: Label 'MPOS Printer: %1';
+        BooleanString: Text;
     begin
         if MPOSReportPrinter.FindSet() then
             repeat
                 if MPOSReportPrinter."Paper Size" = MPOSReportPrinter."Paper Size"::Custom then begin
-                    Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3,"units":%4,"height":"%5","width":"%6","landscape":"%7"}]}',
-                                                CopyStr(StrSubstNo(HardwareConnectorLbl, MPOSReportPrinter.ID), 1, 250), MPOSReportPrinter."Paper Source".AsInteger(), MPOSReportPrinter."Paper Size".AsInteger(), MPOSReportPrinter."Paper Unit".AsInteger(), MPOSReportPrinter."Paper Height", MPOSReportPrinter."Paper Width", MPOSReportPrinter.Landscape));
+                    if MPOSReportPrinter.Landscape then
+                        BooleanString := 'true'
+                    else
+                        BooleanString := 'false';
+
+                    Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3,"units":"%4","height":%5,"width":%6,"landscape":%7}]}',
+                                                CopyStr(StrSubstNo(HardwareConnectorLbl, MPOSReportPrinter.ID), 1, 250), MPOSReportPrinter."Paper Source".AsInteger(), MPOSReportPrinter."Paper Size".AsInteger(), MPOSReportPrinter."Paper Unit", MPOSReportPrinter."Printer Paper Height", MPOSReportPrinter."Printer Paper Width", BooleanString));
                 end else begin
                     Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3}]}', CopyStr(StrSubstNo(HardwareConnectorLbl, MPOSReportPrinter.ID), 1, 250), MPOSReportPrinter."Paper Source".AsInteger(), MPOSReportPrinter."Paper Size".AsInteger()));
                 end;
