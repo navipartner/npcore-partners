@@ -4,6 +4,7 @@ page 6059862 "NPR HWC Printers"
     PageType = List;
     ApplicationArea = NPRRetail;
     UsageCategory = Lists;
+    DelayedInsert = true;
     SourceTable = "NPR HWC Printer";
     Caption = 'Hardware Connector Report Printer Setup';
 
@@ -28,12 +29,12 @@ page 6059862 "NPR HWC Printers"
                     ToolTip = 'The paper size to use on the printer. Set to custom to define via the other fields.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Paper Height"; Rec."Paper Height")
+                field("Paper Height"; Rec."Printer Paper Height")
                 {
                     ToolTip = 'The paper height to use on the printer';
                     ApplicationArea = NPRRetail;
                 }
-                field("Paper Width"; Rec."Paper Width")
+                field("Paper Width"; Rec."Printer Paper Width")
                 {
                     ToolTip = 'The paper width to use on the printer';
                     ApplicationArea = NPRRetail;

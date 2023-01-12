@@ -5,6 +5,7 @@ page 6059883 "NPR MPOS Report Printers"
     ApplicationArea = NPRRetail;
     UsageCategory = Lists;
     SourceTable = "NPR MPOS Report Printer";
+    DelayedInsert = true;
     Caption = 'MPOS Report Printer Setup';
 
     layout
@@ -28,12 +29,12 @@ page 6059883 "NPR MPOS Report Printers"
                     ToolTip = 'The paper size to use on the printer. Set to custom to define via the other fields.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Paper Height"; Rec."Paper Height")
+                field("Paper Height"; Rec."Printer Paper Height")
                 {
                     ToolTip = 'The paper height to use on the printer';
                     ApplicationArea = NPRRetail;
                 }
-                field("Paper Width"; Rec."Paper Width")
+                field("Paper Width"; Rec."Printer Paper Width")
                 {
                     ToolTip = 'The paper width to use on the printer';
                     ApplicationArea = NPRRetail;
