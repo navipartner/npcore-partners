@@ -431,6 +431,7 @@ codeunit 85003 "NPR Library - POS Mock"
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
         POSSession: Codeunit "NPR POS Session";
         POSSetup: Record "NPR POS Setup";
+        ObjectType: Option ,,,"Report",,"Codeunit","XMLPort",,"Page";
     begin
         if Initialized then begin
             //Clean any previous mock session
@@ -443,6 +444,7 @@ codeunit 85003 "NPR Library - POS Mock"
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
+            NPRLibraryPOSMasterData.CreatePosMenuFilter(ObjectType::Page, 22, 'CUSDOM');
             Initialized := true;
         end;
 

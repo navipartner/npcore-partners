@@ -1,73 +1,37 @@
-﻿codeunit 6150820 "NPR POS Action: Run Object"
+﻿codeunit 6150820 "NPR POS Action: Run Object" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        ActionDescription: Label 'This is a built-in action for running a page';
-        ReadingErr: Label 'reading in %1';
-
-    local procedure ActionCode(): Code[20]
+        ActionDescription: Label 'This is a built-in action for running a Object';
+        ParamMenuFilterCode_Name_CaptionLbl: Label 'Menu Filter Code';
     begin
-        exit('RUNOBJECT');
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddTextParameter(ParamMenuFilterCode_Name(), '', ParamMenuFilterCode_Name_CaptionLbl, ParamMenuFilterCode_Name_CaptionLbl);
     end;
 
-    local procedure ActionVersion(): Text[30]
+    local procedure GetActionScript(): Text
     begin
-        exit('1.0');
+        exit(
+        //###NPR_INJECT_FROM_FILE:POSActionRunObject.js###
+        'let main=async({})=>await workflow.respond();'
+        );
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-  ActionCode(),
-  ActionDescription,
-  ActionVersion(),
-  Sender.Type::Generic,
-  Sender."Subscriber Instances Allowed"::Multiple)
-then begin
-            Sender.RegisterWorkflowStep('1', 'respond();');
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterTextParameter('MenuFilterCode', '');
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', false, false)]
-    local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        JSON: Codeunit "NPR POS JSON Management";
-        MenuFilterCode: Code[20];
+        BusinessLogicRun: Codeunit "NPR POS Action: Run Object-B";
+        POSSession: Codeunit "NPR POS Session";
+        MenuFilterCode: Text;
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScopeParameters(ActionCode());
-
-        MenuFilterCode := CopyStr(JSON.GetStringOrFail('MenuFilterCode', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(MenuFilterCode));
-        RunObject(MenuFilterCode, POSSession);
-        Handled := true;
+        MenuFilterCode := Context.GetStringParameter(ParamMenuFilterCode_Name());
+        BusinessLogicRun.RunObject(MenuFilterCode, POSSession);
     end;
 
-    local procedure RunObject(MenuFilterCode: Code[20]; POSSession: Codeunit "NPR POS Session")
-    var
-        POSMenuFilter: Record "NPR POS Menu Filter";
+    local procedure ParamMenuFilterCode_Name(): Text[20]
     begin
-        POSMenuFilter.SetFilter("Filter Code", '=%1', MenuFilterCode);
-        POSMenuFilter.FindFirst();
-        POSMenuFilter.RunObjectWithFilter(POSMenuFilter, POSSession);
+        exit('MenuFilterCode');
     end;
 }
