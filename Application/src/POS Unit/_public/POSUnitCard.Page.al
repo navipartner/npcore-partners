@@ -129,6 +129,11 @@
                     ToolTip = 'Specifies the value of the POS Display Profile field';
                     ApplicationArea = NPRRetail;
                 }
+                field("POS HTML Display Profile"; Rec."POS HTML Display Profile")
+                {
+                    ToolTip = 'Specifies the value of the POS HTML Display Profile field';
+                    ApplicationArea = NPRRetail;
+                }
                 field("POS Tax Free Profile"; Rec."POS Tax Free Profile")
                 {
                     ToolTip = 'Specifies the value of the POS Tax Free Profile field';

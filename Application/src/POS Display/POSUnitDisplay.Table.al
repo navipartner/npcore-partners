@@ -1,6 +1,6 @@
 table 6014698 "NPR POS Unit Display"
 {
-    DataClassification = ToBeClassified;
+    DataClassification = CustomerContent;
     Description = 'A table that contains device specific information, not suited for the Display Profile table (DisplaySetup)';
 #IF NOT BC17
     Access = Internal;
