@@ -1,0 +1,50 @@
+trigger: none
+
+schedules:
+  - cron: "0 18 28 * *" #UTC TIME! mm HH DD MM DW
+    displayName: Daily after-midnight AppSource Validation build
+    branches:
+      include:
+      - master
+
+resources:
+  repositories:
+  - repository: scriptsRepo
+    type: git
+    name: 'NpCore/NpDevOps'
+
+jobs:
+- job: CreateNewMajorRelease
+  
+  pool:
+    name: NP Core Pipelines
+    demands: 
+    - docker
+    # Now only 2019 is available but in the future it will be every newer version.
+    # Then we will probably remove this requirement as it will alwyas TRUE.
+    - Agent.OS -equals Windows_NT
+    - Agent.OSVersion -equals 10.0.17763
+  
+  variables:
+    StagingHostPath: C:\AzureDevOps\Staging\$(Build.BuildId)\$(System.StageName)
+    StagingContainerPath: C:/Staging
+
+  displayName: Create new major release
+
+  steps:
+  - template: /YAML/Templates/Step/DownloadScriptsFromRepo.yml@scriptsRepo
+    parameters:
+      scriptsRepo: scriptsRepo
+      path: $(StagingHostPath)/Scripts
+
+  - task: PowerShell@2
+    inputs:
+      filePath: $(SetupScriptVars.psScriptsFolder)/BuildDeploy/CreateReleaseBranch.ps1
+      arguments: >
+        -RepositoryId '$(Build.Repository.ID)'
+        -ReleaseBranchFolderPath 'refs/heads/releases/'
+        -SourceBranch '$(Build.SourceBranch)'
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)          
+    displayName: 'Create new release branch'
+    retryCountOnTaskFailure: 3
