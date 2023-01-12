@@ -508,8 +508,9 @@
         if POSAuditProfile."Do Not Print Receipt on Sale" then
             exit;
         POSAuditProfile."Do Not Print Receipt on Sale" := true;
-        POSAuditProfile.Modify();        
+        POSAuditProfile.Modify();
     end;
+
     procedure CreateItemForPOSSaleUsage(var Item: Record Item; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store"; VATProductPostingGroup: Record "VAT Product Posting Group")
     var
         NPRLibraryInventory: Codeunit "NPR Library - Inventory";
@@ -648,6 +649,21 @@
         NpRvRetVouchType."Voucher Type" := VoucherType;
         NpRvRetVouchType."Return Voucher Type" := ReturnVoucherType;
         NpRvRetVouchType.Insert();
+    end;
+
+    procedure CreatePosMenuFilter(ObjectType: Option ,,,"Report",,"Codeunit","XMLPort",,"Page"; ObjectID: Integer; FilterCode: Code[20])
+    var
+        POSMenuFilter: Record "NPR POS Menu Filter";
+    begin
+        if not POSMenuFilter.Get(FilterCode) then begin
+            POSMenuFilter.Init();
+            POSMenuFilter."Filter Code" := FilterCode;
+            POSMenuFilter.Insert();
+        end;
+        POSMenuFilter."Object Type" := ObjectType;
+        POSMenuFilter."Object Id" := ObjectID;
+        POSMenuFilter.Active := true;
+        POSMenuFilter.Modify();
     end;
 
 }
