@@ -166,6 +166,9 @@
 
                     ToolTip = 'Specifies the value of the No. of Changes field.';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Removing unnecessary - value available in Item Worksheet FactBox';
                 }
                 field("No. of Warnings"; Rec."No. of Warnings")
                 {
