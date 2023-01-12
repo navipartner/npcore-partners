@@ -4,7 +4,7 @@ resources:
   repositories:
   - repository: scriptsRepo
     type: git
-    name:  'NpCore/NpDevOps'
+    name: 'NpCore/NpDevOps'
 
 stages:
   - template: /YAML/ZAL Build Definitions/Release build.yml@scriptsRepo
