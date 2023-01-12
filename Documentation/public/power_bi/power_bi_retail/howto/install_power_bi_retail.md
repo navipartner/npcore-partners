@@ -2,24 +2,6 @@
 
 Take control over your operations by using the Power BI app for retail business. To install the application, follow the provided steps:
 
-## Prerequisites
-
-Prior to the installation of the Power BI app, request a free BC account from the [NaviPartner website](https://www.navipartner.com/get-trial/).   
-
-1. Populate and submit the registration form.    
-       ![Registration_form](./../images/Picture1.png)       
-2. On the following screen, select the theme, and then the **ERP system** link.      
-       ![Erp_system](./../images/Pic1a.png)    
-       Once the registration is completed, you will receive the necessary credentials. They will be expressed in the following format:
-
-    **database: BCEU4044501010IM8G02043**       
-    **username: K07747JI**    
-    **password: 9653453**
-
-3. Use the credentials in the final step of the installation to connect to your Power BI Retail report with your test database.
-
-## Procedure
-
 1. Log into your Power BI account. 
 2. Go to the [Microsoft app store](https://apps.microsoft.com/store/apps) and find our product **NP Power BI for Retail**. Click **Free trial** to run the installation wizard.    
    
