@@ -325,4 +325,59 @@ codeunit 85073 "NPR POS Self Service Tests"
         POSEntry.FindLast();
         Assert.IsTrue(POSEntry."System Entry" = true, 'POS Entry is not created.');
     end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ItemAddOn()
+    var
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryRandom: Codeunit "Library - Random";
+        ItemAddOnBLogic: Codeunit "NPR SS Action - Item AddOn-BL";
+    begin
+        // [SCENARIO]
+        // [Given] POS & Payment setup
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
+
+        // [Given] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        CreateItemAddOnTypeQuantity(ItemAddOn, POSUnit, POSStore);
+
+        POSSession.GetSale(POSSale);
+        POSSession.GetSaleLine(POSSaleLine);
+        //[When]
+        ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
+        ItemAddOnLine.FindFirst();
+        ItemAddOnBLogic.ApplyUserQuantity('1', ItemAddOnLine, 0, POSSale, POSSaleLine);
+
+        //[Then]
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        if SaleLinePOS.IsEmpty then
+            Assert.AssertRecordNotFound();
+        Assert.IsTrue(SaleLinePOS.Quantity = 1, 'Quantity is not entered.');
+        Assert.IsTrue(SaleLinePOS."No." = ItemAddOnLine."Item No.", 'Item from Item AddOn Line is not inserted.');
+    end;
+
+    local procedure CreateItemAddOnTypeQuantity(var ItemAddOn: Record "NPR NpIa Item AddOn"; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store")
+    var
+        Item: Record Item;
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+    begin
+        ItemAddOn.Enabled := true;
+        ItemAddOn.Insert(true);
+
+        ItemAddOnLine.Validate("AddOn No.", ItemAddOn."No.");
+        ItemAddOnLine.Validate("Line No.", 10000);
+        ItemAddOnLine.Validate(Type, ItemAddOnLine.Type::Quantity);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        ItemAddOnLine.Validate("Item No.", Item."No.");
+        ItemAddOnLine.Insert(true);
+    end;
 }

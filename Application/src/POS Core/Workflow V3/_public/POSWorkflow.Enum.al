@@ -457,6 +457,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'LAYAWAY_CANCEL', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Layaway Cancel";
     }
+    value(91; "SS-ITEM-ADDON")
+    {
+        Caption = 'SS-ITEM-ADDON', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR SS Action - Item AddOn";
+    }
     value(90; "SS-DELETE-LINE")
     {
         Caption = 'SS-DELETE-LINE', Locked = true, MaxLength = 20;
