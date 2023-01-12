@@ -44,8 +44,8 @@
                     POSArchiveSale."Header Type" := POSArchiveSale."Header Type"::Cancelled;
             end;
             POSArchiveSale.Modify();
-            POSArchiveSaleLine.SetRange("Register No.",POSArchiveSale."Register No.");
-            POSArchiveSaleLine.SetRange("Sales Ticket No.",POSArchiveSale."Sales Ticket No.");
+            POSArchiveSaleLine.SetRange("Register No.", POSArchiveSale."Register No.");
+            POSArchiveSaleLine.SetRange("Sales Ticket No.", POSArchiveSale."Sales Ticket No.");
             if POSArchiveSaleLine.FindSet(true) then
                 repeat
                     case POSArchiveSaleLine.Type of
@@ -88,7 +88,7 @@
                 until POSArchiveSaleLine.Next() = 0;
         until POSArchiveSale.next() = 0;
     end;
-    
+
     local procedure ArchiveActiveSale()
     var
         POSSale: Record "NPR POS Sale";
@@ -116,9 +116,10 @@
                         POSArchiveSaleLine.Insert()
                     else
                         POSArchiveSaleLine.Modify();
-                    POSSaleLine.Delete();
                 until POSSaleLine.next() = 0;
             POSSale.Delete();
+            if not POSSaleLine.IsEmpty() then
+                POSSaleLine.DeleteAll();
         until POSSale.Next() = 0;
     end;
 }
