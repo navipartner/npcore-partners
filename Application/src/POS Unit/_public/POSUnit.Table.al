@@ -273,6 +273,12 @@
                     end;
             end;
         }
+        field(615; "POS HTML Display Profile"; Code[40])
+        {
+            Caption = 'POS HTML Display Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS HTML Disp. Prof.";
+        }
         field(620; "POS Security Profile"; Code[20])
         {
             Caption = 'POS Security Profile';
