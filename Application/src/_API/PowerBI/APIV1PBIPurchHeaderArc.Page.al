@@ -108,6 +108,10 @@ page 6060038 "NPR APIV1 PBIPurch Header Arc"
                 {
                     Caption = 'Transaction Type', Locked = true;
                 }
+                field(versionNo; Rec."Version No.")
+                {
+                    Caption = 'Version No.', Locked = true;
+                }
             }
         }
     }
