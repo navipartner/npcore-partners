@@ -53,6 +53,8 @@
         {
             Caption = 'Reserved For Web';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Never implemented. Use field "Visibility On Web"';
 
             trigger OnValidate()
             begin
@@ -63,6 +65,8 @@
         {
             Caption = 'Reserved For Members';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Never implemented. Use field "Visibility On Web"';
 
             trigger OnValidate()
             begin
@@ -190,31 +194,55 @@
         {
             Caption = 'Event Arrival From Time';
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                IfAllowOverride();
+            end;
         }
         field(151; "Event Arrival Until Time"; Time)
         {
             Caption = 'Event Arrival Until Time';
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                IfAllowOverride();
+            end;
         }
         field(160; "Sales From Date (Rel.)"; DateFormula)
         {
             Caption = 'Sales From Date (Rel.)';
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                IfAllowOverride();
+            end;
         }
         field(162; "Sales From Time"; Time)
         {
             Caption = 'Sales From Time';
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                IfAllowOverride();
+            end;
         }
         field(163; "Sales Until Date (Rel.)"; DateFormula)
         {
             Caption = 'Sales Until Date (Rel.)';
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                IfAllowOverride();
+            end;
         }
         field(165; "Sales Until Time"; Time)
         {
             Caption = 'Sales Until Time';
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                IfAllowOverride();
+            end;
         }
         field(200; "Scheduled Start Time"; Time)
         {
@@ -227,6 +255,13 @@
         {
             CalcFormula = Lookup("NPR TM Admis. Schedule"."Stop Time" WHERE("Schedule Code" = FIELD("Schedule Code")));
             Caption = 'Scheduled Stop Time';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(210; "Capacity Limit By"; Enum "NPR TM CapacityLimit")
+        {
+            CalcFormula = Lookup("NPR TM Admission"."Capacity Limits By" WHERE("Admission Code" = FIELD("Admission Code")));
+            Caption = 'Capacity Limit By';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -311,17 +346,25 @@
     var
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
     begin
+        if (Admission.IsTemporary) then
+            exit;
+
         TestField("Schedule Code");
         AdmissionSchedule.Get("Schedule Code");
 
-        if ((Admission."Capacity Limits By" = Admission."Capacity Limits By"::ADMISSION) or
-            (Admission."Capacity Limits By" = Admission."Capacity Limits By"::OVERRIDE)) then begin
+        if (Admission."Capacity Limits By" = Admission."Capacity Limits By"::ADMISSION) then begin
             "Prebook Is Required" := Admission."Prebook Is Required";
             "Max Capacity Per Sch. Entry" := Admission."Max Capacity Per Sch. Entry";
-            "Reserved For Web" := Admission."Reserved For Web";
-            "Reserved For Members" := Admission."Reserved For Members";
             "Capacity Control" := Admission."Capacity Control";
             "Prebook From" := Admission."Prebook From";
+
+            "Event Arrival From Time" := Admission."Event Arrival From Time";
+            "Event Arrival Until Time" := Admission."Event Arrival Until Time";
+
+            "Sales From Date (Rel.)" := Admission."Sales From Date (Rel.)";
+            "Sales From Time" := Admission."Sales From Time";
+            "Sales Until Date (Rel.)" := Admission."Sales Until Date (Rel.)";
+            "Sales Until Time" := Admission."Sales Until Time";
         end;
     end;
 
@@ -329,31 +372,33 @@
     var
         Admission: Record "NPR TM Admission";
     begin
+        if (AdmissionSchedule.IsTemporary) then
+            exit;
+
         TestField("Admission Code");
         Admission.Get("Admission Code");
 
         if (Admission."Capacity Limits By" = Admission."Capacity Limits By"::SCHEDULE) then begin
             "Prebook Is Required" := AdmissionSchedule."Prebook Is Required";
             "Max Capacity Per Sch. Entry" := AdmissionSchedule."Max Capacity Per Sch. Entry";
-            "Reserved For Web" := AdmissionSchedule."Reserved For Web";
-            "Reserved For Members" := AdmissionSchedule."Reserved For Members";
             "Capacity Control" := AdmissionSchedule."Capacity Control";
             "Prebook From" := AdmissionSchedule."Prebook From";
+
+            "Event Arrival From Time" := AdmissionSchedule."Event Arrival From Time";
+            "Event Arrival Until Time" := AdmissionSchedule."Event Arrival Until Time";
+
+            "Sales From Date (Rel.)" := AdmissionSchedule."Sales From Date (Rel.)";
+            "Sales From Time" := AdmissionSchedule."Sales From Time";
+            "Sales Until Date (Rel.)" := AdmissionSchedule."Sales Until Date (Rel.)";
+            "Sales Until Time" := AdmissionSchedule."Sales Until Time";
         end;
-
-        "Event Arrival From Time" := AdmissionSchedule."Event Arrival From Time";
-        "Event Arrival Until Time" := AdmissionSchedule."Event Arrival Until Time";
-
-        "Sales From Date (Rel.)" := AdmissionSchedule."Sales From Date (Rel.)";
-        "Sales From Time" := AdmissionSchedule."Sales From Time";
-        "Sales Until Date (Rel.)" := AdmissionSchedule."Sales Until Date (Rel.)";
-        "Sales Until Time" := AdmissionSchedule."Sales Until Time";
     end;
 
     local procedure IfAllowOverride()
     var
         Admission: Record "NPR TM Admission";
     begin
+        // TODO change override
         TestField("Admission Code");
         Admission.Get("Admission Code");
         Admission.TestField("Capacity Limits By", Admission."Capacity Limits By"::OVERRIDE);

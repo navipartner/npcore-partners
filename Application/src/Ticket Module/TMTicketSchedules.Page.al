@@ -83,31 +83,55 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Event Arrival From Time field';
+                    trigger OnValidate()
+                    begin
+                        ConfirmSynchronizationOnce();
+                    end;
                 }
                 field("Event Arrival Until Time"; Rec."Event Arrival Until Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Event Arrival Until Time field';
+                    trigger OnValidate()
+                    begin
+                        ConfirmSynchronizationOnce();
+                    end;
                 }
                 field("Sales From Date (Rel.)"; Rec."Sales From Date (Rel.)")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales From Date (Rel.) field';
+                    trigger OnValidate()
+                    begin
+                        ConfirmSynchronizationOnce();
+                    end;
                 }
                 field("Sales From Time"; Rec."Sales From Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales From Time field';
+                    trigger OnValidate()
+                    begin
+                        ConfirmSynchronizationOnce();
+                    end;
                 }
                 field("Sales Until Date (Rel.)"; Rec."Sales Until Date (Rel.)")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales Until Date (Rel.) field';
+                    trigger OnValidate()
+                    begin
+                        ConfirmSynchronizationOnce();
+                    end;
                 }
                 field("Sales Until Time"; Rec."Sales Until Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales Until Time field';
+                    trigger OnValidate()
+                    begin
+                        ConfirmSynchronizationOnce();
+                    end;
                 }
                 field(Monday; Rec.Monday)
                 {
@@ -148,6 +172,10 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Prebook Is Required field';
+                    trigger OnValidate()
+                    begin
+                        ConfirmSynchronizationOnce();
+                    end;
                 }
                 field("Notify Stakeholder"; Rec."Notify Stakeholder")
                 {
@@ -169,18 +197,6 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Max Capacity Per Sch. Entry field';
                 }
-                field("Reserved For Web"; Rec."Reserved For Web")
-                {
-                    ApplicationArea = NPRTicketAdvanced;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Reserved For Web field';
-                }
-                field("Reserved For Members"; Rec."Reserved For Members")
-                {
-                    ApplicationArea = NPRTicketAdvanced;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Reserved For Members field';
-                }
                 field("Unbookable Before Start (Secs)"; Rec."Unbookable Before Start (Secs)")
                 {
                     ApplicationArea = NPRTicketAdvanced;
@@ -197,11 +213,19 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Capacity Control field';
+                    trigger OnValidate()
+                    begin
+                        ConfirmSynchronizationOnce();
+                    end;
                 }
                 field("Prebook From"; Rec."Prebook From")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Prebook From field';
+                    trigger OnValidate()
+                    begin
+                        ConfirmSynchronizationOnce();
+                    end;
                 }
                 field("Admission Base Calendar Code"; Rec."Admission Base Calendar Code")
                 {
@@ -259,7 +283,16 @@
         }
     }
 
+    local procedure ConfirmSynchronizationOnce()
+    begin
+        if (_ConfirmedScheduleCode <> Rec."Schedule Code") then
+            if (not Rec.ConfirmSync()) then
+                Error('');
+        _ConfirmedScheduleCode := Rec."Schedule Code";
+    end;
+
     var
         _CalendarManager: Codeunit "Calendar Management";
+        _ConfirmedScheduleCode: Code[20];
 }
 

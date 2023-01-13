@@ -86,7 +86,7 @@
 
             trigger OnValidate()
             begin
-                UpdateReccurencePattern();
+                UpdateRecurrencePattern();
             end;
         }
         field(20; "Recurrence Pattern"; Option)
@@ -194,11 +194,17 @@
         {
             Caption = 'Reserved For Web';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Never implemented. Use field "Visibility On Web"';
+
         }
         field(43; "Reserved For Members"; Integer)
         {
             Caption = 'Reserved For Members';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Never implemented. Use field "Visibility On Web"';
+
         }
         field(44; "Capacity Control"; Option)
         {
@@ -305,23 +311,51 @@
 
     trigger OnModify()
     begin
-        UpdateScheduleLines();
+        UpdateAdmissionScheduleLines();
     end;
 
     var
         STOP_TIME: Label 'If your intention is to have a stop time on the next day, please specify event duration instead.';
 
-    local procedure UpdateScheduleLines()
+    local procedure UpdateAdmissionScheduleLines()
     var
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
-        AdmissionScheduleLines.SetFilter("Schedule Code", '=%1', "Schedule Code");
+        AdmissionScheduleLines.SetFilter("Schedule Code", '=%1', Rec."Schedule Code");
         if (AdmissionScheduleLines.FindSet()) then begin
             repeat
                 AdmissionScheduleLines.SyncScheduleSettings(Rec);
                 AdmissionScheduleLines.Modify();
             until (AdmissionScheduleLines.Next() = 0);
         end;
+    end;
+
+    internal procedure ConfirmSync(): Boolean
+    var
+        AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
+        Admission: Record "NPR TM Admission";
+        StringBuffer: TextBuilder;
+        ConfirmChange: Label 'Depending on the "%1" setting on %5, changes will be synchronized to %2 with "%3" value %4. The following %5 are affected: %6.';
+    begin
+        if (Rec."Schedule Code" = '') then
+            exit(true);
+
+        AdmissionScheduleLines.SetFilter("Schedule Code", '=%1', Rec."Schedule Code");
+        if (AdmissionScheduleLines.FindSet()) then begin
+            repeat
+                if (Admission.Get(AdmissionScheduleLines."Admission Code")) then begin
+                    if (Admission."Capacity Limits By" = Admission."Capacity Limits By"::Schedule) then
+                        if (StringBuffer.ToText() = '') then
+                            StringBuffer.Append(Admission."Admission Code")
+                        else
+                            StringBuffer.Append(StrSubstNo(', %1', Admission."Admission Code"));
+                end;
+            until (AdmissionScheduleLines.Next() = 0);
+
+            if (StringBuffer.ToText() <> '') then
+                exit(Confirm(ConfirmChange, true, Admission.FieldCaption("Capacity Limits By"), AdmissionScheduleLines.TableCaption(), AdmissionScheduleLines.FieldCaption("Schedule Code"), AdmissionScheduleLines."Schedule Code", Admission.TableCaption, StringBuffer.ToText()));
+        end;
+        exit(true);
     end;
 
     local procedure UpdateEndAfterDate()
@@ -333,7 +367,7 @@
         end;
     end;
 
-    local procedure UpdateReccurencePattern()
+    local procedure UpdateRecurrencePattern()
     var
         TMAdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
     begin
