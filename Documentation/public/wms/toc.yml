@@ -18,6 +18,8 @@
     href: explanation/fifo_and_lifo.md
   - name: Inventory adjustments
     href: explanation/inventory_adjustments.md
+  - name: MatrixScan inventory counting
+    href: explanation/matrixcount.md
 
 - name: How-to
   items: 
