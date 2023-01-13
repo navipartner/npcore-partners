@@ -76,7 +76,7 @@ codeunit 6059990 "NPR HL Attribute Mgt."
 
     local procedure UpdateHLMemberAttribute(HLMember: Record "NPR HL HeyLoyalty Member"; NPRAttributeValueSet: Record "NPR Attribute Value Set"; var HLMemberAttribute: Record "NPR HL Member Attribute"): Boolean
     begin
-        exit(UpdateHLMemberAttribute(HLMember, NPRAttributeValueSet."Attribute Code", UpperCase(CopyStr(NPRAttributeValueSet."Text Value", 1, 20)), HLMemberAttribute));
+        exit(UpdateHLMemberAttribute(HLMember, NPRAttributeValueSet."Attribute Code", CopyStr(UpperCase(NPRAttributeValueSet."Text Value"), 1, 20), HLMemberAttribute));
     end;
 
     local procedure UpdateHLMemberAttribute(HLMember: Record "NPR HL HeyLoyalty Member"; AttributeCode: Code[20]; AttributeValueCode: Code[20]; var HLMemberAttributeOut: Record "NPR HL Member Attribute"): Boolean

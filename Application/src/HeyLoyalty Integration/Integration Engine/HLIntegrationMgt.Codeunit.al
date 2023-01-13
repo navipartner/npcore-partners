@@ -39,10 +39,12 @@ codeunit 6059993 "NPR HL Integration Mgt."
     procedure InvokeGetHLMemberByEmail(HLMember: Record "NPR HL HeyLoyalty Member"; var ResponseJToken: JsonToken)
     var
         TypeHelper: Codeunit "Type Helper";
+        EmailAddress: Text;
         UrlPlaceholderLbl: Label '%1?filter[email][eq][]=%2', Locked = true;
     begin
         HLMember.TestField("E-mail Address");
-        ResponseJToken.ReadFrom(SendHeyLoyaltyRequest('GET', StrSubstNo(UrlPlaceholderLbl, GetHLMembersUrl(), TypeHelper.UrlEncode(HLMember."E-Mail Address"))));
+        EmailAddress := HLMember."E-Mail Address";
+        ResponseJToken.ReadFrom(SendHeyLoyaltyRequest('GET', StrSubstNo(UrlPlaceholderLbl, GetHLMembersUrl(), TypeHelper.UrlEncode(EmailAddress))));
     end;
 
     [TryFunction]
