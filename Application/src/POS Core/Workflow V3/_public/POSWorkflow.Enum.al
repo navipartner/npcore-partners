@@ -497,6 +497,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SS-START-POS', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR SS Action: Start SelfServ.";
     }
+    value(101; "CURRENT_SALE_STATS")
+    {
+        Caption = 'CURRENT_SALE_STATS', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Cur Sale Stats";
+    }
     value(6014600; BALANCE_V4)
     {
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;

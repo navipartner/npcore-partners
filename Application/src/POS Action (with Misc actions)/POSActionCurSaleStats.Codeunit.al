@@ -1,44 +1,26 @@
-codeunit 6059870 "NPR POS Action: Cur Sale Stats"
+codeunit 6059870 "NPR POS Action: Cur Sale Stats" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-    local procedure ActionCode(): Text[20]
-    begin
-        exit('CURRENT_SALE_STATS');
-    end;
-
-    local procedure ActionVersion(): Code[10]
-    begin
-
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This built-in action opens page with current sale statistics.';
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescription, ActionVersion()) then begin
-            Sender.RegisterWorkflow20('await workflow.respond();');
-        end;
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        POSSale: Record "NPR POS Sale";
-        SalePOS: Codeunit "NPR POS Sale";
-        POSCurrentStatsBuffer: Record "NPR POS Single Stats Buffer";
-        POSStatisticsMgt: Codeunit "NPR POS Statistics Mgt.";
+    local procedure GetActionScript(): Text
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
+        exit(
+        //###NPR_INJECT_FROM_FILE:POSActionCurSaleStats.js###
+        'let main=async({})=>await workflow.respond();'
+        );
+    end;
 
-        Handled := true;
-
-        POSSession.GetSale(SalePOS);
-        SalePOS.GetCurrentSale(POSSale);
-
-        POSStatisticsMgt.FillCurrentStatsBuffer(POSCurrentStatsBuffer, POSSale);
-        Page.RunModal(Page::"NPR POS Current Sale Stats", POSCurrentStatsBuffer);
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    var
+        BusinessLogicRun: Codeunit "NPR POS Action: CurSaleStats-B";
+    begin
+        BusinessLogicRun.RunSalesStatsPage();
     end;
 }
