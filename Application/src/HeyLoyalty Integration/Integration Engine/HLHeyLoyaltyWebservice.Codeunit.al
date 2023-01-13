@@ -6,15 +6,6 @@ codeunit 6059991 "NPR HL HeyLoyalty Webservice"
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
         HLMemberMgt: Codeunit "NPR HL Member Mgt.";
 
-    //#if Debug
-    trigger OnRun()
-    begin
-        //UpsertMember('e24433ec-420c-46ec-92cf-2ac71ef75349');
-        UnsubscribeMember('19af6290-a54a-4ba7-9630-9db447f1b27c');
-    end;
-    //#endif
-
-
     procedure UnsubscribeMember(HeyLoyaltyId: Text)
     var
         HLMember: Record "NPR HL HeyLoyalty Member";
@@ -49,6 +40,7 @@ codeunit 6059991 "NPR HL HeyLoyalty Webservice"
     begin
         if HeyLoyaltyId = '' then
             exit;
+        HLMemberMgt.CheckHeyLoyaltyIdMaxLength(HeyLoyaltyId);
         if not HLIntegrationMgt.InvokeGetHLMemberByID(HeyLoyaltyId, HLMemberJToken) then
             exit;
 
@@ -59,7 +51,7 @@ codeunit 6059991 "NPR HL HeyLoyalty Webservice"
             if not GetHLMemberByEmailAddress(HLMember) then begin
                 HLMember.Init();
                 HLMember."Entry No." := 0;
-                HLMember."HeyLoyalty Id" := HeyLoyaltyId;
+                HLMember."HeyLoyalty Id" := CopyStr(HeyLoyaltyId, 1, MaxStrLen(HLMember."HeyLoyalty Id"));
                 HLMember.Insert(true);
             end else
                 if (HLMember."HeyLoyalty Id" <> HeyLoyaltyId) and (HLMember."HeyLoyalty Id" <> '') then
