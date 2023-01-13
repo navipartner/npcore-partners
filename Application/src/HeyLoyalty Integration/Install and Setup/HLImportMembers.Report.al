@@ -78,17 +78,17 @@ report 6014461 "NPR HL Import Members"
     end;
 
     [TryFunction]
-    local procedure ReadWorksheetHeaders(var TempExcelBuffer: Record "Excel Buffer" temporary; var Headers: Dictionary of [Integer, Text])
+    local procedure ReadWorksheetHeaders(var ExcelBuffer: Record "Excel Buffer"; var Headers: Dictionary of [Integer, Text])
     begin
         Clear(Headers);
-        TempExcelBuffer.SetRange("Row No.", 1);
-        TempExcelBuffer.FindSet();
+        ExcelBuffer.SetRange("Row No.", 1);
+        ExcelBuffer.FindSet();
         repeat
-            Headers.Add(TempExcelBuffer."Column No.", TempExcelBuffer."Cell Value as Text");
-        until TempExcelBuffer.Next() = 0;
+            Headers.Add(ExcelBuffer."Column No.", ExcelBuffer."Cell Value as Text");
+        until ExcelBuffer.Next() = 0;
     end;
 
-    local procedure ProcessWorksheetRow(var TempExcelBuffer: Record "Excel Buffer" temporary; RowNo: Integer; Headers: Dictionary of [Integer, Text]): Boolean
+    local procedure ProcessWorksheetRow(var ExcelBuffer: Record "Excel Buffer"; RowNo: Integer; Headers: Dictionary of [Integer, Text]): Boolean
     var
         HLMember: Record "NPR HL HeyLoyalty Member";
         HLMemberEssensialValuesIn: Record "NPR HL HeyLoyalty Member";
@@ -102,27 +102,27 @@ report 6014461 "NPR HL Import Members"
         EmailNotFoundErr: Label 'Email address could not be found. Worksheet row No. %1', Comment = '%1 - excell worksheet row number';
         IdNotFoundErr: Label 'HeyLoyalty ID could not be found. Worksheet row No. %1', Comment = '%1 - excell worksheet row number';
     begin
-        TempExcelBuffer.SetRange("Row No.", RowNo);
-        if TempExcelBuffer.FindSet() then
+        ExcelBuffer.SetRange("Row No.", RowNo);
+        if ExcelBuffer.FindSet() then
             repeat
-                Headers.Get(TempExcelBuffer."Column No.", ColumnName);
+                Headers.Get(ExcelBuffer."Column No.", ColumnName);
                 case ColumnName of
                     'id',
                     'opt_in', 'opt_in_date',
                     'last_open', 'last_click', 'open_rate', 'click_rate',
                     'reference_from', 'deleted_from':
-                        HLMemberJObject.Add(ColumnName, TempExcelBuffer."Cell Value as Text");
+                        HLMemberJObject.Add(ColumnName, ExcelBuffer."Cell Value as Text");
 
                     'created_at', 'updated_at', 'unsubscribed_at':
                         begin
-                            if Evaluate(DateTimeAsDecimal, TempExcelBuffer."Cell Value as Text", 9) then
-                                HLMemberJObject.Add(ColumnName, TempExcelBuffer.ConvertDateTimeDecimalToDateTime(DateTimeAsDecimal))
+                            if Evaluate(DateTimeAsDecimal, ExcelBuffer."Cell Value as Text", 9) then
+                                HLMemberJObject.Add(ColumnName, ExcelBuffer.ConvertDateTimeDecimalToDateTime(DateTimeAsDecimal))
                             else
-                                HLMemberJObject.Add(ColumnName, TempExcelBuffer."Cell Value as Text");
+                                HLMemberJObject.Add(ColumnName, ExcelBuffer."Cell Value as Text");
                         end;
 
                     'status', 'status_email':
-                        AddStatus(HLMemberStatusesJObject, ColumnName, TempExcelBuffer."Cell Value as Text");
+                        AddStatus(HLMemberStatusesJObject, ColumnName, ExcelBuffer."Cell Value as Text");
 
                     'sent_mail', 'sent_sms', 'sent_push',
                     'open_count', 'open_count_push', 'click_count',
@@ -130,9 +130,9 @@ report 6014461 "NPR HL Import Members"
                         ;
 
                     else
-                        AddField(HLMemberFieldsJObject, ColumnName, TempExcelBuffer."Cell Value as Text");
+                        AddField(HLMemberFieldsJObject, ColumnName, ExcelBuffer."Cell Value as Text");
                 end;
-            until TempExcelBuffer.Next() = 0;
+            until ExcelBuffer.Next() = 0;
 
         HLMemberJObject.Add('status', HLMemberStatusesJObject);
         HLMemberJObject.Add('fields', HLMemberFieldsJObject);

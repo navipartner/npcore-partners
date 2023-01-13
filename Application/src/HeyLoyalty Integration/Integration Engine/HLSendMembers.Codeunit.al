@@ -182,14 +182,18 @@ codeunit 6059997 "NPR HL Send Members"
     procedure GetHeyLoyaltyMemberID(HLMember: Record "NPR HL HeyLoyalty Member"; WithError: Boolean): Text[50]
     var
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
+        HLMemberMgt: Codeunit "NPR HL Member Mgt.";
         JsonHelper: Codeunit "NPR Json Helper";
         ResponseJToken: JsonToken;
+        HeyLoyaltyId: Text;
     begin
         if not HLIntegrationMgt.InvokeGetHLMemberByEmail(HLMember, ResponseJToken) then begin
             if WithError then
                 Error(GetLastErrorText());
             exit('');
         end;
-        exit(JsonHelper.GetJText(ResponseJToken, 'members[0].id', 50, WithError));
+        HeyLoyaltyId := JsonHelper.GetJText(ResponseJToken, 'members[0].id', WithError);
+        HLMemberMgt.CheckHeyLoyaltyIdMaxLength(HeyLoyaltyId);
+        exit(CopyStr(HeyLoyaltyId, 1, 50));
     end;
 }

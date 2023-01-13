@@ -99,9 +99,9 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
         NcTask."Entry No." := 0;
         NcTask."Task Processor Code" := GetHeyLoyaltyTaskProcessorCode();
         NcTask.Type := TaskType;
-        NcTask."Company Name" := CompanyName;
+        NcTask."Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(NcTask."Company Name"));
         NcTask."Table No." := RecRef.Number;
-        NcTask."Table Name" := RecRef.Name;
+        NcTask."Table Name" := CopyStr(RecRef.Name, 1, MaxStrLen(NcTask."Table Name"));
         NcTask."Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(NcTask."Record Position"));
         NcTask."Record ID" := RecRef.RecordId;
         NcTask."Record Value" := CopyStr(TaskRecordValue, 1, MaxStrLen(NcTask."Record Value"));

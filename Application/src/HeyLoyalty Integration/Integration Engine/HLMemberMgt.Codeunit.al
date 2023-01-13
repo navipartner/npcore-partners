@@ -349,9 +349,11 @@ codeunit 6059995 "NPR HL Member Mgt."
                             'email', 'mobile':
                                 ;
                             'firstname':
+#pragma warning disable AA0139
                                 HLMember."First Name" := JsonHelper.GetJText(HLMemberJToken, 'fields.firstname.value', MaxStrLen(HLMember."First Name"), false);
                             'lastname':
                                 HLMember."Last Name" := JsonHelper.GetJText(HLMemberJToken, 'fields.lastname.value', MaxStrLen(HLMember."Last Name"), false);
+#pragma warning restore
                             'birthdate':
                                 HLMember.Birthday := JsonHelper.GetJDate(HLMemberJToken, 'fields.birthdate.value', false);
                             'sex':
@@ -362,22 +364,28 @@ codeunit 6059995 "NPR HL Member Mgt."
                                         HLMember.Gender := HLMember.Gender::FEMALE;
                                 end;
                             'address':
+#pragma warning disable AA0139
                                 HLMember.Address := JsonHelper.GetJText(HLMemberJToken, 'fields.address.value', MaxStrLen(HLMember.Address), false);
                             'postalcode':
                                 HLMember."Post Code Code" := JsonHelper.GetJText(HLMemberJToken, 'fields.postalcode.value', MaxStrLen(HLMember."Post Code Code"), false);
                             'city':
                                 HLMember.City := JsonHelper.GetJText(HLMemberJToken, 'fields.city.value', MaxStrLen(HLMember.City), false);
+#pragma warning restore
                             'country':
                                 begin
                                     HLCountryID := JsonHelper.GetJText(HLMemberJToken, 'fields.country.value', false);
                                     HLMember."HL Country ID" := CopyStr(HLCountryID, 1, MaxStrLen(HLMember."HL Country ID"));
+#pragma warning disable AA0139
                                     HLMember."HL Country Name" := JsonHelper.GetJText(HLMemberJToken, StrSubstNo('fields.country.options.%1', HLCountryID), MaxStrLen(HLMember."HL Country Name"), false);
+#pragma warning restore
                                     HLMember."Country Code" := HLMember.FindCountryCode();
                                 end;
                             MembershipHLFieldID:
                                 begin
+#pragma warning disable AA0139
                                     HLMember."HL Membership Name" :=
                                         JsonHelper.GetJText(HLMemberJToken, StrSubstNo('fields.%1.value', HLIntegrationMgt.HLMembershipCodeFieldID()), MaxStrLen(HLMember."HL Membership Name"), false);
+#pragma warning restore
                                     MembershipSetup.SetRange("HeyLoyalty Name", HLMember."HL Membership Name");
                                     if MembershipSetup.FindFirst() then begin
                                         HLMember."Membership Code" := MembershipSetup.Code;
@@ -426,9 +434,11 @@ codeunit 6059995 "NPR HL Member Mgt."
     begin
         HLMember."HeyLoyalty Id" := GetHeyLoyaltyIDFromResponse(HLMemberJToken, HLMember."HeyLoyalty Id");
         HLMember."E-Mail Address" := GetEmailFromResponse(HLMemberJToken, Mandatory, HLMember."E-Mail Address");
+#pragma warning disable AA0139
         HLMember."Phone No." := JsonHelper.GetJText(HLMemberJToken, 'fields.mobile.value', MaxStrLen(HLMember."Phone No."), false, HLMember."Phone No.");
 
         HLMember."HL Member Status" := LowerCase(JsonHelper.GetJText(HLMemberJToken, 'status.status', MaxStrLen(HLMember."HL Member Status"), false, HLMember."HL Member Status"));
+#pragma warning restore
         case LowerCase(JsonHelper.GetJText(HLMemberJToken, 'status.email', false)) of
             '', 'active', 'null':
                 HLMember."HL E-mail Status" := HLMember."HL E-mail Status"::Active;
@@ -443,13 +453,19 @@ codeunit 6059995 "NPR HL Member Mgt."
     end;
 
     procedure GetHeyLoyaltyIDFromResponse(HeyLoyaltyResponse: JsonToken; DefaultID: Text[50]): Text[50]
+    var
+        HeyLoyaltyId: Text;
     begin
-        exit(JsonHelper.GetJText(HeyLoyaltyResponse, 'id', 50, DefaultID = '', DefaultID));
+        HeyLoyaltyId := JsonHelper.GetJText(HeyLoyaltyResponse, 'id', DefaultID = '', DefaultID);
+        CheckHeyLoyaltyIdMaxLength(HeyLoyaltyId);
+        exit(CopyStr(HeyLoyaltyId, 1, 50));
     end;
 
     procedure GetEmailFromResponse(HeyLoyaltyResponse: JsonToken; Mandatory: Boolean; DefaultEmail: Text[80]): Text[80]
     begin
+#pragma warning disable AA0139
         exit(JsonHelper.GetJText(HeyLoyaltyResponse, 'fields.email.value', 80, Mandatory and (DefaultEmail = ''), DefaultEmail));
+#pragma warning restore
     end;
 
     procedure GetUnsubscribedAtFromResponse(HeyLoyaltyResponse: JsonToken; DefaultValue: DateTime): DateTime
@@ -542,6 +558,14 @@ codeunit 6059995 "NPR HL Member Mgt."
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR HL Member Mgt.");
+    end;
+
+    procedure CheckHeyLoyaltyIdMaxLength(HeyLoyaltyId: Text)
+    var
+        TooLongIDErr: Label 'Error reading HeyLoyalty ID "%1". Maximum allowed length for a HeyLoyalty ID is %2 characters.', Comment = '%1 - HeyLoyalty ID; %2 - Maximum number of characters';
+    begin
+        if StrLen(HeyLoyaltyId) > 50 then
+            Error(TooLongIDErr, HeyLoyaltyId, 50);
     end;
 
     procedure DoInitialSync(var Member: Record "NPR MM Member"; WithDialog: Boolean)
