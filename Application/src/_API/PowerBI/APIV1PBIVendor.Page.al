@@ -60,6 +60,10 @@ page 6059980 "NPR APIV1 PBIVendor"
                 {
                     Caption = 'Global Dimension 2 Code', Locked = true;
                 }
+                field(payToVendorNo; Rec."Pay-to Vendor No.")
+                {
+                    Caption = 'Pay-to Vendor No.', Locked = true;
+                }
             }
         }
     }
