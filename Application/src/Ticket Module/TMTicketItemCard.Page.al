@@ -8,6 +8,7 @@ page 6059884 "NPR TM Ticket Item Card"
     InsertAllowed = false;
     DeleteAllowed = false;
     ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    Caption = 'Ticket Item Card';
 
     layout
     {

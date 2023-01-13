@@ -296,7 +296,7 @@
         AdmissionScheduleLines.MODIFYALL("Concurrency Code", ConcurrencyCode);
     end;
 
-    procedure CreateAdmissionCode(AdmissionCode: Code[20]; Description: text[50]; AdmissionType: Option; CapacityLimit: Option; DefaultSchedule: Option): code[20]
+    procedure CreateAdmissionCode(AdmissionCode: Code[20]; Description: text[50]; AdmissionType: Option; CapacityLimit: Enum "NPR TM CapacityLimit"; DefaultSchedule: Option): code[20]
     var
         Admission: Record "NPR TM Admission";
     begin

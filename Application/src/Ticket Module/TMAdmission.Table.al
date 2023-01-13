@@ -32,12 +32,10 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR TM Admission" WHERE(Type = CONST(LOCATION));
         }
-        field(20; "Capacity Limits By"; Option)
+        field(20; "Capacity Limits By"; Enum "NPR TM CapacityLimit")
         {
             Caption = 'Capacity Limits By';
             DataClassification = CustomerContent;
-            OptionCaption = 'Admission,Schedule,Override';
-            OptionMembers = ADMISSION,SCHEDULE,OVERRIDE;
         }
         field(21; "Default Schedule"; Option)
         {
@@ -60,11 +58,15 @@
         {
             Caption = 'Reserved For Web';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Never implemented. Use field "Visibility On Web"';
         }
         field(43; "Reserved For Members"; Integer)
         {
             Caption = 'Reserved For Members';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Never implemented. Use field "Visibility On Web"';
         }
         field(44; "Capacity Control"; Option)
         {
@@ -155,6 +157,36 @@
             Caption = 'Ticket Base Calendar Code';
             DataClassification = CustomerContent;
             TableRelation = "Base Calendar";
+        }
+        field(150; "Event Arrival From Time"; Time)
+        {
+            Caption = 'Event Arrival From Time';
+            DataClassification = CustomerContent;
+        }
+        field(151; "Event Arrival Until Time"; Time)
+        {
+            Caption = 'Event Arrival Until Time';
+            DataClassification = CustomerContent;
+        }
+        field(160; "Sales From Date (Rel.)"; DateFormula)
+        {
+            Caption = 'Sales From Date (Rel.)';
+            DataClassification = CustomerContent;
+        }
+        field(162; "Sales From Time"; Time)
+        {
+            Caption = 'Sales From Time';
+            DataClassification = CustomerContent;
+        }
+        field(163; "Sales Until Date (Rel.)"; DateFormula)
+        {
+            Caption = 'Sales Until Date (Rel.)';
+            DataClassification = CustomerContent;
+        }
+        field(165; "Sales Until Time"; Time)
+        {
+            Caption = 'Sales Until Time';
+            DataClassification = CustomerContent;
         }
         field(210; "eTicket Type Code"; Text[30])
         {

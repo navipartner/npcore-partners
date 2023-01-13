@@ -88,7 +88,7 @@ page 6059885 "NPR TM Ticket BOM Part"
                 Scope = Repeater;
                 Caption = 'Admission';
                 Image = WorkCenter;
-                RunObject = Page "NPR TM Ticket Admissions";
+                RunObject = Page "NPR TM Admission Card";
                 RunPageLink = "Admission Code" = field("Admission Code");
             }
             Action(NavigateAdmissionsSchedules)

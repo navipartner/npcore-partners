@@ -25,6 +25,12 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Schedule Code field';
                 }
+                field("Capacity Limit By"; Rec."Capacity Limit By")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Schedule Code field';
+                    Editable = false;
+                }
                 field("Visibility On Web"; Rec."Visibility On Web")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -49,18 +55,6 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Max Capacity Per Sch. Entry field';
-                }
-                field("Reserved For Web"; Rec."Reserved For Web")
-                {
-                    ApplicationArea = NPRTicketAdvanced;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Reserved For Web field';
-                }
-                field("Reserved For Members"; Rec."Reserved For Members")
-                {
-                    ApplicationArea = NPRTicketAdvanced;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Reserved For Members field';
                 }
                 field("Capacity Control"; Rec."Capacity Control")
                 {
