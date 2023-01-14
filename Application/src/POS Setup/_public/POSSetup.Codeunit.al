@@ -22,6 +22,8 @@
     #region Initialization
 
     procedure Initialize()
+    var
+        Handled: Boolean;
     begin
         if (Initialized) then
             exit;
@@ -32,14 +34,15 @@
             UserSetup.Insert();
         end;
 
-        if (UserSetup."NPR POS Unit No." = '') or (not POSUnitRec.Get(UserSetup."NPR POS Unit No.")) then begin
-            Commit();
-            while (not (Page.RunModal(Page::"NPR POS Unit Selection", POSUnitRec) = Action::LookupOK)) do;
-            UserSetup."NPR POS Unit No." := POSUnitRec."No.";
-            UserSetup.Modify();
-        end;
+        OnBeforeSetPOSUnitOnInitalize(UserSetup, POSUnitRec, Handled);
+        if not Handled then
+            if (UserSetup."NPR POS Unit No." = '') or (not POSUnitRec.Get(UserSetup."NPR POS Unit No.")) then begin
+                Commit();
+                while (not (Page.RunModal(Page::"NPR POS Unit Selection", POSUnitRec) = Action::LookupOK)) do;
+                UserSetup."NPR POS Unit No." := POSUnitRec."No.";
+                UserSetup.Modify();
+            end;
 
-        POSUnitRec.Get(UserSetup."NPR POS Unit No.");
         SetPOSUnit(POSUnitRec);
 
         Initialized := true;
@@ -434,10 +437,15 @@
     #endregion "Action Settings"
 
     #region events
-    
+
     [Obsolete('Not used anymore.')]
     [IntegrationEvent(true, false)]
     local procedure OnGetLockTimeout(POSSecurtyProfile: Record "NPR POS Security Profile"; var LockTimeoutInSeconds: Integer; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSetPOSUnitOnInitalize(var UserSetup: Record "User Setup"; var POSUnitRec: Record "NPR POS Unit"; var Handled: Boolean)
     begin
     end;
     #endregion events

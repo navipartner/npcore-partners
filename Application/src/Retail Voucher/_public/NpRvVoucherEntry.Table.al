@@ -156,5 +156,11 @@
         key(Key6; "Entry Type", "Document Type", "Document No.", "Document Line No.")
         {
         }
+        key(Key7; "Voucher No.", Open, Positive)
+        {
+        }
+        key(Key8; "Voucher No.", "Entry Type", "Partner Code")
+        {
+        }
     }
 }

@@ -21,7 +21,6 @@ codeunit 88001 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
         POSPaymentMethod: Record "NPR POS Payment Method";
         BCPTTestContext: Codeunit "BCPT Test Context";
         POSSession: Codeunit "NPR POS Session";
-        LibraryRandom: Codeunit "NPR Library - Random";
         POSMockLibrary: Codeunit "NPR Library - POS Mock";
         LibraryEFT: Codeunit "NPR Library - EFT";
         POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
@@ -39,16 +38,11 @@ codeunit 88001 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
         NoSeriesLine: Record "No. Series Line";
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
+        BCPTInitializeDataSetup: Record "NPR BCPT Initialize Data Setup";
     begin
         POSPaymentMethod.Get('T');
         Item.Get('100CHIMSTA');
         Item2.Get('100DFTBLK');
-
-        POSUnit.Get('01');
-        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
-        POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
-        if not EFTSetup.Get(POSPaymentMethod.Code, POSUnit."No.") then
-            LibraryEFT.CreateMockEFTSetup(EFTSetup, POSUnit."No.", POSPaymentMethod.Code);
 
         if Evaluate(NoOfSales, BCPTTestContext.GetParameter(NoOfSalesParamLbl)) then;
         if Evaluate(NoOfLinesPerSale, BCPTTestContext.GetParameter(NoOfLinesPerSaleParamLbl)) then;
@@ -64,33 +58,27 @@ codeunit 88001 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
         if NoOfLinesPerSale > 1000 then
             NoOfLinesPerSale := 1000;
 
-        CreateBarCodeItemReference(BarCodeItemReference, Item);
-        CreateBarCodeItemReference(BarCodeItemReference2, Item2);
+        POSMasterDataLibrary.CreateBarCodeItemReference(BarCodeItemReference, Item);
+        POSMasterDataLibrary.CreateBarCodeItemReference(BarCodeItemReference2, Item2);
 
-        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        POSAuditProfile.Get('DEFAULT');
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
-        NoSeriesLine.FindFirst();
-        NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
-        NoSeriesLine.Modify();
+        NoSeriesLine.FindSet(true, true);
+        repeat
+            if AllowGapsInSaleFiscalNoSeries <> NoSeriesLine."Allow Gaps in Nos." then begin
+                NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
+                NoSeriesLine.Modify(true);
+            end;
+        until NoSeriesLine.Next() = 0;
 
         Commit();
-    end;
-
-    local procedure CreateBarCodeItemReference(var NewItemReference: Record "Item Reference"; Item: Record Item)
-    begin
-        NewItemReference.SetCurrentKey("Reference Type", "Reference No.");
-        NewItemReference.SetRange("Reference Type", NewItemReference."Reference Type"::"Bar Code");
-        NewItemReference.SetRange("Item No.", Item."No.");
-        if NewItemReference.Count() > 1 then
-            NewItemReference.DeleteAll();
-
-        if not NewItemReference.FindFirst() then begin
-            NewItemReference.Init();
-            NewItemReference."Item No." := Item."No.";
-            NewItemReference."Reference Type" := NewItemReference."Reference Type"::"Bar Code";
-            NewItemReference."Reference No." := LibraryRandom.RandText(50);
-            NewItemReference.Insert(true);
-        end;
+        BCPTInitializeDataSetup.FindNextPOSUnit(POSUnit);
+        Commit();
+        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
+        POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
+        if not EFTSetup.Get(POSPaymentMethod.Code, POSUnit."No.") then
+            LibraryEFT.CreateMockEFTSetup(EFTSetup, POSUnit."No.", POSPaymentMethod.Code);
+        Commit();
     end;
 
     local procedure CreateDirectSalesWithEFT()
@@ -115,7 +103,6 @@ codeunit 88001 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
         BCPTTestContext.StartScenario('Start Sale');
         POSSession.StartTransaction();
         BCPTTestContext.EndScenario('Start Sale');
-        Commit();
         BCPTTestContext.UserWait();
     end;
 
@@ -136,7 +123,6 @@ codeunit 88001 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
             end;
             if i = 1 then
                 BCPTTestContext.EndScenario('Add Sale Line');
-            Commit();
             BCPTTestContext.UserWait();
         end;
     end;
@@ -160,7 +146,6 @@ codeunit 88001 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
         SalePOS.GetCurrentSale(POSSale);
         EFTTransactionMgt.StartPayment(EFTSetup, AmountToPay, '', POSSale);
         BCPTTestContext.EndScenario('Pay Sale');
-        Commit();
         BCPTTestContext.UserWait();
     end;
 

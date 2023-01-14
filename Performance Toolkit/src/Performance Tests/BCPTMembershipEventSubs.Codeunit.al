@@ -8,7 +8,7 @@ codeunit 88100 "NPR BCPT Membership Event Subs"
         repeat
             if MemberInfoCapture."E-Mail Address" = '' then begin
                 MemberInfoCapture."E-Mail Address" := GenerateRandomEmail();
-                MemberInfoCapture.Modify(true);
+                MemberInfoCapture.Modify();
             end;
         until MemberInfoCapture.Next() = 0;
 
