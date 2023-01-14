@@ -28,4 +28,8 @@ enumextension 88000 "NPR BCPT Test Param. Enum" extends "BCPT Test Param. Enum"
     {
         Implementation = "BCPT Test Param. Provider" = "NPR BCPT POS DS Create Member";
     }
+    value(88007; "NPR BCPT Initialize Data")
+    {
+        Implementation = "BCPT Test Param. Provider" = "NPR BCPT Initialize Data";
+    }
 }

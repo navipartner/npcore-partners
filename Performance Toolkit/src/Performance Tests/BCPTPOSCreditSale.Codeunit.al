@@ -19,7 +19,6 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         BarCodeItemReference, BarCodeItemReference2 : Record "Item Reference";
         BCPTTestContext: Codeunit "BCPT Test Context";
         POSSession: Codeunit "NPR POS Session";
-        LibraryRandom: Codeunit "NPR Library - Random";
         POSMockLibrary: Codeunit "NPR Library - POS Mock";
         POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
@@ -32,18 +31,15 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
 
     local procedure InitTest();
     var
+        SalesSetup: Record "Sales & Receivables Setup";
         Salesperson: Record "Salesperson/Purchaser";
         NoSeriesLine: Record "No. Series Line";
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
+        BCPTInitializeDataSetup: Record "NPR BCPT Initialize Data Setup";
     begin
         Item.Get('100CHIMSTA');
         Item2.Get('100DFTBLK');
-
-        POSUnit.Get('01');
-        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
-        Salesperson.Get('1');
-        POSMockLibrary.InitializePOSSession(POSSession, POSUnit, Salesperson);
 
         if Evaluate(NoOfSales, BCPTTestContext.GetParameter(NoOfSalesParamLbl)) then;
         if Evaluate(NoOfLinesPerSale, BCPTTestContext.GetParameter(NoOfLinesPerSaleParamLbl)) then;
@@ -59,33 +55,38 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         if NoOfLinesPerSale > 1000 then
             NoOfLinesPerSale := 1000;
 
-        CreateBarCodeItemReference(BarCodeItemReference, Item);
-        CreateBarCodeItemReference(BarCodeItemReference2, Item2);
+        POSMasterDataLibrary.CreateBarCodeItemReference(BarCodeItemReference, Item);
+        POSMasterDataLibrary.CreateBarCodeItemReference(BarCodeItemReference2, Item2);
 
-        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        POSAuditProfile.Get('DEFAULT');
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
-        NoSeriesLine.FindFirst();
-        NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
-        NoSeriesLine.Modify();
+        NoSeriesLine.FindSet(true, true);
+        repeat
+            if AllowGapsInSaleFiscalNoSeries <> NoSeriesLine."Allow Gaps in Nos." then begin
+                NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
+                NoSeriesLine.Modify(true);
+            end;
+        until NoSeriesLine.Next() = 0;
+
+        SalesSetup.Get();
+        SalesSetup.TestField("Order Nos.");
+        NoSeriesLine.SetRange("Series Code", SalesSetup."Order Nos.");
+        NoSeriesLine.FindSet(true, true);
+        repeat
+            if NoSeriesLine."Ending No." <> '' then begin
+                NoSeriesLine."Ending No." := '';
+                NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+                NoSeriesLine.Modify(true);
+            end;
+        until NoSeriesLine.Next() = 0;
 
         Commit();
-    end;
-
-    local procedure CreateBarCodeItemReference(var NewItemReference: Record "Item Reference"; Item: Record Item)
-    begin
-        NewItemReference.SetCurrentKey("Reference Type", "Reference No.");
-        NewItemReference.SetRange("Reference Type", NewItemReference."Reference Type"::"Bar Code");
-        NewItemReference.SetRange("Item No.", Item."No.");
-        if NewItemReference.Count() > 1 then
-            NewItemReference.DeleteAll();
-
-        if not NewItemReference.FindFirst() then begin
-            NewItemReference.Init();
-            NewItemReference."Item No." := Item."No.";
-            NewItemReference."Reference Type" := NewItemReference."Reference Type"::"Bar Code";
-            NewItemReference."Reference No." := LibraryRandom.RandText(50);
-            NewItemReference.Insert(true);
-        end;
+        BCPTInitializeDataSetup.FindNextPOSUnit(POSUnit);
+        Commit();
+        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
+        Salesperson.Get('1');
+        POSMockLibrary.InitializePOSSession(POSSession, POSUnit, Salesperson);
+        Commit();
     end;
 
     local procedure CreateCreditSales()
@@ -109,7 +110,6 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         BCPTTestContext.StartScenario('Start Sale');
         POSSession.StartTransaction();
         BCPTTestContext.EndScenario('Start Sale');
-        Commit();
         BCPTTestContext.UserWait();
     end;
 
@@ -127,7 +127,6 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
                 POSMockLibrary.CreateItemLine(POSSession, Item2, BarCodeItemReference2, ItemIdentifierType::ItemCrossReference, 1);
             if i = 1 then
                 BCPTTestContext.EndScenario('Add Sale Line');
-            Commit();
             BCPTTestContext.UserWait();
         end;
     end;
@@ -142,10 +141,9 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         BCPTTestContext.StartScenario('Select Customer');
         POSSession.GetSale(SalePOS);
         SalePOS.GetCurrentSale(POSSale);
-        Customer.Get('10000');
+        Customer.Next((SessionId() mod 4) + 1);
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
         BCPTTestContext.EndScenario('Select Customer');
-        Commit();
         BCPTTestContext.UserWait();
     end;
 
@@ -161,7 +159,6 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         SalesDocumentExportMgt.SetShip(true);
         SalesDocumentExportMgt.ProcessPOSSale(SalePOS);
         BCPTTestContext.EndScenario('Export Sale');
-        Commit();
         BCPTTestContext.UserWait();
     end;
 

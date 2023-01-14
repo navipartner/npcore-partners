@@ -34,13 +34,10 @@ codeunit 88003 "NPR BCPT POS DS Voucher Issue" implements "BCPT Test Param. Prov
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
         NoSeriesLine: Record "No. Series Line";
+        BCPTInitializeDataSetup: Record "NPR BCPT Initialize Data Setup";
     begin
         POSPaymentMethod.Get('K');
         VoucherType.Get('CREDITVOUCHER');
-
-        POSUnit.Get('01');
-        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
-        POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
 
         if Evaluate(NoOfSales, BCPTTestContext.GetParameter(NoOfSalesParamLbl)) then;
         if Evaluate(PostSale, BCPTTestContext.GetParameter(PostSaleParamLbl)) then;
@@ -51,12 +48,21 @@ codeunit 88003 "NPR BCPT POS DS Voucher Issue" implements "BCPT Test Param. Prov
         if NoOfSales > 1000 then
             NoOfSales := 1000;
 
-        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        POSAuditProfile.Get('DEFAULT');
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
-        NoSeriesLine.FindFirst();
-        NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
-        NoSeriesLine.Modify();
+        NoSeriesLine.FindSet(true, true);
+        repeat
+            if AllowGapsInSaleFiscalNoSeries <> NoSeriesLine."Allow Gaps in Nos." then begin
+                NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
+                NoSeriesLine.Modify(true);
+            end;
+        until NoSeriesLine.Next() = 0;
 
+        Commit();
+        BCPTInitializeDataSetup.FindNextPOSUnit(POSUnit);
+        Commit();
+        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
+        POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
         Commit();
     end;
 
@@ -83,7 +89,6 @@ codeunit 88003 "NPR BCPT POS DS Voucher Issue" implements "BCPT Test Param. Prov
         BCPTTestContext.StartScenario('Start Sale');
         POSSession.StartTransaction();
         BCPTTestContext.EndScenario('Start Sale');
-        Commit();
         BCPTTestContext.UserWait();
     end;
 
@@ -92,7 +97,6 @@ codeunit 88003 "NPR BCPT POS DS Voucher Issue" implements "BCPT Test Param. Prov
         BCPTTestContext.StartScenario('Add Voucher Line');
         POSMockLibrary.CreateVoucherLine(POSSession, VoucherType.Code, 1, AmountToPay, '', 0);
         BCPTTestContext.EndScenario('Add Voucher Line');
-        Commit();
         BCPTTestContext.UserWait();
     end;
 
@@ -101,7 +105,6 @@ codeunit 88003 "NPR BCPT POS DS Voucher Issue" implements "BCPT Test Param. Prov
         BCPTTestContext.StartScenario('Pay Sale');
         POSMockLibrary.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '', PostSale);
         BCPTTestContext.EndScenario('Pay Sale');
-        Commit();
         BCPTTestContext.UserWait();
     end;
 

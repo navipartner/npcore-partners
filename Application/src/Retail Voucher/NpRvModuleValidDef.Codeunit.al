@@ -2,23 +2,14 @@
 {
     Access = Internal;
 
-    var
-        Text000: Label 'Validate Voucher - Default';
-        Text001: Label 'Voucher is being used';
-        Text002: Label 'The voucher has already been used. No amount remains on the voucher.';
-        Text003: Label 'Voucher is not valid yet';
-        Text004: Label 'Voucher is not valid anymore';
-        Text005: Label 'Invalid Reference No. %1';
-        VourcherRedeemedErr: Label 'The voucher with Reference No. %1 has already been redeemed in another transaction on %2.', Comment = '%1 - voucher reference number, 2% - date';
-
     procedure ValidateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
-        ArchvoucherEntry: record "NPR NpRv Arch. Voucher Entry";
+        ArchvoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
         Voucher: Record "NPR NpRv Voucher";
-        VoucherType: Record "NPR NpRv Voucher Type";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        Timestamp: DateTime;
+        VourcherRedeemedErr: Label 'The voucher with Reference No. %1 has already been redeemed in another transaction on %2.', Comment = '%1 - voucher reference number, 2% - date';
+        InvalidReferenceErr: Label 'Invalid Reference No. %1', Comment = '%1 - Reference Number value';
     begin
         if not NpRvVoucherMgt.FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", Voucher) then begin
             if NpRvVoucherMgt.FindArchivedVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", ArchVoucher) then begin
@@ -27,48 +18,59 @@
                 if ArchvoucherEntry.FindLast() then;
                 Error(VourcherRedeemedErr, TempNpRvVoucherBuffer."Reference No.", ArchvoucherEntry."Posting Date");
             end else
-                Error(Text005, TempNpRvVoucherBuffer."Reference No.");
+                Error(InvalidReferenceErr, TempNpRvVoucherBuffer."Reference No.");
         end;
+
+        CheckVoucher(Voucher);
         NpRvVoucherMgt.Voucher2Buffer(Voucher, TempNpRvVoucherBuffer);
-        VoucherType.Get(TempNpRvVoucherBuffer."Voucher Type");
-        VoucherType.TestField("Payment Type");
-        if Voucher.CalcInUseQty() > 0 then
-            Error(Text001);
+    end;
 
-        Voucher.CalcFields(Open);
-
-        if not Voucher.Open then
-            Error(Text002);
+    local procedure CheckVoucher(var Voucher: Record "NPR NpRv Voucher")
+    var
+        IsHandled: Boolean;
+        Timestamp: DateTime;
+        VoucherAlreadyUsedErr: Label 'The voucher has already been used. No amount remains on the voucher.';
+        VoucherBeingUsedErr: Label 'Voucher is being used.';
+        VoucherNotValidAnymoreErr: Label 'Voucher is not valid anymore.';
+        VoucherNotValidYetErr: Label 'Voucher is not valid yet.';
+    begin
+        OnBeforeCheckVoucher(Voucher, IsHandled);
+        if IsHandled then
+            exit;
 
         Timestamp := CurrentDateTime;
         if Voucher."Starting Date" > Timestamp then
-            Error(Text003);
+            Error(VoucherNotValidYetErr);
 
         if (Voucher."Ending Date" < Timestamp) and (Voucher."Ending Date" <> 0DT) then
-            Error(Text004);
+            Error(VoucherNotValidAnymoreErr);
+
+        Voucher.CalcFields(Open);
+        if not Voucher.Open then
+            Error(VoucherAlreadyUsedErr);
+
+        TestVoucherType(Voucher."Voucher Type");
+        if Voucher.CalcInUseQty() > 0 then
+            Error(VoucherBeingUsedErr);
     end;
 
-    procedure FindVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
+    local procedure TestVoucherType(VoucherTypeCode: Code[20])
     var
-        Voucher: Record "NPR NpRv Voucher";
-        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        VoucherType: Record "NPR NpRv Voucher Type";
     begin
-        if not NpRvVoucherMgt.FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", Voucher) then
-            Error(Text005, TempNpRvVoucherBuffer."Reference No.");
-        NpRvVoucherMgt.Voucher2Buffer(Voucher, TempNpRvVoucherBuffer);
+        VoucherType.Get(VoucherTypeCode);
+        VoucherType.TestField("Payment Type");
+    end;
 
-        if not Voucher.Open then
-            Error(Text002);
-
-        if Voucher."Starting Date" > CurrentDateTime() then
-            Error(Text003);
-
-        if (Voucher."Ending Date" < CurrentDateTime()) and (Voucher."Ending Date" <> 0DT) then
-            Error(Text004);
+    [Obsolete('Not being used.')]
+    procedure FindVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
+    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnInitVoucherModules', '', true, true)]
     local procedure OnInitVoucherModules(var VoucherModule: Record "NPR NpRv Voucher Module")
+    var
+        ValidateVoucherDefaultDescriptionLbl: Label 'Validate Voucher - Default';
     begin
         if VoucherModule.Get(VoucherModule.Type::"Validate Voucher", ModuleCode()) then
             exit;
@@ -76,7 +78,7 @@
         VoucherModule.Init();
         VoucherModule.Type := VoucherModule.Type::"Validate Voucher";
         VoucherModule.Code := ModuleCode();
-        VoucherModule.Description := Text000;
+        VoucherModule.Description := ValidateVoucherDefaultDescriptionLbl;
         VoucherModule."Event Codeunit ID" := CurrCodeunitId();
         VoucherModule.Insert(true);
     end;
@@ -106,6 +108,11 @@
             exit;
 
         ValidateVoucher(TempNpRvVoucherBuffer);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckVoucher(var Voucher: Record "NPR NpRv Voucher"; var IsHandled: Boolean)
+    begin
     end;
 
     local procedure CurrCodeunitId(): Integer

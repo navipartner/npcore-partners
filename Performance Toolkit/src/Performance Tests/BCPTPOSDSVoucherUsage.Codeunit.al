@@ -20,7 +20,6 @@ codeunit 88004 "NPR BCPT POS DS Voucher Usage" implements "BCPT Test Param. Prov
         VoucherType: Record "NPR NpRv Voucher Type";
         BCPTTestContext: Codeunit "BCPT Test Context";
         POSSession: Codeunit "NPR POS Session";
-        LibraryRandom: Codeunit "NPR Library - Random";
         POSMockLibrary: Codeunit "NPR Library - POS Mock";
         POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
@@ -35,13 +34,10 @@ codeunit 88004 "NPR BCPT POS DS Voucher Usage" implements "BCPT Test Param. Prov
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
         NoSeriesLine: Record "No. Series Line";
+        BCPTInitializeDataSetup: Record "NPR BCPT Initialize Data Setup";
     begin
         VoucherType.Get('CREDITVOUCHER');
         Item.Get('100CHIMSTA');
-
-        POSUnit.Get('01');
-        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
-        POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
 
         if Evaluate(NoOfSales, BCPTTestContext.GetParameter(NoOfSalesParamLbl)) then;
         if Evaluate(PostSale, BCPTTestContext.GetParameter(PostSaleParamLbl)) then;
@@ -52,32 +48,24 @@ codeunit 88004 "NPR BCPT POS DS Voucher Usage" implements "BCPT Test Param. Prov
         if NoOfSales > 1000 then
             NoOfSales := 1000;
 
-        CreateBarCodeItemReference(BarCodeItemReference, Item);
+        POSMasterDataLibrary.CreateBarCodeItemReference(BarCodeItemReference, Item);
 
-        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        POSAuditProfile.Get('DEFAULT');
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
-        NoSeriesLine.FindFirst();
-        NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
-        NoSeriesLine.Modify();
+        NoSeriesLine.FindSet(true, true);
+        repeat
+            if AllowGapsInSaleFiscalNoSeries <> NoSeriesLine."Allow Gaps in Nos." then begin
+                NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
+                NoSeriesLine.Modify(true);
+            end;
+        until NoSeriesLine.Next() = 0;
 
         Commit();
-    end;
-
-    local procedure CreateBarCodeItemReference(var NewItemReference: Record "Item Reference"; Item: Record Item)
-    begin
-        NewItemReference.SetCurrentKey("Reference Type", "Reference No.");
-        NewItemReference.SetRange("Reference Type", NewItemReference."Reference Type"::"Bar Code");
-        NewItemReference.SetRange("Item No.", Item."No.");
-        if NewItemReference.Count() > 1 then
-            NewItemReference.DeleteAll();
-
-        if not NewItemReference.FindFirst() then begin
-            NewItemReference.Init();
-            NewItemReference."Item No." := Item."No.";
-            NewItemReference."Reference Type" := NewItemReference."Reference Type"::"Bar Code";
-            NewItemReference."Reference No." := LibraryRandom.RandText(50);
-            NewItemReference.Insert(true);
-        end;
+        BCPTInitializeDataSetup.FindNextPOSUnit(POSUnit);
+        Commit();
+        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
+        POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
+        Commit();
     end;
 
     local procedure CreateDirectSalesWithVoucherUsage()
@@ -102,7 +90,6 @@ codeunit 88004 "NPR BCPT POS DS Voucher Usage" implements "BCPT Test Param. Prov
         BCPTTestContext.StartScenario('Start Sale');
         POSSession.StartTransaction();
         BCPTTestContext.EndScenario('Start Sale');
-        Commit();
         BCPTTestContext.UserWait();
     end;
 
@@ -114,21 +101,23 @@ codeunit 88004 "NPR BCPT POS DS Voucher Usage" implements "BCPT Test Param. Prov
         POSMockLibrary.CreateItemLine(POSSession, Item, BarCodeItemReference, ItemIdentifierType::ItemCrossReference, 1);
         AmountToPay := Item."Unit Price";
         BCPTTestContext.EndScenario('Add Sale Line');
-        Commit();
         BCPTTestContext.UserWait();
     end;
 
     local procedure PaySale(AmountToPay: Decimal)
     var
         Voucher: Record "NPR NpRv Voucher";
+        BCPTValidateVoucherSubs: Codeunit "NPR BCPT Validate Voucher Subs";
     begin
+        Voucher.SetCurrentKey("Voucher Type");
         Voucher.SetRange("Voucher Type", VoucherType.Code);
         Voucher.SetFilter(Amount, '%1..', AmountToPay);
+        Voucher.SetRange("In-use Quantity", 0);
         Voucher.FindLast();
         BCPTTestContext.StartScenario('Pay Sale');
+        BindSubscription(BCPTValidateVoucherSubs);
         POSMockLibrary.PayAndTryEndSaleAndStartNew(POSSession, VoucherType."Payment Type", AmountToPay, Voucher."Reference No.", PostSale);
         BCPTTestContext.EndScenario('Pay Sale');
-        Commit();
         BCPTTestContext.UserWait();
     end;
 
