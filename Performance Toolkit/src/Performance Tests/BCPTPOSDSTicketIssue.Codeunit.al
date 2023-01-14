@@ -20,7 +20,6 @@ codeunit 88005 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
         POSPaymentMethod: Record "NPR POS Payment Method";
         BCPTTestContext: Codeunit "BCPT Test Context";
         POSSession: Codeunit "NPR POS Session";
-        LibraryRandom: Codeunit "NPR Library - Random";
         POSMockLibrary: Codeunit "NPR Library - POS Mock";
         POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
@@ -38,6 +37,7 @@ codeunit 88005 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
         TicketType: Record "NPR TM Ticket Type";
+        BCPTInitializeDataSetup: Record "NPR BCPT Initialize Data Setup";
     begin
         POSPaymentMethod.Get('K');
         Item.Get('31001');
@@ -46,10 +46,6 @@ codeunit 88005 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
             Item.Validate("NPR Ticket Type", TicketType.Code);
             Item.Modify();
         end;
-
-        POSUnit.Get('01');
-        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
-        POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
 
         if Evaluate(NoOfSales, BCPTTestContext.GetParameter(NoOfSalesParamLbl)) then;
         if Evaluate(NoOfLinesPerSale, BCPTTestContext.GetParameter(NoOfLinesPerSaleParamLbl)) then;
@@ -65,32 +61,24 @@ codeunit 88005 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
         if NoOfLinesPerSale > 1000 then
             NoOfLinesPerSale := 1000;
 
-        CreateBarCodeItemReference(BarCodeItemReference, Item);
+        POSMasterDataLibrary.CreateBarCodeItemReference(BarCodeItemReference, Item);
 
-        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        POSAuditProfile.Get('DEFAULT');
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
-        NoSeriesLine.FindFirst();
-        NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
-        NoSeriesLine.Modify();
+        NoSeriesLine.FindSet(true, true);
+        repeat
+            if AllowGapsInSaleFiscalNoSeries <> NoSeriesLine."Allow Gaps in Nos." then begin
+                NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
+                NoSeriesLine.Modify(true);
+            end;
+        until NoSeriesLine.Next() = 0;
 
         Commit();
-    end;
-
-    local procedure CreateBarCodeItemReference(var NewItemReference: Record "Item Reference"; Item: Record Item)
-    begin
-        NewItemReference.SetCurrentKey("Reference Type", "Reference No.");
-        NewItemReference.SetRange("Reference Type", NewItemReference."Reference Type"::"Bar Code");
-        NewItemReference.SetRange("Item No.", Item."No.");
-        if NewItemReference.Count() > 1 then
-            NewItemReference.DeleteAll();
-
-        if not NewItemReference.FindFirst() then begin
-            NewItemReference.Init();
-            NewItemReference."Item No." := Item."No.";
-            NewItemReference."Reference Type" := NewItemReference."Reference Type"::"Bar Code";
-            NewItemReference."Reference No." := LibraryRandom.RandText(50);
-            NewItemReference.Insert(true);
-        end;
+        BCPTInitializeDataSetup.FindNextPOSUnit(POSUnit);
+        Commit();
+        POSMasterDataLibrary.OpenPOSUnit(POSUnit);
+        POSMockLibrary.InitializePOSSession(POSSession, POSUnit);
+        Commit();
     end;
 
     local procedure CreateDirectSalesWithTicketIssue()
@@ -115,7 +103,6 @@ codeunit 88005 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
         BCPTTestContext.StartScenario('Start Sale');
         POSSession.StartTransaction();
         BCPTTestContext.EndScenario('Start Sale');
-        Commit();
         BCPTTestContext.UserWait();
     end;
 
@@ -131,7 +118,6 @@ codeunit 88005 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
             AmountToPay += Item."Unit Price";
             if i = 1 then
                 BCPTTestContext.EndScenario('Add Sale Line');
-            Commit();
             BCPTTestContext.UserWait();
         end;
     end;
@@ -141,7 +127,6 @@ codeunit 88005 "NPR BCPT POS DS Ticket Issue" implements "BCPT Test Param. Provi
         BCPTTestContext.StartScenario('Pay Sale');
         POSMockLibrary.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '', PostSale);
         BCPTTestContext.EndScenario('Pay Sale');
-        Commit();
         BCPTTestContext.UserWait();
     end;
 

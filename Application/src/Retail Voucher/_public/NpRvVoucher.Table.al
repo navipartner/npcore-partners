@@ -468,9 +468,6 @@
         TestReferenceNo();
     end;
 
-    var
-        Text000: Label 'Reference No. %1 is already used.';
-
     local procedure InitReferenceNo()
     var
         VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
@@ -486,16 +483,19 @@
     local procedure TestReferenceNo()
     var
         Voucher: Record "NPR NpRv Voucher";
+        ReferenceAlreadyUsedErr: Label 'Reference No. %1 is already used.';
     begin
         if "Reference No." = '' then
             InitReferenceNo();
 
         TestField("Reference No.");
 
-        Voucher.SetFilter("No.", '<>%1', "No.");
+
+        Voucher.SetCurrentKey("Reference No.");
         Voucher.SetRange("Reference No.", "Reference No.");
-        if Voucher.FindFirst() then
-            Error(Text000, "Reference No.");
+        Voucher.SetFilter("No.", '<>%1', "No.");
+        if not Voucher.IsEmpty() then
+            Error(ReferenceAlreadyUsedErr, "Reference No.");
     end;
 
     local procedure UpdateContactInfo()
@@ -569,10 +569,10 @@
         exit("In-use Quantity");
     end;
 
+    [Obsolete('Not being used.')]
     procedure GetImageContent(var TenantMedia: Record "Tenant Media")
     begin
 
     end;
-
 }
 

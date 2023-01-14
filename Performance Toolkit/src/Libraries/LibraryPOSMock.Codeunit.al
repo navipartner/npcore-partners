@@ -2,26 +2,23 @@ codeunit 88103 "NPR Library - POS Mock"
 {
     procedure InitializePOSSession(POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit")
     var
+        // TempPOSAction: Record "NPR POS Action" temporary;
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
         POSMockFramework: Codeunit "NPR BCPT POS Framework: Mock";
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
-        _POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
-        POSAction: Record "NPR POS Action" temporary;
-        UserSetup: record "User Setup";
+        POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
+        BCPTPOSSetupEventSubs: Codeunit "NPR BCPT POS Setup Event Subs";
     begin
-        if UserSetup.Get(UserId) then;
-        UserSetup."User ID" := UserId;
-        UserSetup."NPR POS Unit No." := POSUnit."No.";
-        if not UserSetup.Insert() then
-            UserSetup.Modify();
+        BindSubscription(BCPTPOSSetupEventSubs);
+        BCPTPOSSetupEventSubs.SetPOSUnit(POSUnit);
 
         POSMockFramework.Constructor();
-        POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
+        POSBackgroundTaskAPI.Initialize(POSBackgroundTaskManager);
         POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, CreateGuid(), POSBackgroundTaskAPI);
         POSSession.StartPOSSession();
 
-        POSAction.DiscoverActions();
+        // TempPOSAction.DiscoverActions();
     end;
 
     procedure InitializePOSSession(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; Salesperson: Record "Salesperson/Purchaser")
