@@ -7,6 +7,8 @@ NP Retail is a cloud-based POS solution that uses Microsoft Dynamics 365 Busines
 - To start with, we recommend [downloading the demo](downloaddemo.md), and experiencing first-hand what our solution can do.
 
 - Once you're ready for more advanced features, see our guides for setting up desktop software products [Major Tom](install_major_tom.md) and [Minor Tom](install_minor_tom.md).
+ 
+- Download and install the [Hardware Connector](hw_connector.md) app to bridge the local hardware to the WEB MT interface of the POS.
 
 - If you're unsure whether our solution is supported by your hardware components, refer to the [system requirements](system_requirements.md).
 
