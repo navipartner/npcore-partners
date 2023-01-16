@@ -1,4 +1,4 @@
-table 6059795 "NPR POS HTML Disp. Prof."
+table 6059809 "NPR POS HTML Disp. Prof."
 {
     DataClassification = CustomerContent;
     Access = Internal;
