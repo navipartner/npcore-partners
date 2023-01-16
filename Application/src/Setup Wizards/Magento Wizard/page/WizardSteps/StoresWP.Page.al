@@ -130,7 +130,7 @@
             until MagentoStore.Next() = 0;
     end;
 
-    local procedure CheckIfNoAvailableInMagStore(var MagStore: Record "NPR Magento Store"; var WantedStartingNo: Code[10]) CalculatedNo: Code[10]
+    local procedure CheckIfNoAvailableInMagStore(var MagStore: Record "NPR Magento Store"; var WantedStartingNo: Code[32]) CalculatedNo: Code[32]
     var
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
     begin
@@ -139,7 +139,7 @@
         MagStore.SetRange(Code, CalculatedNo);
 
         if MagStore.FindFirst() then begin
-            HelperFunctions.FormatCode(WantedStartingNo, true);
+            HelperFunctions.FormatCode32(WantedStartingNo);
             CalculatedNo := CheckIfNoAvailableInMagStore(MagStore, WantedStartingNo);
         end;
     end;

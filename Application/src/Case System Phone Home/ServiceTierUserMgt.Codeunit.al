@@ -127,7 +127,7 @@
             exit;
 
         if TryInitAndSendRequestV2('ValidateBCOnlineTenantWithAzureAD', TenantId(), TenantDiagnostic."Azure AD Tenant ID", TenantDiagnostic."Last Tenant ID Sent to CS", ResponseMessage) then begin
-            TenantDiagnostic."Last Tenant ID Sent to CS" := TenantId();
+            TenantDiagnostic."Last Tenant ID Sent to CS" := CopyStr(TenantId(), 1, MaxStrLen(TenantDiagnostic."Last Tenant ID Sent to CS"));
             TenantDiagnostic."Last DT Tenant ID Sent to CS" := CurrentDateTime;
             TenantDiagnostic.Modify();
         end;

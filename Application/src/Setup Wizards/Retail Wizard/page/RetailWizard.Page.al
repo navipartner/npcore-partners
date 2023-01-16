@@ -1183,7 +1183,7 @@
     begin
         if package = '' then
             exit;
-        BackgroundPackageImport."Package Name" := package;
+        BackgroundPackageImport."Package Name" := CopyStr(package, 1, MaxStrLen(BackgroundPackageImport."Package Name"));
         BackgroundPackageImport."Adjust Table Names" := AdjustTableNames;
         BackgroundPackageImport.Insert();
         if RunInBackground then

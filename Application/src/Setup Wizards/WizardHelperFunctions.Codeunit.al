@@ -8,7 +8,9 @@
         FormattedStartingNo := DelChr(NoToFormat, '=', '0123456789');
         if FormattedStartingNo = NoToFormat then begin
             if returnNewValue then
-                NoToFormat += '1'
+#pragma warning disable AA0139
+            NoToFormat += '1'
+#pragma warning restore
         end else
             NoToFormat := IncStr(NoToFormat);
     end;
@@ -20,8 +22,23 @@
     begin
         FormattedStartingNo := DelChr(NoToFormat, '=', '0123456789');
         if FormattedStartingNo = NoToFormat then
+#pragma warning disable AA0139
             exit(NoToFormat + '1')
+#pragma warning restore
         else
             exit(IncStr(NoToFormat));
+    end;
+
+    procedure FormatCode32(var NoToFormat: Code[32])
+    var
+        FormattedStartingNo: Text;
+    begin
+        FormattedStartingNo := DelChr(NoToFormat, '=', '0123456789');
+        if FormattedStartingNo = NoToFormat then
+#pragma warning disable AA0139
+            NoToFormat += '1'
+#pragma warning restore
+        else
+            NoToFormat := IncStr(NoToFormat);
     end;
 }
