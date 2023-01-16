@@ -1,14 +1,14 @@
 # Set up the POS HTML Display
 
-This guide refers to the newer version of the [POS Display Profile](../reference/POS_Display_profile.md). While it shares the same purpose as showing some media content and also the receipt view, the main difference between them is the fact that this profile can do much more, like returning input from the customer display if the screen is a touch screen, and the HTML file is equipped to handle the customer's input.
+This guide pertains to the newer version of the [POS Display Profile](../reference/POS_Display_profile.md). While it shares the same purpose as displaying the specified media content and the receipt view, the main difference between them is the fact that this profile can do much more, like returning input from the customer display if the screen is a touch screen, and the HTML file is equipped to handle the customer's input.
 
-There is a [standard HTML file](https://npcorehtmldisplay.blob.core.windows.net/standard-html/Media_Receipt_Input.html) which is compatible with the display content lines. This HTML file can:
+There is a [standard HTML file](https://npcorehtmldisplay.blob.core.windows.net/standard-html/Media_Receipt_Input.html) which supports showing display content lines, receipt view, and input for both phone and signature. This HTML file can: 
 
 - Display the media content defined in the **Display Content Lines**.
 - Show the receipt to the customer with prices both including and excluding VAT.
 - Collect the phone number and signature.
 
-To collect input when a sale is finalized, and the total amount is negative (i.e. the customer gets money back) set the field **Customer Input Option: Money Back** to **Phone & Signature**.
+To collect input when a sale is finalized, and the total amount is negative (i.e. the customer gets money back) set the **Customer Input Option: Money Back** field to **Phone & Signature**.
 When this option is used the customer is presented with the digital input on the customer display, and when the **Submit** button is clicked, the information is sent back to the sales screen, where the cashier can verify the phone number and signature. The cashier has three options here:
 
 - Hit the red button to reattempt the input, so the customer gets the possibility to try again. This could be relevant if the signature is declined or the phone number was incorrect. 
@@ -40,9 +40,6 @@ When this option is used the customer is presented with the digital input on the
   The **HTML File** toggle switch is enabled.
 9. Start or restart the POS unit.   
    The customer display now contains the specified screen layout.
-
-> [!NOTE]
-> The URL above links to the standard HTML file which supports showing display content lines, receipt view, and input for both phone and signature. 
 
 > [!NOTE]
 > If the customer display is displayed on the wrong screen, go to [**POS Unit Display**](../../posunit/reference/POS_Unit_Display.md) and update the information.
