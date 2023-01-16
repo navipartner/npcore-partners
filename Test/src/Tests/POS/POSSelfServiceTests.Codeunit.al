@@ -264,6 +264,34 @@ codeunit 85073 "NPR POS Self Service Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure LoginScreen()
+    var
+        POSEntry: Record "NPR POS Entry";
+        SalePOS: Record "NPR POS Sale";
+        ActionLoginScreen: Codeunit "NPR SS Action: Login Screen";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        CurrentView: Codeunit "NPR POS View";
+        Response: Text;
+    begin
+        // [Given] POS & Payment setup
+        LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
+
+        // [Given] Active POS session
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+
+        //[When]
+        ActionLoginScreen.ChangeToLoginScreen(POSSession, Response);
+
+        //[Then]
+        POSSession.GetCurrentView(CurrentView);
+        Assert.IsTrue(CurrentView.Type() = CurrentView.Type() ::Login, Format(CurrentView.Type()));
+        POSEntry.FindLast();
+        Assert.IsTrue(POSEntry."Entry Type" = POSEntry."Entry Type"::"Cancelled Sale", 'POS Entry type Cancelled Sale is not created.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure DeleteLine()
     var
         Item: Record Item;
