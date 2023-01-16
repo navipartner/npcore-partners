@@ -34,5 +34,7 @@
     href: reference/POS_unit_Receipt_profile.md
   - name: POS View Profile (reference guide)
     href: reference/POS_view_profile.md
-  - name: POS self-service actions
+  - name: POS self-service actions (reference guide)
     href: reference/POS_Self_Service_Actions.md
+  - name: POS HTML Display Profile (reference guide)
+    href: reference/POS_HTMLDisplay_profile.md
