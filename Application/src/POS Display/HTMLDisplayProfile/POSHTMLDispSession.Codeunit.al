@@ -1,4 +1,4 @@
-codeunit 6060074 "NPR POS HTML Disp. Session"
+codeunit 6060084 "NPR POS HTML Disp. Session"
 {
     Access = Internal;
     SingleInstance = true;

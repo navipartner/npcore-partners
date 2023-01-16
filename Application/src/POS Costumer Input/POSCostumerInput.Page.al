@@ -1,4 +1,4 @@
-page 6059903 "NPR POS Costumer Input"
+page 6150774 "NPR POS Costumer Input"
 {
     PageType = Card;
     UsageCategory = Administration;

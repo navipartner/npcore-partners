@@ -1,4 +1,4 @@
-enum 6014517 "NPR POS Costumer Input Context"
+enum 6014519 "NPR POS Costumer Input Context"
 {
     Extensible = false;
 #if not BC17

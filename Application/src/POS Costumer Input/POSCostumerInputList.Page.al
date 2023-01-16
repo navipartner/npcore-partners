@@ -1,4 +1,4 @@
-page 6059904 "NPR POS Costumer Input List"
+page 6150775 "NPR POS Costumer Input List"
 {
     PageType = List;
     ApplicationArea = NPRRetail;
