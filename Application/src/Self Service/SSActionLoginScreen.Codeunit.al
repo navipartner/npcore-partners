@@ -1,63 +1,25 @@
-﻿codeunit 6151283 "NPR SS Action: Login Screen"
+﻿codeunit 6151283 "NPR SS Action: Login Screen" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'This built in function locks the POS';
-        ConfirmTitle: Label 'We need your confirmation...';
-        ConfirmMessage: Label 'Your current order will be lost. Are you sure you want to restart your session?';
-        SAVE_SALE: Label 'Saving Sales...';
-        REQUIRES_ATTENTION: Label 'Your order must be handled by an attendant. It has reference number %1.';
-        CANCEL_SALE: Label 'Sale was canceled %1';
-
-    local procedure ActionCode(): Text[20]
+        ConfirmMessageLbl: Label 'Your current order will be lost. Are you sure you want to restart your session?';
+        ConfirmTitleLbl: Label 'We need your confirmation...';
     begin
-
-        exit('SS-LOGIN-SCREEN');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddLabel('ConfirmTitle', ConfirmTitleLbl);
+        WorkflowConfig.AddLabel('ConfirmMessage', ConfirmMessageLbl);
+        WorkflowConfig.SetWorkflowTypeUnattended();
     end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-
-        exit('1.2');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction20(
-          ActionCode(),
-          ActionDescription,
-          ActionVersion())
-        then begin
-            Sender.RegisterWorkflow20(
-                'let result = await popup.confirm ({title: $captions.ConfirmTitle, caption: $captions.ConfirmMessage});' +
-                'if (result) {' +
-                  'let responseJson = await workflow.respond();' +
-                  'let response = JSON.parse (responseJson);' +
-                  'if (response.message) {await popup.message (response.message);}' +
-                '};'
-               );
-            Sender.SetWorkflowTypeUnattended();
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-        Captions.AddActionCaption(ActionCode(), 'ConfirmTitle', ConfirmTitle);
-        Captions.AddActionCaption(ActionCode(), 'ConfirmMessage', ConfirmMessage);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup");
     var
+        POSSession: Codeunit "NPR POS Session";
         WorkflowResponseJson: Text;
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
         ChangeToLoginScreen(POSSession, WorkflowResponseJson);
 
         if (WorkflowResponseJson = '') then
@@ -66,20 +28,29 @@
         FrontEnd.WorkflowResponse(WorkflowResponseJson);
     end;
 
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionLoginScreenSS.js###
+'let main=async({captions:e})=>{if(await popup.confirm({title:e.ConfirmTitle,caption:e.ConfirmMessage})){let a=await workflow.respond(),s=JSON.parse(a);s.message&&await popup.message(s.message)}};'
+        )
+    end;
+
     procedure ChangeToLoginScreen(POSSession: Codeunit "NPR POS Session"; var WorkflowResponseJson: Text)
     var
         SalePOS: Record "NPR POS Sale";
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
+        POSResumeSaleMgt: Codeunit "NPR POS Resume Sale Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
-        POSResumeSaleMgt: Codeunit "NPR POS Resume Sale Mgt.";
-        ResponseMessage: Text;
-        PosEntryNo: Integer;
         SalesIsCanceled: Boolean;
+        PosEntryNo: Integer;
+        Requires_Attention: Label 'Your order must be handled by an attendant. It has reference number %1.';
         ResponseLbl: Label '{"message" : {"title":"%1", "caption":"%2"}}', Locked = true;
+        Save_Sale: Label 'Saving Sales...';
+        ResponseMessage: Text;
     begin
-
         POSSession.GetSetup(POSSetup);
         POSCreateEntry.InsertUnitLogoutEntry(POSSetup.GetPOSUnitNo(), POSSetup.Salesperson());
 
@@ -92,8 +63,8 @@
             POSSale.GetCurrentSale(SalePOS);
             PosEntryNo := POSResumeSaleMgt.DoSaveAsPOSQuote(POSSession, SalePOS, true);
             POSQuoteEntry.Get(PosEntryNo);
-            ResponseMessage := StrSubstNo(REQUIRES_ATTENTION, POSQuoteEntry."Sales Ticket No.");
-            WorkflowResponseJson := StrSubstNo(ResponseLbl, SAVE_SALE, ResponseMessage);
+            ResponseMessage := StrSubstNo(Requires_Attention, POSQuoteEntry."Sales Ticket No.");
+            WorkflowResponseJson := StrSubstNo(ResponseLbl, Save_Sale, ResponseMessage);
         end;
         POSSession.StartPOSSession();
     end;
@@ -106,7 +77,6 @@
         SaleAmount: Decimal;
         Subtotal: Decimal;
     begin
-
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
         if (PaidAmount = 0) then
@@ -117,12 +87,12 @@
 
     procedure CancelSale(POSSession: Codeunit "NPR POS Session"): Boolean
     var
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
-        Line: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
+        Line: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CANCEL_SALE: Label 'Sale was canceled %1';
     begin
-
         POSSession.GetSale(POSSale);
         POSSale.RefreshCurrent();
 
