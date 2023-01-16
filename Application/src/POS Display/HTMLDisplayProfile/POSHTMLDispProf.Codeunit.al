@@ -1,4 +1,4 @@
-codeunit 6059901 "NPR POS HTML Disp. Prof."
+codeunit 6060082 "NPR POS HTML Disp. Prof."
 {
     Access = Internal;
 
@@ -304,7 +304,7 @@ codeunit 6059901 "NPR POS HTML Disp. Prof."
         if (AwaitResponse) then begin
             HwcGUID.AddGuid(Request.AwaitResponse());
         end;
-    FrontEnd.InvokeFrontEndMethod2(Request);
+        FrontEnd.InvokeFrontEndMethod2(Request);
 
     end;
 }

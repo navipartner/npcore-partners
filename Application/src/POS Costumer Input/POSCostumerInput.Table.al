@@ -1,4 +1,4 @@
-table 6059794 "NPR POS Costumer Input"
+table 6059810 "NPR POS Costumer Input"
 {
     DataClassification = CustomerContent;
     Access = Internal;
