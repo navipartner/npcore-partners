@@ -10,7 +10,7 @@
 
     var
         PostItemEntriesVar, PostPOSEntriesVar, PostCompressedVar, StopOnErrorVar, ShowProgressDialog, PostingDateExists, ReplacePostingDate, ReplaceDocumentDate : Boolean;
-        PostingDate: Date;
+        _PostingDate: Date;
         TextErrorMultiple: Label '%3 %1 and %2 cannot be posted together. Only one %3 can be posted at a time.';
         TextErrorSalesTaxCompressed: Label '%1 %2 cannot be posted compressed because it has Sales Tax Lines. Please check the POS posting compression settings.';
         TextErrorBufferLinesnotmade: Label '%1 were not created from Sales and Payment Lines.';
@@ -28,7 +28,7 @@
         PreparingGenJournalLinesLbl: Label 'Preparing Gen. Journal Lines       #4###### @5@@@@@@@@@@@@@\';
         PostingGenJournalLinesLbl: Label 'Posting Gen Journal lines         #8###### @9@@@@@@@@@@@@@\';
         PostingItemLinesLbl: Label 'Posting Item Lines         #10###### @11@@@@@@@@@@@@@\';
-        POSPostingLogEntryNo, POSItemPostingLogEntryNo : Integer;
+        _POSPostingLogEntryNo, POSItemPostingLogEntryNo : Integer;
         PostingPerPeriodRegister, JobQueuePosting : Boolean;
         ErrorText: Text;
         PostingPOSEntriesOpenDialogLbl: Label 'Posting POS Entries individually\#1######\@2@@@@@@@@@@@@@\';
@@ -66,7 +66,7 @@
 
         if PostPOSEntriesVar then begin
             //POS Entries must belong to the same POS Ledger Register Entry
-            POSPostingLogEntryNo := CreatePOSPostingLogEntry(POSEntry, 0);
+            _POSPostingLogEntryNo := CreatePOSPostingLogEntry(POSEntry, 0);
             Commit();
             Clear(_GLPostingErrorEntries);
             PostPOSEntries(POSEntry);
@@ -116,11 +116,11 @@
         CreateGenJnlLinesFromPOSBalancingLines(POSEntry, TempGenJournalLine);
 
         if (not CheckAndPostGenJournal(TempGenJournalLine, POSEntry, TempPOSEntry)) then begin
-            UpdatePOSPostingLogEntry(POSPostingLogEntryNo, false);
-            MarkPOSEntries(1, POSPostingLogEntryNo, POSEntry, TempPOSEntry);
+            UpdatePOSPostingLogEntry(_POSPostingLogEntryNo, false);
+            MarkPOSEntries(1, _POSPostingLogEntryNo, POSEntry, TempPOSEntry);
         end else begin
-            UpdatePOSPostingLogEntry(POSPostingLogEntryNo, false);
-            MarkPOSEntries(0, POSPostingLogEntryNo, POSEntry, TempPOSEntry);
+            UpdatePOSPostingLogEntry(_POSPostingLogEntryNo, false);
+            MarkPOSEntries(0, _POSPostingLogEntryNo, POSEntry, TempPOSEntry);
         end;
     end;
 
@@ -203,11 +203,11 @@
                         Error(TextErrorMultiple, POSEntry."POS Period Register No.", PreviousPOSPeriodRegister, POSPeriodRegister.TableCaption);
                     if PostingDateExists then begin
                         if ReplacePostingDate or (POSEntry."Posting Date" = 0D) then begin
-                            POSEntry."Posting Date" := PostingDate;
+                            POSEntry."Posting Date" := _PostingDate;
                             POSEntry.Validate("Currency Code");
                         end;
                         if ReplaceDocumentDate or (POSEntry."Document Date" = 0D) then begin
-                            POSEntry.Validate("Document Date", PostingDate);
+                            POSEntry.Validate("Document Date", _PostingDate);
                         end;
                     end;
 
@@ -616,7 +616,7 @@
                         DoSkipProcessing := SkipProcessing(2, POSEntry."Entry No.", 1);
                     if not DoSkipProcessing then begin
                         if PostingDateExists then
-                            POSPostItemEntries.SetPostingDate(ReplaceDocumentDate, ReplaceDocumentDate, PostingDate);
+                            POSPostItemEntries.SetPostingDate(ReplaceDocumentDate, ReplaceDocumentDate, _PostingDate);
 
                         POSEntryToPost.Get(POSEntry."Entry No.");
                         LineToProcessCount += 1;
@@ -784,7 +784,7 @@
         PostingDateExists := true;
         ReplaceDocumentDate := NewReplaceDocumentDate;
         ReplaceDocumentDate := NewReplacePostingDate;
-        PostingDate := NewPostingDate;
+        _PostingDate := NewPostingDate;
     end;
 
     procedure SetPostCompressed(PostCompressedIn: Boolean)
@@ -1091,7 +1091,7 @@
         POSPostingLog."POS Entry View" := CopyStr(POSEntry.GetView(), 1, MaxStrLen(POSPostingLog."POS Entry View"));
         POSPostingLog."Last POS Entry No. at Posting" := LastPOSEntry."Entry No.";
         POSPostingLog."Posting Type" := PostingType;
-        POSPostingLog."Parameter Posting Date" := PostingDate;
+        POSPostingLog."Parameter Posting Date" := _PostingDate;
         POSPostingLog."Parameter Replace Posting Date" := ReplacePostingDate;
         POSPostingLog."Parameter Replace Doc. Date" := ReplaceDocumentDate;
         POSPostingLog."Parameter Post Item Entries" := PostItemEntriesVar;
@@ -1134,7 +1134,7 @@
         POSPostingLog."Error Description" := copystr(PostingErrorTxt, 1, MaxStrLen(POSPostingLog."Error Description"));
         POSPostingLog."POS Entry View" := CopyStr(POSEntry.GetView(), 1, MaxStrLen(POSPostingLog."POS Entry View"));
         POSPostingLog."Posting Type" := PostingType;
-        POSPostingLog."Parameter Posting Date" := PostingDate;
+        POSPostingLog."Parameter Posting Date" := _PostingDate;
         POSPostingLog."Parameter Replace Posting Date" := ReplacePostingDate;
         POSPostingLog."Parameter Replace Doc. Date" := ReplaceDocumentDate;
         POSPostingLog."Parameter Post Item Entries" := PostItemEntriesVar;

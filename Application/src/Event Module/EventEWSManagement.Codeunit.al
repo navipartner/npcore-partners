@@ -1,9 +1,10 @@
 ﻿codeunit 6060151 "NPR Event EWS Management"
 {
     Access = Internal;
+
     var
 
-        ExchItemType: Option "E-Mail",Appointment,"Meeting Request";
+        _ExchItemType: Option "E-Mail",Appointment,"Meeting Request";
         EventExchIntEmailGlobal: Record "NPR Event Exch. Int. E-Mail";
         ExchTemplateCaption: Label 'Please select a %1 template...';
         SkipLookup: Boolean;
@@ -56,7 +57,7 @@
             UserName := Job."NPR Organizer E-Mail";
             Source := GetObjectCaption(8, PAGE::"NPR Event Card") + ': ' + Job.FieldCaption("NPR Organizer E-Mail");
         end;
-        if (ExchItemType = ExchItemType::"E-Mail") and (Job."Person Responsible" <> '') and Resource.Get(Job."Person Responsible") and (Resource."NPR E-Mail" <> '') then begin
+        if (_ExchItemType = _ExchItemType::"E-Mail") and (Job."Person Responsible" <> '') and Resource.Get(Job."Person Responsible") and (Resource."NPR E-Mail" <> '') then begin
             UserName := Resource."NPR E-Mail";
             Source := GetObjectCaption(8, PAGE::"NPR Event Card") + ': ' + Job.FieldCaption("Person Responsible");
         end;
@@ -339,7 +340,7 @@
         ParentEntryNo: Integer;
     begin
         AddExchObjToBuffer(EventExchIntSumBuffer, 0, EmailCustomerText, '', '', EventExchIntSumBuffer."Entry No.", 0);
-        ExchItemType := ExchItemType::"E-Mail";
+        _ExchItemType := _ExchItemType::"E-Mail";
         GetOrganizerSetup(Job, FromSource);
         ParentEntryNo := EventExchIntSumBuffer."Entry No.";
         AddExchObjToBuffer(EventExchIntSumBuffer, 1, FromText, EventExchIntEmailGlobal."E-Mail", FromSource, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
@@ -353,7 +354,7 @@
         AddJobPlanningLineToBuffer(EventExchIntSumBuffer, JobPlanningLine, ToText, ParentEntryNo);
 
         AddExchObjToBuffer(EventExchIntSumBuffer, 0, AppointmentText, '', '', EventExchIntSumBuffer."Entry No.", 0);
-        ExchItemType := ExchItemType::Appointment;
+        _ExchItemType := _ExchItemType::Appointment;
         GetOrganizerSetup(Job, FromSource);
         FromEmail := EventExchIntEmailGlobal."E-Mail";
         if (Job."NPR Calendar Item Status" in [Job."NPR Calendar Item Status"::" ", Job."NPR Calendar Item Status"::Error]) then
@@ -362,7 +363,7 @@
         AddExchObjToBuffer(EventExchIntSumBuffer, 1, SavedInText, FromEmail, FromSource, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
 
         AddExchObjToBuffer(EventExchIntSumBuffer, 0, MeetingReqText, '', '', EventExchIntSumBuffer."Entry No.", 0);
-        ExchItemType := ExchItemType::"Meeting Request";
+        _ExchItemType := _ExchItemType::"Meeting Request";
         GetOrganizerSetup(Job, FromSource);
         ParentEntryNo := EventExchIntSumBuffer."Entry No.";
         AddExchObjToBuffer(EventExchIntSumBuffer, 1, FromText, FromEmail, FromSource, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
@@ -386,13 +387,13 @@
                     AddExchObjToBuffer(EventExchIntSumBuffer, 1, ExchItem, JobPlanningLine."NPR Resource E-Mail", Source, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
                 end;
             else begin
-                    AddExchObjToBuffer(EventExchIntSumBuffer, 1, ExchItem, '', Source, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
-                    ParentEntryNo := EventExchIntSumBuffer."Entry No.";
-                    JobPlanningLine.FindSet();
-                    repeat
-                        AddExchObjToBuffer(EventExchIntSumBuffer, 2, '', JobPlanningLine."NPR Resource E-Mail", '', EventExchIntSumBuffer."Entry No.", ParentEntryNo);
-                    until JobPlanningLine.Next() = 0;
-                end;
+                AddExchObjToBuffer(EventExchIntSumBuffer, 1, ExchItem, '', Source, EventExchIntSumBuffer."Entry No.", ParentEntryNo);
+                ParentEntryNo := EventExchIntSumBuffer."Entry No.";
+                JobPlanningLine.FindSet();
+                repeat
+                    AddExchObjToBuffer(EventExchIntSumBuffer, 2, '', JobPlanningLine."NPR Resource E-Mail", '', EventExchIntSumBuffer."Entry No.", ParentEntryNo);
+                until JobPlanningLine.Next() = 0;
+            end;
         end;
     end;
 

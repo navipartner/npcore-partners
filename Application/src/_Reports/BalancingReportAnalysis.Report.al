@@ -175,11 +175,11 @@
             column(CreditUnrealSaleAmtLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Credit Unreal. Sale Amt. (LCY)")) { }
             column(EFTLCYlbl_; "POS Workshift Checkpoint".FieldCaption("EFT (LCY)")) { }
             column(LocalCurrencyLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Local Currency (LCY)")) { }
-            column(StoreCode_; POSEntry."POS Store Code") { }
-            column(DocumentNo_; POSEntry."Document No.") { }
-            column(StartingTime_; POSEntry."Starting Time") { }
-            column(EndingTime_; POSEntry."Ending Time") { }
-            column(ClosingDate_; POSEntry."Entry Date") { }
+            column(StoreCode_; _POSEntry."POS Store Code") { }
+            column(DocumentNo_; _POSEntry."Document No.") { }
+            column(StartingTime_; _POSEntry."Starting Time") { }
+            column(EndingTime_; _POSEntry."Ending Time") { }
+            column(ClosingDate_; _POSEntry."Entry Date") { }
             column(UserFullName_; User."Full Name") { }
             column(SalespersonName_; Salesperson.Name) { }
             column(StoreLbl_; StoreLbl) { }
@@ -190,10 +190,10 @@
             column(SignatureLbl_; SignatureLbl) { }
             column(PrintedBylbl_; PrintedByLbl) { }
             column(Salespersonlbl_; Salespersonlbl) { }
-            column(PricesIncVAT_; Format(POSEntry."Prices Including VAT")) { }
-            column(PricesIncVATLbl_; POSEntry.FieldCaption("Prices Including VAT")) { }
+            column(PricesIncVAT_; Format(_POSEntry."Prices Including VAT")) { }
+            column(PricesIncVATLbl_; _POSEntry.FieldCaption("Prices Including VAT")) { }
             column(CompanyName_; CompanyName) { }
-            column(POSEntryDescription_; POSEntry.Description) { }
+            column(POSEntryDescription_; _POSEntry.Description) { }
             column(ReportTitle_; VarReportTitle) { }
             column(PrintSales_; PrintSales) { }
             column(PrintReceipts_; PrintReceipts) { }
@@ -474,9 +474,9 @@
             begin
                 VarMain := 1;
 
-                if POSEntry.Get("POS Workshift Checkpoint"."POS Entry No.") then
-                    CalcInPreviousPeriod(PreviousPeriodCaption, TempPOSWorkshiftCheckpoint, POSEntry);
-                if Salesperson.Get(POSEntry."Salesperson Code") then;
+                if _POSEntry.Get("POS Workshift Checkpoint"."POS Entry No.") then
+                    CalcInPreviousPeriod(PreviousPeriodCaption, TempPOSWorkshiftCheckpoint, _POSEntry);
+                if Salesperson.Get(_POSEntry."Salesperson Code") then;
                 IF User.GET(USERSECURITYID()) THEN;
 
                 VarBalancedBy := '';
@@ -602,7 +602,7 @@
 
     var
         CompanyInfo: Record "Company Information";
-        POSEntry: Record "NPR POS Entry";
+        _POSEntry: Record "NPR POS Entry";
         Salesperson: Record "Salesperson/Purchaser";
         User: Record User;
         TempPOSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint" temporary;

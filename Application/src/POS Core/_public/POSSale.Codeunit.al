@@ -6,7 +6,7 @@
         POSUnit: Record "NPR POS Unit";
         This: Codeunit "NPR POS Sale";
         Setup: Codeunit "NPR POS Setup";
-        FrontEnd: Codeunit "NPR POS Front End Management";
+        _FrontEnd: Codeunit "NPR POS Front End Management";
         SaleLine: Codeunit "NPR POS Sale Line";
         PaymentLine: Codeunit "NPR POS Payment Line";
         OnRunType: Enum "NPR POS Sale OnRunType";
@@ -41,7 +41,7 @@
     begin
         Initialized := true;
 
-        FrontEnd := FrontEndIn;
+        _FrontEnd := FrontEndIn;
         POSUnit := POSUnitIn;
         Setup := SetupIn;
         This := ThisIn;
@@ -49,11 +49,11 @@
         Clear(Rec);
         Clear(LastSaleRetrieved);
 
-        OnBeforeInitSale(Rec, FrontEnd);
+        OnBeforeInitSale(Rec, _FrontEnd);
         InitSale();
-        OnAfterInitSale(Rec, FrontEnd);
+        OnAfterInitSale(Rec, _FrontEnd);
 
-        FrontEnd.StartTransaction(Rec);
+        _FrontEnd.StartTransaction(Rec);
     end;
 
     local procedure InitSale()
@@ -73,8 +73,8 @@
 
         Rec.Validate("Customer No.", '');
 
-        SaleLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, FrontEnd);
-        PaymentLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, FrontEnd);
+        SaleLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, _FrontEnd);
+        PaymentLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, _FrontEnd);
 
         Rec.FilterGroup := 2;
         Rec.SetRange("Register No.", Rec."Register No.");
@@ -625,9 +625,9 @@
                             SaleLinePOS.TestField("Gen. Bus. Posting Group");
                             SaleLinePOS.TestField("Gen. Prod. Posting Group");
                             SaleLinePOS.TestField("VAT Bus. Posting Group");
-                            SaleLinePOS.TestField("VAT Prod. Posting Group");                            
+                            SaleLinePOS.TestField("VAT Prod. Posting Group");
                         end;
-                    end;                    
+                    end;
             end;
 
             if (SaleLinePOS."Discount %" = 0) and
@@ -651,7 +651,7 @@
     begin
         Initialized := true;
 
-        FrontEnd := FrontEndIn;
+        _FrontEnd := FrontEndIn;
         POSUnit := POSUnitIn;
         Setup := SetupIn;
         This := ThisIn;
@@ -659,11 +659,11 @@
         Clear(Rec);
         Clear(LastSaleRetrieved);
 
-        OnBeforeResumeSale(Rec, FrontEnd);
+        OnBeforeResumeSale(Rec, _FrontEnd);
         ResumeSale(SalePOS_ToResume);
-        OnAfterResumeSale(Rec, FrontEnd);
+        OnAfterResumeSale(Rec, _FrontEnd);
 
-        FrontEnd.StartTransaction(Rec);
+        _FrontEnd.StartTransaction(Rec);
     end;
 
     local procedure ResumeSale(SalePOS_ToResume: Record "NPR POS Sale")
@@ -687,14 +687,14 @@
 
         Rec.Modify(true);
 
-        SaleLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, FrontEnd);
+        SaleLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, _FrontEnd);
         SaleLinePOS.SetRange("Register No.", Rec."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
         SaleLinePOS.SetFilter("Line Type", '<>%1', SaleLinePOS."Line Type"::"POS Payment");
         if not SaleLinePOS.IsEmpty then
             SaleLine.SetLast();
 
-        PaymentLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, FrontEnd);
+        PaymentLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, _FrontEnd);
 
         Rec.FilterGroup := 2;
         Rec.SetRange("Register No.", Rec."Register No.");

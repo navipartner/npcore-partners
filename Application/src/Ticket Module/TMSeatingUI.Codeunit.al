@@ -12,10 +12,10 @@ codeunit 6151131 "NPR TM Seating UI"
     SingleInstance = true;
 
     var
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        _TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         //***  Model: DotNet NPRNetModel;
         ActiveModelID: Guid;
-        ReservationUpdateEntryNo: Integer;
+        _ReservationUpdateEntryNo: Integer;
         ShowExtAdmSchEntryNo: Integer;
         EditReservation: Boolean;
 
@@ -71,11 +71,11 @@ codeunit 6151131 "NPR TM Seating UI"
     begin
 
         // Asynchrounous
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        if (TicketReservationRequest.FindSet()) then
+        _TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (_TicketReservationRequest.FindSet()) then
             repeat
-                ShowUI := ShowUIAdmissionScheduleEntry(POSFrontEnd, TicketReservationRequest."External Adm. Sch. Entry No.", EditCurrentReservation);
-            until (ShowUI or (TicketReservationRequest.Next() = 0));
+                ShowUI := ShowUIAdmissionScheduleEntry(POSFrontEnd, _TicketReservationRequest."External Adm. Sch. Entry No.", EditCurrentReservation);
+            until (ShowUI or (_TicketReservationRequest.Next() = 0));
     end;
 
     procedure ShowUIAdmissionScheduleEntry(POSFrontEnd: Codeunit "NPR POS Front End Management"; ExtAdmScheduleEntryNo: Integer; EditCurrentReservation: Boolean): Boolean
@@ -191,30 +191,30 @@ codeunit 6151131 "NPR TM Seating UI"
 
             'ticketing-make-reservation':
                 begin
-                    if (TicketReservationRequest."External Adm. Sch. Entry No." <> ShowExtAdmSchEntryNo) then begin
-                        TicketRequestManager.DeleteReservationRequest(TicketReservationRequest."Session Token ID", false);
+                    if (_TicketReservationRequest."External Adm. Sch. Entry No." <> ShowExtAdmSchEntryNo) then begin
+                        TicketRequestManager.DeleteReservationRequest(_TicketReservationRequest."Session Token ID", false);
 
-                        TicketReservationRequest.Get(TicketReservationRequest."Entry No.");
-                        TicketReservationRequest."External Adm. Sch. Entry No." := ShowExtAdmSchEntryNo;
-                        TicketReservationRequest.Modify();
+                        _TicketReservationRequest.Get(_TicketReservationRequest."Entry No.");
+                        _TicketReservationRequest."External Adm. Sch. Entry No." := ShowExtAdmSchEntryNo;
+                        _TicketReservationRequest.Modify();
 
-                        ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(TicketReservationRequest."Session Token ID", false, ResponseMessage);
+                        ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(_TicketReservationRequest."Session Token ID", false, ResponseMessage);
                         if (ResponseCode <> 0) then begin
                             // FrontEnd.CloseModel(ActiveModelID);
                             Error(ResponseMessage);
                         end;
 
                     end;
-                    SaveSeatReservation(TicketReservationRequest, EventName);
+                    SaveSeatReservation(_TicketReservationRequest, EventName);
 
                     // FrontEnd.UpdateModel(Model, ActiveModelID);
                     // FrontEnd.CloseModel(ActiveModelID);
 
                     // Goto next ticket in BOM
-                    if (TicketReservationRequest.Next() <> 0) then begin
+                    if (_TicketReservationRequest.Next() <> 0) then begin
                         repeat
                             ShowUI := ShowUIAdmissionScheduleEntry(FrontEnd, ShowExtAdmSchEntryNo, EditReservation);
-                        until (ShowUI or (TicketReservationRequest.Next() = 0));
+                        until (ShowUI or (_TicketReservationRequest.Next() = 0));
                     end;
 
                     if (not ShowUI) then
@@ -525,7 +525,7 @@ codeunit 6151131 "NPR TM Seating UI"
             CreateInitialSeatReservationList(ExtAdmScheduleEntryNo) +
             GetSeatDisabledList(ExtAdmScheduleEntryNo) +
             GetSeatReservationEditList(EditReservation) +
-            StrSubstNo(PlaceHolder2Lbl, TicketReservationRequest.Quantity) +
+            StrSubstNo(PlaceHolder2Lbl, _TicketReservationRequest.Quantity) +
 
           ']]></script>' +
 
@@ -593,7 +593,7 @@ codeunit 6151131 "NPR TM Seating UI"
     local procedure UpdateSeatReservationList(ExtAdmScheduleEntryNo: Integer): Text
     begin
 
-        exit(GetSeatReservationList(ExtAdmScheduleEntryNo, ReservationUpdateEntryNo));
+        exit(GetSeatReservationList(ExtAdmScheduleEntryNo, _ReservationUpdateEntryNo));
     end;
 
     local procedure CreateInitialSeatReservationList(ExtAdmScheduleEntryNo: Integer): Text
@@ -644,7 +644,7 @@ codeunit 6151131 "NPR TM Seating UI"
         if (not EditMode) then
             exit('');
 
-        SeatingReservationEntry.SetFilter("Ticket Token", '=%1', TicketReservationRequest."Session Token ID");
+        SeatingReservationEntry.SetFilter("Ticket Token", '=%1', _TicketReservationRequest."Session Token ID");
         if (not SeatingReservationEntry.FindSet()) then
             exit('');
 

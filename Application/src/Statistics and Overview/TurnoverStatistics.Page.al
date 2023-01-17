@@ -31,8 +31,8 @@
         Text10600000: Label '<-1W+1D>';
         Text10600001: Label '<-1M+1D>';
         Text10600002: Label '<-1Y+1D>';
-        DepartmentFilter: Code[50];
-        DateFilter: Text[30];
+        _DepartmentFilter: Code[50];
+        _DateFilter: Text[30];
         DateFilterLast: Text[30];
         NettoLast: Decimal;
         Netto: Decimal;
@@ -65,7 +65,7 @@
             case Value of
                 1:
                     begin
-                        DateFilter := StrSubstNo(DayLbl, Today);
+                        _DateFilter := StrSubstNo(DayLbl, Today);
                         D := Date2DWY(Today, 1);
                         W := Date2DWY(Today, 2);
                         Y := Date2DWY(Today, 3) - 1;
@@ -85,7 +85,7 @@
                         Week := Date2DWY(Today, 2);
                         Year := Date2DWY(Today, 3);
                         StartDate := DWY2Date(1, Week, Year);
-                        DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
+                        _DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
                         Year := Year - 1;
                         if LastYear_W53 then
                             Week += 1;
@@ -105,7 +105,7 @@
                         Month := Date2DMY(Today, 2);
                         Year := Date2DMY(Today, 3);
                         StartDate := DMY2Date(1, Month, Year);
-                        DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
+                        _DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
                         Year := Year - 1;
                         EndDateLast := DMY2Date(Weekday, Month, Year);
                         StartDateLast := DMY2Date(1, Month, Year);
@@ -116,7 +116,7 @@
                         EndDate := Today();
                         Year := Date2DMY(Today, 3);
                         StartDate := DMY2Date(1, 1, Year);
-                        DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
+                        _DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
                         EndDateLast := CalcDate(YearLbl, Today);
                         StartDateLast := CalcDate(YearLbl, StartDate);
                         DateFilterLast := StrSubstNo(DateLbl, StartDateLast, EndDateLast);
@@ -128,7 +128,7 @@
                     begin
                         EndDate := Today();
                         StartDate := CalcDate(Text10600000, EndDate);
-                        DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
+                        _DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
                         Weekday := Date2DWY(EndDate, 1);
                         Week := Date2DWY(EndDate, 2);
                         Year := Date2DWY(EndDate, 3);
@@ -150,7 +150,7 @@
                     begin
                         EndDate := Today();
                         StartDate := CalcDate(Text10600001, EndDate);
-                        DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
+                        _DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
                         StartDateLast := CalcDate(YearLbl, StartDate);
                         EndDateLast := CalcDate(YearLbl, EndDate);
                         DateFilterLast := StrSubstNo(DateLbl, StartDateLast, EndDateLast);
@@ -159,15 +159,15 @@
                     begin
                         EndDate := Today();
                         StartDate := CalcDate(Text10600002, EndDate);
-                        DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
+                        _DateFilter := StrSubstNo(DateLbl, StartDate, EndDate);
                         StartDateLast := CalcDate(YearLbl, StartDate);
                         EndDateLast := CalcDate(YearLbl, EndDate);
                         DateFilterLast := StrSubstNo(DateLbl, StartDateLast, EndDateLast);
                     end;
             end;
         end;
-        CalculateYear(DateFilter, DepartmentFilter);
-        CalculateLastYear(DateFilterLast, DepartmentFilter);
+        CalculateYear(_DateFilter, _DepartmentFilter);
+        CalculateLastYear(DateFilterLast, _DepartmentFilter);
     end;
 
     internal procedure CalculateYear(DateFilter: Code[50]; DepartmentFilter: Code[50])
@@ -265,7 +265,7 @@
     begin
         //SetDeptFilter
 
-        DepartmentFilter := Filter;
+        _DepartmentFilter := Filter;
     end;
 }
 

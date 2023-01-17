@@ -7,7 +7,7 @@
         Sale: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         Setup: Codeunit "NPR POS Setup";
-        FrontEnd: Codeunit "NPR POS Front End Management";
+        _FrontEnd: Codeunit "NPR POS Front End Management";
         RegisterNo: Code[20];
         SalesTicketNo: Code[20];
         DeleteNotAllowed: Label 'Payments approved by a 3-party must be cancelled, not deleted.';
@@ -30,7 +30,7 @@
 
         POSSale := SaleIn;
         Setup := SetupIn;
-        FrontEnd := FrontEndIn;
+        _FrontEnd := FrontEndIn;
 
         RegisterNo := RegisterNoIn;
         SalesTicketNo := SalesTicketNoIn;

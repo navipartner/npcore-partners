@@ -2,7 +2,7 @@
 {
     var
         [NonDebuggable]
-        ServicePassword: Text;
+        _ServicePassword: Text;
         Text000: Label 'Invalid Reference No. %1';
         Text001: Label 'Voucher %1 is already in use';
         Text002: Label 'Insufficient Remaining Voucher Amount %1';
@@ -16,13 +16,13 @@
         TempNpRvPartnerRelation: Record "NPR NpRv Partner Relation" temporary;
     begin
         retail_voucher_partners.Import();
-        retail_voucher_partners.GetSourceTables(TempNpRvPartner, TempNpRvPartnerRelation, ServicePassword);
+        retail_voucher_partners.GetSourceTables(TempNpRvPartner, TempNpRvPartnerRelation, _ServicePassword);
 
         if not TempNpRvPartner.FindSet() then
             exit;
 
         repeat
-            UpsertPartner(TempNpRvPartner, TempNpRvPartnerRelation, ServicePassword);
+            UpsertPartner(TempNpRvPartner, TempNpRvPartnerRelation, _ServicePassword);
         until TempNpRvPartner.Next() = 0;
     end;
 

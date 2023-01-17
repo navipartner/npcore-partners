@@ -15,7 +15,7 @@
         dataitem("Integer"; "Integer")
         {
             DataItemTableView = SORTING(Number) ORDER(Ascending) WHERE(Number = CONST(1));
-            column(CleanupAction; CleanupAction)
+            column(CleanupAction; _CleanupAction)
             {
             }
             column(TableOption; TableOption)
@@ -224,7 +224,7 @@
                     ToolTip = 'Specifies the value of the Insert Data In Table field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Cleanup Action"; CleanupAction)
+                field("Cleanup Action"; _CleanupAction)
                 {
                     Caption = 'Cleanup Action';
                     OptionCaption = 'Delete,Rename';
@@ -274,7 +274,7 @@
         RecInsTxt: Label 'Records have been inserted.';
         ItemRenameOption: Option " ","Vendor Item No.","Vendor + Vendor Item No.";
         TableOption: Option Customer,Vendor,Item,GLAccount;
-        CleanupAction: Option Delete,Rename;
+        _CleanupAction: Option Delete,Rename;
         CustFilter: Text;
         GLFilter: Text;
         ItemFilter: Text;
@@ -285,10 +285,10 @@
         case TableOption of
             TableOption::Customer:
                 begin
-                    if CleanupAction = CleanupAction::Delete then begin
+                    if _CleanupAction = _CleanupAction::Delete then begin
                         Deleteable := DataCleanupCVILine.MoveCustEntriesTest(Customer);
                     end;
-                    if CleanupAction = CleanupAction::Rename then begin
+                    if _CleanupAction = _CleanupAction::Rename then begin
                         if FillTable then
                             if not DataCleanupCVI.Get(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::Customer, Customer."No.") then
                                 InsertCVIRec(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::Customer, Customer."No.", 0D, '');
@@ -296,10 +296,10 @@
                 end;
             TableOption::Vendor:
                 begin
-                    if CleanupAction = CleanupAction::Delete then begin
+                    if _CleanupAction = _CleanupAction::Delete then begin
                         Deleteable := DataCleanupCVILine.MoveVendorEntriesTest(Vendor);
                     end;
-                    if CleanupAction = CleanupAction::Rename then begin
+                    if _CleanupAction = _CleanupAction::Rename then begin
                         if FillTable then
                             if not DataCleanupCVI.Get(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::Vendor, Vendor."No.") then
                                 InsertCVIRec(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::Vendor, Vendor."No.", 0D, '');
@@ -308,9 +308,9 @@
                 end;
             TableOption::Item:
                 begin
-                    if CleanupAction = CleanupAction::Delete then
+                    if _CleanupAction = _CleanupAction::Delete then
                         Deleteable := DataCleanupCVILine.MoveItemEntriesTest(Item);
-                    if CleanupAction = CleanupAction::Rename then begin
+                    if _CleanupAction = _CleanupAction::Rename then begin
                         if FillTable then
                             if not DataCleanupCVI.Get(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::Item, Item."No.") then begin
                                 if ItemRenameOption = ItemRenameOption::"Vendor Item No." then
@@ -326,9 +326,9 @@
                 end;
             TableOption::GLAccount:
                 begin
-                    if CleanupAction = CleanupAction::Delete then
+                    if _CleanupAction = _CleanupAction::Delete then
                         Deleteable := DataCleanupCVILine.MoveGLEntriesTest("G/L Account");
-                    if CleanupAction = CleanupAction::Rename then begin
+                    if _CleanupAction = _CleanupAction::Rename then begin
                         if FillTable then
                             if not DataCleanupCVI.Get(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::"G/L Account", "G/L Account"."No.") then
                                 InsertCVIRec(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::"G/L Account", "G/L Account"."No.", 0D, '');
@@ -340,7 +340,7 @@
 
     local procedure Func_LedgerOnPreDataItem()
     begin
-        if CleanupAction = CleanupAction::Delete then begin
+        if _CleanupAction = _CleanupAction::Delete then begin
             case TableOption of
                 TableOption::Customer:
                     begin
@@ -384,7 +384,7 @@
 
     local procedure Func_LedgerOnAfterGetRec()
     begin
-        if CleanupAction = CleanupAction::Delete then begin
+        if _CleanupAction = _CleanupAction::Delete then begin
             case TableOption of
                 TableOption::Customer:
                     begin

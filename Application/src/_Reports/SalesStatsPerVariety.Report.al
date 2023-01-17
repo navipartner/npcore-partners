@@ -155,9 +155,9 @@
                 COGSAmount := 0;
 
 
-                ItemVariant.Reset();
-                ItemVariant.SetRange("Item No.", "No.");
-                if not ItemVariant.FindFirst() then
+                _ItemVariant.Reset();
+                _ItemVariant.SetRange("Item No.", "No.");
+                if not _ItemVariant.FindFirst() then
                     CurrReport.Skip();
 
                 if not PrintAlsoWithoutSale then begin
@@ -246,7 +246,7 @@
     var
         AllObj: Record AllObj;
         GLSetup: Record "General Ledger Setup";
-        ItemVariant: Record "Item Variant";
+        _ItemVariant: Record "Item Variant";
         PrintAlsoWithoutSale: Boolean;
         PrintTotal: Boolean;
         AverageProfit: Decimal;

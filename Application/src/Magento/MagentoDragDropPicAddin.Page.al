@@ -63,7 +63,7 @@
 
     trigger OnInit()
     begin
-        PictureType := -1;
+        _PictureType := -1;
     end;
 
     trigger OnOpenPage()
@@ -84,10 +84,10 @@
         Overwrite: Boolean;
         PictureDataUri: Text;
         PicturesAlreadyExistLbl: Label '%1 pictures already exist:', Comment = '%1 = number of pictures';
-        PictureName: Text;
+        _PictureName: Text;
         PictureLinkNo: Code[20];
         PictureLinkVariantValueCode: Code[20];
-        PictureType: Integer;
+        _PictureType: Integer;
         Text00101: Label '\  - %1';
         ConfirmOverwriteLbl: Label '\\Overwrite?';
         DragAndDropPictureLbl: Label 'DragAndDrop Picture';
@@ -114,7 +114,7 @@
         ExistingCount := 0;
         if TempMagentoPicture.FindSet() then
             repeat
-                if MagentoPicture.Get(PictureType, TempMagentoPicture.Name) then begin
+                if MagentoPicture.Get(_PictureType, TempMagentoPicture.Name) then begin
                     ExistingCount += 1;
                     ConfirmText += StrSubstNo(Text00101, MagentoPicture.Name);
                 end;
@@ -137,19 +137,19 @@
         if (TempMagentoPicture.IsEmpty()) then
             exit;
 
-        if PictureType < 0 then
-            PictureType := SelectPictureType();
-        if PictureType < 0 then
+        if _PictureType < 0 then
+            _PictureType := SelectPictureType();
+        if _PictureType < 0 then
             exit;
 
         Overwrite := ConfirmOverwrite();
         TempMagentoPicture.FindSet();
         repeat
-            Skip := MagentoPicture.Get(PictureType, TempMagentoPicture.Name) and not Overwrite;
+            Skip := MagentoPicture.Get(_PictureType, TempMagentoPicture.Name) and not Overwrite;
             if not Skip then begin
                 Base64Images.Get(TempMagentoPicture.Name, Base64);
-                SavePicture(PictureType, Base64, TempMagentoPicture);
-                SavePictureLinks(PictureType, TempMagentoPicture);
+                SavePicture(_PictureType, Base64, TempMagentoPicture);
+                SavePictureLinks(_PictureType, TempMagentoPicture);
                 Commit();
             end;
         until TempMagentoPicture.Next() = 0;
@@ -283,20 +283,20 @@
 
     procedure SetItemNo(ItemNo: Code[20])
     begin
-        PictureType := Rec.Type::Item.AsInteger();
+        _PictureType := Rec.Type::Item.AsInteger();
         PictureLinkNo := ItemNo;
     end;
 
     procedure SetItemGroupNo(ItemGroupNo: Code[20]; NewIsIconPicture: Boolean)
     begin
-        PictureType := Rec.Type::"Item Group".AsInteger();
+        _PictureType := Rec.Type::"Item Group".AsInteger();
         PictureLinkNo := ItemGroupNo;
         IsIconPicture := NewIsIconPicture;
     end;
 
     procedure SetBrandCode(BrandCode: Code[20]; NewIsLogoPicture: Boolean)
     begin
-        PictureType := Rec.Type::Brand.AsInteger();
+        _PictureType := Rec.Type::Brand.AsInteger();
         PictureLinkNo := BrandCode;
         IsLogoPicture := NewIsLogoPicture;
     end;
@@ -327,19 +327,19 @@
         if not Initialized then
             exit;
 
-        Base64 := NpRegEx.ExtractMagentoPicture(PictureDataUri, PictureName, PictureSize, PictureType, TempMagentoPicture);
-        Base64Images.Set(PictureName, Base64);
+        Base64 := NpRegEx.ExtractMagentoPicture(PictureDataUri, _PictureName, PictureSize, _PictureType, TempMagentoPicture);
+        Base64Images.Set(_PictureName, Base64);
 
         // Reset data for next picture.
         PictureDataUri := '';
-        PictureName := '';
+        _PictureName := '';
         PictureSize := 0;
     end;
 
     internal procedure EndDataTransfer()
     begin
         // We are done receiving data for all pictures.
-        PictureName := '';
+        _PictureName := '';
         PictureDataUri := '';
         PictureSize := 0;
 
@@ -361,10 +361,10 @@
     local procedure InitDataStream(Filename: Text; Filesize: Decimal)
     begin
         // We are initiating a new stream of data of a picture.
-        if (TempMagentoPicture.Get(PictureType, Filename)) then
+        if (TempMagentoPicture.Get(_PictureType, Filename)) then
             Error(PictureNamesMustBeUniqueErr);
 
-        PictureName := Filename;
+        _PictureName := Filename;
         PictureDataUri := '';
         PictureSize := Filesize;
     end;
@@ -372,7 +372,7 @@
     internal procedure InitDataTransfer()
     begin
         // We are initiating a new transfer of a batch of pictures.
-        PictureName := '';
+        _PictureName := '';
         PictureDataUri := '';
         TempMagentoPicture.DeleteAll();
         Initialized := true;

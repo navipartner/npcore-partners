@@ -20,8 +20,8 @@
         CaptionRegisterClosed: Label 'Register closed';
         CaptionTotal: Label 'Grand Total';
         CaptionDeletedSaleline: Label 'Deleted item';
-        MatrixIsActivated: Boolean;
-        DisplayIsActivated: Boolean;
+        _MatrixIsActivated: Boolean;
+        _DisplayIsActivated: Boolean;
         Text000: Label 'Update POS Unit Display on Sale Line Insert';
         CaptionTAXTotal: Label 'Tax';
         CaptionSubTotal: Label 'Sub-Total';
@@ -39,15 +39,15 @@
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
-        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
-        if (not MatrixIsActivated) and (not DisplayIsActivated) then
+        CustomerDisplayIsActivated(POSUnit, _MatrixIsActivated, _DisplayIsActivated);
+        if (not _MatrixIsActivated) and (not _DisplayIsActivated) then
             exit;
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
-        if DisplayIsActivated then
+        if _DisplayIsActivated then
             Login(FrontEnd)
         else
-            if MatrixIsActivated then
+            if _MatrixIsActivated then
                 UpdateDisplayFromSalePOS(Action::Login, '', '');
     end;
 
@@ -60,14 +60,14 @@
     begin
         if not POSUnit.Get(SaleHeader."Register No.") then
             exit;
-        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
-        if (not MatrixIsActivated) and (not DisplayIsActivated) then
+        CustomerDisplayIsActivated(POSUnit, _MatrixIsActivated, _DisplayIsActivated);
+        if (not _MatrixIsActivated) and (not _DisplayIsActivated) then
             exit;
 
-        if DisplayIsActivated then
+        if _DisplayIsActivated then
             Update2ndDisplayFromSalePOS(FrontEnd, SaleHeader, POSUnit, Action::Clear, TextValue, 0)
         else
-            if MatrixIsActivated then
+            if _MatrixIsActivated then
                 UpdateDisplayFromSalePOS(Action::Login, TextValue, '');
     end;
 
@@ -87,16 +87,16 @@
             exit;
         if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
-        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
-        if (not MatrixIsActivated) and (not DisplayIsActivated) then
+        CustomerDisplayIsActivated(POSUnit, _MatrixIsActivated, _DisplayIsActivated);
+        if (not _MatrixIsActivated) and (not _DisplayIsActivated) then
             exit;
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
-        if DisplayIsActivated then
+        if _DisplayIsActivated then
             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::Payment, 0)
         else
-            if MatrixIsActivated then
+            if _MatrixIsActivated then
                 UpdateDisplayFromSaleLinePOS(SaleLinePOS);
     end;
 
@@ -113,17 +113,17 @@
     begin
         if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
-        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
-        if (not MatrixIsActivated) and (not DisplayIsActivated) then
+        CustomerDisplayIsActivated(POSUnit, _MatrixIsActivated, _DisplayIsActivated);
+        if (not _MatrixIsActivated) and (not _DisplayIsActivated) then
             exit;
 
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
-        if DisplayIsActivated then
+        if _DisplayIsActivated then
             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::DeleteLine, 0)
         else
-            if MatrixIsActivated then begin
+            if _MatrixIsActivated then begin
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
                 if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"POS Payment" then
                     UpdateDisplayFromSalePOS(Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
@@ -143,17 +143,17 @@
         if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
-        if (not MatrixIsActivated) and (not DisplayIsActivated) then
+        CustomerDisplayIsActivated(POSUnit, _MatrixIsActivated, _DisplayIsActivated);
+        if (not _MatrixIsActivated) and (not _DisplayIsActivated) then
             exit;
 
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
-        if DisplayIsActivated then
+        if _DisplayIsActivated then
             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::NewQuantity, SaleLinePOS.Quantity)
         else
-            if MatrixIsActivated then
+            if _MatrixIsActivated then
                 UpdateDisplayFromSaleLinePOS(SaleLinePOS);
     end;
 
@@ -168,17 +168,17 @@
         if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
-        if (not MatrixIsActivated) and (not DisplayIsActivated) then
+        CustomerDisplayIsActivated(POSUnit, _MatrixIsActivated, _DisplayIsActivated);
+        if (not _MatrixIsActivated) and (not _DisplayIsActivated) then
             exit;
 
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
-        if DisplayIsActivated then
+        if _DisplayIsActivated then
             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::NewQuantity, SaleLinePOS.Quantity)
         else
-            if MatrixIsActivated then
+            if _MatrixIsActivated then
                 UpdateDisplayFromSaleLinePOS(SaleLinePOS);
     end;
 
@@ -196,17 +196,17 @@
         if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
-        if (not MatrixIsActivated) and (not DisplayIsActivated) then
+        CustomerDisplayIsActivated(POSUnit, _MatrixIsActivated, _DisplayIsActivated);
+        if (not _MatrixIsActivated) and (not _DisplayIsActivated) then
             exit;
 
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
-        if DisplayIsActivated then
+        if _DisplayIsActivated then
             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::Payment, 0)
         else
-            if MatrixIsActivated then begin
+            if _MatrixIsActivated then begin
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
                 if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"POS Payment" then
                     UpdateDisplayFromSalePOS(Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
@@ -229,17 +229,17 @@
         if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
-        if (not MatrixIsActivated) and (not DisplayIsActivated) then
+        CustomerDisplayIsActivated(POSUnit, _MatrixIsActivated, _DisplayIsActivated);
+        if (not _MatrixIsActivated) and (not _DisplayIsActivated) then
             exit;
 
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
-        if DisplayIsActivated then
+        if _DisplayIsActivated then
             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::Payment, 0)
         else
-            if MatrixIsActivated then begin
+            if _MatrixIsActivated then begin
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
                 UpdateDisplayFromSalePOS(Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
             end;
@@ -266,11 +266,11 @@
         if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
-        if (not MatrixIsActivated) and (not DisplayIsActivated) then
+        CustomerDisplayIsActivated(POSUnit, _MatrixIsActivated, _DisplayIsActivated);
+        if (not _MatrixIsActivated) and (not _DisplayIsActivated) then
             exit;
 
-        if DisplayIsActivated then
+        if _DisplayIsActivated then
             exit;
 
         CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
@@ -301,8 +301,8 @@
         if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
-        if (not MatrixIsActivated) then
+        CustomerDisplayIsActivated(POSUnit, _MatrixIsActivated, _DisplayIsActivated);
+        if (not _MatrixIsActivated) then
             exit;
 
         if POSPaymentMethod."Currency Code" <> '' then begin

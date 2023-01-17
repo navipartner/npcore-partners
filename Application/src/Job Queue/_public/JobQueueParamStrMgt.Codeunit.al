@@ -4,7 +4,7 @@
 
     var
         ParamString: Text;
-        ParamDict: Dictionary of [Text, Text];
+        _ParamDict: Dictionary of [Text, Text];
         Initialized: Boolean;
 
     procedure Parse(_ParamString: Text)
@@ -17,7 +17,7 @@
         ParamString := _ParamString;
         KeyValueList := ParamString.Split(',');
         foreach KeyValuePair in KeyValueList do
-            AddToParamDict(KeyValuePair, ParamDict);
+            AddToParamDict(KeyValuePair, _ParamDict);
 
         Initialized := true;
     end;
@@ -33,7 +33,7 @@
     internal procedure HasParams(): Boolean
     begin
         MakeSureIsInitialized();
-        exit(ParamDict.Count() > 0);
+        exit(_ParamDict.Count() > 0);
     end;
 
     procedure ContainsParam(ParamKey: Text): Boolean
@@ -41,15 +41,15 @@
         MakeSureIsInitialized();
         if ParamKey = '' then
             exit(false);
-        exit(ParamDict.ContainsKey(ParamKey));
+        exit(_ParamDict.ContainsKey(ParamKey));
     end;
 
     procedure GetParamValueAsText(ParamKey: Text): Text
     begin
         MakeSureIsInitialized();
         if ParamKey <> '' then
-            if ParamDict.ContainsKey(ParamKey) then
-                exit(ParamDict.Get(ParamKey));
+            if _ParamDict.ContainsKey(ParamKey) then
+                exit(_ParamDict.Get(ParamKey));
         exit('');
     end;
 
@@ -60,12 +60,12 @@
         MakeSureIsInitialized();
         ParamValue := false;
         if ParamKey <> '' then
-            if ParamDict.ContainsKey(ParamKey) then begin
-                R := ParamDict.Get(ParamKey);
+            if _ParamDict.ContainsKey(ParamKey) then begin
+                R := _ParamDict.Get(ParamKey);
                 if R = '' then // if only parameter name is present
                     ParamValue := true
                 else
-                    evaluate(ParamValue, ParamDict.Get(ParamKey));
+                    evaluate(ParamValue, _ParamDict.Get(ParamKey));
             end;
     end;
 
@@ -74,20 +74,20 @@
         MakeSureIsInitialized();
         ParamValue := 0;
         if ParamKey <> '' then
-            if ParamDict.ContainsKey(ParamKey) then
-                evaluate(ParamValue, ParamDict.Get(ParamKey));
+            if _ParamDict.ContainsKey(ParamKey) then
+                evaluate(ParamValue, _ParamDict.Get(ParamKey));
     end;
 
     procedure ClearParamDict()
     begin
-        Clear(ParamDict);
+        Clear(_ParamDict);
         ParamString := '';
         Initialized := false;
     end;
 
     procedure AddToParamDict(KeyValuePair: Text)
     begin
-        AddToParamDict(KeyValuePair, ParamDict);
+        AddToParamDict(KeyValuePair, _ParamDict);
     end;
 
     local procedure AddToParamDict(KeyValuePair: Text; ParamDict: Dictionary of [Text, Text])
@@ -117,13 +117,13 @@
         ParamValue: Text;
         ResultString: Text;
     begin
-        KeyList := ParamDict.Keys;
+        KeyList := _ParamDict.Keys;
         foreach ParamKey in KeyList do
             if ParamKey <> '' then begin
                 if ResultString <> '' then
                     ResultString := ResultString + ',';
                 ResultString := ResultString + ParamKey;
-                if ParamDict.Get(ParamKey, ParamValue) then
+                if _ParamDict.Get(ParamKey, ParamValue) then
                     if ParamValue <> '' then
                         ResultString := ResultString + '=' + ParamValue;
             end;

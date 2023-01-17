@@ -158,7 +158,7 @@
                         end;
                     else begin
                         GetItem();
-                        "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
+                        "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(_Item, "Unit of Measure Code");
                         "Quantity (Base)" := CalcBaseQty(Quantity);
                         "Unit Price" := FindItemSalesPrice();
                     end;
@@ -208,7 +208,7 @@
                             CalculateCostPrice();
                             UpdateAmounts(Rec);
 
-                            if not Item."NPR Group sale" then begin
+                            if not _Item."NPR Group sale" then begin
                                 OldUnitPrice := "Unit Price";
                                 "Unit Price" := Rec.FindItemSalesPrice();
                                 if OldUnitPrice <> "Unit Price" then
@@ -285,9 +285,9 @@
                             GetItem();
 
                             "Eksp. Salgspris" := true;
-                            GetAmount(Rec, Item, "Unit Price");
+                            GetAmount(Rec, _Item, "Unit Price");
                             if ("No." <> '') then begin
-                                if (Item."NPR Group sale") or (Item."Unit Cost" = 0) then begin
+                                if (_Item."NPR Group sale") or (_Item."Unit Cost" = 0) then begin
                                     CalculateCostPrice();
                                 end else
                                     if ("Serial No." <> '') and (Quantity > 0) then
@@ -398,7 +398,7 @@
                             "Discount Amount" := 0;
                             if Modify() then;
                             GetItem();
-                            GetAmount(Rec, Item, Rec."Unit Price");
+                            GetAmount(Rec, _Item, Rec."Unit Price");
                         end;
                     "Line Type"::"Item Category":
                         Error(Trans0002);
@@ -481,7 +481,7 @@
                                 "Amount Including VAT" := 0;
 
                                 if Modify() then;
-                                GetAmount(Rec, Item, Rec."Unit Price");
+                                GetAmount(Rec, _Item, Rec."Unit Price");
                             end;
                     end;
                 end;
@@ -1741,7 +1741,7 @@
     end;
 
     var
-        Item: Record Item;
+        _Item: Record Item;
         POSUnitGlobal: Record "NPR POS Unit";
         SalePOS: Record "NPR POS Sale";
         Currency: Record Currency;
@@ -2269,18 +2269,18 @@
         TestItem();
         GetItem();
 
-        "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
-        "VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
-        "Item Category Code" := Item."Item Category Code";
-        "Tax Group Code" := Item."Tax Group Code";
-        "Posting Group" := Item."Inventory Posting Group";
-        "Item Disc. Group" := Item."Item Disc. Group";
-        "Custom Disc Blocked" := Item."NPR Custom Discount Blocked";
+        "Gen. Prod. Posting Group" := _Item."Gen. Prod. Posting Group";
+        "VAT Prod. Posting Group" := _Item."VAT Prod. Posting Group";
+        "Item Category Code" := _Item."Item Category Code";
+        "Tax Group Code" := _Item."Tax Group Code";
+        "Posting Group" := _Item."Inventory Posting Group";
+        "Item Disc. Group" := _Item."Item Disc. Group";
+        "Custom Disc Blocked" := _Item."NPR Custom Discount Blocked";
         if "Unit of Measure Code" = '' then
-            "Unit of Measure Code" := Item."Base Unit of Measure";
+            "Unit of Measure Code" := _Item."Base Unit of Measure";
 
         GetDescription();
-        "Magento Brand" := Item."NPR Magento Brand";
+        "Magento Brand" := _Item."NPR Magento Brand";
     end;
 
     local procedure InitFromItemCategory()
@@ -2292,11 +2292,11 @@
 
         ItemCategory.Get("No.");
         GetItem();
-        Item.TestField("NPR Group sale");
-        "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
-        "VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
-        "Tax Group Code" := Item."Tax Group Code";
-        "Item Disc. Group" := Item."Item Disc. Group";
+        _Item.TestField("NPR Group sale");
+        "Gen. Prod. Posting Group" := _Item."Gen. Prod. Posting Group";
+        "VAT Prod. Posting Group" := _Item."VAT Prod. Posting Group";
+        "Tax Group Code" := _Item."Tax Group Code";
+        "Item Disc. Group" := _Item."Item Disc. Group";
         Description := CopyStr(ItemCategory.Description, 1, MaxStrLen(Description));
     end;
 
@@ -2320,15 +2320,15 @@
         if "No." = '' then
             exit;
 
-        Item.Get("No.");
-        Item.TestField(Blocked, false);
-        Item.TestField("Gen. Prod. Posting Group");
-        if Item.Type = Item.Type::Inventory then
-            Item.TestField("Inventory Posting Group");
-        if Item."Price Includes VAT" then
-            Item.TestField(Item."VAT Bus. Posting Gr. (Price)");
+        _Item.Get("No.");
+        _Item.TestField(Blocked, false);
+        _Item.TestField("Gen. Prod. Posting Group");
+        if _Item.Type = _Item.Type::Inventory then
+            _Item.TestField("Inventory Posting Group");
+        if _Item."Price Includes VAT" then
+            _Item.TestField(_Item."VAT Bus. Posting Gr. (Price)");
         if "Variant Code" <> '' then begin
-            ItemVariant.Get(Item."No.", "Variant Code");
+            ItemVariant.Get(_Item."No.", "Variant Code");
             ItemVariant.TestField("NPR Blocked", false);
         end;
     end;
@@ -2347,8 +2347,8 @@
     local procedure GetItem()
     begin
         TestField("No.");
-        if "No." <> Item."No." then
-            Item.Get("No.");
+        if "No." <> _Item."No." then
+            _Item.Get("No.");
     end;
 
     local procedure UpdateCost()
@@ -2380,8 +2380,8 @@
 
         GetItem();
         if ("Serial No." <> '') and (Quantity > 0) then begin
-            Item.TestField("Item Tracking Code");
-            ItemTrackingCode.Get(Item."Item Tracking Code");
+            _Item.TestField("Item Tracking Code");
+            ItemTrackingCode.Get(_Item."Item Tracking Code");
             if ItemTrackingCode."SN Specific Tracking" then begin
                 ItemLedgerEntry.SetAutoCalcFields("Cost Amount (Actual)");
                 ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Serial No.");
@@ -2402,10 +2402,10 @@
             VATPercent := "VAT %"
         else
             VATPercent := 0;
-        if (Item."NPR Group sale") and (Item."Profit %" <> 0) then
-            exit(((1 - Item."Profit %" / 100) * "Unit Price" / (1 + VATPercent / 100)) * "Qty. per Unit of Measure")
+        if (_Item."NPR Group sale") and (_Item."Profit %" <> 0) then
+            exit(((1 - _Item."Profit %" / 100) * "Unit Price" / (1 + VATPercent / 100)) * "Qty. per Unit of Measure")
         else
-            exit(Item."Unit Cost" * "Qty. per Unit of Measure");
+            exit(_Item."Unit Cost" * "Qty. per Unit of Measure");
     end;
 
     local procedure UpdateDependingLinesQuantity()
@@ -2480,17 +2480,17 @@
         if IsHandled then
             exit;
         if "Variant Code" <> '' then begin
-            ItemVariant.Get(Item."No.", "Variant Code");
+            ItemVariant.Get(_Item."No.", "Variant Code");
             Description := CopyStr(ItemVariant.Description, 1, MaxStrLen(Rec.Description));
             "Description 2" := CopyStr(ItemVariant."Description 2", 1, MaxStrLen(Rec."Description 2"));
             if NPRVarietySetup.Get() then
                 if NPRVarietySetup."Custom Descriptions" then begin
-                    Description := CopyStr(Item.Description, 1, MaxStrLen(Rec.Description));
+                    Description := CopyStr(_Item.Description, 1, MaxStrLen(Rec.Description));
                     "Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen(Rec."Description 2"));
                 end;
         end else begin
-            Description := CopyStr(Item.Description, 1, MaxStrLen(Rec.Description));
-            "Description 2" := CopyStr(Item."Description 2", 1, MaxStrLen(Rec."Description 2"));
+            Description := CopyStr(_Item.Description, 1, MaxStrLen(Rec.Description));
+            "Description 2" := CopyStr(_Item."Description 2", 1, MaxStrLen(Rec."Description 2"));
         end;
     end;
 
@@ -2519,7 +2519,7 @@
         TestField("Line Type", "Line Type"::Item);
 
         GetItem();
-        Item.TestField("Costing Method", Item."Costing Method"::Specific);
+        _Item.TestField("Costing Method", _Item."Costing Method"::Specific);
         ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Serial No.");
         ItemLedgerEntry.SetRange(Open, true);
         ItemLedgerEntry.SetRange(Positive, true);
@@ -2578,8 +2578,8 @@
         TestField(Quantity);
 
         GetItem();
-        Item.TestField("Item Tracking Code");
-        ItemTrackingCode.Get(Item."Item Tracking Code");
+        _Item.TestField("Item Tracking Code");
+        ItemTrackingCode.Get(_Item."Item Tracking Code");
 
         SaleLinePOS2.SetCurrentKey("Serial No.");
         SaleLinePOS2.SetRange("Serial No.", "Serial No.");
