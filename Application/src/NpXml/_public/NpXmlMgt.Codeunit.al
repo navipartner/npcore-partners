@@ -12,11 +12,11 @@
         Error002: Label 'Record in %1 within the filters does not exist';
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         NpXmlValueMgt: Codeunit "NPR NpXml Value Mgt.";
-        RecRef: RecordRef;
+        _RecRef: RecordRef;
         OutputOutStr: OutStream;
         ResponseOutStr: OutStream;
         Window: Dialog;
-        PrimaryKeyValue: Text;
+        _PrimaryKeyValue: Text;
         Text002: Label 'Exporting %1 to XML\';
         Text003: Label 'Exporting:           #2###################\Estimated Time Left: #3###################\Record:       #4###########################';
         HideDialog: Boolean;
@@ -41,7 +41,7 @@
         Initialized := false;
         StartTime := Time;
         Counter := 0;
-        Total := RecRef.Count();
+        Total := _RecRef.Count();
         OpenDialog(StrSubstNo(Text002, NpXmlTemplate2.Code) + Text003);
 
         if NpXmlTemplate2."Max Records per File" <= 0 then
@@ -50,24 +50,24 @@
         XmlEntityCount := 0;
         NpXmlDomMgt.InitDoc(Document, Node, NpXmlTemplate2."Xml Root Name", NpXmlTemplate2."Custom Namespace for XMLNS");
         NpXmlDomMgt.AddRootAttributes(Node, NpXmlTemplate2);
-        RecordSetExists := RecRef.FindSet();
+        RecordSetExists := _RecRef.FindSet();
         repeat
             Counter += 1;
-            UpdateDialog(Counter, Total, StartTime, RecRef.GetPosition());
+            UpdateDialog(Counter, Total, StartTime, _RecRef.GetPosition());
 
-            if ParseDataToXmlDocNode(RecRef, RecordSetExists, Node) then
+            if ParseDataToXmlDocNode(_RecRef, RecordSetExists, Node) then
                 XmlEntityCount += 1;
 
             if XmlEntityCount >= NpXmlTemplate2."Max Records per File" then begin
-                FinalizeDoc(Document, NpXmlTemplate2, GetFilename(NpXmlTemplate2."Xml Root Name", PrimaryKeyValue, Counter));
+                FinalizeDoc(Document, NpXmlTemplate2, GetFilename(NpXmlTemplate2."Xml Root Name", _PrimaryKeyValue, Counter));
                 XmlEntityCount := 0;
                 NpXmlDomMgt.InitDoc(Document, Node, NpXmlTemplate2."Xml Root Name", NpXmlTemplate2."Custom Namespace for XMLNS");
                 NpXmlDomMgt.AddRootAttributes(Node, NpXmlTemplate2);
             end;
-        until RecRef.Next() = 0;
+        until _RecRef.Next() = 0;
 
         if XmlEntityCount > 0 then
-            FinalizeDoc(Document, NpXmlTemplate2, GetFilename(NpXmlTemplate2."Xml Root Name", PrimaryKeyValue, Counter));
+            FinalizeDoc(Document, NpXmlTemplate2, GetFilename(NpXmlTemplate2."Xml Root Name", _PrimaryKeyValue, Counter));
 
         Clear(Document);
         CloseDialog();
@@ -89,7 +89,7 @@
         Initialized := false;
         StartTime := Time;
         Counter := 0;
-        Total := RecRef.Count();
+        Total := _RecRef.Count();
         OpenDialog(StrSubstNo(Text002, NpXmlTemplate2.Code) + Text003);
 
         if NpXmlTemplate2."Max Records per File" <= 0 then
@@ -98,12 +98,12 @@
         XmlEntityCount := 0;
         NpXmlDomMgt.InitDoc(Document, Node, NpXmlTemplate2."Xml Root Name", NpXmlTemplate2."Custom Namespace for XMLNS");
         NpXmlDomMgt.AddRootAttributes(Node, NpXmlTemplate2);
-        RecordSetExists := RecRef.FindSet();
+        RecordSetExists := _RecRef.FindSet();
         repeat
             Counter += 1;
-            UpdateDialog(Counter, Total, StartTime, RecRef.GetPosition());
+            UpdateDialog(Counter, Total, StartTime, _RecRef.GetPosition());
 
-            if ParseDataToXmlDocNode(RecRef, RecordSetExists, Node) then
+            if ParseDataToXmlDocNode(_RecRef, RecordSetExists, Node) then
                 XmlEntityCount += 1;
 
             if XmlEntityCount >= NpXmlTemplate2."Max Records per File" then begin
@@ -112,7 +112,7 @@
                 NpXmlDomMgt.InitDoc(Document, Node, NpXmlTemplate2."Xml Root Name", NpXmlTemplate2."Custom Namespace for XMLNS");
                 NpXmlDomMgt.AddRootAttributes(Node, NpXmlTemplate2);
             end;
-        until RecRef.Next() = 0;
+        until _RecRef.Next() = 0;
 
         if XmlEntityCount > 0 then
             FinalizeDoc(Document, NpXmlTemplate2, Result);
@@ -154,8 +154,8 @@
     procedure Initialize(NewNpXmlTemplate: Record "NPR NpXml Template"; var NewRecRef: RecordRef; NewPrimaryKeyValue: Text; NewHideDialog: Boolean)
     begin
         NpXmlTemplate2 := NewNpXmlTemplate;
-        RecRef := NewRecRef;
-        PrimaryKeyValue := NewPrimaryKeyValue;
+        _RecRef := NewRecRef;
+        _PrimaryKeyValue := NewPrimaryKeyValue;
         HideDialog := NewHideDialog;
         Initialized := true;
     end;
@@ -800,7 +800,7 @@
     var
         Handled: Boolean;
     begin
-        OnBeforeTransferXml(NpXmlTemplate, RecRef, XmlDoc, Filename, Handled);
+        OnBeforeTransferXml(NpXmlTemplate, _RecRef, XmlDoc, Filename, Handled);
         if not (NpXmlTemplate."File Transfer" or NpXmlTemplate."FTP Transfer" or NpXmlTemplate."API Transfer") then
             exit(false);
 
@@ -1132,35 +1132,35 @@
     begin
         NpXmlTemplate.Get(NPXmlTemplateCode);
         NpXmlTemplate.TestField("Table No.");
-        Clear(RecRef);
-        RecRef.Open(NpXmlTemplate."Table No.");
+        Clear(_RecRef);
+        _RecRef.Open(NpXmlTemplate."Table No.");
         Counter := 0;
-        Total := RecRef.Count();
-        RecRef.FindSet();
+        Total := _RecRef.Count();
+        _RecRef.FindSet();
         Success := false;
 
         StartTime := Time;
-        OpenDialog(StrSubstNo(Text200, RecRef.Caption) + Text300);
+        OpenDialog(StrSubstNo(Text200, _RecRef.Caption) + Text300);
         while not Success do begin
             Counter += 1;
-            UpdateDialog(Counter, Total, StartTime, RecRef.GetPosition());
+            UpdateDialog(Counter, Total, StartTime, _RecRef.GetPosition());
             NpXmlElement.Reset();
             NpXmlElement.SetRange("Xml Template Code", NpXmlTemplate.Code);
             NpXmlElement.SetFilter("Parent Line No.", '=%1', 0);
             NpXmlElement.SetRange(Active, true);
             NpXmlElement.FindSet();
             repeat
-                SetRecRefXmlFilter(NpXmlElement, RecRef, RecRef2);
+                SetRecRefXmlFilter(NpXmlElement, _RecRef, RecRef2);
                 Success := RecRef2.FindFirst();
             until (NpXmlElement.Next() = 0) or Success;
             if not Success then
-                if RecRef.Next() = 0 then
-                    Error(Error002, RecRef.Caption);
+                if _RecRef.Next() = 0 then
+                    Error(Error002, _RecRef.Caption);
         end;
         CloseDialog();
 
-        PrimaryKeyValue := NpXmlValueMgt.GetPrimaryKeyValue(RecRef);
-        Filename := GetFilename(NpXmlTemplate."Xml Root Name", PrimaryKeyValue, 1);
+        _PrimaryKeyValue := NpXmlValueMgt.GetPrimaryKeyValue(_RecRef);
+        Filename := GetFilename(NpXmlTemplate."Xml Root Name", _PrimaryKeyValue, 1);
         NpXmlDomMgt.InitDoc(XmlDoc, XmlDocNode, NpXmlTemplate."Xml Root Name", NpXmlTemplate."Custom Namespace for XMLNS");
         NpXmlDomMgt.AddRootAttributes(XmlDocNode, NpXmlTemplate);
 
@@ -1170,14 +1170,14 @@
         NpXmlElement.SetRange(Active, true);
         if NpXmlElement.FindSet() then
             repeat
-                SetRecRefXmlFilter(NpXmlElement, RecRef, RecRef2);
+                SetRecRefXmlFilter(NpXmlElement, _RecRef, RecRef2);
                 if RecRef2.FindSet() then
                     repeat
                         Success := AddXmlElement(XmlDocNode, NpXmlElement, RecRef2, 0);
                     until (RecRef2.Next() = 0) or not Success;
                 RecRef2.Close();
             until NpXmlElement.Next() = 0;
-        RecRef.Close();
+        _RecRef.Close();
 
         AddXmlNamespaces(NpXmlTemplate, XmlDoc);
         Clear(TempBlob);

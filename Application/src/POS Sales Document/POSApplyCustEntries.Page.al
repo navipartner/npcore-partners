@@ -1189,9 +1189,9 @@
             ApplnRounding := -((AppliedAmount - PmtDiscAmount) + ApplyingAmount);
     end;
 
-    internal procedure GetCustLedgEntry(var CustLedgEntry: Record "Cust. Ledger Entry")
+    internal procedure GetCustLedgEntry(var ParamCustLedgEntry: Record "Cust. Ledger Entry")
     begin
-        CustLedgEntry := Rec;
+        ParamCustLedgEntry := Rec;
     end;
 
     local procedure FindApplyingEntry()

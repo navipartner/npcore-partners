@@ -1,8 +1,9 @@
 ﻿codeunit 6151241 "NPR Purchase Ord Mgt"
 {
     Access = Internal;
+
     var
-        TrailingPurchOrdersSetup: Record "NPR Trail. Purch. Orders Setup";
+        _TrailingPurchOrdersSetup: Record "NPR Trail. Purch. Orders Setup";
         PurchHeader: Record "Purchase Header";
 
     procedure OnOpenPage(var TrailingPurchOrdersSetup: Record "NPR Trail. Purch. Orders Setup")
@@ -27,10 +28,10 @@
         Measure := BusChartBuf."Drill-Down Measure Index";
         if (Measure < 0) or (Measure > 3) then
             exit;
-        TrailingPurchOrdersSetup.Get(UserId);
+        _TrailingPurchOrdersSetup.Get(UserId);
         PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Order);
-        if TrailingPurchOrdersSetup."Show Orders" = TrailingPurchOrdersSetup."Show Orders"::"Delayed Orders" then
-            PurchaseHeader.SetFilter("Posting Date", '<%1', TrailingPurchOrdersSetup.GetStartDate());
+        if _TrailingPurchOrdersSetup."Show Orders" = _TrailingPurchOrdersSetup."Show Orders"::"Delayed Orders" then
+            PurchaseHeader.SetFilter("Posting Date", '<%1', _TrailingPurchOrdersSetup.GetStartDate());
         if Evaluate(PurchaseHeader.Status, BusChartBuf.GetMeasureValueString(Measure), 9) then
             PurchaseHeader.SetRange(Status, PurchaseHeader.Status);
 
@@ -49,15 +50,15 @@
         ColumnNo: Integer;
         PurchHeaderStatus: Integer;
     begin
-        TrailingPurchOrdersSetup.Get(UserId);
+        _TrailingPurchOrdersSetup.Get(UserId);
         BusChartBuf.Initialize();
-        BusChartBuf."Period Length" := TrailingPurchOrdersSetup."Period Length";
+        BusChartBuf."Period Length" := _TrailingPurchOrdersSetup."Period Length";
         BusChartBuf.SetPeriodXAxis();
 
         CreateMap(ChartToStatusMap);
         for PurchHeaderStatus := 1 to ArrayLen(ChartToStatusMap) do begin
             PurchHeader.Status := ChartToStatusMap[PurchHeaderStatus];
-            BusChartBuf.AddMeasure(Format(PurchHeader.Status), PurchHeader.Status, BusChartBuf."Data Type"::Decimal, TrailingPurchOrdersSetup.GetChartType());
+            BusChartBuf.AddMeasure(Format(PurchHeader.Status), PurchHeader.Status, BusChartBuf."Data Type"::Decimal, _TrailingPurchOrdersSetup.GetChartType());
         end;
 
         if CalcPeriods(FromDate, ToDate, BusChartBuf) then begin
@@ -83,7 +84,7 @@
         i: Integer;
     begin
         MaxPeriodNo := ArrayLen(ToDate);
-        ToDate[MaxPeriodNo] := TrailingPurchOrdersSetup.GetStartDate();
+        ToDate[MaxPeriodNo] := _TrailingPurchOrdersSetup.GetStartDate();
         if ToDate[MaxPeriodNo] = 0D then
             exit(false);
         for i := MaxPeriodNo downto 1 do begin
@@ -98,7 +99,7 @@
 
     local procedure GetPurchOrderValue(Status: Enum "Purchase Document Status"; FromDate: Date; ToDate: Date): Decimal
     begin
-        if TrailingPurchOrdersSetup."Value to Calculate" = TrailingPurchOrdersSetup."Value to Calculate"::"No. of Orders" then
+        if _TrailingPurchOrdersSetup."Value to Calculate" = _TrailingPurchOrdersSetup."Value to Calculate"::"No. of Orders" then
             exit(GetPurchOrderCount(Status, FromDate, ToDate));
         exit(GetPurchOrderAmount(Status, FromDate, ToDate));
     end;
@@ -110,8 +111,8 @@
         Amount: Decimal;
         TotalAmount: Decimal;
     begin
-        if TrailingPurchOrdersSetup."Show Orders" = TrailingPurchOrdersSetup."Show Orders"::"Delayed Orders" then
-            TrailingSalesOrderQry.SetFilter(ShipmentDate, '<%1', TrailingPurchOrdersSetup.GetStartDate());
+        if _TrailingPurchOrdersSetup."Show Orders" = _TrailingPurchOrdersSetup."Show Orders"::"Delayed Orders" then
+            TrailingSalesOrderQry.SetFilter(ShipmentDate, '<%1', _TrailingPurchOrdersSetup.GetStartDate());
 
         TrailingSalesOrderQry.SetRange(Status, Status);
         TrailingSalesOrderQry.SetRange(DocumentDate, FromDate, ToDate);
@@ -129,8 +130,8 @@
     local procedure GetPurchOrderCount(Status: Enum "Purchase Document Status"; FromDate: Date; ToDate: Date): Decimal
     begin
         PurchHeader.SetRange("Document Type", PurchHeader."Document Type"::Order);
-        if TrailingPurchOrdersSetup."Show Orders" = TrailingPurchOrdersSetup."Show Orders"::"Delayed Orders" then
-            PurchHeader.SetFilter("Posting Date", '<%1', TrailingPurchOrdersSetup.GetStartDate())
+        if _TrailingPurchOrdersSetup."Show Orders" = _TrailingPurchOrdersSetup."Show Orders"::"Delayed Orders" then
+            PurchHeader.SetFilter("Posting Date", '<%1', _TrailingPurchOrdersSetup.GetStartDate())
         else
             PurchHeader.SetRange("Posting Date");
         PurchHeader.SetRange(Status, Status);

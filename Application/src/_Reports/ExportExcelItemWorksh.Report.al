@@ -1,7 +1,7 @@
 ﻿report 6060043 "NPR Export Excel Item Worksh."
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     Caption = 'Export Excel Item Worksheet';
     ProcessingOnly = true;
@@ -15,7 +15,7 @@
 
             trigger OnAfterGetRecord()
             begin
-                if RowNo = HeaderRowNo then begin
+                if _RowNo = HeaderRowNo then begin
                     ItemWorksheetTemplate.Get("Worksheet Template Name");
                     ItemWorksheet.Get("Worksheet Template Name", "Worksheet Name");
                 end;
@@ -36,158 +36,158 @@
                     repeat
                         //Add row based on Worksheet Variant Line
                         ItemWorksheetCU.OnBeforeExportWorksheetVariantLine(ItemWorksheetVariantLine);
-                        RowNo := RowNo + 1;
+                        _RowNo := _RowNo + 1;
                         if MappingFound then begin
                             if ItemWorksheetVariantLine."Existing Item No." <> '' then
-                                MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item No."), Format(ItemWorksheetVariantLine."Existing Item No."), false, false, '', TempExcelBuf."Cell Type"::Text)
+                                MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item No."), Format(ItemWorksheetVariantLine."Existing Item No."), false, false, '', TempExcelBuf."Cell Type"::Text)
                             else
-                                MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item No."), Format(ItemWorksheetVariantLine."Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo(Description), Format(ItemWorksheetVariantLine.Description), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item Category Code"), Format("Item Category Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Product Group Code"), Format("Product Group Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendor Item No."), Format("Vendor Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Tariff No."), Format("Tariff No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                                MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item No."), Format(ItemWorksheetVariantLine."Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo(Description), Format(ItemWorksheetVariantLine.Description), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item Category Code"), Format("Item Category Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Product Group Code"), Format("Product Group Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendor Item No."), Format("Vendor Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Tariff No."), Format("Tariff No."), false, false, '', TempExcelBuf."Cell Type"::Text);
                             if ItemWorksheetVariantLine."Sales Price" <> 0 then
-                                MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Sales Price"), Format(ItemWorksheetVariantLine."Sales Price"), false, false, '', TempExcelBuf."Cell Type"::Number)
+                                MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Sales Price"), Format(ItemWorksheetVariantLine."Sales Price"), false, false, '', TempExcelBuf."Cell Type"::Number)
                             else
-                                MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Sales Price"), Format("Sales Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Sales Price Currency Code"), Format("Sales Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                                MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Sales Price"), Format("Sales Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Sales Price Currency Code"), Format("Sales Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
                             if ItemWorksheetVariantLine."Direct Unit Cost" <> 0 then
-                                MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Direct Unit Cost"), Format(ItemWorksheetVariantLine."Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number)
+                                MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Direct Unit Cost"), Format(ItemWorksheetVariantLine."Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number)
                             else
-                                MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Direct Unit Cost"), Format("Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Purchase Price Currency Code"), Format("Purchase Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendor No."), Format("Vendor No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety Group"), Format("Variety Group"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 1 Value"), Format(ItemWorksheetVariantLine."Variety 1 Value"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 2 Value"), Format(ItemWorksheetVariantLine."Variety 2 Value"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 3 Value"), Format(ItemWorksheetVariantLine."Variety 3 Value"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 4 Value"), Format(ItemWorksheetVariantLine."Variety 4 Value"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                                MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Direct Unit Cost"), Format("Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Purchase Price Currency Code"), Format("Purchase Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendor No."), Format("Vendor No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety Group"), Format("Variety Group"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 1 Value"), Format(ItemWorksheetVariantLine."Variety 1 Value"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 2 Value"), Format(ItemWorksheetVariantLine."Variety 2 Value"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 3 Value"), Format(ItemWorksheetVariantLine."Variety 3 Value"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 4 Value"), Format(ItemWorksheetVariantLine."Variety 4 Value"), false, false, '', TempExcelBuf."Cell Type"::Text);
                             if ItemWorksheetVariantLine."Recommended Retail Price" <> 0 then
-                                MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Recommended Retail Price"), Format(ItemWorksheetVariantLine."Recommended Retail Price"), false, false, '', TempExcelBuf."Cell Type"::Number)
+                                MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Recommended Retail Price"), Format(ItemWorksheetVariantLine."Recommended Retail Price"), false, false, '', TempExcelBuf."Cell Type"::Number)
                             else
-                                MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Recommended Retail Price"), Format("Recommended Retail Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                                MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Recommended Retail Price"), Format("Recommended Retail Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
                             if ItemWorksheetVariantLine."Internal Bar Code" <> '' then
-                                MapCell(RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Internal Bar Code"), Format(ItemWorksheetVariantLine."Internal Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text)
+                                MapCell(_RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Internal Bar Code"), Format(ItemWorksheetVariantLine."Internal Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text)
                             else
-                                MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Internal Bar Code"), Format("Internal Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                                MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Internal Bar Code"), Format("Internal Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
                             if ItemWorksheetVariantLine."Vendors Bar Code" <> '' then
-                                MapCell(RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Vendors Bar Code"), Format(ItemWorksheetVariantLine."Vendors Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text)
+                                MapCell(_RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Vendors Bar Code"), Format(ItemWorksheetVariantLine."Vendors Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text)
                             else
-                                MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendors Bar Code"), Format("Vendors Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Net Weight"), Format("Net Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Gross Weight"), Format("Gross Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                            MapAllColumns(RowNo, DATABASE::"NPR Item Worksheet Line", false, false, '');
-                            MapAttributeCells(RowNo, DATABASE::"NPR Item Worksheet Line", false, false, '', TempExcelBuf."Cell Type"::Number);
+                                MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendors Bar Code"), Format("Vendors Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Net Weight"), Format("Net Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Gross Weight"), Format("Gross Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                            MapAllColumns(_RowNo, DATABASE::"NPR Item Worksheet Line", false, false, '');
+                            MapAttributeCells(_RowNo, DATABASE::"NPR Item Worksheet Line", false, false, '', TempExcelBuf."Cell Type"::Number);
                         end else begin
                             if ItemWorksheetVariantLine."Existing Item No." <> '' then
-                                EnterCell(RowNo, 1, Format(ItemWorksheetVariantLine."Existing Item No."), false, false, '', TempExcelBuf."Cell Type"::Text)
+                                EnterCell(_RowNo, 1, Format(ItemWorksheetVariantLine."Existing Item No."), false, false, '', TempExcelBuf."Cell Type"::Text)
                             else
-                                EnterCell(RowNo, 1, Format(ItemWorksheetVariantLine."Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            EnterCell(RowNo, 0, Format(ItemWorksheetVariantLine.Description), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            EnterCell(RowNo, 0, Format("Item Category Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            EnterCell(RowNo, 0, Format("Product Group Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            EnterCell(RowNo, 0, Format("Vendor Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            EnterCell(RowNo, 0, Format("Tariff No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                                EnterCell(_RowNo, 1, Format(ItemWorksheetVariantLine."Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            EnterCell(_RowNo, 0, Format(ItemWorksheetVariantLine.Description), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            EnterCell(_RowNo, 0, Format("Item Category Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            EnterCell(_RowNo, 0, Format("Product Group Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            EnterCell(_RowNo, 0, Format("Vendor Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            EnterCell(_RowNo, 0, Format("Tariff No."), false, false, '', TempExcelBuf."Cell Type"::Text);
                             if ItemWorksheetVariantLine."Sales Price" <> 0 then
-                                EnterCell(RowNo, 0, Format(ItemWorksheetVariantLine."Sales Price"), false, false, '', TempExcelBuf."Cell Type"::Number)
+                                EnterCell(_RowNo, 0, Format(ItemWorksheetVariantLine."Sales Price"), false, false, '', TempExcelBuf."Cell Type"::Number)
                             else
-                                EnterCell(RowNo, 0, Format("Sales Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                            EnterCell(RowNo, 0, Format("Sales Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                                EnterCell(_RowNo, 0, Format("Sales Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                            EnterCell(_RowNo, 0, Format("Sales Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
                             if ItemWorksheetVariantLine."Direct Unit Cost" <> 0 then
-                                EnterCell(RowNo, 0, Format(ItemWorksheetVariantLine."Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number)
+                                EnterCell(_RowNo, 0, Format(ItemWorksheetVariantLine."Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number)
                             else
-                                EnterCell(RowNo, 0, Format("Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                            EnterCell(RowNo, 0, Format("Purchase Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            EnterCell(RowNo, 0, Format("Vendor No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            EnterCell(RowNo, 0, Format("Variety Group"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                            EnterCell(RowNo, 0, ItemWorksheetVariantLine."Variety 1 Value", false, false, '', TempExcelBuf."Cell Type"::Text);
-                            EnterCell(RowNo, 0, ItemWorksheetVariantLine."Variety 2 Value", false, false, '', TempExcelBuf."Cell Type"::Text);
-                            EnterCell(RowNo, 0, ItemWorksheetVariantLine."Variety 3 Value", false, false, '', TempExcelBuf."Cell Type"::Text);
-                            EnterCell(RowNo, 0, ItemWorksheetVariantLine."Variety 4 Value", false, false, '', TempExcelBuf."Cell Type"::Text);
+                                EnterCell(_RowNo, 0, Format("Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                            EnterCell(_RowNo, 0, Format("Purchase Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            EnterCell(_RowNo, 0, Format("Vendor No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            EnterCell(_RowNo, 0, Format("Variety Group"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                            EnterCell(_RowNo, 0, ItemWorksheetVariantLine."Variety 1 Value", false, false, '', TempExcelBuf."Cell Type"::Text);
+                            EnterCell(_RowNo, 0, ItemWorksheetVariantLine."Variety 2 Value", false, false, '', TempExcelBuf."Cell Type"::Text);
+                            EnterCell(_RowNo, 0, ItemWorksheetVariantLine."Variety 3 Value", false, false, '', TempExcelBuf."Cell Type"::Text);
+                            EnterCell(_RowNo, 0, ItemWorksheetVariantLine."Variety 4 Value", false, false, '', TempExcelBuf."Cell Type"::Text);
                             if ItemWorksheetVariantLine."Recommended Retail Price" <> 0 then
-                                EnterCell(RowNo, 0, Format(ItemWorksheetVariantLine."Recommended Retail Price"), false, false, '', TempExcelBuf."Cell Type"::Number)
+                                EnterCell(_RowNo, 0, Format(ItemWorksheetVariantLine."Recommended Retail Price"), false, false, '', TempExcelBuf."Cell Type"::Number)
                             else
-                                EnterCell(RowNo, 0, Format("Recommended Retail Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                                EnterCell(_RowNo, 0, Format("Recommended Retail Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
                             if ItemWorksheetVariantLine."Vendors Bar Code" <> '' then
-                                EnterCell(RowNo, 0, ItemWorksheetVariantLine."Vendors Bar Code", false, false, '', TempExcelBuf."Cell Type"::Text)
+                                EnterCell(_RowNo, 0, ItemWorksheetVariantLine."Vendors Bar Code", false, false, '', TempExcelBuf."Cell Type"::Text)
                             else
-                                EnterCell(RowNo, 0, "Vendors Bar Code", false, false, '', TempExcelBuf."Cell Type"::Text);
+                                EnterCell(_RowNo, 0, "Vendors Bar Code", false, false, '', TempExcelBuf."Cell Type"::Text);
                             if ItemWorksheetVariantLine."Internal Bar Code" <> '' then
-                                EnterCell(RowNo, 0, ItemWorksheetVariantLine."Internal Bar Code", false, false, '', TempExcelBuf."Cell Type"::Text)
+                                EnterCell(_RowNo, 0, ItemWorksheetVariantLine."Internal Bar Code", false, false, '', TempExcelBuf."Cell Type"::Text)
                             else
-                                EnterCell(RowNo, 0, "Internal Bar Code", false, false, '', TempExcelBuf."Cell Type"::Text);
-                            EnterCell(RowNo, 0, Format("Net Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                            EnterCell(RowNo, 0, Format("Gross Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                                EnterCell(_RowNo, 0, "Internal Bar Code", false, false, '', TempExcelBuf."Cell Type"::Text);
+                            EnterCell(_RowNo, 0, Format("Net Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                            EnterCell(_RowNo, 0, Format("Gross Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
                             NPRAttrManagement.GetWorksheetLineAttributeValue(NPRAttrTextArray, DATABASE::"NPR Item Worksheet Line", "Worksheet Template Name", "Worksheet Name", "Line No.");
                             i := 1;
                             if NPRAttrVisibleArray[1] then
                                 repeat
-                                    EnterCell(RowNo, 0, Format(NPRAttrTextArray[i]), false, false, '', TempExcelBuf."Cell Type"::Text);
+                                    EnterCell(_RowNo, 0, Format(NPRAttrTextArray[i]), false, false, '', TempExcelBuf."Cell Type"::Text);
                                     i := i + 1;
                                 until not NPRAttrVisibleArray[i];
                         end;
                     until ItemWorksheetVariantLine.Next() = 0;
                 end else begin
                     //Add row based on Worksheet Line
-                    RowNo := RowNo + 1;
+                    _RowNo := _RowNo + 1;
                     if MappingFound then begin
                         if ItemWorksheetVariantLine."Existing Item No." <> '' then
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item No."), Format("Existing Item No."), false, false, '', TempExcelBuf."Cell Type"::Text)
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item No."), Format("Existing Item No."), false, false, '', TempExcelBuf."Cell Type"::Text)
                         else
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item No."), Format("Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo(Description), Format(Description), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item Category Code"), Format("Item Category Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Product Group Code"), Format("Product Group Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendor Item No."), Format("Vendor Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Tariff No."), Format("Tariff No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Sales Price"), Format("Sales Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Sales Price Currency Code"), Format("Sales Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Direct Unit Cost"), Format("Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Purchase Price Currency Code"), Format("Purchase Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendor No."), Format("Vendor No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety Group"), Format("Variety Group"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety 1"), Format("Variety 1"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety 2"), Format("Variety 2"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety 3"), Format("Variety 3"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety 4"), Format("Variety 4"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Recommended Retail Price"), Format("Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendors Bar Code"), Format("Vendors Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Internal Bar Code"), Format("Internal Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Net Weight"), Format("Net Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Gross Weight"), Format("Gross Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                        MapAllColumns(RowNo, DATABASE::"NPR Item Worksheet Line", false, false, '');
-                        MapAttributeCells(RowNo, DATABASE::"NPR Item Worksheet Line", false, false, '', TempExcelBuf."Cell Type"::Number);
+                            MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item No."), Format("Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo(Description), Format(Description), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item Category Code"), Format("Item Category Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Product Group Code"), Format("Product Group Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendor Item No."), Format("Vendor Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Tariff No."), Format("Tariff No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Sales Price"), Format("Sales Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Sales Price Currency Code"), Format("Sales Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Direct Unit Cost"), Format("Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Purchase Price Currency Code"), Format("Purchase Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendor No."), Format("Vendor No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety Group"), Format("Variety Group"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety 1"), Format("Variety 1"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety 2"), Format("Variety 2"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety 3"), Format("Variety 3"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety 4"), Format("Variety 4"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Recommended Retail Price"), Format("Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendors Bar Code"), Format("Vendors Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Internal Bar Code"), Format("Internal Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Net Weight"), Format("Net Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                        MapCell(_RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Gross Weight"), Format("Gross Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                        MapAllColumns(_RowNo, DATABASE::"NPR Item Worksheet Line", false, false, '');
+                        MapAttributeCells(_RowNo, DATABASE::"NPR Item Worksheet Line", false, false, '', TempExcelBuf."Cell Type"::Number);
                     end else begin
                         if "Existing Item No." <> '' then
-                            EnterCell(RowNo, 1, Format("Existing Item No."), false, false, '', TempExcelBuf."Cell Type"::Text)
+                            EnterCell(_RowNo, 1, Format("Existing Item No."), false, false, '', TempExcelBuf."Cell Type"::Text)
                         else
-                            EnterCell(RowNo, 1, Format("Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format(Description), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Item Category Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Product Group Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Vendor Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Tariff No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Sales Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                        EnterCell(RowNo, 0, Format("Sales Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                        EnterCell(RowNo, 0, Format("Purchase Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Vendor No."), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Variety Group"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Variety 1"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Variety 2"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Variety 3"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Variety 4"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Recommended Retail Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                        EnterCell(RowNo, 0, Format("Vendors Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Internal Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Net Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
-                        EnterCell(RowNo, 0, Format("Gross Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                            EnterCell(_RowNo, 1, Format("Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format(Description), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Item Category Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Product Group Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Vendor Item No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Tariff No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Sales Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                        EnterCell(_RowNo, 0, Format("Sales Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Direct Unit Cost"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                        EnterCell(_RowNo, 0, Format("Purchase Price Currency Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Vendor No."), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Variety Group"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Variety 1"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Variety 2"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Variety 3"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Variety 4"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Recommended Retail Price"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                        EnterCell(_RowNo, 0, Format("Vendors Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Internal Bar Code"), false, false, '', TempExcelBuf."Cell Type"::Text);
+                        EnterCell(_RowNo, 0, Format("Net Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
+                        EnterCell(_RowNo, 0, Format("Gross Weight"), false, false, '', TempExcelBuf."Cell Type"::Number);
                         NPRAttrManagement.GetWorksheetLineAttributeValue(NPRAttrTextArray, DATABASE::"NPR Item Worksheet Line", "Worksheet Template Name", "Worksheet Name", "Line No.");
                         i := 1;
                         if NPRAttrVisibleArray[1] then
                             repeat
-                                EnterCell(RowNo, 0, Format(NPRAttrTextArray[i]), false, false, '', TempExcelBuf."Cell Type"::Text);
+                                EnterCell(_RowNo, 0, Format(NPRAttrTextArray[i]), false, false, '', TempExcelBuf."Cell Type"::Text);
                                 i := i + 1;
                             until not NPRAttrVisibleArray[i];
                     end;
@@ -228,12 +228,12 @@
                 RecNo := 0;
 
                 //Add Header Row
-                RowNo := 1;
-                HeaderRowNo := RowNo;
+                _RowNo := 1;
+                HeaderRowNo := _RowNo;
                 ItemWorksheet.Get(GetRangeMin("Worksheet Template Name"), GetRangeMax("Worksheet Name"));
                 if ItemWorksheet."Excel Import from Line No." > 1 then begin
-                    RowNo := ItemWorksheet."Excel Import from Line No." - 1;
-                    HeaderRowNo := RowNo;
+                    _RowNo := ItemWorksheet."Excel Import from Line No." - 1;
+                    HeaderRowNo := _RowNo;
                 end;
                 ItemWorksheetExcelColumn.Reset();
                 ItemWorksheetExcelColumn.SetRange("Worksheet Template Name", ItemWorksheet."Item Template Name");
@@ -322,7 +322,7 @@
         i: Integer;
         NextColumNo: Integer;
         RecNo: Integer;
-        RowNo: Integer;
+        _RowNo: Integer;
         TotalRecNo: Integer;
         AnalyzingDataLbl: Label 'Analyzing Data...\\';
         AttributeLbl: Label 'Attribute %1.', Comment = '%1 = Attribute';

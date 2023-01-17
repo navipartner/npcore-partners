@@ -30,8 +30,8 @@ codeunit 6060010 "NPR Retail Checklist"
 
     local procedure CreateChecklistItems();
     begin
-        AddRoleToList(TempAllProfile, Page::"NPR Retail Setup RC");
-        AddRoleToList(TempAllProfile, Page::"NPR Retail Manager Role Center");
+        AddRoleToList(TempAllProfile_, Page::"NPR Retail Setup RC");
+        AddRoleToList(TempAllProfile_, Page::"NPR Retail Manager Role Center");
 
         CreateWelcomeVideoExperience();
 
@@ -94,7 +94,7 @@ codeunit 6060010 "NPR Retail Checklist"
         #endregion
         #endregion
 
-        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 1000, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 1000, TempAllProfile_, false);
         Checklist.InitializeGuidedExperienceItems();
     end;
 
@@ -107,7 +107,7 @@ codeunit 6060010 "NPR Retail Checklist"
     end;
 
     var
-        TempAllProfile: Record "All Profile" temporary;
+        TempAllProfile_: Record "All Profile" temporary;
         Checklist: Codeunit Checklist;
         GuidedExperience: Codeunit "Guided Experience";
 }

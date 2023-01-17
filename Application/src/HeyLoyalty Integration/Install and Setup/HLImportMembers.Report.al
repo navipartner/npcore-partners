@@ -15,8 +15,8 @@ report 6014461 "NPR HL Import Members"
         DoneLbl: Label 'Import process completed successfully.';
     begin
         SelectExcelWorksheet(SheetName, ExcelFileStream);
-        TempExcelBuffer.OpenBookStream(ExcelFileStream, SheetName);
-        TempExcelBuffer.ReadSheet();
+        TempExcelBuffer_.OpenBookStream(ExcelFileStream, SheetName);
+        TempExcelBuffer_.ReadSheet();
         AnalyzeData();
         Message(DoneLbl);
     end;
@@ -32,34 +32,34 @@ report 6014461 "NPR HL Import Members"
         NothingToImportErr: Label 'There is nothing to do.';
         IdColumnMissingErr: Label 'The worksheet must contain a column called ''id'' with HeyLoyalty Ids of members to be imported.';
     begin
-        if not ReadWorksheetHeaders(TempExcelBuffer, Headers) then
+        if not ReadWorksheetHeaders(TempExcelBuffer_, Headers) then
             Error(NothingToImportErr);
         if not Headers.Values.Contains('id') then
             Error(IdColumnMissingErr);
 
-        TempExcelBuffer.SetRange("Column No.", Headers.Keys.Get(Headers.Values.IndexOf('id')));
-        TempExcelBuffer.SetFilter("Row No.", '>%1', 1);
-        if TempExcelBuffer.IsEmpty() then
+        TempExcelBuffer_.SetRange("Column No.", Headers.Keys.Get(Headers.Values.IndexOf('id')));
+        TempExcelBuffer_.SetFilter("Row No.", '>%1', 1);
+        if TempExcelBuffer_.IsEmpty() then
             Error(NothingToImportErr);
 
         Window.Open(
             DialogTxt01Lbl +
             DialogTxt02Lbl);
         Window.Update(1, 0);
-        TotalRecNo := TempExcelBuffer.Count();
+        TotalRecNo := TempExcelBuffer_.Count();
         RecNo := 0;
 
-        TempExcelBuffer.SetRange("Column No.");
+        TempExcelBuffer_.SetRange("Column No.");
 
         repeat
             RecNo += 1;
-            if ProcessWorksheetRow(TempExcelBuffer, RecNo + 1, Headers) then
+            if ProcessWorksheetRow(TempExcelBuffer_, RecNo + 1, Headers) then
                 Commit();
             Window.Update(1, Round(RecNo / TotalRecNo * 10000, 1));
         until RecNo = TotalRecNo;
 
-        TempExcelBuffer.Reset();
-        TempExcelBuffer.DeleteAll();
+        TempExcelBuffer_.Reset();
+        TempExcelBuffer_.DeleteAll();
         Window.Close();
     end;
 
@@ -72,7 +72,7 @@ report 6014461 "NPR HL Import Members"
         if not UploadIntoStream(ImportFromExcelLbl, '', ExcelFileExtensionTok, ServerFileName, ExcelFileStream) or (ServerFileName = '') then
             Error('');
         if SheetName = '' then
-            SheetName := TempExcelBuffer.SelectSheetsNameStream(ExcelFileStream);
+            SheetName := TempExcelBuffer_.SelectSheetsNameStream(ExcelFileStream);
         if SheetName = '' then
             Error('');
     end;
@@ -183,5 +183,5 @@ report 6014461 "NPR HL Import Members"
     end;
 
     var
-        TempExcelBuffer: Record "Excel Buffer" temporary;
+        TempExcelBuffer_: Record "Excel Buffer" temporary;
 }

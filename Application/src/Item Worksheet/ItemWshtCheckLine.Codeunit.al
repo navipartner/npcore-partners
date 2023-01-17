@@ -4,7 +4,7 @@
 
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
-        ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
+        _ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemworksheetVarietyValue: Record "NPR Item Worksh. Variety Value";
         TariffNumber: Record "Tariff Number";
         Text103: Label '%1 %2 %3 is locked. A copy needs to be created or the Variety value added manually. ';
@@ -169,15 +169,15 @@
                 ProcessError(ItemWkshtLine, CopyStr(ErrorText, 1, 1024), StopOnError);
             end;
         end;
-        ItemWorksheetVariantLine.Reset();
-        ItemWorksheetVariantLine.SetRange("Worksheet Template Name", ItemWkshtLine."Worksheet Template Name");
-        ItemWorksheetVariantLine.SetRange("Worksheet Name", ItemWkshtLine."Worksheet Name");
-        ItemWorksheetVariantLine.SetRange("Worksheet Line No.", ItemWkshtLine."Line No.");
-        ItemWorksheetVariantLine.SetFilter("Heading Text", '%1', '');
-        if ItemWorksheetVariantLine.FindSet() then
+        _ItemWorksheetVariantLine.Reset();
+        _ItemWorksheetVariantLine.SetRange("Worksheet Template Name", ItemWkshtLine."Worksheet Template Name");
+        _ItemWorksheetVariantLine.SetRange("Worksheet Name", ItemWkshtLine."Worksheet Name");
+        _ItemWorksheetVariantLine.SetRange("Worksheet Line No.", ItemWkshtLine."Line No.");
+        _ItemWorksheetVariantLine.SetFilter("Heading Text", '%1', '');
+        if _ItemWorksheetVariantLine.FindSet() then
             repeat
-                CheckItemWorksheetVariantLine(ItemWorksheetVariantLine, ItemWkshtLine, StopOnError);
-            until ItemWorksheetVariantLine.Next() = 0;
+                CheckItemWorksheetVariantLine(_ItemWorksheetVariantLine, ItemWkshtLine, StopOnError);
+            until _ItemWorksheetVariantLine.Next() = 0;
 
         ItemworksheetVarietyValue.Reset();
         ItemworksheetVarietyValue.SetRange("Worksheet Template Name", ItemWkshtLine."Worksheet Template Name");
@@ -363,13 +363,13 @@
                 if ItemWkshtLine."Direct Unit Cost" <> 0 then begin
                     ProcessError(ItemWkshtLine, StrSubstNo(Text111, ItemWkshtLine."Line No."), StopOnError);
                 end else begin
-                    ItemWorksheetVariantLine.Reset();
-                    ItemWorksheetVariantLine.SetRange("Worksheet Template Name", ItemWkshtLine."Worksheet Template Name");
-                    ItemWorksheetVariantLine.SetRange("Worksheet Name", ItemWkshtLine."Worksheet Name");
-                    ItemWorksheetVariantLine.SetRange("Worksheet Line No.", ItemWkshtLine."Line No.");
-                    ItemWorksheetVariantLine.SetFilter(Action, '<>%1', ItemWkshtLine.Action::Skip);
-                    ItemWorksheetVariantLine.SetFilter("Direct Unit Cost", '<>0');
-                    if ItemWorksheetVariantLine.FindFirst() then begin
+                    _ItemWorksheetVariantLine.Reset();
+                    _ItemWorksheetVariantLine.SetRange("Worksheet Template Name", ItemWkshtLine."Worksheet Template Name");
+                    _ItemWorksheetVariantLine.SetRange("Worksheet Name", ItemWkshtLine."Worksheet Name");
+                    _ItemWorksheetVariantLine.SetRange("Worksheet Line No.", ItemWkshtLine."Line No.");
+                    _ItemWorksheetVariantLine.SetFilter(Action, '<>%1', ItemWkshtLine.Action::Skip);
+                    _ItemWorksheetVariantLine.SetFilter("Direct Unit Cost", '<>0');
+                    if _ItemWorksheetVariantLine.FindFirst() then begin
                         ProcessError(ItemWkshtLine, StrSubstNo(Text111, ItemWkshtLine."Line No."), StopOnError);
                     end;
                 end;

@@ -23,29 +23,29 @@
     end;
 
     var
-        POSSession: Codeunit "NPR POS Session";
+        _POSSession: Codeunit "NPR POS Session";
         FunctionToRun: Option " ",ApplyPrepmtCreditMemoAndRefund,CreateAndPostDownpmtAndLayawayInvoices,HandleDownpayment;
-        Instalments: Integer;
-        DownpaymentPct: Decimal;
-        CreditMemoNo: Text;
+        _Instalments: Integer;
+        _DownpaymentPct: Decimal;
+        _CreditMemoNo: Text;
         DownpaymentInvoiceNo: Text[20];
-        PrepaymentPaymentTerms: Text;
-        ServiceInvoiceNo: Text;
+        _PrepaymentPaymentTerms: Text;
+        _ServiceInvoiceNo: Text;
 
     procedure SetRunApplyPrepmtCreditMemoAndRefund(POSSessionIn: Codeunit "NPR POS Session"; CreditMemoNoIn: Text; ServiceInvoiceNoIn: Text)
     begin
         FunctionToRun := FunctionToRun::ApplyPrepmtCreditMemoAndRefund;
-        POSSession := POSSessionIn;
-        CreditMemoNo := CreditMemoNoIn;
-        ServiceInvoiceNo := ServiceInvoiceNoIn;
+        _POSSession := POSSessionIn;
+        _CreditMemoNo := CreditMemoNoIn;
+        _ServiceInvoiceNo := ServiceInvoiceNoIn;
     end;
 
     procedure SetRunCreateAndPostDownpmtAndLayawayInvoices(DownpaymentPctIn: Decimal; PrepaymentPaymentTermsIn: Text; InstalmentsIn: Integer)
     begin
         FunctionToRun := FunctionToRun::CreateAndPostDownpmtAndLayawayInvoices;
-        DownpaymentPct := DownpaymentPctIn;
-        Instalments := InstalmentsIn;
-        PrepaymentPaymentTerms := PrepaymentPaymentTermsIn;
+        _DownpaymentPct := DownpaymentPctIn;
+        _Instalments := InstalmentsIn;
+        _PrepaymentPaymentTerms := PrepaymentPaymentTermsIn;
     end;
 
     procedure GetDownpaymentInvoiceNo(): Text
@@ -56,7 +56,7 @@
     procedure SetRunHandleDownpayment(POSSessionIn: Codeunit "NPR POS Session"; DownpaymentInvoiceNoIn: Text)
     begin
         FunctionToRun := FunctionToRun::HandleDownpayment;
-        POSSession := POSSessionIn;
+        _POSSession := POSSessionIn;
         DownpaymentInvoiceNo := CopyStr(DownpaymentInvoiceNoIn, 1, MaxStrLen(DownpaymentInvoiceNo));
     end;
 
@@ -66,9 +66,9 @@
         LAYAWAY_CANCEL_REFUND: Label 'Layaway order credited and deleted.\Refund line has been created for total paid amount minus fees.';
         LAYAWAY_CANCEL: Label 'Layaway order credited and deleted';
     begin
-        ApplyPrepaymentCreditMemoToOpenPrepaymentInvoices(CreditMemoNo, SalesHeader); //COMMITS
-        ApplyPrepaymentCreditMemoToServiceInvoice(CreditMemoNo, ServiceInvoiceNo); //COMMITS
-        POSRefundAmount := CreatePOSRefundForRemainingCreditMemoAmount(POSSession, CreditMemoNo);
+        ApplyPrepaymentCreditMemoToOpenPrepaymentInvoices(_CreditMemoNo, SalesHeader); //COMMITS
+        ApplyPrepaymentCreditMemoToServiceInvoice(_CreditMemoNo, _ServiceInvoiceNo); //COMMITS
+        POSRefundAmount := CreatePOSRefundForRemainingCreditMemoAmount(_POSSession, _CreditMemoNo);
 
         if POSRefundAmount <> 0 then
             Message(LAYAWAY_CANCEL_REFUND)
@@ -78,8 +78,8 @@
 
     local procedure CreateAndPostDownpmtAndLayawayInvoices(var SalesHeader: Record "Sales Header")
     begin
-        DownpaymentInvoiceNo := CreateAndPostDownpaymentInvoice(SalesHeader, DownpaymentPct, PrepaymentPaymentTerms);
-        CreateAndPostLayawayInvoices(SalesHeader, Instalments, PrepaymentPaymentTerms, DownpaymentPct);
+        DownpaymentInvoiceNo := CreateAndPostDownpaymentInvoice(SalesHeader, _DownpaymentPct, _PrepaymentPaymentTerms);
+        CreateAndPostLayawayInvoices(SalesHeader, _Instalments, _PrepaymentPaymentTerms, _DownpaymentPct);
     end;
 
     local procedure HandleDownpayment()
@@ -87,7 +87,7 @@
         POSApplyCustomerEntries: Codeunit "NPR POS Apply Customer Entries";
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
-        POSApplyCustomerEntries.BalanceDocument(POSSession, CustLedgerEntry."Document Type"::Invoice, DownpaymentInvoiceNo, true);
+        POSApplyCustomerEntries.BalanceDocument(_POSSession, CustLedgerEntry."Document Type"::Invoice, DownpaymentInvoiceNo, true);
     end;
 
     local procedure ApplyPrepaymentCreditMemoToOpenPrepaymentInvoices(CreditMemoNo: Text; var SalesHeader: Record "Sales Header")

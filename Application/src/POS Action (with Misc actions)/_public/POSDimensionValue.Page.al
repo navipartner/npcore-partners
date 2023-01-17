@@ -15,7 +15,7 @@ page 6150624 "NPR POS Dimension Value"
         area(content)
         {
 
-            field(SearchBox; SearchBox)
+            field(SearchBox; _SearchBox)
             {
                 Editable = true;
                 ApplicationArea = NPRRetail;
@@ -25,7 +25,7 @@ page 6150624 "NPR POS Dimension Value"
                 trigger OnValidate();
                 begin
                     FilterList();
-                    Clear(SearchBox);
+                    Clear(_SearchBox);
                     if CurrentClientType in [ClientType::Phone, ClientType::Tablet] then
                         CurrPage.SetFieldFocus.SetFocusOnFieldPhone('SearchBox')
                     else
@@ -89,12 +89,12 @@ page 6150624 "NPR POS Dimension Value"
         Rec.Reset();
         Rec.ClearMarks();
         Rec.MarkedOnly(false);
-        if (SearchBox = '') then begin
+        if (_SearchBox = '') then begin
             CurrPage.Update(false);
             exit;
         end;
 
-        SearchDim(SearchBox, DimValue);
+        SearchDim(_SearchBox, DimValue);
 
         Rec.Copy(DimValue);
         Rec.SetLoadFields();
@@ -141,7 +141,7 @@ page 6150624 "NPR POS Dimension Value"
         Emphasize: Boolean;
         [InDataSet]
         NameIndent: Integer;
-        SearchBox: Text;
+        _SearchBox: Text;
 
     procedure GetSelectionFilter(): Text
     var

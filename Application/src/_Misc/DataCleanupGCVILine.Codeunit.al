@@ -25,29 +25,29 @@
                 end;
             Rec.Type::Item:
                 begin
-                    Item.Get(Rec."No.");
+                    _Item.Get(Rec."No.");
                     if Rec."Cleanup Action" = Rec."Cleanup Action"::Delete then
-                        Item.Delete(true);
+                        _Item.Delete(true);
 
                     if Rec."Cleanup Action" = Rec."Cleanup Action"::Rename then
-                        Item.Rename(Rec."NewNo.");
+                        _Item.Rename(Rec."NewNo.");
                 end;
             Rec.Type::"G/L Account":
                 begin
-                    GLAccount.Get(Rec."No.");
+                    _GLAccount.Get(Rec."No.");
                     if Rec."Cleanup Action" = Rec."Cleanup Action"::Delete then
-                        GLAccount.Delete(true);
+                        _GLAccount.Delete(true);
 
                     if Rec."Cleanup Action" = Rec."Cleanup Action"::Rename then
-                        GLAccount.Rename(Rec."NewNo.");
+                        _GLAccount.Rename(Rec."NewNo.");
                 end;
         end;
     end;
 
     var
         Customer: Record Customer;
-        GLAccount: Record "G/L Account";
-        Item: Record Item;
+        _GLAccount: Record "G/L Account";
+        _Item: Record Item;
         Vendor: Record Vendor;
 
     procedure TestRun(var DataCleanupCVI: Record "NPR Data Cleanup GCVI"): Boolean
@@ -91,13 +91,13 @@
                 end;
             DataCleanupCVI.Type::Item:
                 begin
-                    Item.Get(DataCleanupCVI."No.");
+                    _Item.Get(DataCleanupCVI."No.");
                     if DataCleanupCVI."Cleanup Action" = DataCleanupCVI."Cleanup Action"::Delete then
-                        if not MoveItemEntriesTest(Item) then
+                        if not MoveItemEntriesTest(_Item) then
                             exit(false);
                     if DataCleanupCVI."Cleanup Action" = DataCleanupCVI."Cleanup Action"::Rename then begin
                         TempItem.Init();
-                        TempItem.Copy(Item);
+                        TempItem.Copy(_Item);
                         TempItem."No." := DataCleanupCVI."NewNo.";
                         if not TempItem.Insert(false) then
                             exit(false);
@@ -105,13 +105,13 @@
                 end;
             DataCleanupCVI.Type::"G/L Account":
                 begin
-                    GLAccount.Get(DataCleanupCVI."No.");
+                    _GLAccount.Get(DataCleanupCVI."No.");
                     if DataCleanupCVI."Cleanup Action" = DataCleanupCVI."Cleanup Action"::Delete then
-                        if not MoveGLEntriesTest(GLAccount) then
+                        if not MoveGLEntriesTest(_GLAccount) then
                             exit(false);
                     if DataCleanupCVI."Cleanup Action" = DataCleanupCVI."Cleanup Action"::Rename then begin
                         TempGLAccount.Init();
-                        TempGLAccount.Copy(GLAccount);
+                        TempGLAccount.Copy(_GLAccount);
                         TempGLAccount."No." := DataCleanupCVI."NewNo.";
                         if not TempGLAccount.Insert(false) then
                             exit(false);

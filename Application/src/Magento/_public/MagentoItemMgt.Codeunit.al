@@ -2,7 +2,7 @@
 {
 
     var
-        MagentoSetup: Record "NPR Magento Setup";
+        _MagentoSetup: Record "NPR Magento Setup";
         MagentoFunctions: Codeunit "NPR Magento Functions";
         Text000: Label 'Replicating Special Prices to Sales Prices:';
 
@@ -54,7 +54,7 @@
         if not Item."NPR Magento Item" then
             exit;
 
-        if not (MagentoSetup.Get() and MagentoSetup."Magento Enabled") then
+        if not (_MagentoSetup.Get() and _MagentoSetup."Magento Enabled") then
             exit;
 
         MagentoWebsite.SetRange("Default Website", true);
@@ -75,10 +75,10 @@
     begin
         if Item."NPR Seo Link" <> '' then
             exit(false);
-        if not MagentoSetup.Get() then
+        if not _MagentoSetup.Get() then
             exit(false);
 
-        exit(not MagentoSetup."Auto Seo Link Disabled");
+        exit(not _MagentoSetup."Auto Seo Link Disabled");
     end;
 
     procedure SetupMultiStoreData(var Item: Record Item)
@@ -89,9 +89,9 @@
     begin
         if not Item."NPR Magento Item" then
             exit;
-        if not (MagentoSetup.Get() and MagentoSetup."Magento Enabled") then
+        if not (_MagentoSetup.Get() and _MagentoSetup."Magento Enabled") then
             exit;
-        if not MagentoSetup."Multistore Enabled" then
+        if not _MagentoSetup."Multistore Enabled" then
             exit;
 
         if MagentoStore.FindSet() then
@@ -117,7 +117,7 @@
         Counter: Integer;
         Total: Integer;
     begin
-        if not (MagentoSetup.Get() and MagentoSetup."Special Prices Enabled" and MagentoSetup."Replicate to Sales Prices") then
+        if not (_MagentoSetup.Get() and _MagentoSetup."Special Prices Enabled" and _MagentoSetup."Replicate to Sales Prices") then
             exit;
 
         Item.SetFilter("NPR Special Price", '>%1', 0);
@@ -146,7 +146,7 @@
         PriceListLine: Record "Price List Line";
         PriceListHeader: Record "Price List Header";
     begin
-        if not (MagentoSetup.Get() and MagentoSetup."Special Prices Enabled" and MagentoSetup."Replicate to Sales Prices") then
+        if not (_MagentoSetup.Get() and _MagentoSetup."Special Prices Enabled" and _MagentoSetup."Replicate to Sales Prices") then
             exit;
 
         if Item."NPR Special Price" <= 0 then
@@ -168,16 +168,16 @@
 
         if DeleteTrigger then
             exit;
-        if (MagentoSetup."Replicate to Price Source Type" <> MagentoSetup."Replicate to Price Source Type"::"All Customers") and (MagentoSetup."Replicate to Sales Code" = '') then
+        if (_MagentoSetup."Replicate to Price Source Type" <> _MagentoSetup."Replicate to Price Source Type"::"All Customers") and (_MagentoSetup."Replicate to Sales Code" = '') then
             PriceListLine.Init();
-        if not PriceListHeader.Get(MagentoSetup."Replicate to Sales Code") then
-            CreatePriceListHeader(MagentoSetup."Replicate to Sales Code", Item."NPR Special Price From", Item."NPR Special Price To");
-        PriceListLine.Validate("Price List Code", MagentoSetup."Replicate to Sales Code");
+        if not PriceListHeader.Get(_MagentoSetup."Replicate to Sales Code") then
+            CreatePriceListHeader(_MagentoSetup."Replicate to Sales Code", Item."NPR Special Price From", Item."NPR Special Price To");
+        PriceListLine.Validate("Price List Code", _MagentoSetup."Replicate to Sales Code");
         PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
         PriceListLine.Validate("Asset No.", Item."No.");
-        PriceListLine."Source Type" := MagentoSetup."Replicate to Price Source Type";
-        if MagentoSetup."Replicate to Price Source Type" <> MagentoSetup."Replicate to Price Source Type"::"All Customers" then
-            PriceListLine.Validate("Source No.", MagentoSetup."Replicate to Sales Code");
+        PriceListLine."Source Type" := _MagentoSetup."Replicate to Price Source Type";
+        if _MagentoSetup."Replicate to Price Source Type" <> _MagentoSetup."Replicate to Price Source Type"::"All Customers" then
+            PriceListLine.Validate("Source No.", _MagentoSetup."Replicate to Sales Code");
         PriceListLine."Starting Date" := Item."NPR Special Price From";
         PriceListLine."Minimum Quantity" := 0;
         PriceListLine."Unit Price" := Item."NPR Special Price";
@@ -190,15 +190,15 @@
 
     local procedure FindSalesPrices(Item: Record Item; var PriceListLine: Record "Price List Line"): Boolean
     begin
-        if not (MagentoSetup.Get() and MagentoSetup."Special Prices Enabled" and MagentoSetup."Replicate to Sales Prices") then
+        if not (_MagentoSetup.Get() and _MagentoSetup."Special Prices Enabled" and _MagentoSetup."Replicate to Sales Prices") then
             exit(false);
 
         Clear(PriceListLine);
         PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
         PriceListLine.SetRange("Asset No.", Item."No.");
-        PriceListLine.SetRange("Source Type", MagentoSetup."Replicate to Price Source Type");
-        if MagentoSetup."Replicate to Price Source Type" <> MagentoSetup."Replicate to Price Source Type"::"All Customers" then
-            PriceListLine.SetRange("Source No.", MagentoSetup."Replicate to Sales Code");
+        PriceListLine.SetRange("Source Type", _MagentoSetup."Replicate to Price Source Type");
+        if _MagentoSetup."Replicate to Price Source Type" <> _MagentoSetup."Replicate to Price Source Type"::"All Customers" then
+            PriceListLine.SetRange("Source No.", _MagentoSetup."Replicate to Sales Code");
         PriceListLine.SetRange("Variant Code", '');
         exit(not PriceListLine.IsEmpty());
     end;
@@ -269,8 +269,8 @@
 
     procedure GetStockQty(ItemNo: Code[20]; VariantFilter: Text) StockQty: Decimal
     begin
-        if MagentoSetup.Get() then;
-        StockQty := CalcStockQty(ItemNo, VariantFilter, MagentoSetup."Inventory Location Filter");
+        if _MagentoSetup.Get() then;
+        StockQty := CalcStockQty(ItemNo, VariantFilter, _MagentoSetup."Inventory Location Filter");
         exit(StockQty);
     end;
 
@@ -314,11 +314,11 @@
         VariantFilter := UpperCase(VariantFilter);
         LocationFilter := UpperCase(LocationFilter);
 
-        if MagentoSetup.Get() then;
-        case MagentoSetup."Stock Calculation Method" of
-            MagentoSetup."Stock Calculation Method"::"Function":
+        if _MagentoSetup.Get() then;
+        case _MagentoSetup."Stock Calculation Method" of
+            _MagentoSetup."Stock Calculation Method"::"Function":
                 begin
-                    OnCalcStockQty(MagentoSetup, ItemNo, VariantFilter, LocationFilter, StockQty, Handled);
+                    OnCalcStockQty(_MagentoSetup, ItemNo, VariantFilter, LocationFilter, StockQty, Handled);
                 end;
         end;
 
@@ -586,12 +586,12 @@
         NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
         Handled: Boolean;
     begin
-        if not MagentoSetup.Get() then
+        if not _MagentoSetup.Get() then
             exit;
 
-        if MagentoSetup."Stock NpXml Template" = '' then
+        if _MagentoSetup."Stock NpXml Template" = '' then
             exit;
-        if not NpXmlTemplate.Get(MagentoSetup."Stock NpXml Template") then
+        if not NpXmlTemplate.Get(_MagentoSetup."Stock NpXml Template") then
             exit;
         if NpXmlTemplate."Table No." <> DATABASE::Item then
             exit;
@@ -600,10 +600,10 @@
         if NpXmlTemplateTrigger.FindFirst() then
             NpXmlTemplateTrigger.DeleteAll(true);
 
-        case MagentoSetup."Stock Calculation Method" of
-            MagentoSetup."Stock Calculation Method"::"Function":
+        case _MagentoSetup."Stock Calculation Method" of
+            _MagentoSetup."Stock Calculation Method"::"Function":
                 begin
-                    OnUpsertStockTriggers(MagentoSetup, NpXmlTemplate, Handled);
+                    OnUpsertStockTriggers(_MagentoSetup, NpXmlTemplate, Handled);
                 end;
         end;
 
@@ -696,8 +696,8 @@
 
         Handled := true;
 
-        if MagentoSetup.Get() then;
-        Trigger2Item(MagentoSetup, ChildLinkRecRef, TempItem);
+        if _MagentoSetup.Get() then;
+        Trigger2Item(_MagentoSetup, ChildLinkRecRef, TempItem);
 
         ParentRecRef.GetTable(TempItem);
     end;

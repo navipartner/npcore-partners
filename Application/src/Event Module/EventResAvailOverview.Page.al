@@ -266,14 +266,14 @@
 
     trigger OnAfterGetRecord()
     begin
-        Resource.Get(Rec."No.");
-        ResNoAndDesc := Rec."No." + ' ' + Resource.Name;
+        _Resource.Get(Rec."No.");
+        ResNoAndDesc := Rec."No." + ' ' + _Resource.Name;
         SetMatrixData();
         SetStyle();
     end;
 
     var
-        Resource: Record Resource;
+        _Resource: Record Resource;
         ResourceNoFilter: Text;
         StartingDate: Date;
         EndingDate: Date;
@@ -315,17 +315,17 @@
         CheckTime();
         Rec.DeleteAll();
         if ResourceNoFilter <> '' then
-            Resource.SetFilter("No.", ResourceNoFilter);
-        if Resource.FindSet() then
+            _Resource.SetFilter("No.", ResourceNoFilter);
+        if _Resource.FindSet() then
             repeat
                 FromTime := StartingTime;
                 ResourceCounter += 10000;
-                InsertRec(Resource, ResourceCounter, 0, StartingTime, EndingTime);
+                InsertRec(_Resource, ResourceCounter, 0, StartingTime, EndingTime);
                 for i := 1 to MaxNoOfIntervals() do begin
-                    InsertRec(Resource, ResourceCounter + i, ResourceCounter, FromTime, FromTime + TimeInterval);
+                    InsertRec(_Resource, ResourceCounter + i, ResourceCounter, FromTime, FromTime + TimeInterval);
                     FromTime := FromTime + TimeInterval;
                 end;
-            until Resource.Next() = 0;
+            until _Resource.Next() = 0;
         LoadDateArrays(StartingDate);
     end;
 

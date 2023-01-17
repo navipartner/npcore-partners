@@ -30,7 +30,7 @@
 
                         if Page.RunModal(Page::"NPR POS Units Select", TempAllPOSUnit) = Action::LookupOK then begin
                             SelectedPOSUnit := TempAllPOSUnit."No.";
-                            SelectedPOSStore := TempAllPOSUnit."POS Store Code";
+                            _SelectedPOSStore := TempAllPOSUnit."POS Store Code";
                             CurrPage.Update(false);
                         end;
 
@@ -56,9 +56,9 @@
                     trigger OnValidate()
                     begin
                         if (StartingNoPaymentBin <> '') and (SelectedPOSUnit <> '') then begin
-                            GetRec(TempPOSPaymentBin);
+                            GetRec(TempPOSPaymentBin_);
 
-                            CreateTempPOSPaymentBins(NoOfPOSPaymentBinsToCreate, StartingNoPaymentBin, SelectedPOSStore, SelectedPOSUnit, TempPOSPaymentBin);
+                            CreateTempPOSPaymentBins(NoOfPOSPaymentBinsToCreate, StartingNoPaymentBin, _SelectedPOSStore, SelectedPOSUnit, TempPOSPaymentBin_);
 
                             NoOfPOSPaymentBinsToCreate := 0;
                             StartingNoPaymentBin := '';
@@ -86,8 +86,8 @@
                     trigger OnValidate()
                     begin
                         if (NoOfPOSPaymentBinsToCreate <> 0) and (SelectedPOSUnit <> '') then begin
-                            GetRec(TempPOSPaymentBin);
-                            CreateTempPOSPaymentBins(NoOfPOSPaymentBinsToCreate, StartingNoPaymentBin, SelectedPOSStore, SelectedPOSUnit, TempPOSPaymentBin);
+                            GetRec(TempPOSPaymentBin_);
+                            CreateTempPOSPaymentBins(NoOfPOSPaymentBinsToCreate, StartingNoPaymentBin, _SelectedPOSStore, SelectedPOSUnit, TempPOSPaymentBin_);
 
                             NoOfPOSPaymentBinsToCreate := 0;
                             StartingNoPaymentBin := '';
@@ -143,8 +143,8 @@
 
     var
         TempAllPOSUnit: Record "NPR POS Unit" temporary;
-        TempPOSPaymentBin: Record "NPR POS Payment Bin" temporary;
-        SelectedPOSStore: Code[10];
+        TempPOSPaymentBin_: Record "NPR POS Payment Bin" temporary;
+        _SelectedPOSStore: Code[10];
         SelectedPOSUnit: Code[10];
         StartingNoPaymentBin: Code[10];
         NoOfPOSPaymentBinsToCreate: Integer;

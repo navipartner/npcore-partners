@@ -88,13 +88,13 @@
 
             trigger OnValidate()
             begin
-                ItemWorksheetLine.LockTable();
-                ItemWorksheetLine.SetRange("Worksheet Template Name", "Item Template Name");
-                ItemWorksheetLine.SetRange("Worksheet Name", Name);
-                if ItemWorksheetLine.FindSet() then
+                _ItemWorksheetLine.LockTable();
+                _ItemWorksheetLine.SetRange("Worksheet Template Name", "Item Template Name");
+                _ItemWorksheetLine.SetRange("Worksheet Name", Name);
+                if _ItemWorksheetLine.FindSet() then
                     repeat
-                        ItemWorksheetLine.RefreshVariants(0, true); //Update Headings
-                    until ItemWorksheetLine.Next() = 0;
+                        _ItemWorksheetLine.RefreshVariants(0, true); //Update Headings
+                    until _ItemWorksheetLine.Next() = 0;
             end;
         }
         field(400; "Sales Price Currency Code"; Code[10])
@@ -133,9 +133,9 @@
     var
         NPRAttributeKey: Record "NPR Attribute Key";
     begin
-        ItemWorksheetLine.SetRange("Worksheet Template Name", "Item Template Name");
-        ItemWorksheetLine.SetRange("Worksheet Name", Name);
-        ItemWorksheetLine.DeleteAll();
+        _ItemWorksheetLine.SetRange("Worksheet Template Name", "Item Template Name");
+        _ItemWorksheetLine.SetRange("Worksheet Name", Name);
+        _ItemWorksheetLine.DeleteAll();
         ItemWorksheetVariantLine.SetRange("Worksheet Template Name", "Item Template Name");
         ItemWorksheetVariantLine.SetRange("Worksheet Name", Name);
         ItemWorksheetVariantLine.DeleteAll();
@@ -175,7 +175,7 @@
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value";
-        ItemWorksheetLine: Record "NPR Item Worksheet Line";
+        _ItemWorksheetLine: Record "NPR Item Worksheet Line";
         CheckingLinesLbl: Label 'Checking lines        #2######';
 
     internal procedure SetupNewBatch()
@@ -186,15 +186,15 @@
 
     internal procedure ModifyLines(i: Integer)
     begin
-        ItemWorksheetLine.LockTable();
-        ItemWorksheetLine.SetRange("Worksheet Template Name", "Item Template Name");
-        ItemWorksheetLine.SetRange("Worksheet Name", Name);
-        if ItemWorksheetLine.FindSet() then
+        _ItemWorksheetLine.LockTable();
+        _ItemWorksheetLine.SetRange("Worksheet Template Name", "Item Template Name");
+        _ItemWorksheetLine.SetRange("Worksheet Name", Name);
+        if _ItemWorksheetLine.FindSet() then
             repeat
                 case i of
                 end;
-                ItemWorksheetLine.Modify(true);
-            until ItemWorksheetLine.Next() = 0;
+                _ItemWorksheetLine.Modify(true);
+            until _ItemWorksheetLine.Next() = 0;
     end;
 
     internal procedure CheckLines(NprItemWorksheetLine: Record "NPR Item Worksheet Line")
@@ -235,25 +235,25 @@
 
     internal procedure UpdateSalesPriceAllLinesWithRRP()
     begin
-        ItemWorksheetLine.Reset();
-        ItemWorksheetLine.SetRange("Worksheet Template Name", "Item Template Name");
-        ItemWorksheetLine.SetRange("Worksheet Name", Name);
-        if ItemWorksheetLine.FindSet() then
+        _ItemWorksheetLine.Reset();
+        _ItemWorksheetLine.SetRange("Worksheet Template Name", "Item Template Name");
+        _ItemWorksheetLine.SetRange("Worksheet Name", Name);
+        if _ItemWorksheetLine.FindSet() then
             repeat
-                ItemWorksheetLine.UpdateSalesPriceWithRRP();
-                ItemWorksheetLine.Modify();
-            until ItemWorksheetLine.Next() = 0;
+                _ItemWorksheetLine.UpdateSalesPriceWithRRP();
+                _ItemWorksheetLine.Modify();
+            until _ItemWorksheetLine.Next() = 0;
     end;
 
     internal procedure InsertDefaultFieldSetup()
     var
         ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
     begin
-        ItemWorksheetLine.Reset();
-        ItemWorksheetLine.Init();
-        ItemWorksheetLine."Worksheet Template Name" := "Item Template Name";
-        ItemWorksheetLine."Worksheet Name" := Name;
-        ItemWorksheetManagement.SetDefaultFieldSetupLines(ItemWorksheetLine, 2);
+        _ItemWorksheetLine.Reset();
+        _ItemWorksheetLine.Init();
+        _ItemWorksheetLine."Worksheet Template Name" := "Item Template Name";
+        _ItemWorksheetLine."Worksheet Name" := Name;
+        ItemWorksheetManagement.SetDefaultFieldSetupLines(_ItemWorksheetLine, 2);
     end;
 }
 

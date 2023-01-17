@@ -12,13 +12,13 @@
     end;
 
     var
-        POSSession: Codeunit "NPR POS Session";
+        _POSSession: Codeunit "NPR POS Session";
         AltSaleCancelDescription: Text;
         Initialized: Boolean;
 
     procedure Initialize(POSSessionIn: Codeunit "NPR POS Session")
     begin
-        POSSession := POSSessionIn;
+        _POSSession := POSSessionIn;
         Initialized := true;
     end;
 
@@ -40,19 +40,19 @@
         Setup: Codeunit "NPR POS Setup";
     begin
         CheckInitialized();
-        POSSession.GetFrontEnd(POSFrontEndMgt, true);
+        _POSSession.GetFrontEnd(POSFrontEndMgt, true);
 
-        POSSession.GetSetup(Setup);
+        _POSSession.GetSetup(Setup);
         Setup.GetPOSUnit(POSUnit);
-        POSSession.GetSale(POSSale);
+        _POSSession.GetSale(POSSale);
         POSSale.ResumeExistingSale(SalePOS, POSUnit, POSFrontEndMgt, Setup, POSSale);
 
-        POSSession.GetSaleLine(POSSaleLine);
+        _POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.Init(SalePOS."Register No.", SalePOS."Sales Ticket No.", POSSale, Setup, POSFrontEndMgt);
 
         POSActionCancelSale.CheckSaleBeforeCancel();
         POSActionCancelSale.SetAlternativeDescription(AltSaleCancelDescription);
-        if not POSActionCancelSale.CancelSale(POSSession) then
+        if not POSActionCancelSale.CancelSale(_POSSession) then
             Error('');
     end;
 

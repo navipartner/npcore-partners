@@ -10,7 +10,7 @@
         Sale: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         Setup: Codeunit "NPR POS Setup";
-        FrontEnd: Codeunit "NPR POS Front End Management";
+        _FrontEnd: Codeunit "NPR POS Front End Management";
         ITEM_REQUIRES_VARIANT: Label 'Variant is required for item %1.';
         TEXTDEPOSIT: Label 'Deposit';
         AUTOSPLIT_ERROR: Label 'Autosplit key can''t insert the new line %1 as it already exists. Highlight a different line before selling next item.';
@@ -41,7 +41,7 @@
 
         POSSale := SaleIn;
         Setup := SetupIn;
-        FrontEnd := FrontEndIn;
+        _FrontEnd := FrontEndIn;
 
         Setup.GetPOSViewProfile(POSViewProfile);
 

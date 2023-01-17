@@ -16,7 +16,7 @@
             group(POSStoreSelection)
             {
                 Caption = 'Select POS Store';
-                field(POSStoreCode; SelectedPOSStore)
+                field(POSStoreCode; _SelectedPOSStore)
                 {
                     ShowMandatory = true;
                     Caption = 'POS Store Code';
@@ -31,11 +31,11 @@
                         StartingNoUnit := '';
 
                         if Page.RunModal(Page::"NPR POS Stores Select", TempAllPOSStore) = Action::LookupOK then begin
-                            SelectedPOSStore := TempAllPOSStore.Code;
+                            _SelectedPOSStore := TempAllPOSStore.Code;
                             CurrPage.Update(false);
                         end;
 
-                        Rec.SetRange("POS Store Code", SelectedPOSStore);
+                        Rec.SetRange("POS Store Code", _SelectedPOSStore);
                         CurrPage.Update(false);
                     end;
                 }
@@ -57,14 +57,14 @@
 
                     trigger OnValidate()
                     begin
-                        if (StartingNoUnit <> '') and (SelectedPOSStore <> '') then begin
-                            GetRec(TempPOSUnit);
-                            CreateTempPOSUnits(NoOfPOSUnitsToCreate, StartingNoUnit, SelectedPOSStore, TempPOSUnit);
+                        if (StartingNoUnit <> '') and (_SelectedPOSStore <> '') then begin
+                            GetRec(TempPOSUnit_);
+                            CreateTempPOSUnits(NoOfPOSUnitsToCreate, StartingNoUnit, _SelectedPOSStore, TempPOSUnit_);
 
                             NoOfPOSUnitsToCreate := 0;
                             StartingNoUnit := '';
                         end;
-                        Rec.SetRange("POS Store Code", SelectedPOSStore);
+                        Rec.SetRange("POS Store Code", _SelectedPOSStore);
                         CurrPage.Update(false);
                     end;
                 }
@@ -86,14 +86,14 @@
 
                     trigger OnValidate()
                     begin
-                        if (NoOfPOSUnitsToCreate <> 0) and (SelectedPOSStore <> '') then begin
-                            GetRec(TempPOSUnit);
-                            CreateTempPOSUnits(NoOfPOSUnitsToCreate, StartingNoUnit, SelectedPOSStore, TempPOSUnit);
+                        if (NoOfPOSUnitsToCreate <> 0) and (_SelectedPOSStore <> '') then begin
+                            GetRec(TempPOSUnit_);
+                            CreateTempPOSUnits(NoOfPOSUnitsToCreate, StartingNoUnit, _SelectedPOSStore, TempPOSUnit_);
 
                             NoOfPOSUnitsToCreate := 0;
                             StartingNoUnit := '';
                         end;
-                        Rec.SetRange("POS Store Code", SelectedPOSStore);
+                        Rec.SetRange("POS Store Code", _SelectedPOSStore);
                         CurrPage.Update(false);
                     end;
                 }
@@ -344,7 +344,7 @@
     }
 
     var
-        TempPOSUnit: Record "NPR POS Unit" temporary;
+        TempPOSUnit_: Record "NPR POS Unit" temporary;
         TempAllPOSStore: Record "NPR POS Store" temporary;
         TempAllPOSAuditProfile: Record "NPR POS Audit Profile" temporary;
         TempAllPOSViewProfile: Record "NPR POS View Profile" temporary;
@@ -356,7 +356,7 @@
         GLSetup: Record "General Ledger Setup";
         NoOfPOSUnitsToCreate: Integer;
         StartingNoUnit: Code[10];
-        SelectedPOSStore: Code[10];
+        _SelectedPOSStore: Code[10];
 
     internal procedure SetGlobals(var POSStoreAll: Record "NPR POS Store";
                          var POSAuditProfile: Record "NPR POS Audit Profile";

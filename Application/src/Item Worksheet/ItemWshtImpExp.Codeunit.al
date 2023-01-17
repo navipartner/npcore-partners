@@ -3,7 +3,7 @@
     Access = Internal;
 
     var
-        ItemWorksheet: Record "NPR Item Worksheet";
+        _ItemWorksheet: Record "NPR Item Worksheet";
         IsExported: Boolean;
         XmlINStream: InStream;
         TextExportCancelledMsg: Label 'Export Cancelled.';
@@ -17,11 +17,11 @@
     var
         TempBlob: Codeunit "Temp Blob";
     begin
-        if ItemWorksheet.Get(ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name") then begin
-            ItemWorksheet.SetRange("Item Template Name", ItemWorksheetLine."Worksheet Template Name");
-            ItemWorksheet.SetRange(Name, ItemWorksheetLine."Worksheet Name");
+        if _ItemWorksheet.Get(ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name") then begin
+            _ItemWorksheet.SetRange("Item Template Name", ItemWorksheetLine."Worksheet Template Name");
+            _ItemWorksheet.SetRange(Name, ItemWorksheetLine."Worksheet Name");
             TempBlob.CreateOutStream(XmlOUTStream);
-            IsExported := XMLPORT.Export(XMLPORT::"NPR Item Worksh. Import/Export", XmlOUTStream, ItemWorksheet);
+            IsExported := XMLPORT.Export(XMLPORT::"NPR Item Worksh. Import/Export", XmlOUTStream, _ItemWorksheet);
             TempBlob.CreateInStream(XmlINStream);
             if IsExported then begin
                 if not DownloadFromStream(XmlINStream, 'Download file', 'C:\Temp', 'Xml file(*.xml)|*.xml', ToFile) then

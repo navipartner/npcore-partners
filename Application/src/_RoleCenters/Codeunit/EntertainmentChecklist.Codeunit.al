@@ -30,7 +30,7 @@ codeunit 6060003 "NPR Entertainment Checklist"
 
     local procedure CreateChecklistItems();
     begin
-        AddRoleToList(TempAllProfile, Page::"NPR Entertainment RC");
+        AddRoleToList(TempAllProfile_, Page::"NPR Entertainment RC");
 
         CreateWelcomeVideoExperience();
 
@@ -93,7 +93,7 @@ codeunit 6060003 "NPR Entertainment Checklist"
         #endregion
         #endregion
 
-        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 1000, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 1000, TempAllProfile_, false);
         Checklist.InitializeGuidedExperienceItems();
     end;
 
@@ -106,7 +106,7 @@ codeunit 6060003 "NPR Entertainment Checklist"
     end;
 
     var
-        TempAllProfile: Record "All Profile" temporary;
+        TempAllProfile_: Record "All Profile" temporary;
         Checklist: Codeunit Checklist;
         GuidedExperience: Codeunit "Guided Experience";
 }

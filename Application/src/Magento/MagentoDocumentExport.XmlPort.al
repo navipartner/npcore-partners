@@ -177,8 +177,8 @@
                     SalesInvHeader.SetRange("Bill-to Customer No.", CustomerNo);
                     SalesInvHeader.SetRange("Posting Date", StartDate, EndDate);
 
-                    if (DocumentNumber <> '') then
-                        SalesInvHeader.SetRange("No.", DocumentNumber);
+                    if (_DocumentNumber <> '') then
+                        SalesInvHeader.SetRange("No.", _DocumentNumber);
                 end;
             }
             tableelement(salescrmemoheader; "Sales Cr.Memo Header")
@@ -337,8 +337,8 @@
                     SalesCrMemoHeader.SetRange("Posting Date", StartDate, EndDate);
                     SalesCrMemoHeader.SetRange("Bill-to Customer No.", CustomerNo);
 
-                    if (DocumentNumber <> '') then
-                        SalesCrMemoHeader.SetRange("No.", DocumentNumber);
+                    if (_DocumentNumber <> '') then
+                        SalesCrMemoHeader.SetRange("No.", _DocumentNumber);
                 end;
             }
             tableelement(salesheader; "Sales Header")
@@ -526,8 +526,8 @@
                     SalesHeader.SetRange("Bill-to Customer No.", CustomerNo);
                     SalesHeader.SetRange("Posting Date", StartDate, EndDate);
 
-                    if (DocumentNumber <> '') then
-                        SalesHeader.SetRange("No.", DocumentNumber);
+                    if (_DocumentNumber <> '') then
+                        SalesHeader.SetRange("No.", _DocumentNumber);
                 end;
             }
             tableelement(salesshipmentheader; "Sales Shipment Header")
@@ -709,8 +709,8 @@
                     SalesShipmentHeader.SetRange("Posting Date", StartDate, EndDate);
                     SalesShipmentHeader.SetRange("Bill-to Customer No.", CustomerNo);
 
-                    if (DocumentNumber <> '') then
-                        SalesShipmentHeader.SetRange("No.", DocumentNumber);
+                    if (_DocumentNumber <> '') then
+                        SalesShipmentHeader.SetRange("No.", _DocumentNumber);
                 end;
             }
             tableelement(salesquote; "Sales Header")
@@ -870,8 +870,8 @@
                     SalesHeader.SetRange("Bill-to Customer No.", CustomerNo);
                     SalesHeader.SetRange("Posting Date", StartDate, EndDate);
 
-                    if (DocumentNumber <> '') then
-                        SalesHeader.SetRange("No.", DocumentNumber);
+                    if (_DocumentNumber <> '') then
+                        SalesHeader.SetRange("No.", _DocumentNumber);
                 end;
             }
         }
@@ -896,7 +896,7 @@
         ExportInvoices: Boolean;
         ExportCrMemos: Boolean;
         ExportOrders: Boolean;
-        DocumentNumber: Code[20];
+        _DocumentNumber: Code[20];
         ExportShipments: Boolean;
         HideLines: Boolean;
         ExportQuotes: Boolean;
@@ -913,7 +913,7 @@
 
         ExportQuotes := false;
 
-        DocumentNumber := NewDocumentNo;
+        _DocumentNumber := NewDocumentNo;
         ExportShipments := NewExportShipments;
         HideLines := NewHideLines;
     end;
@@ -924,7 +924,7 @@
         EndDate := NewEndDate;
         StartDate := NewStartDate;
 
-        DocumentNumber := NewDocumentNo;
+        _DocumentNumber := NewDocumentNo;
         HideLines := NewHideLines;
 
         ExportQuotes := true;

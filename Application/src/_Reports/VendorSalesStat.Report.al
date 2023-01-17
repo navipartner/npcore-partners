@@ -136,8 +136,8 @@
 
                 trigger OnPostDataItem()
                 begin
-                    Coverage := CalcCoverage(PurchaseLCY, SalesLCY);
-                    CoverageRate := CalcCoverageRate(Coverage, SalesLCY);
+                    _Coverage := CalcCoverage(PurchaseLCY, SalesLCY);
+                    CoverageRate := CalcCoverageRate(_Coverage, SalesLCY);
                     if (PurchaseLCY <> 0) and (SalesLCY <> 0) then
                         SalesPct := (PurchaseLCY / SalesLCY) * 100;
                 end;
@@ -146,7 +146,7 @@
                 begin
                     SalesQty := 0;
                     SalesLCY := 0;
-                    Coverage := 0;
+                    _Coverage := 0;
                     CoverageRate := 0;
                 end;
             }
@@ -162,7 +162,7 @@
                 column(SalesExVat; SalesExVat)
                 {
                 }
-                column(Coverage; Coverage)
+                column(Coverage; _Coverage)
                 {
                 }
                 column(CoverRate; CoverageRate)
@@ -254,7 +254,7 @@
         SalesLCY: Decimal;
         SalesExVat: Decimal;
         SalesPct: Decimal;
-        Coverage: Decimal;
+        _Coverage: Decimal;
         CoverageRate: Decimal;
         Text000: Label 'Year up until date';
         Text001: Label 'Inventory';

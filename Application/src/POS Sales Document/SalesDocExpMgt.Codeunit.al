@@ -7,7 +7,7 @@
         DocumentType: Enum "Sales Document Type";
         Ask: Boolean;
         Invoice: Boolean;
-        Print: Boolean;
+        _Print: Boolean;
         Receive: Boolean;
         Ship: Boolean;
         CannotDeleteItemGroupsErr: Label 'You cannot debit item groups!';
@@ -63,7 +63,7 @@
 
     procedure SetPrint(PrintIn: Boolean)
     begin
-        Print := PrintIn;
+        _Print := PrintIn;
     end;
 
     procedure SetReceive(ReceiveIn: Boolean)
@@ -254,7 +254,7 @@
         Commit();
 
         if Post and Posted then begin
-            if Print then begin
+            if _Print then begin
                 POSSalesDocumentOutputMgt.SetOnRunOperation(1, 0);
                 if not POSSalesDocumentOutputMgt.Run(SalesHeader) then
                     Message(PrintingErrorTxt, GetLastErrorText);
