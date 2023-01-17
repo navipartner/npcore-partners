@@ -145,6 +145,43 @@
                     TotalQuantityUnitPrice := (Quantity * "Unit Price");
                 end;
             }
+            dataitem("NPR DE POS Audit Log Aux. Info"; "NPR DE POS Audit Log Aux. Info")
+            {
+                DataItemLink = "POS Entry No." = FIELD("Entry No.");
+
+                column(POSEntryNo_NPRDEPOSAuditLogAuxInfo; "POS Entry No.")
+                {
+                    IncludeCaption = true;
+                }
+                column(TSSCode_NPRDEPOSAuditLogAuxInfo; "TSS Code")
+                {
+                    IncludeCaption = true;
+                }
+                column(TransactionID_NPRDEPOSAuditLogAuxInfo; "Transaction ID")
+                {
+                    IncludeCaption = true;
+                }
+                column(StartTime_NPRDEPOSAuditLogAuxInfo; "Start Time")
+                {
+                    IncludeCaption = true;
+                }
+                column(FinishTime_NPRDEPOSAuditLogAuxInfo; "Finish Time")
+                {
+                    IncludeCaption = true;
+                }
+                column(SignatureCount_NPRDEPOSAuditLogAuxInfo; "Signature Count")
+                {
+                    IncludeCaption = true;
+                }
+                column(Signature_NPRDEPOSAuditLogAuxInfo; Signature)
+                {
+                    IncludeCaption = true;
+                }
+                column(SerialNumber_NPRDEPOSAuditLogAuxInfo; "Serial Number")
+                {
+                    IncludeCaption = true;
+                }
+            }
             trigger OnAfterGetRecord()
             var
                 FormatAddress: Codeunit "Format Address";
