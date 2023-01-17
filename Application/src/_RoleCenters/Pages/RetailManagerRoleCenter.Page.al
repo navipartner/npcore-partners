@@ -875,16 +875,6 @@
                     ToolTip = 'View Posted Sales Shipments that have been done.';
                     ApplicationArea = NPRRetail;
                 }
-
-                action("Sales Credit Memos")
-                {
-                    Caption = 'Sales Credit Memos';
-                    Image = RegisteredDocs;
-                    RunObject = Page "Sales Credit Memos";
-                    ToolTip = 'View Sales Credit Memos that have been done.';
-                    ApplicationArea = NPRRetail;
-                }
-
                 action("Posted Sales Credit Memos List")
                 {
                     Caption = 'Posted Sales Credit Memos List';
@@ -955,6 +945,15 @@
                 ToolTip = 'Create Sales Return Order.';
                 ApplicationArea = NPRRetail;
             }
+            action("Sales Credit Memos")
+            {
+                Caption = 'Sales Credit Memos';
+                Image = RegisteredDocs;
+                RunObject = Page "Sales Credit Memos";
+
+                ToolTip = 'View Sales Credit Memos that have been done.';
+                ApplicationArea = NPRRetail;
+            }
             action("&Transfer Order")
             {
                 Caption = '&Transfer Order';
@@ -994,7 +993,6 @@
                 ToolTip = 'Executes the Purchase Return Order action.';
                 ApplicationArea = NPRRetail;
             }
-
         }
         area(Processing)
         {
