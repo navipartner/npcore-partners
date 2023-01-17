@@ -110,7 +110,7 @@
             Message(Caption_TestSuccess);
     end;
 
-    procedure VoucherIssueFromPOSSale(ReceiptNo: Text)
+    procedure VoucherIssueFromPOSSale(ReceiptNo: Code[20])
     var
         Handled: Boolean;
         POSEntry: Record "NPR POS Entry";
@@ -421,11 +421,15 @@
     begin
         TaxFreeUnit.Get(TaxFreeRequest."POS Unit No.");
         TaxFreeVoucher.Init();
+#pragma warning disable AA0139
         TaxFreeVoucher."External Voucher Barcode" := TaxFreeRequest."External Voucher Barcode";
         TaxFreeVoucher."External Voucher No." := TaxFreeRequest."External Voucher No.";
+#pragma warning restore AA0139        
         TaxFreeVoucher."Issued Date" := Today();
         TaxFreeVoucher."Issued Time" := Time;
+#pragma warning disable AA0139        
         TaxFreeVoucher."Issued By User" := UserId;
+#pragma warning restore AA0139        
         TaxFreeVoucher."Print Type" := TaxFreeRequest."Print Type";
         TaxFreeVoucher."Total Amount Incl. VAT" := TaxFreeRequest."Total Amount Incl. VAT";
         TaxFreeVoucher."Refund Amount" := TaxFreeRequest."Refund Amount";
@@ -456,7 +460,9 @@
     local procedure VoidVoucher(var TaxFreeVoucher: Record "NPR Tax Free Voucher"; Silent: Boolean)
     begin
         TaxFreeVoucher.Void := true;
+#pragma warning disable AA0139        
         TaxFreeVoucher."Voided By User" := UserId;
+#pragma warning restore AA0139        
         TaxFreeVoucher."Voided Date" := Today();
         TaxFreeVoucher."Voided Time" := Time;
         TaxFreeVoucher.Modify(true);
@@ -466,14 +472,16 @@
             Message(Caption_VoidSucces, TaxFreeVoucher."External Voucher No.");
     end;
 
-    local procedure CreateRequest(RequestType: Text; TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Request: Record "NPR Tax Free Request"): Boolean
+    local procedure CreateRequest(RequestType: Text[30]; TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Request: Record "NPR Tax Free Request"): Boolean
     var
         POSSession: Codeunit "NPR POS Session";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
     begin
         Request.Init();
+#pragma warning disable AA0139        
         Request."User ID" := UserId;
+#pragma warning restore AA0139        
         Request."Request Type" := RequestType;
         Request."Date Start" := Today();
         Request."Time Start" := Time;

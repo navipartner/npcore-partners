@@ -28,7 +28,7 @@
         RecNumLab: Label 'receiptNumber', Locked = true;
         KeyErr: Label 'Key %1 not supported', Comment = '%1 - Key';
         Printer: Codeunit "NPR RP Line Print Mgt.";
-        Font: Text;
+        Font: Text[30];
         Center: Boolean;
         Bold: Boolean;
         ContenText: Text;
@@ -90,7 +90,7 @@
         Printer.ProcessBuffer(CODEUNIT::"NPR Tax Free Receipt", Enum::"NPR Line Printer Device"::Epson);
     end;
 
-    local procedure ClearPrinterVar(var Font: Text; var Center: Boolean; var Bold: Boolean; var ContenText: Text; var LinkText: Text; var RecNumText: Text)
+    local procedure ClearPrinterVar(var Font: Text[30]; var Center: Boolean; var Bold: Boolean; var ContenText: Text; var LinkText: Text; var RecNumText: Text)
     begin
         Font := '';
         Center := false;
@@ -100,7 +100,7 @@
         RecNumText := '';
     end;
 
-    local procedure ParseStyle(StyleValue: Text; var Font: Text; var Center: Boolean; var Bold: Boolean)
+    local procedure ParseStyle(StyleValue: Text; var Font: Text[30]; var Center: Boolean; var Bold: Boolean)
     var
         StylePart: Text;
     begin
@@ -112,7 +112,7 @@
         ParseStyleTag(StyleValue, Font, Center, Bold);
     end;
 
-    local procedure ParseStyleTag(StyleValue: Text; var Font: Text; var Center: Boolean; var Bold: Boolean)
+    local procedure ParseStyleTag(StyleValue: Text; var Font: Text[30]; var Center: Boolean; var Bold: Boolean)
     var
         StyleFSLab: Label 'font-size', Locked = true;
         StyleTALab: Label 'text-align', Locked = true;

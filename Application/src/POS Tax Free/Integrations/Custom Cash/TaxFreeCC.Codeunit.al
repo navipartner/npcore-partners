@@ -132,8 +132,10 @@
 
         JsonObj.Get('number', JsonTokValue);
 
+#pragma warning disable AA0139
         TaxFreeRequest."External Voucher No." := JsonTokValue.AsValue().AsText();
         TaxFreeRequest."External Voucher Barcode" := JsonTokValue.AsValue().AsText();
+#pragma warning restore AA0139
 
         JsonObj.Get('purchaseAmount', JsonTokValue);
         TaxFreeRequest."Total Amount Incl. VAT" := JsonTokValue.AsValue().AsDecimal();

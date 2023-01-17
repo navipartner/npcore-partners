@@ -114,7 +114,9 @@
             end;
 
             if TryGetItemInnerText(Service, 'Name', Value) then
+#pragma warning disable AA0139            
                 GlobalBlueServices.Name := Value;
+#pragma warning restore AA0139                
             if TryGetItemInnerText(Service, 'MinimumPurchaseAmount', Value) then
                 Evaluate(GlobalBlueServices."Minimum Purchase Amount", Value, 9);
             if TryGetItemInnerText(Service, 'MaximumPurchaseAmount', Value) then
@@ -174,7 +176,9 @@
             Evaluate(GlobalBlueCountries."Country Code", Value);
 
             TryGetItemInnerText(Country, 'Name', Value);
+#pragma warning disable AA0139            
             GlobalBlueCountries.Name := Value;
+#pragma warning restore AA0139
 
             if TryGetItemInnerText(Country, 'PhonePrefix', Value) then
                 Evaluate(GlobalBlueCountries."Phone Prefix", Value, 9);
@@ -307,8 +311,10 @@
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/NumericDocIdentifier', Value) then
             Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
+#pragma warning disable AA0139        
         TaxFreeRequest."External Voucher No." := Value;
         TaxFreeRequest."External Voucher Barcode" := Value;
+#pragma warning restore AA0139
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/TotalGrossAmount', Value) then
             Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
@@ -378,8 +384,10 @@
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/NumericDocIdentifier', Value) then
             Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
+#pragma warning disable AA0139        
         TaxFreeRequest."External Voucher No." := Value;
         TaxFreeRequest."External Voucher Barcode" := Value;
+#pragma warning restore AA0139
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/TotalGrossAmount', Value) then
             Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
@@ -489,6 +497,7 @@
         //Necessary data for UI confirm
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/FirstName', Value) then
             Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
+#pragma warning disable AA0139            
         tmpCustomerInfoCapture."First Name" := Value;
 
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/LastName', Value) then
@@ -498,6 +507,7 @@
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Passport/PassportNumber', Value) then
             Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         tmpCustomerInfoCapture."Passport Number" := Value;
+#pragma warning restore AA0139
 
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Address/CountryCode', Value) then
             Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
@@ -505,6 +515,7 @@
 
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Address/CountryName', Value) then
             Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
+#pragma warning disable AA0139            
         tmpCustomerInfoCapture."Country Of Residence" := Value;
 
         //Non-essential data:
@@ -522,6 +533,7 @@
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/MobileNumber', Value) then
             tmpCustomerInfoCapture."Mobile No." := Value;
+#pragma warning restore AA0139            
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/TravelDetails/DepartureDate', Value) then
             Evaluate(tmpCustomerInfoCapture."Departure Date", Value, 9);
@@ -533,13 +545,17 @@
             Evaluate(tmpCustomerInfoCapture."Final Destination Country Code", Value, 9);
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/TravelDetails/FinalDestinationCountryName', Value) then
+#pragma warning disable AA0139            
             tmpCustomerInfoCapture."Final Destination Country" := Value;
+#pragma warning restore AA0139            
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Passport/PassportCountryCode', Value) then
             Evaluate(tmpCustomerInfoCapture."Passport Country Code", Value, 9);
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Passport/PassportCountryName', Value) then
+#pragma warning disable AA0139            
             tmpCustomerInfoCapture."Passport Country" := Value;
+#pragma warning restore AA0139            
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/DateOfBirth', Value) then
             Evaluate(tmpCustomerInfoCapture."Date Of Birth", CopyStr(Value, 1, StrPos(Value, 'T') - 1), 9);
@@ -920,9 +936,9 @@
             if Value = 'Error' then begin
                 //Validation error
                 if TrySelectSingleNodeText(XMLDoc, '//Message/Error/ErrorCode', Value) then
-                    TaxFreeRequest."Error Code" := Value;
+                    TaxFreeRequest."Error Code" := CopyStr(Value, 1, MaxStrLen(TaxFreeRequest."Error Code"));
                 if TrySelectSingleNodeText(XMLDoc, '//Message/Error/ErrorMessage', Value) then
-                    TaxFreeRequest."Error Message" := Value;
+                    TaxFreeRequest."Error Message" := CopyStr(Value, 1, MaxStrLen(TaxFreeRequest."Error Message"));
             end else
                 //Undocumented critical error
                 TaxFreeRequest."Error Message" := Error_Unknown;
@@ -933,9 +949,9 @@
             //Operation result error
             IsError := true;
             if TrySelectSingleNodeText(XMLDoc, '//Message/ErrorRes/ErrorCode', Value) then
-                TaxFreeRequest."Error Code" := Value;
+                TaxFreeRequest."Error Code" := CopyStr(Value, 1, MaxStrLen(TaxFreeRequest."Error Code"));
             if TrySelectSingleNodeText(XMLDoc, '//Message/ErrorRes/Message', Value) then
-                TaxFreeRequest."Error Message" := Value;
+                TaxFreeRequest."Error Message" := CopyStr(Value, 1, MaxStrLen(TaxFreeRequest."Error Message"));
             exit;
         end;
 
@@ -1156,7 +1172,9 @@
             exit(false);
         end;
 
+#pragma warning disable AA0139
         tmpCustomerInfoCapture."Global Blue Identifier" := Input;
+#pragma warning restore AA0139        
 
         if not TryLookupTraveller(tmpCustomerInfoCapture) then begin
             Message(Caption_TravellerLookupFail);

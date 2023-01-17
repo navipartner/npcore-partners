@@ -80,7 +80,9 @@
             repeat
                 if TempJsonBuffer.GetPropertyValue(JsonPropertyValue, TempJsonBuffer.Value) then
                     if Get(TempJsonBuffer.Value) then begin
+#pragma warning disable AA0139                        
                         Value := JsonPropertyValue;
+#pragma warning restore AA0139                        
                         Modify()
                     end;
             until TempJsonBuffer.Next() = 0;
@@ -172,7 +174,7 @@
         end;
     end;
 
-    procedure AddParameter(ParamName: Text; DataType: Integer)
+    procedure AddParameter(ParamName: Text[30]; DataType: Integer)
     begin
         Init();
         Parameter := ParamName;
