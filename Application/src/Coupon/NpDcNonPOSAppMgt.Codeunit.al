@@ -14,35 +14,35 @@
     end;
 
     var
-        TempSalePOS: Record "NPR POS Sale" temporary;
-        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
-        TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary;
+        TempSalePOS_: Record "NPR POS Sale" temporary;
+        TempSaleLinePOS_: Record "NPR POS Sale Line" temporary;
+        TempNpDcExtCouponBuffer_: Record "NPR NpDc Ext. Coupon Buffer" temporary;
         FunctionToRun: Option " ","Apply Discount";
 
     procedure ApplyDiscount(var TempSalePOSIn: Record "NPR POS Sale" temporary; var TempSaleLinePOSIn: Record "NPR POS Sale Line" temporary; var TempNpDcExtCouponBufferIn: Record "NPR NpDc Ext. Coupon Buffer" temporary; Self: Codeunit "NPR NpDc Non-POS App. Mgt.")
     begin
         FunctionToRun := FunctionToRun::"Apply Discount";
-        TempSalePOS.Copy(TempSalePOSIn, true);
-        TempSaleLinePOS.Copy(TempSaleLinePOSIn, true);
-        TempNpDcExtCouponBuffer.Copy(TempNpDcExtCouponBufferIn, true);
+        TempSalePOS_.Copy(TempSalePOSIn, true);
+        TempSaleLinePOS_.Copy(TempSaleLinePOSIn, true);
+        TempNpDcExtCouponBuffer_.Copy(TempNpDcExtCouponBufferIn, true);
 
         if Self.Run() then;
 
         FunctionToRun := FunctionToRun::" ";
-        TempSalePOSIn.Copy(TempSalePOS, true);
-        TempSaleLinePOSIn.Copy(TempSaleLinePOS, true);
+        TempSalePOSIn.Copy(TempSalePOS_, true);
+        TempSaleLinePOSIn.Copy(TempSaleLinePOS_, true);
     end;
 
     local procedure ApplyDiscount_OnRun()
     var
         SalePOS: Record "NPR POS Sale";
     begin
-        InsertPOSSale(TempSalePOS, TempSaleLinePOS, SalePOS);
+        InsertPOSSale(TempSalePOS_, TempSaleLinePOS_, SalePOS);
 
-        RemoveCouponReservations(TempNpDcExtCouponBuffer);
-        ScanCoupons(SalePOS, TempNpDcExtCouponBuffer);
+        RemoveCouponReservations(TempNpDcExtCouponBuffer_);
+        ScanCoupons(SalePOS, TempNpDcExtCouponBuffer_);
 
-        TransferPOSSalesLines(SalePOS, TempSaleLinePOS);
+        TransferPOSSalesLines(SalePOS, TempSaleLinePOS_);
 
         Error('');  //Roll back all the changes done to persistent tables
     end;

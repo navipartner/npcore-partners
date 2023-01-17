@@ -329,10 +329,10 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         SalesLineEntry: Record "NPR POS Entry Sales Line";
     begin
         POSEntry.SetLoadFields("Amount Excl. Tax");
-        if POSStoreCode <> '' then
-            POSEntry.SetRange("POS Store Code", POSStoreCode);
-        if POSUnitNo <> '' then
-            POSEntry.SetRange("POS Unit No.", POSUnitNo);
+        if _POSStoreCode <> '' then
+            POSEntry.SetRange("POS Store Code", _POSStoreCode);
+        if _POSUnitNo <> '' then
+            POSEntry.SetRange("POS Unit No.", _POSUnitNo);
         POSEntry.SetRange("Entry Date", BaseDate);
 
         if POSEntry.FindSet() then begin
@@ -353,10 +353,10 @@ codeunit 6059818 "NPR POS Statistics Mgt."
     var
         POSTurnoverQuery: Query "NPR POS Turnover";
     begin
-        if POSStoreCode <> '' then
-            POSTurnoverQuery.SetFilter(POS_Store_Code, POSStoreCode);
-        if POSUnitNo <> '' then
-            POSTurnoverQuery.SetFilter(POS_Unit_No, POSUnitNo);
+        if _POSStoreCode <> '' then
+            POSTurnoverQuery.SetFilter(POS_Store_Code, _POSStoreCode);
+        if _POSUnitNo <> '' then
+            POSTurnoverQuery.SetFilter(POS_Unit_No, _POSUnitNo);
         POSTurnoverQuery.SetRange(Posting_Date, FromDate, ToDate);
         POSTurnoverQuery.Open();
 
@@ -373,10 +373,10 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         if POSEntriesEmpty(FromDate, ToDate) then
             exit;
 
-        if POSStoreCode <> '' then
-            POSCreditSalesInvoiceQuery.SetFilter(POS_Store_Code, POSStoreCode);
-        if POSUnitNo <> '' then
-            POSCreditSalesInvoiceQuery.SetFilter(POS_Unit_No, POSUnitNo);
+        if _POSStoreCode <> '' then
+            POSCreditSalesInvoiceQuery.SetFilter(POS_Store_Code, _POSStoreCode);
+        if _POSUnitNo <> '' then
+            POSCreditSalesInvoiceQuery.SetFilter(POS_Unit_No, _POSUnitNo);
 
         POSCreditSalesInvoiceQuery.SetRange(Posting_Date, FromDate, ToDate);
         POSCreditSalesInvoiceQuery.SetRange(Sales_Document_Type, Enum::"Sales Document Type"::Invoice);
@@ -396,10 +396,10 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         if POSEntriesEmpty(FromDate, ToDate) then
             exit;
 
-        if POSStoreCode <> '' then
-            POSCreditSalesCrMemoQuery.SetFilter(POS_Store_Code, POSStoreCode);
-        if POSUnitNo <> '' then
-            POSCreditSalesCrMemoQuery.SetFilter(POS_Unit_No, POSUnitNo);
+        if _POSStoreCode <> '' then
+            POSCreditSalesCrMemoQuery.SetFilter(POS_Store_Code, _POSStoreCode);
+        if _POSUnitNo <> '' then
+            POSCreditSalesCrMemoQuery.SetFilter(POS_Unit_No, _POSUnitNo);
 
         POSCreditSalesCrMemoQuery.SetRange(Posting_Date, FromDate, ToDate);
         POSCreditSalesCrMemoQuery.SetRange(Sales_Document_Type, Enum::"Sales Document Type"::"Credit Memo");
@@ -433,8 +433,8 @@ codeunit 6059818 "NPR POS Statistics Mgt."
 
     local procedure SetFilters(StoreCode: Code[10]; UnitNo: Code[10])
     begin
-        POSStoreCode := StoreCode;
-        POSUnitNo := UnitNo;
+        _POSStoreCode := StoreCode;
+        _POSUnitNo := UnitNo;
     end;
 
     local procedure ClearData(var POSTurnoverCalcBuffer: Record "NPR POS Turnover Calc. Buffer")
@@ -520,7 +520,7 @@ codeunit 6059818 "NPR POS Statistics Mgt."
     end;
 
     var
-        POSStoreCode: Code[10];
-        POSUnitNo: Code[10];
+        _POSStoreCode: Code[10];
+        _POSUnitNo: Code[10];
         EntryNo: Integer;
 }

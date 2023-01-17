@@ -1,9 +1,9 @@
 ﻿#if BC17
 report 6014428 "NPR Shelf Labels"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Shelf Labels.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -89,7 +89,7 @@ report 6014428 "NPR Shelf Labels"
             column(NPRAttributeTextArrayText1; NPRAttributeTextArrayText[1])
             {
             }
-            column(TMPBeforeUnitPrice; TMPBeforeUnitPrice)
+            column(TMPBeforeUnitPrice; _TMPBeforeUnitPrice)
             {
             }
             column(Description_ItemVariant; ItemVariant.Description)
@@ -111,28 +111,28 @@ report 6014428 "NPR Shelf Labels"
                 if ItemCategory.Get(TMPRetail_Journal_Line_Col1."Item group") then
                     TMPItemCategory := ItemCategory.Description;
 
-                TMPBeforeUnitPrice := TMPRetail_Journal_Line_Col1."Discount Price Incl. Vat";
+                _TMPBeforeUnitPrice := TMPRetail_Journal_Line_Col1."Discount Price Incl. Vat";
                 TMPUnitPriceCard := Item."Unit Price";
                 TMPRetailLineDiscount := TMPRetail_Journal_Line_Col1."Discount Price Incl. Vat";
                 if (TMPRetail_Journal_Line_Col1."Discount Type" = TMPRetail_Journal_Line_Col1."Discount Type"::Campaign) and (TMPRetail_Journal_Line_Col1."Discount Code" <> '') then
-                    CalculatePriceCampaign("Item No.", TMPBeforeUnitPrice, TMPUnitPrice)
+                    CalculatePriceCampaign("Item No.", _TMPBeforeUnitPrice, _TMPUnitPrice)
                 else
-                    CalculatePrice("Item No.", TMPBeforeUnitPrice, TMPUnitPrice);
+                    CalculatePrice("Item No.", _TMPBeforeUnitPrice, _TMPUnitPrice);
 
                 case UnitPriceOption of
                     UnitPriceOption::"Use Retail Journal Line Prices":
-                        TMPUnitPrice := TMPRetailLineDiscount;
+                        _TMPUnitPrice := TMPRetailLineDiscount;
                     UnitPriceOption::"Use Item Card Unit Prices":
-                        TMPUnitPrice := TMPUnitPriceCard;
+                        _TMPUnitPrice := TMPUnitPriceCard;
                 end;
 
                 BeforeCaptionTxt := '';
-                if TMPUnitPrice <> TMPBeforeUnitPrice then
+                if _TMPUnitPrice <> _TMPBeforeUnitPrice then
                     BeforeCaptionTxt := BeforeCaptionLbl;
 
-                if StrPos(Format(TMPUnitPrice, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'), ',') > 1 then begin
-                    TMPUnitPriceWhole := SelectStr(1, Format(TMPUnitPrice, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'));
-                    TMPUnitPriceDecimal := SelectStr(2, Format(TMPUnitPrice, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'));
+                if StrPos(Format(_TMPUnitPrice, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'), ',') > 1 then begin
+                    TMPUnitPriceWhole := SelectStr(1, Format(_TMPUnitPrice, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'));
+                    TMPUnitPriceDecimal := SelectStr(2, Format(_TMPUnitPrice, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'));
                 end;
             end;
         }
@@ -187,9 +187,9 @@ report 6014428 "NPR Shelf Labels"
         BarcodeLib: Codeunit "NPR Barcode Image Library";
         TempBlobCol1: Codeunit "Temp Blob";
         CurrencyChar: Char;
-        TMPBeforeUnitPrice: Decimal;
+        _TMPBeforeUnitPrice: Decimal;
         TMPRetailLineDiscount: Decimal;
-        TMPUnitPrice: Decimal;
+        _TMPUnitPrice: Decimal;
         TMPUnitPriceCard: Decimal;
         k: Integer;
         LineNo: Integer;

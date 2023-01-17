@@ -17,9 +17,9 @@
         Item: Record Item;
         ItemVariant: Record "Item Variant";
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
-        ItemWkshVariantLine: Record "NPR Item Worksh. Variant Line";
+        _ItemWkshVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value";
-        ItemWkshLine: Record "NPR Item Worksheet Line";
+        _ItemWkshLine: Record "NPR Item Worksheet Line";
         RegisteredWorksheetVariantLine: Record "NPR Reg. Item Wsht Var. Line";
         RegisteredWorksheetVarietyValue: Record "NPR Reg. Item Wsht Var. Value";
         RegisteredWorksheetLine: Record "NPR Regist. Item Worksh Line";
@@ -31,116 +31,116 @@
 
     procedure RunWithCheck(var ItemWkshLine2: Record "NPR Item Worksheet Line")
     begin
-        ItemWkshLine.Copy(ItemWkshLine2);
+        _ItemWkshLine.Copy(ItemWkshLine2);
         Code();
-        ItemWkshLine2 := ItemWkshLine;
+        ItemWkshLine2 := _ItemWkshLine;
     end;
 
     local procedure "Code"()
     var
         ItemWorksheetCU: Codeunit "NPR Item Worksheet";
     begin
-        if ItemWkshLine.EmptyLine() then
+        if _ItemWkshLine.EmptyLine() then
             exit;
 
-        if ItemWkshLine.Status = ItemWkshLine.Status::Validated then begin
-            ItemWorksheetTemplate.Get(ItemWkshLine."Worksheet Template Name");
-            if ItemWkshLine.Action <> ItemWkshLine.Action::Skip then
-                OnBeforeRegisterLine(ItemWkshLine);
-            case ItemWkshLine.Action of
-                ItemWkshLine.Action::Skip:
+        if _ItemWkshLine.Status = _ItemWkshLine.Status::Validated then begin
+            ItemWorksheetTemplate.Get(_ItemWkshLine."Worksheet Template Name");
+            if _ItemWkshLine.Action <> _ItemWkshLine.Action::Skip then
+                OnBeforeRegisterLine(_ItemWkshLine);
+            case _ItemWkshLine.Action of
+                _ItemWkshLine.Action::Skip:
                     begin
-                        if ItemWkshLine."Item No." = '' then
-                            ItemWkshLine."Item No." := ItemWkshLine."Existing Item No.";
+                        if _ItemWkshLine."Item No." = '' then
+                            _ItemWkshLine."Item No." := _ItemWkshLine."Existing Item No.";
                     end;
-                ItemWkshLine.Action::CreateNew:
+                _ItemWkshLine.Action::CreateNew:
                     begin
                         Item.Init();
-                        if ItemWkshLine."Item No." <> '' then begin
+                        if _ItemWkshLine."Item No." <> '' then begin
                             Item.Init();
-                            Item."No." := ItemWkshLine."Item No.";
-                            Item."No. Series" := ItemWkshLine."No. Series";
+                            Item."No." := _ItemWkshLine."Item No.";
+                            Item."No. Series" := _ItemWkshLine."No. Series";
                             Item.Validate("No.");
-                            ItemWkshLine."Item No." := Item."No.";
-                            Item."No. Series" := ItemWkshLine."No. Series";
+                            _ItemWkshLine."Item No." := Item."No.";
+                            Item."No. Series" := _ItemWkshLine."No. Series";
                             Item.Insert(true);
                         end else begin
                             Item.Init();
-                            NewItemNo := ItemWkshLine.GetNewItemNo();
+                            NewItemNo := _ItemWkshLine.GetNewItemNo();
                             if NewItemNo = '' then
-                                NoSeriesMgt.InitSeries(ItemWkshLine."No. Series", '', 0D, NewItemNo, ItemWkshLine."No. Series");
+                                NoSeriesMgt.InitSeries(_ItemWkshLine."No. Series", '', 0D, NewItemNo, _ItemWkshLine."No. Series");
                             Item."No." := NewItemNo;
                             Item.Validate("No.", NewItemNo);
-                            Item."No. Series" := ItemWkshLine."No. Series";
+                            Item."No. Series" := _ItemWkshLine."No. Series";
                             Item.Insert(true);
-                            ItemWkshLine."Item No." := NewItemNo;
+                            _ItemWkshLine."Item No." := NewItemNo;
                         end;
                         CreateItem();
                     end;
-                ItemWkshLine.Action::UpdateOnly:
+                _ItemWkshLine.Action::UpdateOnly:
                     begin
-                        ItemWkshLine."Item No." := ItemWkshLine."Existing Item No.";
+                        _ItemWkshLine."Item No." := _ItemWkshLine."Existing Item No.";
                         UpdateItem();
                     end;
-                ItemWkshLine.Action::UpdateAndCreateVariants:
+                _ItemWkshLine.Action::UpdateAndCreateVariants:
                     begin
-                        ItemWkshLine."Item No." := ItemWkshLine."Existing Item No.";
+                        _ItemWkshLine."Item No." := _ItemWkshLine."Existing Item No.";
                         UpdateItem();
                     end;
             end;
 
-            ItemWkshVariantLine.Reset();
-            ItemWkshVariantLine.SetRange("Worksheet Template Name", ItemWkshLine."Worksheet Template Name");
-            ItemWkshVariantLine.SetRange("Worksheet Name", ItemWkshLine."Worksheet Name");
-            ItemWkshVariantLine.SetRange("Worksheet Line No.", ItemWkshLine."Line No.");
-            ItemWkshVariantLine.SetFilter("Heading Text", '%1', '');
+            _ItemWkshVariantLine.Reset();
+            _ItemWkshVariantLine.SetRange("Worksheet Template Name", _ItemWkshLine."Worksheet Template Name");
+            _ItemWkshVariantLine.SetRange("Worksheet Name", _ItemWkshLine."Worksheet Name");
+            _ItemWkshVariantLine.SetRange("Worksheet Line No.", _ItemWkshLine."Line No.");
+            _ItemWkshVariantLine.SetFilter("Heading Text", '%1', '');
             //Skip Headers
-            if ItemWkshVariantLine.FindSet() then
+            if _ItemWkshVariantLine.FindSet() then
                 repeat
-                    if ItemWkshVariantLine.Action <> ItemWkshVariantLine.Action::Skip then
-                        OnBeforeRegisterVariantLine(ItemWkshVariantLine);
-                    case ItemWkshVariantLine.Action of
-                        ItemWkshVariantLine.Action::CreateNew:
+                    if _ItemWkshVariantLine.Action <> _ItemWkshVariantLine.Action::Skip then
+                        OnBeforeRegisterVariantLine(_ItemWkshVariantLine);
+                    case _ItemWkshVariantLine.Action of
+                        _ItemWkshVariantLine.Action::CreateNew:
                             begin
-                                if (ItemWkshVariantLine."Variety 1 Value" <> '') or
-                                   (ItemWkshVariantLine."Variety 2 Value" <> '') or
-                                   (ItemWkshVariantLine."Variety 3 Value" <> '') or
-                                   (ItemWkshVariantLine."Variety 4 Value" <> '') then begin
-                                    UpdateAndCopyVariety(ItemWkshLine."Variety 1", ItemWkshLine."Variety 1 Table (Base)", ItemWkshLine."Variety 1 Table (New)", ItemWkshVariantLine."Variety 1 Value");
-                                    UpdateAndCopyVariety(ItemWkshLine."Variety 2", ItemWkshLine."Variety 2 Table (Base)", ItemWkshLine."Variety 2 Table (New)", ItemWkshVariantLine."Variety 2 Value");
-                                    UpdateAndCopyVariety(ItemWkshLine."Variety 3", ItemWkshLine."Variety 3 Table (Base)", ItemWkshLine."Variety 3 Table (New)", ItemWkshVariantLine."Variety 3 Value");
-                                    UpdateAndCopyVariety(ItemWkshLine."Variety 4", ItemWkshLine."Variety 4 Table (Base)", ItemWkshLine."Variety 4 Table (New)", ItemWkshVariantLine."Variety 4 Value");
-                                    if ItemWkshVariantLine."Item No." = '' then
-                                        ItemWkshVariantLine."Item No." := ItemWkshLine."Item No.";
-                                    CreateVariant(ItemWkshVariantLine);
-                                    ItemWkshVariantLine.UpdateBarcode();
+                                if (_ItemWkshVariantLine."Variety 1 Value" <> '') or
+                                   (_ItemWkshVariantLine."Variety 2 Value" <> '') or
+                                   (_ItemWkshVariantLine."Variety 3 Value" <> '') or
+                                   (_ItemWkshVariantLine."Variety 4 Value" <> '') then begin
+                                    UpdateAndCopyVariety(_ItemWkshLine."Variety 1", _ItemWkshLine."Variety 1 Table (Base)", _ItemWkshLine."Variety 1 Table (New)", _ItemWkshVariantLine."Variety 1 Value");
+                                    UpdateAndCopyVariety(_ItemWkshLine."Variety 2", _ItemWkshLine."Variety 2 Table (Base)", _ItemWkshLine."Variety 2 Table (New)", _ItemWkshVariantLine."Variety 2 Value");
+                                    UpdateAndCopyVariety(_ItemWkshLine."Variety 3", _ItemWkshLine."Variety 3 Table (Base)", _ItemWkshLine."Variety 3 Table (New)", _ItemWkshVariantLine."Variety 3 Value");
+                                    UpdateAndCopyVariety(_ItemWkshLine."Variety 4", _ItemWkshLine."Variety 4 Table (Base)", _ItemWkshLine."Variety 4 Table (New)", _ItemWkshVariantLine."Variety 4 Value");
+                                    if _ItemWkshVariantLine."Item No." = '' then
+                                        _ItemWkshVariantLine."Item No." := _ItemWkshLine."Item No.";
+                                    CreateVariant(_ItemWkshVariantLine);
+                                    _ItemWkshVariantLine.UpdateBarcode();
                                     ProcessVariantLineSalesPrice();
                                     ProcessVariantLinePurchasePrice();
                                 end;
                             end;
-                        ItemWkshVariantLine.Action::Update:
+                        _ItemWkshVariantLine.Action::Update:
                             begin
-                                ItemVariant.Get(ItemWkshVariantLine."Existing Item No.", ItemWkshVariantLine."Existing Variant Code");
-                                ItemWkshVariantLine."Item No." := ItemWkshVariantLine."Existing Item No.";
-                                ItemWkshVariantLine."Variant Code" := ItemWkshVariantLine."Existing Variant Code";
-                                if ItemWkshVariantLine.Description <> '' then
-                                    ItemVariant.Description := ItemWkshVariantLine.Description;
-                                ItemVariant."NPR Blocked" := ItemWkshVariantLine.Blocked;
+                                ItemVariant.Get(_ItemWkshVariantLine."Existing Item No.", _ItemWkshVariantLine."Existing Variant Code");
+                                _ItemWkshVariantLine."Item No." := _ItemWkshVariantLine."Existing Item No.";
+                                _ItemWkshVariantLine."Variant Code" := _ItemWkshVariantLine."Existing Variant Code";
+                                if _ItemWkshVariantLine.Description <> '' then
+                                    ItemVariant.Description := _ItemWkshVariantLine.Description;
+                                ItemVariant."NPR Blocked" := _ItemWkshVariantLine.Blocked;
                                 ItemVariant.Modify(true);
-                                ItemWkshVariantLine.UpdateBarcode();
+                                _ItemWkshVariantLine.UpdateBarcode();
                                 ProcessVariantLineSalesPrice();
                                 ProcessVariantLinePurchasePrice();
                             end;
                     end;
-                    ItemWkshVariantLine.Modify(true);
-                    if ItemWkshVariantLine.Action <> ItemWkshVariantLine.Action::Skip then
-                        OnAfterRegisterVariantLine(ItemWkshVariantLine);
-                until ItemWkshVariantLine.Next() = 0;
-            ItemWkshLine.Validate(ItemWkshLine.Status, ItemWkshLine.Status::Processed);
+                    _ItemWkshVariantLine.Modify(true);
+                    if _ItemWkshVariantLine.Action <> _ItemWkshVariantLine.Action::Skip then
+                        OnAfterRegisterVariantLine(_ItemWkshVariantLine);
+                until _ItemWkshVariantLine.Next() = 0;
+            _ItemWkshLine.Validate(_ItemWkshLine.Status, _ItemWkshLine.Status::Processed);
             if not CalledFromTest then
-                ItemWkshLine.Modify(true);
-            if ItemWkshLine.Action <> ItemWkshLine.Action::Skip then
-                ItemWorksheetCU.OnAfterRegisterLine(ItemWkshLine);
+                _ItemWkshLine.Modify(true);
+            if _ItemWkshLine.Action <> _ItemWkshLine.Action::Skip then
+                ItemWorksheetCU.OnAfterRegisterLine(_ItemWkshLine);
         end;
         if not CalledFromTest then
             CreateRegisteredWorksheetLines();
@@ -150,104 +150,104 @@
     local procedure CreateItem()
     var
     begin
-        GetItem(ItemWkshLine."Item No.");
-        Item.Validate(Item."Vendor Item No.", ItemWkshLine."Vendor Item No.");
-        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Vendor No.")) then
-            Item.Validate(Item."Vendor No.", ItemWkshLine."Vendor No.");
-        Item.Validate(Item.Description, ItemWkshLine.Description);
-        if ItemWkshLine."Direct Unit Cost" <> 0 then
-            if (ItemWkshLine."Purchase Price Currency Code" = '') then
-                Item.Validate(Item."Last Direct Cost", ItemWkshLine."Direct Unit Cost");
-        Item.Validate(Item."Costing Method", ItemWkshLine."Costing Method");
-        if ItemWkshLine."Costing Method" = ItemWkshLine."Costing Method"::Standard then
-            if (ItemWkshLine."Purchase Price Currency Code" = '') then
-                Item.Validate(Item."Standard Cost", ItemWkshLine."Direct Unit Cost");
+        GetItem(_ItemWkshLine."Item No.");
+        Item.Validate(Item."Vendor Item No.", _ItemWkshLine."Vendor Item No.");
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Vendor No.")) then
+            Item.Validate(Item."Vendor No.", _ItemWkshLine."Vendor No.");
+        Item.Validate(Item.Description, _ItemWkshLine.Description);
+        if _ItemWkshLine."Direct Unit Cost" <> 0 then
+            if (_ItemWkshLine."Purchase Price Currency Code" = '') then
+                Item.Validate(Item."Last Direct Cost", _ItemWkshLine."Direct Unit Cost");
+        Item.Validate(Item."Costing Method", _ItemWkshLine."Costing Method");
+        if _ItemWkshLine."Costing Method" = _ItemWkshLine."Costing Method"::Standard then
+            if (_ItemWkshLine."Purchase Price Currency Code" = '') then
+                Item.Validate(Item."Standard Cost", _ItemWkshLine."Direct Unit Cost");
         if Item."Unit Cost" = 0 then
-            Item."Unit Cost" := ItemWkshLine."Direct Unit Cost";
-        if (ItemWkshLine."Sales Price Currency Code" = '') then
-            if ItemWkshLine."Sales Price Start Date" <= WorkDate() then
-                Item.Validate(Item."Unit Price", ItemWkshLine."Sales Price");
-        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Base Unit of Measure")) then
-            Item.Validate(Item."Base Unit of Measure", ItemWkshLine."Base Unit of Measure");
-        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Inventory Posting Group")) then
-            Item.Validate(Item."Inventory Posting Group", ItemWkshLine."Inventory Posting Group");
-        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Gen. Prod. Posting Group")) then
-            Item.Validate(Item."Gen. Prod. Posting Group", ItemWkshLine."Gen. Prod. Posting Group");
-        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Tax Group Code")) then
-            Item.Validate(Item."Tax Group Code", ItemWkshLine."Tax Group Code");
-        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("VAT Prod. Posting Group")) then
-            Item.Validate(Item."VAT Prod. Posting Group", ItemWkshLine."VAT Prod. Posting Group");
-        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Global Dimension 1 Code")) then
-            Item.Validate(Item."Global Dimension 1 Code", ItemWkshLine."Global Dimension 1 Code");
-        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Global Dimension 2 Code")) then
-            Item.Validate(Item."Global Dimension 2 Code", ItemWkshLine."Global Dimension 2 Code");
-        ItemWkshLine."Variety 1 Table (New)" := FindNewVarietyNames(ItemWkshLine, 1, ItemWkshLine."Variety 1", ItemWkshLine."Variety 1 Table (Base)", ItemWkshLine."Variety 1 Table (New)", ItemWkshLine."Create Copy of Variety 1 Table");
-        ItemWkshLine."Variety 2 Table (New)" := FindNewVarietyNames(ItemWkshLine, 2, ItemWkshLine."Variety 2", ItemWkshLine."Variety 2 Table (Base)", ItemWkshLine."Variety 2 Table (New)", ItemWkshLine."Create Copy of Variety 2 Table");
-        ItemWkshLine."Variety 3 Table (New)" := FindNewVarietyNames(ItemWkshLine, 3, ItemWkshLine."Variety 3", ItemWkshLine."Variety 3 Table (Base)", ItemWkshLine."Variety 3 Table (New)", ItemWkshLine."Create Copy of Variety 3 Table");
-        ItemWkshLine."Variety 4 Table (New)" := FindNewVarietyNames(ItemWkshLine, 4, ItemWkshLine."Variety 4", ItemWkshLine."Variety 4 Table (Base)", ItemWkshLine."Variety 4 Table (New)", ItemWkshLine."Create Copy of Variety 4 Table");
-        Item."NPR Variety 1" := ItemWkshLine."Variety 1";
-        Item."NPR Variety 1 Table" := ItemWkshLine."Variety 1 Table (New)";
-        Item."NPR Variety 2" := ItemWkshLine."Variety 2";
-        Item."NPR Variety 2 Table" := ItemWkshLine."Variety 2 Table (New)";
-        Item."NPR Variety 3" := ItemWkshLine."Variety 3";
-        Item."NPR Variety 3 Table" := ItemWkshLine."Variety 3 Table (New)";
-        Item."NPR Variety 4" := ItemWkshLine."Variety 4";
-        Item."NPR Variety 4 Table" := ItemWkshLine."Variety 4 Table (New)";
-        Item."NPR Cross Variety No." := ItemWkshLine."Cross Variety No.";
-        Item."NPR Variety Group" := ItemWkshLine."Variety Group";
-        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Sales Unit of Measure")) then
-            Item.Validate(Item."Sales Unit of Measure", ItemWkshLine."Sales Unit of Measure");
-        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Sales Unit of Measure")) then
-            Item.Validate(Item."Purch. Unit of Measure", ItemWkshLine."Sales Unit of Measure");
-        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Manufacturer Code")) then
-            Item.Validate(Item."Manufacturer Code", ItemWkshLine."Manufacturer Code");
-        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Item Category Code")) then
-            Item.Validate(Item."Item Category Code", ItemWkshLine."Item Category Code");
-        Item.Validate(Item."Net Weight", ItemWkshLine."Net Weight");
-        Item.Validate(Item."Gross Weight", ItemWkshLine."Gross Weight");
-        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Tariff No.")) then
-            Item.Validate(Item."Tariff No.", ItemWkshLine."Tariff No.");
-        ValidateFields(Item, ItemWkshLine, true, false);
+            Item."Unit Cost" := _ItemWkshLine."Direct Unit Cost";
+        if (_ItemWkshLine."Sales Price Currency Code" = '') then
+            if _ItemWkshLine."Sales Price Start Date" <= WorkDate() then
+                Item.Validate(Item."Unit Price", _ItemWkshLine."Sales Price");
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Base Unit of Measure")) then
+            Item.Validate(Item."Base Unit of Measure", _ItemWkshLine."Base Unit of Measure");
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Inventory Posting Group")) then
+            Item.Validate(Item."Inventory Posting Group", _ItemWkshLine."Inventory Posting Group");
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Gen. Prod. Posting Group")) then
+            Item.Validate(Item."Gen. Prod. Posting Group", _ItemWkshLine."Gen. Prod. Posting Group");
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Tax Group Code")) then
+            Item.Validate(Item."Tax Group Code", _ItemWkshLine."Tax Group Code");
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("VAT Prod. Posting Group")) then
+            Item.Validate(Item."VAT Prod. Posting Group", _ItemWkshLine."VAT Prod. Posting Group");
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Global Dimension 1 Code")) then
+            Item.Validate(Item."Global Dimension 1 Code", _ItemWkshLine."Global Dimension 1 Code");
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Global Dimension 2 Code")) then
+            Item.Validate(Item."Global Dimension 2 Code", _ItemWkshLine."Global Dimension 2 Code");
+        _ItemWkshLine."Variety 1 Table (New)" := FindNewVarietyNames(_ItemWkshLine, 1, _ItemWkshLine."Variety 1", _ItemWkshLine."Variety 1 Table (Base)", _ItemWkshLine."Variety 1 Table (New)", _ItemWkshLine."Create Copy of Variety 1 Table");
+        _ItemWkshLine."Variety 2 Table (New)" := FindNewVarietyNames(_ItemWkshLine, 2, _ItemWkshLine."Variety 2", _ItemWkshLine."Variety 2 Table (Base)", _ItemWkshLine."Variety 2 Table (New)", _ItemWkshLine."Create Copy of Variety 2 Table");
+        _ItemWkshLine."Variety 3 Table (New)" := FindNewVarietyNames(_ItemWkshLine, 3, _ItemWkshLine."Variety 3", _ItemWkshLine."Variety 3 Table (Base)", _ItemWkshLine."Variety 3 Table (New)", _ItemWkshLine."Create Copy of Variety 3 Table");
+        _ItemWkshLine."Variety 4 Table (New)" := FindNewVarietyNames(_ItemWkshLine, 4, _ItemWkshLine."Variety 4", _ItemWkshLine."Variety 4 Table (Base)", _ItemWkshLine."Variety 4 Table (New)", _ItemWkshLine."Create Copy of Variety 4 Table");
+        Item."NPR Variety 1" := _ItemWkshLine."Variety 1";
+        Item."NPR Variety 1 Table" := _ItemWkshLine."Variety 1 Table (New)";
+        Item."NPR Variety 2" := _ItemWkshLine."Variety 2";
+        Item."NPR Variety 2 Table" := _ItemWkshLine."Variety 2 Table (New)";
+        Item."NPR Variety 3" := _ItemWkshLine."Variety 3";
+        Item."NPR Variety 3 Table" := _ItemWkshLine."Variety 3 Table (New)";
+        Item."NPR Variety 4" := _ItemWkshLine."Variety 4";
+        Item."NPR Variety 4 Table" := _ItemWkshLine."Variety 4 Table (New)";
+        Item."NPR Cross Variety No." := _ItemWkshLine."Cross Variety No.";
+        Item."NPR Variety Group" := _ItemWkshLine."Variety Group";
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Sales Unit of Measure")) then
+            Item.Validate(Item."Sales Unit of Measure", _ItemWkshLine."Sales Unit of Measure");
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Sales Unit of Measure")) then
+            Item.Validate(Item."Purch. Unit of Measure", _ItemWkshLine."Sales Unit of Measure");
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Manufacturer Code")) then
+            Item.Validate(Item."Manufacturer Code", _ItemWkshLine."Manufacturer Code");
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Item Category Code")) then
+            Item.Validate(Item."Item Category Code", _ItemWkshLine."Item Category Code");
+        Item.Validate(Item."Net Weight", _ItemWkshLine."Net Weight");
+        Item.Validate(Item."Gross Weight", _ItemWkshLine."Gross Weight");
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Tariff No.")) then
+            Item.Validate(Item."Tariff No.", _ItemWkshLine."Tariff No.");
+        ValidateFields(Item, _ItemWkshLine, true, false);
         Item.Modify(true);
 
 
-        ItemWkshLine.UpdateBarcode();
+        _ItemWkshLine.UpdateBarcode();
         ProcessLineSalesPrices();
         ProcessLinePurchasePrices();
-        UpdateAndCopyVarieties(ItemWkshLine, 1, ItemWkshLine."Variety 1", ItemWkshLine."Variety 1 Table (Base)", ItemWkshLine."Variety 1 Table (New)", ItemWkshLine."Create Copy of Variety 1 Table", true);
-        UpdateAndCopyVarieties(ItemWkshLine, 2, ItemWkshLine."Variety 2", ItemWkshLine."Variety 2 Table (Base)", ItemWkshLine."Variety 2 Table (New)", ItemWkshLine."Create Copy of Variety 2 Table", true);
-        UpdateAndCopyVarieties(ItemWkshLine, 3, ItemWkshLine."Variety 3", ItemWkshLine."Variety 3 Table (Base)", ItemWkshLine."Variety 3 Table (New)", ItemWkshLine."Create Copy of Variety 3 Table", true);
-        UpdateAndCopyVarieties(ItemWkshLine, 4, ItemWkshLine."Variety 4", ItemWkshLine."Variety 4 Table (Base)", ItemWkshLine."Variety 4 Table (New)", ItemWkshLine."Create Copy of Variety 4 Table", true);
+        UpdateAndCopyVarieties(_ItemWkshLine, 1, _ItemWkshLine."Variety 1", _ItemWkshLine."Variety 1 Table (Base)", _ItemWkshLine."Variety 1 Table (New)", _ItemWkshLine."Create Copy of Variety 1 Table", true);
+        UpdateAndCopyVarieties(_ItemWkshLine, 2, _ItemWkshLine."Variety 2", _ItemWkshLine."Variety 2 Table (Base)", _ItemWkshLine."Variety 2 Table (New)", _ItemWkshLine."Create Copy of Variety 2 Table", true);
+        UpdateAndCopyVarieties(_ItemWkshLine, 3, _ItemWkshLine."Variety 3", _ItemWkshLine."Variety 3 Table (Base)", _ItemWkshLine."Variety 3 Table (New)", _ItemWkshLine."Create Copy of Variety 3 Table", true);
+        UpdateAndCopyVarieties(_ItemWkshLine, 4, _ItemWkshLine."Variety 4", _ItemWkshLine."Variety 4 Table (Base)", _ItemWkshLine."Variety 4 Table (New)", _ItemWkshLine."Create Copy of Variety 4 Table", true);
         UpdateItemAttributes();
     end;
 
     local procedure UpdateItem()
     begin
-        GetItem(ItemWkshLine."Item No.");
-        if (Item."Vendor Item No." <> ItemWkshLine."Vendor Item No.") and (ItemWkshLine."Vendor Item No." <> '') then
-            Item.Validate(Item."Vendor Item No.", ItemWkshLine."Vendor Item No.");
-        if (Item."Vendor No." <> ItemWkshLine."Vendor No.") and (ItemWkshLine."Vendor No." <> '') then
-            Item.Validate(Item."Vendor No.", ItemWkshLine."Vendor No.");
-        if (Item.Description <> ItemWkshLine.Description) and (ItemWkshLine.Description <> '') then
-            Item.Validate(Item.Description, ItemWkshLine.Description);
-        if (Item."Tariff No." <> ItemWkshLine."Tariff No.") and (ItemWkshLine."Tariff No." <> '') then
-            Item.Validate(Item."Tariff No.", ItemWkshLine."Tariff No.");
-        if (Item."Net Weight" <> ItemWkshLine."Net Weight") and (ItemWkshLine."Net Weight" <> 0) then
-            Item.Validate(Item."Net Weight", ItemWkshLine."Net Weight");
-        if (Item."Gross Weight" <> ItemWkshLine."Gross Weight") and (ItemWkshLine."Gross Weight" <> 0) then
-            Item.Validate(Item."Gross Weight", ItemWkshLine."Gross Weight");
+        GetItem(_ItemWkshLine."Item No.");
+        if (Item."Vendor Item No." <> _ItemWkshLine."Vendor Item No.") and (_ItemWkshLine."Vendor Item No." <> '') then
+            Item.Validate(Item."Vendor Item No.", _ItemWkshLine."Vendor Item No.");
+        if (Item."Vendor No." <> _ItemWkshLine."Vendor No.") and (_ItemWkshLine."Vendor No." <> '') then
+            Item.Validate(Item."Vendor No.", _ItemWkshLine."Vendor No.");
+        if (Item.Description <> _ItemWkshLine.Description) and (_ItemWkshLine.Description <> '') then
+            Item.Validate(Item.Description, _ItemWkshLine.Description);
+        if (Item."Tariff No." <> _ItemWkshLine."Tariff No.") and (_ItemWkshLine."Tariff No." <> '') then
+            Item.Validate(Item."Tariff No.", _ItemWkshLine."Tariff No.");
+        if (Item."Net Weight" <> _ItemWkshLine."Net Weight") and (_ItemWkshLine."Net Weight" <> 0) then
+            Item.Validate(Item."Net Weight", _ItemWkshLine."Net Weight");
+        if (Item."Gross Weight" <> _ItemWkshLine."Gross Weight") and (_ItemWkshLine."Gross Weight" <> 0) then
+            Item.Validate(Item."Gross Weight", _ItemWkshLine."Gross Weight");
         if Item."Unit Cost" = 0 then
-            Item."Unit Cost" := ItemWkshLine."Direct Unit Cost";
+            Item."Unit Cost" := _ItemWkshLine."Direct Unit Cost";
         Item.Modify(true);
-        ValidateFields(Item, ItemWkshLine, true, false);
+        ValidateFields(Item, _ItemWkshLine, true, false);
 
-        ItemWkshLine.UpdateBarcode();
+        _ItemWkshLine.UpdateBarcode();
         ProcessLineSalesPrices();
         ProcessLinePurchasePrices();
-        UpdateAndCopyVarieties(ItemWkshLine, 1, ItemWkshLine."Variety 1", ItemWkshLine."Variety 1 Table (Base)", ItemWkshLine."Variety 1 Table (New)", ItemWkshLine."Create Copy of Variety 1 Table", false);
-        UpdateAndCopyVarieties(ItemWkshLine, 2, ItemWkshLine."Variety 2", ItemWkshLine."Variety 2 Table (Base)", ItemWkshLine."Variety 2 Table (New)", ItemWkshLine."Create Copy of Variety 2 Table", false);
-        UpdateAndCopyVarieties(ItemWkshLine, 3, ItemWkshLine."Variety 3", ItemWkshLine."Variety 3 Table (Base)", ItemWkshLine."Variety 3 Table (New)", ItemWkshLine."Create Copy of Variety 3 Table", false);
-        UpdateAndCopyVarieties(ItemWkshLine, 4, ItemWkshLine."Variety 4", ItemWkshLine."Variety 4 Table (Base)", ItemWkshLine."Variety 4 Table (New)", ItemWkshLine."Create Copy of Variety 4 Table", false);
+        UpdateAndCopyVarieties(_ItemWkshLine, 1, _ItemWkshLine."Variety 1", _ItemWkshLine."Variety 1 Table (Base)", _ItemWkshLine."Variety 1 Table (New)", _ItemWkshLine."Create Copy of Variety 1 Table", false);
+        UpdateAndCopyVarieties(_ItemWkshLine, 2, _ItemWkshLine."Variety 2", _ItemWkshLine."Variety 2 Table (Base)", _ItemWkshLine."Variety 2 Table (New)", _ItemWkshLine."Create Copy of Variety 2 Table", false);
+        UpdateAndCopyVarieties(_ItemWkshLine, 3, _ItemWkshLine."Variety 3", _ItemWkshLine."Variety 3 Table (Base)", _ItemWkshLine."Variety 3 Table (New)", _ItemWkshLine."Create Copy of Variety 3 Table", false);
+        UpdateAndCopyVarieties(_ItemWkshLine, 4, _ItemWkshLine."Variety 4", _ItemWkshLine."Variety 4 Table (Base)", _ItemWkshLine."Variety 4 Table (New)", _ItemWkshLine."Create Copy of Variety 4 Table", false);
         UpdateItemAttributes();
     end;
 
@@ -318,16 +318,16 @@
         //Copy Worksheet Values
         if CopyValues then begin
             ItemWorksheetVarietyValue.Reset();
-            ItemWorksheetVarietyValue.SetRange("Worksheet Template Name", ItemWkshLine."Worksheet Template Name");
-            ItemWorksheetVarietyValue.SetRange("Worksheet Name", ItemWkshLine."Worksheet Name");
-            ItemWorksheetVarietyValue.SetRange("Worksheet Line No.", ItemWkshLine."Line No.");
+            ItemWorksheetVarietyValue.SetRange("Worksheet Template Name", _ItemWkshLine."Worksheet Template Name");
+            ItemWorksheetVarietyValue.SetRange("Worksheet Name", _ItemWkshLine."Worksheet Name");
+            ItemWorksheetVarietyValue.SetRange("Worksheet Line No.", _ItemWkshLine."Line No.");
             ItemWorksheetVarietyValue.SetRange(Type, Variety);
             if ItemWorksheetVarietyValue.FindSet() then
                 repeat
                     IsUpdated := false;
-                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Template Name", ItemWkshLine."Worksheet Template Name");
-                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Name", ItemWkshLine."Worksheet Name");
-                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Line No.", ItemWkshLine."Line No.");
+                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Template Name", _ItemWkshLine."Worksheet Template Name");
+                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Name", _ItemWkshLine."Worksheet Name");
+                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Line No.", _ItemWkshLine."Line No.");
                     ItemWorksheetVariantLineToCreate.SetRange(Action, ItemWorksheetVariantLineToCreate.Action::CreateNew);
                     if ItemWorksheetVariantLineToCreate.FindSet() then
                         repeat
@@ -501,9 +501,9 @@
     begin
         AttributeKey.SetCurrentKey("Table ID", "MDR Code PK");
         AttributeKey.SetFilter("Table ID", '=%1', DATABASE::"NPR Item Worksheet Line");
-        AttributeKey.SetFilter("MDR Code PK", '=%1', ItemWkshLine."Worksheet Template Name");
-        AttributeKey.SetFilter("MDR Code 2 PK", '=%1', ItemWkshLine."Worksheet Name");
-        AttributeKey.SetFilter("MDR Line PK", '=%1', ItemWkshLine."Line No.");
+        AttributeKey.SetFilter("MDR Code PK", '=%1', _ItemWkshLine."Worksheet Template Name");
+        AttributeKey.SetFilter("MDR Code 2 PK", '=%1', _ItemWkshLine."Worksheet Name");
+        AttributeKey.SetFilter("MDR Line PK", '=%1', _ItemWkshLine."Line No.");
         AttributeKey.SetFilter("MDR Line 2 PK", '=%1', 0);
 
         // Fill array
@@ -513,8 +513,8 @@
             if AttributeValueSet.FindSet() then
                 repeat
                     if not AttributeID.Get(DATABASE::Item, AttributeValueSet."Attribute Code") then
-                        Error(TxtAttributeNotSetUp, AttributeValueSet."Attribute Code", ItemWkshLine."Item No.");
-                    AttributeManagement.SetMasterDataAttributeValue(DATABASE::Item, AttributeID."Shortcut Attribute ID", ItemWkshLine."Item No.", AttributeValueSet."Text Value");
+                        Error(TxtAttributeNotSetUp, AttributeValueSet."Attribute Code", _ItemWkshLine."Item No.");
+                    AttributeManagement.SetMasterDataAttributeValue(DATABASE::Item, AttributeID."Shortcut Attribute ID", _ItemWkshLine."Item No.", AttributeValueSet."Text Value");
                 until AttributeValueSet.Next() = 0;
         end;
     end;
@@ -524,19 +524,19 @@
         if ItemWorksheetTemplate."Register Lines" then begin
             CopyToRegisteredWorksheetLine();
 
-            ItemWkshVariantLine.Reset();
-            ItemWkshVariantLine.SetRange("Worksheet Template Name", ItemWkshLine."Worksheet Template Name");
-            ItemWkshVariantLine.SetRange("Worksheet Name", ItemWkshLine."Worksheet Name");
-            ItemWkshVariantLine.SetRange("Worksheet Line No.", ItemWkshLine."Line No.");
-            if ItemWkshVariantLine.FindSet() then
+            _ItemWkshVariantLine.Reset();
+            _ItemWkshVariantLine.SetRange("Worksheet Template Name", _ItemWkshLine."Worksheet Template Name");
+            _ItemWkshVariantLine.SetRange("Worksheet Name", _ItemWkshLine."Worksheet Name");
+            _ItemWkshVariantLine.SetRange("Worksheet Line No.", _ItemWkshLine."Line No.");
+            if _ItemWkshVariantLine.FindSet() then
                 repeat
                     CopyToRegisteredWorksheetVariantLine();
-                until ItemWkshVariantLine.Next() = 0;
+                until _ItemWkshVariantLine.Next() = 0;
 
             ItemWorksheetVarietyValue.Reset();
-            ItemWorksheetVarietyValue.SetRange("Worksheet Template Name", ItemWkshLine."Worksheet Template Name");
-            ItemWorksheetVarietyValue.SetRange("Worksheet Name", ItemWkshLine."Worksheet Name");
-            ItemWorksheetVarietyValue.SetRange("Worksheet Line No.", ItemWkshLine."Line No.");
+            ItemWorksheetVarietyValue.SetRange("Worksheet Template Name", _ItemWkshLine."Worksheet Template Name");
+            ItemWorksheetVarietyValue.SetRange("Worksheet Name", _ItemWkshLine."Worksheet Name");
+            ItemWorksheetVarietyValue.SetRange("Worksheet Line No.", _ItemWkshLine."Line No.");
             if ItemWorksheetVarietyValue.FindSet() then
                 repeat
                     CopyToRegisteredWorksheetVarietyValueLine();
@@ -547,202 +547,202 @@
     local procedure CopyToRegisteredWorksheetLine()
     begin
         RegisteredWorksheetLine."Registered Worksheet No." := LastRegisteredWorksheetNo();
-        RegisteredWorksheetLine."Line No." := ItemWkshLine."Line No.";
-        RegisteredWorksheetLine.Action := ItemWkshLine.Action;
-        RegisteredWorksheetLine."Existing Item No." := ItemWkshLine."Existing Item No.";
-        RegisteredWorksheetLine."Item No." := ItemWkshLine."Item No.";
-        RegisteredWorksheetLine."Vendor Item No." := ItemWkshLine."Vendor Item No.";
-        RegisteredWorksheetLine."Internal Bar Code" := ItemWkshLine."Internal Bar Code";
-        RegisteredWorksheetLine."Vendor No." := ItemWkshLine."Vendor No.";
-        RegisteredWorksheetLine.Description := ItemWkshLine.Description;
-        RegisteredWorksheetLine."Direct Unit Cost" := ItemWkshLine."Direct Unit Cost";
-        RegisteredWorksheetLine."Unit Price (LCY)" := ItemWkshLine."Sales Price";
-        RegisteredWorksheetLine."Use Variant" := ItemWkshLine."Use Variant";
-        RegisteredWorksheetLine."Base Unit of Measure" := ItemWkshLine."Base Unit of Measure";
-        RegisteredWorksheetLine."Inventory Posting Group" := ItemWkshLine."Inventory Posting Group";
-        RegisteredWorksheetLine."Costing Method" := ItemWkshLine."Costing Method";
-        RegisteredWorksheetLine."Vendors Bar Code" := ItemWkshLine."Vendors Bar Code";
-        RegisteredWorksheetLine."VAT Bus. Posting Group" := ItemWkshLine."VAT Bus. Posting Group";
-        RegisteredWorksheetLine."VAT Bus. Posting Gr. (Price)" := ItemWkshLine."VAT Bus. Posting Gr. (Price)";
-        RegisteredWorksheetLine."Gen. Prod. Posting Group" := ItemWkshLine."Gen. Prod. Posting Group";
-        RegisteredWorksheetLine."No. Series" := ItemWkshLine."No. Series";
-        RegisteredWorksheetLine."Tax Group Code" := ItemWkshLine."Tax Group Code";
-        RegisteredWorksheetLine."VAT Prod. Posting Group" := ItemWkshLine."VAT Prod. Posting Group";
-        RegisteredWorksheetLine."Global Dimension 1 Code" := ItemWkshLine."Global Dimension 2 Code";
-        RegisteredWorksheetLine.Status := ItemWkshLine.Status;
-        RegisteredWorksheetLine."Status Comment" := ItemWkshLine."Status Comment";
-        RegisteredWorksheetLine."Variety 1" := ItemWkshLine."Variety 1";
-        RegisteredWorksheetLine."Variety 1 Table (New)" := CopyStr(ItemWkshLine."Variety 1 Table (New)", 1, MaxStrLen(RegisteredWorksheetLine."Variety 1 Table (New)"));
-        RegisteredWorksheetLine."Variety 1 Table (Base)" := ItemWkshLine."Variety 1 Table (Base)";
-        RegisteredWorksheetLine."Variety 1 Lock Table" := ItemWkshLine."Variety 1 Lock Table";
-        RegisteredWorksheetLine."Create Copy of Variety 1 Table" := ItemWkshLine."Create Copy of Variety 1 Table";
-        RegisteredWorksheetLine."Variety 2" := ItemWkshLine."Variety 2";
-        RegisteredWorksheetLine."Variety 2 Table (New)" := CopyStr(ItemWkshLine."Variety 2 Table (New)", 1, MaxStrLen(RegisteredWorksheetLine."Variety 2 Table (New)"));
-        RegisteredWorksheetLine."Variety 2 Table (Base)" := ItemWkshLine."Variety 2 Table (Base)";
-        RegisteredWorksheetLine."Variety 2 Lock Table" := ItemWkshLine."Variety 2 Lock Table";
-        RegisteredWorksheetLine."Create Copy of Variety 2 Table" := ItemWkshLine."Create Copy of Variety 2 Table";
-        RegisteredWorksheetLine."Variety 3" := ItemWkshLine."Variety 3";
-        RegisteredWorksheetLine."Variety 3 Table (New)" := CopyStr(ItemWkshLine."Variety 3 Table (New)", 1, MaxStrLen(RegisteredWorksheetLine."Variety 3 Table (New)"));
-        RegisteredWorksheetLine."Variety 3 Table (Base)" := ItemWkshLine."Variety 3 Table (Base)";
-        RegisteredWorksheetLine."Variety 3 Lock Table" := ItemWkshLine."Variety 3 Lock Table";
-        RegisteredWorksheetLine."Create Copy of Variety 3 Table" := ItemWkshLine."Create Copy of Variety 3 Table";
-        RegisteredWorksheetLine."Variety 4" := ItemWkshLine."Variety 4";
-        RegisteredWorksheetLine."Variety 4 Table (New)" := CopyStr(ItemWkshLine."Variety 4 Table (New)", 1, MaxStrLen(RegisteredWorksheetLine."Variety 4 Table (New)"));
-        RegisteredWorksheetLine."Variety 4 Table (Base)" := ItemWkshLine."Variety 4 Table (Base)";
-        RegisteredWorksheetLine."Variety 4 Lock Table" := ItemWkshLine."Variety 4 Lock Table";
-        RegisteredWorksheetLine."Create Copy of Variety 4 Table" := ItemWkshLine."Create Copy of Variety 4 Table";
-        RegisteredWorksheetLine."Cross Variety No." := ItemWkshLine."Cross Variety No.";
-        RegisteredWorksheetLine."Variety Group" := ItemWkshLine."Variety Group";
-        RegisteredWorksheetLine."Sales Unit of Measure" := ItemWkshLine."Sales Unit of Measure";
-        RegisteredWorksheetLine."Purch. Unit of Measure" := ItemWkshLine."Purch. Unit of Measure";
-        RegisteredWorksheetLine."Manufacturer Code" := ItemWkshLine."Manufacturer Code";
-        RegisteredWorksheetLine."Item Category Code" := ItemWkshLine."Item Category Code";
-        RegisteredWorksheetLine."Product Group Code" := ItemWkshLine."Product Group Code";
-        RegisteredWorksheetLine."Variant Code" := ItemWkshLine."Variant Code";
-        RegisteredWorksheetLine."Sales Price Currency Code" := ItemWkshLine."Sales Price Currency Code";
-        RegisteredWorksheetLine."Purchase Price Currency Code" := ItemWkshLine."Purchase Price Currency Code";
-        RegisteredWorksheetLine."Sales Price Start Date" := ItemWkshLine."Sales Price Start Date";
-        RegisteredWorksheetLine."Purchase Price Start Date" := ItemWkshLine."Purchase Price Start Date";
-        RegisteredWorksheetLine."Tariff No." := ItemWkshLine."Tariff No.";
-        RegisteredWorksheetLine."No. 2" := ItemWkshLine."No. 2";
-        RegisteredWorksheetLine.Type := ItemWkshLine.Type;
-        RegisteredWorksheetLine."Shelf No." := ItemWkshLine."Shelf No.";
-        RegisteredWorksheetLine."Item Disc. Group" := ItemWkshLine."Item Disc. Group";
-        RegisteredWorksheetLine."Allow Invoice Disc." := ItemWkshLine."Allow Invoice Disc.";
-        RegisteredWorksheetLine."Statistics Group" := ItemWkshLine."Statistics Group";
-        RegisteredWorksheetLine."Commission Group" := ItemWkshLine."Commission Group";
-        RegisteredWorksheetLine."Price/Profit Calculation" := ItemWkshLine."Price/Profit Calculation";
-        RegisteredWorksheetLine."Profit %" := ItemWkshLine."Profit %";
-        RegisteredWorksheetLine."Lead Time Calculation" := ItemWkshLine."Lead Time Calculation";
-        RegisteredWorksheetLine."Reorder Point" := ItemWkshLine."Reorder Point";
-        RegisteredWorksheetLine."Maximum Inventory" := ItemWkshLine."Maximum Inventory";
-        RegisteredWorksheetLine."Reorder Quantity" := ItemWkshLine."Reorder Quantity";
-        RegisteredWorksheetLine."Unit List Price" := ItemWkshLine."Unit List Price";
-        RegisteredWorksheetLine."Duty Due %" := ItemWkshLine."Duty Due %";
-        RegisteredWorksheetLine."Duty Code" := ItemWkshLine."Duty Code";
-        RegisteredWorksheetLine."Units per Parcel" := ItemWkshLine."Units per Parcel";
-        RegisteredWorksheetLine."Unit Volume" := ItemWkshLine."Unit Volume";
-        RegisteredWorksheetLine.Durability := ItemWkshLine.Durability;
-        RegisteredWorksheetLine."Freight Type" := ItemWkshLine."Freight Type";
-        RegisteredWorksheetLine."Duty Unit Conversion" := ItemWkshLine."Duty Unit Conversion";
-        RegisteredWorksheetLine."Country/Region Purchased Code" := ItemWkshLine."Country/Region Purchased Code";
-        RegisteredWorksheetLine."Budget Quantity" := ItemWkshLine."Budget Quantity";
-        RegisteredWorksheetLine."Budgeted Amount" := ItemWkshLine."Budgeted Amount";
-        RegisteredWorksheetLine."Budget Profit" := ItemWkshLine."Budget Profit";
-        RegisteredWorksheetLine.Blocked := ItemWkshLine.Blocked;
-        RegisteredWorksheetLine."Price Includes VAT" := ItemWkshLine."Price Includes VAT";
-        RegisteredWorksheetLine."Country/Region of Origin Code" := ItemWkshLine."Country/Region of Origin Code";
-        RegisteredWorksheetLine."Automatic Ext. Texts" := ItemWkshLine."Automatic Ext. Texts";
-        RegisteredWorksheetLine.Reserve := ItemWkshLine.Reserve;
-        RegisteredWorksheetLine."Stockout Warning" := ItemWkshLine."Stockout Warning";
-        RegisteredWorksheetLine."Prevent Negative Inventory" := ItemWkshLine."Prevent Negative Inventory";
-        RegisteredWorksheetLine."Assembly Policy" := ItemWkshLine."Assembly Policy";
-        RegisteredWorksheetLine.GTIN := ItemWkshLine.GTIN;
-        RegisteredWorksheetLine."Lot Size" := ItemWkshLine."Lot Size";
-        RegisteredWorksheetLine."Serial Nos." := ItemWkshLine."Serial Nos.";
-        RegisteredWorksheetLine."Scrap %" := ItemWkshLine."Scrap %";
-        RegisteredWorksheetLine."Inventory Value Zero" := ItemWkshLine."Inventory Value Zero";
-        RegisteredWorksheetLine."Discrete Order Quantity" := ItemWkshLine."Discrete Order Quantity";
-        RegisteredWorksheetLine."Minimum Order Quantity" := ItemWkshLine."Minimum Order Quantity";
-        RegisteredWorksheetLine."Maximum Order Quantity" := ItemWkshLine."Maximum Order Quantity";
-        RegisteredWorksheetLine."Safety Stock Quantity" := ItemWkshLine."Safety Stock Quantity";
-        RegisteredWorksheetLine."Order Multiple" := ItemWkshLine."Order Multiple";
-        RegisteredWorksheetLine."Safety Lead Time" := ItemWkshLine."Safety Lead Time";
-        RegisteredWorksheetLine."Flushing Method" := ItemWkshLine."Flushing Method";
-        RegisteredWorksheetLine."Replenishment System" := ItemWkshLine."Replenishment System";
-        RegisteredWorksheetLine."Reordering Policy" := ItemWkshLine."Reordering Policy";
-        RegisteredWorksheetLine."Include Inventory" := ItemWkshLine."Include Inventory";
-        RegisteredWorksheetLine."Manufacturing Policy" := ItemWkshLine."Manufacturing Policy";
-        RegisteredWorksheetLine."Rescheduling Period" := ItemWkshLine."Rescheduling Period";
-        RegisteredWorksheetLine."Lot Accumulation Period" := ItemWkshLine."Lot Accumulation Period";
-        RegisteredWorksheetLine."Dampener Period" := ItemWkshLine."Dampener Period";
-        RegisteredWorksheetLine."Dampener Quantity" := ItemWkshLine."Dampener Quantity";
-        RegisteredWorksheetLine."Overflow Level" := ItemWkshLine."Overflow Level";
-        RegisteredWorksheetLine."Service Item Group" := ItemWkshLine."Service Item Group";
-        RegisteredWorksheetLine."Item Tracking Code" := ItemWkshLine."Item Tracking Code";
-        RegisteredWorksheetLine."Lot Nos." := ItemWkshLine."Lot Nos.";
-        RegisteredWorksheetLine."Expiration Calculation" := ItemWkshLine."Expiration Calculation";
-        RegisteredWorksheetLine."Special Equipment Code" := ItemWkshLine."Special Equipment Code";
-        RegisteredWorksheetLine."Put-away Template Code" := ItemWkshLine."Put-away Template Code";
-        RegisteredWorksheetLine."Put-away Unit of Measure Code" := ItemWkshLine."Put-away Unit of Measure Code";
-        RegisteredWorksheetLine."Phys Invt Counting Period Code" := ItemWkshLine."Phys Invt Counting Period Code";
-        RegisteredWorksheetLine."Use Cross-Docking" := ItemWkshLine."Use Cross-Docking";
-        RegisteredWorksheetLine."Custom Text 1" := ItemWkshLine."Custom Text 1";
-        RegisteredWorksheetLine."Custom Text 2" := ItemWkshLine."Custom Text 2";
-        RegisteredWorksheetLine."Custom Text 3" := ItemWkshLine."Custom Text 3";
-        RegisteredWorksheetLine."Custom Text 4" := ItemWkshLine."Custom Text 4";
-        RegisteredWorksheetLine."Custom Text 5" := ItemWkshLine."Custom Text 5";
-        RegisteredWorksheetLine."Custom Price 1" := ItemWkshLine."Custom Price 1";
-        RegisteredWorksheetLine."Custom Price 2" := ItemWkshLine."Custom Price 2";
-        RegisteredWorksheetLine."Custom Price 3" := ItemWkshLine."Custom Price 3";
-        RegisteredWorksheetLine."Custom Price 4" := ItemWkshLine."Custom Price 4";
-        RegisteredWorksheetLine."Custom Price 5" := ItemWkshLine."Custom Price 5";
-        RegisteredWorksheetLine."Group sale" := ItemWkshLine."Group sale";
-        RegisteredWorksheetLine."Label Barcode" := ItemWkshLine."Label Barcode";
-        RegisteredWorksheetLine."Explode BOM auto" := ItemWkshLine."Explode BOM auto";
-        RegisteredWorksheetLine."Guarantee voucher" := ItemWkshLine."Guarantee voucher";
-        RegisteredWorksheetLine."Cannot edit unit price" := ItemWkshLine."Cannot edit unit price";
-        RegisteredWorksheetLine."Second-hand number" := ItemWkshLine."Second-hand number";
-        RegisteredWorksheetLine.Condition := ItemWkshLine.Condition;
-        RegisteredWorksheetLine."Second-hand" := ItemWkshLine."Second-hand";
-        RegisteredWorksheetLine."Guarantee Index" := ItemWkshLine."Guarantee Index";
-        RegisteredWorksheetLine."Insurrance category" := ItemWkshLine."Insurrance category";
-        RegisteredWorksheetLine."Item Brand" := ItemWkshLine."Item Brand";
-        RegisteredWorksheetLine."Type Retail" := ItemWkshLine."Type Retail";
-        RegisteredWorksheetLine."No Print on Reciept" := ItemWkshLine."No Print on Reciept";
-        RegisteredWorksheetLine."Print Tags" := ItemWkshLine."Print Tags";
-        RegisteredWorksheetLine."Change quantity by Photoorder" := ItemWkshLine."Change quantity by Photoorder";
-        RegisteredWorksheetLine."Std. Sales Qty." := ItemWkshLine."Std. Sales Qty.";
-        RegisteredWorksheetLine."Blocked on Pos" := ItemWkshLine."Blocked on Pos";
-        RegisteredWorksheetLine."Ticket Type" := ItemWkshLine."Ticket Type";
-        RegisteredWorksheetLine."Magento Status" := ItemWkshLine."Magento Status";
-        RegisteredWorksheetLine.Backorder := ItemWkshLine.Backorder;
-        RegisteredWorksheetLine."Product New From" := ItemWkshLine."Product New From";
-        RegisteredWorksheetLine."Product New To" := ItemWkshLine."Product New To";
-        RegisteredWorksheetLine."Attribute Set ID" := ItemWkshLine."Attribute Set ID";
-        RegisteredWorksheetLine."Special Price" := ItemWkshLine."Special Price";
-        RegisteredWorksheetLine."Special Price From" := ItemWkshLine."Special Price From";
-        RegisteredWorksheetLine."Special Price To" := ItemWkshLine."Special Price To";
-        RegisteredWorksheetLine."Magento Brand" := ItemWkshLine."Magento Brand";
-        RegisteredWorksheetLine."Display Only" := ItemWkshLine."Display Only";
-        RegisteredWorksheetLine."Magento Item" := ItemWkshLine."Magento Item";
-        RegisteredWorksheetLine."Magento Name" := ItemWkshLine."Magento Name";
-        RegisteredWorksheetLine."Seo Link" := ItemWkshLine."Seo Link";
-        RegisteredWorksheetLine."Meta Title" := ItemWkshLine."Meta Title";
-        RegisteredWorksheetLine."Meta Description" := ItemWkshLine."Meta Description";
-        RegisteredWorksheetLine."Featured From" := ItemWkshLine."Featured From";
-        RegisteredWorksheetLine."Featured To" := ItemWkshLine."Featured To";
-        RegisteredWorksheetLine."Routing No." := ItemWkshLine."Routing No.";
-        RegisteredWorksheetLine."Production BOM No." := ItemWkshLine."Production BOM No.";
-        RegisteredWorksheetLine."Overhead Rate" := ItemWkshLine."Overhead Rate";
-        RegisteredWorksheetLine."Order Tracking Policy" := ItemWkshLine."Order Tracking Policy";
-        RegisteredWorksheetLine.Critical := ItemWkshLine.Critical;
-        RegisteredWorksheetLine."Common Item No." := ItemWkshLine."Common Item No.";
+        RegisteredWorksheetLine."Line No." := _ItemWkshLine."Line No.";
+        RegisteredWorksheetLine.Action := _ItemWkshLine.Action;
+        RegisteredWorksheetLine."Existing Item No." := _ItemWkshLine."Existing Item No.";
+        RegisteredWorksheetLine."Item No." := _ItemWkshLine."Item No.";
+        RegisteredWorksheetLine."Vendor Item No." := _ItemWkshLine."Vendor Item No.";
+        RegisteredWorksheetLine."Internal Bar Code" := _ItemWkshLine."Internal Bar Code";
+        RegisteredWorksheetLine."Vendor No." := _ItemWkshLine."Vendor No.";
+        RegisteredWorksheetLine.Description := _ItemWkshLine.Description;
+        RegisteredWorksheetLine."Direct Unit Cost" := _ItemWkshLine."Direct Unit Cost";
+        RegisteredWorksheetLine."Unit Price (LCY)" := _ItemWkshLine."Sales Price";
+        RegisteredWorksheetLine."Use Variant" := _ItemWkshLine."Use Variant";
+        RegisteredWorksheetLine."Base Unit of Measure" := _ItemWkshLine."Base Unit of Measure";
+        RegisteredWorksheetLine."Inventory Posting Group" := _ItemWkshLine."Inventory Posting Group";
+        RegisteredWorksheetLine."Costing Method" := _ItemWkshLine."Costing Method";
+        RegisteredWorksheetLine."Vendors Bar Code" := _ItemWkshLine."Vendors Bar Code";
+        RegisteredWorksheetLine."VAT Bus. Posting Group" := _ItemWkshLine."VAT Bus. Posting Group";
+        RegisteredWorksheetLine."VAT Bus. Posting Gr. (Price)" := _ItemWkshLine."VAT Bus. Posting Gr. (Price)";
+        RegisteredWorksheetLine."Gen. Prod. Posting Group" := _ItemWkshLine."Gen. Prod. Posting Group";
+        RegisteredWorksheetLine."No. Series" := _ItemWkshLine."No. Series";
+        RegisteredWorksheetLine."Tax Group Code" := _ItemWkshLine."Tax Group Code";
+        RegisteredWorksheetLine."VAT Prod. Posting Group" := _ItemWkshLine."VAT Prod. Posting Group";
+        RegisteredWorksheetLine."Global Dimension 1 Code" := _ItemWkshLine."Global Dimension 2 Code";
+        RegisteredWorksheetLine.Status := _ItemWkshLine.Status;
+        RegisteredWorksheetLine."Status Comment" := _ItemWkshLine."Status Comment";
+        RegisteredWorksheetLine."Variety 1" := _ItemWkshLine."Variety 1";
+        RegisteredWorksheetLine."Variety 1 Table (New)" := CopyStr(_ItemWkshLine."Variety 1 Table (New)", 1, MaxStrLen(RegisteredWorksheetLine."Variety 1 Table (New)"));
+        RegisteredWorksheetLine."Variety 1 Table (Base)" := _ItemWkshLine."Variety 1 Table (Base)";
+        RegisteredWorksheetLine."Variety 1 Lock Table" := _ItemWkshLine."Variety 1 Lock Table";
+        RegisteredWorksheetLine."Create Copy of Variety 1 Table" := _ItemWkshLine."Create Copy of Variety 1 Table";
+        RegisteredWorksheetLine."Variety 2" := _ItemWkshLine."Variety 2";
+        RegisteredWorksheetLine."Variety 2 Table (New)" := CopyStr(_ItemWkshLine."Variety 2 Table (New)", 1, MaxStrLen(RegisteredWorksheetLine."Variety 2 Table (New)"));
+        RegisteredWorksheetLine."Variety 2 Table (Base)" := _ItemWkshLine."Variety 2 Table (Base)";
+        RegisteredWorksheetLine."Variety 2 Lock Table" := _ItemWkshLine."Variety 2 Lock Table";
+        RegisteredWorksheetLine."Create Copy of Variety 2 Table" := _ItemWkshLine."Create Copy of Variety 2 Table";
+        RegisteredWorksheetLine."Variety 3" := _ItemWkshLine."Variety 3";
+        RegisteredWorksheetLine."Variety 3 Table (New)" := CopyStr(_ItemWkshLine."Variety 3 Table (New)", 1, MaxStrLen(RegisteredWorksheetLine."Variety 3 Table (New)"));
+        RegisteredWorksheetLine."Variety 3 Table (Base)" := _ItemWkshLine."Variety 3 Table (Base)";
+        RegisteredWorksheetLine."Variety 3 Lock Table" := _ItemWkshLine."Variety 3 Lock Table";
+        RegisteredWorksheetLine."Create Copy of Variety 3 Table" := _ItemWkshLine."Create Copy of Variety 3 Table";
+        RegisteredWorksheetLine."Variety 4" := _ItemWkshLine."Variety 4";
+        RegisteredWorksheetLine."Variety 4 Table (New)" := CopyStr(_ItemWkshLine."Variety 4 Table (New)", 1, MaxStrLen(RegisteredWorksheetLine."Variety 4 Table (New)"));
+        RegisteredWorksheetLine."Variety 4 Table (Base)" := _ItemWkshLine."Variety 4 Table (Base)";
+        RegisteredWorksheetLine."Variety 4 Lock Table" := _ItemWkshLine."Variety 4 Lock Table";
+        RegisteredWorksheetLine."Create Copy of Variety 4 Table" := _ItemWkshLine."Create Copy of Variety 4 Table";
+        RegisteredWorksheetLine."Cross Variety No." := _ItemWkshLine."Cross Variety No.";
+        RegisteredWorksheetLine."Variety Group" := _ItemWkshLine."Variety Group";
+        RegisteredWorksheetLine."Sales Unit of Measure" := _ItemWkshLine."Sales Unit of Measure";
+        RegisteredWorksheetLine."Purch. Unit of Measure" := _ItemWkshLine."Purch. Unit of Measure";
+        RegisteredWorksheetLine."Manufacturer Code" := _ItemWkshLine."Manufacturer Code";
+        RegisteredWorksheetLine."Item Category Code" := _ItemWkshLine."Item Category Code";
+        RegisteredWorksheetLine."Product Group Code" := _ItemWkshLine."Product Group Code";
+        RegisteredWorksheetLine."Variant Code" := _ItemWkshLine."Variant Code";
+        RegisteredWorksheetLine."Sales Price Currency Code" := _ItemWkshLine."Sales Price Currency Code";
+        RegisteredWorksheetLine."Purchase Price Currency Code" := _ItemWkshLine."Purchase Price Currency Code";
+        RegisteredWorksheetLine."Sales Price Start Date" := _ItemWkshLine."Sales Price Start Date";
+        RegisteredWorksheetLine."Purchase Price Start Date" := _ItemWkshLine."Purchase Price Start Date";
+        RegisteredWorksheetLine."Tariff No." := _ItemWkshLine."Tariff No.";
+        RegisteredWorksheetLine."No. 2" := _ItemWkshLine."No. 2";
+        RegisteredWorksheetLine.Type := _ItemWkshLine.Type;
+        RegisteredWorksheetLine."Shelf No." := _ItemWkshLine."Shelf No.";
+        RegisteredWorksheetLine."Item Disc. Group" := _ItemWkshLine."Item Disc. Group";
+        RegisteredWorksheetLine."Allow Invoice Disc." := _ItemWkshLine."Allow Invoice Disc.";
+        RegisteredWorksheetLine."Statistics Group" := _ItemWkshLine."Statistics Group";
+        RegisteredWorksheetLine."Commission Group" := _ItemWkshLine."Commission Group";
+        RegisteredWorksheetLine."Price/Profit Calculation" := _ItemWkshLine."Price/Profit Calculation";
+        RegisteredWorksheetLine."Profit %" := _ItemWkshLine."Profit %";
+        RegisteredWorksheetLine."Lead Time Calculation" := _ItemWkshLine."Lead Time Calculation";
+        RegisteredWorksheetLine."Reorder Point" := _ItemWkshLine."Reorder Point";
+        RegisteredWorksheetLine."Maximum Inventory" := _ItemWkshLine."Maximum Inventory";
+        RegisteredWorksheetLine."Reorder Quantity" := _ItemWkshLine."Reorder Quantity";
+        RegisteredWorksheetLine."Unit List Price" := _ItemWkshLine."Unit List Price";
+        RegisteredWorksheetLine."Duty Due %" := _ItemWkshLine."Duty Due %";
+        RegisteredWorksheetLine."Duty Code" := _ItemWkshLine."Duty Code";
+        RegisteredWorksheetLine."Units per Parcel" := _ItemWkshLine."Units per Parcel";
+        RegisteredWorksheetLine."Unit Volume" := _ItemWkshLine."Unit Volume";
+        RegisteredWorksheetLine.Durability := _ItemWkshLine.Durability;
+        RegisteredWorksheetLine."Freight Type" := _ItemWkshLine."Freight Type";
+        RegisteredWorksheetLine."Duty Unit Conversion" := _ItemWkshLine."Duty Unit Conversion";
+        RegisteredWorksheetLine."Country/Region Purchased Code" := _ItemWkshLine."Country/Region Purchased Code";
+        RegisteredWorksheetLine."Budget Quantity" := _ItemWkshLine."Budget Quantity";
+        RegisteredWorksheetLine."Budgeted Amount" := _ItemWkshLine."Budgeted Amount";
+        RegisteredWorksheetLine."Budget Profit" := _ItemWkshLine."Budget Profit";
+        RegisteredWorksheetLine.Blocked := _ItemWkshLine.Blocked;
+        RegisteredWorksheetLine."Price Includes VAT" := _ItemWkshLine."Price Includes VAT";
+        RegisteredWorksheetLine."Country/Region of Origin Code" := _ItemWkshLine."Country/Region of Origin Code";
+        RegisteredWorksheetLine."Automatic Ext. Texts" := _ItemWkshLine."Automatic Ext. Texts";
+        RegisteredWorksheetLine.Reserve := _ItemWkshLine.Reserve;
+        RegisteredWorksheetLine."Stockout Warning" := _ItemWkshLine."Stockout Warning";
+        RegisteredWorksheetLine."Prevent Negative Inventory" := _ItemWkshLine."Prevent Negative Inventory";
+        RegisteredWorksheetLine."Assembly Policy" := _ItemWkshLine."Assembly Policy";
+        RegisteredWorksheetLine.GTIN := _ItemWkshLine.GTIN;
+        RegisteredWorksheetLine."Lot Size" := _ItemWkshLine."Lot Size";
+        RegisteredWorksheetLine."Serial Nos." := _ItemWkshLine."Serial Nos.";
+        RegisteredWorksheetLine."Scrap %" := _ItemWkshLine."Scrap %";
+        RegisteredWorksheetLine."Inventory Value Zero" := _ItemWkshLine."Inventory Value Zero";
+        RegisteredWorksheetLine."Discrete Order Quantity" := _ItemWkshLine."Discrete Order Quantity";
+        RegisteredWorksheetLine."Minimum Order Quantity" := _ItemWkshLine."Minimum Order Quantity";
+        RegisteredWorksheetLine."Maximum Order Quantity" := _ItemWkshLine."Maximum Order Quantity";
+        RegisteredWorksheetLine."Safety Stock Quantity" := _ItemWkshLine."Safety Stock Quantity";
+        RegisteredWorksheetLine."Order Multiple" := _ItemWkshLine."Order Multiple";
+        RegisteredWorksheetLine."Safety Lead Time" := _ItemWkshLine."Safety Lead Time";
+        RegisteredWorksheetLine."Flushing Method" := _ItemWkshLine."Flushing Method";
+        RegisteredWorksheetLine."Replenishment System" := _ItemWkshLine."Replenishment System";
+        RegisteredWorksheetLine."Reordering Policy" := _ItemWkshLine."Reordering Policy";
+        RegisteredWorksheetLine."Include Inventory" := _ItemWkshLine."Include Inventory";
+        RegisteredWorksheetLine."Manufacturing Policy" := _ItemWkshLine."Manufacturing Policy";
+        RegisteredWorksheetLine."Rescheduling Period" := _ItemWkshLine."Rescheduling Period";
+        RegisteredWorksheetLine."Lot Accumulation Period" := _ItemWkshLine."Lot Accumulation Period";
+        RegisteredWorksheetLine."Dampener Period" := _ItemWkshLine."Dampener Period";
+        RegisteredWorksheetLine."Dampener Quantity" := _ItemWkshLine."Dampener Quantity";
+        RegisteredWorksheetLine."Overflow Level" := _ItemWkshLine."Overflow Level";
+        RegisteredWorksheetLine."Service Item Group" := _ItemWkshLine."Service Item Group";
+        RegisteredWorksheetLine."Item Tracking Code" := _ItemWkshLine."Item Tracking Code";
+        RegisteredWorksheetLine."Lot Nos." := _ItemWkshLine."Lot Nos.";
+        RegisteredWorksheetLine."Expiration Calculation" := _ItemWkshLine."Expiration Calculation";
+        RegisteredWorksheetLine."Special Equipment Code" := _ItemWkshLine."Special Equipment Code";
+        RegisteredWorksheetLine."Put-away Template Code" := _ItemWkshLine."Put-away Template Code";
+        RegisteredWorksheetLine."Put-away Unit of Measure Code" := _ItemWkshLine."Put-away Unit of Measure Code";
+        RegisteredWorksheetLine."Phys Invt Counting Period Code" := _ItemWkshLine."Phys Invt Counting Period Code";
+        RegisteredWorksheetLine."Use Cross-Docking" := _ItemWkshLine."Use Cross-Docking";
+        RegisteredWorksheetLine."Custom Text 1" := _ItemWkshLine."Custom Text 1";
+        RegisteredWorksheetLine."Custom Text 2" := _ItemWkshLine."Custom Text 2";
+        RegisteredWorksheetLine."Custom Text 3" := _ItemWkshLine."Custom Text 3";
+        RegisteredWorksheetLine."Custom Text 4" := _ItemWkshLine."Custom Text 4";
+        RegisteredWorksheetLine."Custom Text 5" := _ItemWkshLine."Custom Text 5";
+        RegisteredWorksheetLine."Custom Price 1" := _ItemWkshLine."Custom Price 1";
+        RegisteredWorksheetLine."Custom Price 2" := _ItemWkshLine."Custom Price 2";
+        RegisteredWorksheetLine."Custom Price 3" := _ItemWkshLine."Custom Price 3";
+        RegisteredWorksheetLine."Custom Price 4" := _ItemWkshLine."Custom Price 4";
+        RegisteredWorksheetLine."Custom Price 5" := _ItemWkshLine."Custom Price 5";
+        RegisteredWorksheetLine."Group sale" := _ItemWkshLine."Group sale";
+        RegisteredWorksheetLine."Label Barcode" := _ItemWkshLine."Label Barcode";
+        RegisteredWorksheetLine."Explode BOM auto" := _ItemWkshLine."Explode BOM auto";
+        RegisteredWorksheetLine."Guarantee voucher" := _ItemWkshLine."Guarantee voucher";
+        RegisteredWorksheetLine."Cannot edit unit price" := _ItemWkshLine."Cannot edit unit price";
+        RegisteredWorksheetLine."Second-hand number" := _ItemWkshLine."Second-hand number";
+        RegisteredWorksheetLine.Condition := _ItemWkshLine.Condition;
+        RegisteredWorksheetLine."Second-hand" := _ItemWkshLine."Second-hand";
+        RegisteredWorksheetLine."Guarantee Index" := _ItemWkshLine."Guarantee Index";
+        RegisteredWorksheetLine."Insurrance category" := _ItemWkshLine."Insurrance category";
+        RegisteredWorksheetLine."Item Brand" := _ItemWkshLine."Item Brand";
+        RegisteredWorksheetLine."Type Retail" := _ItemWkshLine."Type Retail";
+        RegisteredWorksheetLine."No Print on Reciept" := _ItemWkshLine."No Print on Reciept";
+        RegisteredWorksheetLine."Print Tags" := _ItemWkshLine."Print Tags";
+        RegisteredWorksheetLine."Change quantity by Photoorder" := _ItemWkshLine."Change quantity by Photoorder";
+        RegisteredWorksheetLine."Std. Sales Qty." := _ItemWkshLine."Std. Sales Qty.";
+        RegisteredWorksheetLine."Blocked on Pos" := _ItemWkshLine."Blocked on Pos";
+        RegisteredWorksheetLine."Ticket Type" := _ItemWkshLine."Ticket Type";
+        RegisteredWorksheetLine."Magento Status" := _ItemWkshLine."Magento Status";
+        RegisteredWorksheetLine.Backorder := _ItemWkshLine.Backorder;
+        RegisteredWorksheetLine."Product New From" := _ItemWkshLine."Product New From";
+        RegisteredWorksheetLine."Product New To" := _ItemWkshLine."Product New To";
+        RegisteredWorksheetLine."Attribute Set ID" := _ItemWkshLine."Attribute Set ID";
+        RegisteredWorksheetLine."Special Price" := _ItemWkshLine."Special Price";
+        RegisteredWorksheetLine."Special Price From" := _ItemWkshLine."Special Price From";
+        RegisteredWorksheetLine."Special Price To" := _ItemWkshLine."Special Price To";
+        RegisteredWorksheetLine."Magento Brand" := _ItemWkshLine."Magento Brand";
+        RegisteredWorksheetLine."Display Only" := _ItemWkshLine."Display Only";
+        RegisteredWorksheetLine."Magento Item" := _ItemWkshLine."Magento Item";
+        RegisteredWorksheetLine."Magento Name" := _ItemWkshLine."Magento Name";
+        RegisteredWorksheetLine."Seo Link" := _ItemWkshLine."Seo Link";
+        RegisteredWorksheetLine."Meta Title" := _ItemWkshLine."Meta Title";
+        RegisteredWorksheetLine."Meta Description" := _ItemWkshLine."Meta Description";
+        RegisteredWorksheetLine."Featured From" := _ItemWkshLine."Featured From";
+        RegisteredWorksheetLine."Featured To" := _ItemWkshLine."Featured To";
+        RegisteredWorksheetLine."Routing No." := _ItemWkshLine."Routing No.";
+        RegisteredWorksheetLine."Production BOM No." := _ItemWkshLine."Production BOM No.";
+        RegisteredWorksheetLine."Overhead Rate" := _ItemWkshLine."Overhead Rate";
+        RegisteredWorksheetLine."Order Tracking Policy" := _ItemWkshLine."Order Tracking Policy";
+        RegisteredWorksheetLine.Critical := _ItemWkshLine.Critical;
+        RegisteredWorksheetLine."Common Item No." := _ItemWkshLine."Common Item No.";
         RegisteredWorksheetLine.Insert();
     end;
 
     local procedure CopyToRegisteredWorksheetVariantLine()
     begin
         RegisteredWorksheetVariantLine."Registered Worksheet No." := LastRegisteredWorksheetNo();
-        RegisteredWorksheetVariantLine."Registered Worksheet Line No." := ItemWkshLine."Line No.";
-        RegisteredWorksheetVariantLine."Line No." := ItemWkshVariantLine."Line No.";
-        RegisteredWorksheetVariantLine.Level := ItemWkshVariantLine.Level;
-        RegisteredWorksheetVariantLine.Action := ItemWkshVariantLine.Action;
-        RegisteredWorksheetVariantLine."Item No." := ItemWkshVariantLine."Item No.";
-        RegisteredWorksheetVariantLine."Existing Item No." := ItemWkshVariantLine."Existing Item No.";
-        RegisteredWorksheetVariantLine."Existing Variant Code" := ItemWkshVariantLine."Existing Variant Code";
-        RegisteredWorksheetVariantLine."Variant Code" := ItemWkshVariantLine."Variant Code";
-        RegisteredWorksheetVariantLine."Internal Bar Code" := ItemWkshVariantLine."Internal Bar Code";
-        RegisteredWorksheetVariantLine."Sales Price" := ItemWkshVariantLine."Sales Price";
-        RegisteredWorksheetVariantLine."Direct Unit Cost" := ItemWkshVariantLine."Direct Unit Cost";
-        RegisteredWorksheetVariantLine."Vendors Bar Code" := ItemWkshVariantLine."Vendors Bar Code";
-        RegisteredWorksheetVariantLine."Heading Text" := ItemWkshVariantLine."Heading Text";
-        RegisteredWorksheetVariantLine."Variety 1 Value" := ItemWkshVariantLine."Variety 1 Value";
-        RegisteredWorksheetVariantLine."Variety 2 Value" := ItemWkshVariantLine."Variety 2 Value";
-        RegisteredWorksheetVariantLine."Variety 3 Value" := ItemWkshVariantLine."Variety 3 Value";
-        RegisteredWorksheetVariantLine."Variety 4 Value" := ItemWkshVariantLine."Variety 4 Value";
-        RegisteredWorksheetVariantLine.Description := ItemWkshVariantLine.Description;
-        RegisteredWorksheetVariantLine.Blocked := ItemWkshVariantLine.Blocked;
+        RegisteredWorksheetVariantLine."Registered Worksheet Line No." := _ItemWkshLine."Line No.";
+        RegisteredWorksheetVariantLine."Line No." := _ItemWkshVariantLine."Line No.";
+        RegisteredWorksheetVariantLine.Level := _ItemWkshVariantLine.Level;
+        RegisteredWorksheetVariantLine.Action := _ItemWkshVariantLine.Action;
+        RegisteredWorksheetVariantLine."Item No." := _ItemWkshVariantLine."Item No.";
+        RegisteredWorksheetVariantLine."Existing Item No." := _ItemWkshVariantLine."Existing Item No.";
+        RegisteredWorksheetVariantLine."Existing Variant Code" := _ItemWkshVariantLine."Existing Variant Code";
+        RegisteredWorksheetVariantLine."Variant Code" := _ItemWkshVariantLine."Variant Code";
+        RegisteredWorksheetVariantLine."Internal Bar Code" := _ItemWkshVariantLine."Internal Bar Code";
+        RegisteredWorksheetVariantLine."Sales Price" := _ItemWkshVariantLine."Sales Price";
+        RegisteredWorksheetVariantLine."Direct Unit Cost" := _ItemWkshVariantLine."Direct Unit Cost";
+        RegisteredWorksheetVariantLine."Vendors Bar Code" := _ItemWkshVariantLine."Vendors Bar Code";
+        RegisteredWorksheetVariantLine."Heading Text" := _ItemWkshVariantLine."Heading Text";
+        RegisteredWorksheetVariantLine."Variety 1 Value" := _ItemWkshVariantLine."Variety 1 Value";
+        RegisteredWorksheetVariantLine."Variety 2 Value" := _ItemWkshVariantLine."Variety 2 Value";
+        RegisteredWorksheetVariantLine."Variety 3 Value" := _ItemWkshVariantLine."Variety 3 Value";
+        RegisteredWorksheetVariantLine."Variety 4 Value" := _ItemWkshVariantLine."Variety 4 Value";
+        RegisteredWorksheetVariantLine.Description := _ItemWkshVariantLine.Description;
+        RegisteredWorksheetVariantLine.Blocked := _ItemWkshVariantLine.Blocked;
         RegisteredWorksheetVariantLine.Insert();
     end;
 
@@ -776,13 +776,13 @@
         SalesPriceEndDate: Date;
         SalesPriceStartDate: Date;
     begin
-        if ItemWkshLine."Sales Price" = 0 then
+        if _ItemWkshLine."Sales Price" = 0 then
             exit;
-        GetItem(ItemWkshLine."Item No.");
-        if ItemWkshLine."Sales Price" <> Item."Unit Price" then begin
-            if ItemWkshLine."Sales Price Currency Code" = '' then begin
-                if ItemWkshLine."Sales Price Start Date" <= WorkDate() then begin
-                    Item.Validate("Unit Price", ItemWkshLine."Sales Price");
+        GetItem(_ItemWkshLine."Item No.");
+        if _ItemWkshLine."Sales Price" <> Item."Unit Price" then begin
+            if _ItemWkshLine."Sales Price Currency Code" = '' then begin
+                if _ItemWkshLine."Sales Price Start Date" <= WorkDate() then begin
+                    Item.Validate("Unit Price", _ItemWkshLine."Sales Price");
                     Item.Modify(true);
                 end;
             end;
@@ -791,18 +791,18 @@
         if ItemWorksheetTemplate."Sales Price Handling" = ItemWorksheetTemplate."Sales Price Handling"::Item then
             exit;
 
-        if ItemWkshLine."Sales Unit of Measure" <> '' then
-            SalesUnitOfMeasure := ItemWkshLine."Sales Unit of Measure"
+        if _ItemWkshLine."Sales Unit of Measure" <> '' then
+            SalesUnitOfMeasure := _ItemWkshLine."Sales Unit of Measure"
         else
             SalesUnitOfMeasure := Item."Sales Unit of Measure";
 
         PriceListLine.Reset();
-        PriceListLine.SetRange("Price List Code", ItemWkshLine."Worksheet Template Name");
+        PriceListLine.SetRange("Price List Code", _ItemWkshLine."Worksheet Template Name");
         PriceListLine.SetRange("Source Type", PriceListLine."Source Type"::"All Customers");
         PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
-        PriceListLine.SetRange("Asset No.", ItemWkshLine."Item No.");
+        PriceListLine.SetRange("Asset No.", _ItemWkshLine."Item No.");
         PriceListLine.SetRange("Variant Code", '');
-        PriceListLine.SetRange("Currency Code", ItemWkshLine."Sales Price Currency Code");
+        PriceListLine.SetRange("Currency Code", _ItemWkshLine."Sales Price Currency Code");
         PriceListLine.SetRange("Price Type", PriceListLine."Price Type"::Sale);
         PriceListLine.SetRange("Amount Type", PriceListLine."Amount Type"::Price);
         if SalesUnitOfMeasure = Item."Sales Unit of Measure" then
@@ -820,8 +820,8 @@
             ItemWorksheetTemplate."Sales Price Handling"::"Item+Variant+Date":
                 begin
                     SalesPriceStartDate := WorkDate();
-                    if ItemWkshLine."Sales Price Start Date" <> 0D then
-                        SalesPriceStartDate := ItemWkshLine."Sales Price Start Date";
+                    if _ItemWkshLine."Sales Price Start Date" <> 0D then
+                        SalesPriceStartDate := _ItemWkshLine."Sales Price Start Date";
                     PriceListLine.SetFilter("Starting Date", '>%1', SalesPriceStartDate);
                     if PriceListLine.FindFirst() then
                         SalesPriceEndDate := PriceListLine."Starting Date" - 1
@@ -834,28 +834,28 @@
             if PriceListLine."Ending Date" <> SalesPriceEndDate then begin
                 PriceListLine.Validate("Ending Date", SalesPriceEndDate);
             end;
-            if PriceListLine."Unit Price" <> ItemWkshLine."Sales Price" then begin
-                PriceListLine.Validate("Unit Price", ItemWkshLine."Sales Price");
+            if PriceListLine."Unit Price" <> _ItemWkshLine."Sales Price" then begin
+                PriceListLine.Validate("Unit Price", _ItemWkshLine."Sales Price");
             end;
             PriceListLine.Modify(true);
             if not MasterLineMapMgt.IsMaster(Database::"Price List Line", PriceListLine.SystemId) then
                 MasterLineMapMgt.CreateMap(Database::"Price List Line", PriceListLine.SystemId, PriceListLine.SystemId);
         end else begin
-            if not PriceListHeader.Get(ItemWkshLine."Worksheet Template Name") then
-                CreatePriceListHeader(ItemWkshLine."Worksheet Template Name", SalesPriceStartDate, SalesPriceEndDate);
+            if not PriceListHeader.Get(_ItemWkshLine."Worksheet Template Name") then
+                CreatePriceListHeader(_ItemWkshLine."Worksheet Template Name", SalesPriceStartDate, SalesPriceEndDate);
             PriceListLine.Init();
             PriceListLine.Validate("Price Type", PriceListLine."Price Type"::Sale);
-            PriceListLine.Validate("Price List Code", ItemWkshLine."Worksheet Template Name");
+            PriceListLine.Validate("Price List Code", _ItemWkshLine."Worksheet Template Name");
             PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
-            PriceListLine.Validate("Asset No.", ItemWkshLine."Item No.");
+            PriceListLine.Validate("Asset No.", _ItemWkshLine."Item No.");
             PriceListLine.Validate("Source Type", PriceListLine."Source Type"::"All Customers");
             PriceListLine."Source No." := '';
             PriceListLine.Validate("Starting Date", SalesPriceStartDate);
-            PriceListLine.Validate("Currency Code", ItemWkshLine."Sales Price Currency Code");
+            PriceListLine.Validate("Currency Code", _ItemWkshLine."Sales Price Currency Code");
             PriceListLine.Validate("Variant Code", '');
             PriceListLine.Validate("Unit of Measure Code", SalesUnitOfMeasure);
             PriceListLine.Validate("Minimum Quantity", 0);
-            PriceListLine.Validate("Unit Price", ItemWkshLine."Sales Price");
+            PriceListLine.Validate("Unit Price", _ItemWkshLine."Sales Price");
             PriceListLine.Validate("Ending Date", SalesPriceEndDate);
             PriceListLine.Validate("Amount Type", PriceListLine."Amount Type"::Price);
 #if BC17
@@ -906,23 +906,23 @@
            (ItemWorksheetTemplate."Sales Price Handling" = ItemWorksheetTemplate."Sales Price Handling"::"Item+Date") then
             exit;
 
-        VariantSalesPrice := ItemWkshVariantLine."Sales Price";
+        VariantSalesPrice := _ItemWkshVariantLine."Sales Price";
         if VariantSalesPrice = 0 then begin
-            VariantSalesPrice := ItemWkshLine."Sales Price";
+            VariantSalesPrice := _ItemWkshLine."Sales Price";
             OnlyCloseExistingPrices := true;
         end;
 
-        if ItemWkshLine."Sales Unit of Measure" <> '' then
-            SalesUnitOfMeasure := ItemWkshLine."Sales Unit of Measure"
+        if _ItemWkshLine."Sales Unit of Measure" <> '' then
+            SalesUnitOfMeasure := _ItemWkshLine."Sales Unit of Measure"
         else
             SalesUnitOfMeasure := Item."Sales Unit of Measure";
 
         PriceListLine.Reset();
         PriceListLine.SetRange("Source Type", PriceListLine."Source Type"::"All Customers");
         PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
-        PriceListLine.SetRange("Asset No.", ItemWkshVariantLine."Item No.");
-        PriceListLine.SetRange("Variant Code", ItemWkshVariantLine."Variant Code");
-        PriceListLine.SetRange("Currency Code", ItemWkshLine."Sales Price Currency Code");
+        PriceListLine.SetRange("Asset No.", _ItemWkshVariantLine."Item No.");
+        PriceListLine.SetRange("Variant Code", _ItemWkshVariantLine."Variant Code");
+        PriceListLine.SetRange("Currency Code", _ItemWkshLine."Sales Price Currency Code");
         PriceListLine.SetRange("Price Type", PriceListLine."Price Type"::Sale);
         PriceListLine.SetRange("Amount Type", PriceListLine."Amount Type"::Price);
         if SalesUnitOfMeasure = Item."Sales Unit of Measure" then
@@ -942,8 +942,8 @@
             ItemWorksheetTemplate."Sales Price Handling"::"Item+Variant+Date":
                 begin
                     SalesPriceStartDate := WorkDate();
-                    if ItemWkshLine."Sales Price Start Date" <> 0D then
-                        SalesPriceStartDate := ItemWkshLine."Sales Price Start Date";
+                    if _ItemWkshLine."Sales Price Start Date" <> 0D then
+                        SalesPriceStartDate := _ItemWkshLine."Sales Price Start Date";
                     PriceListLine.SetFilter("Starting Date", '>%1', SalesPriceStartDate);
                     if PriceListLine.FindFirst() then
                         SalesPriceEndDate := PriceListLine."Starting Date" - 1
@@ -966,9 +966,9 @@
             PriceListLineMaster.Reset();
             PriceListLineMaster.SetRange("Source Type", PriceListLineMaster."Source Type"::"All Customers");
             PriceListLineMaster.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
-            PriceListLineMaster.SetRange("Asset No.", ItemWkshLine."Item No.");
+            PriceListLineMaster.SetRange("Asset No.", _ItemWkshLine."Item No.");
             PriceListLineMaster.SetRange("Starting Date", SalesPriceStartDate);
-            PriceListLineMaster.SetRange("Currency Code", ItemWkshLine."Sales Price Currency Code");
+            PriceListLineMaster.SetRange("Currency Code", _ItemWkshLine."Sales Price Currency Code");
             PriceListLineMaster.SetRange("Variant Code", '');
             PriceListLineMaster.SetRange("Amount Type", PriceListLine."Amount Type"::Price);
             if SalesUnitOfMeasure = Item."Sales Unit of Measure" then
@@ -986,7 +986,7 @@
                 until PriceListLineMaster.Next() = 0;
             if MasterLineFound then begin
                 PriceListLine := PriceListLineMaster;
-                PriceListLine."Variant Code" := ItemWkshVariantLine."Variant Code";
+                PriceListLine."Variant Code" := _ItemWkshVariantLine."Variant Code";
                 if (PriceListLineMaster."Unit Price" <> VariantSalesPrice) and (not OnlyCloseExistingPrices) then begin
                     PriceListLine.Validate("Variant Code");
                     PriceListLine.Validate("Unit Price", VariantSalesPrice);
@@ -998,19 +998,19 @@
                 end;
             end else
                 if not OnlyCloseExistingPrices then begin
-                    if not PriceListHeader.Get(ItemWkshLine."Worksheet Template Name") then
-                        CreatePriceListHeader(ItemWkshLine."Worksheet Template Name", SalesPriceStartDate, SalesPriceEndDate);
+                    if not PriceListHeader.Get(_ItemWkshLine."Worksheet Template Name") then
+                        CreatePriceListHeader(_ItemWkshLine."Worksheet Template Name", SalesPriceStartDate, SalesPriceEndDate);
                     PriceListLine.Init();
                     PriceListLine.Validate("Price Type", PriceListLine."Price Type"::Sale);
-                    PriceListLine.Validate("Price List Code", ItemWkshLine."Worksheet Template Name");
+                    PriceListLine.Validate("Price List Code", _ItemWkshLine."Worksheet Template Name");
                     PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
-                    PriceListLine.Validate("Asset No.", ItemWkshLine."Item No.");
+                    PriceListLine.Validate("Asset No.", _ItemWkshLine."Item No.");
                     PriceListLine.Validate("Source Type", PriceListLine."Source Type"::"All Customers");
                     PriceListLine.Validate("Amount Type", PriceListLine."Amount Type"::Price);
                     PriceListLine."Source No." := '';
                     PriceListLine.Validate("Starting Date", SalesPriceStartDate);
-                    PriceListLine.Validate("Currency Code", ItemWkshLine."Sales Price Currency Code");
-                    PriceListLine.Validate("Variant Code", ItemWkshVariantLine."Variant Code");
+                    PriceListLine.Validate("Currency Code", _ItemWkshLine."Sales Price Currency Code");
+                    PriceListLine.Validate("Variant Code", _ItemWkshVariantLine."Variant Code");
                     PriceListLine.Validate("Unit of Measure Code", SalesUnitOfMeasure);
                     PriceListLine.Validate("Minimum Quantity", 0);
                     PriceListLine.Validate("Unit Price", VariantSalesPrice);
@@ -1077,46 +1077,46 @@
         PriceListLine: Record "Price List Line";
         PriceListHeader: Record "Price List Header";
     begin
-        if ItemWkshLine."Direct Unit Cost" = 0 then
+        if _ItemWkshLine."Direct Unit Cost" = 0 then
             exit;
-        GetItem(ItemWkshLine."Item No.");
+        GetItem(_ItemWkshLine."Item No.");
         if ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::Item then begin
-            if ItemWkshLine."Direct Unit Cost" <> Item."Last Direct Cost" then begin
-                Item.Validate("Last Direct Cost", ItemWkshLine."Direct Unit Cost");
+            if _ItemWkshLine."Direct Unit Cost" <> Item."Last Direct Cost" then begin
+                Item.Validate("Last Direct Cost", _ItemWkshLine."Direct Unit Cost");
                 Item.Modify(true);
             end;
             exit;
         end;
         PriceListLine.Reset();
-        PriceListLine.SetRange("Source No.", ItemWkshLine."Vendor No.");
-        PriceListLine.SetRange("Asset No.", ItemWkshLine."Item No.");
+        PriceListLine.SetRange("Source No.", _ItemWkshLine."Vendor No.");
+        PriceListLine.SetRange("Asset No.", _ItemWkshLine."Item No.");
         PriceListLine.SetRange("Variant Code", '');
-        PriceListLine.SetRange("Currency Code", ItemWkshLine."Purchase Price Currency Code");
+        PriceListLine.SetRange("Currency Code", _ItemWkshLine."Purchase Price Currency Code");
         PriceListLine.SetRange("Amount Type", PriceListLine."Amount Type"::Price);
-        if ItemWkshLine."Purchase Price Start Date" <> 0D then
-            PriceListLine.SetRange("Starting Date", ItemWkshLine."Purchase Price Start Date")
+        if _ItemWkshLine."Purchase Price Start Date" <> 0D then
+            PriceListLine.SetRange("Starting Date", _ItemWkshLine."Purchase Price Start Date")
         else
             PriceListLine.SetRange("Starting Date", 0D, WorkDate());
         if PriceListLine.FindLast() then begin
             //Found Purchase Price
-            if PriceListLine."Unit Cost" <> ItemWkshLine."Direct Unit Cost" then begin
+            if PriceListLine."Unit Cost" <> _ItemWkshLine."Direct Unit Cost" then begin
                 if (ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") or (PriceListLine."Starting Date" = WorkDate()) or
-                  (ItemWkshLine."Purchase Price Start Date" <> 0D) then begin
-                    PriceListLine.Validate("Unit Cost", ItemWkshLine."Direct Unit Cost");
+                  (_ItemWkshLine."Purchase Price Start Date" <> 0D) then begin
+                    PriceListLine.Validate("Unit Cost", _ItemWkshLine."Direct Unit Cost");
                     PriceListLine.Modify(true);
                 end else begin
                     PriceListLine.Validate("Ending Date", WorkDate() - 1);
                     PriceListLine.Modify(true);
                     PriceListLine.Validate("Ending Date", 0D);
-                    PriceListLine.Validate("Unit Cost", ItemWkshLine."Direct Unit Cost");
-                    if ItemWkshLine."Purchase Price Start Date" <> 0D then
-                        PriceListLine.Validate("Starting Date", ItemWkshLine."Purchase Price Start Date")
+                    PriceListLine.Validate("Unit Cost", _ItemWkshLine."Direct Unit Cost");
+                    if _ItemWkshLine."Purchase Price Start Date" <> 0D then
+                        PriceListLine.Validate("Starting Date", _ItemWkshLine."Purchase Price Start Date")
                     else
                         PriceListLine.Validate("Starting Date", WorkDate());
-                    if not PriceListHeader.Get(ItemWkshLine."Worksheet Template Name") then
-                        CreatePriceListHeader(ItemWkshLine."Worksheet Template Name", PriceListLine."Starting Date", 0D);
+                    if not PriceListHeader.Get(_ItemWkshLine."Worksheet Template Name") then
+                        CreatePriceListHeader(_ItemWkshLine."Worksheet Template Name", PriceListLine."Starting Date", 0D);
                     PriceListLine.Validate(Status, PriceListLine.Status::Active);
-                    PriceListLine.Validate("Price List Code", ItemWkshLine."Worksheet Template Name");
+                    PriceListLine.Validate("Price List Code", _ItemWkshLine."Worksheet Template Name");
                     PriceListLine.Insert(true);
                 end;
             end;
@@ -1125,20 +1125,20 @@
             PriceListLine.Init();
             PriceListLine.Validate("Price Type", PriceListLine."Price Type"::Purchase);
             PriceListLine.Validate("Source Type", PriceListLine."Source Type"::Vendor);
-            PriceListLine.Validate("Source No.", ItemWkshLine."Vendor No.");
+            PriceListLine.Validate("Source No.", _ItemWkshLine."Vendor No.");
             PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
-            PriceListLine.Validate("Asset No.", ItemWkshLine."Item No.");
+            PriceListLine.Validate("Asset No.", _ItemWkshLine."Item No.");
             PriceListLine.Validate("Unit of Measure Code", Item."Purch. Unit of Measure");
-            PriceListLine.Validate("Unit Cost", ItemWkshLine."Direct Unit Cost");
-            PriceListLine.Validate("Currency Code", ItemWkshLine."Purchase Price Currency Code");
+            PriceListLine.Validate("Unit Cost", _ItemWkshLine."Direct Unit Cost");
+            PriceListLine.Validate("Currency Code", _ItemWkshLine."Purchase Price Currency Code");
             PriceListLine.Validate("Amount Type", PriceListLine."Amount Type"::Price);
             if (ItemWorksheetTemplate."Purchase Price Handling" <> ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") then
                 PriceListLine.Validate("Starting Date", WorkDate());
-            if ItemWkshLine."Purchase Price Start Date" <> 0D then
-                PriceListLine.Validate("Starting Date", ItemWkshLine."Purchase Price Start Date");
-            if not PriceListHeader.Get(ItemWkshLine."Worksheet Template Name") then
-                CreatePriceListHeader(ItemWkshLine."Worksheet Template Name", PriceListLine."Starting Date", 0D);
-            PriceListLine.Validate("Price List Code", ItemWkshLine."Worksheet Template Name");
+            if _ItemWkshLine."Purchase Price Start Date" <> 0D then
+                PriceListLine.Validate("Starting Date", _ItemWkshLine."Purchase Price Start Date");
+            if not PriceListHeader.Get(_ItemWkshLine."Worksheet Template Name") then
+                CreatePriceListHeader(_ItemWkshLine."Worksheet Template Name", PriceListLine."Starting Date", 0D);
+            PriceListLine.Validate("Price List Code", _ItemWkshLine."Worksheet Template Name");
 #if BC17
             PriceListLine.Status := PriceListLine.Status::Active;
 #else
@@ -1154,59 +1154,59 @@
         PriceListLineItem: Record "Price List Line";
         PriceListHeader: Record "Price List Header";
     begin
-        if ItemWkshVariantLine."Direct Unit Cost" = 0 then
+        if _ItemWkshVariantLine."Direct Unit Cost" = 0 then
             exit;
         if ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::"Item+Date" then
             exit;
         PriceListLine.Reset();
-        PriceListLine.SetRange("Source No.", ItemWkshLine."Vendor No.");
+        PriceListLine.SetRange("Source No.", _ItemWkshLine."Vendor No.");
         PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
-        PriceListLine.SetRange("Asset No.", ItemWkshVariantLine."Item No.");
-        PriceListLine.SetRange("Variant Code", ItemWkshVariantLine."Variant Code");
-        PriceListLine.SetRange("Currency Code", ItemWkshLine."Purchase Price Currency Code");
+        PriceListLine.SetRange("Asset No.", _ItemWkshVariantLine."Item No.");
+        PriceListLine.SetRange("Variant Code", _ItemWkshVariantLine."Variant Code");
+        PriceListLine.SetRange("Currency Code", _ItemWkshLine."Purchase Price Currency Code");
         PriceListLine.SetRange("Amount Type", PriceListLine."Amount Type"::Price);
-        if ItemWkshLine."Purchase Price Start Date" <> 0D then
-            PriceListLine.SetRange("Starting Date", ItemWkshLine."Purchase Price Start Date")
+        if _ItemWkshLine."Purchase Price Start Date" <> 0D then
+            PriceListLine.SetRange("Starting Date", _ItemWkshLine."Purchase Price Start Date")
         else
             PriceListLine.SetRange("Starting Date", 0D, WorkDate());
         if PriceListLine.FindLast() then begin
             //existing variant price found
-            if ItemWkshVariantLine."Direct Unit Cost" <> PriceListLine."Unit Cost" then begin
+            if _ItemWkshVariantLine."Direct Unit Cost" <> PriceListLine."Unit Cost" then begin
                 if (ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") or (PriceListLine."Starting Date" = WorkDate()) or
-                  (ItemWkshLine."Purchase Price Start Date" <> 0D) then begin
-                    PriceListLine.Validate("Unit Cost", ItemWkshVariantLine."Direct Unit Cost");
+                  (_ItemWkshLine."Purchase Price Start Date" <> 0D) then begin
+                    PriceListLine.Validate("Unit Cost", _ItemWkshVariantLine."Direct Unit Cost");
                     PriceListLine.Modify(true);
                 end else begin
                     PriceListLine.Validate("Ending Date", WorkDate() - 1);
                     PriceListLine.Modify(true);
                     PriceListLine.Validate("Ending Date", 0D);
-                    PriceListLine.Validate("Unit Cost", ItemWkshVariantLine."Direct Unit Cost");
+                    PriceListLine.Validate("Unit Cost", _ItemWkshVariantLine."Direct Unit Cost");
                     PriceListLine.Validate("Starting Date", WorkDate());
-                    if not PriceListHeader.Get(ItemWkshLine."Worksheet Template Name") then
-                        CreatePriceListHeader(ItemWkshLine."Worksheet Template Name", PriceListLine."Starting Date", 0D);
-                    PriceListLine.Validate("Price List Code", ItemWkshLine."Worksheet Template Name");
+                    if not PriceListHeader.Get(_ItemWkshLine."Worksheet Template Name") then
+                        CreatePriceListHeader(_ItemWkshLine."Worksheet Template Name", PriceListLine."Starting Date", 0D);
+                    PriceListLine.Validate("Price List Code", _ItemWkshLine."Worksheet Template Name");
                     PriceListLine.Validate(Status, PriceListLine.Status::Active);
                     PriceListLine.Insert(true);
                 end;
             end;
         end else begin
             PriceListLineItem.Reset();
-            PriceListLineItem.SetRange("Source No.", ItemWkshLine."Vendor No.");
-            PriceListLineItem.SetRange("Asset No.", ItemWkshVariantLine."Item No.");
-            PriceListLineItem.SetRange("Currency Code", ItemWkshLine."Purchase Price Currency Code");
-            if ItemWkshLine."Purchase Price Start Date" <> 0D then
-                PriceListLine.SetRange("Starting Date", ItemWkshLine."Purchase Price Start Date")
+            PriceListLineItem.SetRange("Source No.", _ItemWkshLine."Vendor No.");
+            PriceListLineItem.SetRange("Asset No.", _ItemWkshVariantLine."Item No.");
+            PriceListLineItem.SetRange("Currency Code", _ItemWkshLine."Purchase Price Currency Code");
+            if _ItemWkshLine."Purchase Price Start Date" <> 0D then
+                PriceListLine.SetRange("Starting Date", _ItemWkshLine."Purchase Price Start Date")
             else
                 PriceListLine.SetRange("Starting Date", 0D, WorkDate());
             if PriceListLine.FindLast() then begin
                 //existing item price
-                if PriceListLineItem."Unit Cost" <> ItemWkshVariantLine."Direct Unit Cost" then begin
+                if PriceListLineItem."Unit Cost" <> _ItemWkshVariantLine."Direct Unit Cost" then begin
                     PriceListLine.Init();
                     PriceListLine := PriceListLineItem;
                     PriceListLine.Validate("Amount Type", PriceListLine."Amount Type"::Price);
-                    PriceListLine.Validate("Variant Code", ItemWkshVariantLine."Variant Code");
-                    PriceListLine.Validate("Unit Cost", ItemWkshVariantLine."Direct Unit Cost");
-                    PriceListLine.Validate("Currency Code", ItemWkshLine."Purchase Price Currency Code");
+                    PriceListLine.Validate("Variant Code", _ItemWkshVariantLine."Variant Code");
+                    PriceListLine.Validate("Unit Cost", _ItemWkshVariantLine."Direct Unit Cost");
+                    PriceListLine.Validate("Currency Code", _ItemWkshLine."Purchase Price Currency Code");
                     if (ItemWorksheetTemplate."Purchase Price Handling" <> ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") then
                         PriceListLine.Validate("Starting Date", WorkDate());
                     PriceListLine.Validate(Status, PriceListLine.Status::Active);
@@ -1216,22 +1216,22 @@
                 //No Price found
                 PriceListLine.Init();
                 PriceListLine.Validate("Price Type", PriceListLine."Price Type"::Purchase);
-                PriceListLine.Validate("Source No.", ItemWkshLine."Vendor No.");
+                PriceListLine.Validate("Source No.", _ItemWkshLine."Vendor No.");
                 PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
-                PriceListLine.Validate("Asset No.", ItemWkshLine."Item No.");
-                PriceListLine.Validate("Variant Code", ItemWkshVariantLine."Variant Code");
+                PriceListLine.Validate("Asset No.", _ItemWkshLine."Item No.");
+                PriceListLine.Validate("Variant Code", _ItemWkshVariantLine."Variant Code");
                 PriceListLine.Validate("Unit of Measure Code", Item."Purch. Unit of Measure");
-                PriceListLine.Validate("Unit Cost", ItemWkshVariantLine."Direct Unit Cost");
-                PriceListLine.Validate("Currency Code", ItemWkshLine."Purchase Price Currency Code");
+                PriceListLine.Validate("Unit Cost", _ItemWkshVariantLine."Direct Unit Cost");
+                PriceListLine.Validate("Currency Code", _ItemWkshLine."Purchase Price Currency Code");
                 PriceListLine.Validate("Source Type", PriceListLine."Source Type"::"All Vendors");
                 PriceListLine.Validate("Amount Type", PriceListLine."Amount Type"::Price);
                 if (ItemWorksheetTemplate."Purchase Price Handling" <> ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") then
                     PriceListLine.Validate("Starting Date", WorkDate());
-                if ItemWkshLine."Purchase Price Start Date" <> 0D then
-                    PriceListLine.Validate("Starting Date", ItemWkshLine."Purchase Price Start Date");
-                if not PriceListHeader.Get(ItemWkshLine."Worksheet Template Name") then
-                    CreatePriceListHeader(ItemWkshLine."Worksheet Template Name", PriceListLine."Starting Date", 0D);
-                PriceListLine.Validate("Price List Code", ItemWkshLine."Worksheet Template Name");
+                if _ItemWkshLine."Purchase Price Start Date" <> 0D then
+                    PriceListLine.Validate("Starting Date", _ItemWkshLine."Purchase Price Start Date");
+                if not PriceListHeader.Get(_ItemWkshLine."Worksheet Template Name") then
+                    CreatePriceListHeader(_ItemWkshLine."Worksheet Template Name", PriceListLine."Starting Date", 0D);
+                PriceListLine.Validate("Price List Code", _ItemWkshLine."Worksheet Template Name");
 #if BC17
                 PriceListLine.Status := PriceListLine.Status::Active;
 #else
@@ -1388,14 +1388,14 @@
         ItemFldRef: FieldRef;
         ItemWorksheetFldRef: FieldRef;
     begin
-        ItemWorksheetFieldSetup.SetFilter("Worksheet Template Name", '%1|%2', ItemWkshLine."Worksheet Template Name", '');
-        ItemWorksheetFieldSetup.SetFilter("Worksheet Name", '%1|%2', ItemWkshLine."Worksheet Name", '');
+        ItemWorksheetFieldSetup.SetFilter("Worksheet Template Name", '%1|%2', _ItemWkshLine."Worksheet Template Name", '');
+        ItemWorksheetFieldSetup.SetFilter("Worksheet Name", '%1|%2', _ItemWkshLine."Worksheet Name", '');
         ItemWorksheetFieldSetup.SetRange("Table No.", DATABASE::"NPR Item Worksheet Line");
         ItemWorksheetFieldSetup.SetRange("Field Number", SourceFieldNo);
         if not ItemWorksheetFieldSetup.FindLast() then
             exit(false);
         ItemRecRef.Get(VarItem.RecordId);
-        ItemWorksheetRecRef.Get(ItemWkshLine.RecordId);
+        ItemWorksheetRecRef.Get(_ItemWkshLine.RecordId);
         ItemWorksheetFldRef := ItemWorksheetRecRef.Field(SourceFieldNo);
         ItemFldRef := ItemRecRef.Field(ItemWorksheetFieldSetup."Target Field Number Create");
         if MapField(ItemWorksheetFieldSetup, ItemWorksheetFldRef, ItemFldRef) then begin

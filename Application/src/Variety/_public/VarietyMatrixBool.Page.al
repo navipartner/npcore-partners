@@ -42,7 +42,7 @@
 
                     trigger OnValidate()
                     begin
-                        MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
+                        MATRIX_GenerateColumnCaptions(0, _Item, ShowAsCrossVRT);
 
                         UpdateMatrix(false);
                     end;
@@ -56,7 +56,7 @@
 
                     trigger OnValidate()
                     begin
-                        MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
+                        MATRIX_GenerateColumnCaptions(0, _Item, ShowAsCrossVRT);
 
                         UpdateMatrix(true);
                     end;
@@ -69,7 +69,7 @@
 
                     trigger OnValidate()
                     begin
-                        MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
+                        MATRIX_GenerateColumnCaptions(0, _Item, ShowAsCrossVRT);
                         UpdateMatrix(false);
                     end;
                 }
@@ -89,7 +89,7 @@
                 field("Variety 1 Value"; Rec."Variety 1 Value")
                 {
 
-                    CaptionClass = '3,' + Item."NPR Variety 1";
+                    CaptionClass = '3,' + _Item."NPR Variety 1";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety1;
@@ -99,7 +99,7 @@
                 field("Variety 2 Value"; Rec."Variety 2 Value")
                 {
 
-                    CaptionClass = '3,' + Item."NPR Variety 2";
+                    CaptionClass = '3,' + _Item."NPR Variety 2";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety2;
@@ -109,7 +109,7 @@
                 field("Variety 3 Value"; Rec."Variety 3 Value")
                 {
 
-                    CaptionClass = '3,' + Item."NPR Variety 3";
+                    CaptionClass = '3,' + _Item."NPR Variety 3";
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety3;
@@ -119,7 +119,7 @@
                 field("Variety 4 Value"; Rec."Variety 4 Value")
                 {
 
-                    CaptionClass = '3,' + Item."NPR Variety 4";
+                    CaptionClass = '3,' + _Item."NPR Variety 4";
                     Editable = false;
                     Visible = showvariety4;
                     ToolTip = 'Specifies the value of the Variety 4 Value field';
@@ -1547,13 +1547,13 @@
                     group("Variety 1")
                     {
                         Caption = 'Variety 1';
-                        field(Variety1; Item."NPR Variety 1")
+                        field(Variety1; _Item."NPR Variety 1")
                         {
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Variety 1.';
                             ApplicationArea = NPRRetail;
                         }
-                        field(Variety1Table; Item."NPR Variety 1 Table")
+                        field(Variety1Table; _Item."NPR Variety 1 Table")
                         {
 
                             ShowCaption = false;
@@ -1563,9 +1563,9 @@
                             var
                                 VRTLookupFunc: Codeunit "NPR Variety Lookup Functions";
                             begin
-                                VRTLookupFunc.LookupVarietyValues(Item, 0);
-                                VRTMatrixMgt.SetRecord(RecRef, Item."No.");//Is this one needed?
-                                MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
+                                VRTLookupFunc.LookupVarietyValues(_Item, 0);
+                                VRTMatrixMgt.SetRecord(RecRef, _Item."No.");//Is this one needed?
+                                MATRIX_GenerateColumnCaptions(0, _Item, ShowAsCrossVRT);
                                 UpdateMatrix(true);
                             end;
                         }
@@ -1573,13 +1573,13 @@
                     group("Variety 2")
                     {
                         Caption = 'Variety 2';
-                        field(Variety2; Item."NPR Variety 2")
+                        field(Variety2; _Item."NPR Variety 2")
                         {
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Variety 2.';
                             ApplicationArea = NPRRetail;
                         }
-                        field(Variety2Table; Item."NPR Variety 2 Table")
+                        field(Variety2Table; _Item."NPR Variety 2 Table")
                         {
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 2 Table field';
@@ -1588,9 +1588,9 @@
                             var
                                 VRTLookupFunc: Codeunit "NPR Variety Lookup Functions";
                             begin
-                                VRTLookupFunc.LookupVarietyValues(Item, 1);
-                                VRTMatrixMgt.SetRecord(RecRef, Item."No.");
-                                MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
+                                VRTLookupFunc.LookupVarietyValues(_Item, 1);
+                                VRTMatrixMgt.SetRecord(RecRef, _Item."No.");
+                                MATRIX_GenerateColumnCaptions(0, _Item, ShowAsCrossVRT);
                                 UpdateMatrix(true);
                             end;
                         }
@@ -1598,13 +1598,13 @@
                     group("Variety 3")
                     {
                         Caption = 'Variety 3';
-                        field(Variety3; Item."NPR Variety 3")
+                        field(Variety3; _Item."NPR Variety 3")
                         {
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Variety 3.';
                             ApplicationArea = NPRRetail;
                         }
-                        field(Variety3Table; Item."NPR Variety 3 Table")
+                        field(Variety3Table; _Item."NPR Variety 3 Table")
                         {
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 3 Table field';
@@ -1613,9 +1613,9 @@
                             var
                                 VRTLookupFunc: Codeunit "NPR Variety Lookup Functions";
                             begin
-                                VRTLookupFunc.LookupVarietyValues(Item, 2);
-                                VRTMatrixMgt.SetRecord(RecRef, Item."No.");
-                                MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
+                                VRTLookupFunc.LookupVarietyValues(_Item, 2);
+                                VRTMatrixMgt.SetRecord(RecRef, _Item."No.");
+                                MATRIX_GenerateColumnCaptions(0, _Item, ShowAsCrossVRT);
                                 UpdateMatrix(true);
                             end;
                         }
@@ -1623,13 +1623,13 @@
                     group("Variety 4")
                     {
                         Caption = 'Variety 4';
-                        field(Variety4; Item."NPR Variety 4")
+                        field(Variety4; _Item."NPR Variety 4")
                         {
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Variety 4.';
                             ApplicationArea = NPRRetail;
                         }
-                        field(Variety4Table; Item."NPR Variety 4 Table")
+                        field(Variety4Table; _Item."NPR Variety 4 Table")
                         {
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Item.NPR Variety 4 Table field';
@@ -1638,9 +1638,9 @@
                             var
                                 VRTLookupFunc: Codeunit "NPR Variety Lookup Functions";
                             begin
-                                VRTLookupFunc.LookupVarietyValues(Item, 3);
-                                VRTMatrixMgt.SetRecord(RecRef, Item."No.");
-                                MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
+                                VRTLookupFunc.LookupVarietyValues(_Item, 3);
+                                VRTMatrixMgt.SetRecord(RecRef, _Item."No.");
+                                MATRIX_GenerateColumnCaptions(0, _Item, ShowAsCrossVRT);
                                 UpdateMatrix(true);
                             end;
                         }
@@ -1670,7 +1670,7 @@
                 var
                     VRTCloneData: Codeunit "NPR Variety Clone Data";
                 begin
-                    VRTCloneData.CreateTableCopy(Item, 0, false);
+                    VRTCloneData.CreateTableCopy(_Item, 0, false);
                     CurrPage.Update(false);
                 end;
             }
@@ -1690,7 +1690,7 @@
                 var
                     MATRIX_Step: Option Initial,Previous,Same,Next;
                 begin
-                    MATRIX_GenerateColumnCaptions(MATRIX_Step::Previous, Item, ShowAsCrossVRT);
+                    MATRIX_GenerateColumnCaptions(MATRIX_Step::Previous, _Item, ShowAsCrossVRT);
                     UpdateMatrix(false);
                 end;
             }
@@ -1710,7 +1710,7 @@
                 var
                     MATRIX_Step: Option Initial,Previous,Same,Next;
                 begin
-                    MATRIX_GenerateColumnCaptions(MATRIX_Step::Next, Item, ShowAsCrossVRT);
+                    MATRIX_GenerateColumnCaptions(MATRIX_Step::Next, _Item, ShowAsCrossVRT);
                     UpdateMatrix(false);
                 end;
             }
@@ -1767,8 +1767,8 @@
     trigger OnOpenPage()
     begin
         Initialize();
-        ShowAsCrossVRT := Item."NPR Cross Variety No.";
-        MATRIX_GenerateColumnCaptions(0, Item, ShowAsCrossVRT);
+        ShowAsCrossVRT := _Item."NPR Cross Variety No.";
+        MATRIX_GenerateColumnCaptions(0, _Item, ShowAsCrossVRT);
         UpdateMatrix(true);
     end;
 
@@ -1778,7 +1778,7 @@
         TempMatrixRecord: Record "NPR Variety Buffer" temporary;
         MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[100] of Boolean;
-        Item: Record Item;
+        _Item: Record Item;
         ShowAsCrossVRT: Option Variety1,Variety2,Variety3,Variety4;
         RecRef: RecordRef;
         VRTMatrixMgt: Codeunit "NPR Variety Matrix Management";
@@ -2052,9 +2052,9 @@
     begin
         Clear(Rec);
         Load(MATRIX_CaptionSet, MATRIX_MatrixRecords, MATRIX_CurrentNoOfColumns);
-        Rec.LoadMatrixRows(Rec, Item, ShowAsCrossVRT, HideInactive);
+        Rec.LoadMatrixRows(Rec, _Item, ShowAsCrossVRT, HideInactive);
         if ReloadMatrixData then
-            VRTMatrixMgt.LoadMatrixData(Item."No.", HideInactive);
+            VRTMatrixMgt.LoadMatrixData(_Item."No.", HideInactive);
         SetVisible();
 
         case ShowAsCrossVRT of
@@ -2068,19 +2068,19 @@
                 Rec.SetCurrentKey("Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order");
         end;
 
-        ShowVariety1 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety1) and (Item."NPR Variety 1" <> ''));
-        ShowVariety2 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety2) and (Item."NPR Variety 2" <> ''));
-        ShowVariety3 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety3) and (Item."NPR Variety 3" <> ''));
-        ShowVariety4 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety4) and (Item."NPR Variety 4" <> ''));
+        ShowVariety1 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety1) and (_Item."NPR Variety 1" <> ''));
+        ShowVariety2 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety2) and (_Item."NPR Variety 2" <> ''));
+        ShowVariety3 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety3) and (_Item."NPR Variety 3" <> ''));
+        ShowVariety4 := ((ShowAsCrossVRT <> ShowAsCrossVRT::Variety4) and (_Item."NPR Variety 4" <> ''));
         CurrPage.Update(false);
     end;
 
     internal procedure SetRecordRef(RecRef2: RecordRef; var Item2: Record Item; ShowFieldNo: Integer)
     begin
         RecRef := RecRef2;
-        Item := Item2;
+        _Item := Item2;
         LocationFilter := CopyStr(Item2.GetFilter("Location Filter"), 1, MaxStrLen(LocationFilter));
-        VRTMatrixMgt.SetRecord(RecRef2, Item."No.");
+        VRTMatrixMgt.SetRecord(RecRef2, _Item."No.");
         CurrVRTField.SetRange("Table No.", RecRef.Number);
 
         if CurrVRTField.FindSet() then

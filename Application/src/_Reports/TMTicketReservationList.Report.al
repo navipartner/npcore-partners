@@ -35,10 +35,10 @@ report 6060121 "NPR TM Ticket Reservation List"
             column(AdmittedTime; TicketReservationList.AccessTime)
             {
             }
-            column(AdmissionStartDate; AdmissionScheduleEntry."Admission Start Date")
+            column(AdmissionStartDate; _AdmissionScheduleEntry."Admission Start Date")
             {
             }
-            column(AdmissionStartTime; AdmissionScheduleEntry."Admission Start Time")
+            column(AdmissionStartTime; _AdmissionScheduleEntry."Admission Start Time")
             {
             }
             column(SalesDateTime; InitialEntry."Created Datetime")
@@ -89,8 +89,8 @@ report 6060121 "NPR TM Ticket Reservation List"
                 IF (NOT TicketReservationList.READ()) THEN
                     CurrReport.BREAK();
 
-                AdmissionScheduleEntry.GET(TicketReservationList.EntryID);
-                IF (NOT ((AdmissionScheduleEntry."Admission Start Date" >= AdmissionStart_DateLow) AND (AdmissionScheduleEntry."Admission Start Date" <= AdmissionStart_DateHigh))) THEN
+                _AdmissionScheduleEntry.GET(TicketReservationList.EntryID);
+                IF (NOT ((_AdmissionScheduleEntry."Admission Start Date" >= AdmissionStart_DateLow) AND (_AdmissionScheduleEntry."Admission Start Date" <= AdmissionStart_DateHigh))) THEN
                     CurrReport.SKIP();
 
                 InitialEntry.SETFILTER("External Adm. Sch. Entry No.", '=%1', TicketReservationList.ExternalScheduleEntryNo);
@@ -247,7 +247,7 @@ report 6060121 "NPR TM Ticket Reservation List"
         Admitted_: Option EITHER,ADMITTED,NOT_ADMITTED;
         TopX_Rows: Integer;
         ToBeRedeemed: Boolean;
-        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        _AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         InitialEntry: Record "NPR TM Det. Ticket AccessEntry";
         TicketStatus: Option OPEN,REVOKED,ADMITTED;
         Name: Text;

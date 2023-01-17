@@ -5,7 +5,7 @@
     TableNo = "NPR POS Sale Line";
 
     var
-        CustLedgEntryView: Text;
+        _CustLedgEntryView: Text;
         CONFIRM_BALANCE: Label 'Do you wish to apply %1 %2 for customer %3?';
         BALANCING_OF: Label 'Balancing of %1';
 
@@ -28,7 +28,7 @@
 
     procedure SetCustLedgEntryView(TableView: Text)
     begin
-        CustLedgEntryView := TableView;
+        _CustLedgEntryView := TableView;
     end;
 
     procedure SelectCustomerEntries(var POSSession: Codeunit "NPR POS Session"; CustLedgEntryView: Text)

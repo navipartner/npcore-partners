@@ -1,7 +1,7 @@
 report 6014415 "NPR Rep. Check Missing Fields"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     ApplicationArea = NPRRetail;
     Caption = 'Check Missing Fields';
@@ -76,13 +76,13 @@ report 6014415 "NPR Rep. Check Missing Fields"
         ReplicationAPI: Codeunit "NPR Replication API";
         EntitySet: Text;
     begin
-        if ServiceSetup."API Version" <> Endpoint."Service Code" then
-            ServiceSetup.Get(Endpoint."Service Code");
+        if _ServiceSetup."API Version" <> Endpoint."Service Code" then
+            _ServiceSetup.Get(Endpoint."Service Code");
 
-        URI := ReplicationAPI.CreateURI(ServiceSetup, Endpoint, DummyNextEndpointURI);
-        MetadataURI := GetMetadataURI(URI, ServiceSetup);
+        URI := ReplicationAPI.CreateURI(_ServiceSetup, Endpoint, DummyNextEndpointURI);
+        MetadataURI := GetMetadataURI(URI, _ServiceSetup);
         EntitySet := GetResource(URI);
-        UpdateMetadata(MetadataURI, ServiceSetup);
+        UpdateMetadata(MetadataURI, _ServiceSetup);
 
         RepGetBCGenericData.InitializeTempSpecialFieldMapping(TempSpecialFieldMapping, Endpoint);
         FieldRec.SetRange(TableNo, Endpoint."Table ID");
@@ -253,7 +253,7 @@ report 6014415 "NPR Rep. Check Missing Fields"
     end;
 
     var
-        ServiceSetup: Record "NPR Replication Service Setup";
+        _ServiceSetup: Record "NPR Replication Service Setup";
         TempMetadata: Record "XML Buffer" temporary;
         LastMetadataEntryNo: Integer;
         ImportedMetadatas: List Of [Text];

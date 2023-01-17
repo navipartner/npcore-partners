@@ -293,7 +293,7 @@
         DateRecord: Record Date;
         Item: Record Item;
         TempBuffer: Record "NPR Advanced Sales Statistics" temporary;
-        ItemCategory: Record "Item Category";
+        _ItemCategory: Record "Item Category";
         "Salesperson/Purchaser": Record "Salesperson/Purchaser";
         Vendor: Record Vendor;
         "Record": RecordRef;
@@ -389,8 +389,8 @@
             Type::ItemCategory:
                 begin
                     Record.Open(DATABASE::"Item Category");
-                    Field := Record.Field(ItemCategory.FieldNo(Code));
-                    Caption := Record.Field(ItemCategory.FieldNo(Description));
+                    Field := Record.Field(_ItemCategory.FieldNo(Code));
+                    Caption := Record.Field(_ItemCategory.FieldNo(Description));
                     Title := TitleItemCategory;
                 end;
 

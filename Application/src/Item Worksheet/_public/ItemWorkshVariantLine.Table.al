@@ -110,10 +110,10 @@
                         Description := ItemVariant.Description;
                         GetLine();
                         "Sales Price" := GetExistingVariantPrice();
-                        if "Sales Price" = ItemWorksheetLine."Sales Price" then
+                        if "Sales Price" = _ItemWorksheetLine."Sales Price" then
                             "Sales Price" := 0;
                         "Direct Unit Cost" := GetExistingVariantCost();
-                        if "Direct Unit Cost" = ItemWorksheetLine."Direct Unit Cost" then
+                        if "Direct Unit Cost" = _ItemWorksheetLine."Direct Unit Cost" then
                             "Direct Unit Cost" := 0;
                     end;
                 end;
@@ -466,7 +466,7 @@
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         ItemWorksheetVariantLine2: Record "NPR Item Worksh. Variant Line";
         ItemWorksheet: Record "NPR Item Worksheet";
-        ItemWorksheetLine: Record "NPR Item Worksheet Line";
+        _ItemWorksheetLine: Record "NPR Item Worksheet Line";
         DimMgt: Codeunit DimensionManagement;
         ItemNumberManagement: Codeunit "NPR Item Number Mgt.";
         UpdateFromWorksheetLine: Boolean;
@@ -501,17 +501,17 @@
     internal procedure GetLine()
     begin
         if "Worksheet Line No." = 0 then
-            ItemWorksheetLine.Init()
+            _ItemWorksheetLine.Init()
         else
-            if ("Worksheet Template Name" <> ItemWorksheetLine."Worksheet Template Name") or
-               ("Worksheet Name" <> ItemWorksheetLine."Worksheet Name") or
-               ("Worksheet Line No." <> ItemWorksheetLine."Line No.") then
-                ItemWorksheetLine.Get("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.");
+            if ("Worksheet Template Name" <> _ItemWorksheetLine."Worksheet Template Name") or
+               ("Worksheet Name" <> _ItemWorksheetLine."Worksheet Name") or
+               ("Worksheet Line No." <> _ItemWorksheetLine."Line No.") then
+                _ItemWorksheetLine.Get("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.");
     end;
 
     internal procedure SetLine(ItemWorksheetLineParm: Record "NPR Item Worksheet Line")
     begin
-        ItemWorksheetLine := ItemWorksheetLineParm;
+        _ItemWorksheetLine := ItemWorksheetLineParm;
     end;
 
     internal procedure CheckIfDeleteIsOK(): Boolean
@@ -550,7 +550,7 @@
             exit("Direct Unit Cost");
 
         GetLine();
-        exit(ItemWorksheetLine."Direct Unit Cost");
+        exit(_ItemWorksheetLine."Direct Unit Cost");
     end;
 
     internal procedure GetUnitPrice(): Decimal
@@ -559,7 +559,7 @@
             exit("Sales Price");
 
         GetLine();
-        exit(ItemWorksheetLine."Sales Price");
+        exit(_ItemWorksheetLine."Sales Price");
     end;
 
     local procedure GetExistingVariantPrice(): Decimal
@@ -583,7 +583,7 @@
         PriceListLine: Record "Price List Line";
     begin
         PriceListLine.SetRange("Source Type", PriceListLine."Source Type"::Vendor);
-        PriceListLine.SetRange("Source No.", ItemWorksheetLine."Vendor No.");
+        PriceListLine.SetRange("Source No.", _ItemWorksheetLine."Vendor No.");
         PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
         PriceListLine.SetRange("Asset No.", "Existing Item No.");
         PriceListLine.SetRange("Variant Code", "Existing Variant Code");
@@ -671,9 +671,9 @@
                         end;
                     end;
                 end;
-                if (ItemWorksheetLine."Vendor No." <> '') and (OldVrtValue <> '') and (OldVrtValue <> VrtValue) then begin
+                if (_ItemWorksheetLine."Vendor No." <> '') and (OldVrtValue <> '') and (OldVrtValue <> VrtValue) then begin
                     if Confirm(StrSubstNo(MapValueVarietyQst, OldVrtValue, VrtValue, VrtType, VrtTable)) then begin
-                        CreateVarietyMapping(VrtType, VrtTable, '', '', ItemWorksheetLine."Vendor No.", OldVrtValue, VrtValue);
+                        CreateVarietyMapping(VrtType, VrtTable, '', '', _ItemWorksheetLine."Vendor No.", OldVrtValue, VrtValue);
                         if Confirm(ApplyMappingQst) then begin
                             ItemWorksheetVariantLine.Reset();
                             ItemWorksheetVariantLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
@@ -690,30 +690,30 @@
                     if not NewVarExists then begin
                         //Insert in the new value in Worksheet Value table
                         ItemWorksheetVarValue.Init();
-                        ItemWorksheetVarValue.Validate("Worksheet Template Name", ItemWorksheetLine."Worksheet Template Name");
-                        ItemWorksheetVarValue.Validate("Worksheet Name", ItemWorksheetLine."Worksheet Name");
-                        ItemWorksheetVarValue.Validate("Worksheet Line No.", ItemWorksheetLine."Line No.");
+                        ItemWorksheetVarValue.Validate("Worksheet Template Name", _ItemWorksheetLine."Worksheet Template Name");
+                        ItemWorksheetVarValue.Validate("Worksheet Name", _ItemWorksheetLine."Worksheet Name");
+                        ItemWorksheetVarValue.Validate("Worksheet Line No.", _ItemWorksheetLine."Line No.");
                         ItemWorksheetVarValue.Validate(Type, VrtType);
                         ItemWorksheetVarValue.Validate(Table, VrtTable);
                         ItemWorksheetVarValue.Validate(Value, VrtValue);
                         ItemWorksheetVarValue.Insert(true);
                     end;
-                    if not VarietyValue.Get(VrtType, VrtTable, VrtValue) and (StrLen(ItemWorksheetLine."Status Comment") < 247) then begin
-                        if ItemWorksheetLine.IsCopyVariety(VrtNo) then
+                    if not VarietyValue.Get(VrtType, VrtTable, VrtValue) and (StrLen(_ItemWorksheetLine."Status Comment") < 247) then begin
+                        if _ItemWorksheetLine.IsCopyVariety(VrtNo) then
                             AddCommentText := StrSubstNo(AddedVarietyLbl, VrtType, VrtValue)
                         else
                             AddCommentText := StrSubstNo(AddedVarietyUnlockedTableLbl, VrtType, VrtValue);
                         if UpdateFromWorksheetLine then begin
                             if StatusCommentText = '' then
-                                StatusCommentText := ItemWorksheetLine."Status Comment";
+                                StatusCommentText := _ItemWorksheetLine."Status Comment";
                             if StatusCommentText <> '' then
                                 StatusCommentText := StatusCommentText + ' - ';
                             StatusCommentText := StatusCommentText + AddCommentText;
                         end else begin
-                            if ItemWorksheetLine."Status Comment" <> '' then
-                                ItemWorksheetLine."Status Comment" := CopyStr(ItemWorksheetLine."Status Comment" + ' - ', 1, MaxStrLen(ItemWorksheetLine."Status Comment"));
-                            ItemWorksheetLine."Status Comment" := CopyStr(ItemWorksheetLine."Status Comment" + AddCommentText, 1, MaxStrLen(ItemWorksheetLine."Status Comment"));
-                            ItemWorksheetLine.Modify(true);
+                            if _ItemWorksheetLine."Status Comment" <> '' then
+                                _ItemWorksheetLine."Status Comment" := CopyStr(_ItemWorksheetLine."Status Comment" + ' - ', 1, MaxStrLen(_ItemWorksheetLine."Status Comment"));
+                            _ItemWorksheetLine."Status Comment" := CopyStr(_ItemWorksheetLine."Status Comment" + AddCommentText, 1, MaxStrLen(_ItemWorksheetLine."Status Comment"));
+                            _ItemWorksheetLine.Modify(true);
                         end;
                     end;
                 end;
@@ -764,7 +764,7 @@
     local procedure UpdateAllRemarks()
     begin
         GetLine();
-        ItemWorksheetLine.UpdateVarietyHeadingText();
+        _ItemWorksheetLine.UpdateVarietyHeadingText();
     end;
 
     internal procedure GetExistingVariantCode(): Code[20]
@@ -894,20 +894,20 @@
     begin
         GetLine();
         ItemWorksheetVarietyMapping.Reset();
-        ItemWorksheetVarietyMapping.SetFilter("Worksheet Template Name", '%1|%2', ItemWorksheetLine."Worksheet Template Name", '');
-        ItemWorksheetVarietyMapping.SetFilter("Worksheet Name", '%1|%2', ItemWorksheetLine."Worksheet Name", '');
-        ItemWorksheetVarietyMapping.SetFilter("Vendor No.", '%1|%2', ItemWorksheetLine."Vendor No.", '');
+        ItemWorksheetVarietyMapping.SetFilter("Worksheet Template Name", '%1|%2', _ItemWorksheetLine."Worksheet Template Name", '');
+        ItemWorksheetVarietyMapping.SetFilter("Worksheet Name", '%1|%2', _ItemWorksheetLine."Worksheet Name", '');
+        ItemWorksheetVarietyMapping.SetFilter("Vendor No.", '%1|%2', _ItemWorksheetLine."Vendor No.", '');
         I := 0;
         repeat
             I := I + 1;
             case I of
                 1:
                     if "Variety 1 Value" <> '' then begin
-                        ItemWorksheetVarietyMapping.SetRange(Variety, ItemWorksheetLine."Variety 1");
-                        ItemWorksheetVarietyMapping.SetFilter("Variety Table", '%1|%2', ItemWorksheetLine."Variety 1 Table (New)", '');
+                        ItemWorksheetVarietyMapping.SetRange(Variety, _ItemWorksheetLine."Variety 1");
+                        ItemWorksheetVarietyMapping.SetFilter("Variety Table", '%1|%2', _ItemWorksheetLine."Variety 1 Table (New)", '');
                         ItemWorksheetVarietyMapping.SetRange("Vendor Variety Value", "Variety 1 Value");
 
-                        SetExtraVarityFilter(ItemWorksheetLine, ItemWorksheetVarietyMapping);
+                        SetExtraVarityFilter(_ItemWorksheetLine, ItemWorksheetVarietyMapping);
 
                         if ItemWorksheetVarietyMapping.FindFirst() then begin
                             "Variety 1 Value" := ItemWorksheetVarietyMapping."Variety Value";
@@ -916,11 +916,11 @@
                     end;
                 2:
                     if "Variety 2 Value" <> '' then begin
-                        ItemWorksheetVarietyMapping.SetRange(Variety, ItemWorksheetLine."Variety 2");
-                        ItemWorksheetVarietyMapping.SetFilter("Variety Table", '%1|%2', ItemWorksheetLine."Variety 2 Table (New)", '');
+                        ItemWorksheetVarietyMapping.SetRange(Variety, _ItemWorksheetLine."Variety 2");
+                        ItemWorksheetVarietyMapping.SetFilter("Variety Table", '%1|%2', _ItemWorksheetLine."Variety 2 Table (New)", '');
                         ItemWorksheetVarietyMapping.SetRange("Vendor Variety Value", "Variety 2 Value");
 
-                        SetExtraVarityFilter(ItemWorksheetLine, ItemWorksheetVarietyMapping);
+                        SetExtraVarityFilter(_ItemWorksheetLine, ItemWorksheetVarietyMapping);
 
                         if ItemWorksheetVarietyMapping.FindFirst() then begin
                             "Variety 2 Value" := ItemWorksheetVarietyMapping."Variety Value";
@@ -929,10 +929,10 @@
                     end;
                 3:
                     if "Variety 3 Value" <> '' then begin
-                        ItemWorksheetVarietyMapping.SetRange(Variety, ItemWorksheetLine."Variety 3");
-                        ItemWorksheetVarietyMapping.SetFilter("Variety Table", '%1|%2', ItemWorksheetLine."Variety 3 Table (New)", '');
+                        ItemWorksheetVarietyMapping.SetRange(Variety, _ItemWorksheetLine."Variety 3");
+                        ItemWorksheetVarietyMapping.SetFilter("Variety Table", '%1|%2', _ItemWorksheetLine."Variety 3 Table (New)", '');
                         ItemWorksheetVarietyMapping.SetRange("Vendor Variety Value", "Variety 3 Value");
-                        SetExtraVarityFilter(ItemWorksheetLine, ItemWorksheetVarietyMapping);
+                        SetExtraVarityFilter(_ItemWorksheetLine, ItemWorksheetVarietyMapping);
 
                         if ItemWorksheetVarietyMapping.FindFirst() then begin
                             "Variety 3 Value" := ItemWorksheetVarietyMapping."Variety Value";
@@ -941,10 +941,10 @@
                     end;
                 4:
                     if "Variety 4 Value" <> '' then begin
-                        ItemWorksheetVarietyMapping.SetRange(Variety, ItemWorksheetLine."Variety 4");
-                        ItemWorksheetVarietyMapping.SetFilter("Variety Table", '%1|%2', ItemWorksheetLine."Variety 4 Table (New)", '');
+                        ItemWorksheetVarietyMapping.SetRange(Variety, _ItemWorksheetLine."Variety 4");
+                        ItemWorksheetVarietyMapping.SetFilter("Variety Table", '%1|%2', _ItemWorksheetLine."Variety 4 Table (New)", '');
                         ItemWorksheetVarietyMapping.SetRange("Vendor Variety Value", "Variety 4 Value");
-                        SetExtraVarityFilter(ItemWorksheetLine, ItemWorksheetVarietyMapping);
+                        SetExtraVarityFilter(_ItemWorksheetLine, ItemWorksheetVarietyMapping);
 
                         if ItemWorksheetVarietyMapping.FindFirst() then begin
                             "Variety 4 Value" := ItemWorksheetVarietyMapping."Variety Value";
