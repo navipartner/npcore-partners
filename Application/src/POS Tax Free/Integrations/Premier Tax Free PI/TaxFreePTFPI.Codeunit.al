@@ -120,7 +120,7 @@
             Valid := (UpperCase(Eligible) = 'TRUE')
         else begin
             if TryGetFirstNodeContent(XMLDoc, 'error', false, ErrorNo) then
-                TaxFreeRequest."Error Code" := ErrorNo;
+                TaxFreeRequest."Error Code" := CopyStr(ErrorNo, 1, MaxStrLen(TaxFreeRequest."Error Code"));
             Error(GetFirstNodeContent(XMLDoc, 'error_text', false));
         end;
     end;
@@ -137,7 +137,7 @@
 
         ErrorNo := GetFirstNodeContent(XMLDoc, 'error', false);
         if not (UpperCase(ErrorNo) = '0') then begin //0 = Success
-            TaxFreeRequest."Error Code" := ErrorNo;
+            TaxFreeRequest."Error Code" := CopyStr(ErrorNo, 1, MaxStrLen(TaxFreeRequest."Error Code"));
             Error(GetFirstNodeContent(XMLDoc, 'error_text', false));
         end;
     end;
@@ -171,15 +171,17 @@
         if TryGetFirstNodeContent(XMLDoc, 'refund_amount', false, VoucherRefundAmount) then;
 
         if (StrLen(VoucherNo) > 0) and (StrLen(VoucherBarcode) > 0) and (StrLen(PrintXML) > 0) and (StrLen(VoucherTotalAmount) > 0) and (StrLen(VoucherRefundAmount) > 0) then begin
+#pragma warning disable AA0139            
             TaxFreeRequest."External Voucher No." := VoucherNo;
             TaxFreeRequest."External Voucher Barcode" := VoucherBarcode;
+#pragma warning restore AA0139            
             Evaluate(TaxFreeRequest."Total Amount Incl. VAT", VoucherTotalAmount, 9);
             Evaluate(TaxFreeRequest."Refund Amount", VoucherRefundAmount, 9);
             TaxFreeRequest.Print.CreateOutStream(OutStream, TEXTENCODING::UTF8);
             OutStream.Write(PrintXML);
         end else begin
             if TryGetFirstNodeContent(XMLDoc, 'error', false, ErrorNo) then
-                TaxFreeRequest."Error Code" := ErrorNo;
+                TaxFreeRequest."Error Code" := CopyStr(ErrorNo, 1, MaxStrLen(TaxFreeRequest."Error Code"));
 
             Error(GetFirstNodeContent(XMLDoc, 'error_text', false));
         end;
