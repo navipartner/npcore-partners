@@ -2,7 +2,7 @@
 {
     Access = Internal;
 
-    local procedure IsEnabled(POSAuditProfileCode: Code[20]): Boolean
+    internal procedure IsEnabled(POSAuditProfileCode: Code[20]): Boolean
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
@@ -21,7 +21,7 @@
         Commit();
         if POSAuditLogVerify.Run(POSAuditLog) then; //will always return false because an error is needed to rollback DB changes while validating
 
-        Error := POSAuditLogVerify.VerificationError();        
+        Error := POSAuditLogVerify.VerificationError();
         if Error then begin
             //The reason we use a global boolean in a codeunit to transfer error flag is because french compliance performs temporary DB re-calculations that HAS to be rolled back even when there is no error. 
             //So it always errors in normal NAV terminology to trigger that rollback. 
@@ -170,6 +170,62 @@
         POSAuditLogMgt.CreateEntry(POSUnit.RecordId, POSAuditLog."Action Type"::LOG_INIT, 0, '', POSUnitNo);
     end;
 
+    internal procedure PreparePOSActionAuthDescription(WorkflowName: Text; ButtonType: Text; ButtonParameter: Text; POSUnit: Record "NPR POS Unit"; var ActionSystemId: RecordId; var DescriptionLog: Text)
+    var
+        MissingInfoLbl: Label 'No button information was provided from FrontEnd.';
+        POSMenu: Record "NPR POS Menu";
+        POSAction: Record "NPR POS Action";
+        POSSetup: Record "NPR POS Setup";
+    begin
+        case true of
+            ButtonType = 'ActionType.PopupMenu':
+                begin
+                    DescriptionLog := StrSubstNo('authorized PopupMenu %1', ButtonParameter);
+                    if POSMenu.Get(ButtonParameter) then
+                        ActionSystemId := POSMenu.RecordId;
+                end;
+            ButtonType = 'Payment':
+                begin
+                    DescriptionLog := StrSubstNo('authorized Payment %1', ButtonParameter);
+                    if POSUnit."POS Named Actions Profile" <> '' then
+                        POSSetup.Get(POSUnit."POS Named Actions Profile")
+                    else
+                        POSSetup.FindFirst();
+                    if POSAction.Get(POSSetup."Payment Action Code") then
+                        ActionSystemId := POSAction.RecordId;
+                end;
+            ButtonType = 'Item':
+                begin
+                    DescriptionLog := StrSubstNo('authorized Action Item %1', ButtonParameter);
+                    if POSUnit."POS Named Actions Profile" <> '' then
+                        POSSetup.Get(POSUnit."POS Named Actions Profile")
+                    else
+                        POSSetup.FindFirst();
+                    if POSAction.Get(POSSetup."Item Insert Action Code") then
+                        ActionSystemId := POSAction.RecordId;
+                end;
+            ButtonType = 'Customer':
+                begin
+                    DescriptionLog := StrSubstNo('authorized Action Customer %1', ButtonParameter);
+                    if POSUnit."POS Named Actions Profile" <> '' then
+                        POSSetup.Get(POSUnit."POS Named Actions Profile")
+                    else
+                        POSSetup.FindFirst();
+                    if POSAction.Get(POSSetup."Customer Action Code") then
+                        ActionSystemId := POSAction.RecordId;
+                end;
+            ButtonType = 'Workflow':
+                begin
+                    DescriptionLog := StrSubstNo('authorized Action %1', WorkflowName);
+                    if POSAction.Get(WorkflowName) then
+                        ActionSystemId := POSAction.RecordId;
+                end;
+            else
+                DescriptionLog := MissingInfoLbl;
+        end;
+
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnHandleAuditLogBeforeInsert(var POSAuditLog: Record "NPR POS Audit Log")
     begin
@@ -199,4 +255,5 @@
     internal procedure OnShowAdditionalInfo(POSAuditLog: Record "NPR POS Audit Log")
     begin
     end;
+
 }
