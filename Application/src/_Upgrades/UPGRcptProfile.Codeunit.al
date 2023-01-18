@@ -35,63 +35,74 @@
     local procedure UpgradePOSUnitRcptTxtProfile()
     var
         POSUnitRcptTxtProfile: Record "NPR POS Unit Rcpt.Txt Profile";
-        ReceiptFooterMgt: codeunit "NPR Receipt Footer Mgt.";
+        POSTicketRcptText: Record "NPR POS Ticket Rcpt. Text";
         DataTypeMgt: Codeunit "Data Type Management";
         ReceiptText: Text;
         FieldReference: array[9] of FieldRef;
         RecRef: RecordRef;
-        i: Integer;
+        LineNo, i: Integer;
     begin
         POSUnitRcptTxtProfile.SetRange("Sales Ticket Line Text off", POSUnitRcptTxtProfile."Sales Ticket Line Text off"::"Pos Unit");
-        if not POSUnitRcptTxtProfile.FindSet() then
-            exit;
-        repeat
-            clear(ReceiptText);
+        if POSUnitRcptTxtProfile.FindSet(true) then
+            repeat
+                clear(ReceiptText);        
+                LineNo := 0;        
+                POSTicketRcptText.Reset();
+                POSTicketRcptText.SetRange("Rcpt. Txt. Profile Code", POSUnitRcptTxtProfile.Code);
+                if POSTicketRcptText.FindLast() then
+                    LineNo := POSTicketRcptText."Line No.";
 
-            DataTypeMgt.GetRecordRef(POSUnitRcptTxtProfile, RecRef);
-            for i := 1 to 9 do begin
-                FindFieldByName(RecRef, FieldReference[i], 'Sales Ticket Line Text' + Format(i));
-                if Format(FieldReference[i].Value()) <> '' then
-                    ReceiptText += Format(FieldReference[i].Value()) + ' ';
-            end;
-            ReceiptFooterMgt.SetDefaultBreakLineNumberOfCharacters(POSUnitRcptTxtProfile);
-            if ReceiptText <> '' then begin
-                ReceiptText := CopyStr(ReceiptText, 1, StrLen(ReceiptText) - 1);
-                POSUnitRcptTxtProfile."Sales Ticket Rcpt. Text" := CopyStr(ReceiptText, 1, MaxStrLen(POSUnitRcptTxtProfile."Sales Ticket Rcpt. Text"));
-            end;
-            POSUnitRcptTxtProfile.Modify();
-        until POSUnitRcptTxtProfile.Next() = 0;
+                DataTypeMgt.GetRecordRef(POSUnitRcptTxtProfile, RecRef);
+                for i := 1 to 9 do begin
+                    FindFieldByName(RecRef, FieldReference[i], 'Sales Ticket Line Text' + Format(i));
+                    if Format(FieldReference[i].Value()) <> '' then begin
+                        LineNo += 10000;
+                        POSTicketRcptText."Rcpt. Txt. Profile Code" := POSUnitRcptTxtProfile.Code;
+                        POSTicketRcptText."Line No." := LIneNo;
+                        POSTicketRcptText.Init();
+                        POSTicketRcptText."Receipt Text" := CopyStr(Format(FieldReference[i].Value()), 1, MaxStrLen(POSTicketRcptText."Receipt Text"));
+                        POSTicketRcptText.Insert();
+                    end;
+                end;
+                POSUnitRcptTxtProfile.Modify();
+            until POSUnitRcptTxtProfile.Next() = 0;
     end;
 
     local procedure UpgradeCommentRcptTxtProfile()
     var
         RetailComment: Record "NPR Retail Comment";
         POSUnitRcptTxtProfile: Record "NPR POS Unit Rcpt.Txt Profile";
-        ReceiptFooterMgt: codeunit "NPR Receipt Footer Mgt.";
+        POSTicketRcptText: Record "NPR POS Ticket Rcpt. Text";
         ReceiptText: Text;
+        LineNo: Integer;
     begin
         POSUnitRcptTxtProfile.SetRange("Sales Ticket Line Text off", POSUnitRcptTxtProfile."Sales Ticket Line Text off"::Comment);
-        if not POSUnitRcptTxtProfile.FindSet() then
-            exit;
-        repeat
-            clear(ReceiptText);
-            RetailComment.Reset();
-            RetailComment.SetRange("Table ID", DATABASE::"NPR POS Unit");
-            RetailComment.SetRange("No.", POSUnitRcptTxtProfile.Code);
-            RetailComment.SetRange(Integer, 1000);
-            RetailComment.SetRange("Hide on printout", false);
-            if RetailComment.FindSet() then begin
-                ReceiptFooterMgt.SetDefaultBreakLineNumberOfCharacters(POSUnitRcptTxtProfile);
-                repeat
-                    ReceiptText += RetailComment.Comment + ' ';
-                until RetailComment.next() = 0;
-                if ReceiptText <> '' then begin
-                    ReceiptText := CopyStr(ReceiptText, 1, StrLen(ReceiptText) - 1);
-                    POSUnitRcptTxtProfile."Sales Ticket Rcpt. Text" := CopyStr(ReceiptText, 1, MaxStrLen(POSUnitRcptTxtProfile."Sales Ticket Rcpt. Text"));
+        if POSUnitRcptTxtProfile.FindSet(true) then
+            repeat            
+                clear(ReceiptText);
+                LineNo := 0;                
+                POSTicketRcptText.Reset();
+                POSTicketRcptText.SetRange("Rcpt. Txt. Profile Code", POSUnitRcptTxtProfile.Code);
+                if POSTicketRcptText.FindLast() then
+                    LineNo := POSTicketRcptText."Line No.";
+
+                RetailComment.Reset();
+                RetailComment.SetRange("Table ID", DATABASE::"NPR POS Unit");
+                RetailComment.SetRange("No.", POSUnitRcptTxtProfile.Code);
+                RetailComment.SetRange(Integer, 1000);
+                RetailComment.SetRange("Hide on printout", false);
+                if RetailComment.FindSet() then begin
+                    repeat
+                        LineNo += 10000;
+                        POSTicketRcptText."Rcpt. Txt. Profile Code" := POSUnitRcptTxtProfile.Code;
+                        POSTicketRcptText."Line No." := LineNo;
+                        POSTicketRcptText.Init();
+                        POSTicketRcptText."Receipt Text" := CopyStr(RetailComment.Comment, 1, MaxStrLen(POSTicketRcptText."Receipt Text"));
+                        POSTicketRcptText.Insert();                        
+                    until RetailComment.next() = 0;
+                    POSUnitRcptTxtProfile.Modify();
                 end;
-                POSUnitRcptTxtProfile.Modify();
-            end;
-        until POSUnitRcptTxtProfile.Next() = 0;
+            until POSUnitRcptTxtProfile.Next() = 0;
     end;
 
     local procedure FindFieldByName(RecordRef: RecordRef; var FieldRef: FieldRef; FieldNameTxt: Text): Boolean
