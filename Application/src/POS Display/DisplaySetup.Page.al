@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Display Profiles';
-    ContextSensitiveHelpPage = 'retail/posunit/reference/POS_Display_profile.html';
+    ContextSensitiveHelpPage = 'retail/pos_profiles/reference/POS_Display_profile.html';
     PageType = List;
     Editable = false;
     UsageCategory = Administration;

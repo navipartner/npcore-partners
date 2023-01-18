@@ -28,6 +28,8 @@
     href: reference/POS_Unit_Display.md
   - name: POS counting screen (reference guide)
     href: reference/counting_reference.md
+  - name: POS Menu Buttons Setup (reference guide)
+    href: reference/pos_menu_buttons.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
