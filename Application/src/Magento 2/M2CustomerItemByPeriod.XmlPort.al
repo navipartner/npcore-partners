@@ -463,7 +463,7 @@
                 TmpItemResponse.DeleteAll();
     end;
 
-    local procedure GetNotShippedItems(PeriodStartDate: Date; PeriodEndDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; SellToCustomerNo: Code[20])
+    local procedure GetNotShippedItems(PeriodStartDate: Date; PeriodEndDate: Date; ItemNo: Code[20]; ParamVariantCode: Code[10]; LocationCode: Code[10]; SellToCustomerNo: Code[20])
     var
         SalesLine: Record "Sales Line";
     begin
@@ -476,7 +476,7 @@
         SalesLine.SetFilter("No.", '=%1', ItemNo);
         SalesLine.SetFilter("Sell-to Customer No.", '=%1', SellToCustomerNo);
         SalesLine.SetFilter("Planned Shipment Date", '%1..%2', PeriodStartDate, PeriodEndDate);
-        SalesLine.SetFilter("Variant Code", '=%1', VariantCode);
+        SalesLine.SetFilter("Variant Code", '=%1', ParamVariantCode);
         if (LocationCode <> '') then
             SalesLine.SetFilter("Location Code", '=%1', LocationCode);
 
@@ -500,7 +500,7 @@
         end;
     end;
 
-    local procedure GetShippedItems(PeriodStartDate: Date; PeriodEndDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; SellToCustomerNo: Code[20])
+    local procedure GetShippedItems(PeriodStartDate: Date; PeriodEndDate: Date; ItemNo: Code[20]; ParamVariantCode: Code[10]; LocationCode: Code[10]; SellToCustomerNo: Code[20])
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
@@ -512,7 +512,7 @@
 
         ItemLedgerEntry.SetFilter("Entry Type", '=%1', ItemLedgerEntry."Entry Type"::Sale);
         ItemLedgerEntry.SetFilter("Item No.", '=%1', ItemNo);
-        ItemLedgerEntry.SetFilter("Variant Code", '=%1', VariantCode);
+        ItemLedgerEntry.SetFilter("Variant Code", '=%1', ParamVariantCode);
         if (LocationCode <> '') then
             ItemLedgerEntry.SetFilter("Location Code", '=%1', LocationCode);
         ItemLedgerEntry.SetFilter("Source Type", '=%1', ItemLedgerEntry."Source Type"::Customer);
@@ -522,7 +522,7 @@
         if (ItemLedgerEntry.FindSet()) then begin
             repeat
                 TmpItemLedgerEntry.SetFilter("Item No.", '=%1', ItemNo);
-                TmpItemLedgerEntry.SetFilter("Variant Code", '=%1', VariantCode);
+                TmpItemLedgerEntry.SetFilter("Variant Code", '=%1', ParamVariantCode);
                 TmpItemLedgerEntry.SetFilter("Document Type", '=%1', ItemLedgerEntry."Document Type");
 
                 if (not TmpItemLedgerEntry.FindFirst()) then begin
@@ -530,7 +530,7 @@
                     TmpItemLedgerEntry.Init();
                     TmpItemLedgerEntry."Entry No." := TmpItemLedgerEntry.Count() + 1;
                     TmpItemLedgerEntry."Item No." := ItemNo;
-                    TmpItemLedgerEntry."Variant Code" := VariantCode;
+                    TmpItemLedgerEntry."Variant Code" := ParamVariantCode;
                     TmpItemLedgerEntry."Document Type" := ItemLedgerEntry."Document Type";
                     TmpItemLedgerEntry.Insert();
                 end;
@@ -551,7 +551,7 @@
         end;
     end;
 
-    local procedure GetInvoicedItems(PeriodStartDate: Date; PeriodEndDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; SellToCustomerNo: Code[20])
+    local procedure GetInvoicedItems(PeriodStartDate: Date; PeriodEndDate: Date; ItemNo: Code[20]; ParamVariantCode: Code[10]; LocationCode: Code[10]; SellToCustomerNo: Code[20])
     var
         ValueEntry: Record "Value Entry";
     begin
@@ -561,7 +561,7 @@
 
         ValueEntry.SetFilter("Item Ledger Entry Type", '=%1', ValueEntry."Item Ledger Entry Type"::Sale);
         ValueEntry.SetFilter("Item No.", '=%1', ItemNo);
-        ValueEntry.SetFilter("Variant Code", '=%1', VariantCode);
+        ValueEntry.SetFilter("Variant Code", '=%1', ParamVariantCode);
         if (LocationCode <> '') then
             ValueEntry.SetFilter("Location Code", '=%1', LocationCode);
         ValueEntry.SetFilter("Source Type", '=%1', ValueEntry."Source Type"::Customer);
@@ -572,7 +572,7 @@
         if (ValueEntry.FindSet()) then begin
             repeat
                 TmpValueEntry.SetFilter("Item No.", '=%1', ItemNo);
-                TmpValueEntry.SetFilter("Variant Code", '=%1', VariantCode);
+                TmpValueEntry.SetFilter("Variant Code", '=%1', ParamVariantCode);
                 TmpValueEntry.SetFilter("Document Type", '=%1', ValueEntry."Document Type");
 
                 if (not TmpValueEntry.FindFirst()) then begin
@@ -580,7 +580,7 @@
                     TmpValueEntry.Init();
                     TmpValueEntry."Entry No." := TmpValueEntry.Count() + 1;
                     TmpValueEntry."Item No." := ItemNo;
-                    TmpValueEntry."Variant Code" := VariantCode;
+                    TmpValueEntry."Variant Code" := ParamVariantCode;
                     TmpValueEntry."Document Type" := ValueEntry."Document Type";
                     TmpValueEntry.Insert();
                 end;

@@ -507,30 +507,30 @@
     end;
 
 
-    procedure ItemAvailabilityByPeriod(var ItemAvailabilityByPeriod: XMLport "NPR M2 Item Availab. By Period")
+    procedure ItemAvailabilityByPeriod(var ItemAvailabilityByPeriodXmlPort: XMLport "NPR M2 Item Availab. By Period")
     begin
-        ItemAvailabilityByPeriod.Import();
-        ItemAvailabilityByPeriod.CalculateAvailability();
+        ItemAvailabilityByPeriodXmlPort.Import();
+        ItemAvailabilityByPeriodXmlPort.CalculateAvailability();
         // All logic in XML port to generate output on export
     end;
 
-    procedure CustomerItemByPeriod(var CustomerItemByPeriod: XMLport "NPR M2 Customer Item By Period")
+    procedure CustomerItemByPeriod(var CustomerItemByPeriodXmlPort: XMLport "NPR M2 Customer Item By Period")
     begin
-        CustomerItemByPeriod.Import();
-        CustomerItemByPeriod.ValidateRequest();
+        CustomerItemByPeriodXmlPort.Import();
+        CustomerItemByPeriodXmlPort.ValidateRequest();
         // All logic in XML port to generate output on export
     end;
 
-    procedure EstimateDeliveryDate(var EstimateDeliveryDate: XMLport "NPR M2 Estimate Delivery Date")
+    procedure EstimateDeliveryDate(var EstimateDeliveryDateXmlPort: XMLport "NPR M2 Estimate Delivery Date")
     begin
-        EstimateDeliveryDate.Import();
-        EstimateDeliveryDate.PrepareResult();
+        EstimateDeliveryDateXmlPort.Import();
+        EstimateDeliveryDateXmlPort.PrepareResult();
     end;
 
-    procedure GetWorkingDayCalendar(var GetWorkingDayCalendar: XMLport "NPR M2 Get WorkingDay Calendar")
+    procedure GetWorkingDayCalendar(var GetWorkingDayCalendarXmlPort: XMLport "NPR M2 Get WorkingDay Calendar")
     begin
-        GetWorkingDayCalendar.Import();
-        GetWorkingDayCalendar.PrepareResponse();
+        GetWorkingDayCalendarXmlPort.Import();
+        GetWorkingDayCalendarXmlPort.PrepareResponse();
     end;
 
     #region Events

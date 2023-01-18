@@ -71,7 +71,7 @@ xmlport 6151199 "NPR NpCs Local Inventory"
         exit(Inventory);
     end;
 
-    local procedure Sku2ItemVariant(Sku: Text; var ItemVariant: Record "Item Variant")
+    local procedure Sku2ItemVariant(ParamSku: Text; var ItemVariant: Record "Item Variant")
     var
         ItemReference: Record "Item Reference";
         NpCsDocumentMapping: Record "NPR NpCs Document Mapping";
@@ -80,7 +80,7 @@ xmlport 6151199 "NPR NpCs Local Inventory"
         Position: Integer;
         ItemRefNo: Text;
     begin
-        ItemVariantNo := UpperCase(Sku);
+        ItemVariantNo := UpperCase(ParamSku);
         Position := StrPos(ItemVariantNo, '_');
         if Position > 0 then begin
             VariantCode := CopyStr(ItemVariantNo, Position + 1);
@@ -92,9 +92,9 @@ xmlport 6151199 "NPR NpCs Local Inventory"
         if ItemVariant.Find() then
             exit;
 
-        ItemRefNo := Sku;
-        if StrLen(Sku) <= MaxStrLen(NpCsDocumentMapping."From No.") then begin
-            NpCsDocumentMapping.SetRange("From No.", Sku);
+        ItemRefNo := ParamSku;
+        if StrLen(ParamSku) <= MaxStrLen(NpCsDocumentMapping."From No.") then begin
+            NpCsDocumentMapping.SetRange("From No.", ParamSku);
             NpCsDocumentMapping.SetRange(Type, NpCsDocumentMapping.Type::"Item Cross Reference No.");
             NpCsDocumentMapping.SetFilter("To No.", '<>%1', '');
             if NpCsDocumentMapping.FindFirst() then

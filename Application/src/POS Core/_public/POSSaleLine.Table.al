@@ -2361,7 +2361,7 @@
         exit(GetUnitCostLCY(false));
     end;
 
-    local procedure GetUnitCostLCY(Silent: Boolean): Decimal
+    local procedure GetUnitCostLCY(IsSilent: Boolean): Decimal
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
         ItemTrackingCode: Record "Item Tracking Code";
@@ -2390,7 +2390,7 @@
                 ItemLedgerEntry.SetRange("Item No.", "No.");
                 ItemLedgerEntry.SetRange("Serial No.", "Serial No.");
                 if not ItemLedgerEntry.FindFirst() then begin
-                    if not Silent then
+                    if not IsSilent then
                         Message(TxtNoSerial, "Serial No.");
                     exit(0);
                 end;

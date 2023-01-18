@@ -388,27 +388,27 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
         LoyaltyPointManagement.CalculatePointsForTransactions(Membership."Entry No.", MembershipLoyaltyJnl.DocumentDate, MembershipLoyaltyJnl.ItemNo, '', MembershipLoyaltyJnl.Quantity, MembershipLoyaltyJnl.AmountInclVAT, false, AwardedAmount, AwardedPoints, PointsEarned, RuleReference);
     end;
 
-    local procedure ExcludeVat(AmountInclVat: Decimal; ItemNo: Code[20]) AmountBase: Decimal
+    local procedure ExcludeVat(ParamAmountInclVat: Decimal; ParamItemNo: Code[20]) AmountBase: Decimal
     var
         Item: Record "Item";
         VatPostingSetup: Record "VAT Posting Setup";
     begin
         // Hard error on missing data
-        Item.Get(ItemNo);
+        Item.Get(ParamItemNo);
         VatPostingSetup.SetFilter("VAT Bus. Posting Group", '=%1', Item."VAT Bus. Posting Gr. (Price)");
         VatPostingSetup.SetFilter("VAT Prod. Posting Group", '=%1', Item."VAT Prod. Posting Group");
         VatPostingSetup.FindFirst();
 
-        AmountBase := AmountInclVat / ((100 + VatPostingSetup."VAT %") / 100.0);
+        AmountBase := ParamAmountInclVat / ((100 + VatPostingSetup."VAT %") / 100.0);
     end;
 
-    local procedure IncludeVat(AmountBase: Decimal; ItemNo: Code[20]) AmountInclVat: Decimal
+    local procedure IncludeVat(AmountBase: Decimal; ParamItemNo: Code[20]) AmountInclVat: Decimal
     var
         Item: Record "Item";
         VatPostingSetup: Record "VAT Posting Setup";
     begin
         // Hard error on missing data
-        Item.Get(ItemNo);
+        Item.Get(ParamItemNo);
         VatPostingSetup.SetFilter("VAT Bus. Posting Group", '=%1', Item."VAT Bus. Posting Gr. (Price)");
         VatPostingSetup.SetFilter("VAT Prod. Posting Group", '=%1', Item."VAT Prod. Posting Group");
         VatPostingSetup.FindFirst();
@@ -416,7 +416,7 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
         AmountInclVat := AmountBase * ((100 + VatPostingSetup."VAT %") / 100.0);
     end;
 
-    local procedure MembershipLookup(var ExternalMembershipNo: Text): Boolean
+    local procedure MembershipLookup(var ParamExternalMembershipNo: Text): Boolean
     var
         Membership: Record "NPR MM Membership";
         MembershipListPage: Page "NPR MM Memberships";
@@ -431,7 +431,7 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
             exit(false);
 
         MembershipListPage.GetRecord(Membership);
-        ExternalMembershipNo := Membership."External Membership No.";
+        ParamExternalMembershipNo := Membership."External Membership No.";
         exit(true);
     end;
 }

@@ -81,37 +81,37 @@
         key(Key1; Status, "Send on Date Time")
         { }
     }
-    procedure SetMessage(Message: Text)
+    procedure SetMessage(ParamMessage: Text)
     var
         OutStr: OutStream;
     begin
         Rec.Message.CreateOutStream(OutStr);
-        Outstr.Write(Message);
+        Outstr.Write(ParamMessage);
     end;
 
-    procedure SetError(Message: Text)
+    procedure SetError(ParamMessage: Text)
     var
         OutStr: OutStream;
     begin
         Rec."Error Message".CreateOutStream(OutStr);
-        Outstr.Write(Message);
+        Outstr.Write(ParamMessage);
     end;
 
-    procedure GetMessage(var Message: Text)
+    procedure GetMessage(var ParamMessage: Text)
     var
         InStr: InStream;
     begin
         Rec.CalcFields(Message);
         Rec.Message.CreateInStream(InStr);
-        InStr.Read(Message);
+        InStr.Read(ParamMessage);
     end;
 
-    procedure GetSetError(var Message: Text)
+    procedure GetSetError(var ParamMessage: Text)
     var
         InStr: InStream;
     begin
         Rec.CalcFields("Error Message");
         Rec."Error Message".CreateInStream(InStr);
-        InStr.Read(Message);
+        InStr.Read(ParamMessage);
     end;
 }

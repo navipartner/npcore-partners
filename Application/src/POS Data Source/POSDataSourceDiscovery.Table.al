@@ -44,15 +44,15 @@
             Error(Text001);
     end;
 
-    procedure RegisterDataSource(Name: Code[50]; Description: Text)
+    procedure RegisterDataSource(ParamName: Code[50]; ParamDescription: Text)
     begin
         MakeSureRecIsTemporary();
 
-        Rec.Name := CopyStr(Name, 1, MaxStrLen(Rec.Name));
+        Rec.Name := CopyStr(ParamName, 1, MaxStrLen(Rec.Name));
         if Rec.Find() then
             Error(Text002, Rec.Name);
 
-        Rec.Description := CopyStr(Description, 1, MaxStrLen(Rec.Description));
+        Rec.Description := CopyStr(ParamDescription, 1, MaxStrLen(Rec.Description));
         Rec.Insert();
     end;
 

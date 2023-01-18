@@ -192,33 +192,33 @@
     end;
 
     [Obsolete('Delete when final v1/v2 workflow is gone')]
-    procedure DiscoverAction("Code": Code[20]; Description: Text[250]; Version: Text[30]; Type: Integer; AllowedInstances: Option): Boolean
+    procedure DiscoverAction(ParamCode: Code[20]; ParamDescription: Text[250]; ParamVersion: Text[30]; ParamType: Integer; AllowedInstances: Option): Boolean
     var
         xPOSAction: Record "NPR POS Action";
     begin
-        if (ActionInRefresh <> '') and (ActionInRefresh <> Code) then
+        if (ActionInRefresh <> '') and (ActionInRefresh <> ParamCode) then
             exit(false);
 
-        MakeSureDiscoveryIsAllowed(Code);
+        MakeSureDiscoveryIsAllowed(ParamCode);
         Version20 := false;
-        ActionUpdateRequired := ActionUpdateCheck(Code, Version);
+        ActionUpdateRequired := ActionUpdateCheck(ParamCode, ParamVersion);
         if not ActionUpdateRequired then
-            UpdateMLDescription(Code, Description);
+            UpdateMLDescription(ParamCode, ParamDescription);
 
         if not (IsTemporary or ActionUpdateRequired) then
             exit(false);
 
         if ActionUpdateRequired then
-            DeleteParameters(Code);
+            DeleteParameters(ParamCode);
 
-        if not xPOSAction.Get(Code) then
+        if not xPOSAction.Get(ParamCode) then
             xPOSAction.Init();
 
         Init();
-        Rec.Code := Code;
-        Rec.Description := Description;
-        Rec.Version := Version;
-        Rec.Type := Type;
+        Rec.Code := ParamCode;
+        Rec.Description := ParamDescription;
+        Rec.Version := ParamVersion;
+        Rec.Type := ParamType;
         Rec."Blocking UI" := true;
         Rec.Blocked := xPOSAction.Blocked;
 
@@ -227,13 +227,13 @@
 
         if not Insert() then;
 
-        if (ActionInRefresh = Code) then
+        if (ActionInRefresh = ParamCode) then
             Modify();
 
         if Rec.Type <> Rec.Type::BackEnd then begin
             Clear(WorkflowObj);
-            WorkflowObj.SetName(Code);
-            ActionInDiscovery := Code;
+            WorkflowObj.SetName(ParamCode);
+            ActionInDiscovery := ParamCode;
         end else
             InitializeWorkflowDiscovery();
 
@@ -244,31 +244,31 @@
     end;
 
     [Obsolete('Delete when final v1/v2 workflow is gone')]
-    procedure DiscoverAction20("Code": Code[20]; Description: Text[250]; Version: Text[32]): Boolean
+    procedure DiscoverAction20(ParamCode: Code[20]; ParamDescription: Text[250]; ParamVersion: Text[32]): Boolean
     var
         xPOSAction: Record "NPR POS Action";
     begin
-        if (ActionInRefresh <> '') and (ActionInRefresh <> Code) then
+        if (ActionInRefresh <> '') and (ActionInRefresh <> ParamCode) then
             exit(false);
 
-        MakeSureDiscoveryIsAllowed(Code);
+        MakeSureDiscoveryIsAllowed(ParamCode);
 
         Version20 := true;
-        ActionUpdateRequired := ActionUpdateCheck(Code, Version);
+        ActionUpdateRequired := ActionUpdateCheck(ParamCode, ParamVersion);
 
         if not (IsTemporary or ActionUpdateRequired) then
             exit(false);
 
         if ActionUpdateRequired then
-            DeleteParameters(Code);
+            DeleteParameters(ParamCode);
 
-        if not xPOSAction.Get(Code) then
+        if not xPOSAction.Get(ParamCode) then
             xPOSAction.Init();
 
         Init();
-        Rec.Code := Code;
-        Rec.Description := Description;
-        Rec.Version := Version;
+        Rec.Code := ParamCode;
+        Rec.Description := ParamDescription;
+        Rec.Version := ParamVersion;
         Rec."Workflow Engine Version" := '2.0';
         Rec."Blocking UI" := true;
         Rec.Blocked := xPOSAction.Blocked;
@@ -278,13 +278,13 @@
 
         if not Insert() then;
 
-        if (ActionInRefresh = Code) then
+        if (ActionInRefresh = ParamCode) then
             Modify();
 
         if Rec.Type <> Rec.Type::BackEnd then begin
             Clear(WorkflowObj);
-            WorkflowObj.SetName(Code);
-            ActionInDiscovery := Code;
+            WorkflowObj.SetName(ParamCode);
+            ActionInDiscovery := ParamCode;
             WorkflowObj.Content().Add('engineVersion', '2.0');
         end else
             InitializeWorkflowDiscovery();
@@ -296,14 +296,14 @@
     end;
 
     [Obsolete('Delete when final v1/v2 workflow is gone')]
-    local procedure ActionUpdateCheck("Code": Text; Version: Text): Boolean
+    local procedure ActionUpdateCheck(ParamCode: Text; ParamVersion: Text): Boolean
     var
         POSAction: Record "NPR POS Action";
     begin
-        POSAction.SetRange(Code, Code);
-        POSAction.SetRange(Version, Version);
+        POSAction.SetRange(Code, ParamCode);
+        POSAction.SetRange(Version, ParamVersion);
         if POSAction.IsEmpty then begin
-            TempUpdatedActions.Code := CopyStr(Code, 1, MaxStrLen(TempUpdatedActions.Code));
+            TempUpdatedActions.Code := CopyStr(ParamCode, 1, MaxStrLen(TempUpdatedActions.Code));
             TempUpdatedActions.Insert();
             exit(true);
         end;
@@ -321,7 +321,7 @@
     end;
 
     [Obsolete('Delete when final v1/v2 workflow is gone')]
-    procedure RegisterWorkflowStep(Label: Text; "Code": Text)
+    procedure RegisterWorkflowStep(Label: Text; ParamCode: Text)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
         WorkflowStep: JsonObject;
@@ -331,7 +331,7 @@
 
         RequireVersion10();
         WorkflowStep.Add('Label', Label);
-        WorkflowStep.Add('Code', Code);
+        WorkflowStep.Add('Code', ParamCode);
         WorkflowObj.Steps().Add(WorkflowStep);
     end;
 
@@ -354,7 +354,7 @@
     end;
 
     [Obsolete('Delete when final v1/v2 workflow is gone')]
-    procedure RegisterWorkflow20("Code": Text)
+    procedure RegisterWorkflow20(ParamCode: Text)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
         WorkflowStep: JsonObject;
@@ -362,9 +362,9 @@
         RequireVersion20();
 
         if Type = Type::BackEnd then
-            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text003, Code, Type));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text003, ParamCode, Type));
 
-        WorkflowStep.Add('Code', Code);
+        WorkflowStep.Add('Code', ParamCode);
         WorkflowObj.Steps().Add(WorkflowStep);
 
         StreamWorkflowToBlob();
@@ -525,9 +525,9 @@
     end;
 
     [Obsolete('Delete when final v1/v2 workflow is gone')]
-    procedure IsThisAction("Code": Code[20]): Boolean
+    procedure IsThisAction(ParamCode: Code[20]): Boolean
     begin
-        exit(Rec.Code = Code);
+        exit(Rec.Code = ParamCode);
     end;
 
     [Obsolete('Delete when final v1/v2 workflow is gone')]
@@ -755,13 +755,13 @@
     end;
 
     [Obsolete('Delete when final v1/v2 workflow is gone')]
-    local procedure UpdateMLDescription("Code": Code[20]; Description: Text[250])
+    local procedure UpdateMLDescription(ParamCode: Code[20]; ParamDescription: Text[250])
     var
         POSAction: Record "NPR POS Action";
     begin
-        if POSAction.Get(Code) then
-            if POSAction.Description <> Description then begin
-                POSAction.Description := Description;
+        if POSAction.Get(ParamCode) then
+            if POSAction.Description <> ParamDescription then begin
+                POSAction.Description := ParamDescription;
                 POSAction.Modify();
             end;
     end;

@@ -660,9 +660,9 @@
             gShowDeliverTo := TicketBOM.FindFirst();
     end;
 
-    internal procedure AllowQuantityChange(AllowQuantityChange: Boolean)
+    internal procedure AllowQuantityChange(IsQuantityChangeAllowed: Boolean)
     begin
-        gAllowQuantityChange := AllowQuantityChange;
+        gAllowQuantityChange := IsQuantityChangeAllowed;
     end;
 
     internal procedure FinalizeReservationRequest(FailWithError: Boolean; var ResponseMessage: Text): Integer
