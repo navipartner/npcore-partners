@@ -126,9 +126,9 @@ codeunit 6060025 "NPR Environment Mgt."
         if FirstTime then begin
             if not RecFound then
                 NPREnvironmentInfo.Init();
-            NPREnvironmentInfo."Environment Company Name" := CompanyName();
+            NPREnvironmentInfo."Environment Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(NPREnvironmentInfo."Environment Company Name"));
             NPREnvironmentInfo."Environment Database Name" := ActiveSession."Database Name";
-            NPREnvironmentInfo."Environment Tenant Name" := TenantId();
+            NPREnvironmentInfo."Environment Tenant Name" := CopyStr(TenantId(), 1, MaxStrLen(NPREnvironmentInfo."Environment Tenant Name"));
             NPREnvironmentInfo."Environment Type" := GetDefaultEnvironmentType();
             NPREnvironmentInfo."Environment Verified" := true;
             if RecFound then begin
@@ -155,9 +155,9 @@ codeunit 6060025 "NPR Environment Mgt."
         if NPREnvironmentInfo."Environment Template" and NPREnvironmentInfo."Environment Verified" then begin
             if (NPREnvironmentInfo."Environment Company Name" <> CompanyName()) or (NPREnvironmentInfo."Environment Database Name" <> ActiveSession."Database Name") or (NPREnvironmentInfo."Environment Tenant Name" <> TenantId()) then begin
                 NPREnvironmentInfo."Environment Template" := false;
-                NPREnvironmentInfo."Environment Company Name" := CompanyName();
+                NPREnvironmentInfo."Environment Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(NPREnvironmentInfo."Environment Company Name"));
                 NPREnvironmentInfo."Environment Database Name" := ActiveSession."Database Name";
-                NPREnvironmentInfo."Environment Tenant Name" := TenantId();
+                NPREnvironmentInfo."Environment Tenant Name" := CopyStr(TenantId(), 1, MaxStrLen(NPREnvironmentInfo."Environment Tenant Name"));
                 if NPREnvironmentInfo.Modify() then;
             end;
             exit(true);
@@ -190,9 +190,9 @@ codeunit 6060025 "NPR Environment Mgt."
             else
                 EnvironmentType := StrMenu(Caption_EnvironmentOption, 3, Caption_OptionMessage);
             if EnvironmentType > 0 then begin
-                NPREnvironmentInfo."Environment Company Name" := CompanyName();
+                NPREnvironmentInfo."Environment Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(NPREnvironmentInfo."Environment Company Name"));
                 NPREnvironmentInfo."Environment Database Name" := ActiveSession."Database Name";
-                NPREnvironmentInfo."Environment Tenant Name" := TenantId();
+                NPREnvironmentInfo."Environment Tenant Name" := CopyStr(TenantId(), 1, MaxStrLen(NPREnvironmentInfo."Environment Tenant Name"));
                 NPREnvironmentInfo."Environment Type" := "NPR Environment Type".FromInteger(EnvironmentType - 1);
                 NPREnvironmentInfo."Environment Verified" := true;
                 if NPREnvironmentInfo.Modify() then;
