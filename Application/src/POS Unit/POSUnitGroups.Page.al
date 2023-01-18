@@ -2,6 +2,7 @@ page 6059875 "NPR POS Unit Groups"
 {
     Extensible = False;
     Caption = 'POS Unit Groups';
+    ContextSensitiveHelpPage = 'retail/posunit/intro.html';
     PageType = List;
     ApplicationArea = NPRRetail;
     UsageCategory = Lists;

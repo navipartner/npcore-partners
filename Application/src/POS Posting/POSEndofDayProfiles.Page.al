@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS End of Day Profile';
-    ContextSensitiveHelpPage = 'retail/posunit/reference/POS_End_of_Day_Profile.html';
+    ContextSensitiveHelpPage = 'retail/pos_profiles/reference/POS_End_of_Day_Profile.html';
     PageType = List;
     UsageCategory = Administration;
 

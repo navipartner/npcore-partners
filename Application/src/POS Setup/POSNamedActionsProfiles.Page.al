@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Actions Profiles';
+    ContextSensitiveHelpPage = 'retail/pos_profiles/howto/Named_Action_Code.html';
     CardPageID = "NPR POS Named Actions Profile";
     ApplicationArea = NPRRetail;
     PageType = List;
