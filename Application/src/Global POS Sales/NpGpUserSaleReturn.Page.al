@@ -75,6 +75,13 @@
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Description 2"; Rec."Description 2")
+                {
+
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRRetail;
+                }
                 field(OriginalQuantity; OriginalQuantity)
                 {
 
@@ -113,6 +120,18 @@
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Currency Code field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Variant Code"; Rec."Variant Code")
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Customer No."; TempNpGpPOSSalesEntry."Customer No.")
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                     ApplicationArea = NPRRetail;
                 }
             }
