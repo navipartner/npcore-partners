@@ -84,6 +84,9 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
 
     procedure CreatePOSStore(var POSStore: Record "NPR POS Store"; NewRecordId: Integer)
     begin
+        if POSStore.Get(NewRecordId) then
+            exit;
+
         POSStore.Init();
         POSStore.Validate(Code, Format(NewRecordId));
         POSStore."POS Posting Profile" := 'DEFAULT';
@@ -120,6 +123,9 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
         POSPaymentBin: record "NPR POS Payment Bin";
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
     begin
+        if POSUnit.Get(NewRecordId) then
+            exit;
+
         POSUnit.Init();
         POSUnit.Validate("No.", Format(NewRecordId));
         POSUnit."POS Store Code" := POSStoreCode;
