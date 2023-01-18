@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Period Register List';
+    ContextSensitiveHelpPage = 'retail/posunit/intro.html';
     Editable = false;
     PageType = List;
     SourceTable = "NPR POS Period Register";

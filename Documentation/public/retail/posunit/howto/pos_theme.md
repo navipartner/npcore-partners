@@ -19,3 +19,5 @@ To create a POS theme, you need to do the following:
 ### Related links
 
 - [POS Self-Service Profile](../../pos_profiles/howto/pos_self_service_prof.md)
+- [Create a new POS unit](createnew.md)
+- [POS view profile (reference guide)](../../pos_profiles/reference/POS_view_profile.md)
