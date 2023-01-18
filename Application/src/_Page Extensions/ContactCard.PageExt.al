@@ -53,7 +53,32 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                     ToolTip = 'Specifies whether Magento Prices will be visible for the contact';
                     ApplicationArea = NPRRetail;
                 }
+                group("NPR First And Last Name")
+                {
+                    ShowCaption = false;
+                    Visible = FirstAndSurNameVisible;
+
+                    field("NPR First Name"; Rec."First Name")
+                    {
+                        Importance = Additional;
+                        ToolTip = 'Specifies the First Name of the contact and allows additional name details.';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("NPR Surname"; Rec.Surname)
+                    {
+                        Importance = Additional;
+                        ToolTip = 'Specifies the Surname of the contact and allows additional name details.';
+                        ApplicationArea = NPRRetail;
+                    }
+                }
             }
+        }
+        modify(Type)
+        {
+            trigger OnAfterValidate()
+            begin
+                FirstAndSurNameVisible := Rec.Type = Rec.Type::Person;
+            end;
         }
     }
     actions
@@ -121,5 +146,12 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
             }
         }
     }
+    trigger OnOpenPage()
+    begin
+        FirstAndSurNameVisible := Rec.Type = Rec.Type::Person;
+    end;
+
+    var
+        FirstAndSurNameVisible: Boolean;
 }
 
