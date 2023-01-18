@@ -1,6 +1,7 @@
 page 6150771 "NPR POS HTML Disp. Prof. Card"
 {
     PageType = Card;
+    ContextSensitiveHelpPage = 'retail/pos_profiles/howto/POS_HTMLDisplay_profile.html';
     UsageCategory = Administration;
     SourceTable = "NPR POS HTML Disp. Prof.";
     Extensible = false;
@@ -93,10 +94,6 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                 ApplicationArea = NPRRetail;
                 Image = Import;
                 ToolTip = 'Upload HTML to be used for Costumer Display.';
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
 
                 trigger OnAction()
                 var
@@ -122,10 +119,6 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                 ApplicationArea = NPRRetail;
                 Image = Export;
                 ToolTip = 'Download HTML to be used for Costumer Display.';
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
 
                 trigger OnAction()
                 var
@@ -143,6 +136,36 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
 
                 end;
             }
+            action("Delete HTML")
+            {
+                ApplicationArea = NPRRetail;
+                Image = Delete;
+                ToolTip = 'Delete HTML';
+
+                trigger OnAction()
+                begin
+                    if (Rec."HTML Blob".HasValue() and Rec.CalcFields("HTML Blob")) then
+                        Clear(Rec."HTML Blob");
+                end;
+            }
+            action(DeployPackageFromAzureBlob)
+            {
+                Caption = 'Download Template Data';
+                Image = ImportDatabase;
+
+                //RunObject = page "NPR HTML Disp Prof Azure";
+                ToolTip = 'Downloads template data.';
+                ApplicationArea = NPRRetail;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                begin
+                    GetHtmlFile();
+                end;
+            }
         }
         area(Navigation)
         {
@@ -158,19 +181,38 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
             }
-            action("POS Unit List")
-            {
-                Caption = 'POS Unit List';
-                Image = Administration;
-                RunObject = Page "NPR POS Unit List";
-                ToolTip = 'Go to POS Unit list';
-                ApplicationArea = NPRRetail;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-            }
         }
 
     }
+    local procedure GetHtmlFile()
+    var
+        rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
+        packageList: List of [Text];
+        TempRetailList: Record "NPR Retail List" temporary;
+        package: Text;
+        outStream: OutStream;
+        Client: HttpClient;
+        ResponseMessage: HttpResponseMessage;
+        htmlContent: Text;
+    begin
+        rapidstartBaseDataMgt.GetAllPackagesInBlobStorage('https://npretailbasedata.blob.core.windows.net/pos-html-profile/?restype=container&comp=list', packageList);
+        foreach package in packageList do begin
+            TempRetailList.Number += 1;
+            TempRetailList.Value := CopyStr(package, 1, MaxStrLen(TempRetailList.Value));
+            TempRetailList.Choice := CopyStr(package, 1, MaxStrLen(TempRetailList.Choice));
+            TempRetailList.Insert();
+        end;
+
+        if Page.Runmodal(Page::"NPR Retail List", TempRetailList) <> Action::LookupOK then
+            exit;
+        if (not Client.Get('https://npretailbasedata.blob.core.windows.net/pos-html-profile/' + TempRetailList.Value, ResponseMessage)) then
+            Error('Failed download: %1', ResponseMessage.ReasonPhrase);
+        if (not ResponseMessage.IsSuccessStatusCode) then
+            Error('Web servie was not successfull: %1', ResponseMessage.ReasonPhrase);
+        if not (ResponseMessage.Content.ReadAs(htmlContent)) then
+            Error('Coudl not read the content of the file');
+        Rec."HTML Blob".CreateOutStream(outStream);
+        outStream.WriteText(htmlContent);
+        Rec.Modify();
+    end;
 }

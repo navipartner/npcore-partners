@@ -2,7 +2,8 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
 {
     Access = Internal;
 
-
+    var
+        MsgRememberInputLabel: Label 'Remember to ask for input on the second display.', Comment = 'Input reminder', MaxLength = 100;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterInitializeAtLogin', '', true, true)]
     local procedure OnAfterInitializeAtLogin(POSUnit: Record "NPR POS Unit")
@@ -21,6 +22,8 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
     local procedure OnAfterInitSale(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSUnit: Record "NPR POS Unit";
+        HtmlDisplayReq: Codeunit "NPR POS Html Disp. Req";
+        ReceiptContent: JsonObject;
         Context: JsonObject;
         JsParam: JsonObject;
     begin
@@ -28,6 +31,8 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         if (POSUnit."POS HTML Display Profile" = '') then
             exit;
         JsParam.Add('JSAction', 'UpdateReceipt');
+        ReceiptContent := HtmlDisplayReq.GetReceiptContent(POSUnit."No.", SaleHeader."Sales Ticket No.", SaleHeader.Date);
+        JsParam.Add('ReceiptContent', ReceiptContent);
         Context.Add('DisplayAction', 'SendJS');
         Context.Add('JSParameter', JsParam);
         SendRequest(POSUnit."No.", Context, False);
@@ -189,12 +194,11 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
     local procedure OnHardwareConnectorResponse(RequestId: Guid; Response: JsonToken; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSUnit: Record "NPR POS Unit";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleRec: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         CostumerInput: Record "NPR POS Costumer Input";
         ValidatePage: Page "NPR POS HTML Validate Input";
         HwcGUID: Codeunit "NPR POS HTML Disp. Session";
+        Setup: Codeunit "NPR POS Setup";
         ResponseObj: JsonToken;
         InputObj: JsonToken;
         PhoneObj: JsonToken;
@@ -204,9 +208,8 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
     begin
         if (not HwcGUID.PopGuid(RequestId)) then
             exit;
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(POSSaleRec);
-        POSUnit.Get(POSSaleRec."Register No.");
+        POSSession.GetSetup(Setup);
+        POSUnit.Get(Setup.GetPOSUnitNo());
         if (POSUnit."POS HTML Display Profile" = '') then
             exit;
         if (
@@ -246,21 +249,19 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
     local procedure SendInputSignalToHWC()
     var
         POSSession: Codeunit "NPR POS Session";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleRec: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
         HtmlProf: Record "NPR POS HTML Disp. Prof.";
+        Setup: Codeunit "NPR POS Setup";
         Context: JsonObject;
         JsParam: JsonObject;
     begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(POSSaleRec);
+        POSSession.GetSetup(Setup);
         POSEntry.Reset();
-        POSEntry.SetFilter(POSEntry."POS Unit No.", POSSaleRec."Register No.");
+        POSEntry.SetFilter(POSEntry."POS Unit No.", Setup.GetPOSUnitNo());
         if (not POSEntry.FindLast()) then
             exit;
-        if (not POSUnit.Get(POSSaleRec."Register No.")) then
+        if (not POSUnit.Get(Setup.GetPOSUnitNo())) then
             exit;
         if (not HtmlProf.Get(POSUnit."POS HTML Display Profile")) then
             exit;
@@ -272,7 +273,8 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         JsParam.Add('JSAction', 'GetInput');
         JsParam.Add('InputType', Format(HtmlProf."CIO: Money Back"));
         Context.Add('JSParameter', JsParam);
-        SendRequest(POSSaleRec."Register No.", Context, True);
+        Message(MsgRememberInputLabel);
+        SendRequest(POSUnit."No.", Context, True);
     end;
 
     local procedure SendRequest(POSUnitCode: Code[10]; Context: JsonObject; AwaitResponse: Boolean)
