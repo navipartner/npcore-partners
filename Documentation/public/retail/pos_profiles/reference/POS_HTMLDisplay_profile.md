@@ -12,7 +12,7 @@ Each POS unit can have a different display view. The following fields can be set
 | **Display Content Code** | Specifies the **Display Content Code** group that will be used for this POS HTML Display Profile. Display Content Codes are groupings of either images, videos, or URLs. This is where the media displayed on the customer display is uploaded or linked to. |
 | **Costumer Input Option: Money Back** | Specifies the input method for ending a sale with a negative total i.e. returning money to the costumer. It can be **None** or **Phone & Signature**. |
 
-![POS_display](../images/POS_HTMLDisplay_1.png)
+![POS_display](../images/html_profile_new_filled.png)
 
 
 Once the POS HTML Display Profile is defined, you can set it on the POS unit of your choice by adding the predefined POS HTML Display Profile in the **POS HTML Display Profile** field.
