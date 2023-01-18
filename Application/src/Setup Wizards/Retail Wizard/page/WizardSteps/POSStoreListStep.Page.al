@@ -204,7 +204,7 @@
         NoOfPOSStoresToCreate: Integer;
         StartingNoStore: Code[10];
 
-    internal procedure CreateTempPOSStores(NoOfPOSStores: Integer; StartingNo: Code[10]; var POSStoreTemp: Record "NPR POS Store")
+    internal procedure CreateTempPOSStores(NoOfPOSStores: Integer; ParamStartingNo: Code[10]; var POSStoreTemp: Record "NPR POS Store")
     var
         POSStore: Record "NPR POS Store";
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
@@ -212,7 +212,7 @@
         LastNoUsed: Code[10];
     begin
         Rec.Reset();
-        LastNoUsed := StartingNo;
+        LastNoUsed := ParamStartingNo;
 
         for i := 1 to NoOfPOSStores do begin
             Rec.Init();

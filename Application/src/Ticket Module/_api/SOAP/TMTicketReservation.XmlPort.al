@@ -389,11 +389,11 @@ xmlport 6060114 "NPR TM Ticket Reservation"
         until (TicketReservationRequest.Next() = 0);
     end;
 
-    local procedure IsRescheduleAllowed(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]): Boolean
+    local procedure IsRescheduleAllowed(ItemNo: Code[20]; VariantCode: Code[10]; ParamAdmissionCode: Code[20]): Boolean
     var
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
     begin
-        if not TicketAdmissionBOM.Get(ItemNo, VariantCode, AdmissionCode) then
+        if not TicketAdmissionBOM.Get(ItemNo, VariantCode, ParamAdmissionCode) then
             exit(false);
         case TicketAdmissionBOM."Reschedule Policy" of
             TicketAdmissionBOM."Reschedule Policy"::NOT_ALLOWED:
@@ -403,13 +403,13 @@ xmlport 6060114 "NPR TM Ticket Reservation"
         end;
     end;
 
-    local procedure FindExternalAdmissionScheduleEntryNo(TicketNo: Code[20]; AdmissionCode: Code[20]): Integer
+    local procedure FindExternalAdmissionScheduleEntryNo(TicketNo: Code[20]; ParamAdmissionCode: Code[20]): Integer
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
         TicketAccessEntry.SetRange("Ticket No.", TicketNo);
-        TicketAccessEntry.SetRange("Admission Code", AdmissionCode);
+        TicketAccessEntry.SetRange("Admission Code", ParamAdmissionCode);
         if TicketAccessEntry.FindFirst() then begin
             DetTicketAccessEntry.SetRange("Ticket Access Entry No.", TicketAccessEntry."Entry No.");
             if DetTicketAccessEntry.FindLast() then

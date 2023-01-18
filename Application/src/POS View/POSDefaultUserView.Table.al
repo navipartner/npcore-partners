@@ -59,17 +59,17 @@
         }
     }
 
-    procedure SetDefault(Type: Option Login,Sale,Payment,Balance,Locked; RegisterNo: Code[10]; ViewCode: Code[10])
+    procedure SetDefault(ParamType: Option Login,Sale,Payment,Balance,Locked; RegisterNo: Code[10]; ViewCode: Code[10])
     var
         DefaultView: Record "NPR POS Default User View";
     begin
-        DefaultView.SetRange(Type, Type);
+        DefaultView.SetRange(Type, ParamType);
         DefaultView.SetRange("Register No.", RegisterNo);
         DefaultView.SetRange("User Name", UserId);
         if not DefaultView.FindFirst() then begin
             if ViewCode = '' then
                 exit;
-            DefaultView.Type := Type;
+            DefaultView.Type := ParamType;
             DefaultView."Register No." := RegisterNo;
             DefaultView."User Name" := CopyStr(UserId, 1, MaxStrLen(DefaultView."User Name"));
             DefaultView.Insert();
@@ -84,11 +84,11 @@
         Rec := DefaultView;
     end;
 
-    procedure GetDefault(Type: Option Login,Sale,Payment,Balance,Locked; RegisterNo: Code[10]): Boolean
+    procedure GetDefault(ParamType: Option Login,Sale,Payment,Balance,Locked; RegisterNo: Code[10]): Boolean
     var
         DefaultView: Record "NPR POS Default User View";
     begin
-        DefaultView.SetRange(Type, Type);
+        DefaultView.SetRange(Type, ParamType);
         DefaultView.SetRange("Register No.", RegisterNo);
         DefaultView.SetRange("User Name", UserId);
         if DefaultView.FindFirst() then begin

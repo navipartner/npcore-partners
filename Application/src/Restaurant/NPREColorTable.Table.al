@@ -379,7 +379,7 @@
         InsertColor('ffffff', 'White');
     END;
 
-    local procedure InsertColor(RGBHexCode: Code[6]; ColorDescription: Text[30])
+    local procedure InsertColor(ParamRGBHexCode: Code[6]; ColorDescription: Text[30])
     var
         NPREColorTable: Record "NPR NPRE Color Table";
     begin
@@ -389,7 +389,7 @@
             NPREColorTable.Insert();
         end;
 
-        NPREColorTable."RGB Color Code (Hex)" := RGBHexCode;
+        NPREColorTable."RGB Color Code (Hex)" := ParamRGBHexCode;
         NPREColorTable.Modify();
     end;
 

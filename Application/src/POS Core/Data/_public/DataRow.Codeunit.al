@@ -158,11 +158,11 @@
         exit(true);
     end;
 
-    procedure Constructor(Position: Text);
+    procedure Constructor(ParamPosition: Text);
     begin
         Clear(_json);
 
-        _json.Add(LabelPosition, Position);
+        _json.Add(LabelPosition, ParamPosition);
         _json.Get(LabelPosition, _position);
 
         _json.Add(LabelNegative, false);

@@ -104,11 +104,11 @@ table 6014650 "NPR Stripe Subscription"
         exit(StripeWebService.UpdateSubscription(StripeCustomer, StripePlan, Rec));
     end;
 
-    internal procedure UpdateSubscriptionUsage(Quantity: Integer): Boolean
+    internal procedure UpdateSubscriptionUsage(ParamQuantity: Integer): Boolean
     var
         StripeWebService: Codeunit "NPR Stripe Web Service";
     begin
-        exit(StripeWebService.UpdateSubscriptionUsage(Rec, Quantity));
+        exit(StripeWebService.UpdateSubscriptionUsage(Rec, ParamQuantity));
     end;
 
     internal procedure UpdateLastSubscriptionPeriodStartOnStripeSetup()
@@ -174,9 +174,9 @@ table 6014650 "NPR Stripe Subscription"
         exit(StripeTaxRate.Id)
     end;
 
-    internal procedure GetFormDataForUpdateSubscriptionUsage(Quantity: Integer) Data: Text
+    internal procedure GetFormDataForUpdateSubscriptionUsage(ParamQuantity: Integer) Data: Text
     begin
-        Data := 'quantity=' + Format(Quantity);
+        Data := 'quantity=' + Format(ParamQuantity);
     end;
 
     internal procedure PopulateFromJson(Data: JsonObject)

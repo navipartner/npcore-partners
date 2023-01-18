@@ -146,10 +146,10 @@ xmlport 6060111 "NPR TM Ticket Statistics 2-Dim"
         StartTime: Time;
         TempFactDimension2: Record "NPR TM Ticket Access Fact" temporary;
 
-    internal procedure GetRequest(var FromDate: Date; var UntilDate: Date; var Dim1: Text; var Dim2: Text)
+    internal procedure GetRequest(var ParamFromDate: Date; var ParamUntilDate: Date; var Dim1: Text; var Dim2: Text)
     begin
-        FromDate := RequestFromDate;
-        UntilDate := RequestUntilDate;
+        ParamFromDate := RequestFromDate;
+        ParamUntilDate := RequestUntilDate;
         Dim1 := DimensionCode1;
         Dim2 := DimensionCode2;
 

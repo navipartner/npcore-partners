@@ -270,7 +270,7 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
         tmpMembershipResponse.DeleteAll();
     end;
 
-    internal procedure AddResponse(MembershipEntryNo: Integer; MemberEntryNo: Integer; AdmissionCode: Code[20])
+    internal procedure AddResponse(MembershipEntryNo: Integer; MemberEntryNo: Integer; ParamAdmissionCode: Code[20])
     var
         Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
@@ -289,9 +289,9 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
             exit;
         end;
 
-        if (AdmissionCode <> '') then
-            if (not AdmissionSetup.Get(AdmissionCode)) then begin
-                AddErrorResponse(StrSubstNo(ResponseLbl, AdmissionCode));
+        if (ParamAdmissionCode <> '') then
+            if (not AdmissionSetup.Get(ParamAdmissionCode)) then begin
+                AddErrorResponse(StrSubstNo(ResponseLbl, ParamAdmissionCode));
                 exit;
             end;
 
@@ -333,7 +333,7 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
             UNTIL (MembershipEntry.NEXT() = 0);
         END;
 
-        xml_admissioncode := AdmissionCode;
+        xml_admissioncode := ParamAdmissionCode;
 
         tmpMembershipResponse.TransferFields(Membership, true);
         if (tmpMembershipResponse.Insert()) then;
@@ -341,8 +341,8 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
         guestcardinality := '9999';
         MembershipAdmissionSetup.SetFilter("Membership  Code", '=%1', Membership."Membership Code");
 
-        if (AdmissionCode <> '') then
-            MembershipAdmissionSetup.SetFilter("Admission Code", '=%1', AdmissionCode);
+        if (ParamAdmissionCode <> '') then
+            MembershipAdmissionSetup.SetFilter("Admission Code", '=%1', ParamAdmissionCode);
 
         if (MembershipAdmissionSetup.FindSet()) then begin
             repeat

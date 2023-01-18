@@ -42,15 +42,15 @@
     end;
 
 
-    procedure Initialize(Code: Text; Name: Text; FontFace: Text; Prefix: Text; CssStream: InStream; WoffStream: InStream)
+    procedure Initialize(ParamCode: Text; ParamName: Text; ParamFontFace: Text; ParamPrefix: Text; CssStream: InStream; WoffStream: InStream)
     var
         Base64: Codeunit "Base64 Convert";
         NpRegex: Codeunit "NPR RegEx";
     begin
-        _code := Code;
-        _name := Name;
-        _fontFace := FontFace;
-        _prefix := Prefix;
+        _code := ParamCode;
+        _name := ParamName;
+        _fontFace := ParamFontFace;
+        _prefix := ParamPrefix;
         _woff := 'data:application/x-font-woff;charset=utf-8;base64,' + Base64.ToBase64(WoffStream);
 
         CssStream.ReadText(_css);

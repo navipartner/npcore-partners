@@ -1,6 +1,7 @@
 ﻿codeunit 6150894 "NPR Data Column" implements "NPR IJsonSerializable"
 {
     Access = Internal;
+
     var
         _constructed: Boolean;
         _json: JsonObject;
@@ -139,31 +140,31 @@
     end;
 
     procedure Constructor(
-        FieldId: Text;
-        Caption: Text;
-        DataType: Enum "NPR Data Type";
-        Ordinal: Integer;
-        Visible: Boolean
+        ParamFieldId: Text;
+        ParamCaption: Text;
+        ParamDataType: Enum "NPR Data Type";
+        ParamOrdinal: Integer;
+        ParamVisible: Boolean
     );
     begin
         Initialize();
 
-        _json.Add(LabelFieldId, FieldId);
+        _json.Add(LabelFieldId, ParamFieldId);
         _json.Get(LabelFieldId, _fieldId);
 
-        _json.Add(LabelDataType, DataType.AsInteger());
+        _json.Add(LabelDataType, ParamDataType.AsInteger());
         _json.Get(LabelDataType, _dataType);
 
         _json.Add(LabelFormat, '');
         _json.Get(LabelFormat, _format);
 
-        _json.Add(LabelOrdinal, Ordinal);
+        _json.Add(LabelOrdinal, ParamOrdinal);
         _json.Get(LabelOrdinal, _ordinal);
 
-        _json.Add(LabelCaption, Caption);
+        _json.Add(LabelCaption, ParamCaption);
         _json.Get(LabelCaption, _caption);
 
-        _json.Add(LabelVisible, Visible);
+        _json.Add(LabelVisible, ParamVisible);
         _json.Get(LabelVisible, _visible);
 
         _json.Add(LabelFormula, '');

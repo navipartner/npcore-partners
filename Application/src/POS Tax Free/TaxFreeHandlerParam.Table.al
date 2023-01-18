@@ -89,9 +89,9 @@
     end;
 
     [TryFunction]
-    procedure TryGetParameterValue(Param: Text; var Value: Variant)
+    procedure TryGetParameterValue(Param: Text; var ParamValue: Variant)
     begin
-        GetParameterValue(Param, Value);
+        GetParameterValue(Param, ParamValue);
     end;
 
     procedure GetParameterValue(Param: Text; var pValue: Variant)

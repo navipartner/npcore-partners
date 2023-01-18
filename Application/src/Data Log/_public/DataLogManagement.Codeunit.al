@@ -47,25 +47,25 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseInsert', '', true, false)]
-    local procedure OnDatabaseInsert(RecRef: RecordRef)
+    local procedure SystemEventWrapperOnDatabaseInsert(RecRef: RecordRef)
     begin
         LogDatabaseInsert(RecRef);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseModify', '', true, false)]
-    local procedure OnDatabaseModify(RecRef: RecordRef)
+    local procedure SystemEventWrapperOnDatabaseModify(RecRef: RecordRef)
     begin
         LogDatabaseModify(RecRef);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseDelete', '', true, false)]
-    local procedure OnDatabaseDelete(RecRef: RecordRef)
+    local procedure SystemEventWrapperOnDatabaseDelete(RecRef: RecordRef)
     begin
         LogDatabaseDelete(RecRef);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterOnDatabaseRename', '', true, false)]
-    local procedure OnDatabaseRename(RecRef: RecordRef; xRecRef: RecordRef)
+    local procedure SystemEventWrappeOnDatabaseRename(RecRef: RecordRef; xRecRef: RecordRef)
     begin
         LogDatabaseRename(RecRef, xRecRef);
     end;
@@ -228,7 +228,7 @@
         RecRef.Open(TableID, false);
         if RecRef.FindSet(false) then
             repeat
-                OnDatabaseInsert(RecRef);
+                SystemEventWrapperOnDatabaseInsert(RecRef);
             until RecRef.Next() = 0;
         RecRef.Close();
     end;

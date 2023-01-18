@@ -268,11 +268,11 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
         OnValidateParameterValue(Rec);
     end;
 
-    internal procedure GetOptionInt(Value: Text; OptionStringIn: Text) Result: Integer
+    internal procedure GetOptionInt(ParamValue: Text; OptionStringIn: Text) Result: Integer
     var
         TypeHelper: Codeunit "Type Helper";
     begin
-        exit(TypeHelper.GetOptionNo(Value, OptionStringIn));
+        exit(TypeHelper.GetOptionNo(ParamValue, OptionStringIn));
     end;
 
     internal procedure GetOptionString(Ordinal: Integer; OptionStringIn: Text): Text

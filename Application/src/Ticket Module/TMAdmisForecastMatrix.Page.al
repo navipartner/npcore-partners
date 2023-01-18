@@ -284,10 +284,9 @@
         CurrPage.Update(false);
     end;
 
-    internal procedure SetInitialAdmissionCode(AdmissionCode: Code[20])
+    internal procedure SetInitialAdmissionCode(ParamAdmissionCode: Code[20])
     begin
-
-        PageAdmissionCode := AdmissionCode;
+        PageAdmissionCode := ParamAdmissionCode;
     end;
 }
 

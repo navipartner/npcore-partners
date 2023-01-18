@@ -180,11 +180,11 @@
         end;
     end;
 
-    procedure GetOptionInt(Value: Text; OptionStringIn: Text) Result: Integer
+    procedure GetOptionInt(ParamValue: Text; OptionStringIn: Text) Result: Integer
     var
         TypeHelper: Codeunit "Type Helper";
     begin
-        exit(TypeHelper.GetOptionNo(Value, OptionStringIn));
+        exit(TypeHelper.GetOptionNo(ParamValue, OptionStringIn));
     end;
 
     procedure GetOptionString(Ordinal: Integer; OptionStringIn: Text): Text

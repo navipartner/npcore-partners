@@ -1,6 +1,7 @@
 ﻿codeunit 6150891 "NPR Data Store"
 {
     Access = Internal;
+
     var
         _dataSets: JsonObject;
         _dataSources: JsonArray;
@@ -38,8 +39,8 @@
         exit(Merged);
     end;
 
-    procedure Constructor(DataSources: JsonArray);
+    procedure Constructor(ParamDataSources: JsonArray);
     begin
-        _dataSources := DataSources;
+        _dataSources := ParamDataSources;
     end;
 }

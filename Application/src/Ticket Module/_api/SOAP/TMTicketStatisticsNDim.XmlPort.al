@@ -142,10 +142,10 @@ xmlport 6060110 "NPR TM Ticket Statistics N-Dim"
         RequestFromDate: Date;
         StartTime: Time;
 
-    internal procedure GetRequest(var FromDate: Date; var UntilDate: Date)
+    internal procedure GetRequest(var ParamFromDate: Date; var ParamUntilDate: Date)
     begin
-        FromDate := RequestFromDate;
-        UntilDate := RequestUntilDate;
+        ParamFromDate := RequestFromDate;
+        ParamUntilDate := RequestUntilDate;
         StartTime := Time;
     end;
 

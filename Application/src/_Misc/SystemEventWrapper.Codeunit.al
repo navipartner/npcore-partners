@@ -8,7 +8,7 @@
         FilterTokens.MakeDateFilter(DateFilterText);
     end;
 
-    procedure ApplicationVersion() ApplicationVersion: Text[248]
+    procedure GetApplicationVersion() ApplicationVersion: Text[248]
     var
         ApplicationSystemConstants: Codeunit "Application System Constants";
     begin

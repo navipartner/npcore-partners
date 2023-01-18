@@ -81,14 +81,14 @@
         end;
     end;
 
-    procedure RegisterManager(ManagerCode: Code[20]; Description: Text[50])
+    procedure RegisterManager(ManagerCode: Code[20]; ParamDescription: Text[50])
     var
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
     begin
         if (not ForeignMembershipSetup.Get('', ManagerCode)) then begin
             ForeignMembershipSetup."Community Code" := '';
             ForeignMembershipSetup."Manager Code" := ManagerCode;
-            ForeignMembershipSetup.Description := Description;
+            ForeignMembershipSetup.Description := ParamDescription;
             ForeignMembershipSetup."Invokation Priority" := 10;
             ForeignMembershipSetup.Disabled := true;
             ForeignMembershipSetup.Insert();

@@ -194,12 +194,12 @@
         GLSetup: Record "General Ledger Setup";
         DimMgt: Codeunit DimensionManagement;
 
-    procedure UpdateGlobalDimCode(GlobalDimCodeNo: Integer; "Table ID": Integer; Kassenr: Code[10]; Bonnr: Code[20]; Dato2: Date; EkspArt: Option; LinjeNr: Integer; Nr: Code[20]; NewDimValue: Code[20])
+    procedure UpdateGlobalDimCode(GlobalDimCodeNo: Integer; TableID: Integer; Kassenr: Code[10]; Bonnr: Code[20]; Dato2: Date; EkspArt: Option; LinjeNr: Integer; Nr: Code[20]; NewDimValue: Code[20])
     var
         Ekspedition: Record "NPR POS Sale";
         Ekspeditionlinie: Record "NPR POS Sale Line";
     begin
-        case "Table ID" of
+        case TableID of
             DATABASE::"NPR POS Sale":
                 begin
                     Ekspedition.SetRange("Register No.", Kassenr);

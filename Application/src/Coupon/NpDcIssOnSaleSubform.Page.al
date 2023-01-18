@@ -67,11 +67,11 @@
     var
         LotQtyVisible: Boolean;
 
-    internal procedure SetLotQtyVisible(Type: Integer)
+    internal procedure SetLotQtyVisible(ParamType: Integer)
     var
         NpDcIssueOnSaleSetup: Record "NPR NpDc Iss.OnSale Setup";
     begin
-        LotQtyVisible := Type = NpDcIssueOnSaleSetup.Type::Lot;
+        LotQtyVisible := ParamType = NpDcIssueOnSaleSetup.Type::Lot;
         CurrPage.Update(false);
     end;
 }

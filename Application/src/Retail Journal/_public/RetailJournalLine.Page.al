@@ -330,12 +330,12 @@
             if not Confirm(t002, true) then Error('');
     end;
 
-    internal procedure SetItemFilter(ItemNo: Code[20])
+    internal procedure SetItemFilter(ParamItemNo: Code[20])
     begin
-        if ItemNo = '' then
+        if ParamItemNo = '' then
             Rec.SetRange("Item No.")
         else
-            Rec.SetRange("Item No.", ItemNo);
+            Rec.SetRange("Item No.", ParamItemNo);
 
         CurrPage.Update(false);
     end;

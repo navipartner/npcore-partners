@@ -177,13 +177,13 @@
         InsertExchLabelBarcode(Barcode);
     end;
 
-    local procedure InsertExchLabelBarcode(Barcode: Code[20])
+    local procedure InsertExchLabelBarcode(ParamBarcode: Code[20])
     var
         SalesHeader: Record "Sales Header";
     begin
         if not SalesHeader.Get(SalesHeader."Document Type"::Order, Rec."Sales Header No.") then
             exit;        
-        SalesHeader."NPR Exchange Label Barcode" := Barcode;
+        SalesHeader."NPR Exchange Label Barcode" := ParamBarcode;
         SalesHeader.Modify();        
     end;
 

@@ -7,7 +7,7 @@
     var
         SETUP_MISSING: Label 'Setup is missing for %1.';
 
-    procedure GetLoyaltyPoints(var GetLoyaltyPoints: XMLport "NPR MM Get Loyalty Points")
+    procedure GetLoyaltyPoints(var GetLoyaltyPointsXmlPort: XMLport "NPR MM Get Loyalty Points")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -15,15 +15,15 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         FileNameLbl: Label 'GetLoyaltyPoints-%1.xml', Locked = true;
     begin
-        GetLoyaltyPoints.Import();
+        GetLoyaltyPointsXmlPort.Import();
 
         InsertImportEntry('GetLoyaltyPoints', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        GetLoyaltyPoints.SetDestination(OutStr);
-        GetLoyaltyPoints.Export();
+        GetLoyaltyPointsXmlPort.SetDestination(OutStr);
+        GetLoyaltyPointsXmlPort.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -31,18 +31,18 @@
         MemberInfoCapture.SetFilter("Import Entry Document ID", '=%1', ImportEntry."Document ID");
 
         if (NaviConnectSyncMgt.ProcessImportEntry(ImportEntry)) then begin
-            GetLoyaltyPoints.ClearResponse();
+            GetLoyaltyPointsXmlPort.ClearResponse();
 
             MemberInfoCapture.FindFirst();
-            GetLoyaltyPoints.AddResponse(MemberInfoCapture."Membership Entry No.");
+            GetLoyaltyPointsXmlPort.AddResponse(MemberInfoCapture."Membership Entry No.");
 
         end else begin
-            GetLoyaltyPoints.AddErrorResponse(ImportEntry."Error Message");
+            GetLoyaltyPointsXmlPort.AddErrorResponse(ImportEntry."Error Message");
         end;
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        GetLoyaltyPoints.SetDestination(OutStr);
-        GetLoyaltyPoints.Export();
+        GetLoyaltyPointsXmlPort.SetDestination(OutStr);
+        GetLoyaltyPointsXmlPort.Export();
         ImportEntry.Modify(true);
 
         MemberInfoCapture.DeleteAll();
@@ -177,7 +177,7 @@
         exit(PdfDoc);
     end;
 
-    procedure RegisterSale(var RegisterSale: XMLport "NPR MM Register Sale")
+    procedure RegisterSale(var RegisterSaleXmlPort: XMLport "NPR MM Register Sale")
     var
         TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         TempSalesLines: Record "NPR MM Reg. Sales Buffer" temporary;
@@ -191,7 +191,7 @@
         FileNameLbl: Label 'RegisterSale-%1.xml', Locked = true;
     begin
 
-        RegisterSale.Import();
+        RegisterSaleXmlPort.Import();
 
         InsertImportEntry('RegisterSale', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
@@ -200,29 +200,29 @@
         Commit();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        RegisterSale.SetDestination(OutStr);
-        RegisterSale.Export();
+        RegisterSaleXmlPort.SetDestination(OutStr);
+        RegisterSaleXmlPort.Export();
         ImportEntry.Modify(true);
         Commit();
 
         // Process
-        RegisterSale.SetDocumentId := ImportEntry."Document ID";
-        RegisterSale.GetRequest(TempAuthorization, TempSalesLines, TempPaymentLines);
+        RegisterSaleXmlPort.SetDocumentId := ImportEntry."Document ID";
+        RegisterSaleXmlPort.GetRequest(TempAuthorization, TempSalesLines, TempPaymentLines);
         if (LoyaltyPointsMgrServer.RegisterSales(TempAuthorization, TempSalesLines, TempPaymentLines, TempPointsResponse, ResponseMessage, ResponseMessageId)) then begin
-            RegisterSale.SetResponse(TempPointsResponse);
+            RegisterSaleXmlPort.SetResponse(TempPointsResponse);
 
             ImportEntry.Imported := true;
             ImportEntry."Runtime Error" := false;
         end else begin
-            RegisterSale.SetErrorResponse(ResponseMessage, ResponseMessageId);
+            RegisterSaleXmlPort.SetErrorResponse(ResponseMessage, ResponseMessageId);
 
             ImportEntry.Imported := true;
             ImportEntry."Runtime Error" := true;
         end;
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        RegisterSale.SetDestination(OutStr);
-        RegisterSale.Export();
+        RegisterSaleXmlPort.SetDestination(OutStr);
+        RegisterSaleXmlPort.Export();
 
         ImportEntry.Imported := true;
         ImportEntry."Runtime Error" := false;
@@ -230,7 +230,7 @@
         ImportEntry.Modify(true);
     end;
 
-    procedure ReservePoints(var ReservePoints: XMLport "NPR MM Reserve Points")
+    procedure ReservePoints(var ReservePointsXmlPort: XMLport "NPR MM Reserve Points")
     var
         TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         TempPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
@@ -243,7 +243,7 @@
         FileNameLbl: Label 'ReservePoints-%1.xml', Locked = true;
     begin
 
-        ReservePoints.Import();
+        ReservePointsXmlPort.Import();
 
         InsertImportEntry('ReservePoints', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
@@ -252,29 +252,29 @@
         Commit();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        ReservePoints.SetDestination(OutStr);
-        ReservePoints.Export();
+        ReservePointsXmlPort.SetDestination(OutStr);
+        ReservePointsXmlPort.Export();
         ImportEntry.Modify(true);
         Commit();
 
         // Process
-        ReservePoints.SetDocumentId := ImportEntry."Document ID";
-        ReservePoints.GetRequest(TempAuthorization, TempPaymentLines);
+        ReservePointsXmlPort.SetDocumentId := ImportEntry."Document ID";
+        ReservePointsXmlPort.GetRequest(TempAuthorization, TempPaymentLines);
         if (LoyaltyPointsMgrServer.ReservePoints(TempAuthorization, TempPaymentLines, TempPointsResponse, ResponseMessage, ResponseMessageId)) then begin
-            ReservePoints.SetResponse(TempPointsResponse);
+            ReservePointsXmlPort.SetResponse(TempPointsResponse);
 
             ImportEntry.Imported := true;
             ImportEntry."Runtime Error" := false;
         end else begin
-            ReservePoints.SetErrorResponse(ResponseMessage, ResponseMessageId);
+            ReservePointsXmlPort.SetErrorResponse(ResponseMessage, ResponseMessageId);
 
             ImportEntry.Imported := true;
             ImportEntry."Runtime Error" := true;
         end;
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        ReservePoints.SetDestination(OutStr);
-        ReservePoints.Export();
+        ReservePointsXmlPort.SetDestination(OutStr);
+        ReservePointsXmlPort.Export();
 
         ImportEntry.Imported := true;
         ImportEntry."Runtime Error" := false;
@@ -282,7 +282,7 @@
         ImportEntry.Modify(true);
     end;
 
-    procedure GetLoyaltyConfiguration(var GetLoyaltyConfiguration: XMLport "NPR MM Get Loyalty Config.")
+    procedure GetLoyaltyConfiguration(var GetLoyaltyConfigurationXmlPort: XMLport "NPR MM Get Loyalty Config.")
     var
         TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         TempLoyaltySetup: Record "NPR MM Loyalty Setup" temporary;
@@ -294,7 +294,7 @@
         FileNameLbl: Label 'GetLoyaltyConfiguration-%1.xml', Locked = true;
     begin
 
-        GetLoyaltyConfiguration.Import();
+        GetLoyaltyConfigurationXmlPort.Import();
 
         InsertImportEntry('GetLoyaltyConfiguration', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
@@ -303,30 +303,30 @@
         Commit();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        GetLoyaltyConfiguration.SetDestination(OutStr);
-        GetLoyaltyConfiguration.Export();
+        GetLoyaltyConfigurationXmlPort.SetDestination(OutStr);
+        GetLoyaltyConfigurationXmlPort.Export();
         ImportEntry.Modify(true);
         Commit();
 
         // Process
-        GetLoyaltyConfiguration.SetDocumentId := ImportEntry."Document ID";
-        GetLoyaltyConfiguration.GetRequest(TempAuthorization);
+        GetLoyaltyConfigurationXmlPort.SetDocumentId := ImportEntry."Document ID";
+        GetLoyaltyConfigurationXmlPort.GetRequest(TempAuthorization);
 
         if (LoyaltyPointsMgrServer.GetLoyaltySetup(TempAuthorization, TempLoyaltySetup, ResponseMessage, ResponseMessageId)) then begin
-            GetLoyaltyConfiguration.SetResponse(TempLoyaltySetup);
+            GetLoyaltyConfigurationXmlPort.SetResponse(TempLoyaltySetup);
 
             ImportEntry.Imported := true;
             ImportEntry."Runtime Error" := false;
         end else begin
-            GetLoyaltyConfiguration.SetErrorResponse(ResponseMessage, ResponseMessageId);
+            GetLoyaltyConfigurationXmlPort.SetErrorResponse(ResponseMessage, ResponseMessageId);
 
             ImportEntry.Imported := true;
             ImportEntry."Runtime Error" := true;
         end;
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        GetLoyaltyConfiguration.SetDestination(OutStr);
-        GetLoyaltyConfiguration.Export();
+        GetLoyaltyConfigurationXmlPort.SetDestination(OutStr);
+        GetLoyaltyConfigurationXmlPort.Export();
 
         ImportEntry.Imported := true;
         ImportEntry."Runtime Error" := false;

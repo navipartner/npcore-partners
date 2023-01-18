@@ -719,7 +719,7 @@
         Commit();
     end;
 
-    procedure ConfirmMembershipPayment(var ConfirmMembershipPayment: XMLport "NPR MM Confirm Members. Pay.")
+    procedure ConfirmMembershipPayment(var ConfirmMembershipPaymentXmlPort: XMLport "NPR MM Confirm Members. Pay.")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -728,36 +728,36 @@
         FileNameLbl: Label 'ConfirmMembershipPayment-%1.xml', Locked = true;
     begin
 
-        ConfirmMembershipPayment.Import();
+        ConfirmMembershipPaymentXmlPort.Import();
 
         InsertImportEntry('ConfirmMembershipPayment', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        ConfirmMembershipPayment.SetDestination(OutStr);
-        ConfirmMembershipPayment.Export();
+        ConfirmMembershipPaymentXmlPort.SetDestination(OutStr);
+        ConfirmMembershipPaymentXmlPort.Export();
         ImportEntry.Modify(true);
 
         Commit();
 
         if (NaviConnectSyncMgt.ProcessImportEntry(ImportEntry)) then begin
 
-            ConfirmMembershipPayment.ClearResponse();
+            ConfirmMembershipPaymentXmlPort.ClearResponse();
             MemberInfoCapture.SetCurrentKey("Import Entry Document ID");
             MemberInfoCapture.SetFilter("Import Entry Document ID", '=%1', ImportEntry."Document ID");
             MemberInfoCapture.FindFirst();
 
-            ConfirmMembershipPayment.AddResponse(MemberInfoCapture."Membership Entry No.");
+            ConfirmMembershipPaymentXmlPort.AddResponse(MemberInfoCapture."Membership Entry No.");
 
             MemberInfoCapture.DeleteAll();
         end else begin
-            ConfirmMembershipPayment.AddErrorResponse(ImportEntry."Error Message");
+            ConfirmMembershipPaymentXmlPort.AddErrorResponse(ImportEntry."Error Message");
         end;
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        ConfirmMembershipPayment.SetDestination(OutStr);
-        ConfirmMembershipPayment.Export();
+        ConfirmMembershipPaymentXmlPort.SetDestination(OutStr);
+        ConfirmMembershipPaymentXmlPort.Export();
         ImportEntry.Modify(true);
 
         Commit();
@@ -1115,7 +1115,7 @@
         Commit();
     end;
 
-    procedure GetSetAutoRenew(var GetSetAutoRenew: XMLport "NPR MM GetSet AutoRenew Option")
+    procedure GetSetAutoRenew(var GetSetAutoRenewXmlPort: XMLport "NPR MM GetSet AutoRenew Option")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -1123,30 +1123,30 @@
         FileNameLbl: Label 'GetSetAutoRenewOption-%1.xml', Locked = true;
     begin
 
-        GetSetAutoRenew.Import();
+        GetSetAutoRenewXmlPort.Import();
 
         InsertImportEntry('GetSetAutoRenewOption', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        GetSetAutoRenew.SetDestination(OutStr);
-        GetSetAutoRenew.Export();
+        GetSetAutoRenewXmlPort.SetDestination(OutStr);
+        GetSetAutoRenewXmlPort.Export();
         ImportEntry.Modify(true);
         Commit();
 
         if (NaviConnectSyncMgt.ProcessImportEntry(ImportEntry)) then begin
 
-            GetSetAutoRenew.createResponse();
+            GetSetAutoRenewXmlPort.createResponse();
 
         end else begin
-            GetSetAutoRenew.setError('Not processed.');
+            GetSetAutoRenewXmlPort.setError('Not processed.');
 
         end;
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        GetSetAutoRenew.SetDestination(OutStr);
-        GetSetAutoRenew.Export();
+        GetSetAutoRenewXmlPort.SetDestination(OutStr);
+        GetSetAutoRenewXmlPort.Export();
         ImportEntry.Modify(true);
 
         Commit();

@@ -1106,38 +1106,38 @@
         OnAfterCalcApplnAmount(Rec, AppliedAmount, ApplyingAmount, CalcType, AppliedCustLedgEntry);
     end;
 
-    local procedure CalcApplnRemainingAmount(Amount: Decimal): Decimal
+    local procedure CalcApplnRemainingAmount(ParamAmount: Decimal): Decimal
     var
         ApplnRemainingAmount: Decimal;
     begin
         ValidExchRate := true;
         if ApplnCurrencyCode = Rec."Currency Code" then
-            exit(Amount);
+            exit(ParamAmount);
 
         if ApplnDate = 0D then
             ApplnDate := Rec."Posting Date";
         ApplnRemainingAmount :=
           CurrExchRate.ApplnExchangeAmtFCYToFCY(
-            ApplnDate, Rec."Currency Code", ApplnCurrencyCode, Amount, ValidExchRate);
+            ApplnDate, Rec."Currency Code", ApplnCurrencyCode, ParamAmount, ValidExchRate);
 
         OnAfterCalcApplnRemainingAmount(Rec, ApplnRemainingAmount);
         exit(ApplnRemainingAmount);
     end;
 
-    local procedure CalcApplnAmountToApply(AmountToApply: Decimal): Decimal
+    local procedure CalcApplnAmountToApply(ParamAmountToApply: Decimal): Decimal
     var
         NewApplnAmountToApply: Decimal;
     begin
         ValidExchRate := true;
 
         if ApplnCurrencyCode = Rec."Currency Code" then
-            exit(AmountToApply);
+            exit(ParamAmountToApply);
 
         if ApplnDate = 0D then
             ApplnDate := Rec."Posting Date";
         NewApplnAmountToApply :=
           CurrExchRate.ApplnExchangeAmtFCYToFCY(
-            ApplnDate, Rec."Currency Code", ApplnCurrencyCode, AmountToApply, ValidExchRate);
+            ApplnDate, Rec."Currency Code", ApplnCurrencyCode, ParamAmountToApply, ValidExchRate);
 
         OnAfterCalcApplnAmountToApply(Rec, NewApplnAmountToApply);
         exit(NewApplnAmountToApply);

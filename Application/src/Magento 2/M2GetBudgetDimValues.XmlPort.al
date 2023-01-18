@@ -276,14 +276,14 @@ xmlport 6151141 "NPR M2 Get Budget Dim. Values"
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format(Time - StartTime, 0, 9));
     end;
 
-    local procedure GetDimensions("Code": Code[20]; var TmpDimension: Record Dimension temporary; var TmpDimensionValue: Record "Dimension Value" temporary)
+    local procedure GetDimensions(ParamCode: Code[20]; var TmpDimension: Record Dimension temporary; var TmpDimensionValue: Record "Dimension Value" temporary)
     var
         Dimension: Record Dimension;
         DimensionValue: Record "Dimension Value";
     begin
 
-        if (Code <> '') then begin
-            Dimension.Get(Code);
+        if (ParamCode <> '') then begin
+            Dimension.Get(ParamCode);
             TmpDimension.TransferFields(Dimension, true);
             TmpDimension.Insert();
             DimensionValue.SetFilter("Dimension Code", '=%1', Dimension.Code);

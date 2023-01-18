@@ -450,11 +450,11 @@
         Commit();
     end;
 
-    local procedure InsertVarietyFields(Type: Integer; TableNo: Integer; FieldNo: Integer; ValidateField: Boolean; EditField: Boolean; TableDefault: Boolean; Type2: Integer; TableNo2: Integer; FieldNo2: Integer; MatrixSubscriber1: Text; MatrixSubscriber2: Text; MatrixSubscriberOnLookup: Text; UseOnLookupValue: Boolean; MatrixSubscriberOnDrillDown: Text; UseOnDrillDownalue: Boolean)
+    local procedure InsertVarietyFields(ParamType: Integer; TableNo: Integer; FieldNo: Integer; ValidateField: Boolean; EditField: Boolean; TableDefault: Boolean; Type2: Integer; TableNo2: Integer; FieldNo2: Integer; MatrixSubscriber1: Text; MatrixSubscriber2: Text; MatrixSubscriberOnLookup: Text; UseOnLookupValue: Boolean; MatrixSubscriberOnDrillDown: Text; UseOnDrillDownalue: Boolean)
     var
         VRTFieldsSetup: Record "NPR Variety Field Setup";
     begin
-        if VRTFieldsSetup.Get(Type, TableNo, FieldNo) then begin
+        if VRTFieldsSetup.Get(ParamType, TableNo, FieldNo) then begin
             if (VRTFieldsSetup."Secondary Type" = 1) and
                (VRTFieldsSetup."Secondary Table No." = 1) and
                (VRTFieldsSetup."Secondary Field No." = 1) then begin
@@ -474,7 +474,7 @@
         end;
 
         VRTFieldsSetup.Init();
-        VRTFieldsSetup.Type := Type;
+        VRTFieldsSetup.Type := ParamType;
         VRTFieldsSetup."Table No." := TableNo;
         VRTFieldsSetup.Validate("Field No.", FieldNo);
         VRTFieldsSetup."Validate Field" := ValidateField;
@@ -503,11 +503,11 @@
         InitVarietyFields();
     end;
 
-    local procedure SetDescription(Type: Integer; TableNo: Integer; FieldNo: Integer; NewDescription: Text)
+    local procedure SetDescription(ParamType: Integer; TableNo: Integer; FieldNo: Integer; NewDescription: Text)
     var
         VRTFieldsSetup: Record "NPR Variety Field Setup";
     begin
-        if not VRTFieldsSetup.Get(Type, TableNo, FieldNo) then
+        if not VRTFieldsSetup.Get(ParamType, TableNo, FieldNo) then
             exit;
         VRTFieldsSetup.Description := CopyStr(NewDescription, 1, MaxStrLen(VRTFieldsSetup.Description));
         VRTFieldsSetup.Modify();

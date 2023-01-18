@@ -69,12 +69,12 @@
         exit(CustomCode);
     end;
 
-    procedure DiscoverSecureMethod("Code": Code[10]; Description: Text; Type: Option)
+    procedure DiscoverSecureMethod(ParamCode: Code[10]; ParamDescription: Text; Param: Option)
     begin
         Rec.Init();
-        Rec.Code := CopyStr(Code, 1, MaxStrLen(Rec.Code));
-        Rec.Description := CopyStr(Description, 1, MaxStrLen(Rec.Description));
-        Rec.Type := Type;
+        Rec.Code := CopyStr(ParamCode, 1, MaxStrLen(Rec.Code));
+        Rec.Description := CopyStr(ParamDescription, 1, MaxStrLen(Rec.Description));
+        Rec.Type := Param;
         if not Rec.Insert() then
             Rec.Modify();
     end;

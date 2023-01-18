@@ -1071,7 +1071,7 @@
         IsSimpleView := JournalUserPreferences."Is Simple View";
     end;
 
-    local procedure SetIsSimpleView(SetIsSimpleView: Boolean)
+    local procedure SetIsSimpleView(IsSimpleView: Boolean)
     var
         JournalUserPreferences: Record "Journal User Preferences";
     begin
@@ -1084,8 +1084,8 @@
             JournalUserPreferences.Insert();
         end;
 
-        if JournalUserPreferences."Is Simple View" <> SetIsSimpleView then begin
-            JournalUserPreferences."Is Simple View" := SetIsSimpleView;
+        if JournalUserPreferences."Is Simple View" <> IsSimpleView then begin
+            JournalUserPreferences."Is Simple View" := IsSimpleView;
             JournalUserPreferences.Modify();
         end;
     end;

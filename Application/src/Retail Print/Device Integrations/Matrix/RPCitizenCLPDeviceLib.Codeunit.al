@@ -305,9 +305,9 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib." implements "NPR IMatrix Printe
         RetailList.Insert();
     end;
 
-    local procedure GetBarcodeFont(Barcode: Text): Text
+    local procedure GetBarcodeFont(ParamBarcode: Text): Text
     begin
-        case Barcode of
+        case ParamBarcode of
             'CODE39':
                 exit('A');
             'UPCA':

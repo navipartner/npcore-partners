@@ -333,7 +333,7 @@
             Validate(Value, TempRetailList.Choice);
     end;
 
-    internal procedure GetParameter(RecordID: RecordID; ID: Integer; Name: Text): Boolean
+    internal procedure GetParameter(RecordID: RecordID; ParamID: Integer; ParamName: Text): Boolean
     var
         ParamValue: Record "NPR POS Parameter Value";
         RecRef: RecordRef;
@@ -342,8 +342,8 @@
 
         ParamValue.SetRange("Table No.", RecRef.Number);
         ParamValue.SetRange("Record ID", RecordID);
-        ParamValue.SetRange(ID, ID);
-        ParamValue.SetRange(Name, Name);
+        ParamValue.SetRange(ID, ParamID);
+        ParamValue.SetRange(Name, ParamName);
         if ParamValue.FindFirst() then begin
             Rec := ParamValue;
             exit(true);
