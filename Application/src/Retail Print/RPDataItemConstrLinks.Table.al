@@ -331,7 +331,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
     trigger OnInsert()
     begin
         ModifiedRec();
-        TestField("Data Item Field ID");
+        TestField("Field ID");
     end;
 
     trigger OnModify()
