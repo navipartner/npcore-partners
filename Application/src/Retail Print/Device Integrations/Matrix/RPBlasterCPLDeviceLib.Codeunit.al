@@ -18,14 +18,14 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib." implements "NPR IMatrix Printe
         InitBuffer();
 
         if DeviceSettings.FindSet() then
-                repeat
-                    case DeviceSettings.Name of
-                        'MEDIA_SIZE':
-                            InitializePrinter(DeviceSettings.Value);
-                        else
-                            Error(InvalidDeviceSettingErr, DeviceSettings.Name);
-                    end;
-                until DeviceSettings.Next() = 0;
+            repeat
+                case DeviceSettings.Name of
+                    'MEDIA_SIZE':
+                        InitializePrinter(DeviceSettings.Value);
+                    else
+                        Error(InvalidDeviceSettingErr, DeviceSettings.Name);
+                end;
+            until DeviceSettings.Next() = 0;
     end;
 
     procedure PrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
@@ -216,7 +216,7 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib." implements "NPR IMatrix Printe
         end;
     end;
 
-    local procedure AddStringToBuffer(String: Text)
+    local procedure AddStringToBuffer(ParamString: Text)
     var
         DotNetCharArray: Codeunit "DotNet_Array";
         DotNetByteArray: Codeunit "DotNet_Array";
@@ -225,7 +225,7 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib." implements "NPR IMatrix Printe
     begin
         //This function over allocates and is verbose, all because of the beautiful DotNet wrapper codeunits.
 
-        DotNetString.Set(String + TypeHelper.CRLFSeparator());
+        DotNetString.Set(ParamString + TypeHelper.CRLFSeparator());
         DotNetString.ToCharArray(0, DotNetString.Length(), DotNetCharArray);
         _DotNetEncoding.GetBytes(DotNetCharArray, 0, DotNetCharArray.Length(), DotNetByteArray);
         _DotNetStream.Write(DotNetByteArray, 0, DotNetByteArray.Length());

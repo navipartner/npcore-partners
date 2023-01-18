@@ -102,12 +102,12 @@ page 6150624 "NPR POS Dimension Value"
         CurrPage.Update(false);
     end;
 
-    local procedure SearchDim(SearchBox: Text; var DimValue: Record "Dimension Value")
+    local procedure SearchDim(ParamSearchBox: Text; var DimValue: Record "Dimension Value")
     var
         DimFound: Boolean;
     begin
         DimValue.FilterGroup := -1;
-        ApplyMemberFilter(SearchBox, DimValue);
+        ApplyMemberFilter(ParamSearchBox, DimValue);
         DimValue.SetLoadFields(Code);
 
         if (DimValue.GetFilters() <> '') then begin
@@ -120,19 +120,19 @@ page 6150624 "NPR POS Dimension Value"
         DimValue.FilterGroup := 0;
     end;
 
-    local procedure ApplyMemberFilter(SearchBox: Text; var DimValue: Record "Dimension Value")
+    local procedure ApplyMemberFilter(ParamSearchBox: Text; var DimValue: Record "Dimension Value")
     begin
-        if (StrLen(SearchBox) <= MaxStrLen(DimValue.Code)) then
-            DimValue.SetFilter(Code, '%1', UpperCase(SearchBox));
+        if (StrLen(ParamSearchBox) <= MaxStrLen(DimValue.Code)) then
+            DimValue.SetFilter(Code, '%1', UpperCase(ParamSearchBox));
 
-        if (StrLen(SearchBox) <= MaxStrLen(DimValue.Name)) then
-            DimValue.SetFilter(Name, '%1', '@' + ConvertSpaceToWildcard(SearchBox));
+        if (StrLen(ParamSearchBox) <= MaxStrLen(DimValue.Name)) then
+            DimValue.SetFilter(Name, '%1', '@' + ConvertSpaceToWildcard(ParamSearchBox));
     end;
 
-    local procedure ConvertSpaceToWildcard(SearchBox: Text): Text
+    local procedure ConvertSpaceToWildcard(ParamSearchBox: Text): Text
     var
     begin
-        exit(ConvertStr(SearchBox, ' ', '*') + '*');
+        exit(ConvertStr(ParamSearchBox, ' ', '*') + '*');
     end;
 
     var

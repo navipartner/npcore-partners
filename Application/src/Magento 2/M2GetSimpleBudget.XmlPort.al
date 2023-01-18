@@ -220,7 +220,7 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         ResponseMessage := ReasonText;
     end;
 
-    local procedure CalculateStatistics(SalespersonCode: Code[20]; CustomerNo: Code[20])
+    local procedure CalculateStatistics(ParamSalespersonCode: Code[20]; CustomerNo: Code[20])
     var
         Customer: Record Customer;
     begin
@@ -231,8 +231,8 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         TmpSellAgingBandBufferCQ.DeleteAll();
         TmpSellAgingBandBufferCM.DeleteAll();
 
-        if (SalesPersonCode <> '') then
-            Customer.SetFilter("Salesperson Code", '=%1', SalesPersonCode);
+        if (ParamSalespersonCode <> '') then
+            Customer.SetFilter("Salesperson Code", '=%1', ParamSalespersonCode);
         if (CustomerNo <> '') then
             Customer.SetFilter("No.", '=%1', CustomerNo);
 

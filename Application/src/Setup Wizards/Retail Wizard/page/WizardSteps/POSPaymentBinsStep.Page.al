@@ -166,7 +166,7 @@
         if TempAllPOSUnit.FindSet() then;
     end;
 
-    internal procedure CreateTempPOSPaymentBins(NoOfPOSPaymentBins: integer; WantedStartingNo: Code[10]; SelectedPOSStore: Code[10]; SelectedPOSPaymentBin: Code[10]; var POSPaymentBinTemp: Record "NPR POS Payment Bin")
+    internal procedure CreateTempPOSPaymentBins(ParamNoOfPOSPaymentBins: integer; WantedStartingNo: Code[10]; SelectedPOSStore: Code[10]; SelectedPOSPaymentBin: Code[10]; var POSPaymentBinTemp: Record "NPR POS Payment Bin")
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
@@ -177,7 +177,7 @@
 
         LastNoUsed := WantedStartingNo;
 
-        for i := 1 to NoOfPOSPaymentBins do begin
+        for i := 1 to ParamNoOfPOSPaymentBins do begin
             Rec.Init();
             LastNoUsed := CheckIfNoAvailableInPOSPaymentBin(POSPaymentBin, LastNoUsed);
             LastNoUsed := CheckIfNoAvailableInPOSPaymentBin(POSPaymentBinTemp, LastNoUsed);

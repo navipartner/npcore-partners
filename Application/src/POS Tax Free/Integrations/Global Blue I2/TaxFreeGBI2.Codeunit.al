@@ -978,7 +978,7 @@
     var
         SystemEventWrapper: Codeunit "NPR System Event Wrapper";
     begin
-        exit(EscapeSpecialChars(SystemEventWrapper.ApplicationVersion()));
+        exit(EscapeSpecialChars(SystemEventWrapper.GetApplicationVersion()));
     end;
 
     local procedure FormattedDateTime(): Text

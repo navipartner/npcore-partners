@@ -779,21 +779,21 @@
     end;
 
 #if not BC17 and not BC18
-    local procedure PeriodToInteger(Period: Enum "Analysis Period Type"): Integer
+    local procedure PeriodToInteger(AnalysisPeriodType: Enum "Analysis Period Type"): Integer
     begin
-        case Period of
-            Period::Day:
+        case AnalysisPeriodType of
+            AnalysisPeriodType::Day:
                 exit(PeriodType::Day);
-            Period::Week:
+            AnalysisPeriodType::Week:
                 exit(PeriodType::Week);
-            Period::Month:
+            AnalysisPeriodType::Month:
                 exit(PeriodType::Month);
-            Period::Quarter:
+            AnalysisPeriodType::Quarter:
                 exit(PeriodType::Quarter);
-            Period::Year:
+            AnalysisPeriodType::Year:
                 exit(PeriodType::Year);
             else
-                Error((StrSubstNo(IncorrectPeriodErr, Format(Period))));
+                Error((StrSubstNo(IncorrectPeriodErr, Format(AnalysisPeriodType))));
         end;
     end;
 #endif

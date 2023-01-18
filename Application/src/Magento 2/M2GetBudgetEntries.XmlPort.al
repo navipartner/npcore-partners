@@ -248,11 +248,11 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
         ResponseMessageId := Format(10);
     end;
 
-    local procedure GetBudgetEntriesWorker(BudgetName: Code[10]; CustomerNo: Code[20]; ItemNo: Code[20]; LocationCode: Code[10]; GlblDim1Code: Code[20]; GlblDim2Code: Code[20]; BudgetDim1Code: Code[20]; BudgetDim2Code: Code[20]; BudgetDim3Code: Code[20]; BudgetFromDate: Date; BudgetUntilDate: Date)
+    local procedure GetBudgetEntriesWorker(ParamBudgetName: Code[10]; CustomerNo: Code[20]; ItemNo: Code[20]; ParamLocationCode: Code[10]; GlblDim1Code: Code[20]; GlblDim2Code: Code[20]; BudgetDim1Code: Code[20]; BudgetDim2Code: Code[20]; BudgetDim3Code: Code[20]; BudgetFromDate: Date; BudgetUntilDate: Date)
     var
         ItemBudgetEntry: Record "Item Budget Entry";
     begin
-        ItemBudgetEntry.SetFilter("Budget Name", '=%1', BudgetName);
+        ItemBudgetEntry.SetFilter("Budget Name", '=%1', ParamBudgetName);
 
         if (CustomerNo <> '') then begin
             ItemBudgetEntry.SetFilter("Source Type", '=%1', ItemBudgetEntry."Source Type"::Customer);
@@ -262,8 +262,8 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
         if (ItemNo <> '') then
             ItemBudgetEntry.SetFilter("Item No.", '=%1', ItemNo);
 
-        if (LocationCode <> '') then
-            ItemBudgetEntry.SetFilter("Location Code", '=%1', LocationCode);
+        if (ParamLocationCode <> '') then
+            ItemBudgetEntry.SetFilter("Location Code", '=%1', ParamLocationCode);
 
         if (GlblDim1Code <> '') then
             ItemBudgetEntry.SetFilter("Global Dimension 1 Code", '=%1', GlblDim1Code);
