@@ -1,44 +1,26 @@
 ﻿codeunit 6014424 "NPR Receipt Footer Mgt."
 {
     Access = Internal;
+
+    [Obsolete('Breaking lines, in Text Receipt preview, is not used anymore')]
     procedure SetDefaultBreakLineNumberOfCharacters(var POSUnitReceiptTextProfile: Record "NPR POS Unit Rcpt.Txt Profile")
     begin
-        if POSUnitReceiptTextProfile."Break Line" <> 0 then
-            exit;
-        POSUnitReceiptTextProfile."Break Line" := 40;
+
     end;
 
     procedure IsReceiptTextSet(POSUnitReceiptTextProfile: Record "NPR POS Unit Rcpt.Txt Profile"): Boolean
-    begin
-        exit(StrLen(POSUnitReceiptTextProfile."Sales Ticket Rcpt. Text") > 0);
-    end;
-
-    procedure BreakSalesTicketReceiptText(var POSUnitReceiptTextProfile: Record "NPR POS Unit Rcpt.Txt Profile")
     var
         TicketRcptText: Record "NPR POS Ticket Rcpt. Text";
-        ReceiptTextTokens: List of [Text];
-        ReceiptText: Text;
-        PreviewReceiptText: Text;
-        LineNo: Integer;
     begin
-        if not IsReceiptTextSet(POSUnitReceiptTextProfile) then
-            exit;
-        SetDefaultBreakLineNumberOfCharacters(POSUnitReceiptTextProfile);
-        TicketRcptText.DeleteAllForCurrProfile(POSUnitReceiptTextProfile.Code);
-        ReceiptTextTokens := POSUnitReceiptTextProfile."Sales Ticket Rcpt. Text".Split(' ');
-        foreach ReceiptText in ReceiptTextTokens do begin
-            if StrLen(PreviewReceiptText + ReceiptText + ' ') < POSUnitReceiptTextProfile."Break Line" then
-                PreviewReceiptText += ReceiptText + ' '
-            else begin
-                LineNo += 10000;
-                TicketRcptText.Add(POSUnitReceiptTextProfile.Code, LineNo, PreviewReceiptText);
-                Clear(PreviewReceiptText);
-                PreviewReceiptText := ReceiptText + ' ';
-            end;
-        end;
-        if PreviewReceiptText <> '' then begin
-            TicketRcptText.Add(POSUnitReceiptTextProfile.Code, LineNo + 10000, PreviewReceiptText);
-        end;
+        TicketRcptText.Reset();
+        TicketRcptText.SetRange("Rcpt. Txt. Profile Code", POSUnitReceiptTextProfile.Code);
+        exit(not TicketRcptText.IsEmpty());
+    end;
+
+    [Obsolete('Splitting text area, in Text Receipt preview, into the Text Receipt Lines is not supported anymore.')]
+    procedure BreakSalesTicketReceiptText(var POSUnitReceiptTextProfile: Record "NPR POS Unit Rcpt.Txt Profile")
+    begin
+
     end;
 
     procedure GetSalesTicketReceiptText(var PreviewReceiptText: Text; POSUnit: Record "NPR POS Unit")
@@ -87,6 +69,6 @@
     begin
         TicketRcptText.Reset();
         TicketRcptText.SetRange("Rcpt. Txt. Profile Code", POSUnitReceiptTextProfile.Code);
-    end;
+    end;       
 }
 

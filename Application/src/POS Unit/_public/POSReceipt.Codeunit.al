@@ -15,9 +15,10 @@ codeunit 6059937 "NPR POS Receipt"
         exit(ReceiptFooterMgt.IsReceiptTextSet(POSUnitReceiptTextProfile));
     end;
 
+    [Obsolete('Breaking lines in Text Receipt preview is not used anymore')]
     procedure SetDefaultBreakLineNumberOfCharacters(var POSUnitReceiptTextProfile: Record "NPR POS Unit Rcpt.Txt Profile")
     begin
-        ReceiptFooterMgt.SetDefaultBreakLineNumberOfCharacters(POSUnitReceiptTextProfile);
+        
     end;
 
     var
