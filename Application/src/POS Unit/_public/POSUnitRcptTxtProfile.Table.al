@@ -103,26 +103,16 @@
         {
             Caption = 'Sales Ticket Receipt Text';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                ReceiptFooterMgt: codeunit "NPR Receipt Footer Mgt.";
-            begin
-                ReceiptFooterMgt.BreakSalesTicketReceiptText(Rec);
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Text Receipt preview lines to set directly receipt text';
         }
         field(30; "Break Line"; Integer)
         {
             Caption = 'Break Line';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                ReceiptFooterMgt: codeunit "NPR Receipt Footer Mgt.";
-            begin
-                ReceiptFooterMgt.BreakSalesTicketReceiptText(Rec);
-            end;
-        }
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Text Receipt preview lines to set directly receipt text';
+        }       
     }
 
     keys
@@ -132,16 +122,6 @@
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnInsert()
-    var
-        ReceiptFooterMgt: codeunit "NPR Receipt Footer Mgt.";
-    begin
-        ReceiptFooterMgt.SetDefaultBreakLineNumberOfCharacters(Rec);
-    end;
 
     trigger OnDelete()
     var
