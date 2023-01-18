@@ -24,8 +24,8 @@ table 6059806 "NPR Environment Information"
                 if "Environment Verified" then begin
                     ActiveSession.Get(ServiceInstanceId(), SessionId());
                     "Environment Database Name" := ActiveSession."Database Name";
-                    "Environment Company Name" := CompanyName;
-                    "Environment Tenant Name" := TenantId();
+                    "Environment Company Name" := CopyStr(CompanyName(), 1, MaxStrLen("Environment Company Name"));
+                    "Environment Tenant Name" := CopyStr(TenantId(), 1, MaxStrLen("Environment Tenant Name"));
                     Modify();
                 end;
             end;
