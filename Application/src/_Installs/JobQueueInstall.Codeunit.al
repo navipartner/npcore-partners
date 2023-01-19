@@ -62,6 +62,11 @@
             UpdateAdjCostJobQueueTimeout();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateAdjCostJobQueueTimeout'));
         end;
+
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateRetentionJobQueue')) then begin
+            UpdateRetentionJobQueue();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateRetentionJobQueue'));
+        end;        
 #endif
 
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AutoRescheduleRetenPolicy')) then begin
@@ -335,6 +340,26 @@
                 end;
             until JobQueueEntry.Next() = 0;
     end;
+    
+   local procedure UpdateRetentionJobQueue()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobTimeout: Duration;
+    begin
+        JobTimeout := 2 * 60 * 60 * 1000;  //2 hours
+
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", 3997);  //Codeunit::"Retention Policy JQ"
+        if JobQueueEntry.FindSet(true) then
+            repeat
+                JobQueueEntry."Job Timeout" := JobTimeout;
+                Clear(JobQueueEntry."Next Run Date Formula");
+                JobQueueEntry."No. of Minutes between Runs" := 121;
+                JobQueueEntry."Starting Time" := 020000T;
+                JobQueueEntry."Ending Time" := 060000T;
+                JobQueueEntry.Modify();
+            until JobQueueEntry.Next() = 0;
+    end;    
 #endif
 
     local procedure AssignJoqCategoryToTMRetentionJQ()
