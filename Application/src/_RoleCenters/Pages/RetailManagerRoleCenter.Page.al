@@ -845,7 +845,14 @@
                     RunObject = page "NPR NpGp POS Sales Entries";
                     ToolTip = 'View Global POS Sales Entries.';
                     ApplicationArea = NPRRetail;
-
+                }
+                action("NaviDocs Document List")
+                {
+                    Caption = 'NaviDocs Document List';
+                    Image = RegisteredDocs;
+                    RunObject = page "NPR NaviDocs Document List";
+                    ToolTip = 'View NaviDocs Document List.';
+                    ApplicationArea = NPRRetail;
                 }
                 action(POSQuotes)
                 {
@@ -854,8 +861,6 @@
                     RunObject = page "NPR POS Saved Sales";
                     ToolTip = 'View POS Saved Sales that have been done.';
                     ApplicationArea = NPRRetail;
-
-
                 }
                 action("Posted Sales Invoices")
                 {
@@ -864,9 +869,7 @@
                     RunObject = Page "Posted Sales Invoices";
                     ToolTip = 'View Sales Invoices that have been done.';
                     ApplicationArea = NPRRetail;
-
                 }
-
                 action("Posted Sales Shipment List")
                 {
                     Caption = 'Posted Sales Shipment List';

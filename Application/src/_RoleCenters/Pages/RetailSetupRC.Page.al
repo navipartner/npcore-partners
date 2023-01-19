@@ -428,6 +428,20 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'View or edit the E-mail Templates';
                     ApplicationArea = NPRRetail;
                 }
+                action("NaviDocs Setups")
+                {
+                    Caption = 'NaviDocs Setup';
+                    RunObject = Page "NPR NaviDocs Setup";
+                    ToolTip = 'View or edit the NaviDocs Setup';
+                    ApplicationArea = NPRRetail;
+                }
+                action("NPR NaviDocs Handling Profiles ")
+                {
+                    Caption = 'NaviDocs Posting List';
+                    RunObject = Page "NPR NaviDocs Handling Profiles";
+                    ToolTip = 'View or edit the NaviDocs Handling Profiles';
+                    ApplicationArea = NPRRetail;
+                }
                 action("Smart Email List")
                 {
                     Caption = 'Smart Email List';
