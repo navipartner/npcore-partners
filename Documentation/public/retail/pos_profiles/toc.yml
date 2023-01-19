@@ -18,7 +18,7 @@
     href: howto/POSCustomerDisplay.md
   - name: Change the POS unit receipt footer text
     href: howto/POSUnitReceiptFooter.md
-  - name: Set up the POS HTML Display
+  - name: Set up the POS HTML Display Profile
     href: howto/POS_HTMLDisplay_profile.md
 - name: Reference
   items:
