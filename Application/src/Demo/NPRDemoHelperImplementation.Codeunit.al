@@ -2,7 +2,7 @@ codeunit 6059866 "NPRDemoHelperImplementation"
 {
     Access = Internal;
 
-    Procedure CreateMPOSUser(Username: Text; Password: Text; Company_Name: text; URL: text; POSUnit: code[20])
+    procedure CreateMPOSUser(Username: Text; Password: Text; Company_Name: text; URL: text; POSUnit: code[20])
     var
         MPOSUser: Record "NPR MPOS QR Codes";
         Usersetup: Record "User Setup";
@@ -10,17 +10,17 @@ codeunit 6059866 "NPRDemoHelperImplementation"
 
         if not UserSetup.Get(Username) then begin
             UserSetup.Init();
-            UserSetup."User ID" := Username;
-            Usersetup."NPR POS Unit No." := POSUnit;
+            UserSetup."User ID" := CopyStr(Username, 1, MaxStrLen(Usersetup."User ID"));
+            Usersetup."NPR POS Unit No." := CopyStr(POSUnit, 1, MaxStrLen(Usersetup."NPR POS Unit No."));
             UserSetup.Insert(true);
         end;
 
         if not MPOSUser.Get(Username, Company_Name) then begin
             MPOSUser.init();
-            MPOSUser.validate("User ID", Username);
-            MPOSUser.validate(Password, Password);
-            MPOSUser.validate(Company, Company_Name);
-            MPOSUser.validate(Url, Url);
+            MPOSUser.validate("User ID", CopyStr(Username, 1, MaxStrLen(MPOSUser."User ID")));
+            MPOSUser.validate(Password, CopyStr(Password, 1, MaxStrLen(MPOSUser.Password)));
+            MPOSUser.validate(Company, CopyStr(Company_Name, 1, MaxStrLen(MPOSUser.Company)));
+            MPOSUser.validate(Url, CopyStr(Url, 1, MaxStrLen(MPOSUser.Url)));
             MPOSUser.Insert(true);
             Commit();
         end;
@@ -33,7 +33,7 @@ codeunit 6059866 "NPRDemoHelperImplementation"
         MPOSUser.modify(true);
     end;
 
-    Procedure UpdatePasswordPaymentGateway(PaymentCode: code[20]; "Demo Password": text)
+    procedure UpdatePasswordPaymentGateway(PaymentCode: code[20]; "Demo Password": text)
     var
         MagPaymentGateway: Record "NPR Magento Payment Gateway";
     begin
@@ -41,7 +41,7 @@ codeunit 6059866 "NPRDemoHelperImplementation"
             MagPaymentGateway.SetApiPassword("Demo Password");
     end;
 
-    Procedure UpdatePasswordCollectStore(StoreCode: code[20]; Password: text)
+    procedure UpdatePasswordCollectStore(StoreCode: code[20]; Password: text)
     var
         NPRNpCsStore: record "NPR NpCs Store";
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
