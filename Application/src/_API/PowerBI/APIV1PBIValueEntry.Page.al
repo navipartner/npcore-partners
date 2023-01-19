@@ -113,6 +113,14 @@ page 6059969 "NPR APIV1 PBIValueEntry"
                 {
                     Caption = 'Type', Locked = true;
                 }
+                field(genProdPostingGroup; Rec."Gen. Prod. Posting Group")
+                {
+                    Caption = 'Gen. Prod. Posting Group', Locked = true;
+                }
+                field(costPerUnit; Rec."Cost per Unit")
+                {
+                    Caption = 'Cost per Unit', Locked = true;
+                }
                 field(systemCreatedAt; Rec.SystemCreatedAt)
                 {
                     Caption = 'SystemCreatedAt', Locked = true;
