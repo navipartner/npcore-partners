@@ -43,7 +43,7 @@
                 POSSalesLine."Vendor No." := ItemJournalLine."NPR Vendor No.";
                 POSSalesLine.Modify();
 
-                CheckAndCreateServiceItemPos(POSEntry, POSSalesLine);
+                CreateDeleteServiceItem(POSEntry, POSSalesLine);
             until POSSalesLine.Next() = 0;
 
         OnAfterPostPOSEntry(Rec);
@@ -350,11 +350,11 @@
         exit(false);
     end;
 
-    local procedure CheckAndCreateServiceItemPos(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line")
+    local procedure CreateDeleteServiceItem(POSEntry: Record "NPR POS Entry"; POSSalesLine: Record "NPR POS Entry Sales Line")
     var
         CreateServiceItem: codeunit "NPR Create Service Item";
     begin
-        CreateServiceItem.Create(POSEntry, POSEntrySalesLine);
+        CreateServiceItem.CreateDeleteServiceItem(POSEntry, POSSalesLine);
     end;
 
     procedure PostAssemblyOrders(POSEntry: Record "NPR POS Entry"; FailOnError: Boolean): Boolean

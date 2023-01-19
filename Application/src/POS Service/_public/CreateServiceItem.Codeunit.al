@@ -12,6 +12,20 @@ codeunit 6059838 "NPR Create Service Item"
         CopyFromPOS(POSSaleLine, POSSale);
     end;
 
+    [CommitBehavior(CommitBehavior::Error)]
+    procedure CreateDeleteServiceItem(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line")
+    var
+        Item: Record Item;
+    begin
+        if SkipCreatingDeletingServiceItem(POSEntrySalesLine, POSEntry, Item) then
+            exit;
+
+        if POSEntrySalesLine.Quantity > 0 then
+            CreateServiceItem(POSEntry, POSEntrySalesLine)
+        else
+            DeleteServiceItem(POSEntry, POSEntrySalesLine);
+    end;
+
     local procedure CopyFromPOS(POSSaleLine: Record "NPR POS Sale Line"; POSSale: Record "NPR POS Sale")
     var
         ServiceItem: Record "Service Item";
@@ -31,6 +45,91 @@ codeunit 6059838 "NPR Create Service Item"
         ServiceItem.Validate("Sales Date", POSSale.Date);
         OnBeforeModifyServiceItemFromActivePOSSale(ServiceItem, POSSaleLine, POSSale);
         ServiceItem.Modify();
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    procedure CreateServiceItem(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line")
+    var
+        ServiceItem: Record "Service Item";
+        Item: Record Item;
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+        ResSkillMgt: Codeunit "Resource Skill Mgt.";
+        ServLogMgt: Codeunit ServLogManagement;
+        TrackingLinesExist: Boolean;
+        ServItemWithSerialNoExist: Boolean;
+        NoOfServiceItems: Integer;
+        ServItemLbl: Label '%1 / %2 / %3', Locked = true;
+    begin
+        ServiceMgtSetup.Get();
+        GLSetup.Get();
+        TrackingLinesExist := POSEntrySalesLine."Serial No." <> '';
+
+        for NoOfServiceItems := 1 to POSEntrySalesLine.Quantity do begin
+            Clear(ServiceItem);
+
+            ServItemWithSerialNoExist := false;
+            if TrackingLinesExist then begin
+                ServiceItem.SetRange("Item No.", POSEntrySalesLine."No.");
+                ServiceItem.SetRange("Serial No.", POSEntrySalesLine."Serial No.");
+                ServItemWithSerialNoExist := ServiceItem.FindFirst();
+            end;
+
+            if (not TrackingLinesExist) or (not ServItemWithSerialNoExist) then begin
+                ServiceItem.Init();
+                ServiceMgtSetup.TestField("Service Item Nos.");
+                NoSeriesMgt.InitSeries(ServiceMgtSetup."Service Item Nos.", ServiceItem."No. Series", 0D, ServiceItem."No.", ServiceItem."No. Series");
+                ServiceItem.Insert();
+            end;
+
+            POSEntrySalesDocLink.LinkServiceItem2Line(POSEntry."Entry No.", POSEntrySalesLine."Line No.", ServiceItem."No.");
+
+            ServiceItem."Shipment Type" := ServiceItem."Shipment Type"::Sales;
+            ServiceItem.Validate(Description, CopyStr(POSEntrySalesLine.Description, 1, MaxStrLen(ServiceItem.Description)));
+            ServiceItem."Description 2" := CopyStr(StrSubstNo(ServItemLbl, POSEntrySalesLine."POS Store Code", POSEntrySalesLine."POS Unit No.", POSEntrySalesLine."Document No."), 1, MaxStrLen(ServiceItem."Description 2"));
+
+            ServiceItem.Validate("Customer No.", POSEntry."Customer No.");
+
+            ServiceItem.OmitAssignResSkills(true);
+            ServiceItem.Validate("Item No.", Item."No.");
+            ServiceItem.OmitAssignResSkills(false);
+
+            if TrackingLinesExist then
+                ServiceItem."Serial No." := POSEntrySalesLine."Serial No.";
+
+            ServiceItem."Variant Code" := POSEntrySalesLine."Variant Code";
+            ItemUnitOfMeasure.Get(Item."No.", POSEntrySalesLine."Unit of Measure Code");
+            ServiceItem.Validate("Sales Unit Cost", Round(POSEntrySalesLine."Unit Cost (LCY)" / ItemUnitOfMeasure."Qty. per Unit of Measure", GLSetup."Unit-Amount Rounding Precision"));
+
+            if POSEntry."Currency Code" <> '' then
+                ServiceItem.Validate("Sales Unit Price", AmountToLCY(
+                                                            Round(POSEntrySalesLine."Unit Price" / ItemUnitOfMeasure."Qty. per Unit of Measure", GLSetup."Unit-Amount Rounding Precision"),
+                                                            POSEntry."Currency Factor",
+                                                            POSEntry."Currency Code",
+                                                            POSEntry."Posting Date"))
+            else
+                ServiceItem.Validate("Sales Unit Price", Round(POSEntrySalesLine."Unit Price" / ItemUnitOfMeasure."Qty. per Unit of Measure", GLSetup."Unit-Amount Rounding Precision"));
+
+            ServiceItem."Vendor No." := Item."Vendor No.";
+            ServiceItem."Vendor Item No." := Item."Vendor Item No.";
+            ServiceItem."Unit of Measure Code" := Item."Base Unit of Measure";
+            ServiceItem."Sales Date" := POSEntry."Posting Date";
+            ServiceItem."Installation Date" := POSEntry."Posting Date";
+
+            SetWarrantyParts(Item, ServiceItem, POSEntry);
+            SetWarrantyLabor(Item, ServiceItem, POSEntry);
+
+            OnBeforeModifyServiceItemFromPostedPOSSale(ServiceItem, Item, POSEntrySalesLine, POSEntry);
+
+            ServiceItem.Modify();
+
+            ResSkillMgt.AssignServItemResSkills(ServiceItem);
+
+            CreateComponents(POSEntrySalesLine, POSEntry, ServiceItem);
+
+            ServLogMgt.ServItemAutoCreated(ServiceItem);
+        end;
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
@@ -181,6 +280,37 @@ codeunit 6059838 "NPR Create Service Item"
         exit(Skip);
     end;
 
+    local procedure SkipCreatingDeletingServiceItem(POSEntrySalesLine: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry"; var Item: Record Item): Boolean
+    var
+        ServiceItemGroup: Record "Service Item Group";
+        Skip, IsHandled : Boolean;
+    begin
+        OnBeforeCheckConditionsForCreateDeleteServiceItemPostedSale(POSEntrySalesLine, POSEntry, IsHandled, Skip);
+        if IsHandled then
+            exit(Skip);
+
+        if POSEntrySalesLine.Type <> POSEntrySalesLine.Type::Item then
+            exit(true);
+
+        if POSEntrySalesLine.Quantity = 0 then
+            exit(true);
+
+        if POSEntrySalesLine.Quantity <> Round(POSEntrySalesLine.Quantity, 1) then
+            exit(true);
+
+        Item.Get(POSEntrySalesLine."No.");
+        if Item."Service Item Group" = '' then
+            exit(true);
+
+        if not ServiceItemGroup.Get(Item."Service Item Group") then
+            exit(true);
+
+        if not ServiceItemGroup."Create Service Item" then
+            exit(true);
+
+        OnAfterCheckConditionsForCreateDeleteServiceItem(Item, ServiceItemGroup, Skip);
+    end;
+
     local procedure SetWarrantyParts(Item: Record Item; var ServiceItem: Record "Service Item"; POSEntry: Record "NPR POS Entry")
     var
         ItemTrackingCode: Record "Item Tracking Code";
@@ -268,6 +398,21 @@ codeunit 6059838 "NPR Create Service Item"
         ServItemComponent.Insert();
     end;
 
+    local procedure DeleteServiceItem(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line")
+    var
+        ServItem: Record "Service Item";
+    begin
+        ServItem.SetRange("Item No.", POSEntrySalesLine."No.");
+        ServItem.SetRange("Customer No.", POSEntry."Customer No.");
+        ServItem.SetRange("Serial No.", POSEntrySalesLine."Serial No.");
+        if ServItem.FindFirst() then
+            if ServItem.CheckIfCanBeDeleted() <> '' then begin
+                ServItem.Validate(Status, ServItem.Status::" ");
+                ServItem.Modify(true);
+            end else
+                ServItem.Delete(true);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitBeforeInsert(var ServiceItem: Record "Service Item"; POSSaleLine: Record "NPR POS Sale Line"; POSSale: Record "NPR POS Sale"; var RunTrigger: Boolean)
     begin
@@ -285,6 +430,11 @@ codeunit 6059838 "NPR Create Service Item"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckConditionsForCreatingServiceItem(Item: Record Item; ServiceItemGroup: Record "Service Item Group"; var Skip: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCheckConditionsForCreateDeleteServiceItem(Item: Record Item; ServiceItemGroup: Record "Service Item Group"; var Skip: Boolean)
     begin
     end;
 
@@ -325,6 +475,11 @@ codeunit 6059838 "NPR Create Service Item"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCreateComponent(ServItemComponent: Record "Service Item Component"; BOMComponent: Record "BOM Component"; BOMComponent2: Record "BOM Component"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry"; ServiceItem: Record "Service Item")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckConditionsForCreateDeleteServiceItemPostedSale(POSEntrySalesLine: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry"; var IsHandled: Boolean; Skip: Boolean)
     begin
     end;
 }
