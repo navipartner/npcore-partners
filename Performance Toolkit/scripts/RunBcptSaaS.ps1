@@ -79,6 +79,26 @@ $company = $companies | Where-Object { $_.name -eq $CompanyName } | Select-Objec
 Write-Host "Using company:" -ForegroundColor Green
 Write-Host ($company | Out-String)
 
+# Check if any BCPT is running and wait
+$isBcptInProgress = $false
+Do
+{
+    $checkBcptUrl = "https://api.businesscentral.dynamics.com/v2.0/$($TenantId)/$($SandboxName)/ODataV4/BCPTTestSuite_IsAnyTestRunInProgress?company=$([Uri]::EscapeDataString($CompanyName))"
+    $checkRunning = @(. "$invokeSaasApi" ` `
+        -AuthorizationType "AAD" `
+        -BearerToken $token `
+        -BaseServiceUrl $checkBcptUrl `
+        -Method "POST" `
+        -NotApi)
+        $isBcptInProgress = ($checkRunning[0] -eq $true)
+        
+        if ($isBcptInProgress -eq $true) {
+            Write-Host "BCPT is currently in progress - Waiting..."
+            Start-Sleep -Seconds 10
+        }
+
+} While ($isBcptInProgress -eq $true)
+
 # Get BCPT suites
 Write-Host "Available BCPT suite codes:" -ForegroundColor Green
 $suites = @(. "$invokeSaasApi" ` `
@@ -148,7 +168,7 @@ $selectedSuites | ForEach-Object {
         Write-Host "Running performance test failed" -ForegroundColor Red
     }
     
-    #$job | Receive-Job
+    $job | Receive-Job -Keep
 
     $job | Remove-Job | Out-Null
 
