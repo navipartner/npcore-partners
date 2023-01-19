@@ -1,6 +1,7 @@
 ﻿codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
 {
     Access = Internal;
+
     trigger OnRun()
     var
         NotInitialized: Label 'Codeunit 6151603 wasn''t initialized properly. This is a programming bug, not a user error. Please contact system vendor.';
@@ -20,13 +21,21 @@
         FunctionToRun: Option " ","Apply Discount";
 
     procedure ApplyDiscount(var TempSalePOSIn: Record "NPR POS Sale" temporary; var TempSaleLinePOSIn: Record "NPR POS Sale Line" temporary; var TempNpDcExtCouponBufferIn: Record "NPR NpDc Ext. Coupon Buffer" temporary; Self: Codeunit "NPR NpDc Non-POS App. Mgt.")
+    var
+        LastErrorText: Text;
     begin
         FunctionToRun := FunctionToRun::"Apply Discount";
         TempSalePOS_.Copy(TempSalePOSIn, true);
         TempSaleLinePOS_.Copy(TempSaleLinePOSIn, true);
         TempNpDcExtCouponBuffer_.Copy(TempNpDcExtCouponBufferIn, true);
 
+        ClearLastError();
+
         if Self.Run() then;
+
+        LastErrorText := GetLastErrorText();
+        if (LastErrorText <> '') then
+            Error(LastErrorText);
 
         FunctionToRun := FunctionToRun::" ";
         TempSalePOSIn.Copy(TempSalePOS_, true);
