@@ -44,7 +44,8 @@ param(
     [System.Object] $Body = $null,
 
     [Switch] $Silent,
-    [Switch] $DumpResponse
+    [Switch] $DumpResponse,
+    [Switch] $NotApi
 )
 try {
     $parameters = @{}
@@ -81,7 +82,9 @@ try {
         #$Body = @{}
     }
 
-    $serviceUrl.Path += "/api"
+    if (-not $NotApi.IsPresent) {
+        $serviceUrl.Path += "/api"
+    }
 
     if ($APIPublisher) {
         $serviceUrl.Path += "/$APIPublisher"
@@ -91,7 +94,9 @@ try {
         $serviceUrl.Path += "/$APIGroup"
     }
 
-    $serviceUrl.Path += "/$APIVersion"
+    if (-not $NotApi.IsPresent) {
+        $serviceUrl.Path += "/$APIVersion"
+    }
 
     if ($CompanyId) {
         $serviceUrl.Path += "/companies($CompanyId)"
