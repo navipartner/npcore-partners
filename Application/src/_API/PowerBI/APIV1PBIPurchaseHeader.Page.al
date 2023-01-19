@@ -108,6 +108,14 @@ page 6060037 "NPR APIV1 PBIPurchase Header"
                 {
                     Caption = 'Transaction Type', Locked = true;
                 }
+                field(locationCode; Rec."Location Code")
+                {
+                    Caption = 'Transaction Type', Locked = true;
+                }
+                field(quoteNo; Rec."Quote No.")
+                {
+                    Caption = 'Quote No.', Locked = true;
+                }
             }
         }
     }

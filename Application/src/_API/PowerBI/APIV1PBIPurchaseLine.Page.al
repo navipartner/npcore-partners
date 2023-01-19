@@ -180,6 +180,10 @@ page 6060039 "NPR APIV1 PBIPurchase Line"
                 {
                     Caption = 'Amount Received Not Invoiced Excluding VAT (LCY)', Locked = true;
                 }
+                field(payToVendorNo; Rec."Pay-to Vendor No.")
+                {
+                    Caption = 'Pay-to Vendor No.', Locked = true;
+                }
             }
         }
     }
