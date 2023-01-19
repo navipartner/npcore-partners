@@ -56,6 +56,10 @@ page 6059926 "NPR APIV1 PBIItem"
                 {
                     Caption = 'Type', Locked = true;
                 }
+                field(baseUnitOfMeasure; Rec."Base Unit of Measure")
+                {
+                    Caption = 'Base Unit of Measure', Locked = true;
+                }
                 field(unitCost; Rec."Unit Cost")
                 {
                     Caption = 'Unit Cost', Locked = true;
@@ -95,6 +99,14 @@ page 6059926 "NPR APIV1 PBIItem"
                 field(countryRegionOfOriginCode; Rec."Country/Region of Origin Code")
                 {
                     Caption = 'Country/Region of Origin Code', Locked = true;
+                }
+                field(shelfNo; Rec."Shelf No.")
+                {
+                    Caption = 'Shelf No.', Locked = true;
+                }
+                field(itemTrackingCode; Rec."Item Tracking Code")
+                {
+                    Caption = 'Item Tracking Code', Locked = true;
                 }
                 field(nprItemBrand; Rec."NPR Item Brand")
                 {

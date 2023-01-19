@@ -120,6 +120,10 @@ page 6059929 "NPR APIV1 PBIItemledgerEntry"
                 {
                     Caption = 'Transaction Type', Locked = true;
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'SystemCreatedAt', Locked = true;
+                }
             }
         }
     }
