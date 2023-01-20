@@ -18,12 +18,19 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit" implements "NPR IPOS Workflow"
         ParamCustEntryView_DescLbl: Label 'Pre-filtered customer entry view';
         InvoiceNoPrompt_Cpt: Label 'Enter document no.';
         AmountPrompt_Cpt: Label 'Enter amount to deposit';
+        EditDesc_titleLbl: Label 'Add or change description.';
+        ParamEditDescription_CaptionLbl: Label 'Edit Description';
+        ParamEditDescription_DescLbl: Label 'Enable/Disable Edit Description';
+        ParamCopyDescToLedgerEntries_CaptionLbl: Label 'Copy Description';
+        ParamCopyDescToLedgerEntries_DescLbl: Label 'Copy New Description to Ledger Entries';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddLabel('InvoiceNoPrompt', InvoiceNoPrompt_Cpt);
         WorkflowConfig.AddLabel('AmountPrompt', AmountPrompt_Cpt);
         WorkflowConfig.AddLabel('CrMemoNoPrompt', InvoiceNoPrompt_Cpt);
+        WorkflowConfig.AddLabel('editDesc_title', EditDesc_titleLbl);
+        WorkflowConfig.AddLabel('editDesc_lead', EditDesc_titleLbl);
         WorkflowConfig.AddOptionParameter(
             'DepositType',
             ParamDepositType_OptLbl,
@@ -32,6 +39,8 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit" implements "NPR IPOS Workflow"
             ParamDepositType_OptDescLbl,
             ParamDepositType_OptCptLbl);
         WorkflowConfig.AddTextParameter('CustomerEntryView', '', ParamCustEntryView_NameCptLbl, ParamCustEntryView_DescLbl);
+        WorkflowConfig.AddBooleanParameter('EditDescription', false, ParamEditDescription_CaptionLbl, ParamEditDescription_DescLbl);
+        WorkflowConfig.AddBooleanParameter('CopyNewDescToLedgEntries', false, ParamCopyDescToLedgerEntries_CaptionLbl, ParamCopyDescToLedgerEntries_DescLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -39,6 +48,8 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit" implements "NPR IPOS Workflow"
         case Step of
             'CreateDeposit':
                 CreateDeposit(Context, Sale, SaleLine);
+            'ChangeDesc':
+                ChangeDesc(Context, SaleLine)
         end;
     end;
 
@@ -52,6 +63,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit" implements "NPR IPOS Workflow"
     begin
         DepositType := Context.GetIntegerParameter('DepositType');
         CustomerEntryView := Context.GetStringParameter('CustomerEntryView');
+
         if (DepositType = DepositType::InvoiceNoPrompt) or (DepositType = DepositType::CrMemoNoPrompt) then
             PromptValue := CopyStr(Context.GetString('PromptValue'), 1, 20);
         if (DepositType = DepositType::AmountPrompt) then
@@ -104,8 +116,19 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionCustDeposit.js###
-'let main=async({workflow:e,parameters:i,popup:t,captions:o,context:a})=>{debugger;i.DepositType==1&&(a.PromptValue=await t.input({caption:o.InvoiceNoPrompt})),i.DepositType==2&&(a.PromptAmt=await t.numpad({caption:o.AmountPrompt})),i.DepositType==4&&(a.PromptValue=await t.input({caption:o.CrMemoNoPrompt})),await e.respond("CreateDeposit")};'
+'let main=async({workflow:i,parameters:n,popup:a,captions:e,context:t})=>{if(!(n.DepositType==1&&(t.PromptValue=await a.input({caption:e.InvoiceNoPrompt}),t.PromptValue===null))&&!(n.DepositType==2&&(t.PromptAmt=await a.numpad({caption:e.AmountPrompt}),t.PromptAmt===null))&&!(n.DepositType==4&&(t.PromptValue=await a.input({caption:e.CrMemoNoPrompt}),t.PromptValue===null))&&(await i.respond("CreateDeposit"),n.EditDescription)){debugger;if(i.context.Desc1=await a.input({title:e.editDesc_title,caption:e.editDesc_lead}),i.context.Desc1===null||i.context.Desc1==="")return;await i.respond("ChangeDesc")}};'
         );
+    end;
+
+    local procedure ChangeDesc(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line")
+    var
+        CustomDescription: Text;
+        CopyNewDesc: Boolean;
+        POSActionCustDepositB: Codeunit "NPR POS Action: Cust.Deposit B";
+    begin
+        CopyNewDesc := Context.GetBooleanParameter('CopyNewDescToLedgEntries');
+        CustomDescription := Context.GetString('Desc1');
+        POSActionCustDepositB.SetNewDesc(CustomDescription, SaleLine, CopyNewDesc);
     end;
 }
 

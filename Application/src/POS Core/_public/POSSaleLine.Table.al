@@ -1499,6 +1499,11 @@
                                 "No." = FILTER(<> '')) "Item Discount Group" WHERE(Code = FIELD("Item Disc. Group"));
             ValidateTableRelation = false;
         }
+        field(22; "Copy Description"; Boolean)
+        {
+            Caption = 'Copy Description from POS Entry to Cust. Ledger Entry';
+            DataClassification = CustomerContent;
+        }
         field(10000; Silent; Boolean)
         {
             Caption = 'Silent';
