@@ -30,6 +30,8 @@ stages:
 
         - name: BC1905
 
+        - name: BC2005_CLOUD
+
         - name: vLatest_CLOUD
           alwaysRun: true
 
