@@ -4,18 +4,15 @@ The balancing screen consists of the **Statistics** and **Counting** sections.
 
 ![balance_the_pos_v4](../images/balance_pos_v4_balancing_screen.png)
 
-From the **Statistics** section for the Workshift of a particular POS, you can open the **Overview**, **Discount**, **Turnover**, **Tax Summary**, or display all statistic segments. 
+From the **Statistics** section for the work shift of a particular POS, you can open the **Overview**, **Discount**, **Turnover**, **Tax Summary**, or display all statistic segments. 
 
 ![balance_the_pos_v4_all](../images/balance_pos_v4_balancing_screen_%20all.png)
 
-> [!Note]
-> This information is controlled by the specific [POS End of Day Profile](../../pos_profiles/reference/POS_End_of_Day_Profile.md). You can also hide them, if needed. 
-
-The setup is done in the **POS End of Day Profile**. You can define different profiles, and attach them to an individual POS unit, giving each POS unit its own profile if needed.
+The setup is done in the **POS End of Day Profile**. You can define different profiles, and attach them to an individual POS unit, giving it its own profile.
 
 To balance the POS with this balancing feature version, follow the provided steps:
 
-1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS End of Day Profile** and choose the related link.
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS End of Day Profile**, and choose the related link.
 2. Click **New** to open a blank **NPR POS End of Day Profile Card**. 
 3. Populate the fields according to the [reference table](../reference/end_of_day_v4.md).
 4. Search for **POS Actions Profiles**, and create a new **POS Named Action Profile** (or edit an existing one).
