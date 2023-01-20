@@ -1,6 +1,7 @@
 codeunit 6059978 "NPR POS Action: Cust.Deposit B"
 {
     Access = Internal;
+
     procedure CreateDeposit(DepositType: Option ApplyCustomerEntries,InvoiceNoPrompt,AmountPrompt,MatchCustomerBalance,CrMemoNoPrompt;
                             CustomerEntryView: Text;
                             POSSale: Codeunit "NPR POS Sale";
@@ -106,6 +107,16 @@ codeunit 6059978 "NPR POS Action: Cust.Deposit B"
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
     end;
 
+    procedure SetNewDesc(NewDesc: Text[100]; SaleLine: Codeunit "NPR POS Sale Line"; CopyNewDesc: Boolean)
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        SaleLinePOS.Description := NewDesc;
+        SaleLinePOS."Copy Description" := CopyNewDesc;
+        SaleLinePOS.Modify();
+    end;
+
     local procedure SelectCustomer(POSSale: Codeunit "NPR POS Sale"): Boolean
     var
         SalePOS: Record "NPR POS Sale";
@@ -127,4 +138,5 @@ codeunit 6059978 "NPR POS Action: Cust.Deposit B"
         Commit();
         exit(true);
     end;
+
 }

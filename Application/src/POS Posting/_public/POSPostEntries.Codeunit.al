@@ -903,13 +903,19 @@
                                     POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No."
                                 else
                                     POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
-                                PostingDescription := StrSubstNo(PostingDescriptionLbl, POSEntry.TableCaption, POSSalesLineToBeCompressed."POS Entry No.");
+                                if POSSalesLineToBeCompressed."Copy Description" then
+                                    PostingDescription := POSSalesLineToBeCompressed.Description
+                                else
+                                    PostingDescription := StrSubstNo(PostingDescriptionLbl, POSEntry.TableCaption, POSSalesLineToBeCompressed."POS Entry No.");
                             end;
                         Compressionmethod::"Per POS Period Register":
                             begin
                                 POSPeriodRegister.TestField("Document No.");
                                 POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
-                                PostingDescription := StrSubstNo(PostingDescriptionLbl, POSPeriodRegister.TableCaption, POSSalesLineToBeCompressed."POS Period Register No.");
+                                if POSSalesLineToBeCompressed."Copy Description" then
+                                    PostingDescription := POSSalesLineToBeCompressed.Description
+                                else
+                                    PostingDescription := StrSubstNo(PostingDescriptionLbl, POSPeriodRegister.TableCaption, POSSalesLineToBeCompressed."POS Period Register No.");
                             end;
                     end;
 

@@ -576,6 +576,11 @@
             DataClassification = CustomerContent;
             TableRelation = Vendor;
         }
+        field(7001; "Copy Description"; Boolean)
+        {
+            Caption = 'Copy Description from POS Entry to Cust. Ledger Entry';
+            DataClassification = CustomerContent;
+        }
         field(10014; "Orig.POS Entry S.Line SystemId"; Guid)
         {
             Caption = 'Original POS Entry Sale Line SystemId';

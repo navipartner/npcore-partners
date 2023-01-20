@@ -317,6 +317,7 @@
         POSEntrySalesLine."Return Reason Code" := POSSaleLine."Return Reason Code";
         POSEntrySalesLine."NPRE Seating Code" := POSSaleLine."NPRE Seating Code";
         POSEntrySalesLine."Orig.POS Entry S.Line SystemId" := POSSaleLine."Orig.POS Entry S.Line SystemId";
+        POSEntrySalesLine."Copy Description" := POSSaleLine."Copy Description";
 
         CreateRMAEntry(POSEntry, POSSale, POSSaleLine);
 
