@@ -1,81 +1,67 @@
-﻿codeunit 6150829 "NPR POS Action: POS Info"
+codeunit 6150829 "NPR POS Action: POS Info" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
-    var
-        ReadingErr: Label 'reading in %1';
-
     local procedure ActionCode(): Code[20]
     begin
-        exit('POSINFO');
+        exit(Format(Enum::"NPR POS Workflow"::POSINFO));
     end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('2.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config")
     var
-        ActionDescriptionLbl: Label 'This built in function opens assignes a POS info code to POS sale or POS sale line.', MaxLength = 250;
-    begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
-            Sender.RegisterWorkflow20(
-                'await workflow.respond("SelectPosInfo");' +
-                'while ($context.AskForPosInfoText) {' +
-                '  $context.UserInputString = await popup.input({title: $context.PopupTitle, caption: $context.FieldDescription, required: $context.InputMandatory});' +
-                '  if (($context.InputMandatory) && (!$context.UserInputString)) { ' +
-                '    let DoRetry = await popup.confirm({title: $context.FieldDescription, caption: $captions.ConfirmRetry});' +
-                '    if (!DoRetry) {' +
-                '      return;' +
-                '    };' +
-                '  } else {' +
-                '    await workflow.respond("ValidateUserInput");' +
-                '  };' +
-                '};'
-                );
-
-            Sender.RegisterTextParameter('POSInfoCode', '');
-            Sender.RegisterOptionParameter('ApplicationScope', ' ,Current Line,All Lines,New Lines,Ask', 'All Lines');
-            Sender.RegisterBooleanParameter('ClearPOSInfo', false);
-            Sender.RegisterDataSourceBinding('BUILTIN_SALE');
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    var
+        ActionDescription: Label 'This built in function assigns a POS info code to POS sale or POS sale line.';
+        ParamPOSInfoCode_CptLBl: Label 'POS Info Code';
+        ParamPOSInfoCode_DescLbl: Label 'Code of POS info record.';
+        ParamApplicationScope_OptionLbl: Label ' ,Current Line,All Lines,New Lines,Ask', locked = true;
+        ParamApplicationScope_CptLbl: Label 'Application Scope';
+        ParamApplicationScope_DescLbl: Label 'Choose application scope.';
+        ParamApplicationScope_OptionCptLbl: Label ' ,Current Line,All Lines,New Lines,Ask';
+        ParamClearPOSInfo_CptLbl: Label 'Clear POS Info';
+        ParamClearPOSInfo_DescLbl: Label 'Clears POS info from';
         MustBeSpecifiedLbl: Label 'You cannot leave this field blank.';
         ConfirmRetryQst: Label 'Do you want to try again?';
         ConfirmRetryLbl: Label '%1 %2', Locked = true;
     begin
-        Captions.AddActionCaption(ActionCode(), 'ConfirmRetry', StrSubstNo(ConfirmRetryLbl, MustBeSpecifiedLbl, ConfirmRetryQst));
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddTextParameter('POSInfoCode', '', ParamPOSInfoCode_CptLBl, ParamPOSInfoCode_DescLbl);
+        WorkflowConfig.AddOptionParameter('ApplicationScope',
+                                        ParamApplicationScope_OptionLbl,
+                                        SelectStr(3, ParamApplicationScope_OptionLbl),
+                                        ParamApplicationScope_CptLbl,
+                                        ParamApplicationScope_DescLbl,
+                                        ParamApplicationScope_OptionCptLbl);
+        WorkflowConfig.AddBooleanParameter('ClearPOSInfo', false, ParamClearPOSInfo_CptLbl, ParamClearPOSInfo_DescLbl);
+        WorkflowConfig.AddLabel('ConfirmRetry', StrSubstNo(ConfirmRetryLbl, MustBeSpecifiedLbl, ConfirmRetryQst));
+        WorkflowConfig.SetDataSourceBinding('BUILTIN_SALE');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        PosInfo: Record "NPR POS Info";
+        POSInfo: Record "NPR POS Info";
+        POSsession: Codeunit "NPR POS Session";
+        BusinessLogicRun: Codeunit "NPR POS Action: POS Info-B";
+        ApplicationScope: Option " ","Current Line","All Lines","New Lines","Ask";
         UserInputString: Text;
+        ClearPOSInfo: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-        Handled := true;
 
-        PosInfo.Get(Context.GetStringParameterOrFail('POSInfoCode', StrSubstNo(ReadingErr, ActionCode())));
+        POSInfo.Get(Context.GetStringParameter('POSInfoCode'));
 
-        case WorkflowStep of
+        case Step of
             'SelectPosInfo':
                 if AddInfoRequired(PosInfo, Context) then
                     exit;
             'ValidateUserInput':
-                UserInputString := ValidateUserInput(PosInfo, Context);
+                UserInputString := ValidateUserInput(POSInfo, Context);
         end;
-        OpenPOSInfoPage(PosInfo, Context, POSSession, UserInputString);
+
+        ApplicationScope := Context.GetIntegerParameter('ApplicationScope');
+        ClearPOSInfo := Context.GetBooleanParameter('ClearPOSInfo');
+        BusinessLogicRun.OpenPOSInfoPage(POSInfo, POSSession, UserInputString, ApplicationScope, ClearPOSInfo);
     end;
 
-    local procedure AddInfoRequired(PosInfo: Record "NPR POS Info"; Context: Codeunit "NPR POS JSON Management"): Boolean
+    local procedure AddInfoRequired(PosInfo: Record "NPR POS Info"; Context: Codeunit "NPR POS JSON Helper"): Boolean
     var
         POSInfoManagement: Codeunit "NPR POS Info Management";
         IsRequired: Boolean;
@@ -90,52 +76,14 @@
         exit(IsRequired);
     end;
 
-    local procedure ValidateUserInput(PosInfo: Record "NPR POS Info"; Context: Codeunit "NPR POS JSON Management") UserInputString: Text
+    local procedure ValidateUserInput(PosInfo: Record "NPR POS Info"; Context: Codeunit "NPR POS JSON Helper") UserInputString: Text
     begin
         Context.SetScopeRoot();
         UserInputString := Context.GetString('UserInputString');
-        if UserInputString = '' then begin
-            PosInfo.Get(Context.GetStringParameterOrFail('POSInfoCode', StrSubstNo(ReadingErr, ActionCode())));
+        if UserInputString = '' then
             if PosInfo."Input Mandatory" then
                 Error('');
-        end;
         Context.SetContext('AskForPosInfoText', false);
-    end;
-
-    local procedure OpenPOSInfoPage(PosInfo: Record "NPR POS Info"; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; UserInputString: Text)
-    var
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        CurrentView: Codeunit "NPR POS View";
-        POSInfoManagement: Codeunit "NPR POS Info Management";
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-    begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.GetType() = CurrentView.GetType() ::Sale) then begin
-            POSSession.GetSaleLine(POSSaleLine);
-            POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        end;
-
-        if (CurrentView.GetType() = CurrentView.GetType() ::Payment) then begin
-            POSSession.GetPaymentLine(POSPaymentLine);
-            POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
-        end;
-
-        if (SaleLinePOS."Sales Ticket No." = '') then begin
-            // No lines in current view
-            SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
-            SaleLinePOS."Register No." := SalePOS."Register No.";
-            SaleLinePOS.Date := SalePOS.Date;
-            SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
-        end;
-
-        POSInfoManagement.ProcessPOSInfoMenuFunction(
-            SaleLinePOS, PosInfo.Code, Context.GetIntegerParameter('ApplicationScope'), Context.GetBooleanParameter('ClearPOSInfo'), UserInputString);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, false)]
@@ -157,5 +105,13 @@
                         POSParameterValue.Value := PosInfo.Code;
                 end;
         end;
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionPOSInfo.js###
+'let main=async({workflow:e,context:i,popup:r,parameters:t,captions:a})=>{for(await e.respond("SelectPosInfo");i.AskForPosInfoText;)if(i.UserInputString=await r.input({title:i.PopupTitle,caption:i.FieldDescription,required:i.InputMandatory}),i.InputMandatory&&!i.UserInputString){if(!await r.confirm({title:i.FieldDescription,caption:a.ConfirmRetry}))return}else await e.respond("ValidateUserInput")};'
+);
     end;
 }
