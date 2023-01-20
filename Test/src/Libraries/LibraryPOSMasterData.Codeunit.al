@@ -666,5 +666,20 @@
         POSMenuFilter.Modify();
     end;
 
+    procedure CreatePOSInfo(POSInfoCode: code[20]; InputType: Option "Text","SubCode","Table"; Type: Option "Show Message","Request Data","Write Default Message"; MessageTxt: Text[50])
+    var
+        POSInfo: Record "NPR POS Info";
+    begin
+        if not POSInfo.Get(POSInfoCode) then begin
+            POSInfo.Init();
+            POSInfo.Validate(Code, POSInfoCode);
+            POSInfo.Insert(true);
+        end;
+        POSInfo.Validate("Input Type", InputType);
+        POSInfo.Validate(Type, Type);
+        POSInfo.Validate(Message, MessageTxt);
+        POSInfo.Modify(true);
+    end;
+
 }
 
