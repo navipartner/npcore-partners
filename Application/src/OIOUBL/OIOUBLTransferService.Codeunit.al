@@ -195,7 +195,7 @@ codeunit 6060015 "NPR OIOUBL Transfer Service"
     end;
 
 
-#IF BC17 or BC18 or BC19
+#IF BC17 or BC18 or BC19 or BC20
     [EventSubscriber(ObjectType::Table, Database::"Document Sending Profile", 'OnCheckElectronicSendingEnabled', '', false, false)]
     local procedure OnCheckElectronicSendingEnabled(var ExchServiceEnabled: Boolean)
     var
