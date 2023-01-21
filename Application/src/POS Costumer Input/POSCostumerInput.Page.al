@@ -5,10 +5,10 @@ page 6150774 "NPR POS Costumer Input"
     SourceTable = "NPR POS Costumer Input";
     Extensible = false;
     ApplicationArea = NPRRetail;
-    Caption = 'Costumer Input';
+    Caption = 'Customer Input';
 #IF NOT BC17
-    AboutTitle = 'Costumer Input';
-    AboutText = 'Costumer input defines the input given by a costumer, for a given context.';
+    AboutTitle = 'Customer Input';
+    AboutText = 'Customer input defines the input given by a customer, for a given context.';
 #ENDIF
 
     layout
@@ -31,11 +31,11 @@ page 6150774 "NPR POS Costumer Input"
                 field("Date"; Rec."Date & Time")
                 {
                     ApplicationArea = NPRRetail;
-                    Caption = 'Costumer Input Date & Time';
+                    Caption = 'Customer Input Date & Time';
                     ToolTip = 'The date and time for collection of input.';
                     Editable = false;
 #IF NOT BC17
-                    AboutTitle = 'Costumer Input Date & Time';
+                    AboutTitle = 'Customer Input Date & Time';
                     AboutText = 'The date and time for collection of input.';
 #ENDIF
                 }
@@ -43,10 +43,10 @@ page 6150774 "NPR POS Costumer Input"
                 {
                     ApplicationArea = NPRRetail;
                     Editable = false;
-                    Caption = 'Costumer Input Context';
+                    Caption = 'Customer Input Context';
                     ToolTip = 'Describes the context in which the input was gathered.';
 #IF NOT BC17
-                    AboutTitle = 'Costumer Input Context';
+                    AboutTitle = 'Customer Input Context';
                     AboutText = 'Describes the context in which the input was gathered.';
 #ENDIF
 
@@ -55,11 +55,11 @@ page 6150774 "NPR POS Costumer Input"
                 {
                     ApplicationArea = NPRRetail;
                     Editable = false;
-                    Caption = 'Costumer Phone Number';
-                    ToolTip = 'The phone number given by the costumer';
+                    Caption = 'Customer Phone Number';
+                    ToolTip = 'The phone number given by the customer';
 #IF NOT BC17
-                    AboutTitle = 'Costumer Phone Number';
-                    AboutText = 'The phone number given by the costumer';
+                    AboutTitle = 'Customer Phone Number';
+                    AboutText = 'The phone number given by the customer';
 #ENDIF
 
                 }

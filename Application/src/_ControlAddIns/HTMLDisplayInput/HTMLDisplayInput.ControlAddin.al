@@ -5,7 +5,7 @@ controladdin "NPR HTML Display Input"
 
     VerticalStretch = true;
     HorizontalStretch = true;
-    RequestedHeight = 600;
+    //RequestedHeight = 600;
 
     procedure SendInputData(Input: JsonObject; ShowControl: Boolean);
     event Ready();
