@@ -74,11 +74,11 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                 field("Costumer Input Option: Money Back"; Rec."CIO: Money Back")
                 {
                     ApplicationArea = NPRRetail;
-                    Caption = 'Costumer Input Option: Money Back';
-                    ToolTip = 'Specifies the costumer input options.';
+                    Caption = 'Customer Input Option: Money Back';
+                    ToolTip = 'Specifies the customer input options.';
 #IF NOT BC17
-                    AboutTitle = 'Costumer Input Option: Money Back';
-                    AboutText = 'Specifies the costumer input options.';
+                    AboutTitle = 'Customer Input Option: Money Back';
+                    AboutText = 'Specifies the customer input options.';
 #ENDIF
                 }
             }
@@ -93,7 +93,7 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
             {
                 ApplicationArea = NPRRetail;
                 Image = Import;
-                ToolTip = 'Upload HTML to be used for Costumer Display.';
+                ToolTip = 'Upload HTML to be used for customer display.';
 
                 trigger OnAction()
                 var
@@ -118,7 +118,7 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
             {
                 ApplicationArea = NPRRetail;
                 Image = Export;
-                ToolTip = 'Download HTML to be used for Costumer Display.';
+                ToolTip = 'Download HTML to be used for customer display.';
 
                 trigger OnAction()
                 var
@@ -154,7 +154,7 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                 Image = ImportDatabase;
 
                 //RunObject = page "NPR HTML Disp Prof Azure";
-                ToolTip = 'Downloads template data.';
+                ToolTip = 'Downloads Template Data.';
                 ApplicationArea = NPRRetail;
                 Promoted = true;
                 PromotedOnly = true;

@@ -253,8 +253,10 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         POSUnit: Record "NPR POS Unit";
         HtmlProf: Record "NPR POS HTML Disp. Prof.";
         Setup: Codeunit "NPR POS Setup";
+        POSSaleLines: Record "NPR POS Entry Sales Line";
         Context: JsonObject;
         JsParam: JsonObject;
+        Sum: Integer;
     begin
         POSSession.GetSetup(Setup);
         POSEntry.Reset();
@@ -268,6 +270,15 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         if (POSEntry."Amount Incl. Tax" >= 0) then
             exit;
         if (not (HtmlProf."CIO: Money Back" <> HtmlProf."CIO: Money Back"::None)) then
+            exit;
+        if (POSEntry.CalcFields("Is Pay-in Pay-out") and POSEntry."Is Pay-in Pay-out") then
+            exit;
+        POSSaleLines.SetFilter("POS Entry No.", '=%1', POSEntry."Entry No.");
+        POSSaleLines.SetFilter(Type, '=%1', POSSaleLines.Type::Item);
+        repeat
+            Sum := Sum + POSSaleLines."Amount Incl. VAT";
+        until POSSaleLines.Next() = 0;
+        if (Sum >= 0) then
             exit;
         Context.Add('DisplayAction', 'SendJS');
         JsParam.Add('JSAction', 'GetInput');
