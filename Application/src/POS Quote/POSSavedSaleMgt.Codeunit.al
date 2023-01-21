@@ -39,7 +39,7 @@
                     Clear(POSQuotes);
                     POSQuotes.SetIsInEndOfTheDayProcess(true);
                     POSQuotes.LookupMode(true);
-                    Confirmed := POSQuotes.RunModal() = ACTION::LookupOK;
+                    Confirmed := POSQuotes.RunModal() = Action::LookupOK;
                 end;
         end;
 
@@ -123,7 +123,7 @@
         FindFields(RecRef, false, TempNpDcSaleLinePOSNewCouponFieldBuffer, false);
 
         RecRef.GetTable(POSCrossReference);
-        FindFields(RecRef, false, TempPOSCrossReferenceFieldBuffer, false);
+        FindFields(RecRef, false, TempPOSCrossReferenceFieldBuffer, true);
 
         RecRef.GetTable(NpCsSaleLinePOSRef);
         FindFields(RecRef, false, TempNpCsSaleLinePOSRefFieldBuffer, false);
@@ -386,7 +386,7 @@
         if not POSQuoteEntry."POS Sales Data".HasValue() then
             exit(false);
         POSQuoteEntry.CalcFields("POS Sales Data");
-        POSQuoteEntry."POS Sales Data".CreateInStream(InStr, TEXTENCODING::UTF8);
+        POSQuoteEntry."POS Sales Data".CreateInStream(InStr, TextEncoding::UTF8);
         exit(XmlDocument.ReadFrom(InStr, XmlDoc));
     end;
 
@@ -472,7 +472,7 @@
         FindFields(RecRef, false, TempNpDcSaleLinePOSNewCouponFieldBuffer, false);
 
         RecRef.GetTable(POSCrossReference);
-        FindFields(RecRef, false, TempPOSCrossReferenceFieldBuffer, false);
+        FindFields(RecRef, false, TempPOSCrossReferenceFieldBuffer, true);
 
         RecRef.GetTable(NpCsSaleLinePOSRef);
         FindFields(RecRef, false, TempNpCsSaleLinePOSRefFieldBuffer, false);
@@ -597,7 +597,7 @@
                     POSCrossReference."Record Value" := StrSubstNo(POSCrossRefLbl, SalePOS."Sales Ticket No.", CopyStr(POSCrossReference."Record Value", Position + 1))
                 else
                     POSCrossReference."Record Value" := SalePOS."Sales Ticket No.";
-                POSCrossReference.Insert(true);
+                POSCrossReference.Insert(true, true);
             end;
 
             Element.SelectNodes('collect_documents/collect_document', NewCollectDocumentNodes);
@@ -651,7 +651,7 @@
         DateTimeValue: DateTime;
         DurationValue: Duration;
         GUIDValue: Guid;
-        RecordIDValue: RecordID;
+        RecordIDValue: RecordId;
     begin
         FieldRef := RecRef.Field(Field."No.");
         case Field.Type of
