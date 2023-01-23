@@ -68,6 +68,16 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                     AboutText = 'Specifies if VAT should be excluded on the receipt';
 #ENDIF
                 }
+                field("Receipt Item Description"; Rec."Receipt Item Description")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Receipt Item Description';
+                    ToolTip = 'Specifies which description is used on the second display.';
+#IF NOT BC17
+                    AboutTitle = 'Receipt Item Description';
+                    AboutText = 'Specifies which description is used on the second display.';
+#ENDIF
+                }
             }
             group("Input Options")
             {

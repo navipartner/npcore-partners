@@ -522,7 +522,7 @@
         }
         field(6001; "Costumer Input"; Boolean)
         {
-            Caption = 'Costumer Input';
+            Caption = 'Customer Input';
             Editable = false;
             FieldClass = FlowField;
             CalcFormula = exist("NPR POS Costumer Input" WHERE("POS Entry No." = FIELD("Entry No.")));

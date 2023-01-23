@@ -35,6 +35,12 @@ table 6059809 "NPR POS HTML Disp. Prof."
             OptionMembers = "None","Phone & Signature";
             Caption = 'Customer Input Option: Money Back';
         }
+        field(7; "Receipt Item Description"; Option)
+        {
+            DataClassification = CustomerContent;
+            OptionMembers = "Item Description 1","Item Description 2";
+            Caption = 'Receipt Item Description';
+        }
     }
 
     keys

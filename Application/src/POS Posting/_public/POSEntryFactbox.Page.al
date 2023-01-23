@@ -131,7 +131,7 @@
             }
             field("Costumer Input"; Rec."Costumer Input")
             {
-                ToolTip = 'Specifies if there are any costumer input related to the POS Entry';
+                ToolTip = 'Specifies if there are any customer input related to the POS Entry';
                 ApplicationArea = NPRRetail;
             }
             group(CleanCashTransactions)

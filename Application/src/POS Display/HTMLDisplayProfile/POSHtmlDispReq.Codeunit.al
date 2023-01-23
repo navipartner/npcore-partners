@@ -87,6 +87,8 @@ codeunit 6060083 "NPR POS Html Disp. Req"
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         GLSetup: Record "General Ledger Setup";
+        POSunit: Record "NPR POS Unit";
+        HtmlProfile: Record "NPR POS HTML Disp. Prof.";
 
         ReceiptContent: JsonObject;
         SaleLines: JsonArray;
@@ -109,6 +111,8 @@ codeunit 6060083 "NPR POS Html Disp. Req"
         SaleLinePOS.SetRange("Register No.", POSUnitCode);
         SaleLinePOS.SetRange("Sales Ticket No.", SalesTicket);
         SaleLinePOS.SetRange(Date, Date);
+        POSunit.Get(POSUnitCode);
+        HtmlProfile.Get(POSunit."POS HTML Display Profile");
         if (SaleLinePOS.FindSet()) then begin
             repeat
                 if SaleLinePOS."No." <> '' then
@@ -128,6 +132,8 @@ codeunit 6060083 "NPR POS Html Disp. Req"
                         LineType::Item:
                             begin
                                 SaleLine.Add('Description', SaleLinePOS.Description);
+                                if (HtmlProfile."Receipt Item Description" = HtmlProfile."Receipt Item Description"::"Item Description 2") then
+                                    SaleLine.Replace('Description', SaleLinePOS."Description 2");
                                 SaleLine.Add('AmountIncTax', SaleLinePOS."Amount Including VAT");
                                 SaleLine.Add('AmountExTax', SaleLinePOS.Amount);
                                 SaleLine.Add('Quantity', SaleLinePOS.Quantity);
