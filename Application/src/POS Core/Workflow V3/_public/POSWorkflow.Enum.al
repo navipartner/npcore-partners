@@ -512,6 +512,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'PRINT_RECEIPT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Print Receipt";
     }
+    value(103; DELIVER_COLLECT_ORD)
+    {
+        Caption = 'DELIVER_COLLECT_ORD', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NpCs POSAction Deliv.Order";
+    }
     value(105; "PRINT_ITEM")
     {
         Caption = 'PRINT_ITEM', Locked = true, MaxLength = 20;
