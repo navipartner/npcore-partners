@@ -1,5 +1,3 @@
 # Represents a vendor in Business Central.
 
-Link to Vendors API openapi playground:
-[Vendors API](/api/sandbox.html?spec=vendor.json)
-
+Refer to the [Vendors API OpenAPI playground](/api/sandbox.html?spec=vendor.json) to learn how to correctly consume the provided service.

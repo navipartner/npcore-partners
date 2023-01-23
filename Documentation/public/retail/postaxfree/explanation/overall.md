@@ -18,4 +18,5 @@ Note: It is also possible to provide tax free services without a middle-man tax 
 Tax free providers make this concept abstract.
 
 ### Related links
+
 - [Set up Global Blue tax free](../howto/globalblue.md)

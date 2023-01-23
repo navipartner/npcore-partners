@@ -1,5 +1,5 @@
-# Represents a customer in Business Central.
+# Customer API
 
-Link to Customers API openapi playground:
-[Customers API](/api/sandbox.html?spec=customer.json)
+Customer API corresponds to the Customer entity in Business Central. Refer to the [Customers OpenAPI playground](/api/sandbox.html?spec=customer.json) to learn how to correctly consume the provided service.
+
 

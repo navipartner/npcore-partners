@@ -1,6 +1,6 @@
 # Welcome to the NP Retail product documentation
 
-NP Retail is a cloud-based POS solution that uses Microsoft Dynamics 365 Business Central as its base. In addition to the POS system, it combines financial management, accounting, management of orders and products, inventory management, reports, and statistics in one comprehensive SaaS solution that facilitates business processes in small and mid-sized organizations. 
+NP Retail is a solution which combines the functionalities of the POS and ERP systems based on Microsoft Dynamics 365 Business Central. This framework enables synchronizing data across different channels to offer information and insights to small and mid-sized businesses, and assisting them with improving overall customer service. Some of the improved business aspects include financial management, accounting, management of orders and products, inventory management, reports, and statistics, which are all merged into a single solution. 
 
 ## Get started
 
