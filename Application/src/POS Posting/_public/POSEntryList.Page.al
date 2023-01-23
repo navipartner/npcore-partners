@@ -70,12 +70,6 @@
                     ApplicationArea = NPRRetail;
                     Visible = not IsSimpleView;
                 }
-                field("Salesperson Code"; Rec."Salesperson Code")
-                {
-                    ToolTip = 'Specifies the person that has been working on this transaction.';
-                    ApplicationArea = NPRRetail;
-                    Visible = not IsSimpleView;
-                }
                 field("POS Period Register No."; Rec."POS Period Register No.")
                 {
                     Visible = false;
@@ -102,6 +96,11 @@
                 field(Description; Rec.Description)
                 {
                     ToolTip = 'Specifies the description for the entry.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Salesperson Code"; Rec."Salesperson Code")
+                {
+                    ToolTip = 'Specifies the person that has been working on this transaction.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer No."; Rec."Customer No.")

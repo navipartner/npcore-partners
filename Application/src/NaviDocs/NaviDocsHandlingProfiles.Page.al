@@ -28,7 +28,7 @@
                 }
                 field("Handle by NAS"; Rec."Handle by NAS")
                 {
-
+                    Caption = 'Job Queue';
                     ToolTip = 'Specifies the value of the Handle by NAS field';
                     ApplicationArea = NPRRetail;
                 }
