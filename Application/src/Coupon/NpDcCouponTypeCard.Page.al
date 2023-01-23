@@ -261,6 +261,16 @@
                     }
                 }
             }
+            group(GS1)
+            {
+                Visible = GS1Type;
+                field("GS1 Account No.";
+                Rec."GS1 Account No.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the GS1 Account No. field.';
+                }
+            }
         }
     }
 
@@ -403,10 +413,12 @@
         HasIssueCouponSetup: Boolean;
         HasValidateCouponSetup: Boolean;
         PrintUsingTemplate: Boolean;
+        GS1Type: Boolean;
 
     local procedure SetHasSetup()
     var
         NpDcCouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
+        ModuleApplyGS1: Codeunit "NPR NpDc Module Apply GS1";
     begin
         HasIssueCouponSetup := false;
         NpDcCouponModuleMgt.OnHasIssueCouponSetup(Rec, HasIssueCouponSetup);
@@ -416,7 +428,7 @@
 
         HasApplyDiscountSetup := false;
         NpDcCouponModuleMgt.OnHasApplyDiscountSetup(Rec, HasApplyDiscountSetup);
-
+        GS1Type := Rec."Apply Discount Module" = ModuleApplyGS1.ModuleCode();
         CurrPage.Update(false);
     end;
 
