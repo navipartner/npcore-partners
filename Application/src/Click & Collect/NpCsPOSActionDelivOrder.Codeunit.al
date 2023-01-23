@@ -1,62 +1,88 @@
-﻿codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
+﻿codeunit 6151203 "NPR NpCs POSAction Deliv.Order" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
     var
-        DeliverCollectInStoreLbl: Label 'Deliver Collect in Store Documents';
+        DelOrderBL: Codeunit "NPR NpCs POSAct. Deliv.Order-B";
+
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
+    var
         CollectInStoreLbl: Label 'Collect in Store';
-        EnterCollectRefNoLbl: Label 'Enter Collect Reference No.';
-        ProcessingStatusQst: Label 'Processing Status is ''%1''.\Continue delivering %2 %3?', Comment = '%1=NpCsDocument."Processing Status";%2=NpCsDocument."Document Type";%3=NpCsDocument."Reference No."';
-        DeliveryStatusQst: Label 'Delivery Status is ''%1''.\Continue delivering %2 %3?', Comment = '%1=NpCsDocument."Processing Status";%2=NpCsDocument."Document Type";%3=NpCsDocument."Reference No."';
-        EmptyLinesOnDocumentErr: Label 'Document ''%1'' has no lines to deliver.', Comment = '%1=NpCsDocument."Reference No."';
+        DeliverCollectInStoreLbl: Label 'Deliver Collect in Store Documents';
         DeliveryLbl: Label 'Collect %1 %2', Comment = '%1=NpCsDocument."Document Type";%2=NpCsDocument."Reference No."';
-        SalesLineTypeNotSupportedErr: Label 'Supported types are %1, %2 and %3.', Comment = '%1=SalesLine.Type::"";%2=SalesLine.Type::Item;%3=SalesLine.Type::"G/L Account"';
-        PrepaidAmountLbl: Label 'Prepaid Amount %1', Comment = '%1=POS Menu Button Parameter Value';
-        FoundDeliverReferenceErr: Label 'Collect Reference No. %3 (%1 %2) is already being delivery on current sale', Comment = '%1=NpCsDocument."Document Type";%2=NpCsDocument."Document No.";%3=NpCsDocument."Reference No."';
-        OpenDocumentLbl: Label 'Open Document';
+        EnterCollectRefNoLbl: Label 'Enter Collect Reference No.';
+        LocationFromDescLbl: Label 'Specifies Location from';
+        LocationFromParamLbl: Label 'Location from';
+        LocationFromPOptLbl: Label 'POS Store,Location Filter Parameter', Locked = true;
+        LocationFromPOpt_CptLbl: Label 'POS Store,Location Filter Parameter';
         OpenDocumentDescriptionLbl: Label 'Open the selected order before document is delivered';
-
-    local procedure ActionCode(): Text[20]
+        OpenDocumentLbl: Label 'Open Document';
+        ParamConfInvDiscLbl: Label 'Confirm Inv. Discount Amount';
+        ParamDelivery_CptLbl: Label 'Delivery Text';
+        ParamDelivery_DescLbl: Label 'Specifies Delivery Text';
+        ParamLocFilter_CptLbl: Label 'Location Filter';
+        ParamLocFilter_DescLbl: Label 'Specifies Location Filter';
+        ParamPrepaidCaptLbl: Label 'Prepaid Text';
+        ParamPrepaidLbl: Label 'Prepaid Text';
+        ParamSortingLbl: Label 'Sorting';
+        ParamSortingOptLbl: Label 'Entry No.,Reference No.,Delivery expires at', Locked = true;
+        ParamSortingOpt_CptLbl: Label 'Entry No.,Reference No.,Delivery expires at';
+        PrepaidAmountLbl: Label 'Prepaid Amount %1', Comment = '%1=POS Menu Button Parameter Value';
     begin
-        exit('DELIVER_COLLECT_ORD');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(DeliverCollectInStoreLbl);
+
+        WorkflowConfig.SetDataSourceBinding('BUILTIN_SALELINE');
+        WorkflowConfig.SetCustomJavaScriptLogic('enable', 'return row.getField("CollectInStore.ProcessedOrdersExists").rawValue;');
+        WorkflowConfig.AddLabel('DocumentInputTitle', CollectInStoreLbl);
+        WorkflowConfig.AddLabel('ReferenceNo', EnterCollectRefNoLbl);
+
+        WorkflowConfig.AddOptionParameter('Location From',
+                                          LocationFromPOptLbl,
+                                          SelectStr(1, LocationFromPOptLbl),
+                                          LocationFromParamLbl,
+                                          LocationFromDescLbl,
+                                          LocationFromPOpt_CptLbl);
+        WorkflowConfig.AddTextParameter('Location Filter', '', ParamLocFilter_CptLbl, ParamLocFilter_DescLbl);
+        WorkflowConfig.AddTextParameter('Delivery Text', DeliveryLbl, ParamDelivery_CptLbl, ParamDelivery_DescLbl);
+        WorkflowConfig.AddTextParameter('Prepaid Text', PrepaidAmountLbl, ParamPrepaidLbl, ParamPrepaidCaptLbl);
+        WorkflowConfig.AddOptionParameter('Sorting',
+                                          ParamSortingOptLbl,
+                                          SelectStr(1, ParamSortingOptLbl),
+                                          ParamSortingLbl,
+                                          ParamSortingLbl,
+                                          ParamSortingOpt_CptLbl);
+        WorkflowConfig.AddBooleanParameter('OpenDocument', false, OpenDocumentLbl, OpenDocumentDescriptionLbl);
+        WorkflowConfig.AddBooleanParameter('ConfirmInvDiscAmt', false, ParamConfInvDiscLbl, ParamConfInvDiscLbl);
     end;
 
-    local procedure ActionVersion(): Text[30]
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; SaleMgr: Codeunit "NPR POS Sale"; SaleLineMgr: Codeunit "NPR POS Sale Line"; PaymentLineMgr: Codeunit "NPR POS Payment Line"; SetupMgr: Codeunit "NPR POS Setup");
+    var
+        POSSession: Codeunit "NPR POS Session";
     begin
-        exit('1.4');
+        case Step of
+            'select_document':
+                begin
+                    OnActionSelectDocument(Context, POSSession);
+                end;
+            'deliver_document':
+                begin
+                    OnActionDeliverDocument(Context, POSSession);
+                end;
+        end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
+    local procedure GetActionScript(): Text
     begin
-        if not Sender.DiscoverAction(
-          ActionCode(),
-          DeliverCollectInStoreLbl,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Multiple) then
-            exit;
-
-        Sender.RegisterWorkflowStep('document_input', 'input({title: labels.DocumentInputTitle,caption: labels.ReferenceNo,value: ""}).cancel(abort);');
-        Sender.RegisterWorkflowStep('select_document', 'respond();');
-        Sender.RegisterWorkflowStep('deliver_document', 'if(context.entry_no) {respond();}');
-        Sender.RegisterWorkflow(false);
-        Sender.RegisterDataSourceBinding('BUILTIN_SALE');
-        Sender.RegisterCustomJavaScriptLogic('enable', 'return row.getField("CollectInStore.ProcessedOrdersExists").rawValue;');
-        Sender.RegisterOptionParameter('Location From', 'POS Store,Location Filter Parameter', 'POS Store');
-        Sender.RegisterTextParameter('Location Filter', '');
-        Sender.RegisterTextParameter('Delivery Text', DeliveryLbl);
-        Sender.RegisterTextParameter('Prepaid Text', PrepaidAmountLbl);
-        Sender.RegisterOptionParameter('Sorting', 'Entry No.,Reference No.,Delivery expires at', 'Entry No.');
-        Sender.RegisterBooleanParameter('OpenDocument', false);
-        Sender.RegisterBooleanParameter('ConfirmInvDiscAmt', false);
+        exit(
+//###NPR_INJECT_FROM_FILE:NpCsDeliverOrder.js###
+'let main=async({workflow:n,context:e,popup:i,captions:t})=>{if(e.document_input=await i.input({title:t.DocumentInputTitle,caption:t.ReferenceNo,value:""}),e.document_input==null)return" ";await n.respond("select_document"),e.entry_no&&await n.respond("deliver_document")};'
+        );
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    procedure ActionCode(): Text
     begin
-        Captions.AddActionCaption(ActionCode(), 'DocumentInputTitle', CollectInStoreLbl);
-        Captions.AddActionCaption(ActionCode(), 'ReferenceNo', EnterCollectRefNoLbl);
+        exit(Format(Enum::"NPR POS Workflow"::DELIVER_COLLECT_ORD));
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, true)]
@@ -103,87 +129,37 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
-    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    var
-        SalesDocImportMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'OpenDocument':
-                Caption := OpenDocumentLbl;
-            'ConfirmInvDiscAmt':
-                Caption := SalesDocImportMgt.GetConfirmInvDiscAmtLbl();
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
-    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    var
-        SalesDocImportMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'OpenDocument':
-                Caption := OpenDocumentDescriptionLbl;
-            'ConfirmInvDiscAmt':
-                Caption := SalesDocImportMgt.GetConfirmInvDiscAmtDescLbl();
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-    begin
-        if Handled then
-            exit;
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-        Handled := true;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        case WorkflowStep of
-            'select_document':
-                begin
-                    OnActionSelectDocument(JSON, POSSession, FrontEnd);
-                end;
-            'deliver_document':
-                begin
-                    OnActionDeliverDocument(JSON, POSSession);
-                    POSSession.RequestRefreshData();
-                end;
-        end;
-    end;
-
-    local procedure OnActionSelectDocument(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnActionSelectDocument(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
     var
         NpCsDocument: Record "NPR NpCs Document";
+        ConfirmInvDiscAmt, OpenDocument : Boolean;
+        ReferenceNo: Text;
+        LocationFilter: Text;
+        SortingParam: Integer;
     begin
-        if not FindDocument(JSON, POSSession, NpCsDocument) then
+        OpenDocument := Context.GetBooleanParameter('OpenDocument');
+        ConfirmInvDiscAmt := Context.GetBooleanParameter('ConfirmInvDiscAmt');
+        ReferenceNo := CopyStr(Context.GetString('document_input'), 1, MaxStrLen(NpCsDocument."Reference No."));
+        LocationFilter := GetLocationFilter(Context, POSSession);
+        SortingParam := Context.GetIntegerParameter('Sorting');
+
+        if not DelOrderBL.FindAndConfirmDoc(NpCsDocument, ReferenceNo, LocationFilter, SortingParam, ConfirmInvDiscAmt, OpenDocument) then
             exit;
 
-        if not ConfirmDocumentStatus(NpCsDocument) then
-            exit;
-
-        if not ConfirmOpenDocument(JSON, NpCsDocument) then
-            exit;
-
-        JSON.SetContext('entry_no', NpCsDocument."Entry No.");
-        FrontEnd.SetActionContext(ActionCode(), JSON);
+        Context.SetContext('entry_no', NpCsDocument."Entry No.");
     end;
 
-    local procedure OnActionDeliverDocument(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure OnActionDeliverDocument(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
     var
         NpCsDocument: Record "NPR NpCs Document";
+        ConfirmInvDiscAmt: Boolean;
         EntryNo: Integer;
+        DeliverText: Text;
     begin
-        JSON.SetContext('/', false);
-        EntryNo := JSON.GetInteger('entry_no');
+        Context.SetContext('/', false);
+        EntryNo := Context.GetInteger('entry_no');
+        DeliverText := Context.GetStringParameter('Delivery Text');
+        ConfirmInvDiscAmt := Context.GetBooleanParameter('ConfirmInvDiscAmt');
         if EntryNo = 0 then
             exit;
 
@@ -191,265 +167,21 @@
         case NpCsDocument."Document Type" of
             NpCsDocument."Document Type"::Order:
                 begin
-                    DeliverOrder(JSON, POSSession, NpCsDocument);
+                    DelOrderBL.DeliverOrder(DeliverText, POSSession, NpCsDocument);
                 end;
             NpCsDocument."Document Type"::"Posted Invoice":
                 begin
-                    DeliverPostedInvoice(JSON, POSSession, NpCsDocument);
+                    DelOrderBL.DeliverPostedInvoice(ConfirmInvDiscAmt, DeliverText, POSSession, NpCsDocument);
                 end;
         end;
     end;
 
-    local procedure DeliverOrder(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; NpCsDocument: Record "NPR NpCs Document")
-    var
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        SalePOS: Record "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
-        POSSale: Codeunit "NPR POS Sale";
-        RemainingAmount: Decimal;
-    begin
-        SalesHeader.Get(SalesHeader."Document Type"::Order, NpCsDocument."Document No.");
-        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        if SalesLine.IsEmpty() then
-            Error(EmptyLinesOnDocumentErr, NpCsDocument."Reference No.");
-
-        SalesLine.SetFilter(Type, '%1|%2|%3', SalesLine.Type::" ", SalesLine.Type::"G/L Account", SalesLine.Type::Item);
-        if SalesLine.IsEmpty() then
-            Error(SalesLineTypeNotSupportedErr, SalesLine.Type::" ", SalesLine.Type::"G/L Account", SalesLine.Type::Item);
-
-        POSSession.GetSale(POSSale);
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSale.GetCurrentSale(SalePOS);
-
-        if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
-            SalePOS.TestField("Customer No.", SalesHeader."Bill-to Customer No.");
-        end else begin
-            SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
-            SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
-            SalePOS.Modify(true);
-            POSSale.RefreshCurrent();
-        end;
-
-        POSSession.GetSaleLine(POSSaleLine);
-
-        InsertDeliveryCommentLine(JSON, NpCsDocument, POSSaleLine);
-
-        POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        RemainingAmount := SalesDocImpMgt.GetTotalAmountToBeInvoiced(SalesHeader);
-        if RemainingAmount > 0 then begin
-            SalesHeader.CalcFields("NPR Magento Payment Amount");
-            RemainingAmount -= SalesHeader."NPR Magento Payment Amount";
-            if RemainingAmount < 0 then
-                RemainingAmount := 0;
-        end;
-        SalesHeader.Invoice := NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS;
-        SalesHeader.Ship := NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS;
-        SalesHeader.Receive := false;
-        SalesHeader."Print Posted Documents" := false;
-        SalesDocImpMgt.SalesDocumentPaymentAmountToPOSSaleLine(RemainingAmount, SaleLinePOS, SalesHeader, false, false, NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS);
-        SaleLinePOS.UpdateAmounts(SaleLinePOS);
-        POSSaleLine.InsertLineRaw(SaleLinePOS, false);
-        InsertPOSReference(NpCsDocument, SaleLinePOS);
-    end;
-
-    local procedure DeliverPostedInvoice(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; NpCsDocument: Record "NPR NpCs Document")
-    var
-        SalesInvHeader: Record "Sales Invoice Header";
-        SalesInvLine: Record "Sales Invoice Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
-        RemainingAmount: Decimal;
-        ConfirmInvDiscAmt: Boolean;
-    begin
-        SalesInvHeader.Get(NpCsDocument."Document No.");
-        POSSession.GetSaleLine(POSSaleLine);
-        SalesInvLine.SetRange("Document No.", SalesInvHeader."No.");
-        if SalesInvLine.IsEmpty() then
-            Error(EmptyLinesOnDocumentErr, NpCsDocument."Reference No.");
-
-        SalesInvLine.SetFilter(Type, '%1|%2|%3', SalesInvLine.Type::" ", SalesInvLine.Type::"G/L Account", SalesInvLine.Type::Item);
-        if SalesInvLine.IsEmpty() then
-            Error(SalesLineTypeNotSupportedErr, SalesInvLine.Type::" ", SalesInvLine.Type::"G/L Account", SalesInvLine.Type::Item);
-
-        ConfirmInvDiscAmt := JSON.GetBooleanParameterOrFail('ConfirmInvDiscAmt', ActionCode());
-        if ConfirmInvDiscAmt then begin
-            SalesInvLine.SetFilter("Inv. Discount Amount", '>%1', 0);
-            SalesInvLine.CalcSums("Inv. Discount Amount");
-            if SalesInvLine."Inv. Discount Amount" > 0 then begin
-                if not Confirm(SalesDocImpMgt.GetImportInvDiscAmtQst()) then
-                    exit;
-            end;
-        end;
-        InsertDeliveryCommentLine(JSON, NpCsDocument, POSSaleLine);
-
-        POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        RemainingAmount := SalesDocImpMgt.GetTotalAmountToBeInvoiced(SalesInvHeader);
-        SalesDocImpMgt.SalesDocumentPaymentAmountToPOSSaleLine(RemainingAmount, SaleLinePOS, SalesInvHeader, false, false, true);
-        SaleLinePOS.UpdateAmounts(SaleLinePOS);
-        POSSaleLine.InsertLineRaw(SaleLinePOS, false);
-        InsertPOSReference(NpCsDocument, SaleLinePOS);
-
-    end;
-
-    local procedure InsertDeliveryCommentLine(JSON: Codeunit "NPR POS JSON Management"; NpCsDocument: Record "NPR NpCs Document"; POSSaleLine: Codeunit "NPR POS Sale Line")
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-        NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref.";
-        DeliveryText: Text;
-    begin
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        NpCsSaleLinePOSReference.SetRange("Register No.", SaleLinePOS."Register No.");
-        NpCsSaleLinePOSReference.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        NpCsSaleLinePOSReference.SetRange("Document Type", NpCsDocument."Document Type");
-        NpCsSaleLinePOSReference.SetRange("Document No.", NpCsDocument."Document No.");
-        if not NpCsSaleLinePOSReference.IsEmpty() then
-            Error(FoundDeliverReferenceErr, NpCsDocument."Document Type", NpCsDocument."Document No.", NpCsDocument."Reference No.");
-
-        DeliveryText := StrSubstNo(JSON.GetStringParameter('Delivery Text'), NpCsDocument."Document Type", NpCsDocument."Reference No.");
-        if DeliveryText = '' then
-            DeliveryText := StrSubstNo(DeliveryLbl, NpCsDocument."Document Type", NpCsDocument."Reference No.");
-        SaleLinePOS.Init();
-        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
-        SaleLinePOS."No." := '*';
-        SaleLinePOS.Description := CopyStr(DeliveryText, 1, MaxStrLen(SaleLinePOS.Description));
-        POSSaleLine.InsertLine(SaleLinePOS);
-
-        InsertPOSReference(NpCsDocument, SaleLinePOS);
-    end;
-
-    local procedure InsertPOSReference(NpCsDocument: Record "NPR NpCs Document"; SaleLinePOS: Record "NPR POS Sale Line")
-    var
-        NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref.";
-    begin
-        if NpCsSaleLinePOSReference.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Sale Type", SaleLinePOS.Date, SaleLinePOS."Line No.") then
-            NpCsSaleLinePOSReference.Delete();
-        NpCsSaleLinePOSReference.Init();
-        NpCsSaleLinePOSReference."Register No." := SaleLinePOS."Register No.";
-        NpCsSaleLinePOSReference."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        NpCsSaleLinePOSReference."Sale Date" := SaleLinePOS.Date;
-        NpCsSaleLinePOSReference."Sale Line No." := SaleLinePOS."Line No.";
-        NpCsSaleLinePOSReference."Collect Document Entry No." := NpCsDocument."Entry No.";
-        NpCsSaleLinePOSReference."Document No." := NpCsDocument."Document No.";
-        NpCsSaleLinePOSReference."Document Type" := NpCsDocument."Document Type";
-        NpCsSaleLinePOSReference.Insert();
-
-    end;
-
-    local procedure FindDocument(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; var NpCsDocument: Record "NPR NpCs Document"): Boolean
-    begin
-        if FindDocumentFromInput(JSON, NpCsDocument) then
-            exit(true);
-
-        if SelectDocument(JSON, POSSession, NpCsDocument) then
-            exit(true);
-
-        exit(false);
-    end;
-
-    local procedure ConfirmOpenDocument(JSON: Codeunit "NPR POS JSON Management"; NpCsDocument: Record "NPR NpCs Document"): Boolean
-    var
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        PageMgt: Codeunit "Page Management";
-        SalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
-        OpenDocument, ConfirmInvDiscAmt : Boolean;
-    begin
-        OpenDocument := JSON.GetBooleanParameterOrFail('OpenDocument', ActionCode());
-        ConfirmInvDiscAmt := JSON.GetBooleanParameterOrFail('ConfirmInvDiscAmt', ActionCode());
-        if ConfirmInvDiscAmt then begin
-            SalesLine.SetRange("Document Type", NpCsDocument."Document Type");
-            SalesLine.SetRange("Document No.", NpCsDocument."Document No.");
-            SalesLine.SetFilter("Inv. Discount Amount", '>%1', 0);
-            SalesLine.CalcSums("Inv. Discount Amount");
-            if SalesLine."Inv. Discount Amount" > 0 then begin
-                if not Confirm(SalesDocImpMgt.GetImportInvDiscAmtQst()) then
-                    exit;
-            end;
-        end;
-        if OpenDocument then begin
-            SalesHeader."Document Type" := NpCsDocument."Document Type";
-            SalesHeader."No." := NpCsDocument."Document No.";
-            SalesHeader.SetRecFilter();
-            exit(Page.RunModal(PageMgt.GetPageID(SalesHeader), SalesHeader) = Action::LookupOK);
-        end;
-        exit(true);
-    end;
-
-    local procedure ConfirmDocumentStatus(NpCsDocument: Record "NPR NpCs Document") Confirmed: Boolean
-    begin
-        if NpCsDocument."Delivery Status" = NpCsDocument."Delivery Status"::Ready then
-            exit(true);
-
-        if NpCsDocument."Delivery Status" = NpCsDocument."Delivery Status"::" " then begin
-            Confirmed := Confirm(ProcessingStatusQst, false, NpCsDocument."Processing Status", NpCsDocument."Document Type", NpCsDocument."Reference No.");
-            exit(Confirmed);
-        end;
-
-        Confirmed := Confirm(DeliveryStatusQst, false, NpCsDocument."Delivery Status", NpCsDocument."Document Type", NpCsDocument."Reference No.");
-        exit(Confirmed);
-    end;
-
-    local procedure FindDocumentFromInput(JSON: Codeunit "NPR POS JSON Management"; var NpCsDocument: Record "NPR NpCs Document"): Boolean
-    var
-        ReferenceNo: Text;
-    begin
-        JSON.SetScope('/');
-        if not JSON.SetScope('$document_input') then
-            exit(false);
-
-        ReferenceNo := CopyStr(JSON.GetString('input'), 1, MaxStrLen(NpCsDocument."Reference No."));
-        if ReferenceNo = '' then
-            exit(false);
-
-        NpCsDocument.SetRange("Reference No.", ReferenceNo);
-        NpCsDocument.SetRange(Type, NpCsDocument.Type::"Collect in Store");
-        exit(NpCsDocument.FindFirst());
-    end;
-
-    local procedure SelectDocument(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; var NpCsDocument: Record "NPR NpCs Document"): Boolean
-    var
-        LocationFilter: Text;
-        Sorting: Option "Entry No.","Reference No.","Delivery expires at";
-    begin
-        LocationFilter := GetLocationFilter(JSON, POSSession);
-
-        Clear(NpCsDocument);
-        NpCsDocument.SetRange(Type, NpCsDocument.Type::"Collect in Store");
-        NpCsDocument.SetRange("Delivery Status", NpCsDocument."Delivery Status"::Ready);
-        if LocationFilter <> '' then
-            NpCsDocument.SetFilter("Location Code", LocationFilter);
-        case JSON.GetIntegerParameter('Sorting') of
-            Sorting::"Entry No.":
-                begin
-                    NpCsDocument.SetCurrentKey("Entry No.");
-                end;
-            Sorting::"Reference No.":
-                begin
-                    NpCsDocument.SetCurrentKey("Reference No.");
-                end;
-            Sorting::"Delivery expires at":
-                begin
-                    NpCsDocument.SetCurrentKey("Delivery expires at");
-                end;
-        end;
-        if Page.RunModal(Page::"NPR NpCs Coll. Store Orders", NpCsDocument) = Action::LookupOK then
-            exit(true);
-
-        exit(false);
-    end;
-
-    local procedure GetLocationFilter(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session") LocationFilter: Text
+    local procedure GetLocationFilter(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session") LocationFilter: Text
     var
         POSStore: Record "NPR POS Store";
         POSSetup: Codeunit "NPR POS Setup";
     begin
-        case JSON.GetIntegerParameterOrFail('Location From', ActionCode()) of
+        case Context.GetIntegerParameter('Location From') of
             0:
                 begin
                     POSSession.GetSetup(POSSetup);
@@ -458,7 +190,7 @@
                 end;
             1:
                 begin
-                    LocationFilter := UpperCase(JSON.GetStringParameterOrFail('Location Filter', ActionCode()));
+                    LocationFilter := UpperCase(Context.GetStringParameter('Location Filter'));
                 end;
         end;
 
