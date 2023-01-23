@@ -1,6 +1,7 @@
 ﻿codeunit 6151592 "NPR NpDc Module Issue: Default"
 {
     Access = Internal;
+
     var
         Text000: Label 'Issue Coupon - Default';
         CouponIssuedTxt: Label 'Coupon No. %1 has been issued.';
