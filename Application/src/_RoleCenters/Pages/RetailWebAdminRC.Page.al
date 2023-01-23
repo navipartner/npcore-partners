@@ -13,11 +13,6 @@ page 6059871 "NPR Retail Web Admin RC"
             {
                 ApplicationArea = NPRRetail;
             }
-            part(MyJobQueue; "My Job Queue")
-            {
-                Caption = 'Job Queue';
-                ApplicationArea = NPRRetail;
-            }
             part(Control21; "Report Inbox Part")
             {
                 AccessByPermission = TableData "Report Inbox" = R;
@@ -33,10 +28,6 @@ page 6059871 "NPR Retail Web Admin RC"
                 ApplicationArea = NPRRetail;
             }
             systempart(Control1901377608; MyNotes)
-            {
-                ApplicationArea = NPRRetail;
-            }
-            part(PowerBi; "Power BI Report Spinner Part")
             {
                 ApplicationArea = NPRRetail;
             }

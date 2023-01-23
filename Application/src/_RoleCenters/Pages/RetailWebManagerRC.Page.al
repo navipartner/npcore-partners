@@ -22,11 +22,6 @@
                 AccessByPermission = TableData "Report Inbox" = R;
                 ApplicationArea = NPRRetail;
             }
-            part(MyJobQueue; "My Job Queue")
-            {
-                Caption = 'Job Queue';
-                ApplicationArea = NPRRetail;
-            }
             part(Control6150616; "NPR Web Manager Activ.")
             {
                 Visible = false;
@@ -36,7 +31,6 @@
             {
                 ApplicationArea = NPRRetail;
             }
-
         }
     }
 
