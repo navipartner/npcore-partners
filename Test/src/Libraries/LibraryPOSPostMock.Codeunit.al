@@ -11,7 +11,7 @@
         ItemPost: Boolean;
         POSPost: Boolean;
         MissingEntryErr: Label 'Missing %1, %2 %3';
-        CouldNotPostErr: Label 'The POS Entry could not be posted.';
+        CouldNotPostErr: Label 'The POS Entry could not be posted: %1';
 
     procedure Initialize(_ItemPost: Boolean; _POSPost: Boolean)
     begin
@@ -28,6 +28,7 @@
         POSEntryManagement: Codeunit "NPR POS Entry Management";
         POSPostEntries: Codeunit "NPR POS Post Entries";
     begin
+        ClearLastError();
         if not POSEntryManagement.FindPOSEntryViaDocumentNo(SalePOS."Sales Ticket No.", POSEntry) then
             Error(MissingEntryErr, POSEntry.TableCaption, POSEntry.FieldCaption("Document No."), SalePOS."Sales Ticket No.");
 
@@ -39,6 +40,6 @@
         POSPostEntries.SetPostPOSEntries(POSPost);
 
         if not POSPostEntries.Run(POSEntry) then
-            Error(CouldNotPostErr);
+            Error(CouldNotPostErr, GetLastErrorText());
     end;
 }

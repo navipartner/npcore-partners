@@ -68,6 +68,8 @@
         Handled: Boolean;
         NpDcArchCoupon: Record "NPR NpDc Arch. Coupon";
     begin
+        NpDcCouponModuleMgt.OnBeforeValidateCoupon(ReferenceNo);
+
         if StrLen(ReferenceNo) > MaxStrLen(Coupon."Reference No.") then
             Error(Text003);
         Coupon.SetRange("Reference No.", UpperCase(ReferenceNo));

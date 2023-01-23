@@ -59,5 +59,10 @@
     internal procedure OnCancelDiscountApplication(Coupon: Record "NPR NpDc Coupon"; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeValidateCoupon(var ReferenceNo: Text)
+    begin
+    end;
 }
 

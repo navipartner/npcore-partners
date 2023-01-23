@@ -3,8 +3,8 @@
     Caption = 'Coupon Type';
     DataClassification = CustomerContent;
     DataCaptionFields = "Code", Description;
-    DrillDownPageID = "NPR NpDc Coupon Types";
-    LookupPageID = "NPR NpDc Coupon Types";
+    DrillDownPageId = "NPR NpDc Coupon Types";
+    LookupPageId = "NPR NpDc Coupon Types";
 
     fields
     {
@@ -104,44 +104,41 @@
         {
             Caption = 'Print Template Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR RP Template Header" WHERE("Table ID" = CONST(6151591));
+            TableRelation = "NPR RP Template Header" where("Table ID" = const(6151591));
         }
         field(67; "Print on Issue"; Boolean)
         {
             Caption = 'Print on Issue';
             DataClassification = CustomerContent;
-            Description = 'NPR5.42';
         }
         field(70; Enabled; Boolean)
         {
             Caption = 'Enabled';
             DataClassification = CustomerContent;
-            Description = 'NPR5.39';
         }
         field(80; "Application Sequence No."; Integer)
         {
             Caption = 'Application Sequence No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
             MinValue = 0;
         }
         field(100; "Issue Coupon Module"; Code[20])
         {
             Caption = 'Issue Coupon Module';
             DataClassification = CustomerContent;
-            TableRelation = "NPR NpDc Coupon Module".Code WHERE(Type = CONST("Issue Coupon"));
+            TableRelation = "NPR NpDc Coupon Module".Code where(Type = const("Issue Coupon"));
         }
         field(110; "Validate Coupon Module"; Code[20])
         {
             Caption = 'Validate Coupon Module';
             DataClassification = CustomerContent;
-            TableRelation = "NPR NpDc Coupon Module".Code WHERE(Type = CONST("Validate Coupon"));
+            TableRelation = "NPR NpDc Coupon Module".Code where(Type = const("Validate Coupon"));
         }
         field(120; "Apply Discount Module"; Code[20])
         {
             Caption = 'Apply Discount Module';
             DataClassification = CustomerContent;
-            TableRelation = "NPR NpDc Coupon Module".Code WHERE(Type = CONST("Apply Discount"));
+            TableRelation = "NPR NpDc Coupon Module".Code where(Type = const("Apply Discount"));
         }
         field(150; "POS Store Group"; Code[20])
         {
@@ -158,19 +155,26 @@
             Caption = 'Match POS Store Group';
             DataClassification = CustomerContent;
         }
+
+        field(170; "GS1 Account No."; Code[20])
+        {
+            Caption = 'GS1 Account No.';
+            DataClassification = CustomerContent;
+            TableRelation = "G/L Account" where("Account Type" = const(Posting),
+                                                 "Direct Posting" = const(true));
+        }
         field(1000; "Coupon Qty. (Open)"; Integer)
         {
-            CalcFormula = Count("NPR NpDc Coupon" WHERE("Coupon Type" = FIELD(Code),
-                                                     Open = CONST(true)));
+            CalcFormula = count("NPR NpDc Coupon" where("Coupon Type" = field(Code),
+                                                     Open = const(true)));
             Caption = 'Coupon Qty. (Open)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1020; "Arch. Coupon Qty."; Integer)
         {
-            CalcFormula = Count("NPR NpDc Arch. Coupon" WHERE("Coupon Type" = FIELD(Code)));
+            CalcFormula = count("NPR NpDc Arch. Coupon" where("Coupon Type" = field(Code)));
             Caption = 'Arch. Coupon Qty.';
-            Description = 'NPR5.37';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -191,8 +195,8 @@
         {
             Caption = 'Print Object ID';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Print Object Type" = CONST(Codeunit)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit)) ELSE
-            IF ("Print Object Type" = CONST(Report)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = if ("Print Object Type" = const(Codeunit)) AllObjWithCaption."Object ID" where("Object Type" = const(Codeunit)) else
+            if ("Print Object Type" = const(Report)) AllObjWithCaption."Object ID" where("Object Type" = const(Report));
             BlankZero = true;
         }
     }

@@ -115,6 +115,58 @@ codeunit 85074 "NPR Coupon Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GS1DiscountAmountTest()
+    // [SCENARIO] Scan GS1 coupon, discount amount 1.5 is applied, transaction is ended
+    var
+        SalePOS: Record "NPR POS Sale";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryRandom: Codeunit "Library - Random";
+        TransactionEnded: Boolean;
+    begin
+        Initialize();
+        // [GIVEN] POS Transaction with 1 line
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        CreateItemTransaction(LibraryRandom.RandDecInRange(2, 100, LibraryRandom.RandIntInRange(0, 2)));
+        // [WHEN]
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, '25554380000236153901015'); //3901 - 1 decimal place, 015 = 1.5
+
+        // [THEN] Finish transaction with cash payment
+        TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, _Item."Unit Price" - 1.5, '');
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure GS1FreeItemTest()
+    // [SCENARIO] Scan GS1 coupon, discount 100% is applied, transaction is ended
+    var
+        SalePOS: Record "NPR POS Sale";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryRandom: Codeunit "Library - Random";
+        TransactionEnded: Boolean;
+    begin
+        Initialize();
+        // [GIVEN] POS Transaction with 1 line
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        CreateItemTransaction(LibraryRandom.RandDecInRange(2, 100, LibraryRandom.RandIntInRange(0, 2)));
+        // [WHEN]
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, '25554590000300373900000'); //000 - free item (100% discount)
+
+        // [THEN] Finish transaction with cash payment
+        TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, '');
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+    end;
+
+    [Test]
     [HandlerFunctions('OpenPageHandler')]
     procedure VerifyCoupon()
     var
@@ -206,8 +258,10 @@ codeunit 85074 "NPR Coupon Tests"
             NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(_Item, _POSUnit, _POSStore);
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethodCash, _POSPaymentMethodCash."Processing Type"::CASH, '', false);
-            CreateDiscountType(100, _Item."No.");
 
+            CreateDiscountType(100, _Item."No.");
+            CreateGS1DiscountTypeAmount();
+            CreateGS1DiscountTypeFree();
             _Initialized := true;
         end;
         Commit();
@@ -220,5 +274,44 @@ codeunit 85074 "NPR Coupon Tests"
     begin
         LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(_CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), _CouponType, DiscountPct);
         LibraryCoupon.SetExtraItemCoupon(_CouponType, ItemNo);
+    end;
+
+    local procedure CreateItemTransaction(ItemPrice: Decimal)
+    var
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+    begin
+        _Item.Get(_Item."No.");
+        _Item."Unit Price" := ItemPrice;
+        _Item.Modify();
+        NPRLibraryPOSMock.CreateItemLine(_POSSession, _Item."No.", 1);
+        NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
+    end;
+
+    local procedure CreateGS1DiscountTypeAmount()
+    var
+        NpDcModuleIssueGS1: Codeunit "NPR NpDc Module Issue GS1";
+        NpDcCouponType: Record "NPR NpDc Coupon Type";
+        NpDcModuleApplyGS1: Codeunit "NPR NpDc Module Apply GS1";
+        LibraryERM: Codeunit "Library - ERM";
+        VATPostSetup: Record "VAT Posting Setup";
+        GLAccountNo: Code[20];
+    begin
+        NpDcModuleIssueGS1.CreateGS1CouponType(NpDcCouponType, 0);
+        NpDcCouponType."GS1 Account No." := GLAccountNo;
+        LibraryERM.FindVATPostingSetup(VATPostSetup, "Tax Calculation Type"::"Normal VAT");
+        GLAccountNo := LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostSetup, "General Posting Type"::Sale);
+        NpDcCouponType."GS1 Account No." := GLAccountNo;
+        NpDcCouponType."Apply Discount Module" := NpDcModuleApplyGS1.ModuleCode();
+        NpDcCouponType.Modify();
+    end;
+
+    local procedure CreateGS1DiscountTypeFree()
+    var
+        NpDcModuleIssueGS1: Codeunit "NPR NpDc Module Issue GS1";
+        NpDcCouponType: Record "NPR NpDc Coupon Type";
+    begin
+        NpDcModuleIssueGS1.CreateGS1CouponType(NpDcCouponType, 1);
+        NpDcCouponType.Modify();
     end;
 }
