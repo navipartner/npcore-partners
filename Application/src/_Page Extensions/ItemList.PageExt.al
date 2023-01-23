@@ -489,6 +489,65 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 end;
             }
         }
+        addafter(PricesandDiscounts)
+        {
+            action("NPR MultipleUnitPrices")
+            {
+                Caption = 'Multiple Unit Prices';
+                Image = Price;
+                Promoted = true;
+                PromotedCategory = Category6;
+                RunObject = page "NPR Quantity Discount Card";
+                RunPageLink = "Item No." = field("No.");
+                RunPageMode = Edit;
+                ToolTip = 'Setup different unit prices for the item. An item price is automatically granted on the invoice line when the specified criteria are such as quantity are met.';
+                ApplicationArea = NPRRetail;
+            }
+            action("NPR PeriodDiscount")
+            {
+                Caption = 'Period Discount';
+                Image = Period;
+                Promoted = true;
+                PromotedCategory = Category6;
+                ShortcutKey = 'Ctrl+P';
+                ToolTip = 'View all period discount specified for this item.';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    PeriodDiscountLine: Record "NPR Period Discount Line";
+                    CampaignDiscLineList: Page "NPR Campaign Disc. Line List";
+                begin
+                    PeriodDiscountLine.SetRange(Status, PeriodDiscountLine.Status::Active);
+                    PeriodDiscountLine.SetRange("Item No.", Rec."No.");
+                    CampaignDiscLineList.SetTableView(PeriodDiscountLine);
+                    CampaignDiscLineList.RunModal();
+                end;
+            }
+            action("NPR MixDiscount")
+            {
+                Caption = 'Mix Discount';
+                Image = Discount;
+                Promoted = true;
+                PromotedCategory = Category6;
+                ShortcutKey = 'Ctrl+F';
+                ToolTip = 'View all mix discount specified for this item.';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    MixedDiscountLine: Record "NPR Mixed Discount Line";
+                    MixedDiscountLines: Page "NPR Mixed Discount Lines";
+                begin
+                    Clear(MixedDiscountLines);
+                    MixedDiscountLines.Editable(false);
+                    MixedDiscountLine.Reset();
+                    MixedDiscountLine.SetRange("No.", Rec."No.");
+                    MixedDiscountLines.SetTableView(MixedDiscountLine);
+                    MixedDiscountLines.RunModal();
+                end;
+            }
+        }
     }
 
     trigger OnOpenPage()
