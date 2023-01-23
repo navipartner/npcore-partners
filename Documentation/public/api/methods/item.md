@@ -1,5 +1,3 @@
 # Represents an item in Business Central.
 
-Link to Items API openapi playground:
-[Items API](/api/sandbox.html?spec=item.json)
-
+Refer to the [Items API OpenAPI playground](/api/sandbox.html?spec=item.json) to learn how to correctly consume the provided service.

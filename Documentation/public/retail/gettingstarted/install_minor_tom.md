@@ -23,13 +23,13 @@ Minor Tom is an abbreviated version of Major Tom, which offers only the essentia
      -  Click **Refresh**, and follow the login steps presented, with an account that is connected to any of the Cloud BC Environments.    
         After the login popup is closed, the dropdown box should be filled with different environment names.
      -  Select the environment you want to use.     
-        The **Url** field is updated with a new URL.
+        The **URL** field is updated with a new URL.
      -  Click **Save** to save the changes.
    
    > [!Note]
    > The customers' Azure tenant needs to be [configured](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-session-lifetime) prior to using the cloud version so that their session can be automatically extended on the following login.
 
-4. Once the installation is complete, you can click **New Sale** in the sidebar (right-click to open/close the sidebar) to start using the POS features.
+4. Once the installation is complete, click **New Sale** in the sidebar (right-click to open/close the sidebar) to start using the POS features.
 
    > [!Note]
    > Whenever a new Minor Tom version is available, it will be automatically detected and downloaded as soon as you launch the app.

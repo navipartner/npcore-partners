@@ -1,5 +1,4 @@
-# Represents a Campaign Discount in Business Central.
+# Campaign Discount API
 
-Link to Campaign Discounts API openapi playground:
-[Campaign Discounts API](/api/sandbox.html?spec=campaign_discount.json)
+Refer to the [Campaign Discounts OpenAPI playground](/api/sandbox.html?spec=campaign_discount.json) to learn how to correctly consume the provided service.
 

@@ -1,14 +1,10 @@
 # POS units
 
-POS units are a central part of the retail solution. They consist of [hardware](../gettingstarted/system_requirements.md) and software components that enable services and item sale transactions at retail locations. The transactions can be recorded, and a receipt can be printed out or sent to the buyer via email or text. 
+POS units are a central part of the retail solution. They consist of [hardware](../gettingstarted/system_requirements.md) and software components that enable services and item sale transactions at retail locations. The transactions can be recorded and sent to customers via text or email or printed in the form of a receipt. In brief, POS units automate the transaction process and tracking of important sales data. 
 
-POS units are also capable of tracking the real-time status of the shop's inventory and recording relevant data on paper or spreadsheets, helping strategize marketing efforts, and boost sales.
+They are also highly customizable - it's possible to configure each of their many aspects. To find out more, refer to one of the following links.
 
-In brief, POS units help streamline retail operations by automating the transaction process and tracking important sales data. 
-
-As POS units in the NP Retail solution are highly customizable, it's possible to configure each of their many aspects. To find out more, refer to one of the following links.
-
-### Highlighted articles
+## Highlighted articles
 
 | Module     | Description |
 | ----------- | ----------- |
