@@ -324,11 +324,11 @@
                     AssignDecimalFieldValue(UnitPrice, RecRef, 'Unit Price');
                     AssignDecimalFieldValue(VATPct, RecRef, 'VAT %');
 
-                    SalesHeader.Get(DocumentType, DocumentNo);
-                    if not SalesHeader."Prices Including VAT" then
-                        SalesPrice := UnitPrice * (1 + (VATPct / 100))
-                    else
-                        SalesPrice := UnitPrice;
+                    if SalesHeader.Get(DocumentType, DocumentNo) then
+                        if not SalesHeader."Prices Including VAT" then
+                            SalesPrice := UnitPrice * (1 + (VATPct / 100))
+                        else
+                            SalesPrice := UnitPrice;
                 end;
             DATABASE::"NPR POS Sale Line":
                 begin
