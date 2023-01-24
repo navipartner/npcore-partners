@@ -1,100 +1,34 @@
-﻿codeunit 6150786 "NPR POS Action - Play Sound"
+codeunit 6150786 "NPR POS Action - Play Sound" implements "NPR IPOS Workflow"
 {
     Access = Internal;
     local procedure ActionCode(): Code[20]
     begin
-        exit('PLAY_SOUND');
+        exit(Format(Enum::"NPR POS Workflow"::PLAY_SOUND));
     end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config")
     var
-        ActionDescriptionLbl: Label 'This built in function allows to play back an audio file from provided Url.', MaxLength = 250;
-        DefaultMessageHdrLbl: Label 'You might want to know...', MaxLength = 250;
+        ActionDescription: Label 'Plays back an audio file from provided Url';
+        ParamAudioFileUrlCaption_Lbl: Label 'Audio File Url';
+        ParamAudioFileUrlDesc_Lbl: Label 'Url of the audio file to be played back';
+        ParamMessageHeaderCaption_Lbl: Label 'Message Header';
+        ParamMessageHeaderDesc_Lbl: Label 'Define message heading text';
+        ParamMessageTextCaption_Lbl: Label 'Message Text';
+        ParamMessageTextDesc_Lbl: Label 'Define message detailed text';
+        ParamShowMessageCaption_Lbl: Label 'Show Message';
+        ParamShowMessageDesc_Lbl: Label 'Set if you want to show a message to user';
     begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescriptionLbl,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('PlaySoundAndDisplayMessage',
-              'if (param.AudioFileUrl) {' +
-              '  var audio = new Audio(param.AudioFileUrl);' +
-              '  audio.play();' +
-              '}' +
-              'if (param.ShowMessage) {' +
-              '  if (param.MessageText.length > 0) {' +
-              '    message(param.MessageHeader,param.MessageText);' +
-              '  };' +
-              '}');
-            Sender.RegisterWorkflow(false);
-
-            Sender.RegisterTextParameter('AudioFileUrl', '');
-            Sender.RegisterBooleanParameter('ShowMessage', false);
-            Sender.RegisterTextParameter('MessageText', '');
-            Sender.RegisterTextParameter('MessageHeader', DefaultMessageHdrLbl);
-        end;
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddTextParameter('AudioFileUrl', '', ParamAudioFileUrlCaption_Lbl, ParamAudioFileUrlDesc_Lbl);
+        WorkflowConfig.AddBooleanParameter('ShowMessage', false, ParamShowMessageCaption_Lbl, ParamShowMessageDesc_Lbl);
+        WorkflowConfig.AddTextParameter('MessageText', '', ParamMessageTextCaption_Lbl, ParamMessageTextDesc_Lbl);
+        WorkflowConfig.AddTextParameter('MessageHeader', '', ParamMessageHeaderCaption_Lbl, ParamMessageHeaderDesc_Lbl);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-        Handled := true;
-    end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
-    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    var
-        CaptionAudioFileUrl: Label 'Audio File Url';
-        CaptionMessageHeader: Label 'Message Header';
-        CaptionMessageText: Label 'Message Text';
-        CaptionShowMessage: Label 'Show Message';
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'AudioFileUrl':
-                Caption := CaptionAudioFileUrl;
-            'ShowMessage':
-                Caption := CaptionShowMessage;
-            'MessageText':
-                Caption := CaptionMessageText;
-            'MessageHeader':
-                Caption := CaptionMessageHeader;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
-    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
-    var
-        DescAudioFileUrl: Label 'Url of the audio file to be played back';
-        DescMessageHeader: Label 'Define message heading text';
-        DescMessageText: Label 'Define message detailed text';
-        DescShowMessage: Label 'Set if you want to show a message to user';
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'AudioFileUrl':
-                Caption := DescAudioFileUrl;
-            'ShowMessage':
-                Caption := DescShowMessage;
-            'MessageText':
-                Caption := DescMessageText;
-            'MessageHeader':
-                Caption := DescMessageHeader;
-        end;
     end;
 
     #region Ean Box Event Handling
@@ -135,4 +69,12 @@
         exit(Codeunit::"NPR POS Action - Play Sound");
     end;
     #endregion Ean Box Event Handling
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionPlaySound.js###
+'let main=async({parameters:i,context:l,captions:o})=>{if(i.AudioFileUrl){var e=new Audio(i.AudioFileUrl);e.play()}i.ShowMessage&&i.MessageText.length>0&&await popup.message(i.MessageText,i.MessageHeader)};'
+        );
+    end;
 }
