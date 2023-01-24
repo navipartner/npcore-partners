@@ -121,8 +121,8 @@
         TransHeader.TestField("Receipt Date");
         TransHeader.TestField("Transfer-from Code");
         TransHeader.TestField("Transfer-to Code");
-        TransHeader.TestField("In-Transit Code");
         TransferLine2."In-Transit Code" := TransHeader."In-Transit Code";
+        TransferLine2."Direct Transfer" := TransHeader."Direct Transfer";
         TransferLine2."Transfer-from Code" := TransHeader."Transfer-from Code";
         TransferLine2."Transfer-to Code" := TransHeader."Transfer-to Code";
         TransferLine2."Shipment Date" := TransHeader."Shipment Date";
