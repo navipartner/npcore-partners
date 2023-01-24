@@ -37,9 +37,6 @@ param (
 
 Clear-Host
 
-# Invoke SaaS API script
-$invokeSaasApi = Join-Path $PSScriptRoot "Invoke-SaaSApi.ps1"
-
 # Add ActiveDirectory client
 $aadActiveDirectoryPath = (Join-Path $PSScriptRoot "TestRunner\Microsoft.IdentityModel.Clients.ActiveDirectory.dll")
 Add-type -Path $aadActiveDirectoryPath
@@ -51,27 +48,21 @@ $aadTokenProviderScriptPath = Join-Path $PSScriptRoot "TestRunner\AadTokenProvid
 # Import AL Test Runner functions
 #Import-Module (Join-Path $PSScriptRoot "TestRunner\ALTestRunner.psm1") -Force
 
-# Create credential
-$credential = New-Object System.Management.Automation.PSCredential "$($Username)", (ConvertTo-SecureString -String "$($Password)" -AsPlainText -Force)
+# Include NpBcptMgmt
+$npBcptMgmt = Join-Path $PSScriptRoot "NpBcptMgmt.ps1"
+. "$npBcptMgmt"
 
-# Request token
-$authority = "https://login.microsoftonline.com/"
-$resource = "https://api.businesscentral.dynamics.com"
-$aadTokenProvider = [AadTokenProvider]::new($authority, $resource, $ClientId, $credential, $aadActiveDirectoryPath)
-$token = $aadTokenProvider.GetToken($credential)
+$bcptMgmt = [NpBcptMgmt]::new($Username, $Password, $TenantId, $SandboxName, $CompanyName, $ClientId, $aadActiveDirectoryPath)
 
-$internalServiceUrl = "https://businesscentral.dynamics.com/$($TenantId)/$($SandboxName)?company=$([Uri]::EscapeDataString($CompanyName))"
+$internalServiceUrl = $bcptMgmt.GetInternalServiceUrl()
 Write-Host "Using internal Service Url:" -ForegroundColor Green
 Write-Host "$($internalServiceUrl) `r`n"
 
-# Get Api base url
-$apiBaseUrl = [Uri]"https://api.businesscentral.dynamics.com/v2.0/$($TenantId)/$($SandboxName)"
-
 # Get companies
-$companies = @(. "$invokeSaasApi" `
+$companies = @(Invoke-BcSaaS `
     -AuthorizationType "AAD" `
-    -BearerToken $token `
-    -BaseServiceUrl $apiBaseUrl `
+    -BearerToken $bcptMgmt.GetToken() `
+    -BaseServiceUrl $bcptMgmt.GetApiBaseUrl() `
     -Path 'companies')
 
 # Select company
@@ -79,32 +70,12 @@ $company = $companies | Where-Object { $_.name -eq $CompanyName } | Select-Objec
 Write-Host "Using company:" -ForegroundColor Green
 Write-Host ($company | Out-String)
 
-# Check if any BCPT is running and wait
-$isBcptInProgress = $false
-Do
-{
-    $checkBcptUrl = "https://api.businesscentral.dynamics.com/v2.0/$($TenantId)/$($SandboxName)/ODataV4/BCPTTestSuite_IsAnyTestRunInProgress?company=$([Uri]::EscapeDataString($CompanyName))"
-    $checkRunning = @(. "$invokeSaasApi" ` `
-        -AuthorizationType "AAD" `
-        -BearerToken $token `
-        -BaseServiceUrl $checkBcptUrl `
-        -Method "POST" `
-        -NotApi)
-        $isBcptInProgress = ($checkRunning[0] -eq $true)
-        
-        if ($isBcptInProgress -eq $true) {
-            Write-Host "BCPT is currently in progress - Waiting..."
-            Start-Sleep -Seconds 10
-        }
-
-} While ($isBcptInProgress -eq $true)
-
 # Get BCPT suites
 Write-Host "Available BCPT suite codes:" -ForegroundColor Green
-$suites = @(. "$invokeSaasApi" ` `
+$suites = @(Invoke-BcSaaS `
     -AuthorizationType "AAD" `
-    -BearerToken $token `
-    -BaseServiceUrl $apiBaseUrl `
+    -BearerToken $bcptMgmt.GetToken() `
+    -BaseServiceUrl $bcptMgmt.GetApiBaseUrl() `
     -CompanyId $($company.id) `
     -APIPublisher "microsoft" `
     -APIGroup "PerformancToolkit" `
@@ -134,52 +105,58 @@ Write-Host "`r`n"
 # Create BCPT credential
 $bcptCredential = New-Object System.Management.Automation.PSCredential "$($Username)", (ConvertTo-SecureString -String "$($Password)" -AsPlainText -Force)
 
+# Wait for BCPT
+$bcptMgmt.WaitForBcpt(10)
+
 # RUN BCPT
 Write-Host "Running BCPT:" -ForegroundColor Green
+Write-Host ""
+
 $selectedSuites | ForEach-Object {
     $suiteCode = $_
 
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-    Write-Host "Running BCPT for '$($suiteCode)'..."
+    Write-Host "Running BCPT for '$($suiteCode)'..." -ForegroundColor Green
 
     $params = @{
         Credential = $bcptCredential
         AuthorizationType = "AAD"
     }
     
-    $Job = Start-Job -ScriptBlock { Param( $location, [HashTable] $params, $suiteCode, $internalServiceUrl, $testPage, $sandboxName, $clientId)
-        Write-Host "Running test for '$($suiteCode)'..."
-        
-        Set-Location $location
+    try {
+        Invoke-Command -ScriptBlock { Param( $location, [HashTable] $params, $suiteCode, $internalServiceUrl, $testPage, $sandboxName, $clientId)
+            
+            Set-Location $location
 
-        .\RunBCPTTests.ps1 @params `
-            -BCPTTestRunnerInternalFolderPath $location `
-            -SuiteCode "$($suiteCode)" `
-            -ServiceUrl "$internalServiceUrl" `
-            -Environment PROD `
-            -SandboxName "$($sandboxName)" `
-            -ClientId "$($clientId)" `
-            -TestRunnerPage ([int]$testPage)
-        
-        Write-Host "Running test for '$($suiteCode)'..."
-    } -ArgumentList (Join-Path -Path $PSScriptRoot -ChildPath "TestRunner"), $params, $suiteCode, $internalServiceUrl, $TestPageId, $SandboxName, $ClientId | Wait-Job
-    
-    if ($job.State -ne "Completed") {
-        Write-Host "Running performance test failed" -ForegroundColor Red
+            .\RunBCPTTests.ps1 @params `
+                -BCPTTestRunnerInternalFolderPath $location `
+                -SuiteCode "$($suiteCode)" `
+                -ServiceUrl "$internalServiceUrl" `
+                -Environment PROD `
+                -SandboxName "$($sandboxName)" `
+                -ClientId "$($clientId)" `
+                -TestRunnerPage ([int]$testPage)
+            
+        } -ArgumentList (Join-Path -Path $PSScriptRoot -ChildPath "TestRunner"), $params, $suiteCode, $internalServiceUrl, $TestPageId, $SandboxName, $ClientId
     }
-    
-    $job | Receive-Job -Keep
+    catch {
+        $_
+    }
 
-    $job | Remove-Job | Out-Null
-
-    Write-Host "---> '$($suiteCode)' completed after $([math]::Round($stopwatch.Elapsed.TotalSeconds, 0)) seconds."
+    Write-Host "---> '$($suiteCode)' completed after $([math]::Round($stopwatch.Elapsed.TotalSeconds, 0)) seconds." -ForegroundColor Green
+    Write-Host ""
     $stopwatch.Stop()
+
+    Start-Sleep -Seconds 3
+
+    # Wait for bcpt
+    $bcptMgmt.WaitForBcpt(10)
 }
 
 #$bcptLogEntries = @(. "$invokeSaasApi" ` `
 #    -AuthorizationType "AAD" `
-#    -BearerToken $token `
-#    -BaseServiceUrl $apiBaseUrl `
+#    -BearerToken $bcptMgmt.GetToken() `
+#    -BaseServiceUrl $bcptMgmt.GetApiBaseUrl() `
 #    -CompanyId $($company.id) `
 #    -APIPublisher "microsoft" `
 #    -APIGroup "PerformancToolkit" `
