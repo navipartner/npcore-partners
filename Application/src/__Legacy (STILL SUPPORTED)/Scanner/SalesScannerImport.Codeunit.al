@@ -48,9 +48,9 @@ codeunit 6059802 "NPR Sales Scanner Import" implements "NPR IScanner Import"
         SalesLine: Record "Sales Line";
         ScannerImportMgt: Codeunit "NPR Scanner Import Mgt.";
         ItemNo: Code[20];
-        VariantCode: Code[20];
+        VariantCode: Code[10];
     begin
-        ScannerImportMgt.GetItemNoAndVariantCodeFromScannedCode(ItemCode, ItemNo, VariantCode);
+        ScannerImportMgt.GetItemAndVariantCodeFromScannedCode(ItemCode, ItemNo, VariantCode);
 
         SalesLine.Init();
         SalesLine."Document Type" := SalesHeader."Document Type";

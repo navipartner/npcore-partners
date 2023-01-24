@@ -31,7 +31,7 @@
             "id": "AA0022",
             "action": "Error",
             "justification": "An IF followed by two or more ELSE IF should be replaced with a CASE"
-        },
+        },        
         {
             "id": "AA0072",
             "action":"Hidden",
