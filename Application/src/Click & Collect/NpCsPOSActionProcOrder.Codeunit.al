@@ -1,39 +1,63 @@
-﻿codeunit 6151202 "NPR NpCs POSAction Proc. Order"
+﻿codeunit 6151202 "NPR NpCs POSAction Proc. Order" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
-        Text000: Label 'Process Collect in Store Orders';
+        ActionDescriptionLbl: Label 'This built-in action process Collect in Store Orders.';
+        ParamLocationFilterLbl: Label 'Location Filter';
+        ParamFromLocation_OptLbl: Label 'POS Store,Location Filter Parameter';
+        ParamFromLocation_NameLbl: Label 'Location From';
+        ParamFromLocation_DescLbl: Label 'Specifies from location';
+        ParamSorting_OptLbl: Label 'Entry No.,Reference No.,Processing expires at';
+        ParamSorting_NameLbl: Label 'Sorting';
+        ParamSorting_DescLbl: Label 'Specifies sorting';
+    begin
+        WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.SetDataSourceBinding('BUILTIN_SALE');
+        WorkflowConfig.SetCustomJavaScriptLogic('enable', 'return row.getField("CollectInStore.UnprocessedOrdersExists").rawValue;');
+        WorkflowConfig.AddOptionParameter('Location From',
+                                          ParamFromLocation_OptLbl,
+                                          SelectStr(1, ParamFromLocation_OptLbl),
+                                          ParamFromLocation_NameLbl,
+                                          ParamFromLocation_DescLbl,
+                                          ParamFromLocation_OptLbl);
+        WorkflowConfig.AddTextParameter('Location Filter', '', ParamLocationFilterLbl, ParamLocationFilterLbl);
+        WorkflowConfig.AddOptionParameter('Sorting',
+                                          ParamSorting_OptLbl,
+                                          SelectStr(1, ParamSorting_OptLbl),
+                                          ParamSorting_NameLbl,
+                                          ParamSorting_DescLbl,
+                                          ParamSorting_OptLbl);
+    end;
+
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; SaleMgr: Codeunit "NPR POS Sale"; SaleLineMgr: Codeunit "NPR POS Sale Line"; PaymentLineMgr: Codeunit "NPR POS Payment Line"; SetupMgr: Codeunit "NPR POS Setup");
+    var
+        LocationFilter: Text;
+        SortingInt: Integer;
+    begin
+        case Step of
+            'run_collect_in_store_orders':
+                begin
+                    LocationFilter := GetLocationFilter(Context);
+                    SortingInt := Context.GetIntegerParameter('Sorting');
+                    RunCollectInStoreOrders(LocationFilter, SortingInt);
+                    SaleMgr.RefreshCurrent();
+                end;
+        end;
+    end;
 
     local procedure ActionCode(): Text[20]
     begin
-        exit('PROCESS_COLLECT_ORD');
+        exit(Format(Enum::"NPR POS Workflow"::PROCESS_COLLECT_ORD));
     end;
 
-    local procedure ActionVersion(): Text[30]
+    local procedure GetActionScript(): Text
     begin
-        exit('1.1');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
-    begin
-        if not Sender.DiscoverAction(
-          ActionCode(),
-          Text000,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Multiple) then
-            exit;
-
-        Sender.RegisterWorkflowStep('run_collect_in_store_orders', 'respond();');
-        Sender.RegisterWorkflow(false);
-        Sender.RegisterDataSourceBinding('BUILTIN_SALE');
-        Sender.RegisterCustomJavaScriptLogic('enable', 'return row.getField("CollectInStore.UnprocessedOrdersExists").rawValue;');
-
-        Sender.RegisterOptionParameter('Location From', 'POS Store,Location Filter Parameter', 'POS Store');
-        Sender.RegisterTextParameter('Location Filter', '');
-        Sender.RegisterOptionParameter('Sorting', 'Entry No.,Reference No.,Processing expires at', 'Entry No.');
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionProcessOrder.js###
+'let main=async({})=>await workflow.respond("run_collect_in_store_orders");'
+        );
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, true)]
@@ -80,39 +104,13 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        LocationFilter: Text;
-        POSSale: Codeunit "NPR POS Sale";
-    begin
-        if Handled then
-            exit;
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-        Handled := true;
-
-        case WorkflowStep of
-            'run_collect_in_store_orders':
-                begin
-                    JSON.InitializeJObjectParser(Context, FrontEnd);
-                    LocationFilter := GetLocationFilter(JSON, POSSession);
-                    RunCollectInStoreOrders(LocationFilter, JSON);
-                    POSSession.GetSale(POSSale);
-                    POSSale.RefreshCurrent();
-                    POSSession.RequestRefreshData();
-                end;
-        end;
-    end;
-
-    local procedure RunCollectInStoreOrders(LocationFilter: Text; JSON: Codeunit "NPR POS JSON Management")
+    procedure RunCollectInStoreOrders(LocationFilter: Text; Sort: Integer)
     var
         NpCsDocument: Record "NPR NpCs Document";
         Sorting: Option "Entry No.","Reference No.","Processing expires at";
     begin
         SetUnprocessedFilter(LocationFilter, NpCsDocument);
-        case JSON.GetIntegerParameter('Sorting') of
+        case Sort of
             Sorting::"Entry No.":
                 begin
                     NpCsDocument.SetCurrentKey("Entry No.");
@@ -129,12 +127,13 @@
         Page.RunModal(PAGE::"NPR NpCs Coll. Store Orders", NpCsDocument);
     end;
 
-    local procedure GetLocationFilter(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session") LocationFilter: Text
+    local procedure GetLocationFilter(Context: Codeunit "NPR POS JSON Helper") LocationFilter: Text
     var
         POSStore: Record "NPR POS Store";
         POSSetup: Codeunit "NPR POS Setup";
+        POSSession: Codeunit "NPR POS Session";
     begin
-        case JSON.GetIntegerParameterOrFail('Location From', ActionCode()) of
+        case Context.GetIntegerParameter('Location From') of
             0:
                 begin
                     POSSession.GetSetup(POSSetup);
@@ -143,7 +142,7 @@
                 end;
             1:
                 begin
-                    LocationFilter := UpperCase(JSON.GetStringParameterOrFail('Location Filter', ActionCode()));
+                    LocationFilter := UpperCase(Context.GetStringParameter('Location Filter'));
                 end;
         end;
 
