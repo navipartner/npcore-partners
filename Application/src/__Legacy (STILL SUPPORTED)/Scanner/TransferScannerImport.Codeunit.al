@@ -46,13 +46,18 @@ codeunit 6059800 "NPR Transfer Scanner Import" implements "NPR IScanner Import"
     var
         TransferLine: Record "Transfer Line";
         ScannerImportMgt: Codeunit "NPR Scanner Import Mgt.";
+        ItemNo: Code[20];
+        VariantCode: Code[10];
     begin
+        ScannerImportMgt.GetItemAndVariantCodeFromScannedCode(ItemCode, ItemNo, VariantCode);
         TransferLine.Init();
         TransferLine."Document No." := TransferHeader."No.";
         TransferLine."Line No." := LineNo;
         TransferLine.Insert();
 
-        TransferLine.Validate("Item No.", ScannerImportMgt.GetItemNoFromScannedCode(ItemCode));
+        TransferLine.Validate("Item No.", ItemNo);
+        if VariantCode <> '' then
+            TransferLine.Validate("Variant Code", VariantCode);
         Evaluate(TransferLine.Quantity, Quantity);
         TransferLine.Validate(Quantity);
         TransferLine.Modify();
