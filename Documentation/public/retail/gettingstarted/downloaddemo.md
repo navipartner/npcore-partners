@@ -1,6 +1,6 @@
 # Set up NP Retail demo environment
 
-The trial version of the NP Retail solution that is readily available on the [NaviPartner portal](https://www.navipartner.com/get-trial/). To request the free trial of the solution, follow the provided steps:
+The trial version of the NP Retail solution is readily available on the [NaviPartner portal](https://www.navipartner.com/get-trial/), and can be tested as many times as you need. To request the free trial of the solution, follow the provided steps:
 
 1. Navigate to the [NaviPartner portal](https://www.navipartner.com/get-trial/).
 2. Provide all the necessary information, such as a name, company name, email and phone number.     
