@@ -1,7 +1,7 @@
 ﻿page 6151410 "NPR Magento VAT Prod. Groups"
 {
     Extensible = False;
-    Caption = 'VAT Product Posting Groups';
+    Caption = 'Magento VAT Product Posting Groups';
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR Magento VAT Prod. Group";
