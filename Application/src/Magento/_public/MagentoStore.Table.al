@@ -1,6 +1,7 @@
 ﻿table 6151404 "NPR Magento Store"
 {
     Caption = 'Magento Store';
+    LookupPageId = "NPR Magento Store List";
     DataClassification = CustomerContent;
 
     fields
