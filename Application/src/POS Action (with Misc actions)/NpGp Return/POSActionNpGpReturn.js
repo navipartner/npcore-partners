@@ -16,12 +16,6 @@ let main = async ({ workflow, context, popup, parameters, captions}) => {
         await workflow.respond("handle"); 
 
     if (parameters.ExportReturnOrd){ 
-        const{workflowName,workflowVersion} = await workflow.respond("GetExportReturnOrdVersion");
-        if (workflowVersion == 1) await workflow.respond("ExportReturnOrderLegacy");
-
-        if (workflowVersion >=2) { 
-            const{expParameters} = await workflow.respond("ExportReturnOrderv3"); 
-            await workflow.run(workflowName, { parameters: expParameters });  
-        }   
-    }
+            await workflow.respond("ExportPurchaseReturnOrder");  
+        }
 }

@@ -340,4 +340,96 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
         PaymentMethodWarning(TempNpGpPOSPaymentLine);
         POSSale.RefreshCurrent();
     end;
+
+    procedure ExportPurchaseReturnOrder(Sale: Codeunit "NPR POS Sale"; ShowReturnOrd: Boolean)
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        Item: Record Item;
+        MissingVendorErr: Label 'You need to enter Vendor No. for Item %1';
+        Vendor: Record Vendor;
+        PurcOrderHeader: Record "Purchase Header";
+        ReleasePurchDoc: Codeunit "Release Purchase Document";
+        PurchaseLine: Record "Purchase Line";
+        NextLineNo: Integer;
+        RetOrdCounter: Integer;
+    begin
+        Sale.GetCurrentSale(SalePOS);
+
+        NextLineNo := 10000;
+        RetOrdCounter := 0;
+
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetFilter(Quantity, '<%1', 0);
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
+        if SaleLinePOS.FindSet() then
+            repeat
+                if not Item.Get(SaleLinePOS."No.") then
+                    exit;
+                if not Vendor.get(Item."Vendor No.") then
+                    Error(MissingVendorErr, Item."No.");
+                //check for existing purchase return order
+                PurcOrderHeader.SetRange("Document Type", PurcOrderHeader."Document Type"::"Return Order");
+                PurcOrderHeader.SetRange("Buy-from Vendor No.", Vendor."No.");
+                if PurcOrderHeader.FindFirst() then begin
+                    //open purch order
+                    ReleasePurchDoc.PerformManualReopen(PurcOrderHeader);
+                    //add line
+                    PurchaseLine.SetRange("Document Type", PurcOrderHeader."Document Type");
+                    PurchaseLine.SetRange("Document No.", PurcOrderHeader."No.");
+                    if PurchaseLine.FindLast() then
+                        NextLineNo := PurchaseLine."Line No." + 10000;
+                    RetOrdCounter += 1;
+                end else begin
+                    createPurchaseHeader(Vendor."No.", SalePOS."Location Code", PurcOrderHeader);
+                    RetOrdCounter += 1;
+                end;
+                CreatePurcOrderLine(PurcOrderHeader, NextLineNo, SaleLinePOS);
+                ReleasePurchDoc.PerformManualRelease(PurcOrderHeader);
+            until SaleLinePOS.Next() = 0;
+
+        if ShowReturnOrd then begin
+            if RetOrdCounter = 1 then
+                Page.Run(Page::"Purchase Return Order", PurcOrderHeader)
+            else
+                Page.Run(Page::"Purchase Return Order List");
+        end;
+    end;
+
+    local procedure createPurchaseHeader(VendorNo: Code[20]; LocationCode: Code[20]; var PurchaseHeader: Record "Purchase Header")
+    begin
+        Clear(PurchaseHeader);
+
+        PurchaseHeader.Init();
+        PurchaseHeader."Document Type" := PurchaseHeader."Document Type"::"Return Order";
+        PurchaseHeader.Insert(true);
+
+        PurchaseHeader.Validate("Buy-from Vendor No.", VendorNo);
+        if LocationCode <> '' then
+            PurchaseHeader.Validate("Location Code", LocationCode);
+        PurchaseHeader.Modify();
+    end;
+
+    local procedure CreatePurcOrderLine(PurcOrderHeader: Record "Purchase Header"; NextLineNo: Integer; SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        PurchaseLine: Record "Purchase Line";
+    begin
+        PurchaseLine.Init();
+        PurchaseLine."Document Type" := PurcOrderHeader."Document Type";
+        PurchaseLine."Document No." := PurcOrderHeader."No.";
+        PurchaseLine."Line No." := NextLineNo;
+        PurchaseLine.Insert(true);
+
+        PurchaseLine.Validate(Type, PurchaseLine.Type::Item);
+        PurchaseLine.Validate("No.", SaleLinePOS."No.");
+        if SaleLinePOS."Variant Code" <> '' then
+            PurchaseLine.Validate("Variant Code", SaleLinePOS."Variant Code");
+
+        if (SaleLinePOS."Location Code" <> '') then
+            PurchaseLine.Validate("Location Code", SaleLinePOS."Location Code");
+
+        PurchaseLine.Validate(Quantity, -SaleLinePOS.Quantity);
+        PurchaseLine.Modify();
+    end;
 }
