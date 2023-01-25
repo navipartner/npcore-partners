@@ -4,10 +4,10 @@
     Caption = 'Stores';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Page ''NPR Magento Store List'' is used instead.';
     SourceTable = "NPR Magento Store";
-    ApplicationArea = NPRRetail;
 
     layout
     {
