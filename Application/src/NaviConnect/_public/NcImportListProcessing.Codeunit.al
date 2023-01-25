@@ -12,6 +12,10 @@
         if not FilterImportType(JQParamStrMgt.GetParamValueAsText(ParamImportType()), NcImportType) then
             exit;
 
+        //reset retry
+        if JQParamStrMgt.ContainsParam(ParamResetRetryCount()) then
+            ResetRetryCount(NcImportType);
+
         UpdateImportList(Rec, NcImportType);
 
         if JQParamStrMgt.ContainsParam(ParamProcessImport()) then
@@ -21,6 +25,7 @@
     var
         DownloadFtpTxt: Label 'Download Ftp';
         ProcessImportListTxt: Label 'Process Import List';
+        ResetRetryTxt: Label 'Reset Retry Count';
         AllTxt: Label 'All';
 
     local procedure UpdateImportList(JobQueueEntry: Record "Job Queue Entry"; var ImportType: Record "NPR Nc Import Type")
@@ -106,6 +111,9 @@
         else
             Description := ImportTypeParamValue;
 
+        if JQParamStrMgt.ContainsParam(ParamResetRetryCount()) then
+            Description += ' | ' + ResetRetryTxt;
+
         if JQParamStrMgt.ContainsParam(ParamDownloadFtp()) then
             Description += ' | ' + DownloadFtpTxt;
 
@@ -118,6 +126,13 @@
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR Nc Import List Processing");
+    end;
+
+    local procedure ResetRetryCount(NcImportType: Record "NPR Nc Import Type")
+    var
+        NcImportProcessor: Codeunit "NPR Nc Import Processor";
+    begin
+        NcImportProcessor.ResetRetryCount(NcImportType);
     end;
 
     procedure ParamImportType(): Text
@@ -133,5 +148,10 @@
     procedure ParamProcessImport(): Text
     begin
         exit('process_import_list');
+    end;
+
+    internal procedure ParamResetRetryCount(): Text
+    begin
+        exit('reset_retry_count');
     end;
 }

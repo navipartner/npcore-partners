@@ -179,6 +179,11 @@
                 end;
             end;
         }
+        field(610; "Background Session Reschedule"; Boolean)
+        {
+            Caption = 'Background Session Reschedule';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

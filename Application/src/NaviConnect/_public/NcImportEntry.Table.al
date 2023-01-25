@@ -136,7 +136,6 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
-
         field(110; "Batch Id"; GUID)
         {
             Caption = 'Batch Id';

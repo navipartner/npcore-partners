@@ -69,13 +69,19 @@
                 field("Max. Retry Count"; Rec."Max. Retry Count")
                 {
 
-                    ToolTip = 'Specifies the value of the Max. Retry Count field';
+                    ToolTip = 'Specifies how many times the system should automatically try to reprocess the ''Import Entries''. For each run, the ''Import Count'' field on the ''Import Entry'' is incresed by one. For the ''Import Entries'' with processing errors, if needed, the latter can be reset by creating a ''Import List Processing Job Queue Entry'' with parameter ''reset_retry_count'' that runs, for example, once per night. The result in this case will be that the system will reschedule these entries for processing.';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Delay between Retries"; Rec."Delay between Retries")
                 {
 
                     ToolTip = 'Specifies the value of the Delay between Retries field';
+                    ApplicationArea = NPRNaviConnect;
+                }
+
+                field("Background Session Reschedule"; Rec."Background Session Reschedule")
+                {
+                    ToolTip = 'Failed import entries can be rescheduled manually by using the action ''Reschedule Selected for Import'' or automatically by setting up the ''Max. Retry Count'' on the ''Import Type''. Normally, the reschedule is done in the user session or when the Job Queue picks up again the import entry to reprocess it. By enabling this setting, the reschedule is done in a new background session';
                     ApplicationArea = NPRNaviConnect;
                 }
             }
