@@ -4,19 +4,19 @@
   items:
   - name: POS layout, sections and contents
     href: explanation/POS_menu.md
-  - name: POS Posting Setup
+  - name: POS posting setup
     href: explanation/POS_posting_setup.md
   - name: POS stores
     href: explanation/POS_store.md
-  - name: Item AddOns
+  - name: Item add-ons
     href: explanation/item_addons.md
   - name: Item categories
     href: explanation/item_categories.md
 - name: Reference
   items:
-  - name: POS Payment View Event Setup (reference guide)
+  - name: POS payment view event Setup (reference guide)
     href: reference/POS_Payment_View_Event_Setup.md
-  - name: Item AddOns (reference guide)
+  - name: Item add-ons (reference guide)
     href: reference/item_addons_ref.md
   - name: Item categories (reference guide)
     href: reference/item_categories_ref.md
@@ -28,7 +28,7 @@
     href: reference/POS_Unit_Display.md
   - name: POS counting screen (reference guide)
     href: reference/counting_reference.md
-  - name: POS Menu Buttons Setup (reference guide)
+  - name: POS menu buttons setup (reference guide)
     href: reference/pos_menu_buttons.md
 - name: How-To  
   items:
@@ -64,7 +64,7 @@
     href: howto/Configuration_of_master_slave_POS_units.md
   - name: Set up retail logo
     href: howto/set_up_retail_logo.md
-  - name: Set up Item AddOns
+  - name: Set up Item add-ons
     href: howto/item_addons_procedure.md
   - name: Set up salespeople/purchasers
     href: howto/salespeople_setup.md
