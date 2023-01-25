@@ -117,7 +117,7 @@
                 field("Import Count"; Rec."Import Count")
                 {
 
-                    ToolTip = 'Specifies the value of the Import Count field';
+                    ToolTip = 'Specifies how many times the system tried to process the entry. For the ''Import Entries'' with processing errors, if needed, it can be reset automatically by creating a ''Import List Processing Job Queue Entry'' with parameter ''reset_retry_count''. For example, this job can be scheduled to run once per night. The result in this case will be that the system will reschedule these entries for processing.';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Import Started by"; Rec."Import Started by")
@@ -445,7 +445,7 @@
             ImportEntry.ModifyAll("Runtime Error", false, false);
             ImportEntry.ModifyAll("Earliest Import Datetime", 0DT);
             Commit();
-            if ImportEntry.FindSet() then
+            if ImportEntry.FindSet(true, false) then
                 repeat
                     NcImportProcessor.ScheduleImport(ImportEntry);
                 until ImportEntry.Next() = 0;
