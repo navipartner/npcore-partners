@@ -1,10 +1,10 @@
 # Item worksheets
 
-The item worksheet is a feature of NP Retail, developed to help maintain the item data, easily and efficiently with minimal entry time.
+The item worksheet is a feature which helps maintain item-related data easily and efficiently with minimal entry time.
 
 It supports data import from various data sources, like text or Excel sheets. You can transform data into the Business Central variant structure, and check for inconsistencies and errors. Users can also perform manual and visual checks and adjustments. There is an option to keep the history records for review and auditing purposes.
 
-It is also possible to setup the custom mapping per Excel sheet template. The functionality is structured as a standard Business Central Worksheet with possibility to register lines.
+It is also possible to setup the custom mapping per Excel sheet template. The functionality is structured as a standard Business Central Worksheet with an option to register lines.
 
 The general flow is as follows:
 
