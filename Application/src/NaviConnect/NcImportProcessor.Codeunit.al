@@ -170,14 +170,28 @@
             Commit();
         end;
 
-        ScheduleImport(NcImportEntry);
+        ScheduleImport(NcImportEntry, NcImportType);
+    end;
+
+    internal procedure ScheduleImport(var NcImportEntry: Record "NPR Nc Import Entry"; NcImportType: Record "NPR Nc Import Type")
+    var
+        SessionId: Integer;
+    begin
+        if not NcImportType."Background Session Reschedule" then begin
+            ResetImportEntryFields(NcImportEntry);
+            NcImportEntry.Modify(true);
+        end else
+            SESSION.StartSession(SessionId, CurrCodeunitId(), CompanyName, NcImportEntry);
     end;
 
     procedure ScheduleImport(var NcImportEntry: Record "NPR Nc Import Entry")
     var
-        SessionId: Integer;
+        NcImportType: Record "NPR Nc Import Type";
     begin
-        SESSION.StartSession(SessionId, CurrCodeunitId(), CompanyName, NcImportEntry);
+        if not NcImportType.Get(NcImportEntry."Import Type") then
+            exit;
+
+        ScheduleImport(NcImportEntry, NcImportType);
     end;
 
     local procedure CurrCodeunitId(): Integer
@@ -219,8 +233,43 @@
             ImportEntry.SetRange("Batch Id", pImportEntry."Batch Id");
             ImportEntry.SetRange(Imported, false);
             ImportEntry.SetFilter("Entry No.", '<%1', pImportEntry."Entry No.");
-            IF NOT ImportEntry.IsEmpty then
+            IF NOT ImportEntry.IsEmpty() then
                 Error(BatchEntriesMustBeImportedInOrderErr, pImportEntry."Entry No.", pImportEntry."Batch Id");
+        end;
+    end;
+
+    local procedure ResetImportEntryFields(var NcImportEntry: Record "NPR Nc Import Entry")
+    var
+    begin
+        NcImportEntry.Imported := false;
+        NcImportEntry."Runtime Error" := false;
+        Clear(NcImportEntry."Last Error Message");
+        NcImportEntry."Error Message" := '';
+        NcImportEntry."Import Started at" := 0DT;
+        NcImportEntry."Import Duration" := 0;
+        NcImportEntry."Import Completed at" := 0DT;
+        NcImportEntry."Import Started by" := '';
+        NcImportEntry."Server Instance Id" := 0;
+        NcImportEntry."Session Id" := 0;
+    end;
+
+    internal procedure ResetRetryCount(NcImportType: Record "NPR Nc Import Type")
+    var
+        NcImportEntry: Record "NPR Nc Import Entry";
+        NcImportEntry2: Record "NPR Nc Import Entry";
+    begin
+        NcImportEntry.SetRange("Import Type", NcImportType.Code);
+        NcImportEntry.SetRange(Imported, false);
+        NcImportEntry.SetFilter("Import Count", '>%1', 0);
+        If not NcImportEntry.IsEmpty() then begin
+            If NcImportEntry.FindSet() then
+                repeat
+                    NcImportEntry2 := NcImportEntry;
+                    ResetImportEntryFields(NcImportEntry2);
+                    NcImportEntry2."Import Count" := 0;
+                    NcImportEntry2.Modify(true);
+                until NcImportEntry.Next() = 0;
+            Commit();
         end;
     end;
 
