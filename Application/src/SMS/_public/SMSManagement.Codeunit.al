@@ -63,11 +63,11 @@
         SMSImplementation.InsertMessageLog(PhoneNo, SenderNo, Message, SendDT);
     end;
 
-    procedure DiscardOldMessages(MessageLog: Record "NPR SMS Log") IsDiscarder: Boolean
+    procedure DiscardOldMessages(MessageLog: Record "NPR SMS Log") IsDiscarded: Boolean
     var
         SMSImplementation: Codeunit "NPR SMS Implementation";
     begin
-        SMSImplementation.DiscardOldMessages(MessageLog);
+        IsDiscarded := SMSImplementation.DiscardOldMessages(MessageLog);
     end;
 
     procedure UpdateMessageLog(MessageLog: Record "NPR SMS Log"; Status: Enum "NPR SMS Log Status"; ErrorMessage: Text)
@@ -111,6 +111,7 @@
         OnBeforeFindTemplate(IsHandled, RecordVariant, Template);
         TemplateFound := SMSImplementation.FindTemplate(RecordVariant, Template, IsHandled);
         OnAfterFindTemplate(RecordVariant, Template, TemplateFound);
+        exit(TemplateFound);
     end;
 
     [IntegrationEvent(false, FALSE)]
@@ -127,7 +128,7 @@
     var
         SMSImplementation: Codeunit "NPR SMS Implementation";
     begin
-        SMSImplementation.MakeMessage(Template, RecordVariant);
+        SMSMessage := SMSImplementation.MakeMessage(Template, RecordVariant);
     end;
     #endregion
     #region Job functions
@@ -149,7 +150,7 @@
     var
         SMSImplementation: Codeunit "NPR SMS Implementation";
     begin
-        SMSImplementation.GetJobQueueCategoryCode();
+        exit(SMSImplementation.GetJobQueueCategoryCode());
     end;
     #endregion
     #region Report Links Azure Functions
@@ -157,7 +158,7 @@
     var
         SMSImplementation: Codeunit "NPR SMS Implementation";
     begin
-        SMSImplementation.AFReportLink(ReportId);
+        exit(SMSImplementation.AFReportLink(ReportId));
     end;
     #endregion Report Links Azure Functions 
 }
