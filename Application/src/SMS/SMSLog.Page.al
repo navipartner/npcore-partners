@@ -82,7 +82,7 @@
             {
                 Caption = 'Set Pending';
 
-                ToolTip = 'Executes the Set Pending action';
+                ToolTip = 'Executing the Set Pending action will change selected records in status Error to status Pending.';
                 Image = CreateLinesFromTimesheet;
                 ApplicationArea = NPRRetail;
                 trigger OnAction()
@@ -98,7 +98,7 @@
             {
                 Caption = 'Set Discard';
 
-                ToolTip = 'Executes the Set Discard action';
+                ToolTip = 'Executing the Set Discard action will change selected records in status Error or status Pending to Status Discard.';
                 Image = Error;
                 ApplicationArea = NPRRetail;
                 trigger OnAction()

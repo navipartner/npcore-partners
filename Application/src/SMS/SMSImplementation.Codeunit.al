@@ -322,6 +322,7 @@ codeunit 6060035 "NPR SMS Implementation"
             exit(false);
         if CurrentDateTime > (MessageLog."Send on Date Time" + SMSSetup."Discard Msg. Older Than [Hrs]" * 60 * 60 * 1000) then begin
             MessageLog.Status := MessageLog.Status::"Timeout Discard";
+            MessageLog.Modify();
             exit(true);
         end;
     end;
