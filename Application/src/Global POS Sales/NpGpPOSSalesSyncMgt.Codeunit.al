@@ -6,7 +6,7 @@
     trigger OnRun()
     begin
         case Rec."Table No." of
-            DATABASE::"NPR POS Entry":
+            Database::"NPR POS Entry":
                 begin
                     ExportPOSEntry(Rec);
                 end;
@@ -54,7 +54,7 @@
         Clear(NcTask."Data Output");
         Clear(NcTask.Response);
         XmlDocument.ReadFrom(XmlText, XmlDoc);
-        NcTask."Data Output".CreateOutStream(OutStr, TEXTENCODING::UTF8);
+        NcTask."Data Output".CreateOutStream(OutStr, TextEncoding::UTF8);
         XmlDoc.WriteTo(OutStr);
 
         NcTask.Modify();
@@ -62,7 +62,6 @@
         Commit();
 
         TempBlob.CreateOutStream(OutStr, TextEncoding::UTF8);
-        //XmlDoc.WriteTo(XmlText);
         TempBlob.CreateInStream(InStr, TextEncoding::UTF8);
         RequestMessage.Content.WriteFrom(XmlText);
 
@@ -88,7 +87,7 @@
 
         ResponseMessage.Content.ReadAs(Response);
 
-        NcTask.Response.CreateOutStream(OutStr, TEXTENCODING::UTF8);
+        NcTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
         OutStr.WriteText(NpXmlDomMgt.PrettyPrintXml(Response));
         NcTask.Modify();
     end;
@@ -129,7 +128,8 @@
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         if POSSalesLine.FindSet() then
             repeat
-                if POSCrossReference.GetBySystemId(POSSalesLine.SystemId) then;
+                if not POSCrossReference.GetBySystemId(POSSalesLine.SystemId) then
+                    POSCrossReference.Init();
                 Xml +=
                             '<glob1:sales_line line_no="' + Format(POSSalesLine."Line No.", 0, 9) + '">' +
                               '<glob1:retail_id>' + Format(POSSalesLine.SystemId) + '</glob1:retail_id>' +
@@ -244,7 +244,7 @@
 
     local procedure GlobalPosSalesCodeunitId(): Integer
     begin
-        exit(CODEUNIT::"NPR NpGp POS Sales WS");
+        exit(Codeunit::"NPR NpGp POS Sales WS");
     end;
 
     [TryFunction]

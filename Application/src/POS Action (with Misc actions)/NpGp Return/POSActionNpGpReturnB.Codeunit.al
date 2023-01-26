@@ -47,7 +47,7 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
 
     procedure GetRecordsFromXml(XmlDoc: XmlDocument; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line" temporary)
     var
-        NpGpPOSEntries: XMLport "NPR NpGp POS Entries";
+        NpGpPOSEntries: XmlPort "NPR NpGp POS Entries";
         OutStm: OutStream;
         TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary;
         TempBlob: Codeunit "Temp Blob";
@@ -117,7 +117,7 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
         if WarningMsg = '' then
             exit;
 
-        MESSAGE(PaidWithHeaderTxt + WarningMsg);
+        Message(PaidWithHeaderTxt + WarningMsg);
     end;
 
     procedure TestQuantity(var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; SalePOS: Record "NPR POS Sale")
@@ -245,7 +245,7 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
             exit;
 
         NpGpUserSaleReturn.SetTables(SalePOS, TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine);
-        if not (NpGpUserSaleReturn.RunModal() = ACTION::OK) then
+        if not (NpGpUserSaleReturn.RunModal() = Action::OK) then
             Error('');
         NpGpUserSaleReturn.GetLines(TempNpGpPOSSalesLine);
     end;
@@ -288,18 +288,8 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
 
         POSSession.GetSaleLine(POSSaleLine);
 
-        UpdateLineNos(SalePOS, TempNpGpPOSSalesLine);
-
         repeat
-            SaleLinePOS.Init();
-            SaleLinePOS.Validate("Register No.", SalePOS."Register No.");
-            SaleLinePOS.Validate("Sales Ticket No.", SalePOS."Sales Ticket No.");
-
-            SaleLinePOS."Line No." := TempNpGpPOSSalesLine."Line No.";
-            SaleLinePOS.Date := SalePOS.Date;
-            SaleLinePOS.Insert(true);
-
-            SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
+            POSSaleLine.GetNewSaleLine(SaleLinePOS);
             SaleLinePOS."VAT Bus. Posting Group" := SalePOS."VAT Bus. Posting Group";
             SaleLinePOS."Gen. Bus. Posting Group" := NpGpCrossCompanySetup."Gen. Bus. Posting Group";
 
@@ -324,7 +314,7 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
             SaleLinePOS."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
             SaleLinePOS."Return Sale Sales Ticket No." := TempNpGpPOSSalesEntry."Document No.";
             SaleLinePOS."Return Reason Code" := ReturnReasonCode;
-            SaleLinePOS.Modify(true);
+            POSSaleLine.InsertLineRaw(SaleLinePOS, false);
 
             POSCrossRefMgt.InitReference(SaleLinePOS.SystemId, TempNpGpPOSSalesLine."Global Reference", CopyStr(SaleLinePOS.TableName(), 1, 250), SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No."));
         until not FullSale or (TempNpGpPOSSalesLine.Next() = 0);
@@ -360,7 +350,7 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
             repeat
                 if not Item.Get(SaleLinePOS."No.") then
                     exit;
-                if not Vendor.get(Item."Vendor No.") then
+                if not Vendor.Get(Item."Vendor No.") then
                     Error(MissingVendorErr, Item."No.");
                 //check for existing purchase return order
                 PurcOrderHeader.SetRange("Document Type", PurcOrderHeader."Document Type"::"Return Order");
