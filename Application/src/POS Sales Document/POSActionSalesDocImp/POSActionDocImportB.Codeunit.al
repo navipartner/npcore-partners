@@ -63,10 +63,8 @@ codeunit 6059961 "NPR POS Action: Doc. Import B"
         Customer: Record Customer;
     begin
         POSSale.GetCurrentSale(SalePOS);
-        if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
+        if SalePOS."Customer No." <> '' then
             exit(true);
-        end;
 
         if not SelectCustomer then
             exit(true);
@@ -86,7 +84,6 @@ codeunit 6059961 "NPR POS Action: Doc. Import B"
         POSSale.GetCurrentSale(SalePOS);
         if SalePOS."Customer No." <> '' then
             exit;
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", CustomerNo);
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();

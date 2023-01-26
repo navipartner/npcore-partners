@@ -48,7 +48,6 @@
         POSSale.GetCurrentSale(SalePOS);
 
         SalePOS.TestField("Customer No.");
-        SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
         AppliesToID := StrSubstNo(AppliesToIDLbl, SalePOS."Register No.", SalePOS."Sales Ticket No.");
         RestoreAppliesToIDMarks(SalePOS, AppliesToID);
 
@@ -104,9 +103,8 @@
         CustLedgEntry.SetAutoCalcFields("Remaining Amount");
         CustLedgEntry.SetRange("Document Type", DocumentType);
         CustLedgEntry.SetRange("Document No.", DocumentNo);
-        if SalePOS."Customer Type" = SalePOS."Customer Type"::Ord then
-            if SalePOS."Customer No." <> '' then
-                CustLedgEntry.SetRange("Customer No.", SalePOS."Customer No.");
+        if SalePOS."Customer No." <> '' then
+            CustLedgEntry.SetRange("Customer No.", SalePOS."Customer No.");
         CustLedgEntry.FindFirst();
         CustLedgEntry.TestField(Open);
 
@@ -115,14 +113,11 @@
                 Error('');
 
         if SalePOS."Customer No." = '' then begin
-            SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
             SalePOS.Validate("Customer No.", CustLedgEntry."Customer No.");
             SalePOS.Modify();
             POSSale.RefreshCurrent();
-        end else begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
+        end else
             SalePOS.TestField("Customer No.", CustLedgEntry."Customer No.");
-        end;
 
         CreateApplyingPOSSaleLine(POSSaleLine, CustLedgEntry);
     end;

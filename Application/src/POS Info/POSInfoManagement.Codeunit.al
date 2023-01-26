@@ -29,8 +29,6 @@
     local procedure OnBeforeValidateCustomerNoSalePos(var Rec: Record "NPR POS Sale")
     var
         Customer: Record Customer;
-        Contact: Record Contact;
-        ContBusRel: Record "Contact Business Relation";
         POSInfoLinkTable: Record "NPR POS Info Link Table";
         pSaleLinePos: Record "NPR POS Sale Line";
         FrontEndUpdateIsNeeded: Boolean;
@@ -38,29 +36,8 @@
         if Rec.IsTemporary then
             exit;
         if Rec."Customer No." <> '' then begin
-            case Rec."Customer Type" of
-                Rec."Customer Type"::Ord:
-                    begin
-                        Customer.Get(Rec."Customer No.");
-                        Customer.CalcFields("Balance (LCY)");
-                    end;
-                Rec."Customer Type"::Cash:
-                    begin
-                        Contact.Get(Rec."Customer No.");
-                        ContBusRel.SetCurrentKey("Link to Table", "Contact No.");
-                        ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Customer);
-                        if (Contact."Company No." = '') or (Contact."Company No." = Contact."No.") then
-                            ContBusRel.SetRange("Contact No.", Contact."No.")
-                        else
-                            ContBusRel.SetFilter("Contact No.", '%1|%2', Contact."No.", Contact."Company No.");
-                        ContBusRel.SetFilter("No.", '<>'''''); 
-                        if ContBusRel.FindFirst() then begin
-                            Customer.Get(ContBusRel."No.");
-                            Customer.CalcFields("Balance (LCY)");
-                        end;
-                            
-                    end;
-            end;
+            Customer.Get(Rec."Customer No.");
+            Customer.CalcFields("Balance (LCY)");
         end else
             Clear(Customer);
         POSInfoLinkTable.Reset();

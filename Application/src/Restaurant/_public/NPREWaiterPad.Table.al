@@ -23,13 +23,14 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Ordinary,Cash';
             OptionMembers = Ord,Cash;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not used';
         }
         field(11; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Customer Type" = CONST(Ord)) Customer."No." ELSE
-            IF ("Customer Type" = CONST(Cash)) Contact."No.";
+            TableRelation = Customer."No.";
         }
         field(14; "Start Date"; Date)
         {

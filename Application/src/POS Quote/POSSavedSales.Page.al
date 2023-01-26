@@ -46,6 +46,8 @@
 
                     ToolTip = 'Specifies the customer type.';
                     ApplicationArea = NPRRetail;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Not used';
                 }
                 field("Customer No."; Rec."Customer No.")
                 {

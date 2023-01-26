@@ -47,15 +47,15 @@
     var
         POSUnit: Record "NPR POS Unit";
         PricingProfile: Codeunit "NPR POS Pricing Profile";
-        ItemPriceFunction: Text[250];        
-        ItemPriceCodeunitId: Integer;         
+        ItemPriceFunction: Text[250];
+        ItemPriceCodeunitId: Integer;
         Handled: Boolean;
     begin
         if POSUnit.Get(SalePOS."Register No.") then;
         PricingProfile.GetItemPriceFunctionIfProfileExist(POSUnit."POS Pricing Profile", ItemPriceCodeunitId, ItemPriceFunction);
-        
+
         if ItemPriceFunction <> '' then begin
-            PricingProfile.OnFindItemPrice(ItemPriceCodeunitId, ItemPriceFunction , SalePOS, SaleLinePOS, Handled);
+            PricingProfile.OnFindItemPrice(ItemPriceCodeunitId, ItemPriceFunction, SalePOS, SaleLinePOS, Handled);
             if Handled then
                 exit;
         end;
@@ -170,16 +170,15 @@
         SalesHeader."Currency Code" := Currency.Code;
         SalesHeader.UpdateCurrencyFactor();
 
-        if SalePOS."Customer Type" = SalePOS."Customer Type"::Ord then
-            if Customer.Get(SalePOS."Customer No.") then begin
-                SalesHeader."Bill-to Customer No." := Customer."No.";
-                SalesHeader."Customer Price Group" := Customer."Customer Price Group";
-                SalesLine."Customer Price Group" := Customer."Customer Price Group";
-                SalesLine."Customer Disc. Group" := Customer."Customer Disc. Group";
-            end else begin
-                if POSUnit.Get(SalePOS."Register No.") then;
-                PricingProfile.GetCustomerGroupsIfProfileExist(POSUnit."POS Pricing Profile", SalesLine."Customer Disc. Group", SalesLine."Customer Price Group");
-            end;
+        if Customer.Get(SalePOS."Customer No.") then begin
+            SalesHeader."Bill-to Customer No." := Customer."No.";
+            SalesHeader."Customer Price Group" := Customer."Customer Price Group";
+            SalesLine."Customer Price Group" := Customer."Customer Price Group";
+            SalesLine."Customer Disc. Group" := Customer."Customer Disc. Group";
+        end else begin
+            if POSUnit.Get(SalePOS."Register No.") then;
+            PricingProfile.GetCustomerGroupsIfProfileExist(POSUnit."POS Pricing Profile", SalesLine."Customer Disc. Group", SalesLine."Customer Price Group");
+        end;
 
         SalesLine.GetLineWithPrice(LineWithPrice);
         LineWithPrice.SetLine(TempSalesPriceListLine."Price Type"::Sale, SalesHeader, SalesLine);
@@ -204,7 +203,7 @@
             exit;
         if not Item.Get(SaleLinePOS."No.") then
             exit;
-        
+
         SalesLine.Init();
         SalesLine.Type := SalesLine.Type::Item;
         SalesLine."No." := Item."No.";
@@ -215,16 +214,15 @@
         SalesHeader."Posting Date" := SalePOS.Date;
         SalesHeader."Currency Code" := Currency.Code;
         SalesHeader.UpdateCurrencyFactor();
-        if SalePOS."Customer Type" = SalePOS."Customer Type"::Ord then
-            if Customer.Get(SalePOS."Customer No.") then begin
-                SalesHeader."Bill-to Customer No." := Customer."No.";
-                SalesHeader."Customer Price Group" := Customer."Customer Price Group";
-                SalesLine."Customer Price Group" := Customer."Customer Price Group";
-                SalesLine."Customer Disc. Group" := Customer."Customer Disc. Group";
-            end else begin
-                if POSUnit.Get(SalePOS."Register No.") then;
-                PricingProfile.GetCustomerGroupsIfProfileExist(POSUnit."POS Pricing Profile", SalesLine."Customer Disc. Group", SalesLine."Customer Price Group");
-            end;
+        if Customer.Get(SalePOS."Customer No.") then begin
+            SalesHeader."Bill-to Customer No." := Customer."No.";
+            SalesHeader."Customer Price Group" := Customer."Customer Price Group";
+            SalesLine."Customer Price Group" := Customer."Customer Price Group";
+            SalesLine."Customer Disc. Group" := Customer."Customer Disc. Group";
+        end else begin
+            if POSUnit.Get(SalePOS."Register No.") then;
+            PricingProfile.GetCustomerGroupsIfProfileExist(POSUnit."POS Pricing Profile", SalesLine."Customer Disc. Group", SalesLine."Customer Price Group");
+        end;
         SalesLine.GetLineWithPrice(LineWithPrice);
         LineWithPrice.SetLine(TempSalesPriceLineDisc."Price Type"::Sale, SalesHeader, SalesLine);
 

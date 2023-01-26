@@ -3,31 +3,18 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
     Access = Internal;
     procedure FindSendMethod(POSSale: Codeunit "NPR POS Sale"; var Email: Text; var PhoneNo: Text)
     var
-        Contact: Record Contact;
         Customer: Record Customer;
         SalePOS: Record "NPR POS Sale";
     begin
         POSSale.GetCurrentSale(SalePOS);
         if SalePOS."Customer No." = '' then
             exit;
-        case SalePOS."Customer Type" of
-            SalePOS."Customer Type"::Ord:
-                begin
-                    if Customer.Get(SalePOS."Customer No.") then begin
-                        Email := Customer."E-Mail";
-                        PhoneNo := Customer."Phone No.";
-                    end;
-                end;
-            SalePOS."Customer Type"::Cash:
-                begin
-                    if Contact.Get(SalePOS."Customer No.") then begin
-                        Email := Contact."E-Mail";
-                        PhoneNo := Contact."Mobile Phone No.";
-                        if PhoneNo = '' then
-                            PhoneNo := Contact."Phone No.";
-                    end;
-                end;
+
+        if Customer.Get(SalePOS."Customer No.") then begin
+            Email := Customer."E-Mail";
+            PhoneNo := Customer."Phone No.";
         end;
+        ;
     end;
 
     procedure CreateNpRvSalesLine(POSSale: Codeunit "NPR POS Sale"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; TempVoucher: Record "NPR NpRv Voucher" temporary; VoucherType: Record "NPR NpRv Voucher Type"; POSSaleLine: Codeunit "NPR POS Sale Line")
@@ -52,16 +39,7 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
         NpRvSalesLine.Description := VoucherType.Description;
         NpRvSalesLine."Starting Date" := CurrentDateTime;
         POSSale.GetCurrentSale(SalePOS);
-        case SalePOS."Customer Type" of
-            SalePOS."Customer Type"::Ord:
-                begin
-                    NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");
-                end;
-            SalePOS."Customer Type"::Cash:
-                begin
-                    NpRvSalesLine.Validate("Contact No.", SalePOS."Customer No.");
-                end;
-        end;
+        NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");
         NpRvSalesLine.Insert();
     end;
 

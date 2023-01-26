@@ -176,10 +176,8 @@
         MergeToWaiterPad."Number of Guests" := MergeToWaiterPad."Number of Guests" + WaiterPad."Number of Guests";
         MergeToWaiterPad."Billed Number of Guests" := MergeToWaiterPad."Billed Number of Guests" + WaiterPad."Billed Number of Guests";
         MergeToWaiterPad."Pre-receipt Printed" := false;
-        if MergeToWaiterPad."Customer No." = '' then begin
-            MergeToWaiterPad."Customer Type" := WaiterPad."Customer Type";
+        if MergeToWaiterPad."Customer No." = '' then
             MergeToWaiterPad."Customer No." := WaiterPad."Customer No.";
-        end;
         MergeToWaiterPad.Modify();
 
         WaiterPad."Number of Guests" := 0;

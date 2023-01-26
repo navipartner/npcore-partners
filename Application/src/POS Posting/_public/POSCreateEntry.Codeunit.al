@@ -157,10 +157,7 @@
         FiscalNoCheck(POSEntry, POSSale);
 
         POSEntry."Salesperson Code" := POSSale."Salesperson Code";
-        if POSSale."Customer Type" = POSSale."Customer Type"::Ord then
-            POSEntry."Customer No." := POSSale."Customer No."
-        else
-            POSEntry."Contact No." := POSSale."Customer No.";
+        POSEntry."Customer No." := POSSale."Customer No.";
         if POSSale."Contact No." <> '' then
             if Contact.Get(CopyStr(POSSale."Contact No.", 1, MaxStrLen(Contact."No."))) then
                 POSEntry."Contact No." := Contact."No.";
@@ -1873,8 +1870,6 @@
         ContBusRel: Record "Contact Business Relation";
         POSEntryNavigation: Codeunit "NPR POS Entry Navigation";
     begin
-        if SalePOS."Customer Type" <> SalePOS."Customer Type"::Cash then
-            exit;
         if not MarketingSetup.Get() then
             exit;
         if not Contact.Get(SalePOS."Customer No.") then

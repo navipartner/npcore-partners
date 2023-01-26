@@ -30,10 +30,8 @@ codeunit 6060007 "NPR POS Action: LayawayShow-B"
         Customer: Record Customer;
     begin
         POSSale.GetCurrentSale(SalePOS);
-        if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
+        if SalePOS."Customer No." <> '' then
             exit(true);
-        end;
 
         if not SelectCustomer then
             exit(true);
@@ -41,7 +39,6 @@ codeunit 6060007 "NPR POS Action: LayawayShow-B"
         if PAGE.RunModal(0, Customer) <> ACTION::LookupOK then
             exit(false);
 
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();

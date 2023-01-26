@@ -71,10 +71,11 @@
                     ShowCaption = false;
                     field("Customer Type"; POSQuoteEntry."Customer Type")
                     {
-
                         Caption = 'Customer Type';
                         ToolTip = 'Specifies the value of the Customer Type field';
                         ApplicationArea = NPRRetail;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Not used';
                     }
                     field("Customer No."; POSQuoteEntry."Customer No.")
                     {

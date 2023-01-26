@@ -183,7 +183,6 @@
 
     local procedure UpdateWPHdrFromSaleHdr(SalePOS: Record "NPR POS Sale"; var WaiterPad: Record "NPR NPRE Waiter Pad")
     begin
-        WaiterPad."Customer Type" := SalePOS."Customer Type";
         WaiterPad."Customer No." := SalePOS."Customer No.";
         WaiterPad.Modify();
     end;
@@ -272,7 +271,6 @@
         SalePOS."NPRE Pre-Set Waiter Pad No." := WaiterPad."No.";
         SalePOS."NPRE Pre-Set Seating Code" := WaiterPad."Current Seating FF";
         SalePOS."NPRE Number of Guests" := WaiterPad."Number of Guests";
-        SalePOS."Customer Type" := WaiterPad."Customer Type";
         SalePOS.Validate("Customer No.", WaiterPad."Customer No.");
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
@@ -695,10 +693,8 @@
         SalePOS."NPRE Pre-Set Seating Code" := '';
         SalePOS."NPRE Pre-Set Waiter Pad No." := '';
 
-        if SalePOS."Customer No." <> '' then begin
-            SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
+        if SalePOS."Customer No." <> '' then
             SalePOS.Validate("Customer No.", '');
-        end;
         if ModifyRec then
             SalePOS.Modify();
 

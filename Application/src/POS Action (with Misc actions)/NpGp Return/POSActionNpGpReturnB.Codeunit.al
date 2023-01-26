@@ -271,19 +271,12 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
         POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
         POSSession: Codeunit "NPR POS Session";
         Customer: Record Customer;
-        Contact: Record Contact;
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        if Customer.Get(TempNpGpPOSSalesEntry."Customer No.") then begin
+        if Customer.Get(TempNpGpPOSSalesEntry."Customer No.") then
             SalePOS.Validate("Customer No.", Customer."No.");
-        end else begin
-            if Contact.Get(TempNpGpPOSSalesEntry."Customer No.") then begin
-                SalePOS.Validate("Customer Type", SalePOS."Customer Type"::Cash);
-                SalePOS.Validate("Customer No.", Contact."No.");
-            end;
-        end;
 
         if not FullSale then
             TestQuantity(TempNpGpPOSSalesLine, SalePOS)

@@ -34,7 +34,6 @@
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        SalePOS.Validate("Customer Type", PreviousSalePOS."Customer Type");
         SalePOS.Validate("Customer No.", PreviousSalePOS."Customer No.");
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();

@@ -1,6 +1,7 @@
 ﻿codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
 {
     Access = Internal;
+
     var
         Text000: Label 'This action Issues Return Retail Vouchers.';
         Text001: Label 'Select Voucher Type';
@@ -374,7 +375,6 @@
 
     local procedure SelectSendMethod(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        Contact: Record Contact;
         Customer: Record Customer;
         VoucherType: Record "NPR NpRv Voucher Type";
         SalePOS: Record "NPR POS Sale";
@@ -391,23 +391,9 @@
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         if SalePOS."Customer No." <> '' then begin
-            case SalePOS."Customer Type" of
-                SalePOS."Customer Type"::Ord:
-                    begin
-                        if Customer.Get(SalePOS."Customer No.") then begin
-                            Email := Customer."E-Mail";
-                            PhoneNo := Customer."Phone No.";
-                        end;
-                    end;
-                SalePOS."Customer Type"::Cash:
-                    begin
-                        if Contact.Get(SalePOS."Customer No.") then begin
-                            Email := Contact."E-Mail";
-                            PhoneNo := Contact."Mobile Phone No.";
-                            if PhoneNo = '' then
-                                PhoneNo := Contact."Phone No.";
-                        end;
-                    end;
+            if Customer.Get(SalePOS."Customer No.") then begin
+                Email := Customer."E-Mail";
+                PhoneNo := Customer."Phone No.";
             end;
         end;
         JSON.SetContext('SendToEmail', Email);

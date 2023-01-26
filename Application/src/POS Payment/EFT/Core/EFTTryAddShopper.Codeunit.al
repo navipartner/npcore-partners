@@ -13,12 +13,6 @@
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        case Rec."Entity Type" of
-            Rec."Entity Type"::Contact:
-                SalePOS.Validate("Customer Type", SalePOS."Customer Type"::Cash);
-            Rec."Entity Type"::Customer:
-                SalePOS.Validate("Customer Type", SalePOS."Customer Type"::Ord);
-        end;
         SalePOS.Validate("Customer No.", Rec."Entity Key");
 
         SalePOS.Modify(true);

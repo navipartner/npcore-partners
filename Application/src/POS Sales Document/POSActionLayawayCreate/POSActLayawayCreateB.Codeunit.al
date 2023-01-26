@@ -148,7 +148,6 @@ codeunit 6060012 "NPR POS Act.: Layaway Create-B"
         Customer: Record Customer;
     begin
         if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
             Customer.Get(SalePOS."Customer No.");
             Customer.TestField("Application Method", Customer."Application Method"::Manual);
             exit(true);
@@ -157,7 +156,6 @@ codeunit 6060012 "NPR POS Act.: Layaway Create-B"
         if Page.RunModal(0, Customer) <> Action::LookupOK then
             exit(false);
 
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         Customer.Get(SalePOS."Customer No.");

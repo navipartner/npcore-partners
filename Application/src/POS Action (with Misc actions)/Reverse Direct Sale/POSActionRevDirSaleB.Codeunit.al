@@ -153,7 +153,6 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         CustomerNo: Code[20];
         POSSale: Codeunit "NPR POS Sale";
         Customer: Record Customer;
-        Contact: Record Contact;
         POSEntry: Record "NPR POS Entry";
     begin
         POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
@@ -166,14 +165,8 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         else
             exit;
 
-        if Customer.Get(CustomerNo) then begin
+        if Customer.Get(CustomerNo) then
             SalePOS.Validate("Customer No.", Customer."No.");
-        end else begin
-            if Contact.Get(CustomerNo) then begin
-                SalePOS.Validate("Customer Type", SalePOS."Customer Type"::Cash);
-                SalePOS.Validate("Customer No.", Contact."No.");
-            end;
-        end;
 
         SalePOS.Modify(true);
         POSSale.Refresh(SalePOS);

@@ -1,6 +1,7 @@
 ﻿codeunit 6014417 "NPR POS Doc. Export Try Pay"
 {
     Access = Internal;
+
     var
         HandleType: Option Undefined,Prepayment,Post;
         FullPosting: Boolean;
@@ -30,7 +31,6 @@
 
             POSSession.GetSale(POSSale);
             POSSale.GetCurrentSale(SalePOS);
-            SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
             SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
             SalePOS.Modify(true);
             POSSale.RefreshCurrent();

@@ -1407,16 +1407,7 @@
         NpRvSalesLine."Starting Date" := CurrentDateTime;
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        case SalePOS."Customer Type" of
-            SalePOS."Customer Type"::Ord:
-                begin
-                    NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");
-                end;
-            SalePOS."Customer Type"::Cash:
-                begin
-                    NpRvSalesLine.Validate("Contact No.", SalePOS."Customer No.");
-                end;
-        end;
+        NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");
 
         NpRvSalesLine."Voucher No." := TempVoucher."No.";
         NpRvSalesLine."Reference No." := TempVoucher."Reference No.";

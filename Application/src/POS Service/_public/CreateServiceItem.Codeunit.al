@@ -273,7 +273,7 @@ codeunit 6059838 "NPR Create Service Item"
         if not ServiceItemGroup."Create Service Item" then
             exit(true);
 
-        if not ((POSSale."Customer Type" = POSSale."Customer Type"::Ord) and (POSSale."Customer No." <> '')) then
+        if not (POSSale."Customer No." <> '') then
             Error(ServiceNoCustErr);
 
         OnAfterCheckConditionsForCreatingServiceItem(Item, ServiceItemGroup, Skip);

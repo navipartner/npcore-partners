@@ -139,7 +139,6 @@
         DataRow.Add(GetCustomerNameText(), Customer.Name);
         DataRow.Add(GetCustomerPostingGroup(), Customer."Customer Posting Group");
         DataRow.Add(GetContactNameText(), Contact.Name);
-        DataRow.Add(GetCustomerType(), GetCustomerTypeString(SalePOS));
 
         Handled := true;
     end;
@@ -227,12 +226,9 @@
         exit('CustomerPostingGroup');
     end;
 
+    [Obsolete('Not used.')]
     local procedure GetCustomerTypeString(SalePOS: Record "NPR POS Sale"): Text
     begin
-        if SalePOS."Customer No." = '' then
-            exit('')
-        else
-            exit(Format(SalePOS."Customer Type"))
     end;
 
     local procedure GetCompanyDisplayName(): Text

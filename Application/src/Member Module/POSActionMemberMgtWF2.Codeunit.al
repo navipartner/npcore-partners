@@ -1,6 +1,7 @@
 ﻿codeunit 6014479 "NPR POS Action Member Mgt WF2"
 {
     Access = Internal;
+
     var
         MemberSelectionMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
 
@@ -514,18 +515,14 @@
             exit(false);
 
         if (Membership."Customer No." <> '') then begin
-            SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
             SalePOS."Customer No." := '';
             SalePOS.Validate("Customer No.", Membership."Customer No.");
         end else begin
-            SalePOS."Customer Type" := SalePOS."Customer Type"::Cash;
             SalePOS."Customer No." := '';
 
             MembershipSetup.Get(Membership."Membership Code");
-            if (MembershipSetup."Membership Customer No." <> '') then begin
-                SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
+            if (MembershipSetup."Membership Customer No." <> '') then
                 SalePOS."Customer No." := '';
-            end;
 
             SalePOS.Validate("Customer No.", Membership."Customer No.");
         end;
@@ -726,26 +723,26 @@
                     MemberCard.FindFirst();
                 end;
             else begin
-                    MemberCard.Reset();
-                    MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
-                    MemberCard.SetFilter(Blocked, '=%1', false);
-                    MemberCardCount := MemberCard.Count();
-                    case true of
-                        MemberCardCount > 1:
-                            begin
-                                MemberCardList.SetTableView(MemberCard);
-                                MemberCardList.Editable(false);
-                                MemberCardList.LookupMode(true);
-                                if (Action::LookupOK <> MemberCardList.RunModal()) then
-                                    exit;
-                                MemberCardList.GetRecord(MemberCard);
-                            end;
-                        else begin
-                                if (not MemberCard.FindFirst()) then
-                                    exit;
-                            end;
+                MemberCard.Reset();
+                MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
+                MemberCard.SetFilter(Blocked, '=%1', false);
+                MemberCardCount := MemberCard.Count();
+                case true of
+                    MemberCardCount > 1:
+                        begin
+                            MemberCardList.SetTableView(MemberCard);
+                            MemberCardList.Editable(false);
+                            MemberCardList.LookupMode(true);
+                            if (Action::LookupOK <> MemberCardList.RunModal()) then
+                                exit;
+                            MemberCardList.GetRecord(MemberCard);
+                        end;
+                    else begin
+                        if (not MemberCard.FindFirst()) then
+                            exit;
                     end;
                 end;
+            end;
         end;
 
         ExtMemberCardNo := MemberCard."External Card No.";

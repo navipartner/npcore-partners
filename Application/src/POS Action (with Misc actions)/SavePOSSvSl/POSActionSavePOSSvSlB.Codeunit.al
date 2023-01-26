@@ -57,7 +57,6 @@ codeunit 6059851 "NPR POS Action: SavePOSSvSl B"
         POSQuoteEntry."Register No." := SalePOS."Register No.";
         POSQuoteEntry."Sales Ticket No." := SalePOS."Sales Ticket No.";
         POSQuoteEntry."Salesperson Code" := SalePOS."Salesperson Code";
-        POSQuoteEntry."Customer Type" := SalePOS."Customer Type";
         POSQuoteEntry."Customer No." := SalePOS."Customer No.";
         POSQuoteEntry."Customer Price Group" := SalePOS."Customer Price Group";
         POSQuoteEntry."Customer Disc. Group" := SalePOS."Customer Disc. Group";

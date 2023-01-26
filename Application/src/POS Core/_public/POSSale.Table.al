@@ -64,16 +64,13 @@
         {
             Caption = 'Customer No.';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Customer Type" = CONST(Ord)) Customer."No."
-            ELSE
-            IF ("Customer Type" = CONST(Cash)) Contact."No.";
+            TableRelation = Customer."No.";
             ValidateTableRelation = false;
 
             trigger OnValidate()
             var
                 SaleLinePOS: Record "NPR POS Sale Line";
                 Item: Record Item;
-                Contact: Record Contact;
                 POSPostingProfile: Record "NPR POS Posting Profile";
                 Cust: Record Customer;
                 POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
@@ -96,43 +93,28 @@
                 "Tax Liable" := POSPostingProfile."Tax Liable";
                 "VAT Bus. Posting Group" := POSPostingProfile."VAT Bus. Posting Group";
 
-                if ("Customer Type" = "Customer Type"::Cash) and ("Customer No." <> '') then begin
-                    Contact.Get("Customer No.");
-                    Name := Contact.Name;
-                    Address := Contact.Address;
-                    "Address 2" := Contact."Address 2";
-                    "Post Code" := Contact."Post Code";
-                    City := Contact.City;
-                    "Contact No." := Contact."No.";
-                    Validate("Country Code", Contact."Country/Region Code");
-                end;
-
                 Modify();
 
-                if ("Customer No." <> '') and ("Customer Type" = "Customer Type"::Ord) then begin
+                if "Customer No." <> '' then begin
                     Cust.Get("Customer No.");
+                    Name := Cust.Name;
+                    Address := Cust.Address;
+                    "Address 2" := Cust."Address 2";
+                    "Post Code" := Cust."Post Code";
+                    City := Cust.City;
+                    Validate("Country Code", Cust."Country/Region Code");
+                    if Cust."Customer Price Group" <> '' then
+                        "Customer Price Group" := Cust."Customer Price Group";
+                    if Cust."Customer Disc. Group" <> '' then
+                        "Customer Disc. Group" := Cust."Customer Disc. Group";
 
-                    if "Customer No." <> '' then begin
-                        Cust.Get("Customer No.");
-                        Name := Cust.Name;
-                        Address := Cust.Address;
-                        "Address 2" := Cust."Address 2";
-                        "Post Code" := Cust."Post Code";
-                        City := Cust.City;
-                        Validate("Country Code", Cust."Country/Region Code");
-                        if Cust."Customer Price Group" <> '' then
-                            "Customer Price Group" := Cust."Customer Price Group";
-                        if Cust."Customer Disc. Group" <> '' then
-                            "Customer Disc. Group" := Cust."Customer Disc. Group";
-
-                        if (POSPostingProfile."Default POS Posting Setup" = POSPostingProfile."Default POS Posting Setup"::Customer) or not FoundPostingProfile then begin
-                            if not Cust.NPR_IsRestrictedOnPOS(Cust.FieldNo("Gen. Bus. Posting Group")) then
-                                "Gen. Bus. Posting Group" := Cust."Gen. Bus. Posting Group";
-                            "Tax Area Code" := Cust."Tax Area Code";
-                            "Tax Liable" := Cust."Tax Liable";
-                            if not Cust.NPR_IsRestrictedOnPOS(Cust.FieldNo("VAT Bus. Posting Group")) then
-                                "VAT Bus. Posting Group" := Cust."VAT Bus. Posting Group";
-                        end;
+                    if (POSPostingProfile."Default POS Posting Setup" = POSPostingProfile."Default POS Posting Setup"::Customer) or not FoundPostingProfile then begin
+                        if not Cust.NPR_IsRestrictedOnPOS(Cust.FieldNo("Gen. Bus. Posting Group")) then
+                            "Gen. Bus. Posting Group" := Cust."Gen. Bus. Posting Group";
+                        "Tax Area Code" := Cust."Tax Area Code";
+                        "Tax Liable" := Cust."Tax Liable";
+                        if not Cust.NPR_IsRestrictedOnPOS(Cust.FieldNo("VAT Bus. Posting Group")) then
+                            "VAT Bus. Posting Group" := Cust."VAT Bus. Posting Group";
                     end;
                 end;
 
@@ -153,51 +135,47 @@
 
                 if not Modify() then;
 
-                if ("Customer Type" = "Customer Type"::Ord) then begin
-                    SaleLinePOS.Reset();
-                    SaleLinePOS.SetRange("Register No.", "Register No.");
-                    SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                    SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
-                    SaleLinePOS.SetRange(Date, Date);
-                    if not SaleLinePOS.IsEmpty and ("Prices Including VAT" <> xRec."Prices Including VAT") then begin
-                        SaleLinePOS.ModifyAll(Amount, 0);
-                        SaleLinePOS.ModifyAll("Amount Including VAT", 0);
-                        SaleLinePOS.ModifyAll("VAT Base Amount", 0);
-                        SaleLinePOS.ModifyAll("Line Amount", 0);
-                    end;
-                    if SaleLinePOS.FindSet(true, false) then begin
-                        repeat
-                            xSaleLinePOS := SaleLinePOS;
-                            Item.Get(SaleLinePOS."No.");
-                            SaleLinePOS."Customer Price Group" := "Customer Price Group";
-                            SaleLinePOS."Allow Line Discount" := "Allow Line Discount";
-                            SaleLinePOS."Price Includes VAT" := "Prices Including VAT";
-                            SaleLinePOS."Gen. Bus. Posting Group" := "Gen. Bus. Posting Group";
-                            SaleLinePOS."VAT Bus. Posting Group" := "VAT Bus. Posting Group";
-                            SaleLinePOS."Tax Area Code" := "Tax Area Code";
-                            SaleLinePOS."Tax Liable" := "Tax Liable";
-                            SaleLinePOS.UpdateVATSetup();
+                SaleLinePOS.Reset();
+                SaleLinePOS.SetRange("Register No.", "Register No.");
+                SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
+                SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
+                SaleLinePOS.SetRange(Date, Date);
+                if not SaleLinePOS.IsEmpty and ("Prices Including VAT" <> xRec."Prices Including VAT") then begin
+                    SaleLinePOS.ModifyAll(Amount, 0);
+                    SaleLinePOS.ModifyAll("Amount Including VAT", 0);
+                    SaleLinePOS.ModifyAll("VAT Base Amount", 0);
+                    SaleLinePOS.ModifyAll("Line Amount", 0);
+                end;
+                if SaleLinePOS.FindSet(true, false) then begin
+                    repeat
+                        xSaleLinePOS := SaleLinePOS;
+                        Item.Get(SaleLinePOS."No.");
+                        SaleLinePOS."Customer Price Group" := "Customer Price Group";
+                        SaleLinePOS."Allow Line Discount" := "Allow Line Discount";
+                        SaleLinePOS."Price Includes VAT" := "Prices Including VAT";
+                        SaleLinePOS."Gen. Bus. Posting Group" := "Gen. Bus. Posting Group";
+                        SaleLinePOS."VAT Bus. Posting Group" := "VAT Bus. Posting Group";
+                        SaleLinePOS."Tax Area Code" := "Tax Area Code";
+                        SaleLinePOS."Tax Liable" := "Tax Liable";
+                        SaleLinePOS.UpdateVATSetup();
 
-                            //Recalc.existing price to reflect possible VAT Rate/Price Inc. VAT change
-                            POSSaleLine.ConvertPriceToVAT(
-                              xSaleLinePOS."Price Includes VAT", xSaleLinePOS."VAT Bus. Posting Group", xSaleLinePOS."VAT Prod. Posting Group",
-                              SaleLinePOS, SaleLinePOS."Unit Price");
+                        //Recalc.existing price to reflect possible VAT Rate/Price Inc. VAT change
+                        POSSaleLine.ConvertPriceToVAT(
+                            xSaleLinePOS."Price Includes VAT", xSaleLinePOS."VAT Bus. Posting Group", xSaleLinePOS."VAT Prod. Posting Group",
+                            SaleLinePOS, SaleLinePOS."Unit Price");
 
-                            SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
-                            SaleLinePOS.GetAmount(SaleLinePOS, Item, SaleLinePOS."Unit Price");
-                            SaleLinePOS.Modify();
-                        until SaleLinePOS.Next() = 0;
-                    end;
+                        SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
+                        SaleLinePOS.GetAmount(SaleLinePOS, Item, SaleLinePOS."Unit Price");
+                        SaleLinePOS.Modify();
+                    until SaleLinePOS.Next() = 0;
                 end;
 
                 POSSalesDiscountCalcMgt.RecalculateAllSaleLinePOS(Rec);
 
                 case true of
-                    (Rec."Customer Type" = Rec."Customer Type"::Ord) and (Rec."Customer No." <> ''):
+                    (Rec."Customer No." <> ''):
                         POSSaleTranslation.AssignLanguageCodeFrom(Rec, Cust);
-                    (Rec."Customer Type" = Rec."Customer Type"::Cash) and (Rec."Customer No." <> ''):
-                        POSSaleTranslation.AssignLanguageCodeFrom(Rec, Contact);
-                    (Rec."Customer Type" = Rec."Customer Type"::Ord) and (Rec."Customer No." = ''):
+                    (Rec."Customer No." = ''):
                         POSSaleTranslation.AssignLanguageCodeFrom(Rec, POSStore);
                 end;
 
@@ -391,6 +369,8 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Ordinary,Cash';
             OptionMembers = Ord,Cash;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not used';
         }
         field(107; "Org. Bonnr."; Code[20])
         {
