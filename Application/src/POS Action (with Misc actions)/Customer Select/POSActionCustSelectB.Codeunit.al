@@ -22,14 +22,12 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
                 if not Confirm(StrSubstNo(customerCreditWarningLbl, BalanceAmt)) then
                     exit;
 
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
     end;
 
     procedure RemoveCustomer(var SalePOS: Record "NPR POS Sale")
     begin
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", '');
         SalePOS.Modify(true);
     end;

@@ -5,10 +5,8 @@
     var
         Customer: Record Customer;
     begin
-        if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
+        if SalePOS."Customer No." <> '' then
             exit(true);
-        end;
 
         if not SelectCustomer then
             exit(true);
@@ -16,7 +14,6 @@
         if Page.RunModal(0, Customer) <> Action::LookupOK then
             exit(false);
 
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();

@@ -4,42 +4,24 @@ codeunit 6150726 "NPR POSAction: Ins. Customer" implements "NPR IPOS Workflow"
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'This is a built-in action for setting a customer on the current transaction';
-        ParameterCustomerType_OptionsLbl: Label 'Contact,Customer', Locked = true;
         ParamCardPageId_NameCaptionLbl: Label 'CardPageId';
-        ParamCustomerType_NameCaptionLbl: Label 'CustomerType';
-        ParameterCustomerType_CaptionOptionsLbl: Label 'Contact,Customer';
         ParamCardPageId_DescrptionLbl: Label 'Card Page Id';
-        ParamCustomerType_DescrptionLbl: Label 'Customer Type';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddIntegerParameter(ParameterCardPageId_Name(), 0, ParamCardPageId_NameCaptionLbl, ParamCardPageId_DescrptionLbl);
-        WorkflowConfig.AddOptionParameter(
-            ParameterCustomerType_Name(),
-            ParameterCustomerType_OptionsLbl,
-            SelectStr(2, ParameterCustomerType_OptionsLbl),
-            ParamCustomerType_NameCaptionLbl,
-            ParamCustomerType_DescrptionLbl,
-            ParameterCustomerType_CaptionOptionsLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     var
         SalePOS: Record "NPR POS Sale";
         PosActionBusinessLogic: Codeunit "NPR POSAction: Ins. Customer-B";
-        CustomerType: Option Contact,Customer;
         CardPageId: Integer;
     begin
         CardPageId := Context.GetIntegerParameter(ParameterCardPageId_Name());
-        CustomerType := Context.GetIntegerParameter(ParameterCustomerType_Name());
 
         Sale.GetCurrentSale(SalePOS);
-        case CustomerType of
-            CustomerType::Contact:
-                PosActionBusinessLogic.OnActionCreateContact(CardPageId, SalePOS);
-            CustomerType::Customer:
-                PosActionBusinessLogic.OnActionCreateCustomer(CardPageId, SalePOS);
-        end;
+        PosActionBusinessLogic.OnActionCreateCustomer(CardPageId, SalePOS);
     end;
 
     local procedure GetActionScript(): Text
@@ -71,7 +53,6 @@ codeunit 6150726 "NPR POSAction: Ins. Customer" implements "NPR IPOS Workflow"
 
         PrevRec := Format(SalePOS);
 
-        SalePOS.Validate("Customer Type", SalePOS."Customer Type"::Ord);
         SalePOS.Validate("Customer No.", Customer."No.");
 
         if PrevRec <> Format(SalePOS) then
@@ -104,11 +85,6 @@ codeunit 6150726 "NPR POSAction: Ins. Customer" implements "NPR IPOS Workflow"
     local procedure ParameterCardPageId_Name(): Text[30]
     begin
         exit('CardPageId');
-    end;
-
-    local procedure ParameterCustomerType_Name(): Text[30]
-    begin
-        exit('CustomerType');
     end;
 }
 
