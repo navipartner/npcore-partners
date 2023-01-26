@@ -5,10 +5,8 @@
     DelayedInsert = false;
     DeleteAllowed = false;
     InsertAllowed = false;
-    ModifyAllowed = false;
-    PageType = List;
+    PageType = Worksheet;
     UsageCategory = Administration;
-
     SourceTable = "NPR Inv. Overview Line";
     SourceTableTemporary = true;
     ApplicationArea = NPRRetail;
