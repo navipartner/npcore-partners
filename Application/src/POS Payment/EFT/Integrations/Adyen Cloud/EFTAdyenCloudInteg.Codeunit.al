@@ -635,20 +635,14 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
 
         EFTShopperRecognition.SetRange("Integration Type", IntegrationType());
         EFTShopperRecognition.SetRange("Entity Key", SalePOS."Customer No.");
-        if SalePOS."Customer Type" = SalePOS."Customer Type"::Cash then
-            EFTShopperRecognition.SetRange("Entity Type", EFTShopperRecognition."Entity Type"::Contact)
-        else
-            EFTShopperRecognition.SetRange("Entity Type", EFTShopperRecognition."Entity Type"::Customer);
+        EFTShopperRecognition.SetRange("Entity Type", EFTShopperRecognition."Entity Type"::Customer);
 
         if not EFTShopperRecognition.FindFirst() then begin
             EFTShopperRecognition.Init();
             EFTShopperRecognition."Integration Type" := IntegrationType();
             EFTShopperRecognition."Shopper Reference" := CopyStr(Format(CreateGuid()), 2, 36);
             EFTShopperRecognition."Entity Key" := SalePOS."Customer No.";
-            if SalePOS."Customer Type" = SalePOS."Customer Type"::Cash then
-                EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Contact
-            else
-                EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Customer;
+            EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Customer;
             EFTShopperRecognition.Insert();
         end;
 

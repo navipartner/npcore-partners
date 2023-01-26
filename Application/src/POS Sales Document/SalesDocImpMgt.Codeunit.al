@@ -32,7 +32,6 @@
         POSSession.GetSaleLine(POSSaleLine);
         POSSale.GetCurrentSale(SalePOS);
 
-        SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
         SalePOS.TestField("Customer No.", SalesHeader."Bill-to Customer No.");
 
         if DocumentIsAttachedToPOSSale(SalePOS) then
@@ -192,10 +191,8 @@
         POSSale.GetCurrentSale(SalePOS);
 
         if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
             SalePOS.TestField("Customer No.", SalesHeader."Bill-to Customer No.");
         end else begin
-            SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
             SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
             SalePOS.Modify(true);
             POSSale.RefreshCurrent();
@@ -363,10 +360,8 @@
         POSSale.GetCurrentSale(SalePOS);
         Clear(SalePOS."Sales Document No.");
         Clear(SalePOS."Sales Document Type");
-        if (SalePOS."Customer Type" <> SalePOS."Customer Type"::Ord) or (SalePOS."Customer No." <> SalesHeader."Bill-to Customer No.") then begin
-            SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
+        if SalePOS."Customer No." <> SalesHeader."Bill-to Customer No." then
             SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
-        end;
         SalePOS.Modify();
         POSSale.RefreshCurrent();
 

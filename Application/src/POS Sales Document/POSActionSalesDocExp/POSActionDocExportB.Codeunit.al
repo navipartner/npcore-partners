@@ -5,10 +5,8 @@ codeunit 6059913 "NPR POS Action: Doc. ExportB"
     var
         Customer: Record Customer;
     begin
-        if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
+        if SalePOS."Customer No." <> '' then
             exit(true);
-        end;
 
         if CustomerTableView <> '' then
             Customer.SetView(CustomerTableView);
@@ -16,7 +14,6 @@ codeunit 6059913 "NPR POS Action: Doc. ExportB"
         if PAGE.RunModal(CustomerLookupPage, Customer) <> ACTION::LookupOK then
             exit(false);
 
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         Commit();

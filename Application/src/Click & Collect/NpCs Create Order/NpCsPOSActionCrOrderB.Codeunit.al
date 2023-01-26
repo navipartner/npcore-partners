@@ -80,7 +80,7 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
         SalePOS: Record "NPR POS Sale";
         Customer: Record Customer;
     begin
-        if (SalePOS."Customer No." <> '') and (SalePOS."Customer Type" = SalePOS."Customer Type"::Ord) then
+        if (SalePOS."Customer No." <> '') then
             if Customer.Get(SalePOS."Customer No.") then;
 
         if Customer."No." = '' then begin
@@ -199,7 +199,6 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
 
         SalePOS."External Document No." := SalePOS."Sales Ticket No.";
         SalePOS.Reference := SalePOS."Sales Ticket No.";
-        SalePOS.Validate("Customer Type", SalePOS."Customer Type"::Ord);
         SalePOS.Validate("Customer No.", CustomerNo);
         SalePOS.TestField("Customer No.");
 

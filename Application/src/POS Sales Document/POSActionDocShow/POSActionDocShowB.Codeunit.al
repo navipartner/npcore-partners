@@ -39,10 +39,8 @@ codeunit 6059963 "NPR POS Action: Doc. Show-B"
     var
         Customer: Record Customer;
     begin
-        if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
+        if SalePOS."Customer No." <> '' then
             exit(true);
-        end;
 
         if not SelectCustomer then
             exit(true);
@@ -50,7 +48,6 @@ codeunit 6059963 "NPR POS Action: Doc. Show-B"
         if Page.RunModal(0, Customer) <> Action::LookupOK then
             exit(false);
 
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         Commit();

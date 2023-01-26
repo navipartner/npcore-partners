@@ -45,15 +45,15 @@
             Description = 'NPR5.48';
             OptionCaption = 'Customer,Contact';
             OptionMembers = Customer,Contact;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not used';
         }
         field(30; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.48';
-            TableRelation = IF ("Customer Type" = CONST(Customer)) Customer."No."
-            ELSE
-            IF ("Customer Type" = CONST(Contact)) Contact."No.";
+            TableRelation = Customer."No.";
         }
         field(35; "Customer Price Group"; Code[10])
         {

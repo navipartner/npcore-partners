@@ -193,10 +193,8 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
+        if SalePOS."Customer No." <> '' then
             exit(true);
-        end;
 
         if not SelectCustomer then
             exit(true);

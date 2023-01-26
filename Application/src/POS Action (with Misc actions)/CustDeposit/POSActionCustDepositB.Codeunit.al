@@ -34,7 +34,6 @@ codeunit 6059978 "NPR POS Action: Cust.Deposit B"
         SelectCustomer(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.TestField("Customer No.");
-        SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
 
         InsertDepositLine(POSSaleLine, SalePOS, Amount);
     end;
@@ -81,7 +80,6 @@ codeunit 6059978 "NPR POS Action: Cust.Deposit B"
 
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.TestField("Customer No.");
-        SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
 
         Customer.SetAutoCalcFields("Balance (LCY)");
         Customer.Get(SalePOS."Customer No.");
@@ -123,15 +121,12 @@ codeunit 6059978 "NPR POS Action: Cust.Deposit B"
         Customer: Record Customer;
     begin
         POSSale.GetCurrentSale(SalePOS);
-        if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
+        if SalePOS."Customer No." <> '' then
             exit(true);
-        end;
 
         if PAGE.RunModal(0, Customer) <> ACTION::LookupOK then
             exit(false);
 
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();

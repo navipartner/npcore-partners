@@ -939,10 +939,8 @@
         POSSale.GetCurrentSale(SalePOS);
 
         if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
             SalePOS.TestField("Customer No.", SalesHeader."Bill-to Customer No.");
         end else begin
-            SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
             SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
             SalePOS.Modify(true);
             POSSale.RefreshCurrent();

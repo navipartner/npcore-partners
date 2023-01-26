@@ -15,7 +15,6 @@ codeunit 6059875 "NPR POS Action: Imp. PstdInv B"
         POSSession.GetSaleLine(POSSaleLine);
         POSSale.GetCurrentSale(SalePOS);
 
-        SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
         SalePOS.TestField("Customer No.", SalesInvHeader."Bill-to Customer No.");
 
         SalesInvLine.SetRange("Document No.", SalesInvHeader."No.");
@@ -102,7 +101,6 @@ codeunit 6059875 "NPR POS Action: Imp. PstdInv B"
         POSSale.GetCurrentSale(SalePOS);
         if SalePOS."Customer No." <> '' then
             exit;
-        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", CustomerNo);
         SalePOS.Modify(true);
     end;

@@ -9,12 +9,10 @@ codeunit 6014679 "NPR POS Sale Translation"
     procedure AssignLanguageCodeFrom(var POSSale: Record "NPR POS Sale"; Rec: Variant)
     begin
         case true of
-            (POSSale."Customer Type" = POSSale."Customer Type"::Ord) and (POSSale."Customer No." <> ''):
+            (POSSale."Customer No." <> ''):
                 AssignLanguageCodeFromCustomer(POSSale, Rec);
-            (POSSale."Customer Type" = POSSale."Customer Type"::Cash) and (POSSale."Customer No." <> ''):
-                AssignLanguageCodeFromContact(POSSale, Rec);
-            (POSSale."Customer Type" = POSSale."Customer Type"::Ord) and (POSSale."Customer No." = ''):
-                AssignLanguageCodeFromPOSStore(POSSale, Rec);                                           
+            (POSSale."Customer No." = ''):
+                AssignLanguageCodeFromPOSStore(POSSale, Rec);
         end;
     end;
 
@@ -26,12 +24,10 @@ codeunit 6014679 "NPR POS Sale Translation"
         AssignTranslationOnPOSSaleLines(POSSale);
     end;
 
+    [Obsolete('Not Used.')]
     local procedure AssignLanguageCodeFromContact(var POSSale: Record "NPR POS Sale"; Rec: Variant)
-    var
-        Contact: Record Contact;       
     begin
-        SetLanguageCode(POSSale, Rec, Contact.FieldName("Language Code"));
-        AssignTranslationOnPOSSaleLines(POSSale);
+
     end;
 
     local procedure AssignLanguageCodeFromPOSStore(var POSSale: Record "NPR POS Sale"; Rec: Variant)
@@ -39,8 +35,8 @@ codeunit 6014679 "NPR POS Sale Translation"
         POSStore: Record "NPR POS Store";
     begin
         SetLanguageCode(POSSale, Rec, POSStore.FieldName("Language Code"));
-        AssignTranslationOnPOSSaleLines(POSSale);       
-    end; 
+        AssignTranslationOnPOSSaleLines(POSSale);
+    end;
 
     local procedure SetLanguageCode(var POSSale: Record "NPR POS Sale"; Rec: Variant; AssignLanguageForFieldName: Text)
     var
@@ -53,7 +49,7 @@ codeunit 6014679 "NPR POS Sale Translation"
         OnBeforeAssignLanguageCodeFrom(RecRef, AssignLanguageForFieldName);
         if not DataTypeMgt.FindFieldByName(RecRef, FieldReference, AssignLanguageForFieldName) then
             exit;
-        POSSale."Language Code" := FieldReference.Value();        
+        POSSale."Language Code" := FieldReference.Value();
     end;
 
     local procedure AssignTranslationOnPOSSaleLines(POSSale: Record "NPR POS Sale")
@@ -95,7 +91,7 @@ codeunit 6014679 "NPR POS Sale Translation"
             OnAfterGetItemTranslation(POSSaleLine, POSSale, ItemTranslation);
         end;
     end;
-      
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeChangeTranslationPerPOSSaleLine(var POSSaleLine: Record "NPR POS Sale Line"; POSSale: Record "NPR POS Sale")
     begin
@@ -114,5 +110,5 @@ codeunit 6014679 "NPR POS Sale Translation"
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAssignLanguageCodeFrom(RecRef: RecordRef; var AssignLanguageForFieldName: Text)
     begin
-    end;     
+    end;
 }

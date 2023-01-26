@@ -74,9 +74,10 @@
                     ShowCaption = false;
                     field("Customer Type"; Rec."Customer Type")
                     {
-
                         ToolTip = 'Specifies the value of the Customer Type field';
                         ApplicationArea = NPRRetail;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Not used';
                     }
                     field("Customer No."; Rec."Customer No.")
                     {
