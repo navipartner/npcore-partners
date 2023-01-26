@@ -90,7 +90,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         DescUseLocationFrom: Label 'Select source to get location code from for sales document';
         OptionUseLocationFrom: Label '<Undefined>,POS Store,POS Sale,Specific Location';
         CaptionUseSpecLocationCode: Label 'Use Specific Location Code';
-        DescUseSpecLocationCode: Label 'Select location code to be used for sales document, if parameter ''%1'' is set to ''%2''', Comment = 'Select location code to be used for sales document, if parameter ''Use Location From'' is set to ''Specific Location''';
+        DescUseSpecLocationCode: Label 'Select location code to be used for sales document, if parameter ''Use Location From'' is set to ''Specific Location''';
         CaptionSendICOrderConfirmation: Label 'Send IC Order Cnfmn.';
         DescSendICOrderConfirmation: Label 'Send intercompany order confirmation immediately after sales document has been created. ';
         CaptionPaymentMethodCode: Label 'Payment Method Code';
@@ -167,7 +167,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
                         CaptionUseLocationFrom,
                         DescUseLocationFrom,
                         OptionUseLocationFrom);
-        WorkflowConfig.AddTextParameter('UseSpecLocationCode', '', CaptionUseSpecLocationCode, StrSubstNo(DescUseSpecLocationCode, CaptionUseLocationFrom, SelectStr(4, OptionUseLocationFrom)));
+        WorkflowConfig.AddTextParameter('UseSpecLocationCode', '', CaptionUseSpecLocationCode, DescUseSpecLocationCode);
         WorkflowConfig.AddBooleanParameter('SendICOrderConfirmation', false, CaptionSendICOrderConfirmation, DescSendICOrderConfirmation);
         WorkflowConfig.AddOptionParameter('PaymentMethodCodeFrom',
                         OptionNamePaymentMethCodeFrom,
