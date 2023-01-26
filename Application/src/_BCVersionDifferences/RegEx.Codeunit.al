@@ -336,27 +336,25 @@
             end;
         until not Match.Success();
 #else
-        RegEx.Match(TextLine, '{\d+}', TempMatch);
-        if TempMatch.FindSet() then
-            repeat
-                if TempMatch.Success then begin
-                    ResultText += CopyStr(TextLine, 1, TempMatch.Index);
-                    ResultText += ConvertToValue(TempMatch.ReadValue(), RecRef);
-                    TextLine := CopyStr(TextLine, TempMatch.Index + TempMatch.Length + 1);
-                end;
-            until TempMatch.Next() = 0;
+        while RegEx.IsMatch(TextLine, '{\d+}', 0) do begin
+            RegEx.Match(TextLine, '{\d+}', TempMatch);
+            if TempMatch.FindFirst() then begin
+                ResultText += CopyStr(TextLine, 1, TempMatch.Index);
+                ResultText += ConvertToValue(TempMatch.ReadValue(), RecRef);
+                TextLine := CopyStr(TextLine, TempMatch.Index + TempMatch.Length + 1);
+            end;
+        end;
 
         ResultText += TextLine;
         TextLine := ResultText;
         ResultText := '';
-        RegEx.Match(TextLine, StrSubstNo(AFReportLinkTag, '.*?'), TempMatch);
-        if TempMatch.FindSet() then
-            repeat
-                if TempMatch.Success then begin
-                    ResultText += CopyStr(TextLine, 1, TempMatch.Index);
-                    TextLine := CopyStr(TextLine, TempMatch.Index + TempMatch.Length + 1);
-                end;
-            until TempMatch.Next() = 0;
+        while RegEx.IsMatch(TextLine, StrSubstNo(AFReportLinkTag, '.*?'), 0) do begin
+            RegEx.Match(TextLine, StrSubstNo(AFReportLinkTag, '.*?'), TempMatch);
+            if TempMatch.FindFirst() then begin
+                ResultText += CopyStr(TextLine, 1, TempMatch.Index);
+                TextLine := CopyStr(TextLine, TempMatch.Index + TempMatch.Length + 1);
+            end;
+        end;
 #endif
         ResultText += TextLine;
     end;
