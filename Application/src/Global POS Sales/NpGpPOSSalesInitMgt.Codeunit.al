@@ -218,8 +218,8 @@
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
     begin
         NcTaskSetup.SetCurrentKey("Table No.");
-        NcTaskSetup.SetRange("Table No.", DATABASE::"NPR POS Entry");
-        NcTaskSetup.SetRange("Codeunit ID", CODEUNIT::"NPR NpGp POS Sales Sync Mgt.");
+        NcTaskSetup.SetRange("Table No.", Database::"NPR POS Entry");
+        NcTaskSetup.SetRange("Codeunit ID", Codeunit::"NPR NpGp POS Sales Sync Mgt.");
         if NcTaskSetup.FindFirst() then
             exit(NcTaskSetup."Task Processor Code");
 
@@ -232,13 +232,11 @@
         NcTaskSetup.Init();
         NcTaskSetup."Entry No." := 0;
         NcTaskSetup."Task Processor Code" := NcTaskProcessor.Code;
-        NcTaskSetup."Table No." := DATABASE::"NPR POS Entry";
-        NcTaskSetup."Codeunit ID" := CODEUNIT::"NPR NpGp POS Sales Sync Mgt.";
+        NcTaskSetup."Table No." := Database::"NPR POS Entry";
+        NcTaskSetup."Codeunit ID" := Codeunit::"NPR NpGp POS Sales Sync Mgt.";
         NcTaskSetup.Insert();
         exit(NcTaskSetup."Task Processor Code");
     end;
-
-    #region POS Cross Reference
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Cross Ref. Setup", 'OnDiscoverSetup', '', true, true)]
     local procedure OnDiscoverPOSCrossReferenceSetup(var Setup: Record "NPR POS Cross Ref. Setup")
@@ -417,7 +415,7 @@
     var
         NpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line";
     begin
-        if NpGpPOSPaymentLine.Get(TempNpGpPOSPaymentLine."POS Entry No.", TempNpGpPOSPaymentLine."Line No.") then
+        if NpGpPOSPaymentLine.Get(NpGpPOSSalesEntry."Entry No.", TempNpGpPOSPaymentLine."Line No.") then
             exit;
 
         NpGpPOSPaymentLine.Init();
@@ -426,6 +424,5 @@
         NpGpPOSPaymentLine.Insert(true);
     end;
 
-    #endregion
 }
 
