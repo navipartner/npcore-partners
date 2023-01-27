@@ -19,6 +19,7 @@ codeunit 88103 "NPR Library - POS Mock"
         POSSession.StartPOSSession();
 
         // TempPOSAction.DiscoverActions();
+        UnbindSubscription(BCPTPOSSetupEventSubs);
     end;
 
     procedure InitializePOSSession(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; Salesperson: Record "Salesperson/Purchaser")

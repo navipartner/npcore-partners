@@ -145,6 +145,7 @@ codeunit 88001 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
         POSSession.GetSale(SalePOS);
         SalePOS.GetCurrentSale(POSSale);
         EFTTransactionMgt.StartPayment(EFTSetup, AmountToPay, '', POSSale);
+        UnbindSubscription(EFTTestMockIntegration);
         BCPTTestContext.EndScenario('Pay Sale');
         BCPTTestContext.UserWait();
     end;

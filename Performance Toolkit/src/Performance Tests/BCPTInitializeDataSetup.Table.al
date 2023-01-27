@@ -27,6 +27,7 @@ table 88000 "NPR BCPT Initialize Data Setup"
 
     procedure FindNextPOSUnit(var POSUnit: Record "NPR POS Unit")
     begin
+        LockTable(true);
         if not Get() then begin
             Init();
             Insert();
