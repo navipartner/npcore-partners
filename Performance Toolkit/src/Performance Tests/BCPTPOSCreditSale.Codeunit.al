@@ -151,13 +151,16 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
     var
         SalePOS: Codeunit "NPR POS Sale";
         SalesDocumentExportMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        BCPTMiscEventSubs: Codeunit "NPR BCPT Misc. Event Subs";
     begin
         BCPTTestContext.StartScenario('Export Sale');
+        BindSubscription(BCPTMiscEventSubs);
         POSSession.GetSale(SalePOS);
         SalesDocumentExportMgt.SetDocumentTypeOrder();
         SalesDocumentExportMgt.SetInvoice(true);
         SalesDocumentExportMgt.SetShip(true);
         SalesDocumentExportMgt.ProcessPOSSale(SalePOS);
+        UnbindSubscription(BCPTMiscEventSubs);
         BCPTTestContext.EndScenario('Export Sale');
         BCPTTestContext.UserWait();
     end;
