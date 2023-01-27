@@ -846,14 +846,6 @@
                     ToolTip = 'View Global POS Sales Entries.';
                     ApplicationArea = NPRRetail;
                 }
-                action("NaviDocs Document List")
-                {
-                    Caption = 'NaviDocs Document List';
-                    Image = RegisteredDocs;
-                    RunObject = page "NPR NaviDocs Document List";
-                    ToolTip = 'View NaviDocs Document List.';
-                    ApplicationArea = NPRRetail;
-                }
                 action(POSQuotes)
                 {
                     Caption = 'POS Saved Sales';
