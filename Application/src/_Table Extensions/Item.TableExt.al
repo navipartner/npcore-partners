@@ -69,7 +69,7 @@ tableextension 6014427 "NPR Item" extends Item
         }
         field(6014419; "NPR Guarantee voucher"; Boolean)
         {
-            Caption = 'Guarantee voucher';
+            Caption = 'Guarantee Voucher';
             DataClassification = CustomerContent;
         }
         field(6014424; "NPR Cannot edit unit price"; Boolean)

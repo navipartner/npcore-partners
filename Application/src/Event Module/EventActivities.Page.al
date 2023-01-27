@@ -42,17 +42,6 @@
                         DrillDownPage(Rec.FieldNo("Event List"));
                     end;
                 }
-                field("Upcoming Events"; Rec."Upcoming Events")
-                {
-
-                    ToolTip = 'Specifies the number of the Upcoming Events. By clicking you can view the list of Upcoming Events.';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnDrillDown()
-                    begin
-                        DrillDownPage(Rec.FieldNo("Upcoming Events"));
-                    end;
-                }
                 field("Completed Events"; Rec."Completed Events")
                 {
 
@@ -64,7 +53,6 @@
                         DrillDownPage(Rec.FieldNo("Completed Events"));
                     end;
                 }
-
                 field("Cancelled Events"; Rec."Cancelled Events")
                 {
 
@@ -74,6 +62,17 @@
                     trigger OnDrillDown()
                     begin
                         DrillDownPage(Rec.FieldNo("Cancelled Events"));
+                    end;
+                }
+                field("Upcoming Events"; Rec."Upcoming Events")
+                {
+
+                    ToolTip = 'Specifies the number of the Upcoming Events. By clicking you can view the list of Upcoming Events.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnDrillDown()
+                    begin
+                        DrillDownPage(Rec.FieldNo("Upcoming Events"));
                     end;
                 }
             }
