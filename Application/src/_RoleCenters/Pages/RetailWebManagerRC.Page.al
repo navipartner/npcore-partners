@@ -4,6 +4,8 @@
     Caption = 'NP Retail Web Manag. Role Center';
     PageType = RoleCenter;
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore';
 
     layout
     {

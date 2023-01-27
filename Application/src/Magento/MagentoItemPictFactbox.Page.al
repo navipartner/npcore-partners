@@ -1,7 +1,7 @@
 ﻿page 6151447 "NPR Magento Item Pict. Factbox"
 {
     Extensible = False;
-    Caption = 'Picture';
+    Caption = 'Webshop picture';
     PageType = CardPart;
     UsageCategory = None;
     SourceTable = Item;
