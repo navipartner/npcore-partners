@@ -412,6 +412,7 @@
         Balancing_CashCountCompleteBalancingLbl: Label 'Complete balancing';
         Balancing_CashCountTransferAmountTooMuchLbl: Label 'The amount you are attempting to transfer is higher than the counted amount. Please correct this before proceeding.';
         Balancing_CashCountShouldNotExceedCountedAmtLbl: Label 'should not exceed counted amount';
+        Balancing_CashCountShouldNotBeNegativeLbl: Label 'should not be negative';
         Balancing_CashCountEnterBankDepositCodeLbl: Label 'Please enter a bank deposit bin code.';
         Balancing_CashCountEnterBankDepositReferenceLbl: Label 'Please enter a bank deposit reference.';
         Balancing_CashCountEnterMoveToBinCodeLbl: Label 'Please enter a move to bin no.';
@@ -558,6 +559,7 @@
         Captions.Add('Balancing_CashCountCompleteBalancing', Balancing_CashCountCompleteBalancingLbl);
         Captions.Add('Balancing_CashCountTransferAmountTooMuch', Balancing_CashCountTransferAmountTooMuchLbl);
         Captions.Add('Balancing_CashCountShouldNotExceedCountedAmt', Balancing_CashCountShouldNotExceedCountedAmtLbl);
+        Captions.Add('Balancing_CashCountShouldNotBeNegative', Balancing_CashCountShouldNotBeNegativeLbl);
         Captions.Add('Balancing_CashCountEnterBankDepositCode', Balancing_CashCountEnterBankDepositCodeLbl);
         Captions.Add('Balancing_CashCountEnterBankDepositReference', Balancing_CashCountEnterBankDepositReferenceLbl);
         Captions.Add('Balancing_CashCountEnterMoveToBinCode', Balancing_CashCountEnterMoveToBinCodeLbl);
