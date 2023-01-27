@@ -60,6 +60,62 @@ page 6059932 "NPR APIV1 PBIMMMembershipEntry"
                 {
                     Caption = 'Valid Until Date', Locked = true;
                 }
+                field(amount; Rec."Amount")
+                {
+                    Caption = 'Amount', Locked = True;
+                }
+                field(amountInclVAT; Rec."Amount Incl VAT")
+                {
+                    Caption = 'Amount Incl VAT', Locked = True;
+                }
+                field(blocked; Rec."Blocked")
+                {
+                    Caption = 'Blocked', Locked = True;
+                }
+                field(closedByEntryNo; Rec."Closed By Entry No.")
+                {
+                    Caption = 'Closed By Entry No_', Locked = True;
+                }
+                field(documentLineNo; Rec."Document Line No.")
+                {
+                    Caption = 'Document Line No_', Locked = True;
+                }
+                field(documentNo; Rec."Document No.")
+                {
+                    Caption = 'Document No_', Locked = True;
+                }
+                field(documentType; Rec."Document Type")
+                {
+                    Caption = 'Document Type', Locked = True;
+                }
+                field(durationDateformula; Rec."Duration Dateformula")
+                {
+                    Caption = 'Duration Dateformula', Locked = True;
+                }
+                field(importEntryDocumentID; Rec."Import Entry Document ID")
+                {
+                    Caption = 'Import Entry Document ID', Locked = True;
+                }
+                field(lineNo; Rec."Line No.")
+                {
+                    Caption = 'Line No_', Locked = True;
+                }
+                field(memberCardEntryNo; Rec."Member Card Entry No.")
+                {
+                    Caption = 'Member Card Entry No_', Locked = True;
+                }
+                field(originalContext; Rec."Original Context")
+                {
+                    Caption = 'Original Context', Locked = True;
+                }
+                field(receiptNo; Rec."Receipt No.")
+                {
+                    Caption = 'Receipt No_', Locked = True;
+                }
+                field(sourceType; Rec."Source Type")
+                {
+                    Caption = 'Source Type', Locked = True;
+                }
             }
         }
     }
