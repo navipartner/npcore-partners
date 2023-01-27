@@ -100,6 +100,8 @@
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'It is not used anymore';
                     ToolTip = 'Specifies the person that has been working on this transaction.';
                     ApplicationArea = NPRRetail;
                 }
