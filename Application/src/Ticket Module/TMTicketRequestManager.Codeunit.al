@@ -2688,7 +2688,7 @@
         TicketReservationRequest.SetAscending(Default, false);
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
-        if (TicketReservationRequest.FindSet(true)) then begin
+        if (TicketReservationRequest.FindSet()) then begin
             repeat
                 if (TicketReservationRequest."Ext. Line Reference No." <> OldLineReference) then begin
                     if (not TicketReservationRequest."Primary Request Line") then begin

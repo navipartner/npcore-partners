@@ -103,6 +103,7 @@ codeunit 88006 "NPR BCPT POS DS Create Member" implements "BCPT Test Param. Prov
         BindSubscription(BCPTMembershipEventSubs);
         POSMockLibrary.CreateItemLine(POSSession, Item, BarCodeItemReference, ItemIdentifierType::ItemCrossReference, 1);
         AmountToPay := Item."Unit Price";
+        UnbindSubscription(BCPTMembershipEventSubs);
         BCPTTestContext.EndScenario('Add Sale Line');
         Commit();
         BCPTTestContext.UserWait();

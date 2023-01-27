@@ -117,6 +117,7 @@ codeunit 88004 "NPR BCPT POS DS Voucher Usage" implements "BCPT Test Param. Prov
         BCPTTestContext.StartScenario('Pay Sale');
         BindSubscription(BCPTValidateVoucherSubs);
         POSMockLibrary.PayAndTryEndSaleAndStartNew(POSSession, VoucherType."Payment Type", AmountToPay, Voucher."Reference No.", PostSale);
+        UnbindSubscription(BCPTValidateVoucherSubs);
         BCPTTestContext.EndScenario('Pay Sale');
         BCPTTestContext.UserWait();
     end;

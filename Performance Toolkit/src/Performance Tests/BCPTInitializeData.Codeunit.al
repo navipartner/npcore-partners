@@ -167,6 +167,19 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
             GeneralPostingSetup.Validate("Inventory Adjmt. Account", '02800');
             GeneralPostingSetup.Insert(true);
         end;
+
+        if not GeneralPostingSetup.Get('UDLAND', 'MISC') then begin
+            GeneralPostingSetup.Validate("Gen. Bus. Posting Group", 'UDLAND');
+            GeneralPostingSetup.Validate("Gen. Prod. Posting Group", 'MISC');
+            GeneralPostingSetup.Validate("Sales Account", '01010');
+            GeneralPostingSetup.Validate("Sales Credit Memo Account", '01010');
+            GeneralPostingSetup.Validate("Purch. Account", '16200');
+            GeneralPostingSetup.Validate("Purch. Credit Memo Account", '16200');
+            GeneralPostingSetup.Validate("COGS Account", '02010');
+            GeneralPostingSetup.Validate("Inventory Adjmt. Account", '02800');
+            GeneralPostingSetup.Validate("Direct Cost Applied Account", '16200');
+            GeneralPostingSetup.Insert(true);
+        end;
     end;
 
     local procedure InsertVATPostingSetup()
