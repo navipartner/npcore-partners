@@ -99,14 +99,6 @@
                     ToolTip = 'Specifies the value of the Profit % (new) field';
                     ApplicationArea = NPRRetail;
                 }
-                field(Inventory; Rec.Inventory)
-                {
-                    ToolTip = 'Specifies the value of the Inventory field';
-                    ApplicationArea = NPRRetail;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Moved to the NPR Retail Jnl. Line FactBox';
-                    Visible = false;
-                }
                 field("Register No."; Rec."Register No.")
                 {
                     ToolTip = 'Specifies the value of the POS Unit No. field';
@@ -228,30 +220,7 @@
                     ToolTip = 'Specifies the value of the Vendor Name field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Net Change"; Rec."Net Change")
-                {
-                    ToolTip = 'Specifies the value of the Net Change field';
-                    ApplicationArea = NPRRetail;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Moved to the NPR Retail Jnl. Line FactBox';
-                    Visible = false;
-                }
-                field("Purchases (Qty.)"; Rec."Purchases (Qty.)")
-                {
-                    ToolTip = 'Specifies the value of the Purchases (Qty.) field';
-                    ApplicationArea = NPRRetail;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Moved to the NPR Retail Jnl. Line FactBox';
-                    Visible = false;
-                }
-                field("Sales (Qty.)"; Rec."Sales (Qty.)")
-                {
-                    ToolTip = 'Specifies the value of the Sales (Qty.) field';
-                    ApplicationArea = NPRRetail;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Moved to the NPR Retail Jnl. Line FactBox';
-                    Visible = false;
-                }
+
                 field("Cannot edit unit price"; Rec."Cannot edit unit price")
                 {
                     Visible = false;
@@ -265,9 +234,7 @@
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.50 [350435]
                         CurrPage.Update();
-                        //+NPR5.50 [350435]
                     end;
                 }
                 field("RFID Tag Value"; Rec."RFID Tag Value")
@@ -284,7 +251,7 @@
     var
         RecRef: RecordRef;
     begin
-        Rec.calcProfit();
+        Rec.CalcProfit();
         RecRef.GetTable(Rec);
         Print := LabelLibrary.SelectionContains(RecRef);
     end;
@@ -310,8 +277,8 @@
     end;
 
     var
-        Print: Boolean;
         LabelLibrary: Codeunit "NPR Label Library";
+        Print: Boolean;
         Caption_DeletePrintedLines: Label 'Delete printed lines?';
         SkipConfirm: Boolean;
         IsWebClient: Boolean;
@@ -327,7 +294,8 @@
             Error(t001);
 
         if Lines.Count() = 1 then
-            if not Confirm(t002, true) then Error('');
+            if not Confirm(t002, true) then 
+            Error('');
     end;
 
     internal procedure SetItemFilter(ParamItemNo: Code[20])
