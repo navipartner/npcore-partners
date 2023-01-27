@@ -18,6 +18,11 @@ xmlport 6060127 "NPR MM Create Membership"
                     MinOccurs = Zero;
                     XmlName = 'request';
                     UseTemporary = true;
+                    textattribute(NstServiceInstanceIdIn)
+                    {
+                        XmlName = 'cache_instance_id';
+                        Occurrence = Optional;
+                    }
                     fieldelement(membershipsalesitem; tmpMemberInfoCapture."Item No.")
                     {
                     }
@@ -67,6 +72,14 @@ xmlport 6060127 "NPR MM Create Membership"
                     MinOccurs = Zero;
                     XmlName = 'response';
                     UseTemporary = true;
+                    textattribute(NstServiceInstanceIdOut)
+                    {
+                        XmlName = 'cache_instance_id';
+                        trigger OnBeforePassVariable()
+                        begin
+                            NstServiceInstanceIdOut := Format(ServiceInstanceId(), 0, 9);
+                        end;
+                    }
                     textelement(status)
                     {
                         MaxOccurs = Once;

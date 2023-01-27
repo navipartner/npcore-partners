@@ -17,6 +17,11 @@ xmlport 6151121 "NPR MM GDPR GetSet Appr. State"
                     MinOccurs = Zero;
                     XmlName = 'request';
                     UseTemporary = true;
+                    textattribute(NstServiceInstanceIdIn)
+                    {
+                        XmlName = 'cache_instance_id';
+                        Occurrence = Optional;
+                    }
                     fieldelement(cardnumber; tmpMemberInfoRequest."External Card No.")
                     {
                         MaxOccurs = Once;
@@ -36,6 +41,15 @@ xmlport 6151121 "NPR MM GDPR GetSet Appr. State"
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
+                    XmlName = 'response';
+                    textattribute(NstServiceInstanceIdOut)
+                    {
+                        XmlName = 'cache_instance_id';
+                        trigger OnBeforePassVariable()
+                        begin
+                            NstServiceInstanceIdOut := Format(ServiceInstanceId(), 0, 9);
+                        end;
+                    }
                     textelement(status)
                     {
                         MaxOccurs = Once;

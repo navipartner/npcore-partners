@@ -24,6 +24,11 @@ xmlport 6151186 "NPR MM Search Members"
                     MaxOccurs = Once;
                     MinOccurs = Once;
                     UseTemporary = true;
+                    textattribute(NstServiceInstanceIdIn)
+                    {
+                        XmlName = 'cache_instance_id';
+                        Occurrence = Optional;
+                    }
                     fieldelement(FirstName; TempMemberInfoRequest."First Name")
                     {
                         XmlName = 'firstname';
@@ -61,6 +66,14 @@ xmlport 6151186 "NPR MM Search Members"
                     XmlName = 'response';
                     MaxOccurs = Once;
                     MinOccurs = Zero;
+                    textattribute(NstServiceInstanceIdOut)
+                    {
+                        XmlName = 'cache_instance_id';
+                        trigger OnBeforePassVariable()
+                        begin
+                            NstServiceInstanceIdOut := Format(ServiceInstanceId(), 0, 9);
+                        end;
+                    }
                     textelement(Status)
                     {
                         XmlName = 'status';

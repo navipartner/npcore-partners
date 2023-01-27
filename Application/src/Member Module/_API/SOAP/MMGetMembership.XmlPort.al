@@ -20,6 +20,11 @@ xmlport 6060129 "NPR MM Get Membership"
                     MinOccurs = Zero;
                     XmlName = 'request';
                     UseTemporary = true;
+                    textattribute(NstServiceInstanceIdIn)
+                    {
+                        XmlName = 'cache_instance_id';
+                        Occurrence = Optional;
+                    }
                     fieldelement(membernumber; tmpMemberInfoCapture."External Member No")
                     {
                         MinOccurs = Zero;
@@ -50,6 +55,14 @@ xmlport 6060129 "NPR MM Get Membership"
                     MinOccurs = Zero;
                     XmlName = 'response';
                     UseTemporary = true;
+                    textattribute(NstServiceInstanceIdOut)
+                    {
+                        XmlName = 'cache_instance_id';
+                        trigger OnBeforePassVariable()
+                        begin
+                            NstServiceInstanceIdOut := Format(ServiceInstanceId(), 0, 9);
+                        end;
+                    }
                     textelement(status)
                     {
                         MaxOccurs = Once;

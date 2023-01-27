@@ -19,6 +19,11 @@ xmlport 6060134 "NPR MM Change Membership"
                     MinOccurs = Zero;
                     XmlName = 'request';
                     UseTemporary = true;
+                    textattribute(NstServiceInstanceIdIn)
+                    {
+                        XmlName = 'cache_instance_id';
+                        Occurrence = Optional;
+                    }
                     fieldelement(membershipnumber; tmpMemberInfoCapture."External Membership No.")
                     {
                         MinOccurs = Zero;
@@ -36,6 +41,14 @@ xmlport 6060134 "NPR MM Change Membership"
                     MinOccurs = Zero;
                     XmlName = 'response';
                     UseTemporary = true;
+                    textattribute(NstServiceInstanceIdOut)
+                    {
+                        XmlName = 'cache_instance_id';
+                        trigger OnBeforePassVariable()
+                        begin
+                            NstServiceInstanceIdOut := Format(ServiceInstanceId(), 0, 9);
+                        end;
+                    }
                     textelement(status)
                     {
                         MaxOccurs = Once;
