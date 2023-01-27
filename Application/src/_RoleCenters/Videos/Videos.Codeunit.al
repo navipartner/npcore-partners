@@ -12,6 +12,7 @@ codeunit 6059919 "NPR Videos"
         POSUnitSetupAuditProfile(sender, VarModuleInfo.Id);
         POSUnitSetupViewProfile(sender, VarModuleInfo.Id);
         POSStoreSetup(sender, VarModuleInfo.Id);
+        EntertainmentTicketAdmission(sender, VarModuleInfo.Id);
     end;
 
     local procedure POSUnitSetupGeneralSettings(var Video: Codeunit Video; AppID: Guid)
@@ -42,6 +43,14 @@ codeunit 6059919 "NPR Videos"
     var
         VideoLbl: Label 'https://share.synthesia.io/embeds/videos/acb03dd9-507e-4ef8-8800-171f16ec8e0a', locked = true;
         TitleLbl: Label 'POS Store Setup';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure EntertainmentTicketAdmission(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://share.synthesia.io/embeds/videos/dddf3d9a-bac6-47e4-b784-4dd50b39cc62', locked = true;
+        TitleLbl: Label 'Entertainment - Ticket Admission 01';
     begin
         Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
     end;
