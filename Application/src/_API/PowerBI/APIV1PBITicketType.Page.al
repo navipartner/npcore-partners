@@ -1,16 +1,16 @@
-page 6059939 "NPR APIV1 PBITicket"
+page 6150787 "NPR APIV1 PBITicketType"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
     APIVersion = 'v1.0';
     PageType = API;
-    EntityName = 'ticket';
-    EntitySetName = 'tickets';
-    Caption = 'PowerBI Ticket';
+    EntityName = 'ticketType';
+    EntitySetName = 'ticketsType';
+    Caption = 'PowerBI Ticket Type';
     DataAccessIntent = ReadOnly;
     ODataKeyFields = SystemId;
     DelayedInsert = true;
-    SourceTable = "NPR TM Ticket";
+    SourceTable = "NPR TM Ticket Type";
     Extensible = false;
     Editable = false;
 
@@ -24,21 +24,21 @@ page 6059939 "NPR APIV1 PBITicket"
                 {
                     Caption = 'SystemId', Locked = true;
                 }
-                field(itemNo; Rec."Item No.")
+                field("code"; Rec."Code")
                 {
-                    Caption = 'Item No.', Locked = true;
+                    Caption = 'Code';
                 }
-                field(no; Rec."No.")
+                field(description; Rec.Description)
                 {
-                    Caption = 'No.', Locked = true;
+                    Caption = 'Description';
                 }
-                field(ticketTypeCode; Rec."Ticket Type Code")
+                field(externalTicketPattern; Rec."External Ticket Pattern")
                 {
-                    Caption = 'Ticket Type Code', Locked = true;
+                    Caption = 'External Ticket Pattern';
                 }
-                field(externalMemberCardNo; Rec."External Member Card No.")
+                field(maxNoOfEntries; Rec."Max No. Of Entries")
                 {
-                    Caption = 'External Member Card No.';
+                    Caption = 'Max No. Of Entries';
                 }
             }
         }

@@ -44,6 +44,30 @@ page 6059928 "NPR APIV1 PBIItemCategory"
                 {
                     Caption = 'Indentation', locked = true;
                 }
+                field(presentationOrder; Rec."Presentation Order")
+                {
+                    Caption = 'Presentation Order', locked = true;
+                }
+                field(nprBlocked; Rec."NPR Blocked")
+                {
+                    Caption = 'Blocked';
+                }
+                field(nprGlobalDimension1Code; Rec."NPR Global Dimension 1 Code")
+                {
+                    Caption = 'Global Dimension 1 Code';
+                }
+                field(nprGlobalDimension2Code; Rec."NPR Global Dimension 2 Code")
+                {
+                    Caption = 'Global Dimension 2 Code';
+                }
+                field(nprMainCategory; Rec."NPR Main Category")
+                {
+                    Caption = 'Main Category';
+                }
+                field(nprMainCategoryCode; Rec."NPR Main Category Code")
+                {
+                    Caption = 'Main Category Code';
+                }
             }
         }
     }

@@ -102,6 +102,14 @@ page 6060002 "NPR APIV1 PBIPOSEntrySalesLine"
                 {
                     Caption = 'No.', Locked = true;
                 }
+                field(lineDscAmtExclVATLCY; Rec."Line Dsc. Amt. Excl. VAT (LCY)")
+                {
+                    Caption = 'Line Dsc. Amt. Excl. VAT (LCY)';
+                }
+                field(lineDscAmtInclVATLCY; Rec."Line Dsc. Amt. Incl. VAT (LCY)")
+                {
+                    Caption = 'Line Dsc. Amt. Incl. VAT (LCY)';
+                }
 
             }
         }
