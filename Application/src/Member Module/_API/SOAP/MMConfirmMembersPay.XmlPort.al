@@ -17,6 +17,11 @@ xmlport 6060137 "NPR MM Confirm Members. Pay."
                     MinOccurs = Zero;
                     XmlName = 'request';
                     UseTemporary = true;
+                    textattribute(NstServiceInstanceIdIn)
+                    {
+                        XmlName = 'cache_instance_id';
+                        Occurrence = Optional;
+                    }
                     fieldelement(documentid; tmpMemberInfoCapture."Import Entry Document ID")
                     {
                     }
@@ -37,6 +42,14 @@ xmlport 6060137 "NPR MM Confirm Members. Pay."
                     MinOccurs = Zero;
                     XmlName = 'response';
                     UseTemporary = true;
+                    textattribute(NstServiceInstanceIdOut)
+                    {
+                        XmlName = 'cache_instance_id';
+                        trigger OnBeforePassVariable()
+                        begin
+                            NstServiceInstanceIdOut := Format(ServiceInstanceId(), 0, 9);
+                        end;
+                    }
                     textelement(status)
                     {
                         MaxOccurs = Once;

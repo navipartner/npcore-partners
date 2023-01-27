@@ -11,15 +11,16 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
-        Commit();
-        SelectLatestVersion();
-
-        if (not MemberInfoCapture.IsEmpty()) then begin
-            MemberInfoCapture.LockTable(true);
-            MemberInfoCapture.FindLast();
-        end;
-
         if (Rec.LoadXmlDoc(XmlDoc)) then begin
+
+            Commit();
+            ClearNstCache(XmlDoc);
+
+            if (not MemberInfoCapture.IsEmpty()) then begin
+                MemberInfoCapture.LockTable(true);
+                MemberInfoCapture.FindLast();
+            end;
+
             FunctionName := GetWebServiceFunction(Rec."Import Type");
             case FunctionName of
                 'CreateMembership':
@@ -80,6 +81,27 @@
             ClearLastError();
 
         end;
+    end;
+
+    local procedure ClearNstCache(XmlDoc: XmlDocument)
+    var
+        XmlRequestNode: XmlNodeList;
+        XmlCacheId: XmlNode;
+        CacheId: Text;
+        XPath: Label '//request[1]/@cache_instance_id', Locked = true;
+    begin
+
+        CacheId := '';
+        // Select the string representation value of the 'cache_instance_id' attribute of the first 'request' element
+        if (XmlDoc.SelectNodes(XPath, XmlRequestNode)) then
+            if (XmlRequestNode.Get(1, XmlCacheId)) then
+                CacheId := XmlCacheId.AsXmlAttribute().Value();
+
+        if ((CacheId = 'DoNotClearCache') or (CacheId = '-1')) then
+            exit;
+
+        if (CacheId <> Format(ServiceInstanceId(), 0, 9)) then
+            SelectLatestVersion();
     end;
 
     var
