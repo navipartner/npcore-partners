@@ -8,13 +8,14 @@
         ReasonText: Text;
     begin
 
-        // For automation of anonymisation
+        // For automation of anonymize process
+        Membership.SetCurrentKey("Entry No.");
         if (Membership.FindSet()) then begin
             repeat
-
-                AnonymizeMembership(Membership."Entry No.", true, ReasonText);
-                Commit();
-
+                if (Membership."Block Reason" <> Membership."Block Reason"::ANONYMIZED) then begin
+                    AnonymizeMembership(Membership."Entry No.", true, ReasonText);
+                    Commit();
+                end;
             until (Membership.Next() = 0);
         end;
     end;
@@ -131,30 +132,56 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         GDPRAgreement: Record "NPR GDPR Agreement";
         PointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
-        AnonymizationDate: Date;
+        AnonymizeOnDate: Date;
         ReasonLbl: Label 'Membership %1 has active roles and was not anonymized.';
     begin
-
         Membership.Get(MembershipEntryNo);
-        MembershipSetup.Get(Membership."Membership Code");
-
-        AnonymizationDate := GetMembershipValidUntil(MembershipEntryNo);
+        AnonymizeOnDate := GetMembershipValidUntil(MembershipEntryNo);
 
         if (AgreementCheck) then begin
-            GDPRAgreement.Get(MembershipSetup."GDPR Agreement No.");
-            AnonymizationDate := CalcDate(GDPRAgreement."Anonymize After", AnonymizationDate);
+            MembershipSetup.Get(Membership."Membership Code");
+            if (MembershipSetup."GDPR Agreement No." = '') then
+                exit(false);
+
+            if (not GDPRAgreement.Get(MembershipSetup."GDPR Agreement No.")) then
+                exit(false);
+
+            AnonymizeOnDate := CalcDate(GDPRAgreement."Anonymize After", AnonymizeOnDate);
         end;
 
-        if (AnonymizationDate > Today) then
-            exit; // Not time
+        if (AnonymizeOnDate > Today) then
+            exit; // Not time yet
 
         MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipRole.SetFilter("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
         if (MembershipRole.FindSet()) then begin
             repeat
-                AnonymizeMember(MembershipRole."Member Entry No.", AgreementCheck, ReasonText);
+                if (MembershipRole."Block Reason" <> MembershipRole."Block Reason"::ANONYMIZED) then
+                    AnonymizeMember(MembershipRole."Member Entry No.", AgreementCheck, ReasonText);
             until (MembershipRole.Next() = 0);
         end;
 
+        // When all regular roles hav been anonymized, the anonymous role can also be marked as anonymized
+        MembershipRole.Reset();
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipRole.SetFilter(Blocked, '=%1', false);
+        MembershipRole.SetFilter("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
+        if (MembershipRole.IsEmpty()) then begin
+            MembershipRole.Reset();
+            MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+            MembershipRole.SetFilter(Blocked, '=%1', false);
+            MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::ANONYMOUS);
+            if (MembershipRole.FindSet(true, true)) then begin
+                repeat
+                    if (ValidateAnonymizeMemberRole(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", AgreementCheck, ReasonText)) then begin
+                        DoAnonymizeRole(MembershipRole);
+                        MembershipRole.Modify(true);
+                    end;
+                until (MembershipRole.Next() = 0);
+            end;
+        end;
+
+        // Membership itself will not be anonymized until all roles are anonymized
         MembershipRole.Reset();
         MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter(Blocked, '=%1', false);
@@ -176,51 +203,33 @@
     var
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
-        MembershipRoleGuardian: Record "NPR MM Membership Role";
         ReasonLbl: Label 'Member %1 has been anonymized.';
         Reason2Lbl: Label 'Member %1 has active roles and was not anonymized.';
     begin
 
-        Member.Get(MemberEntryNo);
+        if (MemberEntryNo <= 0) then
+            exit(true); // This member should not exist. (f.ex. ANONYMOUS or bad data)
 
-        // First active guardian role will determine anonymization date for all members
-        MembershipRole.Reset();
-        MembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
-        MembershipRole.SetFilter(Blocked, '=%1', false);
-        MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::GUARDIAN);
-        if (MembershipRole.FindFirst()) then begin
-            if (ValidateAnonymizeMemberRole(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", AgreementCheck, ReasonText)) then begin
-
-                MembershipRoleGuardian.SetFilter("Membership Entry No.", '=%1', MembershipRole."Membership Entry No.");
-                if (MembershipRoleGuardian.FindSet()) then begin
-                    repeat
-                        if (MembershipRole."Wallet Pass Id" <> '') then
-                            ; //VoidWallet ();
-                        DoAnonymizeRole(MembershipRole);
-                        MembershipRole.Modify(true);
-
-                    until (MembershipRoleGuardian.Next() = 0);
-                end;
-            end;
-        end;
+        if (not Member.Get(MemberEntryNo)) then
+            exit(false);
 
         MembershipRole.Reset();
         MembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
         MembershipRole.SetFilter(Blocked, '=%1', false);
-        MembershipRole.SetFilter("Member Role", '<>%1', MembershipRole."Member Role"::GUARDIAN);
         if (MembershipRole.FindSet(true, true)) then begin
             repeat
-
                 if (ValidateAnonymizeMemberRole(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", AgreementCheck, ReasonText)) then begin
                     if (MembershipRole."Wallet Pass Id" <> '') then
                         ; //VoidWallet ();
                     DoAnonymizeRole(MembershipRole);
                     MembershipRole.Modify(true);
                 end;
-
             until (MembershipRole.Next() = 0)
         end;
 
+        MembershipRole.Reset();
+        MembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
+        MembershipRole.SetFilter(Blocked, '=%1', false);
         if (MembershipRole.IsEmpty()) then begin
             DoAnonymizeMember(MemberEntryNo);
             ReasonText := StrSubstNo(ReasonLbl, Member."External Member No.");
@@ -334,8 +343,8 @@
         MembershipRole: Record "NPR MM Membership Role";
         GDPRManagement: Codeunit "NPR GDPR Management";
         ValidUntil: Date;
-        AnonymizationDate: Date;
-        AnonymizationDateformula: DateFormula;
+        AnonymizeFromDate: Date;
+        AnonymizeFromDateFormula: DateFormula;
         ReasonLbl: Label 'Membership %1 has not expired yet.';
     begin
 
@@ -349,11 +358,11 @@
         if (not AgreementCheck) or (MembershipRole."Member Role" = MembershipRole."Member Role"::ANONYMOUS) then
             exit(ValidUntil < Today);
 
-        if (not GDPRManagement.GetAnonymizationDateformula(MembershipRole."GDPR Agreement No.", MembershipRole."GDPR Data Subject Id", AnonymizationDateformula, ReasonText)) then
+        if (not GDPRManagement.GetAnonymizeDateFormula(MembershipRole."GDPR Agreement No.", MembershipRole."GDPR Data Subject Id", AnonymizeFromDateFormula, ReasonText)) then
             exit(false);
 
-        AnonymizationDate := CalcDate(AnonymizationDateformula, ValidUntil);
-        exit(AnonymizationDate < Today);
+        AnonymizeFromDate := CalcDate(AnonymizeFromDateFormula, ValidUntil);
+        exit(AnonymizeFromDate < Today);
     end;
 
     local procedure GetMembershipValidUntil(MembershipEntryNo: Integer) ValidUntil: Date

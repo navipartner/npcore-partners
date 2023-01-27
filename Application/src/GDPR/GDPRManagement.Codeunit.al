@@ -1,12 +1,6 @@
 ﻿codeunit 6151120 "NPR GDPR Management"
 {
     Access = Internal;
-    // MM1.29/TSA /20180509 CASE 313795 Intial Version
-
-
-    trigger OnRun()
-    begin
-    end;
 
     procedure CreateAgreementPendingEntry(AgreementNo: Code[20]; Version: Integer; DataSubjectId: Text[35])
     var
@@ -16,7 +10,7 @@
         if (Version = 0) then
             Version := GetCurrentVersion(AgreementNo);
 
-        CreateCensentLogEntry(AgreementNo, Version, GDPRConsentLog."Entry Approval State"::PENDING, DataSubjectId);
+        CreateConsentLogEntry(AgreementNo, Version, GDPRConsentLog."Entry Approval State"::PENDING, DataSubjectId);
     end;
 
     procedure CreateAgreementAcceptEntry(AgreementNo: Code[20]; Version: Integer; DataSubjectId: Text[35])
@@ -27,7 +21,7 @@
         if (Version = 0) then
             Version := GetCurrentVersion(AgreementNo);
 
-        CreateCensentLogEntry(AgreementNo, Version, GDPRConsentLog."Entry Approval State"::ACCEPTED, DataSubjectId);
+        CreateConsentLogEntry(AgreementNo, Version, GDPRConsentLog."Entry Approval State"::ACCEPTED, DataSubjectId);
     end;
 
     procedure CreateAgreementRejectEntry(AgreementNo: Code[20]; Version: Integer; DataSubjectId: Text[35])
@@ -38,7 +32,7 @@
         if (Version = 0) then
             Version := GetCurrentVersion(AgreementNo);
 
-        CreateCensentLogEntry(AgreementNo, Version, GDPRConsentLog."Entry Approval State"::REJECTED, DataSubjectId);
+        CreateConsentLogEntry(AgreementNo, Version, GDPRConsentLog."Entry Approval State"::REJECTED, DataSubjectId);
     end;
 
     procedure CreateAgreementDelegateToGuardianEntry(AgreementNo: Code[20]; Version: Integer; DataSubjectId: Text[35])
@@ -49,10 +43,10 @@
         if (Version = 0) then
             Version := GetCurrentVersion(AgreementNo);
 
-        CreateCensentLogEntry(AgreementNo, Version, GDPRConsentLog."Entry Approval State"::DELEGATED, DataSubjectId);
+        CreateConsentLogEntry(AgreementNo, Version, GDPRConsentLog."Entry Approval State"::DELEGATED, DataSubjectId);
     end;
 
-    local procedure CreateCensentLogEntry(AgreementNo: Code[20]; Version: Integer; State: Integer; DataSubjectId: Text[35])
+    local procedure CreateConsentLogEntry(AgreementNo: Code[20]; Version: Integer; State: Integer; DataSubjectId: Text[35])
     var
         GDPRAgreementVersion: Record "NPR GDPR Agreement Version";
         GDPRConsentLog: Record "NPR GDPR Consent Log";
@@ -82,35 +76,33 @@
     var
         GDPRAgreement: Record "NPR GDPR Agreement";
     begin
-
         GDPRAgreement.Get(AgreementNo);
         GDPRAgreement.SetRange("Date Filter", Today);
         GDPRAgreement.CalcFields("Current Version");
         Version := GDPRAgreement."Current Version";
     end;
 
-    procedure GetAnonymizationDateformula(AgreementNo: Code[20]; DataSubjectId: Text[35]; var AnonymizationDateFormula: DateFormula; var ReasonText: Text): Boolean
+    procedure GetAnonymizeDateFormula(AgreementNo: Code[20]; DataSubjectId: Text[35]; var AnonymizeDateFormula: DateFormula; var ReasonText: Text): Boolean
     var
         GDPRAgreement: Record "NPR GDPR Agreement";
         GDPRAgreementVersion: Record "NPR GDPR Agreement Version";
         GDPRConsentLog: Record "NPR GDPR Consent Log";
-        AnonymizationDateFormulaEmptyLbl: Label '%1 is not specified for %2 version %3', Locked = true;
+        AnonymizeDateFormulaEmptyLbl: Label '%1 is not specified for %2 version %3', Locked = true;
     begin
-
         GDPRConsentLog.SetFilter("Agreement No.", '=%1', AgreementNo);
         GDPRConsentLog.SetFilter("Data Subject Id", '=%1', DataSubjectId);
         GDPRConsentLog.SetFilter("Entry Approval State", '=%1', GDPRConsentLog."Entry Approval State"::ACCEPTED);
         if (GDPRConsentLog.FindLast()) then begin
             GDPRAgreementVersion.Get(AgreementNo, GDPRConsentLog."Agreement Version");
-            AnonymizationDateFormula := GDPRAgreementVersion."Anonymize After";
+            AnonymizeDateFormula := GDPRAgreementVersion."Anonymize After";
         end else begin
             GDPRAgreement.Get(AgreementNo);
-            AnonymizationDateFormula := GDPRAgreement."Anonymize After";
+            AnonymizeDateFormula := GDPRAgreement."Anonymize After";
             GDPRAgreementVersion.Version := 0;
         end;
 
-        if (Format(AnonymizationDateFormula) = '') then begin
-            ReasonText := StrSubstNo(AnonymizationDateFormulaEmptyLbl, GDPRAgreementVersion.FieldCaption("Anonymize After"), AgreementNo, GDPRAgreementVersion.Version);
+        if (Format(AnonymizeDateFormula) = '') then begin
+            ReasonText := StrSubstNo(AnonymizeDateFormulaEmptyLbl, GDPRAgreementVersion.FieldCaption("Anonymize After"), AgreementNo, GDPRAgreementVersion.Version);
             exit(false);
         end;
 
@@ -121,7 +113,6 @@
     var
         GDPRConsentLog: Record "NPR GDPR Consent Log";
     begin
-
         GDPRConsentLog.SetFilter("Agreement No.", '=%1', AgreementNo);
 
         if (Version > 0) then
@@ -137,7 +128,6 @@
     var
         GDPRConsentLog: Record "NPR GDPR Consent Log";
     begin
-
         GDPRConsentLog.SetFilter("Agreement No.", '=%1', AgreementNo);
 
         if (Version > 0) then
