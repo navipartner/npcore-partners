@@ -281,22 +281,14 @@
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         Community: Record "NPR MM Member Community";
     begin
+        if (not (Community.Get("Community Code"))) then
+            exit;
 
-        Community.Get("Community Code");
         if ("Customer No." = '') then
             if (Community."Membership to Cust. Rel.") then
-
-                //TESTFIELD(Blocked);
                 exit;
 
-        // MembershipRole.SetFilter ("Member Entry No.", '=%1', "Entry No.");
-        // IF (MembershipRole.FindSet() ()) THEN BEGIN
-        //  REPEAT
-        //    MembershipManagement.SynchronizeCustomerAndContact (MembershipRole."Membership Entry No.");
-        //  UNTIL (MembershipRole.Next() () = 0);
-        // END;
         MembershipManagement.SynchronizeCustomerAndContact(Rec."Entry No.");
-
     end;
 
     var
