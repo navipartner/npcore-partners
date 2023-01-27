@@ -52,6 +52,22 @@ page 6059968 "NPR APIV1 PBITMTicketAccessEnt"
                 {
                     Caption = 'Customer No.', Locked = true;
                 }
+                field(accessDate; Rec."Access Date")
+                {
+                    Caption = 'Access Date', Locked = True;
+                }
+                field(accessTime; Rec."Access Time")
+                {
+                    Caption = 'Access Time', Locked = True;
+                }
+                field(memberCardCode; Rec."Member Card Code")
+                {
+                    Caption = 'Member Card Code', Locked = True;
+                }
+                field(status; Rec."Status")
+                {
+                    Caption = 'Status', Locked = True;
+                }
             }
         }
     }
