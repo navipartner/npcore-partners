@@ -224,7 +224,7 @@
         PaymentLine."Payment Type" := PaymentLine."Payment Type"::"Payment Method";
         PaymentLine."Account Type" := PaymentMethod."Bal. Account Type";
         PaymentLine."Account No." := PaymentMethod."Bal. Account No.";
-        PaymentLine."No." := TransactionId;
+        PaymentLine."No." := CopyStr(TransactionId, 1, MaxStrLen(PaymentLine."No."));
         PaymentLine."Posting Date" := SalesHeader."Posting Date";
         PaymentLine."Source Table No." := DATABASE::"Payment Method";
         PaymentLine."Source No." := PaymentMethod.Code;
@@ -295,7 +295,7 @@
         NpEcDocument.Init();
         NpEcDocument."Entry No." := 0;
         NpEcDocument."Store Code" := NpEcStore.Code;
-        NpEcDocument."Reference No." := GetOrderNo(Element);
+        NpEcDocument."Reference No." := CopyStr(GetOrderNo(Element), 1, MaxStrLen(NpEcDocument."Reference No."));
         NpEcDocument."Document Type" := NpEcDocument."Document Type"::"Sales Order";
         NpEcDocument."Document No." := SalesHeader."No.";
         NpEcDocument.Insert(true);

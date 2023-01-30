@@ -112,7 +112,7 @@
         exit(DecimalExclVat);
     end;
 
-    local procedure GetMagentoStore(MagentoStoreCode: Code[20])
+    local procedure GetMagentoStore(MagentoStoreCode: Code[32])
     begin
         if MagentoStoreCode <> MagentoStore.Code then
             MagentoStore.Get(MagentoStoreCode);

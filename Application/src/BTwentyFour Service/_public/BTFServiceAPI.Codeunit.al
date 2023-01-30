@@ -29,7 +29,7 @@ codeunit 6014641 "NPR BTF Service API"
             exit;
 
         while (StrLen(Path) > StartLength) and (Path[StrLen(Path)] = '/') do
-            Path := CopyStr(Path, 1, StrLen(Path) - 1);
+            Path := CopyStr(CopyStr(Path, 1, StrLen(Path) - 1), 1, MaxStrLen(Path));
     end;
 
     procedure ImportContentOnline(ServiceEndPoint: Record "NPR BTF Service EndPoint"; var Response: Codeunit "Temp Blob"): Boolean
@@ -217,7 +217,7 @@ codeunit 6014641 "NPR BTF Service API"
             exit;
         end;
         PageManagement.PageRun(RecRef);
-    end;      
+    end;
 
     procedure GetIntegrationPrefix(): Text
     begin

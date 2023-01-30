@@ -120,7 +120,7 @@
             Codeunit::"NPR UPG POS View Profile":
                 case UpgradeStep of
                     '':
-                        exit(POSViewProfile.TableCaption());
+                        exit(CopyStr(POSViewProfile.TableCaption(), 1, 250));
                     'UpgradeTaxType':
                         exit('POSViewProfile_TaxType-20220128')
                 end;
