@@ -91,6 +91,7 @@ table 6014680 "NPR POS Entry Media Info"
 
         Clear(Camera);
         Camera.SetQuality(100);
+        Camera.SetEncodingType("Image Encoding"::PNG);
         Camera.RunModal();
         if not Camera.HasPicture() then
             Error('');
