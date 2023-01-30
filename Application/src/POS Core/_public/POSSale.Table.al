@@ -9,7 +9,7 @@
         {
             Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
-            NotBlank = true;
+            NotBlank = true;           
         }
         field(2; "Sales Ticket No."; Code[20])
         {
@@ -25,12 +25,7 @@
 
             trigger OnValidate()
             begin
-                CreateDim(
-                  DATABASE::"NPR POS Unit", "Register No.",
-                  DATABASE::"NPR POS Store", "POS Store Code",
-                  DATABASE::Job, "Event No.",
-                  DATABASE::Customer, "Customer No.",
-                  DATABASE::"Salesperson/Purchaser", "Salesperson Code");
+                CreateDimensionsFromValidatePOSStoreCode();
             end;
         }
         field(4; "Salesperson Code"; Code[20])
@@ -41,13 +36,8 @@
             TableRelation = "Salesperson/Purchaser".Code;
 
             trigger OnValidate()
-            begin
-                CreateDim(
-                  DATABASE::"NPR POS Unit", "Register No.",
-                  DATABASE::"NPR POS Store", "POS Store Code",
-                  DATABASE::Job, "Event No.",
-                  DATABASE::Customer, "Customer No.",
-                  DATABASE::"Salesperson/Purchaser", "Salesperson Code");
+            begin         
+                CreateDimensionsFromValidateSalesPersonCode();        
             end;
         }
         field(5; "Date"; Date)
@@ -81,13 +71,13 @@
                 FoundPostingProfile: Boolean;
             begin
                 GetPOSUnit();
-                "POS Store Code" := POSUnit."POS Store Code";
+                "POS Store Code" := _POSUnit."POS Store Code";
                 GetPOSStore();
                 CheckCustomerOnConnectedSO();
 
-                PricingProfile.GetCustomerGroupsIfProfileExist(POSUnit."POS Pricing Profile", Rec."Customer Disc. Group", Rec."Customer Price Group");
+                PricingProfile.GetCustomerGroupsIfProfileExist(_POSUnit."POS Pricing Profile", Rec."Customer Disc. Group", Rec."Customer Price Group");
 
-                FoundPostingProfile := POSStore.GetProfile(POSPostingProfile);
+                FoundPostingProfile := _POSStore.GetProfile(POSPostingProfile);
                 "Gen. Bus. Posting Group" := POSPostingProfile."Gen. Bus. Posting Group";
                 "Tax Area Code" := POSPostingProfile."Tax Area Code";
                 "Tax Liable" := POSPostingProfile."Tax Liable";
@@ -131,7 +121,7 @@
                 if Cust."No." <> '' then
                     "Prices Including VAT" := Cust."Prices Including VAT"
                 else
-                    "Prices Including VAT" := POSUnit.ShowPricesIncludingVAT();
+                    "Prices Including VAT" := _POSUnit.ShowPricesIncludingVAT();
 
                 if not Modify() then;
 
@@ -176,18 +166,13 @@
                     (Rec."Customer No." <> ''):
                         POSSaleTranslation.AssignLanguageCodeFrom(Rec, Cust);
                     (Rec."Customer No." = ''):
-                        POSSaleTranslation.AssignLanguageCodeFrom(Rec, POSStore);
+                        POSSaleTranslation.AssignLanguageCodeFrom(Rec, _POSStore);
                 end;
 
                 //Ændring foretaget for at kunne validere på nummer og slette rabatter på linier, ved ændring af kundenummer.
                 Modify();
 
-                CreateDim(
-                  DATABASE::Customer, "Customer No.",
-                  DATABASE::"NPR POS Unit", "Register No.",
-                  DATABASE::"NPR POS Store", "POS Store Code",
-                  DATABASE::Job, "Event No.",
-                  DATABASE::"Salesperson/Purchaser", "Salesperson Code");
+                CreateDimensionsFromValidateCustomerNo();
             end;
         }
         field(8; Name; Text[100])
@@ -591,12 +576,7 @@
 
             trigger OnValidate()
             begin
-                CreateDim(
-                  DATABASE::Job, "Event No.",
-                  DATABASE::"NPR POS Unit", "Register No.",
-                  DATABASE::"NPR POS Store", "POS Store Code",
-                  DATABASE::Customer, "Customer No.",
-                  DATABASE::"Salesperson/Purchaser", "Salesperson Code");
+                CreateDimensionsFromValidateEventNo();                 
             end;
         }
         field(181; "Event Task No."; Code[20])
@@ -764,13 +744,13 @@
         GetPOSUnit();
         GetPOSStore();
 
-        "Location Code" := POSStore."Location Code";
-        Rec."Customer Disc. Group" := PricingProfile.GetCustomerDiscountGroupIfProfileExist(POSUnit."POS Pricing Profile");
-        "Event No." := POSUnit.FindActiveEventFromCurrPOSUnit();
+        "Location Code" := _POSStore."Location Code";
+        Rec."Customer Disc. Group" := PricingProfile.GetCustomerDiscountGroupIfProfileExist(_POSUnit."POS Pricing Profile");
+        "Event No." := _POSUnit.FindActiveEventFromCurrPOSUnit();
         "User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
         "Server Instance ID" := Database.ServiceInstanceId();
         "User Session ID" := Database.SessionId();
-        "Language Code" := POSStore."Language Code";
+        "Language Code" := _POSStore."Language Code";
 
         AvoidGUIDCollision();
     end;
@@ -778,14 +758,19 @@
     var
         DimMgt: Codeunit DimensionManagement;
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
-        POSUnit: Record "NPR POS Unit";
-        POSStore: Record "NPR POS Store";
+        _POSUnit: Record "NPR POS Unit";
+        _POSStore: Record "NPR POS Store";
 
     internal procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20]): Boolean
     begin
         exit(NPRDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode));
     end;
 
+    local procedure ModifyRec()
+    begin
+        if not IsNullGuid(Rec.SystemId) then
+            Rec.Modify();        
+    end;
     internal procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20]; Type5: Integer; No5: Code[20])
     var
         TableID: array[10] of Integer;
@@ -838,7 +823,7 @@
     begin
         SourceCode := '';
 
-        if NPRPOSUnit.Get("Register No.") then begin
+        if NPRPOSUnit.Get(Rec."Register No.") then begin
             NPRPOSStore.Get(NPRPOSUnit."POS Store Code");
             if NPRPOSStore.GetProfile(POSPostingProfile) then begin
                 SourceCode := POSPostingProfile."Source Code";
@@ -846,36 +831,36 @@
         end;
     end;
 
-    internal procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
         OldDimSetID: Integer;
     begin
-        OldDimSetID := "Dimension Set ID";
-        DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
-        if "Sales Ticket No." <> '' then
-            Modify();
+        OldDimSetID := Rec."Dimension Set ID";
+        DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, Rec."Dimension Set ID");
+        if Rec."Sales Ticket No." <> '' then
+            Rec.Modify();
 
-        if OldDimSetID <> "Dimension Set ID" then begin
-            Modify();
+        if OldDimSetID <> Rec."Dimension Set ID" then begin
+            ModifyRec();
             if SalesLinesExist() then
-                UpdateAllLineDim("Dimension Set ID", OldDimSetID);
+                UpdateAllLineDim(Rec."Dimension Set ID", OldDimSetID);
         end;
     end;
 
-    internal procedure ShowDocDim()
+    procedure ShowDocDim()
     var
         OldDimSetID: Integer;
         DimSetIdLbl: Label '%1 %2', Locked = true;
     begin
-        OldDimSetID := "Dimension Set ID";
-        "Dimension Set ID" :=
+        OldDimSetID := Rec."Dimension Set ID";
+        Rec."Dimension Set ID" :=
           DimMgt.EditDimensionSet(
-            "Dimension Set ID", StrSubstNo(DimSetIdLbl, "Register No.", "Sales Ticket No."),
-            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
+            Rec."Dimension Set ID", StrSubstNo(DimSetIdLbl, Rec."Register No.", Rec."Sales Ticket No."),
+            Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code");
         if OldDimSetID <> "Dimension Set ID" then begin
-            Modify();
+            ModifyRec();
             if SalesLinesExist() then
-                UpdateAllLineDim("Dimension Set ID", OldDimSetID);
+                UpdateAllLineDim(Rec."Dimension Set ID", OldDimSetID);
         end;
     end;
 
@@ -883,8 +868,13 @@
     var
         POSSaleLine: Record "NPR POS Sale Line";
         NewDimSetID: Integer;
+        IsHandled: Boolean;
     begin
-        // Update all lines with changed dimensions.
+        IsHandled := false;
+        OnBeforeUpdateAllLineDim(Rec, NewParentDimSetID, OldParentDimSetID, IsHandled, xRec);
+        if IsHandled then
+            exit;
+
         if NewParentDimSetID = OldParentDimSetID then
             exit;
 
@@ -914,18 +904,18 @@
 
     local procedure GetPOSUnit()
     begin
-        if POSUnit."No." <> "Register No." then
-            POSUnit.Get("Register No.");
+        if _POSUnit."No." <> "Register No." then
+            _POSUnit.Get("Register No.");
     end;
 
     local procedure GetPOSStore()
     begin
         if "POS Store Code" = '' then begin
-            if POSStore.Code <> POSUnit."POS Store Code" then
-                POSStore.get(POSUnit."POS Store Code")
+            if _POSStore.Code <> _POSUnit."POS Store Code" then
+                _POSStore.get(_POSUnit."POS Store Code")
         end else begin
-            if POSStore.Code <> "POS Store Code" then
-                POSStore.Get("POS Store Code");
+            if _POSStore.Code <> "POS Store Code" then
+                _POSStore.Get("POS Store Code");
         end;
     end;
 
@@ -972,5 +962,98 @@
             if not SaleLinePOS.IsEmpty() then
                 Error(CustomerExistLbl);
         end;
+    end;
+
+    local procedure CreateDimensionsFromValidateEventNo()
+    var
+        IsHandled: Boolean;
+    begin        
+        IsHandled := false;
+        OnBeforeCreateDimensionsFromValidateEventNo(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        CreateDim(
+            DATABASE::Job, "Event No.",
+            DATABASE::"NPR POS Unit", "Register No.",
+            DATABASE::"NPR POS Store", "POS Store Code",
+            DATABASE::Customer, "Customer No.",
+            DATABASE::"Salesperson/Purchaser", "Salesperson Code");
+    end;
+
+    local procedure CreateDimensionsFromValidatePOSStoreCode()
+    var
+        IsHandled: Boolean;
+    begin        
+        IsHandled := false;
+        OnBeforeCreateDimensionsFromValidatePOSStoreCode(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        CreateDim(
+            DATABASE::"NPR POS Unit", "Register No.",
+            DATABASE::"NPR POS Store", "POS Store Code",
+            DATABASE::Job, "Event No.",
+            DATABASE::Customer, "Customer No.",
+            DATABASE::"Salesperson/Purchaser", "Salesperson Code");  
+    end;
+
+    procedure CreateDimensionsFromValidateSalesPersonCode()
+    var
+        IsHandled: Boolean;
+    begin        
+        IsHandled := false;
+        OnBeforeCreateDimensionsFromValidateSalesPersonCode(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        CreateDim(
+            DATABASE::"NPR POS Unit", "Register No.",
+            DATABASE::"NPR POS Store", "POS Store Code",
+            DATABASE::Job, "Event No.",
+            DATABASE::Customer, "Customer No.",
+            DATABASE::"Salesperson/Purchaser", "Salesperson Code");
+    end;
+
+    local procedure CreateDimensionsFromValidateCustomerNo()
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCreateDimensionsFromValidateCustomerNo(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        CreateDim(
+            DATABASE::Customer, "Customer No.",
+            DATABASE::"NPR POS Unit", "Register No.",
+            DATABASE::"NPR POS Store", "POS Store Code",
+            DATABASE::Job, "Event No.",
+            DATABASE::"Salesperson/Purchaser", "Salesperson Code");
+    end;
+    
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateAllLineDim(var POSSale: Record "NPR POS Sale"; NewParentDimSetID: Integer; OldParentDimSetID: Integer; var IsHandled: Boolean; xPOSSale: Record "NPR POS Sale")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateDimensionsFromValidateSalesPersonCode(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateDimensionsFromValidateCustomerNo(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
+    begin
+    end; 
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateDimensionsFromValidatePOSStoreCode(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateDimensionsFromValidateEventNo(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
+    begin
     end;
 }
