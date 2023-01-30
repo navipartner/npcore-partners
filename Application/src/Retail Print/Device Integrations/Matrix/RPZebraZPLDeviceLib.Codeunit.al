@@ -30,8 +30,6 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
     begin
         SetEncodingAndInitBuffer(DeviceSettings);
 
-        AddStringToBuffer('^XA');
-
         if DeviceSettings.FindSet() then
             repeat
                 case DeviceSettings.Name of
@@ -593,12 +591,6 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
         if Align > 0 then
             FieldBlock(StrLength, 1, 0, Justify, 0);
 
-        // Check if € symbol
-        if StrPos(TextIn, '€') > 0 then begin
-            FieldHex();
-            TextIn := TextIn.Replace('€', '_15');
-        end;
-
         //^FD
         FieldData(TextIn);
 
@@ -796,12 +788,14 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
                 begin
                     _Encoding := _Encoding::"UTF-8";
                     InitBuffer();
+                    AddStringToBuffer('^XA');
                     AddStringToBuffer('^CI28');
                 end;
             'Windows-1252':
                 begin
                     _Encoding := _Encoding::"Windows-1252";
                     InitBuffer();
+                    AddStringToBuffer('^XA');
                     AddStringToBuffer('^CI27');
                 end;
             else
