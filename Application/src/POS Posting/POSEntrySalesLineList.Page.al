@@ -167,6 +167,11 @@
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Dimension Set ID"; Rec."Dimension Set ID")
+                {
+                    ToolTip = 'Specifies the value of the Dimension Set ID field.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
