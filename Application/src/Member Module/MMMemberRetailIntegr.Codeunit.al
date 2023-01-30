@@ -532,12 +532,12 @@
 
         // create defaults depending how my "revisit" to member info capture occurs
         case MembershipSalesSetup."Business Flow Type" of
-
             MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
                 begin
                     MemberLinesToSuggest := MembershipSetup."Membership Member Cardinality";
                     if ((MembershipSalesSetup."Suggested Membercount In Sales" > 0) and
-                        (MembershipSalesSetup."Suggested Membercount In Sales" < MembershipSetup."Membership Member Cardinality")) then
+                        (MembershipSalesSetup."Suggested Membercount In Sales" < MembershipSetup."Membership Member Cardinality"))
+                    then
                         MemberLinesToSuggest := MembershipSalesSetup."Suggested Membercount In Sales";
 
                     MemberInfoCaptureCount := MemberInfoCapture.Count();
@@ -553,13 +553,12 @@
                             MemberInfoCapture."First Name" := StrSubstNo(MEMBER_NAME, i);
                             MemberInfoCapture.Insert();
                         end;
+
+                        Commit();
                     end;
 
-                    MemberInfoCapture.Reset();
-                    MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
-                    MemberInfoCapture.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
-                    MemberInfoCapture.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
-                    MemberInfoCapture.FindSet(true);
+                    MemberInfoCapture.LockTable(true);
+                    MemberInfoCapture.FindSet();
                     repeat
                         MemberInfoCapture."Item No." := SaleLinePOS."No.";
                         MemberInfoCapture."Membership Code" := MembershipSalesSetup."Membership Code";
@@ -591,7 +590,6 @@
         Commit();
         if (DisplayMemberInfoCaptureDialog(SaleLinePOS)) then begin
             Commit();
-
             MemberInfoCapture.LockTable();
 
             MemberInfoCapture.Reset();
@@ -607,7 +605,9 @@
                 if (MembershipSalesSetup."Auto-Admit Member On Sale" = MembershipSalesSetup."Auto-Admit Member On Sale"::YES) then
                     MemberInfoCapture.ModifyAll("Auto-Admit Member", true);
             end;
+
             Commit();
+
             AttemptCreateMembership.SetAttemptCreateMembershipForcedRollback();
             if (not AttemptCreateMembership.run(MemberInfoCapture)) then
                 if (not AttemptCreateMembership.WasSuccessful(ReasonMessage)) then
@@ -713,15 +713,12 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         CreateMembership: Codeunit "NPR Membership Attempt Create";
     begin
-
+        MemberInfoCapture.LockTable(true);
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCapture.SetFilter("Receipt No.", '=%1', ReceiptNo);
         MemberInfoCapture.SetFilter("Line No.", '=%1', ReceiptLine);
         if (not MemberInfoCapture.FindSet()) then
             exit;
-
-        MemberInfoCapture.LockTable(true);
-        MemberInfoCapture.FindSet();
 
         repeat
             MemberInfoCapture."Unit Price" := UnitPrice;
@@ -735,7 +732,6 @@
 
         CreateMembership.SetCreateMembership();
         CreateMembership.Run(MemberInfoCapture);
-
     end;
 
     // This is outside of the end sales transactions, issuing tickets is considered same as printing
