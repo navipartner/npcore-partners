@@ -14,6 +14,8 @@
     //     // PosUnitId -> BeaconId        
     // end;
 
+#pragma warning disable AL0432
+
     trigger OnRun()
     begin
         StartMobilePayUpgradeProcedure();
@@ -434,4 +436,6 @@
         CANT_AUTH_Err: Label 'Can''t authenticate!';
         TempOldEFTTypePaymentGenParam: Record "NPR EFT Type Pay. Gen. Param." temporary;
         MerchantVatNoEvalFormulaTok: Label '%1%2', Locked = true;
+
+#pragma warning restore
 }
