@@ -48,7 +48,7 @@ class NpBcptMgmt
         return [Uri]"https://api.businesscentral.dynamics.com/v2.0/$($this.TenantId)/$($this.SandboxName)"
     }
 
-    [void] WaitForBcpt([int]$sleepInterval = 5)
+    [void] WaitForBcpt([int]$sleepInterval = 5, [int]$timeout = 1800)
     {
         $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
@@ -70,6 +70,12 @@ class NpBcptMgmt
                         Write-Host "Waiting for BCPT to finish current run" -NoNewline -ForegroundColor Red
                     } else {
                         Write-Host "." -NoNewline -ForegroundColor Red
+                        
+                        # Timeout
+                        if ([math]::Round($stopwatch.Elapsed.TotalSeconds, 0) -gt $timeout) {
+                            Write-Host "BCPT waited more than $([math]::Round($stopwatch.Elapsed.TotalSeconds, 0)) seconds" -ForegroundColor Red
+                            throw "BCPT timeout while waiting current run to finish"
+                        }
                     }
                     Start-Sleep -Seconds $sleepInterval
                 } else {
