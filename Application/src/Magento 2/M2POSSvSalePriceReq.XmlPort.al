@@ -155,7 +155,8 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
 
     trigger OnInitXmlPort()
     begin
-        TicketNumber := DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '0123456789'));
+        TicketNumber := CopyStr(DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '0123456789')),
+         1, MaxStrLen(TicketNumber));
     end;
 
     var

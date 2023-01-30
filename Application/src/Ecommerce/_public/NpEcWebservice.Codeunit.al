@@ -118,7 +118,9 @@
             exit;
 
         if NcImportType.Get(ImportTypeCode) then begin
+#pragma warning disable AA0139
             ImportTypeCode := ImportTypeCode + '1';
+#pragma warning restore
             while NcImportType.Get(ImportTypeCode) do
                 ImportTypeCode := IncStr(ImportTypeCode);
         end;
@@ -129,7 +131,7 @@
         NcImportType."Import Codeunit ID" := ImportCodeunitID;
         NcImportType."Lookup Codeunit ID" := LookupCodeunitID;
         NcImportType."Webservice Enabled" := true;
-        NcImportType."Webservice Function" := WebserviceFunction;
+        NcImportType."Webservice Function" := CopyStr(WebserviceFunction, 1, MaxStrLen(NcImportType."Webservice Function"));
         NcImportType."Webservice Codeunit ID" := CurrCodeunitId();
         NcImportType."Keep Import Entries for" := CreateDateTime(Today, 0T) - CreateDateTime(CalcDate('<-90D>', Today), 010000T);
         NcImportType.Insert(true);

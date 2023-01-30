@@ -1,6 +1,7 @@
 ﻿codeunit 6151321 "NPR NpEc Purch.Doc.Import Mgt."
 {
     Access = Internal;
+
     var
         InvalidLineTypeErr: Label 'Invalid Line Type: %1', Comment = '%1=xml attribute type';
         XmlElementIsMissingErr: Label 'XmlElement %1 is missing', Comment = '%1=xpath to element';
@@ -76,7 +77,7 @@
         NpEcDocument.Init();
         NpEcDocument."Entry No." := 0;
         NpEcDocument."Store Code" := NpEcStore.Code;
-        NpEcDocument."Reference No." := GetInvoiceNo(Element);
+        NpEcDocument."Reference No." := CopyStr(GetInvoiceNo(Element), 1, MaxStrLen(NpEcDocument."Reference No."));
         NpEcDocument."Document Type" := NpEcDocument."Document Type"::"Purchase Invoice";
         NpEcDocument."Document No." := PurchHeader."No.";
         NpEcDocument.Insert(true);

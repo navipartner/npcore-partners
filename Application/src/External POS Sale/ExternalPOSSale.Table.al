@@ -475,9 +475,9 @@
     begin
         GetPOSUnit();
         GetPOSStore();
-        "POS Store Code" := POSStore.Code;
-        "Location Code" := POSStore."Location Code";
-        "User ID" := copystr(UserId, 1, MaxStrLen("User ID"));
+        Rec."POS Store Code" := POSStore.Code;
+        Rec."Location Code" := POSStore."Location Code";
+        Rec."User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
     end;
 
     var

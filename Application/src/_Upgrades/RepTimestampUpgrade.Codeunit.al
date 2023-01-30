@@ -37,6 +37,7 @@ codeunit 6059933 "NPR Rep. Timestamp Upgrade"
     begin
         if RepEndpoint.FindSet(true, false) then
             Repeat
+#pragma warning disable AA0139
                 RepEndpoint.Path := RepEndpoint.Path.Replace('replicationCounter', 'systemRowVersion');
                 case RepEndpoint."Table ID" of
                     Database::"G/L Account":
@@ -44,6 +45,7 @@ codeunit 6059933 "NPR Rep. Timestamp Upgrade"
                     Database::"NPR Aux. G/L Account":
                         RepEndpoint.Path := RepEndpoint.Path.Replace('glAccountsRead', 'auxGLAccounts');
                 end;
+#pragma warning restore
                 if ReplicationSetup."API Version" <> RepEndpoint."Service Code" then
                     if ReplicationSetup.Get(RepEndpoint."Service Code") then;
                 UpgradeReplicationCounter(RepEndpoint, ReplicationSetup);
