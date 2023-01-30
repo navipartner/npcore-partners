@@ -106,7 +106,7 @@ Write-Host "`r`n"
 $bcptCredential = New-Object System.Management.Automation.PSCredential "$($Username)", (ConvertTo-SecureString -String "$($Password)" -AsPlainText -Force)
 
 # Wait for BCPT
-$bcptMgmt.WaitForBcpt(10)
+$bcptMgmt.WaitForBcpt(10, 1800)
 
 # RUN BCPT
 Write-Host "Running BCPT:" -ForegroundColor Green
@@ -150,7 +150,7 @@ $selectedSuites | ForEach-Object {
     Start-Sleep -Seconds 3
 
     # Wait for bcpt
-    $bcptMgmt.WaitForBcpt(10)
+    $bcptMgmt.WaitForBcpt(10, 1800)
 }
 
 #$bcptLogEntries = @(. "$invokeSaasApi" ` `

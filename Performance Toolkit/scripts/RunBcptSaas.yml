@@ -1,0 +1,14 @@
+pool:
+  vmImage: "windows-2022"
+
+steps:
+  - task: PowerShell@2
+    name: RunBcpt
+    inputs:
+      filePath: 'Performance Toolkit/scripts/RunBcptSaaS.ps1'
+      arguments: >
+        -Username 'NPRetailPerformanceTest-558472@NPRetailPerformanceTest.onmicrosoft.com'
+        -Password 'w!8gzMQU~)^t'
+        -SandboxName 'NPRetailBCPT-Sandbox-2'
+        -SuiteCodes @('POS1S1', 'POS1S5', 'POS1S10')
+    displayName: 'Run BCPT'
