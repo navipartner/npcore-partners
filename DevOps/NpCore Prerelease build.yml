@@ -28,8 +28,10 @@ stages:
         - Agent.OSVersion -equals 10.0.17763
       containerDefinitions:
         - name: Auto
+        
+        - name: BC1803
 
-        - name: BC1804
+        - name: BC1812
 
         - name: BC1905
 
