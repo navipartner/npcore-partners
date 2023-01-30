@@ -56,7 +56,9 @@
         JSONtext := BuildJSONParams(TicketSetup.GetTicketAdmissionWebUrl(true), '', '', '', AdmissionFailedErr);
 
         JsonMgt.InitializeJObjectParser(Context, FrontEnd);
+#pragma warning disable AA0139
         AdmissionCode := JsonMgt.GetStringParameter('AdmissionCode');
+#pragma warning restore
         JSBridge.SetParameters('Admission', JSONtext, AdmissionCode);
 
         JSBridge.RunModal();

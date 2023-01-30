@@ -76,6 +76,8 @@
 #if not BC17
         BarcodeProvider: Codeunit "NPR Barcode Font Provider Mgt.";
 #endif
+        TenantIdErrorMsg: Label 'TenantId is too long, Maximum Lenght for tenant is 30 characters. This is a programming bug, not a user error. Please contact system vendor.';
+
     procedure SetDefaults(var MPOSQRCode: Record "NPR MPOS QR Codes")
     begin
         MPOSQRCode.TestField("User ID");
@@ -84,7 +86,12 @@
         if MPOSQRCode.Url = '' then
             MPOSQRCode.Url := CopyStr(StringReplace(GetUrl(CLIENTTYPE::Windows)), 1, MaxStrLen(MPOSQRCode.Url));
         if MPOSQRCode.Tenant = '' then
+            if StrLen(TenantId()) > MaxStrLen(MPOSQRCode.Tenant) then
+                Error(TenantIdErrorMsg)
+            else
+#pragma warning disable AA0139
             MPOSQRCode.Tenant := TenantId();
+#pragma warning restore
         if MPOSQRCode.Company = '' then begin
             if MPOSQRCode.Get(MPOSQRCode."User ID", CompanyName) then
                 Error('%1: %2', RecordExistsErrorText, Rec.GetPosition(true));

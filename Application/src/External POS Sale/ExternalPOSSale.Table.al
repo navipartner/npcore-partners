@@ -477,7 +477,7 @@
         GetPOSStore();
         "POS Store Code" := POSStore.Code;
         "Location Code" := POSStore."Location Code";
-        "User ID" := UserId;
+        "User ID" := copystr(UserId, 1, MaxStrLen("User ID"));
     end;
 
     var

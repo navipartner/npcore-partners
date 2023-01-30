@@ -6,7 +6,7 @@
         ItemWithItemRefNoNotFoundErr: Label 'There are no items with reference: %1', Comment = '%1=TempItemRefNo';
         Text001: Label 'Status should not be %1.';
 
-    procedure TranslateBarcodeToItemVariant(Barcode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]; var ResolvingTable: Integer; AllowDiscontinued: Boolean) Found: Boolean
+    procedure TranslateBarcodeToItemVariant(Barcode: Text; var ItemNo: Code[20]; var VariantCode: Code[10]; var ResolvingTable: Integer; AllowDiscontinued: Boolean) Found: Boolean
     var
         Item: Record Item;
         ItemReference: Record "Item Reference";
@@ -16,7 +16,6 @@
         ItemNo := '';
         VariantCode := '';
         if (Barcode = '') then exit(false);
-
         if (StrLen(Barcode) <= MaxStrLen(ItemReference."Reference No.")) then begin
             ItemReference.SetCurrentKey("Reference Type", "Reference No.");
             ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
@@ -36,7 +35,6 @@
                 exit(true);
             end;
         end;
-
         if (StrLen(Barcode) <= MaxStrLen(Item."No.")) then begin
             if (Item.Get(UpperCase(Barcode))) then begin
                 ResolvingTable := DATABASE::Item;
@@ -44,7 +42,6 @@
                 exit(true);
             end;
         end;
-
         if (StrLen(Barcode) <= MaxStrLen(Item."Vendor Item No.")) then begin
             Item.SetCurrentKey("Vendor Item No.", "Vendor No.");
             Item.SetRange("Vendor Item No.", Barcode);

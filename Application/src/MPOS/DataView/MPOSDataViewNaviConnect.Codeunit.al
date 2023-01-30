@@ -39,7 +39,7 @@ codeunit 6059826 "NPR MPOS Data View NaviConnect" implements "NPR MPOS IDataView
         RecRef: RecordRef;
         Result: JsonObject;
         InStr: Instream;
-        Barcode: Text[50];
+        Barcode: Text;
         ItemNo: Code[20];
         VariantCode: Code[10];
         ResolvingTable: Integer;

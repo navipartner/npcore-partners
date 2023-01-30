@@ -128,7 +128,7 @@
     internal procedure AddTextEditorOptionKeyAndValue(OptionKey: Text; OptionValue: Variant)
     begin
         TempOptionValueBuffer.Init();
-        TempOptionValueBuffer."Option Key" := OptionKey;
+        TempOptionValueBuffer."Option Key" := CopyStr(OptionKey, 1, MaxStrLen(TempOptionValueBuffer."Option Key"));
         TempOptionValueBuffer.SetOptionValue(OptionValue);
         TempOptionValueBuffer.Insert();
     end;
