@@ -677,13 +677,9 @@
         Rec."User Session ID" := Database.SessionId();
 
         Rec."Salesperson Code" := Setup.Salesperson();
-        if Rec."Salesperson Code" <> SalePOS_ToResume."Salesperson Code" then
-            Rec.CreateDim(
-              DATABASE::"NPR POS Unit", Rec."Register No.",
-              DATABASE::"NPR POS Store", Rec."POS Store Code",
-              DATABASE::Job, Rec."Event No.",
-              DATABASE::Customer, Rec."Customer No.",
-              DATABASE::"Salesperson/Purchaser", Rec."Salesperson Code");
+        if Rec."Salesperson Code" <> SalePOS_ToResume."Salesperson Code" then begin
+            Rec.CreateDimensionsFromValidateSalesPersonCode();             
+        end;
 
         Rec.Modify(true);
 
