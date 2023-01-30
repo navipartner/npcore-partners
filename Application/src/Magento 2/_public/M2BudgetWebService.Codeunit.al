@@ -1,13 +1,15 @@
 ﻿codeunit 6151152 "NPR M2 Budget WebService"
 {
-    procedure GetBudgetDimensionValues(var GetBudgetDimValuesXmlPort: XMLport "NPR M2 Get Budget Dim. Values")
+#pragma warning disable AA0245
+    procedure GetBudgetDimensionValues(var GetBudgetDimensionValues: XMLport "NPR M2 Get Budget Dim. Values")
     begin
 
         SelectLatestVersion();
 
-        GetBudgetDimValuesXmlPort.Import();
-        GetBudgetDimValuesXmlPort.GenerateResponse();
+        GetBudgetDimensionValues.Import();
+        GetBudgetDimensionValues.GenerateResponse();
     end;
+#pragma warning restore
 
     procedure GetBudgetData(var GetBudgetEntries: XMLport "NPR M2 Get Budget Entries")
     begin
