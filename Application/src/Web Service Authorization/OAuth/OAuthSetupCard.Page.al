@@ -157,8 +157,8 @@
 
     trigger OnAfterGetRecord()
     begin
-        ClientIdGlobal := Rec.GetSecret(Rec.FieldNo("Client Id"));
-        ClientSecretGlobal := Rec.GetSecret(Rec.FieldNo("Client Secret"));
+        ClientIdGlobal := CopyStr(Rec.GetSecret(Rec.FieldNo("Client Id")), 1, MaxStrLen(ClientIdGlobal));
+        ClientSecretGlobal := CopyStr(Rec.GetSecret(Rec.FieldNo("Client Secret")), 1, MaxStrLen(ClientSecretGlobal));
     end;
 
 }
