@@ -163,7 +163,7 @@
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketRetailManagement: Codeunit "NPR TM Ticket Retail Mgt.";
-        TicketAttempCreate: Codeunit "NPR Ticket Attempt Create";
+        TicketAttemptCreate: Codeunit "NPR Ticket Attempt Create";
         TicketRequestMini: Page "NPR TM Ticket Req. Mini";
         PageAction: Action;
         ResponseMessage: Text;
@@ -205,7 +205,7 @@
         //**
 
         Commit();
-        if (TicketAttempCreate.AttemptValidateRequestForTicketReuse(TempTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
+        if (TicketAttemptCreate.AttemptValidateRequestForTicketReuse(TempTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
             TicketToken := ReusedToken;
             Commit();
 

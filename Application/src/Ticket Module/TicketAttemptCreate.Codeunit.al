@@ -30,7 +30,7 @@
         _TicketAttemptCreate: Codeunit "NPR Ticket Attempt Create";
         TempTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
         _TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        _ReusedTokenId: Text;
+        _ReusedTokenId: Text[100];
         _TicketNo: Code[20];
         _TicketIdentifierType: Option;
         _TicketIdentifier: Text[50];
@@ -62,7 +62,7 @@
         exit(IsSuccess);
     end;
 
-    procedure AttemptValidateRequestForTicketReuse(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; var ReusedTokenId: Text; var ResponseMessage: Text): Boolean
+    procedure AttemptValidateRequestForTicketReuse(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; var ReusedTokenId: Text[100]; var ResponseMessage: Text): Boolean
     var
         Successful: Boolean;
     begin
@@ -122,7 +122,7 @@
     #endregion
 
     #region Internal Worker Functions
-    local procedure DoRevalidateRequestForTicketReuse(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; var ReusedTokenId: Text)
+    local procedure DoRevalidateRequestForTicketReuse(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; var ReusedTokenId: Text[100])
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
@@ -227,7 +227,7 @@
 
     #endregion
 
-    internal procedure GetReusedTokenId(): Text
+    internal procedure GetReusedTokenId(): Text[100]
     begin
         exit(_ReusedTokenId);
     end;
