@@ -506,32 +506,34 @@
         PriceCalculationMgt.GetHandler(LineWithPrice, PriceCalculation);
     end;
 
-
-    procedure ItemAvailabilityByPeriod(var ItemAvailabilityByPeriodXmlPort: XMLport "NPR M2 Item Availab. By Period")
+#pragma warning disable AA0245 
+    procedure ItemAvailabilityByPeriod(var ItemAvailabilityByPeriod: XMLport "NPR M2 Item Availab. By Period")
     begin
-        ItemAvailabilityByPeriodXmlPort.Import();
-        ItemAvailabilityByPeriodXmlPort.CalculateAvailability();
+        ItemAvailabilityByPeriod.Import();
+        ItemAvailabilityByPeriod.CalculateAvailability();
         // All logic in XML port to generate output on export
     end;
 
-    procedure CustomerItemByPeriod(var CustomerItemByPeriodXmlPort: XMLport "NPR M2 Customer Item By Period")
+    procedure CustomerItemByPeriod(var CustomerItemByPeriod: XMLport "NPR M2 Customer Item By Period")
     begin
-        CustomerItemByPeriodXmlPort.Import();
-        CustomerItemByPeriodXmlPort.ValidateRequest();
+        CustomerItemByPeriod.Import();
+        CustomerItemByPeriod.ValidateRequest();
         // All logic in XML port to generate output on export
     end;
 
-    procedure EstimateDeliveryDate(var EstimateDeliveryDateXmlPort: XMLport "NPR M2 Estimate Delivery Date")
+
+    procedure EstimateDeliveryDate(var EstimateDeliveryDate: XMLport "NPR M2 Estimate Delivery Date")
     begin
-        EstimateDeliveryDateXmlPort.Import();
-        EstimateDeliveryDateXmlPort.PrepareResult();
+        EstimateDeliveryDate.Import();
+        EstimateDeliveryDate.PrepareResult();
     end;
 
-    procedure GetWorkingDayCalendar(var GetWorkingDayCalendarXmlPort: XMLport "NPR M2 Get WorkingDay Calendar")
+    procedure GetWorkingDayCalendar(var GetWorkingDayCalendar: XMLport "NPR M2 Get WorkingDay Calendar")
     begin
-        GetWorkingDayCalendarXmlPort.Import();
-        GetWorkingDayCalendarXmlPort.PrepareResponse();
+        GetWorkingDayCalendar.Import();
+        GetWorkingDayCalendar.PrepareResponse();
     end;
+#pragma warning restore
 
     #region Events
     [IntegrationEvent(false, false)]

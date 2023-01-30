@@ -719,7 +719,8 @@
         Commit();
     end;
 
-    procedure ConfirmMembershipPayment(var ConfirmMembershipPaymentXmlPort: XMLport "NPR MM Confirm Members. Pay.")
+#pragma warning disable AA0245 
+    procedure ConfirmMembershipPayment(var ConfirmMembershipPayment: XMLport "NPR MM Confirm Members. Pay.")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -728,41 +729,42 @@
         FileNameLbl: Label 'ConfirmMembershipPayment-%1.xml', Locked = true;
     begin
 
-        ConfirmMembershipPaymentXmlPort.Import();
+        ConfirmMembershipPayment.Import();
 
         InsertImportEntry('ConfirmMembershipPayment', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        ConfirmMembershipPaymentXmlPort.SetDestination(OutStr);
-        ConfirmMembershipPaymentXmlPort.Export();
+        ConfirmMembershipPayment.SetDestination(OutStr);
+        ConfirmMembershipPayment.Export();
         ImportEntry.Modify(true);
 
         Commit();
 
         if (NaviConnectSyncMgt.ProcessImportEntry(ImportEntry)) then begin
 
-            ConfirmMembershipPaymentXmlPort.ClearResponse();
+            ConfirmMembershipPayment.ClearResponse();
             MemberInfoCapture.SetCurrentKey("Import Entry Document ID");
             MemberInfoCapture.SetFilter("Import Entry Document ID", '=%1', ImportEntry."Document ID");
             MemberInfoCapture.FindFirst();
 
-            ConfirmMembershipPaymentXmlPort.AddResponse(MemberInfoCapture."Membership Entry No.");
+            ConfirmMembershipPayment.AddResponse(MemberInfoCapture."Membership Entry No.");
 
             MemberInfoCapture.DeleteAll();
         end else begin
-            ConfirmMembershipPaymentXmlPort.AddErrorResponse(ImportEntry."Error Message");
+            ConfirmMembershipPayment.AddErrorResponse(ImportEntry."Error Message");
         end;
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        ConfirmMembershipPaymentXmlPort.SetDestination(OutStr);
-        ConfirmMembershipPaymentXmlPort.Export();
+        ConfirmMembershipPayment.SetDestination(OutStr);
+        ConfirmMembershipPayment.Export();
         ImportEntry.Modify(true);
 
         Commit();
 
     end;
+#pragma warning restore
 
     procedure RegretMembershipTimeframe(var Membership: XMLport "NPR MM Regret Member Timeframe")
     var
@@ -1115,7 +1117,8 @@
         Commit();
     end;
 
-    procedure GetSetAutoRenew(var GetSetAutoRenewXmlPort: XMLport "NPR MM GetSet AutoRenew Option")
+#pragma warning disable AA0245 
+    procedure GetSetAutoRenew(var GetSetAutoRenew: XMLport "NPR MM GetSet AutoRenew Option")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -1123,35 +1126,36 @@
         FileNameLbl: Label 'GetSetAutoRenewOption-%1.xml', Locked = true;
     begin
 
-        GetSetAutoRenewXmlPort.Import();
+        GetSetAutoRenew.Import();
 
         InsertImportEntry('GetSetAutoRenewOption', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        GetSetAutoRenewXmlPort.SetDestination(OutStr);
-        GetSetAutoRenewXmlPort.Export();
+        GetSetAutoRenew.SetDestination(OutStr);
+        GetSetAutoRenew.Export();
         ImportEntry.Modify(true);
         Commit();
 
         if (NaviConnectSyncMgt.ProcessImportEntry(ImportEntry)) then begin
 
-            GetSetAutoRenewXmlPort.createResponse();
+            GetSetAutoRenew.createResponse();
 
         end else begin
-            GetSetAutoRenewXmlPort.setError('Not processed.');
+            GetSetAutoRenew.setError('Not processed.');
 
         end;
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        GetSetAutoRenewXmlPort.SetDestination(OutStr);
-        GetSetAutoRenewXmlPort.Export();
+        GetSetAutoRenew.SetDestination(OutStr);
+        GetSetAutoRenew.Export();
         ImportEntry.Modify(true);
 
         Commit();
 
     end;
+#pragma warning restore
 
     procedure MemberFieldUpdate(EntryNo: Integer; CurrentValue: Text[200]; NewValue: Text[200])
     var
