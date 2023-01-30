@@ -393,7 +393,9 @@
         foreach CountedPayment in Counting do begin
             TempBinCheckpoint.Get(GetValueAsInteger(CountedPayment.AsObject(), 'id'));
             TempBinCheckpoint."Counted Amount Incl. Float" := GetValueAsDecimal(CountedPayment.AsObject(), 'countedAmount');
-            TempBinCheckpoint.Comment := StrSubstNo(ManualCountComment, CopyStr(UserId, 1, 25));
+            TempBinCheckpoint.Comment := CopyStr(GetValueAsText(CountedPayment.AsObject(), 'countedAmountComment'), 1, MaxStrLen(TempBinCheckpoint.Comment));
+            if (TempBinCheckpoint.Comment = '') then
+                TempBinCheckpoint.Comment := StrSubstNo(ManualCountComment, CopyStr(UserId, 1, 25));
             TempBinCheckpoint.Modify();
 
             TransferDenominations(CountedPayment, 'coinTypes', Enum::"NPR Denomination Target"::Counted, TempBinCheckpoint);
