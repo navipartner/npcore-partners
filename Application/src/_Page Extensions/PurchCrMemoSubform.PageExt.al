@@ -17,7 +17,7 @@ pageextension 6014436 "NPR Purch. Cr. Memo Subform" extends "Purch. Cr. Memo Sub
                     VarietyWrapper: Codeunit "NPR Variety Wrapper";
                 begin
                     VarietyWrapper.PurchLineShowVariety(Rec, 0);
-#IF NOT (BC1700 or BC1704)                    
+#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803)              
                     ForceTotalsCalculation();
 #ENDIF                    
                 end;

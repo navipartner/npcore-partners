@@ -26,7 +26,9 @@ stages:
 
         - name: BC1711
 
-        - name: BC1804
+        # - name: BC1803
+        
+        # - name: BC1812
 
         - name: BC1905
 
