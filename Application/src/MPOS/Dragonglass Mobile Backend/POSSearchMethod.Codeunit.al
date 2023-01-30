@@ -23,7 +23,9 @@
 
         case SearchType of
             'ITEM':
+#pragma warning disable AA0139
                 SearchItem(SearchTerm, LastKey, FrontEnd);
+#pragma warning restore
         end
     end;
 
