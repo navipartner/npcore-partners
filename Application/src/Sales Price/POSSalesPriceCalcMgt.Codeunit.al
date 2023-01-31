@@ -147,10 +147,7 @@
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        Customer: Record Customer;
-        POSUnit: Record "NPR POS Unit";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
-        PricingProfile: Codeunit "NPR POS Pricing Profile";
         LineWithPrice: Interface "Line With Price";
         PriceCalculation: Interface "Price Calculation";
     begin
@@ -170,15 +167,10 @@
         SalesHeader."Currency Code" := Currency.Code;
         SalesHeader.UpdateCurrencyFactor();
 
-        if Customer.Get(SalePOS."Customer No.") then begin
-            SalesHeader."Bill-to Customer No." := Customer."No.";
-            SalesHeader."Customer Price Group" := Customer."Customer Price Group";
-            SalesLine."Customer Price Group" := Customer."Customer Price Group";
-            SalesLine."Customer Disc. Group" := Customer."Customer Disc. Group";
-        end else begin
-            if POSUnit.Get(SalePOS."Register No.") then;
-            PricingProfile.GetCustomerGroupsIfProfileExist(POSUnit."POS Pricing Profile", SalesLine."Customer Disc. Group", SalesLine."Customer Price Group");
-        end;
+        SalesHeader."Bill-to Customer No." := SalePOS."Customer No.";
+        SalesHeader."Customer Price Group" := SalePOS."Customer Price Group";
+        SalesLine."Customer Price Group" := SaleLinePOS."Customer Price Group";
+        SalesLine."Customer Disc. Group" := SalePOS."Customer Disc. Group";
 
         SalesLine.GetLineWithPrice(LineWithPrice);
         LineWithPrice.SetLine(TempSalesPriceListLine."Price Type"::Sale, SalesHeader, SalesLine);
