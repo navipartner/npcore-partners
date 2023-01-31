@@ -461,7 +461,12 @@
     begin
         if not SetRetailJnl(RetailJnlCode) then
             exit;
-        Selection := StrMenu(Text004, 1);
+
+        if GuiAllowed() then
+            Selection := StrMenu(Text004, 1)
+        else
+            Selection := 1;
+
         if Selection = 0 then
             exit;
         PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
