@@ -83,8 +83,6 @@
                 "Tax Liable" := POSPostingProfile."Tax Liable";
                 "VAT Bus. Posting Group" := POSPostingProfile."VAT Bus. Posting Group";
 
-                Modify();
-
                 if "Customer No." <> '' then begin
                     Cust.Get("Customer No.");
                     Name := Cust.Name;
