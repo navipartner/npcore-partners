@@ -1,6 +1,7 @@
 ﻿codeunit 6014581 "NPR Retail Report Select. Mgt."
 {
     Access = Internal;
+
     var
         RegisterNo: Code[10];
         ReqWindow: Boolean;
@@ -52,6 +53,8 @@
         Itt: Integer;
         Option: Integer;
     begin
+        if not GuiAllowed() then
+            exit;
         ReportSelection.SetCurrentKey("Report Type", Sequence);
         ReportSelection.SetAutoCalcFields("Report Name", "Codeunit Name");
         if ReportSelection.FindSet() then
