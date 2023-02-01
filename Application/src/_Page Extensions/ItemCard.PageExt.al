@@ -703,7 +703,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             }
             part(NPRPicture; "NPR Magento Item Pict. Factbox")
             {
-                Caption = 'Picture';
+                Caption = 'Magento Picture';
                 ShowFilter = false;
                 SubPageLink = "No." = field("No.");
                 Visible = MagentoEnabled;
