@@ -5,7 +5,8 @@
     var
         ActionDescriptionLbl: Label 'This built-in action process Collect in Store Orders.';
         ParamLocationFilterLbl: Label 'Location Filter';
-        ParamFromLocation_OptLbl: Label 'POS Store,Location Filter Parameter';
+        ParamFromLocation_OptLbl: Label 'POS Store,Location Filter Parameter', Locked = true;
+        ParamFromLocation_CaptOptLbl: Label 'POS Store,Location Filter Parameter';
         ParamFromLocation_NameLbl: Label 'Location From';
         ParamFromLocation_DescLbl: Label 'Specifies from location';
         ParamSorting_OptLbl: Label 'Entry No.,Reference No.,Processing expires at';
@@ -21,7 +22,7 @@
                                           SelectStr(1, ParamFromLocation_OptLbl),
                                           ParamFromLocation_NameLbl,
                                           ParamFromLocation_DescLbl,
-                                          ParamFromLocation_OptLbl);
+                                          ParamFromLocation_CaptOptLbl);
         WorkflowConfig.AddTextParameter('Location Filter', '', ParamLocationFilterLbl, ParamLocationFilterLbl);
         WorkflowConfig.AddOptionParameter('Sorting',
                                           ParamSorting_OptLbl,

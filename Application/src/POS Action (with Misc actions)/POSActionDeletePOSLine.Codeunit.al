@@ -1,68 +1,43 @@
-﻿codeunit 6150796 "NPR POSAction: Delete POS Line"
+codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-    local procedure ActionCode(): Code[20]
-    begin
-        exit('DELETE_POS_LINE');
-    end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('2.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         ActionDescriptionLbl: Label 'This built in function deletes sales or payment line from the POS';
-    begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
-            Sender.RegisterWorkflow20(
-                'let saleLines = runtime.getData("BUILTIN_SALELINE");' +
-                'if ((!saleLines.length) || (saleLines._invalid)) {' +
-                '    await popup.error($labels.notallowed);' +
-                '    return;' +
-                '};' +
-
-                'if ($parameters.ConfirmDialog) {' +
-                '    if (!await popup.confirm({ title: $labels.title, caption: $labels.Prompt.substitute(saleLines._current[10]) })) {' +
-                '        return;' +
-                '    };' +
-                '};' +
-                'workflow.respond();'
-            );
-            Sender.RegisterBooleanParameter('ConfirmDialog', false);
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-        Handled := true;
-
-        DeletePosLine(POSSession, Context);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    var
+        ConfirmParamCpt: Label 'Confirm Dialog';
         TitleLbl: Label 'Delete Line';
         PromptLbl: Label 'Are you sure you want to delete the line %1?';
         NotAllowedLbl: Label 'This line can''t be deleted.';
     begin
-        Captions.AddActionCaption(ActionCode(), 'title', TitleLbl);
-        Captions.AddActionCaption(ActionCode(), 'notallowed', NotAllowedLbl);
-        Captions.AddActionCaption(ActionCode(), 'Prompt', PromptLbl);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
+        WorkflowConfig.AddBooleanParameter('ConfirmDialog', false, ConfirmParamCpt, ConfirmParamCpt);
+        WorkflowConfig.AddLabel('title', TitleLbl);
+        WorkflowConfig.AddLabel('notallowed', NotAllowedLbl);
+        WorkflowConfig.AddLabel('Prompt', PromptLbl);
     end;
 
-    local procedure DeletePosLine(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management")
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
+    var
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        DeletePosLine(POSSession, Context);
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+        //###NPR_INJECT_FROM_FILE:POSActionDeleteLine.js###
+'let main=async({workflow:i,parameters:r,captions:t})=>{let e=runtime.getData("BUILTIN_SALELINE");if(!e.length||e._invalid){await popup.error(t.notallowed);return}r.ConfirmDialog&&!await popup.confirm({title:t.title,caption:t.Prompt.substitute(e._current[10])})||i.respond()};'
+        )
+    end;
+
+    local procedure DeletePosLine(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Helper")
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
-        POSSale: Codeunit "NPR POS Sale";
         CurrentView: Codeunit "NPR POS View";
+        DeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
     begin
         POSSession.GetCurrentView(CurrentView);
 
@@ -70,47 +45,15 @@
             POSSession.GetSaleLine(POSSaleLine);
             SetPositionForPOSSaleLine(Context, POSSaleLine);
             OnBeforeDeleteSaleLinePOS(POSSaleLine);
-            HandleLinkedDocuments(POSSaleLine);
-            DeleteAccessories(POSSaleLine);
-            POSSaleLine.DeleteLine();
+            DeletePOSLineB.DeleteSaleLine(POSSaleLine);
         end;
 
         if (CurrentView.GetType() = CurrentView.GetType() ::Payment) then begin
-            POSSession.GetPaymentLine(POSPaymentLine);
-            POSPaymentLine.RefreshCurrent();
-            POSPaymentLine.DeleteLine();
+            DeletePOSLineB.DeletePaymentLine();
         end;
-
-        POSSession.GetSale(POSSale);
-        POSSale.SetModified();
-        POSSession.RequestRefreshData();
     end;
 
-    local procedure DeleteAccessories(POSSaleLine: Codeunit "NPR POS Sale Line")
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-        SaleLinePOS2: Record "NPR POS Sale Line";
-    begin
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item then
-            exit;
-        if SaleLinePOS."No." in ['', '*'] then
-            exit;
-
-        SaleLinePOS2.SetRange("Register No.", SaleLinePOS."Register No.");
-        SaleLinePOS2.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        SaleLinePOS2.SetFilter("Line No.", '<>%1', SaleLinePOS."Line No.");
-        SaleLinePOS2.SetRange("Main Line No.", SaleLinePOS."Line No.");
-        SaleLinePOS2.SetRange(Accessory, true);
-        SaleLinePOS2.SetRange("Main Item No.", SaleLinePOS."No.");
-        if SaleLinePOS2.IsEmpty then
-            exit;
-
-        SaleLinePOS2.SetSkipCalcDiscount(true);
-        SaleLinePOS2.DeleteAll(false);
-    end;
-
-    internal procedure SetPositionForPOSSaleLine(Context: Codeunit "NPR POS JSON Management"; var POSSaleLine: Codeunit "NPR POS Sale Line")
+    internal procedure SetPositionForPOSSaleLine(Context: Codeunit "NPR POS JSON Helper"; var POSSaleLine: Codeunit "NPR POS Sale Line")
     var
         POSDataDriverSaleLine: Codeunit "NPR POS Data Driver: Sale Line";
         Position: Text;
@@ -118,36 +61,6 @@
         Position := Context.GetPositionFromDataSource(POSDataDriverSaleLine.GetSourceNameText());
         IF Position <> '' then
             POSSaleLine.SetPosition(Position);
-    end;
-
-    local procedure HandleLinkedDocuments(POSSaleLine: Codeunit "NPR POS Sale Line")
-    var
-        LinePOS: Record "NPR POS Sale Line";
-    begin
-        POSSaleLine.GetCurrentSaleLine(LinePOS);
-        RevertPrepaymentOnDocuments(LinePOS);
-    end;
-
-    local procedure RevertPrepaymentOnDocuments(SaleLinePOS: Record "NPR POS Sale Line")
-    var
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-    begin
-        if not SaleLinePOS."Sales Document Prepayment" then
-            exit;
-
-        if SalesHeader.Get(SaleLinePOS."Sales Document Type", SaleLinePOS."Sales Document No.") then begin
-            SalesLine.SetHideValidationDialog(true);
-            SalesLine.SuspendStatusCheck(true);
-            SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-            SalesLine.SetRange("Document No.", SalesHeader."No.");
-            if SalesLine.FindSet() then
-                repeat
-                    SalesLine.Validate("Prepmt. Line Amount", SalesLine."Prepmt. Amt. Inv.");
-                    SalesLine.Modify();
-                until SalesLine.Next() = 0;
-        end;
-
     end;
 
     [IntegrationEvent(false, false)]

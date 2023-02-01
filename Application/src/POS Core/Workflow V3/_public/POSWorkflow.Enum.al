@@ -537,6 +537,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'PLAY_SOUND', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action - Play Sound";
     }
+    value(108; DELETE_POS_LINE)
+    {
+        Caption = 'DELETE_POS_LINE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Delete POS Line";
+    }
     value(110; "SINGLE_SALE_STATS")
     {
         Caption = 'SINGLE_SALE_STATS', Locked = true, MaxLength = 20;

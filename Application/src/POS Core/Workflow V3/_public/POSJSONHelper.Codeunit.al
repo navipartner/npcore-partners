@@ -263,8 +263,8 @@ codeunit 6014574 "NPR POS JSON Helper"
                     exit(true);
                 end;
             else begin
-                    exit(Evaluate(ValueOut, String));
-                end;
+                exit(Evaluate(ValueOut, String));
+            end;
         end;
     end;
 
@@ -583,5 +583,26 @@ codeunit 6014574 "NPR POS JSON Helper"
         end;
 
         Result := Token;
+    end;
+
+    internal procedure GetPositionFromDataSource(SourceNameText: text[50]): Text
+    var
+        JsonObj: JsonObject;
+        JToken: JsonToken;
+        Position: Text;
+        JValue: JsonValue;
+    begin
+        If not TrySetScope('data') then
+            exit;
+        if not TrySetScope('positions') then
+            exit;
+        GetJObject(JsonObj);
+        if (_JObject.Get(SourceNameText, JToken)) then begin
+            JValue := JToken.AsValue();
+            if (not JValue.IsNull()) and (not JValue.IsUndefined()) then begin
+                Position := JValue.AsText();
+            end;
+        end;
+        exit(Position);
     end;
 }
