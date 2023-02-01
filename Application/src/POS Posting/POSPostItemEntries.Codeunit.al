@@ -87,6 +87,7 @@
         POSPeriodRegister: Record "NPR POS Period Register";
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
         WMSManagement: Codeunit "WMS Management";
+        POSPostILEPublicAccess: Codeunit "NPR POS Post ILE Public Access";
     begin
         Clear(ItemJnlLine);
         OnBeforePostPOSSalesLineItemJnl(POSSalesLine);
@@ -182,7 +183,7 @@
         if Item.Get(POSSalesLine."No.") then
             ItemJnlLine."NPR Vendor No." := Item."Vendor No.";
 
-        OnAfterCreateItemJournalLine(POSEntry, POSSalesLine, ItemJnlLine);
+        POSPostILEPublicAccess.OnAfterCreateItemJournalLine(POSEntry, POSSalesLine, ItemJnlLine);
 
         if (ItemJnlLine."Journal Template Name" = '') and (ItemJnlLine."Journal Batch Name" = '') then
             ItemJnlPostLine.RunWithCheck(ItemJnlLine);
@@ -391,11 +392,6 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePostPOSSalesLineItemJnl(var POSSalesLine: Record "NPR POS Entry Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateItemJournalLine(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line"; var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 
