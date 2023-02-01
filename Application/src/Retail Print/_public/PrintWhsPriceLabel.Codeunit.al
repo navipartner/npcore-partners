@@ -1,4 +1,4 @@
-codeunit 6059901 "NPR Print Whs. Price Label"
+codeunit 6059902 "NPR Print Whs. Price Label"
 {
     TableNo = "Warehouse Activity Header";
 
