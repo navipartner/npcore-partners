@@ -184,7 +184,9 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
             Error(RefNoBlankErr);
 
         if CopyStr(ReferenceNo, StrLen(ReferenceNo) - 1) = 'XX' then
+#pragma warning disable AA0139
             ReferenceNo := CopyStr(ReferenceNo, 1, StrLen(ReferenceNo) - 2);
+#pragma warning restore
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);

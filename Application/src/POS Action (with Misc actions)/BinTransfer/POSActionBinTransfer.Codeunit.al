@@ -22,7 +22,9 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
             SourceBinSelectionLbl,
             SourceBinOptionsLbl,
+#pragma warning disable AA0139
             SelectStr(1, SourceBinOptionsLbl),
+#pragma warning restore 
             SourceBinSelection_NameLbl,
             SourceBinSelection_NameLbl,
             SourceBinOptions_CptLbl);

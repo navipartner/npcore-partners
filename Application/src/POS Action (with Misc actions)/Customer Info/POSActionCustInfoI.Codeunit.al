@@ -15,7 +15,9 @@ codeunit 6150801 "NPR POS Action: Cust.Info-I" implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
             ParameterShow_Name(),
             ParameterShow_OptionsLbl,
+#pragma warning disable AA0139
             SelectStr(1, ParameterShow_OptionsLbl),
+#pragma warning restore 
             ParameterShow_NameCaptionLbl,
             ParameterShow_NameDescriptionLbl,
             ParameterShow_OptionCaptionsLbl

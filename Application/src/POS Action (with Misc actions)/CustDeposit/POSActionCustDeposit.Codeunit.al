@@ -34,7 +34,9 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit" implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
             'DepositType',
             ParamDepositType_OptLbl,
+#pragma warning disable AA0139
             SelectStr(1, ParamDepositType_OptLbl),
+#pragma warning restore 
             ParamDepositType_NameCptLbl,
             ParamDepositType_OptDescLbl,
             ParamDepositType_OptCptLbl);
@@ -57,7 +59,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit" implements "NPR IPOS Workflow"
     var
         DepositType: Option ApplyCustomerEntries,InvoiceNoPrompt,AmountPrompt,MatchCustomerBalance,CrMemoNoPrompt;
         CustomerEntryView: Text;
-        PromptValue: Text;
+        PromptValue: Code[20];
         PromptAmt: Decimal;
         POSActionCustDepositB: Codeunit "NPR POS Action: Cust.Deposit B";
     begin
@@ -65,7 +67,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit" implements "NPR IPOS Workflow"
         CustomerEntryView := Context.GetStringParameter('CustomerEntryView');
 
         if (DepositType = DepositType::InvoiceNoPrompt) or (DepositType = DepositType::CrMemoNoPrompt) then
-            PromptValue := CopyStr(Context.GetString('PromptValue'), 1, 20);
+            PromptValue := CopyStr(UpperCase(Context.GetString('PromptValue')), 1, MaxStrLen(PromptValue));
         if (DepositType = DepositType::AmountPrompt) then
             PromptAmt := Context.GetDecimal('PromptAmt');
 
@@ -122,12 +124,12 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit" implements "NPR IPOS Workflow"
 
     local procedure ChangeDesc(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line")
     var
-        CustomDescription: Text;
+        CustomDescription: Text[100];
         CopyNewDesc: Boolean;
         POSActionCustDepositB: Codeunit "NPR POS Action: Cust.Deposit B";
     begin
         CopyNewDesc := Context.GetBooleanParameter('CopyNewDescToLedgEntries');
-        CustomDescription := Context.GetString('Desc1');
+        CustomDescription := CopyStr(Context.GetString('Desc1'), 1, MaxStrLen(CustomDescription));
         POSActionCustDepositB.SetNewDesc(CustomDescription, SaleLine, CopyNewDesc);
     end;
 }

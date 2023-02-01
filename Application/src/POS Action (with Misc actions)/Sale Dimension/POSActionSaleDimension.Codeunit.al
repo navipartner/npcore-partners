@@ -41,7 +41,9 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddOptionParameter('ValueSelection',
                                          ParamValueSelection_OptionsLbl,
+#pragma warning disable AA0139
                                          SelectStr(1, ParamValueSelection_OptionsLbl),
+#pragma warning restore 
                                          ParamValueSelection_CptLbl,
                                          ParamValueSelection_DescrLbl,
                                          OptionValueSelectionLbl
@@ -49,7 +51,9 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
 
         WorkflowConfig.AddOptionParameter('DimensionSource',
                                          ParamDimensionSource_OptionsLbl,
+#pragma warning disable AA0139
                                          SelectStr(1, ParamDimensionSource_OptionsLbl),
+#pragma warning restore 
                                          ParamDimensionSource_CptLbl,
                                          ParamDimensionSource_DescrLbl,
                                          DimensionSourceOptionsLbl
@@ -57,7 +61,9 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
 
         WorkflowConfig.AddOptionParameter('ApplyTo',
                                           ParamApplyTo_OptionsLbl,
+#pragma warning disable AA0139
                                          SelectStr(1, ParamApplyTo_OptionsLbl),
+#pragma warning restore 
                                          ParamApplyTo_CptLbl,
                                          ParamApplyTo_DescrLbl,
                                          ParamApplyToOption_CptLbl

@@ -21,7 +21,9 @@ codeunit 6150813 "NPR POS Action: Item Lookup" implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
                        'LookupType',
                        ParamLookupTypeOptions_Lbl,
+#pragma warning disable AA0139
                        SelectStr(1, ParamLookupTypeOptions_Lbl),
+#pragma warning restore 
                        ParamLookupTypeCaption_Lbl,
                        ParamLookupTypeDesc_Lbl,
                        ParamLookupTypeOptions_Lbl
@@ -30,7 +32,9 @@ codeunit 6150813 "NPR POS Action: Item Lookup" implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
           'LocationFilter',
           ParamLocationFilterOptions_Lbl,
+#pragma warning disable AA0139
           SelectStr(1, ParamLocationFilterOptions_Lbl),
+#pragma warning restore 
           ParamLocationFilterCaption_Lbl,
           ParamLocationFilterDesc_Lbl,
           ParamLocationFilterOptions_Lbl

@@ -120,13 +120,17 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('SalesDocViewString', '', ParamSalesDocViewString_CptLbl, ParamSalesDocViewString_DescLbl);
         WorkflowConfig.AddOptionParameter('LocationFrom',
                                           ParamLocationFrom_OptionsLbl,
+#pragma warning disable AA0139
                                           SelectStr(1, ParamLocationFrom_OptionsLbl),
+#pragma warning restore 
                                           ParamLocationFrom_CptLbl,
                                           ParamLocationFrom_DescLbl,
                                           ParamLocationFrom_OptionsCptLbl);
         WorkflowConfig.AddOptionParameter('PaymentMethodCodeFrom',
                                            ParamPaymentMethodCodeFrom_OptLbl,
+#pragma warning disable AA0139
                                            SelectStr(1, ParamPaymentMethodCodeFrom_OptLbl),
+#pragma warning restore 
                                            ParamPaymentMethodCodeFrom_CptLbl,
                                            ParamPaymentMethodCodeFrom_DescLbl,
                                            ParamPaymentMethodCodeFromOptins_CptLbl);
@@ -144,13 +148,17 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('SetShip', false, ParamShip_CptLbl, ParamShip_DescLbl);
         WorkflowConfig.AddOptionParameter('SetDocumentType',
                                            ParamSetDocumentType_OptLbl,
+#pragma warning disable AA0139
                                            SelectStr(1, ParamSetDocumentType_OptLbl),
+#pragma warning restore 
                                            ParamSetDocumentType_CptLbl,
                                            ParamSetDocumentType_DescLbl,
                                            ParamSetDocumentTypeOptions_CptLbl);
         WorkflowConfig.AddOptionParameter('SetNegBalDocumentType',
                                            ParamSetNegDocumentTypeOptions_Lbl,
+#pragma warning disable AA0139
                                            SelectStr(1, ParamSetNegDocumentTypeOptions_Lbl),
+#pragma warning restore 
                                            ParamSetNegDocumentType_CptLbl,
                                            ParamSetNegDocumentType_DescLbl,
                                            ParamSetNegDocumentTypeOptions_CptLbl);

@@ -20,7 +20,9 @@
         WorkflowConfig.AddBooleanParameter('RequestPage', false, RequestPageCaptionLbl, RequestPageDescriptionLbl);
         WorkflowConfig.AddOptionParameter('Record',
             RecordOption_OptionNameLbl,
+#pragma warning disable AA0139
             SelectStr(1, RecordOption_OptionNameLbl),
+#pragma warning restore 
             RecordCaptionLbl,
             RecordDescriptionLbl,
             RecordOption_OptionCaptionLbl);

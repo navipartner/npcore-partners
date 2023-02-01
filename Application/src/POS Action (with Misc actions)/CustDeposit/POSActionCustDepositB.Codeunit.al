@@ -6,7 +6,7 @@ codeunit 6059978 "NPR POS Action: Cust.Deposit B"
                             CustomerEntryView: Text;
                             POSSale: Codeunit "NPR POS Sale";
                             POSSaleLine: Codeunit "NPR POS Sale Line";
-                            PromptValue: Text;
+                            PromptValue: Code[20];
                             PromptAmt: Decimal)
     var
         SalePOS: Record "NPR POS Sale";

@@ -96,7 +96,9 @@ codeunit 6059851 "NPR POS Action: SavePOSSvSl B"
         POSQuoteLine."Discount %" := SaleLinePOS."Discount %";
         POSQuoteLine."Discount Amount" := SaleLinePOS."Discount Amount";
         POSQuoteLine."Discount Code" := SaleLinePOS."Discount Code";
+#pragma warning disable AA0139
         POSQuoteLine."Discount Authorised by" := SaleLinePOS."Discount Authorised by";
+#pragma warning restore AA0139
         POSQuoteLine."EFT Approved" := SaleLinePOS."EFT Approved";
         POSQuoteLine.SystemId := SaleLinePOS.SystemId;
         POSQuoteLine.Insert(true, true);
