@@ -27,7 +27,9 @@ codeunit 6150829 "NPR POS Action: POS Info" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('POSInfoCode', '', ParamPOSInfoCode_CptLBl, ParamPOSInfoCode_DescLbl);
         WorkflowConfig.AddOptionParameter('ApplicationScope',
                                         ParamApplicationScope_OptionLbl,
+#pragma warning disable AA0139
                                         SelectStr(3, ParamApplicationScope_OptionLbl),
+#pragma warning restore 
                                         ParamApplicationScope_CptLbl,
                                         ParamApplicationScope_DescLbl,
                                         ParamApplicationScope_OptionCptLbl);

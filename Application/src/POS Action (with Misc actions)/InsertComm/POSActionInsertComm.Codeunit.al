@@ -18,7 +18,9 @@ codeunit 6150795 "NPR POS Action - Insert Comm." implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('DefaultDescription', '', ParamDefaultDesc_CptLbl, ParamDefaultDesc_DescLbl);
         WorkflowConfig.AddOptionParameter('EditDescription',
                                           ParamEditDesc_OptLbl,
+#pragma warning disable AA0139
                                           SelectStr(1, ParamEditDesc_OptLbl),
+#pragma warning restore 
                                           ParamEditDesc_CptLbl,
                                           ParamEditDesc_DescLbl,
                                           ParamEditDesc_OptCptLbl);
@@ -36,7 +38,7 @@ codeunit 6150795 "NPR POS Action - Insert Comm." implements "NPR IPOS Workflow"
     local procedure InputPosCommentLine(Context: Codeunit "NPR POS JSON Helper"; SaleLine: codeunit "NPR POS Sale Line")
     var
         Line: Record "NPR POS Sale Line";
-        NewDesc: Text;
+        NewDesc: Text[100];
     begin
         NewDesc := CopyStr(Context.GetString('NewDescription'), 1, MaxStrLen(Line.Description));
 

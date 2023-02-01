@@ -22,13 +22,17 @@ codeunit 6150789 "NPR POS Action: Print Item" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('PrintQuantity', PrintQuantity);
         WorkflowConfig.AddOptionParameter('LineSetting',
                                         OptionLineSetting,
+#pragma warning disable AA0139
                                         SelectStr(2, OptionLineSetting),
+#pragma warning restore 
                                         CaptionLineSetting,
                                         DescLineSetting,
                                         OptionCptLineSetting);
         WorkflowConfig.AddOptionParameter('PrintType',
                                         OptionPrintType,
+#pragma warning disable AA0139
                                         SelectStr(1, OptionPrintType),
+#pragma warning restore 
                                         CaptionPrintType,
                                         DescPrintType,
                                         OptionCptPrintType);

@@ -22,7 +22,9 @@ codeunit 6150848 "NPR POS Action: Adjust Inv." implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
             'InputAdjustment',
             ParametarOptionsLbl,
+#pragma warning disable AA0139
             SelectStr(3, ParametarOptionsLbl),
+#pragma warning restore 
             ParameterInputAdjustment_NameLbl,
             ParameterInputAdjustment_CptLbl,
             ParametarOptionsLbl

@@ -19,7 +19,9 @@ codeunit 6150852 "NPR POS Action - Item Price" implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
                'itemIdentifierType',
                ParamItemIdentifierOptionsLbl,
+#pragma warning disable AA0139
                SelectStr(1, ParamItemIdentifierOptionsLbl),
+#pragma warning restore 
                ParamItemIdentifierType_CaptionLbl,
                ParamItemIdentifierType_DescLbl,
                ParamItemIdentifierOptions_CaptionLbl);

@@ -18,7 +18,9 @@
         WorkflowConfig.AddOptionParameter(
             'Security',
             ParamSecurityOptions,
+#pragma warning disable AA0139
             SelectStr(1, ParamSecurityOptions),
+#pragma warning restore 
             ParamSecurity_NameLbl,
             ParamSecurity_DescLbl,
             ParamSecurityOptions);
