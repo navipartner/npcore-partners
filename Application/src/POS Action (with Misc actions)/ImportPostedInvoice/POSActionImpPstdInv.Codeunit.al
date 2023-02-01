@@ -37,7 +37,9 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('SalesDocViewString', '', ParamSalesDocViewString_CptLbl, ParamSalesDocViewString_DescLbl);
         WorkflowConfig.AddOptionParameter('LocationFrom',
                                           ParamLocationFrom_OptionsLbl,
+#pragma warning disable AA0139
                                           SelectStr(1, ParamLocationFrom_OptionsLbl),
+#pragma warning restore 
                                           ParamLocationFrom_CptLbl,
                                           ParamLocationFrom_DescLbl,
                                           ParamLocationFrom_OptionsCptLbl);

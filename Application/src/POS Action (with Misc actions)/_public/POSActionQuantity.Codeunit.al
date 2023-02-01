@@ -38,7 +38,9 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
             'InputType',
             ParamInputType_OptLbl,
+#pragma warning disable AA0139
             SelectStr(1, ParamInputType_OptLbl),
+#pragma warning restore 
             ParamInputType_DescLbl,
             ParamInputType_CptLbl,
             ParamInputType_OptCptLbl);
@@ -46,7 +48,9 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
             'Constraint',
             ParamConstraint_OptLbl,
+#pragma warning disable AA0139
             SelectStr(1, ParamConstraint_OptLbl),
+#pragma warning restore 
             ParamConstraint_DescLbl,
             ParamConstraint_CptLbl,
             ParamConstraint_OptCptLbl);

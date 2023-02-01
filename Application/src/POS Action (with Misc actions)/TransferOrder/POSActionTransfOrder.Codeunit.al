@@ -23,7 +23,9 @@ codeunit 6059967 "NPR POS Action: Transf. Order" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('NewRecord', false, NewRecord_CaptionLbl, StrSubstNo(NewRecord_DescLbl, TransferHeader.TableCaption));
         WorkflowConfig.AddOptionParameter('RegisterLocation',
             RegisterLocationOption_OptionNameLbl,
+#pragma warning disable AA0139
             SelectStr(1, RegisterLocationOption_OptionNameLbl),
+#pragma warning restore 
             RegisterLocation_CaptionLbl,
             RegisterLocation_DescrLbl,
             RegisterLocationOption_OptionCptLbl);

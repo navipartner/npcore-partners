@@ -25,21 +25,27 @@ codeunit 6060160 "NPR POS Action: Get Event" implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
                        'DialogType',
                        ParamDialogTypeOptionsLbl,
+#pragma warning disable AA0139
                        SelectStr(1, ParamDialogTypeOptionsLbl),
+#pragma warning restore 
                        ParamDialogType_CaptionLbl,
                        ParamDialogType_DescLbl,
                        ParamDialogTypeOptions_CaptionLbl);
         WorkflowConfig.AddOptionParameter(
                        'GetEventLines',
                        ParamGetEventLinesOptionsLbl,
+#pragma warning disable AA0139
                        SelectStr(1, ParamGetEventLinesOptionsLbl),
+#pragma warning restore 
                        ParamGetEventLines_CaptionLbl,
                        ParamGetEventLines_DescLbl,
                        ParamGetEventLinesOptions_CaptionLbl);
         WorkflowConfig.AddOptionParameter(
                        'AddNewLinesToTask',
                        ParamAddNewLinesToTaskOptionsLbl,
+#pragma warning disable AA0139
                        SelectStr(1, ParamAddNewLinesToTaskOptionsLbl),
+#pragma warning restore 
                        ParamAddNewLinesToTask_CaptionLbl,
                        ParamAddNewLinesToTask_DescLbl,
                        ParamAddNewLinesToTaskOptions_CaptionLbl);

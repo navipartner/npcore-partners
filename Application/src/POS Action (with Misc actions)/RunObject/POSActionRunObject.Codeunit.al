@@ -1,4 +1,4 @@
-﻿codeunit 6150820 "NPR POS Action: Run Object" implements "NPR IPOS Workflow"
+codeunit 6150820 "NPR POS Action: Run Object" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
@@ -16,7 +16,7 @@
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionRunObject.js###
-        'let main=async({})=>await workflow.respond();'
+'let main=async({})=>await workflow.respond();'
         );
     end;
 
@@ -24,9 +24,9 @@
     var
         BusinessLogicRun: Codeunit "NPR POS Action: Run Object-B";
         POSSession: Codeunit "NPR POS Session";
-        MenuFilterCode: Text;
+        MenuFilterCode: Code[20];
     begin
-        MenuFilterCode := Context.GetStringParameter(ParamMenuFilterCode_Name());
+        Evaluate(MenuFilterCode, Context.GetStringParameter(ParamMenuFilterCode_Name()));
         BusinessLogicRun.RunObject(MenuFilterCode, POSSession);
     end;
 

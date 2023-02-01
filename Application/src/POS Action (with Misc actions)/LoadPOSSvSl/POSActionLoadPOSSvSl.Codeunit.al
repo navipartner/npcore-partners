@@ -31,14 +31,18 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('ScanSalesTicketNo', '', ParamScanSalesTicketNo_CptLbl, ParamScanSalesTicketNo_DescLbl);
         WorkflowConfig.AddOptionParameter('Filter',
                                           ParamFilterOptionsLbl,
+#pragma warning disable AA0139
                                           SelectStr(2, ParamFilterOptionsLbl),
+#pragma warning restore 
                                           ParamFilter_CptLbl,
                                           ParamFilter_DescLbl,
                                           ParamFilterOptions_CptLbl
                                           );
         WorkflowConfig.AddOptionParameter('QuoteInputType',
                                           ParamQuoteInputTypeOptionsLbl,
+#pragma warning disable AA0139                                          
                                           SelectStr(1, ParamQuoteInputTypeOptionsLbl),
+#pragma warning restore 
                                           ParamQuoteInputType_CptLbl,
                                           ParamQuoteInputType_DescLbl,
                                           ParamQuoteInputTypeOptions_CptLbl

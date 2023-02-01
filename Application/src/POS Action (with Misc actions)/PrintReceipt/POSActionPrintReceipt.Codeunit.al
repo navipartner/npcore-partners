@@ -43,7 +43,9 @@ codeunit 6150787 "NPR POS Action: Print Receipt" implements "NPR IPOS Workflow"
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddOptionParameter('Setting',
                                         OptionSetting,
+#pragma warning disable AA0139
                                         SelectStr(1, OptionSetting),
+#pragma warning restore 
                                         CaptionSetting,
                                         DescSetting,
                                         OptionCptSetting);
@@ -52,20 +54,26 @@ codeunit 6150787 "NPR POS Action: Print Receipt" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('Print Terminal Receipt', false, CaptionPrintTerminalReceipt, DescPrintTerminalReceipt);
         WorkflowConfig.AddOptionParameter('ReceiptListFilter',
                                         OptionReceiptListFilter,
+#pragma warning disable AA0139
                                         SelectStr(3, OptionReceiptListFilter),
+#pragma warning restore 
                                         CaptionReceiptListFilter,
                                         DescReceiptListFilter,
                                         OptionCptReceiptListFilter);
         WorkflowConfig.AddTextParameter('ReceiptListView', '', CaptionReceiptListView, DescReceiptListView);
         WorkflowConfig.AddOptionParameter('SelectionDialogType',
                                         OptionSelectionDialogType,
+#pragma warning disable AA0139
                                         SelectStr(2, OptionSelectionDialogType),
+#pragma warning restore 
                                         CaptionSelectionDialogType,
                                         DescSelectionDialogType,
                                         OptionCptSelectionDialogType);
         WorkflowConfig.AddOptionParameter('ObfuscationMethod',
                                         OptionObfuscationMethod,
+#pragma warning disable AA0139
                                         SelectStr(1, OptionObfuscationMethod),
+#pragma warning restore 
                                         CaptionObfuscationMethod,
                                         DescObfuscationMethod,
                                         OptionCptObfuscationMethod);

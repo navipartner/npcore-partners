@@ -21,23 +21,29 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
         Title: Label 'Reverse Sale';
         ReceiptPrompt: Label 'Receipt Number';
         ReasonPrompt: Label 'Return Reason';
+        TooLongErr: Label 'Receipt Number cannot have more than 20 characters.';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddLabel('title', Title);
         WorkflowConfig.AddLabel('receiptprompt', ReceiptPrompt);
         WorkflowConfig.AddLabel('reasonprompt', ReasonPrompt);
+        WorkflowConfig.AddLabel('lengtherror', TooLongErr);
         WorkflowConfig.AddOptionParameter(
                        'ItemCondition',
                        ParamItemCondition_OptLbl,
+#pragma warning disable AA0139
                        SelectStr(2, ParamItemCondition_OptLbl),
+#pragma warning restore 
                        ParamItemCondition_CptLbl,
                        ParamItemCondition_DescLbl,
                        ParamItemCondition_OptCptLbl);
         WorkflowConfig.AddOptionParameter(
                        'ObfucationMethod',
                        ParamObfucationMethod_OptLbl,
+#pragma warning disable AA0139
                        SelectStr(1, ParamObfucationMethod_OptLbl),
+#pragma warning restore 
                        ParamObfucationMethod_CptLbl,
                        ParamObfucationMethod_DescLbl,
                        ParamObfucationMethod_OptCptLbl);
@@ -77,7 +83,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
         IncludePaymentLines: Boolean;
         POSActionRevDirSaleB: Codeunit "NPR POS Action: Rev.Dir.Sale B";
     begin
-        SalesTicketNo := Context.GetString('receipt');
+        SalesTicketNo := CopyStr(UpperCase(Context.GetString('receipt')), 1, MaxStrLen(SalesTicketNo));
         ObfucationMethod := Context.GetIntegerParameter('ObfucationMethod');
         CopyHeaderDim := Context.GetBooleanParameter('CopyHeaderDimensions');
         ReturnReasonCode := CopyStr(Context.GetString('ReturnReasonCode'), 1, MaxStrLen(ReturnReasonCode));
@@ -101,7 +107,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionRevDirSale.js###
-'let main=async({workflow:e,context:i,scope:p,popup:r,parameters:c,captions:a})=>{if(e.context.receipt=await r.input({title:a.title,caption:a.receiptprompt}),e.context.receipt!==null){var n=await e.respond("reason");if(n){var t=await e.respond("SelectReturnReason");if(t===null)return}else var t="";await e.respond("handle",{PromptForReason:n,ReturnReasonCode:t})}};'
+'let main=async({workflow:e,context:i,scope:c,popup:n,parameters:p,captions:t})=>{if(e.context.receipt=await n.input({title:t.title,caption:t.receiptprompt}),e.context.receipt!==null){if(e.context.receipt.length>50)return await n.error(t.lengtherror)," ";var a=await e.respond("reason");if(a){var r=await e.respond("SelectReturnReason");if(r===null)return}else var r="";await e.respond("handle",{PromptForReason:a,ReturnReasonCode:r})}};'
         );
     end;
 }

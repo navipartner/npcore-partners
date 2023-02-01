@@ -29,7 +29,9 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
             ParameterOperation_Name(),
             ParameterOperation_OptionsLbl,
+#pragma warning disable AA0139
             SelectStr(1, ParameterOperation_OptionsLbl),
+#pragma warning restore 
             ParameterOperation_NameCaptionLbl,
             ParameterOperation_NameDescriptionLbl,
             ParameterOperation_OptionCaptionsLbl);

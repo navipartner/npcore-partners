@@ -15,7 +15,9 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddOptionParameter('DialogType',
             ParameterDialogType_OptionNameLbl,
+#pragma warning disable AA0139
             SelectStr(1, ParameterDialogType_OptionNameLbl),
+#pragma warning restore 
             ParameterDialogType_NameLbl,
             ParameterDialogType_NameLbl,
             ParameterDialogType_OptionCaptionsLbl);

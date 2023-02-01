@@ -4,6 +4,10 @@ let main = async ({workflow, popup, captions}) => {
     if (result === null) {
         return(" ");
     }
+    if (result.length > 50) {
+        await popup.error(captions.lengtherror);
+        return(" ");
+    }
     await workflow.respond("InsertBarCode", { BarCode: result })
 
 }

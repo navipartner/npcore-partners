@@ -16,7 +16,9 @@ codeunit 6150724 "NPR POS Action - Change View" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('ViewCode', '', ParamViewCode_CptLbl, ParamViewCode_DescLbl);
         WorkflowConfig.AddOptionParameter('ViewType',
                                            ParamViewType_OptLbl,
+#pragma warning disable AA0139
                                            SelectStr(1, ParamViewType_OptLbl),
+#pragma warning restore 
                                            ParamViewType_CptLbl,
                                            ParamViewType_DescLbl,
                                            ParamViewType_OptLbl);

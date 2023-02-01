@@ -4,7 +4,10 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
     if (workflow.context.receipt === null) {
         return;
     }
-    
+    if (workflow.context.receipt.length > 50) {
+        await popup.error(captions.lengtherror);
+        return(" ");
+    }
     var PromptForReason = await workflow.respond("reason");
 
     if (PromptForReason)

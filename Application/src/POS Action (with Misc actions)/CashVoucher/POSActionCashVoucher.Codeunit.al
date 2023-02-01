@@ -73,7 +73,9 @@ codeunit 6184633 "NPR POS Action: Cash Voucher" implements "NPR IPOS Workflow"
         VoucherType: Code[20];
         ReferenceNo: Text[50];
     begin
+# pragma warning disable AA0139
         VoucherType := Context.GetString('voucherType');
+# pragma warning restore
 
         Voucher.SetCurrentKey("Voucher Type");
         Voucher.SetRange("Voucher Type", VoucherType);
@@ -100,8 +102,10 @@ codeunit 6184633 "NPR POS Action: Cash Voucher" implements "NPR IPOS Workflow"
         VoucherListEnabled: Boolean;
     begin
         Context.GetBooleanParameter('EnableVoucherList', VoucherListEnabled);
+# pragma warning disable AA0139
         VoucherType := Context.GetString('voucherType');
         ReferenceNo := Context.GetString('VoucherRefNo');//is it scanned
+# pragma warning restore
         if ReferenceNo = '' then
             if VoucherListEnabled then
                 ReferenceNo := SetReferenceNo(Context);
@@ -133,8 +137,10 @@ codeunit 6184633 "NPR POS Action: Cash Voucher" implements "NPR IPOS Workflow"
         Success: Boolean;
     begin
         CommisionPercentage := Context.GetDecimalParameter('CommisionPercentage');
+# pragma warning disable AA0139
         VoucherType := Context.GetString('voucherType');
         GLAccount := Context.GetStringParameter('CommisionAccount');
+# pragma warning restore
 
         Success := CashVoucherB.InsertCommision(GLAccount, VoucherType, CommisionPercentage, PaymentLine, SaleLine);
         Response.Add('success', Success);
