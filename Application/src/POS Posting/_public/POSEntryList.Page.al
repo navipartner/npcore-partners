@@ -60,7 +60,7 @@
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
-                    Visible = not IsSimpleView;
+                    Visible = not _IsSimpleView;
                     ToolTip = 'Specifies POS Store from which the POS entry has been created.';
                     ApplicationArea = NPRRetail;
                 }
@@ -68,7 +68,7 @@
                 {
                     ToolTip = 'Specifies POS unit number that has been used for processing this transaction.';
                     ApplicationArea = NPRRetail;
-                    Visible = not IsSimpleView;
+                    Visible = not _IsSimpleView;
                 }
                 field("POS Period Register No."; Rec."POS Period Register No.")
                 {
@@ -78,13 +78,13 @@
                 }
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
-                    Visible = not IsSimpleView;
+                    Visible = not _IsSimpleView;
                     ToolTip = 'Specifies the code for a global dimension that is linked to the record or entry for analysis purposes';
                     ApplicationArea = NPRRetail;
                 }
                 field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                 {
-                    Visible = not IsSimpleView;
+                    Visible = not _IsSimpleView;
                     ToolTip = 'Specifies the code for a global dimension that is linked to the record or entry for analysis purposes. ';
                     ApplicationArea = NPRRetail;
                 }
@@ -109,7 +109,7 @@
                 {
                     ToolTip = 'Specifies the customer account number that the entry is linked to.';
                     ApplicationArea = NPRRetail;
-                    Visible = not IsSimpleView;
+                    Visible = not _IsSimpleView;
                 }
                 field(LastOpenSalesDocumentNo; LastOpenSalesDocumentNo)
                 {
@@ -730,7 +730,7 @@
                     PromotedIsBig = true;
                     PromotedOnly = true;
                     ToolTip = 'View all available fields. Fields not frequently used are currently hidden.';
-                    Visible = IsSimpleView;
+                    Visible = _IsSimpleView;
 
                     trigger OnAction()
                     begin
@@ -749,7 +749,7 @@
                     PromotedIsBig = true;
                     PromotedOnly = true;
                     ToolTip = 'Hide fields that are not frequently used.';
-                    Visible = NOT IsSimpleView;
+                    Visible = NOT _IsSimpleView;
 
                     trigger OnAction()
                     begin
@@ -1009,7 +1009,7 @@
         TextSalesDocNotFound: Label 'Sales Document %1 %2 not found.';
         LastOpenSalesDocumentNo: Code[20];
         LastPostedSalesDocumentNo: Code[20];
-        IsSimpleView: Boolean;
+        _IsSimpleView: Boolean;
 
     local procedure TryGetLastOpenSalesDoc(var POSEntrySalesDocLinkOut: Record "NPR POS Entry Sales Doc. Link"): Boolean
     begin
@@ -1062,14 +1062,14 @@
     var
         JournalUserPreferences: Record "Journal User Preferences";
     begin
-        IsSimpleView := true;
+        _IsSimpleView := true;
 
         JournalUserPreferences.SetFilter("User ID", '%1', UserSecurityId());
         JournalUserPreferences.SetRange("Page ID", PAGE::"NPR POS Entry List");
         if not JournalUserPreferences.FindFirst() then
             exit;
 
-        IsSimpleView := JournalUserPreferences."Is Simple View";
+        _IsSimpleView := JournalUserPreferences."Is Simple View";
     end;
 
     local procedure SetIsSimpleView(IsSimpleView: Boolean)
