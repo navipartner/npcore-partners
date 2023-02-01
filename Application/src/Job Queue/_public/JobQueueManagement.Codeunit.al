@@ -10,6 +10,9 @@
         JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
         JobTimeout: Duration;
+        NotifProfileCodeOnError: Code[20];
+        AutoRescheduleOnErrorDelaySec: Integer;
+        AutoRescheduleOnError: Boolean;
         ShowAutoCreatedClause: Boolean;
         ParamNameAndValueLbl: Label '%1=%2', Locked = true;
 
@@ -237,7 +240,10 @@
         if JobTimeout <> 0 then
             Parameters."Job Timeout" := JobTimeout;
 #ENDIF
-        Clear(JobTimeout);
+        Parameters."NPR Auto-Resched. after Error" := AutoRescheduleOnError;
+        Parameters."NPR Auto-Resched. Delay (sec.)" := AutoRescheduleOnErrorDelaySec;
+        Parameters."NPR Notif. Profile on Error" := NotifProfileCodeOnError;
+        ClearAdditionalParams();
 
         exit(InitRecurringJobQueueEntry(Parameters, JobQueueEntryOut));
     end;
@@ -301,6 +307,10 @@
         if Parameters."Job Timeout" <> 0 then
             JobQueueEntry."Job Timeout" := Parameters."Job Timeout";
 #ENDIF
+        JobQueueEntry."NPR Auto-Resched. after Error" := Parameters."NPR Auto-Resched. after Error";
+        JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := Parameters."NPR Auto-Resched. Delay (sec.)";
+        JobQueueEntry."NPR Notif. Profile on Error" := Parameters."NPR Notif. Profile on Error";
+
         OnBeforeInsertRecurringJobQueueEntry(JobQueueEntry);
         JobQueueEntry.Insert(true);
 
@@ -422,6 +432,7 @@
     begin
         Evaluate(NextRunDateFormula, '<1D>');
         SetJobTimeout(4, 0);  //4 hours
+        SetAutoRescheduleAndNotifyOnError(true, 2700, '');  //Reschedule to run again in 45 minutes on error
 
         if InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::codeunit,
@@ -521,6 +532,21 @@
     procedure SetJobTimeout(NewTimeout: Duration)
     begin
         JobTimeout := NewTimeout;
+    end;
+
+    procedure SetAutoRescheduleAndNotifyOnError(AutoReschedule: Boolean; AutoRescheduleDelaySec: Integer; NotifProfileCode: Code[20])
+    begin
+        AutoRescheduleOnError := AutoReschedule;
+        AutoRescheduleOnErrorDelaySec := AutoRescheduleDelaySec;
+        NotifProfileCodeOnError := NotifProfileCode;
+    end;
+
+    local procedure ClearAdditionalParams()
+    begin
+        Clear(JobTimeout);
+        Clear(AutoRescheduleOnError);
+        Clear(AutoRescheduleOnErrorDelaySec);
+        Clear(NotifProfileCodeOnError);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]

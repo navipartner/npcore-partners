@@ -89,6 +89,11 @@
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", 'NPRUpgradePriceLogTaskQue'));
         end;
 
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetAutoRescedulePOSPostGL')) then begin
+            SetAutoRescedulePOSPostGL();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetAutoRescedulePOSPostGL'));
+        end;
+
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -361,6 +366,20 @@
             until JobQueueEntry.Next() = 0;
     end;    
 #endif
+
+    local procedure SetAutoRescedulePOSPostGL()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR POS Post GL Entries JQ");
+        if JobQueueEntry.FindSet(true) then
+            repeat
+                JobQueueEntry."NPR Auto-Resched. after Error" := true;
+                JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 45 * 60;  //45 minutes
+                JobQueueEntry.Modify();
+            until JobQueueEntry.Next() = 0;
+    end;
 
     local procedure AssignJoqCategoryToTMRetentionJQ()
     var
