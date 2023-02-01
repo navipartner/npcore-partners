@@ -1,7 +1,12 @@
 {
     "name": "Global ruleset",
     "description": "These rules must be respected by all the AL code written within the company.",
-    "rules": [
+    "rules": [        
+        {
+            "id": "AA0072",
+            "action":"None",
+            "justification": "The name of variables and parameters must be suffixed with the type or object name."
+        },
         {
             "id": "AA0218",
             "action":"Error",
