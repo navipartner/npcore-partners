@@ -16,6 +16,16 @@
             Caption = 'Ticket No.';
             DataClassification = CustomerContent;
         }
+        field(11; TicketItemNumber; Code[20])
+        {
+            Caption = 'Ticket Item No.';
+            DataClassification = CustomerContent;
+        }
+        field(12; TicketVariantCode; Code[10])
+        {
+            Caption = 'Ticket Variant Code';
+            DataClassification = CustomerContent;
+        }
         field(20; TicketStatus; Enum "NPR TM Attendee Status")
         {
             Caption = 'Ticket Status';

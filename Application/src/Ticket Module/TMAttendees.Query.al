@@ -53,6 +53,13 @@
                     column(CustomerNumber; "Customer No.")
                     {
                     }
+                    column(ItemNo; "Item No.")
+                    {
+                    }
+                    column(VariantCode; "Variant Code")
+                    {
+
+                    }
 
                     DataItem(TicketReservationRequest; "NPR TM Ticket Reservation Req.")
                     {
