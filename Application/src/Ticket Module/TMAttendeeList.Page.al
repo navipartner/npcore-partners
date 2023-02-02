@@ -29,6 +29,16 @@
                     ToolTip = 'Specifies the value of the Ticket No. field';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
+                field(TicketItemNumber; Rec.TicketItemNumber)
+                {
+                    ToolTip = 'Specifies the value of the Ticket Item No. field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field(TicketVariantCode; Rec.TicketVariantCode)
+                {
+                    ToolTip = 'Specifies the value of the Ticket Variant Code. field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
                 field(TicketStatus; Rec.TicketStatus)
                 {
                     ToolTip = 'Specifies the value of the Ticket Status field';
@@ -156,6 +166,8 @@
             TempAttendeeBuffer.AdmissionCode := TicketReservationQuery.AdmissionCode;
             TempAttendeeBuffer.ScheduleCode := TicketReservationQuery.ScheduleCode;
             TempAttendeeBuffer.TicketNumber := TicketReservationQuery.ExternalTicketNo;
+            TempAttendeeBuffer.TicketItemNumber := TicketReservationQuery.ItemNo;
+            TempAttendeeBuffer.TicketVariantCode := TicketReservationQuery.VariantCode;
             TempAttendeeBuffer.MemberNumber := TicketReservationQuery.MemberNumber;
             TempAttendeeBuffer.OrderNumber := TicketReservationQuery.ExternalOrderNumber;
             TempAttendeeBuffer.CustomerNumber := TicketReservationQuery.CustomerNumber;
