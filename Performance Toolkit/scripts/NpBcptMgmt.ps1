@@ -1,7 +1,7 @@
 class NpBcptMgmt
 {
-    [string] $Username = "NPRetailPerformanceTest-558472@NPRetailPerformanceTest.onmicrosoft.com"
-    [string] $Password = "w!8gzMQU~)^t"
+    [string] $Username
+    [string] $Password
     [String] $TenantId
     [String] $SandboxName
     [String] $CompanyName
@@ -41,6 +41,21 @@ class NpBcptMgmt
     [string] GetInternalServiceUrl()
     {
         return "https://businesscentral.dynamics.com/$($this.TenantId)/$($this.SandboxName)?company=$([Uri]::EscapeDataString($this.CompanyName))"
+    }
+
+    [void] WaitForEnvironment()
+    {
+        $isReady = $false
+        Do {
+            $response = Invoke-RestMethod -UseBasicParsing -Method Get -Uri "https://businesscentral.dynamics.com/$($this.TenantId)/$($this.SandboxName)/deployment/url"
+            if ($response.status -eq "Ready") {
+                Write-Host "Environment '$($this.SandboxName)' is ready."
+                $isReady = $true
+            } else {
+                Write-Host "Waiting for environment '$($this.SandboxName)', status: $($response.status)" -NoNewline -ForegroundColor Red
+                Start-Sleep -Seconds 30
+            }
+        } while ($isReady -eq $false)
     }
 
     [Uri] GetApiBaseUrl()
