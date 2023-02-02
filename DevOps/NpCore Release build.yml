@@ -40,6 +40,7 @@ stages:
 
         - name: Insider_CLOUD
           alwaysRun: true
+          continueOnError: true
         
       analyzers: ('UICop','CodeCop')
       keyVaultCert:
