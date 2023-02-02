@@ -54,6 +54,11 @@ $npBcptMgmt = Join-Path $PSScriptRoot "NpBcptMgmt.ps1"
 
 $bcptMgmt = [NpBcptMgmt]::new($Username, $Password, $TenantId, $SandboxName, $CompanyName, $ClientId, $aadActiveDirectoryPath)
 
+# Wait for environment, in case it's not ready
+Write-Host "Check environment status" -ForegroundColor Green
+$bcptMgmt.WaitForEnvironment()
+Write-Host ""
+
 $internalServiceUrl = $bcptMgmt.GetInternalServiceUrl()
 Write-Host "Using internal Service Url:" -ForegroundColor Green
 Write-Host "$($internalServiceUrl) `r`n"
