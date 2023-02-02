@@ -766,7 +766,7 @@
             UsingPeriod := false;
 
         if UsingPeriod then begin
-            if PAGE.RunModal(6060102, tblPeriode) = ACTION::LookupOK then begin
+            if PAGE.RunModal(Page::"NPR Periodes", tblPeriode) = ACTION::LookupOK then begin
                 Rec."Period Start" := tblPeriode."Start Date";
                 Rec."Period End" := tblPeriode."End Date";
                 DateFilter := StrSubstNo(DateFilterLbl, Rec."Period Start", Rec."Period End");
