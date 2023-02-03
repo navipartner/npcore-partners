@@ -23,19 +23,19 @@
                     {
 
                         ShowMandatory = true;
-                        ToolTip = 'Specifies the value of the Code field';
+                        ToolTip = 'Specifies the unique code for coupon.';
                         ApplicationArea = NPRRetail;
                     }
                     field(Description; Rec.Description)
                     {
 
-                        ToolTip = 'Specifies the value of the Description field';
+                        ToolTip = 'Specifies the short description of a coupon.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Discount Type"; Rec."Discount Type")
                     {
 
-                        ToolTip = 'Specifies the value of the Discount Type field';
+                        ToolTip = 'You can choose between two methods of conveying discounts - Discount amount or Discount %.';
                         ApplicationArea = NPRRetail;
                     }
                     group(Control6014439)
@@ -46,7 +46,7 @@
                         {
 
                             ShowMandatory = true;
-                            ToolTip = 'Specifies the value of the Discount Amount field';
+                            ToolTip = 'Specifies the amount that will be on the coupon.';
                             ApplicationArea = NPRRetail;
                         }
                     }
@@ -58,13 +58,13 @@
                         {
 
                             ShowMandatory = true;
-                            ToolTip = 'Specifies the value of the Discount % field';
+                            ToolTip = 'Specifies the discount percentage that the customer gets with the coupon.';
                             ApplicationArea = NPRRetail;
                         }
                         field("Max. Discount Amount"; Rec."Max. Discount Amount")
                         {
 
-                            ToolTip = 'Max. Discount Amount per Sale';
+                            ToolTip = 'Specifies the maximum amount on which the discount will be calculated.';
                             ApplicationArea = NPRRetail;
                         }
                     }
@@ -74,25 +74,25 @@
                     ShowCaption = false;
                     field("POS Store Group"; Rec."POS Store Group")
                     {
-                        ToolTip = 'Specifies the group of POS Stores where Coupon can be used.';
+                        ToolTip = 'Specifies the group of POS Stores where the coupon can be used.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Coupon Qty. (Open)"; Rec."Coupon Qty. (Open)")
                     {
 
-                        ToolTip = 'Specifies the value of the Coupon Qty. (Open) field';
+                        ToolTip = 'Specifies the number of open coupons.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Arch. Coupon Qty."; Rec."Arch. Coupon Qty.")
                     {
 
-                        ToolTip = 'Specifies the value of the Arch. Coupon Qty. field';
+                        ToolTip = 'Specifies the number of archived coupons.';
                         ApplicationArea = NPRRetail;
                     }
                     field(Enabled; Rec.Enabled)
                     {
 
-                        ToolTip = 'Specifies the value of the Enabled field';
+                        ToolTip = 'Enable if the coupon is in use.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -106,7 +106,7 @@
                     field("Issue Coupon Module"; Rec."Issue Coupon Module")
                     {
 
-                        ToolTip = 'Specifies the value of the Issue Coupon Module field';
+                        ToolTip = 'Specifies whether the coupon is issued manually, automatically (during a sale) or when a member has accumulated enough points for it.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
@@ -127,19 +127,19 @@
                     {
 
                         ShowMandatory = true;
-                        ToolTip = '[S] ~ Coupon No. [AN] ~ Random Char [AN*3] ~ 3 Random Chars';
+                        ToolTip = 'Specifies the pattern used to create the coupon external number, which will later be scanned ([S] ~ Coupon No. [AN] ~ Random Char [AN*3] ~ 3 Random Chars).';
                         ApplicationArea = NPRRetail;
                     }
                     field("Customer No."; Rec."Customer No.")
                     {
 
                         Caption = 'Customer No.';
-                        ToolTip = 'Specifies the value of the Customer No. field';
+                        ToolTip = 'Specifies the number used for making the coupon tracking easier for a customer.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Object Type"; Rec."Print Object Type")
                     {
-                        ToolTip = 'Specifies the print object type for the voucher type';
+                        ToolTip = 'Specifies the template which will be printed for the coupon.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
@@ -156,13 +156,13 @@
                     field("Print Template Code"; Rec."Print Template Code")
                     {
                         Enabled = PrintUsingTemplate;
-                        ToolTip = 'Specifies the value of the Print Template Code field';
+                        ToolTip = 'Specifies the template which will be printed for the coupon.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print on Issue"; Rec."Print on Issue")
                     {
 
-                        ToolTip = 'Specifies the value of the Print on Issue field';
+                        ToolTip = 'Specifies if the coupon is printed automatically after being issued.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -176,7 +176,7 @@
                     field("Validate Coupon Module"; Rec."Validate Coupon Module")
                     {
 
-                        ToolTip = 'Specifies the value of the Validate Coupon Module field';
+                        ToolTip = 'Specifies how the coupon validation is performed.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
@@ -191,24 +191,24 @@
                     field("Starting Date"; Rec."Starting Date")
                     {
 
-                        ToolTip = 'Specifies the value of the Starting Date field';
+                        ToolTip = 'Specifies the date from which the coupon becomes valid.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Starting Date Formula"; Rec."Starting Date DateFormula")
                     {
 
-                        ToolTip = 'Specifies the value of the Starting Date Formula  field.';
+                        ToolTip = 'Specifies the date until which the coupon is valid.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Ending Date"; Rec."Ending Date")
                     {
 
-                        ToolTip = 'Specifies the value of the Ending Date Formula field';
+                        ToolTip = 'Specifies the formula which calculates the date from which the coupon becomes valid.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Ending Date Formula"; Rec."Ending Date DateFormula")
                     {
-                        ToolTip = 'Specifies the value of the Ending Date Formula field.';
+                        ToolTip = 'Specifies the formula which calculates the date until which the coupon is valid..';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -222,7 +222,7 @@
                     field("Apply Discount Module"; Rec."Apply Discount Module")
                     {
 
-                        ToolTip = 'Specifies the value of the Apply Discount Module field';
+                        ToolTip = 'Specifies the discount module which will be used. A coupon can be given according to settings on the coupon itself, according to settings set on the Items list, ';
                         ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
@@ -243,20 +243,20 @@
                     field("Max Use per Sale"; Rec."Max Use per Sale")
                     {
 
-                        ToolTip = 'Specifies the value of the Max Use per Sale field';
+                        ToolTip = 'Specifies the maximum number of coupon uses per sale.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Multi-Use Coupon"; Rec."Multi-Use Coupon")
                     {
 
-                        ToolTip = 'Specifies the value of the Multi-Use Coupon field';
+                        ToolTip = 'Specifies if the coupon can be used more than once this field needs to be checked.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Multi-Use Qty."; Rec."Multi-Use Qty.")
                     {
 
                         Caption = 'Multi-Use Qty.';
-                        ToolTip = 'Specifies the value of the Multi-Use Qty. field';
+                        ToolTip = 'Specifies the number of times a customer is allowed to use the coupon.';
                         ApplicationArea = NPRRetail;
                     }
                 }

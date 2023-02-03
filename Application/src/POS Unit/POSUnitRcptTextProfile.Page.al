@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Unit Receipt Text Profile';
+    ContextSensitiveHelpPage = 'retail/pos_profiles/reference/POS_unit_Receipt_profile.html';
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR POS Unit Rcpt.Txt Profile";
@@ -24,7 +25,7 @@
 
                     ToolTip = 'Specifies the short description of a profile.';
                     ApplicationArea = NPRRetail;
-                }                              
+                }
             }
             part(TicketRcptTextLines; "NPR POS Ticket Rcpt. Text")
             {
@@ -33,7 +34,7 @@
                 SubPageLink = "Rcpt. Txt. Profile Code" = FIELD(Code);
                 ApplicationArea = NPRRetail;
             }
-        }        
-    }    
+        }
+    }
 }
 
