@@ -36,18 +36,25 @@ codeunit 6060028 "NPR NpDc Module Issue GS1"
         Coupon: Record "NPR NpDc Coupon";
         DiscountAmount: Decimal;
         DiscountType: Option "Discount Amount","Discount %";
+        ReferenceNumber: Text[50];
+        TooLongErr: Label 'Maximal length of %1 can be %2 characters', Comment = '%1 Reference No. caption, %2 length of Reference No.';
     begin
-        if not IsGS1Coupon(ReferenceNo, DiscountAmount, DiscountType) then
+        if StrLen(ReferenceNo) > MaxStrLen(Coupon."Reference No.") then
+            Error(TooLongErr, Coupon.FieldCaption("Reference No."), MaxStrLen(Coupon."Reference No."));
+
+        ReferenceNumber := CopyStr(ReferenceNo, 1, MaxStrLen(ReferenceNumber));
+
+        if not IsGS1Coupon(ReferenceNumber, DiscountAmount, DiscountType) then
             exit;
 
 
         if not GetGS1CouponType(CouponType, DiscountType) then
             CreateGS1CouponType(CouponType, DiscountType);
 
-        if FindCoupon(ReferenceNo, Coupon) then
+        if FindCoupon(ReferenceNumber, Coupon) then
             IssueCouponQty(Coupon)
         else
-            IssueGS1Coupon(ReferenceNo, CouponType, DiscountAmount);
+            IssueGS1Coupon(ReferenceNumber, CouponType, DiscountAmount);
     end;
 
     local procedure GetGS1CouponType(var CouponType: Record "NPR NpDc Coupon Type"; DiscountType: Option): Boolean
@@ -72,10 +79,11 @@ codeunit 6060028 "NPR NpDc Module Issue GS1"
         CouponType.Insert();
     end;
 
-    local procedure IssueGS1Coupon(ReferenceNo: Text; CouponType: Record "NPR NpDc Coupon Type"; DiscountAmount: Decimal)
+    local procedure IssueGS1Coupon(ReferenceNo: Text[50]; CouponType: Record "NPR NpDc Coupon Type"; DiscountAmount: Decimal)
     var
         Coupon: Record "NPR NpDc Coupon";
     begin
+
         Coupon.Init();
         Coupon."Reference No." := ReferenceNo;
         Coupon.Validate("Coupon Type", CouponType.Code);
@@ -89,7 +97,7 @@ codeunit 6060028 "NPR NpDc Module Issue GS1"
         IssueCouponQty(Coupon);
     end;
 
-    local procedure IsGS1Coupon(ReferenceNo: Text; var DiscountAmount: Decimal; var DiscountType: Option): Boolean
+    local procedure IsGS1Coupon(ReferenceNo: Text[50]; var DiscountAmount: Decimal; var DiscountType: Option): Boolean
     begin
         if StrLen(ReferenceNo) > 23 then
             exit(ParseComplex(ReferenceNo, DiscountAmount, DiscountType))
@@ -152,7 +160,7 @@ codeunit 6060028 "NPR NpDc Module Issue GS1"
         exit(true);
     end;
 
-    local procedure FindCoupon(ReferenceNo: Text; var Coupon: Record "NPR NpDc Coupon"): Boolean
+    local procedure FindCoupon(ReferenceNo: Text[50]; var Coupon: Record "NPR NpDc Coupon"): Boolean
     begin
         Coupon.SetRange("Reference No.", ReferenceNo);
         exit(Coupon.FindFirst());
