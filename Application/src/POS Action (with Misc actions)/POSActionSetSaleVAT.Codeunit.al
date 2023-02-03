@@ -1,170 +1,72 @@
-﻿codeunit 6150842 "NPR POS Action - Set Sale VAT"
+﻿codeunit 6150842 "NPR POS Action - Set Sale VAT" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
-        ActionDescription: Label 'Action for changing VAT Business Posting Group of active sale.';
-        ConfirmTitle: Label 'Confirm VAT';
+        VATBusinessPostingGroup: Record "VAT Business Posting Group";
+        ActionDescriptionLbl: Label 'Action for changing VAT Business Posting Group of active sale.';
+        CommentLine_DescLbl: Label 'Add Comment Line';
+        ConfirmDialog_DescLbl: Label 'Confirm Dialog';
         ConfirmLead: Label 'Switch %1 on active sale?';
-        ERROR_MINAMOUNT: Label 'Sale amount is below the minimum limit';
-        ERROR_MAXAMOUNT: Label 'Sale amount is above the maximum limit';
-        COMMENT_VATADDED: Label 'VAT added to sale';
-        COMMENT_VATREMOVED: Label 'VAT removed from sale';
-
-    local procedure ActionCode(): Code[20]
+        ConfirmTitle: Label 'Confirm VAT';
+        GenPostingGr_CaptLbl: Label 'Gen. Bus. Posting Group';
+        GenPostingGr_DescLbl: Label 'Specify Gen. Bus. Posting Group';
+        MaxSaleAmtLimit_CaptLbl: Label 'Maximum Sale Amount Limit';
+        MaxSaleAmtLimit_DescLbl: Label 'Specify Maximum Sale Amount Limit';
+        MaxSalesAmount_CaptLbl: Label 'Maximum Sale Amount';
+        MaxSalesAmount_DescLbl: Label 'Specify Maximum Sale Amount';
+        MinSaleAmtLimit_CaptLbl: Label 'Minimum Sale Amount Limit';
+        MinSaleAmtLimit_DescLbl: Label 'Specify Minimum Sale Amount Limit';
+        MinSalesAmount_CaptLbl: Label 'Minimum Sale Amount';
+        MinSalesAmount_DescLbl: Label 'Specify Minimum Sale Amount';
+        VatBusPostingGr_CaptLbl: Label 'VAT Bus. Posting Group';
     begin
-        exit('SET_SALE_VAT');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
+
+        WorkflowConfig.AddBooleanParameter('MinimumSaleAmountLimit', false, MinSaleAmtLimit_CaptLbl, MinSaleAmtLimit_DescLbl);
+        WorkflowConfig.AddDecimalParameter('MinimumSaleAmount', 0, MinSalesAmount_CaptLbl, MinSalesAmount_DescLbl);
+        WorkflowConfig.AddBooleanParameter('MaximumSaleAmountLimit', false, MaxSaleAmtLimit_CaptLbl, MaxSaleAmtLimit_DescLbl);
+        WorkflowConfig.AddDecimalParameter('MaximumSaleAmount', 0, MaxSalesAmount_CaptLbl, MaxSalesAmount_DescLbl);
+        WorkflowConfig.AddBooleanParameter('AddCommentLine', false, CommentLine_DescLbl, CommentLine_DescLbl);
+        WorkflowConfig.AddBooleanParameter('ConfirmDialog', true, ConfirmDialog_DescLbl, ConfirmDialog_DescLbl);
+        WorkflowConfig.AddTextParameter('GenBusPostingGroup', '', GenPostingGr_CaptLbl, GenPostingGr_DescLbl);
+        WorkflowConfig.AddTextParameter('VATBusPostingGroup', '', VatBusPostingGr_CaptLbl, VatBusPostingGr_CaptLbl);
+
+        WorkflowConfig.AddLabel('confirmTitle', ConfirmTitle);
+        WorkflowConfig.AddLabel('confirmLead', StrSubstNo(ConfirmLead, VATBusinessPostingGroup.TableCaption));
     end;
 
-    local procedure ActionVersion(): Text[30]
+    local procedure GetActionScript(): Text
     begin
-        exit('1.1');
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionSetSaleVAT.js###
+'let main=async({workflow:a,parameters:n,popup:r,captions:i})=>{n.ConfirmDialog&&!await r.confirm({title:i.confirmTitle,caption:i.confirmLead})||await a.respond()};'
+          );
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-          ActionCode(),
-          ActionDescription,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-
-            Sender.RegisterWorkflowStep('changeVAT', 'if (param.ConfirmDialog) { confirm(labels.confirmTitle, labels.confirmLead).respond(); } else { respond(); }');
-            Sender.RegisterWorkflow(false);
-
-            Sender.RegisterBooleanParameter('MinimumSaleAmountLimit', false);
-            Sender.RegisterDecimalParameter('MinimumSaleAmount', 0);
-            Sender.RegisterBooleanParameter('MaximumSaleAmountLimit', false);
-            Sender.RegisterDecimalParameter('MaximumSaleAmount', 0);
-            Sender.RegisterBooleanParameter('AddCommentLine', false);
-            Sender.RegisterBooleanParameter('ConfirmDialog', true);
-            Sender.RegisterTextParameter('GenBusPostingGroup', '');
-            Sender.RegisterTextParameter('VATBusPostingGroup', '');
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup");
     var
-        VATBusinessPostingGroup: Record "VAT Business Posting Group";
-    begin
-        Captions.AddActionCaption(ActionCode(), 'confirmTitle', ConfirmTitle);
-        Captions.AddActionCaption(ActionCode(), 'confirmLead', StrSubstNo(ConfirmLead, VATBusinessPostingGroup.TableCaption));
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        VATBusPostingGroup: Text;
-        GenBusPostingGroup: Text;
-        MinSaleAmountLimit: Boolean;
-        MaxSaleAmountLimit: Boolean;
-        MinSaleAmount: Decimal;
-        MaxSaleAmount: Decimal;
+        SetSaleVatB: Codeunit "NPR POS Action-Set Sale VAT-B.";
         AddCommentLine: Boolean;
+        MaxSaleAmountLimit: Boolean;
+        MinSaleAmountLimit: Boolean;
+        MaxSaleAmount: Decimal;
+        MinSaleAmount: Decimal;
+        GenBusPostingGroup: Text;
+        VATBusPostingGroup: Text;
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
+        MinSaleAmountLimit := Context.GetBooleanParameter('MinimumSaleAmountLimit');
+        MinSaleAmount := Context.GetDecimalParameter('MinimumSaleAmount');
+        MaxSaleAmountLimit := Context.GetBooleanParameter('MaximumSaleAmountLimit');
+        MaxSaleAmount := Context.GetDecimalParameter('MaximumSaleAmount');
+        AddCommentLine := Context.GetBooleanParameter('AddCommentLine');
+        GenBusPostingGroup := Context.GetStringParameter('GenBusPostingGroup');
+        VATBusPostingGroup := Context.GetStringParameter('VATBusPostingGroup');
 
-        Handled := true;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        MinSaleAmountLimit := JSON.GetBooleanParameterOrFail('MinimumSaleAmountLimit', ActionCode());
-        MinSaleAmount := JSON.GetDecimalParameterOrFail('MinimumSaleAmount', ActionCode());
-        MaxSaleAmountLimit := JSON.GetBooleanParameterOrFail('MaximumSaleAmountLimit', ActionCode());
-        MaxSaleAmount := JSON.GetDecimalParameterOrFail('MaximumSaleAmount', ActionCode());
-        AddCommentLine := JSON.GetBooleanParameterOrFail('AddCommentLine', ActionCode());
-        GenBusPostingGroup := JSON.GetStringParameterOrFail('GenBusPostingGroup', ActionCode());
-        VATBusPostingGroup := JSON.GetStringParameterOrFail('VATBusPostingGroup', ActionCode());
-
-        CheckLimits(POSSession, MinSaleAmount, MinSaleAmountLimit, MaxSaleAmount, MaxSaleAmountLimit);
-        ChangeSaleVATBusPostingGroup(POSSession, GenBusPostingGroup, VATBusPostingGroup, AddCommentLine);
-    end;
-
-    local procedure CheckLimits(POSSession: Codeunit "NPR POS Session"; MinSaleAmount: Decimal; MinSaleAmountLimit: Boolean; MaxSaleAmount: Decimal; MaxSaleAmountLimit: Boolean)
-    var
-        POSSale: Codeunit "NPR POS Sale";
-        SalesAmount: Decimal;
-        PaidAmount: Decimal;
-        ChangeAmount: Decimal;
-        RoundingAmount: Decimal;
-    begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetTotals(SalesAmount, PaidAmount, ChangeAmount, RoundingAmount);
-
-        if MinSaleAmountLimit and (SalesAmount < MinSaleAmount) then
-            Error('%1 (%2)', ERROR_MINAMOUNT, MinSaleAmount);
-
-        if MaxSaleAmountLimit and (SalesAmount > MaxSaleAmount) then
-            Error('%1 (%2)', ERROR_MAXAMOUNT, MaxSaleAmount);
-    end;
-
-    local procedure InsertComment(POSSaleLine: Codeunit "NPR POS Sale Line"; VATAmountDifference: Decimal)
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-        SaleLinePOSDescLbl: Label '%1: %2', Locked = true;
-    begin
-        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
-
-        if VATAmountDifference = 0 then
-            exit
-        else
-            if VATAmountDifference > 0 then
-                SaleLinePOS.Description := StrSubstNo(SaleLinePOSDescLbl, COMMENT_VATREMOVED, VATAmountDifference)
-            else
-                SaleLinePOS.Description := StrSubstNo(SaleLinePOSDescLbl, COMMENT_VATADDED, VATAmountDifference);
-
-        POSSaleLine.InsertLine(SaleLinePOS);
-    end;
-
-    local procedure ChangeSaleVATBusPostingGroup(POSSession: Codeunit "NPR POS Session"; NewGenBusPostingGroup: Text; NewVATBusPostingGroup: Text; AddCommentLine: Boolean)
-    var
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
-        GenBusinessPostingGroup: Record "Gen. Business Posting Group";
-        VATBusinessPostingGroup: Record "VAT Business Posting Group";
-        OldVATTotal: Decimal;
-        NewVATTotal: Decimal;
-    begin
-        if NewGenBusPostingGroup <> '' then
-            GenBusinessPostingGroup.Get(NewGenBusPostingGroup);
-        VATBusinessPostingGroup.Get(NewVATBusPostingGroup);
-
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if SaleLinePOS.FindSet() then
-            repeat
-                OldVATTotal += (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);
-                if (NewGenBusPostingGroup <> '') and (SaleLinePOS."Gen. Bus. Posting Group" <> GenBusinessPostingGroup.Code) then
-                    SaleLinePOS.Validate("Gen. Bus. Posting Group", NewGenBusPostingGroup);
-                if (NewVATBusPostingGroup <> '') and (SaleLinePOS."VAT Bus. Posting Group" <> VATBusinessPostingGroup.Code) then
-                    SaleLinePOS.Validate("VAT Bus. Posting Group", NewVATBusPostingGroup);
-                SaleLinePOS.UpdateVATSetup();
-                SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
-                SaleLinePOS.UpdateAmounts(SaleLinePOS);
-                SaleLinePOS.Modify();
-                NewVATTotal += (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);
-            until SaleLinePOS.Next() = 0;
-        if (NewGenBusPostingGroup <> '') and (SalePOS."Gen. Bus. Posting Group" <> GenBusinessPostingGroup.Code) then
-            SalePOS.Validate("Gen. Bus. Posting Group", NewGenBusPostingGroup);
-        SalePOS.Validate("VAT Bus. Posting Group", VATBusinessPostingGroup.Code);
-        POSSale.Refresh(SalePOS);
-        POSSale.Modify(true, false);
-
-        if AddCommentLine then
-            InsertComment(POSSaleLine, OldVATTotal - NewVATTotal);
-
-        POSSaleLine.RefreshCurrent();
-        POSSession.RequestRefreshData();
+        SetSaleVatB.CheckLimits(Sale, MinSaleAmount, MinSaleAmountLimit, MaxSaleAmount, MaxSaleAmountLimit);
+        SetSaleVatB.ChangeSaleVATBusPostingGroup(Sale, SaleLine, GenBusPostingGroup, VATBusPostingGroup, AddCommentLine);
     end;
 }
 
