@@ -46,9 +46,9 @@ codeunit 6014471 "NPR Webservice Install"
 
     local procedure InitM2AccountWebService()
     var
-        M2AccountWebService: Codeunit "NPR M2 Account WebService";
+        M2AccountManager: Codeunit "NPR M2 Account Manager";
     begin
-        M2AccountWebService.InitM2AccountWebService();
+        M2AccountManager.InitM2AccountWebService();
     end;
 
     local procedure InitMagentoWebservice()
