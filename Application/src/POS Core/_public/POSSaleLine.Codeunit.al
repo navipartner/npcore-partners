@@ -314,6 +314,22 @@
         POSSale.RefreshCurrent();
     end;
 
+    procedure SetLocation(LocationCode: Code[10])
+    var
+        POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+    begin
+        RefreshCurrent();
+        OnBeforeSetLocation(Rec, LocationCode);
+
+        xRec := Rec;
+        Rec.Validate("Location Code", LocationCode);
+        Rec.Modify(true);
+        POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(Rec, xRec);
+        OnAfterSetLocation(Rec);
+
+        POSSale.RefreshCurrent();
+    end;
+
     procedure SetDescription(NewDescription: Text)
     begin
         RefreshCurrent();
@@ -525,12 +541,22 @@
     end;
 
     [IntegrationEvent(true, false)]
+    procedure OnAfterSetLocation(var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
     internal procedure OnBeforeSetQuantity(var SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
     begin
     end;
 
     [IntegrationEvent(true, false)]
     internal procedure OnBeforeSetUoM(var SaleLinePOS: Record "NPR POS Sale Line"; var UoM: Code[10])
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    internal procedure OnBeforeSetLocation(var SaleLinePOS: Record "NPR POS Sale Line"; var Location: Code[10])
     begin
     end;
     //--- POS Sales Workflow ---
