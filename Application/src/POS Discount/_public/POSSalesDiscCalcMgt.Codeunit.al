@@ -221,13 +221,13 @@
 
                 if POSSaleTaxCalc.Find(POSSaleTax, SaleLinePOS.SystemId) then
                     if POSSaleTax."Calculated Amount Excl. Tax" = 0 then
-                        POSSaleTaxCalc.DeleteAllLines(POSSaleTax); 
-                
+                        POSSaleTaxCalc.DeleteAllLines(POSSaleTax);
+
                 SaleLinePOS.CreateDim(
                   NPRDimMgt.LineTypeToTableNPR(SaleLinePOS."Line Type"), SaleLinePOS."No.",
                   NPRDimMgt.DiscountTypeToTableNPR(SaleLinePOS."Discount Type"), SaleLinePOS."Discount Code",
-                  DATABASE::"NPR NPRE Seating", SaleLinePOS."NPRE Seating Code",
-                  0, '');
+                  Database::"NPR NPRE Seating", SaleLinePOS."NPRE Seating Code",
+                  Database::"Responsibility Center", SaleLinePOS."Responsibility Center");
                 SaleLinePOS.Modify();
             end;
         until TempSaleLinePOS.Next() = 0;

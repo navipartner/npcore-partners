@@ -309,6 +309,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
                     PaymentLine."VAT Base Amount" := -POSEntryPaymentLines."VAT Base Amount (LCY)";
                 PaymentLine."Line Type" := PaymentLine."Line Type"::"POS Payment";
                 PaymentLine."Location Code" := SalePOS."Location Code";
+                PaymentLine."Responsibility Center" := POSEntryPaymentLines."Responsibility Center";
                 PaymentLine."VAT Bus. Posting Group" := POSEntryPaymentLines."VAT Bus. Posting Group";
                 PaymentLine."VAT Prod. Posting Group" := POSEntryPaymentLines."VAT Prod. Posting Group";
                 PaymentLine.Description := POSEntryPaymentLines.Description;

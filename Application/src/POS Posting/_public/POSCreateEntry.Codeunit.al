@@ -178,6 +178,7 @@
         POSEntry."Prices Including VAT" := POSSale."Prices Including VAT";
         POSEntry."NPRE Number of Guests" := POSSale."NPRE Number of Guests";
         POSEntry."External Document No." := POSSale."External Document No.";
+        POSEntry."Responsibility Center" := POSSale."Responsibility Center";
 
         OnBeforeInsertPOSEntry(POSSale, POSEntry);
 
@@ -230,6 +231,7 @@
         POSEntrySalesLine."Document No." := POSSaleLine."Sales Ticket No.";
         POSEntrySalesLine."Customer No." := POSSale."Customer No.";
         POSEntrySalesLine."Salesperson Code" := POSSale."Salesperson Code";
+        POSEntrySalesLine."Responsibility Center" := POSSaleLine."Responsibility Center";
 
         case POSSaleLine."Line Type" of
             POSSaleLine."Line Type"::Item:
@@ -388,6 +390,7 @@
         POSEntryPaymentLine."POS Store Code" := POSSale."POS Store Code";
         POSEntryPaymentLine."POS Unit No." := POSSaleLine."Register No.";
         POSEntryPaymentLine."Document No." := POSSaleLine."Sales Ticket No.";
+        POSEntryPaymentLine."Responsibility Center" := POSSaleLine."Responsibility Center";
 
 #pragma warning disable AA0139
         if (not POSPaymentMethod.Get(POSSaleLine."No.")) then
@@ -795,6 +798,7 @@
         POSEntry."POS Period Register No." := POSPeriodRegister."No.";
         POSEntry."POS Store Code" := GetStoreNoForUnitNo(POSUnitNo);
         POSEntry."POS Unit No." := POSUnitNo;
+        POSEntry."Responsibility Center" := GetResponsibilityCenterForStoreCode(POSEntry."POS Store Code");
 
         POSEntry."Entry Date" := Today();
         POSEntry."Starting Time" := Time;
@@ -1028,10 +1032,16 @@
     var
         POSUnit: Record "NPR POS Unit";
     begin
+        if (POSUnit.Get(POSUnitNo)) then
+            exit(POSUnit."POS Store Code");
+    end;
 
-        if (POSUnit.Get(POSUnitNo)) then;
-
-        exit(POSUnit."POS Store Code");
+    local procedure GetResponsibilityCenterForStoreCode(POSStoreCode: Code[10]): Code[10]
+    var
+        POSStore: Record "NPR POS Store";
+    begin
+        if POSStore.Get(POSStoreCode) then
+            exit(POSStore."Responsibility Center");
     end;
 
 

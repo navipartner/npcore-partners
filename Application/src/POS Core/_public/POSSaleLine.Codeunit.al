@@ -67,6 +67,7 @@
         Rec."Sales Ticket No." := Sale."Sales Ticket No.";
         Rec.Date := Sale.Date;
         Rec."Line Type" := Rec."Line Type"::Item;
+        Rec."Responsibility Center" := Sale."Responsibility Center";
 
         Setup.GetPOSStore(POSStore);
         Rec."Location Code" := POSStore."Location Code";

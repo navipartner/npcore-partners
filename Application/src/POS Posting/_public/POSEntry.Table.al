@@ -513,6 +513,13 @@
             DataClassification = CustomerContent;
             TableRelation = Contact;
         }
+        field(5700; "Responsibility Center"; Code[10])
+        {
+            Caption = 'Responsibility Center';
+            Editable = false;
+            DataClassification = CustomerContent;
+            TableRelation = "Responsibility Center";
+        }
         field(6000; "Images Exist"; Boolean)
         {
             Caption = 'Images Exist';

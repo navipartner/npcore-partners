@@ -53,6 +53,7 @@
         SaleLinePOS."Line No." := GetLastLineNo(SalePOS) + 10000;
         SaleLinePOS.Insert(true);
         SaleLinePOS."Location Code" := SalePOS."Location Code";
+        SaleLinePOS."Responsibility Center" := SalePOS."Responsibility Center";
         SaleLinePOS.Reference := SalePOS.Reference;
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"POS Payment";
         SaleLinePOS."No." := NoIn;
@@ -110,7 +111,7 @@
                 TotalAmount := TotalAmount + SaleLinePOS."Amount Including VAT";
             until SaleLinePOS.Next() = 0;
 
-        SaleLinePOS.SetFilter("Line Type", '%1|%2', SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type"::"Item Category", SaleLinePOS."Line Type"::"BOM List", SaleLinePOS."Line Type"::"Customer Deposit",SaleLinePOS."Line Type"::"Issue Voucher");
+        SaleLinePOS.SetFilter("Line Type", '%1|%2', SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type"::"Item Category", SaleLinePOS."Line Type"::"BOM List", SaleLinePOS."Line Type"::"Customer Deposit", SaleLinePOS."Line Type"::"Issue Voucher");
         if SaleLinePOS.FindSet() then
             repeat
                 TotalAmount := TotalAmount + SaleLinePOS."Amount Including VAT";

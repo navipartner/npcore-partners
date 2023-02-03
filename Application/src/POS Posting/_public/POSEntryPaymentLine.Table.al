@@ -298,6 +298,13 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(5700; "Responsibility Center"; Code[10])
+        {
+            Caption = 'Responsibility Center';
+            Editable = false;
+            DataClassification = CustomerContent;
+            TableRelation = "Responsibility Center";
+        }
     }
 
     keys
