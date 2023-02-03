@@ -7,6 +7,7 @@
     // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
 
     Caption = 'Client Attribute Card';
+    ContextSensitiveHelpPage = 'retail/attributes/reference/client_attribute.html';
     PageType = Card;
     SourceTable = "NPR Attribute";
     UsageCategory = None;
@@ -20,85 +21,85 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the unique code that is used to identify a client attribute.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies additional information about this client attribute.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
 
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the name of the attribute.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Code Caption"; Rec."Code Caption")
                 {
 
-                    ToolTip = 'Specifies the value of the Code Caption field';
+                    ToolTip = 'Specifies the name which will be displayed on the page as a caption.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Filter Caption"; Rec."Filter Caption")
                 {
 
-                    ToolTip = 'Specifies the value of the Filter Caption field';
+                    ToolTip = 'Specifies the filter caption which will be displayed on the page.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
 
-                    ToolTip = 'Specifies the value of the Blocked field';
+                    ToolTip = '	Block the attribute if you don''t want it to be referenced.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Global; Rec.Global)
                 {
 
-                    ToolTip = 'Specifies the value of the Global field';
+                    ToolTip = 'Specifies whether the attribute can be used globally.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Value Datatype"; Rec."Value Datatype")
                 {
 
-                    ToolTip = 'Specifies the value of the Value Datatype field';
+                    ToolTip = 'Specifies the data format that the attribute will be displayed as (e.g. integer, Boolean).';
                     ApplicationArea = NPRRetail;
                 }
                 field("On Validate"; Rec."On Validate")
                 {
 
-                    ToolTip = 'Specifies the value of the On Validate field';
+                    ToolTip = 'The validation is used when there is a set of values that needs to be displayed, and if Value Datatype is set to Code. Otherwise, this field isn''t used. The selected or input data is validated against a set of values that can be in an existing table or predefined in the Client Attribute Value Lookup page.';
                     ApplicationArea = NPRRetail;
                 }
                 field("On Format"; Rec."On Format")
                 {
 
-                    ToolTip = 'Specifies the value of the On Format field';
+                    ToolTip = 'Specifies the selected format. You can choose between Native, User''s Culture, and Custom.';
                     ApplicationArea = NPRRetail;
                 }
                 field("LookUp Table"; Rec."LookUp Table")
                 {
 
-                    ToolTip = 'LookUp Table overide manual set lookup value.';
+                    ToolTip = 'The lookup table is enabled if we want to use the values from an existing table.';
                     ApplicationArea = NPRRetail;
                 }
                 field("LookUp Table Id"; Rec."LookUp Table Id")
                 {
 
-                    ToolTip = 'Specifies the value of the LookUp Table Id field';
+                    ToolTip = 'When we''re using an existing table for lookup values, we can define which one it will be by providing its ID.';
                     ApplicationArea = NPRRetail;
                 }
                 field("LookUp Table Name"; Rec."LookUp Table Name")
                 {
 
-                    ToolTip = 'Specifies the value of the LookUp Table Name field';
+                    ToolTip = 'As there are multiple fields in a table, it''s necessary to identify which field will be used for client attributes by providing its ID.';
                     ApplicationArea = NPRRetail;
                 }
                 field("LookUp Value Field Id"; Rec."LookUp Value Field Id")
                 {
 
-                    ToolTip = 'Specifies the value of the LookUp Value Field Id field';
+                    ToolTip = 'Specifies the description of the field that has been selected in Lookup Value Field ID.';
                     ApplicationArea = NPRRetail;
                 }
                 field("LookUp Value Field Name"; Rec."LookUp Value Field Name")
