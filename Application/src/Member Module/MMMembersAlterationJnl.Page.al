@@ -53,6 +53,14 @@
                             SetExternalMembershipNo(Rec."External Membership No.", Rec);
                     end;
                 }
+                field("Admin Name"; AdminName)
+                {
+
+                    Editable = false;
+                    ToolTip = 'Specifies the name of first Administrator linked to selected membership.';
+                    Caption = 'Administrator name';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Membership Code"; Rec."Membership Code")
                 {
 
@@ -248,6 +256,8 @@
             Rec."Information Context"::CANCEL:
                 AlterationOption := AlterationOption::CANCEL;
         end;
+
+        AdminName := GetAdminName();
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
@@ -278,6 +288,7 @@
         FldExternalNumber: Text;
         FldAlterationItemNo: Text;
         FldAlterationDate: Text;
+        AdminName: Text;
         REQUIRED: Integer;
         OPTIONAL: Integer;
         SELECT_FILE_CAPTION: Label 'Membership Alteration Import';
@@ -708,6 +719,23 @@
         VarText := CopyStr(InputText, NextFieldPos);
         exit(RField);
 
+    end;
+
+    local procedure GetAdminName(): Text;
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+    begin
+        if Rec."Membership Entry No." = 0 then
+            exit;
+
+        MembershipRole.SetRange("Membership Entry No.", Rec."Membership Entry No.");
+        MembershipRole.SetRange("Member Role", MembershipRole."Member Role"::ADMIN);
+        if MembershipRole.FindFirst() then begin
+            MembershipRole.CalcFields("Member Display Name");
+            exit(MembershipRole."Member Display Name");
+        end;
+
+        exit('');
     end;
 }
 
