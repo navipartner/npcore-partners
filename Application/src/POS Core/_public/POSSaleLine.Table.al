@@ -107,10 +107,10 @@
                 end;
 
                 CreateDim(
-                  NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
-                  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                  DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
-                  0, '');
+                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
+                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
+                    Database::"NPR NPRE Seating", "NPRE Seating Code",
+                    Database::"Responsibility Center", "Responsibility Center");
             end;
         }
         field(7; "Location Code"; Code[10])
@@ -1081,8 +1081,8 @@
                 CreateDim(
                     NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
                     NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                    DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
-                    0, '');
+                    Database::"NPR NPRE Seating", "NPRE Seating Code",
+                    Database::"Responsibility Center", "Responsibility Center");
             end;
         }
         field(402; "Discount Calculated"; Boolean)
@@ -1185,10 +1185,10 @@
             trigger OnValidate()
             begin
                 CreateDim(
-                  DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
-                  NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
-                  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                  0, '');
+                    Database::"NPR NPRE Seating", "NPRE Seating Code",
+                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
+                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
+                    Database::"Responsibility Center", "Responsibility Center");
             end;
         }
         field(801; "Insurance Category"; Code[50])
@@ -1227,6 +1227,22 @@
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used';
+        }
+        field(5700; "Responsibility Center"; Code[10])
+        {
+            Caption = 'Responsibility Center';
+            DataClassification = CustomerContent;
+            Editable = false;
+            TableRelation = "Responsibility Center";
+
+            trigger OnValidate()
+            begin
+                CreateDim(
+                    Database::"Responsibility Center", "Responsibility Center",
+                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
+                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
+                    Database::"NPR NPRE Seating", "NPRE Seating Code");
+            end;
         }
         field(5999; "Buffer Ref. No."; Integer)
         {
@@ -1459,10 +1475,10 @@
             trigger OnValidate()
             begin
                 CreateDim(
-                  NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
-                  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                  DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
-                  0, '');
+                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
+                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
+                    Database::"NPR NPRE Seating", "NPRE Seating Code",
+                    Database::"Responsibility Center", "Responsibility Center");
             end;
         }
         field(6051; "Product Group Code"; Code[10])
@@ -1855,6 +1871,7 @@
             exit;
         end;
 
+        SalesLine."Responsibility Center" := "Responsibility Center";
         SalesLine.Validate("No.", "No.");
         if TransferPostingGroups then begin
             if "Posting Group" <> '' then
@@ -2227,6 +2244,7 @@
         "Tax Area Code" := SalePOS."Tax Area Code";
         "Tax Liable" := SalePOS."Tax Liable";
         "NPRE Seating Code" := SalePOS."NPRE Pre-Set Seating Code";
+        "Responsibility Center" := SalePOS."Responsibility Center";
     end;
 
     local procedure InitFromCustomer()
