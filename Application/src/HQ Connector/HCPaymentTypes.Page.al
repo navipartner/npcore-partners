@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'HC Payment Types';
+    ContextSensitiveHelpPage = 'retail/posunit/reference/payment_types.html';
     PageType = List;
     SourceTable = "NPR HC Payment Type POS";
     UsageCategory = Administration;
@@ -17,25 +18,25 @@
                 field("No."; Rec."No.")
                 {
 
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the ID of the payment type.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies additional information about the payment type, such as its name.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Account Type"; Rec."Account Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Account Type field';
+                    ToolTip = 'Enable the interface between the payment type and the account type, and set how it will be treated in the accounts.';
                     ApplicationArea = NPRRetail;
                 }
                 field("G/L Account No."; Rec."G/L Account No.")
                 {
 
-                    ToolTip = 'Specifies the value of the G/L Account field';
+                    ToolTip = 'Depending on your selection in the previous field, the code used for identifying one of the listed entities will need to be provided.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Bank Acc. No."; Rec."Bank Acc. No.")
@@ -65,7 +66,7 @@
                 field("Payment Method Code"; Rec."Payment Method Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Payment Method Code field';
+                    ToolTip = 'Determines which payment method is used, and to which G/L account it is associated.';
                     ApplicationArea = NPRRetail;
                 }
             }

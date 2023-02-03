@@ -21,13 +21,13 @@ The following options are available in the **Name and Date Formatting** section:
 
 | Field Name      | Description |
 | ----------- | ----------- |
-| **Client Decimal Separator**       | how numbers in POS will be separated from decimals (whether a comma or period will be used).     |
-| **Client Thousands Separator**   | how thousands will be separated (whether a comma or period will be used).        |
-| **Client Number Decimal Digits**  | how many decimals will be shown in POS. |
+| **Client Decimal Separator**       | Specifies how numbers in POS will be separated from decimals (whether a comma or period will be used).     |
+| **Client Thousands Separator**   | Specifies how thousands will be separated (whether a comma or period will be used).        |
+| **Client Number Decimal Digits**  | Specifies how many decimals will be shown in POS. |
 | **Client Currency Symbol** | Specifies currency symbol. |
-| **Client Short Date Pattern** |  Format of date. |
-| **Client Date Separator** |  Data separator should be - or /. |
-| **Client Day Names** |  Names of days of week. Days should be inserted with comma between names. |
+| **Client Short Date Pattern** |  Specifies the format of the date. |
+| **Client Date Separator** |  Specifies whether the data separator should be - or /. |
+| **Client Day Names** |  Specifies the names of days of week. Days should be inserted with comma between names. |
 
 ![nameanddate](../images/Name%20and%20date.PNG)
 

@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Item Worksheet Template';
+    ContextSensitiveHelpPage = 'retail/item_worksheet/reference/item_worksheet_template.html';
     PageType = Card;
     SourceTable = "NPR Item Worksh. Template";
     UsageCategory = None;
@@ -15,25 +16,25 @@
                 field(Name; Rec.Name)
                 {
 
-                    ToolTip = 'Specifies the value of the Name field.';
+                    ToolTip = 'Specifies  the name of the worksheet.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field.';
+                    ToolTip = 'Specifies the description of the template.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register Lines"; Rec."Register Lines")
                 {
 
-                    ToolTip = 'Specifies the value of the Register Lines field.';
+                    ToolTip = 'When checked, a registered item worksheet and the related records will be created.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Delete Processed Lines"; Rec."Delete Processed Lines")
                 {
 
-                    ToolTip = 'Specifies the value of the Delete Processed Lines field.';
+                    ToolTip = 'If checked, all lines will be removed from the item worksheet when successfully registered.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -69,7 +70,7 @@
                 {
                     ToolTip = 'Specifies whether combining variants process should be executed as a background task.';
                     ApplicationArea = NPRRetail;
-                }                
+                }
                 field("Match by Item No. Only"; Rec."Match by Item No. Only")
                 {
 
@@ -85,7 +86,7 @@
                 field("Do not Apply Internal Barcode"; Rec."Do not Apply Internal Barcode")
                 {
 
-                    ToolTip = 'Specifies the value of the Do not apply Internal Barcode field.';
+                    ToolTip = 'If enabled, the Internal Barcode field isn''t applied.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -94,19 +95,19 @@
                 field("Item No. Creation by"; Rec."Item No. Creation by")
                 {
 
-                    ToolTip = 'Specifies the value of the Item No. Creation by field.';
+                    ToolTip = 'Determines how the item number will be created for all new items.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item No. Prefix"; Rec."Item No. Prefix")
                 {
 
-                    ToolTip = 'Specifies the value of the Item No. Prefix field.';
+                    ToolTip = 'Specifies if the prefix will be used when generating the item number. ';
                     ApplicationArea = NPRRetail;
                 }
                 field("Prefix Code"; Rec."Prefix Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Prefix Code field.';
+                    ToolTip = 'Specifies the prefix of maximum three characters. This is used for the item number prefix when the From Template option is selected.';
                     ApplicationArea = NPRRetail;
                 }
                 field("No. Series"; Rec."No. Series")
@@ -121,7 +122,7 @@
                 field("Error Handling"; Rec."Error Handling")
                 {
 
-                    ToolTip = 'Specifies the value of the Error Handling field.';
+                    ToolTip = 'Defines the error handling when validating or registering the worksheet lines.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Test Validation"; Rec."Test Validation")
@@ -136,13 +137,13 @@
                 field("Create Internal Barcodes"; Rec."Create Internal Barcodes")
                 {
 
-                    ToolTip = 'Specifies the value of the Create Internal Barcodes field.';
+                    ToolTip = 'Defines the creation of barcodes when registering the worksheet lines, if varieties are used, only the barcodes for variants will be created based on varieties.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Create Vendor  Barcodes"; Rec."Create Vendor  Barcodes")
                 {
 
-                    ToolTip = 'Specifies the value of the Create Vendor  Barcodes field.';
+                    ToolTip = 'Defines if and when the vendor barcodes are used during the line registration. ';
                     ApplicationArea = NPRRetail;
                 }
             }

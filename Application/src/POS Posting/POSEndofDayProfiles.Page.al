@@ -19,12 +19,12 @@
             {
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the unique code of the profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a short description of what the profile is used for.';
                     ApplicationArea = NPRRetail;
                 }
 
@@ -35,32 +35,32 @@
                 }
                 field("End of Day Type"; Rec."End of Day Type")
                 {
-                    ToolTip = 'Specifies the value of the End of Day Type field';
+                    ToolTip = 'Specifies whether the end-of-day process is performed for each POS unit, or if one POS unit is in charge of all counitng and cash collection.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Master POS Unit No."; Rec."Master POS Unit No.")
                 {
-                    ToolTip = 'Specifies the value of the Master POS Unit No. field';
+                    ToolTip = 'Specifies the number of the POS unit in charge of counting and cash collection.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Z-Report UI"; Rec."Z-Report UI")
                 {
-                    ToolTip = 'Specifies the value of the Z-Report UI field';
+                    ToolTip = 'Specifies what is displayed when the button for the POS balancing action is used.';
                     ApplicationArea = NPRRetail;
                 }
                 field("X-Report UI"; Rec."X-Report UI")
                 {
-                    ToolTip = 'Specifies the value of the X-Report UI field';
+                    ToolTip = 'Specifies how many details related to the status of the POS unit during the workshift are displayed on the POS. ';
                     ApplicationArea = NPRRetail;
                 }
                 field("Close Workshift UI"; Rec."Close Workshift UI")
                 {
-                    ToolTip = 'Specifies the value of the Close Workshift UI field';
+                    ToolTip = 'Specifies whether printout is performed on closing the work shift. Currently, it''s not in use as when the balancing is completed, the work shift is automatically closed, and followed by a printout.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Force Blind Counting"; Rec."Force Blind Counting")
                 {
-                    ToolTip = 'Specifies the value of the Force Blind Counting field';
+                    ToolTip = 'Display the expected ledger balance of the cash on the counting screen. When this function is activated, the expected ledger balance of the counted cash isn''t visible.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Hide Turnover Section"; Rec."Hide Turnover Section")
@@ -70,22 +70,22 @@
                 }
                 field("SMS Profile"; Rec."SMS Profile")
                 {
-                    ToolTip = 'Specifies the value of the SMS Profile field';
+                    ToolTip = 'Set up an SMS profile to send an SMS to the supervisor with the result of the counting.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Z-Report Number Series"; Rec."Z-Report Number Series")
                 {
-                    ToolTip = 'Specifies the value of the Z-Report Number Series field';
+                    ToolTip = 'Specifies the number series used for creating the Document No. in the POS entry for entries created from running the Z report.';
                     ApplicationArea = NPRRetail;
                 }
                 field("X-Report Number Series"; Rec."X-Report Number Series")
                 {
-                    ToolTip = 'Specifies the value of the X-Report Number Series field';
+                    ToolTip = 'Specifies the number series used for creating the Document No. in the POS entry for entries created from running the X report.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Show Zero Amount Lines"; Rec."Show Zero Amount Lines")
                 {
-                    ToolTip = 'Specifies the value of the Show Zero Amount Lines field';
+                    ToolTip = 'Display all currencies when counting is performed, even if they amount to zero. This function needs to be used with discretion, as it might result in confusion.';
                     ApplicationArea = NPRRetail;
                 }
             }
