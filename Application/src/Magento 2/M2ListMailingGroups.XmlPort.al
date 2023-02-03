@@ -33,6 +33,15 @@ xmlport 6151139 "NPR M2 List Mailing Groups"
                             IsMember := Format(ContactMailingGroup.Get(ContactNo, MailGrp.Code), 0, 9);
                     end;
                 }
+                textattribute(ContactNumber)
+                {
+                    Occurrence = Optional;
+                    XmlName = 'ContactNumber';
+                    trigger OnBeforePassVariable()
+                    begin
+                        ContactNumber := ContactNo;
+                    end;
+                }
             }
         }
     }
