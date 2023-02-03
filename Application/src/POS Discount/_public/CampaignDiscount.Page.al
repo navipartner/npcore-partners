@@ -186,6 +186,7 @@
             group("Lin&e")
             {
                 Caption = 'Lin&e';
+                Image = Line;
                 action(Comment)
                 {
                     Caption = 'Comment';
@@ -264,6 +265,7 @@
             group("&Functions")
             {
                 Caption = '&Functions';
+                Image = Action;
                 group("Period Discount")
                 {
                     Caption = 'Period Discount';
