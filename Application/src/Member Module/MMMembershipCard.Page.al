@@ -599,6 +599,24 @@
                     IssueAdHocSponsorshipTickets(Rec."Entry No.");
                 end;
             }
+            action(DeleteMembership)
+            {
+                Caption = 'Delete Membership';
+                Image = Delete;
+
+                ToolTip = 'This actions tries a little bit harder to delete a Membership when membership data or setup is inconsistent.';
+                ApplicationArea = NPRMembershipAdvanced;
+
+                trigger OnAction()
+                var
+                    MembershipMgt: Codeunit "NPR MM Membership Mgt.";
+                    MembershipSetup: Record "NPR MM Membership Setup";
+                    ConfirmLbl: Label 'This action will attempt to delete the membership and its related information. It can not be undone. ';
+                begin
+                    if (Confirm(ConfirmLbl, false)) then
+                        MembershipMgt.DeleteMembership(Rec."Entry No.", (not MembershipSetup.Get(Rec."Membership Code")));
+                end;
+            }
         }
         area(navigation)
         {

@@ -23,15 +23,87 @@ codeunit 85114 "NPR Library - Member GDPR"
         AddGuardianRole(MembershipEntryNo, AddAdminMember(CreateMembership(ExpiredDate, MembershipCode)));
     end;
 
-    internal procedure AnonymizeMembership(MembershipEntry: Integer)
+    internal procedure AnonymizeMembership(MembershipEntryNo: Integer)
     var
         GDPRManagement: Codeunit "NPR MM GDPR Management";
         ReasonText: Text;
     begin
-        GDPRManagement.AnonymizeMembership(MembershipEntry, false, ReasonText);
+        GDPRManagement.AnonymizeMembership(MembershipEntryNo, false, ReasonText);
     end;
 
-    internal procedure CreateMembership(ValidUntilDate: Date; MembershipCode: Code[20]) EntryNo: Integer
+    internal procedure AnonymizeMembershipAgreementCheck(MembershipEntryNo: Integer)
+    var
+        GDPRManagement: Codeunit "NPR MM GDPR Management";
+        ReasonText: Text;
+    begin
+        GDPRManagement.AnonymizeMembership(MembershipEntryNo, true, ReasonText);
+    end;
+
+    internal procedure DeleteMembership(MembershipEntryNo: Integer)
+    var
+        GDPRManagement: Codeunit "NPR MM GDPR Management";
+    begin
+        GDPRManagement.DeleteMembership(MembershipEntryNo);
+    end;
+
+    internal procedure DeleteMembership(MembershipEntryNo: Integer; AnonymizeDate: Date)
+    begin
+        SetMembershipAnonymizeDate(MembershipEntryNo, AnonymizeDate);
+        DeleteMembership(MembershipEntryNo);
+    end;
+
+    internal procedure SetMembershipAnonymizeDate(MembershipEntryNo: Integer; AnonymizeDate: Date)
+    var
+        Membership: Record "NPR MM Membership";
+    begin
+        Membership.Get(MembershipEntryNo);
+        if (Membership."Block Reason" <> Membership."Block Reason"::ANONYMIZED) then
+            exit;
+
+        if (Membership."Blocked At" = CreateDateTime(0D, 0T)) then
+            Error('Incorrect Blocked At datetime.');
+
+        Membership."Blocked At" := CreateDateTime(AnonymizeDate, DT2Time(Membership."Blocked At"));
+        Membership.Modify();
+    end;
+
+    internal procedure CreatePlainMembership(ValidUntilDate: Date) EntryNo: Integer
+    begin
+        exit(CreateMembership(ValidUntilDate, 'TEST01'));
+    end;
+
+    internal procedure CreateGdprMembership(ValidUntilDate: Date) EntryNo: Integer
+    begin
+        exit(CreateMembership(ValidUntilDate, 'TEST01', 'GDPR01'));
+    end;
+
+
+    local procedure CreateMembership(ValidUntilDate: Date; MembershipCode: Code[20]; GDPRAgreementCode: Code[20]) EntryNo: Integer
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        GDPRAgreement: Record "NPR GDPR Agreement";
+    begin
+        if (not MembershipSetup.Get(MembershipCode)) then begin
+            MembershipSetup.Code := MembershipCode;
+            MembershipSetup.Insert()
+        end;
+        MembershipSetup."GDPR Agreement No." := GDPRAgreementCode;
+        MembershipSetup."GDPR Mode" := MembershipSetup."GDPR Mode"::IMPLIED;
+        MembershipSetup.Modify();
+
+        if (not GDPRAgreement.Get(GDPRAgreementCode)) then begin
+            GDPRAgreement."No." := GDPRAgreementCode;
+            GDPRAgreement.Insert();
+        end;
+
+        Evaluate(GDPRAgreement."Anonymize After", '<7D>');
+        GDPRAgreement.KeepAnonymizedFor := GDPRAgreement.KeepAnonymizedFor::ONE_DAY;
+        GDPRAgreement.Modify();
+
+        exit(CreateMembership(ValidUntilDate, MembershipCode));
+    end;
+
+    local procedure CreateMembership(ValidUntilDate: Date; MembershipCode: Code[20]) EntryNo: Integer
     var
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
@@ -115,7 +187,8 @@ codeunit 85114 "NPR Library - Member GDPR"
     local procedure AddRole(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberRole: Option)
     var
         MembershipRole: Record "NPR MM Membership Role";
-
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
     begin
         If (MembershipEntryNo = 0) then
             Error('A role can not be created for membership entry 0');
@@ -124,9 +197,15 @@ codeunit 85114 "NPR Library - Member GDPR"
             if (MemberRole <> MembershipRole."Member Role"::ANONYMOUS) then
                 Error('A role can not be created for member entry 0');
 
+        Membership.Get(MembershipEntryNo);
+        if (not (MembershipSetup.Get(Membership."Membership Code"))) then
+            MembershipSetup.Init();
+
         MembershipRole."Membership Entry No." := MembershipEntryNo;
         MembershipRole."Member Role" := MemberRole;
         MembershipRole."Member Entry No." := MemberEntryNo;
+        MembershipRole."GDPR Agreement No." := MembershipSetup."GDPR Agreement No.";
+
         MembershipRole.Insert();
     end;
 
@@ -146,6 +225,7 @@ codeunit 85114 "NPR Library - Member GDPR"
         Assert.IsTrue(Member.Get(MemberEntryNo), 'Member not found.');
         Assert.IsTrue(Member.Blocked, 'Anonymized member must be blocked.');
         Assert.AreEqual(Member."Block Reason"::ANONYMIZED, Member."Block Reason", 'Anonymized member has incorrect block reason.');
+        Assert.AreNotEqual(CreateDateTime(0D, 0T), Member."Blocked At", 'Anonymized member has incorrect blocked at datetime.');
 
         Assert_IsAnonymousValue(Member."First Name", Member.FieldCaption("First Name"));
     end;
@@ -158,6 +238,7 @@ codeunit 85114 "NPR Library - Member GDPR"
         Assert.IsTrue(Membership.Get(MembershipEntryNo), 'Membership not found.');
         Assert.IsTrue(Membership.Blocked, 'Anonymized membership must be blocked.');
         Assert.AreEqual(Membership."Block Reason"::ANONYMIZED, Membership."Block Reason", 'Anonymized membership has incorrect block reason.');
+        Assert.AreNotEqual(CreateDateTime(0D, 0T), Membership."Blocked At", 'Anonymous Membership has incorrect blocked at datetime.');
 
         Assert_IsAnonymousValue(Membership."Company Name", Membership.FieldCaption("Company Name"));
     end;
@@ -177,6 +258,7 @@ codeunit 85114 "NPR Library - Member GDPR"
         Assert.IsTrue(MemberRole.Get(MembershipEntryNo, MemberEntryNo), 'Membership role not found.');
         Assert.IsTrue(MemberRole.Blocked, 'Anonymized membership role must be blocked.');
         Assert.AreEqual(MemberRole."Block Reason"::ANONYMIZED, MemberRole."Block Reason", 'Anonymized membership role has incorrect block reason.');
+        Assert.AreNotEqual(CreateDateTime(0D, 0T), MemberRole."Blocked At", 'Anonymized membership role has incorrect blocked at datetime.');
     end;
 
     internal procedure Assert_RoleIsNotAnonymized(MembershipEntryNo: Integer; MemberEntryNo: Integer)
@@ -187,6 +269,7 @@ codeunit 85114 "NPR Library - Member GDPR"
         Assert.IsTrue(MemberRole.Get(MembershipEntryNo, MemberEntryNo), 'Membership role not found.');
         Assert.IsFalse(MemberRole.Blocked, 'Membership role should not be blocked.');
         Assert.AreNotEqual(MemberRole."Block Reason"::ANONYMIZED, MemberRole."Block Reason", 'Membership role has incorrect block reason.');
+        Assert.AreEqual(CreateDateTime(0D, 0T), MemberRole."Blocked At", 'Membership role has incorrect blocked at datetime.');
     end;
 
     internal procedure Assert_MemberIsNotAnonymized(MemberEntryNo: Integer)
@@ -197,6 +280,7 @@ codeunit 85114 "NPR Library - Member GDPR"
         Assert.IsTrue(Member.Get(MemberEntryNo), 'Member not found.');
         Assert.IsFalse(Member.Blocked, 'Member should not be blocked.');
         Assert.AreNotEqual(Member."Block Reason"::ANONYMIZED, Member."Block Reason", 'Member has incorrect block reason.');
+        Assert.AreEqual(CreateDateTime(0D, 0T), Member."Blocked At", 'Member has incorrect blocked at datetime.');
     end;
 
     internal procedure Assert_MembershipIsNotAnonymized(MembershipEntryNo: Integer)
@@ -207,6 +291,7 @@ codeunit 85114 "NPR Library - Member GDPR"
         Assert.IsTrue(Membership.Get(MembershipEntryNo), 'Membership not found.');
         Assert.IsFalse(Membership.Blocked, 'Membership should be blocked.');
         Assert.AreNotEqual(Membership."Block Reason"::ANONYMIZED, Membership."Block Reason", 'Membership has incorrect block reason.');
+        Assert.AreEqual(CreateDateTime(0D, 0T), Membership."Blocked At", 'Membership has incorrect blocked at datetime.');
     end;
 
     internal procedure Assert_IsAnonymousValue(FieldValue: Text; FieldCaption: Text)
@@ -214,6 +299,30 @@ codeunit 85114 "NPR Library - Member GDPR"
         Assert: Codeunit "Assert";
     begin
         Assert.AreEqual('', DelChr(FieldValue, '<=>', ' -'), StrSubstNo('Anonymized field %1 contains unexpected characters.', FieldCaption));
+    end;
+
+    internal procedure Assert_MembershipIsDeleted(MembershipEntryNo: Integer)
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipRole: Record "NPR MM Membership Role";
+        Assert: Codeunit "Assert";
+    begin
+        Assert.IsFalse(Membership.Get(MembershipEntryNo), 'Membership was found but was expected to have been deleted.');
+
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        Assert.IsTrue(MembershipRole.IsEmpty(), 'Membership Role was found but was expected to have been deleted.');
+    end;
+
+    internal procedure Assert_MemberIsDeleted(MemberEntryNo: Integer)
+    var
+        Member: Record "NPR MM Member";
+        MembershipRole: Record "NPR MM Membership Role";
+        Assert: Codeunit "Assert";
+    begin
+        Assert.IsFalse(Member.Get(MemberEntryNo), 'Member was found but was expected to have been deleted.');
+
+        MembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
+        Assert.IsTrue(MembershipRole.IsEmpty(), 'Membership Role was found but was expected to have been deleted.');
     end;
 
 }

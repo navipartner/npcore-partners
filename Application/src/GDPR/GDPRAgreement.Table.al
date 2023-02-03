@@ -1,7 +1,6 @@
 ﻿table 6151121 "NPR GDPR Agreement"
 {
     Access = Internal;
-    // MM1.29/TSA /20180509 CASE 313795 Initial Version
 
     Caption = 'GDPR Agreement';
     DataClassification = CustomerContent;
@@ -29,6 +28,14 @@
         {
             Caption = 'Anonymize After';
             DataClassification = CustomerContent;
+        }
+        field(110; KeepAnonymizedFor; Option)
+        {
+            Caption = 'Keep Anonymized Membership For';
+            OptionMembers = FOREVER,ONE_DAY,ONE_WEEK,ONE_MONTH,THREE_MONTHS,SIX_MONTHS,TWELVE_MONTHS;
+            DataClassification = CustomerContent;
+            OptionCaption = 'Forever,1 Day,1 Week,1 Month,3 Months,6 Months,12 Months';
+            InitValue = FOREVER;
         }
         field(1000; "Latest Version"; Integer)
         {

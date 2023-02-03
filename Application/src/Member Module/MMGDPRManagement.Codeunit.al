@@ -16,6 +16,12 @@
                     AnonymizeMembership(Membership."Entry No.", true, ReasonText);
                     Commit();
                 end;
+
+                if (Membership."Block Reason" = Membership."Block Reason"::ANONYMIZED) then begin
+                    DeleteMembership(Membership."Entry No.");
+                    Commit();
+                end;
+
             until (Membership.Next() = 0);
         end;
     end;
@@ -125,6 +131,58 @@
         end;
     end;
 
+    internal procedure DeleteMembership(MembershipEntryNo: Integer): Boolean
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        GDPRAgreement: Record "NPR GDPR Agreement";
+        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        DeleteAfterDateTime: Datetime;
+    begin
+        Membership.Get(MembershipEntryNo);
+
+        if (Membership."Block Reason" <> Membership."Block Reason"::ANONYMIZED) then
+            exit(false);
+
+        if (Membership."Blocked At" = CreateDateTime(0D, 0T)) then
+            exit(false);
+
+        if (not MembershipSetup.Get(Membership."Membership Code")) then
+            exit(false);
+
+        if (MembershipSetup."GDPR Agreement No." = '') then
+            exit(false);
+
+        if (not GDPRAgreement.Get(MembershipSetup."GDPR Agreement No.")) then
+            exit(false);
+
+        case (GDPRAgreement.KeepAnonymizedFor) of
+            GDPRAgreement.KeepAnonymizedFor::FOREVER:
+                exit(false);
+            GDPRAgreement.KeepAnonymizedFor::ONE_DAY:
+                DeleteAfterDateTime := CreateDatetime(CalcDate('<+1D>', DT2Date(Membership."Blocked At")), DT2Time(Membership."Blocked At"));
+            GDPRAgreement.KeepAnonymizedFor::ONE_WEEK:
+                DeleteAfterDateTime := CreateDatetime(CalcDate('<+7D>', DT2Date(Membership."Blocked At")), DT2Time(Membership."Blocked At"));
+            GDPRAgreement.KeepAnonymizedFor::ONE_MONTH:
+                DeleteAfterDateTime := CreateDatetime(CalcDate('<+1M>', DT2Date(Membership."Blocked At")), DT2Time(Membership."Blocked At"));
+            GDPRAgreement.KeepAnonymizedFor::THREE_MONTHS:
+                DeleteAfterDateTime := CreateDatetime(CalcDate('<+3M>', DT2Date(Membership."Blocked At")), DT2Time(Membership."Blocked At"));
+            GDPRAgreement.KeepAnonymizedFor::SIX_MONTHS:
+                DeleteAfterDateTime := CreateDatetime(CalcDate('<+6M>', DT2Date(Membership."Blocked At")), DT2Time(Membership."Blocked At"));
+            GDPRAgreement.KeepAnonymizedFor::TWELVE_MONTHS:
+                DeleteAfterDateTime := CreateDatetime(CalcDate('<+12M>', DT2Date(Membership."Blocked At")), DT2Time(Membership."Blocked At"));
+            else
+                exit(false);
+        end;
+
+        if (DeleteAfterDateTime > CreateDateTime(Today(), Time())) then
+            exit(false);
+
+        MembershipManagement.DeleteMembership(MembershipEntryNo, true);
+        exit(true);
+
+    end;
+
     procedure AnonymizeMembership(MembershipEntryNo: Integer; AgreementCheck: Boolean; var ReasonText: Text): Boolean
     var
         Membership: Record "NPR MM Membership";
@@ -139,7 +197,9 @@
         AnonymizeOnDate := GetMembershipValidUntil(MembershipEntryNo);
 
         if (AgreementCheck) then begin
-            MembershipSetup.Get(Membership."Membership Code");
+            if (not MembershipSetup.Get(Membership."Membership Code")) then
+                exit(false);
+
             if (MembershipSetup."GDPR Agreement No." = '') then
                 exit(false);
 
@@ -150,7 +210,7 @@
         end;
 
         if (AnonymizeOnDate > Today) then
-            exit; // Not time yet
+            exit(false); // Not time yet
 
         MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
@@ -247,7 +307,7 @@
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
 #pragma warning disable AA0240
-        DummyEMailAddressLbl: Label 'anonymous%1@unknown-domain.com', Locked = true;
+        DummyEMailAddressLbl: Label '%1@anon.%2.navipartner.com', Locked = true;
 #pragma warning restore
     begin
 
@@ -266,7 +326,7 @@
         Member.Gender := Member.Gender::NOT_SPECIFIED;
         Member.Birthday := 0D;
         Clear(Member.Image);
-        Member."E-Mail Address" := StrSubstNo(DummyEMailAddressLbl, Member."External Member No.");
+        Member."E-Mail Address" := CopyStr(LowerCase(StrSubstNo(DummyEMailAddressLbl, Member."External Member No.", CopyStr(DelChr(CompanyName(), '<=>', ' !"@#£¤$%&/()=+\^*<>,;:-_|'), 1, 30))), 1, MaxStrLen(Member."E-Mail Address"));
         Member."Notification Method" := Member."Notification Method"::NONE;
         Member."E-Mail News Letter" := Member."E-Mail News Letter"::NOT_SPECIFIED;
         Member."Display Name" := '------ - -------';
