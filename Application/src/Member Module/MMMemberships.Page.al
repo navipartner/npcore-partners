@@ -12,8 +12,6 @@
     SourceTable = "NPR MM Membership";
     UsageCategory = Lists;
     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-
-
     layout
     {
         area(content)
@@ -62,74 +60,62 @@
                 }
                 field("Community Code"; Rec."Community Code")
                 {
-
                     ToolTip = 'Specifies the community code.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
-
                     ToolTip = 'Specifies the customer number.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
-
                     ToolTip = 'Specifies the company name.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Membership Code"; Rec."Membership Code")
                 {
-
                     ToolTip = 'Specifies the membership code.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Issued Date"; Rec."Issued Date")
                 {
-
                     ToolTip = 'Specifies the issued date.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the description.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-
                     ToolTip = 'Specifies if the membership is blocked.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
-
                     ToolTip = 'Specifies when the membership was blocked.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Auto-Renew"; Rec."Auto-Renew")
                 {
-
                     ToolTip = 'Specifies if the membership is auto-renewable.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Auto-Renew Payment Method Code"; Rec."Auto-Renew Payment Method Code")
                 {
-
                     ToolTip = 'Specifies the payment method code for auto-renewal.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(DisplayName; DisplayName)
                 {
-
                     Caption = 'Member Display Name';
                     ToolTip = 'Specifies the member display name.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(1);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
@@ -138,14 +124,11 @@
 
                     trigger OnValidate()
                     begin
-
                         SetMasterDataAttributeValue(1);
-
                     end;
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(2);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
@@ -154,14 +137,11 @@
 
                     trigger OnValidate()
                     begin
-
                         SetMasterDataAttributeValue(2);
-
                     end;
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(3);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
@@ -170,14 +150,11 @@
 
                     trigger OnValidate()
                     begin
-
                         SetMasterDataAttributeValue(3);
-
                     end;
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(4);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
@@ -186,14 +163,11 @@
 
                     trigger OnValidate()
                     begin
-
                         SetMasterDataAttributeValue(4);
-
                     end;
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(5);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
@@ -202,14 +176,11 @@
 
                     trigger OnValidate()
                     begin
-
                         SetMasterDataAttributeValue(5);
-
                     end;
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(6);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
@@ -218,14 +189,11 @@
 
                     trigger OnValidate()
                     begin
-
                         SetMasterDataAttributeValue(6);
-
                     end;
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(7);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
@@ -234,14 +202,11 @@
 
                     trigger OnValidate()
                     begin
-
                         SetMasterDataAttributeValue(7);
-
                     end;
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(8);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
@@ -250,14 +215,11 @@
 
                     trigger OnValidate()
                     begin
-
                         SetMasterDataAttributeValue(8);
-
                     end;
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(9);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
@@ -266,14 +228,11 @@
 
                     trigger OnValidate()
                     begin
-
                         SetMasterDataAttributeValue(9);
-
                     end;
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
-
                     CaptionClass = GetAttributeCaptionClass(10);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
@@ -282,9 +241,7 @@
 
                     trigger OnValidate()
                     begin
-
                         SetMasterDataAttributeValue(10);
-
                     end;
                 }
             }
@@ -334,7 +291,7 @@
 
                 RunObject = Page "NPR MM Create Membership";
 
-                ToolTip = 'Opens the form to create a new membershop.';
+                ToolTip = 'Opens the form to create a new membership.';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action("Update Customer")
@@ -348,6 +305,26 @@
                 trigger OnAction()
                 begin
                     SyncContacts();
+                end;
+            }
+            action(AddToAlterationJnl)
+            {
+                Caption = 'Add to alternation journal';
+                Ellipsis = true;
+                Image = Journal;
+
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+
+                ToolTip = 'Adds membership to alternation journal.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                begin
+                    AddToAlterationJournal();
                 end;
             }
 
@@ -506,11 +483,9 @@
                         RaptorAction: Record "NPR Raptor Action";
                         RaptorMgt: Codeunit "NPR Raptor Management";
                     begin
-
                         Rec.TestField("Customer No.");
                         if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory(), true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Rec."Customer No.");
-
                     end;
                 }
                 action(RaptorRecommendations)
@@ -531,11 +506,9 @@
                         RaptorAction: Record "NPR Raptor Action";
                         RaptorMgt: Codeunit "NPR Raptor Management";
                     begin
-
                         Rec.TestField("Customer No.");
                         if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations(), true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Rec."Customer No.");
-
                     end;
                 }
             }
@@ -598,7 +571,6 @@
     var
         RaptorSetup: Record "NPR Raptor Setup";
     begin
-
         Rec.SetFilter(Blocked, '=%1', false);
 
         NPRAttrManagement.GetAttributeVisibility(GetAttributeTableId(), NPRAttrVisibleArray);
@@ -654,33 +626,38 @@
         end;
     end;
 
+
+    local procedure AddToAlterationJournal()
+    var
+        Membership: Record "NPR MM Membership";
+    begin
+        CurrPage.SetSelectionFilter(Membership);
+        if Membership.FindSet() then begin
+            repeat
+                MembershipManagement.AddToAlterationJournal(Membership);
+            until Membership.Next() = 0;
+        end;
+    end;
+
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin
-
         NPRAttrManagement.SetEntryAttributeValue(GetAttributeTableId(), AttributeNumber, Rec."Entry No.", NPRAttrTextArray[AttributeNumber]);
-
     end;
 
     local procedure GetMasterDataAttributeValue()
     begin
-
         NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId(), Rec."Entry No.");
         NPRAttrEditable := CurrPage.Editable();
-
     end;
 
     internal procedure GetAttributeVisibility(AttributeNumber: Integer): Boolean
     begin
-
         exit(NPRAttrVisibleArray[AttributeNumber]);
-
     end;
 
     local procedure GetAttributeTableId(): Integer
     begin
-
         exit(DATABASE::"NPR MM Membership");
-
     end;
 
     local procedure GetAttributeCaptionClass(AttributeNumber: Integer): Text[50]

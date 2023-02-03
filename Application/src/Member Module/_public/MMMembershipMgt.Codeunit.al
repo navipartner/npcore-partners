@@ -5388,4 +5388,17 @@
     begin
         Error(UsageErr, MembershipAlterationSetup.TableCaption, MembershipSalesSetup.TableCaption);
     end;
+
+    internal procedure AddToAlterationJournal(Membership: Record "NPR MM Membership")
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+    begin
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Source Type" := MemberInfoCapture."Source Type"::ALTERATION_JNL;
+        MemberInfoCapture.Insert();
+        MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
+        MemberInfoCapture."External Membership No." := Membership."External Membership No.";
+        MemberInfoCapture."Membership Code" := Membership."Membership Code";
+        MemberInfoCapture.Modify();
+    end;
 }
