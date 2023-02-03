@@ -43,6 +43,20 @@
         IdLbl: Label ',{"id":"%1","storecode":"%2"}', Locked = true;
         AccountLbl: Label '{"account": {"email":"%1", "accounts":[%2]}}', Locked = true;
 
+    internal procedure InitM2AccountWebService()
+    var
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
+    begin
+        if not WebService.ReadPermission then
+            exit;
+
+        if not WebService.WritePermission then
+            exit;
+
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR M2 Account WebService", 'm2_account_services', true);
+    end;
+
     procedure SetFunction(FunctionIn: Option)
     begin
         SelectedAccountFunction := FunctionIn;

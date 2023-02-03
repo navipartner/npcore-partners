@@ -38,7 +38,7 @@
         ScheduleRetry(NcImportEntry);
     end;
 
-    local procedure EmitTelemetryData(NcImportEntry: Record "NPR Nc Import Entry"; LastErrorMessage: Text)
+    internal procedure EmitTelemetryData(NcImportEntry: Record "NPR Nc Import Entry"; LastErrorMessage: Text)
     var
         CustomDimensions: Dictionary of [Text, Text];
         ActiveSession: Record "Active Session";
