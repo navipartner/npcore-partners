@@ -285,7 +285,7 @@ codeunit 85073 "NPR POS Self Service Tests"
 
         //[Then]
         POSSession.GetCurrentView(CurrentView);
-        Assert.IsTrue(CurrentView.Type() = CurrentView.Type() ::Login, Format(CurrentView.Type()));
+        Assert.IsTrue(CurrentView.GetType() = CurrentView.GetType() ::Login, Format(CurrentView.GetType()));
         POSEntry.FindLast();
         Assert.IsTrue(POSEntry."Entry Type" = POSEntry."Entry Type"::"Cancelled Sale", 'POS Entry type Cancelled Sale is not created.');
     end;
