@@ -72,6 +72,7 @@
         Rec.Insert(true);
 
         Rec.Validate("Customer No.", '');
+        Rec.Modify(true);
 
         SaleLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, _FrontEnd);
         PaymentLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, _FrontEnd);
@@ -639,9 +640,10 @@
             if SaleLinePOS."Location Code" = '' then begin
                 SaleLinePOS."Location Code" := POSStore."Location Code";
             end;
+            if (SaleLinePOS."Responsibility Center" = '') and (POSStore."Responsibility Center" <> '') then
+                SaleLinePOS.Validate("Responsibility Center", POSStore."Responsibility Center");
             if SaleLinePOS."Shortcut Dimension 1 Code" = '' then
                 SaleLinePOS.Validate("Shortcut Dimension 1 Code", NPRPOSUnit."Global Dimension 1 Code");
-
             if SaleLinePOS."Shortcut Dimension 2 Code" = '' then
                 SaleLinePOS.Validate("Shortcut Dimension 2 Code", NPRPOSUnit."Global Dimension 2 Code");
         until SaleLinePOS.Next() = 0;
@@ -678,7 +680,7 @@
 
         Rec."Salesperson Code" := Setup.Salesperson();
         if Rec."Salesperson Code" <> SalePOS_ToResume."Salesperson Code" then begin
-            Rec.CreateDimensionsFromValidateSalesPersonCode();             
+            Rec.CreateDimensionsFromValidateSalesPersonCode();
         end;
 
         Rec.Modify(true);

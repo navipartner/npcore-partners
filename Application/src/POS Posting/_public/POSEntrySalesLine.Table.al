@@ -521,6 +521,12 @@
             Caption = 'Quantity (Base)';
             DataClassification = CustomerContent;
         }
+        field(5700; "Responsibility Center"; Code[10])
+        {
+            Caption = 'Responsibility Center';
+            DataClassification = CustomerContent;
+            TableRelation = "Responsibility Center";
+        }
         field(5709; "Item Category Code"; Code[20])
         {
             Caption = 'Item Category Code';
