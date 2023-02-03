@@ -380,6 +380,8 @@
         BalancingCashCountAmountLbl: Label 'Amount';
         BalancingCashCountTotalLbl: Label 'Total';
         BalancingCountByTypeCompletedLbl: Label 'You have counted by coin type. Entering a value manually will lose counting by coin type data you entered. Are you sure you want to continue?';
+        BalancingCashCountCommentLbl: Label 'Comment';
+        BalancingCashCountAddCommentLbl: Label 'Add Comment';
         CaptionDataGridSelected: Label 'Selected';
         CaptionLookupSearch: Label 'Search';
         CaptionLookup: Label 'Lookup: ';
@@ -564,6 +566,8 @@
         Captions.Add('Balancing_CashCountEnterBankDepositReference', Balancing_CashCountEnterBankDepositReferenceLbl);
         Captions.Add('Balancing_CashCountEnterMoveToBinCode', Balancing_CashCountEnterMoveToBinCodeLbl);
         Captions.Add('Balancing_CashCountEnterMoveToBinReference', Balancing_CashCountEnterMoveToBinReferenceLbl);
+        Captions.Add('BalancingCashCountComment', BalancingCashCountCommentLbl);
+        Captions.Add('BalancingCashCountAddComment', BalancingCashCountAddCommentLbl);
         Captions.Add('CaptionDataGridSelected', CaptionDataGridSelected);
         Captions.Add('Lookup_Search', CaptionLookupSearch);
         Captions.Add('Lookup_Caption', CaptionLookup);
