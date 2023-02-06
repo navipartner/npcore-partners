@@ -320,6 +320,7 @@
         Response.Add('isStatisticsEnabled', (EndOfDayProfile."Z-Report UI" = EndOfDayProfile."Z-Report UI"::SUMMARY_BALANCING));
         Response.Add('hideTurnover', EndOfDayProfile."Hide Turnover Section");
         Response.Add('backendContext', GetEndOfDayContext(Context));
+        Response.Add('reportType', _POSWorkShiftCheckpoint.Type);
 
         Response.WriteTo(JsonText);
 
