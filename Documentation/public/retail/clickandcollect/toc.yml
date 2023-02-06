@@ -4,6 +4,8 @@
   items:
   - name: Set up the Click & Collect module in NP Retail
     href: howto/clickandcollect_setup.md
+  - name: Set up prepayment (Click & Collect)
+    href: howto/prepayment.md
 - name: Explanations
   items:
   - name: POS actions for the Click & Collect module
