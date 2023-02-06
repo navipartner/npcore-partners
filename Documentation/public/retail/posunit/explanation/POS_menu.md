@@ -10,7 +10,7 @@ The POS view is the layout of the POS screens. Currently, we have a standard lay
 
 - POS Payment View - its main purpose is to check out customers and accept one of the payment types.
 
-## POS menus
+## POS menu
 
 POS menus are used for defining the interface used in the POS login view, sales view, and payment view. All menus can be divided into main menus and supporting menus.  
 
