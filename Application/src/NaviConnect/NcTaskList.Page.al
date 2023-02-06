@@ -285,6 +285,7 @@
             action(Output)
             {
                 Caption = 'Output';
+                Visible = false;
                 Image = List;
                 Promoted = true;
                 PromotedOnly = true;
