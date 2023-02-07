@@ -382,6 +382,8 @@
         BalancingCountByTypeCompletedLbl: Label 'You have counted by coin type. Entering a value manually will lose counting by coin type data you entered. Are you sure you want to continue?';
         BalancingCashCountCommentLbl: Label 'Comment';
         BalancingCashCountAddCommentLbl: Label 'Add Comment';
+        Balancing_CashCountNothingToCountLbl: Label 'Nothing to count';
+        Balancing_CashCountNothingToCountMessageLbl: Label 'There is nothing to count in this payment bin.';
         BalancingXReportLbl: Label 'X-Report';
         BalancingZReportLbl: Label 'Z-Report';
         BalancingUnknownReportTypeLbl: Label 'Unknown Report Type';
@@ -571,6 +573,8 @@
         Captions.Add('Balancing_CashCountEnterMoveToBinReference', Balancing_CashCountEnterMoveToBinReferenceLbl);
         Captions.Add('BalancingCashCountComment', BalancingCashCountCommentLbl);
         Captions.Add('BalancingCashCountAddComment', BalancingCashCountAddCommentLbl);
+        Captions.Add('Balancing_CashCountNothingToCount', Balancing_CashCountNothingToCountLbl);
+        Captions.Add('Balancing_CashCountNothingToCountMessage', Balancing_CashCountNothingToCountMessageLbl);
         Captions.Add('BalancingXReport', BalancingXReportLbl);
         Captions.Add('BalancingZReport', BalancingZReportLbl);
         Captions.Add('BalancingUnknownReportType', BalancingUnknownReportTypeLbl);
