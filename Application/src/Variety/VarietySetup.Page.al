@@ -20,11 +20,13 @@
                     ToolTip = 'Enable the variety.';
                     ApplicationArea = NPRRetail;
                 }
+#IF (BC17 or BC18 or BC19)                 
                 field("Item Journal Blocking"; Rec."Item Journal Blocking")
                 {
                     ToolTip = 'Specifies if the items without variants are allowed.';
                     ApplicationArea = NPRRetail;
-                }
+                }                
+#ENDIF                
                 field("Variant Description"; Rec."Variant Description")
                 {
                     ToolTip = 'Specifies the first variant description';

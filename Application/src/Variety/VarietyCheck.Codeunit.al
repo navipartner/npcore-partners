@@ -113,6 +113,7 @@
         if not VRTSetup.Get() then
             exit;
 
+#IF (BC17 or BC18 or BC19)
         case VRTSetup."Item Journal Blocking" of
             VRTSetup."Item Journal Blocking"::TotalBlockItemIfVariants:
                 begin
@@ -122,15 +123,14 @@
                         ItemJnlLine.TestField(ItemJnlLine."Variant Code");
                 end;
             VRTSetup."Item Journal Blocking"::SaleBlockItemIfVariants:
-                begin
-                    if ItemJnlLine."Entry Type" in [ItemJnlLine."Entry Type"::Purchase, ItemJnlLine."Entry Type"::Sale] then begin
-                        ItemVar.SetRange("Item No.", ItemJnlLine."Item No.");
-                        ItemVar.SetRange("NPR Blocked", false);
-                        if not ItemVar.IsEmpty then
-                            ItemJnlLine.TestField(ItemJnlLine."Variant Code");
-                    end;
+                if ItemJnlLine."Entry Type" in [ItemJnlLine."Entry Type"::Purchase, ItemJnlLine."Entry Type"::Sale] then begin
+                    ItemVar.SetRange("Item No.", ItemJnlLine."Item No.");
+                    ItemVar.SetRange("NPR Blocked", false);
+                    if not ItemVar.IsEmpty then
+                        ItemJnlLine.TestField(ItemJnlLine."Variant Code");
                 end;
         end;
+#ENDIF
 
         if ItemJnlLine."Variant Code" <> '' then begin
             ItemVar.Get(ItemJnlLine."Item No.", ItemJnlLine."Variant Code");

@@ -310,7 +310,7 @@
             Codeunit::"NPR Rep. Timestamp Upgrade":
                 Exit('NPR_RepCounterToSQLTimestampUPG_20221025');
             Codeunit::"NPR UPG Login":
-                exit('NPRUPGLogin-20221213');
+                exit('NPRUPGLogin-20221213');               
         end;
     end;
 }

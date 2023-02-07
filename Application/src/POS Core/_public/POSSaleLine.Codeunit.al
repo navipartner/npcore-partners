@@ -490,11 +490,31 @@
         exit(InsertLineInternal(Line, HandleReturnValue));
     end;
 
+#pragma warning disable AA0137
+    internal procedure CheckMandatoryFields(var Rec: Record "NPR POS Sale Line")
+    var
+        Item: Record "Item";
+    begin
+#IF NOT (BC17 or BC18 or BC19)        
+        case Rec."Line Type" of
+            Rec."Line Type"::Item:
+                begin
+                    if Item.Get(Rec."No.") then
+                        if Item.IsVariantMandatory() then
+                            Rec.TestField("Variant Code");
+                end;
+        end;
+#ENDIF        
+    end;  
+#pragma warning restore AA0137
+
     local procedure InsertLineInternal(var Line: Record "NPR POS Sale Line"; HandleReturnValue: Boolean) ReturnValue: Boolean
     var
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
     begin
         Rec := Line;
+
+        CheckMandatoryFields(Line);
 
         InvokeOnBeforeInsertSaleLineWorkflow(Rec);
 
