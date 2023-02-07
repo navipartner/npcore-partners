@@ -1,60 +1,46 @@
-﻿codeunit 6150855 "NPR POS Action: Ret.Amt.Dialog"
+codeunit 6150855 "NPR POS Action: Ret.Amt.Dialog" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'Show the return amount (change) after sale ends for mPOS.';
-        ConfirmEndOfSaleTitle: Label '(MPOS) End of Sale';
 
     local procedure ActionCode(): Code[20]
     begin
-        exit('SHOW_RET_AMT_DIALOG');
+        exit(Format(Enum::"NPR POS Workflow"::SHOW_RET_AMT_DIALOG));
     end;
 
-    local procedure ActionVersion(): Text[30]
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
+    var
+        LabelConfirmEndOfSaleTitleLbl: Label '(MPOS) End of Sale';
     begin
-        exit('1.1');
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddLabel('confirm_title', LabelConfirmEndOfSaleTitleLbl);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    var
+        POSSession: Codeunit "NPR POS Session";
     begin
-        if Sender.DiscoverAction(
-          ActionCode(),
-          ActionDescription,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('ConfirmReturnAmount', 'message ({title: labels.confirm_title, caption: context.confirm_message});');
-            Sender.RegisterWorkflow(true);
+        case Step of
+            'ConfirmReturnAmount':
+                CreateReturnAmtMessage(Context, POSSession, Sale);
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-        Captions.AddActionCaption(ActionCode(), 'confirm_title', ConfirmEndOfSaleTitle);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure CreateReturnAmtMessage(JSON: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; POSSale: Codeunit "NPR POS Sale")
     var
-        POSSale: Codeunit "NPR POS Sale";
+        JObject: JsonObject;
         SalesAmount: Decimal;
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         SalesDateText: Text;
         ReceiptNo: Text;
         HTML: Text;
-        JSON: Codeunit "NPR POS JSON Management";
         HtmlLbl: Label '<center><table border="0" cellspacing="0"><tr><td align="left">Receipt No.</td><td align="right">%1</td></tr><tr><td align="left">Sales Amount</td><td align="right">%2</td></tr><tr><td align="left">Paid Amount</td><td align="right">%3</td></tr><tr><td>&nbsp;</td></tr><tr><td align="left"><h2>Amount to Return&nbsp;&nbsp;</h2></td><td align="right"><h2>%4</h2></td></tr></table>', Locked = true;
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        JSON.InitializeJObjectParser(Parameters, FrontEnd);
+        JSON.InitializeJObjectParser(JObject);
         POSSession.GetSale(POSSale);
         POSSale.GetLastSaleInfo(SalesAmount, PaidAmount, SalesDateText, ReturnAmount, ReceiptNo);
         ReturnAmount := Abs(ReturnAmount);
@@ -67,16 +53,6 @@
           Format(ReturnAmount, 0, '<Precision,2:2><Standard Format,0>'));
 
         JSON.SetContext('confirm_message', HTML);
-        FrontEnd.SetActionContext(ActionCode(), JSON);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
@@ -92,11 +68,6 @@
         Rec.Enabled := true;
     end;
 
-    local procedure CurrCodeunitId(): Integer
-    begin
-        exit(CODEUNIT::"NPR POS Action: Ret.Amt.Dialog");
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure ShowReturnAmountDialog(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
@@ -110,8 +81,6 @@
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'ShowReturnAmountDialog' then
             exit;
-        if not POSSession.IsActiveSession(POSFrontEnd) then
-            exit;
         POSUnit.Get(SalePOS."Register No.");
         if POSUnit."POS Type" <> POSUnit."POS Type"::MPOS then
             exit;
@@ -123,7 +92,19 @@
 
         POSFrontEnd.GetSession(POSSession);
         POSSession.RetrieveSessionAction(ActionCode(), POSAction);
-        POSFrontEnd.InvokeWorkflow(POSAction);
+    end;
+
+    local procedure CurrCodeunitId(): Integer
+    begin
+        exit(CODEUNIT::"NPR POS Action: Ret.Amt.Dialog");
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+        //###NPR_INJECT_FROM_FILE:POSActionRetAmtDialog.js###
+'let main=async({workflow:t,context:a,popup:e,captions:i})=>{await t.respond("ConfirmReturnAmount"),await e.message({title:i.confirm_title,caption:a.confirm_message})};'
+        );
     end;
 }
 
