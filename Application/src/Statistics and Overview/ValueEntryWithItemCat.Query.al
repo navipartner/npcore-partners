@@ -63,11 +63,11 @@ query 6014423 "NPR Value Entry With Item Cat"
                 column(Item_Category_Code; "Item Category Code")
                 {
                 }
-                dataitem(Item;Item)
+                dataitem(Item; Item)
                 {
                     DataItemLink = "No." = Item_Ledger_Entry."Item No.";
                     SqlJoinType = InnerJoin;
-                    filter(Filter_Group_sale;"NPR Group sale")
+                    filter(Filter_Group_sale; "NPR Group sale")
                     {
                     }
                 }
