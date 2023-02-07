@@ -13,7 +13,7 @@
 
     var
         Text000: Label 'When POS View is changed to Payment';
-        Text001: Label 'Block payment if Sale contains Items with insufficient Inventory';
+        BlockPaymentWFDescriptionLbl: Label 'Block payment if Sale contains Items with insufficient Inventory';
         Text003: Label 'When POS View is changed from Login to Sale';
 
     // Discovery
@@ -131,7 +131,7 @@
         case Rec."Subscriber Function" of
             'TestItemInventory':
                 begin
-                    Rec.Description := Text001;
+                    Rec.Description := CopyStr(BlockPaymentWFDescriptionLbl, 1, MaxStrLen(Rec.Description));
                     Rec."Sequence No." := 10;
                     Rec.Enabled := false;
                 end;
