@@ -638,7 +638,7 @@
             end;
 
             if SaleLinePOS."Location Code" = '' then begin
-                SaleLinePOS."Location Code" := POSStore."Location Code";
+                SaleLinePOS.Validate("Location Code", POSStore."Location Code");
             end;
             if (SaleLinePOS."Responsibility Center" = '') and (POSStore."Responsibility Center" <> '') then
                 SaleLinePOS.Validate("Responsibility Center", POSStore."Responsibility Center");

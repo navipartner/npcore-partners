@@ -88,6 +88,8 @@
                             "Unit Price" := FindItemSalesPrice();
                             Validate(Quantity);
                             POSSaleTranslation.AssignTranslationOnPOSSaleLine(Rec, SalePOS);
+                            if "No." <> xRec."No." then
+                                GetDefaultBin();
                         end;
                     "Line Type"::"Item Category":
                         begin
@@ -118,6 +120,12 @@
             Caption = 'Location Code';
             DataClassification = CustomerContent;
             TableRelation = Location;
+
+            trigger OnValidate()
+            begin
+                if "Location Code" <> xRec."Location Code" then
+                    GetDefaultBin();
+            end;
         }
         field(8; "Posting Group"; Code[20])
         {
@@ -831,6 +839,8 @@
             trigger OnValidate()
             begin
                 Validate("No.");
+                if "Variant Code" <> xRec."Variant Code" then
+                    GetDefaultBin();
             end;
         }
         field(103; "Line Amount"; Decimal)
@@ -1763,6 +1773,7 @@
 
     var
         _Item: Record Item;
+        _Location: Record Location;
         POSUnitGlobal: Record "NPR POS Unit";
         SalePOS: Record "NPR POS Sale";
         Currency: Record Currency;
@@ -2632,8 +2643,134 @@
         end;
     end;
 
+    procedure GetDefaultBin()
+    var
+        WMSManagement: Codeunit "WMS Management";
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeGetDefaultBin(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        if not IsInventoriableItem() then
+            exit;
+
+        "Bin Code" := '';
+
+        if ("Location Code" <> '') and ("No." <> '') then begin
+            GetLocation("Location Code");
+            if _Location."Bin Mandatory" and not _Location."Directed Put-away and Pick" then begin
+                if IsAsmToOrderRequired() then
+                    if GetATOBin(_Location, "Bin Code") then
+                        exit;
+
+                if not IsShipmentBinOverridesDefaultBin(_Location) then begin
+                    WMSManagement.GetDefaultBin("No.", "Variant Code", "Location Code", "Bin Code");
+                    HandleDedicatedBin(false);
+                end;
+            end;
+        end;
+
+        OnAfterGetDefaultBin(Rec);
+    end;
+
+    local procedure GetATOBin(Location: Record Location; var BinCode: Code[20]): Boolean
+    var
+        AsmHeader: Record "Assembly Header";
+    begin
+        if not Location."Require Shipment" then
+            BinCode := Location."Asm.-to-Order Shpt. Bin Code";
+        if BinCode <> '' then
+            exit(true);
+
+        if AsmHeader.GetFromAssemblyBin(Location, BinCode) then
+            exit(true);
+
+        exit(false);
+    end;
+
+    local procedure HandleDedicatedBin(IssueWarning: Boolean)
+    var
+        WhseIntegrationMgt: Codeunit "Whse. Integration Management";
+    begin
+        if Quantity <= 0 then
+            exit;
+
+        WhseIntegrationMgt.CheckIfBinDedicatedOnSrcDoc("Location Code", "Bin Code", IssueWarning);
+    end;
+
+    procedure IsInventoriableItem(): Boolean
+    begin
+        if ("Line Type" <> "Line Type"::Item) or ("No." = '') then
+            exit(false);
+        GetItem();
+        exit(_Item.IsInventoriableType());
+    end;
+
+    local procedure GetLocation(LocationCode: Code[10])
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeGetLocation(Rec, xRec, _Location, LocationCode, IsHandled);
+        If IsHandled then
+            exit;
+
+        if LocationCode = '' then
+            Clear(_Location)
+        else
+            if _Location.Code <> LocationCode then
+                _Location.Get(LocationCode);
+    end;
+
+    local procedure IsAsmToOrderRequired(): Boolean
+    var
+        POSPostItemEntries: Codeunit "NPR POS Post Item Entries";
+        IsHandled: Boolean;
+        Result: Boolean;
+    begin
+        OnBeforeIsAsmToOrderRequired(Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
+        if ("Line Type" <> "Line Type"::Item) or ("No." = '') then
+            exit(false);
+
+        exit(POSPostItemEntries.IsAsmToOrderRequired("No.", "Variant Code", "Location Code"));
+    end;
+
+    local procedure IsShipmentBinOverridesDefaultBin(Location: Record Location): Boolean
+    var
+        Bin: Record Bin;
+        ShipmentBinAvailable: Boolean;
+    begin
+        ShipmentBinAvailable := Bin.Get(Location.Code, Location."Shipment Bin Code");
+        exit(Location."Require Shipment" and ShipmentBinAvailable);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetDescription(var POSSaleLine: Record "NPR POS Sale Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetDefaultBin(var POSSaleLine: Record "NPR POS Sale Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetDefaultBin(var POSSaleLine: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetLocation(var POSSaleLine: Record "NPR POS Sale Line"; xPOSSaleLine: Record "NPR POS Sale Line"; var Location: Record "Location"; LocationCode: Code[10]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeIsAsmToOrderRequired(POSSaleLine: Record "NPR POS Sale Line"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
