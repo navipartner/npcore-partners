@@ -24,8 +24,8 @@ To set up the prepayment flow of 100% on ordering for the Click & Collect module
 5. Deliver the Click & Collect order on the POS.    
    When you use the button to pick up the order, a window for scanning or inserting a reference number for the order is displayed.
 6. Provide the order reference number.      
-   The original sales order is opened, and the salesperson can see the details of items to deliver. 
-   On the POS, there are two lines - one with the **Collect Order No.**, and the other with the **Remaining Amount for Order**. In case of the 100% prepayment, the remaining amount should equal to zero. 
+   The original sales order is opened, and the salesperson can see the details of items to deliver.     
+   On the POS, there are two lines - one with the **Collect Order No.**, and the other with the **Remaining Amount for Order**. In the case of the 100% prepayment, the remaining amount should equal to zero. 
 7. Continue to the payment screen, and complete the zero payment in cash to finalize the sale.     
    The original sales order is posted into a posted invoice on the **Customer Ledger Entries**, and the items are shipped. 
 
