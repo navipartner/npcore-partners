@@ -50,6 +50,7 @@
     end;
 
     var
+        Location: Record Location;
         PostingDate: Date;
         PostingDateExists: Boolean;
         ReplacePostingDate: Boolean;
@@ -82,12 +83,14 @@
     var
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
-        MoveToLocation: Record Location;
         Item: Record Item;
         POSPeriodRegister: Record "NPR POS Period Register";
+        TempWhseJnlLine: Record "Warehouse Journal Line" temporary;
+        TempWhseTrackingSpecification: Record "Tracking Specification" temporary;
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
         WMSManagement: Codeunit "WMS Management";
         POSPostILEPublicAccess: Codeunit "NPR POS Post ILE Public Access";
+        PostWhseJnlLine: Boolean;
     begin
         Clear(ItemJnlLine);
         OnBeforePostPOSSalesLineItemJnl(POSSalesLine);
@@ -116,10 +119,14 @@
         ItemJnlLine."Shortcut Dimension 1 Code" := POSSalesLine."Shortcut Dimension 1 Code";
         ItemJnlLine."Shortcut Dimension 2 Code" := POSSalesLine."Shortcut Dimension 2 Code";
         ItemJnlLine."Dimension Set ID" := POSSalesLine."Dimension Set ID";
-        if POSSalesLine."Location Code" = '' then begin
+        if POSSalesLine."Location Code" = '' then
             POSSalesLine."Location Code" := POSStore."Location Code";
-        end;
         ItemJnlLine."Location Code" := POSSalesLine."Location Code";
+        if POSSalesLine."Bin Code" = '' then begin
+            GetLocation(POSSalesLine."Location Code");
+            if Location."Bin Mandatory" and not Location."Directed Put-away and Pick" then
+                WMSManagement.GetDefaultBin(POSSalesLine."No.", POSSalesLine."Variant Code", POSSalesLine."Location Code", POSSalesLine."Bin Code");
+        end;
         ItemJnlLine."Bin Code" := POSSalesLine."Bin Code";
         ItemJnlLine."Variant Code" := POSSalesLine."Variant Code";
         ItemJnlLine."Inventory Posting Group" := POSSalesLine."Posting Group";
@@ -133,9 +140,9 @@
         ItemJnlLine."Transaction Specification" := POSEntry."Transaction Specification";
         if POSSalesLine."Withhold Item" then begin
             ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::Transfer;
-            MoveToLocation.Get(POSSalesLine."Move to Location");
-            ItemJnlLine."New Location Code" := MoveToLocation.Code;
-            if MoveToLocation."Bin Mandatory" and not MoveToLocation."Directed Put-away and Pick" then
+            GetLocation(POSSalesLine."Move to Location");
+            ItemJnlLine."New Location Code" := Location.Code;
+            if Location."Bin Mandatory" and not Location."Directed Put-away and Pick" then
                 WMSManagement.GetDefaultBin(ItemJnlLine."Item No.", ItemJnlLine."Variant Code", ItemJnlLine."New Location Code", ItemJnlLine."New Bin Code");
         end else
             ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::Sale;
@@ -183,10 +190,23 @@
         if Item.Get(POSSalesLine."No.") then
             ItemJnlLine."NPR Vendor No." := Item."Vendor No.";
 
+        if (POSSalesLine."Location Code" <> '') and (POSSalesLine.Type = POSSalesLine.Type::Item) and (ItemJnlLine.Quantity <> 0) then
+            if ShouldPostWhseJnlLine(POSSalesLine) then begin
+                CreateWhseJnlLine(ItemJnlLine, POSSalesLine, TempWhseJnlLine);
+                PostWhseJnlLine := true;
+            end;
+
         POSPostILEPublicAccess.OnAfterCreateItemJournalLine(POSEntry, POSSalesLine, ItemJnlLine);
 
-        if (ItemJnlLine."Journal Template Name" = '') and (ItemJnlLine."Journal Batch Name" = '') then
-            ItemJnlPostLine.RunWithCheck(ItemJnlLine);
+        if not ((ItemJnlLine."Journal Template Name" = '') and (ItemJnlLine."Journal Batch Name" = '')) then
+            exit;
+
+        if not ItemJnlPostLine.RunWithCheck(ItemJnlLine) then
+            ItemJnlPostLine.CheckItemTracking();
+        if PostWhseJnlLine then begin
+            CollectWhseJnlLineTracking(ItemJnlPostLine, TempWhseJnlLine, TempWhseTrackingSpecification);
+            POSPostWhseJnlLine(TempWhseJnlLine, TempWhseTrackingSpecification);
+        end;
     end;
 
     local procedure InsertTrackingLine(var ItemJournalLine: Record "Item Journal Line")
@@ -256,9 +276,85 @@
         exit(false);
     end;
 
+    local procedure ShouldPostWhseJnlLine(POSSalesLine: Record "NPR POS Entry Sales Line") Result: Boolean
+    var
+        IsHandled: Boolean;
+    begin
+        OnBeforeShouldPostWhseJnlLine(POSSalesLine, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
+        if POSSalesLine.IsInventoriableItem() then begin
+            GetLocation(POSSalesLine."Location Code");
+            exit(Location."Directed Put-away and Pick" or Location."Bin Mandatory");
+        end;
+        exit(false);
+    end;
+
+    local procedure GetLocation(LocationCode: Code[10])
+    begin
+        if LocationCode = '' then
+            Location.GetLocationSetup(LocationCode, Location)
+        else
+            if Location.Code <> LocationCode then
+                Location.Get(LocationCode);
+    end;
+
+    local procedure CreateWhseJnlLine(ItemJnlLine: Record "Item Journal Line"; POSSalesLine: Record "NPR POS Entry Sales Line"; var TempWhseJnlLine: Record "Warehouse Journal Line" temporary)
+    var
+        WhseMgt: Codeunit "Whse. Management";
+        WMSMgt: Codeunit "WMS Management";
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCreateWhseJnlLine(POSSalesLine, ItemJnlLine, IsHandled);
+        if IsHandled then
+            exit;
+
+        GetLocation(POSSalesLine."Location Code");
+        WMSMgt.CheckAdjmtBin(Location, ItemJnlLine.Quantity, true);
+        WMSMgt.CreateWhseJnlLine(ItemJnlLine, 0, TempWhseJnlLine, false);
+        TempWhseJnlLine."Source Type" := DATABASE::"NPR POS Entry Sales Line";
+        TempWhseJnlLine."Source Subtype" := 0;
+        TempWhseJnlLine."Source Code" := ItemJnlLine."Source Code";
+        TempWhseJnlLine."Source Document" := WhseMgt.GetWhseJnlSourceDocument(TempWhseJnlLine."Source Type", TempWhseJnlLine."Source Subtype");
+        TempWhseJnlLine."Source No." := Format(POSSalesLine."POS Entry No.");
+        TempWhseJnlLine."Source Line No." := POSSalesLine."Line No.";
+        TempWhseJnlLine."Reference Document" := TempWhseJnlLine."Reference Document"::" ";
+        TempWhseJnlLine."Reference No." := POSSalesLine."Document No.";
+
+        OnAfterCreateWhseJnlLine(POSSalesLine, TempWhseJnlLine);
+    end;
+
+    local procedure CollectWhseJnlLineTracking(ItemJnlPostLine: Codeunit "Item Jnl.-Post Line"; WhseJnlLine: Record "Warehouse Journal Line"; var WhseTrackingSpecification: Record "Tracking Specification")
+    var
+        TempTrackingSpec: Record "Tracking Specification" temporary;
+    begin
+        if ItemJnlPostLine.CollectTrackingSpecification(TempTrackingSpec) then
+            if TempTrackingSpec.FindSet() then
+                repeat
+                    WhseTrackingSpecification := TempTrackingSpec;
+                    WhseTrackingSpecification.SetSource(WhseJnlLine."Source Type", -1, WhseJnlLine."Source No.", WhseJnlLine."Source Line No.", '', 0);
+                    if WhseTrackingSpecification.Insert() then;
+                until TempTrackingSpec.Next() = 0;
+    end;
+
+    local procedure POSPostWhseJnlLine(WhseJnlLine: Record "Warehouse Journal Line"; var WhseTrackingSpecification: Record "Tracking Specification")
+    var
+        TempWhseJnlLine2: Record "Warehouse Journal Line" temporary;
+        ItemTrackingMgt: Codeunit "Item Tracking Management";
+        WhseJnlPostLine: Codeunit "Whse. Jnl.-Register Line";
+    begin
+        ItemTrackingMgt.SplitWhseJnlLine(WhseJnlLine, TempWhseJnlLine2, WhseTrackingSpecification, false);
+        if TempWhseJnlLine2.FindSet() then
+            repeat
+                WhseJnlPostLine.Run(TempWhseJnlLine2);
+            until TempWhseJnlLine2.Next() = 0;
+        WhseTrackingSpecification.DeleteAll();
+    end;
+
     local procedure CheckAndCreateAssemblyOrder(FailOnError: Boolean; POSEntry: Record "NPR POS Entry"; POSSalesLine: Record "NPR POS Entry Sales Line"): Boolean
     var
-        Item: Record Item;
         AssemblyHeader: Record "Assembly Header";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
         AssemblyPost: Codeunit "Assembly-Post";
@@ -266,17 +362,7 @@
         CreateAssemblyLink: Boolean;
         AssemblyHeaderLbl: Label '%1: %2 - %3', Locked = true;
     begin
-        if (POSSalesLine.Type <> POSSalesLine.Type::Item) then
-            exit(true);
-
-        if (POSSalesLine.Quantity <= 0) then
-            exit(true);
-
-        Item.Get(POSSalesLine."No.");
-        if (Item."Replenishment System" <> Item."Replenishment System"::Assembly) then
-            exit(true);
-
-        if (Item."Assembly Policy" <> Item."Assembly Policy"::"Assemble-to-Order") then
+        if not IsAsmToOrderRequired(POSSalesLine) then
             exit(true);
 
         CreateAssembly := true;
@@ -346,8 +432,6 @@
         if (FailOnError) then
             Error(GetLastErrorText);
 
-
-
         exit(false);
     end;
 
@@ -380,6 +464,75 @@
         exit(true);
     end;
 
+    local procedure IsAsmToOrderRequired(POSSalesLine: Record "NPR POS Entry Sales Line"): Boolean
+    var
+        IsHandled: Boolean;
+        Result: Boolean;
+    begin
+        OnBeforeIsAsmToOrderRequired(POSSalesLine, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
+        if (POSSalesLine.Type <> POSSalesLine.Type::Item) or
+           (POSSalesLine."No." = '') or
+           (POSSalesLine.Quantity <= 0)
+        then
+            exit(false);
+
+        exit(IsAsmToOrderRequired(POSSalesLine."No.", POSSalesLine."Variant Code", POSSalesLine."Location Code"));
+    end;
+
+    procedure IsAsmToOrderRequired(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]): Boolean
+    var
+        Item: Record Item;
+        StockkeepingUnit: Record "Stockkeeping Unit";
+    begin
+        if StockkeepingUnit.Get(LocationCode, ItemNo, VariantCode) then
+            exit(
+                (StockkeepingUnit."Replenishment System" = StockkeepingUnit."Replenishment System"::Assembly) and
+                (StockkeepingUnit."Assembly Policy" = StockkeepingUnit."Assembly Policy"::"Assemble-to-Order"));
+
+        Item.Get(ItemNo);
+        exit(
+            (Item."Replenishment System" = Item."Replenishment System"::Assembly) and
+            (Item."Assembly Policy" = Item."Assembly Policy"::"Assemble-to-Order"));
+    end;
+
+#IF NOT (BC17 or BC18 or BC19 or BC20)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse. Management", 'OnAfterGetSourceDocumentType', '', false, false)]
+    local procedure GetPOSRelatedSourceDocumentType(SourceType: Integer; SourceSubtype: Integer; var SourceDocument: Enum "Warehouse Journal Source Document"; var IsHandled: Boolean)
+    begin
+        if IsHandled or
+           not (SourceType in [Database::"NPR POS Entry Sales Line"])
+        then
+            exit;
+
+        IsHandled := true;
+
+        case SourceType of
+            Database::"NPR POS Entry Sales Line":
+                SourceDocument := "Warehouse Journal Source Document"::"NPR POS Entry";
+        end;
+    end;
+#ENDIF
+#IF (BC17 or BC18 or BC19 or BC20)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse. Management", 'OnAfterGetSourceDocument', '', false, false)]
+    local procedure GetPOSRelatedSourceDocument(SourceType: Integer; SourceSubtype: Integer; var SourceDocument: Option; var IsHandled: Boolean)
+    begin
+        if IsHandled or
+           not (SourceType in [Database::"NPR POS Entry Sales Line"])
+        then
+            exit;
+
+        IsHandled := true;
+
+        case SourceType of
+            Database::"NPR POS Entry Sales Line":
+                SourceDocument := "Warehouse Journal Source Document"::"NPR POS Entry".AsInteger();
+        end;
+    end;
+#ENDIF
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforePostPOSEntry(var POSEntry: Record "NPR POS Entry")
     begin
@@ -397,6 +550,26 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterPostPOSEntry(var POSEntry: Record "NPR POS Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeIsAsmToOrderRequired(POSSalesLine: Record "NPR POS Entry Sales Line"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeShouldPostWhseJnlLine(POSSalesLine: Record "NPR POS Entry Sales Line"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateWhseJnlLine(POSSalesLine: Record "NPR POS Entry Sales Line"; ItemJnlLine: Record "Item Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateWhseJnlLine(var POSSalesLine: Record "NPR POS Entry Sales Line"; var TempWhseJnlLine: Record "Warehouse Journal Line" temporary)
     begin
     end;
 }

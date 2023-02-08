@@ -363,8 +363,9 @@
         {
             Caption = 'Bin Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.32.10';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"),
+                                            "Item Filter" = FIELD("No."),
+                                            "Variant Filter" = FIELD("Variant Code"));
         }
         field(201; "Qty. per Unit of Measure"; Decimal)
         {
@@ -638,5 +639,21 @@
                 "Dimension Set ID", StrSubstNo(DimSetIdLbl, TableCaption, "POS Entry No.", "Line No."), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
             Modify();
         end;
+    end;
+
+    procedure IsInventoriableItem(): Boolean
+    var
+        Item: Record Item;
+    begin
+        if (Type <> Type::Item) or ("No." = '') then
+            exit(false);
+        GetItem(Item);
+        exit(Item.IsInventoriableType());
+    end;
+
+    procedure GetItem(var Item: Record Item)
+    begin
+        TestField("No.");
+        Item.Get("No.");
     end;
 }

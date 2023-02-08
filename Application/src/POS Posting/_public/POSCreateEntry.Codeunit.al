@@ -255,6 +255,7 @@
         POSEntrySalesLine."No." := POSSaleLine."No.";
         POSEntrySalesLine."Variant Code" := POSSaleLine."Variant Code";
         POSEntrySalesLine."Location Code" := POSSaleLine."Location Code";
+        POSEntrySalesLine."Bin Code" := POSSaleLine."Bin Code";
         POSEntrySalesLine."Posting Group" := POSSaleLine."Posting Group";
         POSEntrySalesLine.Description := POSSaleLine.Description;
         POSEntrySalesLine."Description 2" := POSSaleLine."Description 2";
