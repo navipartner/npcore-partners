@@ -17,26 +17,15 @@
         ListOfDirectory: List of [Text];
     begin
         ClearLastError();
-        case true of
-            ImportType."Ftp Filename" <> '':
-                if TryImportNewEntry(TempImportEntry, ImportType, ImportType."Ftp Filename") then
-                    SaveNewEntry(TempImportEntry);
+        if ImportType."Ftp Filename" <> '' then
+            ListOfDirectory.Add(ImportType."Ftp Filename")
+        else
+            ListDirectory(ImportType, ListOfDirectory);
 
-            ImportType.Sftp:
-                if DownloadSftpFilenames(ImportType, ListOfDirectory) then begin
-                    foreach Filename in ListOfDirectory do
-                        if TryImportNewEntrySftp(TempImportEntry, ImportType, Filename) then
-                            SaveNewEntry(TempImportEntry);
-                end;
-
-            DownloadFtpListDirectoryDetails(ImportType, ListOfDirectory):
-                foreach FileName in ListOfDirectory do begin
-                    if TryImportNewEntry(TempImportEntry, ImportType, Filename) then
-                        SaveNewEntry(TempImportEntry);
-                end;
-            else
-                exit(false);
-        end;
+        OnBeforeDownloadDirectory(ImportType, ListOfDirectory);
+        foreach Filename in ListOfDirectory do
+            if DownloadFileToImportEntry(TempImportEntry, ImportType, Filename) then
+                SaveNewEntry(TempImportEntry);
 
         if GetLastErrorText() = '' then
             exit(true);
@@ -51,6 +40,14 @@
     begin
         StoreImportEntries(ImportEntryTmp);
         Commit();
+    end;
+
+    local procedure DownloadFileToImportEntry(var TempImportEntry: Record "NPR Nc Import Entry" temporary; ImportType: Record "NPR Nc Import Type"; Filename: Text): Boolean
+    begin
+        if ImportType.Sftp then
+            exit(TryImportNewEntrySftp(TempImportEntry, ImportType, Filename))
+        else
+            exit(TryImportNewEntry(TempImportEntry, ImportType, Filename));
     end;
 
     [TryFunction]
@@ -208,7 +205,7 @@
     #region "Process Import"
     procedure ProcessImportEntry(var ImportEntry: Record "NPR Nc Import Entry"): Boolean
     begin
-        CODEUNIT.Run(CODEUNIT::"NPR Nc Import Processor", ImportEntry);
+        Codeunit.Run(Codeunit::"NPR Nc Import Processor", ImportEntry);
         if ImportEntry.Get(ImportEntry."Entry No.") then
             exit(ImportEntry.Imported);
 
@@ -233,7 +230,7 @@
 
                 if Task.Get(Task."Entry No.") then;
                 ClearLastError();
-                if not CODEUNIT.Run(TaskSetup."Codeunit ID", Task) then begin
+                if not Codeunit.Run(TaskSetup."Codeunit ID", Task) then begin
                     TaskError(Task);
                     exit(false);
                 end;
@@ -359,6 +356,14 @@
     #endregion "Status Mgt."
 
     #region "Ftp List"
+    local procedure ListDirectory(NcImportType: Record "NPR Nc Import Type"; var ListDirectoryDetails: List of [Text]): Boolean
+    begin
+        if NcImportType.Sftp then
+            exit(DownloadSftpFilenames(NcImportType, ListDirectoryDetails))
+        else
+            exit(DownloadFtpListDirectoryDetails(NcImportType, ListDirectoryDetails));
+    end;
+
     [TryFunction]
     local procedure DownloadFtpListDirectoryDetails(ImportType: Record "NPR Nc Import Type"; var ListDirectoryDetails: List of [Text])
     var
@@ -378,7 +383,7 @@
 
         FtpHost := ManageHostPrefix(ImportType."Ftp Host");
         FtpPort := ImportType."Ftp Port";
-        IF FtpPort = 0 then
+        if FtpPort = 0 then
             FtpPort := 21;
 
         FTPClient.Construct(FtpHost, ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive", ImportType."Ftp EncMode");
@@ -400,7 +405,7 @@
                         FileObject := JToken.AsObject();
 
                         FileObject.Get('IsDirectory', JToken);
-                        if not Jtoken.AsValue().AsBoolean() then begin
+                        if not JToken.AsValue().AsBoolean() then begin
                             FileObject.Get('Name', JToken);
                             ListDirectoryDetails.Add(JToken.AsValue().AsText());
                         end;
@@ -454,7 +459,7 @@
                         FileObject := JToken.AsObject();
 
                         FileObject.Get('IsDirectory', JToken);
-                        if not Jtoken.AsValue().AsBoolean() then begin
+                        if not JToken.AsValue().AsBoolean() then begin
                             FileObject.Get('Name', JToken);
                             ListDirectory.Add(JToken.AsValue().AsText());
                         end;
@@ -558,7 +563,7 @@
                         FileObject := JToken.AsObject();
 
                         FileObject.Get('IsDirectory', JToken);
-                        if Jtoken.AsValue().AsBoolean() then begin
+                        if JToken.AsValue().AsBoolean() then begin
                             FileObject.Get('Name', JToken);
                             if JToken.AsValue().AsText() = FolderName then
                                 FolderExist := true;
@@ -691,6 +696,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeClearLastErrorInTaskError(var SkipErrorClearing: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDownloadDirectory(ImportType: Record "NPR Nc Import Type"; var ListOfDirectory: List of [Text])
     begin
     end;
     #endregion events
