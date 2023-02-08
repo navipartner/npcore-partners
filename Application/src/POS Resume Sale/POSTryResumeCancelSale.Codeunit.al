@@ -50,7 +50,7 @@
         _POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.Init(SalePOS."Register No.", SalePOS."Sales Ticket No.", POSSale, Setup, POSFrontEndMgt);
 
-        POSActionCancelSale.CheckSaleBeforeCancel();
+        POSActionCancelSale.CheckSaleBeforeCancel(POSSale);
         POSActionCancelSale.SetAlternativeDescription(AltSaleCancelDescription);
         if not POSActionCancelSale.CancelSale(_POSSession) then
             Error('');
