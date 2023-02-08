@@ -577,6 +577,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'OPEN_CASH_DRAWER', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Open Drawer";
     }
+    value(117; "SPLIT_WAITER_PAD")
+    {
+        Caption = 'SPLIT_WAITER_PAD', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NPRE POSAction: Split Wa.";
+    }
     value(118; "SHOW_RET_AMT_DIALOG")
     {
         Caption = 'SHOW_RET_AMT_DIALOG', Locked = true, MaxLength = 20;
@@ -587,7 +592,6 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: EndOfDay V4";
     }
-
     value(6059935; VOUCHER_PAYMENT)
     {
         Caption = 'VOUCHER_PAYMENT', Locked = true, MaxLength = 20;
