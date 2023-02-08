@@ -18,7 +18,7 @@ codeunit 6059778 "NPR POS Action: Payment WF2 BL"
         IProcessingType := POSPaymentMethodOut."Processing Type";
         WorkflowNameOut := IProcessingType.GetPaymentHandler();
 
-        PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+        PaymentLine.CalculateBalance(POSPaymentMethodOut, SalesAmount, PaidAmount, ReturnAmount, SubTotal);
         AmountOut := PaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, POSPaymentMethodOut, ReturnPOSPaymentMethod, true);
     end;
 
