@@ -355,6 +355,14 @@ codeunit 6014608 "NPR Replication Register"
 #ELSE
         MagentoStoresPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoStores/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
 #ENDIF
+
+        MagentoStoreItemsEndPointIDLbl: Label 'GetMagentoStoreItems', Locked = true;
+        MagentoStoreItemsEndPointDescriptionLbl: Label 'Gets Magento Store Items from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
+        MagentoStoreItemsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoStoreItems/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        MagentoStoreItemsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoStoreItems/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         MagentoPicturesEndPointIDLbl: Label 'GetMagentoPictures', Locked = true;
         MagentoPicturesEndPointDescriptionLbl: Label 'Gets Magento Pictures from related company. ', Locked = true;
 #IF (BC17 or BC18 or BC19 or BC20)
@@ -1513,7 +1521,7 @@ codeunit 6014608 "NPR Replication Register"
         ServiceSetup: Record "NPR Replication Service Setup";
         ServiceEndPoint: Record "NPR Replication Endpoint";
     begin
-        ServiceSetup.SetRange("API Version", DimensionsServiceCodeLbl);
+        ServiceSetup.SetRange("API Version", MiscServiceCodeLbl);
         if ServiceSetup.IsEmpty() then
             exit;
 
@@ -1666,7 +1674,7 @@ codeunit 6014608 "NPR Replication Register"
         ServiceSetup: Record "NPR Replication Service Setup";
         ServiceEndPoint: Record "NPR Replication Endpoint";
     begin
-        ServiceSetup.SetRange("API Version", DimensionsServiceCodeLbl);
+        ServiceSetup.SetRange("API Version", MagentoServiceCodeLbl);
         if ServiceSetup.IsEmpty() then
             exit;
 
@@ -1681,6 +1689,10 @@ codeunit 6014608 "NPR Replication Register"
         ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoStoresEndPointIDLbl, MagentoStoresPathLbl,
                             MagentoStoresEndPointDescriptionLbl, true, 300, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
                             1000, Database::"NPR Magento Store", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoStoreItemsEndPointIDLbl, MagentoStoreItemsPathLbl,
+                           MagentoStoreItemsEndPointDescriptionLbl, true, 310, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                           1000, Database::"NPR Magento Store Item", false, false);
 
         ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoPicturesEndPointIDLbl, MagentoPicturesPathLbl,
                            MagentoPicturesEndPointDescriptionLbl, true, 400, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
@@ -1769,6 +1781,25 @@ codeunit 6014608 "NPR Replication Register"
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
             Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoStoreItemsSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Store Item";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Store Item" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+          Rec.FieldNo("Webshop Description"), 'webshopDescription@odata.mediaReadLink', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+         Rec.FieldNo("Webshop Short Desc."), 'webshopShortDesc@odata.mediaReadLink', 0, false, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]

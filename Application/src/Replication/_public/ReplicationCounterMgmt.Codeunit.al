@@ -801,6 +801,51 @@
         end;
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Store Item", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeInsertMagentoStoreItem(var Rec: Record "NPR Magento Store Item"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Store Item", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeModifyMagentoStoreItem(var Rec: Record "NPR Magento Store Item"; var xRec: Record "NPR Magento Store Item"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Store Item", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure UpdateReplicationCounterOnBeforeRenameMagentoStoreItem(var Rec: Record "NPR Magento Store Item"; var xRec: Record "NPR Magento Store Item"; RunTrigger: Boolean)
+    var
+        DataTypeMgmt: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
+            UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
+            RecRef.SetTable(Rec);
+        end;
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR Magento Picture", 'OnBeforeInsertEvent', '', false, false)]
     local procedure UpdateReplicationCounterOnBeforeInsertMagentoPicture(var Rec: Record "NPR Magento Picture"; RunTrigger: Boolean)
     var
