@@ -30,7 +30,7 @@ codeunit 6014528 "NPR Barcode Font Provider Mgt."
 
     internal procedure SetBarcodeSimbiology(TextToEncode: Text) BarcodeSimbiology: Enum "Barcode Symbology"
     begin
-        if StrLen(TextToEncode) = 13 then
+        if IsValidEan13(TextToEncode) then
             exit(BarcodeSimbiology::"EAN-13")
         else
             exit(BarcodeSimbiology::Code39);
@@ -96,6 +96,16 @@ codeunit 6014528 "NPR Barcode Font Provider Mgt."
         JObject.WriteTo(ContentText);
     end;
 
+    local procedure IsValidEan13(TextToEncode: Text): Boolean
+    var
+        TypeHelper: Codeunit "Type Helper";
+    begin
+        if StrLen(TextToEncode) <> 13 then
+            exit(false);
+        if not TypeHelper.IsNumeric(TextToEncode) then
+            exit(false);
+        exit(not (StrCheckSum(TextToEncode, '1313131313131') <> 0))
+    end;
 
 }
 #endif
