@@ -41,19 +41,18 @@ codeunit 6059872 "NPR POSAction: Cancel Sale B"
         exit(POSSale.TryEndSale(POSSession, false));
     end;
 
-    procedure CheckSaleBeforeCancel()
+    procedure CheckSaleBeforeCancel(Sale: Codeunit "NPR POS Sale")
     var
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
-        PaidAmount: Decimal;
-        ReturnAmount: Decimal;
-        SaleAmount: Decimal;
-        Subtotal: Decimal;
-        POSSession: Codeunit "NPR POS Session";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         PartlyPaidErr: Label 'This sales can''t be deleted. It has been partly paid. You must first void the payment.';
     begin
-        POSSession.GetPaymentLine(POSPaymentLine);
-        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
-        if (PaidAmount <> 0) then
+        Sale.GetCurrentSale(SalePOS);
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"POS Payment");
+        SaleLinePOS.SetFilter("Amount Including VAT", '<> %1', 0);
+        if not SaleLinePOS.IsEmpty() then
             Error(PartlyPaidErr);
     end;
 
