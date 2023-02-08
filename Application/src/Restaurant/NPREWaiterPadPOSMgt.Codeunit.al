@@ -518,6 +518,7 @@
         exit(true);
     end;
 
+    [Obsolete('Use procedure that uses "NPR POS JSON Helper" as parameter. Delete when final v1/v2 workflow is gone')]
     procedure FindSeating(JSON: Codeunit "NPR POS JSON Management"; var NPRESeating: Record "NPR NPRE Seating")
     var
         RestaurantCode: Code[20];
@@ -546,6 +547,34 @@
         end;
     end;
 
+    procedure FindSeating(JSON: Codeunit "NPR POS JSON Helper"; var NPRESeating: Record "NPR NPRE Seating")
+    var
+        SeatingManagement: Codeunit "NPR NPRE Seating Mgt.";
+        RestaurantCode: Code[20];
+        SeatingCode: Code[20];
+        OutText: text;
+        LocationFilter: Text;
+        SeatingFilter: Text;
+    begin
+        if JSON.GetString('restaurantCode', OutText) then
+            RestaurantCode := CopyStr(OutText, 1, MaxStrLen(RestaurantCode));
+        SeatingCode := GetSeatingCode(JSON, RestaurantCode);
+        NPRESeating.Get(SeatingCode);
+
+        SeatingFilter := JSON.GetStringParameter('SeatingFilter');
+        LocationFilter := JSON.GetStringParameter('LocationFilter');
+        if LocationFilter = '' then
+            LocationFilter := SeatingManagement.RestaurantSeatingLocationFilter(RestaurantCode);
+        if (SeatingFilter <> '') or (LocationFilter <> '') then begin
+            NPRESeating.SetRecFilter();
+            NPRESeating.FilterGroup(2);
+            NPRESeating.SetFilter(Code, SeatingFilter);
+            NPRESeating.SetFilter("Seating Location", LocationFilter);
+            NPRESeating.FindFirst();
+        end;
+    end;
+
+    [Obsolete('Use procedure that uses "NPR POS JSON Helper" as parameter. Delete when final v1/v2 workflow is gone')]
     local procedure GetSeatingCode(JSON: Codeunit "NPR POS JSON Management"; RestaurantCode: Code[20]) SeatingCode: Code[20]
     var
         SeatingManagement: Codeunit "NPR NPRE Seating Mgt.";
@@ -569,6 +598,36 @@
         end;
         SeatingFilter := JSON.GetStringOrFail('SeatingFilter', StrSubstNo(ReadingErr, ObjectIdentifier()));
         LocationFilter := JSON.GetStringOrFail('LocationFilter', StrSubstNo(ReadingErr, ObjectIdentifier()));
+        if LocationFilter = '' then
+            LocationFilter := SeatingManagement.RestaurantSeatingLocationFilter(RestaurantCode);
+        SeatingCode := SeatingManagement.UILookUpSeating(SeatingFilter, LocationFilter);
+        exit(SeatingCode);
+    end;
+
+    local procedure GetSeatingCode(JSON: Codeunit "NPR POS JSON Helper"; RestaurantCode: Code[20]) SeatingCode: Code[20]
+    var
+        NPRESeating: Record "NPR NPRE Seating";
+        SeatingManagement: Codeunit "NPR NPRE Seating Mgt.";
+        ShowOnlyActiveWaiPad: Boolean;
+        OutText: text;
+        SeatingFilter: Text;
+        LocationFilter: Text;
+    begin
+        if JSON.GetString('seatingCode', OutText) then
+            SeatingCode := CopyStr(OutText, 1, MaxStrLen(SeatingCode));
+        if SeatingCode <> '' then
+            exit(SeatingCode);
+
+        if JSON.GetIntegerParameter('InputType') <> 2 then
+            exit('');
+
+        if JSON.GetBoolean('ShowOnlyActiveWaiPad', ShowOnlyActiveWaiPad) and ShowOnlyActiveWaiPad then begin
+            NPRESeating.SetAutoCalcFields("Current Waiter Pad FF");
+            NPRESeating.SetFilter("Current Waiter Pad FF", '<>%1', '');
+            SeatingManagement.SetAddSeatingFilters(NPRESeating);
+        end;
+        SeatingFilter := JSON.GetStringParameter('SeatingFilter');
+        LocationFilter := JSON.GetStringParameter('LocationFilter');
         if LocationFilter = '' then
             LocationFilter := SeatingManagement.RestaurantSeatingLocationFilter(RestaurantCode);
         SeatingCode := SeatingManagement.UILookUpSeating(SeatingFilter, LocationFilter);

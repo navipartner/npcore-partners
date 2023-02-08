@@ -272,7 +272,7 @@ codeunit 6014574 "NPR POS JSON Helper"
     var
         String: Text;
     begin
-        String := GetString(Property);
+        if GetString(Property, String) then;
         Bool := JsonStringToBool(String, ValueOut);
     end;
 
