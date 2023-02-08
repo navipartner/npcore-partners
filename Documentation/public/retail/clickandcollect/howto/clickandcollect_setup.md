@@ -27,7 +27,7 @@ The following procedure contains necessary steps for creating a collect store th
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Collect Stores**, and choose the related link.            
    The card contains various options for managing collect stores.  
 2. To create a new store card, click **New**.             
-   The **Collect Store Card** popup window is displayed. Use the provided fields to create a collect store.       
+   The **Collect Store Card** popup window is displayed.    
 3. Provide the company name in the **Company Name** field.      
    The **Service URL** field is populated automatically if the store is in the same tenant, but it needs to be provided manually if that's not the case. 
 4. Provide the service username and password in the designated fields. 
@@ -84,21 +84,22 @@ To create a new collect workflow, refer to the provided steps:
    
    #### E-mail Setup
 
-   The email setup procedure slightly differs depending on whether the environment you're on is on-prem or SaaS. 
+   The email setup procedure slightly differs depending on whether the environment you're in is on-prem or SaaS. 
+
    ##### SaaS
 
    On SaaS environments, you first need to set up the email account. 
 
    1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Email Accounts**, and choose the related link. 
-   2. Click **New**, and then **Add an email account**.
-   3. Choose the **SMTP** option, and click **Next**.     
+   2. Click **New** and then **Add an email account**.
+   3. Choose the **SMTP** option and click **Next**.     
       The **Setup SMTP Account** popup window is displayed. 
    4. Provide the following information:       
       - the name that will be used to identify the account (**Account Name**)
       - the **Sender Type** (whether it's a currently logged-in user or another user, who will be specified)
       - the email address of the user (if **Specific User** is selected in **Sender Type**)
       - the URL to the SMTP server (**Server Url**)
-      - the **Authentication** type, and the accompanying data if needed (e.g. username and password).
+      - the **Authentication** type, and the accompanying data if needed (e.g., username and password).
       - Specify if the mail server requires a secure connection that uses encryption or certificates. 
    5. Click **Finish**.      
       If you wish, you can also send a test email to check the validity of all provided information. 
