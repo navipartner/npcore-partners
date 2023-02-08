@@ -3,6 +3,7 @@
     var
         Text000: Label 'Ambigous input, please specify.';
         Text001: Label '"%1" not found.';
+        OverMaxLenTextLbl: Label 'Text "%1" has more then max allowed %2 characters.', Comment = '%1-text, %2-max character no.';
 
     [Obsolete('Only necessary to for v1/v2 workflow. Remove when everything is migrated to v3.')]
     internal procedure InvokeEanBox(EanBoxValue: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management")
@@ -193,8 +194,11 @@
         IntBuffer: Integer;
         DecBuffer: Decimal;
     begin
-        if EanBoxParameter."Ean Box Value" then
-            EanBoxParameter.Value := EanBoxValue;
+        if EanBoxParameter."Ean Box Value" then begin
+            if StrLen(EanBoxValue) > MaxStrLen(EanBoxParameter.Value) then
+                Error(OverMaxLenTextLbl, EanBoxValue, MaxStrLen(EanBoxParameter.Value));
+            EanBoxParameter.Value := CopyStr(EanBoxValue, 1, MaxStrLen(EanBoxParameter.Value));
+        end;
 
         case EanBoxParameter."Data Type" of
             EanBoxParameter."Data Type"::Option:
@@ -225,8 +229,11 @@
         IntBuffer: Integer;
         DecBuffer: Decimal;
     begin
-        if EanBoxParameter."Ean Box Value" then
-            EanBoxParameter.Value := EanBoxValue;
+        if EanBoxParameter."Ean Box Value" then begin
+            if StrLen(EanBoxValue) > MaxStrLen(EanBoxParameter.Value) then
+                Error(OverMaxLenTextLbl, EanBoxValue, MaxStrLen(EanBoxParameter.Value));
+            EanBoxParameter.Value := CopyStr(EanBoxValue, 1, MaxStrLen(EanBoxParameter.Value));
+        end;
 
         case EanBoxParameter."Data Type" of
             EanBoxParameter."Data Type"::Option:
