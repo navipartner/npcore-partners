@@ -557,6 +557,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SINGLE_SALE_STATS', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Sin Sale Stats";
     }
+    value(112; "SPLIT_BILL")
+    {
+        Caption = 'SPLIT_BILL', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NPRE POS Action: SplitBill";
+    }
     value(113; "SETVATBPGRP")
     {
         Caption = 'SETVATBPGRP', Locked = true, MaxLength = 20;
