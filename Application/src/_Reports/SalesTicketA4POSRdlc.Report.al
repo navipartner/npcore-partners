@@ -80,7 +80,6 @@
             }
             column(POS_Unit_No_; "POS Unit No.")
             {
-                IncludeCaption = true;
             }
             dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
             {
@@ -106,6 +105,10 @@
                     IncludeCaption = true;
                 }
                 column(Quantity_POS_Entry_Sales_Line; Quantity)
+                {
+                    IncludeCaption = true;
+                }
+                column(UOM_POS_Entry_Sales_Line; "Unit of Measure Code")
                 {
                     IncludeCaption = true;
                 }
@@ -357,6 +360,7 @@
         PaymentLabel = 'Payment Specification';
         VATLabel = 'VAT Specification';
         PosStoreCodeLabel = 'Store Code';
+        UOMLabel = 'UOM';
     }
 
     trigger OnPreReport()

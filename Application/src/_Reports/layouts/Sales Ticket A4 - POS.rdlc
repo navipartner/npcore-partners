@@ -6954,6 +6954,15 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
       </DefaultValue>
       <Prompt>PosStoreCodeLabel</Prompt>
     </ReportParameter>
+    <ReportParameter Name="UOMLabel">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>UOMLabel</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>UOMLabel</Prompt>
+    </ReportParameter>
     <ReportParameter Name="Picture_CompanyInformationCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -7008,15 +7017,6 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
       </DefaultValue>
       <Prompt>Document_No_POS_EntryCaption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="POS_Unit_No_Caption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>POS_Unit_No_Caption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>POS_Unit_No_Caption</Prompt>
-    </ReportParameter>
     <ReportParameter Name="No_POS_Entry_Sales_LineCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -7044,6 +7044,15 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
       </DefaultValue>
       <Prompt>Quantity_POS_Entry_Sales_LineCaption</Prompt>
     </ReportParameter>
+    <ReportParameter Name="UOM_POS_Entry_Sales_LineCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>UOM_POS_Entry_Sales_LineCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>UOM_POS_Entry_Sales_LineCaption</Prompt>
+    </ReportParameter>
     <ReportParameter Name="Unit_Price_POS_Entry_Sales_LineCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -7070,6 +7079,78 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
         </Values>
       </DefaultValue>
       <Prompt>Amount_Incl_VAT_POS_Entry_Sales_LineCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="POSEntryNo_NPRDEPOSAuditLogAuxInfoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>POSEntryNo_NPRDEPOSAuditLogAuxInfoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>POSEntryNo_NPRDEPOSAuditLogAuxInfoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TSSCode_NPRDEPOSAuditLogAuxInfoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TSSCode_NPRDEPOSAuditLogAuxInfoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TSSCode_NPRDEPOSAuditLogAuxInfoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TransactionID_NPRDEPOSAuditLogAuxInfoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TransactionID_NPRDEPOSAuditLogAuxInfoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TransactionID_NPRDEPOSAuditLogAuxInfoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="StartTime_NPRDEPOSAuditLogAuxInfoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>StartTime_NPRDEPOSAuditLogAuxInfoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>StartTime_NPRDEPOSAuditLogAuxInfoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="FinishTime_NPRDEPOSAuditLogAuxInfoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>FinishTime_NPRDEPOSAuditLogAuxInfoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>FinishTime_NPRDEPOSAuditLogAuxInfoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SignatureCount_NPRDEPOSAuditLogAuxInfoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SignatureCount_NPRDEPOSAuditLogAuxInfoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SignatureCount_NPRDEPOSAuditLogAuxInfoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Signature_NPRDEPOSAuditLogAuxInfoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Signature_NPRDEPOSAuditLogAuxInfoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Signature_NPRDEPOSAuditLogAuxInfoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SerialNumber_NPRDEPOSAuditLogAuxInfoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SerialNumber_NPRDEPOSAuditLogAuxInfoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SerialNumber_NPRDEPOSAuditLogAuxInfoCaption</Prompt>
     </ReportParameter>
     <ReportParameter Name="POSPaymentMethodCode_POS_Payment_LineCaption">
       <DataType>String</DataType>
@@ -7174,7 +7255,7 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>36</NumberOfRows>
+      <NumberOfRows>45</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -7239,37 +7320,37 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>12</RowIndex>
-          <ParameterName>Picture_CompanyInformationCaption</ParameterName>
+          <ParameterName>UOMLabel</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>13</RowIndex>
-          <ParameterName>VAT_Registration_No_CompanyInformationCaption</ParameterName>
+          <ParameterName>Picture_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>14</RowIndex>
-          <ParameterName>Phone_No_CompanyInformationCaption</ParameterName>
+          <ParameterName>VAT_Registration_No_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>15</RowIndex>
-          <ParameterName>E_Mail_CompanyInformationCaption</ParameterName>
+          <ParameterName>Phone_No_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>16</RowIndex>
-          <ParameterName>Home_Page_CompanyInformationCaption</ParameterName>
+          <ParameterName>E_Mail_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>17</RowIndex>
-          <ParameterName>Document_No_POS_EntryCaption</ParameterName>
+          <ParameterName>Home_Page_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>18</RowIndex>
-          <ParameterName>POS_Unit_No_Caption</ParameterName>
+          <ParameterName>Document_No_POS_EntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -7289,71 +7370,116 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>22</RowIndex>
-          <ParameterName>Unit_Price_POS_Entry_Sales_LineCaption</ParameterName>
+          <ParameterName>UOM_POS_Entry_Sales_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>23</RowIndex>
-          <ParameterName>Line_Discount_pct_POS_Entry_Sales_LineCaption</ParameterName>
+          <ParameterName>Unit_Price_POS_Entry_Sales_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>24</RowIndex>
-          <ParameterName>Amount_Incl_VAT_POS_Entry_Sales_LineCaption</ParameterName>
+          <ParameterName>Line_Discount_pct_POS_Entry_Sales_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>25</RowIndex>
-          <ParameterName>POSPaymentMethodCode_POS_Payment_LineCaption</ParameterName>
+          <ParameterName>Amount_Incl_VAT_POS_Entry_Sales_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>26</RowIndex>
-          <ParameterName>Description_POS_Payment_LineCaption</ParameterName>
+          <ParameterName>POSEntryNo_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>27</RowIndex>
-          <ParameterName>Amount_POS_Payment_LineCaption</ParameterName>
+          <ParameterName>TSSCode_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>28</RowIndex>
-          <ParameterName>AmountSalesCurrency_POS_Payment_LineCaption</ParameterName>
+          <ParameterName>TransactionID_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>29</RowIndex>
-          <ParameterName>VATIdentifier_POS_Tax_Amount_LineCaption</ParameterName>
+          <ParameterName>StartTime_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>30</RowIndex>
-          <ParameterName>TaxCalculationType_POS_Tax_Amount_LineCaption</ParameterName>
+          <ParameterName>FinishTime_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>31</RowIndex>
-          <ParameterName>Tax_POS_Tax_Amount_LineCaption</ParameterName>
+          <ParameterName>SignatureCount_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>32</RowIndex>
-          <ParameterName>Quantity_POS_Tax_Amount_LineCaption</ParameterName>
+          <ParameterName>Signature_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>33</RowIndex>
-          <ParameterName>LineAmount_POS_Tax_Amount_LineCaption</ParameterName>
+          <ParameterName>SerialNumber_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>34</RowIndex>
-          <ParameterName>TaxBaseAmount_POS_Tax_Amount_LineCaption</ParameterName>
+          <ParameterName>POSPaymentMethodCode_POS_Payment_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>35</RowIndex>
+          <ParameterName>Description_POS_Payment_LineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>36</RowIndex>
+          <ParameterName>Amount_POS_Payment_LineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>37</RowIndex>
+          <ParameterName>AmountSalesCurrency_POS_Payment_LineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>38</RowIndex>
+          <ParameterName>VATIdentifier_POS_Tax_Amount_LineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>39</RowIndex>
+          <ParameterName>TaxCalculationType_POS_Tax_Amount_LineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>40</RowIndex>
+          <ParameterName>Tax_POS_Tax_Amount_LineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>41</RowIndex>
+          <ParameterName>Quantity_POS_Tax_Amount_LineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>42</RowIndex>
+          <ParameterName>LineAmount_POS_Tax_Amount_LineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>43</RowIndex>
+          <ParameterName>TaxBaseAmount_POS_Tax_Amount_LineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>44</RowIndex>
           <ParameterName>TaxAmount_POS_Tax_Amount_LineCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
@@ -7556,6 +7682,9 @@ End Function</Code>
         <Field Name="Quantity_POS_Entry_Sales_LineFormat">
           <DataField>Quantity_POS_Entry_Sales_LineFormat</DataField>
         </Field>
+        <Field Name="UOM_POS_Entry_Sales_Line">
+          <DataField>UOM_POS_Entry_Sales_Line</DataField>
+        </Field>
         <Field Name="Unit_Price_POS_Entry_Sales_Line">
           <DataField>Unit_Price_POS_Entry_Sales_Line</DataField>
         </Field>
@@ -7588,6 +7717,30 @@ End Function</Code>
         </Field>
         <Field Name="Description_Item_Variant">
           <DataField>Description_Item_Variant</DataField>
+        </Field>
+        <Field Name="POSEntryNo_NPRDEPOSAuditLogAuxInfo">
+          <DataField>POSEntryNo_NPRDEPOSAuditLogAuxInfo</DataField>
+        </Field>
+        <Field Name="TSSCode_NPRDEPOSAuditLogAuxInfo">
+          <DataField>TSSCode_NPRDEPOSAuditLogAuxInfo</DataField>
+        </Field>
+        <Field Name="TransactionID_NPRDEPOSAuditLogAuxInfo">
+          <DataField>TransactionID_NPRDEPOSAuditLogAuxInfo</DataField>
+        </Field>
+        <Field Name="StartTime_NPRDEPOSAuditLogAuxInfo">
+          <DataField>StartTime_NPRDEPOSAuditLogAuxInfo</DataField>
+        </Field>
+        <Field Name="FinishTime_NPRDEPOSAuditLogAuxInfo">
+          <DataField>FinishTime_NPRDEPOSAuditLogAuxInfo</DataField>
+        </Field>
+        <Field Name="SignatureCount_NPRDEPOSAuditLogAuxInfo">
+          <DataField>SignatureCount_NPRDEPOSAuditLogAuxInfo</DataField>
+        </Field>
+        <Field Name="Signature_NPRDEPOSAuditLogAuxInfo">
+          <DataField>Signature_NPRDEPOSAuditLogAuxInfo</DataField>
+        </Field>
+        <Field Name="SerialNumber_NPRDEPOSAuditLogAuxInfo">
+          <DataField>SerialNumber_NPRDEPOSAuditLogAuxInfo</DataField>
         </Field>
         <Field Name="POS_Entry_No_POS_Payment_Line">
           <DataField>POS_Entry_No_POS_Payment_Line</DataField>
