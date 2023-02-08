@@ -30,17 +30,17 @@
     begin
         case Step of
             'CheckSaleBeforeCancel':
-                CheckSaleBeforeCancel();
+                CheckSaleBeforeCancel(Sale);
             'CancelSale':
                 FrontEnd.WorkflowResponse(CancelSaleAndStartNew());
         end;
     end;
 
-    procedure CheckSaleBeforeCancel()
+    procedure CheckSaleBeforeCancel(Sale: Codeunit "NPR POS Sale")
     var
         POSActionCancelSaleB: Codeunit "NPR POSAction: Cancel Sale B";
     begin
-        POSActionCancelSaleB.CheckSaleBeforeCancel();
+        POSActionCancelSaleB.CheckSaleBeforeCancel(Sale);
     end;
 
     procedure CancelSaleAndStartNew(): Boolean
