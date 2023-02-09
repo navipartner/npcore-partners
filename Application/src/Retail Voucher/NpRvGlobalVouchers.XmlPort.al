@@ -127,6 +127,10 @@ xmlport 6151010 "NPR NpRv Global Vouchers"
                 {
                     MinOccurs = Zero;
                 }
+                fieldelement(issue_posstore_code; NpRvVoucherBuffer."POS Store Code")
+                {
+                    MinOccurs = Zero;
+                }
             }
         }
     }

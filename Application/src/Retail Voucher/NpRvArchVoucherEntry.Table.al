@@ -131,6 +131,12 @@
             Caption = 'Original Entry No.';
             DataClassification = CustomerContent;
         }
+        field(90; "POS Store Code"; Code[10])
+        {
+            Caption = 'POS Store Code';
+            DataClassification = CustomerContent;
+        }
+
     }
 
     keys

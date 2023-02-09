@@ -131,6 +131,7 @@
         NpRvVoucherEntry."Document No." := TempNpRvVoucherBuffer."Issue Sales Ticket No.";
         NpRvVoucherEntry."User ID" := TempNpRvVoucherBuffer."Issue User ID";
         NpRvVoucherEntry."Partner Code" := TempNpRvVoucherBuffer."Issue Partner Code";
+        NpRvVoucherEntry."POS Store Code" := TempNpRvVoucherBuffer."POS Store Code";
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry.Insert();
     end;
@@ -342,6 +343,7 @@
         NpRvVoucherEntry."Document No." := NpRvVoucherBuffer."Redeem Sales Ticket No.";
         NpRvVoucherEntry."User ID" := NpRvVoucherBuffer."Redeem User ID";
         NpRvVoucherEntry."Partner Code" := NpRvVoucherBuffer."Redeem Partner Code";
+        NpRvVoucherEntry."POS Store Code" := NpRvVoucherBuffer."POS Store Code";
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry.Insert();
 
@@ -417,6 +419,7 @@
         NpRvVoucherEntry."Document No." := NpRvVoucherBuffer."Redeem Sales Ticket No.";
         NpRvVoucherEntry."User ID" := NpRvVoucherBuffer."Redeem User ID";
         NpRvVoucherEntry."Partner Code" := NpRvVoucherBuffer."Redeem Partner Code";
+        NpRvVoucherEntry."POS Store Code" := NpRvVoucherBuffer."POS Store Code";
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry.Insert();
 
@@ -553,6 +556,7 @@
         NpRvVoucherEntry."Document No." := TempNpRvVoucherBuffer."Redeem Sales Ticket No.";
         NpRvVoucherEntry."User ID" := TempNpRvVoucherBuffer."Redeem User ID";
         NpRvVoucherEntry."Partner Code" := TempNpRvVoucherBuffer."Redeem Partner Code";
+        NpRvVoucherEntry."POS Store Code" := TempNpRvVoucherBuffer."POS Store Code";
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry.Insert();
 
@@ -607,6 +611,8 @@
     end;
 
     local procedure Voucher2Buffer(var NpRvVoucher: Record "NPR NpRv Voucher"; var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
+    var
+        NPRPOSUnit: Record "NPR POS Unit";
     begin
         NpRvVoucher.CalcFields(Amount, "Issue Date", "Issue Register No.", "Issue Document No.", "Issue User ID", "Issue Partner Code");
         TempNpRvVoucherBuffer."Voucher Type" := NpRvVoucher."Voucher Type";
@@ -631,6 +637,8 @@
         TempNpRvVoucherBuffer."Issue Sales Ticket No." := NpRvVoucher."Issue Document No.";
         TempNpRvVoucherBuffer."Issue User ID" := NpRvVoucher."Issue User ID";
         TempNpRvVoucherBuffer."Issue Partner Code" := NpRvVoucher."Issue Partner Code";
+        if NPRPOSUnit.Get(NpRvVoucher."Issue Register No.") then
+            TempNpRvVoucherBuffer."POS Store Code" := NPRPOSUnit."POS Store Code";
     end;
 
     local procedure SetGlobalLanguage(LanguageUsername: Text)

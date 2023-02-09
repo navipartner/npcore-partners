@@ -383,10 +383,10 @@
                 Image = Post;
                 action("Archive Coupon")
                 {
-                    Caption = 'Archive Coupon';
+                    Caption = 'Archive Voucher';
                     Image = Post;
 
-                    ToolTip = 'Executes the Archive Coupon action';
+                    ToolTip = 'Executes the Archive Voucher action';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

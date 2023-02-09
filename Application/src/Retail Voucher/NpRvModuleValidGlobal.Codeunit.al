@@ -278,6 +278,8 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
     var
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        NPRPOSUnit: Record "NPR POS Unit";
+        StoreCode: Code[10];
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
         ContentHeader: HttpHeaders;
@@ -295,6 +297,8 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvGlobalVoucherSetup.TestField("Service Url");
 
         Voucher.CalcFields(Amount, "Issue Date", "Issue Register No.", "Issue Document No.", "Issue User ID");
+        if NPRPOSUnit.Get(Voucher."Issue Register No.") then
+            StoreCode := NPRPOSUnit."POS Store Code";
         RequestXmlText :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
             '<soapenv:Body>' +
@@ -322,6 +326,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     '<issue_sales_ticket_no>' + Voucher."Issue Document No." + '</issue_sales_ticket_no>' +
                     '<issue_user_id>' + Voucher."Issue User ID" + '</issue_user_id>' +
                     '<issue_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</issue_partner_code>' +
+                    '<issue_posstore_code>' + StoreCode + '</issue_posstore_code>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</CreateVouchers>' +
@@ -439,6 +444,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             VoucherEntry."User ID" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_user_id', MaxStrLen(VoucherEntry."User ID"), false);
             VoucherEntry."Closed by Entry No." := 0;
             VoucherEntry."Partner Code" := UpperCase(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_partner_code', MaxStrLen(VoucherEntry."Partner Code"), false));
+            VoucherEntry."POS Store Code" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_posstore_code', MaxStrLen(VoucherEntry."POS Store Code"), false);
             VoucherEntry.Insert();
             Found := true;
         end;
@@ -511,6 +517,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     '<redeem_sales_ticket_no>' + TempNpRvVoucherBuffer."Redeem Sales Ticket No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + TempNpRvVoucherBuffer."Redeem User ID" + '</redeem_user_id>' +
                     '<redeem_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</redeem_partner_code>' +
+                    '<issue_posstore_code>' + TempNpRvVoucherBuffer."POS Store Code" + '</issue_posstore_code>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</ReserveVouchers>' +
@@ -567,6 +574,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             VoucherEntry.Open := VoucherEntry.Amount <> 0;
 #pragma warning disable AA0139
             VoucherEntry."Register No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_register_no', MaxStrLen(VoucherEntry."Register No."), false);
+            VoucherEntry."POS Store Code" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_posstore_code', MaxStrLen(VoucherEntry."POS Store Code"), false);
             VoucherEntry."Document No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_sales_ticket_no', MaxStrLen(VoucherEntry."Document No."), false);
             VoucherEntry."User ID" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_user_id', MaxStrLen(VoucherEntry."User ID"), false);
             VoucherEntry."Closed by Entry No." := 0;
@@ -630,6 +638,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     '<redeem_sales_ticket_no>' + VoucherEntry."Document No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + VoucherEntry."User ID" + '</redeem_user_id>' +
                     '<redeem_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</redeem_partner_code>' +
+                    '<issue_posstore_code>' + VoucherEntry."POS Store Code" + '</issue_posstore_code>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</RedeemVouchers>' +
@@ -718,6 +727,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     '<redeem_sales_ticket_no>' + VoucherEntry."Document No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + VoucherEntry."User ID" + '</redeem_user_id>' +
                     '<redeem_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</redeem_partner_code>' +
+                    '<issue_posstore_code>' + VoucherEntry."POS Store Code" + '</issue_posstore_code>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</RedeemPartnerVouchers>' +
@@ -782,6 +792,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     '<redeem_sales_ticket_no>' + VoucherEntry."Document No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + VoucherEntry."User ID" + '</redeem_user_id>' +
                     '<redeem_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</redeem_partner_code>' +
+                    '<issue_posstore_code>' + VoucherEntry."POS Store Code" + '</issue_posstore_code>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</TopUpVouchers>' +
@@ -868,10 +879,12 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvVoucherEntry.Open := NpRvVoucherEntry.Amount <> 0;
 #pragma warning disable AA0139
         NpRvVoucherEntry."Register No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_register_no', MaxStrLen(NpRvVoucherEntry."Register No."), false);
+
         NpRvVoucherEntry."Document No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_sales_ticket_no', MaxStrLen(NpRvVoucherEntry."Document No."), false);
         NpRvVoucherEntry."User ID" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_user_id', MaxStrLen(NpRvVoucherEntry."User ID"), false);
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry."Partner Code" := UpperCase(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_partner_code', MaxStrLen(NpRvVoucherEntry."Partner Code"), false));
+        NpRvVoucherEntry."POS Store Code" := UpperCase(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_posstore_code', MaxStrLen(NpRvVoucherEntry."POS Store Code"), false));
 #pragma warning restore
         NpRvVoucherEntry.Insert();
         Commit();
