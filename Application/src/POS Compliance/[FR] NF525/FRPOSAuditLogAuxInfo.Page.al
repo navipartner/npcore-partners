@@ -8,7 +8,8 @@
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = None;
-
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Replaced with NPR FR POS Audit Log Add. Info';
     SourceTable = "NPR FR POS Audit Log Aux. Info";
 
     layout
