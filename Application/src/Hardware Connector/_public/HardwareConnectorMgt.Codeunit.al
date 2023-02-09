@@ -6,7 +6,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
 
     var
         PrintLbl: Label 'Printing...';
-        FileMoveLbl: Label 'Moving file...';        
+        FileMoveLbl: Label 'Moving file...';
 
     internal procedure SendRawPrintRequest(PrinterName: Text; PrintJobBase64: Text)
     var
@@ -60,7 +60,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('operation', 'exists');
         Request.Add('path', Path);
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure CopyFileRequest(SourcePath: Text; DestinationPath: Text) Response: JsonObject
@@ -72,7 +72,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('source', SourcePath);
         Request.Add('destination', DestinationPath);
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure DeleteFileRequest(Path: Text) Response: JsonObject
@@ -84,7 +84,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('operation', 'delete');
         Request.Add('path', Path);
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure WriteTextRequest(Path: Text; Content: Text) Response: JsonObject
@@ -97,7 +97,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('path', Path);
         Request.Add('contents', Content);
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure WriteLinesRequest(Path: Text; Content: JsonToken) Response: JsonObject
@@ -110,7 +110,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('path', Path);
         Request.Add('contents', Content.AsArray());
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure WriteBinaryRequest(Path: Text; var TempBlob: Codeunit "Temp Blob") Response: JsonObject
@@ -128,7 +128,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('path', Path);
         Request.Add('contents', Bytes);
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure AppendTextRequest(Path: Text; Content: Text) Response: JsonObject
@@ -141,7 +141,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('path', Path);
         Request.Add('contents', Content);
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure AppendLinesRequest(Path: Text; Content: JsonToken) Response: JsonObject
@@ -154,7 +154,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('path', Path);
         Request.Add('contents', Content.AsArray());
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     procedure ReadTextRequest(Path: Text) Response: JsonObject
@@ -166,7 +166,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('operation', 'readText');
         Request.Add('path', Path);
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure ReadLinesRequest(Path: Text) Response: JsonObject
@@ -178,7 +178,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('operation', 'readLines');
         Request.Add('path', Path);
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure ReadBinaryRequest(Path: Text) Response: JsonObject
@@ -190,7 +190,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('operation', 'readBinary');
         Request.Add('path', Path);
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure ExistsDirectoryRequest(Path: Text) Response: JsonObject
@@ -202,7 +202,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('operation', 'directory.exists');
         Request.Add('path', Path);
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure CopyDirectoryRequest(SourcePath: Text; DestinationPath: Text) Response: JsonObject
@@ -215,7 +215,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('source', SourcePath);
         Request.Add('destination', DestinationPath);
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure MoveDirectoryRequest(SourcePath: Text; DestinationPath: Text) Response: JsonObject
@@ -228,7 +228,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('source', SourcePath);
         Request.Add('destination', DestinationPath);
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure DeleteDirectoryRequest(Path: Text; Force: Boolean) Response: JsonObject
@@ -242,7 +242,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('force', Force);
 
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     internal procedure GetDirectoryContentRequest(Path: Text) Response: JsonObject
@@ -254,7 +254,7 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Request.Add('operation', 'directory.getContents');
         Request.Add('path', Path);
 
-        SendGenericRequest('file', Request, Caption, true, 'success', 'errorText', true, Response);
+        SendGenericRequest('File', Request, Caption, true, 'success', 'errorText', true, Response);
     end;
 
     local procedure SendGenericRequest(Handler: Text; Request: JsonObject; WindowCaption: Text; AutoParseResponse: Boolean; ResponseSuccessElementName: Text; ResponseErrorReasonElementName: Text; ShowConnectionError: Boolean; var ResponseOut: JsonObject) ResponseReceived: Boolean
