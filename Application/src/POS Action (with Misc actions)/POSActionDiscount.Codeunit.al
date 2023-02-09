@@ -638,7 +638,7 @@
             LineValue := -LineValue;
     end;
 
-    local procedure SetTotalDiscountAmount(var SalePOS: Record "NPR POS Sale"; TotalDiscountAmount: Decimal)
+    procedure SetTotalDiscountAmount(var SalePOS: Record "NPR POS Sale"; TotalDiscountAmount: Decimal)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         TotalPrice: Decimal;
@@ -842,7 +842,7 @@
         DimValueCode := DimValue.Code;
     end;
 
-    local procedure GetMultiLineDiscountTarget(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; PresetMultiLineDiscTarget: Option Auto,"Positive Only","Negative Only",All,Ask; AllowAllLines: Boolean)
+    procedure GetMultiLineDiscountTarget(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; PresetMultiLineDiscTarget: Option Auto,"Positive Only","Negative Only",All,Ask; AllowAllLines: Boolean)
     var
         DefaultOptionNo: Integer;
         NoOfNegativeLines: Integer;
@@ -889,18 +889,18 @@
                     MultiLineDiscTarget := MultiLineDiscTarget::"Negative Only";
 
             else begin
-                    RequestMsgTxt := DiscTargetOtherOptionsLbl;
-                    if AllowAllLines then
-                        RequestMsgTxt := RequestMsgTxt + ',' + DiscTargetAllOptionLbl;
-                    if SaleLinePOS.Quantity >= 0 then
-                        DefaultOptionNo := 1
-                    else
-                        DefaultOptionNo := 2;
-                    SelectedOptionNo := StrMenu(RequestMsgTxt, DefaultOptionNo, SelectDiscountTargetLbl);
-                    if SelectedOptionNo = 0 then
-                        Error('');
-                    MultiLineDiscTarget := SelectedOptionNo;
-                end;
+                RequestMsgTxt := DiscTargetOtherOptionsLbl;
+                if AllowAllLines then
+                    RequestMsgTxt := RequestMsgTxt + ',' + DiscTargetAllOptionLbl;
+                if SaleLinePOS.Quantity >= 0 then
+                    DefaultOptionNo := 1
+                else
+                    DefaultOptionNo := 2;
+                SelectedOptionNo := StrMenu(RequestMsgTxt, DefaultOptionNo, SelectDiscountTargetLbl);
+                if SelectedOptionNo = 0 then
+                    Error('');
+                MultiLineDiscTarget := SelectedOptionNo;
+            end;
         end;
     end;
 
