@@ -1,7 +1,7 @@
 # Set up the POS HTML Display Profile
 
 This guide refers to the newer version of the [POS Display Profile](../reference/POS_Display_profile.md). While it shares the same purpose, such as displaying media content and the receipt view, this profile can do much more, like returning input from the customer display if the touch screen is in use, and the HTML file is equipped to handle the customer's input.
-
+ 
 There is standard HTML which can be used for the display, which is compatible with the Display Content Lines, which can be added by clicking the action **Download Template Data**
 
 ![download_template_data](../images/download_template_data_html.PNG)
