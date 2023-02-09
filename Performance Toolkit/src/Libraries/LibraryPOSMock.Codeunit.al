@@ -170,6 +170,31 @@ codeunit 88103 "NPR Library - POS Mock"
         POSSession.RequestRefreshData();
     end;
 
+    procedure SetLineDiscountPctABS(POSSession: Codeunit "NPR POS Session"; PresetMultiLineDiscTarget: Option Auto,"Positive Only","Negative Only",All,Ask; AllowAllLines: Boolean; TotalDiscountAmount: Decimal)
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        View: Codeunit "NPR POS View";
+        POSActionDiscount: Codeunit "NPR POS Action - Discount";
+    begin
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        POSSaleLine.RefreshxRec();
+        POSSession.GetCurrentView(View);
+
+        POSActionDiscount.GetMultiLineDiscountTarget(SalePOS, SaleLinePOS, PresetMultiLineDiscTarget, AllowAllLines);
+        POSActionDiscount.SetTotalDiscountAmount(SalePOS, TotalDiscountAmount);
+
+        POSSaleLine.RefreshCurrent();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        POSSaleLine.OnAfterSetQuantity(SaleLinePOS);
+        POSSession.RequestRefreshData();
+    end;
+
     local procedure IssueReturnVoucher(POSSession: Codeunit "NPR POS Session"; VoucherTypeCode: Code[20])
     var
         ReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
