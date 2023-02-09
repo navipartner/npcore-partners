@@ -39,6 +39,13 @@
                     ToolTip = 'Specifies the value of the Remaining Amount field';
                     ApplicationArea = NPRRetail;
                 }
+
+                field("POS Store Code"; Rec."POS Store Code")
+                {
+
+                    ToolTip = 'Specifies the value of the POS Store Code field';
+                    ApplicationArea = NPRRetail;
+                }
                 field(Positive; Rec.Positive)
                 {
 
