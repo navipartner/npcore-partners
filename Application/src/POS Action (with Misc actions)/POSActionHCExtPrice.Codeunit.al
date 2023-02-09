@@ -1,6 +1,9 @@
 ﻿codeunit 6150909 "NPR POS Action: HC Ext. Price"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used.';
+    
     var
         ActionDescription: Label 'This action makes remote call to aquire item price information ';
 

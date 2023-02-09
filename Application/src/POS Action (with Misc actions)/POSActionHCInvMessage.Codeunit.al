@@ -1,6 +1,8 @@
 ﻿codeunit 6150914 "NPR POS Action: HC Inv.Message"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used.';
     var
         ActionDescription: Label 'This action makes remote call to aquire item price information ';
 
