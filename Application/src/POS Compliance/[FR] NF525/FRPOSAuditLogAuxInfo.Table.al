@@ -3,7 +3,8 @@
     Access = Internal;
     Caption = 'FR POS Entry Aux. Info';
     DataClassification = CustomerContent;
-
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Replaced with table NPR FR POS Audit Log Add. Info';
     fields
     {
         field(1; "POS Entry No."; Integer)

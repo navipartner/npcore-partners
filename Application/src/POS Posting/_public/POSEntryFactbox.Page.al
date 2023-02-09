@@ -177,21 +177,13 @@
             group(FRAuditLog)
             {
                 ShowCaption = false;
-                Visible = ShowFRAudit;
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Replaced with table NPR FR POS Audit Log Add. Info';
                 field("FR POS Audit Log"; Rec."FR POS Audit Log")
                 {
                     ToolTip = 'Specifies the details of FR POS Audit Log information';
                     ApplicationArea = NPRRetail;
-
-                    trigger OnDrillDown()
-                    var
-                        FRPOSAuditLogAuxInfo: Record "NPR FR POS Audit Log Aux. Info";
-                    begin
-                        FRPOSAuditLogAuxInfo.FilterGroup(10);
-                        FRPOSAuditLogAuxInfo.SetRange("POS Entry No.", Rec."Entry No.");
-                        FRPOSAuditLogAuxInfo.FilterGroup(0);
-                        Page.RunModal(Page::"NPR FR POS Audit Log Aux. Info", FRPOSAuditLogAuxInfo);
-                    end;
                 }
             }
         }
@@ -252,11 +244,9 @@
         POSAuditProfile: Record "NPR POS Audit Profile";
         CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";
         DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
-        FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
     begin
         Clear(ShowCleanCash);
         Clear(ShowDEAudit);
-        Clear(ShowFRAudit);
         if not POSUnit.Get(Rec."POS Unit No.") then
             exit;
         if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
@@ -266,14 +256,11 @@
                 ShowCleanCash := true;
             DEAuditMgt.HandlerCode():
                 ShowDEAudit := true;
-            FRAuditMgt.HandlerCode():
-                ShowFRAudit := true;
         end;
     end;
 
     var
         ShowCleanCash: Boolean;
-        ShowFRAudit: Boolean;
         ShowDEAudit: Boolean;
 }
 

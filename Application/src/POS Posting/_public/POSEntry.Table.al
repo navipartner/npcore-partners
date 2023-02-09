@@ -504,6 +504,8 @@
             Editable = false;
             Caption = 'FR POS Audit Log Aux. Info';
             FieldClass = FlowField;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaced with table NPR FR POS Audit Log Add. Info';
             CalcFormula = exist("NPR FR POS Audit Log Aux. Info" where("POS Entry No." = field("Entry No.")));
         }
         field(5052; "Contact No."; Code[20])
