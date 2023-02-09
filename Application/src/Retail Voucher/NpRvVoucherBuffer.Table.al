@@ -180,6 +180,11 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.49';
         }
+        field(2025; "POS Store Code"; Code[10])
+        {
+            Caption = 'POS Store Code';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
