@@ -19,8 +19,8 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         BarCodeItemReference, BarCodeItemReference2 : Record "Item Reference";
         BCPTTestContext: Codeunit "BCPT Test Context";
         POSSession: Codeunit "NPR POS Session";
-        POSMockLibrary: Codeunit "NPR Library - POS Mock";
-        POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
+        POSMockLibrary: Codeunit "NPR BCPT Library - POS Mock";
+        POSMasterDataLibrary: Codeunit "NPR BCPT Library POSMasterData";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
         NoOfSales, NoOfLinesPerSale : Integer;
         NoOfSalesParamLbl: Label 'NoOfSales', Locked = true;

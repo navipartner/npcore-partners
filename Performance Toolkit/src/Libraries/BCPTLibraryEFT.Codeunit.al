@@ -1,4 +1,4 @@
-codeunit 88101 "NPR Library - EFT"
+codeunit 88101 "NPR BCPT Library - EFT"
 {
     procedure CreateMockEFTSetup(var EFTSetup: Record "NPR EFT Setup"; RegisterNo: Text; PaymentType: Text)
     var

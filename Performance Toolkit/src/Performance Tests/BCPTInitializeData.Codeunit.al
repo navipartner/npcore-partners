@@ -76,7 +76,6 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
     var
         POSStore: Record "NPR POS Store";
         POSUnit: Record "NPR POS Unit";
-        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
     begin
         CreatePOSStore(POSStore, NewRecordId);
         CreatePOSUnit(POSUnit, POSStore.Code, NewRecordId);

@@ -1,4 +1,4 @@
-codeunit 88104 "NPR Library - Random"
+codeunit 88104 "NPR BPCT Library - Random"
 {
     // Pseudo random number generator.
 

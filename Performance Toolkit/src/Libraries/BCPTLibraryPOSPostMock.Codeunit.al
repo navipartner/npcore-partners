@@ -1,4 +1,4 @@
-﻿codeunit 88105 "NPR Library - POS Post Mock"
+﻿codeunit 88105 "NPR BCPT Library POS Post Mock"
 {
     TableNo = "NPR POS Sale";
 

@@ -1,7 +1,7 @@
-﻿codeunit 88102 "NPR Library - POS Master Data"
+﻿codeunit 88102 "NPR BCPT Library POSMasterData"
 {
     var
-        LibraryRandom: Codeunit "NPR Library - Random";
+        LibraryRandom: Codeunit "NPR BPCT Library - Random";
 
     procedure OpenPOSUnit(var POSUnit: Record "NPR POS Unit")
     var

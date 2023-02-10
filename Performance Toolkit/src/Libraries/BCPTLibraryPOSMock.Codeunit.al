@@ -1,4 +1,4 @@
-codeunit 88103 "NPR Library - POS Mock"
+codeunit 88103 "NPR BCPT Library - POS Mock"
 {
     procedure InitializePOSSession(POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit")
     var
@@ -234,7 +234,7 @@ codeunit 88103 "NPR Library - POS Mock"
 
     local procedure POSPost(SalePOS: Record "NPR POS Sale")
     var
-        POSPostMock: Codeunit "NPR Library - POS Post Mock";
+        POSPostMock: Codeunit "NPR BCPT Library POS Post Mock";
     begin
         // Used to be triggered automatically
         Commit();
