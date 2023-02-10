@@ -1,155 +1,86 @@
-﻿codeunit 6150816 "NPR POSAction: VAT Refusion"
+codeunit 6150816 "NPR POSAction: VAT Refusion" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
-        ActionDescription: Label 'This is a built in function for handling VAT refussion';
-        Setup: Codeunit "NPR POS Setup";
-        MaxAmountLimit: Label 'Maximum payment amount for %1 is %2.';
-        TEXTConfirmRefussionTitle: Label 'Confirm VAT Refussion';
-        TEXTConfrmRefussionLead: Label 'VAT Refussion payment of amount %1 are being added.\\Press Yes to add refussion payment. Press No to abort.';
-        TEXTRefussionNotPos_title: Label 'VAT Refussion is not possible';
-        TEXTRefussionNotPos_lead: Label 'VAT Amount can not be zero for VAT Refussion';
-        ReadingErr: Label 'reading in %1';
-
-    local procedure ActionCode(): Code[20]
+        ActionDescription: Label 'This is a built in function for handling VAT refussion.';
+        ParamPaymentTypePOSCode_CptLbl: Label 'Payment Type POS Code';
+        ParamPaymentTypePOSCode_DescLbl: Label 'Payment type used for VAT refusion';
+        ParamPAskForConfirm_CptLbl: Label 'Ask For Confirm';
+        ParamAskForConfirm_DescLbl: Label 'If this parameter is enabled you will need to confirm VAT fusion before taking action.';
+        LabelConfirmRefussionTitle_Lbl: Label 'Confirm VAT Refussion';
+        LabelConfrmRefussionLead_Lbl: Label 'VAT Refussion payment of amount %1 are being added.\\Press Yes to add refussion payment. Press No to abort.';
+        LabelRefussionNotPosTitle_Lbl: Label 'VAT Refussion is not possible';
+        LabelRefussionNotPosLead_Lbl: Label 'VAT Amount can not be zero for VAT Refussion';
     begin
-        exit('VATREFUSION');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddTextParameter('PaymentTypePOSCode', '', ParamPaymentTypePOSCode_CptLbl, ParamPaymentTypePOSCode_DescLbl);
+        WorkflowConfig.AddBooleanParameter('AskForConfirm', false, ParamPAskForConfirm_CptLbl, ParamAskForConfirm_DescLbl);
+        WorkflowConfig.AddLabel('confirmRefussionTitle', LabelConfirmRefussionTitle_Lbl);
+        WorkflowConfig.AddLabel('confirmRefussionLead', LabelConfrmRefussionLead_Lbl);
+        WorkflowConfig.AddLabel('informRefussionNotPossibleTitle', LabelRefussionNotPosTitle_Lbl);
+        WorkflowConfig.AddLabel('informRefussionNotPossibleLead', LabelRefussionNotPosLead_Lbl);
     end;
 
-    local procedure ActionVersion(): Text[30]
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
+    var
+        POSSession: Codeunit "NPR POS Session";
     begin
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple) then begin
-            Sender.RegisterWorkflowStep('VATAmt', 'context.VATAmount');
-            Sender.RegisterWorkflowStep('confirmRefussion', 'if ( (param.AskForConfirm == true) && (context.VATAmount != 0) ) { confirm(labels.confirmRefussion_title,labels.confirmRefussion_lead.replace("%1",context.VATAmount)).no(abort); }');
-            Sender.RegisterWorkflowStep('informRefussionNotPossible', 'if (context.VATAmount == 0) { message(labels.informRefussionNotPossible_title, labels.informRefussionNotPossible_lead); abort; }');
-            Sender.RegisterWorkflowStep('doRefussion', 'if (context.VATAmount != 0) { respond(); } ');
-            Sender.RegisterWorkflow(true);
-
-            Sender.RegisterTextParameter('PaymentTypePOSCode', '');
-            Sender.RegisterBooleanParameter('AskForConfirm', false);
-
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-        Captions.AddActionCaption(ActionCode(), 'confirmRefussion_title', TEXTConfirmRefussionTitle);
-        Captions.AddActionCaption(ActionCode(), 'informRefussionNotPossible_title', TEXTRefussionNotPos_title);
-        Captions.AddActionCaption(ActionCode(), 'informRefussionNotPossible_lead', TEXTRefussionNotPos_lead);
-        Captions.AddActionCaption(ActionCode(), 'confirmRefussion_lead', TEXTConfrmRefussionLead);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-
-        case WorkflowStep of
+        case Step of
+            'onBeforeRefusion':
+                OnBeforeRefussion(Context, POSSession);
             'doRefussion':
-                OnDoRefussion(Context, POSSession, FrontEnd);
+                OnDoRefussion(Context, POSSession);
         end;
-
-        Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnBeforeRefussion(Context: codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
     var
-        Context: Codeunit "NPR POS JSON Management";
-        JSON: Codeunit "NPR POS JSON Management";
-        TotalVATOnSale: Decimal;
+        SalePOS: Record "NPR POS Sale";
         NPRPOSPaymentMethod: Record "NPR POS Payment Method";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
+        VATRefusionB: Codeunit "NPR POSAction: VAT Refusion-B";
+        TotalVATOnSale: Decimal;
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
+        Context.SetScopeRoot();
 
         //Calc VAT amount before
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        TotalVATOnSale := CalcVATFromSale(SalePOS);
+        TotalVATOnSale := VATRefusionB.CalcVATFromSale(SalePOS);
 
         //Check pos payment type
-        JSON.InitializeJObjectParser(Parameters, FrontEnd);
         POSSession.GetPaymentLine(POSPaymentLine);
-        NPRPOSPaymentMethod.Get(JSON.GetStringOrFail('PaymentTypePOSCode', StrSubstNo(ReadingErr, ActionCode())));
+        NPRPOSPaymentMethod.Get(Context.GetStringParameter('PaymentTypePOSCode'));
 
-        ValidateMinMaxAmount(NPRPOSPaymentMethod, TotalVATOnSale);
+        VATRefusionB.ValidateMinMaxAmount(NPRPOSPaymentMethod, TotalVATOnSale);
 
         Context.SetContext('VATAmount', TotalVATOnSale);
-
-        FrontEnd.SetActionContext(ActionCode(), Context);
-
-        Handled := true;
     end;
 
 
-    local procedure OnDoRefussion(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnDoRefussion(Context: codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
     var
-        JSON: Codeunit "NPR POS JSON Management";
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
-        PaymentLinePOS: Record "NPR POS Sale Line";
-        POSPaymentMethod: Record "NPR POS Payment Method";
+        VATRefusionB: Codeunit "NPR POSAction: VAT Refusion-B";
+        PaymentTypeCode: Code[10];
+        AmountInclVAT: Decimal;
     begin
+        Context.SetScopeRoot();
+        PaymentTypeCode := CopyStr(Context.GetStringParameter('PaymentTypePOSCode'), 1, MaxStrLen(PaymentTypeCode));
+        AmountInclVAT := Context.GetDecimal('VATAmount');
 
-        POSSession.GetSetup(Setup);
-
-        //Get payment type
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScopeParameters(ActionCode());
-        POSSession.GetPaymentLine(POSPaymentLine);
-        POSPaymentLine.GetPOSPaymentMethod(POSPaymentMethod, CopyStr(JSON.GetStringOrFail('PaymentTypePOSCode', StrSubstNo(ReadingErr, ActionCode())), 1, 10));
-        POSPaymentMethod.Get(POSPaymentMethod.Code);
-
-        //Get amount and add to payment line
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        PaymentLinePOS."No." := POSPaymentMethod.Code;
-        PaymentLinePOS."Amount Including VAT" := JSON.GetDecimalOrFail('VATAmount', StrSubstNo(ReadingErr, ActionCode()));
-        POSPaymentLine.InsertPaymentLine(PaymentLinePOS, 0);
-
-        POSSession.RequestRefreshData();
+        VATRefusionB.DoRefusion(POSSession, PaymentTypeCode, AmountInclVAT);
     end;
 
-    local procedure CalcVATFromSale(SalePOS: Record "NPR POS Sale"): Decimal
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
+    local procedure GetActionScript(): Text
     begin
-        SaleLinePOS.Reset();
-        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange(Date, SalePOS.Date);
-        if SaleLinePOS.IsEmpty() then 
-            exit;
-
-        SaleLinePOS.CalcSums("Amount Including VAT","VAT Base Amount");
-        exit(SaleLinePOS."Amount Including VAT" - SaleLinePOS."VAT Base Amount");
-    end;
-
-    local procedure ValidateMinMaxAmount(NPRPOSPaymentMethod: Record "NPR POS Payment Method"; AmountToCapture: Decimal)
-    begin
-
-        if (NPRPOSPaymentMethod."Maximum Amount" <> 0) then
-            if (AmountToCapture > NPRPOSPaymentMethod."Maximum Amount") then
-                Error(MaxAmountLimit, NPRPOSPaymentMethod.Description, NPRPOSPaymentMethod."Maximum Amount");
-
-        if (NPRPOSPaymentMethod."Minimum Amount" <> 0) then
-            if (AmountToCapture < NPRPOSPaymentMethod."Minimum Amount") then
-                Error(MaxAmountLimit, NPRPOSPaymentMethod.Description, NPRPOSPaymentMethod."Minimum Amount");
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionVATRefusion.js###
+'let main=async({workflow:s,parameters:o,context:e,popup:n,captions:i,respond:r})=>{if(await s.respond("onBeforeRefusion"),!(o.AskForConfirm==!0&&e.VATAmount!=0&&(result=await n.confirm({caption:i.confirmRefussionTitle,label:i.confirmRefussionLead.replace("%1",e.VATAmount)}),!result))){if(e.VATAmount==0){await n.message({caption:i.informRefussionNotPossibleTitle,label:i.informRefussionNotPossibleLead});return}e.VATAmount!=0&&await s.respond("doRefussion")}};'
+        )
     end;
 }
+
