@@ -5,7 +5,7 @@ codeunit 6014641 "NPR BTF Service API"
     var
         SampleLbl: Label 'Sample.%1', Comment = '%1=File Extension';
         SendReqToLiveEnvQst: Label 'Do you want to send request on live environment?';
-        ResponseContentNotFoundMsg: Label 'Response content not found. Instead, check out Response Note to see error details: %1.';
+        ResponseContentNotFoundMsg: Label 'Response content not found. Instead, check out Response Note to see error details: %1.', Comment = '%1=Format(ErrorLog."Initiatied From Rec. ID")';
         EmptyContentErr: Label 'Nothing to import';
         APIIntegrationLbl: Label 'BTwentyFour API Integration - %1', Comment = '%1=API Endpoint ID';
         ServiceSetupNotFoundLbl: Label '%1 %2 not found.', Comment = '%1=ServiceSetup.TableCaption();%2=ServiceSetup.Code';
@@ -207,9 +207,9 @@ codeunit 6014641 "NPR BTF Service API"
 
     procedure ShowWhoInitiateRequest(EntryNo: Integer)
     var
+        ErrorLog: Record "NPR BTF EndPoint Error Log";    
         PageManagement: Codeunit "Page Management";
         RecRef: RecordRef;
-        ErrorLog: Record "NPR BTF EndPoint Error Log";
     begin
         ErrorLog.Get(EntryNo);
         if not RecRef.Get(ErrorLog."Initiatied From Rec. ID") then begin
@@ -235,10 +235,10 @@ codeunit 6014641 "NPR BTF Service API"
 
     procedure InsertImportEntry(var ImportEntry: Record "NPR Nc Import Entry"; ImportTypeCode: Code[20]; Response: Codeunit "Temp Blob"; ServiceEndPoint: Record "NPR BTF Service EndPoint")
     var
+        DataTypeManagement: Codeunit "Data Type Management";
+        RecRef: RecordRef;            
         EndPoint: Interface "NPR BTF IEndPoint";
         FormatResponse: Interface "NPR BTF IFormatResponse";
-        DataTypeManagement: Codeunit "Data Type Management";
-        RecRef: RecordRef;
     begin
         clear(ImportEntry);
         ImportEntry."Entry No." := 0;
@@ -304,12 +304,11 @@ codeunit 6014641 "NPR BTF Service API"
             JobQueueCategory.Code,
             ServiceEndPoint.RecordId(),
             JobQueueEntry)
-        then begin
+        then
             if not ServiceEndPoint.Enabled then
                 JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold")
             else
                 JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
-        end;
     end;
 
     local procedure CreateJobQueueCategory(var JobQueueCategory: Record "Job Queue Category"; ServiceEndPoint: Record "NPR BTF Service EndPoint")
