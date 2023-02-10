@@ -330,6 +330,20 @@
         POSSale.RefreshCurrent();
     end;
 
+    procedure SetBin(BinCode: Code[20])
+    begin
+        RefreshCurrent();
+        OnBeforeSetBin(Rec, BinCode);
+
+        xRec := Rec;
+        Rec.Validate("Bin Code", BinCode);
+        Rec.Modify(true);
+
+        OnAfterSetBin(Rec);
+
+        POSSale.RefreshCurrent();
+    end;
+
     procedure SetDescription(NewDescription: Text)
     begin
         RefreshCurrent();
@@ -566,6 +580,11 @@
     end;
 
     [IntegrationEvent(true, false)]
+    procedure OnAfterSetBin(var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
     internal procedure OnBeforeSetQuantity(var SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
     begin
     end;
@@ -577,6 +596,11 @@
 
     [IntegrationEvent(true, false)]
     internal procedure OnBeforeSetLocation(var SaleLinePOS: Record "NPR POS Sale Line"; var Location: Code[10])
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    internal procedure OnBeforeSetBin(var SaleLinePOS: Record "NPR POS Sale Line"; var Bin: Code[20])
     begin
     end;
     //--- POS Sales Workflow ---
