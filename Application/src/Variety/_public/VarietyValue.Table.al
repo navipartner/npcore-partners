@@ -132,30 +132,9 @@
     internal procedure AssignSortOrder()
     var
         VRTValue: Record "NPR Variety Value";
-        Dec: Decimal;
         NewSortOrder: Integer;
-        DecSep: Text[1];
-        Value2: Code[20];
     begin
-        if Evaluate(Dec, Value) then begin
-            //its a number. take the sort order from here (if possible)
-            //convert '.' with ',' so we can use the number correct
-            DecSep := GetDecimalSeperator();
-            if DecSep = '.' then
-                Value2 := CopyStr(ConvertStr(Value, ',', DecSep), 1, MaxStrLen(Value2))
-            else
-                Value2 := CopyStr(ConvertStr(Value, '.', DecSep), 1, MaxStrLen(Value2));
-            Evaluate(Dec, Value2);
-
-            //number 10 will be 100. Number 10,5 will be 105
-            NewSortOrder := Round(Dec, 0.1) * 10;
-            VRTValue.SetCurrentKey(Type, Table, "Sort Order");
-            VRTValue.SetRange(Type, Type);
-            VRTValue.SetRange(Table, Table);
-            VRTValue.SetRange("Sort Order", NewSortOrder);
-            if not VRTValue.IsEmpty then
-                NewSortOrder := 0;
-        end;
+        NewSortOrder := FindNewSortOrder(Rec.Value);
 
         if NewSortOrder = 0 then begin
             //either its not a number, or the number is already used for sorting
@@ -181,6 +160,61 @@
             exit('.')
         else
             exit(',');
+    end;
+
+    internal procedure FindNewSortOrder(ValueToCheck: Code[20]): Integer
+    var
+        VarietyVal: Record "NPR Variety Value";
+        DecSep: Text[1];
+        Value2: Code[20];
+        Dec: Decimal;
+        RoundDec: Decimal;
+        SortOrder: Integer;
+    begin
+        if not Evaluate(Dec, ValueToCheck) then
+            exit(0);
+
+        //its a number. take the sort order from here (if possible)
+        //convert '.' with ',' so we can use the number correct
+        DecSep := GetDecimalSeperator();
+        if DecSep = '.' then
+            Value2 := CopyStr(ConvertStr(ValueToCheck, ',', DecSep), 1, MaxStrLen(Value2))
+        else
+            Value2 := CopyStr(ConvertStr(ValueToCheck, '.', DecSep), 1, MaxStrLen(Value2));
+
+        if CheckIfMoreThanOneDecimalSeparator(Value2, DecSep) then
+            exit(0);
+
+        if not Evaluate(Dec, Value2) then
+            exit(0);
+
+        //number 10 will be 100. Number 10,5 will be 105
+        RoundDec := Round(Dec, 0.1) * 10;
+        if CheckForIntOverflow(RoundDec) then
+            exit(0);
+
+        SortOrder := RoundDec;
+        VarietyVal.SetCurrentKey(Type, Table, "Sort Order");
+        VarietyVal.SetRange(Type, Type);
+        VarietyVal.SetRange(Table, Table);
+        VarietyVal.SetRange("Sort Order", SortOrder);
+        if not VarietyVal.IsEmpty then
+            exit(0);
+
+        exit(SortOrder);
+    end;
+
+    internal procedure CheckIfMoreThanOneDecimalSeparator(ValueToCheck: Code[20]; DecSeparator: Text[1]): Boolean
+    var
+        ValueWithoutDecSep: Code[20];
+    begin
+        ValueWithoutDecSep := DelChr(ValueToCheck, '=', DecSeparator);
+        exit(StrLen(ValueToCheck) - StrLen(ValueWithoutDecSep) > 1);
+    end;
+
+    internal procedure CheckForIntOverflow(DecToCheck: Decimal): Boolean
+    begin
+        exit(Abs(DecToCheck) > 2147483647);
     end;
 
     internal procedure CheckTableLocked(): Boolean
