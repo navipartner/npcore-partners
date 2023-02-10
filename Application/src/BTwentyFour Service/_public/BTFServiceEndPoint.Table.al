@@ -51,8 +51,8 @@
 
             trigger OnValidate()
             var
+                ImportType: Record "NPR Nc Import Type";            
                 ServiceAPI: Codeunit "NPR BTF Service API";
-                ImportType: Record "NPR Nc Import Type";
             begin
                 if Rec.Enabled then begin
                     ServiceAPI.RegisterNcImportType(CopyStr(Rec."EndPoint ID", 1, MaxStrlen(ImportType.Code)), Rec.Description, GetImportListUpdateHandler());

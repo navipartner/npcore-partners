@@ -107,9 +107,9 @@
 
                 trigger OnAction()
                 var
+                    ServiceEndPoint: Record "NPR BTF Service EndPoint";                
                     ServiceAPI: Codeunit "NPR BTF Service API";
                     Response: Codeunit "Temp Blob";
-                    ServiceEndPoint: Record "NPR BTF Service EndPoint";
                 begin
                     Rec.TestField("Authroization EndPoint ID");
                     ServiceEndPoint.Get(Rec.Code, Rec."Authroization EndPoint ID");
