@@ -20,8 +20,8 @@ codeunit 88004 "NPR BCPT POS DS Voucher Usage" implements "BCPT Test Param. Prov
         VoucherType: Record "NPR NpRv Voucher Type";
         BCPTTestContext: Codeunit "BCPT Test Context";
         POSSession: Codeunit "NPR POS Session";
-        POSMockLibrary: Codeunit "NPR Library - POS Mock";
-        POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
+        POSMockLibrary: Codeunit "NPR BCPT Library - POS Mock";
+        POSMasterDataLibrary: Codeunit "NPR BCPT Library POSMasterData";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
         NoOfSales: Integer;
         NoOfSalesParamLbl: Label 'NoOfSales', Locked = true;

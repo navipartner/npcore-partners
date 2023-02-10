@@ -21,9 +21,9 @@ codeunit 88001 "NPR BCPT POS Direct Sale EFT" implements "BCPT Test Param. Provi
         POSPaymentMethod: Record "NPR POS Payment Method";
         BCPTTestContext: Codeunit "BCPT Test Context";
         POSSession: Codeunit "NPR POS Session";
-        POSMockLibrary: Codeunit "NPR Library - POS Mock";
-        LibraryEFT: Codeunit "NPR Library - EFT";
-        POSMasterDataLibrary: Codeunit "NPR Library - POS Master Data";
+        POSMockLibrary: Codeunit "NPR BCPT Library - POS Mock";
+        LibraryEFT: Codeunit "NPR BCPT Library - EFT";
+        POSMasterDataLibrary: Codeunit "NPR BCPT Library POSMasterData";
         IsInitialized, PostSale, AllowGapsInSaleFiscalNoSeries : Boolean;
         NoOfSales, NoOfLinesPerSale : Integer;
         NoOfSalesParamLbl: Label 'NoOfSales', Locked = true;
