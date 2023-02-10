@@ -16,4 +16,14 @@ codeunit 6060030 "NPR Reverse Sale Public Access"
         POSActionRevDirSaleB.HendleReverse(
             SalesTicketNo, ObfucationMethod, CopyHeaderDim, ReturnReasonCode, IncludePaymentLines);
     end;
+
+    internal procedure CallOnReverseSalesTicketOnBeforeModifySalesLinePOS(var SaleLinePOS: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale")
+    begin
+        OnReverseSalesTicketOnBeforeModifySalesLinePOS(SaleLinePOS, SalePOS);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnReverseSalesTicketOnBeforeModifySalesLinePOS(var SaleLinePOS: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale")
+    begin
+    end;
 }
