@@ -106,6 +106,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
                     SaleLinePOS.Validate("Return Reason Code", ReturnReasonCode);
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
                 SaleLinePOS."Return Sale Sales Ticket No." := SalesTicketNo;
+                CallOnReverseSalesTicketOnBeforeModifySalesLinePOS(SaleLinePOS, SalePOS);
                 SaleLinePOS.Modify(true);
             until POSSalesLine.Next() = 0;
     end;
@@ -328,6 +329,13 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
             exit(PaymentLine."Line No." + 10000)
         else
             exit(10000);
+    end;
+
+    local procedure CallOnReverseSalesTicketOnBeforeModifySalesLinePOS(var SaleLinePOS: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale")
+    var
+        ReverseSalePublicAccess: Codeunit "NPR Reverse Sale Public Access";
+    begin
+        ReverseSalePublicAccess.CallOnReverseSalesTicketOnBeforeModifySalesLinePOS(SaleLinePOS, SalePOS);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeSetQuantity', '', true, true)]
