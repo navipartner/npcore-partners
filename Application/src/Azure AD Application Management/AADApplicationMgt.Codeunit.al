@@ -280,7 +280,7 @@ codeunit 6060060 "NPR AAD Application Mgt."
 
         // Ensure token part has proper length for base64 decode
         Remainder := (4 - (StrLen(TxtBuffer) mod 4));
-        if (not (Remainder = 0)) then
+        if (not (Remainder = 4)) then
             for i := 1 to Remainder do
                 TxtBuffer := TxtBuffer + '=';
 
