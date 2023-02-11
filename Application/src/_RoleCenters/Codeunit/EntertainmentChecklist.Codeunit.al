@@ -25,7 +25,7 @@ codeunit 6060003 "NPR Entertainment Checklist"
     local procedure GetUpgradeTag(): Code[250]
     begin
         //For Any change, increase version
-        exit('NPR-Checklist-Entertainment-v1.5');
+        exit('NPR-Checklist-Entertainment-v1.6');
     end;
 
     local procedure CreateChecklistItems();
@@ -57,7 +57,48 @@ codeunit 6060003 "NPR Entertainment Checklist"
             TempAllProfile.Insert();
         end;
     end;
+#if BC18
+    local procedure CreateWelcomeVideoExperience(var TempAllProfile: Record "All Profile" temporary)
+    var
+        WelcomeVideoENTxt: Label 'Welcome Video Entertainment', Locked = true;
+    begin
+        //Global Language
+        GuidedExperience.InsertAssistedSetup(WelcomeVideoENTxt, WelcomeVideoENTxt, WelcomeVideoENTxt, 2, ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", "Assisted Setup Group"::NPRetail, '', "Video Category"::NPR, '');
 
+        //In case that new language needs to be added, Language ID can be founded in table Windows Language (2000000045), Use just languages with filter "Localization Exist" and "Globally Enabled" set to true
+#region Languages
+#region English
+        if CheckLanguageId(1033) then begin
+            GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 1033, WelcomeVideoENTxt);
+            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 1033, WelcomeVideoENTxt);
+        end;
+        if CheckLanguageId(2057) then begin
+            GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 2057, WelcomeVideoENTxt);
+            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 2057, WelcomeVideoENTxt);
+        end;
+        if CheckLanguageId(3081) then begin
+            GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 3081, WelcomeVideoENTxt);
+            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 3081, WelcomeVideoENTxt);
+        end;
+        if CheckLanguageId(4105) then begin
+            GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 4105, WelcomeVideoENTxt);
+            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 4105, WelcomeVideoENTxt);
+        end;
+        if CheckLanguageId(5129) then begin
+            GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 5129, WelcomeVideoENTxt);
+            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 5129, WelcomeVideoENTxt);
+        end;
+        if CheckLanguageId(7177) then begin
+            GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 7177, WelcomeVideoENTxt);
+            GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 7177, WelcomeVideoENTxt);
+        end;
+#endregion
+#endregion
+
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 1000, TempAllProfile, false);
+        Checklist.InitializeGuidedExperienceItems();
+    end;
+#else
     local procedure CreateWelcomeVideoExperience(var TempAllProfile: Record "All Profile" temporary)
     var
         WelcomeVideoENTxt: Label 'Welcome Video Entertainment', Locked = true;
@@ -67,8 +108,8 @@ codeunit 6060003 "NPR Entertainment Checklist"
         GuidedExperience.InsertApplicationFeature(WelcomeVideoENTxt, WelcomeVideoENTxt, WelcomeVideoENTxt, 2, ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.");
 
         //In case that new language needs to be added, Language ID can be founded in table Windows Language (2000000045), Use just languages with filter "Localization Exist" and "Globally Enabled" set to true
-        #region Languages
-        #region English
+#region Languages
+#region English
         if CheckLanguageId(1033) then begin
             GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Application Feature", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 1033, WelcomeVideoENTxt);
             GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Application Feature", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 1033, WelcomeVideoENTxt);
@@ -93,12 +134,13 @@ codeunit 6060003 "NPR Entertainment Checklist"
             GuidedExperience.AddTranslationForSetupObjectTitle("Guided Experience Type"::"Application Feature", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 7177, WelcomeVideoENTxt);
             GuidedExperience.AddTranslationForSetupObjectDescription("Guided Experience Type"::"Application Feature", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 7177, WelcomeVideoENTxt);
         end;
-        #endregion
-        #endregion
+#endregion
+#endregion
 
         Checklist.Insert("Guided Experience Type"::"Application Feature", ObjectType::Codeunit, Codeunit::"NPR Entertainment Welcome Vid.", 1000, TempAllProfile, false);
         Checklist.InitializeGuidedExperienceItems();
     end;
+#endif
 
     [TryFunction]
     local procedure CheckLanguageId(LanguageId: Integer)
