@@ -406,7 +406,7 @@
     procedure ProcessPOSInfoText(pSaleLinePos: Record "NPR POS Sale Line"; pSalePos: Record "NPR POS Sale"; pPOSInfoCode: Code[20]; pInfoText: Text)
     var
         POSInfo: Record "NPR POS Info";
-        Info: Text;
+        Info: Text[250];
         POSInfoTransaction: Record "NPR POS Info Transaction";
         InfoRequiredErr: Label 'POS Info can not be empty for POS Info Code %1.';
     begin
