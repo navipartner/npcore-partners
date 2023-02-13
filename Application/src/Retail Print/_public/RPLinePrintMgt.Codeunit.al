@@ -134,6 +134,7 @@
         DataTypeManagement.GetRecordRef(RecordVariant, RecRef);
         ProcessTemplate(Code, RecRef);
     end;
+
     procedure ProcessTemplate("Code": Code[20]; RecRef: RecordRef)
     var
         RPTemplateHeader: Record "NPR RP Template Header";
@@ -410,10 +411,15 @@
         if TemplateLine."Start Char" > 0 then
             TemplateLine."Processing Value" := CopyStr(TemplateLine."Processing Value", TemplateLine."Start Char");
 
-        if TemplateLine."Blank Zero" then
+        if TemplateLine."Blank Zero" then begin
             if Evaluate(DecimalBuffer, TemplateLine."Processing Value", 9) then
                 if DecimalBuffer = 0 then
                     TemplateLine."Processing Value" := '';
+
+            if Evaluate(DecimalBuffer, TemplateLine."Processing Value") then
+                if DecimalBuffer = 0 then
+                    TemplateLine."Processing Value" := '';
+        end;
 
         if StrLen(TemplateLine."Default Value") > 0 then
             if StrLen(TemplateLine."Processing Value") = 0 then
