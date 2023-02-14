@@ -6,13 +6,8 @@ codeunit 6150866 "NPR POS Action: Contact Select" implements "NPR IPOS Workflow"
 
 
     local procedure ActionCode(): Code[20]
-    var
-        OrdinalIndex: Integer;
-        EnumValueName: Text;
     begin
-        OrdinalIndex := Enum::"NPR POS Workflow".Ordinals().IndexOf(Enum::"NPR POS Workflow"::CONTACT_SELECT.AsInteger());
-        Enum::"NPR POS Workflow".Names().Get(OrdinalIndex, EnumValueName);
-        exit(UpperCase(CopyStr(EnumValueName, 1, 20)));
+        exit(Format(Enum::"NPR POS Workflow"::CONTACT_SELECT));
     end;
 
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
