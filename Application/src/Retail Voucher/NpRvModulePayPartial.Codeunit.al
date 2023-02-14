@@ -4,6 +4,7 @@
     var
         Text000: Label 'Apply Payment - Partial';
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -129,5 +130,45 @@
         TempSalesLine.UpdateVATOnLines(0, SalesHeader, TempSalesLine, TempVATAmountLine);
         exit(TempVATAmountLine.GetTotalAmountInclVAT());
     end;
+
+    #Region V3
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunApplyPaymentV3', '', true, true)]
+    local procedure OnRunApplyPaymentV3(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; var Handled: Boolean; var ActionContext: JsonObject)
+    begin
+        if Handled then
+            exit;
+        if not IsSubscriber(VoucherType) then
+            exit;
+
+        Handled := true;
+
+        ApplyPayment(POSSession, VoucherType, SaleLinePOSVoucher, ActionContext);
+    end;
+
+    procedure ApplyPayment(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; var ActionContext: JsonObject)
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        PaidAmount: Decimal;
+        ReturnAmount: Decimal;
+        SaleAmount: Decimal;
+        Subtotal: Decimal;
+    begin
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+        if Subtotal >= 0 then
+            exit;
+
+        SaleLinePOS.Get(SaleLinePOSVoucher."Register No.", SaleLinePOSVoucher."Sales Ticket No.", SaleLinePOSVoucher."Sale Date", SaleLinePOSVoucher."Sale Type", SaleLinePOSVoucher."Sale Line No.");
+        SaleLinePOS."Amount Including VAT" += Subtotal;
+        if SaleLinePOS."Amount Including VAT" < 0 then begin
+            SaleLinePOS.Delete(true);
+            exit;
+        end;
+        SaleLinePOS."Currency Amount" := SaleLinePOS."Amount Including VAT";
+        POSPaymentLine.ReverseUnrealizedSalesVAT(SaleLinePOS);
+        SaleLinePOS.Modify();
+    end;
+    #endRegion
 }
 

@@ -5,6 +5,7 @@
     var
         Text000: Label 'Apply Payment - Default (Full Payment)';
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean)
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
@@ -320,6 +321,76 @@
         NpRvSalesLineReference."Sales Line Id" := NpRvSalesLineNew.Id;
         NpRvSalesLineReference.Insert(true);
     end;
+
+    #region V3
+    procedure ApplyPayment(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean; var ActionContext: JsonObject)
+    var
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        ReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
+        VoucherType2: Record "NPR NpRv Voucher Type";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSActIssueReturnVchr: Codeunit "NPR POS Act.Issue Return Vchr";
+        PaidAmount: Decimal;
+        ReturnAmount: Decimal;
+        SaleAmount: Decimal;
+        Subtotal: Decimal;
+        POSAction: Record "NPR POS Action";
+        parameters: JsonObject;
+        ActionVersion: Integer;
+    begin
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+        if Subtotal >= 0 then begin
+            if EndSale then
+                DoEndSale(POSSession, VoucherType);
+            exit;
+        end;
+
+        ReturnVoucherType.Get(VoucherType.Code);
+        ReturnVoucherType.TestField("Return Voucher Type");
+
+        if VoucherType2.Get(ReturnVoucherType."Return Voucher Type") then begin
+            VoucherType2.TestField("Payment Type");
+
+            if POSPaymentMethod.Get(VoucherType2."Payment Type") then begin
+                ReturnAmount := SaleAmount - PaidAmount;
+                if POSPaymentMethod."Rounding Precision" > 0 then
+                    ReturnAmount := Round(SaleAmount - PaidAmount, POSPaymentMethod."Rounding Precision");
+
+                if (POSPaymentMethod."Minimum Amount" > 0) and (Abs(ReturnAmount) < (POSPaymentMethod."Minimum Amount")) then
+                    exit;
+                if (VoucherType2."Minimum Amount Issue" > 0) and (Abs(ReturnAmount) < VoucherType2."Minimum Amount Issue") then
+                    exit;
+            end;
+        end;
+
+        if not POSSession.RetrieveSessionAction(POSActIssueReturnVchr.ActionCode(), POSAction) then
+            POSAction.Get(POSActIssueReturnVchr.ActionCode());
+        ActionVersion := 3;
+        if POSAction."Workflow Implementation" = POSAction."Workflow Implementation"::LEGACY then
+            ActionVersion := 1;
+
+        ActionContext.Add('name', POSAction.Code);
+        ActionContext.Add('version', ActionVersion);
+
+        Parameters.Add('VoucherTypeCode', ReturnVoucherType."Return Voucher Type");
+        Parameters.Add('EndSale', EndSale);
+        ActionContext.Add('parameters', parameters)
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunApplyPaymentV3', '', true, true)]
+    local procedure OnRunApplyPaymentV3(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean; var Handled: Boolean; var ActionContext: JsonObject)
+    begin
+        if Handled then
+            exit;
+        if not IsSubscriber(VoucherType) then
+            exit;
+
+        Handled := true;
+
+        ApplyPayment(POSSession, VoucherType, SaleLinePOSVoucher, EndSale, ActionContext);
+    end;
+    #endregion V3
 
     //--- Voucher Interface ---
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnInitVoucherModules', '', true, true)]
