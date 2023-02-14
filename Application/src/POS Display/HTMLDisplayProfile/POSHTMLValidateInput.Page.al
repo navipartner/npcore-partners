@@ -7,9 +7,6 @@ page 6150773 "NPR POS HTML Validate Input"
     DeleteAllowed = false;
     InsertAllowed = false;
     Caption = 'Input Validation';
-
-
-
     layout
     {
         area(Content)
@@ -21,7 +18,7 @@ page 6150773 "NPR POS HTML Validate Input"
 
                 trigger Ready()
                 begin
-                    CurrPage."Input Validation".SendInputData(jsInput, True);
+                    CurrPage."Input Validation".SendInputDataAndLabel(jsInput, True, Format(MsgApproveInputLabel), Format(MsgRedoInputLabel), Format(MsgPhoneInputLabel));
                 end;
 
                 trigger OkInput()
@@ -53,5 +50,8 @@ page 6150773 "NPR POS HTML Validate Input"
     var
         jsInput: JsonObject;
         Result: Text;
+        MsgApproveInputLabel: Label 'ACCEPTED', Comment = 'Input ok. label', MaxLength = 100;
+        MsgRedoInputLabel: Label 'MAKE AGAIN', Comment = 'Input not ok, try again. label', MaxLength = 100;
+        MsgPhoneInputLabel: Label 'Phone number', Comment = 'Phone number label', MaxLength = 100;
 
 }

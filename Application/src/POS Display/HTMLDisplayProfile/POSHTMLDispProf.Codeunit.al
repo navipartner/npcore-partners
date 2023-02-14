@@ -3,7 +3,9 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
     Access = Internal;
 
     var
-        MsgRememberInputLabel: Label 'Remember to ask for input on the second display.', Comment = 'Input reminder', MaxLength = 100;
+        MsgRememberInputLabel: Label 'REMEMBER TO ASK FOR SIGNATURE ON THE CUSTOMER DISPLAY.', Comment = 'Input reminder', MaxLength = 100;
+        MsgRememberInputTitleLabel: Label 'CUSTOMER DISPLAY', Comment = 'Input reminder', MaxLength = 100;
+        MsgInputCancelledLabel: Label 'Signature capture was canceled', Comment = 'User canceled signature', MaxLength = 100;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterInitializeAtLogin', '', true, true)]
     local procedure OnAfterInitializeAtLogin(POSUnit: Record "NPR POS Unit")
@@ -195,16 +197,12 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
     var
         POSUnit: Record "NPR POS Unit";
         POSEntry: Record "NPR POS Entry";
-        CostumerInput: Record "NPR POS Costumer Input";
         ValidatePage: Page "NPR POS HTML Validate Input";
         HwcGUID: Codeunit "NPR POS HTML Disp. Session";
         Setup: Codeunit "NPR POS Setup";
         ResponseObj: JsonToken;
         InputObj: JsonToken;
-        PhoneObj: JsonToken;
-        SignObj: JsonToken;
         validateResult: Text;
-        signStream: OutStream;
     begin
         if (not HwcGUID.PopGuid(RequestId)) then
             exit;
@@ -220,19 +218,10 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
             case validateResult of
                 'OK':
                     begin
-                        CostumerInput.Init();
-                        CostumerInput.Context := "NPR POS Costumer Input Context"::MONEY_BACK;
-                        InputObj.AsObject().Get('PhoneNumber', PhoneObj);
-                        InputObj.AsObject().Get('Signature', SignObj);
-                        CostumerInput."Phone Number" := PhoneObj.AsValue().AsText();
-                        CostumerInput.Signature.CreateOutStream(signStream);
-                        CostumerInput."Date & Time" := CurrentDateTime();
-                        signStream.WriteText(SignObj.AsValue().AsText());
                         POSEntry.Reset();
                         POSEntry.SetFilter(POSEntry."POS Unit No.", POSUnit."No.");
                         POSEntry.FindLast();
-                        CostumerInput."POS Entry No." := POSEntry."Entry No.";
-                        CostumerInput.Insert();
+                        EnterCustomerInput(InputObj.AsObject(), POSEntry);
                     end;
                 'REDO':
                     begin
@@ -240,10 +229,47 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
                     end;
                 'CANCEL':
                     begin
-                        Message('Signature capture was canceled');
+                        Message(MsgInputCancelledLabel);
                     end;
-            end;
+            end
         end
+    end;
+
+    /// <summary>
+    ///  This method takes a JSON object of the form {PhoneNumber: [Text], Signature: [Text]} where:
+    /// PhoneNumber is a text containing a phone number;
+    /// Signature is a two dimensional array where the first dimension relates to different strokes and 
+    /// the second dimension contains the Point objects in an array [{x: [number], y: [number]}]
+    /// </summary>
+    /// <param name="InputObj"></param>
+    procedure EnterCustomerInput(InputObj: JsonObject; POSEntry: Record "NPR POS Entry")
+    var
+        POSSession: Codeunit "NPR POS Session";
+        POSUnit: Record "NPR POS Unit";
+        CostumerInput: Record "NPR POS Costumer Input";
+        Setup: Codeunit "NPR POS Setup";
+        PhoneObj: JsonToken;
+        SignObj: JsonToken;
+        signStream: OutStream;
+    begin
+        POSSession.GetSetup(Setup);
+        POSUnit.Get(Setup.GetPOSUnitNo());
+        if (POSUnit."POS HTML Display Profile" = '') then
+            exit;
+        if (not InputObj.Get('PhoneNumber', PhoneObj)) then
+            exit;
+        if (not InputObj.Get('Signature', SignObj)) then
+            exit;
+        if (POSEntry."Entry No." = 0) then
+            exit;
+        CostumerInput.Init();
+        CostumerInput.Context := "NPR POS Costumer Input Context"::MONEY_BACK;
+        CostumerInput."Phone Number" := PhoneObj.AsValue().AsText();
+        CostumerInput.Signature.CreateOutStream(signStream);
+        CostumerInput."Date & Time" := CurrentDateTime();
+        signStream.WriteText(SignObj.AsValue().AsText());
+        CostumerInput."POS Entry No." := POSEntry."Entry No.";
+        CostumerInput.Insert();
     end;
 
     local procedure SendInputSignalToHWC()
@@ -256,7 +282,8 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         POSSaleLines: Record "NPR POS Entry Sales Line";
         Context: JsonObject;
         JsParam: JsonObject;
-        Sum: Integer;
+        Sum: Decimal;
+        cPage: Page "NPR Custom Message Page";
     begin
         POSSession.GetSetup(Setup);
         POSEntry.Reset();
@@ -278,13 +305,13 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         repeat
             Sum := Sum + POSSaleLines."Amount Incl. VAT";
         until POSSaleLines.Next() = 0;
-        if (Sum >= 0) then
+        if (Sum >= 0.00) then
             exit;
         Context.Add('DisplayAction', 'SendJS');
         JsParam.Add('JSAction', 'GetInput');
         JsParam.Add('InputType', Format(HtmlProf."CIO: Money Back"));
         Context.Add('JSParameter', JsParam);
-        Message(MsgRememberInputLabel);
+        cPage.ShowMessage(MsgRememberInputTitleLabel, MsgRememberInputLabel);
         SendRequest(POSUnit."No.", Context, True);
     end;
 
@@ -304,7 +331,6 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         Request.SetHandler('HTMLDisplay');
         if (Context.Get('JSParameter', JsToken)) then begin
             JsToken.AsObject().Add('ExVAT', HtmlDisplay."Ex. VAT");
-            JsToken.AsObject().Add('ReturnInput', Format(HtmlDisplay."CIO: Money Back"));
             JsToken.WriteTo(JSParamTxt);
             Context.Replace('JSParameter', JSParamTxt);
         end;

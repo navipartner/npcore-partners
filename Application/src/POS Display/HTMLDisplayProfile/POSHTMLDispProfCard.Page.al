@@ -7,10 +7,6 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
     Extensible = false;
     ApplicationArea = NPRRetail;
     Caption = 'HTML Display Profile';
-#IF NOT BC17
-    AboutTitle = 'HTML Display Profile';
-    AboutText = 'This page describes a HTML display profile, which can be used for multiple POS Units.';
-#ENDIF
 
     layout
     {
@@ -23,60 +19,36 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                     ApplicationArea = NPRRetail;
                     Caption = 'Code';
                     ToolTip = 'Specifies the unique code identifying the profile.';
-#IF NOT BC17
-                    AboutTitle = 'Code';
-                    AboutText = 'Specifies a unique code to identify the profile.';
-#ENDIF
                 }
                 field(HTML; Rec."HTML Blob".HasValue())
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'HTML File';
                     ToolTip = 'Specifies if an HTML file is uploaded. Upload HTML via the ''Upload File'' action';
-#IF NOT BC17
-                    AboutTitle = 'HTML File';
-                    AboutText = 'Specifies if an HTML file is uploaded. Upload HTML via the ''Upload File'' action';
-#ENDIF
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Description';
                     ToolTip = 'Speccifies the description of the profile, to help distinguish between profiles.';
-#IF NOT BC17
-                    AboutTitle = 'Description';
-                    AboutText = 'Speccifies the description of the profile, to help distinguish between profiles.';
-#ENDIF
                 }
                 field("Content Lines Code"; Rec."Display Content Code")
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Display Content Code';
                     ToolTip = 'Specifies the media the HTML needs to display.';
-#IF NOT BC17
-                    AboutTitle = 'Content Lines';
-                    AboutText = 'Specifies the media the HTML needs to display.';
-#ENDIF
                 }
                 field("Ex. VAT"; Rec."Ex. VAT")
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Price ex. VAT';
                     ToolTip = 'Specifies if VAT should be excluded on the receipt';
-#IF NOT BC17
-                    AboutTitle = 'Ex. VAT';
-                    AboutText = 'Specifies if VAT should be excluded on the receipt';
-#ENDIF
                 }
                 field("Receipt Item Description"; Rec."Receipt Item Description")
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Receipt Item Description';
                     ToolTip = 'Specifies which description is used on the second display.';
-#IF NOT BC17
-                    AboutTitle = 'Receipt Item Description';
-                    AboutText = 'Specifies which description is used on the second display.';
-#ENDIF
                 }
             }
             group("Input Options")
@@ -86,10 +58,6 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                     ApplicationArea = NPRRetail;
                     Caption = 'Customer Input Option: Money Back';
                     ToolTip = 'Specifies the customer input options.';
-#IF NOT BC17
-                    AboutTitle = 'Customer Input Option: Money Back';
-                    AboutText = 'Specifies the customer input options.';
-#ENDIF
                 }
             }
         }
@@ -220,7 +188,7 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
         if (not ResponseMessage.IsSuccessStatusCode) then
             Error('Web servie was not successfull: %1', ResponseMessage.ReasonPhrase);
         if not (ResponseMessage.Content.ReadAs(htmlContent)) then
-            Error('Coudl not read the content of the file');
+            Error('Could not read the content of the file');
         Rec."HTML Blob".CreateOutStream(outStream);
         outStream.WriteText(htmlContent);
         Rec.Modify();
