@@ -64,6 +64,7 @@
                     ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
+                        Rec.SetFilter("Period Start", DateFilter);
                         CurrPage.Update(false);
                     end;
                 }
@@ -461,7 +462,7 @@
         if not (UsingPeriod) then begin
             DateFilter := CopyStr(StrSubstNo(DateFilterLbl, Rec."Period Start", Rec."Period End"), 1, 50);
             DateFilterLastYear := CopyStr(StrSubstNo(DateFilterLbl, CalcDate(LastYearCalc, Rec."Period Start"),
-            CalcDate(LastYearCalc, Rec."Period End")), 1, 50);
+           CalcDate(LastYearCalc, Rec."Period End")), 1, 50);
         end;
     end;
 
