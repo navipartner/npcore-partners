@@ -20,15 +20,11 @@
             TableRelation = "Item Category";
             DataClassification = CustomerContent;
         }
-        field(10; Description; Text[50])
+        field(10; Description; Text[100])
         {
             Caption = 'Description';
             Editable = false;
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-            end;
         }
     }
 
