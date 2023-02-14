@@ -72,3 +72,5 @@
     href: howto/pos_theme.md
   - name: Create POS menu filters
     href: howto/create_pos_menu_filter.md
+  - name: Take photo on POS
+    href: howto/take_photo_pos.md
