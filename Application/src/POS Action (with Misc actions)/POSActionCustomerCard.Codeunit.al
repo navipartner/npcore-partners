@@ -9,12 +9,14 @@ codeunit 6014409 "NPR POS Action: Customer Card"
     var
         ActionDescription: Label 'This built in function opens the customer card page for selected Customer';
     begin
+#pragma warning disable AA0139
         if Sender.DiscoverAction(
             ActionCode(),
             ActionDescription,
             ActionVersion(),
             Sender.Type::Generic,
             Sender."Subscriber Instances Allowed"::Multiple)
+#pragma warning restore 
         then
             Sender.RegisterWorkflow(false);
     end;
@@ -32,8 +34,10 @@ codeunit 6014409 "NPR POS Action: Customer Card"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
+#pragma warning disable AA0139
         if not Action.IsThisAction(ActionCode()) then
             exit;
+#pragma warning restore 
 
         OpenCustomerCardPage(Context, POSSession, FrontEnd);
         Handled := true;

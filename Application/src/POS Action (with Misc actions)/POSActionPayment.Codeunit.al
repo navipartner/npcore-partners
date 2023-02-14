@@ -30,7 +30,9 @@
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
+#pragma warning disable AA0139
           ActionCode(),
+#pragma warning restore
           ActionDescription,
           ActionVersion(),
           Sender.Type::Generic,
@@ -79,8 +81,10 @@
         SalePOS: Record "NPR POS Sale";
         fallbackAmount: Decimal;
     begin
+#pragma warning disable AA0139
         if not Action.IsThisAction(ActionCode()) then
             exit;
+#pragma warning restore 
 
         POSSession.GetSetup(Setup);
         Setup.GetPOSUnit(POSUnit);
@@ -209,8 +213,10 @@
         PaymentHandled: Boolean;
         POSUnit: Record "NPR POS Unit";
     begin
+#pragma warning disable AA0139
         if not Action.IsThisAction(ActionCode()) then
             exit;
+#pragma warning restore
 
         Handled := true;
 
