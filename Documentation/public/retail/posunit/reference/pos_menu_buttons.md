@@ -4,7 +4,7 @@ Refer to the following table to see what each [POS menu button](../howto/add_but
 
 | Field Name      | Description |
 | ----------- | ----------- |
-| **Caption** | The button description that can be seen in the POS. |
+| **Caption** | The button description on the POS that helps users understand what the button does. |
 | **Tooltip** | The text that will be displayed if the cursor is placed on the button.
 | **Action type** | The type of action that will be triggered when the button is clicked. **Popup Menu** is used for defining a submenu which contains its own set of buttons; **Action** - when selected, you can define what the POS action will do; **Item** - you can insert a specific item on the sales line; **Customer** - you can set a button to attach a specific customer to the sale; **Payment Type** - you can set which POS payment method is going to be used when the button is clicked. |
 | **Action code** | The code of the action that will be triggered by clicking the button. |
