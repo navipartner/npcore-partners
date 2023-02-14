@@ -1,6 +1,8 @@
 ﻿codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Use new action SCAN_VOUCHER_2';
 
     var
         Text000: Label 'This action handles Scan Retail Vouchers (Payment).';

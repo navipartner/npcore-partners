@@ -1,6 +1,8 @@
 ﻿codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Use new action ISSUE_RETURN_VCHR_2';
 
     var
         Text000: Label 'This action Issues Return Retail Vouchers.';
