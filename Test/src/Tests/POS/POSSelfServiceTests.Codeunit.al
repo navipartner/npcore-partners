@@ -267,6 +267,7 @@ codeunit 85073 "NPR POS Self Service Tests"
     procedure LoginScreen()
     var
         POSEntry: Record "NPR POS Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         SalePOS: Record "NPR POS Sale";
         ActionLoginScreen: Codeunit "NPR SS Action: Login Screen";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -288,6 +289,11 @@ codeunit 85073 "NPR POS Self Service Tests"
         Assert.IsTrue(CurrentView.GetType() = CurrentView.GetType() ::Login, Format(CurrentView.GetType()));
         POSEntry.FindLast();
         Assert.IsTrue(POSEntry."Entry Type" = POSEntry."Entry Type"::"Cancelled Sale", 'POS Entry type Cancelled Sale is not created.');
+
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        Assert.AreEqual(1, POSEntrySalesLine.Count(), 'More then one Sales Line created when cancelling sale');
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Comment);
+        Assert.IsTrue(POSEntrySalesLine.FindFirst(), 'Comment was not added when cancelling sale');
     end;
 
     [Test]
