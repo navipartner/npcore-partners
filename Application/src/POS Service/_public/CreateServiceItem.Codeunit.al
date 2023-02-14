@@ -21,7 +21,7 @@ codeunit 6059838 "NPR Create Service Item"
             exit;
 
         if POSEntrySalesLine.Quantity > 0 then
-            CreateServiceItem(POSEntry, POSEntrySalesLine)
+            CreateServiceItem(POSEntry, POSEntrySalesLine, Item)
         else
             DeleteServiceItem(POSEntry, POSEntrySalesLine);
     end;
@@ -48,10 +48,9 @@ codeunit 6059838 "NPR Create Service Item"
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
-    procedure CreateServiceItem(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line")
+    procedure CreateServiceItem(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; Item: Record Item)
     var
         ServiceItem: Record "Service Item";
-        Item: Record Item;
         ItemUnitOfMeasure: Record "Item Unit of Measure";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
         NoSeriesMgt: Codeunit NoSeriesManagement;
