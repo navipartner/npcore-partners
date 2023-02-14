@@ -482,6 +482,7 @@
         NpRvSendingLog.Insert(true);
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     internal procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; NpRvSalesLine: Record "NPR NpRv Sales Line"; EndSale: Boolean)
     var
         VoucherType: Record "NPR NpRv Voucher Type";
@@ -1178,6 +1179,7 @@
         NpRvSalesLine.Insert(true);
     end;
 
+    [Obsolete('Delete when final v1/v2 workflow is gone')]
     internal procedure ApplyVoucherPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; EndSale: Boolean)
     var
         TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
@@ -1550,6 +1552,57 @@
             Error(TooLongErr, 'VoucherTypeCode', VoucherTypeCode);
         VoucherTypeCode := CopyStr(VoucherType, 1, MaxStrLen(VoucherTypeCode));
     end;
+
+
+    #region V3
+    internal procedure ApplyPayment(POSSession: Codeunit "NPR POS Session"; NpRvSalesLine: Record "NPR NpRv Sales Line"; EndSale: Boolean; var ActionContext: JsonObject)
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
+        NpRvModulePaymentDefault: Codeunit "NPR NpRv Module Pay.: Default";
+        Handled: Boolean;
+    begin
+        VoucherType.Get(NpRvSalesLine."Voucher Type");
+        NpRvModuleMgt.OnRunApplyPaymentV3(POSSession, VoucherType, NpRvSalesLine, EndSale, Handled, ActionContext);
+        if Handled then
+            exit;
+
+        NpRvModulePaymentDefault.ApplyPayment(POSSession, VoucherType, NpRvSalesLine, EndSale, ActionContext);
+    end;
+
+    internal procedure ApplyVoucherPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; EndSale: Boolean; var ActionContext: JsonObject)
+    var
+        TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
+        VoucherType: Record "NPR NpRv Voucher Type";
+        Voucher: Record "NPR NpRv Voucher";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+    begin
+        VoucherType.Get(VoucherTypeCode);
+        CheckVoucherType(VoucherType, SalePOS);
+
+        PrepareVoucherBuffer(TempNpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber);
+        ValidateVoucher(TempNpRvVoucherBuffer);
+
+        POSLine."No." := VoucherType."Payment Type";
+        POSLine."Register No." := SalePOS."Register No.";
+        POSLine.Description := TempNpRvVoucherBuffer.Description;
+        POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
+        POSLine."Amount Including VAT" := TempNpRvVoucherBuffer.Amount;
+        POSPaymentLine.InsertPaymentLine(POSLine, 0);
+        POSPaymentLine.GetCurrentPaymentLine(POSLine);
+        PaymentLine."Discount Code" := TempNpRvVoucherBuffer."No.";
+        if FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", Voucher) then begin
+            UpdateTaxSetup(POSLine, SalePOS, Voucher."Account No.");
+            POSPaymentLine.ReverseUnrealizedSalesVAT(POSLine);
+            POSLine.Modify();
+        end;
+
+        InsertNpRvSalesLine(TempNpRvVoucherBuffer, SalePOS, NpRvSalesLine, VoucherType, POSLine);
+
+        ApplyPayment(POSSession, NpRvSalesLine, EndSale, ActionContext);
+    end;
+
+    #endregion
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertIssuedVoucher(var Voucher: Record "NPR NpRv Voucher"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")

@@ -1,5 +1,7 @@
 ﻿codeunit 6151292 "NPR SS Action: NpRv Apply"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Use new action SS-VOUCHER-APPLY-2';
     //this action is a SelfService variant of 'SCAN_VOUCHER' action (codeunit 6151014 "NPR NpRv Scan POSAction Mgt.")
     var
         VoucherTypeCode: Code[20];

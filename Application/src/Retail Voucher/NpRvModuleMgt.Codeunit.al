@@ -52,6 +52,7 @@
     begin
     end;
 
+    [Obsolete('Please use OnRunApplyPaymentV3 instead.')]
     [IntegrationEvent(false, false)]
     internal procedure OnRunApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean; var Handled: Boolean)
     begin
@@ -66,4 +67,11 @@
     internal procedure OnInsertVoucherPaymentReturnSalesDoc(VoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; var Handled: Boolean);
     begin
     end;
+
+    #region V3
+    [IntegrationEvent(false, false)]
+    internal procedure OnRunApplyPaymentV3(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean; var Handled: Boolean; var ActionContext: JsonObject)
+    begin
+    end;
+    #endregion
 }

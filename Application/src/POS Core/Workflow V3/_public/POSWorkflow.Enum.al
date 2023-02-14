@@ -457,6 +457,22 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'LAYAWAY_CANCEL', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Layaway Cancel";
     }
+    value(86; SCAN_VOUCHER_2)
+    {
+        Caption = 'SCAN_VOUCHER_2', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Scan Voucher2";
+    }
+
+    value(87; ISSUE_RETURN_VCHR_2)
+    {
+        Caption = 'ISSUE_RETURN_VCHR_2', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Act.Issue Return Vchr";
+    }
+    value(88; "SS-VOUCHER-APPLY-2")
+    {
+        Caption = 'SS-VOUCHER-APPLY-2', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR SS Action: Voucher Apply";
+    }
     value(94; RETAIL_INVENTORY)
     {
         Caption = 'RETAIL_INVENTORY', Locked = true, MaxLength = 20;
