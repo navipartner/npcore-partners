@@ -3,12 +3,13 @@
 To create new buttons in the POS menu, follow the provided steps:
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Menus** and open the related link. 
-2. To add buttons to a menu, select the row in which the menu is located, and click **Buttons** in the ribbon.
+2. Select one of the menus from the list, and click **Buttons** in the ribbon.    
+   The button will be located in that menu when the POS is opened.
 
 ![ADDBUTTONS](../images/ADD%20BUTTONS.png)
 
-3. Click **New**.
-4. Insert the [necessary data](../reference/pos_menu_buttons.md) for a button.       
+1. Click **New**.
+2. Insert the [necessary data](../reference/pos_menu_buttons.md) for a button.       
 
 ![NEWBUTTON](../images/NEW%20BUTTON.png)      
 
