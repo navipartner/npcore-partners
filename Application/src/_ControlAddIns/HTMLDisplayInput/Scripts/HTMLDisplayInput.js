@@ -1,10 +1,10 @@
-function SendInputData(input, showControl)
+function SendInputDataAndLabel(input, showControl, approve, redo, phone)
 {
     try{
         let showPhone = input.PhoneNumber != null && input.PhoneNumber != undefined;;
         let showSign = input.Signature != null && input.Signature != undefined;
         let showBtns = showControl;
-        init(showPhone, showSign, showBtns);
+        init(showPhone, showSign, showBtns, approve, redo);
         if (showSign)
         {
             let signature = JSON.parse(input.Signature);
@@ -16,7 +16,7 @@ function SendInputData(input, showControl)
         if (showPhone)
         {
             let phonebox = document.getElementById("phonebox");
-            phonebox.innerHTML = "Phone No.: " + input.PhoneNumber;
+            phonebox.innerHTML = phone + ": " + input.PhoneNumber;
         }
     } catch (e)
     {
@@ -107,7 +107,7 @@ function DrawCanvas(canvas, points)
     }
 }
 
-function init(phonebox, signaturebox, btns)
+function init(phonebox, signaturebox, btns, approve, redo, phone)
 {
     let body = window.document.getElementById("controlAddIn");
     let gridlayout = document.createElement("div");
@@ -140,22 +140,22 @@ function init(phonebox, signaturebox, btns)
     if (btns)
     {
         let RedoBtn = document.createElement("button");
-        RedoBtn.style.height = "50px";
         RedoBtn.style.width = "100%";
         RedoBtn.style.backgroundColor = "indianred";
         RedoBtn.textContent = "Redo Input";
         RedoBtn.id = "RedoBtn";
-        RedoBtn.innerHTML = "<svg style=\"height: 100%; color: #00800000;\" fill=\"none\" stroke=\"darkred\" stroke-width=\"1.5\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636\"></path></svg>";
+        RedoBtn.innerHTML = "<p style=\"font-size: 40px; font-weight: bold;\">"+ redo +"<p/>"
         RedoBtn.addEventListener("click", () => Microsoft.Dynamics.NAV.InvokeExtensibilityMethod("RedoInput",[]));
         let OkBtn = document.createElement("button");
-        OkBtn.style.height = "50px";
         OkBtn.style.width = "100%";
         OkBtn.style.backgroundColor = "darkseagreen";
         OkBtn.id = "OkBtn";
-        OkBtn.innerHTML = "<svg style=\"height: 100%; color: #00800000;\" fill=\"none\" stroke=\"darkolivegreen\" stroke-width=\"1.5\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.5 12.75l6 6 9-13.5\"></path></svg>";
+        OkBtn.innerHTML = "<p style=\"font-size: 40px; font-weight: bold;\">"+ approve +"<p/>"
         OkBtn.addEventListener("click", () => Microsoft.Dynamics.NAV.InvokeExtensibilityMethod("OkInput",[]));
         gridlayout.appendChild(RedoBtn);
         gridlayout.appendChild(OkBtn);
     }
     body.appendChild(gridlayout);
 }
+
+Microsoft.Dynamics.NAV.InvokeExtensibilityMethod("Ready",[]);
