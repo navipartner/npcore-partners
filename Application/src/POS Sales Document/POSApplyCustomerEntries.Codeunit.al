@@ -146,7 +146,7 @@
             ApplnAmountToApply := ConvertFromCurrency(SaleLinePOS.Date, CustLedgEntry."Currency Code", SaleLinePOS."Currency Code", CustLedgEntry."Amount to Apply");
             LineAmount := ConvertFromCurrency(SaleLinePOS.Date, CustLedgEntry."Currency Code", SaleLinePOS."Currency Code", LineAmount);
         end;
-        if (ApplnAmountToApply < LineAmount) and (ApplnAmountToApply <> 0) then
+        if (Abs(ApplnAmountToApply) < Abs(LineAmount)) and (ApplnAmountToApply <> 0) then
             LineAmount := ApplnAmountToApply;
 
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"Customer Deposit";
