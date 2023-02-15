@@ -224,7 +224,6 @@
             case _TmpSelectionBuffer.Number of
                 DATABASE::"NPR Retail Journal Line":
                     begin
-                        RetailJournalLine.SetView(_TmpSelectionBuffer.GetView());
                         repeat
                             if RetailJournalLine.Get(_TmpSelectionBuffer.RecordId) then begin
                                 RetailJournalLine.Mark(true);
