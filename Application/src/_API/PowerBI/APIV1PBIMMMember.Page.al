@@ -19,6 +19,10 @@ page 6150782 "NPR APIV1 PBIMMMember"
         {
             repeater(GroupName)
             {
+                field(entryNo; Rec."Entry No.")
+                {
+                    Caption = 'Entry No.', Locked = true;
+                }
                 field(id; Rec.SystemId)
                 {
                     Caption = 'SystemId', Locked = true;
