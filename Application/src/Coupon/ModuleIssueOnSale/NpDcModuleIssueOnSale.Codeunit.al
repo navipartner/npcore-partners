@@ -52,7 +52,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale" implements "NPR IPOS Workflow"
         NpDcModuleIssueOnSaleB: Codeunit "NPR NpDc Module Issue: OnSaleB";
         InstantIssue: Boolean;
     begin
-        CouponTypeCode := UpperCase(CopyStr(JSON.GetString('CouponTypeCode'), 1, MaxStrLen(CouponTypeCode)));
+        CouponTypeCode := CopyStr(UpperCase(JSON.GetString('CouponTypeCode')), 1, MaxStrLen(CouponTypeCode));
         Quantity := JSON.GetInteger('Qty_input');
         InstantIssue := JSON.GetBooleanParameter('InstantIssue');
 
