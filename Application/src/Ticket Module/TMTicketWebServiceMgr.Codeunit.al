@@ -297,7 +297,7 @@
 
         NTicket: Integer;
         ResponseMessage: Text;
-        ReusedToken: Text;
+        ReusedToken: Text[100];
         Token: Text[100];
 
         TicketRequestElement: XmlElement;
