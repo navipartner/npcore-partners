@@ -71,6 +71,11 @@ page 6150783 "NPR APIV1 PBITMAdmisSched"
                 {
                     Caption = 'Reason Code', Locked = True;
                 }
+                field(scheduleCode; Rec."Schedule Code")
+                {
+                    Caption = 'Schedule Code',Locked = True;
+                }
+                
             }
         }
     }
