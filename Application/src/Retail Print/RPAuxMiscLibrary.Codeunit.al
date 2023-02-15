@@ -243,7 +243,7 @@
         exit(PadStr('', Length - ValueLength, PadChar) + Value);
     end;
 
-    local procedure GetReceiptPrintCount(var ProcessingValue: Text[250]; var RecID: RecordId; IncludeFirstPrint: Boolean)
+    local procedure GetReceiptPrintCount(var ProcessingValue: Text[2048]; var RecID: RecordId; IncludeFirstPrint: Boolean)
     var
         POSEntryOutputLog: Record "NPR POS Entry Output Log";
         POSEntryOutputLog2: Record "NPR POS Entry Output Log";

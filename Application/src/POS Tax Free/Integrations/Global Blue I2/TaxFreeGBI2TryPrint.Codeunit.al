@@ -67,7 +67,7 @@ codeunit 6060032 "NPR Tax Free GBI2 Try Print"
             String := String.Replace('<bc>', '');
             String := String.Replace('</bc>', '');
             Value := String;
-            Printer.AddBarcode('ITF', Value, 2);
+            Printer.AddBarcode('ITF', Value, 2, false);
             exit;
         end;
 
