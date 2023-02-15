@@ -14,8 +14,13 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
         SourceBinOptions_CptLbl: Label 'POS Unit Default Bin,User Selection,Fixed Parametar';
         SourceBin_NameLbl: Label 'SourceBin';
         SourceBin_CptLbl: Label 'Source Bin';
-        PrintTransferCaptionNameLbl: Label 'Print Transfer';
-        PrintTransferCaptionDescriptionLbl: Label 'Print template from Report Selection - Retail, after transferring content to bin. Template need to be built on top of "Workshift Checkpoint" table.';
+        PrintTransferCaptionNameLbl: Label 'Print Transfer Out';
+        PrintTransferCaptionDescriptionLbl: Label 'Print template from Report Selection - Retail, after transferring out content from bin. Template need to be built on top of "Workshift Checkpoint" table.';
+        TransferDirection: Label 'TransferDirection', Locked = true;
+        TransferDirectionCaption: Label 'Transfer Direction';
+        TransferDirectionDescription: Label 'Transfer Direction';
+        TransferDirectionOption: Label ',TransferOut,TransferIn', Locked = true;
+        TransferDirectionOptionCaption: Label ',Transfer Out,Transfer In';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -30,7 +35,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
             SourceBinOptions_CptLbl);
         WorkflowConfig.AddBooleanParameter(PrintTransferNameLbl, false, PrintTransferCaptionNameLbl, PrintTransferCaptionDescriptionLbl);
         WorkflowConfig.AddTextParameter(SourceBin_NameLbl, '', SourceBin_CptLbl, SourceBin_CptLbl);
-
+        WorkflowConfig.AddOptionParameter(TransferDirection, TransferDirectionOption, '', TransferDirectionCaption, TransferDirectionDescription, TransferDirectionOptionCaption);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -39,12 +44,14 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
         case Step of
             'SelectBin':
                 FrontEnd.WorkflowResponse(SelectSourceBin(Context));
-            'Transfer':
-                FrontEnd.WorkflowResponse(TransferContentsToBin(Context, Sale));
+            'TransferOut':
+                FrontEnd.WorkflowResponse(TransferContentsOutFromBin(Context, Sale));
+            'TransferIn':
+                FrontEnd.WorkflowResponse(TransferContentsInToBin(Setup));
         end;
     end;
 
-    procedure TransferContentsToBin(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale"): JsonObject
+    procedure TransferContentsOutFromBin(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale"): JsonObject
     var
         CheckpointEntryNo: Integer;
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
@@ -84,6 +91,17 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
         Response.Add('FROM_BIN', FromBinNo);
     end;
 
+    local procedure TransferContentsInToBin(PosSetup: Codeunit "NPR POS Setup"): JsonObject
+    var
+        BinTransferJournalPage: Page "NPR BinTransferJournalPos";
+        BinTransferJournal: Record "NPR BinTransferJournal";
+    begin
+        BinTransferJournal.SetFilter(ReceiveAtPosUnitCode, '=%1', PosSetup.GetPOSUnitNo());
+        BinTransferJournal.SetFilter(Status, '=%1', BinTransferJournal.Status::RELEASED);
+        BinTransferJournalPage.SetTableView(BinTransferJournal);
+        BinTransferJournalPage.Run();
+    end;
+
     local procedure GetFixedBin(Context: Codeunit "NPR POS JSON Helper"): Code[10]
     begin
 
@@ -95,7 +113,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
 
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionBinTransfer.js###
-'let main=async()=>{let e=await workflow.respond("SelectBin");return await workflow.respond("Transfer",e)};'
+'let main=async({workflow:e,parameters:n})=>{debugger;if(n.TransferDirection==n.TransferDirection.TransferIn)return await e.respond("TransferIn");{let r=await e.respond("SelectBin");return await e.respond("TransferOut",r)}};'
         );
     end;
 }

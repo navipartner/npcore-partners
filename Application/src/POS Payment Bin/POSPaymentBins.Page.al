@@ -7,7 +7,7 @@
     SourceTable = "NPR POS Payment Bin";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-
+    PromotedActionCategories = 'New,Process,Report,Navigate';
 
     layout
     {
@@ -91,6 +91,47 @@
                 begin
                     POSPaymentBinInvokeMgt.OnShowInvokeParameters(Rec);
                 end;
+            }
+            action(BinTransferJournal)
+            {
+                Caption = 'POS Payment Bin Transfer Journal';
+                RunObject = Page "NPR BinTransferJournal";
+                Image = TransferFunds;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                ToolTip = 'Opens the page for setting up and transferring amounts from different bins.';
+                ApplicationArea = NPRRetail;
+            }
+            action(BinEntries)
+            {
+                Caption = 'Payment Bin Entries';
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Navigate to associated bin payment entries.';
+                Image = BinLedger;
+                Scope = Repeater;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+                PromotedCategory = Category4;
+                RunObject = page "NPR POS Bin Entries";
+                RunPageLink = "Payment Bin No." = field("No.");
+                RunPageView = sorting("Entry No.") order(descending);
+            }
+            action(BinTransferProfile)
+            {
+                Caption = 'Payment Bin Transfer Profile';
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Navigate to the bin transfer profile setup.';
+                Image = BinLedger;
+                Scope = Repeater;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+                PromotedCategory = Category4;
+                RunObject = page "NPR BinTransferProfile";
             }
         }
         area(processing)
