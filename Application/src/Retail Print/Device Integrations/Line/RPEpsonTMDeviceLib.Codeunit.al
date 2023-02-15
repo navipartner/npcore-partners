@@ -114,7 +114,7 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
                 'ENCODING':
                     begin
                         tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
-                        tmpDeviceSetting.Options := 'Windows-1252,Windows-1256';
+                        tmpDeviceSetting.Options := 'Windows-1252,Windows-1256,Windows-1251';
                     end;
                 'DPI':
                     begin
@@ -381,7 +381,8 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
                 end;
         end;
 
-        AddStringToBuffer(POSPrintBuffer.Text);
+        if not POSPrintBuffer."Hide HRI" then
+            AddStringToBuffer(POSPrintBuffer.Text);
         LineFeed();
         SelectJustification(0);
     end;
@@ -458,14 +459,68 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
     procedure SetCharacterCodeForCodepage(Codepage: Integer)
     begin
         case Codepage of
+            437:
+                SelectCharacterCodeTable(0);
+            720:
+                SelectCharacterCodeTable(32);
+            737:
+                SelectCharacterCodeTable(14);
+            775:
+                SelectCharacterCodeTable(33);
+            850:
+                SelectCharacterCodeTable(2);
+            852:
+                SelectCharacterCodeTable(18);
+            855:
+                SelectCharacterCodeTable(34);
+            857:
+                SelectCharacterCodeTable(13);
+            858:
+                SelectCharacterCodeTable(19);
+            860:
+                SelectCharacterCodeTable(3);
+            861:
+                SelectCharacterCodeTable(35);
+            862:
+                SelectCharacterCodeTable(36);
+            863:
+                SelectCharacterCodeTable(4);
+            864:
+                SelectCharacterCodeTable(37);
+            865:
+                SelectCharacterCodeTable(5);
+            866:
+                SelectCharacterCodeTable(17);
+            869:
+                SelectCharacterCodeTable(38);
+            874:
+                SelectCharacterCodeTable(20);
+            1250:
+                SelectCharacterCodeTable(45);
             1251:
                 SelectCharacterCodeTable(46);
             1252:
                 SelectCharacterCodeTable(16);
+            1253:
+                SelectCharacterCodeTable(47);
+            1254:
+                SelectCharacterCodeTable(48);
             1255:
                 SelectCharacterCodeTable(49);
             1256:
                 SelectCharacterCodeTable(50);
+            1257:
+                SelectCharacterCodeTable(51);
+            1258:
+                SelectCharacterCodeTable(52);
+            20290:
+                SelectCharacterCodeTable(1);
+            28591:
+                SelectCharacterCodeTable(39);
+            28597:
+                SelectCharacterCodeTable(15);
+            28605:
+                SelectCharacterCodeTable(40);
             else
                 SelectCharacterCodeTable(16);
         end;
@@ -519,14 +574,68 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
                     end;
                 'ENCODING':
                     case DeviceSettings.Value of
+                        'Windows-874':
+                            _EncodingCodepage := 874;
+                        'Windows-1250':
+                            _EncodingCodepage := 1250;
                         'Windows-1251':
                             _EncodingCodepage := 1251;
                         'Windows-1252':
                             _EncodingCodepage := 1252;
+                        'Windows-1553':
+                            _EncodingCodepage := 1253;
+                        'Windows-1554':
+                            _EncodingCodepage := 1254;
                         'Windows-1255':
                             _EncodingCodepage := 1255;
                         'Windows-1256':
                             _EncodingCodepage := 1256;
+                        'Windows-1557':
+                            _EncodingCodepage := 1257;
+                        'Windows-1558':
+                            _EncodingCodepage := 1258;
+                        'dos-720':
+                            _EncodingCodepage := 720;
+                        'dos-862':
+                            _EncodingCodepage := 862;
+                        'dos-866':
+                            _EncodingCodepage := 866;
+                        'ibm290':
+                            _EncodingCodepage := 20290;
+                        'ibm437':
+                            _EncodingCodepage := 437;
+                        'ibm737':
+                            _EncodingCodepage := 737;
+                        'ibm775':
+                            _EncodingCodepage := 775;
+                        'ibm850':
+                            _EncodingCodepage := 850;
+                        'ibm852':
+                            _EncodingCodepage := 852;
+                        'ibm855':
+                            _EncodingCodepage := 855;
+                        'ibm857':
+                            _EncodingCodepage := 857;
+                        'ibm858':
+                            _EncodingCodepage := 858;
+                        'ibm860':
+                            _EncodingCodepage := 860;
+                        'ibm861':
+                            _EncodingCodepage := 861;
+                        'ibm863':
+                            _EncodingCodepage := 863;
+                        'ibm864':
+                            _EncodingCodepage := 864;
+                        'ibm865':
+                            _EncodingCodepage := 865;
+                        'ibm869':
+                            _EncodingCodepage := 869;
+                        'iso-8859-1':
+                            _EncodingCodepage := 28591;
+                        'iso-8859-7':
+                            _EncodingCodepage := 28597;
+                        'iso-8859-15':
+                            _EncodingCodepage := 28605;
                     end;
                 'DPI':
                     case DeviceSettings.Value of

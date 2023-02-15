@@ -103,7 +103,7 @@
         Printer.AddLine(' ');
         Printer.AddLine(' ');
 
-        Printer.AddBarcode('Code128', Ticket."External Ticket No.", 2);
+        Printer.AddBarcode('Code128', Ticket."External Ticket No.", 2, false);
         Printer.AddLine(' ');
 
         Printer.SetFont('Control');

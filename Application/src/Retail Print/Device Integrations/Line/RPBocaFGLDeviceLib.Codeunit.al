@@ -379,10 +379,10 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib." implements "NPR ILine Printer"
 
         if CopyStr(BarcodeType, 1, 2) <> 'QR' then begin
             // Probably need to check if negative
-        if _PageWidth > BarcodeXCoord then
-            BarcodeXCoord := _PageWidth - BarcodeXCoord // Position of the barcode is starting from the righthand side.
+            if _PageWidth > BarcodeXCoord then
+                BarcodeXCoord := _PageWidth - BarcodeXCoord // Position of the barcode is starting from the righthand side.
             else
-            BarcodeXCoord := _PageWidth;
+                BarcodeXCoord := _PageWidth;
             // TEMP
             AddStringToBuffer(StrSubstNo(PrintBarcodeLbl, BarcodeXCoord, _yCoord));
             // Alignment, will only work on new firmware 150+
@@ -418,9 +418,9 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib." implements "NPR ILine Printer"
             end;
 
             if Height > 1 then
-            _ySpace := Height * 10
+                _ySpace := Height * 10
             else
-            _ySpace := 40;
+                _ySpace := 40;
 
         end else begin // QR
             if StrPos(BarcodeType, '7') > 0 then

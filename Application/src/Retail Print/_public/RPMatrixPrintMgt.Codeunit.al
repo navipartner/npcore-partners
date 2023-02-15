@@ -8,7 +8,7 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
         CurrentBold: Boolean;
         CurrentUnderLine: Boolean;
         CurrentDoubleStrike: Boolean;
-        LineBuffer: Text[1024];
+        LineBuffer: Text[2048];
         HighestRootRecNo: Integer;
         PrintIterationFieldNo: Integer;
         Error_InvalidTableAttribute: Label 'Cannot print attributes from table %1';
@@ -18,31 +18,31 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
     #region Programmatic Printing, instead of user configured.
     internal procedure AddTextField(X: Integer; Y: Integer; Align: Integer; Text: Text)
     begin
-        UpdateField(X, Y, 0, Align, 0, 0, '', CopyStr(Text, 1, 100));
+        UpdateField(X, Y, 0, Align, 0, 0, '', CopyStr(Text, 1, 100), false);
     end;
 
     internal procedure AddDecimalField(X: Integer; Y: Integer; Align: Integer; Decimal: Decimal)
     begin
         case DecimalRounding of
             DecimalRounding::"2":
-                UpdateField(X, Y, 0, Align, 0, 0, '', Format(Decimal, 0, '<Precision,2:2><Standard Format,2>'));
+                UpdateField(X, Y, 0, Align, 0, 0, '', Format(Decimal, 0, '<Precision,2:2><Standard Format,2>'), false);
             DecimalRounding::"3":
-                UpdateField(X, Y, 0, Align, 0, 0, '', Format(Decimal, 0, '<Precision,3:3><Standard Format,2>'));
+                UpdateField(X, Y, 0, Align, 0, 0, '', Format(Decimal, 0, '<Precision,3:3><Standard Format,2>'), false);
             DecimalRounding::"4":
-                UpdateField(X, Y, 0, Align, 0, 0, '', Format(Decimal, 0, '<Precision,4:4><Standard Format,2>'));
+                UpdateField(X, Y, 0, Align, 0, 0, '', Format(Decimal, 0, '<Precision,4:4><Standard Format,2>'), false);
             DecimalRounding::"5":
-                UpdateField(X, Y, 0, Align, 0, 0, '', Format(Decimal, 0, '<Precision,5:5><Standard Format,2>'));
+                UpdateField(X, Y, 0, Align, 0, 0, '', Format(Decimal, 0, '<Precision,5:5><Standard Format,2>'), false);
         end;
     end;
 
     internal procedure AddDateField(X: Integer; Y: Integer; Align: Integer; Date: Date)
     begin
-        UpdateField(X, Y, 0, Align, 0, 0, '', Format(Date, 0));
+        UpdateField(X, Y, 0, Align, 0, 0, '', Format(Date, 0), false);
     end;
 
-    internal procedure AddBarcode(BarcodeType: Text[30]; BarcodeValue: Text[30]; BarcodeWidth: Integer; Align: Integer)
+    internal procedure AddBarcode(BarcodeType: Text[30]; BarcodeValue: Text[30]; BarcodeWidth: Integer; Align: Integer; HideHRI: Boolean)
     begin
-        UpdateField(1, 0, BarcodeWidth, Align, 0, 0, BarcodeType, BarcodeValue);
+        UpdateField(1, 0, BarcodeWidth, Align, 0, 0, BarcodeType, BarcodeValue, HideHRI);
     end;
 
     internal procedure NewLine()
@@ -243,8 +243,8 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
 
     local procedure EvaluateFields(var TemplateLine: Record "NPR RP Template Line"; var DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt."): Text[30]
     var
-        Field1Val: Text[250];
-        Field2Val: Text[250];
+        Field1Val: Text[2048];
+        Field2Val: Text[2048];
         Field1Dec: Decimal;
         Field2Dec: Decimal;
         ReturnResult: Decimal;
@@ -376,10 +376,11 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
                     TemplateLine.Rotation,
                     TemplateLine.Height,
                     TemplateLine."Type Option",
-                    TemplateLine."Processing Value");
+                    TemplateLine."Processing Value",
+                    TemplateLine."Hide HRI");
     end;
 
-    local procedure UpdateField(X: Integer; Y: Integer; Align: Integer; Width: Integer; Rotation: Integer; Height: Integer; Font: Text[30]; Text: Text[100])
+    local procedure UpdateField(X: Integer; Y: Integer; Align: Integer; Width: Integer; Rotation: Integer; Height: Integer; Font: Text[30]; Text: Text[2048]; HideHRI: Boolean)
     begin
         TempGlobalBuffer."Line No." := CurrentLineNo;
         TempGlobalBuffer.Text := Text;
@@ -398,6 +399,7 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
         TempGlobalBuffer.DoubleStrike := CurrentDoubleStrike;
         TempGlobalBuffer.Rotation := Rotation;
         TempGlobalBuffer.Align := Align;
+        TempGlobalBuffer."Hide HRI" := HideHRI;
 
         if not TempGlobalBuffer.Insert() then
             TempGlobalBuffer.Modify();

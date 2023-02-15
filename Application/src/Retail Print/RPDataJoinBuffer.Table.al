@@ -28,7 +28,7 @@
             Caption = 'Join Level';
             DataClassification = CustomerContent;
         }
-        field(20; Value; Text[250])
+        field(20; Value; Text[2048])
         {
             Caption = 'Value';
             DataClassification = CustomerContent;

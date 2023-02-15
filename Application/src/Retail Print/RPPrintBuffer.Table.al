@@ -26,7 +26,7 @@
             Caption = 'Y';
             DataClassification = CustomerContent;
         }
-        field(5; "Text"; Text[100])
+        field(5; "Text"; Text[2048])
         {
             Caption = 'Text';
             DataClassification = CustomerContent;
@@ -81,6 +81,11 @@
         field(42; "Pad Char"; Text[50])
         {
             Caption = 'Pad Char';
+            DataClassification = CustomerContent;
+        }
+        field(45; "Hide HRI"; Boolean)
+        {
+            Caption = 'Hide HRI';
             DataClassification = CustomerContent;
         }
     }

@@ -418,7 +418,7 @@
                 TempRetailList.FindFirst();
             end;
         }
-        field(37; "Processing Value"; Text[250])
+        field(37; "Processing Value"; Text[2048])
         {
             Caption = 'Proccesing Value';
             DataClassification = CustomerContent;
@@ -484,7 +484,7 @@
             Caption = 'Skip If Empty';
             DataClassification = CustomerContent;
         }
-        field(51; "Default Value"; Text[250])
+        field(51; "Default Value"; Text[2048])
         {
             Caption = 'Default Value';
             DataClassification = CustomerContent;
@@ -502,6 +502,11 @@
         field(70; "Processing Function Parameter"; Text[30])
         {
             Caption = 'Processing Function Parameter';
+            DataClassification = CustomerContent;
+        }
+        field(75; "Hide HRI"; Boolean)
+        {
+            Caption = 'Hide HRI';
             DataClassification = CustomerContent;
         }
     }
@@ -575,7 +580,7 @@
         DataItem.SetRange(Code, "Template Code");
         if DataItem.FindSet() then
             repeat
-                    TempRetailList.Number += 1;
+                TempRetailList.Number += 1;
                 TempRetailList.Choice := DataItem.Name;
                 TempRetailList.Value := Format(DataItem."Table ID");
                 TempRetailList.Insert();
@@ -592,7 +597,7 @@
     begin
         if RPTemplateLine.FindSet() then
             repeat
-                    RPTemplateLine.Validate(Level, RPTemplateLine.Level + 1);
+                RPTemplateLine.Validate(Level, RPTemplateLine.Level + 1);
                 RPTemplateLine.Modify(true);
             until RPTemplateLine.Next() = 0;
     end;
@@ -600,12 +605,12 @@
     internal procedure UnindentLine(var RPTemplateLine: Record "NPR RP Template Line")
     begin
         if RPTemplateLine.FindSet() then
-                repeat
-                    if RPTemplateLine.Level > 0 then begin
-                        RPTemplateLine.Validate(Level, RPTemplateLine.Level - 1);
-                        RPTemplateLine.Modify(true);
-                    end;
-                until RPTemplateLine.Next() = 0;
+            repeat
+                if RPTemplateLine.Level > 0 then begin
+                    RPTemplateLine.Validate(Level, RPTemplateLine.Level - 1);
+                    RPTemplateLine.Modify(true);
+                end;
+            until RPTemplateLine.Next() = 0;
     end;
 }
 
