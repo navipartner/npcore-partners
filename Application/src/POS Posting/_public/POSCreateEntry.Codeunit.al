@@ -575,7 +575,7 @@
         POSBinEntry.Insert();
     end;
 
-    local procedure InsertBankTransfer(CheckpointEntry: Record "NPR POS Bin Entry"; TargetBinNo: Code[10]; TransactionAmount: Decimal; Reference: Text[50])
+    internal procedure InsertBankTransfer(CheckpointEntry: Record "NPR POS Bin Entry"; TargetBinNo: Code[10]; TransactionAmount: Decimal; Reference: Text[50])
     var
         POSBinEntry: Record "NPR POS Bin Entry";
     begin
@@ -604,7 +604,7 @@
         POSBinEntry.Insert();
     end;
 
-    local procedure InsertBinAdjustment(CheckpointBinEntry: Record "NPR POS Bin Entry"; TransactionAmount: Decimal; Comment: Text[50])
+    internal procedure InsertBinAdjustment(CheckpointBinEntry: Record "NPR POS Bin Entry"; TransactionAmount: Decimal; Comment: Text[50])
     var
         POSBinEntry: Record "NPR POS Bin Entry";
     begin
