@@ -249,8 +249,10 @@
             DataElement := Node.AsXmlElement();
             GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:Code', EnumAsText, MaxStrLen(EnumAsText));
             evaluate(CleanCashResponse."Fault Code", EnumAsText);
+#pragma warning disable AA0139
             GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:ShortMessage', CleanCashResponse."Fault Short Description", MaxStrLen(CleanCashResponse."Fault Short Description"));
             GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:Message', CleanCashResponse."Fault Description", MaxStrLen(CleanCashResponse."Fault Description"));
+#pragma warning restore
         end;
     end;
 

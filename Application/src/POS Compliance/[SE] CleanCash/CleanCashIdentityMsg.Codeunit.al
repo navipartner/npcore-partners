@@ -89,9 +89,10 @@
 
             if (Element.SelectSingleNode('cc:data', NamespaceManager, Node)) then begin
                 DataElement := Node.AsXmlElement();
+#pragma warning disable AA0139
                 CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Identity/cc:Id', CleanCashResponse."CleanCash Unit Id", MaxStrLen(CleanCashResponse."CleanCash Unit Id"));
                 CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Identity/cc:Firmware', CleanCashResponse."CleanCash Firmware", MaxStrLen(CleanCashResponse."CleanCash Firmware"));
-
+#pragma warning restore
                 CleanCashXCCSPProtocol.GetElementInnerText(NamespaceManager, DataElement, 'cc:Identity/cc:Type', EnumAsText, MaxStrLen(EnumAsText));
                 evaluate(CleanCashResponse."CleanCash Type", EnumAsText);
 
