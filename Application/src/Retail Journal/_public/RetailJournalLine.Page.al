@@ -294,8 +294,8 @@
             Error(t001);
 
         if Lines.Count() = 1 then
-            if not Confirm(t002, true) then 
-            Error('');
+            if not Confirm(t002, true) then
+                Error('');
     end;
 
     internal procedure SetItemFilter(ParamItemNo: Code[20])
@@ -324,10 +324,7 @@
         RecRef: RecordRef;
     begin
         if IsWebClient then begin
-            RetailJnlLine.SetView(Rec.GetView());
-            CurrPage.SetSelectionFilter(RetailJnlLine);
             if RetailJnlLine.FindSet() then begin
-                TempRetailJnlLine.SetView(RetailJnlLine.GetView());
                 repeat
                     TempRetailJnlLine.Init();
                     TempRetailJnlLine := RetailJnlLine;
