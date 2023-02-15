@@ -47,7 +47,6 @@ stages:
       certPassword: 498eH$??nhxUSSFS
       azureADtenantID: ec3af438-38fc-4d9b-b8be-058101411d3a
       azureKeyVaultClientId: b38b8bef-17d2-4368-84ce-f9880a45eed0
-    runtests: TRUE
     objectVisibilityCheck: TRUE
     applicationAreaCheck:
       enabled: true
@@ -68,3 +67,7 @@ stages:
       objectId: 6014400
       objectName: 'NPR NP RETAIL'
       objectCaption: 'NP Retail'
+    runTests: true
+    testApps:
+      - 'Performance Toolkit'
+      - 'Test'
