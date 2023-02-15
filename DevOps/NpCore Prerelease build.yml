@@ -62,6 +62,3 @@ stages:
         objectId: 6014400
         objectName: 'NPR NP RETAIL'
         objectCaption: 'NP Retail'
-      testApps:
-      - 'Performance Toolkit'
-      - 'Test'
