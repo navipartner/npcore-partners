@@ -361,10 +361,12 @@
 
                     trigger OnAction()
                     var
+                        TempItem: Record Item temporary;
                         ItemStatistics: Page "NPR Item Statistics Subpage";
                     begin
+                        TempItem.SetFilter("Date Filter", DateFilter);
                         ItemStatistics.InitForm();
-                        ItemStatistics.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", LastYearCalc, ItemCategoryCodeFilter);
+                        ItemStatistics.SetFilter(Dim1Filter, Dim2Filter, TempItem.GetRangeMin("Date Filter"), TempItem.GetRangeMax("Date Filter"), LastYearCalc, ItemCategoryCodeFilter);
                         ItemStatistics.ShowLastYear(ShowLastYear);
                         ItemStatistics.ChangeEmptyFilter();
                         Sleep(10);
@@ -512,7 +514,7 @@
         PeriodPageMan: Codeunit PeriodPageManagement;
         Day: Enum "Analysis Period Type";
         IncorrectPeriodErr: Label 'Incorrect period: %1';
-#endif
+#endif        
         "Sale (QTY)": Decimal;
         "LastYear Sale (QTY)": Decimal;
         "Sale (LCY)": Decimal;
