@@ -51,6 +51,10 @@ page 6059967 "NPR APIV1 PBITMDetTicketAccess"
                 {
                     Caption = 'Type', Locked = true;
                 }
+                field(externalAdmSchEntryNo; Rec."External Adm. Sch. Entry No.")
+                {
+                    Caption = 'External Adm. Sch. Entry No.', Locked = true;
+                }
             }
         }
     }
