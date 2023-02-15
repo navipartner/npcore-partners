@@ -392,12 +392,20 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
         ESCPOS: Text;
         InStream: InStream;
         RetailLogo: Record "NPR Retail Logo";
+        POSUnit: Record "NPR POS Unit";
+        RegisterNo: Code[10];
         DotNetByteArray: Codeunit "DotNet_Array";
         DotNetStream: Codeunit "DotNet_Stream";
         DotNetEncoding: Codeunit "DotNet_Encoding";
     begin
         RetailLogo.SetAutoCalcFields(ESCPOSLogo);
         RetailLogo.SetRange(Keyword, Keyword);
+
+        RegisterNo := POSUnit.GetCurrentPOSUnit();
+        RetailLogo.SetRange("Register No.", RegisterNo);
+        if RetailLogo.IsEmpty then
+            RetailLogo.SetRange("Register No.", '');
+
         RetailLogo.SetFilter("Start Date", '<=%1|=%2', Today, 0D);
         RetailLogo.SetFilter("End Date", '>=%1|=%2', Today, 0D);
         if RetailLogo.FindSet() then
