@@ -63,10 +63,10 @@
 
             if (LinkText <> '') and (RecNumText <> '') and (ContenText = 'QR LOGO') then begin
                 ContenText := '{"client_cone:null;receipt_number":"' + RecNumText + '"}';
-                Printer.AddBarcode('QR', ContenText, 2);
+                Printer.AddBarcode('QR', ContenText, 2, false);
             end else begin
                 if StrPos(ContenText, 'data:image') <> 0 then begin
-                    Printer.AddBarcode('QR', QRData, 2);
+                    Printer.AddBarcode('QR', QRData, 2, false);
                 end else begin
                     if Font = '' then
                         Font := 'A11';

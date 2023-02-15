@@ -166,6 +166,14 @@
                     ToolTip = 'Specifies the value of the Height field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Hide HRI"; Rec."Hide HRI")
+                {
+                    Enabled = NOT (Rec."Prefix Next Line" OR (Rec."Type" = 1));
+                    Style = Subordinate;
+                    StyleExpr = Rec."Prefix Next Line" OR (Rec."Type" = 1);
+                    ToolTip = 'Specifies the value of the Hide HRI field';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Start Char"; Rec."Start Char")
                 {
 
