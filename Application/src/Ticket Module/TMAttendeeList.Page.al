@@ -109,6 +109,11 @@
                     ToolTip = 'Specifies the value of the Address 2 field';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
+                field(ZipCode; Rec.ZipCode)
+                {
+                    ToolTip = 'Specifies the value of the Zip Code field';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
                 field(City; Rec.City)
                 {
                     ToolTip = 'Specifies the value of the City field';
