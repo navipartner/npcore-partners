@@ -67,7 +67,7 @@ codeunit 6060028 "NPR NpDc Module Issue GS1"
     procedure CreateGS1CouponType(var CouponType: Record "NPR NpDc Coupon Type"; DiscountType: Option)
     begin
         CouponType.Init();
-        CouponType.Code := ModuleCode() + '-' + Format(DiscountType);
+        CouponType.Code := CopyStr(ModuleCode() + '-' + Format(DiscountType), 1, MaxStrLen(CouponType.Code)); //we know that this is going to be 5 characters
         CouponType."Issue Coupon Module" := ModuleCode();
         CouponType.Description := ModuleCode();
         CouponType."Issue Coupon Module" := ModuleCode();

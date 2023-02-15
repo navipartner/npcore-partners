@@ -40,7 +40,6 @@ codeunit 6059889 "NPR NP NpDC Coupon Verify" implements "NPR IPOS Workflow"
         ReferenceNo := Context.GetString('ReferenceNo');
         if StrLen(ReferenceNo) > 50 then
             Error(TooLongErr, 'ReferenceNo', 50);
-
-        NPNpDCCouponCheck.VerifyCoupon(ReferenceNo);
+        NPNpDCCouponCheck.VerifyCoupon(CopyStr(ReferenceNo, 1, 50));
     end;
 }
