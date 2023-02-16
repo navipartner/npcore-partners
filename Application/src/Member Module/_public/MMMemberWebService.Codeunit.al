@@ -829,7 +829,7 @@
 
             3:
                 begin
-                    EntryNo := MemberNotification.CreateWalletSendNotification(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MemberCard."Entry No.", TODAY);
+                    EntryNo := MemberNotification.CreateWalletSendNotification(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MemberCard."Entry No.", Today());
                     if (MembershipNotification.Get(EntryNo)) then
                         if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
                             MemberNotification.HandleMembershipNotification(MembershipNotification);
