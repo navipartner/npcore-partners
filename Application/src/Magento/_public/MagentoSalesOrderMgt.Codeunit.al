@@ -1013,6 +1013,7 @@
             TransferLine.Quantity += NeededQty;
             TransferLine.Modify(true);
         end;
+        OnAfterInsertTransferOrder(TransferHeader, TransferLine);
     end;
 
     local procedure InsertSalesLineFee(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
@@ -1926,5 +1927,10 @@
     local procedure OnAfterInitSendToStoreDocument(SalesHeader: Record "Sales Header"; NpCsStore: Record "NPR NpCs Store"; NpCsWorkflow: Record "NPR NpCs Workflow"; var NpCsDocument: Record "NPR NpCs Document")
     begin
 
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertTransferOrder(var TransferHeader: Record "Transfer Header"; var TransferLine: Record "Transfer Line")
+    begin
     end;
 }
