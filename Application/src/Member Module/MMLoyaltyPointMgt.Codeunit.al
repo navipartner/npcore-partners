@@ -233,13 +233,11 @@
 
     local procedure CurrCodeunitId(): Integer
     begin
-
         exit(Codeunit::"NPR MM Loyalty Point Mgt.");
     end;
 
     local procedure PointAssignmentStepName(): Text
     begin
-
         exit('PointAssignmentOnSale');
     end;
 
@@ -393,7 +391,7 @@
             MembershipPointsEntry."POS Store Code" := POSUnit."POS Store Code";
         end;
 
-        MembershipPointsEntry."Amount (LCY)" := CalculateBaseAmount(ValueEntry, (LoyaltySetup."Amount Base" = LoyaltySetup."Amount Base"::INCL_VAT));
+        MembershipPointsEntry."Amount (LCY)" := CalculateBaseAmount(ValueEntry, LoyaltyPostingSource, (LoyaltySetup."Amount Base" = LoyaltySetup."Amount Base"::INCL_VAT));
         MembershipPointsEntry.Quantity := ValueEntry."Valued Quantity" * -1;
 
         MembershipPointsEntry."Point Constraint" := MembershipPointsEntry."Point Constraint"::EXCLUDE;
@@ -428,7 +426,7 @@
         exit(true);
     end;
 
-    local procedure CalculateBaseAmount(ValueEntry: Record "Value Entry"; IncludeVAT: Boolean) AmountBase: Decimal
+    local procedure CalculateBaseAmount(ValueEntry: Record "Value Entry"; PointSource: Option; IncludeVAT: Boolean) AmountBase: Decimal
     var
         GenProductPostingGroup: Record "Gen. Product Posting Group";
         VATPostingSetup: Record "VAT Posting Setup";
@@ -445,8 +443,10 @@
 
             VATPostingSetup.SetFilter("VAT Bus. Posting Group", '=%1', Item."VAT Bus. Posting Gr. (Price)");
             VATPostingSetup.SetFilter("VAT Prod. Posting Group", '=%1', Item."VAT Prod. Posting Group");
-            if (Customer.Get(ValueEntry."Source No.")) then
-                VATPostingSetup.SetFilter("VAT Bus. Posting Group", '=%1', Customer."VAT Bus. Posting Group");
+
+            if (PointSource = LoyaltyPostingSourceEnum::VALUE_ENTRY) then
+                if (Customer.Get(ValueEntry."Source No.")) then
+                    VATPostingSetup.SetFilter("VAT Bus. Posting Group", '=%1', Customer."VAT Bus. Posting Group");
 
             if (not VATPostingSetup.FindFirst()) then
                 exit(0);

@@ -95,8 +95,8 @@
 
         TicketDemo.CreateAdmissionCode('MM-CASTLE', 'The Castle', Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY);
 
-        TicketDemo.CreateSchedule('MM-WEEKDAYS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, true, true, true, true, true, false, false);
-        TicketDemo.CreateSchedule('MM-WEEKENDS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, false, false, false, false, false, true, true);
+        TicketDemo.CreateSchedule('MM-WEEKDAYS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, Today(), AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, true, true, true, true, true, false, false);
+        TicketDemo.CreateSchedule('MM-WEEKENDS', AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, Today(), AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 080000T, 230000T, false, false, false, false, false, true, true);
 
         AllowAdmissionBeforeStart := 15;
         AllowAdmissionAfterStart := 5;
@@ -166,11 +166,11 @@
         AlterationSetup.Init();
         AlterationSetup.Description := Description;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
-        EVALUATE(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
+        Evaluate(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
         AlterationSetup."Activate Grace Period" := UseGracePeriod;
         AlterationSetup."Grace Period Relates To" := GracePeriodRelatesTo;
-        EVALUATE(AlterationSetup."Grace Period Before", GracePeriodBefore);
-        EVALUATE(AlterationSetup."Grace Period After", GracePeriodAfter);
+        Evaluate(AlterationSetup."Grace Period Before", GracePeriodBefore);
+        Evaluate(AlterationSetup."Grace Period After", GracePeriodAfter);
         AlterationSetup."Price Calculation" := PriceCalculation;
         AlterationSetup.Modify(true);
     end;
@@ -181,19 +181,19 @@
         i: Integer;
     begin
 
-        FOR i := 1 TO 3 do begin
+        for i := 1 to 3 do begin
             AttributeCode := CreateAttribute('MM', i, 'Member');
             CreateAttributeTableLink(AttributeCode, DATABASE::"NPR MM Member", i);
             CreateAttributeTableLink(AttributeCode, DATABASE::"NPR MM Member Info Capture", i);
         end;
 
-        FOR i := 4 TO 6 do begin
+        for i := 4 to 6 do begin
             AttributeCode := CreateAttribute('MM', i, 'Membership');
             CreateAttributeTableLink(AttributeCode, DATABASE::"NPR MM Membership", i);
             CreateAttributeTableLink(AttributeCode, DATABASE::"NPR MM Member Info Capture", i);
         end;
 
-        FOR i := 7 TO 8 do begin
+        for i := 7 to 8 do begin
             AttributeCode := CreateAttribute('MM', i, 'Common');
             CreateAttributeTableLink(AttributeCode, DATABASE::"NPR MM Member", i);
             CreateAttributeTableLink(AttributeCode, DATABASE::"NPR MM Membership", i);
@@ -220,12 +220,12 @@
         AlterationSetup.Description := Description;
         AlterationSetup."To Membership Code" := ToMembershipCode;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
-        EVALUATE(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
+        Evaluate(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
         AlterationSetup."Activate Grace Period" := UseGracePeriod;
         AlterationSetup."Grace Period Relates To" := GracePeriodRelatesTo;
-        EVALUATE(AlterationSetup."Grace Period Before", GracePeriodBefore);
-        EVALUATE(AlterationSetup."Grace Period After", GracePeriodAfter);
-        EVALUATE(AlterationSetup."Membership Duration", MembershipDuration);
+        Evaluate(AlterationSetup."Grace Period Before", GracePeriodBefore);
+        Evaluate(AlterationSetup."Grace Period After", GracePeriodAfter);
+        Evaluate(AlterationSetup."Membership Duration", MembershipDuration);
         AlterationSetup."Price Calculation" := PriceCalculation;
         AlterationSetup."Stacking Allowed" := AllowStacking;
         AlterationSetup.Modify(true);
@@ -274,10 +274,10 @@
         MembershipSalesSetup."Business Flow Type" := MembershipSalesSetup."Business Flow Type"::MEMBERSHIP;
 
         MembershipSalesSetup."Valid From Base" := ValidFromType;
-        EVALUATE(MembershipSalesSetup."Sales Cut-Off Date Calculation", SalesCutoffDateformula);
-        EVALUATE(MembershipSalesSetup."Valid From Date Calculation", ValidFromDateFormula);
+        Evaluate(MembershipSalesSetup."Sales Cut-Off Date Calculation", SalesCutoffDateformula);
+        Evaluate(MembershipSalesSetup."Valid From Date Calculation", ValidFromDateFormula);
         MembershipSalesSetup."Valid Until Calculation" := ValidUntilType;
-        EVALUATE(MembershipSalesSetup."Duration Formula", ValidUntilDateFormala);
+        Evaluate(MembershipSalesSetup."Duration Formula", ValidUntilDateFormala);
 
         MembershipSalesSetup."Membership Code" := MembershipCode;
         MembershipSalesSetup.Modify();
@@ -299,12 +299,12 @@
         AlterationSetup.Description := Description;
         AlterationSetup."To Membership Code" := ToMembershipCode;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
-        EVALUATE(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
+        Evaluate(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
         AlterationSetup."Activate Grace Period" := UseGracePeriod;
         AlterationSetup."Grace Period Relates To" := GracePeriodRelatesTo;
-        EVALUATE(AlterationSetup."Grace Period Before", GracePeriodBefore);
-        EVALUATE(AlterationSetup."Grace Period After", GracePeriodAfter);
-        EVALUATE(AlterationSetup."Membership Duration", MembershipDuration);
+        Evaluate(AlterationSetup."Grace Period Before", GracePeriodBefore);
+        Evaluate(AlterationSetup."Grace Period After", GracePeriodAfter);
+        Evaluate(AlterationSetup."Membership Duration", MembershipDuration);
         AlterationSetup."Price Calculation" := PriceCalculation;
         AlterationSetup."Stacking Allowed" := AllowStacking;
         AlterationSetup.Modify(true);
@@ -326,12 +326,12 @@
         AlterationSetup.Description := Description;
         AlterationSetup."To Membership Code" := ToMembershipCode;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
-        EVALUATE(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
+        Evaluate(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
         AlterationSetup."Activate Grace Period" := UseGracePeriod;
         AlterationSetup."Grace Period Relates To" := GracePeriodRelatesTo;
-        EVALUATE(AlterationSetup."Grace Period Before", GracePeriodBefore);
-        EVALUATE(AlterationSetup."Grace Period After", GracePeriodAfter);
-        EVALUATE(AlterationSetup."Membership Duration", MembershipDuration);
+        Evaluate(AlterationSetup."Grace Period Before", GracePeriodBefore);
+        Evaluate(AlterationSetup."Grace Period After", GracePeriodAfter);
+        Evaluate(AlterationSetup."Membership Duration", MembershipDuration);
         AlterationSetup."Price Calculation" := PriceCalculation;
         AlterationSetup."Stacking Allowed" := AllowStacking;
         AlterationSetup."Upgrade With New Duration" := (MembershipDuration <> '');
@@ -857,16 +857,16 @@
     begin
         case FromSeries OF
             'MM-DEMO01':
-                exit(NoSeriesManagement.GetNextNo('MM-DEMO01', TODAY, true));
+                exit(NoSeriesManagement.GetNextNo('MM-DEMO01', Today(), true));
             'MS-DEMO01':
-                exit(NoSeriesManagement.GetNextNo('MS-DEMO01', TODAY, true));
+                exit(NoSeriesManagement.GetNextNo('MS-DEMO01', Today(), true));
             'MC-DEMO01':
-                exit(NoSeriesManagement.GetNextNo('MC-DEMO01', TODAY, true));
+                exit(NoSeriesManagement.GetNextNo('MC-DEMO01', Today(), true));
 
             'C10':
-                exit(NoSeriesManagement.GetNextNo('MM-PK10', TODAY, true));
+                exit(NoSeriesManagement.GetNextNo('MM-PK10', Today(), true));
             'C20':
-                exit(NoSeriesManagement.GetNextNo('MM-PK20', TODAY, true));
+                exit(NoSeriesManagement.GetNextNo('MM-PK20', Today(), true));
             else
                 ERROR('Get Next No %1 from number series is not configured.', FromSeries);
         end;
@@ -881,7 +881,7 @@
         MembershipSetup."Card Number Length" := 25;
         MembershipSetup."Card Number Validation" := MembershipSetup."Card Number Validation"::NONE;
         MembershipSetup.VALIDATE("Card Number No. Series", NoSeriesCode);
-        EVALUATE(MembershipSetup."Card Number Valid Until", '<+1Y-1D>');
+        Evaluate(MembershipSetup."Card Number Valid Until", '<+1Y-1D>');
         MembershipSetup."Card Number Pattern" := '[S][N]';
     end;
 
