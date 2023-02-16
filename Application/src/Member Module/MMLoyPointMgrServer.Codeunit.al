@@ -7,7 +7,7 @@
     end;
 
     var
-        E1101_SETUP_MISSING: Label 'The requested store and unit has not beed setup.';
+        E1101_SETUP_MISSING: Label 'The requested store and unit has not been setup. [%1], [%2], [%3]';
         AUTHORIZATION_MISSING: Label 'The authorization request is empty.';
         E1102_AUTHORIZATION_INCORRECT: Label 'The supplied authorization code is not correct.';
         E1108_TRANSACTION_ID: Label 'Transaction Id must not be blank.';
@@ -192,8 +192,8 @@
         end;
 
         if (not StoreSetup.Get(TmpAuthorizationIn."Company Name", TmpAuthorizationIn."POS Store Code", TmpAuthorizationIn."POS Unit Code")) then begin
-            if (not StoreSetup.Get(TmpAuthorizationIn."POS Store Code", '')) then begin
-                ResponseMessage := E1101_SETUP_MISSING;
+            if (not StoreSetup.Get('', TmpAuthorizationIn."POS Store Code", '')) then begin
+                ResponseMessage := StrSubstNo(E1101_SETUP_MISSING, TmpAuthorizationIn."Company Name", TmpAuthorizationIn."POS Store Code", TmpAuthorizationIn."POS Unit Code");
                 ResponseMessageId := '-1101';
                 exit(false);
             end;
@@ -217,7 +217,7 @@
         if ((BasicCheck) and (TmpAuthorizationIn."Transaction Date" = 0D)) then
             TmpAuthorizationIn."Transaction Date" := Today();
 
-        //IF ((TmpAuthorizationIn."Transaction Date" = 0D) OR (TmpAuthorizationIn."Transaction Date" > TODAY)) THEN BEGIN
+        //IF ((TmpAuthorizationIn."Transaction Date" = 0D) OR (TmpAuthorizationIn."Transaction Date" >  Today())) THEN BEGIN
         if (TmpAuthorizationIn."Transaction Date" = 0D) then begin
             ResponseMessage := E1104_DATE_INCORRECT;
             ResponseMessageId := '-1104';
@@ -324,10 +324,10 @@
                             exit(false);
                         end;
                     else begin
-                            ResponseMessage := StrSubstNo(TYPE_INCORRECT, StrSubstNo(PlaceHolderLbl, TmpSaleLines.Type::SALES, TmpSaleLines.Type::RETURN));
-                            ResponseMessageId := '-1152';
-                            exit(false);
-                        end;
+                        ResponseMessage := StrSubstNo(TYPE_INCORRECT, StrSubstNo(PlaceHolderLbl, TmpSaleLines.Type::SALES, TmpSaleLines.Type::RETURN));
+                        ResponseMessageId := '-1152';
+                        exit(false);
+                    end;
                 end;
 
                 EarnedPoints += TmpSaleLines."Total Points";
@@ -361,10 +361,10 @@
                             exit(false);
                         end;
                     else begin
-                            ResponseMessage := StrSubstNo(TYPE_INCORRECT, StrSubstNo(PlaceHolderLbl, TmpPaymentLines.Type::PAYMENT, TmpPaymentLines.Type::REFUND));
-                            ResponseMessageId := '-1156';
-                            exit(false);
-                        end;
+                        ResponseMessage := StrSubstNo(TYPE_INCORRECT, StrSubstNo(PlaceHolderLbl, TmpPaymentLines.Type::PAYMENT, TmpPaymentLines.Type::REFUND));
+                        ResponseMessageId := '-1156';
+                        exit(false);
+                    end;
                 end;
 
                 if (TmpPaymentLines."Total Points" <> 0) then begin

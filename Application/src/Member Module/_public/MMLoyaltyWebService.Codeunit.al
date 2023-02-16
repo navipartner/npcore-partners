@@ -621,7 +621,7 @@
                             LoyaltyDeleteCoupon.AddErrorResponse('Coupon has been applied to a sale, coupon reservation must be cancelled before it can be deleted.');
 
                         end else begin
-                            if (LoyaltyPointManagement.UnRedeemPointsCoupon(0, '', TODAY, Coupon."No.")) then begin
+                            if (LoyaltyPointManagement.UnRedeemPointsCoupon(0, '', Today(), Coupon."No.")) then begin
                                 Coupon.Delete();
                                 LoyaltyDeleteCoupon.AddResponse('');
                                 Commit();

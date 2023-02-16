@@ -870,14 +870,14 @@
         exit(true);
     end;
 
-    procedure CreateRegisterSaleTestXml(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpRegisterSaleLines: Record "NPR MM Reg. Sales Buffer" temporary; var TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary) XmlText: Text
+    internal procedure CreateRegisterSaleTestXml(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpRegisterSaleLines: Record "NPR MM Reg. Sales Buffer" temporary; var TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary) XmlText: Text
     begin
 
         XmlText :=
-        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-        '<RegisterSale xmlns="urn:microsoft-dynamics-nav/xmlports/x6151162">' +
-          CreateRegisterSaleXml(TmpTransactionAuthorization, TmpRegisterSaleLines, TmpRegisterPaymentLines) +
-        '</RegisterSale>';
+            '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
+            '<RegisterSale xmlns="urn:microsoft-dynamics-nav/xmlports/x6151162">' +
+            CreateRegisterSaleXml(TmpTransactionAuthorization, TmpRegisterSaleLines, TmpRegisterPaymentLines) +
+            '</RegisterSale>';
     end;
 
     procedure CreateRegisterSaleSoapXml(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpRegisterSaleLines: Record "NPR MM Reg. Sales Buffer" temporary; var TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary) XmlText: Text

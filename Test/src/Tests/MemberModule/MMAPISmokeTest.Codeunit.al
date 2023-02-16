@@ -429,13 +429,4 @@ codeunit 85016 "NPR MM API Smoke Test"
         Assert.Isfalse(ApiStatus, StrSubstNo('Member arrival must fail when providing invalid card number: %1', ResponseMessage));
     end;
 
-    [Normal]
-    local procedure SelectSmokeTestScenario() ItemNo: Code[20]
-    var
-        MemberLibrary: Codeunit "NPR Library - Member Module";
-    begin
-        ItemNo := MemberLibrary.CreateScenario_SmokeTest()
-    end;
-
-
 }

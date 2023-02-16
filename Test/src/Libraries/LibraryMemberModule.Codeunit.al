@@ -27,7 +27,7 @@
     begin
 
         NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-        WorkDate(Today);
+        WorkDate(Today());
 
         // This scenario can be used for smoke testing
 
@@ -35,62 +35,61 @@
 
         MemberCommunity.Get(SetupCommunity_Simple());
         MemberCommunity."Activate Loyalty Program" := true;
-        MemberCommunity.Modify();
-
-        LoyaltyProgramCode := CreateLoyaltySetup('RLP', 'Riverland Loyalty Program', 1.0, 0.015);
-
-        MembershipSetup.Get(SetupMembership_Simple(MemberCommunity.Code, 'GOLD', LoyaltyProgramCode, 'Gold Membership'));
-        MembershipSetup."Customer Config. Template Code" := CreateDemoCustomerTemplate('MM-GOLD');
-        MembershipSetup.Modify();
-        AddConfigTemplateLine(MembershipSetup."Customer Config. Template Code", 0, Customer.FIELDNO("Customer Disc. Group"), CreateDiscountGroup('CDG-GOLD', 'GOLD Discount Grp.'));
-
-        MembershipSetup.Get(SetupMembership_Simple(MemberCommunity.Code, 'SILVER', LoyaltyProgramCode, 'Silver Membership'));
-        MembershipSetup."Customer Config. Template Code" := CreateDemoCustomerTemplate('MM-SILVER');
-        MembershipSetup.Modify();
-        AddConfigTemplateLine(MembershipSetup."Customer Config. Template Code", 0, Customer.FIELDNO("Customer Disc. Group"), CreateDiscountGroup('CDG-SILVER', 'SILVER Discount Grp.'));
-
-        MembershipSetup.Get(SetupMembership_Simple(MemberCommunity.Code, 'BRONZE', LoyaltyProgramCode, 'Bronze Membership'));
-        MembershipSetup."Customer Config. Template Code" := CreateDemoCustomerTemplate('MM-BRONZE');
-        MembershipSetup.Modify();
-        AddConfigTemplateLine(MembershipSetup."Customer Config. Template Code", 0, Customer.FIELDNO("Customer Disc. Group"), CreateDiscountGroup('CDG-BRONZE', 'BRONZE Discount Grp.'));
-
         MemberCommunity."Membership to Cust. Rel." := true;
         MemberCommunity.Modify();
 
-        Item.Get(CreateItem('320100-ADDMEMBER', '', 'Add Member to Membership', 0));
-        Item.Get(CreateItem('320100-CARD', '', 'Additional Membership Card', 17));
-        Item.Get(CreateItem('320100-REPLACCRD', '', 'Membership Replacement Card', 27));
-        Item.Get(CreateItem('320100-REGRET', '', 'Regret Membership time frame', 0));
-        Item.Get(CreateItem('320100', '', 'GOLD Membership', 157));
-        SetupSimpleMembershipSalesItem(Item."No.", 'GOLD');
-        SetupRenew_NoGraceNotStackable('GOLD', CreateItem('320100-RENEW', '', 'Renew GOLD Membership', 157), '', 'Renew GOLD Membership');
-        SetupUpgrade('GOLD', CreateItem('320100-DOWNGRADE', '', 'Downgrade from GOLD to SILVER', 147), 'SILVER', '', 'Downgrade from GOLD to SILVER');
-        SetupExtend('GOLD', CreateItem('320100-EXTEND', '', 'Extend GOLD Membership', 34), '', '+9M', 'Extend GOLD Membership');
+        LoyaltyProgramCode := CreateLoyaltySetup(GenerateCode20(), 'Riverland Loyalty Program', 1.0, 0.015);
 
-        Item.Get(CreateItem('320101', '', 'SILVER Membership', 147));
-        SetupSimpleMembershipSalesItem(Item."No.", 'SILVER');
-        SetupRenew_NoGraceNotStackable('SILVER', CreateItem('320101-RENEW', '', 'Renew Silver Membership', 147), '', 'Renew Silver Membership');
-        SetupUpgrade('SILVER', CreateItem('320101-UPGRADE', '', 'Upgrade from SILVER to GOLD', 157), 'GOLD', '', 'Upgrade from SILVER to GOLD');
-        SetupUpgrade('SILVER', CreateItem('320101-DOWNGRADE', '', 'Downgrade from SILVER to BRONZE', 137), 'SILVER', '', 'Downgrade from SILVER to BRONZE');
+        MembershipSetup.Get(SetupMembership_Simple(MemberCommunity.Code, 'T-GOLD', LoyaltyProgramCode, 'Gold Membership'));
+        MembershipSetup."Customer Config. Template Code" := CreateDemoCustomerTemplate(GenerateCode10());
+        MembershipSetup.Modify();
+        AddConfigTemplateLine(MembershipSetup."Customer Config. Template Code", 0, Customer.FieldNo("Customer Disc. Group"), CreateDiscountGroup(GenerateCode10(), 'GOLD Discount Grp.'));
 
-        Item.Get(CreateItem('320102', '', 'BRONZE Membership', 137));
-        SetupSimpleMembershipSalesItem(Item."No.", 'BRONZE');
-        SetupUpgrade('BRONZE', CreateItem('320102-UPGRADE', '', 'Upgrade from BRONZE to SILVER', 147), 'SILVER', '', 'Upgrade from BRONZE to SILVER');
+        MembershipSetup.Get(SetupMembership_Simple(MemberCommunity.Code, 'T-SILVER', LoyaltyProgramCode, 'Silver Membership'));
+        MembershipSetup."Customer Config. Template Code" := CreateDemoCustomerTemplate(GenerateCode10());
+        MembershipSetup.Modify();
+        AddConfigTemplateLine(MembershipSetup."Customer Config. Template Code", 0, Customer.FieldNo("Customer Disc. Group"), CreateDiscountGroup(GenerateCode10(), 'SILVER Discount Grp.'));
 
-        CreateLoyaltyUpgradeThreshold(LoyaltyProgramCode, 'BRONZE', 'SILVER', '320102-UPGRADE', true, 3000);
-        CreateLoyaltyUpgradeThreshold(LoyaltyProgramCode, 'SILVER', 'GOLD', '320101-UPGRADE', true, 5000);
-        CreateLoyaltyUpgradeThreshold(LoyaltyProgramCode, 'GOLD', 'SILVER', '320100-DOWNGRADE', false, 2000);
-        CreateLoyaltyUpgradeThreshold(LoyaltyProgramCode, 'SILVER', 'BRONZE', '320101-DOWNGRADE', false, 4000);
+        MembershipSetup.Get(SetupMembership_Simple(MemberCommunity.Code, 'T-BRONZE', LoyaltyProgramCode, 'Bronze Membership'));
+        MembershipSetup."Customer Config. Template Code" := CreateDemoCustomerTemplate(GenerateCode10());
+        MembershipSetup.Modify();
+        AddConfigTemplateLine(MembershipSetup."Customer Config. Template Code", 0, Customer.FieldNo("Customer Disc. Group"), CreateDiscountGroup(GenerateCode10(), 'BRONZE Discount Grp.'));
 
-        SetupWelcomeNotification('WG', 'RIVERLAND', 'GOLD');
-        SetupWelcomeNotification('WS', 'RIVERLAND', 'SILVER');
-        SetupWelcomeNotification('WB', 'RIVERLAND', 'BRONZE');
+        Item.Get(CreateItem('T-320100-ADDMEMBER', '', 'Add Member to Membership', 0));
+        Item.Get(CreateItem('T-320100-CARD', '', 'Additional Membership Card', 17));
+        Item.Get(CreateItem('T-320100-REPLACCRD', '', 'Membership Replacement Card', 27));
+        Item.Get(CreateItem('T-320100-REGRET', '', 'Regret Membership time frame', 0));
+        Item.Get(CreateItem('T-320100', '', 'GOLD Membership', 157));
+        SetupSimpleMembershipSalesItem(Item."No.", 'T-GOLD');
+        SetupRenew_NoGraceNotStackable('T-GOLD', CreateItem('T-320100-RENEW', '', 'Renew GOLD Membership', 157), '', 'Renew GOLD Membership');
+        SetupUpgrade('T-GOLD', CreateItem('T-320100-DOWNGRADE', '', 'Downgrade from GOLD to SILVER', 147), 'T-SILVER', '', 'Downgrade from GOLD to SILVER');
+        SetupExtend('T-GOLD', CreateItem('T-320100-EXTEND', '', 'Extend GOLD Membership', 34), '', '+9M', 'Extend GOLD Membership');
 
-        SetupWalletNotification('WC', 'RIVERLAND', '', 0);
-        SetupWalletNotification('WU', 'RIVERLAND', '', 1);
+        Item.Get(CreateItem('T-320101', '', 'SILVER Membership', 147));
+        SetupSimpleMembershipSalesItem(Item."No.", 'T-SILVER');
+        SetupRenew_NoGraceNotStackable('T-SILVER', CreateItem('T-320101-RENEW', '', 'Renew Silver Membership', 147), '', 'Renew Silver Membership');
+        SetupUpgrade('T-SILVER', CreateItem('T-320101-UPGRADE', '', 'Upgrade from SILVER to GOLD', 157), 'T-GOLD', '', 'Upgrade from SILVER to GOLD');
+        SetupUpgrade('T-SILVER', CreateItem('T-320101-DOWNGRADE', '', 'Downgrade from SILVER to BRONZE', 137), 'T-SILVER', '', 'Downgrade from SILVER to BRONZE');
+
+        Item.Get(CreateItem('T-320102', '', 'BRONZE Membership', 137));
+        SetupSimpleMembershipSalesItem(Item."No.", 'T-BRONZE');
+        SetupUpgrade('T-BRONZE', CreateItem('T-320102-UPGRADE', '', 'Upgrade from BRONZE to SILVER', 147), 'T-SILVER', '', 'Upgrade from BRONZE to SILVER');
+
+        CreateLoyaltyUpgradeThreshold(LoyaltyProgramCode, 'T-BRONZE', 'T-SILVER', 'T-320102-UPGRADE', true, 3000);
+        CreateLoyaltyUpgradeThreshold(LoyaltyProgramCode, 'T-SILVER', 'T-GOLD', 'T-320101-UPGRADE', true, 5000);
+        CreateLoyaltyUpgradeThreshold(LoyaltyProgramCode, 'T-GOLD', 'T-SILVER', 'T-320100-DOWNGRADE', false, 2000);
+        CreateLoyaltyUpgradeThreshold(LoyaltyProgramCode, 'T-SILVER', 'T-BRONZE', 'T-320101-DOWNGRADE', false, 4000);
+
+        SetupWelcomeNotification('T-WG', 'RIVERLAND', 'T-GOLD');
+        SetupWelcomeNotification('T-WS', 'RIVERLAND', 'T-SILVER');
+        SetupWelcomeNotification('T-WB', 'RIVERLAND', 'T-BRONZE');
+
+        SetupWalletNotification('T-WC', 'RIVERLAND', '', 0);
+        SetupWalletNotification('T-WU', 'RIVERLAND', '', 1);
+
+        exit('T-320100');
 
     end;
-
 
     procedure CreateCancelSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; PriceCalculation: Option);
     var
@@ -107,11 +106,11 @@
         AlterationSetup.Init();
         AlterationSetup.Description := Description;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
-        EVALUATE(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
+        Evaluate(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
         AlterationSetup."Activate Grace Period" := UseGracePeriod;
         AlterationSetup."Grace Period Relates To" := GracePeriodRelatesTo;
-        EVALUATE(AlterationSetup."Grace Period Before", GracePeriodBefore);
-        EVALUATE(AlterationSetup."Grace Period After", GracePeriodAfter);
+        Evaluate(AlterationSetup."Grace Period Before", GracePeriodBefore);
+        Evaluate(AlterationSetup."Grace Period After", GracePeriodAfter);
         AlterationSetup."Price Calculation" := PriceCalculation;
         AlterationSetup.Modify(true);
     end;
@@ -122,19 +121,19 @@
         i: Integer;
     begin
 
-        FOR i := 1 TO 3 do begin
+        for i := 1 to 3 do begin
             AttributeCode := CreateAttribute('MM', i, 'Member');
             CreateAttributeTableLink(AttributeCode, DATABASE::"NPR MM Member", i);
             CreateAttributeTableLink(AttributeCode, DATABASE::"NPR MM Member Info Capture", i);
         end;
 
-        FOR i := 4 TO 6 do begin
+        for i := 4 to 6 do begin
             AttributeCode := CreateAttribute('MM', i, 'Membership');
             CreateAttributeTableLink(AttributeCode, DATABASE::"NPR MM Membership", i);
             CreateAttributeTableLink(AttributeCode, DATABASE::"NPR MM Member Info Capture", i);
         end;
 
-        FOR i := 7 TO 8 do begin
+        for i := 7 to 8 do begin
             AttributeCode := CreateAttribute('MM', i, 'Common');
             CreateAttributeTableLink(AttributeCode, DATABASE::"NPR MM Member", i);
             CreateAttributeTableLink(AttributeCode, DATABASE::"NPR MM Membership", i);
@@ -161,12 +160,12 @@
         AlterationSetup.Description := Description;
         AlterationSetup."To Membership Code" := ToMembershipCode;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
-        EVALUATE(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
+        Evaluate(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
         AlterationSetup."Activate Grace Period" := UseGracePeriod;
         AlterationSetup."Grace Period Relates To" := GracePeriodRelatesTo;
-        EVALUATE(AlterationSetup."Grace Period Before", GracePeriodBefore);
-        EVALUATE(AlterationSetup."Grace Period After", GracePeriodAfter);
-        EVALUATE(AlterationSetup."Membership Duration", MembershipDuration);
+        Evaluate(AlterationSetup."Grace Period Before", GracePeriodBefore);
+        Evaluate(AlterationSetup."Grace Period After", GracePeriodAfter);
+        Evaluate(AlterationSetup."Membership Duration", MembershipDuration);
         AlterationSetup."Price Calculation" := PriceCalculation;
         AlterationSetup."Stacking Allowed" := AllowStacking;
         AlterationSetup.Modify(true);
@@ -215,10 +214,10 @@
         MembershipSalesSetup."Business Flow Type" := MembershipSalesSetup."Business Flow Type"::MEMBERSHIP;
 
         MembershipSalesSetup."Valid From Base" := ValidFromType;
-        EVALUATE(MembershipSalesSetup."Sales Cut-Off Date Calculation", SalesCutoffDateformula);
-        EVALUATE(MembershipSalesSetup."Valid From Date Calculation", ValidFromDateFormula);
+        Evaluate(MembershipSalesSetup."Sales Cut-Off Date Calculation", SalesCutoffDateformula);
+        Evaluate(MembershipSalesSetup."Valid From Date Calculation", ValidFromDateFormula);
         MembershipSalesSetup."Valid Until Calculation" := ValidUntilType;
-        EVALUATE(MembershipSalesSetup."Duration Formula", ValidUntilDateFormala);
+        Evaluate(MembershipSalesSetup."Duration Formula", ValidUntilDateFormala);
 
         MembershipSalesSetup."Membership Code" := MembershipCode;
         MembershipSalesSetup.Modify();
@@ -240,12 +239,12 @@
         AlterationSetup.Description := Description;
         AlterationSetup."To Membership Code" := ToMembershipCode;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
-        EVALUATE(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
+        Evaluate(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
         AlterationSetup."Activate Grace Period" := UseGracePeriod;
         AlterationSetup."Grace Period Relates To" := GracePeriodRelatesTo;
-        EVALUATE(AlterationSetup."Grace Period Before", GracePeriodBefore);
-        EVALUATE(AlterationSetup."Grace Period After", GracePeriodAfter);
-        EVALUATE(AlterationSetup."Membership Duration", MembershipDuration);
+        Evaluate(AlterationSetup."Grace Period Before", GracePeriodBefore);
+        Evaluate(AlterationSetup."Grace Period After", GracePeriodAfter);
+        Evaluate(AlterationSetup."Membership Duration", MembershipDuration);
         AlterationSetup."Price Calculation" := PriceCalculation;
         AlterationSetup."Stacking Allowed" := AllowStacking;
         AlterationSetup.Modify(true);
@@ -267,12 +266,12 @@
         AlterationSetup.Description := Description;
         AlterationSetup."To Membership Code" := ToMembershipCode;
         AlterationSetup."Alteration Activate From" := ActivateFrom;
-        EVALUATE(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
+        Evaluate(AlterationSetup."Alteration Date Formula", ActivationFromDateFormula);
         AlterationSetup."Activate Grace Period" := UseGracePeriod;
         AlterationSetup."Grace Period Relates To" := GracePeriodRelatesTo;
-        EVALUATE(AlterationSetup."Grace Period Before", GracePeriodBefore);
-        EVALUATE(AlterationSetup."Grace Period After", GracePeriodAfter);
-        EVALUATE(AlterationSetup."Membership Duration", MembershipDuration);
+        Evaluate(AlterationSetup."Grace Period Before", GracePeriodBefore);
+        Evaluate(AlterationSetup."Grace Period After", GracePeriodAfter);
+        Evaluate(AlterationSetup."Membership Duration", MembershipDuration);
         AlterationSetup."Price Calculation" := PriceCalculation;
         AlterationSetup."Stacking Allowed" := AllowStacking;
         AlterationSetup."Upgrade With New Duration" := (MembershipDuration <> '');
@@ -567,13 +566,18 @@
         exit(MemberCommunity.Code);
     end;
 
-    local procedure CreateDemoCustomerTemplate(TemplateCode: Code[10]): Code[10];
+    local procedure CreateDemoCustomerTemplate(TemplateCode: Code[10]): Code[10]
     var
         Customer: Record Customer;
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateLine: Record "Config. Template Line";
-    begin
 
+        GeneralPostingSetup: Record "General Posting Setup";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Currency: Record "Currency";
+        LibraryERM: Codeunit "Library - ERM";
+        LibrarySales: Codeunit "Library - Sales";
+    begin
         if (not ConfigTemplateHeader.Get(TemplateCode)) then begin
             ConfigTemplateHeader.Init();
             ConfigTemplateHeader.Code := TemplateCode;
@@ -585,10 +589,14 @@
         ConfigTemplateLine.SetFilter("Data Template Code", '=%1', ConfigTemplateHeader.Code);
         ConfigTemplateLine.DeleteALL();
 
-        AddConfigTemplateLine(TemplateCode, 0, Customer.FIELDNO("Currency Code"), 'DKK');
-        AddConfigTemplateLine(TemplateCode, 0, Customer.FIELDNO("Gen. Bus. Posting Group"), 'NATIONAL');
-        AddConfigTemplateLine(TemplateCode, 0, Customer.FIELDNO("VAT Bus. Posting Group"), 'NATIONAL');
-        AddConfigTemplateLine(TemplateCode, 0, Customer.FIELDNO("Customer Posting Group"), 'DOMESTIC');
+        LibraryERM.FindGeneralPostingSetupInvtFull(GeneralPostingSetup);
+        LibraryERM.FindVATPostingSetupInvt(VATPostingSetup);
+        LibraryERM.FindCurrency(Currency);
+
+        AddConfigTemplateLine(TemplateCode, 0, Customer.FieldNo("Currency Code"), Currency.Code);
+        AddConfigTemplateLine(TemplateCode, 0, Customer.FieldNo("Gen. Bus. Posting Group"), GeneralPostingSetup."Gen. Bus. Posting Group");
+        AddConfigTemplateLine(TemplateCode, 0, Customer.FieldNo("VAT Bus. Posting Group"), VATPostingSetup."VAT Bus. Posting Group");
+        AddConfigTemplateLine(TemplateCode, 0, Customer.FieldNo("Customer Posting Group"), LibrarySales.FindCustomerPostingGroup());
 
         exit(ConfigTemplateHeader.Code);
     end;
@@ -649,7 +657,6 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         Community: Record "NPR MM Member Community";
     begin
-
         if (not MembershipSetup.Get(Code)) then begin
             MembershipSetup.Code := Code;
             MembershipSetup.Insert();
@@ -764,12 +771,7 @@
 
 
     local procedure CreateSimpleCustomerTemplate(): Code[10];
-    var
-        ConfigTemplateHeader: Record "Config. Template Header";
-        ConfigTemplateLine: Record "Config. Template Line";
-        Customer: Record Customer;
     begin
-
         exit(CreateDemoCustomerTemplate(GenerateCode10()));
     end;
 
@@ -779,7 +781,7 @@
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-        WorkDate(Today);
+        WorkDate(Today());
 
         CreateNoSerie('MM-DEMO01', 'MM-DEMO-00001');
         CreateNoSerie('MS-DEMO01', 'MS-DEMO-00001');
@@ -788,6 +790,9 @@
         CreateNoSerie('MM-ATF001', 'MMATF0000001');
         CreateNoSerie('MM-PK10', 'MM & 10000');         // Code 10 number series
         CreateNoSerie('MM-PK20', 'MM & 2000000000');    // Code 20 number series
+
+        CreateNoSerie('MM-SPK10', 'MM010000');         // Code 10 number series
+        CreateNoSerie('MM-SPK20', 'MM02000000000');    // Code 20 number series
     end;
 
     procedure GenerateCode10(): Code[20]
@@ -800,22 +805,37 @@
         exit(GetNextNoFromSeries('C20'));
     end;
 
+    procedure GenerateSafeCode10(): Code[20]
+    begin
+        exit(GetNextNoFromSeries('SAFE10'));
+    end;
+
+    procedure GenerateSafeCode20(): Code[20]
+    begin
+        exit(GetNextNoFromSeries('SAFE20'));
+    end;
+
     local procedure GetNextNoFromSeries(FromSeries: Code[20]): Code[20]
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
     begin
         case FromSeries OF
             'MM-DEMO01':
-                exit(NoSeriesManagement.GetNextNo('MM-DEMO01', TODAY, true));
+                exit(NoSeriesManagement.GetNextNo('MM-DEMO01', Today(), true));
             'MS-DEMO01':
-                exit(NoSeriesManagement.GetNextNo('MS-DEMO01', TODAY, true));
+                exit(NoSeriesManagement.GetNextNo('MS-DEMO01', Today(), true));
             'MC-DEMO01':
-                exit(NoSeriesManagement.GetNextNo('MC-DEMO01', TODAY, true));
+                exit(NoSeriesManagement.GetNextNo('MC-DEMO01', Today(), true));
 
             'C10':
-                exit(NoSeriesManagement.GetNextNo('MM-PK10', TODAY, true));
+                exit(NoSeriesManagement.GetNextNo('MM-PK10', Today(), true));
             'C20':
-                exit(NoSeriesManagement.GetNextNo('MM-PK20', TODAY, true));
+                exit(NoSeriesManagement.GetNextNo('MM-PK20', Today(), true));
+
+            'SAFE10':
+                exit(NoSeriesManagement.GetNextNo('MM-SPK10', Today(), true));
+            'SAFE20':
+                exit(NoSeriesManagement.GetNextNo('MM-SPK20', Today(), true));
             else
                 ERROR('Get Next No %1 from number series is not configured.', FromSeries);
         end;
@@ -830,7 +850,7 @@
         MembershipSetup."Card Number Length" := 25;
         MembershipSetup."Card Number Validation" := MembershipSetup."Card Number Validation"::NONE;
         MembershipSetup.VALIDATE("Card Number No. Series", NoSeriesCode);
-        EVALUATE(MembershipSetup."Card Number Valid Until", '<+1Y-1D>');
+        Evaluate(MembershipSetup."Card Number Valid Until", '<+1Y-1D>');
         MembershipSetup."Card Number Pattern" := '[S][N]';
     end;
 
@@ -880,6 +900,13 @@
         Cde := UpperCase(RandomText);
     end;
 
+    procedure GeneratePhoneNumber(var Txt: Text)
+    var
+        Plain: Label '+1 (212) 555-12.34', Locked = true, comment = 'ITU E.164 limits phone numbers to 15 digits. The set [+ (-.] are legal characters';
+    begin
+        Txt := Plain;
+    end;
+
     procedure SetRandomMemberInfoData(VAR InfoCapture: Record "NPR MM Member Info Capture")
     begin
         Clear(InfoCapture);
@@ -887,7 +914,7 @@
         GenerateText(InfoCapture."First Name", 15);
         GenerateText(InfoCapture."Middle Name", 8);
         GenerateText(InfoCapture."Last Name", 20);
-        GenerateText(InfoCapture."Phone No.", MaxStrLen(InfoCapture."Phone No."));
+        GeneratePhoneNumber(InfoCapture."Phone No.");
         GenerateText(InfoCapture."Social Security No.", MaxStrLen(InfoCapture."Social Security No."));
         GenerateText(InfoCapture.Address, MaxStrLen(InfoCapture.Address));
         GenerateText(InfoCapture.City, MaxStrLen(InfoCapture.City));
