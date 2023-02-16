@@ -1086,9 +1086,9 @@
                     end;
 
                     if (MemberInfoCapture."E-Mail Address" <> '') then begin
-                        ValidEmail := (StrPos(Rec."E-Mail Address", '@') > 1);
+                        ValidEmail := (StrPos(MemberInfoCapture."E-Mail Address", '@') > 1);
                         if (ValidEmail) then
-                            ValidEmail := (StrPos(CopyStr(Rec."E-Mail Address", StrPos(Rec."E-Mail Address", '@')), '.') > 1);
+                            ValidEmail := (StrPos(CopyStr(MemberInfoCapture."E-Mail Address", StrPos(MemberInfoCapture."E-Mail Address", '@')), '.') > 1);
                         SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), not ValidEmail);
                     end;
 
@@ -1144,9 +1144,9 @@
         end else begin
             SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), (MemberInfoCapture."E-Mail Address" = ''));
             if (MemberInfoCapture."E-Mail Address" <> '') then begin
-                ValidEmail := (StrPos(Rec."E-Mail Address", '@') > 1);
+                ValidEmail := (StrPos(MemberInfoCapture."E-Mail Address", '@') > 1);
                 if (ValidEmail) then
-                    ValidEmail := (StrPos(CopyStr(Rec."E-Mail Address", StrPos(Rec."E-Mail Address", '@')), '.') > 1);
+                    ValidEmail := (StrPos(CopyStr(MemberInfoCapture."E-Mail Address", StrPos(MemberInfoCapture."E-Mail Address", '@')), '.') > 1);
                 SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), not ValidEmail);
             end;
 
