@@ -55,7 +55,7 @@
     local procedure CU6150705OnAfterInitSale(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSUnit: Record "NPR POS Unit";
-        TextValue: Text;
+        TextValue: Text[30];
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
         if not POSUnit.Get(SaleHeader."Register No.") then
