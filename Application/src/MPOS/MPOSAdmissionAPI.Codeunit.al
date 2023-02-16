@@ -6,14 +6,14 @@
         ActionDescriptionLbl: Label 'Start Admission API page for Mobile POS.';
         AdmissionFailedErr: Label 'Error opening the admission webpage.';
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     var
         MposAdmApiLbl: Label 'MPOS_ADMISSION_API', Locked = true;
     begin
         exit(MposAdmApiLbl);
     end;
 
-    local procedure ActionVersion(): Text
+    local procedure ActionVersion(): Text[30]
     var
         VersionLbl: Label '1.0', Locked = true;
     begin
