@@ -341,7 +341,7 @@
         exit('');
     end;
 
-    internal procedure SetSilentDelete(Value: Boolean)
+    procedure SetSilentDelete(Value: Boolean)
     begin
         SilentDelete := Value;
     end;
