@@ -47,6 +47,13 @@ codeunit 6059838 "NPR Create Service Item"
         ServiceItem.Modify();
     end;
 
+    [Obsolete('Replaced by CreateServiceItem(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; Item: Record Item)')]
+    procedure CreateServiceItem(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line")
+    begin
+
+    end;
+
+
     [CommitBehavior(CommitBehavior::Error)]
     procedure CreateServiceItem(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; Item: Record Item)
     var
