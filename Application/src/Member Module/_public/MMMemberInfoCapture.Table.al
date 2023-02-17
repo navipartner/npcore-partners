@@ -87,11 +87,17 @@
                 CountryRegion: Record "Country/Region";
             begin
                 CityTxt := CopyStr(Rec.City, 1, MaxStrLen(CityTxt));
+                CountyTxt := CopyStr(Rec.County, 1, MaxStrLen(CountyTxt));
                 PostCode.ValidatePostCode(CityTxt, Rec."Post Code Code", CountyTxt, Rec."Country Code", (CurrFieldNo <> 0) and GuiAllowed);
                 Rec.City := CityTxt;
                 if (CountryRegion.Get(Rec."Country Code")) then
                     Rec.Country := CountryRegion.Name;
             end;
+        }
+        field(26; County; Text[30])
+        {
+            Caption = 'County';
+            DataClassification = CustomerContent;
         }
         field(27; City; Text[50])
         {

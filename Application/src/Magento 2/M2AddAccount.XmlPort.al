@@ -59,6 +59,10 @@ xmlport 6151157 "NPR M2 Add Account"
                         fieldelement(City; TmpContactRequest.City)
                         {
                         }
+                        fieldelement(County; tmpcontactrequest.County)
+                        {
+                            MinOccurs = Zero;
+                        }
                         fieldelement(CountryCode; TmpContactRequest."Country/Region Code")
                         {
                         }

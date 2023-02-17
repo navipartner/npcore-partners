@@ -91,6 +91,11 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                     {
                         MaxOccurs = Once;
                     }
+                    fieldelement(county; TempCustomer.County)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                    }
                     fieldelement(city; TempCustomer.City)
                     {
                         MaxOccurs = Once;
@@ -157,6 +162,11 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                     fieldelement(post_code; TempCustomer2."Post Code")
                     {
                         MaxOccurs = Once;
+                    }
+                    fieldelement(county; TempCustomer2.County)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
                     }
                     fieldelement(city; TempCustomer2.City)
                     {

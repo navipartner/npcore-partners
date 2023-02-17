@@ -106,6 +106,9 @@ xmlport 6151152 "NPR M2 Get Account"
                         fieldelement(City; TmpContactResponse.City)
                         {
                         }
+                        fieldelement(County; tmpcontactresponse.County)
+                        {
+                        }
                         textelement(contactcountry)
                         {
                             XmlName = 'Country';
@@ -209,6 +212,9 @@ xmlport 6151152 "NPR M2 Get Account"
                             {
                             }
                             fieldelement(City; TmpSellToCustomer.City)
+                            {
+                            }
+                            fieldelement(County; tmpselltocustomer.County)
                             {
                             }
                             textelement(selltocountry)
@@ -317,6 +323,9 @@ xmlport 6151152 "NPR M2 Get Account"
                                 fieldelement(City; TmpBillToCustomer.City)
                                 {
                                 }
+                                fieldelement(County; tmpbilltocustomer.County)
+                                {
+                                }
                                 textelement(billtoaddresscountry)
                                 {
                                     XmlName = 'Country';
@@ -396,6 +405,9 @@ xmlport 6151152 "NPR M2 Get Account"
                                 {
                                 }
                                 fieldelement(City; TmpShipToAddress.City)
+                                {
+                                }
+                                fieldelement(County; tmpshiptoaddress.County)
                                 {
                                 }
                                 textelement(shiptoaddresscountry)
