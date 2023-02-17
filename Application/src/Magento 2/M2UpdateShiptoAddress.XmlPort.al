@@ -50,6 +50,10 @@ xmlport 6151155 "NPR M2 Update Shipto Address"
                         fieldelement(City; TmpShipToAddressRequest.City)
                         {
                         }
+                        fieldelement(County; tmpshiptoaddressrequest.County)
+                        {
+                            MinOccurs = Zero;
+                        }
                         fieldelement(CountryCode; TmpShipToAddressRequest."Country/Region Code")
                         {
                         }
@@ -124,6 +128,9 @@ xmlport 6151155 "NPR M2 Update Shipto Address"
                             {
                             }
                             fieldelement(City; TmpShipToAddressResponse.City)
+                            {
+                            }
+                            fieldelement(County; tmpshiptoaddressresponse.County)
                             {
                             }
                             textelement(shiptoaddresscountry)
