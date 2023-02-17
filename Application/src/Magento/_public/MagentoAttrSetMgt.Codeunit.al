@@ -105,6 +105,26 @@
     end;
 
     /// <summary>
+    /// Gets Magento Attribute ID for the search criteria
+    /// </summary>
+    /// <param name="AttributeDescriptionFilter">A filter string that is applied to the "Description" field.</param>
+    /// <remarks>AttributeDescription with ignoring case will be used as a search criteria if string is not empty</remarks>
+    /// <returns>Magento Attribute ID</returns>
+    procedure GetMagentoAttributeID(AttributeDescriptionFilter: Text): Integer
+    var
+        MagentoAttribute: Record "NPR Magento Attribute";
+    begin
+        if AttributeDescriptionFilter = '' then
+            exit(0);
+
+        MagentoAttribute.SetFilter(Description, AttributeDescriptionFilter);
+        if MagentoAttribute.FindFirst() then
+            exit(MagentoAttribute."Attribute ID");
+
+        exit(0);
+    end;
+
+    /// <summary>
     /// Updates Magento Attribute
     /// </summary>
     /// <param name="AttributeId">Specifies unique Magento Attrubute identifier</param>
@@ -366,6 +386,24 @@
     end;
 
     /// <summary>
+    /// Gets Magento Attribute Label Line No.
+    /// </summary>
+    /// <param name="AttributeId">Specifies Magento Attribute identifier</param>
+    /// <param name="LabelLineNo">Specifies Magento Attribute Label Value filter</param>
+    /// <returns>Line No.</returns>
+    procedure GetMagentoAttributeLabelLineNo(AttributeId: Integer; AttributeValueFilter: Text): Integer
+    var
+        MagentoAttributeLabel: Record "NPR Magento Attr. Label";
+    begin
+        MagentoAttributeLabel.SetRange("Attribute ID", AttributeId);
+        MagentoAttributeLabel.SetFilter(Value, AttributeValueFilter);
+        if MagentoAttributeLabel.FindFirst() then
+            exit(MagentoAttributeLabel."Line No.");
+
+        exit(0);
+    end;
+
+    /// <summary>
     /// Specifies whether Magento Attribute Label exist for the search criteria
     /// </summary>
     /// <param name="AttributeValueFilter">A filter string that is used as search criteria</param>
@@ -414,6 +452,50 @@
             exit;
         DataTypeMgt.GetRecordRef(MagentoAttributeLabel, RecRef);
         UpdateTableFields(RecRef, UpdateFields, RunTrigger, FieldsNotUpdated);
+    end;
+
+    /// <summary>
+    /// Updates Magento Attribute Label Value field
+    /// </summary>
+    /// <param name="AttributeId">Specifies Magento Attrubute identifier</param>
+    /// <param name="NewAttributeValue">Specifies the NEW value of Magento Attribute Label</param>
+    /// <param name="OldAttributeValue">Specifies the OLD value of Magento Attribute Label</param>
+    /// <param name="RunTrigger">Specifies whether trigger should be executed when creating Magento Attribute Label</param>
+    /// <returns>Line No. of Magento Attribute Label</returns>
+    procedure UpdateMagentoAttributeLabelValue(AttributeId: Integer; NewAttributeValue: Text; OldAttributeValue: Text; RunTrigger: Boolean): Integer
+    var
+        MagentoAttributeLabel: Record "NPR Magento Attr. Label";
+    begin
+        MagentoAttributeLabel.SetRange("Attribute ID", AttributeId);
+        MagentoAttributeLabel.SetFilter(Value, '@' + OldAttributeValue);
+        if not MagentoAttributeLabel.FindFirst() then
+            exit(0);
+
+        MagentoAttributeLabel.Value := NewAttributeValue;
+        MagentoAttributeLabel.Modify(RunTrigger);
+        exit(MagentoAttributeLabel."Line No.")
+    end;
+
+    /// <summary>
+    /// Updates Magento Attribute Label Value field or creates a new entry
+    /// </summary>
+    /// <param name="AttributeId">Specifies Magento Attrubute identifier</param>
+    /// <param name="NewAttributeValue">Specifies the NEW value of Magento Attribute Label</param>
+    /// <param name="OldAttributeValue">Specifies the OLD value of Magento Attribute Label</param>
+    /// <param name="RunTrigger">Specifies whether trigger should be executed when creating Magento Attribute Label</param>
+    /// <returns>Line No. of Magento Attribute Label</returns>
+    /// <remarks>Value 10000 is used for incrementing Line No.</remarks>
+    procedure CreateUpdateMagentoAttributeLabelValue(AttributeId: Integer; NewAttributeValue: Text; OldAttributeValue: Text; RunTrigger: Boolean): Integer
+    var
+        AttributeLabelLineNo: Integer;
+    begin
+        AttributeLabelLineNo := UpdateMagentoAttributeLabelValue(AttributeId, NewAttributeValue, OldAttributeValue, RunTrigger);
+
+        if AttributeLabelLineNo <> 0 then
+            exit(AttributeLabelLineNo);
+
+        AttributeLabelLineNo := FindLastMagentoAttributeLabelLineNo(AttributeId) + 10000;
+        exit(CreateMagentoAttributeLabel(AttributeId, AttributeLabelLineNo, NewAttributeValue, RunTrigger));
     end;
 
     /// <summary>
