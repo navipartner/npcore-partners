@@ -301,6 +301,7 @@
         Customer.Address := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'address', MaxStrLen(Customer.Address), true), 1, MaxStrLen(Customer.Address));
         Customer."Address 2" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'address_2', MaxStrLen(Customer.Address), false), 1, MaxStrLen(Customer."Address 2"));
         Customer."Post Code" := CopyStr(UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'post_code', MaxStrLen(Customer."Post Code"), true)), 1, MaxStrLen(Customer."Post Code"));
+        Customer.County := CopyStr(UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'county', MaxStrLen(Customer.County), false)), 1, MaxStrLen(Customer.County));
         Customer.City := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'city', MaxStrLen(Customer.City), true), 1, MaxStrLen(Customer.City));
         Customer."Country/Region Code" := CopyStr(UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'country_code', MaxStrLen(Customer."Country/Region Code"), false)), 1, MaxStrLen(Customer."Country/Region Code"));
         Customer.Contact := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'contact', MaxStrLen(Customer.Contact), false), 1, MaxStrLen(Customer.Contact));
@@ -527,6 +528,7 @@
         SalesHeader."Sell-to Address" := CopyStr(NpXmlDomMgt.GetElementText(XmlElement2, 'address', MaxStrLen(SalesHeader."Sell-to Address"), true), 1, MaxStrLen(SalesHeader."Sell-to Address"));
         SalesHeader."Sell-to Address 2" := CopyStr(NpXmlDomMgt.GetElementText(XmlElement2, 'address_2', MaxStrLen(SalesHeader."Sell-to Address 2"), false), 1, MaxStrLen(SalesHeader."Sell-to Address 2"));
         SalesHeader."Sell-to Post Code" := CopyStr(UpperCase(NpXmlDomMgt.GetElementCode(XmlElement2, 'post_code', MaxStrLen(SalesHeader."Sell-to Post Code"), true)), 1, MaxStrLen(SalesHeader."Sell-to Post Code"));
+        SalesHeader."Sell-to County" := CopyStr(UpperCase(NpXmlDomMgt.GetElementCode(XmlElement2, 'county', MaxStrLen(SalesHeader."Sell-to County"), false)), 1, MaxStrLen(SalesHeader."Sell-to County"));
         SalesHeader."Sell-to City" := CopyStr(NpXmlDomMgt.GetElementText(XmlElement2, 'city', MaxStrLen(SalesHeader."Sell-to City"), true), 1, MaxStrLen(SalesHeader."Sell-to City"));
         SalesHeader."Sell-to Country/Region Code" := CopyStr(NpXmlDomMgt.GetElementCode(XmlElement2, 'country_code', MaxStrLen(SalesHeader."Sell-to Country/Region Code"), false), 1, MaxStrLen(SalesHeader."Sell-to Country/Region Code"));
         SalesHeader."Sell-to Contact" := CopyStr(NpXmlDomMgt.GetElementText(XmlElement2, 'contact', MaxStrLen(SalesHeader."Sell-to Contact"), false), 1, MaxStrLen(SalesHeader."Sell-to Contact"));
@@ -573,6 +575,7 @@
                         SalesHeader."Ship-to City" := SalesHeader."Sell-to City";
                         SalesHeader."Ship-to Country/Region Code" := SalesHeader."Sell-to Country/Region Code";
                         SalesHeader."Ship-to Contact" := SalesHeader."Sell-to Contact";
+                        SalesHeader."Ship-to County" := SalesHeader."Sell-to County";
                     end;
                 end;
         end;
@@ -587,6 +590,7 @@
             SalesHeader."Ship-to Address" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement2, 'address', MaxStrLen(SalesHeader."Ship-to Address"), true), 1, MaxStrLen(SalesHeader."Ship-to Address"));
             SalesHeader."Ship-to Address 2" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement2, 'address_2', MaxStrLen(SalesHeader."Ship-to Address 2"), false), 1, MaxStrLen(SalesHeader."Ship-to Address 2"));
             SalesHeader."Ship-to Post Code" := CopyStr(UpperCase(NpXmlDomMgt.GetXmlText(XmlElement2, 'post_code', MaxStrLen(SalesHeader."Ship-to Post Code"), true)), 1, MaxStrLen(SalesHeader."Ship-to Post Code"));
+            SalesHeader."Ship-to County" := CopyStr(UpperCase(NpXmlDomMgt.GetXmlText(XmlElement2, 'county', MaxStrLen(SalesHeader."Ship-to County"), false)), 1, MaxStrLen(SalesHeader."Ship-to County"));
             SalesHeader."Ship-to City" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement2, 'city', MaxStrLen(SalesHeader."Ship-to City"), true), 1, MaxStrLen(SalesHeader."Ship-to City"));
             SalesHeader."Ship-to Country/Region Code" := CopyStr(UpperCase(NpXmlDomMgt.GetXmlText(XmlElement2, 'country_code', MaxStrLen(SalesHeader."Ship-to Country/Region Code"), false)), 1, MaxStrLen(SalesHeader."Ship-to Country/Region Code"));
             SalesHeader."Ship-to Contact" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement2, 'contact', MaxStrLen(SalesHeader."Ship-to Contact"), false), 1, MaxStrLen(SalesHeader."Ship-to Contact"));
@@ -599,6 +603,7 @@
             SalesHeader."Ship-to Address" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement2, 'address', MaxStrLen(SalesHeader."Ship-to Address"), true), 1, MaxStrLen(SalesHeader."Ship-to Address"));
             SalesHeader."Ship-to Address 2" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement2, 'address_2', MaxStrLen(SalesHeader."Ship-to Address 2"), false), 1, MaxStrLen(SalesHeader."Ship-to Address 2"));
             SalesHeader."Ship-to Post Code" := CopyStr(UpperCase(NpXmlDomMgt.GetElementCode(XmlElement2, 'post_code', MaxStrLen(SalesHeader."Ship-to Post Code"), true)), 1, MaxStrLen(SalesHeader."Ship-to Post Code"));
+            SalesHeader."Ship-to County" := CopyStr(UpperCase(NpXmlDomMgt.GetElementCode(XmlElement2, 'county', MaxStrLen(SalesHeader."Ship-to County"), false)), 1, MaxStrLen(SalesHeader."Ship-to County"));
             SalesHeader."Ship-to City" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement2, 'city', MaxStrLen(SalesHeader."Ship-to City"), true), 1, MaxStrLen(SalesHeader."Ship-to City"));
             SalesHeader."Ship-to Country/Region Code" := CopyStr(NpXmlDomMgt.GetElementCode(XmlElement2, 'country_code', MaxStrLen(SalesHeader."Ship-to Country/Region Code"), false), 1, MaxStrLen(SalesHeader."Ship-to Country/Region Code"));
             SalesHeader."Ship-to Contact" := CopyStr(NpXmlDomMgt.GetElementText(XmlElement2, 'contact', MaxStrLen(SalesHeader."Ship-to Contact"), false), 1, MaxStrLen(SalesHeader."Ship-to Contact"));

@@ -64,6 +64,10 @@ xmlport 6151156 "NPR M2 Update Account"
                     fieldelement(City; TmpContactRequest.City)
                     {
                     }
+                    fieldelement(County; tmpcontactrequest.County)
+                    {
+                        MinOccurs = Zero;
+                    }
                     fieldelement(CountryCode; TmpContactRequest."Country/Region Code")
                     {
                     }

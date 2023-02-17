@@ -727,6 +727,8 @@
             Customer.Validate("Country/Region Code", TmpContact."Country/Region Code");
         if (TmpContact."Post Code" <> '') then
             Customer.Validate("Post Code", TmpContact."Post Code");
+        if (TmpContact.County <> '') then
+            Customer.Validate(County, TmpContact.County);
         if (TmpContact.City <> '') then
             Customer.Validate(City, TmpContact.City);
 
@@ -845,6 +847,7 @@
         Account.Validate(Address, TmpAccount.Address);
         Account.Validate("Address 2", TmpAccount."Address 2");
         Account.Validate("Post Code", TmpAccount."Post Code");
+        Account.Validate(County, TmpAccount.County);
         Account.Validate(City, TmpAccount.City);
         Account.Validate("Country/Region Code", TmpAccount."Country/Region Code");
 
@@ -978,6 +981,8 @@
 
         if (TmpAccount."Post Code" <> '') then
             Contact.Validate("Post Code", TmpAccount."Post Code");
+        if (TmpAccount.County <> '') then
+            Contact.Validate(County, TmpAccount.County);
         if (TmpAccount.City <> '') then
             Contact.Validate(City, TmpAccount.City);
         if (TmpAccount."Country/Region Code" <> '') then
@@ -1346,6 +1351,7 @@
         MemberInfoCapture."Last Name" := CopyStr(TmpContact.Surname, 1, MaxStrLen(MemberInfoCapture."Last Name"));
         MemberInfoCapture.Address := CopyStr(TmpContact.Address, 1, MaxStrLen(MemberInfoCapture.Address));
         MemberInfoCapture."Post Code Code" := CopyStr(TmpContact."Post Code", 1, MaxStrLen(MemberInfoCapture."Post Code Code"));
+        MemberInfoCapture.County := CopyStr(TmpContact.County, 1, MaxStrLen(MemberInfoCapture.County));
         MemberInfoCapture.City := CopyStr(TmpContact.City, 1, MaxStrLen(MemberInfoCapture.City));
         MemberInfoCapture."Country Code" := CopyStr(TmpContact."Country/Region Code", 1, MaxStrLen(MemberInfoCapture."Country Code"));
 

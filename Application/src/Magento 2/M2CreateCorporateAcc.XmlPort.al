@@ -68,6 +68,10 @@ xmlport 6151153 "NPR M2 Create Corporate Acc."
                     fieldelement(City; TmpContactRequest.City)
                     {
                     }
+                    fieldelement(County; tmpcontactrequest.County)
+                    {
+                        MinOccurs = Zero;
+                    }
                     fieldelement(CountryCode; TmpContactRequest."Country/Region Code")
                     {
                     }
