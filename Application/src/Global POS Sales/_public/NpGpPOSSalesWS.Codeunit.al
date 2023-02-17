@@ -76,5 +76,69 @@
 
         npGpPOSEntries.SetSourceTables(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry, TempNpGpPOSPaymentLine);
     end;
+
+    procedure GetGlobalSaleByDocumentNo(documentNumber: Text; posUnitFilter: Text; posStoreFilter: Text; var npGpPOSEntries: XMLport "NPR NpGp POS Entries")
+    var
+        NpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry";
+        NpGpPOSSalesLine: Record "NPR NpGp POS Sales Line";
+        NpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry";
+        NpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line";
+        NpGpPOSSalesLineReturn: Record "NPR NpGp POS Sales Line";
+        TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary;
+        TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary;
+        TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary;
+        TempNpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line" temporary;
+        MissingDocumentNoErr: Label 'parameter DocumentNumber must have a value';
+    begin
+        if documentNumber = '' then
+            Error(MissingDocumentNoErr);
+        if posStoreFilter <> '' then
+            NpGpPOSSalesEntry.SetFilter("POS Store Code", posStoreFilter);
+        if posUnitFilter <> '' then
+            NpGpPOSSalesEntry.SetFilter("POS Unit No.", posUnitFilter);
+        NpGpPOSSalesEntry.SetRange("Document No.", documentNumber);
+
+        if NpGpPOSSalesEntry.FindSet() then
+            repeat
+                TempNpGpPOSSalesEntry := NpGpPOSSalesEntry;
+                TempNpGpPOSSalesEntry.Insert();
+
+                NpGpPOSSalesLine.SetRange("POS Entry No.", NpGpPOSSalesEntry."Entry No.");
+                NpGpPOSSalesLine.SetRange(Type, NpGpPOSSalesLine.Type::Item);
+                NpGpPOSSalesLine.SetFilter(Quantity, '>0');
+                if NpGpPOSSalesLine.FindSet() then
+                    repeat
+                        TempNpGpPOSSalesLine := NpGpPOSSalesLine;
+                        TempNpGpPOSSalesLine.Insert();
+
+                        Clear(NpGpPOSSalesLineReturn);
+                        if NpGpPOSSalesLine."Global Reference" <> '' then begin
+                            NpGpPOSSalesLineReturn.SetRange("Global Reference", NpGpPOSSalesLine."Global Reference");
+                            NpGpPOSSalesLineReturn.SetFilter(Quantity, '<0');
+                            if NpGpPOSSalesLineReturn.FindSet() then
+                                repeat
+                                    TempNpGpPOSSalesLine.Quantity += NpGpPOSSalesLineReturn.Quantity;
+                                until NpGpPOSSalesLineReturn.Next() = 0;
+                        end;
+                        TempNpGpPOSSalesLine.Modify();
+                    until NpGpPOSSalesLine.Next() = 0;
+
+                NpGpPOSInfoPOSEntry.SetRange("POS Entry No.", NpGpPOSSalesEntry."Entry No.");
+                if NpGpPOSInfoPOSEntry.FindSet() then
+                    repeat
+                        TempNpGpPOSInfoPOSEntry := NpGpPOSInfoPOSEntry;
+                        TempNpGpPOSInfoPOSEntry.Insert();
+                    until NpGpPOSInfoPOSEntry.Next() = 0;
+
+                NpGpPOSPaymentLine.SetRange("POS Entry No.", NpGpPOSSalesEntry."Entry No.");
+                if NpGpPOSPaymentLine.FindSet() then
+                    repeat
+                        TempNpGpPOSPaymentLine := NpGpPOSPaymentLine;
+                        TempNpGpPOSPaymentLine.Insert();
+                    until NpGpPOSPaymentLine.Next() = 0;
+            until NpGpPOSSalesEntry.Next() = 0;
+
+        npGpPOSEntries.SetSourceTables(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry, TempNpGpPOSPaymentLine);
+    end;
 }
 
