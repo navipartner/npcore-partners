@@ -503,6 +503,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'LOCK_POS', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Lock POS";
     }
+    value(99; EXCHANGELABEL)
+    {
+        Caption = 'EXCHANGELABEL', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: ScanExchLabel";
+    }
     value(96; RUNOBJECT)
     {
         Caption = 'RUNOBJECT', Locked = true, MaxLength = 20;

@@ -1,107 +1,60 @@
-﻿codeunit 6150830 "NPR POS Action: ScanExchLabel"
+codeunit 6150830 "NPR POS Action: ScanExchLabel" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
+    var
+        InpTitle: Label 'Exchange Label';
+
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'This is a build in function to handle exchange labels.';
-        InpTitle: Label 'Exchange Label';
+        ParamPromptForBarCode_CptLbl: Label 'Prompt for Barcode';
+        ParamPromptForBarCode_DescLbl: Label 'Defines if Prompt Barcode will show On action.';
+        ParamExchLabelBarCode_CptLbl: Label 'Exchange Label Barcode';
+        ParamExchLabelBarCode_DescLbl: Label 'Predefined exchange label barcode.';
         InpLead: Label 'Enter Exchange Label Barcode';
-        ErrNotExchLabel: Label '%1 ';
-        ReadingErr: Label 'reading in %1';
-        SettingScopeErr: Label 'setting scope in %1';
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('prompt', 'if (param.PromptForBarcode == true) { input(labels.InpTitle, labels.InpLead, labels.InpInstr, param.ExchLabelBarcode, true).respond().cancel() } else { respond() };');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddBooleanParameter('PromptForBarcode', false, ParamPromptForBarCode_CptLbl, ParamPromptForBarCode_DescLbl);
+        WorkflowConfig.AddTextParameter('ExchLabelBarcode', '', ParamExchLabelBarCode_CptLbl, ParamExchLabelBarCode_DescLbl);
+        WorkflowConfig.AddLabel('InpTitle', InpTitle);
+        WorkflowConfig.AddLabel('InpLead', InpLead);
+    end;
 
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterDataBinding();
-            Sender.RegisterBooleanParameter('PromptForBarcode', false);
-            Sender.RegisterTextParameter('ExchLabelBarcode', '');
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    var
+    begin
+        case Step of
+            'ExchangeLabelBarCode':
+                ExchangeLabelBarCode(Context, Sale, SaleLine);
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure ExchangeLabelBarCode(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line")
     var
-        JSON: Codeunit "NPR POS JSON Management";
         ExchLabelBarcode: Text;
         InputExchLabelBarcode: Text;
         PromptForBarcode: Boolean;
+        POSActionScanExchLabelB: Codeunit "NPR POS Action:ScanExchLabel B";
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScopeRoot();
-        PromptForBarcode := JSON.GetBooleanParameterOrFail('PromptForBarcode', ActionCode());
+        PromptForBarcode := Context.GetBooleanParameter('PromptForBarcode');
 
         if not PromptForBarcode then begin
-            ExchLabelBarcode := JSON.GetStringParameter('ExchLabelBarcode');
-            if ExchLabelBarcode = '' then begin
-                Handled := true;
-                exit;
-            end;
+            ExchLabelBarcode := Context.GetStringParameter('ExchLabelBarcode');
+            if ExchLabelBarcode = '' then
+                exit
         end else begin
-            JSON.SetScope('$prompt', StrSubstNo(SettingScopeErr, ActionCode()));
-            InputExchLabelBarcode := JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode()));
+            InputExchLabelBarcode := Context.GetString('ExchBarCode');
             ExchLabelBarcode := InputExchLabelBarcode;
         end;
 
-        HandleExchangeLabelBarcode(ExchLabelBarcode, POSSession);
-
-        POSSession.RequestRefreshData();
-
-        Handled := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-
-        Captions.AddActionCaption(ActionCode(), 'InpTitle', InpTitle);
-        Captions.AddActionCaption(ActionCode(), 'InpLead', InpLead);
-        Captions.AddActionCaption(ActionCode(), 'InpInstr', '');
+        POSActionScanExchLabelB.HandleExchangeLabelBarcode(ExchLabelBarcode, Sale, SaleLine);
     end;
 
     local procedure ActionCode(): Code[20]
     begin
-        exit('EXCHANGELABEL');
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.0');
-    end;
-
-    local procedure HandleExchangeLabelBarcode(iBarcode: Text; var POSSession: Codeunit "NPR POS Session")
-    var
-        ExchangeLabelManagement: Codeunit "NPR Exchange Label Mgt.";
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-        CodeBarcode: Code[20];
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-    begin
-
-        CodeBarcode := CopyStr(iBarcode, 1, MaxStrLen(CodeBarcode));
-
-        if not BarCodeIsExchangeLabel(CodeBarcode) then
-            Error(ErrNotExchLabel, iBarcode);
-
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        if ExchangeLabelManagement.ScanExchangeLabel(SalePOS, CodeBarcode, CodeBarcode) then begin
-            POSSession.GetSaleLine(POSSaleLine);
-            POSSaleLine.SetFirst();
-        end;
+        exit(Format(Enum::"NPR POS Workflow"::EXCHANGELABEL));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
@@ -137,13 +90,14 @@
     local procedure SetEanBoxEventInScopeExchLabel(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         ExchangeLabel: Record "NPR Exchange Label";
+        POSActionScanExchLabelB: Codeunit "NPR POS Action:ScanExchLabel B";
     begin
         if EanBoxSetupEvent."Event Code" <> EventCodeExchLabel() then
             exit;
         if StrLen(EanBoxValue) > MaxStrLen(ExchangeLabel.Barcode) then
             exit;
 
-        if BarCodeIsExchangeLabel(EanBoxValue) then
+        if POSActionScanExchLabelB.BarCodeIsExchangeLabel(EanBoxValue) then
             InScope := true;
     end;
 
@@ -157,25 +111,11 @@
         exit(CODEUNIT::"NPR POS Action: ScanExchLabel");
     end;
 
-    procedure BarCodeIsExchangeLabel(Barcode: Text): Boolean
-    var
-        ExchangeLabel: Record "NPR Exchange Label";
-        ExchangeLabelSetup: Record "NPR Exchange Label Setup";
-        ExchangeLabelManagement: Codeunit "NPR Exchange Label Mgt.";
+    local procedure GetActionScript(): Text
     begin
-        if StrLen(Barcode) > MaxStrLen(ExchangeLabel.Barcode) then
-            exit(false);
-
-        Barcode := UpperCase(Barcode);
-        ExchangeLabelSetup.Get();
-        if not ExchangeLabelManagement.CheckPrefix(Barcode, ExchangeLabelSetup."EAN Prefix Exhange Label") then
-            exit(false);
-
-        ExchangeLabel.SetCurrentKey(Barcode);
-        ExchangeLabel.SetRange(Barcode, Barcode);
-        if ExchangeLabel.FindFirst() then
-            exit(true);
-
-        exit(false);
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionScanExchLabel.js###
+'let main=async({workflow:e,popup:n,captions:a,parameters:r})=>{if(r.PromptForBarcode){let t=await n.input({title:a.InpTitle,caption:a.InpLead});if(t===null)return" ";await e.respond("ExchangeLabelBarCode",{ExchBarCode:t})}else await e.respond("ExchangeLabelBarCode")};'
+  );
     end;
 }
