@@ -17,12 +17,484 @@ codeunit 85107 "NPR MM Loyalty Test"
         _isSalesInitialized: Boolean;
 
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PosEndOfSale_GenericAward()
+    var
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
+
+        Item: Record Item;
+        DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
+        SaleEnded: Boolean;
+        UnitPrice: Decimal;
+    begin
+        UnitPrice := 100;
+
+        InitializeSales();
+        InitializeFixedMembershipSetup();
+        CreateMembership('T-320102');
+
+        LibraryPOSMock.CreateItemLine(_POSSession, CreateItem(Item, UnitPrice), 1);
+
+        _LastMembership.Find();
+        _LastMembership.TestField("Awarded Points (Sale)", 0);
+
+        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.")) then
+            Error('Error assigning membership to sales.');
+
+        SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
+
+        _LastMembership.Find();
+        _LastMembership.TestField("Awarded Points (Sale)", CalculateEarnPointsFromAmount(UnitPrice, _LoyaltySetup."Amount Factor", 1));
+    end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure SuccessfulTest()
+    procedure PosEndOfSale_ItemRule_NotApplicable()
     var
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
+
+        Item: Record Item;
+        ItemLoyalty: Record "NPR MM Loy. Item Point Setup";
+        DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
+        SaleEnded: Boolean;
+        UnitPrice: Decimal;
     begin
+        UnitPrice := 100;
+
+        InitializeFixedMembershipSetup();
+        InitializeSales();
+        CreateMembership('T-320102');
+        CreateItem(Item, UnitPrice);
+
+        _LoyaltySetup."Point Base" := _LoyaltySetup."Point Base"::AMOUNT_ITEM_SETUP;
+        _LoyaltySetup.Modify();
+
+        ItemLoyalty.Code := _LoyaltySetup.Code;
+        ItemLoyalty."Line No." := 1;
+        ItemLoyalty.Type := ItemLoyalty.Type::Item;
+        ItemLoyalty."No." := Item."No.";
+        // When award is set to Not Applicable, amount factor and points should be ignored - numbers from Loyalty Setup should apply
+        ItemLoyalty.Award := ItemLoyalty.Award::NA;
+        ItemLoyalty."Amount Factor" := 3.14;
+        ItemLoyalty.Points := 117;
+        ItemLoyalty.Constraint := ItemLoyalty.Constraint::INCLUDE;
+        ItemLoyalty.Insert();
+
+        _LastMembership.Find();
+        _LastMembership.TestField("Awarded Points (Sale)", 0);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.")) then
+            Error('Error assigning membership to sales.');
+
+        SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
+
+        _LastMembership.Find();
+        _LastMembership.TestField("Awarded Points (Sale)", CalculateEarnPointsFromAmount(UnitPrice, _LoyaltySetup."Amount Factor", 1));
+        _LastMembership.TestField("Remaining Points", CalculateEarnPointsFromAmount(UnitPrice, _LoyaltySetup."Amount Factor", 1));
+
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PosEndOfSale_ItemRule_Amount()
+    var
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
+
+        Item: Record Item;
+        ItemLoyalty: Record "NPR MM Loy. Item Point Setup";
+        DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
+        SaleEnded: Boolean;
+        UnitPrice: Decimal;
+    begin
+        UnitPrice := 100;
+
+        InitializeSales();
+        InitializeFixedMembershipSetup();
+        CreateMembership('T-320102');
+        CreateItem(Item, UnitPrice);
+
+        _LoyaltySetup."Point Base" := _LoyaltySetup."Point Base"::AMOUNT_ITEM_SETUP;
+        _LoyaltySetup.Modify();
+
+        ItemLoyalty.Code := _LoyaltySetup.Code;
+        ItemLoyalty."Line No." := 1;
+        ItemLoyalty.Type := ItemLoyalty.Type::Item;
+        ItemLoyalty."No." := Item."No.";
+        ItemLoyalty.Award := ItemLoyalty.Award::AMOUNT;
+        ItemLoyalty."Amount Factor" := 3.14;
+        ItemLoyalty.Points := 117;
+        ItemLoyalty.Constraint := ItemLoyalty.Constraint::INCLUDE;
+        ItemLoyalty.Insert();
+
+        _LastMembership.Find();
+        _LastMembership.TestField("Awarded Points (Sale)", 0);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.")) then
+            Error('Error assigning membership to sales.');
+
+        SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
+
+        _LastMembership.Find();
+        _LastMembership.TestField("Awarded Points (Sale)", CalculateEarnPointsFromAmount(UnitPrice, ItemLoyalty."Amount Factor" * _LoyaltySetup."Amount Factor", 1));
+
+    end;
+
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PosEndOfSale_ItemRule_AmountItemPoints()
+    var
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
+
+        Item: Record Item;
+        ItemLoyalty: Record "NPR MM Loy. Item Point Setup";
+        DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
+        SaleEnded: Boolean;
+        UnitPrice: Decimal;
+    begin
+        UnitPrice := 100;
+
+        InitializeSales();
+        InitializeFixedMembershipSetup();
+        CreateMembership('T-320102');
+        CreateItem(Item, UnitPrice);
+
+        _LoyaltySetup."Point Base" := _LoyaltySetup."Point Base"::AMOUNT_ITEM_SETUP;
+        _LoyaltySetup.Modify();
+
+        ItemLoyalty.Code := _LoyaltySetup.Code;
+        ItemLoyalty."Line No." := 1;
+        ItemLoyalty.Type := ItemLoyalty.Type::Item;
+        ItemLoyalty."No." := Item."No.";
+        ItemLoyalty.Award := ItemLoyalty.Award::POINTS_AND_AMOUNT;
+        ItemLoyalty."Amount Factor" := 3.14;
+        ItemLoyalty.Points := 117;
+        ItemLoyalty.Constraint := ItemLoyalty.Constraint::INCLUDE;
+        ItemLoyalty.Insert();
+
+        _LastMembership.Find();
+        _LastMembership.TestField("Awarded Points (Sale)", 0);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.")) then
+            Error('Error assigning membership to sales.');
+
+        SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
+
+        _LastMembership.Find();
+        _LastMembership.TestField("Awarded Points (Sale)", CalculateEarnPointsFromAmount(UnitPrice, ItemLoyalty."Amount Factor" * _LoyaltySetup."Amount Factor", 1) + ItemLoyalty.Points);
+
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure PosEndOfSale_ItemRule_ItemPoints()
+    var
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
+
+        Item: Record Item;
+        ItemLoyalty: Record "NPR MM Loy. Item Point Setup";
+        DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
+        SaleEnded: Boolean;
+        UnitPrice: Decimal;
+    begin
+        UnitPrice := 100;
+
+        InitializeSales();
+        InitializeFixedMembershipSetup();
+        CreateMembership('T-320102');
+        CreateItem(Item, UnitPrice);
+
+        _LoyaltySetup."Point Base" := _LoyaltySetup."Point Base"::AMOUNT_ITEM_SETUP;
+        _LoyaltySetup.Modify();
+
+        ItemLoyalty.Code := _LoyaltySetup.Code;
+        ItemLoyalty."Line No." := 1;
+        ItemLoyalty.Type := ItemLoyalty.Type::Item;
+        ItemLoyalty."No." := Item."No.";
+        ItemLoyalty.Award := ItemLoyalty.Award::POINTS;
+        ItemLoyalty."Amount Factor" := 3.23;
+        ItemLoyalty.Points := 117;
+        ItemLoyalty.Constraint := ItemLoyalty.Constraint::INCLUDE;
+        ItemLoyalty.Insert();
+
+        _LastMembership.Find();
+
+        _Assert.AreEqual(0, _LastMembership."Awarded Points (Sale)", 'Unexpected initial value.');
+        _Assert.AreEqual(0, _LastMembership."Awarded Points (Refund)", 'Unexpected initial value.');
+        // Sale
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.")) then
+            Error('Error assigning membership to sales.');
+
+        SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
+
+        _LastMembership.Find();
+        _Assert.AreEqual(ItemLoyalty.Points, _LastMembership."Awarded Points (Sale)", 'Incorrect points after sale.');
+        _Assert.AreEqual(0, _LastMembership."Awarded Points (Refund)", 'Incorrect points after sale.');
+
+        // Refund
+        InitializeSales();
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", -1);
+        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.")) then
+            Error('Error assigning membership to sales.');
+
+        SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, -1 * UnitPrice, '');
+
+        _LastMembership.Find();
+        _Assert.AreEqual(ItemLoyalty.Points, _LastMembership."Awarded Points (Sale)", 'Incorrect points after refund.');
+        _Assert.AreEqual(ItemLoyalty.Points, _LastMembership."Awarded Points (Refund)", 'Incorrect points after refund.');
+
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RemoteMaster_AsYouGo_Earn()
+    var
+        LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
+
+        ClientLoyaltyPointsMgr: Codeunit "NPR MM Loy. Point Mgr (Client)";
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        ImportEntry: Record "NPR Nc Import Entry";
+        RequestXmlText, ResponseXmlText : Text;
+        ResponseCode: Code[20];
+        ResponseMessage: Text;
+        DocumentId: Text;
+    begin
+        SetScenario_100(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateRegisterSaleTestXml(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_RegisterSale_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        TempPointsResponse.FindFirst();
+
+        ImportEntry.SetFilter("Document ID", '=%1', DocumentId);
+        ImportEntry.FindFirst();
+        ImportEntry.TestField(Imported, true);
+        ImportEntry.TestField("Runtime Error", false);
+
+        if (ResponseCode <> 'OK') then
+            Error(ResponseMessage);
+
+        _LastMembership.CalcFields("Remaining Points", "Awarded Points (Sale)");
+        _Assert.AreEqual(TempSalesLinesRequest."Total Points", _LastMembership."Remaining Points", 'Membership remaining points does not matched earned points.');
+        _Assert.AreEqual(TempSalesLinesRequest."Total Points", _LastMembership."Awarded Points (Sale)", 'Membership awarded points does not matched earned points.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RemoteMaster_AsYouGo_Reserve()
+    var
+        LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
+
+        ClientLoyaltyPointsMgr: Codeunit "NPR MM Loy. Point Mgr (Client)";
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        ImportEntry: Record "NPR Nc Import Entry";
+        RequestXmlText, ResponseXmlText : Text;
+        ResponseCode: Code[20];
+        ResponseMessage: Text;
+        DocumentId: Text;
+    begin
+        SetScenario_100(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+
+        TempPaymentLinesRequest.FindFirst();
+        TempPaymentLinesRequest."Total Points" := 100;
+        TempPaymentLinesRequest.Modify();
+
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateReservePointsTestXml(TempAuthorization, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_ReservePoints_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        ImportEntry.SetFilter("Document ID", '=%1', DocumentId);
+        ImportEntry.FindFirst();
+        ImportEntry.TestField(Imported, true);
+        ImportEntry.TestField("Runtime Error", false);
+
+        if (ResponseCode = 'OK') then
+            Error('This test should fail because membership has no points yet.');
+    end;
+
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RemoteMaster_AsYouGo_EarnAndBurn_01()
+    var
+        LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
+
+        ClientLoyaltyPointsMgr: Codeunit "NPR MM Loy. Point Mgr (Client)";
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        ImportEntry: Record "NPR Nc Import Entry";
+        RequestXmlText, ResponseXmlText : Text;
+        ResponseCode: Code[20];
+        ResponseMessage: Text;
+        DocumentId: Text;
+        PointsToEarn, PointsToBurn : Integer;
+        ReservationToken: Text[40];
+        LoyaltyCode: Code[20];
+        Qty: Decimal;
+        Amount: Decimal;
+        Points: Integer;
+    begin
+        LoyaltyCode := SetScenario_100(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+
+        // This test over-reserves amount of points it then uses to pay. All reserved points are spent.
+        // Earn points on sale
+        PointsToEarn := SetPointsToEarn(Random(1000) + 10000, TempSalesLinesRequest); // Earn more point then we will burn
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateRegisterSaleTestXml(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_RegisterSale_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Earn points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        TempPointsResponse.FindFirst();
+        _LastMembership.CalcFields("Remaining Points", "Awarded Points (Sale)");
+        _Assert.AreEqual(TempSalesLinesRequest."Total Points", _LastMembership."Remaining Points", 'Membership remaining points does not matched earned points.');
+        _Assert.AreEqual(TempSalesLinesRequest."Total Points", _LastMembership."Awarded Points (Sale)", 'Membership awarded points does not matched earned points.');
+
+        // Prepare next request
+        TempSalesLinesRequest.DeleteAll();
+        TempPaymentLinesRequest.DeleteAll();
+        TempPointsResponse.DeleteAll();
+
+        TempAuthorization."Reference Number" := GenerateSafeCode20();
+        TempAuthorization.Modify();
+
+        // Reserve points to burn
+        PointsToBurn := PointsToEarn; // Reserve all point available
+        LibraryLoyalty.CreatePaymentLine(0, PointsToBurn, '', TempPaymentLinesRequest);
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateReservePointsTestXml(TempAuthorization, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_ReservePoints_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Reserve points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        TempPointsResponse.FindFirst();
+        ReservationToken := TempPointsResponse."Authorization Code";
+
+        // Prepare next request
+        TempSalesLinesRequest.DeleteAll();
+        TempPaymentLinesRequest.DeleteAll();
+        TempPointsResponse.DeleteAll();
+
+        TempAuthorization."Reference Number" := GenerateSafeCode20();
+        TempAuthorization.Modify();
+
+        // Pay with points on sale. "Overpay" with points. 
+        LibraryLoyalty.GenerateQtyAmtPointsBurn(LoyaltyCode, Qty, Amount, Points);
+        LibraryLoyalty.CreateSaleLine(GenerateSafeCode20(), GenerateSafeCode10(), Qty, Amount, Points, TempSalesLinesRequest);
+        LibraryLoyalty.CreatePaymentLine(Amount, PointsToBurn, ReservationToken, TempPaymentLinesRequest);
+
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateRegisterSaleTestXml(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_RegisterSale_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Earn and burn points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        _LastMembership.CalcFields("Remaining Points", "Awarded Points (Sale)");
+        _Assert.AreEqual(0, _LastMembership."Remaining Points", 'Membership remaining points does not matched earned points.');
+        _Assert.AreEqual(PointsToEarn + Points, _LastMembership."Awarded Points (Sale)", 'Membership awarded points does not matched earned points.');
+
+    end;
+
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RemoteMaster_AsYouGo_EarnAndBurn_03()
+    var
+        LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
+
+        ClientLoyaltyPointsMgr: Codeunit "NPR MM Loy. Point Mgr (Client)";
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        ImportEntry: Record "NPR Nc Import Entry";
+        RequestXmlText, ResponseXmlText : Text;
+        ResponseCode: Code[20];
+        ResponseMessage: Text;
+        DocumentId: Text;
+        PointsToEarn, PointsToBurn : Integer;
+        ReservationToken: Text[40];
+        LoyaltyCode: Code[20];
+        Qty: Decimal;
+        Amount: Decimal;
+        Points: Integer;
+    begin
+        LoyaltyCode := SetScenario_100(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+
+        // Earn points on sale
+        PointsToEarn := 170;
+        SetPointsToEarn(PointsToEarn, TempSalesLinesRequest);
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateRegisterSaleTestXml(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_RegisterSale_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Earn points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        TempPointsResponse.FindFirst();
+        _LastMembership.CalcFields("Remaining Points", "Awarded Points (Sale)");
+        _Assert.AreEqual(TempSalesLinesRequest."Total Points", _LastMembership."Remaining Points", 'Membership remaining points does not matched earned points (1).');
+        _Assert.AreEqual(TempSalesLinesRequest."Total Points", _LastMembership."Awarded Points (Sale)", 'Membership awarded points does not matched earned points (1).');
+
+        // Prepare next request
+        TempSalesLinesRequest.DeleteAll();
+        TempPaymentLinesRequest.DeleteAll();
+        TempPointsResponse.DeleteAll();
+
+        TempAuthorization."Reference Number" := GenerateSafeCode20();
+        TempAuthorization.Modify();
+
+        // Reserve points to burn
+        PointsToBurn := 47;
+        LibraryLoyalty.CreatePaymentLine(0, PointsToBurn, '', TempPaymentLinesRequest);
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateReservePointsTestXml(TempAuthorization, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_ReservePoints_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Reserve points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        TempPointsResponse.FindFirst();
+        ReservationToken := TempPointsResponse."Authorization Code";
+
+        // Prepare next request
+        TempSalesLinesRequest.DeleteAll();
+        TempPaymentLinesRequest.DeleteAll();
+        TempPointsResponse.DeleteAll();
+
+        TempAuthorization."Reference Number" := GenerateSafeCode20();
+        TempAuthorization.Modify();
+
+        Qty := 1;
+        Amount := 42.49;
+        Points := 55;
+        LibraryLoyalty.CreateSaleLine(GenerateSafeCode20(), GenerateSafeCode10(), Qty, Amount, Points, TempSalesLinesRequest);
+        LibraryLoyalty.CreatePaymentLine(Amount, PointsToBurn, ReservationToken, TempPaymentLinesRequest);
+
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateRegisterSaleTestXml(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_RegisterSale_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Earn and burn points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        _LastMembership.CalcFields("Remaining Points", "Awarded Points (Sale)");
+        _Assert.AreEqual((PointsToEarn - PointsToBurn), _LastMembership."Remaining Points", 'Membership remaining points does not matched earned points (2).');
+        _Assert.AreEqual(PointsToEarn + Points, _LastMembership."Awarded Points (Sale)", 'Membership awarded points does not matched earned points (2).');
 
     end;
 
