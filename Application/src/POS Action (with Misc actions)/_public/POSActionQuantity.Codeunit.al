@@ -118,7 +118,7 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         if not InitializedQty then begin
             QuantityText := Context.GetString('PromptQuantity');
 
-            if not Evaluate(QuantityGlobal, QuantityText) then begin
+            if not Evaluate(QuantityGlobal, QuantityText, 9) then begin
                 POSActQuantityB.RemoveStarFromQuantity(QuantityText);
                 Evaluate(QuantityGlobal, QuantityText);
             end;
