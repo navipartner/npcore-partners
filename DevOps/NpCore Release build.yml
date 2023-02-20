@@ -61,4 +61,7 @@ stages:
         destinationFileName: /Permissions/NPRETAIL.PermissionSet.al
         objectId: 6014400
         objectName: 'NPR NP RETAIL'
-        objectCaption: 'NP Retail'      
+        objectCaption: 'NP Retail'
+      testApps:
+      - 'Performance Toolkit'
+      - 'Test'
