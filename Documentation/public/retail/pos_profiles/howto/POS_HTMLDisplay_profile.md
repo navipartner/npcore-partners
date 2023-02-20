@@ -22,7 +22,7 @@ This HTML file can:
 
 ## Procedure 
 
-1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Unit List**, and choose the related link. 
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Unit List**, and choose the related link.      
    A list of all existing POS units is displayed. 
 2. Click the POS unit you wish to set up the **POS HTML Display** for.   
    The **POS Unit Card** popup window is displayed.
@@ -31,7 +31,7 @@ This HTML file can:
 4. Fill out the **Code** field.
 5. Open the dropdown list next to the **Display Content Code**, and then click the **Select from full list** button.    
 6. From the page **Select - Display Content**, click the **Content Line** field on the far right to open the **Display Content Lines** page.   
-7. Click **New** to input a URL or to upload an image.    
+7. Click **New** to input a URL or to upload an image, video or a HTML file.    
    Add more lines for an image slideshow.
 8. Go back to the **POS HTML Display Profile**, and either use the **Download Template Data** action to use a standard HTML or **Upload HTML** action under **Actions** to use a specialized HTML.    
    The HTML file toggle is enabled.
