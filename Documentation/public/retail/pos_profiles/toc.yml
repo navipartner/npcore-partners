@@ -38,3 +38,5 @@
     href: reference/POS_Self_Service_Actions.md
   - name: POS HTML Display Profile (reference guide)
     href: reference/POS_HTMLDisplay_profile.md
+  - name: POS tax-free profile (reference guide)
+    href: reference/pos_tax_free_profile.md
