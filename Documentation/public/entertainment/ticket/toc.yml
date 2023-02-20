@@ -30,7 +30,7 @@
     href: howto/create_postpaid_ticket.md
   - name: Admit an issued ticket
     href: howto/admit_issued_ticket.md
-  - name: Generate a ticketholder notification
+  - name: Generate a ticket-holder notification
     href: howto/ticketholder_notification.md
   - name: Create and customize Base Calendar for Admission
     href: howto/CreateCustomizedCalendar.md
@@ -65,8 +65,13 @@
     href: reference/ticket_types.md
   - name: Ticket BOM (reference guide)
     href: reference/ticket_bom.md
-  - name: Ticket booking proces - API
-    href: files/aquire_ticket_workflow.pdf
   - name: Admission schedule
     href: reference/admission_schedule.md
+  - name: API
+    items:
+    - name: Ticket booking process - API
+      href: files/acquire_ticket_workflow.pdf
+    - name: Ticket Service WSDL
+      href: files/ticket_services_wsdl.xml
+
 
