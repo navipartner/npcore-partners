@@ -2,7 +2,7 @@
   href: intro.md
 - name: How-To  
   items:
-  - name: Set up Global Blue I2
+  - name: Set up Global Blue I2 tax-free solution
     href: howto/globalblue.md
 - name: Explanation  
   items:
@@ -10,3 +10,7 @@
     href: explanation/overall.md
   - name: NAS setup
     href: explanation/nas-setup.md 
+- name: Reference
+  items:
+  - name: Tax-free profile parameters (reference guide)
+    href: reference/tax_free_params.md
