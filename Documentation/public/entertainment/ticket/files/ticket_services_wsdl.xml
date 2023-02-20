@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<?xml-stylesheet type="text/xsl" href="https://https://docs.navipartner.com/entertainment/ticket/files/wsdl-viewer.xsl"?>
+<?xml-stylesheet type="text/xsl" href="https://docs.navipartner.com/entertainment/ticket/files/wsdl-viewer.xsl"?>
 <definitions targetNamespace="urn:microsoft-dynamics-schemas/codeunit/ticket_services" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="urn:microsoft-dynamics-schemas/codeunit/ticket_services">
 	<types>
 		<schema elementFormDefault="qualified" targetNamespace="urn:microsoft-dynamics-nav/xmlports/x6060116" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="urn:microsoft-dynamics-nav/xmlports/x6060116">
