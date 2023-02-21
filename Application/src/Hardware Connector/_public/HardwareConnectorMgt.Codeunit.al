@@ -23,7 +23,6 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
     var
         Content: JsonObject;
         Base64Convert: Codeunit "Base64 Convert";
-        AzureKeyVault: Codeunit "NPR Azure Key Vault Mgt.";
         Response: JsonObject;
     begin
         Content.Add('PrinterName', PrinterName);
@@ -32,7 +31,10 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
 
         if UpperCase(FileExtension) = 'PDF' then begin
             Content.Add('PrintMethod', 'Spire');
-            Content.Add('ExternalLibLicenseKey', AzureKeyVault.GetAzureKeyVaultSecret('SpirePDFDotNetCoreLicenseKey'))
+            //license key is added here instead of keyvault because onprem partners without keyvault access need PDF printing functionality.
+            //not optimal but at least the license is for infinite deployments of our product.
+            //None of the proper solutions are possible short term: Setting up partner onprem to connect to our keyvault or building a customer account API that can retrieve all secrets without keyvault dependency.
+            Content.Add('ExternalLibLicenseKey', 'etsqfTbTAQAtl4LVKv1Zcx/A0EqSDOhekJOdhgf4tBITDoYhbWINywuYS1gH69hi6d6TaqMRXo/BCXQu9t8ip3VnAfQlDa2b2QaZIIVo7c6INW7vyYh7UXN3QjprQ55DfYk2j3/8bVx88MBddOwZddZAEh6rUJqND/dX67od2X5IWgxPt3xclB9czKLuD8r9qQ1OUFUXh0A1kd6F+oKGAEpWIQlJjxkOfENjCSaAkOgIJXLIsB9pfu79QwbGrTLe9AslykNsKxD6xl4KaiIFUZSeS2phKR3DAE+Rmo7bjVIJe/uUbXYBzP0XRpknzZFR6ewjzkeEW89g+lz3svdKIqcuvOu6fet3CK4xpov0dgiWb+2kjZiwGZfQ+YBeJX9gj1MTQcy26qAcx3h9tGRsVGJz9Cxz/nU6QPMEeS+YR516eIkppz0f3FvFZ6Hs9M/1srmZbi/tSB/ZrHtZ/3qjSCGd3wvSHSkVfHhGLAEpeb1Hq3UQz6XdSHhLY7u/vm8pjLB+N07PyWNAAB9W38Ffid0RSVlyz6y5XciV9xUedaoazEL/5q1b0kOPWxHvg/2IbJxsZimLK9f/WVHWrGFIljiAe6S0n2HGUWe+4/poUQzOP/81SUbXhKEua59VKxXLlVThlSNH57q2lbRCQc/Ir29gS4CKyS5AZUbhOXNLvdD0CNbtfIIwWALhRYIjFIv1CWvrSPHSPDs51jPDEy7gzDVsvRGdfN4q82wZaINOIsmxdz0rEQagA8YA5Jy3j3B0HGfJtlPC1MpIuM46R23XwK+emxCQhJXGWqWmhExlrmnEU0NNR3zMbHSt4o3GCDuZLgAIZIHIu4VVRw7qoymiXFG/S2dxBHC96jFVOJIaF6+zbY79owFIhj9fNdMvZnmU1YxLefu2bj8fdfRydF7T6HN8RaNkvs6BLrC5jvx2rXMY7Ga4x1SDLnJwP7lcXNNmcMqSiA4PMjUNJUQ8mDcpB8mhAnCKN4Lg/dpddNv8C8m9Oft2jJ79QOqeJvI/lY+SbPkbdicC3+u4QfI7/nYz6GGfq34MFhdJsr5wWkpjiQqCWVTcQWRcHMRN+jwJkFHm4BJFKZjXDkjsiN13wY60dvjdkz6FXW75mEteGCti/jUExGUGZwxYNYpEz5JqCV5CjTpbLzZv580qZzXoiYAoNZtIVweaeHxSgqWBJIyUs6dAEcPuyYMuXIDXf+a0JcRlFwZa352h6B1dIbGGxwSSWihABWI7+p0bnZjhoXaZNuxlj/tKjtqbDnpc4GTBcoG67SyEeMEDdin5PlAfI6qMf4TWGOjX5FxVvJvGVRijVnYY4drO+C5c86xIauvZut5vGmNrogcxSPsY9ANhYch3+oMqb7aMdQuxDK2LYwEMbP7p8+BCT1ce2l+liw4ncfLxn1kGoohRAuC1xUFND6DIFRJ6I2QoKrSt16x+uCWtjwRb2eayqih5NSAKsi1E5GAMUqXdtwAAHuIrDddVxNe5f1Yy19HDDHt/qFsK2Zmt8ETxVuQ7Yv7PKadCZTYvIJxKaKNO5PDU+vBPe9jEDH6OGYNKi9aK8QqIwSrkFD68qM11f8QDAqU6Tg==');
         end else begin
             Content.Add('PrintMethod', 'OSFileHandler');
         end;
