@@ -129,7 +129,9 @@
         }
         key(Key2; "Posting Per Entry No.", "Posting Per", "Posting Type")
         {
-
+        }
+        key(Key3; "Posting Per Entry No.", "Posting Per", "Posting Type", "With Error")
+        {
         }
     }
 
