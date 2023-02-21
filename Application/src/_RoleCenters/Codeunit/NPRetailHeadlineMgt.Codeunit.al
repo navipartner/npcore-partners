@@ -44,7 +44,7 @@
 
     procedure GetHeadlineText(Qualifier: Text; Payload: Text; var ResultText: Text[250]): Boolean
     var
-        PayloadWithoutEmphasize: Text[158];
+        PayloadWithoutEmphasize: Text;
         PayloadTagsLength: Integer;
         QualifierTagsLength: Integer;
         NpRegEx: Codeunit "NPR RegEx";
