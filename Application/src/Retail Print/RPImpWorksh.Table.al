@@ -85,7 +85,7 @@
 
     trigger OnInsert()
     begin
-        SetDefaultAction();
+        InitValues();
     end;
 
     var
@@ -113,6 +113,21 @@
             Action := Action::Skip;
             Warning := true;
         end;
+    end;
+
+    local procedure InitValues()
+    var
+        RPTemplateHeader: Record "NPR RP Template Header";
+    begin
+        Action := Action::Skip;
+
+        if not RPTemplateHeader.Get(Template) then begin
+            "New Template" := true;
+            exit;
+        end;
+
+        if not IsSafeVersionIncrease() then
+            Warning := true;
     end;
 
     procedure SetStyle(): Text
