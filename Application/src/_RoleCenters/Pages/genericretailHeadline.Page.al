@@ -63,7 +63,7 @@
 
     var
         HeadlineManagement: Codeunit "NPR NP Retail Headline Mgt.";
-        GreetingText: Text[250];
+        GreetingText: Text;
         NPRetailTxt: Label 'Want to learn more about NP Retail?';
 
         LicenseInformation: Codeunit "NPR License Information";
