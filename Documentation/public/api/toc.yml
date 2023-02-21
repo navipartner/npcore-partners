@@ -1,4 +1,6 @@
 - name: Getting Started
   href: gettingstarted/toc.yml
-- name: Methods
+- name: REST API Methods
   href: methods/toc.yml
+- name: SOAP API Webservices
+  href: files/ticket_services_wsdl.xml
