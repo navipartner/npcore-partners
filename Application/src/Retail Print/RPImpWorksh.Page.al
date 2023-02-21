@@ -21,20 +21,19 @@
         {
             repeater(Group)
             {
-                field(Template; Rec.Template)
-                {
-
-                    Editable = false;
-                    StyleExpr = Style;
-                    Width = 80;
-                    ToolTip = 'Specifies the value of the Template field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("New Template"; Rec."New Template")
                 {
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the New Template field';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Template; Rec.Template)
+                {
+                    Editable = false;
+                    StyleExpr = Style;
+                    Width = 80;
+                    ToolTip = 'Specifies the value of the Template field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Action"; Rec.Action)
@@ -96,6 +95,37 @@
 
     actions
     {
+        area(Processing)
+        {
+            action(ToggleDefaultAction)
+            {
+                Caption = 'Set new templates to Create/Replace';
+                ToolTip = 'Executes the Set new templates to Create/Replace';
+                ApplicationArea = NPRRetail;
+                Image = RefreshLines;
+
+                trigger OnAction()
+                begin
+                    if Rec.FindSet(true) then
+                        repeat
+                            Rec.SetDefaultAction();
+                            Rec.Modify()
+                        until Rec.Next() = 0;
+                end;
+            }
+            action(ToggleSkipAction)
+            {
+                Caption = 'Set all templates to Skip';
+                ToolTip = 'Executes the Set all templates to Skip';
+                ApplicationArea = NPRRetail;
+                Image = RefreshLines;
+
+                trigger OnAction()
+                begin
+                    Rec.ModifyAll(Action, Rec.Action::Skip)
+                end;
+            }
+        }
     }
 
     trigger OnAfterGetRecord()
