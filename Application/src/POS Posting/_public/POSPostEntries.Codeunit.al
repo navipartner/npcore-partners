@@ -1598,7 +1598,7 @@
         POSPostingLog: Record "NPR POS Posting Log";
         PostingErrorCount: Integer;
     begin
-        POSPostingLog.SetCurrentKey("Posting Per Entry No.", "Posting Per", "Posting Type");
+        POSPostingLog.SetCurrentKey("Posting Per Entry No.", "Posting Per", "Posting Type", "With Error");
         POSPostingLog.SetRange("Posting Per Entry No.", PostingPerEntryNo);
         POSPostingLog.SetRange("Posting Per", PostingPerType);
         POSPostingLog.SetRange("Posting Type", PostingType);
