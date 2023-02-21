@@ -3,7 +3,7 @@
 Variety groups are combinations of varieties assembled according to a certain logic, which can be assigned to the items. The following options are available in the **Variety Group** administrative section: 
 
 
- Field Name      | Description |
+| Field Name      | Description |
 | ----------- | ----------- |
 | **Code**       | Specifies the unique code for a variety group.    |
 | **Description**   | Specifies a short description for a variety group which informs users about its characteristics.      |

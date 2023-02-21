@@ -2,5 +2,11 @@
   href: intro.md
 - name: How-To
   items: 
-  - name: Configure SMS Setup
-  href: howto/smshowto.md
+  - name: Configure SMS setup
+    href: howto/smshowto.md
+- name: Reference
+  items:
+  - name: SMS setup (reference guide)
+    href: reference/sms_module_reference.md
+  - name: SMS template (reference guide)
+    href: reference/sms_template_reference.md
