@@ -25,6 +25,9 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                 ToolTip = 'Executes the Show Imported File action and displays imported files.';
                 Image = View;
                 ApplicationArea = NPRRetail;
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Field XML Stylesheet is not used anymore.';
+                Visible = false;
 
                 trigger OnAction()
                 var

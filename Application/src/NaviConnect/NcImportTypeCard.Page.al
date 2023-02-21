@@ -192,6 +192,9 @@
             group("XML Stylesheet")
             {
                 Caption = 'XML Stylesheet';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Field XML Stylesheet is not used anymore.';
+                Visible = false;
                 field(XMLStylesheetData; XMLStylesheetData)
                 {
 

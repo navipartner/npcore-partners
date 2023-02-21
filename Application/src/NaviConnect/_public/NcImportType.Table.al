@@ -152,6 +152,8 @@
         {
             Caption = 'XML Stylesheet';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'This field is not going to be used anymore. Action Show Formatted Source on page NPR Nc Import List will be deleted.';
         }
         field(520; "Max. Retry Count"; Integer)
         {
