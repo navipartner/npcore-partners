@@ -20,7 +20,6 @@
         _ItemWkshVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value";
         _ItemWkshLine: Record "NPR Item Worksheet Line";
-        RegisteredWorksheetVariantLine: Record "NPR Reg. Item Wsht Var. Line";
         RegisteredWorksheetVarietyValue: Record "NPR Reg. Item Wsht Var. Value";
         RegisteredWorksheetLine: Record "NPR Regist. Item Worksh Line";
         NoSeriesMgt: Codeunit NoSeriesManagement;
@@ -152,7 +151,7 @@
     begin
         GetItem(_ItemWkshLine."Item No.");
         Item.Validate(Item."Vendor Item No.", _ItemWkshLine."Vendor Item No.");
-        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Vendor No.")) then
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Vendor No.")) then
             Item.Validate(Item."Vendor No.", _ItemWkshLine."Vendor No.");
         Item.Validate(Item.Description, _ItemWkshLine.Description);
         if _ItemWkshLine."Direct Unit Cost" <> 0 then
@@ -167,19 +166,19 @@
         if (_ItemWkshLine."Sales Price Currency Code" = '') then
             if _ItemWkshLine."Sales Price Start Date" <= WorkDate() then
                 Item.Validate(Item."Unit Price", _ItemWkshLine."Sales Price");
-        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Base Unit of Measure")) then
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Base Unit of Measure")) then
             Item.Validate(Item."Base Unit of Measure", _ItemWkshLine."Base Unit of Measure");
-        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Inventory Posting Group")) then
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Inventory Posting Group")) then
             Item.Validate(Item."Inventory Posting Group", _ItemWkshLine."Inventory Posting Group");
-        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Gen. Prod. Posting Group")) then
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Gen. Prod. Posting Group")) then
             Item.Validate(Item."Gen. Prod. Posting Group", _ItemWkshLine."Gen. Prod. Posting Group");
-        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Tax Group Code")) then
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Tax Group Code")) then
             Item.Validate(Item."Tax Group Code", _ItemWkshLine."Tax Group Code");
-        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("VAT Prod. Posting Group")) then
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("VAT Prod. Posting Group")) then
             Item.Validate(Item."VAT Prod. Posting Group", _ItemWkshLine."VAT Prod. Posting Group");
-        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Global Dimension 1 Code")) then
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Global Dimension 1 Code")) then
             Item.Validate(Item."Global Dimension 1 Code", _ItemWkshLine."Global Dimension 1 Code");
-        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Global Dimension 2 Code")) then
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Global Dimension 2 Code")) then
             Item.Validate(Item."Global Dimension 2 Code", _ItemWkshLine."Global Dimension 2 Code");
         _ItemWkshLine."Variety 1 Table (New)" := FindNewVarietyNames(_ItemWkshLine, 1, _ItemWkshLine."Variety 1", _ItemWkshLine."Variety 1 Table (Base)", _ItemWkshLine."Variety 1 Table (New)", _ItemWkshLine."Create Copy of Variety 1 Table");
         _ItemWkshLine."Variety 2 Table (New)" := FindNewVarietyNames(_ItemWkshLine, 2, _ItemWkshLine."Variety 2", _ItemWkshLine."Variety 2 Table (Base)", _ItemWkshLine."Variety 2 Table (New)", _ItemWkshLine."Create Copy of Variety 2 Table");
@@ -195,17 +194,17 @@
         Item."NPR Variety 4 Table" := _ItemWkshLine."Variety 4 Table (New)";
         Item."NPR Cross Variety No." := _ItemWkshLine."Cross Variety No.";
         Item."NPR Variety Group" := _ItemWkshLine."Variety Group";
-        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Sales Unit of Measure")) then
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Sales Unit of Measure")) then
             Item.Validate(Item."Sales Unit of Measure", _ItemWkshLine."Sales Unit of Measure");
-        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Sales Unit of Measure")) then
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Sales Unit of Measure")) then
             Item.Validate(Item."Purch. Unit of Measure", _ItemWkshLine."Sales Unit of Measure");
-        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Manufacturer Code")) then
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Manufacturer Code")) then
             Item.Validate(Item."Manufacturer Code", _ItemWkshLine."Manufacturer Code");
-        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Item Category Code")) then
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Item Category Code")) then
             Item.Validate(Item."Item Category Code", _ItemWkshLine."Item Category Code");
         Item.Validate(Item."Net Weight", _ItemWkshLine."Net Weight");
         Item.Validate(Item."Gross Weight", _ItemWkshLine."Gross Weight");
-        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine.FieldNo("Tariff No.")) then
+        if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Tariff No.")) then
             Item.Validate(Item."Tariff No.", _ItemWkshLine."Tariff No.");
         ValidateFields(Item, _ItemWkshLine, true, false);
         Item.Modify(true);
@@ -218,7 +217,7 @@
         UpdateAndCopyVarieties(_ItemWkshLine, 2, _ItemWkshLine."Variety 2", _ItemWkshLine."Variety 2 Table (Base)", _ItemWkshLine."Variety 2 Table (New)", _ItemWkshLine."Create Copy of Variety 2 Table", true);
         UpdateAndCopyVarieties(_ItemWkshLine, 3, _ItemWkshLine."Variety 3", _ItemWkshLine."Variety 3 Table (Base)", _ItemWkshLine."Variety 3 Table (New)", _ItemWkshLine."Create Copy of Variety 3 Table", true);
         UpdateAndCopyVarieties(_ItemWkshLine, 4, _ItemWkshLine."Variety 4", _ItemWkshLine."Variety 4 Table (Base)", _ItemWkshLine."Variety 4 Table (New)", _ItemWkshLine."Create Copy of Variety 4 Table", true);
-        UpdateItemAttributes();
+        UpdateItemAttributes(_ItemWkshLine);
     end;
 
     local procedure UpdateItem()
@@ -248,10 +247,10 @@
         UpdateAndCopyVarieties(_ItemWkshLine, 2, _ItemWkshLine."Variety 2", _ItemWkshLine."Variety 2 Table (Base)", _ItemWkshLine."Variety 2 Table (New)", _ItemWkshLine."Create Copy of Variety 2 Table", false);
         UpdateAndCopyVarieties(_ItemWkshLine, 3, _ItemWkshLine."Variety 3", _ItemWkshLine."Variety 3 Table (Base)", _ItemWkshLine."Variety 3 Table (New)", _ItemWkshLine."Create Copy of Variety 3 Table", false);
         UpdateAndCopyVarieties(_ItemWkshLine, 4, _ItemWkshLine."Variety 4", _ItemWkshLine."Variety 4 Table (Base)", _ItemWkshLine."Variety 4 Table (New)", _ItemWkshLine."Create Copy of Variety 4 Table", false);
-        UpdateItemAttributes();
+        UpdateItemAttributes(_ItemWkshLine);
     end;
 
-    local procedure UpdateAndCopyVarieties(var ItemworkshLine: Record "NPR Item Worksheet Line"; VarietyNo: Integer; Variety: Code[10]; VarietyTableFrom: Code[40]; VarietyTableTo: Code[40]; CreateCopy: Boolean; CopyValues: Boolean)
+    internal procedure UpdateAndCopyVarieties(var ItemworkshLine: Record "NPR Item Worksheet Line"; VarietyNo: Integer; Variety: Code[10]; VarietyTableFrom: Code[40]; VarietyTableTo: Code[40]; CreateCopy: Boolean; CopyValues: Boolean)
     var
         ItemWorksheetVariantLineToCreate: Record "NPR Item Worksh. Variant Line";
         VarietyGroup: Record "NPR Variety Group";
@@ -318,16 +317,16 @@
         //Copy Worksheet Values
         if CopyValues then begin
             ItemWorksheetVarietyValue.Reset();
-            ItemWorksheetVarietyValue.SetRange("Worksheet Template Name", _ItemWkshLine."Worksheet Template Name");
-            ItemWorksheetVarietyValue.SetRange("Worksheet Name", _ItemWkshLine."Worksheet Name");
-            ItemWorksheetVarietyValue.SetRange("Worksheet Line No.", _ItemWkshLine."Line No.");
+            ItemWorksheetVarietyValue.SetRange("Worksheet Template Name", ItemworkshLine."Worksheet Template Name");
+            ItemWorksheetVarietyValue.SetRange("Worksheet Name", ItemworkshLine."Worksheet Name");
+            ItemWorksheetVarietyValue.SetRange("Worksheet Line No.", ItemworkshLine."Line No.");
             ItemWorksheetVarietyValue.SetRange(Type, Variety);
             if ItemWorksheetVarietyValue.FindSet() then
                 repeat
                     IsUpdated := false;
-                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Template Name", _ItemWkshLine."Worksheet Template Name");
-                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Name", _ItemWkshLine."Worksheet Name");
-                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Line No.", _ItemWkshLine."Line No.");
+                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Template Name", ItemworkshLine."Worksheet Template Name");
+                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Name", ItemworkshLine."Worksheet Name");
+                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Line No.", ItemworkshLine."Line No.");
                     ItemWorksheetVariantLineToCreate.SetRange(Action, ItemWorksheetVariantLineToCreate.Action::CreateNew);
                     if ItemWorksheetVariantLineToCreate.FindSet() then
                         repeat
@@ -491,7 +490,7 @@
             Item.Get(ItemNo);
     end;
 
-    local procedure UpdateItemAttributes()
+    internal procedure UpdateItemAttributes(ItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
         AttributeID: Record "NPR Attribute ID";
         AttributeKey: Record "NPR Attribute Key";
@@ -501,9 +500,9 @@
     begin
         AttributeKey.SetCurrentKey("Table ID", "MDR Code PK");
         AttributeKey.SetFilter("Table ID", '=%1', DATABASE::"NPR Item Worksheet Line");
-        AttributeKey.SetFilter("MDR Code PK", '=%1', _ItemWkshLine."Worksheet Template Name");
-        AttributeKey.SetFilter("MDR Code 2 PK", '=%1', _ItemWkshLine."Worksheet Name");
-        AttributeKey.SetFilter("MDR Line PK", '=%1', _ItemWkshLine."Line No.");
+        AttributeKey.SetFilter("MDR Code PK", '=%1', ItemWorksheetLine."Worksheet Template Name");
+        AttributeKey.SetFilter("MDR Code 2 PK", '=%1', ItemWorksheetLine."Worksheet Name");
+        AttributeKey.SetFilter("MDR Line PK", '=%1', ItemWorksheetLine."Line No.");
         AttributeKey.SetFilter("MDR Line 2 PK", '=%1', 0);
 
         // Fill array
@@ -530,18 +529,25 @@
             _ItemWkshVariantLine.SetRange("Worksheet Line No.", _ItemWkshLine."Line No.");
             if _ItemWkshVariantLine.FindSet() then
                 repeat
-                    CopyToRegisteredWorksheetVariantLine();
+                    CopyToRegisteredWorksheetVariantLine(_ItemWkshLine."Line No.", _ItemWkshVariantLine);
                 until _ItemWkshVariantLine.Next() = 0;
 
-            ItemWorksheetVarietyValue.Reset();
-            ItemWorksheetVarietyValue.SetRange("Worksheet Template Name", _ItemWkshLine."Worksheet Template Name");
-            ItemWorksheetVarietyValue.SetRange("Worksheet Name", _ItemWkshLine."Worksheet Name");
-            ItemWorksheetVarietyValue.SetRange("Worksheet Line No.", _ItemWkshLine."Line No.");
-            if ItemWorksheetVarietyValue.FindSet() then
-                repeat
-                    CopyToRegisteredWorksheetVarietyValueLine();
-                until ItemWorksheetVarietyValue.Next() = 0;
+            CreateRegisteredWorksheetVarietyValues(_ItemWkshLine);
         end;
+    end;
+
+    internal procedure CreateRegisteredWorksheetVarietyValues(ItemWkshLine: Record "NPR Item Worksheet Line")
+    var
+        ItemWkshVarietyValue: Record "NPR Item Worksh. Variety Value";
+    begin
+        ItemWkshVarietyValue.Reset();
+        ItemWkshVarietyValue.SetRange("Worksheet Template Name", ItemWkshLine."Worksheet Template Name");
+        ItemWkshVarietyValue.SetRange("Worksheet Name", ItemWkshLine."Worksheet Name");
+        ItemWkshVarietyValue.SetRange("Worksheet Line No.", ItemWkshLine."Line No.");
+        if ItemWkshVarietyValue.FindSet() then
+            repeat
+                CopyToRegisteredWorksheetVarietyValueLine(ItemWkshVarietyValue);
+            until ItemWkshVarietyValue.Next() = 0;
     end;
 
     local procedure CopyToRegisteredWorksheetLine()
@@ -721,44 +727,46 @@
         RegisteredWorksheetLine.Insert();
     end;
 
-    local procedure CopyToRegisteredWorksheetVariantLine()
+    internal procedure CopyToRegisteredWorksheetVariantLine(LineNo: Integer; ItemWkshVariantLine: Record "NPR Item Worksh. Variant Line")
+    var 
+        RegisteredWorksheetVariantLine: Record "NPR Reg. Item Wsht Var. Line";
     begin
         RegisteredWorksheetVariantLine."Registered Worksheet No." := LastRegisteredWorksheetNo();
-        RegisteredWorksheetVariantLine."Registered Worksheet Line No." := _ItemWkshLine."Line No.";
-        RegisteredWorksheetVariantLine."Line No." := _ItemWkshVariantLine."Line No.";
-        RegisteredWorksheetVariantLine.Level := _ItemWkshVariantLine.Level;
-        RegisteredWorksheetVariantLine.Action := _ItemWkshVariantLine.Action;
-        RegisteredWorksheetVariantLine."Item No." := _ItemWkshVariantLine."Item No.";
-        RegisteredWorksheetVariantLine."Existing Item No." := _ItemWkshVariantLine."Existing Item No.";
-        RegisteredWorksheetVariantLine."Existing Variant Code" := _ItemWkshVariantLine."Existing Variant Code";
-        RegisteredWorksheetVariantLine."Variant Code" := _ItemWkshVariantLine."Variant Code";
-        RegisteredWorksheetVariantLine."Internal Bar Code" := _ItemWkshVariantLine."Internal Bar Code";
-        RegisteredWorksheetVariantLine."Sales Price" := _ItemWkshVariantLine."Sales Price";
-        RegisteredWorksheetVariantLine."Direct Unit Cost" := _ItemWkshVariantLine."Direct Unit Cost";
-        RegisteredWorksheetVariantLine."Vendors Bar Code" := _ItemWkshVariantLine."Vendors Bar Code";
-        RegisteredWorksheetVariantLine."Heading Text" := _ItemWkshVariantLine."Heading Text";
-        RegisteredWorksheetVariantLine."Variety 1 Value" := _ItemWkshVariantLine."Variety 1 Value";
-        RegisteredWorksheetVariantLine."Variety 2 Value" := _ItemWkshVariantLine."Variety 2 Value";
-        RegisteredWorksheetVariantLine."Variety 3 Value" := _ItemWkshVariantLine."Variety 3 Value";
-        RegisteredWorksheetVariantLine."Variety 4 Value" := _ItemWkshVariantLine."Variety 4 Value";
-        RegisteredWorksheetVariantLine.Description := _ItemWkshVariantLine.Description;
-        RegisteredWorksheetVariantLine.Blocked := _ItemWkshVariantLine.Blocked;
+        RegisteredWorksheetVariantLine."Registered Worksheet Line No." := LineNo;
+        RegisteredWorksheetVariantLine."Line No." := ItemWkshVariantLine."Line No.";
+        RegisteredWorksheetVariantLine.Level := ItemWkshVariantLine.Level;
+        RegisteredWorksheetVariantLine.Action := ItemWkshVariantLine.Action;
+        RegisteredWorksheetVariantLine."Item No." := ItemWkshVariantLine."Item No.";
+        RegisteredWorksheetVariantLine."Existing Item No." := ItemWkshVariantLine."Existing Item No.";
+        RegisteredWorksheetVariantLine."Existing Variant Code" := ItemWkshVariantLine."Existing Variant Code";
+        RegisteredWorksheetVariantLine."Variant Code" := ItemWkshVariantLine."Variant Code";
+        RegisteredWorksheetVariantLine."Internal Bar Code" := ItemWkshVariantLine."Internal Bar Code";
+        RegisteredWorksheetVariantLine."Sales Price" := ItemWkshVariantLine."Sales Price";
+        RegisteredWorksheetVariantLine."Direct Unit Cost" := ItemWkshVariantLine."Direct Unit Cost";
+        RegisteredWorksheetVariantLine."Vendors Bar Code" := ItemWkshVariantLine."Vendors Bar Code";
+        RegisteredWorksheetVariantLine."Heading Text" := ItemWkshVariantLine."Heading Text";
+        RegisteredWorksheetVariantLine."Variety 1 Value" := ItemWkshVariantLine."Variety 1 Value";
+        RegisteredWorksheetVariantLine."Variety 2 Value" := ItemWkshVariantLine."Variety 2 Value";
+        RegisteredWorksheetVariantLine."Variety 3 Value" := ItemWkshVariantLine."Variety 3 Value";
+        RegisteredWorksheetVariantLine."Variety 4 Value" := ItemWkshVariantLine."Variety 4 Value";
+        RegisteredWorksheetVariantLine.Description := ItemWkshVariantLine.Description;
+        RegisteredWorksheetVariantLine.Blocked := ItemWkshVariantLine.Blocked;
         RegisteredWorksheetVariantLine.Insert();
     end;
 
-    local procedure CopyToRegisteredWorksheetVarietyValueLine()
+    internal procedure CopyToRegisteredWorksheetVarietyValueLine(ItemWkshVarietyValue: Record "NPR Item Worksh. Variety Value")
     begin
         RegisteredWorksheetVarietyValue."Registered Worksheet No." := LastRegisteredWorksheetNo();
-        RegisteredWorksheetVarietyValue."Registered Worksheet Line No." := ItemWorksheetVarietyValue."Worksheet Line No.";
-        RegisteredWorksheetVarietyValue.Type := ItemWorksheetVarietyValue.Type;
-        RegisteredWorksheetVarietyValue.Table := ItemWorksheetVarietyValue.Table;
-        RegisteredWorksheetVarietyValue.Value := ItemWorksheetVarietyValue.Value;
-        RegisteredWorksheetVarietyValue."Sort Order" := ItemWorksheetVarietyValue."Sort Order";
-        RegisteredWorksheetVarietyValue.Description := ItemWorksheetVarietyValue.Description;
+        RegisteredWorksheetVarietyValue."Registered Worksheet Line No." := ItemWkshVarietyValue."Worksheet Line No.";
+        RegisteredWorksheetVarietyValue.Type := ItemWkshVarietyValue.Type;
+        RegisteredWorksheetVarietyValue.Table := ItemWkshVarietyValue.Table;
+        RegisteredWorksheetVarietyValue.Value := ItemWkshVarietyValue.Value;
+        RegisteredWorksheetVarietyValue."Sort Order" := ItemWkshVarietyValue."Sort Order";
+        RegisteredWorksheetVarietyValue.Description := ItemWkshVarietyValue.Description;
         RegisteredWorksheetVarietyValue.Insert();
     end;
 
-    local procedure LastRegisteredWorksheetNo(): Integer
+    internal procedure LastRegisteredWorksheetNo(): Integer
     var
         RegisteredItemWorksheet: Record "NPR Registered Item Works.";
     begin
@@ -1253,7 +1261,7 @@
         ValidateFields(ExistingItem, VarItemWkshLine, false, true);
     end;
 
-    local procedure ValidateFields(var VarItem: Record Item; var VarItemWkshLine: Record "NPR Item Worksheet Line"; DoValidateFields: Boolean; DoInsertChangeRecords: Boolean)
+    internal procedure ValidateFields(var VarItem: Record Item; var VarItemWkshLine: Record "NPR Item Worksheet Line"; DoValidateFields: Boolean; DoInsertChangeRecords: Boolean)
     var
         SourceFieldRec: Record "Field";
         TargetFieldRec: Record "Field";
@@ -1380,7 +1388,7 @@
         VarItem.Get(VarItem."No.");
     end;
 
-    local procedure MapStandardItemWorksheetLineField(var VarItem: Record Item; SourceFieldNo: Integer): Boolean
+    internal procedure MapStandardItemWorksheetLineField(var VarItem: Record Item; ItemWorksheetLine: Record "NPR Item Worksheet Line"; SourceFieldNo: Integer): Boolean
     var
         ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
         ItemRecRef: RecordRef;
@@ -1388,14 +1396,14 @@
         ItemFldRef: FieldRef;
         ItemWorksheetFldRef: FieldRef;
     begin
-        ItemWorksheetFieldSetup.SetFilter("Worksheet Template Name", '%1|%2', _ItemWkshLine."Worksheet Template Name", '');
-        ItemWorksheetFieldSetup.SetFilter("Worksheet Name", '%1|%2', _ItemWkshLine."Worksheet Name", '');
+        ItemWorksheetFieldSetup.SetFilter("Worksheet Template Name", '%1|%2', ItemWorksheetLine."Worksheet Template Name", '');
+        ItemWorksheetFieldSetup.SetFilter("Worksheet Name", '%1|%2', ItemWorksheetLine."Worksheet Name", '');
         ItemWorksheetFieldSetup.SetRange("Table No.", DATABASE::"NPR Item Worksheet Line");
         ItemWorksheetFieldSetup.SetRange("Field Number", SourceFieldNo);
         if not ItemWorksheetFieldSetup.FindLast() then
             exit(false);
         ItemRecRef.Get(VarItem.RecordId);
-        ItemWorksheetRecRef.Get(_ItemWkshLine.RecordId);
+        ItemWorksheetRecRef.Get(ItemWorksheetLine.RecordId);
         ItemWorksheetFldRef := ItemWorksheetRecRef.Field(SourceFieldNo);
         ItemFldRef := ItemRecRef.Field(ItemWorksheetFieldSetup."Target Field Number Create");
         if MapField(ItemWorksheetFieldSetup, ItemWorksheetFldRef, ItemFldRef) then begin

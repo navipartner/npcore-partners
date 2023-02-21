@@ -86,11 +86,16 @@
         PricesInCurrency: Boolean;
         RecRef: RecordRef;
         BreakLoop: Boolean;
-        SalesPriceMaintenanceGroups: Record "NPR Sales Price Maint. Groups2";
         TmpItem: Record Item;
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Handled: Boolean;
+        SalesPriceMaintMgt: Codeunit "NPR Sales Price Maint. Mgt.";
+        HandledUpdateSalesPrices: Boolean;
     begin
+        SalesPriceMaintMgt.OnBeforeUpdateSalesPricesForStaff(Item, HandledUpdateSalesPrices);
+        if HandledUpdateSalesPrices then
+            exit;
+
         RecRef.GetTable(Item);
         if RecRef.IsTemporary then
             exit;
@@ -106,19 +111,10 @@
             repeat
                 SalesPriceMaintenanceSetup.CalcFields("Exclude Item Groups");
                 BreakLoop := SalesPriceMaintenanceSetup."Exclude All Item Groups";
-                if not BreakLoop then begin
+                if not BreakLoop then
                     if Item."Item Category Code" <> '' then
-                        if SalesPriceMaintenanceSetup."Exclude Item Groups" > 0 then begin
-                            Clear(SalesPriceMaintenanceGroups);
-                            SalesPriceMaintenanceGroups.SetRange(Id, SalesPriceMaintenanceSetup.Id);
-                            if SalesPriceMaintenanceGroups.FindSet() then begin
-                                repeat
-                                    if not BreakLoop then
-                                        BreakLoop := ExcludeItemGroup(Item."Item Category Code", SalesPriceMaintenanceGroups."Item Category Code");
-                                until SalesPriceMaintenanceGroups.Next() = 0;
-                            end;
-                        end;
-                end;
+                        if SalesPriceMaintenanceSetup."Exclude Item Groups" > 0 then
+                            BreakLoop := SalesPriceMaintMgt.CheckExcludeItemGroup(SalesPriceMaintenanceSetup.Id, Item."Item Category Code");
 
                 if not BreakLoop then begin
                     VATPct := 0;
@@ -221,7 +217,7 @@
         end;
     end;
 
-    local procedure ExcludeItemGroup(Current_ItemGroup: Code[20]; ItemCategory_To_Exclude: Code[20]): Boolean
+    internal procedure ExcludeItemGroup(Current_ItemGroup: Code[20]; ItemCategory_To_Exclude: Code[20]): Boolean
     var
         ItemCategory: Record "Item Category";
     begin
