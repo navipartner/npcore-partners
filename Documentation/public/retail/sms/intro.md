@@ -1,19 +1,24 @@
 # SMS Module
 
-You can use the SMS Module for sending SMS messages from Business Central.
+SMS module provides an option to send information via SMS from the NP Retail solution, such as customer-related information (contact and documents from the **Customer Card**) and transactions from the POS entry.
 
-The *Initial setup* should be done on the [SMS Setup](./howto/smshowto.md) page.
+You can set up the SMS module for the following master cards, documents, and modules:
 
-The *History* is saved in **SMS Log** page with one of the following statuses:
+- **Customer Card**
+- **Retail Voucher Card**
+- **POS Entry List**
+- Click & Collect module
+- Customer Repair module
+- E-ticketing module
+- Wallet module
+- Documents like sales orders, posted invoices, and store orders.
 
-- Pending
-- Sent
-- Error
-- Discard
-- Timeout Discard
+    ![sms_module_example](images/sms_module_example.png)
 
-The scheduled SMS will be sent every minute by using **Job Queue** which will be selected on the **SMS Setup** page.
+The initial setup needs to be performed on the [SMS Setup](./howto/smshowto.md) page.
 
 ### Related links
 
 - [Configure the SMS Setup](./howto/smshowto.md)
+- [SMS setup (reference guide)](./reference/sms_module_reference.md)
+- [SMS template (reference guide)](./reference/sms_template_reference.md)
