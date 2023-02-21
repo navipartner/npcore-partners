@@ -637,10 +637,10 @@
                         }
                         action("NPR Item Group Top")
                         {
-                            Caption = 'Item Category Top';
+                            Caption = 'Item Category Top per Department';
                             Image = Report;
                             RunObject = report "NPR Item Category Top";
-                            ToolTip = 'Generate Top 20 Sales/Profit per Store & Item Category.';
+                            ToolTip = 'Generate Top Sales/Profit per Department & Item Category.';
                             ApplicationArea = NPRRetail;
                         }
                         action("NPR Item Categ. List. M/Y new")

@@ -4,7 +4,7 @@ report 6014420 "NPR Item Category Top"
     Extensible = false;
 #ENDIF
     RDLCLayout = './src/_Reports/layouts/Item Category Top.rdlc';
-    Caption = 'Item Category Top';
+    Caption = 'Item Category Top per Department';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
@@ -13,157 +13,232 @@ report 6014420 "NPR Item Category Top"
     {
         dataitem(ItemCategoryFilter; "Item Category")
         {
-            RequestFilterFields = "Code", "NPR Main Category Code", "NPR Date Filter", "NPR Salesperson/Purch. Filter", "NPR Global Dimension 1 Filter", "NPR Vendor Filter";
+            RequestFilterFields = "NPR Date Filter", "NPR Global Dimension 1 Filter";
             UseTemporary = true;
         }
-        dataitem("Dimension Value"; "Dimension Value")
+        dataitem(DimensionValue; "Dimension Value")
         {
             DataItemTableView = sorting(Code, "Global Dimension No.") where("Global Dimension No." = const(1));
-            column(Picture_CompanyInformation; CompanyInformation.Picture)
+
+            column(Code_DimensionValue; Code) { }
+            column(Name_DimensionValue; Name) { }
+            column(Quantity_DimensionValue; TotalQuantity) { }
+            column(SalesLCY_DimensionValue; TotalSalesLCY) { }
+            column(ProfitLCY_DimensionValue; TotalProfitLCY) { }
+            column(ProfitPerc_DimensionValue; TotalProfitPercentage) { }
+
+            column(Name_CompanyInformation; CompanyInformation.Name) { }
+
+            column(FiltersText; FiltersText) { }
+
+            dataitem(ItemCategoryBuffer; "NPR Item Category Buffer")
             {
+                DataItemLink = "Global Dimension 1 Code" = field(Code);
+                DataItemTableView = sorting("Entry No.");
+
+                column("Code"; "Code") { }
+                column(CodeWithIndentation; "Code with Indentation") { }
+                column(Description; Description) { }
+                column(ParentCategory; "Parent Category") { }
+                column(Indentation; Indentation) { }
+                column(Quantity; "Calc Field 1") { }
+                column(SalesLCY; "Calc Field 2") { }
+                column(ProfitLCY; "Calc Field 3") { }
+                column(ProfitPerc; "Calc Field 4") { }
+                column(Presentation_Order; "Presentation Order") { }
+                column(Global_Dimension_1_Code; "Global Dimension 1 Code") { }
+                column(OrderNo; "Order No.") { }
             }
-            dataitem("Item Category"; "Item Category")
-            {
-                DataItemTableView = sorting(Code);
 
-                trigger OnAfterGetRecord()
-                begin
-                    IleSalesQty := 0;
-                    IleSalesLCY := 0;
-                    IleCostAmtActual := 0;
-                    CalculateValues("Item Category"."Code", "Dimension Value".Code, IleSalesQty, IleSalesLCY, IleCostAmtActual);
-
-                    db := IleSalesLCY - IleCostAmtActual;
-
-                    if IleSalesLCY <> 0 then
-                        dg := (db / IleSalesLCY) * 100
-                    else
-                        dg := 0;
-                    TempNPRBufferSort.Init();
-                    TempNPRBufferSort.Template := "Code";
-                    TempNPRBufferSort."Line No." := 0;
-                    case SortType of
-                        SortType::ant:
-                            begin
-                                TempNPRBufferSort."Decimal 1" := IleSalesQty;
-                            end;
-                        SortType::sal:
-                            begin
-                                TempNPRBufferSort."Decimal 1" := IleSalesLCY;
-                            end;
-                        SortType::db:
-                            begin
-                                TempNPRBufferSort."Decimal 1" := db;
-                            end;
-                        SortType::dg:
-                            begin
-                                TempNPRBufferSort."Decimal 1" := dg;
-                            end;
-                    end;
-                    TempNPRBufferSort."Decimal 2" := IleSalesQty;
-                    TempNPRBufferSort."Decimal 3" := IleSalesLCY;
-                    TempNPRBufferSort."Decimal 4" := IleCostAmtActual;
-                    TempNPRBufferSort.Insert();
-                end;
-
-                trigger OnPreDataItem()
-                var
-                    CostOutside: Decimal;
-                begin
-                    TempNPRBufferSort.DeleteAll();
-                    TempNPRBufferSort.SetCurrentKey("Decimal 1", "Short Code 1");
-
-                    if SortOrder = SortOrder::st then
-                        TempNPRBufferSort.Ascending(false);
-
-                    QtyOutside := 0;
-                    SalesOutside := 0;
-                    CalculateValues('', "Dimension Value".Code, QtyOutside, SalesOutside, CostOutside);
-                end;
-            }
-            dataitem("Integer"; "Integer")
-            {
-                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
-                column(Number_Integer; "Integer".Number)
-                {
-                }
-                column(Code_DimensionValue; "Dimension Value".Code)
-                {
-                }
-                column(Name_DimensionValue; "Dimension Value".Name)
-                {
-                }
-                column(No_ItemCategory; "Item Category"."Code")
-                {
-                }
-                column(Description_ItemCategory; "Item Category".Description)
-                {
-                }
-                column(SalesQty_ItemCategory; IleSalesQty)
-                {
-                }
-                column(SaleLCY_ItemCategory; IleSalesLCY)
-                {
-                }
-                column(db; db)
-                {
-                }
-                column(dg; dg)
-                {
-                }
-                column(QtyOutside; QtyOutside)
-                {
-                }
-                column(SalesOutside; SalesOutside)
-                {
-                }
-                column(COMPANYNAME; CompanyName)
-                {
-                }
-                column("Sorting"; SortOrder)
-                {
-                }
-                column(SortType; SortType)
-                {
-                }
-                column(decsort; TempNPRBufferSort."Decimal 1")
-                {
-                }
-
-                trigger OnAfterGetRecord()
-                begin
-                    if Number = 1 then begin
-                        if not TempNPRBufferSort.Find('-') then
-                            CurrReport.Break();
-                    end else
-                        if TempNPRBufferSort.Next() = 0 then
-                            CurrReport.Break();
-
-                    if Number > ShowQty then
-                        CurrReport.Break();
-
-                    "Item Category".Get(TempNPRBufferSort.Template);
-                    IleSalesQty := TempNPRBufferSort."Decimal 2";
-                    IleSalesLCY := TempNPRBufferSort."Decimal 3";
-                    IleCostAmtActual := TempNPRBufferSort."Decimal 4";
-
-                    db := IleSalesLCY - IleCostAmtActual;
-                    if IleSalesLCY <> 0 then
-                        dg := (db / IleSalesLCY) * 100
-                    else
-                        dg := 0;
-                end;
-
-            }
             trigger OnPreDataItem()
             begin
-                ItemCategoryFilter.CopyFilter("NPR Global Dimension 1 Filter", "Dimension Value".Code);
+                ItemCategoryFilter.CopyFilter("NPR Global Dimension 1 Filter", DimensionValue.Code);
             end;
 
             trigger OnAfterGetRecord()
+            var
+                TempItemCategoryBuffer: Record "NPR Item Category Buffer" temporary;
+                TempItemCategoryBuffer2: Record "NPR Item Category Buffer" temporary;
+                DepartmentItemCategory: Query "NPR Department/Item Category";
+                CalcFieldsDict: Dictionary of [Integer, Decimal];
+                ProfitLCY: Decimal;
+                ProfitPercentage: Decimal;
+                Index: Integer;
+                Ascending: Boolean;
             begin
-                Clear(QtyOutside);
-                Clear(SalesOutside);
+
+                TotalQuantity := 0;
+                TotalSalesLCY := 0;
+                TotalProfitLCY := 0;
+                TotalProfitPercentage := 0;
+
+                TempDimensionValue.Reset();
+                TempDimensionValue.SetFilter(Code, DimensionValue.Code);
+                if not TempDimensionValue.FindFirst() then
+                    CurrReport.Skip();
+
+                DepartmentItemCategory.SetRange(Global_Dimension_1_Code, DimensionValue.Code);
+                DepartmentItemCategory.SetFilter(Filter_Posting_Date, ItemCategoryFilter.GetFilter("NPR Date Filter"));
+
+                DepartmentItemCategory.Open();
+                while DepartmentItemCategory.Read() do begin
+                    ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
+
+                    ProfitLCY := DepartmentItemCategory.Sales_Amount_Actual + DepartmentItemCategory.Cost_Amount_Actual; // Cost Amount Actial field from Item Ledger Entry is saved with minus sign
+                    ProfitPercentage := ProfitLCY / DepartmentItemCategory.Sales_Amount_Actual;
+
+                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 1"), DepartmentItemCategory.Quantity * (-1));
+                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 2"), DepartmentItemCategory.Sales_Amount_Actual);
+                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), ProfitLCY);
+                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 4"), ProfitPercentage);
+
+                    ItemCategoryMgt.InsertItemCategoryToBuffer(DepartmentItemCategory.Item_Category_Code, ItemCategoryBuffer, '', DepartmentItemCategory.Global_Dimension_1_Code, '', CalcFieldsDict);
+                end;
+                DepartmentItemCategory.Close();
+
+
+                DepartmentItemCategory.SetRange(Global_Dimension_1_Code, DimensionValue.Code);
+                DepartmentItemCategory.SetFilter(Filter_Posting_Date, ItemCategoryFilter.GetFilter("NPR Date Filter"));
+
+                DepartmentItemCategory.SetRange(Item_Category_Code, '');
+                DepartmentItemCategory.Open();
+                while DepartmentItemCategory.Read() do begin
+                    ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
+                    ProfitLCY := 0;
+                    ProfitPercentage := 0;
+
+                    ProfitLCY := DepartmentItemCategory.Sales_Amount_Actual + DepartmentItemCategory.Cost_Amount_Actual; // Cost Amount Actial field from Item Ledger Entry is saved with minus sign
+                    ProfitPercentage := ProfitLCY / DepartmentItemCategory.Sales_Amount_Actual;
+
+                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 1"), DepartmentItemCategory.Quantity * (-1));
+                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 2"), DepartmentItemCategory.Sales_Amount_Actual);
+                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), ProfitLCY);
+                    CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 4"), ProfitPercentage);
+
+                    ItemCategoryMgt.InsertUncatagorizedToItemCategoryBuffer('-', NotInItemCategoryLbl, ItemCategoryBuffer, DepartmentItemCategory.Global_Dimension_1_Code, CalcFieldsDict);
+
+                end;
+                DepartmentItemCategory.Close();
+
+                ItemCategoryBuffer.Reset();
+                ItemCategoryBuffer.SetRange("Global Dimension 1 Code", DimensionValue.Code);
+                ItemCategoryMgt.AddItemCategoryParentsToBuffer(ItemCategoryBuffer);
+
+                #region Delete unwanted Levels and Format Identation
+
+                ItemCategoryBuffer.Reset();
+                ItemCategoryBuffer.SetFilter(Indentation, '>%1', NumberOfLevels - 1);
+                ItemCategoryBuffer.DeleteAll();
+
+                ItemCategoryMgt.FormatIndentationInItemCategories(ItemCategoryBuffer, 4);
+
+                #endregion
+
+                ItemCategoryBuffer.Reset();
+                ItemCategoryBuffer.SetRange("Global Dimension 1 Code", DimensionValue.Code);
+                ItemCategoryBuffer.SetRange(Indentation, 0);
+
+                if ItemCategoryBuffer.Count() > NumberOfCategories then begin
+                    Index := 0;
+                    TempItemCategoryBuffer.DeleteAll();
+                    TempItemCategoryBuffer2.DeleteAll();
+                    ItemCategoryBuffer.Reset();
+                    ItemCategoryBuffer.SetRange("Global Dimension 1 Code", DimensionValue.Code);
+
+                    if ItemCategoryBuffer.FindSet() then
+                        repeat
+                            TempItemCategoryBuffer.Init();
+                            TempItemCategoryBuffer := ItemCategoryBuffer;
+                            TempItemCategoryBuffer.Insert();
+                        until ItemCategoryBuffer.Next() = 0;
+
+                    ItemCategoryBuffer.Reset();
+                    ItemCategoryBuffer.SetRange("Global Dimension 1 Code", DimensionValue.Code);
+                    ItemCategoryBuffer.SetRange(Indentation, 0);
+
+                    if ItemCategoryBuffer.FindSet() then
+                        repeat
+                            TempItemCategoryBuffer2.Init();
+                            TempItemCategoryBuffer2 := ItemCategoryBuffer;
+                            TempItemCategoryBuffer2.Insert();
+                        until ItemCategoryBuffer.Next() = 0;
+
+                    case SortBy of
+                        SortBy::Quantity:
+                            begin
+                                TempItemCategoryBuffer2.SetCurrentKey("Calc Field 1");
+                                TempItemCategoryBuffer2.SetAscending("Calc Field 1", false);
+                            end;
+                        SortBy::"Sales (LCY)":
+                            begin
+                                TempItemCategoryBuffer2.SetCurrentKey("Calc Field 2");
+                                TempItemCategoryBuffer2.SetAscending("Calc Field 2", false);
+                            end;
+                        SortBy::"Profit (LCY)":
+                            begin
+                                TempItemCategoryBuffer2.SetCurrentKey("Calc Field 3");
+                                TempItemCategoryBuffer2.SetAscending("Calc Field 3", false);
+                            end;
+                        SortBy::"Profit %":
+                            begin
+                                TempItemCategoryBuffer2.SetCurrentKey("Calc Field 4");
+                                TempItemCategoryBuffer2.SetAscending("Calc Field 4", false);
+                            end;
+                    end;
+
+                    if TempItemCategoryBuffer2.FindSet() then
+                        repeat
+                            if Index > NumberOfCategories - 1 then
+                                ItemCategoryMgt.DeleteItemCategoryBuffer(TempItemCategoryBuffer2.Code, '', DimensionValue.Code, '', ItemCategoryBuffer, TempItemCategoryBuffer);
+                            Index += 1;
+                        until TempItemCategoryBuffer2.Next() = 0;
+                end;
+
+
+                CalculateProfitPercentage(ItemCategoryBuffer);
+                #region Sorting and updating Dimension Value Totals
+
+                if (SortOrder = SortOrder::Ascending) and (NumberOfCategories > 1) then
+                    Ascending := true
+                else
+                    Ascending := false;
+
+                case SortBy of
+                    SortBy::Quantity:
+                        SortByFieldNo := ItemCategoryBuffer.FieldNo("Calc Field 1");
+                    SortBy::"Sales (LCY)":
+                        SortByFieldNo := ItemCategoryBuffer.FieldNo("Calc Field 2");
+                    SortBy::"Profit (LCY)":
+                        SortByFieldNo := ItemCategoryBuffer.FieldNo("Calc Field 3");
+                    SortBy::"Profit %":
+                        SortByFieldNo := ItemCategoryBuffer.FieldNo("Calc Field 4");
+                end;
+
+
+                ItemCategoryBuffer.Reset();
+                ItemCategoryBuffer.SetRange("Global Dimension 1 Code", DimensionValue.Code);
+                ItemCategoryMgt.SortItemCategoryBuffer(ItemCategoryBuffer, SortByFieldNo, Ascending);
+
+                ItemCategoryBuffer.Reset();
+                ItemCategoryBuffer.SetRange("Global Dimension 1 Code", DimensionValue.Code);
+                ItemCategoryBuffer.SetRange(Indentation, 0);
+
+                ItemCategoryBuffer.CalcSums("Calc Field 1", "Calc Field 2", "Calc Field 3");
+                TotalQuantity := ItemCategoryBuffer."Calc Field 1";
+                TotalSalesLCY := ItemCategoryBuffer."Calc Field 2";
+                TotalProfitLCY := ItemCategoryBuffer."Calc Field 3";
+                TotalProfitPercentage := ItemCategoryBuffer."Calc Field 3" / ItemCategoryBuffer."Calc Field 2";
+
+                #endregion
+
+                #region Set Order No. On Item Category Buffer
+                ItemCategoryBuffer.Reset();
+                ItemCategoryBuffer.SetRange("Global Dimension 1 Code", DimensionValue.Code);
+                ItemCategoryMgt.SetOrderNoInItemCategoryBuffer(ItemCategoryBuffer);
+
+                #endregion
+
+                ItemCategoryBuffer.Reset();
             end;
         }
     }
@@ -173,109 +248,118 @@ report 6014420 "NPR Item Category Top"
         SaveValues = true;
         layout
         {
-            area(Content)
+            area(content)
             {
                 group(Options)
                 {
-                    Caption = 'Options';
-                    field("Sort Type"; SortType)
+                    field("Number Of Categories"; NumberOfCategories)
                     {
-                        Caption = 'Show Type';
-                        OptionCaption = 'Quantity,Sale(LCY),Contribution Margin,Contribution Ratio';
-
-                        ToolTip = 'Specifies the value of the Show Type field';
                         ApplicationArea = NPRRetail;
+                        Caption = 'Display Top';
+                        MinValue = 1;
+                        ToolTip = 'Specifies the value of the Display Top field.';
                     }
-                    field("Show Qty"; ShowQty)
+                    field("Number Of Levels"; NumberOfLevels)
                     {
-                        Caption = 'Show Quantity';
-
-                        ToolTip = 'Specifies the value of the Show Quantity field';
                         ApplicationArea = NPRRetail;
+                        Caption = 'Number of levels to display';
+                        MinValue = 1;
+                        ToolTip = 'Specifies the value of the Number of levels to display field.';
                     }
-                    field("Sorting"; SortOrder)
+                    field("Sort By"; SortBy)
                     {
+                        ApplicationArea = NPRRetail;
                         Caption = 'Sort By';
-                        OptionCaption = 'Largest,Smallest';
-
-                        ToolTip = 'Specifies the value of the Sort By field';
+                        ToolTip = 'Specifies the value of the Sort By field.';
+                        OptionCaption = 'Sales (LCY),Profit (LCY),Profit %,Quantity';
+                    }
+                    field("Sort Order"; SortOrder)
+                    {
                         ApplicationArea = NPRRetail;
+                        Caption = 'Sort Order';
+                        ToolTip = 'Specifies the order of sorting for item categories on print.';
+                        OptionCaption = 'Ascending,Descending';
                     }
                 }
             }
         }
     }
 
+
     labels
     {
-        Report_Caption = 'Item Category Top';
-        Sequence_Caption = 'Sequence';
-        ItemCategory_Caption = 'Item Category';
-        Description_Caption = 'Description';
-        Quantity_Caption = 'Quantity';
-        Sale_LCY_Caption = 'Sale (LCY)';
-        Profit_LCY_Caption = 'Profit (LCY)';
-        Profit_Pct_Caption = 'Profit %';
-        NotInItemCategory_Caption = 'Not in Item Category';
+        ReportCaption = 'Item Category Top per Department';
+        SequenceCaption = 'Sequence';
+        ItemCategoryCaption = 'Item Category';
+        DescriptionCaption = 'Description';
+        QuantityCaption = 'Quantity';
+        SaleLCYCaption = 'Sales (LCY)';
+        ProfitLCYCaption = 'Profit (LCY)';
+        ProfitPctCaption = 'Profit %';
+        TotalCaption = 'Total';
+        PageNumberCaption = 'Page';
     }
 
     trigger OnInitReport()
     begin
-        CompanyInformation.Get();
-        CompanyInformation.CalcFields(Picture);
-        SortType := SortType::ant;
-        ShowQty := 20;
-        SortOrder := SortOrder::st;
+        NumberOfLevels := 5;
+        NumberOfCategories := 20;
     end;
 
-
-    local procedure CalculateValues(ItemCategoryCode: Code[20]; GlobalDimension1Code: Code[20]; var Quantity: Decimal; var SalesAmount: Decimal; var CostAmount: Decimal)
+    trigger OnPreReport()
     var
-        SalesStatisticsByPerson: Query "NPR Sales Statistics By Person";
-        ValueEntryWithVendor: Query "NPR Value Entry With Vendor";
+        DepartmentItemCategory: Query "NPR Department/Item Category";
     begin
-        Quantity := 0;
-        SalesAmount := 0;
-        CostAmount := 0;
-        SalesStatisticsByPerson.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
-        SalesStatisticsByPerson.SetRange(Filter_Item_Category_Code, ItemCategoryCode);
-        SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_1_Code, GlobalDimension1Code);
-        SalesStatisticsByPerson.SetFilter(Filter_Vendor_No_, ItemCategoryFilter.GetFilter("NPR Vendor Filter"));
-        SalesStatisticsByPerson.SetFilter(Filter_Posting_Date, ItemCategoryFilter.GetFilter("NPR Date Filter"));
-        SalesStatisticsByPerson.SetFilter(Filter_Global_Dimension_2_Code, ItemCategoryFilter.GetFilter("NPR Global Dimension 2 Filter"));
-        SalesStatisticsByPerson.SetFilter(Filter_SalesPers_Purch_Code, ItemCategoryFilter.GetFilter("NPR Salesperson/Purch. Filter"));
-        SalesStatisticsByPerson.Open();
-        while SalesStatisticsByPerson.Read() do
-            Quantity += -SalesStatisticsByPerson.Quantity;
 
-        ValueEntryWithVendor.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
-        ValueEntryWithVendor.SetRange(Filter_Item_Category_Code, ItemCategoryCode);
-        ValueEntryWithVendor.SetRange(Filter_Dim_1_Code, GlobalDimension1Code);
-        ValueEntryWithVendor.SetFilter(Filter_Vendor_No, ItemCategoryFilter.GetFilter("NPR Vendor Filter"));
-        ValueEntryWithVendor.SetFilter(Filter_DateTime, ItemCategoryFilter.GetFilter("NPR Date Filter"));
-        ValueEntryWithVendor.SetFilter(Filter_Dim_2_Code, ItemCategoryFilter.GetFilter("NPR Global Dimension 2 Filter"));
-        ValueEntryWithVendor.SetFilter(Filter_Salespers_Purch_Code, ItemCategoryFilter.GetFilter("NPR Salesperson/Purch. Filter"));
-        ValueEntryWithVendor.Open();
-        while ValueEntryWithVendor.Read() do begin
-            SalesAmount += ValueEntryWithVendor.Sum_Sales_Amount_Actual;
-            CostAmount += -ValueEntryWithVendor.Sum_Cost_Amount_Actual;
+        CompanyInformation.Get();
+
+        TempDimensionValue.Reset();
+
+        DepartmentItemCategory.SetFilter(Global_Dimension_1_Code, ItemCategoryFilter.GetFilter("NPR Global Dimension 1 Filter"));
+        DepartmentItemCategory.SetFilter(Filter_Posting_Date, ItemCategoryFilter.GetFilter("NPR Date Filter"));
+
+        DepartmentItemCategory.Open();
+
+        while DepartmentItemCategory.Read() do begin
+            TempDimensionValue.Reset();
+            TempDimensionValue.SetFilter(Code, DepartmentItemCategory.Global_Dimension_1_Code);
+            if TempDimensionValue.IsEmpty() then begin
+                TempDimensionValue.Init();
+                TempDimensionValue.Code := DepartmentItemCategory.Global_Dimension_1_Code;
+                TempDimensionValue.Insert();
+            end;
         end;
 
+        FiltersText := ItemCategoryFilter.GetFilters();
+    end;
+
+    local procedure CalculateProfitPercentage(var ItemCategoryBuffer: Record "NPR Item Category Buffer")
+    begin
+        if not ItemCategoryBuffer.FindSet(true) then
+            exit;
+
+        // "Calc Field 2" -> SalesLCY
+        // "Calc Field 3" -> ProfitLCY
+        // "Calc Field 4" -> ProfitPerc
+        repeat
+            ItemCategoryBuffer."Calc Field 4" := ItemCategoryBuffer."Calc Field 3" / ItemCategoryBuffer."Calc Field 2";
+            ItemCategoryBuffer.Modify();
+        until ItemCategoryBuffer.Next() = 0;
     end;
 
     var
         CompanyInformation: Record "Company Information";
-        TempNPRBufferSort: Record "NPR TEMP Buffer" temporary;
-        db: Decimal;
-        dg: Decimal;
-        IleCostAmtActual: Decimal;
-        IleSalesLCY: Decimal;
-        IleSalesQty: Decimal;
-        QtyOutside: Decimal;
-        SalesOutside: Decimal;
-        // TotalProfit: Decimal;
-        ShowQty: Integer;
-        SortType: Option ant,sal,db,dg;
-        SortOrder: Option st,mi;
+        ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+        TempDimensionValue: Record "Dimension Value" temporary;
+        NumberOfCategories: Integer;
+        NumberOfLevels: Integer;
+        SortByFieldNo: Integer;
+        SortOrder: Option "Ascending","Descending";
+        SortBy: Option "Sales (LCY)","Profit (LCY)","Profit %","Quantity";
+        NotInItemCategoryLbl: Label 'Without category';
+        TotalQuantity: Decimal;
+        TotalSalesLCY: Decimal;
+        TotalProfitLCY: Decimal;
+        TotalProfitPercentage: Decimal;
+        FiltersText: Text;
 }
-

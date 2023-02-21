@@ -1142,6 +1142,8 @@
 
         TempItemCategoryBuffer.SetRange("Parent Category", CurrItemCategoryBuffer.Code);
         TempItemCategoryBuffer.SetRange("Salesperson Code", CurrItemCategoryBuffer."Salesperson Code");
+        TempItemCategoryBuffer.SetRange("Global Dimension 1 Code", CurrItemCategoryBuffer."Global Dimension 1 Code");
+        TempItemCategoryBuffer.SetRange("Global Dimension 2 Code", CurrItemCategoryBuffer."Global Dimension 2 Code");
 
         Amount := GetCalcFieldValue(CurrItemCategoryBuffer, FieldNo);
 
