@@ -258,6 +258,9 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Field XML Stylesheet is not used anymore.';
 
                 ToolTip = 'Executes the Show Formatted Source action';
                 ApplicationArea = NPRNaviConnect;
@@ -535,4 +538,3 @@
             Error(NoFileMatchErr, DocNo);
     end;
 }
-
