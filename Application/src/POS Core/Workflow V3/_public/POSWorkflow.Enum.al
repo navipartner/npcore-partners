@@ -613,6 +613,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SHOW_RET_AMT_DIALOG', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Ret.Amt.Dialog";
     }
+    value(125; "SEND_RECEIPT")
+    {
+        Caption = 'SEND_RECEIPT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Send Receipt";
+    }
     value(124; TAX_FREE)
     {
         Caption = 'TAX_FREE', Locked = true, MaxLength = 20;
