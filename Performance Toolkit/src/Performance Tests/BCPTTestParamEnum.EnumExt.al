@@ -36,4 +36,8 @@ enumextension 88000 "NPR BCPT Test Param. Enum" extends "BCPT Test Param. Enum"
     {
         Implementation = "BCPT Test Param. Provider" = "NPR BCPT POS DS Total Disc Amt";
     }
+    value(88009; "NPR BCPT POS Balancing EOD")
+    {
+        Implementation = "BCPT Test Param. Provider" = "NPR BCPT POS Balancing EOD";
+    }
 }

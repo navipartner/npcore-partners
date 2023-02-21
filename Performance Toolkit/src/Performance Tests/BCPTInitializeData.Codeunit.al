@@ -81,7 +81,7 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
         CreatePOSUnit(POSUnit, POSStore.Code, NewRecordId);
     end;
 
-    procedure CreatePOSStore(var POSStore: Record "NPR POS Store"; NewRecordId: Integer)
+    local procedure CreatePOSStore(var POSStore: Record "NPR POS Store"; NewRecordId: Integer)
     begin
         if POSStore.Get(NewRecordId) then
             exit;
@@ -94,7 +94,7 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
         CreatePOSPostingSetupSet(POSStore.Code);
     end;
 
-    procedure CreatePOSPostingSetupSet(POSStoreCode: Code[10])
+    local procedure CreatePOSPostingSetupSet(POSStoreCode: Code[10])
     var
         POSPostingSetup, POSPostingSetup2 : Record "NPR POS Posting Setup";
     begin
@@ -102,7 +102,7 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
         POSPostingSetup."POS Store Code" := POSStoreCode;
 
         POSPostingSetup2.SetRange("POS Store Code", '01');
-        POSPostingSetup2.SetRange("POS Payment Method Code", 'K');
+        POSPostingSetup2.SetFilter("POS Payment Method Code", 'K|EURO|USD|GBP');
         POSPostingSetup2.SetFilter("POS Payment Bin Code", 'BANK|SAFE');
         if POSPostingSetup2.FindSet() then
             repeat
@@ -117,7 +117,7 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
             until POSPostingSetup2.Next() = 0;
     end;
 
-    procedure CreatePOSUnit(var POSUnit: Record "NPR POS Unit"; POSStoreCode: Code[10]; NewRecordId: Integer)
+    local procedure CreatePOSUnit(var POSUnit: Record "NPR POS Unit"; POSStoreCode: Code[10]; NewRecordId: Integer)
     var
         POSPaymentBin: record "NPR POS Payment Bin";
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
@@ -129,6 +129,7 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
         POSUnit.Validate("No.", Format(NewRecordId));
         POSUnit."POS Store Code" := POSStoreCode;
         POSUnit."POS Audit Profile" := 'DEFAULT';
+        POSUnit."POS End of Day Profile" := 'DEFAULT';
         POSUnit.Insert(true);
 
         CreatePOSPaymentBin(POSPaymentBin, NewRecordId);
@@ -138,7 +139,7 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
         POSManagePOSUnit.OpenPosUnit(POSUnit);
     end;
 
-    procedure CreatePOSPaymentBin(var POSPaymentBin: Record "NPR POS Payment Bin"; NewRecordId: Integer)
+    local procedure CreatePOSPaymentBin(var POSPaymentBin: Record "NPR POS Payment Bin"; NewRecordId: Integer)
     begin
         POSPaymentBin.Init();
         POSPaymentBin.Validate("No.", Format(NewRecordId));
