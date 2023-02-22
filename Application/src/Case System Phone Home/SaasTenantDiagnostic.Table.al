@@ -1,23 +1,16 @@
-table 6014696 "NPR Tenant Diagnostic"
+table 6059814 "NPR Saas Tenant Diagnostic"
 {
-    Caption = 'Tenant Diagnostic';
+    Caption = 'Saas Tenant Diagnostic';
     DataClassification = CustomerContent;
     Access = Internal;
     Extensible = false;
 
     fields
     {
-        field(1; "Tenant ID"; Text[50])
-        {
-            Caption = 'Tenant ID';
-            DataClassification = CustomerContent;
-        }
         field(2; "Azure AD Tenant ID"; Text[50])
         {
             Caption = 'Azure AD Tenant ID';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
-            ObsoleteReason = 'We have new set of objects and functions for SaaS environment, so this field is going to be obsoleted.';
         }
         field(10; "POS Stores"; Integer)
         {
@@ -59,20 +52,15 @@ table 6014696 "NPR Tenant Diagnostic"
             Caption = 'POS Units Last Sent';
             DataClassification = CustomerContent;
         }
-        field(50; "Last Tenant ID Sent to CS"; Text[50])
+        field(55; "Last DT AzTenant ID Sent to CS"; DateTime)
         {
-            Caption = 'Last Tenant ID Sent to Case System';
-            DataClassification = CustomerContent;
-        }
-        field(55; "Last DT Tenant ID Sent to CS"; DateTime)
-        {
-            Caption = 'Last DateTime Tenant ID Sent to Case System';
+            Caption = 'Last DateTime Azure AD Tenant ID Sent to Case System';
             DataClassification = CustomerContent;
         }
     }
     keys
     {
-        key(PK; "Tenant ID")
+        key(PK; "Azure AD Tenant ID")
         {
             Clustered = true;
         }
