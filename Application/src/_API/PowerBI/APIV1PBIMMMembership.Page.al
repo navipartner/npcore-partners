@@ -36,6 +36,10 @@ page 6059933 "NPR APIV1 PBIMMMembership"
                 {
                     Caption = 'Membership Code', Locked = true;
                 }
+                field(externalMembershipNo; Rec."External Membership No.")
+                {
+                    Caption = 'External Membership No.', Locked = true;
+                }
             }
         }
     }
