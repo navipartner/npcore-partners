@@ -1,7 +1,7 @@
 ﻿report 6014406 "NPR Sales Person Top 20"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Salesperson Top 20.rdlc';
@@ -124,6 +124,9 @@
                 IncludeCaption = true;
             }
             column(Salesperson_Purchaser_Sales_LCY_; SalesLCY)
+            {
+            }
+            column(Salesperson_Purchaser_Discount_AmountCaption; Discount_Amount_CaptionLbl)
             {
             }
             column(Salesperson_Purchaser_Discount_Amount; DiscountAmount)
@@ -281,6 +284,7 @@
         Report_Caption_Lbl: Label 'Salesperson Top 20';
         TurnoverCaptionLbl: Label 'Turnover (LCY)';
         TextSort1: Label 'Turnover,Discount,Contribution Margin,Contribution Ratio';
+        Discount_Amount_CaptionLbl: Label 'Discount Amount';
         SortOrder: Option Largest,Smallest;
         ShowType: Option Turnover,Discount,"Contribution Margin","Contribution Ratio";
         J: Text[30];

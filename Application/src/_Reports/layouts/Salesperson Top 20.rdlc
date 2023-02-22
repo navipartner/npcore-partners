@@ -7,7 +7,6 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>5bce67ad-83b8-4c9e-afcb-936bbd9bb1ec</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -214,7 +213,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!Salesperson_Purchaser_Discount_AmountCaption.Value</Value>
+                                  <Value>=First(Fields!Salesperson_Purchaser_Discount_AmountCaption.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -240,6 +239,7 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -1226,7 +1226,6 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
-                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -1958,6 +1957,9 @@ End Function
         </Field>
         <Field Name="Salesperson_Purchaser_Sales_LCY_Format">
           <DataField>Salesperson_Purchaser_Sales_LCY_Format</DataField>
+        </Field>
+        <Field Name="Salesperson_Purchaser_Discount_AmountCaption">
+          <DataField>Salesperson_Purchaser_Discount_AmountCaption</DataField>
         </Field>
         <Field Name="Salesperson_Purchaser_Discount_Amount">
           <DataField>Salesperson_Purchaser_Discount_Amount</DataField>
