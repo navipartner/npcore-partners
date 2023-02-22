@@ -116,6 +116,10 @@ page 6059926 "NPR APIV1 PBIItem"
                 {
                     Caption = 'Magento Name', Locked = true;
                 }
+                field(nprTicketType; Rec."NPR Ticket Type")
+                {
+                    Caption = 'Ticket Type';
+                }
             }
         }
     }
