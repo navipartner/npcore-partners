@@ -88,6 +88,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG PaymentV2"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR TM Calendar Upgrade"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Login"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeReceiptText'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -274,7 +275,6 @@
                 end;
             Codeunit::"NPR Fix POS Entry SystemId":
                 exit('NPRFixPOSEntrySystemId_20220126');
-
             Codeunit::"NPR Upgrade Shipping Provider":
                 case UpgradeStep of
                     'NPRShippingProvider':
@@ -283,7 +283,6 @@
                         Exit('NPRPackageDimensions');
                     'NPRPackageServices':
                         Exit('NPRPackageServices');
-
                 end;
             Codeunit::"NPR UPG E-Mail Setup":
                 Exit('NPRUPGUPGEMailSetup-20220312');
@@ -310,7 +309,12 @@
             Codeunit::"NPR Rep. Timestamp Upgrade":
                 Exit('NPR_RepCounterToSQLTimestampUPG_20221025');
             Codeunit::"NPR UPG Login":
-                exit('NPRUPGLogin-20221213');               
+                exit('NPRUPGLogin-20221213');
+            CodeUnit::"NPR UPG Print Template":
+                case UpgradeStep of
+                    'UpgradeReceiptText':
+                        exit('UpgradeReceiptText');
+                end;
         end;
     end;
 }
