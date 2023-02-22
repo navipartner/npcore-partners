@@ -1,7 +1,5 @@
-table 6014693 "NPR Client Diagnostic"
+table 6059816 "NPR Client Diagnostic v2"
 {
-    ObsoleteState = Removed;
-    ObsoleteReason = 'With new callback we have started to track POS logins separately so we need an option to have two lines from the same user. Anc because PK cannot be changed, new table (6059816 "NPR Client Diagnostic v2") was created.';
     Caption = 'Client Diagnostic';
     DataClassification = CustomerContent;
     DataPerCompany = false;
@@ -29,6 +27,11 @@ table 6014693 "NPR Client Diagnostic"
             CalcFormula = Lookup(User."Full Name" WHERE("User Security ID" = FIELD("User Security ID")));
             Editable = false;
             FieldClass = FlowField;
+        }
+        field(5; "User Login Type"; Enum "NPR User Login Type")
+        {
+            Caption = 'User Login Type';
+            DataClassification = CustomerContent;
         }
         field(10; "Expiry Date"; DateTime)
         {
@@ -80,10 +83,15 @@ table 6014693 "NPR Client Diagnostic"
             Caption = 'Client Diagnostic Last Sent';
             DataClassification = CustomerContent;
         }
+        field(70; "Delegated User"; Boolean)
+        {
+            Caption = 'Delegated User';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
-        key(PK; "User Security ID")
+        key(PK; "User Security ID", "User Login Type")
         {
             Clustered = true;
         }
