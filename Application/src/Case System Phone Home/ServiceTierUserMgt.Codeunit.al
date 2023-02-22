@@ -3,7 +3,7 @@
     Access = Internal;
 
     var
-        ClientDiagnostic: Record "NPR Client Diagnostic";
+        ClientDiagnostic: Record "NPR Client Diagnostic v2";
         Initialized: Boolean;
 
 #if BC17 or BC18 or BC19
@@ -13,6 +13,25 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', false, false)]
     local procedure OnAfterLogin();
 #endif
+    var
+        TempClientDiagnostic: Record "NPR Client Diagnostic v2" temporary;
+    begin
+        TempClientDiagnostic."User Security ID" := UserSecurityId();
+        TempClientDiagnostic."User Login Type" := TempClientDiagnostic."User Login Type"::BC;
+        InitCaseSystemCallback(TempClientDiagnostic);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR POS (Dragonglass)", 'OnOpenPageEvent', '', false, false)]
+    local procedure HandlePosSessionOnBeforeInitialize()
+    var
+        TempClientDiagnostic: Record "NPR Client Diagnostic v2" temporary;
+    begin
+        TempClientDiagnostic."User Security ID" := UserSecurityId();
+        TempClientDiagnostic."User Login Type" := TempClientDiagnostic."User Login Type"::POS;
+        InitCaseSystemCallback(TempClientDiagnostic);
+    end;
+
+    local procedure InitCaseSystemCallback(TempClientDiagnostic: Record "NPR Client Diagnostic v2" temporary)
     var
         EnvironmentInformation: Codeunit "Environment Information";
         SessionId: Integer;
@@ -26,13 +45,13 @@
         if EnvironmentInformation.IsSandbox() then
             exit;
 
-        if StartSession(SessionId, Codeunit::"NPR Invoke CaseSystem Login") then;
+        if StartSession(SessionId, Codeunit::"NPR Invoke CaseSystem Login", CompanyName, TempClientDiagnostic) then;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::User, 'OnAfterDeleteEvent', '', true, false)]
     local procedure UserOnAfterDelete(var Rec: Record User; RunTrigger: Boolean)
     var
-        ClientDiag: Record "NPR Client Diagnostic";
+        ClientDiag: Record "NPR Client Diagnostic v2";
     begin
         ClientDiag.SetRange("User Security ID", Rec."User Security ID");
         if not ClientDiag.IsEmpty() then
@@ -113,33 +132,48 @@
             TenantDiagnostic.DeleteAll();
     end;
 
-    procedure ValidateBCOnlineTenant()
+    procedure ValidateTenant()
     var
         TenantDiagnostic: Record "NPR Tenant Diagnostic";
         EnvironmentInformation: Codeunit "Environment Information";
         ResponseMessage: Text;
     begin
-        if not EnvironmentInformation.IsSaaS() then
+        if EnvironmentInformation.IsSaaS() then
             exit;
 
         InitTenantDiagnostic(TenantDiagnostic);
         if TenantDiagnostic."Last Tenant ID Sent to CS" = TenantId() then
             exit;
 
-        if TryInitAndSendRequestV2('ValidateBCOnlineTenantWithAzureAD', TenantId(), TenantDiagnostic."Azure AD Tenant ID", TenantDiagnostic."Last Tenant ID Sent to CS", ResponseMessage) then begin
+        if TryInitAndSendRequest('ValidateTenant', '', '', TenantId(), ResponseMessage) then begin
             TenantDiagnostic."Last Tenant ID Sent to CS" := CopyStr(TenantId(), 1, MaxStrLen(TenantDiagnostic."Last Tenant ID Sent to CS"));
             TenantDiagnostic."Last DT Tenant ID Sent to CS" := CurrentDateTime;
             TenantDiagnostic.Modify();
         end;
     end;
 
-    procedure TestUserOnLogin()
+    procedure ValidateSaasTenant(AzureAdTenantId: Text)
+    var
+        SaasTenantDiagnostic: Record "NPR Saas Tenant Diagnostic";
+        ResponseMessage: Text;
+    begin
+        InitSaasTenantDiagnostic(AzureAdTenantId, SaasTenantDiagnostic);
+        if SaasTenantDiagnostic."Last DT AzTenant ID Sent to CS" <> 0DT then
+            exit;
+
+        if TryInitAndSendRequestFromSaasEnvironment('ValidateSaasTenant', SaasTenantDiagnostic."Azure AD Tenant ID", ResponseMessage) then begin
+            SaasTenantDiagnostic."Last DT AzTenant ID Sent to CS" := CurrentDateTime;
+            SaasTenantDiagnostic.Modify();
+        end;
+    end;
+
+    procedure TestUserOnLogin(IsSaas: Boolean; AzureAdTenantId: Text; UserLoginType: Enum "NPR User Login Type")
     var
         CheckIsUsingRegularInvoicing, UsingRegularInvoicing, WebServiceCallSucceeded, Handled : Boolean;
     begin
         OnShouldCheckIsUsingRegularInvoicing(CheckIsUsingRegularInvoicing);
         if CheckIsUsingRegularInvoicing then begin
-            IsUsingRegularInvoicing(UsingRegularInvoicing, WebServiceCallSucceeded);
+            IsUsingRegularInvoicing(UsingRegularInvoicing, WebServiceCallSucceeded, IsSaas);
             if not WebServiceCallSucceeded then
                 exit;
 
@@ -148,16 +182,23 @@
                 exit;
         end;
 
-        TestUserExpired(false);
-        TestUserLocked(false);
+        UpdateExpirationMessage(IsSaas, AzureAdTenantId, UserLoginType);
+        UpdateExpirationDate(IsSaas, AzureAdTenantId, UserLoginType);
+        UpdateUserLockedMessage(IsSaas, AzureAdTenantId, UserLoginType);
     end;
 
-    local procedure IsUsingRegularInvoicing(var UsingRegularInvoicing: Boolean; var WebServiceCallSucceeded: Boolean)
+    local procedure IsUsingRegularInvoicing(var UsingRegularInvoicing: Boolean; var WebServiceCallSucceeded: Boolean; IsSaas: Boolean)
     var
         UseRegularInvoicing: Text;
+        AzureADTenant: Codeunit "Azure AD Tenant";
     begin
-        if not TryInitAndSendRequest('GetTenantUseRegularInvoicing', '', '', TenantId(), UseRegularInvoicing) then
-            exit;
+        if IsSaas then begin
+            if not TryInitAndSendRequestFromSaasEnvironment('GetSaasTenantUseRegularInvoicing', AzureADTenant.GetAadTenantId(), UseRegularInvoicing) then
+                exit;
+        end else begin
+            if not TryInitAndSendRequest('GetTenantUseRegularInvoicing', '', '', TenantId(), UseRegularInvoicing) then
+                exit;
+        end;
 
         WebServiceCallSucceeded := true;
 
@@ -166,26 +207,16 @@
                 WebServiceCallSucceeded := false;
     end;
 
-    local procedure TestUserExpired(PreventLogin: Boolean)
+
+
+    local procedure UpdateExpirationMessage(IsSaas: Boolean; AzureAdTenantId: Text; UserLoginType: Enum "NPR User Login Type")
     var
         ExpirationMessage: Text;
-    begin
-        UpdateExpirationMessage(ExpirationMessage);
-        if ExpirationMessage <> '' then
-            Message(ExpirationMessage);
-
-        UpdateExpirationDate();
-        if PreventLogin then
-            PreventLoginIfUserIsExpired();
-    end;
-
-    local procedure UpdateExpirationMessage(var ExpirationMessage: Text)
-    var
         ExpirationMessageLastChecked: DateTime;
         DurationFromLastCheck: Duration;
         DurationCondition: Integer;
     begin
-        InitClientDiagnostic();
+        InitClientDiagnostic(UserLoginType);
 
         ExpirationMessageLastChecked := ClientDiagnostic."Expirat. Message Last Checked";
         if ExpirationMessageLastChecked = 0DT then
@@ -200,8 +231,13 @@
         if (ClientDiagnostic."Expiration Message" = '') and (DurationFromLastCheck <= DurationCondition) then
             exit;
 
-        if not TryInitAndSendRequest('GetUserExpirationMessage', UserId(), GetDatabaseName(), TenantId(), ExpirationMessage) then
-            exit;
+        if IsSaas then begin
+            if not TryInitAndSendRequestFromSaasEnvironment('GetSaasUserExpirationMessage', UserId(), AzureAdTenantId, format(UserLoginType.AsInteger()), ExpirationMessage) then
+                exit;
+        end else begin
+            if not TryInitAndSendRequest('GetUserExpirationMessage', UserId(), GetDatabaseName(), TenantId(), ExpirationMessage) then
+                exit;
+        end;
 
         if LowerCase(ExpirationMessage) = 'false' then
             ExpirationMessage := '';
@@ -215,14 +251,14 @@
             exit;
     end;
 
-    local procedure UpdateExpirationDate()
+    local procedure UpdateExpirationDate(IsSaas: Boolean; AzureAdTenantId: Text; UserLoginType: Enum "NPR User Login Type")
     var
         ExpirationDateTime: DateTime;
         ExpiryDateLastChecked: DateTime;
         DurationFromLastCheck: Duration;
         DurationCondition: Integer;
     begin
-        InitClientDiagnostic();
+        InitClientDiagnostic(UserLoginType);
 
         ExpiryDateLastChecked := ClientDiagnostic."Expiry Date Last Checked";
         if ExpiryDateLastChecked = 0DT then
@@ -237,7 +273,7 @@
         if (ClientDiagnostic."Expiry Date" = 0DT) and (DurationFromLastCheck <= DurationCondition) then
             exit;
 
-        ExpirationDateTime := GetExpirationDateTime();
+        ExpirationDateTime := GetExpirationDateTime(IsSaas, AzureAdTenantId, UserLoginType);
         if ClientDiagnostic."Expiry Date" <> ExpirationDateTime then begin
             ClientDiagnostic."Expiry Date" := ExpirationDateTime;
             ClientDiagnostic."Expiry Date Last Updated" := CurrentDateTime();
@@ -247,7 +283,7 @@
             Commit();
     end;
 
-    local procedure GetExpirationDateTime(): DateTime
+    local procedure GetExpirationDateTime(IsSaas: Boolean; AzureAdTenantId: Text; UserLoginType: Enum "NPR User Login Type"): DateTime
     var
         ExpirationDate: Text;
         Day: Integer;
@@ -258,8 +294,14 @@
         Second: Text[2];
         ExpirationTime: Time;
     begin
-        if not TryInitAndSendRequest('GetUserExpirationDate', UserId(), GetDatabaseName(), TenantId(), ExpirationDate) then
-            exit(0DT);
+        if IsSaas then begin
+            if not TryInitAndSendRequestFromSaasEnvironment('GetSaasUserExpirationDate', UserId(), AzureAdTenantId, Format(UserLoginType.AsInteger()), ExpirationDate) then
+                exit(0DT);
+        end else begin
+            if not TryInitAndSendRequest('GetUserExpirationDate', UserId(), GetDatabaseName(), TenantId(), ExpirationDate) then
+                exit(0DT);
+        end;
+
         if (ExpirationDate = '') or (ExpirationDate = '0001-01-01T00:00:00') then
             exit(0DT);
 
@@ -275,54 +317,46 @@
         exit(CreateDateTime(DMY2Date(Day, Month, Year), ExpirationTime));
     end;
 
-    local procedure InitClientDiagnostic()
+    local procedure InitClientDiagnostic(UserLoginType: Enum "NPR User Login Type")
+    var
+#IF CLOUD
+        AzureADUserManagement: Codeunit "Azure AD User Management";
+        DelegatedUser: Boolean;
+#ENDIF
     begin
         if Initialized then
             exit;
 
-        if ClientDiagnostic.Get(UserSecurityId()) then begin
+        if ClientDiagnostic.Get(UserSecurityId(), UserLoginType) then begin
+#IF CLOUD
+            DelegatedUser := AzureADUserManagement.IsUserDelegated(UserSecurityId());
+            if ClientDiagnostic."Delegated User" <> DelegatedUser then begin
+                ClientDiagnostic."Delegated User" := DelegatedUser;
+                ClientDiagnostic.Modify();
+            end;
+#ENDIF
             Initialized := true;
             exit;
         end;
 
         ClientDiagnostic.Init();
         ClientDiagnostic."User Security ID" := UserSecurityId();
+        ClientDiagnostic."User Login Type" := UserLoginType;
+#IF CLOUD
+        ClientDiagnostic."Delegated User" := DelegatedUser;
+#ENDIF
         if ClientDiagnostic.Insert() then
             Initialized := true;
     end;
 
-    local procedure PreventLoginIfUserIsExpired()
-    var
-        UserExpired: Label 'Your account has expired on %1. Expiration Message was: "%2". In order to continue, contact NaviPartner support or uninstall NP Retail extension.', Comment = '%1 = Expiration Date, %2 = Expiration Message';
-    begin
-        if ClientDiagnostic."Expiry Date" = 0DT then
-            exit;
-
-        if CurrentDateTime >= ClientDiagnostic."Expiry Date" then
-            Error(UserExpired, ClientDiagnostic."Expiry Date", ClientDiagnostic."Expiration Message");
-    end;
-
-    local procedure TestUserLocked(ThrowAnError: Boolean)
+    local procedure UpdateUserLockedMessage(IsSaas: Boolean; AzureAdTenantId: Text; UserLoginType: Enum "NPR User Login Type")
     var
         LockedMessage: Text;
-    begin
-        UpdateUserLockedMessage(LockedMessage);
-        if LockedMessage = '' then
-            exit;
-
-        if ThrowAnError then
-            TryThrowAnError(LockedMessage)
-        else
-            Message(LockedMessage);
-    end;
-
-    local procedure UpdateUserLockedMessage(var LockedMessage: Text)
-    var
         LockedMessageLastChecked: DateTime;
         DurationFromLastCheck: Duration;
         DurationCondition: Integer;
     begin
-        InitClientDiagnostic();
+        InitClientDiagnostic(UserLoginType);
 
         LockedMessageLastChecked := ClientDiagnostic."Locked Message Last Checked";
         if LockedMessageLastChecked = 0DT then
@@ -337,8 +371,13 @@
         if (ClientDiagnostic."Locked Message" = '') and (DurationFromLastCheck <= DurationCondition) then
             exit;
 
-        if not TryInitAndSendRequest('GetUserLockedMessage', UserId(), GetDatabaseName(), TenantId(), LockedMessage) then
-            exit;
+        if IsSaas then begin
+            if not TryInitAndSendRequestFromSaasEnvironment('GetSaasUserLockedMessage', UserId(), AzureAdTenantId, Format(UserLoginType.AsInteger()), LockedMessage) then
+                exit;
+        end else begin
+            if not TryInitAndSendRequest('GetUserLockedMessage', UserId(), GetDatabaseName(), TenantId(), LockedMessage) then
+                exit;
+        end;
 
         if LowerCase(LockedMessage) = 'false' then
             LockedMessage := '';
@@ -350,15 +389,6 @@
         ClientDiagnostic."Locked Message Last Checked" := CurrentDateTime();
         if ClientDiagnostic.Modify() then
             Commit();
-    end;
-
-    [TryFunction]
-    local procedure TryThrowAnError(LockedMessage: Text)
-    var
-        POSSession: Codeunit "NPR POS Session";
-    begin
-        POSSession.SetErrorOnInitialize(true);
-        Error(LockedMessage);
     end;
 
     procedure SendPosUnitQty()
@@ -400,15 +430,60 @@
         end;
     end;
 
-    local procedure InitTenantDiagnostic(var TenantDiagnostic: Record "NPR Tenant Diagnostic")
+    procedure SendPosUnitQtyFromSaasEnvironment(AzureAdTenantId: Text)
     var
-        AzureADTenant: Codeunit "Azure AD Tenant";
+        SaasTenantDiagnostic: Record "NPR Saas Tenant Diagnostic";
+        PosStore: Record "NPR POS Store";
+        PosUnit: Record "NPR POS Unit";
+        ResponseMessage: Text;
+        ShouldSendRequest: Boolean;
+    begin
+        InitSaasTenantDiagnostic(AzureAdTenantId, SaasTenantDiagnostic);
+
+        //In order to reduce number of calls to externall services (case system), send the request on login only:
+        //  if it wasn't sent at least once in the past (because of initial sync after new App version is installed or new company is created) 
+        //  and when there is a difference between current POS Store qty and POS Store qty previously sent through API. (same condition for POS Unit)
+        if (SaasTenantDiagnostic."POS Units Last Sent" = 0DT) or (SaasTenantDiagnostic."POS Stores Last Sent" = 0DT) then begin
+            ShouldSendRequest := true;
+            SaasTenantDiagnostic."POS Stores" := PosStore.Count();
+            SaasTenantDiagnostic."POS Units" := PosUnit.Count();
+            SaasTenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
+            SaasTenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
+        end;
+
+        if (SaasTenantDiagnostic."POS Stores" <> SaasTenantDiagnostic."POS Stores Sent on Last Upd.") or (SaasTenantDiagnostic."POS Units" <> SaasTenantDiagnostic."POS Units Sent on Last Upd.") then
+            ShouldSendRequest := true;
+
+        if not ShouldSendRequest then
+            exit;
+
+        if not TryInitAndSendRequestFromSaasEnvironment('UpdateSaasPosStoresAndUnits', AzureAdTenantId, CompanyName(), Format(SaasTenantDiagnostic."POS Stores"), Format(SaasTenantDiagnostic."POS Units"), ResponseMessage) then
+            exit;
+
+        if LowerCase(ResponseMessage) = 'true' then begin
+            SaasTenantDiagnostic."POS Stores Sent on Last Upd." := SaasTenantDiagnostic."POS Stores";
+            SaasTenantDiagnostic."POS Units Sent on Last Upd." := SaasTenantDiagnostic."POS Units";
+            SaasTenantDiagnostic."POS Stores Last Sent" := CurrentDateTime();
+            SaasTenantDiagnostic."POS Units Last Sent" := CurrentDateTime();
+            SaasTenantDiagnostic.Modify();
+        end;
+    end;
+
+    local procedure InitTenantDiagnostic(var TenantDiagnostic: Record "NPR Tenant Diagnostic")
     begin
         if not TenantDiagnostic.Get(TenantId()) then begin
             TenantDiagnostic.Init();
             TenantDiagnostic."Tenant ID" := CopyStr(TenantId(), 1, MaxStrLen(TenantDiagnostic."Tenant ID"));
-            TenantDiagnostic."Azure AD Tenant ID" := CopyStr(AzureADTenant.GetAadTenantId(), 1, MaxStrLen(TenantDiagnostic."Azure AD Tenant ID"));
             TenantDiagnostic.Insert();
+        end;
+    end;
+
+    local procedure InitSaasTenantDiagnostic(AzureAdTenantId: Text; var SaasTenantDiagnostic: Record "NPR Saas Tenant Diagnostic")
+    begin
+        if not SaasTenantDiagnostic.Get(AzureAdTenantId) then begin
+            SaasTenantDiagnostic.Init();
+            SaasTenantDiagnostic."Azure AD Tenant ID" := CopyStr(AzureAdTenantId, 1, MaxStrLen(SaasTenantDiagnostic."Azure AD Tenant ID"));
+            SaasTenantDiagnostic.Insert();
         end;
     end;
 
@@ -418,7 +493,7 @@
         Content: HttpContent;
     begin
         Content.WriteFrom(InitRequestContent(serviceMethod, ThisUserId, DatabaseName, ThisTenantId));
-        TrySendRequest(Content, serviceMethod, responseMessage)
+        TrySendRequest(Content, serviceMethod, false, responseMessage)
     end;
 
     [TryFunction]
@@ -427,20 +502,38 @@
         Content: HttpContent;
     begin
         Content.WriteFrom(InitRequestContent(serviceMethod, DatabaseName, ThisTenantId, ThisCompanyName, ThisPosStores, ThisPosUnits));
-        TrySendRequest(Content, serviceMethod, responseMessage)
+        TrySendRequest(Content, serviceMethod, false, responseMessage)
     end;
 
     [TryFunction]
-    local procedure TryInitAndSendRequestV2(serviceMethod: Text; ThisTenantId: Text; AzureADTenantID: Text; PreviousTenantId: Text; var responseMessage: Text)
+    local procedure TryInitAndSendRequestFromSaasEnvironment(serviceMethod: Text; ThisUserId: Text; AzureADTenantID: Text; UserLoginTypeIn: Text; var responseMessage: Text)
     var
         Content: HttpContent;
     begin
-        Content.WriteFrom(InitRequestContentV2(serviceMethod, ThisTenantId, AzureADTenantID, PreviousTenantId));
-        TrySendRequest(Content, serviceMethod, responseMessage)
+        Content.WriteFrom(InitRequestContentFromSaasEnvironment(serviceMethod, ThisUserId, AzureADTenantID, UserLoginTypeIn));
+        TrySendRequest(Content, serviceMethod, true, responseMessage)
     end;
 
     [TryFunction]
-    local procedure TrySendRequest(var Content: HttpContent; serviceMethod: Text; var responseMessage: Text)
+    local procedure TryInitAndSendRequestFromSaasEnvironment(serviceMethod: Text; AzureADTenantID: Text; var responseMessage: Text)
+    var
+        Content: HttpContent;
+    begin
+        Content.WriteFrom(InitRequestContentFromSaasEnvironment(serviceMethod, AzureADTenantID));
+        TrySendRequest(Content, serviceMethod, true, responseMessage)
+    end;
+
+    [TryFunction]
+    local procedure TryInitAndSendRequestFromSaasEnvironment(serviceMethod: Text; AzureADTenantID: Text; ThisCompanyName: Text; ThisPosStores: Text; ThisPosUnits: Text; var responseMessage: Text)
+    var
+        Content: HttpContent;
+    begin
+        Content.WriteFrom(InitRequestContentFromSaasEnvironment(serviceMethod, AzureADTenantID, ThisCompanyName, ThisPosStores, ThisPosUnits));
+        TrySendRequest(Content, serviceMethod, true, responseMessage)
+    end;
+
+    [TryFunction]
+    local procedure TrySendRequest(var Content: HttpContent; serviceMethod: Text; IsSaas: Boolean; var responseMessage: Text)
     var
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Client: HttpClient;
@@ -450,18 +543,29 @@
         Content.GetHeaders(ContentHeaders);
         ContentHeaders.Clear();
         ContentHeaders.Add('Content-Type', 'text/xml; charset=utf-8');
-        ContentHeaders.Add('SOAPAction', 'urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser:' + serviceMethod);
-        ContentHeaders.Add('Ocp-Apim-Subscription-Key', AzureKeyVaultMgt.GetAzureKeyVaultSecret('CaseSystemBCPhoneHomeAzureAPIKey'));
+        if IsSaas then begin
+            ContentHeaders.Add('SOAPAction', 'urn:microsoft-dynamics-schemas/codeunit/BCSaasUser:' + serviceMethod);
+            ContentHeaders.Add('Ocp-Apim-Subscription-Key', AzureKeyVaultMgt.GetAzureKeyVaultSecret('CaseSystemSaasBCPhoneHomeAzureAPIKey'));
+        end else begin
+            ContentHeaders.Add('SOAPAction', 'urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser:' + serviceMethod);
+            ContentHeaders.Add('Ocp-Apim-Subscription-Key', AzureKeyVaultMgt.GetAzureKeyVaultSecret('CaseSystemBCPhoneHomeAzureAPIKey'));
+        end;
+
         Client.Timeout(5000);
 
-        if not Client.Post('https://api.navipartner.dk/ServiceTierUser', Content, Response) then
-            Error(GetLastErrorText);
+        if IsSaas then begin
+            if not Client.Post('https://api.navipartner.dk/BCSaasUser', Content, Response) then
+                Error(GetLastErrorText);
+        end else begin
+            if not Client.Post('https://api.navipartner.dk/ServiceTierUser', Content, Response) then
+                Error(GetLastErrorText);
+        end;
 
         if not Response.IsSuccessStatusCode then
             Error(Format(Response.HttpStatusCode));
 
         Response.Content().ReadAs(responseMessage);
-        responseMessage := GetWebResponseResult(responseMessage);
+        responseMessage := GetWebResponseResult(responseMessage, IsSaas);
     end;
 
     local procedure InitRequestContent(serviceMethod: Text; ThisUserId: Text; DatabaseName: Text; ThisTenantId: Text): Text
@@ -490,7 +594,7 @@
         exit(Builder.ToText());
     end;
 
-    local procedure InitRequestContentV2(serviceMethod: Text; ThisTenantId: Text; AzureAdTenantId: Text; PreviousTenantId: Text): Text
+    local procedure InitRequestContentFromSaasEnvironment(serviceMethod: Text; ThisUserId: Text; ThisAzureAdTenantId: Text; ThisUserLoginTypeIn: Text): Text
     var
         Builder: TextBuilder;
     begin
@@ -498,10 +602,63 @@
         Builder.Append('<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" >');
         Builder.Append('  <soapenv:Header/>');
         Builder.Append('  <soapenv:Body>');
-        Builder.Append('    <' + serviceMethod + ' xmlns="urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser">');
-        Builder.Append('      <tenantIDIn>' + ThisTenantId + '</tenantIDIn>');
-        Builder.Append('      <azureADTenantIDIn>' + AzureAdTenantId + '</azureADTenantIDIn>');
-        Builder.Append('      <previousTenantIDIn>' + PreviousTenantId + '</previousTenantIDIn>');
+        Builder.Append('    <' + serviceMethod + ' xmlns="urn:microsoft-dynamics-schemas/codeunit/BCSaasUser">');
+
+        if ThisUserId <> '' then
+            Builder.Append('      <usernameIn>' + ThisUserId + '</usernameIn>');
+
+        if ThisAzureAdTenantId <> '' then
+            Builder.Append('      <azureAdTenantIDIn>' + ThisAzureAdTenantId + '</azureAdTenantIDIn>');
+
+        if ThisUserLoginTypeIn <> '' then
+            Builder.Append('      <userLoginTypeIn>' + ThisUserLoginTypeIn + '</userLoginTypeIn>');
+
+        Builder.Append('    </' + serviceMethod + '>');
+        Builder.Append('  </soapenv:Body>');
+        Builder.Append('</soapenv:Envelope>');
+
+        exit(Builder.ToText());
+    end;
+
+    local procedure InitRequestContentFromSaasEnvironment(serviceMethod: Text; ThisAzureAdTenantId: Text; ThisCompanyName: Text; ThisPosStores: Text; ThisPosUnits: Text): Text
+    var
+        Builder: TextBuilder;
+    begin
+        Builder.Append('<?xml version="1.0" encoding="UTF-8"?>');
+        Builder.Append('<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" >');
+        Builder.Append('  <soapenv:Header/>');
+        Builder.Append('  <soapenv:Body>');
+        Builder.Append('    <' + serviceMethod + ' xmlns="urn:microsoft-dynamics-schemas/codeunit/BCSaasUser">');
+
+        if ThisAzureAdTenantId <> '' then
+            Builder.Append('      <azureAdTenantIDIn>' + ThisAzureAdTenantId + '</azureAdTenantIDIn>');
+
+        if ThisCompanyName <> '' then
+            Builder.Append('      <companyNameIn>' + ThisCompanyName + '</companyNameIn>');
+
+        if ThisPosStores <> '' then
+            Builder.Append('      <posStoresIn>' + ThisPosStores + '</posStoresIn>');
+
+        if ThisPosUnits <> '' then
+            Builder.Append('      <posUnitsIn>' + ThisPosUnits + '</posUnitsIn>');
+
+        Builder.Append('    </' + serviceMethod + '>');
+        Builder.Append('  </soapenv:Body>');
+        Builder.Append('</soapenv:Envelope>');
+
+        exit(Builder.ToText());
+    end;
+
+    local procedure InitRequestContentFromSaasEnvironment(serviceMethod: Text; AzureAdTenantId: Text): Text
+    var
+        Builder: TextBuilder;
+    begin
+        Builder.Append('<?xml version="1.0" encoding="UTF-8"?>');
+        Builder.Append('<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" >');
+        Builder.Append('  <soapenv:Header/>');
+        Builder.Append('  <soapenv:Body>');
+        Builder.Append('    <' + serviceMethod + ' xmlns="urn:microsoft-dynamics-schemas/codeunit/BCSaasUser">');
+        Builder.Append('      <azureAdTenantIDIn>' + AzureAdTenantId + '</azureAdTenantIDIn>');
         Builder.Append('    </' + serviceMethod + '>');
         Builder.Append('  </soapenv:Body>');
         Builder.Append('</soapenv:Envelope>');
@@ -541,14 +698,18 @@
         exit(Builder.ToText());
     end;
 
-    local procedure GetWebResponseResult(response: Text) ResponseText: Text
+    local procedure GetWebResponseResult(response: Text; IsSaas: Boolean) ResponseText: Text
     var
         XmlDoc: XmlDocument;
         XmlNode: XmlNode;
         XmlNamespace: XmlNamespaceManager;
     begin
         XmlDocument.ReadFrom(response, XmlDoc);
-        XmlNamespace.AddNamespace('BC', 'urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser');
+        if IsSaas then
+            XmlNamespace.AddNamespace('BC', 'urn:microsoft-dynamics-schemas/codeunit/BCSaasUser')
+        else
+            XmlNamespace.AddNamespace('BC', 'urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser');
+
         XmlDoc.SelectSingleNode('//BC:return_value', XmlNamespace, XmlNode);
         ResponseText := XmlNode.AsXmlElement().InnerText;
         exit(ResponseText);
