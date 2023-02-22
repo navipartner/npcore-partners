@@ -355,6 +355,9 @@
                 MatrixPrintMgt: Codeunit "NPR RP Matrix Print Mgt.";
                 LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
             begin
+                if Rec."Processing Codeunit" = 0 then
+                    exit;
+
                 PrintTemplateHeader.Get(Rec."Template Code");
 
                 case PrintTemplateHeader."Printer Type" of
@@ -405,6 +408,9 @@
                 MatrixPrintMgt: Codeunit "NPR RP Matrix Print Mgt.";
                 LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
             begin
+                if Rec."Processing Function ID" = '' then
+                    exit;
+
                 PrintTemplateHeader.Get(Rec."Template Code");
 
                 case PrintTemplateHeader."Printer Type" of
