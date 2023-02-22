@@ -1,10 +1,10 @@
 ﻿page 6151260 "NPR POS Entry Cue"
 {
+    Caption = 'POS Entry Cue';
     Extensible = False;
     PageType = CardPart;
     SourceTable = "NPR POS Entry Cue.";
     UsageCategory = None;
-    Caption = 'POS Entry Cue';
 
     layout
     {
@@ -15,10 +15,11 @@
                 Caption = 'Unposted Postings';
                 field(UnpostedItemTrans; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Unposted Item Trans."))))
                 {
+                    ApplicationArea = NPRRetail;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    AutoFormatType = 11;
                     Caption = 'Unposted Item Transactions';
                     ToolTip = 'Specifies the number of the unposted item transactions. By clicking, you can drill down to a list of unposted item transactions.';
-
-                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -32,10 +33,11 @@
                 }
                 field(UnpostedGLTrans; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Unposted G/L Trans."))))
                 {
+                    ApplicationArea = NPRRetail;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    AutoFormatType = 11;
                     Caption = 'Unposted G/L Transactions';
                     ToolTip = 'Specifies the number of the unposted G/L transactions. By clicking, you can drill down to the list of unposted G/L transactions.';
-
-                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -53,12 +55,13 @@
                 Caption = 'Failed Postings';
                 field(FailedItemTrans; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Failed Item Transaction."))))
                 {
-                    Caption = 'Failed Item Transactions';
-                    ToolTip = 'Specifies the number of the failed item transactions. By clicking, you can drill down to the list of the failed item transactions.';
-
                     ApplicationArea = NPRRetail;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    AutoFormatType = 11;
+                    Caption = 'Failed Item Transactions';
                     Style = Unfavorable;
                     StyleExpr = FailedItemTransExists;
+                    ToolTip = 'Specifies the number of the failed item transactions. By clicking, you can drill down to the list of the failed item transactions.';
 
                     trigger OnDrillDown()
                     var
@@ -71,12 +74,13 @@
                 }
                 field(FailedGLTrans; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Failed G/L Posting Trans."))))
                 {
-                    Caption = 'Failed G/L Transaction';
-                    ToolTip = 'Specifies the number of the Failed G/L transactions. By clicking, you can drill down to the list of the Failed G/L transactions.';
-
                     ApplicationArea = NPRRetail;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    AutoFormatType = 11;
+                    Caption = 'Failed G/L Transaction';
                     Style = Unfavorable;
                     StyleExpr = FailedGLPostTransExists;
+                    ToolTip = 'Specifies the number of the Failed G/L transactions. By clicking, you can drill down to the list of the Failed G/L transactions.';
 
                     trigger OnDrillDown()
                     var
@@ -95,10 +99,11 @@
 
                 field(EFTReconcErrors; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("EFT Reconciliation Errors"))))
                 {
+                    ApplicationArea = NPRRetail;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    AutoFormatType = 11;
                     Caption = 'EFT Reconciliation Errors';
                     ToolTip = 'Specifies the number of Reconciliation EFT Errors in the last 30 days. By clicking, you can drill down to the list of Reconciliation EFT Errors in the last 30 days.';
-
-                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -113,10 +118,11 @@
                 }
                 field(UnfinishedEFTRequests; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Unfinished EFT Requests"))))
                 {
+                    ApplicationArea = NPRRetail;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    AutoFormatType = 11;
                     Caption = 'Unfinished EFT Requests';
                     ToolTip = 'Specifies the number of Unfinished EFT Requests in last 30 days. By clicking, you can drill down to the list of Unfinished EFT Requests in last 30 days.';
-
-                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -131,10 +137,11 @@
                 }
                 field(EFTUnknownResultRequests; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("EFT Req. with Unknown Result"))))
                 {
+                    ApplicationArea = NPRRetail;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    AutoFormatType = 11;
                     Caption = 'EFT Requests with Unknown Result';
                     ToolTip = 'Specifies the number of Unfinished EFT Requests in last 30 days. By clicking, you can drill down to the list of Unfinished EFT Requests in last 30 days.';
-
-                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
@@ -155,10 +162,11 @@
 
                 field(CampaignDiscounts; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Campaign Discount List"))))
                 {
+                    ApplicationArea = NPRRetail;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    AutoFormatType = 11;
                     Caption = 'Campaign Discounts';
                     ToolTip = 'Specifies the number of the Campaign Discounts. By clicking, you can drill down to the list of the Campaign Discounts.';
-
-                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     begin
@@ -168,10 +176,11 @@
                 }
                 field(MixDiscounts; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Mix Discount List"))))
                 {
+                    ApplicationArea = NPRRetail;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    AutoFormatType = 11;
                     Caption = 'Mix Discounts';
                     ToolTip = 'Specifies the number of the Mix Discounts. By clicking, you can drill down to the list of the Mix Discounts.';
-
-                    ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
                     var
