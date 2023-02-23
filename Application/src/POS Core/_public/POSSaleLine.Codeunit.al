@@ -505,21 +505,21 @@
     end;
 
 #pragma warning disable AA0137
-    internal procedure CheckMandatoryFields(var Rec: Record "NPR POS Sale Line")
+    internal procedure CheckMandatoryFields(var PosSaleLine: Record "NPR POS Sale Line")
     var
         Item: Record "Item";
     begin
 #IF NOT (BC17 or BC18 or BC19)        
-        case Rec."Line Type" of
-            Rec."Line Type"::Item:
+        case PosSaleLine."Line Type" of
+            PosSaleLine."Line Type"::Item:
                 begin
-                    if Item.Get(Rec."No.") then
+                    if Item.Get(PosSaleLine."No.") then
                         if Item.IsVariantMandatory() then
-                            Rec.TestField("Variant Code");
+                            PosSaleLine.TestField("Variant Code");
                 end;
         end;
 #ENDIF        
-    end;  
+    end;
 #pragma warning restore AA0137
 
     local procedure InsertLineInternal(var Line: Record "NPR POS Sale Line"; HandleReturnValue: Boolean) ReturnValue: Boolean
