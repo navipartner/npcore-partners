@@ -21,13 +21,11 @@
             Editable = false;
             NotBlank = true;
         }
-        field(3; "Sale Type"; Option)
+        field(3; "Sale Type"; Enum "NPR POS Line Sale Type")
         {
             Caption = 'Sale Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Deposit,Out payment,Comment,Cancelled,Open/Close';
-            OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,Cancelled,"Open/Close";
-            Description = 'This field has been "obsoleted" by removing all reference to it in Np Retail app';
+            Description = 'This field has been "obsoleted" by removing all reference to it in Np Retail app. No need to assing it or filter on it';
         }
         field(4; "Line No."; Integer)
         {
