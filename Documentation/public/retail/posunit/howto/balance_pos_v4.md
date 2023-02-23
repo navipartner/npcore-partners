@@ -14,7 +14,7 @@ To balance the POS with this balancing feature version, follow the provided step
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS End of Day Profile**, and choose the related link.
 2. Click **New** to open a blank **NPR POS End of Day Profile Card**. 
-3. Populate the fields according to the [reference table](../reference/end_of_day_v4.md).
+3. Populate the fields according to the [reference table](../../pos_profiles/reference/POS_End_of_Day_Profile.md).
 4. Search for **POS Actions Profiles**, and create a new **POS Named Action Profile** (or edit an existing one).
 5. In the **End of Day Action Code** field, provide **POS Action BALANCE V4**.     
    In this way, you're notifying the system that the new balancing function is used.

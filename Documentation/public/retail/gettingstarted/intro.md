@@ -12,6 +12,10 @@ NP Retail is a solution which combines the functionalities of the POS and ERP sy
 
 - If you're unsure whether our solution is supported by your hardware components, refer to the [system requirements](system_requirements.md).
 
+### What's new
+
+Learn which [**new features and improvements**](../../release_notes_public.md) have been introduced in the newest versions of the NP Retail solution.
+
 ### Highlighted articles
 
 
