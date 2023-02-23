@@ -406,8 +406,18 @@
                     PromotedOnly = true;
                     ToolTip = 'Displays the Vendor Statistics report.';
                     ApplicationArea = NPRRetail;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Vendor Statistics part with Vendor No. with Sale is not possible anymore.';
+                    trigger OnAction()
+                    var
+                        VendorStatistics: Page "NPR Vendor Statistics Subpage";
+                    begin
+                        VendorStatistics.InitForm();
+                        VendorStatistics.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", ItemCategoryCodeFilter, LastYearCalc);
+
+                        VendorStatistics.ShowLastYear(ShowLastYear);
+                        VendorStatistics.ChangeEmptyFilter();
+                        Sleep(10);
+                        VendorStatistics.RunModal();
+                    end;
                 }
                 action("Item Category Code Statistics")
                 {

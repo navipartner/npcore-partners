@@ -5,10 +5,9 @@
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+
     SourceTable = Vendor;
     ApplicationArea = NPRRetail;
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Vendor Statistics part with Vendor No. with Sale is not possible anymore.';
 
     layout
     {
@@ -65,14 +64,10 @@
 
                     trigger OnDrillDown()
                     var
-                        ValueEntry: Record "Value Entry";
-                        AuxValueEntries: Page "NPR Aux. Value Entries";
+                        ValueEntries: Page "NPR Value Entries Sales";
                     begin
-
-                        SetValueEntryFilter(ValueEntry);
-                        AuxValueEntries.SetTableView(ValueEntry);
-                        AuxValueEntries.Editable(false);
-                        AuxValueEntries.RunModal();
+                        ValueEntries.InitFilters(Dim1Filter, Dim2Filter, Periodestart, Periodeslut, LastYear, ItemCategoryFilter, Rec."No.");
+                        ValueEntries.RunModal();
                     end;
                 }
                 field("<Control61506191>"; -"LastYear Sale Amount")
@@ -183,19 +178,19 @@
 
     internal procedure Calc()
     var
-        ValueEntry: Record "Value Entry";
         ItemLedgerEntry: Record "Item Ledger Entry";
+        CostAmount: Decimal;
+        SalesAmount: Decimal;
     begin
         //Calc()
-        SetValueEntryFilter(ValueEntry);
-        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
+        SetValueEntryFilter(CostAmount, SalesAmount);
 
         SetItemLedgerEntryFilter(ItemLedgerEntry);
         ItemLedgerEntry.CalcSums(Quantity);
 
         "Sale Quantity" := ItemLedgerEntry.Quantity;
-        "Sale Amount" := ValueEntry."Sales Amount (Actual)";
-        "Profit Amount" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
+        "Sale Amount" := SalesAmount;
+        "Profit Amount" := SalesAmount + CostAmount;
         if "Sale Amount" <> 0 then
             "Profit %" := "Profit Amount" / "Sale Amount" * 100
         else
@@ -204,15 +199,14 @@
         // Calc last year
         LastYear := true;
 
-        SetValueEntryFilter(ValueEntry);
-        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
+        SetValueEntryFilter(CostAmount, SalesAmount);
 
         SetItemLedgerEntryFilter(ItemLedgerEntry);
         ItemLedgerEntry.CalcSums(Quantity);
 
         "LastYear Sale Quantity" := ItemLedgerEntry.Quantity;
-        "LastYear Sale Amount" := ValueEntry."Sales Amount (Actual)";
-        "LastYear Profit Amount" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
+        "LastYear Sale Amount" := SalesAmount;
+        "LastYear Profit Amount" := SalesAmount + CostAmount;
         if "LastYear Sale Amount" <> 0 then
             "LastYear Profit %" := "LastYear Profit Amount" / "LastYear Sale Amount" * 100
         else
@@ -250,24 +244,38 @@
             ItemLedgerEntry.SetRange("Global Dimension 2 Code");
     end;
 
-    internal procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
+    internal procedure SetValueEntryFilter(var CostAmount: Decimal; var SalesAmount: Decimal)
+    var
+        ValueEntryWithVendor: Query "NPR Value Entry With Vendor";
     begin
-        //SetValueEntryFilter
-        ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+        ValueEntryWithVendor.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+
+        ValueEntryWithVendor.SetRange(Filter_Vendor_No, Rec."No.");
         if not LastYear then
-            ValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1..%2', Periodestart, Periodeslut)
         else
-            ValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
+
+        if ItemCategoryFilter <> '' then
+            ValueEntryWithVendor.SetRange(Filter_Item_Category_Code, ItemCategoryFilter)
+        else
+            ValueEntryWithVendor.SetRange(Filter_Item_Category_Code);
 
         if Dim1Filter <> '' then
-            ValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
+            ValueEntryWithVendor.SetRange(Filter_Dim_1_Code, Dim1Filter)
         else
-            ValueEntry.SetRange("Global Dimension 1 Code");
+            ValueEntryWithVendor.SetRange(Filter_Dim_1_Code);
 
         if Dim2Filter <> '' then
-            ValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
+            ValueEntryWithVendor.SetRange(Filter_Dim_2_Code, Dim2Filter)
         else
-            ValueEntry.SetRange("Global Dimension 2 Code");
+            ValueEntryWithVendor.SetRange(Filter_Dim_2_Code);
+
+        ValueEntryWithVendor.Open();
+        while ValueEntryWithVendor.Read() do begin
+            CostAmount += ValueEntryWithVendor.Sum_Cost_Amount_Actual;
+            SalesAmount += ValueEntryWithVendor.Sum_Sales_Amount_Actual;
+        end;
     end;
 
     internal procedure ChangeEmptyFilter(): Boolean
