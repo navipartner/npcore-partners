@@ -4,8 +4,8 @@ The End of Day profile can be used to summarize all data such as transactions, s
 
 | Field Name      | Description |
 | ----------- | ----------- |
-| **Code**       | The unique code for the profile.     |
-| **Description**   | The short description of profile.        |
+| **Code**       | The unique ID of the profile.     |
+| **Description**   | The short description of the profile.        |
 | **End of Day Frequency**  | You can determine at which frequency the POS balancing is performed. There are two available options: **NEVER** - it is up to the business to perform balancing when required; **DAILY** - when the POS unit is opened at the beginning of a work day, a reminder for balancing the POS is displayed, and the work shift can't start before balancing is performed. |
 
 > [!Note]
@@ -15,7 +15,8 @@ The End of Day profile can be used to summarize all data such as transactions, s
 
 | Field Name      | Description |
 | ----------- | ----------- |
-| **End of Day Type** | You can choose between: **Individual** - EOD for each individual POS unit; **Master & Slave** - the POS unit you select will be the only one used for counting, and all physical cash is carried to it to be counted as one set (when counting is performed, the work shift for every individual slave POS unit is closed, and a new one is created and ready to work). |
+| **End of Day Type** | You can choose between: **Individual** - EOD for each individual POS unit; **Master & Slave** - the POS unit you select will be the only one used for counting, and all physical cash is carried to it, to be counted as a single set (when counting is performed, the work shift for every individual slave POS unit is closed, and a new one is created and ready to work). |
+| **Master POS Unit No.** | The POS unit on which the balancing is performed if the **End of Day Type** is **Master&Slave**. |
 
 > [!Note]
 > There's a validation process that prevents opening slave POS units until counting and balancing are completed on the master POS unit first. When this is done, the work shift of the slave POS unit becomes available for a new shift to start. Audit-wise, all transactions of slave POS units are accumulated on the master POS unit for the purpose of balancing. The transactions are still allocated to each individual POS unit.
@@ -34,7 +35,7 @@ The End of Day profile can be used to summarize all data such as transactions, s
 | **Show Zero Amount Lines** | When counting is performed, by default the currency with zero amount for counting isn't displayed. If this function is activated, all currencies are displayed, even if they amount to zero. This function needs to be used with discretion, as it might confuse the salespeople.  |
 | **Hide Turnover Section** | Hide the turnover statistics screen. |
 | **Disable Difference Field** | If selected, salespeople will be prompted to provide the counted amount. Otherwise, if an amount is entered in the **Difference** field, the **Counting** field will automatically be updated with the difference between the expected ledger balance amount, and the **Difference** field. |
-| **Require Denominations** | You can set an **Assist** button for denomination count on the following fields: **Counted Amount**, **Bank Deposit Amount**, and **Move to Bin Amount**. |
+| **Require Denominations** | You can set an **Assist** button for denomination count on the following fields: **Counted Amount**, **Bank Deposit Amount**, and **Move to Bin Amount**. This section can only be seen on V3. |
 
 ![endofday](../images/End%20of%20day%20profile.PNG)
 
