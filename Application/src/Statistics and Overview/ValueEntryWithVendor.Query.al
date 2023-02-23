@@ -34,7 +34,41 @@ query 6014424 "NPR Value Entry With Vendor"
             filter(Filter_Cost_Amount_Actual; "Cost Amount (Actual)")
             {
             }
+
+            column(Item_Ledger_Entry_Type; "Item Ledger Entry Type")
+            {
+            }
+            column(Posting_Date; "Posting Date")
+            {
+            }
+            column(Item_No_; "Item No.")
+            {
+            }
+            column(Source_No_; "Source No.")
+            {
+            }
+            column(Global_Dimension_1_Code; "Global Dimension 1 Code")
+            {
+            }
+            column(Global_Dimension_2_Code; "Global Dimension 2 Code")
+            {
+            }
+            column(Location_Code; "Location Code")
+            {
+            }
+            column(Salespers__Purch__Code; "Salespers./Purch. Code")
+            {
+            }
+            column(Cost_Amount__Actual_; "Cost Amount (Actual)")
+            {
+            }
+            column(Sales_Amount__Actual_; "Sales Amount (Actual)")
+            {
+            }
             column(Cost_per_Unit; "Cost per Unit")
+            {
+            }
+            column(Invoiced_Quantity; "Invoiced Quantity")
             {
             }
             column(Sum_Sales_Amount_Actual; "Sales Amount (Actual)")
