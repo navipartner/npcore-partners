@@ -578,6 +578,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SINGLE_SALE_STATS', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Sin Sale Stats";
     }
+    value(114; "MM_CREATE_MEMBER")
+    {
+        Caption = 'MM_CREATE_MEMBER', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Create Member";
+    }
     value(111; "HTML_DISPLAY")
     {
         Caption = 'HTML_DISPLAY', Locked = true, MaxLength = 20;
@@ -592,6 +597,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     {
         Caption = 'SETVATBPGRP', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction: Set VAT B.P.Grp";
+
     }
     value(115; CHANGE_LOCATION)
     {
