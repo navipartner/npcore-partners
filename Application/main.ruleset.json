@@ -293,6 +293,11 @@
             "justification": "Limit JIT loads by selecting all fields for load."
         },
         {
+            "id": "AA0244",
+            "action":"Error",
+            "justification": "Limit JIT loads by selecting all fields for load."
+        },
+        {
             "id": "AA0448",
             "action":"Hidden",
             "justification": "You must use the FieldCaption method instead of the FieldName method and TableCaption method instead of TableName method."
