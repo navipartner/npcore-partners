@@ -484,16 +484,25 @@
                     }
                 }
             }
-        }
-        area(Creation)
-        {
-            action("Import List")
+            group(Web)
             {
-                Caption = 'Import List';
-                RunObject = Page "NPR Nc Import List";
-                ToolTip = 'View, edit or execute different imports.';
-
-                ApplicationArea = NPRRetail;
+                Caption = 'Web';
+                action("Task List")
+                {
+                    Caption = 'List of Tasks';
+                    Image = TaskList;
+                    RunObject = Page "NPR Nc Task List";
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Executes the List of Tasks action';
+                }
+                action("Import List")
+                {
+                    Caption = 'Import List';
+                    RunObject = Page "NPR Nc Import List";
+                    ToolTip = 'View, edit or execute different imports.';
+                    Image = Add;
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
