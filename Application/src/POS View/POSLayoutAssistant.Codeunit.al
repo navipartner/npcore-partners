@@ -232,6 +232,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         ActionParam: Record "NPR POS Action Parameter";
         ParameterSetJArray: JsonArray;
         ParameterJObject: JsonObject;
+        OptionJObject: JsonObject;
     begin
         Response.Add('dataSourceName', POSAction."Data Source Name");
 
@@ -242,8 +243,10 @@ codeunit 6059925 "NPR POS Layout Assistant"
                 Clear(ParameterJObject);
                 ParameterJObject.Add('name', ActionParam.Name);
                 ParameterJObject.Add('data_type', Format(ActionParam."Data Type", 0, 9));
-                if ActionParam."Data Type" = ActionParam."Data Type"::Option then
-                    ParameterJObject.Add('options', ActionParam.Options);
+                if ActionParam."Data Type" = ActionParam."Data Type"::Option then begin
+                    ActionParam.GetOptionsDictionary(OptionJObject);
+                    ParameterJObject.Add('options', OptionJObject);
+                end;
                 ParameterJObject.Add('default_value', ActionParam."Default Value");
                 ParameterSetJArray.Add(ParameterJObject);
             until ActionParam.Next() = 0;
