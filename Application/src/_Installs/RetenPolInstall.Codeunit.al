@@ -41,7 +41,6 @@
 
             AddAllowedTable(Database::"NPR Exchange Label", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
             AddAllowedTable(Database::"NPR NpGp POS Sales Entry", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR EFT Transaction Request", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
             AddAllowedTable(Database::"NPR Tax Free Voucher", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
             AddAllowedTable(Database::"NPR POS Entry", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
 
@@ -72,6 +71,13 @@
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSSavedSales')) then begin
             AddPosSavedSalesRetentionPolicy();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSSavedSales'));
+        end;
+
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'RetenTableListUpdate_20230223')) then begin
+            AddAllowedTable(Database::"NPR EFT Transaction Log", Enum::"Retention Period Enum"::"1 Year", Enum::"Reten. Pol. Deleting"::Default);
+            AddAllowedTable(Database::"NPR EFT Transaction Request", Enum::"Retention Period Enum"::"1 Year", Enum::"Reten. Pol. Deleting"::Default);
+            AddAllowedTable(Database::"NPR Nc Task Output", Enum::"Retention Period Enum"::"3 Months", Enum::"Reten. Pol. Deleting"::Default);
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'RetenTableListUpdate_20230223'));
         end;
 
         LogMessageStopwatch.LogFinish();
