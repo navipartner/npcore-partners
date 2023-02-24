@@ -1,4 +1,4 @@
-# Create Data archive
+# Create a Data archive
 
 To manually create a data archive, follow the provided steps:
 
@@ -16,4 +16,4 @@ To manually create a data archive, follow the provided steps:
 ### Related links
 
 - [Data archives](../explanation/data_archives.md)
-- [Create retention policy](create_retention_policy.md)
+- [Create a retention policy](create_retention_policy.md)
