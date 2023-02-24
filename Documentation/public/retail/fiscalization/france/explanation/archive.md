@@ -1,4 +1,4 @@
-# Data Archives
+# Data Archives - Fiscalization
 
 This article provides information needed to understand how NP Retail exports to .xml archives, how these .xml archives are secured, and how you can validate that they have not been tampered with.
 

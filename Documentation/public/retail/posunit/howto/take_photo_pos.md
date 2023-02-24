@@ -1,4 +1,4 @@
-# Take photo on POS
+# Take a photo on the POS
 
 The **Take Photo** feature can be enabled on POS units, and give an option to cashiers to take photos of products that customers have returned to stores. This action can be added in a form of a button in any POS menu and used during active POS sales. To use this feature, follow the provided steps:
 

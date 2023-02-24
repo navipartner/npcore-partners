@@ -8,6 +8,10 @@
     href: howto/reconciliation.md
   - name: Softpay setup
     href: howto/softpay.md
+  - name: Create Data archive
+    href: howto/create_data_archive.md
+  - name: Create retention policy
+    href: howto/create_retention_policy.md
 - name: Explanations
   items:
   - name: EFT setup
@@ -18,3 +22,5 @@
     href: explanation/lookup.md
   - name: Introduction to Softpay
     href: explanation/softpay.md
+  - name: Data archives
+    href: explanation/data_archives.md
