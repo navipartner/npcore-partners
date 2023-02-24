@@ -639,6 +639,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'VATREFUSION', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction: VAT Refusion";
     }
+    value(128; PRINT_TEMPLATE)
+    {
+        Caption = 'PRINT_TEMPLATE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Print Template";
+    }
     value(123; SETTAXAREACODE)
     {
         Caption = 'SETTAXAREACODE', Locked = true, MaxLength = 20;
