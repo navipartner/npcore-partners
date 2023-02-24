@@ -42,6 +42,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSLayoutArchive'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSSavedSales'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'RetenTableListUpdate_20230223'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddJobQueues'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddTaskCountResetJQ'));
@@ -182,6 +183,8 @@
                         exit('NPR-RetenPolTables-POSLayoutArchive-20221207');
                     'POSSavedSales':
                         exit('NPR-RetenPolTables-POSSavedSales-20221223');
+                    'RetenTableListUpdate_20230223':
+                        exit('NPR-RetenPolTables-Update-20230223');
                 end;
             Codeunit::"NPR Job Queue Install":
                 Case UpgradeStep of
