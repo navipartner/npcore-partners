@@ -3,7 +3,7 @@
 Learn which new features and improvements have been introduced in the newest versions of the NP Retail solution:
 
 ## Version 18.0 (January 28th 2023)
-l
+
 ### Take a photo (from the POS)
 
 You can now take photos of products and other items (like documents) directly from the POS. Among other things, this feature significantly improves the return process, allowing cashiers to capture the state of items at the moment of their return, and record the transaction receipts.
@@ -13,6 +13,8 @@ For more information and operating instructions, refer to the article on the [Ta
 ### GS1 coupons
 
 The GS 1 flat rate discount coupon has been introduced to NP Retail. [GS1](https://www.gs1us.org/upcs-barcodes-prefixes/additional-ways-to-identify-products/coupons) is a standard that facilitates connection between a product and all its vital data, allowing trackability, workflow efficiency, and information-sharing via electronic means. GS1 coupons can now be created on scanning, then used, and finally archived as soon as the POS sale is finalized. 
+
+For more information and operating instructions, refer to the article on the [Coupons](retail/coupons/intro.md).
 
 ### HTML display profile - enhanced customer interaction and sales experience
 

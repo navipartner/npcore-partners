@@ -6,7 +6,7 @@
   items:
   - name: Compliance info
     href: explanation/info.md
-  - name: Data archive
+  - name: Data archive - Fiscalization
     href: explanation/archive.md
   - name: Data archive (FR)
     href: explanation/archive_fr.md
