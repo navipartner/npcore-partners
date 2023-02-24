@@ -40,4 +40,12 @@ enumextension 88000 "NPR BCPT Test Param. Enum" extends "BCPT Test Param. Enum"
     {
         Implementation = "BCPT Test Param. Provider" = "NPR BCPT POS Balancing EOD";
     }
+    value(88010; "NPR BCPT POS Post GL Entries")
+    {
+        Implementation = "BCPT Test Param. Provider" = "NPR BCPT POS Post GL Entries";
+    }
+    value(88011; "NPR BCPT POS Post Item Entries")
+    {
+        Implementation = "BCPT Test Param. Provider" = "NPR BCPT POS Post Item Entries";
+    }
 }
