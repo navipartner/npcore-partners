@@ -1,71 +1,53 @@
-﻿codeunit 6150834 "NPR POS Action: Print Template"
+﻿codeunit 6150834 "NPR POS Action: Print Template" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        ActionDescription: Label 'This is a built-in action for running a report';
-        ReadingErr: Label 'reading in %1';
-
-    local procedure ActionCode(): Code[20]
+        ActionDescriptionLbl: Label 'This is a built-in action for running a report';
+        ParamRecord_CptLbl: Label 'Record';
+        ParamRecord_DescLbl: Label 'Specifies Record';
+        ParamRecord_OptDescLbl: Label 'Sale Line,Sale Header';
+        ParamRecord_OptLbl: Label 'Sale Line,Sale Header', Locked = true;
+        ParamTemplate_CaptLbl: Label 'Templete';
+        ParamTemplate_DescLbl: Label 'Specifies template.';
     begin
-        exit('PRINT_TEMPLATE');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
+
+        WorkflowConfig.AddTextParameter('Template', '', ParamTemplate_CaptLbl, ParamTemplate_DescLbl);
+        WorkflowConfig.AddOptionParameter('Record',
+#pragma warning disable AA0139
+                                          ParamRecord_OptLbl,
+                                          SelectStr(1, ParamRecord_OptLbl),
+#pragma warning restore                                          
+                                          ParamRecord_CptLbl,
+                                          ParamRecord_DescLbl,
+                                          ParamRecord_OptDescLbl);
     end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('1', 'respond();');
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterTextParameter('Template', '');
-            Sender.RegisterOptionParameter('Record', 'Sale Line,Sale Header', 'Sale Line');
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        JSON: Codeunit "NPR POS JSON Management";
-        Template: Text[20];
-        RecordSetting: Option "Sale Line POS","Sale POS";
-        "Record": Variant;
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
+        RecordSetting: Option "Sale Line POS","Sale POS";
+        Template: Text[20];
+        "Record": Variant;
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScopeParameters(ActionCode());
-
-        Template := CopyStr(JSON.GetStringOrFail('Template', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(Template));
-        RecordSetting := JSON.GetIntegerOrFail('Record', StrSubstNo(ReadingErr, ActionCode()));
+        Template := CopyStr(Context.GetStringParameter('Template'), 1, MaxStrLen(Template));
+        RecordSetting := Context.GetIntegerParameter('Record');
 
         case RecordSetting of
             RecordSetting::"Sale Line POS":
                 begin
-                    POSSession.GetSaleLine(POSSaleLine);
-                    POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+                    SaleLine.GetCurrentSaleLine(SaleLinePOS);
                     SaleLinePOS.SetRecFilter();
                     Record := SaleLinePOS;
                 end;
             RecordSetting::"Sale POS":
                 begin
-                    POSSession.GetSale(POSSale);
-                    POSSale.GetCurrentSale(SalePOS);
+                    Sale.GetCurrentSale(SalePOS);
                     SalePOS.SetRecFilter();
                     Record := SalePOS;
                 end;
@@ -74,6 +56,14 @@
         end;
 
         TemplateMgt.PrintTemplate(Template, Record, 0);
-        Handled := true;
     end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionChangeBin.js###
+'let main=async({})=>await workflow.respond();'
+        )
+    end;
+
 }
