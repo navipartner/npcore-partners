@@ -23,7 +23,7 @@ The overall implementation process consists of four major steps:
   4. Educating customers on the functionality specifics.
 
 > [!Tip]
-> Archives retain the minimum quantity of data necessary for reducing liability risks, the use of resources, as well as the effort and time required to find data. You simply need to configure retention policies and select tables to be archived. 
+> Archives retain the minimum amount of data necessary for reducing liability risks, the use of resources, as well as the effort and time required to find data. You simply need to configure retention policies and select tables to be archived. 
 
 ### Related links
 
