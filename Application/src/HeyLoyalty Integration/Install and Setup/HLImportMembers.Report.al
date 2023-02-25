@@ -93,7 +93,7 @@ report 6014461 "NPR HL Import Members"
         HLMember: Record "NPR HL HeyLoyalty Member";
         HLMemberEssensialValuesIn: Record "NPR HL HeyLoyalty Member";
         HLMemberMgt: Codeunit "NPR HL Member Mgt.";
-        HLWebservice: Codeunit "NPR HL HeyLoyalty Webservice";
+        HLWSMgt: Codeunit "NPR HL HeyLoyalty WS Mgt.";
         HLMemberJObject: JsonObject;
         HLMemberFieldsJObject: JsonObject;
         HLMemberStatusesJObject: JsonObject;
@@ -142,11 +142,11 @@ report 6014461 "NPR HL Import Members"
         if HLMemberEssensialValuesIn."HeyLoyalty Id" = '' then
             Error(IdNotFoundErr, RowNo);
 
-        if not HLWebservice.GetHLMemberByHeyLoyaltyID(HLMemberEssensialValuesIn."HeyLoyalty Id", HLMember) then begin
+        if not HLWSMgt.GetHLMemberByHeyLoyaltyID(HLMemberEssensialValuesIn."HeyLoyalty Id", HLMember) then begin
             if HLMemberEssensialValuesIn."E-Mail Address" = '' then
                 Error(EmailNotFoundErr, RowNo);
             HLMember := HLMemberEssensialValuesIn;
-            if not HLWebservice.GetHLMemberByEmailAddress(HLMember) then begin
+            if not HLWSMgt.GetHLMemberByEmailAddress(HLMember) then begin
                 if HLMemberEssensialValuesIn."Unsubscribed at" <> 0DT then
                     exit(false);
                 HLMember.Init();

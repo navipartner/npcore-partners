@@ -1,4 +1,4 @@
-codeunit 6059991 "NPR HL HeyLoyalty Webservice"
+codeunit 6150799 "NPR HL HeyLoyalty WS Mgt."
 {
     Access = Internal;
 
