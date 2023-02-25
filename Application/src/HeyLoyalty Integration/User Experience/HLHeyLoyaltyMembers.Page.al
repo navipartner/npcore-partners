@@ -195,7 +195,7 @@ page 6150753 "NPR HL HeyLoyalty Members"
                 var
                     HLMember: Record "NPR HL HeyLoyalty Member";
                     HLSendMembers: Codeunit "NPR HL Send Members";
-                    HLWebservice: Codeunit "NPR HL HeyLoyalty Webservice";
+                    HLWSMgt: Codeunit "NPR HL HeyLoyalty WS Mgt.";
                     Window: Dialog;
                     RecNo: Integer;
                     TotalRecNo: Integer;
@@ -214,7 +214,7 @@ page 6150753 "NPR HL HeyLoyalty Members"
                             Window.Update(1, Round(RecNo / TotalRecNo * 10000, 1));
                             if HLMember."HeyLoyalty Id" = '' then
                                 HLMember."HeyLoyalty Id" := HLSendMembers.GetHeyLoyaltyMemberID(HLMember, false);
-                            HLWebservice.UpsertMember(HLMember."HeyLoyalty Id");
+                            HLWSMgt.UpsertMember(HLMember."HeyLoyalty Id");
                             Commit();
                         until HLMember.Next() = 0;
                         CurrPage.Update(false);

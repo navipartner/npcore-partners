@@ -13,14 +13,14 @@ codeunit 6060000 "NPR HL Upsert Member"
     var
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
-        HLWebservice: Codeunit "NPR HL HeyLoyalty Webservice";
+        HLWSMgt: Codeunit "NPR HL HeyLoyalty WS Mgt.";
         MemberMgt: Codeunit "NPR HL Member Mgt.";
     begin
         if not HLMember.Find() or HLMember.Deleted then
             exit;
 
         if (HLMember."Member Entry No." = 0) and (HLMember."E-Mail Address" <> '') then
-            if HLWebservice.GetMemberByEmailAddress(HLMember."E-Mail Address", Member) then begin
+            if HLWSMgt.GetMemberByEmailAddress(HLMember."E-Mail Address", Member) then begin
                 HLMember."Member Entry No." := Member."Entry No.";
                 if MemberMgt.FindMembershipRole(Member, MembershipRole) then
                     HLMember."Membership Entry No." := MembershipRole."Membership Entry No.";
