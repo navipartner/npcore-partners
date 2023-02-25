@@ -32,6 +32,7 @@
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo("Contact No."), false);
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo("Customer Price Group"), false);
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo("Customer Disc. Group"), false);
+        DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo("Responsibility Center"), false);
 
         DataSource.AddColumn(GetRegisterNameText(), Caption_RegisterName, DataType::String, false);
         DataSource.AddColumn(GetCustomerNameText(), Caption_CustomerName, DataType::String, false);
