@@ -649,6 +649,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SETTAXAREACODE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction: Set TaxAreaCode";
     }
+    value(132; CHANGE_RESP_CENTER)
+    {
+        Caption = 'CHANGE_RESP_CENTER', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAct:Change Resp. Center";
+    }
     value(6014600; BALANCE_V4)
     {
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;
