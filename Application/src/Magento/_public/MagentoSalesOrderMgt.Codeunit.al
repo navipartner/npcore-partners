@@ -1095,6 +1095,9 @@
 
             SalesLine.Validate("Unit Price", UnitPrice);
             SalesLine.Description := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'description', MaxStrLen(SalesLine.Description), true), 1, MaxStrLen(SalesLine.Description));
+            if ShipmentMapping.Description <> '' then
+                Salesline.Description := ShipmentMapping.Description;
+           
             SalesLine.Modify(true);
         end;
     end;
