@@ -49,6 +49,11 @@
             ELSE
             IF ("Shipment Fee Type" = CONST("Charge (Item)")) "Item Charge";
         }
+        field(160; Description; Text[100])
+        {
+            Caption = 'Description';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
