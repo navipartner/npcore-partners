@@ -19,6 +19,11 @@
                     ToolTip = 'Specifies the value of the External Shipment Method Code field';
                     ApplicationArea = NPRRetail;
                 }
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies Description of External Shipment. This Description will display on Web Orders - Sales line when filled in.';
+                }
                 field("Shipment Method Code"; Rec."Shipment Method Code")
                 {
 
