@@ -1,90 +1,150 @@
-﻿codeunit 6151417 "NPR Magento Pmt. Quickpay Mgt."
+﻿codeunit 6151417 "NPR Magento Pmt. Quickpay Mgt." implements "NPR IPaymentGateway"
 {
     Access = Internal;
 
     var
-        Text000: Label 'Quickpay error:\%1 - %2  \%3';
+        FailedToSendRequestErr: Label 'Failed to communicate with QuickPay API.\\Error message: %1', Comment = '%1 = error message';
+        BadApiResponseErr: Label 'The QuickPay API responded with a bad error.\Status code: %1 - %2\Body: %3', Comment = '%1 = status code, %2 = reason phrase, %3 = body';
+        RequestMethodPostTok: Label 'POST', Locked = true;
+        RequestParameterAmountTok: Label 'amount', Locked = true;
+        RequestParameterIdTok: Label 'id', Locked = true;
+        APIBaseUrlTok: Label 'https://api.quickpay.net', Locked = true;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CapturePaymentEvent', '', false, false)]
-    local procedure CapturePaymentSalesInvoice(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
-    begin
-        if not IsQuickpayPaymentLine(PaymentLine) then
-            exit;
-        if PaymentLine."Document Table No." <> DATABASE::"Sales Invoice Header" then
-            exit;
-
-        Capture(PaymentLine);
-
-        PaymentLine."Date Captured" := Today();
-        PaymentLine.Modify(true);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'RefundPaymentEvent', '', false, false)]
-    local procedure RefundPaymentSalesCrMemo(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
-    begin
-        if not IsQuickpayRefundLine(PaymentLine) then
-            exit;
-        if PaymentLine."Document Table No." <> DATABASE::"Sales Cr.Memo Header" then
-            exit;
-
-        Refund(PaymentLine);
-
-        PaymentLine."Date Refunded" := Today();
-        PaymentLine.Modify(true);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CancelPaymentEvent', '', false, true)]
-    local procedure OnCancelPayment(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
-    begin
-        if not IsQuickpayCancelLine(PaymentLine) then
-            exit;
-        if PaymentLine."Document Table No." <> DATABASE::"Sales Header" then
-            exit;
-        if PaymentLine."Document Type" <> PaymentLine."Document Type"::Order then
-            exit;
-
-        Cancel(PaymentLine);
-    end;
-
-    #region Create Request
-
-    local procedure Capture(PaymentLine: Record "NPR Magento Payment Line")
+    #region Payment Integration
+    local procedure CaptureInternal(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
         JsonBody: JsonObject;
         HttpWebRequest: HttpRequestMessage;
+        HttpWebResponse: HttpResponseMessage;
         RequestBodyText: Text;
+        ResponseTxt: Text;
     begin
-        JsonBody.Add("RequestParameter.Id"(), PaymentLine."No.");
-        JsonBody.Add("RequestParameter.Amount"(), ConvertToQuickPayAmount(PaymentLine.Amount));
+        ClearLastError();
+
+        JsonBody.Add(RequestParameterIdTok, Request."Transaction ID");
+        JsonBody.Add(RequestParameterAmountTok, ConvertToQuickPayAmount(Request."Request Amount"));
         JsonBody.WriteTo(RequestBodyText);
-        SetupHttpWebRequest(HttpWebRequest, CopyStr("RequestMethod.Post"(), 1, 10), PaymentLine, "ServiceName.Capture"(), RequestBodyText);
-        SendWebRequest(HttpWebRequest);
+        Request.AddBody(JsonBody);
+
+        SetupHttpWebRequest(HttpWebRequest, CopyStr(RequestMethodPostTok, 1, 10), Request, 'capture', RequestBodyText);
+
+        if (not TrySendWebRequest(HttpWebRequest, HttpWebResponse)) then begin
+            Response."Response Success" := false;
+            Error(FailedToSendRequestErr, GetLastErrorText());
+        end;
+
+        HttpWebResponse.Content.ReadAs(ResponseTxt);
+
+        Response."Response Success" := HttpWebResponse.IsSuccessStatusCode();
+        Response.AddResponse(ResponseTxt);
+
+        if (not HttpWebResponse.IsSuccessStatusCode()) then
+            Error(BadApiResponseErr, HttpWebResponse.HttpStatusCode(), HttpWebResponse.ReasonPhrase(), ResponseTxt);
     end;
 
-    local procedure Refund(PaymentLine: Record "NPR Magento Payment Line")
+    [TryFunction]
+    local procedure RefundInternal(Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
         JsonBody: JsonObject;
         HttpWebRequest: HttpRequestMessage;
+        HttpWebResponse: HttpResponseMessage;
         RequestBodyText: Text;
+        ResponseTxt: Text;
     begin
-        JsonBody.Add("RequestParameter.Id"(), PaymentLine."No.");
-        JsonBody.Add("RequestParameter.Amount"(), ConvertToQuickPayAmount(PaymentLine.Amount));
+        JsonBody.Add(RequestParameterIdTok, Request."Transaction ID");
+        JsonBody.Add(RequestParameterAmountTok, ConvertToQuickPayAmount(Request."Request Amount"));
         JsonBody.WriteTo(RequestBodyText);
-        SetupHttpWebRequest(HttpWebRequest, CopyStr("RequestMethod.Post"(), 1, 10), PaymentLine, "ServiceName.Refund"(), RequestBodyText);
-        SendWebRequest(HttpWebRequest);
+        Request.AddBody(JsonBody);
+
+        SetupHttpWebRequest(HttpWebRequest, CopyStr(RequestMethodPostTok, 1, 10), Request, 'refund', RequestBodyText);
+
+        if (not TrySendWebRequest(HttpWebRequest, HttpWebResponse)) then begin
+            Response."Response Success" := false;
+            Error(FailedToSendRequestErr, GetLastErrorText());
+        end;
+
+        HttpWebResponse.Content.ReadAs(ResponseTxt);
+
+        Response."Response Success" := HttpWebResponse.IsSuccessStatusCode();
+        Response.AddResponse(ResponseTxt);
+
+        if (not HttpWebResponse.IsSuccessStatusCode()) then
+            Error(BadApiResponseErr, HttpWebResponse.HttpStatusCode(), HttpWebResponse.ReasonPhrase(), ResponseTxt);
     end;
 
-    local procedure Cancel(PaymentLine: Record "NPR Magento Payment Line")
+    [TryFunction]
+    local procedure CancelInternal(Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
         HttpWebRequest: HttpRequestMessage;
+        HttpWebResponse: HttpResponseMessage;
+        ResponseTxt: Text;
     begin
-        SetupHttpWebRequest(HttpWebRequest, CopyStr("RequestMethod.Post"(), 1, 10), PaymentLine, "ServiceName.Cancel"(), '');
-        SendWebRequest(HttpWebRequest);
-    end;
+        SetupHttpWebRequest(HttpWebRequest, CopyStr(RequestMethodPostTok, 1, 10), Request, 'cancel', '');
 
+        if (not TrySendWebRequest(HttpWebRequest, HttpWebResponse)) then begin
+            Response."Response Success" := false;
+            Error(FailedToSendRequestErr, GetLastErrorText());
+        end;
+
+        HttpWebResponse.Content.ReadAs(ResponseTxt);
+
+        Response."Response Success" := HttpWebResponse.IsSuccessStatusCode();
+        Response.AddResponse(ResponseTxt);
+
+        if (not HttpWebResponse.IsSuccessStatusCode()) then
+            Error(BadApiResponseErr, HttpWebResponse.HttpStatusCode(), HttpWebResponse.ReasonPhrase(), ResponseTxt);
+    end;
     #endregion
 
-    #region Aux
+    #region aux
+    /// <summary>
+    /// Test the connectivity with the QuickPay API.
+    /// <br />
+    /// Requires the `ping` API permission.
+    /// </summary>
+    /// <param name="PaymentGatewayCode">Payment Gateway Code for setup</param>
+    /// <param name="ResponseMsg">Response message from QuickPay</param>
+    /// <returns>Boolean</returns>
+    [TryFunction]
+    internal procedure TestConnection(PaymentGatewayCode: Code[20]; var ResponseMsg: Text)
+    var
+        Setup: Record "NPR PG Quickpay Setup";
+        Client: HttpClient;
+        Headers: HttpHeaders;
+        Response: HttpResponseMessage;
+        ResponseTxt: Text;
+        JToken: JsonToken;
+        MsgToken: JsonToken;
+    begin
+        Setup.Get(PaymentGatewayCode);
+
+        Headers := Client.DefaultRequestHeaders();
+        SetHeader(Headers, 'Accept', 'application/json');
+        SetHeader(Headers, 'Accept-Version', 'v10');
+        SetHeader(Headers, 'Authorization', CreateBasicAuth('', Setup.GetApiPassword()));
+
+        Client.Get(APIBaseUrlTok + '/ping', Response);
+
+        if (Response.Content.ReadAs(ResponseTxt)) then;
+
+        if (not Response.IsSuccessStatusCode()) then
+            Error(BadApiResponseErr, Response.HttpStatusCode(), Response.ReasonPhrase(), ResponseTxt);
+
+        if (ResponseTxt <> '') then begin
+            JToken.ReadFrom(ResponseTxt);
+            if (JToken.SelectToken('msg', MsgToken)) then
+                ResponseMsg := MsgToken.AsValue().AsText();
+        end;
+
+        exit(true);
+    end;
+
+    local procedure SetHeader(var Headers: HttpHeaders; HeaderName: Text; HeaderValue: Text)
+    begin
+        if (Headers.Contains(HeaderName)) then
+            Headers.Remove(HeaderName);
+        Headers.Add(HeaderName, HeaderValue);
+    end;
 
     local procedure CreateBasicAuth(ApiUsername: Text; ApiPassword: Text): Text
     var
@@ -99,157 +159,67 @@
         exit(QuickpayAmount);
     end;
 
-    local procedure CurrCodeunitId(): Integer
-    begin
-        exit(CODEUNIT::"NPR Magento Pmt. Quickpay Mgt.");
-    end;
-
-    procedure IsQuickpayPaymentLine(PaymentLine: Record "NPR Magento Payment Line"): Boolean
-    var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
-    begin
-        if PaymentLine."Payment Gateway Code" = '' then
-            exit;
-
-        if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
-            exit(false);
-
-        exit(PaymentGateway."Capture Codeunit Id" = CurrCodeunitId());
-    end;
-
-    procedure IsQuickpayRefundLine(PaymentLine: Record "NPR Magento Payment Line"): Boolean
-    var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
-    begin
-        if PaymentLine."Payment Gateway Code" = '' then
-            exit;
-
-        if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
-            exit(false);
-
-        exit(PaymentGateway."Refund Codeunit Id" = CurrCodeunitId());
-    end;
-
-    procedure IsQuickpayCancelLine(PaymentLine: Record "NPR Magento Payment Line"): Boolean
-    var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
-    begin
-        if PaymentLine."Payment Gateway Code" = '' then
-            exit;
-
-        if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
-            exit(false);
-
-        exit(PaymentGateway."Cancel Codeunit Id" = CurrCodeunitId());
-    end;
-
-    local procedure SendWebRequest(HttpWebRequest: HttpRequestMessage)
+    [TryFunction]
+    local procedure TrySendWebRequest(HttpWebRequest: HttpRequestMessage; var HttpWebResponse: HttpResponseMessage)
     var
         Client: HttpClient;
-        HttpWebResponse: HttpResponseMessage;
-        Response: Text;
     begin
         Client.Timeout(300000);
         Client.Send(HttpWebRequest, HttpWebResponse);
-
-        HttpWebResponse.Content.ReadAs(Response);
-
-        if not HttpWebResponse.IsSuccessStatusCode then
-            Error(Text000, HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
     end;
 
-    local procedure SetupHttpWebRequest(var HttpWebRequest: HttpRequestMessage; RequestMethod: Code[10]; PaymentLine: Record "NPR Magento Payment Line"; RequestService: Text; RequestBody: Text)
+    local procedure SetupHttpWebRequest(var HttpWebRequest: HttpRequestMessage; RequestMethod: Code[10]; PaymentRequest: Record "NPR PG Payment Request"; RequestService: Text; RequestBody: Text)
     var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
+        Setup: Record "NPR PG Quickpay Setup";
         Content: HttpContent;
         Headers: HttpHeaders;
         HeadersReq: HttpHeaders;
     begin
-        if PaymentGateway.Get(PaymentLine."Payment Gateway Code") then begin
-            Content.WriteFrom(RequestBody);
-            HttpWebRequest.GetHeaders(HeadersReq);
-            Content.GetHeaders(Headers);
-            if Headers.Contains('Content-Type') then
-                Headers.Remove('Content-Type');
-            Headers.Add('Content-Type', 'application/json');
-            Headers.Add('accept-version', 'v10');
-            HeadersReq.Add('Authorization', CreateBasicAuth('', PaymentGateway.GetApiPassword()));
+        Setup.Get(PaymentRequest."Payment Gateway Code");
 
-            HttpWebRequest.Content(Content);
-            HttpWebRequest.SetRequestUri(PaymentGateway."Api Url" + '/' + PaymentLine."No." + '/' + RequestService);
-            HttpWebRequest.Method := RequestMethod;
-        end;
+        Content.WriteFrom(RequestBody);
+        HttpWebRequest.GetHeaders(HeadersReq);
+        Content.GetHeaders(Headers);
+        if Headers.Contains('Content-Type') then
+            Headers.Remove('Content-Type');
+        Headers.Add('Content-Type', 'application/json');
+        Headers.Add('accept-version', 'v10');
+        HeadersReq.Add('Authorization', CreateBasicAuth('', Setup.GetApiPassword()));
+
+        HttpWebRequest.Content(Content);
+        HttpWebRequest.SetRequestUri('https://api.quickpay.net/payments/' + PaymentRequest."Transaction ID" + '/' + RequestService);
+        HttpWebRequest.Method := RequestMethod;
     end;
-
     #endregion
-# pragma warning disable AA0228
-    local procedure "RequestMethod.Post"(): Text
+
+    #region Interface implementation
+    procedure Capture(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     begin
-        exit('POST');
+        CaptureInternal(Request, Response);
     end;
 
-    local procedure "RequestParameter.Amount"(): Text
+    procedure Refund(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response");
     begin
-        exit('amount');
+        RefundInternal(Request, Response);
     end;
 
-    local procedure "RequestParameter.Id"(): Text
+    procedure Cancel(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response");
     begin
-        exit('id');
+        CancelInternal(Request, Response);
     end;
 
-    local procedure "ServiceName.Capture"(): Text
-    begin
-        exit('capture');
-    end;
-
-
-    local procedure "ServiceName.Refund"(): Text
-    begin
-        exit('refund');
-    end;
-
-    local procedure "ServiceName.Cancel"(): Text
-    begin
-        exit('cancel');
-    end;
-# pragma warning disable AA0228
-
-    procedure IsNaviConnectPayment(var SalesHeader: Record "Sales Header"): Boolean
+    procedure RunSetupCard(PaymentGatewayCode: Code[10])
     var
-        PaymentLine: Record "NPR Magento Payment Line";
+        PGQuickpaySetup: Record "NPR PG Quickpay Setup";
     begin
-        PaymentLine.Reset();
-        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
-        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
-        PaymentLine.SetRange("Document No.", SalesHeader."No.");
-        PaymentLine.SetFilter("Account No.", '<>%1', '');
-        PaymentLine.SetFilter(Amount, '<>%1', 0);
-        exit(PaymentLine.FindFirst());
-    end;
+        if (not PGQuickpaySetup.Get(PaymentGatewayCode)) then begin
+            PGQuickpaySetup.Init();
+            PGQuickpaySetup.Code := PaymentGatewayCode;
+            PGQuickpaySetup.Insert(true);
+            Commit();
+        end;
 
-    procedure CaptureSalesInvHeader(SalesInvoiceHeader: Record "Sales Invoice Header"): Boolean
-    var
-        PaymentLine: Record "NPR Magento Payment Line";
-    begin
-        if SalesInvoiceHeader."Order No." = '' then
-            exit(false);
-
-        PaymentLine.Reset();
-        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Invoice Header");
-        PaymentLine.SetRange("Document No.", SalesInvoiceHeader."No.");
-        PaymentLine.SetFilter("Payment Gateway Code", '<>%1', '');
-        PaymentLine.SetFilter("Account No.", '<>%1', '');
-        PaymentLine.SetFilter(Amount, '<>%1', 0);
-        PaymentLine.SetRange("Date Captured", 0D);
-        if PaymentLine.FindSet() then
-            repeat
-                Commit();
-                Capture(PaymentLine);
-                PaymentLine."Date Captured" := Today();
-                PaymentLine.Modify();
-                Commit();
-            until PaymentLine.Next() = 0;
-        exit(true);
+        Page.Run(Page::"NPR PG Quickpay Setup Card", PGQuickpaySetup);
     end;
+    #endregion
 }

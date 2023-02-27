@@ -90,6 +90,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR TM Calendar Upgrade"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Login"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeReceiptText'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG PG To Interface"));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -318,6 +319,8 @@
                     'UpgradeReceiptText':
                         exit('UpgradeReceiptText');
                 end;
+            Codeunit::"NPR UPG PG To Interface":
+                Exit('NPR_UPG_PG_To_Interface_20221204');
         end;
     end;
 }

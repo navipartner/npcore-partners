@@ -142,4 +142,51 @@
         }
     }
 
+    var
+        InvoiceLbl: Label 'Invoice';
+        CreditMemoLbl: Label 'Credit Memo';
+        DocumentNoLbl: Label 'Document No. %1', Comment = '%1 = document no';
+
+    internal procedure ToRequest(var Request: Record "NPR PG Payment Request")
+    var
+        SalesHeader: Record "Sales Header";
+        SalesInvHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+    begin
+        Request."Transaction ID" := Rec."No.";
+        Request."Request Amount" := Rec.Amount;
+        Request."Payment Gateway Code" := Rec."Payment Gateway Code";
+        Request."Document Table No." := Rec."Document Table No.";
+
+        case Rec."Document Table No." of
+            Database::"Sales Header":
+                begin
+                    // We wrap in an if statement here because the Sales Header might be
+                    // deleted if we are about to cancel the request.
+                    if (SalesHeader.Get(Rec."Document Type", Rec."Document No.")) then begin
+                        Request."Document System Id" := SalesHeader.SystemId;
+                        Request."Request Description" := Format(SalesHeader."Document Type") + ' ' + SalesHeader."No.";
+                    end else
+                        if (Rec."Document No." <> '') then
+                            Request."Request Description" := CopyStr(StrSubstNo(DocumentNoLbl, Rec."Document No."), 1, MaxStrLen(Request."Request Description"));
+                end;
+            Database::"Sales Invoice Header":
+                begin
+                    SalesInvHeader.Get(Rec."Document No.");
+                    Request."Document System Id" := SalesInvHeader.SystemId;
+                    Request."Request Description" := InvoiceLbl + ' ' + SalesInvHeader."No.";
+                end;
+            Database::"Sales Cr.Memo Header":
+                begin
+                    SalesCrMemoHeader.Get(Rec."Document No.");
+                    Request."Document System Id" := SalesCrMemoHeader.SystemId;
+                    Request."Request Description" := CreditMemoLbl + ' ' + SalesCrMemoHeader."No.";
+                end;
+            else
+                if (Rec."Document No." <> '') then
+                    Request."Request Description" := CopyStr(StrSubstNo(DocumentNoLbl, Rec."Document No."), 1, MaxStrLen(Request."Request Description"));
+        end;
+
+        Request."Last Operation Id" := Rec."Charge ID";
+    end;
 }
