@@ -41,6 +41,12 @@ table 6059809 "NPR POS HTML Disp. Prof."
             OptionMembers = "Item Description 1","Item Description 2";
             Caption = 'Receipt Item Description';
         }
+        field(8; "MobilePay QR"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            InitValue = False;
+            Caption = 'Show Mobilepay QR';
+        }
     }
 
     keys

@@ -1,7 +1,17 @@
 let main = async (obj) => {                  
     try{
-        const {popup, captions, parameters} = obj;
-        switch(parameters.CustomerDisplayOp.toString())
+        const {context, popup, captions, parameters} = obj;
+        let JSAction = "";
+        if (context.JSAction !== undefined)
+        {
+            JSAction = context.JSAction;
+        }
+        else
+        {
+            JSAction = parameters.CustomerDisplayOp.toString();
+        }
+        
+        switch(JSAction)
         {
             case "OPEN":
                 OpenCloseDisplay(true);
@@ -11,6 +21,11 @@ let main = async (obj) => {
                 break
             case "GET_INPUT":
                 await CollectInput(obj);
+                break;
+            case "QRPaymentScan":
+                let result = await workflow.respond("QRPaymentScan");
+                if (result)
+                    QRPaymentScan(context);
                 break;
             default:
                 popup.error(captions.ErrUnknownOperation + ": '" + parameters.CustomerDisplayOp.toString() +"'");
@@ -62,4 +77,32 @@ async function OpenCloseDisplay(open)
     await hwc.invoke("HTMLDisplay", {
         DisplayAction: (open ? "Open" : "Close")
     });
+}
+async function QRPaymentScan(context)
+{
+    console.log(context);
+    if (context.Command === "Open")
+    {
+        hwc.invoke("HTMLDisplay", {
+            DisplayAction: "SendJS",
+            JSParameter: JSON.stringify({
+                JSAction: "QRPaymentScan",
+                Provider: context.Provider,
+                Command: "Open",
+                QrContent: context.QrContent,
+                PaymentAmount: context.Amount 
+            })
+        });
+    }
+    else
+    {
+        hwc.invoke("HTMLDisplay", {
+            DisplayAction: "SendJS",
+            JSParameter: JSON.stringify({
+                JSAction: "QRPaymentScan",
+                Command: "Close"
+            })
+        });
+    }
+    
 }
