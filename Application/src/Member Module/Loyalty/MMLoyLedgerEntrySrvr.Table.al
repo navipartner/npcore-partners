@@ -80,6 +80,11 @@
             Caption = 'Company Name';
             DataClassification = CustomerContent;
         }
+        field(170; "Retail Id"; Guid)
+        {
+            Caption = 'Retail Id';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Reservation is Captured"; Boolean)
         {
             CalcFormula = Exist("NPR MM Members. Points Entry" WHERE("Authorization Code" = FIELD("Authorization Code"),

@@ -41,6 +41,9 @@
                     ImportGetMembershipMembers(XmlDoc, Rec."Document ID");
                 'UpdateMember':
                     ImportUpdateMembers(XmlDoc, Rec."Document ID");
+                'AddReplaceCard':
+                    ImportAddReplaceCard(XmlDoc, Rec."Document ID");
+
                 'BlockMembership':
                     ImportBlockMemberships(XmlDoc, Rec."Document ID");
                 'BlockMember':
@@ -228,14 +231,14 @@
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
         MemberInfoCapture.Insert();
 
-        TargetDocumentId := GetXmlText100(Request, 'documentid', MaxStrLen(MemberInfoCapture."Import Entry Document ID"), true);
+        TargetDocumentId := GetXmlText100(Request, 'documentid', true);
         MembershipEntry.SetFilter("Import Entry Document ID", '=%1', TargetDocumentId);
         MembershipEntry.SetFilter(Blocked, '=%1', false);
         MembershipEntry.FindFirst();
 
-        MemberInfoCapture."Document No." := GetXmlText20(Request, 'externaldocumentnumber', MaxStrLen(MemberInfoCapture."Document No."), false);
-        Evaluate(MemberInfoCapture.Amount, GetXmlText20(Request, 'amount', 20, false));
-        Evaluate(MemberInfoCapture."Amount Incl VAT", GetXmlText20(Request, 'amountinclvat', 20, false));
+        MemberInfoCapture."Document No." := GetXmlText20(Request, 'externaldocumentnumber', false);
+        Evaluate(MemberInfoCapture.Amount, GetXmlText20(Request, 'amount', false));
+        Evaluate(MemberInfoCapture."Amount Incl VAT", GetXmlText20(Request, 'amountinclvat', false));
 
         MemberInfoCapture."Membership Entry No." := MembershipEntry."Membership Entry No.";
         MemberInfoCapture.Modify();
@@ -543,6 +546,104 @@
         exit(true);
     end;
 
+    local procedure ImportAddReplaceCard(XmlDoc: XmlDocument; DocumentID: Text[100])
+    var
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
+    begin
+
+        XmlDoc.GetRoot(Request);
+
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'addreplacecard/request', NodeList)) then
+            exit;
+
+        foreach Node in NodeList do
+            ImportAddReplaceCardWorker(Node.AsXmlElement(), DocumentID);
+
+        Commit();
+    end;
+
+    local procedure ImportAddReplaceCardWorker(Element: XmlElement; DocumentID: Text[100])
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberNotification: Codeunit "NPR MM Member Notification";
+        ReasonText: Text;
+    begin
+
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Import Entry Document ID" := DocumentID;
+        InsertAddReplaceCardRequest(Element, MemberInfoCapture);
+
+        if (MemberInfoCapture."Replace External Card No." <> '') then begin
+            MemberInfoCapture."Membership Entry No." := MemberManagement.GetMembershipFromExtCardNo(MemberInfoCapture."Replace External Card No.", Today, ReasonText);
+            if (MemberInfoCapture."Membership Entry No." = 0) then
+                Error(ReasonText);
+
+            MemberInfoCapture."Member Entry No" := MemberManagement.GetMemberFromExtCardNo(MemberInfoCapture."Replace External Card No.", Today, ReasonText);
+            if (MemberInfoCapture."Member Entry No" = 0) then
+                Error(ReasonText);
+
+            MemberManagement.BlockMemberCard(MemberManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
+        end;
+
+        if (MemberInfoCapture."Replace External Card No." = '') then begin
+            MemberInfoCapture."Membership Entry No." := MemberManagement.GetMembershipFromExtMembershipNo(MemberInfoCapture."External Membership No.");
+            if (MemberInfoCapture."Membership Entry No." = 0) then
+                Error(INVALID_MEMBERSHIP_NO, MemberInfoCapture."External Membership No.");
+
+            MemberInfoCapture."Member Entry No" := MemberManagement.GetMemberFromExtMemberNo(MemberInfoCapture."External Member No");
+            if (MemberInfoCapture."Member Entry No" = 0) then
+                Error(INVALID_MEMBER_NO, MemberInfoCapture."External Member No");
+        end;
+        MemberInfoCapture.Modify();
+
+        if (not MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ReasonText)) then
+            Error(ReasonText);
+
+        MemberInfoCapture.Modify();
+
+        if (MemberInfoCapture."Member Card Type" in [MemberInfoCapture."Member Card Type"::CARD_PASSSERVER, MemberInfoCapture."Member Card Type"::PASSSERVER]) then
+            MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", Today);
+
+    end;
+
+    local procedure InsertAddReplaceCardRequest(Element: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    var
+        Node: XmlNode;
+        CardRequestElement: XmlElement;
+    begin
+        MemberInfoCapture."Entry No." := 0;
+
+        if (NpXmlDomMgt.FindNode(Element.AsXmlNode(), 'add_card', Node)) then begin
+            CardRequestElement := Node.AsXmlElement();
+            MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
+
+            MemberInfoCapture."External Membership No." := GetXmlAttributeText20(CardRequestElement, 'membershipnumber', false);
+            if (MemberInfoCapture."External Membership No." <> '') then begin
+                MemberInfoCapture."External Member No" := GetXmlAttributeText20(CardRequestElement, 'membernumber', true);
+                MemberInfoCapture."External Card No." := GetXmlAttributeText100(CardRequestElement, 'new_cardnumber', false);
+            end;
+        end;
+
+        if (MemberInfoCapture."External Membership No." = '') and (NpXmlDomMgt.FindNode(Element.AsXmlNode(), 'replace_card', Node)) then begin
+            CardRequestElement := Node.AsXmlElement();
+            MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
+
+            MemberInfoCapture."Replace External Card No." := CopyStr(NpXmlDomMgt.GetXmlAttributeText(CardRequestElement, 'old_cardnumber', true), 1, MaxStrLen(MemberInfoCapture."Replace External Card No."));
+            MemberInfoCapture."External Card No." := CopyStr(NpXmlDomMgt.GetXmlAttributeText(CardRequestElement, 'new_cardnumber', false), 1, MaxStrLen(MemberInfoCapture."External Card No."));
+        end;
+
+        if ((MemberInfoCapture."External Membership No." = '') and (MemberInfoCapture."Replace External Card No." = '')) then
+            Error('Invalid Request. Required attributes for either add_card or replace_card is missing and action could not be determined.');
+
+        if (MemberInfoCapture."External Card No." <> '') then
+            MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::FOREIGN;
+
+        MemberInfoCapture.Insert();
+    end;
+
     local procedure ImportBlockMemberships(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
         Request: XmlElement;
@@ -845,7 +946,7 @@
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
         MemberInfoCapture.Insert();
 
-        TargetDocumentId := GetXmlText100(Request, 'documentid', MaxStrLen(MemberInfoCapture."Import Entry Document ID"), true);
+        TargetDocumentId := GetXmlText100(Request, 'documentid', true);
         MembershipEntry.SetFilter("Import Entry Document ID", '=%1', TargetDocumentId);
         MembershipEntry.SetFilter(Blocked, '=%1', false);
         MembershipEntry.FindFirst();
@@ -983,7 +1084,7 @@
         MemberInfoCapture."Card Entry No." := MemberCard."Entry No.";
         MemberInfoCapture.Modify();
 
-        NotificationEntryNo := MemberNotification.CreateWalletWithoutSendingNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
+        NotificationEntryNo := MemberNotification.CreateWalletWithoutSendingNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", Today);
 
         if (NotificationEntryNo = 0) then
             Error('eMemberCard is missing setup.');
@@ -999,14 +1100,14 @@
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."Item No." := GetXmlText20(CreateMembershipRequest, 'membershipsalesitem', MaxStrLen(MemberInfoCapture."Item No."), true);
+        MemberInfoCapture."Item No." := GetXmlText20(CreateMembershipRequest, 'membershipsalesitem', true);
 
-        Evaluate(MemberInfoCapture."Document Date", GetXmlText20(CreateMembershipRequest, 'activationdate', 20, false), 9);
+        Evaluate(MemberInfoCapture."Document Date", GetXmlText20(CreateMembershipRequest, 'activationdate', false), 9);
         MemberInfoCapture.Insert();
 
-        MemberInfoCapture."Company Name" := GetXmlText50(CreateMembershipRequest, 'companyname', MaxStrLen(MemberInfoCapture."Company Name"), false);
-        MemberInfoCapture."Customer No." := GetXmlText20(CreateMembershipRequest, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
-        MemberInfoCapture."Document No." := GetXmlText20(CreateMembershipRequest, 'documentno', MaxStrLen(MemberInfoCapture."Document No."), false);
+        MemberInfoCapture."Company Name" := GetXmlText50(CreateMembershipRequest, 'companyname', false);
+        MemberInfoCapture."Customer No." := GetXmlText20(CreateMembershipRequest, 'preassigned_customer_number', false);
+        MemberInfoCapture."Document No." := GetXmlText20(CreateMembershipRequest, 'documentno', false);
 
     end;
 
@@ -1022,25 +1123,25 @@
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Membership No." := GetXmlText20(MemberRequest, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
-        MemberInfoCapture."External Member No" := GetXmlText20(MemberRequest, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
+        MemberInfoCapture."External Membership No." := GetXmlText20(MemberRequest, 'membershipnumber', false);
+        MemberInfoCapture."External Member No" := GetXmlText20(MemberRequest, 'membernumber', false);
 
-        MemberInfoCapture."First Name" := GetXmlText50(MemberRequest, 'firstname', MaxStrLen(MemberInfoCapture."First Name"), true);
-        MemberInfoCapture."E-Mail Address" := LowerCase(GetXmlText80(MemberRequest, 'email', MaxStrLen(MemberInfoCapture."E-Mail Address"), true));
+        MemberInfoCapture."First Name" := GetXmlText50(MemberRequest, 'firstname', true);
+        MemberInfoCapture."E-Mail Address" := LowerCase(GetXmlText80(MemberRequest, 'email', true));
 
-        MemberInfoCapture."Guardian External Member No." := GetXmlText20(MemberRequest, 'guardian/membernumber', MaxStrLen(MemberInfoCapture."Guardian External Member No."), false);
+        MemberInfoCapture."Guardian External Member No." := GetXmlText20(MemberRequest, 'guardian/membernumber', false);
         if (MemberInfoCapture."Guardian External Member No." <> '') then
             if (MemberInfoCapture."E-Mail Address" = '') then
-                MemberInfoCapture."E-Mail Address" := LowerCase(GetXmlText80(MemberRequest, 'guardian/email', MaxStrLen(MemberInfoCapture."E-Mail Address"), true));
+                MemberInfoCapture."E-Mail Address" := LowerCase(GetXmlText80(MemberRequest, 'guardian/email', true));
 
-        MemberInfoCapture."Middle Name" := GetXmlText50(MemberRequest, 'middlename', MaxStrLen(MemberInfoCapture."Middle Name"), false);
-        MemberInfoCapture."Last Name" := GetXmlText50(MemberRequest, 'lastname', MaxStrLen(MemberInfoCapture."Last Name"), true);
-        MemberInfoCapture.Address := GetXmlText100(MemberRequest, 'address', MaxStrLen(MemberInfoCapture.Address), false);
+        MemberInfoCapture."Middle Name" := GetXmlText50(MemberRequest, 'middlename', false);
+        MemberInfoCapture."Last Name" := GetXmlText50(MemberRequest, 'lastname', true);
+        MemberInfoCapture.Address := GetXmlText100(MemberRequest, 'address', false);
 
-        MemberInfoCapture."Post Code Code" := GetXmlText20(MemberRequest, 'postcode', MaxStrLen(MemberInfoCapture."Post Code Code"), false);
-        MemberInfoCapture.City := GetXmlText50(MemberRequest, 'city', MaxStrLen(MemberInfoCapture.City), false);
-        MemberInfoCapture.Country := GetXmlText50(MemberRequest, 'country', MaxStrLen(MemberInfoCapture.Country), false);
-        MemberInfoCapture."Phone No." := GetXmlText30(MemberRequest, 'phoneno', MaxStrLen(MemberInfoCapture."Phone No."), false);
+        MemberInfoCapture."Post Code Code" := GetXmlText20(MemberRequest, 'postcode', false);
+        MemberInfoCapture.City := GetXmlText50(MemberRequest, 'city', false);
+        MemberInfoCapture.Country := GetXmlText50(MemberRequest, 'country', false);
+        MemberInfoCapture."Phone No." := GetXmlText30(MemberRequest, 'phoneno', false);
 
         if (MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." <> '') then
             MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::SMS;
@@ -1051,7 +1152,7 @@
         if (MemberInfoCapture."E-Mail Address" <> '') and (MemberInfoCapture."Phone No." <> '') then
             MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::EMAIL;
 
-        NotificationMethodText := GetXmlText30(MemberRequest, 'notificationmethod', MaxStrLen(NotificationMethodText), false);
+        NotificationMethodText := GetXmlText30(MemberRequest, 'notificationmethod', false);
         case UpperCase(NotificationMethodText) of
             'NO_THANKYOU', '0':
                 MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::NO_THANKYOU;
@@ -1065,9 +1166,11 @@
                 ; // Do nothing
         end;
 
-        Evaluate(MemberInfoCapture.Birthday, GetXmlText20(MemberRequest, 'birthday', 20, false), 9);
+        Evaluate(MemberInfoCapture.Birthday, GetXmlText20(MemberRequest, 'birthday', false), 9);
+        if (MemberInfoCapture.Birthday < DMY2Date(1, 1, 1900)) then
+            MemberInfoCapture.Birthday := 0D;
 
-        GenderText := GetXmlText30(MemberRequest, 'gender', MaxStrLen(GenderText), false);
+        GenderText := GetXmlText30(MemberRequest, 'gender', false);
         case UpperCase(GenderText) of
             'MALE', '1', Format(MemberInfoCapture.Gender::MALE, 0, 9):
                 MemberInfoCapture.Gender := MemberInfoCapture.Gender::MALE;
@@ -1079,7 +1182,7 @@
                 MemberInfoCapture.Gender := MemberInfoCapture.Gender::NOT_SPECIFIED;
         end;
 
-        CrmText := GetXmlText30(MemberRequest, 'newsletter', MaxStrLen(CrmText), false);
+        CrmText := GetXmlText30(MemberRequest, 'newsletter', false);
         case UpperCase(CrmText) of
             'YES', '1', Format(MemberInfoCapture."News Letter"::YES, 0, 9):
                 MemberInfoCapture."News Letter" := MemberInfoCapture."News Letter"::YES;
@@ -1089,10 +1192,10 @@
                 MemberInfoCapture."News Letter" := MemberInfoCapture."News Letter"::NOT_SPECIFIED;
         end;
 
-        MemberInfoCapture."User Logon ID" := UpperCase(GetXmlText80(MemberRequest, 'username', MaxStrLen(MemberInfoCapture."User Logon ID"), false));
-        MemberInfoCapture."Password SHA1" := GetXmlText50(MemberRequest, 'password', MaxStrLen(MemberInfoCapture."Password SHA1"), false);
+        MemberInfoCapture."User Logon ID" := UpperCase(GetXmlText80(MemberRequest, 'username', false));
+        MemberInfoCapture."Password SHA1" := GetXmlText50(MemberRequest, 'password', false);
 
-        GdprText := GetXmlText30(MemberRequest, 'gdpr_approval', MaxStrLen(GdprText), false);
+        GdprText := GetXmlText30(MemberRequest, 'gdpr_approval', false);
         case UpperCase(GdprText) of
             'PENDING', '1', UpperCase(Format(MemberInfoCapture."GDPR Approval"::PENDING, 0, 9)):
                 MemberInfoCapture."GDPR Approval" := MemberInfoCapture."GDPR Approval"::PENDING;
@@ -1104,7 +1207,7 @@
                 MemberInfoCapture."GDPR Approval" := MemberInfoCapture."GDPR Approval"::NA;
         end;
 
-        MemberInfoCapture."External Card No." := GetXmlText100(MemberRequest, 'membercard/cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
+        MemberInfoCapture."External Card No." := GetXmlText100(MemberRequest, 'membercard/cardnumber', false);
         if (MemberInfoCapture."External Card No." <> '') then begin
 
             if (StrLen(MemberInfoCapture."External Card No.") >= 4) then
@@ -1112,15 +1215,15 @@
                 MemberInfoCapture."External Card No. Last 4" := CopyStr(MemberInfoCapture."External Card No.", StrLen(MemberInfoCapture."External Card No.") - 3);
 #pragma warning restore
 
-            BooleanTextField := GetXmlText20(MemberRequest, 'membercard/is_permanent', MaxStrLen(BooleanTextField), true);
+            BooleanTextField := GetXmlText20(MemberRequest, 'membercard/is_permanent', true);
             if (BooleanTextField = '') then
                 BooleanTextField := Format(false, 0, 9);
 
             Evaluate(isPermanent, BooleanTextField, 9);
             MemberInfoCapture."Temporary Member Card" := not isPermanent;
 
-            DateTextField := GetXmlText20(MemberRequest, 'membercard/valid_until', MaxStrLen(DateTextField), true);
-            if (DateTextField = '') then
+            DateTextField := GetXmlText20(MemberRequest, 'membercard/valid_until', true);
+            if ((DateTextField = '') or (DateTextField = '1754-01-01')) then
                 DateTextField := Format(CalcDate('<+10D>', Today), 0, 9); // Default valid for 10 days
             Evaluate(MemberInfoCapture."Valid Until", DateTextField, 9);
 
@@ -1128,9 +1231,9 @@
 
         MemberInfoCapture."Member Card Type" := MemberInfoCapture."Member Card Type"::NONE;
 
-        MemberInfoCapture."Customer No." := GetXmlText20(MemberRequest, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
-        MemberInfoCapture."Contact No." := GetXmlText20(MemberRequest, 'preassigned_contact_number', MaxStrLen(MemberInfoCapture."Contact No."), false);
-        MemberInfoCapture."Store Code" := GetXmlText20(MemberRequest, 'store_code', MaxStrLen(MemberInfoCapture."Store Code"), false);
+        MemberInfoCapture."Customer No." := GetXmlText20(MemberRequest, 'preassigned_customer_number', false);
+        MemberInfoCapture."Contact No." := GetXmlText20(MemberRequest, 'preassigned_contact_number', false);
+        MemberInfoCapture."Store Code" := GetXmlText20(MemberRequest, 'store_code', false);
 
         MemberInfoCapture.Insert();
     end;
@@ -1142,13 +1245,13 @@
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Member No" := GetXmlText20(Request, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
-        MemberInfoCapture."External Card No." := GetXmlText100(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
-        MemberInfoCapture."External Membership No." := GetXmlText20(Request, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
-        MemberInfoCapture."User Logon ID" := UpperCase(GetXmlText80(Request, 'username', MaxStrLen(MemberInfoCapture."User Logon ID"), false));
-        MemberInfoCapture."Password SHA1" := GetXmlText50(Request, 'password', MaxStrLen(MemberInfoCapture."Password SHA1"), false);
+        MemberInfoCapture."External Member No" := GetXmlText20(Request, 'membernumber', false);
+        MemberInfoCapture."External Card No." := GetXmlText100(Request, 'cardnumber', false);
+        MemberInfoCapture."External Membership No." := GetXmlText20(Request, 'membershipnumber', false);
+        MemberInfoCapture."User Logon ID" := UpperCase(GetXmlText80(Request, 'username', false));
+        MemberInfoCapture."Password SHA1" := GetXmlText50(Request, 'password', false);
 
-        CustomerNo := GetXmlText20(Request, 'customernumber', MaxStrLen(CustomerNo), false);
+        CustomerNo := GetXmlText20(Request, 'customernumber', false);
         if (CustomerNo <> '') then begin
             Membership.SetFilter("Customer No.", '=%1', CustomerNo);
             Membership.SetFilter(Blocked, '=%1', false);
@@ -1161,7 +1264,7 @@
 
         end;
 
-        MemberInfoCapture."Document No." := UpperCase(GetXmlText20(Request, 'externaldocumentnumber', MaxStrLen(MemberInfoCapture."Document No."), false));
+        MemberInfoCapture."Document No." := UpperCase(GetXmlText20(Request, 'externaldocumentnumber', false));
 
         MemberInfoCapture.Insert();
     end;
@@ -1170,7 +1273,7 @@
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Card No." := GetXmlText100(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
+        MemberInfoCapture."External Card No." := GetXmlText100(Request, 'cardnumber', false);
         MemberInfoCapture.Insert();
 
     end;
@@ -1180,9 +1283,9 @@
         ChangeType: Text[100];
     begin
 
-        MemberInfoCapture."Item No." := GetXmlText20(Request, 'membershipchangeitem', MaxStrLen(MemberInfoCapture."Item No."), true);
+        MemberInfoCapture."Item No." := GetXmlText20(Request, 'membershipchangeitem', true);
 
-        ChangeType := GetXmlText100(Request, 'changetype', MaxStrLen(ChangeType), true);
+        ChangeType := GetXmlText100(Request, 'changetype', true);
         case UpperCase(ChangeType) of
             'CANCEL', '1', Format(MemberInfoCapture."Information Context"::REGRET, 0, 9):
                 MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::REGRET;
@@ -1215,8 +1318,8 @@
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Membership No." := GetXmlText20(Request, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
-        Evaluate(MemberInfoCapture.Quantity, GetXmlText20(Request, 'addmembercount', 20, false), 9);
+        MemberInfoCapture."External Membership No." := GetXmlText20(Request, 'membershipnumber', false);
+        Evaluate(MemberInfoCapture.Quantity, GetXmlText20(Request, 'addmembercount', false), 9);
 
         MemberInfoCapture.Insert();
 
@@ -1228,10 +1331,10 @@
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Card No." := GetXmlText100(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
-        DataSubjectId := GetXmlText40(Request, 'datasubjectid', MaxStrLen(DataSubjectId), false);
+        MemberInfoCapture."External Card No." := GetXmlText100(Request, 'cardnumber', false);
+        DataSubjectId := GetXmlText40(Request, 'datasubjectid', false);
 
-        GdprText := GetXmlText20(Request, 'gdpr_approval', MaxStrLen(GdprText), false);
+        GdprText := GetXmlText20(Request, 'gdpr_approval', false);
         case UpperCase(GdprText) of
             'PENDING', '1', UpperCase(Format(MemberInfoCapture."GDPR Approval"::PENDING, 0, 9)):
                 MemberInfoCapture."GDPR Approval" := MemberInfoCapture."GDPR Approval"::PENDING;
@@ -1277,7 +1380,7 @@
         NPRAttributeManagement: Codeunit "NPR Attribute Management";
     begin
 
-        TableId := DATABASE::"NPR MM Member Info Capture";
+        TableId := Database::"NPR MM Member Info Capture";
 
         if (not NPRAttribute.Get(AttributeCode)) then
             Error('Attribute %1 is not valid.', AttributeCode);
@@ -1306,34 +1409,44 @@
         WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR MM Member WebService", 'member_services', true);
     end;
 #pragma warning disable AA0139
-    local procedure GetXmlText20(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[20]
+    local procedure GetXmlText20(Element: XmlElement; NodePath: Text; Required: Boolean): Text[20]
     begin
-        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, 20, Required));
     end;
 
-    local procedure GetXmlText30(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[30]
+    local procedure GetXmlText30(Element: XmlElement; NodePath: Text; Required: Boolean): Text[30]
     begin
-        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, 30, Required));
     end;
 
-    local procedure GetXmlText40(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[40]
+    local procedure GetXmlText40(Element: XmlElement; NodePath: Text; Required: Boolean): Text[40]
     begin
-        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, 40, Required));
     end;
 
-    local procedure GetXmlText50(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[50]
+    local procedure GetXmlText50(Element: XmlElement; NodePath: Text; Required: Boolean): Text[50]
     begin
-        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, 50, Required));
     end;
 
-    local procedure GetXmlText80(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[80]
+    local procedure GetXmlText80(Element: XmlElement; NodePath: Text; Required: Boolean): Text[80]
     begin
-        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, 80, Required));
     end;
 
-    local procedure GetXmlText100(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text[100]
+    local procedure GetXmlText100(Element: XmlElement; NodePath: Text; Required: Boolean): Text[100]
     begin
-        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, 100, Required));
+    end;
+
+    local procedure GetXmlAttributeText20(Element: XmlElement; AttributeName: Text; Required: Boolean): Text[20]
+    begin
+        exit(CopyStr(NpXmlDomMgt.GetXmlAttributeText(Element, AttributeName, Required), 1, 20));
+    end;
+
+    local procedure GetXmlAttributeText100(Element: XmlElement; AttributeName: Text; Required: Boolean): Text[100]
+    begin
+        exit(CopyStr(NpXmlDomMgt.GetXmlAttributeText(Element, AttributeName, Required), 1, 100));
     end;
 #pragma warning restore
 }

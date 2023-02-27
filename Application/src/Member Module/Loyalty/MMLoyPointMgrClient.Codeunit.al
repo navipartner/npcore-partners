@@ -193,6 +193,7 @@
         TmpTransactionAuthorization."Transaction Date" := EFTTransactionRequest."Transaction Date";
         TmpTransactionAuthorization."Transaction Time" := EFTTransactionRequest."Transaction Time";
         TmpTransactionAuthorization."Company Name" := CopyStr(DATABASE.CompanyName, 1, MaxStrLen(TmpTransactionAuthorization."Company Name"));
+        TmpTransactionAuthorization."Retail Id" := EFTTransactionRequest."Sales ID";
         TmpTransactionAuthorization.Insert();
     end;
 
@@ -237,6 +238,7 @@
                 TempRegisterSalesLines."Currency Code" := SaleLinePOS."Currency Code";
 
                 TempRegisterSalesLines."Total Points" := EarnAmountToPoints(LoyaltyStoreSetup, TempRegisterSalesLines."Total Amount");
+                TempRegisterSalesLines."Retail Id" := SaleLinePOS.SystemId;
 
                 TempRegisterSalesLines.Insert();
             until (SaleLinePOS.Next() = 0);
@@ -263,6 +265,7 @@
                 TempRegisterPaymentLines."Currency Code" := EFTTransactionRequest2."Currency Code";
                 TempRegisterPaymentLines."Total Points" := EFTTransactionRequest2."Amount Output";
                 TempRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, EFTTransactionRequest2."Amount Output");
+                TempRegisterPaymentLines."Retail Id" := EFTTransactionRequest2."Sales Line ID";
                 TempRegisterPaymentLines.Insert();
             until (EFTTransactionRequest2.Next() = 0);
         end;
@@ -297,6 +300,7 @@
         TempRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, EFTTransactionRequest."Amount Input");
         TempRegisterPaymentLines."Total Points" := EFTTransactionRequest."Amount Input";
         TempRegisterPaymentLines.Description := CopyStr(EFTTransactionRequest."POS Description", 1, MaxStrLen(TempRegisterPaymentLines.Description));
+        TempRegisterPaymentLines."Retail Id" := EFTTransactionRequest."Sales Line ID";
         TempRegisterPaymentLines.Insert();
 
         SoapAction := 'reservePoints';
@@ -823,6 +827,7 @@
         Xml7Lbl: Label '<TransactionId>%1</TransactionId>', Locked = true;
         Xml8Lbl: Label '<Date>%1</Date>', Locked = true;
         Xml9Lbl: Label '<Time>%1</Time>', Locked = true;
+        XmlALbl: Label '<RetailId>%1</RetailId>', Locked = true;
     begin
         XmlText :=
         '<Authorization>' +
@@ -835,6 +840,7 @@
           StrSubstNo(Xml7Lbl, TmpTransactionAuthorization."Foreign Transaction Id") +
           StrSubstNo(Xml8Lbl, Format(TmpTransactionAuthorization."Transaction Date", 0, 9)) +
           StrSubstNo(Xml9Lbl, Format(TmpTransactionAuthorization."Transaction Time", 0, 9)) +
+          StrSubstNo(XmlALbl, TmpTransactionAuthorization."Retail Id") +
         '</Authorization>';
     end;
 
@@ -857,6 +863,7 @@
         EFTTransactionRequest."Register No." := SalePOS."Register No.";
         EFTTransactionRequest."POS Payment Type Code" := '';
         EFTTransactionRequest."Result Code" := 0;
+        EFTTransactionRequest."Sales ID" := SalePOS.SystemId;
 
         EFTTransactionRequest."Transaction Date" := Today();
         EFTTransactionRequest."Transaction Time" := Time;
@@ -901,8 +908,8 @@
     var
         XmlSalesLines: Text;
         XmlPaymentLines: Text;
-        XmlSalesLinesLbl: Label '<Line Type="%1" ItemNumber="%2" VariantCode="%3" Quantity="%4" Description="%5" CurrencyCode="%6" Amount="%7" Points="%8"/>', Locked = true;
-        XmlPaymentLinesLbl: Label '<Line Type="%1" Description="%2" CurrencyCode="%3" Amount="%4" Points="%5" AuthorizationCode="%6"/>', Locked = true;
+        XmlSalesLinesLbl: Label '<Line Type="%1" ItemNumber="%2" VariantCode="%3" Quantity="%4" Description="%5" CurrencyCode="%6" Amount="%7" Points="%8" Id="%9"/>', Locked = true;
+        XmlPaymentLinesLbl: Label '<Line Type="%1" Description="%2" CurrencyCode="%3" Amount="%4" Points="%5" AuthorizationCode="%6" Id="%7"/>', Locked = true;
     begin
 
         TmpTransactionAuthorization.FindFirst();
@@ -914,21 +921,23 @@
                   TmpRegisterSaleLines."Item No.",
                   TmpRegisterSaleLines."Variant Code",
                   Format(TmpRegisterSaleLines.Quantity, 0, 9),
-                  TmpRegisterSaleLines.Description,
+                  XmlSafe(TmpRegisterSaleLines.Description),
                   TmpRegisterSaleLines."Currency Code",
                   Format(TmpRegisterSaleLines."Total Amount", 0, 9),
-                  Format(TmpRegisterSaleLines."Total Points", 0, 9));
+                  Format(TmpRegisterSaleLines."Total Points", 0, 9),
+                  TmpRegisterSaleLines."Retail Id");
             until (TmpRegisterSaleLines.Next() = 0);
 
         if (TmpRegisterPaymentLines.FindSet()) then
             repeat
                 XmlPaymentLines += StrSubstNo(XmlPaymentLinesLbl,
                   TmpRegisterPaymentLines.Type,
-                  TmpRegisterPaymentLines.Description,
+                  XmlSafe(TmpRegisterPaymentLines.Description),
                   TmpRegisterPaymentLines."Currency Code",
                   Format(TmpRegisterPaymentLines."Total Amount", 0, 9),
                   Format(TmpRegisterPaymentLines."Total Points", 0, 9),
-                  TmpRegisterPaymentLines."Authorization Code");
+                  TmpRegisterPaymentLines."Authorization Code",
+                  TmpRegisterPaymentLines."Retail Id");
             until (TmpRegisterPaymentLines.Next() = 0);
 
         XmlText :=
@@ -982,7 +991,7 @@
             repeat
                 XmlReservationLines += StrSubstNo(XmlReservationLinesLbl,
                   Format(TmpRegisterPaymentLines.Type, 0, 9),
-                  TmpRegisterPaymentLines.Description,
+                  XmlSafe(TmpRegisterPaymentLines.Description),
                   TmpRegisterPaymentLines."Currency Code",
                   Format(TmpRegisterPaymentLines."Total Amount", 0, 9),
                   Format(TmpRegisterPaymentLines."Total Points", 0, 9));
@@ -1020,6 +1029,11 @@
         '<x61:Request>' +
           CreateAuthorizationSection(TmpTransactionAuthorization) +
         '</x61:Request>';
+    end;
+
+    local procedure XmlSafe(InText: Text): Text
+    begin
+        exit(DelChr(InText, '<=>', '"<>&/'));
     end;
 }
 

@@ -60,6 +60,11 @@
             Caption = 'Currency Code';
             DataClassification = CustomerContent;
         }
+        field(170; "Retail Id"; Guid)
+        {
+            Caption = 'Retail Id';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
