@@ -192,6 +192,8 @@
                       '<glob1:payMethod>' + Format(POSPaymentLine."POS Payment Method Code") + '</glob1:payMethod>' +
                       '<glob1:payDesc>' + Format(POSPaymentLine.Description) + '</glob1:payDesc>' +
                       '<glob1:payAmount>' + Format(POSPaymentLine."Payment Amount") + '</glob1:payAmount>' +
+                      '<glob1:currencyCode>' + Format(POSPaymentLine."Currency Code") + '</glob1:currencyCode>' +
+                      '<glob1:amountLCY>' + Format(POSPaymentLine."Amount (LCY)") + '</glob1:amountLCY>' +
                     '</glob1:payment_line>';
             until POSPaymentLine.Next() = 0;
         Xml += '</glob1:pos_payment_lines>' +

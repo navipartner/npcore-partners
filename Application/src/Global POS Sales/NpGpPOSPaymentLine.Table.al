@@ -39,6 +39,18 @@ table 6059798 "NPR NpGp POS Payment Line"
             Caption = 'Payment Amount';
             DataClassification = CustomerContent;
         }
+        field(39; "Currency Code"; Code[10])
+        {
+            Caption = 'Currency Code';
+            DataClassification = CustomerContent;
+            Editable = false;
+            TableRelation = Currency;
+        }
+        field(50; "Amount (LCY)"; Decimal)
+        {
+            Caption = 'Amount (LCY)';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

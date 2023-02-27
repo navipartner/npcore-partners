@@ -280,6 +280,15 @@ xmlport 6151167 "NPR NpGp POS Entries"
                         }
                         fieldelement(payAmount; TempNpGpPOSPaymentLines."Payment Amount")
                         {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(currencyCode; TempNpGpPOSPaymentLines."Currency Code")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(amountLCY; TempNpGpPOSPaymentLines."Amount (LCY)")
+                        {
+                            MinOccurs = Zero;
                         }
                         trigger OnBeforeInsertRecord()
                         begin

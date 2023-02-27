@@ -30,6 +30,16 @@ page 6150755 "NPR NpGp POSPaymeLines Subpage"
                     ToolTip = 'Specifies the value of the Payment Amount field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Currency Code"; Rec."Currency Code")
+                {
+                    ToolTip = 'Specifies the value of the Currency Code field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Amount (LCY)"; Rec."Amount (LCY)")
+                {
+                    ToolTip = 'Specifies the value of the Amount (LCY) field';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
