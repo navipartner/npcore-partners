@@ -1,69 +1,35 @@
-﻿codeunit 6151422 "NPR Magento Pmt. Adyen Mgt."
+﻿codeunit 6151422 "NPR Magento Pmt. Adyen Mgt." implements "NPR IPaymentGateway"
 {
     Access = Internal;
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CapturePaymentEvent', '', true, true)]
-    local procedure OnCapturePayment(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
-    begin
-        if not IsAdyenPaymentLine(PaymentLine) then
-            exit;
-        if not (PaymentLine."Document Table No." in [DATABASE::"Sales Header", DATABASE::"Sales Invoice Header"]) then
-            exit;
 
-        Capture(PaymentLine);
+    var
+        WrongTableSuppliedErr: Label 'The table supplied (%1) is wrong. Expected table no. in (%2).', Comment = '%1 = actual table no., %2 = expected table no. or range of numbers';
+        NoReferenceGivenLbl: Label 'No BC reference given';
 
-        PaymentLine."Date Captured" := Today();
-        PaymentLine.Modify(true);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CancelPaymentEvent', '', true, true)]
-    local procedure OnCancelPayment(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
-    begin
-        if not IsAdyenPaymentLine(PaymentLine) then
-            exit;
-        if not (PaymentLine."Document Table No." in [DATABASE::"Sales Header", DATABASE::"Sales Invoice Header"]) then
-            exit;
-
-        Cancel(PaymentLine);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'RefundPaymentEvent', '', true, true)]
-    local procedure OnRefundPayment(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
-    begin
-        if not IsAdyenRefundLine(PaymentLine) then
-            exit;
-        if not (PaymentLine."Document Table No." in [DATABASE::"Sales Header", DATABASE::"Sales Cr.Memo Header"]) then
-            exit;
-
-        Refund(PaymentLine);
-
-        PaymentLine."Date Refunded" := Today();
-        PaymentLine.Modify(true);
-    end;
-
-    local procedure Capture(PaymentLine: Record "NPR Magento Payment Line")
+    #region Payment Integration
+    local procedure CaptureInternal(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
-        PaymentGateway: Record "NPR Magento Payment Gateway";
+        AdyenSetup: Record "NPR PG Adyen Setup";
         HttpWebRequest: HttpRequestMessage;
         JsonO: JsonObject;
         JsonT: JsonToken;
         Url: Text;
-        Request: Text;
+        RequestTxt: Text;
         CurrencyCode: Code[10];
         Reference: Text;
-        Response: Text;
+        ResponseTxt: Text;
         ResponseJson: Text;
     begin
-        PaymentGateway.Get(PaymentLine."Payment Gateway Code");
-        PaymentGateway.TestField("Api Url");
-        Url := PaymentGateway."Api Url" + '/capture';
+        AdyenSetup.Get(Request."Payment Gateway Code");
+        Url := AdyenSetup.GetAPIBaseUrl() + 'capture';
 
-        case PaymentLine."Document Table No." of
+        case Request."Document Table No." of
             DATABASE::"Sales Header":
                 begin
-                    SalesHeader.Get(PaymentLine."Document Type", PaymentLine."Document No.");
+                    SalesHeader.GetBySystemId(Request."Document System Id");
                     CurrencyCode := SalesHeader."Currency Code";
                     Reference := SalesHeader."No.";
                     if SalesHeader."NPR External Order No." <> '' then
@@ -71,103 +37,116 @@
                 end;
             DATABASE::"Sales Invoice Header":
                 begin
-                    SalesInvHeader.Get(PaymentLine."Document No.");
+                    SalesInvHeader.GetBySystemId(Request."Document System Id");
                     CurrencyCode := SalesInvHeader."Currency Code";
                     Reference := SalesInvHeader."No.";
                     if SalesInvHeader."NPR External Order No." <> '' then
                         Reference := SalesInvHeader."NPR External Order No.";
                 end;
+            else
+                Error(WrongTableSuppliedErr, Request."Document Table No.", StrSubstNo('%1, %2', Database::"Sales Header", Database::"Sales Invoice Header"));
         end;
+
         if CurrencyCode = '' then begin
             GeneralLedgerSetup.Get();
             CurrencyCode := GeneralLedgerSetup."LCY Code";
         end;
 
-        Request :=
+        RequestTxt :=
           '{' +
-          '  "originalReference": "' + PaymentLine."No." + '",' +
+          '  "originalReference": "' + Request."Transaction ID" + '",' +
           '  "modificationAmount": {' +
-          '    "value": ' + ConvertToAdyenPayAmount(PaymentLine.Amount) + ',' +
+          '    "value": ' + ConvertToAdyenPayAmount(Request."Request Amount") + ',' +
           '    "currency": "' + CurrencyCode + '"' +
           '  },' +
           '  "reference": "' + Reference + '",' +
-          '  "merchantAccount": "' + PaymentGateway."Merchant Name" + '"' +
+          '  "merchantAccount": "' + AdyenSetup."Merchant Name" + '"' +
           '}';
 
-        InitWebRequest(Url, PaymentGateway."Api Username", PaymentGateway.GetApiPassword(), HttpWebRequest, Request);
-        ResponseJson := SendWebRequest(HttpWebRequest);
+        Request.AddBody(RequestTxt);
+        InitWebRequest(Url, AdyenSetup."API Username", AdyenSetup.GetApiPassword(), HttpWebRequest, RequestTxt);
 
-        if not JsonO.ReadFrom(ResponseJson) then
+        ResponseJson := SendWebRequest(HttpWebRequest, Response);
+
+        if (not JsonO.ReadFrom(ResponseJson)) then
             Error(ResponseJson);
 
         JsonO.Get('response', JsonT);
-        Response := JsonT.AsValue().AsText();
-        if Response <> '[capture-received]' then
-            Error(Response);
+        ResponseTxt := JsonT.AsValue().AsText();
+        if ResponseTxt <> '[capture-received]' then
+            Error(ResponseTxt);
+
+        Response."Response Success" := true;
     end;
 
-    local procedure Cancel(PaymentLine: Record "NPR Magento Payment Line")
+    local procedure CancelInternal(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
+        AdyenSetup: Record "NPR PG Adyen Setup";
         HttpWebRequest: HttpRequestMessage;
         JsonO: JsonObject;
         JsonT: JsonToken;
         Url: Text;
-        Request: Text;
+        RequestTxt: Text;
         Reference: Text;
-        Response: Text;
+        ResponseTxt: Text;
         ResponseJson: Text;
     begin
-        PaymentGateway.Get(PaymentLine."Payment Gateway Code");
-        PaymentGateway.TestField("Api Url");
-        Url := PaymentGateway."Api Url" + '/cancel';
+        AdyenSetup.Get(Request."Payment Gateway Code");
+        Url := AdyenSetup.GetAPIBaseUrl() + 'cancel';
 
-        PaymentLine.TestField("Document Table No.", DATABASE::"Sales Header");
-        Reference := PaymentLine."Document No.";
+        if (Request."Document Table No." <> Database::"Sales Header") then
+            Error(WrongTableSuppliedErr, Request."Document Table No.", Database::"Sales Header");
 
-        Request :=
+        Reference := Request."Request Description";
+        if (Reference = '') then
+            Reference := NoReferenceGivenLbl;
+
+        RequestTxt :=
           '{' +
-          '  "originalReference": "' + PaymentLine."No." + '",' +
+          '  "originalReference": "' + Request."Transaction ID" + '",' +
           '  "reference": "' + Reference + '",' +
-          '  "merchantAccount": "' + PaymentGateway."Merchant Name" + '"' +
+          '  "merchantAccount": "' + AdyenSetup."Merchant Name" + '"' +
           '}';
 
-        InitWebRequest(Url, PaymentGateway."Api Username", PaymentGateway.GetApiPassword(), HttpWebRequest, Request);
-        ResponseJson := SendWebRequest(HttpWebRequest);
+        Request.AddBody(RequestTxt);
+        InitWebRequest(Url, AdyenSetup."API Username", AdyenSetup.GetApiPassword(), HttpWebRequest, RequestTxt);
+
+        ResponseJson := SendWebRequest(HttpWebRequest, Response);
 
         if not JsonO.ReadFrom(ResponseJson) then
             Error(ResponseJson);
 
         JsonO.Get('response', JsonT);
-        Response := JsonT.AsValue().AsText();
-        if Response <> '[cancel-received]' then
-            Error(Response);
+        ResponseTxt := JsonT.AsValue().AsText();
+        if ResponseTxt <> '[cancel-received]' then
+            Error(ResponseTxt);
+
+        Response."Response Success" := true;
     end;
 
-    local procedure Refund(PaymentLine: Record "NPR Magento Payment Line")
+    local procedure RefundInternal(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        PaymentGateway: Record "NPR Magento Payment Gateway";
+        AdyenSetup: Record "NPR PG Adyen Setup";
         HttpWebRequest: HttpRequestMessage;
         JsonO: JsonObject;
         JsonT: JsonToken;
         Url: Text;
-        Request: Text;
+        RequestTxt: Text;
         CurrencyCode: Code[10];
         Reference: Text;
-        Response: Text;
+        ResponseTxt: Text;
         ResponseJson: Text;
     begin
-        PaymentGateway.Get(PaymentLine."Payment Gateway Code");
-        PaymentGateway.TestField("Api Url");
-        Url := PaymentGateway."Api Url" + '/refund';
+        AdyenSetup.Get(Request."Payment Gateway Code");
+        Url := AdyenSetup.GetAPIBaseUrl() + 'refund';
 
-        case PaymentLine."Document Table No." of
+        case Request."Document Table No." of
             DATABASE::"Sales Header":
                 begin
-                    SalesHeader.Get(PaymentLine."Document Type", PaymentLine."Document No.");
+                    SalesHeader.GetBySystemId(Request."Document System Id");
                     CurrencyCode := SalesHeader."Currency Code";
                     Reference := SalesHeader."No.";
                     if SalesHeader."NPR External Order No." <> '' then
@@ -175,61 +154,46 @@
                 end;
             DATABASE::"Sales Cr.Memo Header":
                 begin
-                    SalesCrMemoHeader.Get(PaymentLine."Document No.");
+                    SalesCrMemoHeader.GetBySystemId(Request."Document System Id");
                     CurrencyCode := SalesCrMemoHeader."Currency Code";
                     Reference := SalesCrMemoHeader."No.";
                     if SalesCrMemoHeader."NPR External Order No." <> '' then
                         Reference := SalesCrMemoHeader."NPR External Order No.";
                 end;
+            else
+                Error(WrongTableSuppliedErr, Request."Document Table No.", StrSubstNo('%1, %2', Database::"Sales Header", Database::"Sales Cr.Memo Header"));
         end;
+
         if CurrencyCode = '' then begin
             GeneralLedgerSetup.Get();
             CurrencyCode := GeneralLedgerSetup."LCY Code";
         end;
 
-        Request :=
+        RequestTxt :=
           '{' +
-          '  "originalReference": "' + PaymentLine."No." + '",' +
+          '  "originalReference": "' + Request."Transaction ID" + '",' +
           '  "modificationAmount": {' +
-          '    "value": ' + ConvertToAdyenPayAmount(PaymentLine.Amount) + ',' +
+          '    "value": ' + ConvertToAdyenPayAmount(Request."Request Amount") + ',' +
           '    "currency": "' + CurrencyCode + '"' +
           '  },' +
           '  "reference": "' + Reference + '",' +
-          '  "merchantAccount": "' + PaymentGateway."Merchant Name" + '"' +
+          '  "merchantAccount": "' + AdyenSetup."Merchant Name" + '"' +
           '}';
 
-        InitWebRequest(Url, PaymentGateway."Api Username", PaymentGateway.GetApiPassword(), HttpWebRequest, Request);
-        ResponseJson := SendWebRequest(HttpWebRequest);
+        Request.AddBody(RequestTxt);
+        InitWebRequest(Url, AdyenSetup."API Username", AdyenSetup.GetApiPassword(), HttpWebRequest, RequestTxt);
+
+        ResponseJson := SendWebRequest(HttpWebRequest, Response);
 
         if not JsonO.ReadFrom(ResponseJson) then
             Error(ResponseJson);
 
         JsonO.Get('response', JsonT);
-        Response := JsonT.AsValue().AsText();
-        if Response <> '[refund-received]' then
-            Error(Response);
-    end;
+        ResponseTxt := JsonT.AsValue().AsText();
+        if ResponseTxt <> '[refund-received]' then
+            Error(ResponseTxt);
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Line", 'OnAfterInsertEvent', '', true, true)]
-    local procedure OnInsertPaymentLine(var Rec: Record "NPR Magento Payment Line"; RunTrigger: Boolean)
-    begin
-        if not RunTrigger then
-            exit;
-        if not IsAdyenPaymentLine(Rec) then
-            exit;
-
-        UpsertShopperRef(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Line", 'OnAfterModifyEvent', '', true, true)]
-    local procedure OnModifyPaymentLine(var Rec: Record "NPR Magento Payment Line"; var xRec: Record "NPR Magento Payment Line"; RunTrigger: Boolean)
-    begin
-        if not RunTrigger then
-            exit;
-        if not IsAdyenPaymentLine(Rec) then
-            exit;
-
-        UpsertShopperRef(Rec);
+        Response."Response Success" := true;
     end;
 
     local procedure UpsertShopperRef(PaymentLine: Record "NPR Magento Payment Line")
@@ -267,7 +231,34 @@
         if PrevRec <> Format(EFTShopperRecognition) then
             EFTShopperRecognition.Modify(true);
     end;
+    #endregion
 
+    #region insert modify
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Line", 'OnAfterInsertEvent', '', true, true)]
+    local procedure OnInsertPaymentLine(var Rec: Record "NPR Magento Payment Line"; RunTrigger: Boolean)
+    begin
+        if not RunTrigger then
+            exit;
+        if not IsAdyenPaymentLine(Rec) then
+            exit;
+
+        UpsertShopperRef(Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Line", 'OnAfterModifyEvent', '', true, true)]
+    local procedure OnModifyPaymentLine(var Rec: Record "NPR Magento Payment Line"; var xRec: Record "NPR Magento Payment Line"; RunTrigger: Boolean)
+    begin
+        if not RunTrigger then
+            exit;
+        if not IsAdyenPaymentLine(Rec) then
+            exit;
+
+        UpsertShopperRef(Rec);
+    end;
+    #endregion
+
+
+    #region aux
     local procedure InitWebRequest(Url: Text; Username: Text; Password: Text; var HttpWebRequest: HttpRequestMessage; RequestBody: Text)
     var
         Content: HttpContent;
@@ -287,20 +278,21 @@
         HttpWebRequest.Method := 'POST';
     end;
 
-    local procedure SendWebRequest(HttpWebRequest: HttpRequestMessage): Text
+    local procedure SendWebRequest(HttpWebRequest: HttpRequestMessage; var Response: Record "NPR PG Payment Response"): Text
     var
         Client: HttpClient;
         HttpWebResponse: HttpResponseMessage;
-        Response: Text;
+        ResponseTxt: Text;
     begin
         Client.Timeout(300000);
         Client.Send(HttpWebRequest, HttpWebResponse);
 
-        HttpWebResponse.Content.ReadAs(Response);
+        HttpWebResponse.Content.ReadAs(ResponseTxt);
+        Response.AddResponse(ResponseTxt);
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
-        exit(Response);
+            Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, ResponseTxt);
+        exit(ResponseTxt);
     end;
 
     local procedure CreateBasicAuth(ApiUsername: Text; ApiPassword: Text): Text
@@ -316,34 +308,51 @@
         exit(AdyenAmount);
     end;
 
-    local procedure CurrCodeunitId(): Integer
-    begin
-        exit(CODEUNIT::"NPR Magento Pmt. Adyen Mgt.");
-    end;
-
     procedure IsAdyenPaymentLine(PaymentLine: Record "NPR Magento Payment Line"): Boolean
     var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
+        PGAdyen: Record "NPR PG Adyen Setup";
+        PG: Record "NPR Magento Payment Gateway";
     begin
         if PaymentLine."Payment Gateway Code" = '' then
             exit(false);
-
-        if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
+        if not PG.Get(PaymentLine."Payment Gateway Code") then
+            exit(false);
+        if not PGAdyen.Get(PaymentLine."Payment Gateway Code") then
             exit(false);
 
-        exit(PaymentGateway."Capture Codeunit Id" = CurrCodeunitId());
+        exit(PG."Integration Type" = PG."Integration Type"::Adyen);
+    end;
+    #endregion
+
+    #region Interface implementation
+    procedure Capture(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response");
+    begin
+        CaptureInternal(Request, Response);
     end;
 
-    procedure IsAdyenRefundLine(PaymentLine: Record "NPR Magento Payment Line"): Boolean
+    procedure Refund(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response");
+    begin
+        RefundInternal(Request, Response);
+    end;
+
+    procedure Cancel(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response");
+    begin
+        CancelInternal(Request, Response);
+    end;
+
+    procedure RunSetupCard(PaymentGatewayCode: Code[10]);
     var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
+        PGAdyenSetup: Record "NPR PG Adyen Setup";
     begin
-        if PaymentLine."Payment Gateway Code" = '' then
-            exit(false);
+        if (not PGAdyenSetup.Get(PaymentGatewayCode)) then begin
+            PGAdyenSetup.Init();
+            PGAdyenSetup.Code := PaymentGatewayCode;
+            PGAdyenSetup.Insert(true);
+            Commit();
+        end;
 
-        if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
-            exit(false);
-
-        exit(PaymentGateway."Refund Codeunit Id" = CurrCodeunitId());
+        PGAdyenSetup.SetRecFilter();
+        Page.Run(Page::"NPR PG Adyen Setup Card", PGAdyenSetup);
     end;
+    #endregion
 }

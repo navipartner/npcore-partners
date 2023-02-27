@@ -147,22 +147,19 @@
 
                 trigger OnAction()
                 var
-                    MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
+                    PaymentLine: Record "NPR Magento Payment Line";
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
                 begin
                     if Rec."Date Captured" <> 0D then begin
-                        if not Confirm(Text002, false) then
+                        if not Confirm(CapturePaymentAgainQst, false) then
                             exit;
                         Rec."Date Captured" := 0D;
                         CurrPage.Update(true);
                     end;
 
-                    MagentoPaymentGateway.Get(Rec."Payment Gateway Code");
-                    MagentoPaymentGateway.TestField("Capture Codeunit Id");
-
-                    MagentoPmtMgt.CapturePaymentLine(Rec);
-                    if Rec."Date Captured" <> 0D then
-                        Message(Text001, Rec."Payment Gateway Code", Rec."No.");
+                    PaymentLine := Rec;
+                    MagentoPmtMgt.CapturePaymentLine(PaymentLine);
+                    CurrPage.Update(false);
                 end;
             }
             action("Refund Payment")
@@ -180,22 +177,19 @@
 
                 trigger OnAction()
                 var
-                    MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
+                    PaymentLine: Record "NPR Magento Payment Line";
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
                 begin
                     if Rec."Date Refunded" <> 0D then begin
-                        if not Confirm(Text003, false) then
+                        if not Confirm(RefundPaymentAgainQst, false) then
                             exit;
                         Rec."Date Refunded" := 0D;
                         CurrPage.Update(true);
                     end;
 
-                    MagentoPaymentGateway.Get(Rec."Payment Gateway Code");
-                    MagentoPaymentGateway.TestField("Refund Codeunit Id");
-
-                    MagentoPmtMgt.RefundPaymentLine(Rec);
-                    if Rec."Date Refunded" <> 0D then
-                        Message(Text000, Rec."Payment Gateway Code", Rec."No.");
+                    PaymentLine := Rec;
+                    MagentoPmtMgt.RefundPaymentLine(PaymentLine);
+                    CurrPage.Update(false);
                 end;
             }
             action("Post Payment")
@@ -217,7 +211,7 @@
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
                 begin
                     MagentoPmtMgt.PostPaymentLine(Rec, GenJnlPostLine);
-                    Message(Text004);
+                    Message(PaymentPostedMsg);
                 end;
             }
         }
@@ -242,6 +236,26 @@
                 begin
                     NavigateForm.SetDoc(Rec."Posting Date", Rec."Document No.");
                     NavigateForm.Run();
+                end;
+            }
+            action("Show Interaction Log")
+            {
+                Caption = 'Show Interaction Log';
+                Image = Log;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                ToolTip = 'Shows the interaction log entries associated with the currently selected line';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    PGInteractionLogEntry: Record "NPR PG Interaction Log Entry";
+                begin
+                    PGInteractionLogEntry.SetFilter("Payment Line System Id", Rec.SystemId);
+                    Page.Run(0, PGInteractionLogEntry);
                 end;
             }
             action("Document Card")
@@ -272,13 +286,11 @@
     end;
 
     var
-        Text000: Label 'Payment Refunded: %1 %2';
-        Text001: Label 'Payment Captured: %1 %2';
-        Text002: Label 'Payment has already been Captured\Capture Again?';
+        CapturePaymentAgainQst: Label 'Payment has already been Captured\Capture Again?';
         CaptureEnabled: Boolean;
         RefundEnabled: Boolean;
-        Text003: Label 'Payment has already been Refunded\Refund Again?';
-        Text004: Label 'Payment Posted';
+        RefundPaymentAgainQst: Label 'Payment has already been Refunded\Refund Again?';
+        PaymentPostedMsg: Label 'Payment Posted';
 
     local procedure SetGatewayEnabled()
     var
@@ -286,11 +298,14 @@
     begin
         CaptureEnabled := false;
         RefundEnabled := false;
+
         if Rec."Payment Gateway Code" = '' then
             exit;
+
         if not PaymentGateway.Get(Rec."Payment Gateway Code") then
             exit;
-        CaptureEnabled := PaymentGateway."Capture Codeunit Id" <> 0;
-        RefundEnabled := PaymentGateway."Refund Codeunit Id" <> 0;
+
+        CaptureEnabled := (PaymentGateway."Enable Capture" or (PaymentGateway."Capture Codeunit Id" <> 0));
+        RefundEnabled := (PaymentGateway."Enable Refund" or (PaymentGateway."Refund Codeunit Id" <> 0));
     end;
 }
