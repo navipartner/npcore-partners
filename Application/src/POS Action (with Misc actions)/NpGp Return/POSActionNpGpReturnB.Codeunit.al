@@ -210,8 +210,10 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
         RequestMessage.SetRequestUri(NpGpPOSSalesSetup."Service Url");
 
         Client.Send(RequestMessage, ResponseMessage);
-        if not ResponseMessage.IsSuccessStatusCode then
-            Error(ResponseMessage.ReasonPhrase);
+        if not ResponseMessage.IsSuccessStatusCode then begin
+            ResponseMessage.Content.ReadAs(Response);
+            Error('%1 %2 \%3', ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase, Response);
+        end;
 
         ResponseMessage.Content.ReadAs(Response);
 
