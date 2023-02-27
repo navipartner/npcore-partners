@@ -46,3 +46,6 @@ If the button is marked in read, that means that the currency hasn't yet been co
 ![counting_transfer_v4](../images/counting_transfer_v4.png)
 
 For more information about individual fields and options on the **Counting** screen, refer to the [reference guide](../reference/counting_reference.md).
+
+
+> [!Video https://share.synthesia.io/ec8e0a32-7578-4569-a608-664743059921]
