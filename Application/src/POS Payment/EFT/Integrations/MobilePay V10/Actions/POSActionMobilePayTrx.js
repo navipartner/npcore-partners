@@ -43,12 +43,15 @@ let main = async ({ workflow, context, popup }) => {
 
     try {
         await workflow.respond("startTransaction");
+        await workflow.run("HTML_DISPLAY", {context: { JSAction: "QRPaymentScan", Command: "Open", QrContent: context.request.qr, Amount: context.request.formattedAmount, Provider: "MobilePay"}});
         await trxPromise;
     }
     finally {
         if (_dialogRef) {
             _dialogRef.close();
         }
+        await workflow.run("HTML_DISPLAY", {context: {JSAction: "QRPaymentScan", Command: "Close"}});
+            
     }
 
     return ({ "success": context.success, "tryEndSale": context.success });

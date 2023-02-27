@@ -330,13 +330,13 @@
                     WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to poll', mobilePayPollRefundRequest.GetRequestResponse(), true);
                 end;
             else begin
-                    Error(UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_Err,
-                        procEftTrxRequest."Processing Type",
-                        procEftTrxRequest.FieldCaption("Processing Type"),
-                        'PollTrxStatus',
-                        procEftTrxRequest."Processing Type"::PAYMENT,
-                        procEftTrxRequest."Processing Type"::REFUND);
-                end;
+                Error(UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_Err,
+                    procEftTrxRequest."Processing Type",
+                    procEftTrxRequest.FieldCaption("Processing Type"),
+                    'PollTrxStatus',
+                    procEftTrxRequest."Processing Type"::PAYMENT,
+                    procEftTrxRequest."Processing Type"::REFUND);
+            end;
         end;
         EftTrxRequest.Find();
         Exit(success);
@@ -391,13 +391,13 @@
                     WriteLogEntry(eftSetup, not success, EftTrxRequest."Entry No.", 'Invoked API to cancel', mobilePayCancelRefund.GetRequestResponse(), true);
                 end;
             else begin
-                    Error(UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_Err,
-                        procEftTrxRequest."Processing Type",
-                        procEftTrxRequest.FieldCaption("Processing Type"),
-                        'RequestAbort',
-                        procEftTrxRequest."Processing Type"::PAYMENT,
-                        procEftTrxRequest."Processing Type"::REFUND);
-                end;
+                Error(UNSUPPORTED_POLLSTATUS_PROCESSING_TYPE_Err,
+                    procEftTrxRequest."Processing Type",
+                    procEftTrxRequest.FieldCaption("Processing Type"),
+                    'RequestAbort',
+                    procEftTrxRequest."Processing Type"::PAYMENT,
+                    procEftTrxRequest."Processing Type"::REFUND);
+            end;
         end;
         EftTrxRequest.Find();
         Exit(success);
@@ -639,9 +639,9 @@
                         attempts -= 1;
                     end;
                 else begin
-                        retry := not RespMessage.IsSuccessStatusCode;
-                        attempts := 0;
-                    end;
+                    retry := not RespMessage.IsSuccessStatusCode;
+                    attempts := 0;
+                end;
             end;
 
             retry := retry and (attempts > 0);
