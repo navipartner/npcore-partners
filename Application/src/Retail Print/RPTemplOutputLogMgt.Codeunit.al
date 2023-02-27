@@ -36,8 +36,10 @@
         Base64Convert: Codeunit "Base64 Convert";
     begin
         RPTemplateOutputLog.Init();
+#pragma warning disable AA0139
         RPTemplateOutputLog."Template Name" := Template;
         RPTemplateOutputLog."User ID" := USERID;
+#pragma warning restore AA0139
         RPTemplateOutputLog."Printed At" := CURRENTDATETIME;
         RPTemplateOutputLog.Output.CREATEOUTSTREAM(OStream);
         Base64Convert.FromBase64(PrintBufferBase64, OStream);

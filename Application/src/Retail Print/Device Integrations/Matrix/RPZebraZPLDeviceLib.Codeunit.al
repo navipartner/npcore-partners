@@ -1,5 +1,6 @@
 codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
 {
+#pragma warning disable AA0139
     Access = Internal;
 
     var
@@ -1013,5 +1014,6 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
     begin
         AddStringToBuffer('^FH');
     end;
+#pragma warning restore AA0139
 }
 
