@@ -42,6 +42,9 @@ This HTML file can:
 > [!NOTE]
 > If the customer display is displayed on the wrong screen, go to [**POS Unit Display**](../../posunit/reference/POS_Unit_Display.md), and update the information. The numbers displayed on the screens in Windows settings under **System > Display** don't correlate to the number specified in **POS Unit Display**
 
+
+> [!Video https://share.synthesia.io/48a111db-645a-4ab4-85b6-4551b787b45f]
+
 ## Next steps
 
 ### Configure refund scenario

@@ -10,6 +10,8 @@ You can now take photos of products and other items (like documents) directly fr
 
 For more information and operating instructions, refer to the article on the [Take Photo on POS](retail/posunit/howto/take_photo_pos.md) feature.
 
+> [!Video https://share.synthesia.io/d67f2a75-b897-46d8-80e1-50a83e9603b1]
+
 ### GS1 coupons
 
 The GS 1 flat rate discount coupon has been introduced to NP Retail. [GS1](https://www.gs1us.org/upcs-barcodes-prefixes/additional-ways-to-identify-products/coupons) is a standard that facilitates connection between a product and all its vital data, allowing trackability, workflow efficiency, and information-sharing via electronic means. GS1 coupons can now be created on scanning, then used, and finally archived as soon as the POS sale is finalized. 
@@ -22,9 +24,13 @@ A new POS profile has been introduced for desktop POS units with multiple displa
 
 For more information and operating instructions, refer to the article on the [POS HTML display profile](retail/pos_profiles/howto/POS_HTMLDisplay_profile.md).
 
+> [!Video https://share.synthesia.io/48a111db-645a-4ab4-85b6-4551b787b45f]
+
 ### V4 POS balancing feature - end-of-day process
 
 A new version of the balancing feature has been released. For more information and setup instructions, refer to the article on the [POS balancing feature V4](retail/posunit/howto/balance_pos_v4.md).
+
+> [!Video https://share.synthesia.io/ec8e0a32-7578-4569-a608-664743059921]
 
 ### NP Power BI for Retail
 

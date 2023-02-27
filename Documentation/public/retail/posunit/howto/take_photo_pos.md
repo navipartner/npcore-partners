@@ -22,3 +22,5 @@ The **Take Photo** feature can be enabled on POS units, and give an option to ca
    The **POS Entry Media Info List** window is displayed. In it, you can add comments, download the photos or take new ones.
 
     ![take_photo](../images/take_photo_feature.PNG)
+
+> [!Video https://share.synthesia.io/d67f2a75-b897-46d8-80e1-50a83e9603b1]
