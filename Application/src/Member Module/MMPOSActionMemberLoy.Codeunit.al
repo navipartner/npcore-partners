@@ -1,6 +1,7 @@
 ﻿codeunit 6060146 "NPR MM POS Action: Member Loy."
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This action is capable of redeeming member points and applying them as a coupon.';
         LoyaltyWindowTitle: Label '%1 - Membership Loyalty.';
@@ -48,6 +49,7 @@
             Sender.RegisterOptionParameter('Function', FunctionOptionString, 'Select Membership');
 
             Sender.RegisterTextParameter('DefaultInputValue', '');
+            Sender.RegisterTextParameter('ForeignCommunityCode', '');
 
         end;
     end;
@@ -88,6 +90,7 @@
         JSON: Codeunit "NPR POS JSON Management";
         FunctionId: Integer;
         MemberCardNumber: Text[50];
+        ForeignCommunityCode: Code[20];
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -100,6 +103,7 @@
             FunctionId := 0;
 
         MemberCardNumber := CopyStr(JSON.GetStringParameter('DefaultInputValue'), 1, MaxStrLen(MemberCardNumber));
+        ForeignCommunityCode := CopyStr(JSON.GetStringParameter('ForeignCommunityCode'), 1, MaxStrLen(ForeignCommunityCode));
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -112,7 +116,6 @@
             'do_work':
                 begin
 
-                    //MemberCardNumber := COPYSTR (GetInput (JSON, 'membercard_number'), 1, MAXSTRLEN (MemberCardNumber));
                     if (MemberCardNumber = '') then
                         MemberCardNumber := CopyStr(GetInput(JSON, 'membercard_number'), 1, MaxStrLen(MemberCardNumber));
 
@@ -121,16 +124,15 @@
 
                     case FunctionId of
                         0:
-                            SetCustomer(POSSession, MemberCardNumber);
+                            SetCustomer(POSSession, MemberCardNumber, ForeignCommunityCode);
                         1:
-                            ViewPoints(MemberCardNumber);
+                            ViewPoints(MemberCardNumber, ForeignCommunityCode);
                         2:
-                            RedeemPoints(Context, POSSession, FrontEnd, MemberCardNumber);
+                            RedeemPoints(Context, POSSession, FrontEnd, MemberCardNumber, ForeignCommunityCode);
                         3:
-                            SelectAvailableCoupon(Context, POSSession, FrontEnd, MemberCardNumber);
-
+                            SelectAvailableCoupon(Context, POSSession, FrontEnd, MemberCardNumber, ForeignCommunityCode);
                         4:
-                            SetCustomer(POSSession, MemberCardNumber);
+                            SetCustomer(POSSession, MemberCardNumber, ForeignCommunityCode);
 
                     end;
                 end;
@@ -148,7 +150,7 @@
 
     end;
 
-    local procedure ViewPoints(MemberCardNumber: Text[100])
+    local procedure ViewPoints(MemberCardNumber: Text[100]; ForeignCommunityCode: Code[20])
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipEntryNo: Integer;
@@ -158,7 +160,7 @@
     begin
 
         if (MemberCardNumber = '') then
-            if (not SelectMemberCardUI(MemberCardNumber)) then
+            if (not SelectMemberCardUI(MemberCardNumber, ForeignCommunityCode)) then
                 exit;
 
         MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(MemberCardNumber, Today, NotFoundReasonText);
@@ -175,7 +177,7 @@
             Error('');
     end;
 
-    local procedure RedeemPoints(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; MemberCardNumber: Text[50])
+    local procedure RedeemPoints(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; MemberCardNumber: Text[50]; ForeignCommunityCode: Code[20])
     var
         POSSale: Codeunit "NPR POS Sale";
         LoyaltyPointMgr: Codeunit "NPR MM Loyalty Point Mgt.";
@@ -193,7 +195,7 @@
         EanBoxEventHandler: Codeunit "NPR POS Input Box Evt Handler";
     begin
 
-        SetCustomer(POSSession, MemberCardNumber);
+        SetCustomer(POSSession, MemberCardNumber, ForeignCommunityCode);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -253,7 +255,7 @@
         end;
     end;
 
-    local procedure SelectAvailableCoupon(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; MemberCardNumber: Text[50])
+    local procedure SelectAvailableCoupon(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; MemberCardNumber: Text[50]; ForeignCommunityCode: Code[20])
     var
         CouponsPage: Page "NPR NpDc Coupons";
         Coupon: Record "NPR NpDc Coupon";
@@ -263,7 +265,7 @@
         EanBoxEventHandler: Codeunit "NPR POS Input Box Evt Handler";
     begin
 
-        SetCustomer(POSSession, MemberCardNumber);
+        SetCustomer(POSSession, MemberCardNumber, ForeignCommunityCode);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -286,7 +288,7 @@
 
     end;
 
-    local procedure SetCustomer(POSSession: Codeunit "NPR POS Session"; MemberCardNumber: Text[100])
+    local procedure SetCustomer(POSSession: Codeunit "NPR POS Session"; MemberCardNumber: Text[100]; ForeignCommunityCode: Code[20])
     var
         POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
         POSSale: Codeunit "NPR POS Sale";
@@ -299,7 +301,7 @@
         POSSale.Refresh(SalePOS);
 
         if (SalePOS."Customer No." = '') then
-            if (not POSActionMemberMgt.SelectMembership(POSSession, DialogMethod::NO_PROMPT, MemberCardNumber)) then
+            if (not POSActionMemberMgt.SelectMembership(POSSession, DialogMethod::NO_PROMPT, MemberCardNumber, ForeignCommunityCode)) then
                 exit;
     end;
 
@@ -313,10 +315,14 @@
         exit(JSON.GetString('input'));
     end;
 
-    local procedure SelectMemberCardUI(var ExtMemberCardNo: Text[100]): Boolean
+    local procedure SelectMemberCardUI(var ExtMemberCardNo: Text[100]; ForeignCommunityCode: Code[20]): Boolean
     var
         MemberCard: Record "NPR MM Member Card";
+        NPRMembershipMgt: Codeunit "NPR MM NPR Membership";
     begin
+
+        IF (ForeignCommunityCode <> '') THEN
+            exit(NPRMembershipMgt.SearchForeignMembers(ForeignCommunityCode, ExtMemberCardNo));
 
         if (ACTION::LookupOK <> PAGE.RunModal(0, MemberCard)) then
             exit(false);
@@ -324,6 +330,7 @@
         ExtMemberCardNo := MemberCard."External Card No.";
         exit(ExtMemberCardNo <> '');
     end;
+
 
     local procedure ThisDataSource(): Text
     begin

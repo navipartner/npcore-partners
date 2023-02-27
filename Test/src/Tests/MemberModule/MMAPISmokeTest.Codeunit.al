@@ -8,7 +8,7 @@ codeunit 85016 "NPR MM API Smoke Test"
 
         _LastMemberCard: Record "NPR MM Member Card";
         _IsInitialized: Boolean;
-
+        _AddMemberWithFirstName: Text[50];
 
     local procedure Initialize()
     var
@@ -89,6 +89,9 @@ codeunit 85016 "NPR MM API Smoke Test"
         CreateMembership();
         MemberLibrary.SetRandomMemberInfoData(MemberInfoCapture);
 
+        if (_AddMemberWithFirstName <> '') then
+            MemberInfoCapture."First Name" := _AddMemberWithFirstName;
+
         // [TEST]
         ApiStatus := MemberApiLibrary.AddMembershipMember(_LastMembership, MemberInfoCapture, MemberEntryNo, ResponseMessage);
         Assert.IsTrue(ApiStatus, ResponseMessage);
@@ -98,6 +101,92 @@ codeunit 85016 "NPR MM API Smoke Test"
         _LastMemberCard.SetFilter("Member Entry No.", '=%1', _LastMember."Entry No.");
         _LastMemberCard.FindFirst();
 
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AddMemberCard()
+    var
+        MemberApiLibrary: Codeunit "NPR Library - Member XML API";
+        MemberLibrary: Codeunit "NPR Library - Member Module";
+        LibraryInventory: Codeunit "NPR Library - Inventory";
+        Assert: Codeunit Assert;
+        ResponseMessage: Text;
+        ApiStatus: Boolean;
+
+        MemberCardEntryNo: Integer;
+        CardNumber: Text[100];
+    begin
+        Initialize();
+        CreateMembership();
+        AddMembershipMember();
+
+        CardNumber := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+
+        // Pre-assigned by invoker
+        ApiStatus := MemberApiLibrary.AddMemberCard(_LastMembership."External Membership No.", _LastMember."External Member No.", CardNumber, MemberCardEntryNo, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+
+        // new card
+        _LastMemberCard.Get(MemberCardEntryNo);
+        _LastMemberCard.TestField(Blocked, false);
+        Assert.AreEqual(CardNumber, _LastMemberCard."External Card No.", 'The created card number does not match the card number provided to the API.');
+
+
+        // Assign card number by setup
+        ApiStatus := MemberApiLibrary.AddMemberCard(_LastMembership."External Membership No.", _LastMember."External Member No.", MemberCardEntryNo, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+
+        // new card
+        _LastMemberCard.Get(MemberCardEntryNo);
+        _LastMemberCard.TestField(Blocked, false);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ReplaceMemberCard()
+    var
+        MemberApiLibrary: Codeunit "NPR Library - Member XML API";
+        MemberLibrary: Codeunit "NPR Library - Member Module";
+        LibraryInventory: Codeunit "NPR Library - Inventory";
+        Assert: Codeunit Assert;
+        ResponseMessage: Text;
+        ApiStatus: Boolean;
+
+        MemberCardEntryNo: Integer;
+        CardNumber: Text[100];
+    begin
+        Initialize();
+        CreateMembership();
+        AddMembershipMember();
+
+        CardNumber := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+
+        // Pre-assigned by invoker
+        ApiStatus := MemberApiLibrary.ReplaceMemberCard(_LastMemberCard."External Card No.", CardNumber, MemberCardEntryNo, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+
+        // original card 
+        _LastMemberCard.Get(_LastMemberCard."Entry No.");
+        _LastMemberCard.TestField(Blocked, true);
+
+        // new card
+        _LastMemberCard.Get(MemberCardEntryNo);
+        _LastMemberCard.TestField(Blocked, false);
+        Assert.AreEqual(CardNumber, _LastMemberCard."External Card No.", 'The created card number does not match the card number provided to the API.');
+
+
+        // Assign card number by setup
+        ApiStatus := MemberApiLibrary.ReplaceMemberCard(_LastMemberCard."External Card No.", '', MemberCardEntryNo, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+
+        // original card 
+        _LastMemberCard.Get(_LastMemberCard."Entry No.");
+        _LastMemberCard.TestField(Blocked, true);
+
+        // new card
+        _LastMemberCard.Get(MemberCardEntryNo);
+        _LastMemberCard.TestField(Blocked, false);
     end;
 
     [Test]
@@ -427,6 +516,55 @@ codeunit 85016 "NPR MM API Smoke Test"
         // [TEST 2]
         ApiStatus := MemberApiLibrary.MemberCardRegisterArrivalAPI('FOOBAR MEMBER NO', AdmissionCode, ScannerStation, ResponseMessage);
         Assert.Isfalse(ApiStatus, StrSubstNo('Member arrival must fail when providing invalid card number: %1', ResponseMessage));
+    end;
+
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure SearchMember()
+    var
+        MemberApiLibrary: Codeunit "NPR Library - Member XML API";
+        MemberLibrary: Codeunit "NPR Library - Member Module";
+        LibraryInventory: Codeunit "NPR Library - Inventory";
+        Assert: Codeunit Assert;
+        ResponseMessage: Text;
+        ApiStatus: Boolean;
+
+        TempMemberInfoCaptureSearchResult: Record "NPR MM Member Info Capture" temporary;
+        LimitResultTo, i : Integer;
+        MemberCardEntryNo: Integer;
+    begin
+
+        Initialize();
+        MemberLibrary.GenerateText(_AddMemberWithFirstName, 15);
+
+        // Create X membership with 1 member and 1 additional card
+        for i := 1 to 10 do begin
+            CreateMembership();
+            AddMembershipMember();
+            ApiStatus := MemberApiLibrary.AddMemberCard(_LastMembership."External Membership No.", _LastMember."External Member No.", MemberCardEntryNo, ResponseMessage);
+            Assert.IsTrue(ApiStatus, ResponseMessage);
+        end;
+
+        LimitResultTo := 5;
+
+        // [TEST]
+        ApiStatus := MemberApiLibrary.SearchMember(_AddMemberWithFirstName, '', '', '', LimitResultTo, TempMemberInfoCaptureSearchResult, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+
+        TempMemberInfoCaptureSearchResult.Reset();
+        TempMemberInfoCaptureSearchResult.SetFilter("First Name", '=%1', _AddMemberWithFirstName);
+        Assert.AreEqual(5 * 2, TempMemberInfoCaptureSearchResult.Count, 'Expected number of members in result is incorrect. Each member should have 2 cards each.');
+
+        // [TEST]
+        Clear(TempMemberInfoCaptureSearchResult);
+        ApiStatus := MemberApiLibrary.SearchMember('', _LastMember."Last Name", '', '', LimitResultTo, TempMemberInfoCaptureSearchResult, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+
+        TempMemberInfoCaptureSearchResult.Reset();
+        TempMemberInfoCaptureSearchResult.SetFilter("Last Name", '=%1', _LastMember."Last Name");
+        Assert.AreEqual(1 * 2, TempMemberInfoCaptureSearchResult.Count, 'Expected number of members in result is incorrect. Each member should have 2 cards each.');
+
     end;
 
 }

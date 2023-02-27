@@ -142,7 +142,7 @@
 
         case POSWorkflowType of
             POSWorkflowMethod::POS:
-                POSActionMemberManagement.MemberArrival(POSSession, InputMethod, ExternalMemberCardNo);
+                POSActionMemberManagement.MemberArrival(POSSession, InputMethod, ExternalMemberCardNo, '');
             POSWorkflowMethod::Automatic,
             POSWorkflowMethod::GuestCheckin:
                 begin

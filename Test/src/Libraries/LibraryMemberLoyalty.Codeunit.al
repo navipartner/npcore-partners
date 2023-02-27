@@ -206,6 +206,6 @@ codeunit 85106 "NPR Library MemberLoyalty"
 
         // Process request
         LoyaltyWebService.ReservePoints(XmlReservePoints);
-        XmlReservePoints.GetRespons(ResponseCode, ResponseMessage, DocumentId, TempPointsResponse);
+        XmlReservePoints.GetResponse(ResponseCode, ResponseMessage, DocumentId, TempPointsResponse);
     end;
 }

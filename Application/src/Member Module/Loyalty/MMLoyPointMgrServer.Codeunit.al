@@ -61,6 +61,7 @@
         LoyaltyStoreLedger."Entry No." := 0;
         LoyaltyStoreLedger."Entry Type" := LoyaltyStoreLedger."Entry Type"::RECEIPT;
         LoyaltyStoreLedger."Authorization Code" := CreateAuthorizationCode();
+        LoyaltyStoreLedger."Retail Id" := TmpAuthorizationIn."Retail Id";
 
         // Store the details in the points entry ledgers
         TmpSaleLinesIn.Reset();
@@ -123,6 +124,7 @@
         LoyaltyStoreLedger."Entry No." := 0;
         LoyaltyStoreLedger."Entry Type" := LoyaltyStoreLedger."Entry Type"::RESERVE;
         LoyaltyStoreLedger."Authorization Code" := CreateAuthorizationCode();
+        LoyaltyStoreLedger."Retail Id" := TmpAuthorizationIn."Retail Id";
 
         // Store the details in the points entry ledger
         TmpReserveLinesIn.Reset();
@@ -504,6 +506,8 @@
         MembershipPointsEntry."Document No." := LoyaltyStoreLedger."Reference Number";
         MembershipPointsEntry."Loyalty Code" := LoyaltySetup.Code;
         MembershipPointsEntry."Authorization Code" := LoyaltyStoreLedger."Authorization Code";
+        MembershipPointsEntry."Retail Id" := LoyaltyStoreLedger."Retail Id";
+        MembershipPointsEntry."Retail Id Line" := TmpBuffer."Retail Id";
 
         MembershipPointsEntry."Item No." := TmpBuffer."Item No.";
         MembershipPointsEntry."Variant Code" := TmpBuffer."Variant Code";
@@ -557,6 +561,8 @@
         MembershipPointsEntry."Document No." := LoyaltyStoreLedger."Reference Number";
         MembershipPointsEntry."Loyalty Code" := LoyaltySetup.Code;
         MembershipPointsEntry."Authorization Code" := TmpBuffer."Authorization Code";
+        MembershipPointsEntry."Retail Id" := LoyaltyStoreLedger."Retail Id";
+        MembershipPointsEntry."Retail Id Line" := TmpBuffer."Retail Id";
 
         LoyaltyPointManagement.CalculatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
 
@@ -606,6 +612,8 @@
         MembershipPointsEntry."Document No." := LoyaltyStoreLedger."Reference Number";
         MembershipPointsEntry."Loyalty Code" := LoyaltySetup.Code;
         MembershipPointsEntry."Authorization Code" := LoyaltyStoreLedger."Authorization Code";
+        MembershipPointsEntry."Retail Id" := LoyaltyStoreLedger."Retail Id";
+        MembershipPointsEntry."Retail Id Line" := TmpBuffer."Retail Id";
 
         LoyaltyPointManagement.CalculatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
 
@@ -650,6 +658,7 @@
         MembershipPointsEntry."POS Unit Code" := LoyaltyStoreLedger."POS Unit Code";
         MembershipPointsEntry."Document No." := LoyaltyStoreLedger."Reference Number";
         MembershipPointsEntry."Loyalty Code" := LoyaltySetup.Code;
+        MembershipPointsEntry."Retail Id" := LoyaltyStoreLedger."Retail Id";
 
         LoyaltyPointManagement.CalculatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
 

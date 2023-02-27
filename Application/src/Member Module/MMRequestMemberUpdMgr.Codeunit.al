@@ -64,7 +64,6 @@
         // Update the remote request as handled and update to new value
         if (RequestMemberUpdate."Remote Entry No." <> 0) then begin
             if (not Membership.Get(MembershipEntryNo)) then
-                //Error ('Invalid membership entry number specified for update member field function. Update of remote not possible.');
                 exit;
 
             if (not NPRMembership.UpdateMemberField(Membership."Community Code", RequestMemberUpdate, NotValidReasonXml)) then begin

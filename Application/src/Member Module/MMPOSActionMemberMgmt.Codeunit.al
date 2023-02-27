@@ -67,6 +67,7 @@
             Sender.RegisterOptionParameter('DialogPrompt', 'Member Card Number,Facial Recognition,No Dialog', 'Member Card Number');
 
             Sender.RegisterTextParameter('DefaultInputValue', '');
+            Sender.RegisterTextParameter('ForeignCommunityCode', '');
 
         end;
     end;
@@ -89,6 +90,7 @@
         DialogPrompt: Integer;
         DialogMethodType: Option;
         DefaultInputValue: Text;
+        ForeignCommunityCode: Code[20];
     begin
         if (not Action.IsThisAction(ActionCode())) then
             exit;
@@ -99,6 +101,7 @@
             FunctionId := 0;
 
         DefaultInputValue := JSON.GetStringParameterOrFail('DefaultInputValue', ActionCode());
+        ForeignCommunityCode := CopyStr(JSON.GetStringParameter('ForeignCommunityCode'), 1, MaxStrLen(ForeignCommunityCode));
 
         DialogPrompt := JSON.GetIntegerParameterOrFail('DialogPrompt', ActionCode());
         if (DialogPrompt < 0) then
@@ -125,9 +128,9 @@
         if (WorkflowStep = '9') then begin
             case FunctionId of
                 0:
-                    MemberArrival(POSSession, DialogMethodType, MemberCardNumber);
+                    MemberArrival(POSSession, DialogMethodType, MemberCardNumber, ForeignCommunityCode);
                 1:
-                    SelectMembership(POSSession, DialogMethodType, MemberCardNumber);
+                    SelectMembership(POSSession, DialogMethodType, MemberCardNumber, ForeignCommunityCode);
                 2:
                     ViewMembershipEntry(DialogMethodType, MemberCardNumber);
                 3:
@@ -143,11 +146,9 @@
                 8:
                     EditMembership(POSSession);
                 9:
-                    ShowMember(POSSession, DialogMethodType, MemberCardNumber);
-
+                    ShowMember(POSSession, DialogMethodType, MemberCardNumber, ForeignCommunityCode);
                 10:
                     EditActiveMembership(POSSession);
-
                 else
                     Error('POS Action: Function with ID %1 is not implemented.', FunctionId);
             end;
@@ -284,7 +285,7 @@
         exit(true);
     end;
 
-    procedure MemberArrival(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100])
+    procedure MemberArrival(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100]; ForeignCommunityCode: Code[20])
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
@@ -304,7 +305,7 @@
     begin
 
         if (InputMethod = DialogMethod::NO_PROMPT) and (ExternalMemberCardNo = '') then
-            if (not ChooseMemberCard(ExternalMemberCardNo)) then
+            if (not SelectMemberCardUI(ExternalMemberCardNo, ForeignCommunityCode)) then
                 Error(MEMBER_REQUIRED);
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, true, ExternalMemberCardNo);
@@ -348,7 +349,7 @@
 
     end;
 
-    procedure SelectMembership(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; var ExternalMemberCardNo: Text[100]) MembershipSelected: Boolean
+    procedure SelectMembership(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; var ExternalMemberCardNo: Text[100]; ForeignCommunityCode: Code[20]) MembershipSelected: Boolean
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         POSSale: Codeunit "NPR POS Sale";
@@ -361,8 +362,10 @@
         POSSale.Refresh(SalePOS);
 
         if (ExternalMemberCardNo = '') then
-            if (not ChooseMemberCard(ExternalMemberCardNo)) then
+            if (not SelectMemberCardUI(ExternalMemberCardNo, ForeignCommunityCode)) then
                 exit;
+
+
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, true, ExternalMemberCardNo);
         MembershipSelected := AssignPOSMembership(SalePOS, ExternalMemberCardNo);
@@ -389,7 +392,7 @@
     begin
 
         if (ExternalMemberCardNo = '') then
-            if (not ChooseMemberCard(ExternalMemberCardNo)) then
+            if (not SelectLocalMemberCardViaMemberUI(ExternalMemberCardNo)) then
                 exit;
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, false, ExternalMemberCardNo);
@@ -416,7 +419,7 @@
     begin
 
         if (ExternalMemberCardNo = '') then
-            if (not ChooseMemberCard(ExternalMemberCardNo)) then
+            if (not SelectLocalMemberCardViaMemberUI(ExternalMemberCardNo)) then
                 exit;
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, false, ExternalMemberCardNo);
@@ -452,7 +455,7 @@
     begin
 
         if (ExternalMemberCardNo = '') then
-            if (not ChooseMemberCard(ExternalMemberCardNo)) then
+            if (not SelectLocalMemberCardViaMemberUI(ExternalMemberCardNo)) then
                 exit;
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, false, ExternalMemberCardNo);
@@ -479,7 +482,7 @@
     begin
 
         if (ExternalMemberCardNo = '') then
-            if (not ChooseMemberCard(ExternalMemberCardNo)) then
+            if (not SelectLocalMemberCardViaMemberUI(ExternalMemberCardNo)) then
                 exit;
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, false, ExternalMemberCardNo);
@@ -531,7 +534,7 @@
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(false, false, InputMethod, false, ExternalMemberCardNo);
         if (ExternalMemberCardNo = '') then
-            if (not ChooseMemberCard(ExternalMemberCardNo)) then
+            if (not SelectLocalMemberCardViaMemberUI(ExternalMemberCardNo)) then
                 exit;
 
         MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, ReasonNotFound);
@@ -561,7 +564,7 @@
     begin
 
         if (ExternalMemberCardNo = '') then
-            if (not ChooseMemberCard(ExternalMemberCardNo)) then
+            if (not SelectLocalMemberCardViaMemberUI(ExternalMemberCardNo)) then
                 exit(false);
 
         MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, ReasonNotFound);
@@ -713,13 +716,13 @@
 
     end;
 
-    procedure ShowMember(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; var ExternalMemberCardNo: Text[100])
+    procedure ShowMember(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; var ExternalMemberCardNo: Text[100]; ForeignCommunityCode: Code[20])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
     begin
 
         if (ExternalMemberCardNo = '') then
-            if (not ChooseMemberCard(ExternalMemberCardNo)) then
+            if (not SelectMemberCardUI(ExternalMemberCardNo, ForeignCommunityCode)) then
                 exit;
 
         MemberRetailIntegration.POS_ShowMemberCard(InputMethod, ExternalMemberCardNo);
@@ -871,9 +874,14 @@
         exit(ItemNo);
     end;
 
-    local procedure ChooseMemberCard(var ExtMemberCardNo: Text[100]): Boolean
+    procedure SelectMemberCardUI(var ExtMemberCardNo: Text[100]; ForeignCommunityCode: Code[20]): Boolean
+    var
+        NPRMembershipMgt: Codeunit "NPR MM NPR Membership";
     begin
-        exit(ChooseMemberCardViaMemberSearchUI(ExtMemberCardNo));
+        if (ForeignCommunityCode <> '') then
+            exit(NPRMembershipMgt.SearchForeignMembers(ForeignCommunityCode, ExtMemberCardNo));
+
+        exit(SelectLocalMemberCardViaMemberUI(ExtMemberCardNo));
     end;
 
     local procedure ChooseMember(var ExtMemberNo: Code[20]): Boolean
@@ -903,7 +911,7 @@
         exit(Member."External Member No." <> '');
     end;
 
-    local procedure ChooseMemberCardViaMemberSearchUI(var ExtMemberCardNo: Text[100]): Boolean
+    local procedure SelectLocalMemberCardViaMemberUI(var ExtMemberCardNo: Text[100]): Boolean
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";

@@ -153,6 +153,17 @@
             Caption = 'Authorization Code';
             DataClassification = CustomerContent;
         }
+        field(170; "Retail Id"; Guid)
+        {
+            Caption = 'Retail Id';
+            DataClassification = CustomerContent;
+        }
+        field(171; "Retail Id Line"; Guid)
+        {
+            Caption = 'Retail Id Line';
+            DataClassification = CustomerContent;
+        }
+
     }
 
     keys

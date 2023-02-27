@@ -78,7 +78,7 @@
         exit(Success = 0);
     end;
 
-    procedure GetMembershipTicketList(var Membership: XMLport "NPR MM Get Members. TicketList"; AdmissionCode: Code[20]; ScannerStationId: Code[10])
+    procedure GetMembershipTicketList(var Membership: XmlPort "NPR MM Get Members. TicketList"; AdmissionCode: Code[20]; ScannerStationId: Code[10])
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -125,7 +125,7 @@
         Commit();
     end;
 
-    procedure GetMembershipChangeItemsList(var Membership: XMLport "NPR MM Get Members. Chg. Items")
+    procedure GetMembershipChangeItemsList(var Membership: XmlPort "NPR MM Get Members. Chg. Items")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -181,7 +181,7 @@
         exit(MembershipMgr.IsMembershipActive(MembershipEntryNo, WorkDate(), true));
     end;
 
-    procedure CreateMembership(var membership: XMLport "NPR MM Create Membership"; ScannerStationId: Code[10])
+    procedure CreateMembership(var membership: XmlPort "NPR MM Create Membership"; ScannerStationId: Code[10])
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -228,7 +228,7 @@
         Commit();
     end;
 
-    procedure AddMembershipMember(var member: XMLport "NPR MM Add Member"; ScannerStationId: Code[10])
+    procedure AddMembershipMember(var member: XmlPort "NPR MM Add Member"; ScannerStationId: Code[10])
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -274,7 +274,7 @@
         Commit();
     end;
 
-    procedure AddAnonymousMember(var AnonymousMember: XMLport "NPR MM Anonymous Member"; ScannerStationId: Code[10])
+    procedure AddAnonymousMember(var AnonymousMember: XmlPort "NPR MM Anonymous Member"; ScannerStationId: Code[10])
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -312,7 +312,7 @@
         Commit();
     end;
 
-    procedure ChangeMembership(var membership: XMLport "NPR MM Change Membership")
+    procedure ChangeMembership(var membership: XmlPort "NPR MM Change Membership")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -352,7 +352,7 @@
         Commit();
     end;
 
-    procedure GetMembership(var membership: XMLport "NPR MM Get Membership"; ScannerStationId: Code[10])
+    procedure GetMembership(var membership: XmlPort "NPR MM Get Membership"; ScannerStationId: Code[10])
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -398,7 +398,7 @@
         Commit();
     end;
 
-    procedure GetMembershipMembers(var member: XMLport "NPR MM Get Members. Members"; ScannerStationId: Code[10])
+    procedure GetMembershipMembers(var member: XmlPort "NPR MM Get Members. Members"; ScannerStationId: Code[10])
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -445,7 +445,7 @@
         Commit();
     end;
 
-    procedure SearchMembers(var searchMember: XMLport "NPR MM Search Members")
+    procedure SearchMembers(var searchMember: XmlPort "NPR MM Search Members")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -455,7 +455,7 @@
         searchMember.Import();
 
         InsertImportEntry('SearchMembers', ImportEntry);
-        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, FORMAT(CurrentDateTime(), 0, 9));
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
         ImportEntry."Document ID" := CreateDocumentId();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
@@ -480,7 +480,7 @@
         Commit();
     end;
 
-    procedure UpdateMember(var member: XMLport "NPR MM Update Member"; ScannerStationId: Code[10])
+    procedure UpdateMember(var member: XmlPort "NPR MM Update Member"; ScannerStationId: Code[10])
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -546,7 +546,7 @@
         exit(Success);
     end;
 
-    procedure BlockMembership(var member: XMLport "NPR MM Block Membership"; ScannerStationId: Code[10])
+    procedure BlockMembership(var member: XmlPort "NPR MM Block Membership"; ScannerStationId: Code[10])
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -593,7 +593,7 @@
         Commit();
     end;
 
-    procedure BlockMember(var member: XMLport "NPR MM Block Membership Member"; ScannerStationId: Code[10])
+    procedure BlockMember(var member: XmlPort "NPR MM Block Membership Member"; ScannerStationId: Code[10])
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -638,7 +638,7 @@
 
     end;
 
-    procedure GetMembershipRoles(var roles: XMLport "NPR MM Get Member GDPR Roles")
+    procedure GetMembershipRoles(var roles: XmlPort "NPR MM Get Member GDPR Roles")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -679,7 +679,7 @@
 
     end;
 
-    procedure GetSetGDPRApprovalState(var gdpr: XMLport "NPR MM GDPR GetSet Appr. State")
+    procedure GetSetGDPRApprovalState(var gdpr: XmlPort "NPR MM GDPR GetSet Appr. State")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -720,7 +720,7 @@
     end;
 
 #pragma warning disable AA0245 
-    procedure ConfirmMembershipPayment(var ConfirmMembershipPayment: XMLport "NPR MM Confirm Members. Pay.")
+    procedure ConfirmMembershipPayment(var ConfirmMembershipPayment: XmlPort "NPR MM Confirm Members. Pay.")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -766,7 +766,7 @@
     end;
 #pragma warning restore
 
-    procedure RegretMembershipTimeframe(var Membership: XMLport "NPR MM Regret Member Timeframe")
+    procedure RegretMembershipTimeframe(var Membership: XmlPort "NPR MM Regret Member Timeframe")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -843,7 +843,7 @@
 
     end;
 
-    procedure CreateWalletMemberPass(var CreateMemberPass: XMLport "NPR MM Create Wallet Mem. Pass")
+    procedure CreateWalletMemberPass(var CreateMemberPass: XmlPort "NPR MM Create Wallet Mem. Pass")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -947,7 +947,49 @@
 
     end;
 
-    procedure GetSetComOptions(var GetSetMemberComOptions: XMLport "NPR MM Member Comm.")
+    procedure AddOrReplaceCard(var AddReplaceCard: XmlPort "NPR MM AddReplaceCard")
+    var
+        ImportEntry: Record "NPR Nc Import Entry";
+        NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
+        OutStr: OutStream;
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        FileNameLbl: Label 'AddReplaceCard-%1.xml', Locked = true;
+    begin
+        AddReplaceCard.Import();
+
+        InsertImportEntry('AddReplaceCard', ImportEntry);
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document ID" := CreateDocumentId();
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        AddReplaceCard.SetDestination(OutStr);
+        AddReplaceCard.Export();
+        ImportEntry.Modify(true);
+        Commit();
+
+        if (NaviConnectSyncMgt.ProcessImportEntry(ImportEntry)) then begin
+            AddReplaceCard.ClearResponse();
+            MemberInfoCapture.SetCurrentKey("Import Entry Document ID");
+            MemberInfoCapture.SetFilter("Import Entry Document ID", '=%1', ImportEntry."Document ID");
+            MemberInfoCapture.FindSet(true);
+            repeat
+                AddReplaceCard.AddResponse(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.");
+            until (MemberInfoCapture.Next() = 0);
+
+            MemberInfoCapture.DeleteAll();
+        end else begin
+            AddReplaceCard.AddErrorResponse(ImportEntry."Error Message");
+        end;
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        AddReplaceCard.SetDestination(OutStr);
+        AddReplaceCard.Export();
+        ImportEntry.Modify(true);
+
+        Commit();
+    end;
+
+    procedure GetSetComOptions(var GetSetMemberComOptions: XmlPort "NPR MM Member Comm.")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -1031,7 +1073,7 @@
 
     end;
 
-    procedure GetAutoRenewProduct(var Membership: XMLport "NPR MM Get AutoRenew Product")
+    procedure GetAutoRenewProduct(var Membership: XmlPort "NPR MM Get AutoRenew Product")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -1074,7 +1116,7 @@
         Commit();
     end;
 
-    procedure ConfirmAutoRenewPayment(var Membership: XMLport "NPR MM Confirm AutoRenew Pay.")
+    procedure ConfirmAutoRenewPayment(var Membership: XmlPort "NPR MM Confirm AutoRenew Pay.")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -1118,7 +1160,7 @@
     end;
 
 #pragma warning disable AA0245 
-    procedure GetSetAutoRenew(var GetSetAutoRenew: XMLport "NPR MM GetSet AutoRenew Option")
+    procedure GetSetAutoRenew(var GetSetAutoRenew: XmlPort "NPR MM GetSet AutoRenew Option")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -1165,6 +1207,7 @@
         Commit();
     end;
 
+    [Obsolete('Incorrect Spelling - use RequestMemberFieldUpdate')]
     procedure ReqeustMemberFieldUpdate(MemberCardNumber: Text[50]; FieldId: Code[10]; ScannerStationId: Code[10]): Boolean
     var
         MemberFieldUpdateMgr: Codeunit "NPR MM Request Member Upd Mgr";
@@ -1174,7 +1217,16 @@
         exit(true);
     end;
 
-    procedure ResolveMemberIdentifier(var MemberIdentifier: XMLport "NPR MM Member Identifier")
+    procedure RequestMemberFieldUpdate(MemberCardNumber: Text[50]; FieldId: Code[10]; ScannerStationId: Code[10]): Boolean
+    var
+        MemberFieldUpdateMgr: Codeunit "NPR MM Request Member Upd Mgr";
+    begin
+
+        MemberFieldUpdateMgr.RequestFieldUpdate(MemberCardNumber, FieldId, ScannerStationId);
+        exit(true);
+    end;
+
+    procedure ResolveMemberIdentifier(var MemberIdentifier: XmlPort "NPR MM Member Identifier")
     begin
 
         MemberIdentifier.Import();
@@ -1254,7 +1306,7 @@
         if (ResponseCode <> 0) then
             exit(ResponseCode);
 
-        commit();
+        Commit();
 
         if (MembershipSetup."Ticket Item Barcode" = '') then
             exit(0);
@@ -1276,10 +1328,10 @@
     begin
         ImportEntry.Init();
         ImportEntry."Entry No." := 0;
-        ImportEntry."Import Type" := GetImportTypeCode(CODEUNIT::"NPR MM Member WebService", WebserviceFunction);
+        ImportEntry."Import Type" := GetImportTypeCode(Codeunit::"NPR MM Member WebService", WebserviceFunction);
         if (ImportEntry."Import Type" = '') then begin
             MemberIntegrationSetup();
-            ImportEntry."Import Type" := GetImportTypeCode(CODEUNIT::"NPR MM Member WebService", WebserviceFunction);
+            ImportEntry."Import Type" := GetImportTypeCode(Codeunit::"NPR MM Member WebService", WebserviceFunction);
             if (ImportEntry."Import Type" = '') then
                 Error(SETUP_MISSING, WebserviceFunction);
         end;
@@ -1295,7 +1347,7 @@
     var
         ImportType: Record "NPR Nc Import Type";
     begin
-        ImportType.SetFilter("Webservice Codeunit ID", '=%1', CODEUNIT::"NPR MM Member WebService");
+        ImportType.SetFilter("Webservice Codeunit ID", '=%1', Codeunit::"NPR MM Member WebService");
         if (not ImportType.IsEmpty()) then
             ImportType.DeleteAll();
 
@@ -1320,6 +1372,7 @@
         CreateImportType('MEMBER-19', 'MemberManagement', 'GetSetMemberComOption');
         CreateImportType('MEMBER-20', 'MemberManagement', 'BlockMember');
         CreateImportType('MEMBER-21', 'MemberManagement', 'SearchMembers');
+        CreateImportType('MEMBER-22', 'MemberManagement', 'AddReplaceCard');
 
         Commit();
     end;
@@ -1334,8 +1387,8 @@
         ImportType."Webservice Function" := FunctionName;
 
         ImportType."Webservice Enabled" := true;
-        ImportType."Import Codeunit ID" := CODEUNIT::"NPR MM Member WebService Mgr";
-        ImportType."Webservice Codeunit ID" := CODEUNIT::"NPR MM Member WebService";
+        ImportType."Import Codeunit ID" := Codeunit::"NPR MM Member WebService Mgr";
+        ImportType."Webservice Codeunit ID" := Codeunit::"NPR MM Member WebService";
 
         ImportType.Insert();
     end;

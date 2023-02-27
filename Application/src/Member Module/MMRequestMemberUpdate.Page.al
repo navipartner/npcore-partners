@@ -14,7 +14,6 @@
         {
             repeater(GroupName)
             {
-
                 field("Entry No."; Rec."Entry No.")
                 {
                     ToolTip = 'Specifies the value of the Entry No. field.';

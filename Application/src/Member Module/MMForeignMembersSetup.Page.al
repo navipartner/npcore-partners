@@ -113,6 +113,29 @@
                     ShowDashboard();
                 end;
             }
+            action(SearchForeignMembers)
+            {
+                Caption = 'Search Foreign Members';
+                Ellipsis = true;
+                Image = Find;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                ToolTip = 'Performs the remote member search functionality.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                var
+                    RemoteMembershipMgt: Codeunit "NPR MM NPR Membership";
+                    SelectedRemoteMemberCardNumber: Text[100];
+                begin
+                    RemoteMembershipMgt.SearchForeignMembers(Rec."Community Code", SelectedRemoteMemberCardNumber);
+                    if (SelectedRemoteMemberCardNumber <> '') then
+                        Message('The remote member card number selected is %1', SelectedRemoteMemberCardNumber);
+                end;
+            }
         }
     }
 

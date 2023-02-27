@@ -910,7 +910,7 @@
     procedure SetRandomMemberInfoData(VAR InfoCapture: Record "NPR MM Member Info Capture")
     begin
         Clear(InfoCapture);
-        // fields are concatinated, so max length does not work when applied on the individual fields
+        // fields are concatenated, so max length does not work when applied on the individual fields
         GenerateText(InfoCapture."First Name", 15);
         GenerateText(InfoCapture."Middle Name", 8);
         GenerateText(InfoCapture."Last Name", 20);

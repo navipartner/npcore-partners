@@ -134,6 +134,7 @@
         MembershipUntilDate: Date;
         ResponseMessage: Text;
         MSG_1101: Label 'Quantity must be 1, when selling memberships.';
+        RemoteMembership: Boolean;
     begin
 
         MemberInfoCapture.FindSet();
@@ -145,6 +146,7 @@
                     begin
 
                         MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
+                        RemoteMembership := IsForeignMembership(MembershipSalesSetup."Membership Code");
 
                         if (MembershipSalesSetup."Business Flow Type" <> MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER) then
                             if (MemberInfoCapture.Quantity <> 1) then
@@ -152,7 +154,7 @@
 
                         if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::MEMBERSHIP) then begin
 
-                            if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then begin
+                            if (RemoteMembership) then begin
                                 RemoteCreateMembership(MemberInfoCapture, MembershipSalesSetup);
                                 repeat
                                     RemoteAddMember(MemberInfoCapture, MembershipSalesSetup);
@@ -168,7 +170,7 @@
                         if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER) then begin
                             repeat
 
-                                if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then begin
+                                if (RemoteMembership) then begin
                                     RemoteAddMember(MemberInfoCapture, MembershipSalesSetup);
                                 end else begin
                                     MemberManagement.AddMemberAndCard(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
@@ -190,9 +192,13 @@
                         end;
 
                         if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_CARD) then begin
-                            MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
-                            if (MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER, MembershipSalesSetup."Member Card Type"::PASSSERVER]) then
-                                MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
+                            if (RemoteMembership) then begin
+                                RemoteCardAdd(MemberInfoCapture, MembershipSalesSetup);
+                            end else begin
+                                MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
+                                if (MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER, MembershipSalesSetup."Member Card Type"::PASSSERVER]) then
+                                    MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
+                            end;
                         end;
 
                     end;
@@ -276,6 +282,28 @@
             Error(NotValidReason);
 
     end;
+
+    local procedure RemoteCardAdd(var MemberInfoCapture: Record "NPR MM Member Info Capture"; MembershipSalesSetup: Record "NPR MM Members. Sales Setup")
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        NPRMembership: Codeunit "NPR MM NPR Membership";
+        NotValidReason: Text;
+    begin
+
+        MembershipSetup.Get(MembershipSalesSetup."Membership Code");
+
+        if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_CARD) then
+            if (not NPRMembership.CreateRemoteAddCard(MembershipSetup."Community Code", MemberInfoCapture, false, NotValidReason)) then
+                Error(NotValidReason);
+
+        if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::REPLACE_CARD) then
+            if (not NPRMembership.CreateRemoteAddCard(MembershipSetup."Community Code", MemberInfoCapture, true, NotValidReason)) then
+                Error(NotValidReason);
+
+    end;
+
+
+
 
     internal procedure WasSuccessful(var ResponseMessage: Text): Boolean
     begin
