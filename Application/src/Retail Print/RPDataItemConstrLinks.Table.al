@@ -273,7 +273,9 @@ table 6014564 "NPR RP Data Item Constr. Links"
                             foreach String in StringArray do begin
                                 TempRetailList.Number += 1;
                                 if not (String in ['', ' ']) then begin
+#pragma warning disable AA0139
                                     TempRetailList.Choice := String;
+#pragma warning restore AA0139
                                     TempRetailList.Value := Format(TempRetailList.Number - 1);
                                     TempRetailList.Insert();
                                 end;

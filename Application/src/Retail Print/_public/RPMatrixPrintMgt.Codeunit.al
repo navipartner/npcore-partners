@@ -1,6 +1,6 @@
 codeunit 6014547 "NPR RP Matrix Print Mgt."
 {
-
+#pragma warning disable AA0139
     var
         TempGlobalBuffer: Record "NPR RP Print Buffer" temporary;
         CurrentLineNo: Integer;
@@ -495,5 +495,6 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
     local procedure OnSendPrintJob(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer)
     begin
     end;
+#pragma warning restore AA0139
 }
 

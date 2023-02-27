@@ -48,7 +48,9 @@
                 LineNo += 1;
                 TempRetailJournalLine."Line No." := LineNo;
                 TempRetailJournalLine."Quantity to Print" := 1;
+#pragma warning disable AA0139
                 TempRetailJournalLine."RFID Tag Value" := RFIDMgt.GetNextRFIDValue();
+#pragma warning restore AA0139
                 RFIDMgt.CheckItemReference(TempRetailJournalLine."RFID Tag Value");
                 TempRetailJournalLine.Insert();
             end;

@@ -1,5 +1,6 @@
 table 6014446 "NPR RP Template Header"
 {
+#pragma warning disable AA0139
     Caption = 'RP Template Header';
     DrillDownPageID = "NPR RP Template List";
     LookupPageID = "NPR RP Template List";
@@ -334,5 +335,6 @@ table 6014446 "NPR RP Template Header"
 
         RPTemplateArchive.Insert();
     end;
+#pragma warning restore AA0139
 }
 

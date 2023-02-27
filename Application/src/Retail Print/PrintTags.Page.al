@@ -1,5 +1,6 @@
 ﻿page 6014417 "NPR Print Tags"
 {
+#pragma warning disable AA0139
     Extensible = False;
     // NPR4.18/MMV/20151229 CASE 225584 Created Page
 
@@ -116,5 +117,6 @@
             TempSelectedPrintTags.Insert();
         end;
     end;
+#pragma warning restore AA0139
 }
 

@@ -1,13 +1,16 @@
 codeunit 6014534 "NPR RP Aux: Event Publishers"
 {
     Access = Internal;
+
     var
         ERROR_UNKNOWNTABLE: Label 'Template line has unknown table selected. Must be %1';
 
     local procedure AddFunction(var tmpRetailList: Record "NPR Retail List" temporary; Choice: Text)
     begin
         tmpRetailList.Number += 1;
+#pragma warning disable AA0139
         tmpRetailList.Choice := Choice;
+#pragma warning restore AA0139
         tmpRetailList.Insert();
     end;
 

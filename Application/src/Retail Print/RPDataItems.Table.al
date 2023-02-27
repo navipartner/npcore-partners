@@ -165,7 +165,9 @@ table 6014561 "NPR RP Data Items"
                 if Key.FindSet() then
                     repeat
                         TempRetailList.Number += 1;
+#pragma warning disable AA0139
                         TempRetailList.Choice := Key.Key;
+#pragma warning restore AA0139
                         TempRetailList.Value := Format(Key."No.");
                         TempRetailList.Insert();
                     until Key.Next() = 0;
@@ -235,8 +237,9 @@ table 6014561 "NPR RP Data Items"
                                 FieldString += ',';
                             FieldString += TempRetailList.Value;
                         until TempRetailList.Next() = 0;
-
+#pragma warning disable AA0139
                     "Total Fields" := FieldString;
+#pragma warning restore AA0139
                 end;
             end;
         }
