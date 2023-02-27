@@ -1,202 +1,175 @@
 ﻿
-codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
+codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt" implements "NPR IPaymentGateway"
 {
     Access = Internal;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CapturePaymentEvent', '', true, true)]
-    local procedure OnPayCapture(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line");
-    begin
-        if PaymentGateway."Capture Codeunit Id" <> CurrCodeunitId() then
-            exit;
-        if not (PaymentLine."Document Table No." in [DATABASE::"Sales Header", DATABASE::"Sales Invoice Header"]) then
-            exit;
+    var
+        WrongTableSuppliedErr: Label 'Table no. %1 was not expected. Expected %2', Comment = '%1 = actual table no., %2 = expected table no.';
+        BadApiResponseErr: Label 'Received a bad response from the Nets Easy API.\Status code: %1 - %2\Body: %3', Comment = '%1 = http status code, %2 = http reason phrase, %3 = response body';
+        MissingChargeID: Label 'The integration was not supplied or could not find the last charge id which is a requirement for refunding. Could not refund the payment %1!', Comment = '%1 = transaction id';
+        PaymentIDEmptyErr: Label 'Payment ID cannot be empty. This is a programming bug, not user error. Please contact system vendor.';
+        MultipleChargesErr: Label 'This payment has multiple charges. The current integration does not support refunding partially captured transactions.\Please refund directly in Nets admin panel.';
 
-        SetBaseAPIUrl(PaymentGateway);
-        CapturePayment(PaymentGateway, PaymentLine);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'RefundPaymentEvent', '', true, true)]
-    local procedure OnRefundPayment(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line");
-    begin
-        if PaymentGateway."Refund Codeunit Id" <> CurrCodeunitId() then
-            exit;
-        if not (PaymentLine."Document Table No." in [DATABASE::"Sales Header", DATABASE::"Sales Cr.Memo Header"]) then
-            exit;
-
-        RefundPayment(PaymentGateway, PaymentLine);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CancelPaymentEvent', '', true, true)]
-    local procedure OnCancelPayment(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
-    begin
-        if PaymentGateway."Cancel Codeunit Id" <> CurrCodeunitId() then
-            exit;
-        if not (PaymentLine."Document Table No." in [DATABASE::"Sales Header", DATABASE::"Sales Invoice Header"]) then
-            exit;
-
-        if PaymentLine."Charge ID" <> '' then // Payment has already been captured -> exit
-            exit;
-
-        CancelPayment(PaymentGateway, PaymentLine);
-    end;
-
-    local procedure CapturePayment(PaymentGateway: Record "NPR Magento Payment Gateway"; PaymentLine: record "NPR Magento Payment Line")
+    #region Payment Integration
+    local procedure CapturePayment(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
         Url: Text;
         Headers: HttpHeaders;
+        Client: HttpClient;
         RequestMessage: HttpRequestMessage;
+        ResponseMessage: HttpResponseMessage;
         ResponseText: Text;
-        Request: Text;
+        RequestTxt: Text;
         Content: HttpContent;
         FormattedAmount: Text;
-        Response: JsonToken;
+        ResponseToken: JsonToken;
+        NetsEasySetup: Record "NPR PG Nets Easy Setup";
+        SalesInvHeader: Record "Sales Invoice Header";
     begin
-        PaymentGateway.TestField(Token);
+        NetsEasySetup.Get(Request."Payment Gateway Code");
+        NetsEasySetup.VerifyHasAuthorizationToken();
 
-        FormattedAmount := GetApiAmount(PaymentLine.Amount);
-        Request :=
+        if (Request."Document Table No." <> Database::"Sales Invoice Header") then
+            Error(WrongTableSuppliedErr, Request."Document Table No.", Database::"Sales Invoice Header");
+
+        SalesInvHeader.GetBySystemId(Request."Document System Id");
+
+        FormattedAmount := GetApiAmount(Request."Request Amount");
+
+        RequestTxt :=
                     '{' +
-
                         '"amount":' + FormattedAmount + ',' +
                         '"orderItems":[' +
                                         '{' +
-                                            '"reference":' + '"' + format(PaymentLine."Document No.") + '"' + ',' +
-                                            '"name":' + '"' + format(PaymentLine.Description) + '"' + ',' +
+                                            '"reference":' + '"' + Format(SalesInvHeader."No.", 0, 9) + '"' + ',' +
+                                            '"name":' + '"' + Format(Request."Request Description", 0, 9) + '"' + ',' +
                                             '"quantity":1,' +
                                             '"unit":"pcs",' +
                                             '"grossTotalAmount":' + FormattedAmount +
-
                                          '}' +
                                     ']' +
                     '}';
 
+        Request.AddBody(RequestTxt);
 
-
-        Content.WriteFrom(Request);
+        Content.WriteFrom(RequestTxt);
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
-        Url := PaymentGateway."Api Url" + 'payments/' + paymentline."No." + '/charges';
+
+        Url := NetsEasySetup.GetBaseAPIUrl() + 'payments/' + Request."Transaction ID" + '/charges';
+
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
-        SetHeader(Headers, 'Authorization', 'Bearer ' + PaymentGateway.Token);
-        SendHttpRequest(RequestMessage, ResponseText);
+        SetHeader(Headers, 'Authorization', 'Bearer ' + NetsEasySetup.GetAuthorizationToken());
 
-        Response.ReadFrom(ResponseText);
-        paymentline."Charge ID" := CopyStr(GetJsonText(Response, 'chargeId', 0), 1, MaxStrLen(paymentline."Charge ID"));
-        PaymentLine."Date Captured" := Today();
-        PaymentLine.Modify(true);
+        Client.Send(RequestMessage, ResponseMessage);
+
+        ResponseMessage.Content.ReadAs(ResponseText);
+        Response.AddResponse(ResponseText);
+        Response."Response Success" := ResponseMessage.IsSuccessStatusCode();
+
+        if (ResponseToken.ReadFrom(ResponseText)) then
+            Response."Response Operation Id" := CopyStr(GetJsonText(ResponseToken, 'chargeId', 0), 1, MaxStrLen(Response."Response Operation Id"));
+
+        if (not ResponseMessage.IsSuccessStatusCode()) then
+            Error(BadApiResponseErr, ResponseMessage.HttpStatusCode(), ResponseMessage.ReasonPhrase(), ResponseText);
     end;
 
-    local procedure RefundPayment(PaymentGateway: Record "NPR Magento Payment Gateway"; PaymentLine: record "NPR Magento Payment Line")
+    local procedure RefundPayment(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
         Url: Text;
         Headers: HttpHeaders;
+        Client: HttpClient;
         RequestMessage: HttpRequestMessage;
+        ResponseMessage: HttpResponseMessage;
         ResponseText: Text;
         RequestTxt: Text;
         Content: HttpContent;
-        Response: JsonToken;
+        NetsEasySetup: Record "NPR PG Nets Easy Setup";
     begin
+        NetsEasySetup.Get(Request."Payment Gateway Code");
+
         // Try to get the payment's charge id.
-        if PaymentLine."Charge ID" = '' then begin
+        if Request."Last Operation Id" = '' then
 #pragma warning disable AA0139
-            PaymentLine."Charge ID" := GetChargeId(PaymentGateway, PaymentLine."No.");
+            Request."Last Operation Id" := GetChargeId(NetsEasySetup, Request."Transaction ID");
 #pragma warning restore
-            PaymentLine.Modify(true);
-            Commit();
-        end;
 
-        PaymentLine.TestField("Charge ID");
-        PaymentGateway.TestField(Token);
+        if (Request."Last Operation Id" = '') then
+            Error(MissingChargeID, Request."Transaction ID");
 
-        RequestTxt := '{' + '"amount":' + GetApiAmount(PaymentLine.Amount) + '}';
+        NetsEasySetup.VerifyHasAuthorizationToken();
+
+        RequestTxt := '{' + '"amount":' + GetApiAmount(Request."Request Amount") + '}';
+        Request.AddBody(RequestTxt);
+
         Content.WriteFrom(RequestTxt);
-
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
 
-        Url := PaymentGateway."Api Url" + 'charges/' + paymentline."Charge ID" + '/refunds';
+        Url := NetsEasySetup.GetBaseAPIUrl() + 'charges/' + Request."Last Operation Id" + '/refunds';
+
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
-        SetHeader(Headers, 'Authorization', 'Bearer ' + PaymentGateway.Token);
-        SendHttpRequest(RequestMessage, ResponseText);
+        SetHeader(Headers, 'Authorization', 'Bearer ' + NetsEasySetup.GetAuthorizationToken());
 
-        Response.ReadFrom(ResponseText);
-        PaymentLine."Date Refunded" := Today();
-        PaymentLine.Modify(true);
+        Client.Send(RequestMessage, ResponseMessage);
 
+        ResponseMessage.Content.ReadAs(ResponseText);
+        Response.AddResponse(ResponseText);
+        Response."Response Success" := ResponseMessage.IsSuccessStatusCode();
+
+        if (not ResponseMessage.IsSuccessStatusCode()) then
+            Error(BadApiResponseErr, ResponseMessage.HttpStatusCode(), ResponseMessage.ReasonPhrase(), ResponseText);
     end;
 
-    local procedure CancelPayment(PaymentGateway: Record "NPR Magento Payment Gateway"; PaymentLine: record "NPR Magento Payment Line")
+    local procedure CancelPayment(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
         Url: Text;
         Headers: HttpHeaders;
+        Client: HttpClient;
         RequestMessage: HttpRequestMessage;
+        ResponseMessage: HttpResponseMessage;
         ResponseText: Text;
-        Request: Text;
+        RequestTxt: Text;
         Content: HttpContent;
         FormattedAmount: Text;
-        Response: JsonToken;
+        NetsEasySetup: Record "NPR PG Nets Easy Setup";
     begin
-        PaymentGateway.TestField(Token);
+        NetsEasySetup.VerifyHasAuthorizationToken();
 
-        FormattedAmount := GetApiAmount(PaymentLine.Amount);
-        Request := '{' + '"amount":' + FormattedAmount + '}';
+        FormattedAmount := GetApiAmount(Request."Request Amount");
+        RequestTxt := '{' + '"amount":' + FormattedAmount + '}';
 
-        Content.WriteFrom(Request);
+        Request.AddBody(RequestTxt);
+        Content.WriteFrom(RequestTxt);
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
-        Url := PaymentGateway."Api Url" + 'payments/' + paymentline."No." + '/cancels';
+
+        Url := NetsEasySetup.GetBaseAPIUrl() + 'payments/' + Request."Transaction ID" + '/cancels';
+
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
-        SetHeader(Headers, 'Authorization', 'Bearer ' + PaymentGateway.Token);
-        SendHttpRequest(RequestMessage, ResponseText);
+        SetHeader(Headers, 'Authorization', 'Bearer ' + NetsEasySetup.GetAuthorizationToken());
 
-        Response.ReadFrom(ResponseText);
-        message(ResponseText);
+        Client.Send(RequestMessage, ResponseMessage);
 
-    end;
-
-    local procedure SendHttpRequest(Var RequestMessage: HttpRequestMessage; var ResponseText: Text);
-    var
-        Client: HttpClient;
-        ErrorText: Text;
-        ResponseMessage: HttpResponseMessage;
-    begin
-        Clear(ResponseMessage);
-        if not Client.Send(RequestMessage, ResponseMessage) then
-            Error(GetLastErrorText);
-
-        if not ResponseMessage.IsSuccessStatusCode() then begin
-            ErrorText := Format(ResponseMessage.HttpStatusCode(), 0, 9) + ': ' + ResponseMessage.ReasonPhrase;
-            if ResponseMessage.Content.ReadAs(ResponseText) then
-                ErrorText += ':\' + ResponseText;
-            Error(CopyStr(ErrorText, 1, 1000));
-        end;
+        Response."Response Success" := ResponseMessage.IsSuccessStatusCode();
         ResponseMessage.Content.ReadAs(ResponseText);
+        Response.AddResponse(ResponseText);
+
+        if (not ResponseMessage.IsSuccessStatusCode()) then
+            Error(BadApiResponseErr, ResponseMessage.HttpStatusCode(), ResponseMessage.ReasonPhrase(), ResponseText);
     end;
+    #endregion
 
-    local procedure CurrCodeunitId(): Integer
-    begin
-        exit(CODEUNIT::"NPR Magento Pmt. EasyNets Mgt");
-    end;
-
-    local procedure SetBaseAPIUrl(var PaymentGateway: Record "NPR Magento Payment Gateway")
-    begin
-        if PaymentGateway."Api Url" = '' then begin
-            PaymentGateway."Api Url" := 'https://test.api.dibspayment.eu/v1/';
-            PaymentGateway.Modify(true);
-            Commit();
-
-        end;
-    end;
-
+    #region aux
     local procedure GetJsonText(JToken: JsonToken; Path: Text; MaxLen: Integer) Value: Text
     var
         Token2: JsonToken;
@@ -213,33 +186,36 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
         exit(Value)
     end;
 
-    local procedure GetChargeId(PaymentGateway: Record "NPR Magento Payment Gateway"; PaymentID: Code[50]): Text
+    local procedure GetChargeId(NetsEasySetup: Record "NPR PG Nets Easy Setup"; PaymentID: Text): Text
     var
         RequestMessage: HttpRequestMessage;
+        ResponseMessage: HttpResponseMessage;
+        Client: HttpClient;
         Headers: HttpHeaders;
         ResponseTxt: Text;
         JsonResponse: JsonToken;
         JsonCharges: JsonToken;
         JsonCharge: JsonToken;
-        PaymentIDEmptyErr: Label 'Payment ID cannot be empty. This is a programming bug, not user error. Please contact system vendor.';
-        MultipleChargesErr: Label 'This payment has multiple charges. The current integration does not support refunding partially captured transactions.\Please refund directly in Nets admin panel.';
     begin
         if PaymentID = '' then
             Error(PaymentIDEmptyErr);
 
-        PaymentGateway.TestField(Token);
+        NetsEasySetup.VerifyHasAuthorizationToken();
 
-        // Ensure we have a "/" at the end of the API url.
-        if not (PaymentGateway."Api Url"[StrLen(PaymentGateway."Api Url")] = '/') then
-            PaymentGateway."Api Url" += '/';
-
-        RequestMessage.SetRequestUri(PaymentGateway."Api Url" + 'payments/' + PaymentID);
+        RequestMessage.SetRequestUri(NetsEasySetup.GetBaseAPIUrl() + 'payments/' + PaymentID);
         RequestMessage.Method('GET');
         RequestMessage.GetHeaders(Headers);
-        SetHeader(Headers, 'Authorization', 'Bearer ' + PaymentGateway.Token);
-        SendHttpRequest(RequestMessage, ResponseTxt); // This call will error if the HTTP request fails
+        SetHeader(Headers, 'Authorization', 'Bearer ' + NetsEasySetup.GetAuthorizationToken());
 
-        JsonResponse.ReadFrom(ResponseTxt);
+        if (not Client.Send(RequestMessage, ResponseMessage)) then
+            exit('');
+
+        if (not ResponseMessage.Content.ReadAs(ResponseTxt)) then
+            exit('');
+
+        if (not JsonResponse.ReadFrom(ResponseTxt)) then
+            exit('');
+
         if not JsonResponse.SelectToken('$.payment.charges', JsonCharges) then
             exit('');
 
@@ -247,7 +223,7 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
             exit('');
 
         if JsonCharges.AsArray().Count = 1 then begin
-            JsonCharges.AsArray().Get(0, JsonCharge); // Unlike a lot of other things in BC this is 0-indexed...
+            JsonCharges.AsArray().Get(0, JsonCharge);
             exit(GetJsonText(JsonCharge, 'chargeId', 0));
         end;
 
@@ -266,4 +242,36 @@ codeunit 6151427 "NPR Magento Pmt. EasyNets Mgt"
     begin
         exit(DelChr(Format(Round(Amount * 100, 1), 0, 9), '=', '.'));
     end;
+    #endregion
+
+    #region Interface implementation
+    procedure Capture(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response");
+    begin
+        CapturePayment(Request, Response);
+    end;
+
+    procedure Refund(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response");
+    begin
+        RefundPayment(Request, Response);
+    end;
+
+    procedure Cancel(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response");
+    begin
+        CancelPayment(Request, Response);
+    end;
+
+    procedure RunSetupCard(PaymentGatewayCode: Code[10])
+    var
+        PGEasyNetsSetup: Record "NPR PG Nets Easy Setup";
+    begin
+        if (not PGEasyNetsSetup.Get(PaymentGatewayCode)) then begin
+            PGEasyNetsSetup.Init();
+            PGEasyNetsSetup.Code := PaymentGatewayCode;
+            PGEasyNetsSetup.Insert(true);
+            Commit();
+        end;
+
+        Page.Run(Page::"NPR PG Nets Easy Setup Card", PGEasyNetsSetup);
+    end;
+    #endregion
 }
