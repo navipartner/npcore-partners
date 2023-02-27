@@ -28,6 +28,8 @@ codeunit 6059903 "NPR POS Action: HTML Disp." implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     var
         ValidationPage: Page "NPR POS HTML Validate Input";
+        POSUnit: Record "NPR POS Unit";
+        HtmlProfile: Record "NPR POS HTML Disp. Prof.";
         POSEntry: Record "NPR POS Entry";
         InputObj: JsonObject;
         HtmlDispCU: Codeunit "NPR POS HTML Disp. Prof.";
@@ -57,6 +59,17 @@ codeunit 6059903 "NPR POS Action: HTML Disp." implements "NPR IPOS Workflow"
                         FrontEnd.WorkflowResponse(True);
                     end;
 
+                end;
+            'QRPaymentScan':
+                begin
+                    if (not POSUnit.Get(Setup.GetPOSUnitNo())) then
+                        FrontEnd.WorkflowResponse(false);
+                    if (not HtmlProfile.Get(POSUnit."POS HTML Display Profile")) then
+                        FrontEnd.WorkflowResponse(false);
+                    if (not HtmlProfile."MobilePay QR") then
+                        FrontEnd.WorkflowResponse(false)
+                    else
+                        FrontEnd.WorkflowResponse(true)
                 end;
         end;
     end;
@@ -92,7 +105,7 @@ codeunit 6059903 "NPR POS Action: HTML Disp." implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionHTMLDisp.Codeunit.js### 
-'let main=async e=>{try{const{popup:r,captions:a,parameters:t}=e;switch(t.CustomerDisplayOp.toString()){case"OPEN":OpenCloseDisplay(!0);break;case"CLOSE":OpenCloseDisplay(!1);break;case"GET_INPUT":await CollectInput(e);break;default:r.error(a.ErrUnknownOperation+": ''"+t.CustomerDisplayOp.toString()+"''");break}}catch(r){popup.error(r)}};async function CollectInput(e){const{hwc:r,workflow:a,popup:t,captions:n}=e;switch(objParam={JSAction:"GetInput",InputType:"Phone & Signature"},await a.respond("POSEntryNo")){case"GET_INPUT":break;case"NOT_SELECTED":t.error(n.ErrPOSEntryNotSelected);return;case"INPUT_EXISTS":t.error(n.ErrPOSEntryInputExists);return;default:t.error(n.ErrPOSEntryUndefined);return}let o=!1;for(;!o;){let s=await r.invoke("HTMLDisplay",{DisplayAction:"SendJS",JSParameter:JSON.stringify(objParam)});o=await a.respond("InputCollected",s.JSON.Input)}}async function OpenCloseDisplay(e){await hwc.invoke("HTMLDisplay",{DisplayAction:e?"Open":"Close"})}'
+'let main=async e=>{try{const{context:n,popup:r,captions:a,parameters:t}=e;let o="";switch(n.JSAction!==void 0?o=n.JSAction:o=t.CustomerDisplayOp.toString(),o){case"OPEN":OpenCloseDisplay(!0);break;case"CLOSE":OpenCloseDisplay(!1);break;case"GET_INPUT":await CollectInput(e);break;case"QRPaymentScan":await workflow.respond("QRPaymentScan")&&QRPaymentScan(n);break;default:r.error(a.ErrUnknownOperation+": ''"+t.CustomerDisplayOp.toString()+"''");break}}catch(n){popup.error(n)}};async function CollectInput(e){const{hwc:n,workflow:r,popup:a,captions:t}=e;switch(objParam={JSAction:"GetInput",InputType:"Phone & Signature"},await r.respond("POSEntryNo")){case"GET_INPUT":break;case"NOT_SELECTED":a.error(t.ErrPOSEntryNotSelected);return;case"INPUT_EXISTS":a.error(t.ErrPOSEntryInputExists);return;default:a.error(t.ErrPOSEntryUndefined);return}let i=!1;for(;!i;){let s=await n.invoke("HTMLDisplay",{DisplayAction:"SendJS",JSParameter:JSON.stringify(objParam)});i=await r.respond("InputCollected",s.JSON.Input)}}async function OpenCloseDisplay(e){await hwc.invoke("HTMLDisplay",{DisplayAction:e?"Open":"Close"})}async function QRPaymentScan(e){console.log(e),e.Command==="Open"?hwc.invoke("HTMLDisplay",{DisplayAction:"SendJS",JSParameter:JSON.stringify({JSAction:"QRPaymentScan",Provider:e.Provider,Command:"Open",QrContent:e.QrContent,PaymentAmount:e.Amount})}):hwc.invoke("HTMLDisplay",{DisplayAction:"SendJS",JSParameter:JSON.stringify({JSAction:"QRPaymentScan",Command:"Close"})})}'
         );
     end;
 }

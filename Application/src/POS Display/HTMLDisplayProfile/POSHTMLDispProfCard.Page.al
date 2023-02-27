@@ -50,6 +50,12 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                     Caption = 'Receipt Item Description';
                     ToolTip = 'Specifies which description is used on the second display.';
                 }
+                field("Show MobilePay QR"; Rec."MobilePay QR")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Show Mobilepay QR';
+                    ToolTip = 'Specifies if the mobilepay QR code should appear on the second display';
+                }
             }
             group("Input Options")
             {
