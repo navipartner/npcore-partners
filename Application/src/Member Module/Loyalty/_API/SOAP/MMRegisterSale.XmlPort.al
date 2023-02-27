@@ -1,18 +1,19 @@
-xmlport 6151163 "NPR MM Reserve Points"
+xmlport 6151162 "NPR MM Register Sale"
 {
 
-    Caption = 'Reserve Points';
+    Caption = 'Register Sale';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
     Encoding = UTF8;
     schema
     {
-        textelement(ReservePoints)
+        textelement(RegisterSale)
         {
             MaxOccurs = Once;
             textelement(Request)
             {
                 MaxOccurs = Once;
+                MinOccurs = Once;
                 tableelement(tmpauthorizationrequest; "NPR MM Loy. LedgerEntry (Srvr)")
                 {
                     MaxOccurs = Once;
@@ -45,13 +46,58 @@ xmlport 6151163 "NPR MM Reserve Points"
                     fieldelement(Time; TmpAuthorizationRequest."Transaction Time")
                     {
                     }
+                    fieldelement(RetailId; TmpAuthorizationRequest."Retail Id")
+                    {
+                    }
                 }
-                textelement(Reservation)
+                textelement(Sales)
+                {
+                    MaxOccurs = Once;
+                    tableelement(tmpregistersalesrequest; "NPR MM Reg. Sales Buffer")
+                    {
+                        XmlName = 'Line';
+                        UseTemporary = true;
+                        fieldattribute(Type; TmpRegisterSalesRequest.Type)
+                        {
+                        }
+                        fieldattribute(ItemNumber; TmpRegisterSalesRequest."Item No.")
+                        {
+                        }
+                        fieldattribute(VariantCode; TmpRegisterSalesRequest."Variant Code")
+                        {
+                        }
+                        fieldattribute(Quantity; TmpRegisterSalesRequest.Quantity)
+                        {
+                        }
+                        fieldattribute(Description; TmpRegisterSalesRequest.Description)
+                        {
+                        }
+                        fieldattribute(CurrencyCode; TmpRegisterSalesRequest."Currency Code")
+                        {
+                        }
+                        fieldattribute(Amount; TmpRegisterSalesRequest."Total Amount")
+                        {
+                        }
+                        fieldattribute(Points; TmpRegisterSalesRequest."Total Points")
+                        {
+                        }
+                        fieldattribute(Id; TmpRegisterSalesRequest."Retail Id")
+                        {
+                        }
+
+                        trigger OnBeforeInsertRecord()
+                        begin
+
+                            TmpRegisterSalesRequest."Entry No." := TmpRegisterSalesRequest.Count() + 1;
+                        end;
+                    }
+                }
+                textelement(Payments)
                 {
                     MaxOccurs = Once;
                     tableelement(tmpregisterpaymentrequest; "NPR MM Reg. Sales Buffer")
                     {
-                        MaxOccurs = Once;
+                        MinOccurs = Zero;
                         XmlName = 'Line';
                         UseTemporary = true;
                         fieldattribute(Type; TmpRegisterPaymentRequest.Type)
@@ -69,6 +115,18 @@ xmlport 6151163 "NPR MM Reserve Points"
                         fieldattribute(Points; TmpRegisterPaymentRequest."Total Points")
                         {
                         }
+                        fieldattribute(AuthorizationCode; TmpRegisterPaymentRequest."Authorization Code")
+                        {
+                        }
+                        fieldattribute(Id; TmpRegisterPaymentRequest."Retail Id")
+                        {
+                        }
+
+                        trigger OnBeforeInsertRecord()
+                        begin
+
+                            TmpRegisterPaymentRequest."Entry No." := TmpRegisterPaymentRequest.Count() + 1;
+                        end;
                     }
                 }
             }
@@ -107,6 +165,12 @@ xmlport 6151163 "NPR MM Reserve Points"
                     fieldattribute(AuthorizationNumber; TmpPointsResponse."Authorization Code")
                     {
                     }
+                    fieldattribute(PointsEarned; TmpPointsResponse."Earned Points")
+                    {
+                    }
+                    fieldattribute(PointsSpent; TmpPointsResponse."Burned Points")
+                    {
+                    }
                     fieldattribute(NewPointBalance; TmpPointsResponse.Balance)
                     {
                     }
@@ -129,6 +193,7 @@ xmlport 6151163 "NPR MM Reserve Points"
 
     trigger OnInitXmlPort()
     begin
+
         StartTime := Time;
     end;
 
@@ -143,7 +208,7 @@ xmlport 6151163 "NPR MM Reserve Points"
         DocumentId := DocumentIdIn;
     end;
 
-    internal procedure GetRequest(var TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpPaymentLine: Record "NPR MM Reg. Sales Buffer" temporary)
+    internal procedure GetRequest(var TmpAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpSalesLine: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPaymentLine: Record "NPR MM Reg. Sales Buffer" temporary)
     begin
 
         SetErrorResponse('No response.', '-1099');
@@ -153,6 +218,13 @@ xmlport 6151163 "NPR MM Reserve Points"
         TmpAuthorization.TransferFields(TmpAuthorizationRequest, true);
         TmpAuthorization.Insert();
 
+        if (TmpRegisterSalesRequest.FindSet()) then begin
+            repeat
+                TmpSalesLine.TransferFields(TmpRegisterSalesRequest, true);
+                TmpSalesLine.Insert();
+            until (TmpRegisterSalesRequest.Next() = 0);
+        end;
+
         if (TmpRegisterPaymentRequest.FindSet()) then begin
             repeat
                 TmpPaymentLine.TransferFields(TmpRegisterPaymentRequest, true);
@@ -161,7 +233,7 @@ xmlport 6151163 "NPR MM Reserve Points"
         end;
     end;
 
-    internal procedure GetRespons(var ResponseCodeOut: Code[10]; var ResponseMessageOut: Text; var DocumentIdOut: Text; var TmpPoints: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
+    internal procedure GetResponse(var ResponseCodeOut: Code[10]; var ResponseMessageOut: Text; var DocumentIdOut: Text; var TmpPoints: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
     begin
 
         // For test framework

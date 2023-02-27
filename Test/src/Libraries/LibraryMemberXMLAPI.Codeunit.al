@@ -208,6 +208,113 @@ codeunit 85015 "NPR Library - Member XML API"
         exit(ApiStatus);
     end;
 
+    procedure AddMemberCard(ExternalMembershipNo: Code[20]; ExternalMemberNo: Code[20]; var MemberCardEntryNo: Integer; var ResponseMessage: Text): Boolean
+    begin
+        exit(AddMemberCard(ExternalMembershipNo, ExternalMemberNo, '', MemberCardEntryNo, ResponseMessage));
+    end;
+
+    procedure AddMemberCard(ExternalMembershipNo: Code[20]; ExternalMemberNo: Code[20]; NewExternalCardNo: Text[100]; var MemberCardEntryNo: Integer; var ResponseMessage: Text): Boolean
+    var
+        NameSpace: Text;
+        XmlDoc: XmlDocument;
+        XmlDec: XmlDeclaration;
+
+        AddCard: XmlElement;
+        Request: XmlElement;
+        AddReplaceCard: XmlElement;
+        Members: XmlElement;
+    begin
+
+        NameSpace := 'urn:microsoft-dynamics-nav/xmlports/x6151185';
+
+        XMLDoc := XmlDocument.Create();
+        XMLDec := XmlDeclaration.Create('1.0', 'utf-8', 'yes');
+        XMLDoc.SetDeclaration(XMLDec);
+
+        Request := XmlElement.Create('request', NameSpace);
+
+        AddCard := XmlElement.Create('add_card', NameSpace);
+        AddCard.SetAttribute('membershipnumber', ExternalMembershipNo);
+        AddCard.SetAttribute('membernumber', ExternalMemberNo);
+        if (NewExternalCardNo <> '') then
+            AddCard.SetAttribute('new_cardnumber', NewExternalCardNo);
+        Request.Add(AddCard);
+
+        AddReplaceCard := XmlElement.Create('addreplacecard', NameSpace);
+        AddReplaceCard.Add(Request);
+
+        Members := XmlElement.Create('members', NameSpace);
+        Members.Add(AddReplaceCard);
+
+        XmlDoc.Add(Members);
+        exit(AddReplaceMemberCardApi(XmlDoc, MemberCardEntryNo, ResponseMessage));
+    end;
+
+
+    procedure ReplaceMemberCard(OriginalExternalCardNo: Text[100]; NewExternalCardNo: Text[100]; var MemberCardEntryNo: Integer; var ResponseMessage: Text): Boolean
+    var
+        NameSpace: Text;
+        XmlDoc: XmlDocument;
+        XmlDec: XmlDeclaration;
+
+        AddCard: XmlElement;
+        Request: XmlElement;
+        AddReplaceCard: XmlElement;
+        Members: XmlElement;
+    begin
+
+        NameSpace := 'urn:microsoft-dynamics-nav/xmlports/x6151185';
+
+        XMLDoc := XmlDocument.Create();
+        XMLDec := XmlDeclaration.Create('1.0', 'utf-8', 'yes');
+        XMLDoc.SetDeclaration(XMLDec);
+
+        Request := XmlElement.Create('request', NameSpace);
+
+        AddCard := XmlElement.Create('replace_card', NameSpace);
+        AddCard.SetAttribute('old_cardnumber', OriginalExternalCardNo);
+        if (NewExternalCardNo <> '') then
+            AddCard.SetAttribute('new_cardnumber', NewExternalCardNo);
+        Request.Add(AddCard);
+
+        AddReplaceCard := XmlElement.Create('addreplacecard', NameSpace);
+        AddReplaceCard.Add(Request);
+
+        Members := XmlElement.Create('members', NameSpace);
+        Members.Add(AddReplaceCard);
+
+        XmlDoc.Add(Members);
+
+        exit(AddReplaceMemberCardApi(XmlDoc, MemberCardEntryNo, ResponseMessage));
+    end;
+
+    procedure AddReplaceMemberCardApi(XmlDoc: XmlDocument; var MemberCardEntryNo: Integer; var ResponseMessage: Text): Boolean
+    var
+        TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
+        MemberWebService: Codeunit "NPR MM Member WebService";
+        IStream: InStream;
+        OStream: OutStream;
+        NameSpace: Text;
+        XmlAsText: Text;
+        ApiStatus: Boolean;
+        XmlDec: XmlDeclaration;
+
+        ApiXmlPort: XmlPort "NPR MM AddReplaceCard";
+    begin
+        XmlDoc.WriteTo(XmlAsText);
+
+        TmpBLOBbuffer.Insert();
+        TmpBLOBbuffer."Buffer 1".CreateOutStream(OStream);
+        OStream.WriteText(XmlAsText);
+        TmpBLOBbuffer.Modify();
+        TmpBLOBbuffer."Buffer 1".CreateInStream(IStream);
+        ApiXmlPort.SetSource(IStream);
+
+        MemberWebService.AddOrReplaceCard(ApiXmlPort);
+        ApiStatus := ApiXmlPort.GetResponse(MemberCardEntryNo, ResponseMessage);
+        exit(ApiStatus);
+    end;
+
 
     procedure ActivateMembership(Membership: Record "NPR MM Membership"; ScannerStation: Code[10]): Boolean
     var
@@ -440,6 +547,81 @@ codeunit 85015 "NPR Library - Member XML API"
         exit(ApiStatus);
     end;
 
+    procedure SearchMember(FirstName: Text[50]; LastName: Text[50]; PhoneNo: Text[30]; Email: Text[80]; LimitResultToCount: Integer; var TempResponseMemberInfoCapture: Record "NPR MM Member Info Capture" temporary; var ResponseMessage: Text): Boolean
+    var
+        NameSpace: Text;
+        XmlDoc: XmlDocument;
+        XmlDec: XmlDeclaration;
+
+        SearchMembers, Members, Request : XmlElement;
+    begin
+        NameSpace := 'urn:microsoft-dynamics-nav/xmlports/x6151186';
+
+        XMLDoc := XmlDocument.Create();
+        XMLDec := XmlDeclaration.Create('1.0', 'utf-8', 'yes');
+        XMLDoc.SetDeclaration(XMLDec);
+
+        Members := XmlElement.Create('members', NameSpace);
+        SearchMembers := XmlElement.Create('searchmembers', NameSpace);
+        Request := XmlElement.Create('request', NameSpace);
+
+        Request.Add(AddElement('firstname', FirstName, NameSpace));
+        Request.Add(AddElement('lastname', LastName, NameSpace));
+        Request.Add(AddElement('phonenumber', PhoneNo, NameSpace));
+        Request.Add(AddElement('email', Email, NameSpace));
+        Request.Add(AddElement('limitresultset', Format(LimitResultToCount, 0, 9), NameSpace));
+
+        SearchMembers.Add(Request);
+        Members.Add(SearchMembers);
+        XmlDoc.Add(Members);
+
+        exit(SearchMemberAPI(XmlDoc, TempResponseMemberInfoCapture, ResponseMessage));
+    end;
+
+    procedure SearchMemberAPI(XmlDoc: XmlDocument; var TempResponseMemberInfoCapture: Record "NPR MM Member Info Capture" temporary; var ResponseMessage: Text): Boolean
+    var
+        TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
+        MemberWebService: Codeunit "NPR MM Member WebService";
+        XmlDomMgt: Codeunit "XML DOM Management";
+        RemoteMemberMgt: Codeunit "NPR MM NPR Membership";
+        IStream: InStream;
+        OStream: OutStream;
+        NameSpace: Text;
+        XmlAsText: Text;
+        ApiStatus: Boolean;
+        RootElement: XmlElement;
+        ResponseNode: XmlNode;
+
+        ApiXmlPort: XmlPort "NPR MM Search Members";
+    begin
+
+        XmlDoc.WriteTo(XmlAsText);
+        TmpBLOBbuffer.Insert();
+        TmpBLOBbuffer."Buffer 1".CreateOutStream(OStream);
+        OStream.WriteText(XmlAsText);
+        TmpBLOBbuffer.Modify();
+        TmpBLOBbuffer."Buffer 1".CreateInStream(IStream);
+        ApiXmlPort.SetSource(IStream);
+
+        MemberWebService.SearchMembers(ApiXmlPort);
+
+        TmpBLOBbuffer."Buffer 1".CreateOutStream(OStream);
+        ApiXmlPort.SetDestination(OStream);
+        ApiXmlPort.Export();
+        TmpBLOBbuffer.Modify();
+        TmpBLOBbuffer."Buffer 1".CreateInStream(IStream);
+        IStream.Read(XmlAsText);
+
+        XmlAsText := XmlDomMgt.RemoveNamespaces(XmlAsText);
+        XmlDocument.ReadFrom(XmlAsText, XmlDoc);
+        if (not XmlDoc.GetRoot(RootElement)) then
+            Error(XmlAsText);
+
+        if (not RootElement.AsXmlNode().SelectSingleNode('descendant::response', ResponseNode)) then
+            Error(XmlAsText);
+
+        exit(RemoteMemberMgt.EvaluateSearchMemberSoapXmlResponse(TempResponseMemberInfoCapture, ResponseMessage, ResponseNode));
+    end;
 
     procedure UpdateMemberImageAPI(MemberNo: Code[20]; Base64Image: Text; ScannerStation: Code[20]): Boolean
     var

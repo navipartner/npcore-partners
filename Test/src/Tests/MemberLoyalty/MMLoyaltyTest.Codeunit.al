@@ -40,7 +40,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         _LastMembership.Find();
         _LastMembership.TestField("Awarded Points (Sale)", 0);
 
-        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.")) then
+        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", '')) then
             Error('Error assigning membership to sales.');
 
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
@@ -87,7 +87,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         _LastMembership.TestField("Awarded Points (Sale)", 0);
 
         LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
-        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.")) then
+        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", '')) then
             Error('Error assigning membership to sales.');
 
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
@@ -135,7 +135,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         _LastMembership.TestField("Awarded Points (Sale)", 0);
 
         LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
-        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.")) then
+        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", '')) then
             Error('Error assigning membership to sales.');
 
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
@@ -183,7 +183,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         _LastMembership.TestField("Awarded Points (Sale)", 0);
 
         LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
-        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.")) then
+        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", '')) then
             Error('Error assigning membership to sales.');
 
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
@@ -232,7 +232,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         _Assert.AreEqual(0, _LastMembership."Awarded Points (Refund)", 'Unexpected initial value.');
         // Sale
         LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
-        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.")) then
+        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", '')) then
             Error('Error assigning membership to sales.');
 
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
@@ -244,7 +244,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         // Refund
         InitializeSales();
         LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", -1);
-        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.")) then
+        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", '')) then
             Error('Error assigning membership to sales.');
 
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, -1 * UnitPrice, '');

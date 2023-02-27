@@ -1,6 +1,7 @@
 ﻿codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
 {
     Access = Internal;
+
     var
         ActionDescription: Label 'This action provides access to backend management function for the member module.';
 
@@ -69,7 +70,7 @@
 
         if (CardNumber <> '') then
             if (Confirm(AssignToSale, true)) then
-                POSActionMemberMgmt.SelectMembership(POSSession, 2, CardNumber); //2 == NoPrompt
+                POSActionMemberMgmt.SelectMembership(POSSession, 2, CardNumber, ''); //2 == NoPrompt
 
     end;
 

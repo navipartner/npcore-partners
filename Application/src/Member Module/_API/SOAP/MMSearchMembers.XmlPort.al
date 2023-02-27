@@ -312,7 +312,7 @@ xmlport 6151186 "NPR MM Search Members"
                 TempMemberInfoResponse."Member Entry No" := Member."Entry No.";
                 TempMemberInfoResponse.Insert();
 
-            until ((Member.Next() = 0) OR (TempMemberInfoRequest.Count() >= TempMemberInfoRequest.Quantity));
+            until ((Member.Next() = 0) OR (TempMemberInfoResponse.Count() >= TempMemberInfoRequest.Quantity));
         end;
 
         if (TempMemberInfoResponse.Count() = 0) then
