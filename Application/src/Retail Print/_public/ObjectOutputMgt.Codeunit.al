@@ -79,6 +79,7 @@ codeunit 6014580 "NPR Object Output Mgt."
             exit(TryGetOutputRec(ObjectType, ObjectID, PrintCode, '', ObjectOutputSelection));
     end;
 
+#pragma warning disable AA0139
     local procedure TryGetPrintOutput(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var ObjectOutputSelection: Record "NPR Object Output Selection"): Boolean
     begin
         case true of
@@ -96,6 +97,7 @@ codeunit 6014580 "NPR Object Output Mgt."
 
         exit(true);
     end;
+#pragma warning restore AA0139
 
     internal procedure PrintMatrixJob(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Interface "NPR IMatrix Printer"; NoOfPrints: Integer)
     var

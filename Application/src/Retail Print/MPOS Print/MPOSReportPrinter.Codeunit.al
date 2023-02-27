@@ -23,7 +23,9 @@ codeunit 6059855 "NPR MPOS Report Printer"
                 end else begin
                     Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3}]}', CopyStr(StrSubstNo(HardwareConnectorLbl, MPOSReportPrinter.ID), 1, 250), MPOSReportPrinter."Paper Source".AsInteger(), MPOSReportPrinter."Paper Size".AsInteger()));
                 end;
+#pragma warning disable AA0139
                 Printers.Add('NPR_MPOS_' + MPOSReportPrinter.ID, Payload);
+#pragma warning restore AA0139
                 Clear(Payload);
             until MPOSReportPrinter.Next() = 0;
     end;

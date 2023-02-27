@@ -1,5 +1,6 @@
 codeunit 6014537 "NPR RP Epson Label Device Lib." implements "NPR IMatrix Printer"
 {
+#pragma warning disable AA0139
     Access = Internal;
 
     var
@@ -533,4 +534,5 @@ codeunit 6014537 "NPR RP Epson Label Device Lib." implements "NPR IMatrix Printe
         RetailList.Choice := Value;
         RetailList.Insert();
     end;
+#pragma warning restore AA0139
 }

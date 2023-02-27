@@ -1,5 +1,6 @@
 codeunit 6014544 "NPR RP Citizen CLP Device Lib." implements "NPR IMatrix Printer"
 {
+#pragma warning disable AA0139
     Access = Internal;
 
     var
@@ -358,5 +359,6 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib." implements "NPR IMatrix Printe
                 Error(BarcodeDoesNotExistErr);
         end
     end;
+#pragma warning restore AA0139
 }
 

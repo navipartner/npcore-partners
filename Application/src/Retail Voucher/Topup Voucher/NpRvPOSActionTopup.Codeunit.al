@@ -26,7 +26,9 @@ codeunit 6151023 "NPR NpRv POS Action Top-up" implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
             'DiscountType',
             ParameterDiscType_OptionsLbl,
+#pragma warning disable AA0139
             SelectStr(3, ParameterDiscType_OptionsLbl),
+#pragma warning restore AA0139
             ParameterDiscType_CaptionLbl,
             ParameterDiscType_CaptionLbl,
             ParameterDiscType_OptionCaptionLbl);

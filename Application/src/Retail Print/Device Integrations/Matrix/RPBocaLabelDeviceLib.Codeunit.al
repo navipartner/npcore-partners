@@ -1,5 +1,6 @@
 codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer"
 {
+#pragma warning disable AA0139
     Access = Internal;
 
     var
@@ -500,4 +501,5 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
                     'QR', 'QR2L', 'QR2M', 'QR2Q', 'QR2H', 'QR7L', 'QR7M', 'QR7Q', 'QR7H', 'QR11L', 'QR11M', 'QR11Q', 'QR11H', 'QR15L', 'QR15M', 'QR15Q', 'QR15H'] then
             exit(true);
     end;
+#pragma warning restore AA0139
 }

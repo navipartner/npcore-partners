@@ -1,5 +1,6 @@
 codeunit 6014601 "NPR RP Boca FGL Device Lib." implements "NPR ILine Printer"
 {
+#pragma warning disable AA0139
     Access = Internal;
     // Line print..
     // ----------------------------------------------------------------------------------
@@ -814,5 +815,6 @@ codeunit 6014601 "NPR RP Boca FGL Device Lib." implements "NPR ILine Printer"
                 end;
         end;
     end;
+#pragma warning restore AA0139
 }
 

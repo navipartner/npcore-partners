@@ -75,7 +75,9 @@
 
                 for i := 1 to OptionCount + 1 do begin
                     TempRetailList.Number += 1;
+#pragma warning disable AA0139
                     TempRetailList.Choice := StringLibrary.SelectStringSep(i, ',');
+#pragma warning restore AA0139
                     TempRetailList.Insert();
                 end;
 

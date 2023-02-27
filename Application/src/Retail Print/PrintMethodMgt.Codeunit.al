@@ -1,5 +1,6 @@
 codeunit 6014582 "NPR Print Method Mgt."
 {
+#pragma warning disable AA0139
     Access = Internal;
 
     procedure PrintBytesLocal(PrinterName: Text; PrintJobBase64: Text)
@@ -128,4 +129,5 @@ codeunit 6014582 "NPR Print Method Mgt."
     begin
         MobilePrintMgt.PrintJobFile(IP, FileBase64);
     end;
+#pragma warning restore AA0139
 }

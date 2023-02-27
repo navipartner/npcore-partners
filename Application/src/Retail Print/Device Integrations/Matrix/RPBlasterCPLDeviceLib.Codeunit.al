@@ -1,5 +1,6 @@
 codeunit 6014545 "NPR RP Blaster CPL Device Lib." implements "NPR IMatrix Printer"
 {
+#pragma warning disable AA0139
     Access = Internal;
 
     var
@@ -412,4 +413,5 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib." implements "NPR IMatrix Printe
         RetailList.Insert();
     end;
     #endregion
+#pragma warning restore AA0139
 }

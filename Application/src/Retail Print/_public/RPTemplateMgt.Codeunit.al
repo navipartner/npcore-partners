@@ -99,7 +99,9 @@
         if not TemplateHeader.Archived then
             exit;
 
+#pragma warning disable AA0139
         TemplateHeader.Version := GetNextVersionNumber(TemplateHeader);
+#pragma warning restore AA0139
         TemplateHeader."Version Comments" := '';
         TemplateHeader.Archived := false;
         TemplateHeader.Modify(true);
@@ -154,7 +156,9 @@
         InputDialog.LookupMode := true;
         InputDialog.SetInput(1, NewTemplateCode, Caption_InsertNewCode);
         if InputDialog.RunModal() = ACTION::LookupOK then
+#pragma warning disable AA0139
             ID := InputDialog.InputCodeValue(1, NewTemplateCode);
+#pragma warning restore AA0139
 
         if ID = 0 then
             exit;

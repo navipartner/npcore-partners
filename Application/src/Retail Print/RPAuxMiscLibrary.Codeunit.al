@@ -1,10 +1,11 @@
 ﻿codeunit 6014550 "NPR RP Aux - Misc. Library"
 {
+#pragma warning disable AA0139
     Access = Internal;
 
 #pragma warning disable AA0150
     procedure ApplyCipher(var "Proccesing Value": Text[30]; HandleDecimals: Boolean) CifferCodeValue: Code[10]
-#pragma warning restore
+#pragma warning restore AA0150
     var
         ExchangeLabelSetup: Record "NPR Exchange Label Setup";
         Index: Integer;
@@ -451,5 +452,6 @@
     begin
         DoFunction(CodeunitID, FunctionName, TemplateLine, RecID, Handled);
     end;
+#pragma warning restore AA0139
 }
 

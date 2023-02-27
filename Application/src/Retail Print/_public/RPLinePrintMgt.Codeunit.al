@@ -1,5 +1,6 @@
 ﻿codeunit 6014549 "NPR RP Line Print Mgt."
 {
+#pragma warning disable AA0139
     var
         TempBuffer: Record "NPR RP Print Buffer" temporary;
         CurrentLineNo: Integer;
@@ -638,5 +639,6 @@
     procedure OnFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID; var Skip: Boolean; var Handled: Boolean)
     begin
     end;
+#pragma warning restore AA0139
 }
 

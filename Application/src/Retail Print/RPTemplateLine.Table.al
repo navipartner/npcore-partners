@@ -1,5 +1,6 @@
 ﻿table 6014445 "NPR RP Template Line"
 {
+#pragma warning disable AA0139
     Access = Internal;
     Caption = 'RP Template Line';
     DataClassification = CustomerContent;
@@ -618,5 +619,6 @@
                 end;
             until RPTemplateLine.Next() = 0;
     end;
+#pragma warning restore AA0139
 }
 

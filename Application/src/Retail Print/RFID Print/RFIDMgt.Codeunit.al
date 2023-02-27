@@ -17,7 +17,9 @@
         RFIDPrintLog.Description := RetailJournalLine.Description;
         RFIDPrintLog."RFID Tag Value" := RetailJournalLine."RFID Tag Value";
         RFIDPrintLog."Batch ID" := BatchID;
+#pragma warning disable AA0139
         RFIDPrintLog."User ID" := UserId();
+#pragma warning restore AA0139
         RFIDPrintLog."Printed At" := CurrentDateTime();
         RFIDPrintLog.Insert();
     end;

@@ -1,5 +1,6 @@
 codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
 {
+#pragma warning disable AA0139
     Access = Internal;
 
     var
@@ -1053,5 +1054,6 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
         CurrentMode := SwitchTo;
         exit(Command);
     end;
+#pragma warning restore AA0139
 }
 
