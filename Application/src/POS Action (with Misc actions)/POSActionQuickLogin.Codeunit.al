@@ -1,111 +1,46 @@
-﻿codeunit 6150845 "NPR POS Action: Quick Login"
+﻿codeunit 6150845 "NPR POS Action: Quick Login" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
-        Text000: Label 'Quick Login - change Salesperson on current POS Sale';
-        ReadingErr: Label 'reading in %1';
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+        ActionDescriptionLbl: Label 'Quick Login - change Salesperson on current POS Sale';
+        FixedSalesPersoneParam_CptLbl: Label 'Fixed Salesperson Code';
+        FixedSalesPersoneParam_DescLbl: Label 'Specifies Fixed Salesperson Code';
+        SalesPersLookupParam_CptLbl: Label 'Lookup Salesperson Code';
+        SalesPersLookupParam_DescLbl: Label 'Specifies Lookup Salesperson Code';
     begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            Text000,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-                then begin
-            Sender.RegisterWorkflowStep('FixedSalespersonCode', 'if (param.FixedSalespersonCode != "")  {respond()}');
-            Sender.RegisterWorkflowStep('LookupSalespersonCode', 'if (param.LookupSalespersonCode)  {respond()}');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
 
-            Sender.RegisterTextParameter('FixedSalespersonCode', '');
-            Sender.RegisterBooleanParameter('LookupSalespersonCode', true);
-            Sender.RegisterWorkflow(false);
-        end;
+        WorkflowConfig.AddTextParameter('FixedSalespersonCode', '', FixedSalesPersoneParam_CptLbl, FixedSalesPersoneParam_DescLbl);
+        WorkflowConfig.AddBooleanParameter('LookupSalespersonCode', true, SalesPersLookupParam_CptLbl, SalesPersLookupParam_DescLbl);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup");
     var
-        JSON: Codeunit "NPR POS JSON Management";
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        case WorkflowStep of
-            'FixedSalespersonCode':
-                begin
-                    Handled := true;
-                    OnActionFixedSalespersonCode(JSON, POSSession);
-
-                    exit;
-                end;
-            'LookupSalespersonCode':
-                begin
-                    Handled := true;
-                    OnActionLookupSalespersonCode(POSSession);
-                    exit;
-                end;
-        end;
-    end;
-
-    local procedure OnActionFixedSalespersonCode(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
-    var
+        POSActBusinessLog: Codeunit "NPR POS Action: Quick Login B.";
         SalespersonCode: Code[20];
+        LookupSalespersonCode: Boolean;
     begin
-        JSON.SetScopeParameters(ActionCode());
-        SalespersonCode := CopyStr(JSON.GetStringOrFail('FixedSalespersonCode', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(SalespersonCode));
-        if SalespersonCode = '' then
+        SalespersonCode := CopyStr(Context.GetStringParameter('FixedSalespersonCode'), 1, MaxStrLen(SalespersonCode));
+        LookupSalespersonCode := Context.GetBooleanParameter('LookupSalespersonCode');
+
+        if (SalespersonCode <> '') and LookupSalespersonCode then begin
+            POSActBusinessLog.OnActionLookupSalespersonCode(SalespersonCode, Sale);
             exit;
-
-        ApplySalespersonCode(SalespersonCode, POSSession);
-
-        POSSession.RequestRefreshData();
+        end;     
+        if SalespersonCode <> '' then
+            POSActBusinessLog.ApplySalespersonCode(SalespersonCode, Sale);
+        if LookupSalespersonCode then
+            POSActBusinessLog.OnActionLookupSalespersonCode(SalespersonCode, Sale);
     end;
 
-    local procedure OnActionLookupSalespersonCode(POSSession: Codeunit "NPR POS Session")
-    var
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-        POSActionLogin: Codeunit "NPR POS Action - Login";
+    local procedure GetActionScript(): Text
     begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        SalePOS.Find();
-        if SalespersonPurchaser.Get(SalePOS."Salesperson Code") then;
-        if PAGE.RunModal(0, SalespersonPurchaser) <> ACTION::LookupOK then
-            exit;
-
-        POSActionLogin.CheckPosUnitGroup(SalespersonPurchaser, SalePOS."Register No.");
-
-        ApplySalespersonCode(SalespersonPurchaser.Code, POSSession);
-        POSSession.RequestRefreshData();
-    end;
-
-    local procedure ApplySalespersonCode(SalespersonCode: Code[20]; var POSSession: Codeunit "NPR POS Session")
-    var
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-    begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        SalePOS.Find();
-
-        SalePOS.Validate("Salesperson Code", SalespersonCode);
-        SalePOS.Modify(true);
-        POSSale.RefreshCurrent();
-    end;
-
-    local procedure ActionCode(): Code[20]
-    begin
-        exit('QUICK_LOGIN');
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.0');
+        exit(
+            //###NPR_INJECT_FROM_FILE:POSActionQuickLogin.js###
+            'let main=async({})=>await workflow.respond();'
+        )
     end;
 }
