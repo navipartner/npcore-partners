@@ -1,14 +1,64 @@
-pool:
-  vmImage: "windows-2022"
+trigger: none
 
-steps:
-  - task: PowerShell@2
-    name: RunBcpt
-    inputs:
-      filePath: 'Performance Toolkit/scripts/RunBcptSaaS.ps1'
-      arguments: >
-        -Username 'NPRetailPerformanceTest-558472@NPRetailPerformanceTest.onmicrosoft.com'
-        -Password 'w!8gzMQU~)^t'
-        -SandboxName 'NPRetailBCPT-Sandbox-2'
-        -SuiteCodes @('POS1S1', 'POS1S5', 'POS1S10')
-    displayName: 'Run BCPT'
+jobs:
+- job: Run_BCPT
+  
+  pool:
+    name: Azure Pipelines
+    vmImage: "windows-2022"
+
+  steps:
+    - checkout: self
+      clean: true
+      fetchDepth: 1
+      fetchTags: false
+      displayName: 'Fetch sources'
+      retryCountOnTaskFailure: 3
+
+    - task: PowerShell@2
+      name: RunBcpt1
+      inputs:
+        filePath: 'Performance Toolkit/scripts/RunBcptSaaS.ps1'
+        arguments: >
+          -Username '$(TestUserUsername)'
+          -Password '$(TestUserPassword)'
+          -SandboxName '$(SandboxName1)'
+          -SuiteCodes $(SuiteCodes)
+      displayName: 'BCPT for Sandbox1'
+      condition: and(succeeded(), ne(variables['SandboxName1'], ''))
+
+    - task: PowerShell@2
+      name: LogsBcpt1
+      inputs:
+        filePath: 'Performance Toolkit/scripts/GetBcptLogsSaaS.ps1'
+        arguments: >
+          -Username '$(TestUserUsername)'
+          -Password '$(TestUserPassword)'
+          -SandboxName '$(SandboxName1)'
+          -SuiteCodes $(SuiteCodes)
+      displayName: 'Logs for Sandbox1'
+      condition: and(succeeded(), ne(variables['SandboxName1'], ''))
+
+    - task: PowerShell@2
+      name: RunBcpt2
+      inputs:
+        filePath: 'Performance Toolkit/scripts/RunBcptSaaS.ps1'
+        arguments: >
+          -Username '$(TestUserUsername)'
+          -Password '$(TestUserPassword)'
+          -SandboxName '$(SandboxName2)'
+          -SuiteCodes $(SuiteCodes)
+      displayName: 'BCPT for Sandbox2'
+      condition: and(succeeded(), ne(variables['SandboxName2'], ''))
+    
+    - task: PowerShell@2
+      name: LogsBcpt2
+      inputs:
+        filePath: 'Performance Toolkit/scripts/GetBcptLogsSaaS.ps1'
+        arguments: >
+          -Username '$(TestUserUsername)'
+          -Password '$(TestUserPassword)'
+          -SandboxName '$(SandboxName2)'
+          -SuiteCodes $(SuiteCodes)
+      displayName: 'Logs for Sandbox2'
+      condition: and(succeeded(), ne(variables['SandboxName2'], ''))
