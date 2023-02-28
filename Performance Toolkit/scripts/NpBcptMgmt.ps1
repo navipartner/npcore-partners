@@ -48,11 +48,12 @@ class NpBcptMgmt
         $isReady = $false
         Do {
             $response = Invoke-RestMethod -UseBasicParsing -Method Get -Uri "https://businesscentral.dynamics.com/$($this.TenantId)/$($this.SandboxName)/deployment/url"
+            Write-Host "Status: $($response.status)"
             if ($response.status -eq "Ready") {
                 Write-Host "Environment '$($this.SandboxName)' is ready."
                 $isReady = $true
             } else {
-                Write-Host "Waiting for environment '$($this.SandboxName)', status: $($response.status)" -NoNewline -ForegroundColor Red
+                Write-Host "Waiting for environment '$($this.SandboxName)', status: $($response.status)" -NoNewline 
                 Start-Sleep -Seconds 30
             }
         } while ($isReady -eq $false)
@@ -82,13 +83,13 @@ class NpBcptMgmt
                 
                 if ($running -eq $true) {
                     if ($running -eq $true -and $isBcptInProgress -eq $false) {
-                        Write-Host "Waiting for BCPT to finish current run" -NoNewline -ForegroundColor Red
+                        Write-Host "Waiting for BCPT to finish current run" -NoNewline
                     } else {
-                        Write-Host "." -NoNewline -ForegroundColor Red
+                        Write-Host "." -NoNewline
                         
                         # Timeout
                         if ([math]::Round($stopwatch.Elapsed.TotalSeconds, 0) -gt $timeout) {
-                            Write-Host "BCPT waited more than $([math]::Round($stopwatch.Elapsed.TotalSeconds, 0)) seconds" -ForegroundColor Red
+                            Write-Host "BCPT waited more than $([math]::Round($stopwatch.Elapsed.TotalSeconds, 0)) seconds" 
                             throw "BCPT timeout while waiting current run to finish"
                         }
                     }
@@ -96,7 +97,7 @@ class NpBcptMgmt
                 } else {
                     if ($isBcptInProgress -eq $true) {
                         Write-Host ""
-                        Write-Host "Done waiting after $([math]::Round($stopwatch.Elapsed.TotalSeconds, 0)) seconds" -ForegroundColor Red
+                        Write-Host "Done waiting after $([math]::Round($stopwatch.Elapsed.TotalSeconds, 0)) seconds" 
                         Write-Host ""
                     }
                 }
@@ -224,7 +225,7 @@ function Invoke-BcSaaS {
             if ($serviceUrl.Query.Contains('?')) {
                 $serviceUrl.Query = $serviceUrl.Query.Trim('?') + "&$($Query)"
             } else {
-                $serviceUrl.Query += "?$($Query)"
+                $serviceUrl.Query += "$($Query)"
             }
         }
         
