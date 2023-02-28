@@ -170,6 +170,7 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
         ContextXMLText: Text;
         Position1, Position2, Length : Integer;
         POSSession: Codeunit "NPR POS Session";
+        NpGpPOSSalesSyncMgt: Codeunit "NPR NpGp POS Sales Sync Mgt.";
         RefNoBlankErr: Label 'The reference number can not be blank or empty';
         NoGlobalSaleErr: Label 'Could not find record of sale';
         NoInterCompTradeErr: Label 'Inter company exchange is not set up between "%1" and "%2"';
@@ -191,7 +192,7 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        ServiceName := GetServiceName(NpGpPOSSalesSetup."Service Url");
+        ServiceName := NpGpPOSSalesSyncMgt.GetServiceName(NpGpPOSSalesSetup."Service Url");
 
         RequestMessage.GetHeaders(RequestHeaders);
 
@@ -252,17 +253,6 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
         if not (NpGpUserSaleReturn.RunModal() = Action::OK) then
             Error('');
         NpGpUserSaleReturn.GetLines(TempNpGpPOSSalesLine);
-    end;
-
-    local procedure GetServiceName(Url: Text) ServiceName: Text
-    var
-        NamePosition: Integer;
-        TypeHelper: Codeunit "Type Helper";
-        String: Text;
-    begin
-        String := TypeHelper.UrlDecode(Url);
-        NamePosition := String.LastIndexOf('/') + 1;
-        ServiceName := String.Substring(NamePosition, StrLen(String) - NamePosition + 1);
     end;
 
     procedure CreateGlobalReverseSale(var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry"; var TempNpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line" temporary; ReturnReasonCode: Code[10]; FullSale: Boolean)
