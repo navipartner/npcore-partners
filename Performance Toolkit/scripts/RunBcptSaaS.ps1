@@ -75,6 +75,29 @@ $company = $companies | Where-Object { $_.name -eq $CompanyName } | Select-Objec
 Write-Host "Using company:" -ForegroundColor Green
 Write-Host ($company | Out-String)
 
+# Get Installed apps
+Write-Host "Get Installed Apps:" -ForegroundColor Green
+try {
+    $apps = @(Invoke-BcSaaS `
+        -AuthorizationType "AAD" `
+        -BearerToken $bcptMgmt.GetToken() `
+        -BaseServiceUrl $bcptMgmt.GetApiBaseUrl() `
+        -CompanyId $($company.id) `
+        -APIPublisher "navipartner" `
+        -APIGroup "bcpt" `
+        -Path "installedApps")
+    
+    if (-not $apps) {
+        throw "Make sure all required apps are installed!"
+    }
+    Write-Host ($apps | Out-String)
+    Write-Host "`r`n"
+}
+catch {
+    Write-Host $($_.Exception.Message)
+    throw "Unable to fetch installed apps"
+}
+
 # Get BCPT suites
 Write-Host "Available BCPT suite codes:" -ForegroundColor Green
 $suites = @(Invoke-BcSaaS `
@@ -113,61 +136,81 @@ $bcptCredential = New-Object System.Management.Automation.PSCredential "$($Usern
 # Wait for BCPT
 $bcptMgmt.WaitForBcpt(10, 1800)
 
-# RUN BCPT
-Write-Host "Running BCPT:" -ForegroundColor Green
-Write-Host ""
+$runStarted = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
 
-$selectedSuites | ForEach-Object {
-    $suiteCode = $_
-
-    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-    Write-Host "Running BCPT for '$($suiteCode)'..." -ForegroundColor Green
-
-    $params = @{
-        Credential = $bcptCredential
-        AuthorizationType = "AAD"
-    }
-    
-    try {
-        Invoke-Command -ScriptBlock { Param( $location, [HashTable] $params, $suiteCode, $internalServiceUrl, $testPage, $sandboxName, $clientId)
-            
-            Set-Location $location
-
-            .\RunBCPTTests.ps1 @params `
-                -BCPTTestRunnerInternalFolderPath $location `
-                -SuiteCode "$($suiteCode)" `
-                -ServiceUrl "$internalServiceUrl" `
-                -Environment PROD `
-                -SandboxName "$($sandboxName)" `
-                -ClientId "$($clientId)" `
-                -TestRunnerPage ([int]$testPage)
-            
-        } -ArgumentList (Join-Path -Path $PSScriptRoot -ChildPath "TestRunner"), $params, $suiteCode, $internalServiceUrl, $TestPageId, $SandboxName, $ClientId
-    }
-    catch {
-        $_
-    }
-
-    Write-Host "---> '$($suiteCode)' completed after $([math]::Round($stopwatch.Elapsed.TotalSeconds, 0)) seconds." -ForegroundColor Green
+try {
+    # RUN BCPT
+    Write-Host "Running BCPT:" -ForegroundColor Green
     Write-Host ""
-    $stopwatch.Stop()
 
-    Start-Sleep -Seconds 3
+    $selectedSuites | ForEach-Object {
+        $suiteCode = $_
 
-    # Wait for bcpt
-    $bcptMgmt.WaitForBcpt(10, 1800)
+        $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+        Write-Host "Running BCPT for '$($suiteCode)'..." -ForegroundColor Green
+
+        $params = @{
+            Credential = $bcptCredential
+            AuthorizationType = "AAD"
+        }
+        
+        try {
+            Invoke-Command -ScriptBlock { Param( $location, [HashTable] $params, $suiteCode, $internalServiceUrl, $testPage, $sandboxName, $clientId)
+                
+                Set-Location $location
+
+                .\RunBCPTTests.ps1 @params `
+                    -BCPTTestRunnerInternalFolderPath $location `
+                    -SuiteCode "$($suiteCode)" `
+                    -ServiceUrl "$internalServiceUrl" `
+                    -Environment PROD `
+                    -SandboxName "$($sandboxName)" `
+                    -ClientId "$($clientId)" `
+                    -TestRunnerPage ([int]$testPage)
+                
+            } -ArgumentList (Join-Path -Path $PSScriptRoot -ChildPath "TestRunner"), $params, $suiteCode, $internalServiceUrl, $TestPageId, $SandboxName, $ClientId
+        }
+        catch {
+            $_
+        }
+
+        Write-Host "---> '$($suiteCode)' completed after $([math]::Round($stopwatch.Elapsed.TotalSeconds, 0)) seconds." -ForegroundColor Green
+        Write-Host ""
+        $stopwatch.Stop()
+
+        Start-Sleep -Seconds 3
+
+        # Wait for bcpt
+        $bcptMgmt.WaitForBcpt(10, 1800)
+    }
+
+    #$bcptLogEntries = @(. "$invokeSaasApi" ` `
+    #    -AuthorizationType "AAD" `
+    #    -BearerToken $bcptMgmt.GetToken() `
+    #    -BaseServiceUrl $bcptMgmt.GetApiBaseUrl() `
+    #    -CompanyId $($company.id) `
+    #    -APIPublisher "microsoft" `
+    #    -APIGroup "PerformancToolkit" `
+    #    -Path "bcptLogEntries")
+    #Write-Host ($bcptLogEntries | Out-String)
+    #
+    #Save-ResultsAsXUnitFile -TestRunResultObject $bcptLogEntries -ResultsFilePath (Join-Path $PSScriptRoot "logs\Results.xml")
+
+    Write-Host "BCPT runner completed" -ForegroundColor Green
+    Write-Host "`r`n"
+
 }
-
-#$bcptLogEntries = @(. "$invokeSaasApi" ` `
-#    -AuthorizationType "AAD" `
-#    -BearerToken $bcptMgmt.GetToken() `
-#    -BaseServiceUrl $bcptMgmt.GetApiBaseUrl() `
-#    -CompanyId $($company.id) `
-#    -APIPublisher "microsoft" `
-#    -APIGroup "PerformancToolkit" `
-#    -Path "bcptLogEntries")
-#Write-Host ($bcptLogEntries | Out-String)
-#
-#Save-ResultsAsXUnitFile -TestRunResultObject $bcptLogEntries -ResultsFilePath (Join-Path $PSScriptRoot "logs\Results.xml")
-
-Write-Host "BCPT runner completed" -ForegroundColor Green
+catch {
+    Write-Host ($_ | Out-String)
+    throw "`r`nBCPT FAILED`r`n"
+} finally {
+    # Display Telemetry KQL sample:
+    Write-Host "Telemetry KQL for debugging this run:"
+    Write-Host "------------------------------------------------"
+    Write-Host "traces"
+    Write-Host "| where timestamp > todatetime('$($runStarted)')"
+    Write-Host "| where timestamp <= todatetime('$((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))')"
+    Write-Host "| where customDimensions.environmentName == '$($SandboxName)'"
+    Write-Host "| order by timestamp asc"
+    Write-Host "------------------------------------------------"
+}
