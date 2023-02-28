@@ -471,7 +471,7 @@
         if not MagentoAttributeLabel.FindFirst() then
             exit(0);
 
-        MagentoAttributeLabel.Value := NewAttributeValue;
+        MagentoAttributeLabel.Value := CopyStr(NewAttributeValue, 1, MaxStrLen(MagentoAttributeLabel.Value));
         MagentoAttributeLabel.Modify(RunTrigger);
         exit(MagentoAttributeLabel."Line No.")
     end;
