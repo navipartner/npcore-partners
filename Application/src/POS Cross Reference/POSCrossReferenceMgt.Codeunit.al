@@ -1,6 +1,7 @@
 ﻿codeunit 6014620 "NPR POS Cross Reference Mgt."
 {
     Access = Internal;
+
     var
         NpRegEx: Codeunit "NPR RegEx";
 
