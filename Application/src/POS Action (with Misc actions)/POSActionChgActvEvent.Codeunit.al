@@ -1,223 +1,83 @@
-﻿codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
+codeunit 6060161 "NPR POS Action: Chg.Actv.Event" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'Set an Event Management module event as active for current POS unit and sale';
+        ParameterDialogType_OptionNameLbl: Label 'TextField,List', Locked = true;
+        ParameterDialogType_OptionCaptionsLbl: Label 'TextField,List';
+        ParameterDialogType_NameLbl: Label 'Dialog Type';
+        ParamClearEvent_NameLbl: Label 'Clear event';
+        ParamCurrSale_NameLbl: Label 'Only Current Sale';
         EventNoLbl: Label 'Event No.';
-        DialogType: Option TextField,List;
-        IsAlreadyAssigned: Label 'The Event ''%1'' has already been set up as active event for %2=''%3''.', Comment = '%1 - event No., %2 - Sales Ticket No. field caption, %3 - Sales Ticket No.';
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        if Sender.DiscoverAction(
-          ActionCode(),
-          ActionDescription,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('textfield',
-              'if ((!param.ClearEvent) && (param.DialogType == param.DialogType["TextField"])) ' +
-              '{input({title: labels.Title, caption: context.CaptionText, value: ""}).cancel(abort);}');
-            Sender.RegisterWorkflowStep('ProcessChange', ' {respond();}');
-            Sender.RegisterOptionParameter('DialogType', 'TextField,List', 'List');
-            Sender.RegisterBooleanParameter('ClearEvent', false);
-            Sender.RegisterBooleanParameter('OnlyCurrentSale', false);
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterDataSourceBinding(ThisDataSource());
-        end;
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddOptionParameter('DialogType',
+            ParameterDialogType_OptionNameLbl,
+#pragma warning disable AA0139
+            SelectStr(2, ParameterDialogType_OptionNameLbl),
+#pragma warning restore 
+            ParameterDialogType_NameLbl,
+            ParameterDialogType_NameLbl,
+            ParameterDialogType_OptionCaptionsLbl);
+        WorkflowConfig.AddBooleanParameter('ClearEvent', false, ParamClearEvent_NameLbl, ParamClearEvent_NameLbl);
+        WorkflowConfig.AddBooleanParameter('OnlyCurrentSale', false, ParamCurrSale_NameLbl, ParamCurrSale_NameLbl);
+        WorkflowConfig.SetDataSourceBinding('BUILTIN_SALE');
+
+        WorkflowConfig.AddLabel('confirmTitle', EventNoLbl);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, false)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-        Captions.AddActionCaption(ActionCode(), 'Title', EventNoLbl);
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.3');
-    end;
-
-    local procedure ActionCode(): Code[20]
-    begin
-        exit('SET_ACTIVE_EVENT');
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup");
     var
+        BusinessLogic: Codeunit "NPR POS Act:Chg.Actv.Event BL";
         POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR POS Sale";
-        JSON: Codeunit "NPR POS JSON Management";
-        POSSale: Codeunit "NPR POS Sale";
+        DialogType: Option TextField,List;
         EventNo: Code[20];
         ClearEvent: Boolean;
         OnlyCurrentSale: Boolean;
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
+        case Step of
+            'ProcessChange':
+                begin
+                    DialogType := Context.GetIntegerParameter('DialogType');
+                    if not (DialogType in [DialogType::TextField, DialogType::List]) then
+                        DialogType := DialogType::List;
+                    ClearEvent := Context.GetBooleanParameter('ClearEvent');
+                    if ClearEvent then
+                        EventNo := '';
+                    OnlyCurrentSale := Context.GetBooleanParameter('OnlyCurrentSale');
 
-        Handled := true;
+                    if not ClearEvent then begin
+                        Sale.GetCurrentSale(SalePOS);
+                        SalePOS.TestField("Register No.");
+                        POSUnit.Get(SalePOS."Register No.");
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        DialogType := JSON.GetIntegerParameterOrFail('DialogType', ActionCode());
-        if not (DialogType in [DialogType::TextField, DialogType::List]) then
-            DialogType := DialogType::List;
-        ClearEvent := JSON.GetBooleanParameter('ClearEvent');
-        if ClearEvent then
-            EventNo := '';
-        OnlyCurrentSale := JSON.GetBooleanParameter('OnlyCurrentSale');
-
-        if not ClearEvent then begin
-            POSSession.GetSale(POSSale);
-            POSSale.GetCurrentSale(SalePOS);
-            SalePOS.TestField("Register No.");
-            POSUnit.get(SalePOS."Register No.");
-
-            case DialogType of
-                DialogType::TextField:
-                    EventNo := CopyStr(GetInput(JSON, 'textfield'), 1, MaxStrLen(EventNo));
-                DialogType::List:
-                    begin
-                        EventNo := POSUnit.FindActiveEventFromCurrPOSUnit();
-                        if not SelectEventFromList(EventNo) then
-                            exit;
+                        case DialogType of
+                            DialogType::TextField:
+                                EventNo := CopyStr(Context.GetString('textfield'), 1, MaxStrLen(EventNo));
+                            DialogType::List:
+                                begin
+                                    EventNo := POSUnit.FindActiveEventFromCurrPOSUnit();
+                                    if not BusinessLogic.SelectEventFromList(EventNo) then
+                                        exit;
+                                end;
+                        end;
                     end;
-            end;
-        end;
 
-        UpdateCurrentEvent(POSSession, EventNo, not OnlyCurrentSale);
-    end;
-
-    local procedure ThisDataSource(): Code[50]
-    begin
-        exit('BUILTIN_SALE');
-    end;
-
-    local procedure ThisExtension(): Text
-    begin
-        exit('ACTIVE_EVENT');
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', true, false)]
-    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
-    begin
-        if ThisDataSource() <> DataSourceName then
-            exit;
-
-        Extensions.Add(ThisExtension());
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', true, false)]
-    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
-    var
-        DataType: Enum "NPR Data Type";
-    begin
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
-            exit;
-
-        Handled := true;
-
-        DataSource.AddColumn(DataSourceField_EventNo(), DataSourceField_EventNo(), DataType::String, false);
-        DataSource.AddColumn(DataSourceField_EventDescription(), DataSourceField_EventDescription(), DataType::String, false);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', true, false)]
-    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        Job: Record Job;
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-    begin
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
-            exit;
-
-        Handled := true;
-
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        if not Job.Get(SalePOS."Event No.") then
-            Job.Init();
-        DataRow.Add(DataSourceField_EventNo(), SalePOS."Event No.");
-        DataRow.Add(DataSourceField_EventDescription(), Job.Description);
-    end;
-
-    local procedure DataSourceField_EventNo(): Text
-    begin
-        exit('EventNo');
-    end;
-
-    local procedure DataSourceField_EventDescription(): Text
-    begin
-        exit('EventDescription');
-    end;
-
-    local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
-    begin
-        JSON.SetScopeRoot();
-        if not JSON.SetScope('$' + Path) then
-            exit('');
-        exit(JSON.GetString('input'));
-    end;
-
-    local procedure SelectEventFromList(var EventNo: Code[20]): Boolean
-    var
-        Job: Record Job;
-        EventList: Page "NPR Event List";
-    begin
-        FilterJobs(Job);
-        if EventNo <> '' then begin
-            Job."No." := EventNo;
-            if Job.Find() then;
-        end;
-        EventList.SetTableView(Job);
-        EventList.SetRecord(Job);
-        EventList.LookupMode := true;
-        if EventList.RunModal() = ACTION::LookupOK then begin
-            EventList.GetRecord(Job);
-            EventNo := Job."No.";
-            exit(EventNo <> '');
-        end;
-        exit(false);
-    end;
-
-    local procedure UpdateCurrentEvent(POSSession: Codeunit "NPR POS Session"; EventNo: Code[20]; UpdateRegister: Boolean)
-    var
-        Job: Record Job;
-        POSUnit: Record "NPR POS Unit";
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-    begin
-        if EventNo <> '' then begin
-            FilterJobs(Job);
-            Job."No." := EventNo;
-            Job.Find();
-        end;
-
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        if UpdateRegister then begin
-            SalePOS.TestField("Register No.");
-            POSUnit.Get(SalePOS."Register No.");
-            POSUnit.SetActiveEventForCurrPOSUnit(EventNo);
-        end;
-
-        if SalePOS."Event No." = EventNo then
-            Message(IsAlreadyAssigned, EventNo, SalePOS.FieldCaption("Sales Ticket No."), SalePOS."Sales Ticket No.")
-        else begin
-            SalePOS.Validate("Event No.", EventNo);
-            POSSale.Refresh(SalePOS);
-            POSSale.Modify(true, true);
-            POSSession.RequestRefreshData();
+                    BusinessLogic.UpdateCurrentEvent(Sale, EventNo, not OnlyCurrentSale);
+                end;
         end;
     end;
 
-    local procedure FilterJobs(var Job: Record Job)
+    local procedure GetActionScript(): Text
     begin
-        Job.SetRange("NPR Event", true);
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionChgActvEvent.js###
+'let main=async({workflow:n,parameters:i,popup:a,captions:e})=>{if(!i.ClearEvent&&i.DialogType==i.DialogType.TextField){var l=await a.input({title:e.confirmTitle,caption:e.confirmLead,value:""});if(l==null)return}await n.respond("ProcessChange",{textfield:l})};'
+        );
     end;
 }
 
