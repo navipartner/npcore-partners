@@ -220,7 +220,7 @@
         WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, GlobalPosSalesCodeunitId(), 'global_pos_sales_service', true);
     end;
 
-    local procedure GetServiceName(Url: Text) ServiceName: Text
+    procedure GetServiceName(Url: Text) ServiceName: Text
     var
         Position: Integer;
     begin
