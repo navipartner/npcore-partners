@@ -220,7 +220,7 @@
             DeAuditAux."TSS Code" := DETSS.Code;
 
         ResponseJson.SelectToken('client_id', Token);
-        DeAuditAux."Client ID" := Token.AsValue().AsText();
+        DeAuditAux.Validate("Client ID", Token.AsValue().AsText());
 
         ResponseJson.SelectToken('state', Token);
         State := Token.AsValue().AsText();
