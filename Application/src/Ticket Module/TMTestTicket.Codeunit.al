@@ -7,11 +7,15 @@ codeunit 6059874 "NPR TM Test Ticket"
 
     trigger OnRun()
     var
+        Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";
-        ValidLbl: Label 'Ticket Valid';
+        ValidLbl: Label 'Ticket Valid.';
+        NotFound: Label 'Ticket %1 not found.';
     begin
-        TicketManagement.ValidateTicketForArrival(1, Rec."Ticket Reference No.", Rec."Admission Code", -1, Rec."Event Date", Rec."Event Time");
+        if (not TicketManagement.GetTicket(1, Rec."Ticket Reference No.", Ticket)) then
+            Error(NotFound, Rec."Ticket Reference No.");
 
+        TicketManagement.ValidateTicketForArrival(Ticket, Rec."Admission Code", -1, Rec."Event Date", Rec."Event Time");
         Error(ValidLbl);
     end;
 }

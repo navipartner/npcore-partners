@@ -10,9 +10,9 @@
 
     procedure ValidateTicketArrival(AdmissionCode: Code[20]; ExternalTicketNo: Text[50]; ScannerStationId: Code[10]; var MessageText: Text): Boolean
     var
-        TicketManagement: Codeunit "NPR TM Ticket Management";
+        AttemptTicket: Codeunit "NPR Ticket Attempt Create";
     begin
-        exit(TicketManagement.AttemptValidateTicketForArrival(TicketIdentifierType::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode, -1, MessageText));
+        exit(AttemptTicket.AttemptValidateTicketForArrival(TicketIdentifierType::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode, -1, '', MessageText));
     end;
 
     procedure ValidateTicketDeparture(AdmissionCode: Code[20]; ExternalTicketNo: Text[50]; ScannerStationId: Code[10]; MessageText: Text): Boolean

@@ -709,28 +709,8 @@
     local procedure RegisterArrival(ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; WithPrint: Boolean)
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        Ticket: Record "NPR TM Ticket";
     begin
-
-        TicketRequestManager.LockResources('RegisterArrival');
-
-        if ((AdmissionCode = '') and (PosUnitNo <> '')) then begin
-            Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNumber);
-            if (Ticket.FindFirst()) then
-                TicketManagement.RegisterTicketBomAdmissionArrival(Ticket, PosUnitNo, 1);
-
-        end else begin
-            TicketManagement.ValidateTicketForArrival(1, ExternalTicketNumber, AdmissionCode, -1, Today(), Time());
-        end;
-
-        if (WithPrint) then begin
-            Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNumber);
-            if (not Ticket.FindFirst()) then
-                exit;
-            Ticket.SetRecFilter();
-            TicketManagement.PrintSingleTicket(Ticket);
-        end;
+        TicketManagement.RegisterArrivalScanTicket(1, ExternalTicketNumber, AdmissionCode, -1, PosUnitNo, WithPrint);
     end;
 
     local procedure RegisterDeparture(ExternalTicketNumber: Code[50]; AdmissionCode: Code[20])
@@ -745,7 +725,6 @@
 
         TicketRequestManager.LockResources('RegisterDeparture');
         TicketManagement.ValidateTicketForDeparture(1, ExternalTicketNumber, AdmissionCode);
-
     end;
 
     local procedure ShowQuickStatistics(AdmissionCode: Code[20])

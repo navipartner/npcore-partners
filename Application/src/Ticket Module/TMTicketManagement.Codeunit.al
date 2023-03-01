@@ -286,25 +286,19 @@
         PrintTicketFromSalesTicketNo(SalePOS."Sales Ticket No.");
     end;
 
-
-    procedure AttemptValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; var ResponseMessage: Text): Boolean
-    var
-        AttemptTicket: Codeunit "NPR Ticket Attempt Create";
+    internal procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]): Boolean
     begin
-        exit(AttemptTicket.AttemptValidateTicketForArrival(TicketIdentifierType, TicketIdentifier, AdmissionCode, AdmissionScheduleEntryNo, ResponseMessage));
+        ValidateTicketForArrival(Ticket, AdmissionCode, -1, Today(), Time()); // Throws error on fail
+        exit(true);
     end;
 
-    procedure ValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; EventDate: Date; EventTime: Time)
+    internal procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; EventDate: Date; EventTime: Time)
     var
         Admission: Record "NPR TM Admission";
-        Ticket: Record "NPR TM Ticket";
         TicketAccessEntryNo: Integer;
         TicketBom: Record "NPR TM Ticket Admission BOM";
         AllowAdmissionOverAllocation: Enum "NPR TM Ternary";
     begin
-
-        if (not GetTicket(TicketIdentifierType, TicketIdentifier, Ticket)) then
-            RaiseError(StrSubstNo(INVALID_REFERENCE, REFERENCE, TicketIdentifier), INVALID_REFERENCE_NO);
 
         if (AdmissionCode = '') then
             AdmissionCode := GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code");
@@ -315,7 +309,7 @@
         if (not (TicketBom.Get(Ticket."Item No.", Ticket."Variant Code", Admission."Admission Code"))) then
             RaiseError(StrSubstNo(INVALID_ADMISSION_CODE, Ticket."External Ticket No.", AdmissionCode), INVALID_ADMISSION_CODE_NO);
 
-        ValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo);
+        ValidateTicketReference(Ticket, AdmissionCode, TicketAccessEntryNo, false);
         ValidateScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo, EventDate, EventTime);
 
         RegisterArrival_Worker(TicketAccessEntryNo, AdmissionScheduleEntryNo, TicketBom.DurationGroupCode, EventDate, EventTime);
@@ -1050,7 +1044,31 @@
         until (TicketBom.Next() = 0);
     end;
 
-    procedure RegisterTicketBomAdmissionArrival(Ticket: Record "NPR TM Ticket"; PosUnitNo: Code[10]; ProcessFlow: Option SALES,SCAN)
+    [CommitBehavior(CommitBehavior::Error)]
+    procedure RegisterArrivalScanTicket(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketNumber: Code[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; WithPrint: Boolean)
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        Ticket: Record "NPR TM Ticket";
+        ProcessFlow: Option SALES,SCAN;
+    begin
+
+        if (not GetTicket(TicketIdentifierType, TicketNumber, Ticket)) then
+            exit;
+
+        TicketRequestManager.LockResources('RegisterArrival');
+
+        Ticket.SetRecFilter();
+        if ((AdmissionCode = '') and (PosUnitNo <> '')) then begin
+            RegisterTicketBomAdmissionArrival(Ticket, PosUnitNo, ProcessFlow::SCAN);
+        end else begin
+            ValidateTicketForArrival(Ticket, AdmissionCode, AdmissionScheduleEntryNo, Today(), Time());
+        end;
+
+        if (WithPrint) then
+            PrintSingleTicket(Ticket);
+    end;
+
+    internal procedure RegisterTicketBomAdmissionArrival(Ticket: Record "NPR TM Ticket"; PosUnitNo: Code[10]; ProcessFlow: Option SALES,SCAN)
     var
         Admission: Record "NPR TM Admission";
         TicketBom: Record "NPR TM Ticket Admission BOM";
@@ -1134,12 +1152,6 @@
         exit(false);
     end;
 
-    local procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]): Boolean
-    begin
-        ValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, Today(), Time()); // Throws error on fail
-        exit(true);
-    end;
-
     procedure GetReceiptRequestToken(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -1184,28 +1196,30 @@
 
     end;
 
-    procedure ValidateTicketReference(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO;
-        TicketIdentifier: Text[50];
-        AdmissionCode: Code[20];
-        var TicketAccessEntryNo: Integer)
+    procedure ValidateTicketReference(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer)
     begin
         ValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo, false);
     end;
 
-    internal procedure ValidateTicketReference(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO;
-        TicketIdentifier: Text[50];
-        AdmissionCode: Code[20];
-        var TicketAccessEntryNo: Integer;
-        SkipPaymentCheck: Boolean)
+    internal procedure ValidateTicketReference(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
     var
         Ticket: Record "NPR TM Ticket";
+    begin
+        if (not GetTicket(TicketIdentifierType, TicketIdentifier, Ticket)) then
+            RaiseError(StrSubstNo(INVALID_REFERENCE, REFERENCE, TicketIdentifier), INVALID_REFERENCE_NO);
+
+        ValidateTicketReference(Ticket, AdmissionCode, TicketAccessEntryNo, SkipPaymentCheck);
+    end;
+
+    local procedure ValidateTicketReference(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
+    var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketIdentifier: Text[30];
     begin
 
-        if (not GetTicket(TicketIdentifierType, TicketIdentifier, Ticket)) then
-            RaiseError(StrSubstNo(INVALID_REFERENCE, REFERENCE, TicketIdentifier), INVALID_REFERENCE_NO);
+        TicketIdentifier := Ticket."External Ticket No.";
 
         if (Ticket."Ticket Reservation Entry No." <> 0) then begin
             if (not TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.")) then
@@ -2478,7 +2492,7 @@
         end;
     end;
 
-    local procedure GetTicket(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; var Ticket: Record "NPR TM Ticket"): Boolean
+    internal procedure GetTicket(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; var Ticket: Record "NPR TM Ticket"): Boolean
     begin
         Clear(Ticket);
 

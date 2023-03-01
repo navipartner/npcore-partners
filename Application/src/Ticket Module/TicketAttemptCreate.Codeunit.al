@@ -10,7 +10,7 @@
                 DoRevalidateRequestForTicketReuse(TempTicketReservationRequest, _ReusedTokenId);
 
             _AttemptFunction::VALIDATE_ARRIVAL:
-                DoValidateTicketForArrival(_TicketIdentifierType, _TicketIdentifier, _AdmissionCode, _AdmissionScheduleEntryNo);
+                DoValidateTicketForArrival(_TicketIdentifierType, _TicketIdentifier, _AdmissionCode, _AdmissionScheduleEntryNo, _PosUnitNo);
 
             _AttemptFunction::ISSUE_FROM_TOKEN:
                 DoIssueTicketFromReservationToken(_Token);
@@ -38,6 +38,7 @@
         _AdmissionScheduleEntryNo: Integer;
         _NewTicketQuantity: Integer;
         _Token: Text[100];
+        _PosUnitNo: Code[10];
 
         _AttemptFunction: Option NA,REUSE,VALIDATE_ARRIVAL,ISSUE_FROM_TOKEN,ISSUE_FROM_RESERVATION,CHANGE_RESERVED_QTY;
 
@@ -77,7 +78,7 @@
         exit(Successful);
     end;
 
-    procedure AttemptValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; var ResponseMessage: Text): Boolean
+    procedure AttemptValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[20]; var ResponseMessage: Text): Boolean
     begin
 
         _AttemptFunction := _AttemptFunction::VALIDATE_ARRIVAL;
@@ -86,6 +87,7 @@
         _TicketIdentifier := TicketIdentifier;
         _AdmissionCode := AdmissionCode;
         _AdmissionScheduleEntryNo := AdmissionScheduleEntryNo;
+        _PosUnitNo := PosUnitNo;
 
         exit(InvokeAttemptAction(ResponseMessage));
     end;
@@ -130,7 +132,7 @@
         IsRepeatedEntry: Boolean;
     begin
 
-        // Precheck if member has tickets for today with same item numbers and qty. If so try to reuse those tickets.
+        // Pre-check if member has tickets for today with same item numbers and qty. If so try to reuse those tickets.
         IsRepeatedEntry := true;
 
         TmpTicketReservationRequest.Reset();
@@ -165,7 +167,7 @@
                     Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
                     if (Ticket.FindSet()) then begin
                         repeat
-                            TicketManagement.ValidateTicketForArrival(0, Ticket."No.", '', 0, Today(), Time());
+                            TicketManagement.RegisterArrivalScanTicket(0, Ticket."No.", '', 0, '', false);
                         until (Ticket.Next() = 0);
                     end;
                 until (TicketReservationRequest.Next() = 0);
@@ -180,12 +182,11 @@
 
     end;
 
-
-    local procedure DoValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer)
+    local procedure DoValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10])
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
     begin
-        TicketManagement.ValidateTicketForArrival(TicketIdentifierType, TicketIdentifier, AdmissionCode, AdmissionScheduleEntryNo, Today(), Time());
+        TicketManagement.RegisterArrivalScanTicket(TicketIdentifierType, TicketIdentifier, AdmissionCode, AdmissionScheduleEntryNo, PosUnitNo, false);
     end;
 
     local procedure DoIssueTicketFromReservationToken(Token: Text[100])
@@ -193,7 +194,6 @@
         TicketRequest: Codeunit "NPR TM Ticket Request Manager";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
-
         TicketReservationRequest.SetCurrentKey("Session Token ID", Default);
         TicketReservationRequest.SetAscending(Default, false);
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -202,27 +202,21 @@
         repeat
             TicketRequest.IssueTicketFromReservation(TicketReservationRequest);
         until (TicketReservationRequest.Next() = 0);
-
     end;
-
 
     local procedure DoIssueTicketFromReservation(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
     var
         TicketRequest: Codeunit "NPR TM Ticket Request Manager";
     begin
-
         TicketRequest.LockResources('DoIssueTicketFromReservation');
         TicketRequest.IssueTicketFromReservation(TicketReservationRequest);
-
     end;
 
     local procedure DoChangeConfirmedTicketQuantity(TicketNo: Code[20]; AdmissionCode: Code[20]; NewTicketQuantity: Integer)
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
     begin
-
         TicketManagement.ChangeConfirmedTicketQuantity(TicketNo, AdmissionCode, NewTicketQuantity);
-
     end;
 
     #endregion

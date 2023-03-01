@@ -135,7 +135,7 @@
         end;
     end;
 
-    procedure PromptForMemberGuestArrival(ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; var TicketToken: Text[100]): Boolean
+    procedure PromptForMemberGuestArrival(ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; var TicketToken: Text[100]): Boolean
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipEntryNo: Integer;
@@ -151,10 +151,10 @@
         if (MemberEntryNo = 0) then
             Error(ErrorReason);
 
-        exit(PromptForMemberGuestArrival(MembershipEntryNo, MemberEntryNo, AdmissionCode, TicketToken));
+        exit(PromptForMemberGuestArrival(MembershipEntryNo, MemberEntryNo, AdmissionCode, PosUnitNo, TicketToken));
     end;
 
-    internal procedure PromptForMemberGuestArrival(MembershipEntryNo: Integer; MemberEntryNo: Integer; AdmissionCode: Code[20]; var TicketToken: Text[100]): Boolean
+    internal procedure PromptForMemberGuestArrival(MembershipEntryNo: Integer; MemberEntryNo: Integer; AdmissionCode: Code[20]; PosUnitNo: Code[10]; var TicketToken: Text[100]): Boolean
     var
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
@@ -202,7 +202,6 @@
             exit(false); // all lines deleted - no guests
 
         PreValidateMemberGuestTicketRequest(TempTicketReservationRequest, true);
-        //**
 
         Commit();
         if (TicketAttemptCreate.AttemptValidateRequestForTicketReuse(TempTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
@@ -257,7 +256,7 @@
             Error(ResponseMessage);
         end;
 
-        TicketRequestManager.RegisterArrivalRequest(Token);
+        TicketRequestManager.RegisterArrivalRequest(Token, PosUnitNo);
 
         Commit();
         TicketToken := Token;
@@ -267,12 +266,12 @@
         exit(true);
     end;
 
-    procedure MemberFastCheckIn(ExternalMemberCardNo: Text[100]; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30])
+    procedure MemberFastCheckIn(ExternalMemberCardNo: Text[100]; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30])
     begin
-        MemberFastCheckIn(ExternalMemberCardNo, ExternalItemNo, AdmissionCode, Qty, TicketTokenToIgnore, ExternalTicketNo, true);
+        MemberFastCheckIn(ExternalMemberCardNo, ExternalItemNo, AdmissionCode, POSUnitNo, Qty, TicketTokenToIgnore, ExternalTicketNo, true);
     end;
 
-    procedure MemberFastCheckIn(ExternalMemberCardNo: Text[100]; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30]; ShowWelcomeMessage: Boolean)
+    procedure MemberFastCheckIn(ExternalMemberCardNo: Text[100]; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30]; ShowWelcomeMessage: Boolean)
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MemberEntryNo: Integer;
@@ -289,13 +288,14 @@
         if (MemberEntryNo = 0) then
             Error(ErrorReason);
 
-        MemberFastCheckIn(MembershipEntryNo, MemberEntryNo, ExternalItemNo, AdmissionCode, Qty, TicketTokenToIgnore, ExternalTicketNo, ShowWelcomeMessage);
+        MemberFastCheckIn(MembershipEntryNo, MemberEntryNo, ExternalItemNo, AdmissionCode, PosUnitNo, Qty, TicketTokenToIgnore, ExternalTicketNo, ShowWelcomeMessage);
     end;
 
-    internal procedure MemberFastCheckIn(MembershipEntryNo: Integer; MemberEntryNo: Integer; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30]; ShowWelcomeMessage: Boolean)
+    internal procedure MemberFastCheckIn(MembershipEntryNo: Integer; MemberEntryNo: Integer; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30]; ShowWelcomeMessage: Boolean)
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         TicketManagement: Codeunit "NPR TM Ticket Management";
+        AttemptTicket: Codeunit "NPR Ticket Attempt Create";
         Ticket: Record "NPR TM Ticket";
         TicketToPrint: Record "NPR TM Ticket";
         Member: Record "NPR MM Member";
@@ -333,24 +333,21 @@
                             TicketReservationRequest.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
                             TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::CONFIRMED);
                             if (TicketReservationRequest.Count() = 1) then
-                                TicketIsReused := TicketManagement.AttemptValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, ErrorReason); // Reuse existing ticket (if possible)
+                                TicketIsReused := AttemptTicket.AttemptValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, PosUnitNo, ErrorReason); // Reuse existing ticket (if possible)
                         end;
             until ((Ticket.Next() = 0) or (TicketIsReused));
 
             if (TicketIsReused) then
                 TicketToPrint.Get(Ticket."No.");
             TicketToPrint.SetRecFilter();
-
         end;
 
         // Create new ticket
         if (not TicketIsReused) then begin
             MemberRetailIntegration.IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
-            TicketManagement.ValidateTicketForArrival(0, TicketNo, AdmissionCode, -1, Today(), Time());
-
+            TicketManagement.RegisterArrivalScanTicket(0, TicketNo, AdmissionCode, -1, PosUnitNo, false);
             TicketToPrint.Get(TicketNo);
             TicketToPrint.SetRecFilter();
-
         end;
 
         if (ShowWelcomeMessage) then
