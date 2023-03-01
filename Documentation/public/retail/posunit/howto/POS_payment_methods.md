@@ -35,6 +35,10 @@ To create new POS payment method, follow the provided steps:
 15.  If a refund is allowed, enable **Allow Refund**.
 16.  Use **Min Amount** and **Max Amount** if the payment method has a limit for the minimum and maximum amounts.
 
+## Next steps
+
+If needed, you can limit payment types to specific items only. For more information, refer to [these instructions](belgian_vouchers.md).
+
 ### Related links
 
 - [EFT setup](../../eft/explanation/EFT_setup.md)

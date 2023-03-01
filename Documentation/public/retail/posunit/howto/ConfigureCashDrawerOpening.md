@@ -13,7 +13,7 @@ This topic walks you through the process of setting up the cash drawer to automa
 
 ## Procedure
 
-1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Unit List** and choose the related link.     
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Unit List**, and choose the related link.     
    A list of all existing POS units is displayed.  
 2. Click the POS unit you wish to configure the cash drawer opening mechanism for.
 3. Click the dropdown next to the **POS Scenarios Profile** and then **Select from full list**.  
