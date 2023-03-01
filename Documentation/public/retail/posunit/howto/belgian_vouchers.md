@@ -2,7 +2,7 @@
 
 When [creating a new payment method](POS_payment_methods.md), you have the option of singling out specific items or item groups that can be purchased with that method. This option is especially useful when you wish to establish vouchers as viable types of payment for specific items only. 
 
-Examples of such vouchers are [meal, eco, and consumption vouchers](../explanation/belgian_voucher.md), which are used in certain regions for purchasing comestibles, eco-friendly supplies, of for temporarily boosting consumption rates. 
+Examples of such vouchers are [meal, eco, and consumption vouchers](../explanation/belgian_voucher.md), which are used in certain regions for purchasing comestibles, eco-friendly supplies or for temporarily boosting consumption rates. 
 
 To configure which items can be purchased with a specific payment method, follow the provided steps:
 
