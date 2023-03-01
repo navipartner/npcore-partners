@@ -764,7 +764,7 @@
                 MemberInfoCaptureLine.SetFilter("Receipt No.", '=%1', MemberInfoCaptureSales."Receipt No.");
                 MemberInfoCaptureLine.SetFilter("Line No.", '=%1', MemberInfoCaptureSales."Line No.");
 
-                if (not AdmitMembersOnEndOfSalesWorker(MemberInfoCaptureLine, AdmittedCount, ReasonCode, ReasonText)) then
+                if (not AdmitMembersOnEndOfSalesWorker(MemberInfoCaptureLine, AdmittedCount, SalePOS."Register No.", ReasonCode, ReasonText)) then
                     Message(MemberTicketAdmitError, MemberInfoCaptureLine."First Name" + ' ' + MemberInfoCaptureLine."Last Name", ReasonText);
             end;
             PreviousLineNo := MemberInfoCaptureSales."Line No.";
@@ -778,7 +778,7 @@
 
     end;
 
-    local procedure AdmitMembersOnEndOfSalesWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var AdmittedCount: Integer; var ReasonCode: Integer; var ReasonText: Text) MemberArrivalOk: Boolean
+    local procedure AdmitMembersOnEndOfSalesWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var AdmittedCount: Integer; PosUnitNo: Code[10]; var ReasonCode: Integer; var ReasonText: Text) MemberArrivalOk: Boolean
     var
         MemberCard: Record "NPR MM Member Card";
         AttemptArrival: Codeunit "NPR MM Attempt Member Arrival";
@@ -806,7 +806,7 @@
 
         // Batch register arrival creating tickets.
         Commit();
-        AttemptArrival.AttemptMemberArrival(MemberInfoCapture, '', '<auto>');
+        AttemptArrival.AttemptMemberArrival(MemberInfoCapture, '', PosUnitNo, '<auto>');
         MemberArrivalOk := AttemptArrival.Run();
 
         // Log arrival message. 
