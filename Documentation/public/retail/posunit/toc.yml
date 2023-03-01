@@ -12,6 +12,8 @@
     href: explanation/item_addons.md
   - name: Item categories
     href: explanation/item_categories.md
+  - name: Meal, eco, and consumption vouchers
+    href: explanation/belgian_voucher.md
 - name: Reference
   items:
   - name: POS payment view event Setup (reference guide)
@@ -74,3 +76,5 @@
     href: howto/create_pos_menu_filter.md
   - name: Take photo on POS
     href: howto/take_photo_pos.md
+  - name: Limit payment types to specific items
+    href: howto/belgian_vouchers.md
