@@ -1,6 +1,6 @@
 ﻿table 6014411 "NPR Mixed Discount"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'Mixed Discount';
     LookupPageID = "NPR Mixed Discount List";
     DataClassification = CustomerContent;
