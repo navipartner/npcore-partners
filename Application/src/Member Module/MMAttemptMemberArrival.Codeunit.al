@@ -5,11 +5,11 @@
     begin
 
         if (_FunctionOption = _FunctionOption::AttemptArrival) then begin
-            _ResponseCode := DoAttemptMemberArrival(_TicketItemNo, _AdmissionCode, _ScannerStationId, _Member, _MembershipEntryNo, _ResponseMessage);
+            _ResponseCode := DoAttemptMemberArrival(_TicketItemNo, _AdmissionCode, _PosUnitNo, _ScannerStationId, _Member, _MembershipEntryNo, _ResponseMessage);
         end;
 
         if (_FunctionOption = _FunctionOption::AttemptArrivalBatch) then begin
-            _ResponseCode := DoAttemptMemberArrival(_MemberInfoCapture, _AdmissionCode, _ScannerStationId, _ResponseMessage);
+            _ResponseCode := DoAttemptMemberArrival(_MemberInfoCapture, _AdmissionCode, _PosUnitNo, _ScannerStationId, _ResponseMessage);
         end;
 
     end;
@@ -19,18 +19,20 @@
         _TicketItemNo: Code[50];
         _AdmissionCode: Code[20];
         _ScannerStationId: Code[10];
+        _PosUnitNo: Code[10];
         _Member: Record "NPR MM Member";
         _MembershipEntryNo: Integer;
         _MemberInfoCapture: Record "NPR MM Member Info Capture";
         _ResponseMessage: Text;
         _ResponseCode: Integer;
 
-    procedure AttemptMemberArrival(TicketItemNo: Code[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; Member: Record "NPR MM Member"; MembershipEntryNo: Integer)
+    procedure AttemptMemberArrival(TicketItemNo: Code[50]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; ScannerStationId: Code[10]; Member: Record "NPR MM Member"; MembershipEntryNo: Integer)
     var
     begin
         _FunctionOption := _FunctionOption::AttemptArrival;
         _TicketItemNo := TicketItemNo;
         _AdmissionCode := AdmissionCode;
+        _PosUnitNo := PosUnitNo;
         _ScannerStationId := ScannerStationId;
         _Member.Copy(Member);
         _MembershipEntryNo := MembershipEntryNo;
@@ -38,13 +40,14 @@
         _ResponseMessage := 'Member Arrival Attempt failed with error.';
     end;
 
-    procedure AttemptMemberArrival(var MemberInfoCapture: Record "NPR MM Member Info Capture"; AdmissionCode: Code[20]; ScannerStationId: Code[10])
+    procedure AttemptMemberArrival(var MemberInfoCapture: Record "NPR MM Member Info Capture"; AdmissionCode: Code[20]; PosUnitNo: Code[10]; ScannerStationId: Code[10])
     var
     begin
         _FunctionOption := _FunctionOption::AttemptArrivalBatch;
         _MemberInfoCapture.Copy(MemberInfoCapture);
         _AdmissionCode := AdmissionCode;
         _ScannerStationId := ScannerStationId;
+        _PosUnitNo := PosUnitNo;
     end;
 
     procedure GetAttemptMemberArrivalResponse(var ResponseMessage: Text) ResponseCode: Integer
@@ -57,7 +60,7 @@
         exit(_ResponseCode);
     end;
 
-    local procedure DoAttemptMemberArrival(var MemberInfoCapture: Record "NPR MM Member Info Capture"; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ResponseMessage: Text) ResponseCode: Integer
+    local procedure DoAttemptMemberArrival(var MemberInfoCapture: Record "NPR MM Member Info Capture"; AdmissionCode: Code[20]; PosUnitNo: Code[10]; ScannerStationId: Code[10]; var ResponseMessage: Text) ResponseCode: Integer
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         Member: Record "NPR MM Member";
@@ -75,7 +78,7 @@
             MembershipSetup.Get(MemberInfoCapture."Membership Code");
             MembershipSetup.TestField("Ticket Item Barcode");
 
-            ResponseCode := DoAttemptMemberArrival(MembershipSetup."Ticket Item Barcode", AdmissionCode, ScannerStationId, Member, MemberInfoCapture."Membership Entry No.", ResponseMessage);
+            ResponseCode := DoAttemptMemberArrival(MembershipSetup."Ticket Item Barcode", AdmissionCode, PosUnitNo, ScannerStationId, Member, MemberInfoCapture."Membership Entry No.", ResponseMessage);
             if (ResponseCode <> 0) then
                 Error(ResponseMessage);
 
@@ -85,12 +88,13 @@
 
     end;
 
-    local procedure DoAttemptMemberArrival(TicketItemNo: Code[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; Member: Record "NPR MM Member"; MembershipEntryNo: Integer; var ResponseMessage: Text) ResponseCode: Integer
+    local procedure DoAttemptMemberArrival(TicketItemNo: Code[50]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; ScannerStationId: Code[10]; Member: Record "NPR MM Member"; MembershipEntryNo: Integer; var ResponseMessage: Text) ResponseCode: Integer
     var
         Ticket: Record "NPR TM Ticket";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         TicketMgr: Codeunit "NPR TM Ticket Management";
+        AttemptTicket: Codeunit "NPR Ticket Attempt Create";
         VariantCode: Code[10];
         ItemNo: Code[20];
         TicketNo: Code[20];
@@ -117,7 +121,7 @@
         Ticket.SetFilter("External Member Card No.", '=%1', Member."External Member No.");
         if (Ticket.FindLast()) then begin
 
-            if (TicketMgr.AttemptValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, ResponseMessage)) then begin
+            if (AttemptTicket.AttemptValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, PosUnitNo, ResponseMessage)) then begin
 
                 if (AdmissionCode = '') then
                     AdmissionCode := '-default-';
@@ -135,7 +139,7 @@
             exit(-1);
 
         Ticket.Get(TicketNo);
-        TicketMgr.ValidateTicketForArrival(0, TicketNo, AdmissionCode, -1, Today(),Time());
+        TicketMgr.RegisterArrivalScanTicket(0, TicketNo, AdmissionCode, -1, '', false);
 
         if (AdmissionCode = '') then
             AdmissionCode := '-default-';

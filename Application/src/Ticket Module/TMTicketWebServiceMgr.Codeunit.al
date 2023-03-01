@@ -374,7 +374,7 @@
         end;
 
         TicketRequestManager.ConfirmReservationRequestWithValidate(Token);
-        TicketRequestManager.RegisterArrivalRequest(Token);
+        TicketRequestManager.RegisterArrivalRequest(Token, '');
     end;
 
     local procedure ImportTicketAttributes(Document: XmlDocument)

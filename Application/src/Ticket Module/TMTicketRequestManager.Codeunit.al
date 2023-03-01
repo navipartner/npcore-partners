@@ -786,7 +786,7 @@
         end;
     end;
 
-    procedure RegisterArrivalRequest(Token: Text[100])
+    procedure RegisterArrivalRequest(Token: Text[100]; PosUnitNo: Code[10])
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
@@ -816,7 +816,7 @@
                     TicketReservationRequest2.SetFilter("Variant Code", '=%1', TicketReservationRequest."Variant Code");
                     TicketReservationRequest2.FindSet();
                     repeat
-                        TicketManagement.ValidateTicketForArrival(0, Ticket."No.", TicketReservationRequest2."Admission Code", TicketReservationRequest2."External Adm. Sch. Entry No.", Today(), Time());
+                        TicketManagement.RegisterArrivalScanTicket(0, Ticket."No.", TicketReservationRequest2."Admission Code", TicketReservationRequest2."External Adm. Sch. Entry No.", PosUnitNo, false);
                     until (TicketReservationRequest2.Next() = 0);
 
                 until (Ticket.Next() = 0);
