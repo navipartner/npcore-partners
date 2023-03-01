@@ -32,14 +32,10 @@
             }
             part(RetailSalesChart; "NPR Retail Sales Chart")
             {
-
-                Visible = false;
                 ApplicationArea = NPRRetail;
             }
             part(RetailSalesByShopChart; "NPR Retail Sales Chart by Shop")
             {
-
-                Visible = false;
                 ApplicationArea = NPRRetail;
             }
             part("MyReports"; "NPR My Reports")
