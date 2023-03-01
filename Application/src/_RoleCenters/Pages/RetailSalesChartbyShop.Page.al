@@ -1,6 +1,6 @@
-﻿Page 6059816 "NPR Retail Sales Chart by Shop"
+﻿page 6059816 "NPR Retail Sales Chart by Shop"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Margin/Turnover by Shop';
     PageType = CardPart;
     SourceTable = "Business Chart Buffer";
@@ -34,7 +34,6 @@
 
                 trigger OnValidate()
                 begin
-                    ChartTypeIsChanged := true;
                     UpdateChart();
                 end;
             }
@@ -42,11 +41,10 @@
             {
                 ApplicationArea = NPRRetail;
 
-
                 trigger AddInReady()
                 begin
                     ChartIsReady := true;
-                    UpdateChart();
+                    Initialize();
                 end;
             }
         }
@@ -60,7 +58,7 @@
             {
                 Caption = 'Period Length';
                 Image = Period;
-                action(Day)
+                Action(Day)
                 {
 
                     Caption = 'Day';
@@ -75,7 +73,7 @@
                         UpdateChart();
                     end;
                 }
-                action(Week)
+                Action(Week)
                 {
 
                     Caption = 'Week';
@@ -90,7 +88,7 @@
                         UpdateChart();
                     end;
                 }
-                action(Month)
+                Action(Month)
                 {
 
                     Caption = 'Month';
@@ -105,7 +103,7 @@
                         UpdateChart();
                     end;
                 }
-                action(Quarter)
+                Action(Quarter)
                 {
 
                     Caption = 'Quarter';
@@ -120,7 +118,7 @@
                         UpdateChart();
                     end;
                 }
-                action(Year)
+                Action(Year)
                 {
 
                     Caption = 'Year';
@@ -136,7 +134,7 @@
                     end;
                 }
             }
-            action(Previous)
+            Action(Previous)
             {
 
                 Caption = 'Previous';
@@ -150,7 +148,7 @@
                     UpdateChart();
                 end;
             }
-            action("Next")
+            Action("Next")
             {
 
                 Caption = 'Next';
@@ -168,16 +166,14 @@
     }
 
     var
-        ChartMgt: Codeunit "NPR Retail Chart Mgt by Shop";
+        BackgroundTaskId: Integer;
+        ChartMgt: Codeunit "NPR Retail Chart Mgt.";
         BusChartBuf: Record "Business Chart Buffer";
         StatusText: Text[250];
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         Period: Option " ",Next,Previous;
         ChartType: Option "Dimension 1","Dimension 2";
         ChartIsReady: Boolean;
-        ChartTypeIsChanged: Boolean;
-        StartDate: Date;
-        Enddate: Date;
         FromToDateLbl: Label '%1 to %2', locked = true;
 
     trigger OnOpenPage()
@@ -185,18 +181,45 @@
         ChartType := ChartType::"Dimension 1";
     end;
 
+    local procedure Initialize()
+    begin
+        BusChartBuf.Initialize();
+        BusChartBuf.Update(CurrPage.chart);
+        UpdateChart();
+    end;
+
     local procedure UpdateChart()
+    var
+        Parameters: Dictionary of [Text, Text];
     begin
         if not ChartIsReady then
             exit;
-        case ChartType of
-            ChartType::"Dimension 2":
-                ChartMgt.TurnOver_RevenuebyDim2(BusChartBuf, Period, PeriodType, StartDate, Enddate, ChartTypeIsChanged);
-            ChartType::"Dimension 1":
-                ChartMgt.TurnOver_RevenuebyDim1(BusChartBuf, Period, PeriodType, StartDate, Enddate, ChartTypeIsChanged);
-        end;
-        BusChartBuf.Update(CurrPage.chart);
-        StatusText := StrSubstNo(FromToDateLbl, StartDate, Enddate);
-        ChartTypeIsChanged := false;
+        Parameters.Add('Period', Format(Period));
+        Parameters.Add('PeriodType', Format(PeriodType));
+        Parameters.Add('PeriodLength', Format(BusChartBuf.GetPeriodLength()));
+        Parameters.Add('PeriodEndDate', Format(BusChartBuf."Period Filter End Date"));
+        Parameters.Add('ChartType', Format(ChartType));
+        CurrPage.EnqueueBackgroundTask(BackgroundTaskId, Codeunit::"NPR Retail Chart by Shop BT", Parameters);
     end;
+
+    trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])
+    begin
+        if TaskId <> BackgroundTaskId then
+            exit;
+        if Results.Count() = 0 then
+            exit;
+        ChartMgt.TurnOver_RevenuebyDim(BusChartBuf, Period, PeriodType, Results);
+
+        BusChartBuf.Update(CurrPage.chart);
+        StatusText := StrSubstNo(FromToDateLbl, BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
+    end;
+
+    trigger OnPageBackgroundTaskError(TaskId: Integer; ErrorCode: Text; ErrorText: Text; ErrorCallStack: Text; var IsHandled: Boolean)
+    var
+        BackgrndTaskMgt: Codeunit "NPR Page Background Task Mgt.";
+    begin
+        if TaskId = BackgroundTaskId then
+            BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
+    end;
+
 }
