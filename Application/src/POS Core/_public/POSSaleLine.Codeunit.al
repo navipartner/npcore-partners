@@ -509,7 +509,7 @@
     var
         Item: Record "Item";
     begin
-#IF NOT (BC17 or BC18 or BC19)        
+#IF NOT (BC17 or BC18 or BC19 or BC20)        
         case PosSaleLine."Line Type" of
             PosSaleLine."Line Type"::Item:
                 begin

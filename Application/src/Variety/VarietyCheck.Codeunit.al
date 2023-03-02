@@ -113,7 +113,7 @@
         if not VRTSetup.Get() then
             exit;
 
-#IF (BC17 or BC18 or BC19)
+#IF (BC17 or BC18 or BC19 or BC20)
         case VRTSetup."Item Journal Blocking" of
             VRTSetup."Item Journal Blocking"::TotalBlockItemIfVariants:
                 begin
