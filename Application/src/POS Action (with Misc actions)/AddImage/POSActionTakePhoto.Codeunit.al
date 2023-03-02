@@ -19,7 +19,9 @@ codeunit 6059840 "NPR POS Action Take Photo" implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
             AddPhotoToSelectionLbl,
             AddPhotoToOptionLbl,
+#pragma warning disable AA0139
             SelectStr(1, AddPhotoToOptionLbl),
+#pragma warning restore 
             AddPhotoToSelectionLbl,
             AddPhotoToSelectionCaptionLbl,
             AddPhotoToOptionCaptionLbl);
