@@ -332,6 +332,7 @@
             i += 1;
 
             PriceListLine.SetPosition(ChangeLogEntry."Primary Key");
+            if PriceListLine.Find() then;
             if PriceListLine."Source Type" = PriceListLine."Source Type"::"All Customers" then begin
                 TempRetailPriceLogEntry.Init();
                 TempRetailPriceLogEntry."Entry No." := i;
