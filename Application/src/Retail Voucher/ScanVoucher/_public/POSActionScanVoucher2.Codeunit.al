@@ -76,22 +76,22 @@
 
     end;
 
-    internal procedure HandleParameters(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var EndSale: Boolean; var ReferenceNo: Text)
+    internal procedure HandleParameters(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var ParamEndSale: Boolean; var ReferenceNo: Text)
     var
         VoucherListEnabled: Boolean;
         POSActionScanActionB: Codeunit "NPR POS Action Scan Voucher2B";
     begin
-        GetParameterValues(Context, VoucherTypeCode, EndSale, ReferenceNo, VoucherListEnabled);
+        GetParameterValues(Context, VoucherTypeCode, ParamEndSale, ReferenceNo, VoucherListEnabled);
         if ReferenceNo = '' then
             POSActionScanActionB.CheckReferenceNo(ReferenceNo, VoucherListEnabled, VoucherTypeCode);
     end;
 
-    internal procedure GetParameterValues(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var EndSale: Boolean; var ReferenceNo: Text; var VoucherListEnabled: Boolean)
+    internal procedure GetParameterValues(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var ParamEndSale: Boolean; var ReferenceNo: Text; var VoucherListEnabled: Boolean)
     var
         VoucherType: Text;
     begin
         ReferenceNo := Context.GetString('VoucherRefNo');
-        EndSale := Context.GetBooleanParameter('EndSale');
+        ParamEndSale := Context.GetBooleanParameter('EndSale');
         VoucherListEnabled := Context.GetBooleanParameter('EnableVoucherList');
         VoucherType := Context.GetString('voucherType');
         Evaluate(VoucherTypeCode, VoucherType);
@@ -119,14 +119,14 @@
         OnRunLegacyWorkflow(FrontEnd, POSAction, VoucherTypeCode, EndSalePar, Handled);
     end;
 
-    internal procedure GetParameterValues(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var EndSale: Boolean)
+    internal procedure GetParameterValues(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var ParamEndSale: Boolean)
     var
         VoucherType: Text;
     begin
         Context.SetScope('voucherType');
         VoucherType := Context.GetString('voucherType');
         Evaluate(VoucherTypeCode, VoucherType);
-        EndSale := Context.GetBooleanParameter('EndSale');
+        ParamEndSale := Context.GetBooleanParameter('EndSale');
     end;
 
     local procedure EndSale(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
