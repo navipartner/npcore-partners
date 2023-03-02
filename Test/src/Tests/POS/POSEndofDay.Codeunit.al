@@ -379,7 +379,7 @@ codeunit 85020 "NPR POS End of Day"
 
     end;
 
-
+#if not BC17
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
@@ -799,7 +799,7 @@ codeunit 85020 "NPR POS End of Day"
         Assert.AreEqual(0, WorkshiftCheckpoint."EFT (LCY)", StrSubstNo('Value of "%1" is not correct.', WorkshiftCheckpoint.FieldCaption("EFT (LCY)")));
 
     end;
-
+#endif
     [ModalPageHandler]
     procedure PageHandler_POSPaymentBinCheckpoint_LookupOK(var UIEndOfDay: Page "NPR POS Payment Bin Checkpoint"; var ActionResponse: Action)
     begin
