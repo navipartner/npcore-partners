@@ -35,7 +35,6 @@
     var
         POSUnit: Record "NPR POS Unit";
         SSProfile: Record "NPR SS Profile";
-        SelfServiceProfile: Codeunit "NPR SS Profile";
     begin
         if not POSUnit.FindSet() then
             exit;
