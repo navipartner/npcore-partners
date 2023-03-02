@@ -20,6 +20,7 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
         NoOfPOSUnits: Integer;
         NoOfPOSUnitsParamLbl: Label 'NoOfPOSUnits', Locked = true;
         ParamValidationErr: Label 'Parameter is not defined in the correct format. The expected format is "%1"', Comment = '%1 - expected format';
+        GetLastPosUnitErr: Label 'Unable to find last created POS Unit';
 
 
     local procedure InitTest();
@@ -150,6 +151,8 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
     begin
         InsertGeneralPostingSetup();
         InsertVATPostingSetup();
+        InsertUserSetup();
+        InsertReminderTerms();
     end;
 
     local procedure InsertGeneralPostingSetup()
@@ -240,5 +243,53 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
         end;
 
         Error(ParamValidationErr, GetDefaultNoOfPOSUnitsParameter());
+    end;
+
+    local procedure GetLastCreatedPosUnit(var POSUnit: Record "NPR POS Unit")
+    begin
+        POSUnit.Reset();
+        POSUnit.SetCurrentKey(SystemCreatedAt);
+        POSUnit.SetAscending(SystemCreatedAt, true);
+        if not POSUnit.FindLast() then
+            Error(GetLastPosUnitErr);
+    end;
+
+    local procedure EnsureUserSetupExistsForUser(User: Record User; POSUnit: Record "NPR POS Unit")
+    var
+        UserSetup: Record "User Setup";
+    begin
+        if UserSetup.Get(User."User Name") then begin
+            UserSetup."NPR POS Unit No." := POSUnit."No.";
+            UserSetup.Modify();
+        end else begin
+            UserSetup.Init();
+            UserSetup."User ID" := User."User Name";
+            UserSetup."NPR POS Unit No." := POSUnit."No.";
+            UserSetup.Insert();
+        end;
+    end;
+
+    local procedure InsertUserSetup()
+    var
+        User: Record User;
+        POSUnit: Record "NPR POS Unit";
+    begin
+        GetLastCreatedPosUnit(POSUnit);
+
+        if User.FindSet() then
+            repeat
+                EnsureUserSetupExistsForUser(User, POSUnit)
+            until User.Next() = 0;
+    end;
+
+    local procedure InsertReminderTerms()
+    var
+        ReminderTerms: Record "Reminder Terms";
+    begin
+        if not ReminderTerms.Get('FOREIGN') then begin
+            ReminderTerms.Init();
+            ReminderTerms.Code := 'FOREIGN';
+            ReminderTerms.Insert();
+        end;
     end;
 }
