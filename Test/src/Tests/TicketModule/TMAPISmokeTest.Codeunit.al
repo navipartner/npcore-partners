@@ -1192,7 +1192,7 @@ codeunit 85013 "NPR TM API SmokeTest"
         AdmissionSchedule.FindFirst();
         Schedule.Get(AdmissionSchedule."Schedule Code");
 
-        ScheduleManager.CreateAdmissionSchedule(Admission."Admission Code", true, Today);
+        ScheduleManager.CreateAdmissionScheduleTestFramework(Admission."Admission Code", true, Today);
         AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', Admission."Admission Code");
         AdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', Schedule."Schedule Code");
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
@@ -1207,21 +1207,21 @@ codeunit 85013 "NPR TM API SmokeTest"
         CalendarManager.SetAdmissionCalendar(Admission, CustomizedCalendar);
         CreateNonWorkingEntry(CustomizedCalendar, CalcDate('+3D'));
 
-        ScheduleManager.CreateAdmissionSchedule(Admission."Admission Code", true, Today);
+        ScheduleManager.CreateAdmissionScheduleTestFramework(Admission."Admission Code", true, Today);
         CountedEntries := AdmissionScheduleEntry.Count();
         Assert.AreEqual(1, CountedEntries, 'Customized Calendar for Admision did not impact closed state on timeslot.');
 
         CalendarManager.SetScheduleCalendar(Schedule, CustomizedCalendar);
         CreateNonWorkingEntry(CustomizedCalendar, CalcDate('+5D'));
 
-        ScheduleManager.CreateAdmissionSchedule(Admission."Admission Code", true, Today);
+        ScheduleManager.CreateAdmissionScheduleTestFramework(Admission."Admission Code", true, Today);
         CountedEntries := AdmissionScheduleEntry.Count();
         Assert.AreEqual(2, CountedEntries, 'Customized Calendar for Schedule did not impact closed state on timeslot.');
 
         CalendarManager.SetAdmissionScheduleCalendar(AdmissionSchedule, CustomizedCalendar);
         CreateNonWorkingEntry(CustomizedCalendar, CalcDate('+7D'));
 
-        ScheduleManager.CreateAdmissionSchedule(Admission."Admission Code", true, Today);
+        ScheduleManager.CreateAdmissionScheduleTestFramework(Admission."Admission Code", true, Today);
         CountedEntries := AdmissionScheduleEntry.Count();
         Assert.AreEqual(3, CountedEntries, 'Customized Calendar for Admision Schedule did not impact closed state on timeslot.');
 
