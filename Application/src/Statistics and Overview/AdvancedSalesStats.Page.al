@@ -408,10 +408,12 @@
                     ApplicationArea = NPRRetail;
                     trigger OnAction()
                     var
+                        TempItem: Record Item temporary;
                         VendorStatistics: Page "NPR Vendor Statistics Subpage";
                     begin
+                        TempItem.SetFilter("Date Filter", DateFilter);
                         VendorStatistics.InitForm();
-                        VendorStatistics.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", ItemCategoryCodeFilter, LastYearCalc);
+                        VendorStatistics.SetFilter(Dim1Filter, Dim2Filter, TempItem.GetRangeMin("Date Filter"), TempItem.GetRangeMax("Date Filter"), ItemCategoryCodeFilter, LastYearCalc);
 
                         VendorStatistics.ShowLastYear(ShowLastYear);
                         VendorStatistics.ChangeEmptyFilter();
@@ -432,10 +434,12 @@
 
                     trigger OnAction()
                     var
+                        TempItem: Record Item temporary;
                         ItemCategoryStatsSubpage: Page "NPR Item Cat. Code Stats";
                     begin
+                        TempItem.SetFilter("Date Filter", DateFilter);
                         ItemCategoryStatsSubpage.InitForm();
-                        ItemCategoryStatsSubpage.SetFilter(Dim1Filter, Dim2Filter, Rec."Period Start", Rec."Period End", LastYearCalc, ItemCategoryCodeFilter, ItemNoFilter);
+                        ItemCategoryStatsSubpage.SetFilter(Dim1Filter, Dim2Filter, TempItem.GetRangeMin("Date Filter"), TempItem.GetRangeMax("Date Filter"), LastYearCalc, ItemCategoryCodeFilter, ItemNoFilter);
                         ItemCategoryStatsSubpage.ShowLastYear(ShowLastYear);
                         ItemCategoryStatsSubpage.ChangeEmptyFilter();
                         Sleep(10);
