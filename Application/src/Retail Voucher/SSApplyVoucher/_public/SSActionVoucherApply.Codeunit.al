@@ -74,13 +74,13 @@
 
     end;
 
-    internal procedure GetParameterValues(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var EndSale: Boolean)
+    internal procedure GetParameterValues(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var ParamEndSale: Boolean)
     var
         VoucherType: Text;
     begin
         VoucherType := Context.GetString('VoucherTypeCode');
         Evaluate(VoucherTypeCode, VoucherType);
-        EndSale := Context.GetBooleanParameter('EndSale');
+        ParamEndSale := Context.GetBooleanParameter('EndSale');
     end;
 
     local procedure EndSale(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line"; Setup: Codeunit "NPR POS Setup") Response: JsonObject

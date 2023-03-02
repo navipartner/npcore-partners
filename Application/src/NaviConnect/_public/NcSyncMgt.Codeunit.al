@@ -421,7 +421,7 @@
     end;
 
     [TryFunction]
-    local procedure DownloadSftpFilenames(ImportType: Record "NPR Nc Import Type"; var ListDirectory: List of [Text])
+    local procedure DownloadSftpFilenames(ImportType: Record "NPR Nc Import Type"; var ParamListDirectory: List of [Text])
     var
         RemotePath: Text;
         FtpPort: Integer;
@@ -461,7 +461,7 @@
                         FileObject.Get('IsDirectory', JToken);
                         if not JToken.AsValue().AsBoolean() then begin
                             FileObject.Get('Name', JToken);
-                            ListDirectory.Add(JToken.AsValue().AsText());
+                            ParamListDirectory.Add(JToken.AsValue().AsText());
                         end;
                     end;
                 end;

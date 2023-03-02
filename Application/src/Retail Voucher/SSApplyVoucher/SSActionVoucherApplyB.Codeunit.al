@@ -1,7 +1,7 @@
 codeunit 6150626 "NPR SS Action: Voucher Apply B"
 {
     Access = Internal;
-    internal procedure ProcessPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line"; EndSale: Boolean; var ActionContext: JsonObject)
+    internal procedure ProcessPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line"; ParamEndSale: Boolean; var ActionContext: JsonObject)
     var
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         SalePOS: Record "NPR POS Sale";
@@ -11,7 +11,7 @@ codeunit 6150626 "NPR SS Action: Voucher Apply B"
         Sale.GetCurrentSale(SalePOS);
         PaymentLine.GetPaymentLine(POSLine);
 
-        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, VoucherNumber, POSLine, SalePOS, POSSession, PaymentLine, POSLine, EndSale, ActionContext);
+        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, VoucherNumber, POSLine, SalePOS, POSSession, PaymentLine, POSLine, ParamEndSale, ActionContext);
     end;
 
     internal procedure EndSale(VoucherTypeCode: Text; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line"; Setup: Codeunit "NPR POS Setup")
