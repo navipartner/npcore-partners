@@ -229,7 +229,7 @@
     local procedure AcquireTicketAdmissionSchedule(var JobPlanningLine: Record "Job Planning Line"; var ResponseMessage: Text): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        DisplayTicketeservationRequest: Page "NPR TM Ticket Make Reserv.";
+        DisplayTicketReservationRequest: Page "NPR TM Ticket Make Reserv.";
         TicketScheduleMgt: Codeunit "NPR TM Admission Sch. Mgt.";
         ResponseCode: Integer;
         NewQty: Integer;
@@ -241,21 +241,21 @@
         TicketReservationRequest.FindSet();
         repeat
             if TicketReservationRequest."Admission Code" <> '' then
-                TicketScheduleMgt.CreateAdmissionSchedule(TicketReservationRequest."Admission Code", false, Today());
+                TicketScheduleMgt.CreateAdmissionSchedule(TicketReservationRequest."Admission Code", false, Today(), 'NPREventTicketMgt.AcquireTicketAdmissionSchedule()');
         until TicketReservationRequest.Next() = 0;
         Commit();
 
         TicketReservationRequest.FindSet();
-        DisplayTicketeservationRequest.SetTableView(TicketReservationRequest);
-        DisplayTicketeservationRequest.LookupMode(true);
-        DisplayTicketeservationRequest.Editable(true);
-        DisplayTicketeservationRequest.LoadTicketRequest(JobPlanningLine."NPR Ticket Token");
-        DisplayTicketeservationRequest.SetTicketItem(JobPlanningLine."No.", JobPlanningLine."Variant Code");
-        DisplayTicketeservationRequest.AllowQuantityChange(true);
-        if DisplayTicketeservationRequest.RunModal() = ACTION::LookupOK then begin
-            ResponseCode := DisplayTicketeservationRequest.FinalizeReservationRequest(false, ResponseMessage);
+        DisplayTicketReservationRequest.SetTableView(TicketReservationRequest);
+        DisplayTicketReservationRequest.LookupMode(true);
+        DisplayTicketReservationRequest.Editable(true);
+        DisplayTicketReservationRequest.LoadTicketRequest(JobPlanningLine."NPR Ticket Token");
+        DisplayTicketReservationRequest.SetTicketItem(JobPlanningLine."No.", JobPlanningLine."Variant Code");
+        DisplayTicketReservationRequest.AllowQuantityChange(true);
+        if DisplayTicketReservationRequest.RunModal() = ACTION::LookupOK then begin
+            ResponseCode := DisplayTicketReservationRequest.FinalizeReservationRequest(false, ResponseMessage);
             if ResponseCode = 0 then begin
-                if DisplayTicketeservationRequest.GetChangedTicketQuantity(NewQty) and (NewQty <> JobPlanningLine.Quantity) then
+                if DisplayTicketReservationRequest.GetChangedTicketQuantity(NewQty) and (NewQty <> JobPlanningLine.Quantity) then
                     JobPlanningLine.Validate(Quantity, NewQty);
                 exit(true);
             end;

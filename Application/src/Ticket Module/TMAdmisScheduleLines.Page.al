@@ -164,7 +164,7 @@
                     TMAdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
                 begin
 
-                    TMAdmissionSchManagement.CreateAdmissionSchedule(Rec."Admission Code", false, WorkDate());
+                    TMAdmissionSchManagement.CreateAdmissionSchedule(Rec."Admission Code", false, WorkDate(), 'Page("Admission Schedule Lines").Calculate Schedule Entries (Button)');
                 end;
             }
             action("Calculate Schedule Entries (Force)")
@@ -182,7 +182,7 @@
                     TMAdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
                 begin
                     if (Confirm(FORCE_GENERATE, false)) then
-                        TMAdmissionSchManagement.CreateAdmissionSchedule(Rec."Admission Code", true, WorkDate());
+                        TMAdmissionSchManagement.CreateAdmissionSchedule(Rec."Admission Code", true, WorkDate(), 'Page("Admission Schedule Lines").Calculate Schedule Entries (Force) (Button)');
                 end;
             }
 

@@ -356,7 +356,7 @@
                 var
                     AdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
                 begin
-                    AdmissionSchManagement.CreateAdmissionSchedule(Rec."Admission Code", false, Today);
+                    AdmissionSchManagement.CreateAdmissionSchedule(Rec."Admission Code", false, Today(), 'Page("Make your reservation").Update Schedule (Button)');
                 end;
             }
         }

@@ -74,7 +74,7 @@
         TicketReservationRequest.FindSet();
         repeat
             if (TicketReservationRequest."Admission Code" <> '') then
-                AdmissionScheduleMgt.CreateAdmissionSchedule(TicketReservationRequest."Admission Code", false, Today());
+                AdmissionScheduleMgt.CreateAdmissionSchedule(TicketReservationRequest."Admission Code", false, Today(), 'NPRTMTicketRetailMgt.AcquireTicketAdmissionSchedule()');
         until (TicketReservationRequest.Next() = 0);
         Commit();
 
