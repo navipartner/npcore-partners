@@ -13,7 +13,7 @@ codeunit 6014465 "NPR String Library"
     procedure CountOccurences(Sequence: Text[10]) Occurences: Integer
     var
         Index: Integer;
-        String: Text[1024];
+        String: Text;
     begin
         Index := 1;
         String := _String;
@@ -26,12 +26,12 @@ codeunit 6014465 "NPR String Library"
         end;
     end;
 
-    procedure SelectStringSep(Index: Integer; Sep: Text[10]): Text[250]
+    procedure SelectStringSep(Index: Integer; Sep: Text): Text
     var
         Int1: Integer;
         Int2: Integer;
         Itt: Integer;
-        String: Text[1024];
+        String: Text;
     begin
         String := _String;
         Itt := 1;
@@ -48,7 +48,7 @@ codeunit 6014465 "NPR String Library"
             exit(String);
     end;
 
-    procedure PadStrLeft(String: Text[60]; TotalStrLen: Integer; PadChar: Text[30]; After: Boolean) OutStr: Text[100]
+    procedure PadStrLeft(String: Text[60]; TotalStrLen: Integer; PadChar: Text[30]; After: Boolean) OutStr: Text
     var
         i: Integer;
     begin

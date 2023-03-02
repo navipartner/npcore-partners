@@ -32,7 +32,7 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib." implements "NPR IMatrix Printe
     procedure PrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary)
     var
         StringLib: Codeunit "NPR String Library";
-        FontParam: Code[10];
+        FontParam: Text;
     begin
         if not _Initialized then //Legacy support for when the template lines contained setup commands.
             InitializePrinter(POSPrintBuffer.Font);
