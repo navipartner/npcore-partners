@@ -2,7 +2,7 @@ codeunit 6059780 "NPR Scanner Import Mgt."
 {
     Access = Public;
 
-    procedure GetItemNoFromScannedCode(ScannedCode: Text[50]): Code[20]
+    procedure GetItemNoFromScannedCode(ScannedCode: Text): Code[20]
     var
         CannotFindItemErr: Label 'Cannot find item with reference %1.', Comment = '%1 = Item Reference';
         ItemNo: Code[20];
@@ -34,7 +34,7 @@ codeunit 6059780 "NPR Scanner Import Mgt."
         Error(CannotFindItemErr, ScannedCode);
     end;
 
-    procedure GetItemAndVariantCodeFromScannedCode(ScannedCode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10])
+    procedure GetItemAndVariantCodeFromScannedCode(ScannedCode: Text; var ItemNo: Code[20]; var VariantCode: Code[10])
     var
         CannotFindItemErr: Label 'Cannot find item with reference %1.', Comment = '%1 = Item Reference';
     begin
@@ -50,7 +50,7 @@ codeunit 6059780 "NPR Scanner Import Mgt."
         Error(CannotFindItemErr, ScannedCode);
     end;
 
-    local procedure TryGetItemNoFromItem(ScannedCode: Text[50]; var ItemNo: Code[20]): Boolean
+    local procedure TryGetItemNoFromItem(ScannedCode: Text; var ItemNo: Code[20]): Boolean
     var
         Item: Record Item;
     begin
@@ -64,7 +64,7 @@ codeunit 6059780 "NPR Scanner Import Mgt."
         exit(true);
     end;
 
-    local procedure TryGetItemNoFromItemReference(ScannedCode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]): Boolean
+    local procedure TryGetItemNoFromItemReference(ScannedCode: Text; var ItemNo: Code[20]; var VariantCode: Code[10]): Boolean
     var
         ItemReference: Record "Item Reference";
     begin
