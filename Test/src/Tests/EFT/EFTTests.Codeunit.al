@@ -3,7 +3,7 @@ codeunit 85004 "NPR EFT Tests"
     // // [Feature] EFT Framework
 
     Subtype = Test;
-
+#if not BC17
     var
         _Initialized: Boolean;
         _POSUnit: Record "NPR POS Unit";
@@ -2840,10 +2840,7 @@ codeunit 85004 "NPR EFT Tests"
         OriginalEFTTransactionRequest.TestField("Recovered by Entry No.", EFTTransactionRequest."Entry No.");
     end;
 
-    procedure "// Aux"()
-    begin
-    end;
-
+    #Region AUX
     procedure AssertPaymentLine(LineSystemId: Guid; Amount: Decimal; ShouldExist: Boolean)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -2922,8 +2919,7 @@ codeunit 85004 "NPR EFT Tests"
         _POSSession.ClearActionState();
         _POSSession.BeginAction(POSActionPayment.ActionCode()); //Required for EFT payments as they depend on outer PAYMENT workflow session state.
     end;
-
-
+    #endregion
 
     [ConfirmHandler]
     procedure ConfirmYesHandler(Question: Text[1024]; var Reply: Boolean)
@@ -2941,5 +2937,5 @@ codeunit 85004 "NPR EFT Tests"
     procedure MessageHandler(Message: Text[1024])
     begin
     end;
+#endif
 }
-
