@@ -265,9 +265,7 @@
 
                 trigger OnAction()
                 begin
-
                     ActivateMembership();
-
                 end;
             }
             action("Add Guardian")
@@ -326,6 +324,25 @@
                         MemberCardEntryNo := CurrPage."Member Cards Subpage".PAGE.GetCurrentEntryNo();
                         MemberRetailIntegration.PrintMemberCard(Rec."Entry No.", MemberCardEntryNo);
                     end;
+                end;
+            }
+            action(TakePicture)
+            {
+                Caption = 'Take Picture';
+                Image = Camera;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                ToolTip = 'Executes the Take Picture action';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                var
+                    MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                begin
+                    MembershipManagement.TakeMemberPicture(Rec);
                 end;
             }
         }
