@@ -1,42 +1,27 @@
-﻿codeunit 6150680 "NPR NPRE RVA: Get WPad"
+﻿codeunit 6150680 "NPR NPRE RVA: Get WPad" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
     var
         NotFoundErr: Label 'The waiter pad "%1", was not found.';
 
-    local procedure ActionCode(): Code[20]
-    begin
-        exit('RV_GET_WAITER_PAD');
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.1');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action");
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        ActionDescription: Label 'This built-in action transfer provided Waiter Pad to POS Sale and selects sales view';
+        ActionDescription: Label 'This built-in action transfer provided Waiter Pad to POS Sale and selects sales view.';
+        ParamWaiterPadCode_CptLbl: Label 'Waiter Pad Code';
+        ParamWaiterPadCode_DescLbl: Label 'Selected waiter pad code.';
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescription, ActionVersion()) then begin
-            Sender.RegisterWorkflow20('await workflow.respond();');
-
-            Sender.RegisterTextParameter('WaiterPadCode', '');
-        end;
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddTextParameter('WaiterPadCode', '', ParamWaiterPadCode_CptLbl, ParamWaiterPadCode_DescLbl);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
-    local procedure OnAction20(Action: Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
+        POSSession: Codeunit "NPR POS Session";
         WaiterPadCode: Code[20];
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        WaiterPadCode := CopyStr(Context.GetStringParameterOrFail('WaiterPadCode', ActionCode()), 1, MaxStrLen(WaiterPadCode));
+        WaiterPadCode := CopyStr(Context.GetStringParameter('WaiterPadCode'), 1, MaxStrLen(WaiterPadCode));
 
         LoadWaiterPad(POSSession, FrontEnd, WaiterPadCode);
         SelectSalesView(POSSession);
@@ -53,7 +38,6 @@
         end;
 
         NPREWaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(NPREWaiterPad, POSSession);
-        POSSession.RequestRefreshData();
     end;
 
     procedure RequestWaiterPad(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; WaiterPadCode: Code[20]);
@@ -72,5 +56,13 @@
     local procedure SelectSalesView(POSSession: Codeunit "NPR POS Session");
     begin
         POSSession.ChangeViewSale();
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+        //###NPR_INJECT_FROM_FILE:NPRERVAGetWPad.js###
+'let main=async({})=>await workflow.respond();'
+        );
     end;
 }
