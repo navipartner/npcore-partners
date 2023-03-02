@@ -7,7 +7,7 @@ To set up the Bambora payment integration in NP Retail, make sure the prerequisi
 1. Get a Bambora merchant.
 
     Before you can get the required information to integrate Business Central and Bambora,
-    you need to have a merchant account with Bambora.
+    you need to have a [merchant account created with Bambora](https://developer.bambora.com/europe/checkout/getting-started/create-account).
 
 2. Acquire the API key information.
 
@@ -20,32 +20,31 @@ To set up the Bambora payment integration in NP Retail, make sure the prerequisi
     > [!Note]
     > NaviPartner advises that you give the key an appropriate name, for example "Business Central". This will help you differentiate the keys afterwards.
 
-3. Set up payment method mapping.
-
-    For the payment gateway to be used it will have to be assigned to specific payment method mappings. These should be created beforehand.
-
 ### Procedure
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Payment Gateways**, and select the related link.      
  
-2. Create a new entry for the Bambora integration. The following fields are required and must contain the appropriate values:
-    - **Code**
-    - **API Username** - This field needs to contain the **Access token**.
-    - **API Password** - This field needs to contain the **Secret token**.
-    - **Merchant ID** - This field needs to contain the **Merchant ID**.
+2. Click **New** to create a code for Bambora integration.    
 
-    Depending on your desired setup, fill out the following three fields:
-    - **Capture Codeunit Id** - The value should be **6014405**.
-    - **Refund Codeunit Id** - The value should be **6014405**.
-    - **Cancel Codeunit Id** - The value should be **6014405**.
+    ![bambora_1](../images/bambora_integration_list.PNG)
 
-    > [!Note]
-    > If you don't want the integration to do one or more of the three actions leave the field empty.
-    > This will cause the integration to skip handling the corresponding action.
+3. Click **Show Setup Card** to edit details.  
+   The following values are required, and need to contain the appropriate values:     
+   - **Access Token** - API username
+   - **Secret Token** - API password
+   - **Merchant ID** - The letter T stands for test account, while the letter P stands for the production account.    
 
-3. Click the ![Lightbulb that opens the Tell Me feature](../../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Payment Method Mapping**, and select the related link.      
+    ![bambora_2](../images/bambora_integration_list_2.PNG)
 
-4. Add the **Code** of the entry you create in step 2 to the **Payment Gateway Code** field of the appropriate mapping lines.
+4. Click the ![Lightbulb that opens the Tell Me feature](../../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Payment Method Mapping**, and select the related link or navigate to **Magento Setup**, and click **Set up payment methods**.     
+   Assigning the payment gateway to the specific payment method mappings needs to be done before the payment gateway can be successfully used. 
+5. Create a new payment method code for each new line, e.g. bambora_checkout. 
+6. Provide a **Description**.
+7. Provide a **Payment Method Code**, e.g. Visa.     
+   If the payment method code doesn't exist, you need to create it, and assign it to the line.
+8. Assign each **External Payment Method Code** to the **Payment Gateway Code**.        
+   
+   ![bambora_3](../images/bambora_integration_list_3.PNG)
 
 ### Related links
 
