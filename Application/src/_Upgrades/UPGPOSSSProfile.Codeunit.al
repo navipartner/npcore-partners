@@ -40,17 +40,19 @@
         if not POSUnit.FindSet() then
             exit;
         repeat
-            if not SelfServiceProfile.ProfileExist(POSUnit."POS Self Service Profile") then begin
+            if not SSProfile.Get(POSUnit."POS Self Service Profile") then begin
                 SSProfile.Code := POSUnit."No." + '_UPG';
                 SSProfile.Init();
                 SSProfile.Description := CopyStr('Created by running upgrade procedure', 1, MaxStrLen(SSProfile.Description));
+                SSProfile."Kiosk Mode Unlock PIN" := POSUnit."Kiosk Mode Unlock PIN";
                 SSProfile.Insert();
-            end;
-            SSProfile."Kiosk Mode Unlock PIN" := POSUnit."Kiosk Mode Unlock PIN";
-            SSProfile.Modify();
 
-            POSUnit."POS Self Service Profile" := SSProfile.Code;
-            POSUnit.Modify();
+                POSUnit."POS Self Service Profile" := SSProfile.Code;
+                POSUnit.Modify();
+            end else begin
+                SSProfile."Kiosk Mode Unlock PIN" := POSUnit."Kiosk Mode Unlock PIN";
+                SSProfile.Modify();
+            end;
         until POSUnit.Next() = 0;
     end;
 }
