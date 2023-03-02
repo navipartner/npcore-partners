@@ -69,7 +69,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterGetApplicationVersion(var AppVersion: Text[80])
+    local procedure OnAfterGetApplicationVersion(var AppVersion: Text[248])
     begin
     end;
 
