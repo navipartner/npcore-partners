@@ -22,7 +22,7 @@ codeunit 6059904 "NPR UPG To Inv. Setup"
         VarietySetup: Record "NPR Variety Setup";
     begin
         //Variant Mandatory if exist
-#IF NOT (BC17 or BC18 or BC19)         
+#IF NOT (BC17 or BC18 or BC19 or BC20)         
         if not InventorySetup.Get() then
             exit;
         if VarietySetup.Get() then begin

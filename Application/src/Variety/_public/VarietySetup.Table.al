@@ -21,7 +21,7 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Total Block Item If Variants,Sale Block Item If Variants,Allow Non Variants';
             OptionMembers = TotalBlockItemIfVariants,SaleBlockItemIfVariants,AllowNonVariants;
-#IF NOT (BC17 or BC18 or BC19)            
+#IF NOT (BC17 or BC18 or BC19 or BC20)            
             ObsoleteState = Pending;
             ObsoleteReason = 'Use "Variant Mandatory if Exist" from Inventory Setup and Item';
 #ENDIF            
