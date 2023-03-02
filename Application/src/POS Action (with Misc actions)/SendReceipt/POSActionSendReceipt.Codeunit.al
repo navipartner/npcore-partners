@@ -104,8 +104,10 @@ codeunit 6150653 "NPR POS Action: Send Receipt" implements "NPR IPOS Workflow"
 
         EntryNo := Context.GetInteger('entryNo');
 
+#pragma warning disable AA0139
         EmailTemplateCode := Context.GetStringParameter('EmailTemplate');
         ReceiptEmail := Context.GetString('receiptAddress');
+#pragma warning restore 
         Context.SetContext('status', NPOSActionSendRcptB.SendReceipt(EmailTemplateCode, ReceiptEmail, EntryNo));
     end;
 
