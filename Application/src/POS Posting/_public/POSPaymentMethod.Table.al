@@ -77,7 +77,7 @@
         }
         field(32; "Use Stand. Exc. Rate for Bal."; Boolean)
         {
-            Caption = 'Use Standard Exchange Rate for Balancing';
+            Caption = 'Use Standard Exchange Rate from BC';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
