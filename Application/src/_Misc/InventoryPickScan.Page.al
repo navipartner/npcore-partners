@@ -422,8 +422,11 @@
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
+    var
+        TempWhich: Text[1024];
     begin
-        exit(Rec.FindFirstAllowedRec(Which));
+        TempWhich := CopyStr(Which, 1, MaxStrLen(TempWhich));
+        exit(Rec.FindFirstAllowedRec(TempWhich));
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
