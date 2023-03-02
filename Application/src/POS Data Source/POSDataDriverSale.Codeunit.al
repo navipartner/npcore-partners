@@ -145,7 +145,7 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnIsDataSourceModified', '', false, false)]
-    local procedure Modified(POSSession: Codeunit "NPR POS Session"; DataSource: Text; var Modified: Boolean)
+    local procedure POSDataManagementModified(POSSession: Codeunit "NPR POS Session"; DataSource: Text; var Modified: Boolean)
     var
         Sale: Codeunit "NPR POS Sale";
     begin

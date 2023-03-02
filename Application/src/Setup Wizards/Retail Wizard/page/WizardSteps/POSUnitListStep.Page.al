@@ -432,7 +432,7 @@
         if TempAllGlobalPOSSalesSetup.FindSet() then;
     end;
 
-    internal procedure CreateTempPOSUnits(NoOfPOSUnits: integer; WantedStartingNo: Code[10]; SelectedPOSStore: Code[10]; var POSUnitTemp: Record "NPR POS Unit")
+    internal procedure CreateTempPOSUnits(ParamNoOfPOSUnits: integer; WantedStartingNo: Code[10]; SelectedPOSStore: Code[10]; var POSUnitTemp: Record "NPR POS Unit")
     var
         POSUnit: Record "NPR POS Unit";
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
@@ -443,7 +443,7 @@
 
         LastNoUsed := WantedStartingNo;
 
-        for i := 1 to NoOfPOSUnits do begin
+        for i := 1 to ParamNoOfPOSUnits do begin
             Rec.Init();
             LastNoUsed := CheckIfNoAvailableInPOSUnit(POSUnit, LastNoUsed);
             LastNoUsed := CheckIfNoAvailableInPOSUnit(POSUnitTemp, LastNoUsed);
