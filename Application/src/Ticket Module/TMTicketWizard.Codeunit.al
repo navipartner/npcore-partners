@@ -60,7 +60,7 @@
         CreateSchedules(AdmissionCode, ScheduleStartDate, ScheduleUntilDate, TempSchedules);
         CreateTicketBom(ItemNo, AdmissionCode, BomTemplate);
 
-        AdmissionSchManagement.CreateAdmissionSchedule(AdmissionCode, false, Today);
+        AdmissionSchManagement.CreateAdmissionSchedule(AdmissionCode, false, Today(), 'NPRTMTicketWizard.TicketWizard()');
 
         ItemNoOut := ItemNo;
         exit(true);

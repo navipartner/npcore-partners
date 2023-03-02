@@ -42,7 +42,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         ItemNo := CreateItem('', TicketTypeCode, 100);
         CreateTicketBOM(ItemNo, '', AdmissionCode, '', 1, true, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-        ScheduleManager.CreateAdmissionSchedule(AdmissionCode, true, Today);
+        ScheduleManager.CreateAdmissionScheduleTestFramework(AdmissionCode, true, Today);
 
         exit(ItemNo)
     end;
@@ -80,7 +80,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         ItemNo := CreateItem('', TicketTypeCode, Random(200) + 100);
         CreateTicketBOM(ItemNo, '', AdmissionCode, '', 1, true, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-        ScheduleManager.CreateAdmissionSchedule(AdmissionCode, true, Today);
+        ScheduleManager.CreateAdmissionScheduleTestFramework(AdmissionCode, true, Today);
 
         exit(ItemNo)
     end;
@@ -122,7 +122,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         ItemNo := CreateItem('', TicketTypeCode, Random(200) + 100);
         CreateTicketBOM(ItemNo, '', AdmissionCode, '', 1, true, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
 
-        ScheduleManager.CreateAdmissionSchedule(AdmissionCode, true, Today);
+        ScheduleManager.CreateAdmissionScheduleTestFramework(AdmissionCode, true, Today);
 
         exit(ItemNo)
     end;
@@ -167,7 +167,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         TicketBom."Revoke Policy" := TicketBom."Revoke Policy"::ALWAYS;
         TicketBom.Modify();
 
-        ScheduleManager.CreateAdmissionSchedule(AdmissionCode, true, Today);
+        ScheduleManager.CreateAdmissionScheduleTestFramework(AdmissionCode, true, Today);
 
         exit(ItemNo)
     end;
@@ -209,7 +209,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         ItemNo := CreateItem('', TicketTypeCode, Random(200) + 100);
         CreateTicketBOM(ItemNo, '', AdmissionCode, TicketBaseCalendarCode, 1, true, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::MULTIPLE);
 
-        ScheduleManager.CreateAdmissionSchedule(AdmissionCode, true, Today);
+        ScheduleManager.CreateAdmissionScheduleTestFramework(AdmissionCode, true, Today);
 
         exit(ItemNo)
     end;
@@ -597,7 +597,7 @@ codeunit 85011 "NPR Library - Ticket Module"
             CreateTicketBOMDynamic(ItemNo, '', AdmissionCode, '', 1, Default, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, AdmissionInclusion);
         end;
 
-        ScheduleManager.CreateAdmissionSchedule(AdmissionCode, true, Today);
+        ScheduleManager.CreateAdmissionScheduleTestFramework(AdmissionCode, true, Today);
 
         exit(ItemNo)
     end;

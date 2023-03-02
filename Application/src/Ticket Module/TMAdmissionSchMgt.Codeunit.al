@@ -10,7 +10,7 @@
         if (Admission.FindSet()) then begin
             repeat
                 Commit();
-                CreateAdmissionSchedule(Admission."Admission Code", false, Today);
+                CreateAdmissionSchedule(Admission."Admission Code", false, Today, 'NPRTMAdmissionSchMgt.OnRun()');
             until (Admission.Next() = 0);
         end;
     end;
@@ -19,7 +19,49 @@
         APPEND_LIST_CONFIRM: Label 'There is already a list created for this schedule.\Do you want to append to it?';
         RECREATE_LIST_CONFIRM: Label 'Warning.\The list will be recreated and the current notification status will set to pending.';
 
-    procedure CreateAdmissionSchedule(AdmissionCode: Code[20]; Regenerate: Boolean; ReferenceDate: Date)
+    // This API is intended for the test framework to use - there is no spamming telemetry
+    internal procedure CreateAdmissionScheduleTestFramework(AdmissionCode: Code[20]; Regenerate: Boolean; ReferenceDate: Date)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+    begin
+        CreateAdmissionScheduleWorker(AdmissionCode, Regenerate, ReferenceDate, CustomDimensions);
+    end;
+
+    procedure CreateAdmissionSchedule(AdmissionCode: Code[20]; Regenerate: Boolean; ReferenceDate: Date; SourceTag: Text)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+        VerbosityLevel: Verbosity;
+        StartTime: Time;
+    begin
+
+        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
+            Clear(ActiveSession);
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
+
+        CustomDimensions.Add('NPR_AdmissionCode', AdmissionCode);
+        CustomDimensions.Add('NPR_Regenerate', Format(Regenerate, 0, 9));
+        CustomDimensions.Add('NPR_ReferenceDate', Format(ReferenceDate, 0, 9));
+        CustomDimensions.Add('NPR_SourceTag', SourceTag);
+
+        VerbosityLevel := Verbosity::Normal;
+        Session.LogMessage('NPR_CreateAdmissionSchedule', 'CreateAdmissionSchedule Started', VerbosityLevel, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+
+        StartTime := Time();
+        CreateAdmissionScheduleWorker(AdmissionCode, Regenerate, ReferenceDate, CustomDimensions);
+
+        CustomDimensions.Add('NPR_DurationMs', format((Time() - StartTime), 0, 9));
+        Session.LogMessage('NPR_CreateAdmissionSchedule', 'CreateAdmissionSchedule Completed', VerbosityLevel, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+    end;
+
+    local procedure CreateAdmissionScheduleWorker(AdmissionCode: Code[20]; Regenerate: Boolean; ReferenceDate: Date; CustomDimensions: Dictionary of [Text, Text])
     var
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
         DateRecord: Record Date;
@@ -29,6 +71,7 @@
         GenerateFromDate: Date;
         GenerateUntilDate: Date;
         AreEqual: Boolean;
+        EntryCounter: Integer;
     begin
 
         AdmissionScheduleLines.SetCurrentKey("Admission Code", "Process Order");
@@ -60,6 +103,9 @@
                     GenerateFromDate := AdmissionScheduleLines."Schedule Generated Until";
             end;
 
+            CustomDimensions.Add('NPR_GenerateFromDate', Format(GenerateFromDate, 0, 9));
+            CustomDimensions.Add('NPR_GenerateUntilDate', Format(GenerateUntilDate, 0, 9));
+
             // Start generating entries
             DateRecord.Reset();
             DateRecord.SetFilter("Period Type", '=%1', DateRecord."Period Type"::Date);
@@ -78,11 +124,14 @@
                     end;
 
                     TempAdmissionScheduleEntry.Reset();
+                    EntryCounter += TempAdmissionScheduleEntry.Count();
                     if (TempAdmissionScheduleEntry.IsTemporary) then
                         TempAdmissionScheduleEntry.DeleteAll();
 
                 until (DateRecord.Next() = 0);
             end;
+
+            CustomDimensions.Add('NPR_EntriesAffected', Format(EntryCounter, 0, 9));
         end;
     end;
 

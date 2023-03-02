@@ -2415,12 +2415,12 @@
 
             if (WithCreate) then begin
                 // gently check
-                if (AdmissionSchManagement.IsUpdateScheduleEntryRequired(AdmissionCode, Today)) then
-                    AdmissionSchManagement.CreateAdmissionSchedule(AdmissionCode, false, AdmissionDate);
+                if (AdmissionSchManagement.IsUpdateScheduleEntryRequired(AdmissionCode, Today())) then
+                    AdmissionSchManagement.CreateAdmissionSchedule(AdmissionCode, false, AdmissionDate, 'NPRTMTicketManagement.GetAdmScheduleEntry.1()');
 
                 // still empty, try harder
                 if (AdmissionSchEntry.IsEmpty()) then
-                    AdmissionSchManagement.CreateAdmissionSchedule(AdmissionCode, false, AdmissionDate);
+                    AdmissionSchManagement.CreateAdmissionSchedule(AdmissionCode, false, AdmissionDate, 'NPRTMTicketManagement.GetAdmScheduleEntry.2()');
             end;
 
             if (AdmissionSchEntry.IsEmpty()) then
