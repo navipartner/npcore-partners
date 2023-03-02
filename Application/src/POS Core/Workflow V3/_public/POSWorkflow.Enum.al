@@ -619,16 +619,6 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SHOW_RET_AMT_DIALOG', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Ret.Amt.Dialog";
     }
-    value(125; "SEND_RECEIPT")
-    {
-        Caption = 'SEND_RECEIPT', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Send Receipt";
-    }
-    value(124; TAX_FREE)
-    {
-        Caption = 'TAX_FREE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Tax Free";
-    }
     value(120; CHANGE_BIN)
     {
         Caption = 'CHANGE_BIN', Locked = true, MaxLength = 20;
@@ -639,30 +629,55 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'VATREFUSION', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction: VAT Refusion";
     }
+    value(123; SETTAXAREACODE)
+    {
+        Caption = 'SETTAXAREACODE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Set TaxAreaCode";
+    }
+    value(124; TAX_FREE)
+    {
+        Caption = 'TAX_FREE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Tax Free";
+    }
+    value(125; "SEND_RECEIPT")
+    {
+        Caption = 'SEND_RECEIPT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Send Receipt";
+    }
     value(126; SET_ACTIVE_EVENT)
     {
         Caption = 'SET_ACTIVE_EVENT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Chg.Actv.Event";
-    }
-    value(129; QUICK_LOGIN)
-    {
-        Caption = 'QUICK_LOGIN', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Quick Login";
     }
     value(128; PRINT_TEMPLATE)
     {
         Caption = 'PRINT_TEMPLATE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Print Template";
     }
-    value(123; SETTAXAREACODE)
+    value(129; QUICK_LOGIN)
     {
-        Caption = 'SETTAXAREACODE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Set TaxAreaCode";
+        Caption = 'QUICK_LOGIN', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Quick Login";
     }
     value(132; CHANGE_RESP_CENTER)
     {
         Caption = 'CHANGE_RESP_CENTER', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAct:Change Resp. Center";
+    }
+    value(133; RV_SELECT_TABLE)
+    {
+        Caption = 'RV_SELECT_TABLE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Select Table";
+    }
+    value(134; RV_NEW_WAITER_PAD)
+    {
+        Caption = 'RV_NEW_WAITER_PAD', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: New WPad";
+    }
+    value(135; RV_GET_WAITER_PAD)
+    {
+        Caption = 'RV_GET_WAITER_PAD', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Get WPad";
     }
     value(6014600; BALANCE_V4)
     {
