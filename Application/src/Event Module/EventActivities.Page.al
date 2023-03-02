@@ -66,7 +66,7 @@
                 }
                 field("Upcoming Events"; Rec."Upcoming Events")
                 {
-
+                    Caption = 'Upcoming  Events';
                     ToolTip = 'Specifies the number of the Upcoming Events. By clicking you can view the list of Upcoming Events.';
                     ApplicationArea = NPRRetail;
 
