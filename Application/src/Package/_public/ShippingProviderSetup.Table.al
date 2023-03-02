@@ -101,15 +101,16 @@ table 6014574 "NPR Shipping Provider Setup"
             ObsoleteReason = 'replaced by "Shipping Provider"';
 
         }
-        field(151; "Api User"; Text[50])
+        field(151; "Api User"; Text[250])
         {
             Caption = 'Api User';
             DataClassification = CustomerContent;
         }
-        field(152; "Api Key"; Text[50])
+        field(152; "Api Key"; Text[250])
         {
             Caption = 'Api Key';
             DataClassification = CustomerContent;
+            ExtendedDatatype = Masked;
         }
         field(153; "Send Package Doc. Immediately"; Boolean)
         {

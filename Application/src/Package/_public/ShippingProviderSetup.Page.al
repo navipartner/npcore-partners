@@ -24,7 +24,16 @@ page 6014574 "NPR Shipping Provider Setup"
                     ToolTip = 'Specifies the Shipping Provider To Use';
                     ApplicationArea = NPRRetail;
                 }
-
+                field("Api User"; Rec."Api User")
+                {
+                    ToolTip = 'Specifies the value of the Api User field.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Api Key"; Rec."Api Key")
+                {
+                    ToolTip = 'Specifies the value of the Api Key field.';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group(Pacsoft)
             {
@@ -109,18 +118,6 @@ page 6014574 "NPR Shipping Provider Setup"
             }
             group(Pakkelabels)
             {
-                field("Api User"; Rec."Api User")
-                {
-
-                    ToolTip = 'Specifies the value of the Api User field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Api Key"; Rec."Api Key")
-                {
-
-                    ToolTip = 'Specifies the value of the Api Key field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Send Package Doc. Immediately"; Rec."Send Package Doc. Immediately")
                 {
 
