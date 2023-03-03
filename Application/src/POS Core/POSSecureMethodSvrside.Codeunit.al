@@ -345,7 +345,7 @@
         Sender.RejectPassword(false, Reason);
     end;
 
-    local procedure LogActionAuthorization(AuthorizedBy: Code[20]; Description: text; POSUnitNo: Code[20]; ActionRecordId: RecordId)
+    local procedure LogActionAuthorization(AuthorizedBy: Code[20]; Description: text; POSUnitNo: Code[10]; ActionRecordId: RecordId)
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
