@@ -23,7 +23,7 @@ codeunit 6150668 "NPR NPRE POSAction: Split Wa." implements "NPR IPOS Workflow"
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddOptionParameter('InputType',
                                         ParamInputType_OptionLbl,
-                                        SelectStr(1, ParamInputType_OptionLbl),
+                                        CopyStr(SelectStr(1, ParamInputType_OptionLbl), 1, 250),
                                         ParamInputType_CptLbl,
                                         ParamInputType_DescLbl,
                                         ParamInputType_OptionCptLbl);

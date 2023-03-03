@@ -30,7 +30,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill" implements "NPR IPOS Workflow"
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddOptionParameter('InputType',
                                         ParamInputType_OptionLbl,
-                                        SelectStr(1, ParamInputType_OptionLbl),
+                                        CopyStr(SelectStr(1, ParamInputType_OptionLbl), 1, 250),
                                         ParamInputType_CptLbl,
                                         ParamInputType_DescLbl,
                                         ParamInputType_OptionCptLbl);
@@ -40,7 +40,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('LocationFilter', '', ParamLocationFilter_CptLbl, ParamLocationFilter_DescLbl);
         WorkflowConfig.AddOptionParameter('IncludeAllWPads',
                                         ParamIncludeAllWPads_OptionLbl,
-                                        SelectStr(2, ParamIncludeAllWPads_OptionLbl),
+                                        CopyStr(SelectStr(2, ParamIncludeAllWPads_OptionLbl), 1, 250),
                                         ParamIncludeAllWPads_CptLbl,
                                         ParamIncludeAllWPads_DescLbl,
                                         ParamIncludeAllWPads_OptionCptLbl);
