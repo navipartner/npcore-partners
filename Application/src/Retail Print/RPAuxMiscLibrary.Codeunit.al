@@ -33,7 +33,7 @@
 
 #pragma warning disable AA0150
     procedure ApplyCurrencyConversion(var "Processing Value": Text[30]; "Conversion String": Code[30])
-#pragma warning restore
+#pragma warning restore AA0150
     var
         CurrencyExchangeRate: Record "Currency Exchange Rate";
         String: Codeunit "NPR String Library";
@@ -63,7 +63,7 @@
 
 #pragma warning disable AA0150
     procedure ApplyExchangeDeadline(var "Processing Value": Text[30])
-#pragma warning restore
+#pragma warning restore AA0150
     var
         ExchangeLabelSetup: Record "NPR Exchange Label Setup";
         Date: Date;
@@ -75,7 +75,7 @@
 
 #pragma warning disable AA0150
     procedure FormatNumberNoDecimal(var "Processing Value": Text[30])
-#pragma warning restore
+#pragma warning restore AA0150
     var
         Dec: Decimal;
     begin
