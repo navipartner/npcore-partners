@@ -1408,7 +1408,7 @@
                 GenJournalLine."Document Type" := GenJournalLine."Document Type"::Refund;
         GenJournalLine."Account No." := AccountNo;
         GenJournalLine."Gen. Posting Type" := GenPostingType;
-        GenJournalLine."Posting Date" := PostingDate;
+        GenJournalLine.Validate("Posting Date", PostingDate);
         GenJournalLine."Document Date" := GenJournalLine."Posting Date";
         GenJournalLine."Document No." := DocumentNo;
         GenJournalLine."External Document No." := ExternalDocNo;
@@ -1486,7 +1486,7 @@
         GenJournalLine."Account No." := AccountNo;
         if DoPostVAT then
             GenJournalLine."Gen. Posting Type" := GLAccount."Gen. Posting Type";
-        GenJournalLine."Posting Date" := POSEntry."Posting Date";
+        GenJournalLine.Validate("Posting Date", POSEntry."Posting Date");
         GenJournalLine."Document Date" := GenJournalLine."Posting Date";
         GenJournalLine."Document No." := POSBalancingLine."Document No.";
         GenJournalLine."External Document No." := '';
