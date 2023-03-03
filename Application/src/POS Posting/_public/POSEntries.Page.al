@@ -380,8 +380,27 @@
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Removed from promoted category.';
+                    Visible = false;
                     Promoted = true;
                     PromotedOnly = true;
+
+                    ToolTip = 'Executes the Send as PDF action';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
+                    begin
+                        EmailDocMgt.SendReport(Rec, false);
+                    end;
+                }
+
+                action("Send As PDF")
+                {
+                    Caption = 'Send as PDF';
+                    Image = SendEmailPDF;
 
                     ToolTip = 'Executes the Send as PDF action';
                     ApplicationArea = NPRRetail;
