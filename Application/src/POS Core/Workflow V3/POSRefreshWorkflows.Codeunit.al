@@ -62,10 +62,14 @@ codeunit 6059798 "NPR POS Refresh Workflows"
             POSAction.Delete();
 
         POSAction.Init();
+# pragma warning disable AA0139
         POSAction.Code := ActionCode;
+# pragma warning restore
         POSAction."Blocking UI" := not NonBlockingUI;
         POSAction."Bound to DataSource" := BoundToDataSource;
+# pragma warning disable AA0139
         POSAction."Data Source Name" := DataSource;
+# pragma warning restore
         POSAction.Version := ActionVersion;
         POSAction."Workflow Engine Version" := '3.0';
         POSAction."Workflow Implementation" := Enum::"NPR POS Workflow".FromInteger(WorkflowOrdinal);
@@ -82,7 +86,9 @@ codeunit 6059798 "NPR POS Refresh Workflows"
         if TempParameters.FindSet() then
             repeat
                 ActionParameters := TempParameters;
+# pragma warning disable AA0139
                 ActionParameters."POS Action Code" := ActionCode;
+# pragma warning restore
                 ActionParameters.Insert();
             until TempParameters.Next() = 0;
 
