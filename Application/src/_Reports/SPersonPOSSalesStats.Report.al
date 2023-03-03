@@ -27,6 +27,8 @@ report 6014446 "NPR S.Person POS Sales Stats"
             trigger OnAfterGetRecord()
             begin
                 NPRGetVESalesLCY(SalesLCY);
+                if (SalesLCY = 0) and (ShowSalespersonWithSale) then
+                    CurrReport.Skip();
                 TempCustAmount.Init();
                 TempCustAmount."Amount (LCY)" := SalesLCY;
                 TempCustAmount."Customer No." := Code;
@@ -271,8 +273,18 @@ report 6014446 "NPR S.Person POS Sales Stats"
     }
     requestpage
     {
+        SaveValues = true;
         layout
         {
+            area(Content)
+            {
+                field("Show Salesperson With Sale"; ShowSalespersonWithSale)
+                {
+                    Caption = 'Show Salesperson With Sale';
+                    ToolTip = 'Specifies the value of the Show Salesperson With Sale field.';
+                    ApplicationArea = NPRRetail;
+                }
+            }
         }
 
         actions
@@ -318,6 +330,11 @@ report 6014446 "NPR S.Person POS Sales Stats"
         j := '2';
         if "Salesperson/Purchaser".GetFilter("Date Filter") <> '' then
             DateFilter := TextDateFilters + "Salesperson/Purchaser".GetFilter("Date Filter");
+        if "Salesperson/Purchaser".IsEmpty() then begin
+            Message(NoDataErrorLbl);
+            CurrReport.Break();
+        end;
+
     end;
 
     var
@@ -344,6 +361,8 @@ report 6014446 "NPR S.Person POS Sales Stats"
         COGSLCY: Decimal;
         COGSLCYSalesPersonLastYear: Decimal;
         TempPOSSalesLineLY: Record "NPR POS Entry Sales Line" temporary;
+        ShowSalespersonWithSale: Boolean;
+        NoDataErrorLbl: Label 'There is not data to be shown.';
 
     local procedure CalcPct(Tal1: Decimal; Tal2: Decimal): Decimal
     begin
