@@ -349,11 +349,11 @@
                         }
                         action("NPR Vendor/Salesperson")
                         {
-                            Caption = 'NPR Vendor/Salesperson';
+                            Caption = 'Vendor/Salesperson';
                             Image = Report;
                             RunObject = Report "NPR Vendor/Salesperson";
                             ApplicationArea = NPRRetail;
-                            ToolTip = 'Executes the NPR Vendor/Salesperson action.';
+                            ToolTip = 'Executes the Vendor/Salesperson action.';
                         }
                     }
                     group(History)
