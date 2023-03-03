@@ -1,7 +1,11 @@
 ﻿#if not CLOUD
 codeunit 6150854 "NPR POS Action - CK Mgt."
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used.';
+
     Access = Internal;
+
     var
         ActionDescription: Label 'This is a built-in action for CashKeeper Payments';
         Setup: Codeunit "NPR POS Setup";
