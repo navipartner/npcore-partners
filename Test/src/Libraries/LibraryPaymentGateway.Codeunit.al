@@ -37,7 +37,7 @@ codeunit 85127 "NPR Library - Payment Gateway"
     begin
         Clear(PaymentGateway);
         PaymentGateway.Init();
-        PaymentGateway.Code := LibraryRandom.RandText(Random(10));
+        PaymentGateway.Code := LibraryRandom.RandText(10);
         PaymentGateway."Integration Type" := IntegrationType;
         PaymentGateway."Enable Capture" := true;
         PaymentGateway."Enable Refund" := true;
@@ -54,7 +54,7 @@ codeunit 85127 "NPR Library - Payment Gateway"
     begin
         Clear(PaymentGateway);
         PaymentGateway.Init();
-        PaymentGateway.Code := LibraryRandom.RandText(Random(10));
+        PaymentGateway.Code := LibraryRandom.RandText(10);
         PaymentGateway."Capture Codeunit Id" := CaptureCodeunitId;
         PaymentGateway."Refund Codeunit Id" := RefundCodeunitId;
         PaymentGateway."Cancel Codeunit Id" := CancelCodeunitId;
@@ -153,7 +153,7 @@ codeunit 85127 "NPR Library - Payment Gateway"
         PaymentLine."Document Table No." := Database::"Sales Header";
         PaymentLine."Document Type" := DocumentType;
         PaymentLine."Document No." := DocumentNo;
-        PaymentLine."No." := LibRandom.RandText(Random(MaxStrLen(PaymentLine."No.")));
+        PaymentLine."No." := LibRandom.RandText(MaxStrLen(PaymentLine."No."));
         PaymentLine.Description := 'Test integration payment';
         PaymentLine.Amount := Amount;
         PaymentLine."Account Type" := PaymentLine."Account Type"::"G/L Account";
