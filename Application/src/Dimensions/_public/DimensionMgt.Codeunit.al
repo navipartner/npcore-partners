@@ -369,7 +369,9 @@
         CreatePosEntrySalesLineDim(POSEntrySalesLine,
                                     POSEntry,
                                     TypeToTableNPR(POSEntrySalesLine.Type), POSEntrySalesLine."No.",
+# pragma warning disable AA0139
                                     DiscountTypeToTableNPR(POSEntrySalesLine."Discount Type"), POSEntrySalesLine."Discount Code",
+# pragma warning restore
                                     DATABASE::"NPR NPRE Seating", POSEntrySalesLine."NPRE Seating Code",
                                     0, '');
     end;
