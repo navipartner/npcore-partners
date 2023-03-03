@@ -48,19 +48,19 @@
         CreateEntryFull(RecordIDIn, Type, ActedOnPOSEntryNo, ActedOnPOSEntryFiscalNo, ActedOnPOSUnitNo, '', '', '');
     end;
 
-    procedure CreateEntryExtended(RecordIDIn: RecordID; Type: Integer; ActedOnPOSEntryNo: Integer; ActedOnPOSEntryFiscalNo: Code[20]; ActedOnPOSUnitNo: Code[10]; Description: Text[250]; AddInfo: Text)
+    procedure CreateEntryExtended(RecordIDIn: RecordID; Type: Integer; ActedOnPOSEntryNo: Integer; ActedOnPOSEntryFiscalNo: Code[20]; ActedOnPOSUnitNo: Code[10]; Description: Text; AddInfo: Text)
     begin
         CreateEntryFull(RecordIDIn, Type, ActedOnPOSEntryNo, ActedOnPOSEntryFiscalNo, ActedOnPOSUnitNo, Description, AddInfo, '');
     end;
 
-    procedure CreateEntryCustom(RecordIDIn: RecordID; Subtype: Text[250]; ActedOnPOSEntryNo: Integer; ActedOnPOSEntryFiscalNo: Code[20]; ActedOnPOSUnitNo: Code[10]; Description: Text[250]; AddInfo: Text)
+    procedure CreateEntryCustom(RecordIDIn: RecordID; Subtype: Text[250]; ActedOnPOSEntryNo: Integer; ActedOnPOSEntryFiscalNo: Code[20]; ActedOnPOSUnitNo: Code[10]; Description: Text; AddInfo: Text)
     var
         POSAuditLog: Record "NPR POS Audit Log";
     begin
         CreateEntryFull(RecordIDIn, POSAuditLog."Action Type"::CUSTOM, ActedOnPOSEntryNo, ActedOnPOSEntryFiscalNo, ActedOnPOSUnitNo, Description, AddInfo, Subtype);
     end;
 
-    local procedure CreateEntryFull(RecordIDIn: RecordID; Type: Integer; ActedOnPOSEntryNo: Integer; ActedOnPOSEntryFiscalNo: Code[20]; ActedOnPOSUnitNo: Code[10]; Description: Text[250]; AddInfo: Text; CustomType: Text)
+    local procedure CreateEntryFull(RecordIDIn: RecordID; Type: Integer; ActedOnPOSEntryNo: Integer; ActedOnPOSEntryFiscalNo: Code[20]; ActedOnPOSUnitNo: Code[10]; Description: Text; AddInfo: Text; CustomType: Text)
     var
         POSAuditLog: Record "NPR POS Audit Log";
         RecRef: RecordRef;

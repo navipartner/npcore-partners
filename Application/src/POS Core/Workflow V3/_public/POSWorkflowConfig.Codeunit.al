@@ -102,7 +102,8 @@ codeunit 6059786 "NPR POS Workflow Config"
     begin
         ClearAll();
     end;
-    local procedure AddParameter(Name: Text[30]; DataType: Option; DefaultValue: Text[250]; Options: Text[250]; CaptionName: Text; CaptionDescription: Text; CaptionOptions: Text)
+
+    local procedure AddParameter(Name: Text[30]; DataType: Option; DefaultValue: Text; Options: Text[250]; CaptionName: Text; CaptionDescription: Text; CaptionOptions: Text)
     var
         MissingNameLbl: Label 'Action %1, Workflow parameter %2 is missing a name caption';
         MissingDescriptionLbl: Label 'Action %1, Workflow parameter %2 is missing a description caption';
@@ -120,7 +121,7 @@ codeunit 6059786 "NPR POS Workflow Config"
         TempParameter."POS Action Code" := '';
         TempParameter.Name := Name;
         TempParameter."Data Type" := DataType;
-        TempParameter."Default Value" := DefaultValue;
+        TempParameter."Default Value" := CopyStr(DefaultValue, 1, MaxStrLen(TempParameter."Default Value"));
         if DataType = TempParameter."Data Type"::Option then begin
             TempParameter.Options := Options;
             if CaptionOptions = '' then
@@ -158,7 +159,9 @@ codeunit 6059786 "NPR POS Workflow Config"
         ValueToHash.Append('<customJScode>' + _CustomJSCode + '</customJScode>');
         ValueToHash.Append('<nonblockingui>' + Format(_NonBlockingUI, 0, 9) + '</nonblockingui>');
 
+# pragma warning disable AA0139
         Exit(CryptographyManagement.GenerateHash(ValueToHash.ToText(), HashAlgorithmType::MD5));
+# pragma warning restore
     end;
 
     internal procedure GetWorkflowParameters(var ParametersOut: Record "NPR POS Action Parameter" temporary; var JavascriptOut: Text; var UnattendedOut: Boolean; var BoundToDataSourceOut: Boolean; var DataSourceOut: Text; var CustomJSMethod: Text; var CustomJSCode: Text; var NonBlockingUIOut: Boolean; var DescriptionOut: Text)
@@ -211,7 +214,9 @@ codeunit 6059786 "NPR POS Workflow Config"
         ValueToHash.Append('<customJScode>' + _CustomJSCode + '</customJScode>');
         ValueToHash.Append('<nonblockingui>' + Format(_NonBlockingUI) + '</nonblockingui>');
 
+# pragma warning disable AA0139
         Exit(CryptographyManagement.GenerateHash(ValueToHash.ToText(), HashAlgorithmType::MD5));
+# pragma warning restore
     end;
 
     [Obsolete('Replaced by internal function')]
