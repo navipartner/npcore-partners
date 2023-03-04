@@ -363,10 +363,10 @@
         SuccessfulCalendarItem: Label 'Successfully %1 calendar.';
         SentToTxt: Label 'sent to';
         RemovedFromTxt: Label 'removed from';
-        NewContext: Text;
-        RemoveContext: Label 'REMOVE';
-        SendContext: Label 'SEND';
-        ReasonContext: Label 'REASON';
+        NewContext: Text[30];
+        RemoveContext: Label 'REMOVE', Locked = true;
+        SendContext: Label 'SEND', Locked = true;
+        ReasonContext: Label 'REASON', Locked = true;
     begin
         if not ProcessCalendarItem(RecRef, ActionToTake) then begin
             ActivityLog.LogActivity(RecRef.RecordId, 1, ErrorContext, ActivityDescription, CopyStr(GetLastErrorText, 1, MaxStrLen(ActivityLog."Activity Message")));
@@ -650,7 +650,7 @@
 
     local procedure GetTemplates(var RecRef: RecordRef; var CalendarItemID: Text; var Job: Record Job; var JobPlanningLine: Record "Job Planning Line"; var UseTemplate: Boolean; var EventExchIntTemplate: Record "NPR Event Exch. Int. Template"): Boolean
     var
-        Source: Text;
+        Source: Text[250];
     begin
         case RecRef.Number of
             DATABASE::Job:
