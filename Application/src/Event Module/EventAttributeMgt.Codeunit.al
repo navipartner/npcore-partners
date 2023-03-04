@@ -1,6 +1,7 @@
 ﻿codeunit 6060155 "NPR Event Attribute Mgt."
 {
     Access = Internal;
+
     var
         EventAttributeFound: Label 'You can''t change %1 as it is already part of template (or is a template) which has assigned values. If you wish to change it, create new template and do changes on it.';
         EventAttributeTemplateOnReport: Record "NPR Event Attribute Template";
@@ -11,6 +12,7 @@
         EventAttributeRowValue: Record "NPR Event Attr. Row Value";
         EventAttributeRowValues: Page "NPR Event Attr. Row Values";
         NewFormula: Text;
+        MaxFormulaLengthExceededErr: Label 'Number of lines included in the formula is too big. Either remove some lines, or spread lines accross multiple templates.';
     begin
         if Rec.Type = Rec.Type::" " then
             exit;
@@ -25,13 +27,15 @@
             EventAttributeRowValues.SetSelection(EventAttributeRowValue);
             NewFormula := RowValueConcatenateLineNo(EventAttributeRowValue);
             if NewFormula <> '' then begin
+                if StrLen(NewFormula) > MaxStrLen(Rec.Formula) then
+                    Error(MaxFormulaLengthExceededErr);
                 Rec.Validate(Formula, NewFormula);
                 Rec.Modify(true);
             end;
         end;
     end;
 
-    local procedure RowValueConcatenateLineNo(var EventAttributeRowValue: Record "NPR Event Attr. Row Value") Lines: Text[250]
+    local procedure RowValueConcatenateLineNo(var EventAttributeRowValue: Record "NPR Event Attr. Row Value") Lines: Text
     begin
         if EventAttributeRowValue.FindSet() then
             repeat
@@ -83,7 +87,7 @@
         EventAttributeRowValue2: Record "NPR Event Attr. Row Value";
         TotalNoOfFields: Integer;
         OptionNo: Integer;
-        NewFormulaValue: Text;
+        NewFormulaValue: Text[250];
         TypeHelper: Codeunit "Type Helper";
     begin
         SetFormulaSearchFilter(Rec."Template Name", Rec."Line No.", EventAttributeRowValue);
@@ -94,6 +98,7 @@
                 case true of
                     (OptionNo = 0) and (OptionNo = TotalNoOfFields):
                         NewFormulaValue := '';
+#pragma warning disable AA0139                        
                     (OptionNo = 0) and (OptionNo < TotalNoOfFields):
                         NewFormulaValue := CopyStr(EventAttributeRowValue.Formula, StrLen(Format(Rec."Line No.") + ',') + 1);
                     (OptionNo > 0) and (OptionNo < TotalNoOfFields):
@@ -101,6 +106,7 @@
                                             CopyStr(EventAttributeRowValue.Formula, StrPos(EventAttributeRowValue.Formula, Format(Rec."Line No.") + ',') + StrLen(Format(Rec."Line No.") + ','));
                     (OptionNo = TotalNoOfFields):
                         NewFormulaValue := CopyStr(EventAttributeRowValue.Formula, 1, StrPos(EventAttributeRowValue.Formula, ',' + Format(Rec."Line No.")) - 1);
+#pragma warning restore AA0139                        
                 end;
                 EventAttributeRowValue2.Get(EventAttributeRowValue."Template Name", EventAttributeRowValue."Line No.");
                 EventAttributeRowValue2.Formula := NewFormulaValue;
@@ -127,7 +133,7 @@
         EventAttrRowValue.SetFilter(Formula, '%1', StrSubstNo(LikeFilterLbl, Format(RowLineNo)));
     end;
 
-    procedure EventAttributeEntryAction(ActionHere: Option "Insert/Modify",Delete,Read; TemplateName: Code[20]; JobNo: Code[20]; RowLineNo: Integer; ColumnLineNo: Integer; ColumnCaption: Text; var Value: Text; FilterMode: Boolean; FilterName: Code[20])
+    procedure EventAttributeEntryAction(ActionHere: Option "Insert/Modify",Delete,Read; TemplateName: Code[20]; JobNo: Code[20]; RowLineNo: Integer; ColumnLineNo: Integer; ColumnCaption: Text; var Value: Text[250]; FilterMode: Boolean; FilterName: Code[20])
     var
         EntryNo: Integer;
         EventAttrTemplate: Record "NPR Event Attribute Template";
@@ -203,7 +209,7 @@
         EventAttributeTemplate: Record "NPR Event Attribute Template";
         EventAttrRowValue: Record "NPR Event Attr. Row Value";
         EventAttrColValue: Record "NPR Event Attr. Column Value";
-        NewValue: Text;
+        NewValue: Text[250];
         ActionHere: Integer;
     begin
         EventAttributeTemplate.Get(TemplateName);
@@ -225,7 +231,7 @@
             until EventAttrRowValue.Next() = 0;
     end;
 
-    procedure CheckAndUpdate(TemplateName: Code[20]; JobNo: Code[20]; RowLineNo: Integer; ColumnLineNo: Integer; ColumnCaption: Text; AttributeValue: Text; FilterMode: Boolean; FilterName: Code[20])
+    procedure CheckAndUpdate(TemplateName: Code[20]; JobNo: Code[20]; RowLineNo: Integer; ColumnLineNo: Integer; ColumnCaption: Text; AttributeValue: Text[250]; FilterMode: Boolean; FilterName: Code[20])
     var
         ActionHere: Integer;
     begin
@@ -236,7 +242,7 @@
             UpdateFormulaResult(TemplateName, JobNo, RowLineNo, ColumnLineNo, ColumnCaption);
     end;
 
-    local procedure CheckDelete(TemplateName: Code[20]; ColumnLineNo: Integer; AttributeValue: Text; FilterMode: Boolean): Boolean
+    local procedure CheckDelete(TemplateName: Code[20]; ColumnLineNo: Integer; AttributeValue: Text[250]; FilterMode: Boolean): Boolean
     var
         EventAttributeTemplate: Record "NPR Event Attribute Template";
         EventAttrColValue: Record "NPR Event Attr. Column Value";

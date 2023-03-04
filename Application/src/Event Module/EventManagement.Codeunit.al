@@ -1125,7 +1125,9 @@
         JobReg."Creation Date" := Today();
         JobReg."Source Code" := SourceCodeSetup.Sales;
         JobReg."Journal Batch Name" := '';
+#pragma warning disable AA0139        
         JobReg."User ID" := UserId;
+#pragma warning restore AA0139        
         JobReg.Insert();
         JobRegisterInitialized := true;
     end;
@@ -1160,8 +1162,8 @@
         PostingGroup: Code[20];
         GenBusPostGroup: Code[20];
         GenProdPostGroup: Code[20];
-        Description: Text;
-        Description2: Text;
+        Description: Text[100];
+        Description2: Text[50];
         UnitOfMeasureCode: Code[10];
         QtyPerUoM: Decimal;
         LocationCode: Code[10];

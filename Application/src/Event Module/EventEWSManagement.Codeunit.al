@@ -43,7 +43,7 @@
         exit(not SearchForDefaultAccount);
     end;
 
-    procedure GetOrganizerSetup(Job: Record Job; var Source: Text)
+    procedure GetOrganizerSetup(Job: Record Job; var Source: Text[250])
     var
         Resource: Record Resource;
         UserName: Text;
@@ -333,8 +333,8 @@
         AppointmentText: Label 'Appointment';
         SavedInText: Label 'Saved in';
         MeetingReqText: Label 'Meeting Request';
-        FromEmail: Text;
-        FromSource: Text;
+        FromEmail: Text[50];
+        FromSource: Text[250];
         JobPlanningLine: Record "Job Planning Line";
         EventCalendarMgt: Codeunit "NPR Event Calendar Mgt.";
         ParentEntryNo: Integer;
@@ -373,9 +373,9 @@
         EventExchIntSumBuffer.FindFirst();
     end;
 
-    local procedure AddJobPlanningLineToBuffer(var EventExchIntSumBuffer: Record "NPR Event Exc.Int.Summ. Buffer"; var JobPlanningLine: Record "Job Planning Line"; ExchItem: Text; ParentEntryNo: Integer)
+    local procedure AddJobPlanningLineToBuffer(var EventExchIntSumBuffer: Record "NPR Event Exc.Int.Summ. Buffer"; var JobPlanningLine: Record "Job Planning Line"; ExchItem: Text[50]; ParentEntryNo: Integer)
     var
-        Source: Text;
+        Source: Text[250];
     begin
         Source := GetObjectCaption(8, PAGE::"NPR Event Plan. Lines Sub.") + ': ' + JobPlanningLine.FieldCaption("NPR Resource E-Mail");
         case true of
@@ -397,7 +397,7 @@
         end;
     end;
 
-    local procedure AddExchObjToBuffer(var EventExchIntSumBuffer: Record "NPR Event Exc.Int.Summ. Buffer"; Indentation: Integer; ExchItem: Text; EmailAccount: Text; Source: Text; var EntryNo: Integer; ParentEntryNo: Integer)
+    local procedure AddExchObjToBuffer(var EventExchIntSumBuffer: Record "NPR Event Exc.Int.Summ. Buffer"; Indentation: Integer; ExchItem: Text[50]; EmailAccount: Text[250]; Source: Text[250]; var EntryNo: Integer; ParentEntryNo: Integer)
     begin
         EntryNo += 1;
         EventExchIntSumBuffer.Init();
