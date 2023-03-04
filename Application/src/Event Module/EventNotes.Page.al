@@ -132,7 +132,7 @@
             until (Job.Next() = 0) or (JobCount = MaxNoOfEvents);
     end;
 
-    local procedure GetUserName(UserID: Text): Text
+    local procedure GetUserName(UserID: Text[132]): Text[132]
     var
         User: Record User;
         EveryoneText: Label 'Everyone';
