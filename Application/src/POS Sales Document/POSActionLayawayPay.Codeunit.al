@@ -25,7 +25,9 @@
         WorkflowConfig.AddOptionParameter(
             'SelectionMethod',
             OptionSelectionMethod,
+#pragma warning disable AA0139
             SelectStr(1, OptionSelectionMethod),
+# pragma warning restore
             CaptionSelectionMethod,
             DescSelectionMethod,
             OptionSelectionCaption);

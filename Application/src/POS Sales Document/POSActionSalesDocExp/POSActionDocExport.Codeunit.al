@@ -121,13 +121,17 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('SetShip', false, CaptionShip, DescShip);
         WorkflowConfig.AddOptionParameter('SetDocumentType',
                                         OptionNameSetDocumentType,
+#pragma warning disable AA0139
                                         SelectStr(1, OptionNameSetDocumentType),
+# pragma warning restore
                                         CaptionDocType,
                                         DescDocType,
                                         OptionCptSetDocumentType);
         WorkflowConfig.AddOptionParameter('SetNegBalDocumentType',
                                         OptionNameSetNegBalDocumentType,
+#pragma warning disable AA0139
                                         SelectStr(1, OptionNameSetNegBalDocumentType),
+# pragma warning restore
                                         CaptionNegDocType,
                                         DescNegDocType,
                                         OptionCptSetNegBalDocumentType);
@@ -163,7 +167,9 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('BlockEmptySale', true, CaptionBlockEmptySale, DescBlockEmptySale);
         WorkflowConfig.AddOptionParameter('UseLocationFrom',
                         OptionNameUseLocationFrom,
+#pragma warning disable AA0139
                         SelectStr(2, OptionNameUseLocationFrom),
+# pragma warning restore
                         CaptionUseLocationFrom,
                         DescUseLocationFrom,
                         OptionUseLocationFrom);
@@ -171,7 +177,9 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('SendICOrderConfirmation', false, CaptionSendICOrderConfirmation, DescSendICOrderConfirmation);
         WorkflowConfig.AddOptionParameter('PaymentMethodCodeFrom',
                         OptionNamePaymentMethCodeFrom,
+#pragma warning disable AA0139
                         SelectStr(1, OptionNamePaymentMethCodeFrom),
+# pragma warning restore
                         CaptionPaymentMethodCodeFrom,
                         DescPaymentMethodCodeFrom,
                         OptionCptPaymentMethCodeFrom);
@@ -257,7 +265,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         PrintPrepayment: Boolean;
         FullPosting: Boolean;
         SalesHeader: Record "Sales Header";
-        CreatedSalesHeader: Text[20];
+        CreatedSalesHeader: Text;
         POSSession: Codeunit "NPR POS Session";
         POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
         CreatedDocTypeIndex: Integer;
@@ -444,7 +452,9 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         if Context.GetString('attention', Attention) then;
         if Context.GetString('yourref', YourRef) then;
 
+# pragma warning disable AA0139
         if POSActionDocExportB.SetInputs(ExtDocNo, Attention, YourRef, SalePOS) then
+# pragma warning restore
             SalePOS.Modify(true);
     end;
 
