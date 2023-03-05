@@ -28,7 +28,9 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddOptionParameter('DocumentType',
                                          ParamDocTypeOpt_Lbl,
+# pragma warning disable AA0139
                                          SelectStr(2, ParamDocTypeOpt_Lbl),
+# pragma warning restore
                                          ParamDocType_CptLbl,
                                          ParamDocType_DescLbl,
                                          ParamDocTypeOpt_CptLbl);
@@ -36,7 +38,9 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('SalesDocViewString', '', ParamSalesDocView_CptLbl, ParamSalesDocView_DescLbl);
         WorkflowConfig.AddOptionParameter('LocationFrom',
                                   ParamLocationFrom_OptionsLbl,
+# pragma warning disable AA0139
                                   SelectStr(1, ParamLocationFrom_OptionsLbl),
+# pragma warning restore
                                   ParamLocationFrom_CptLbl,
                                   ParamLocationFrom_DescLbl,
                                   ParamLocationFrom_OptionsCptLbl);
@@ -174,7 +178,9 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
 
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
         SalesHeader.SetRange(Status, SalesHeader.Status::Open);
+# pragma warning disable AA0139
         LocationFilter := POSMenuMgt.GetPOSMenuButtonLocationFilter(POSSession, ActionCode());
+# pragma warning restore
         if LocationFilter <> '' then
             SalesHeader.SetFilter("Location Code", LocationFilter);
 

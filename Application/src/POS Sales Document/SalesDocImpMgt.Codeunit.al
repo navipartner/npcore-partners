@@ -112,7 +112,9 @@
         SaleLinePOS."Bin Code" := SalesLine."Bin Code";
         SaleLinePOS."Location Code" := SalesLine."Location Code";
         SaleLinePOS."Discount Type" := SalesLine."NPR Discount Type";
+#pragma warning disable AA0139
         SaleLinePOS."Discount Code" := SalesLine."NPR Discount Code";
+# pragma warning restore
         SaleLinePOS."Allow Line Discount" := SalesLine."Allow Line Disc.";
         SaleLinePOS."Discount %" := SalesLine."Line Discount %";
         SaleLinePOS."Discount Amount" := SalesLine."Line Discount Amount";
@@ -248,7 +250,9 @@
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS.Validate("No.", SalesInvoiceHeader."Bill-to Customer No.");
         SaleLinePOS.Validate("Unit Price", PaymentAmount);
+#pragma warning disable AA0139
         SaleLinePOS.Description := StrSubstNo('%1 %2', SalesInvoiceHeader.TableCaption, SalesInvoiceHeader."No.");
+# pragma warning restore
     end;
 
     procedure SelectSalesDocument(TableView: Text; var SalesHeader: Record "Sales Header"): Boolean

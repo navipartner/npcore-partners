@@ -19,7 +19,9 @@ codeunit 6150867 "NPR POS Action: Doc. Show" implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
             ParameterSelectType_Name(),
             OptionSelectType,
+#pragma warning disable AA0139
             SelectStr(1, OptionSelectType),
+# pragma warning restore
             CaptionSelectType,
             DescSelectType,
             OptionSelectType_Caption);
