@@ -1,4 +1,4 @@
-﻿codeunit 6150862 "NPR POS Action: Doc. Pay&Post" implements "NPR IPOS Workflow"
+codeunit 6150862 "NPR POS Action: Doc. Pay&Post" implements "NPR IPOS Workflow"
 {
     Access = Internal;
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
@@ -34,19 +34,25 @@
         WorkflowConfig.AddBooleanParameter('ConfirmInvDiscAmt', false, SalesDocImpMgt.GetConfirmInvDiscAmtLbl(), SalesDocImpMgt.GetConfirmInvDiscAmtDescLbl());
         WorkflowConfig.AddOptionParameter('AutoQtyToInvoice',
                                             AutoQtyOptionNamesLbl,
+#pragma warning disable AA0139
                                             SelectStr(1, AutoQtyOptionNamesLbl),
+# pragma warning restore
                                             CaptionAutoQtyToInvoice,
                                             DescAutoQtyToInvoice,
                                             AutoQtyOptionCptLbl);
         WorkflowConfig.AddOptionParameter('AutoQtyToShip',
                                             AutoQtyOptionNamesLbl,
+#pragma warning disable AA0139
                                             SelectStr(1, AutoQtyOptionNamesLbl),
+# pragma warning restore
                                             CaptionAutoQtyToShip,
                                             DescAutoQtyToShip,
                                             AutoQtyOptionCptLbl);
         WorkflowConfig.AddOptionParameter('AutoQtyToReceive',
                                             AutoQtyOptionNamesLbl,
+#pragma warning disable AA0139
                                             SelectStr(1, AutoQtyOptionNamesLbl),
+# pragma warning restore
                                             CaptionAutoQtyToReceive,
                                             DescAutoQtyToReceive,
                                             AutoQtyOptionCptLbl);
