@@ -264,7 +264,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
             exit;
         CostumerInput.Init();
         CostumerInput.Context := "NPR POS Costumer Input Context"::MONEY_BACK;
-        CostumerInput."Phone Number" := PhoneObj.AsValue().AsText();
+        CostumerInput."Phone Number" := CopyStr(PhoneObj.AsValue().AsText(), 1, 50);
         CostumerInput.Signature.CreateOutStream(signStream);
         CostumerInput."Date & Time" := CurrentDateTime();
         signStream.WriteText(SignObj.AsValue().AsText());
