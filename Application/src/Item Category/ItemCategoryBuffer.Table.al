@@ -159,7 +159,7 @@ table 6059807 "NPR Item Category Buffer"
             Caption = 'Calc Field 10';
             DataClassification = CustomerContent;
         }
-        field(270; "Salesperson Code"; Code[30])
+        field(270; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

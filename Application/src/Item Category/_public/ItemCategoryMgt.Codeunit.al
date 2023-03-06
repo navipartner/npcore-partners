@@ -787,7 +787,7 @@
         if ItemCategoryBuffer.FindSet() then
             repeat
                 ItemCategoryBuffer."Code with Indentation" := ItemCategoryBuffer.Code;
-                ItemCategoryBuffer."Code with Indentation" := ItemCategoryBuffer."Code with Indentation".PadLeft(StrLen(ItemCategoryBuffer."Code with Indentation") + ItemCategoryBuffer."Indentation" * NumberOfSpaces, ' ');
+                ItemCategoryBuffer."Code with Indentation" := CopyStr(ItemCategoryBuffer."Code with Indentation".PadLeft(StrLen(ItemCategoryBuffer."Code with Indentation") + ItemCategoryBuffer."Indentation" * NumberOfSpaces, ' '), 1, MaxStrLen(ItemCategoryBuffer."Code with Indentation"));
                 ItemCategoryBuffer.Modify();
             until ItemCategoryBuffer.Next() = 0;
     end;
