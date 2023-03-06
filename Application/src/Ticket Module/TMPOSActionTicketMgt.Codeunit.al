@@ -1,4 +1,4 @@
-﻿codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
+codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
@@ -11,7 +11,6 @@
         TicketTitle: Label '%1 - Ticket Management.';
         TicketQtyPrompt: Label 'Confirm new group ticket quantity (current quantity is %1)';
         ReferencePrompt: Label 'Enter Ticket Reference Number';
-        ActionDescription: Label 'This action handles ticket management functions.';
         NotAGroupTicket: Label 'Ticket %1 is not a group ticket.';
         QtyNotSettable: Label 'Quantity for ticket %1 can''t be changed.';
         Welcome: Label 'Welcome.';
@@ -34,6 +33,267 @@
         exit('1.1.7');
     end;
 
+    // WORKFLOW 3 START
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
+    var
+        FunctionOptionString: Text[250];
+        InputOptionString: Text;
+    begin
+        FunctionOptionString := 'Admission Count,Register Arrival,Revoke Reservation,Edit Reservation,' +
+            'Reconfirm Reservation,Edit Ticketholder,Change Confirmed Ticket Quantity,Pickup Ticket Reservation,' +
+            'Convert To Membership,Register Departure,Additional Experience';
+        InputOptionString := 'Standard,MPOS NFC Scan';
+        WorkflowConfig.AddActionDescription(ActionDescription());
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddOptionParameter('Function', FunctionOptionString, 'Register Arrival', 'Function', 'Function', FunctionOptionString);
+        WorkflowConfig.AddOptionParameter('InputMethod', InputOptionString, 'Standard', 'Input Method', 'Determines how to input the ticket number.', InputOptionString);
+        WorkflowConfig.AddTextParameter('Admission Code', '', 'Admission Code', 'Admission Code');
+        WorkflowConfig.AddTextParameter('DefaultTicketNumber', '', 'Default Ticket Number', 'Default Ticket Number');
+        WorkflowConfig.AddBooleanParameter('PrintTicketOnArrival', false, 'Print Ticket On Arrival', 'Print Ticket On Arrival');
+        WorkflowConfig.AddBooleanParameter('SuppressWelcomeMessage', false, 'Suppress Welcome Message', 'Suppress Welcome Message');
+        WorkflowConfig.AddLabel('TicketPrompt', TicketNumberPrompt);
+        WorkflowConfig.AddLabel('TicketQtyPrompt', TicketQtyPrompt);
+        WorkflowConfig.AddLabel('TicketTitle', TicketTitle);
+        WorkflowConfig.AddLabel('ReferencePrompt', ReferencePrompt);
+    end;
+
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    var
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        case Step of
+            'ConfigureWorkflow':
+                InitRequest(Context, SaleLine);
+            'RefineWorkflow':
+                begin
+                    RefineWorkflow(Context);
+                end;
+            'DoAction':
+                begin
+                    FrontEnd.GetSession(POSSession);
+                    DoWorkflowFunction(Context, POSSession, Setup.GetPOSUnitNo());
+                end;
+        end;
+    end;
+
+    local procedure InitRequest(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line")
+    var
+        Token: Text[100];
+        ShowTicketDialog: Boolean;
+        ShowTicketQtyDialog: Boolean;
+        ShowReferenceDialog: Boolean;
+        DefaultTicketNumber: Text;
+        FunctionId: Integer;
+        SaleLineRec: Record "NPR POS Sale Line";
+    begin
+        SaleLine.GetCurrentSaleLine(SaleLineRec);
+        ShowTicketDialog := false;
+        ShowTicketQtyDialog := false;
+        ShowReferenceDialog := false;
+        Context.GetString('DefaultTicketNumber', DefaultTicketNumber);
+        Context.GetInteger('FunctionId', FunctionId);
+        case FunctionId of
+            0:
+                ShowTicketDialog := false; // Admission Count
+            1:
+                ShowTicketDialog := true; // Register Arrival
+            2:
+                ShowTicketDialog := true; // Revoke Reservation
+            3:
+                ShowTicketDialog := not (GetRequestToken(SaleLineRec."Sales Ticket No.", SaleLineRec."Line No.", Token)); // Edit Reservation
+            4:
+                ShowTicketDialog := false; // Reconfirm Reservation
+            5:
+                ShowTicketDialog := not (GetRequestToken(SaleLineRec."Sales Ticket No.", SaleLineRec."Line No.", Token)); // Edit Ticketholder
+            6:
+                begin // Change Confirmed Ticket Quantity
+                    ShowTicketDialog := true;
+                    ShowTicketQtyDialog := true;
+                end;
+            7:
+                ShowReferenceDialog := true; // Pick-up Ticket Reservation
+            8:
+                ShowTicketDialog := true; // Convert To Membership
+            9:
+                ShowTicketDialog := true; // Register Departure
+            10:
+                ShowTicketDialog := true; // Register Additional Experience
+        end;
+        Context.SetContext('ShowTicketDialog', ShowTicketDialog and (DefaultTicketNumber = ''));
+        Context.SetContext('ShowTicketQtyDialog', ShowTicketQtyDialog);
+        Context.SetContext('ShowReferenceDialog', ShowReferenceDialog);
+    end;
+
+    local procedure RefineWorkflow(Context: Codeunit "NPR POS JSON Helper")
+    var
+        FunctionId: Integer;
+        AdmissionCode: Code[20];
+        ExternalTicketNumber: Code[30];
+        TicketMaxQty: Integer;
+        ShowQtyDialog: Boolean;
+        DefaultTicketNumber: Text;
+        ShowWelcomeMessage: Boolean;
+    begin
+        Context.GetInteger('FunctionId', FunctionId);
+        DefaultTicketNumber := Context.GetStringParameter('DefaultTicketNumber');
+        AdmissionCode := CopyStr(Context.GetStringParameter('Admission Code'), 1, MaxStrLen(AdmissionCode));
+
+        if (DefaultTicketNumber = '') then begin
+            ExternalTicketNumber := CopyStr(Context.GetString('TicketNumber'), 1, MaxStrLen(ExternalTicketNumber));
+        end else begin
+            ExternalTicketNumber := CopyStr(DefaultTicketNumber, 1, MaxStrLen(ExternalTicketNumber));
+            ShowWelcomeMessage := not (Context.GetBooleanParameter('SuppressWelcomeMessage'));
+            if (FunctionId = 1) then begin
+                Context.SetContext('Verbose', ShowWelcomeMessage);
+                Context.SetContext('VerboseMessage', Welcome);
+            end;
+        end;
+        TicketMaxQty := GetGroupTicketQuantity(Context, ExternalTicketNumber, AdmissionCode, FunctionId, ShowQtyDialog);
+        Context.SetContext('TicketMaxQty', TicketMaxQty);
+        Context.SetContext('ShowTicketQtyDialog', ShowQtyDialog);
+    end;
+
+    local procedure GetGroupTicketQuantity(Context: Codeunit "NPR POS JSON Helper"; ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]; FunctionId: Integer; var ShowQtyDialogOut: Boolean) TicketMaxQty: Integer
+    var
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        IsAdmitted: Boolean;
+    begin
+        Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
+        if (not Ticket.FindFirst()) then
+            Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
+
+        Ticket.TestField(Blocked, false);
+        TicketType.Get(Ticket."Ticket Type Code");
+
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        if (AdmissionCode <> '') then
+            TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+        TicketAccessEntry.FindFirst();
+
+        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        if (AdmissionCode = '') then begin
+            DetTicketAccessEntry.Reset();
+            DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        end;
+
+        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
+        IsAdmitted := DetTicketAccessEntry.FindFirst();
+
+        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+        DetTicketAccessEntry.FindFirst();
+        TicketMaxQty := DetTicketAccessEntry.Quantity;
+
+        ShowQtyDialogOut := ((not IsAdmitted) and (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP));
+        if (FunctionId = 2) then
+            ShowQtyDialogOut := false;
+
+        Context.SetContext('TicketQty', TicketAccessEntry.Quantity);
+        Context.SetContext('TicketMaxQty', TicketMaxQty);
+        Context.SetContext('ShowTicketQtyDialog', ShowQtyDialogOut);
+
+        exit(TicketMaxQty);
+    end;
+
+    local procedure DoWorkflowFunction(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; PosUnitNo: Code[10])
+    var
+        FunctionId: Integer;
+        DefaultTicketNumber: Text;
+        AdmissionCode: Code[20];
+        TicketReference: Text[30];
+        WithTicketPrint: Boolean;
+        ExternalTicketNumber: Code[50];
+        ShowWelcomeMessage: Boolean;
+    begin
+        Context.GetInteger('FunctionId', FunctionId);
+        DefaultTicketNumber := Context.GetStringParameter('DefaultTicketNumber');
+        AdmissionCode := CopyStr(Context.GetStringParameter('Admission Code'), 1, MaxStrLen(AdmissionCode));
+        TicketReference := CopyStr(Context.GetString('TicketReference'), 1, MaxStrLen(TicketReference));
+        WithTicketPrint := Context.GetBooleanParameter('PrintTicketOnArrival');
+        if (DefaultTicketNumber = '') then begin
+            ExternalTicketNumber := CopyStr(Context.GetString('TicketNumber'), 1, MaxStrLen(ExternalTicketNumber));
+        end else begin
+            ExternalTicketNumber := CopyStr(DefaultTicketNumber, 1, MaxStrLen(ExternalTicketNumber));
+            ShowWelcomeMessage := not (Context.GetBooleanParameter('SuppressWelcomeMessage'));
+            if (FunctionId = 1) then begin
+                Context.SetContext('Verbose', ShowWelcomeMessage);
+                Context.SetContext('VerboseMessage', Welcome);
+            end;
+        end;
+        case FunctionId of
+            0:
+                ShowQuickStatistics(AdmissionCode);
+            1:
+                begin
+                    if (SetGroupTicketConfirmedQuantity(Context, ExternalTicketNumber, AdmissionCode)) then
+                        RegisterArrival(ExternalTicketNumber, AdmissionCode, PosUnitNo, WithTicketPrint);
+                end;
+            2:
+                RevokeTicketReservation(POSSession, ExternalTicketNumber);
+            3:
+                EditReservation(POSSession, ExternalTicketNumber);
+            4:
+                ReconfirmReservation(POSSession);
+            5:
+                EditTicketHolder(POSSession, ExternalTicketNumber);
+            6:
+                SetGroupTicketConfirmedQuantity(Context, ExternalTicketNumber, '');
+            7:
+                PickupPreConfirmedTicket(POSSession, TicketReference);
+            8:
+                Error('WF20 support for EAN box is not completed yet.'); //ConvertToMembership (POSSession, Context, FrontEnd, ExternalTicketNumber, AdmissionCode);
+            9:
+                RegisterDeparture(ExternalTicketNumber, AdmissionCode);
+            10:
+                AddAdditionalExperience(POSSession, ExternalTicketNumber);
+            else
+                Error('Function with ID %1 is not implemented.', FunctionId);
+        end;
+    end;
+
+    local procedure SetGroupTicketConfirmedQuantity(Context: Codeunit "NPR POS JSON Helper"; ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]): Boolean
+    var
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        Ticket: Record "NPR TM Ticket";
+        ResponseMessage: Text;
+        NewTicketQty: Integer;
+        QtyChanged: Boolean;
+    begin
+        Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
+        if (not Ticket.FindFirst()) then
+            Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
+
+        Ticket.TestField(Blocked, false);
+        Context.GetInteger('TicketQuantity', NewTicketQty);
+        if (NewTicketQty <= 0) then
+            exit(true); // Accept current quantity on ticket. 
+
+        QtyChanged := TicketManagement.AttemptChangeConfirmedTicketQuantity(Ticket."No.", AdmissionCode, NewTicketQty, ResponseMessage);
+
+        Context.SetContext('Verbose', (not QtyChanged));
+        if (not QtyChanged) then
+            Context.SetContext('VerboseMessage', ResponseMessage);
+
+        exit(QtyChanged);
+    end;
+
+    local procedure ActionDescription(): Text
+    begin
+        exit('This action handles ticket management functions.');
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:TMPOSActionTicketMgt.Codeunit.js### 
+'let main=async({workflow:r,context:t,popup:i,parameters:o,captions:n})=>{var f=["Admission Count","Register Arrival","Revoke Reservation","Edit Reservation","Reconfirm Reservation","Edit Ticketholder","Change Confirmed Ticket Quantity","Pickup Ticket Reservation","Convert To Membership","Register Departure","Additional Experience"],T=["Standard","MPOS NFC Scan"];let l=Number(o.Function),k=Number(o.InputMethod),s=T[k],e={};windowTitle=n.TicketTitle.substitute(f[l].toString()),e.FunctionId=l,e.DefaultTicketNumber=o.DefaultTicketNumber,await r.respond("ConfigureWorkflow",e);let u;if(t.ShowTicketDialog){if(s==="Standard")u=await i.input({caption:n.TicketPrompt,title:windowTitle});else if(s==="MPOS NFC Scan"){var a=await r.run("MPOS_API",{context:{IsFromWorkflow:!0,FunctionName:"NFC_SCAN",Parameters:{}}});if(!a.IsSuccessful){i.error(a.ErrorMessage,"mPOS NFC Error");return}if(!a.Result.ID)return;u=a.Result.ID}}e.TicketNumber=u,await r.respond("RefineWorkflow",e);let d;if(t.ShowTicketQtyDialog&&(ticketQty=await i.numpad({caption:n.TicketQtyPrompt.substitute(t.TicketMaxQty),title:windowTitle}),!d))return;let c;t.ShowReferenceDialog&&(c=await i.input({caption:n.ReferencePrompt,title:windowTitle}),!c)||(e.TicketQuantity=d,e.TicketReference=c,await r.respond("DoAction",e),t.Verbose&&await i.message({caption:t.VerboseMessage,title:windowTitle}))};'
+        )
+    end;
+    //WORKFLOW 3 END
+
+
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
     var
@@ -46,7 +306,7 @@
     begin
         if Sender.DiscoverAction(
           ActionCode(''),
-          ActionDescription,
+          ActionDescription(),
           ActionVersion(),
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Multiple)
@@ -83,7 +343,7 @@
 
         if (Sender.DiscoverAction20(
           ActionCode('2'),
-          ActionDescription,
+          ActionDescription(),
           ActionVersion()))
         then begin
             FunctionOptionString := 'Admission Count,' +
