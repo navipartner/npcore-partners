@@ -669,6 +669,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'CHANGE_RESP_CENTER', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAct:Change Resp. Center";
     }
+    value(136; MM_MEMBER_ARRIVAL)
+    {
+        Caption = 'MM_MEMBER_ARRIVAL', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR MM POS Action: Member Arr.";
+    }
     value(133; RV_SELECT_TABLE)
     {
         Caption = 'RV_SELECT_TABLE', Locked = true, MaxLength = 20;
