@@ -11,24 +11,15 @@
             part(Headline; "NPR generic retail Headline")
             {
                 ApplicationArea = NPRRetail;
-
             }
             part(Control6150616; "NPR Activities")
             {
                 ApplicationArea = NPRRetail;
-
             }
             part(NPRetailPOSEntryCue; "NPR POS Entry Cue")
             {
                 Caption = 'POS Activities';
                 ApplicationArea = NPRRetail;
-
-            }
-            part(ControlPurchase; "NPR Acc. Payables Act")
-            {
-                Caption = 'Purchase Activities';
-                ApplicationArea = NPRRetail;
-
             }
             part(RetailSalesChart; "NPR Retail Sales Chart")
             {
