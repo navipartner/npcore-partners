@@ -270,7 +270,7 @@
                     until NpCsSaleLinePOSRef.Next() = 0;
                 end;
 
-                OnPOSSaleLine2Xml(SaleLinePOS, Element);
+                OnPOSSaleLine2Xml(SaleLinePOS, Element2);
             until SaleLinePOS.Next() = 0;
         end;
     end;
@@ -747,7 +747,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPOSSaleLine2Xml(SaleLinePOS: Record "NPR POS Sale Line"; XmlElement: XmlElement)
+    local procedure OnPOSSaleLine2Xml(SaleLinePOS: Record "NPR POS Sale Line"; var XmlElement: XmlElement)
     begin
     end;
 

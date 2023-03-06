@@ -578,7 +578,7 @@
         end;
     end;
 
-    local procedure NewTicketSales(SaleLinePOS: Record "NPR POS Sale Line"): Integer
+    internal procedure NewTicketSales(SaleLinePOS: Record "NPR POS Sale Line"): Integer
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";

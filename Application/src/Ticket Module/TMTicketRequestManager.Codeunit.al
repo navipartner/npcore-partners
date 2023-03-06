@@ -1229,6 +1229,12 @@
 
         end else begin
             ReservationRequest."External Adm. Sch. Entry No." := ExternalAdmissionScheduleEntryNo;
+            if (ReservationRequest."Scheduled Time Description" = '') then begin
+                AdmSchEntry.SetFilter("External Schedule Entry No.", '=%1', ExternalAdmissionScheduleEntryNo);
+                AdmSchEntry.SetFilter(Cancelled, '=%1', false);
+                if (AdmSchEntry.FindLast()) then
+                    ReservationRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmSchEntry."Admission Start Date", AdmSchEntry."Admission Start Time");
+            end;
         end;
 
         ReservationRequest."Created Date Time" := CurrentDateTime();
