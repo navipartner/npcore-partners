@@ -25,7 +25,7 @@ You can now change the selected [responsibility center](https://learn.microsoft.
 
 For more information and operating instructions, refer to the article on [Changing the Responsibility Center from a POS sale](retail/posunit/howto/change_responsibility_center.md).
 
-### Email ticket action
+### Sending email receipts from the POS
 
 You can now send emails with purchase receipts to customers from the POS. This can be done with the new **SEND_RECEIPT** POS action that can be added to the POS menu as a button. 
 
