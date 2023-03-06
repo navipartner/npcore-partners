@@ -1,65 +1,59 @@
-﻿codeunit 6060140 "NPR MM POS Action: Member Arr."
+﻿codeunit 6060140 "NPR MM POS Action: Member Arr." implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This action handles member arrival functions.';
+        ParamDialogPrompt_CptLbl: Label 'Dialog Prompt';
+        ParamDialogPrompt_DescLbl: Label 'Specifies the type of Dialog Prompt';
+        ParamDialogPrompt_OptLbl: Label 'Member Number,Member Card Number,Membership Number,Facial Recognition,No Prompt', Locked = true;
+        ParamDialogPrompt_OptCptLbl: Label 'Member Number,Member Card Number,Membership Number,Facial Recognition,No Prompt';
+        ParamPOSWorkflow_CptLbl: Label 'POS Workflow';
+        ParamPOSWorkflow_DescLbl: Label 'Specifies the POS Workflow';
+        ParamPOSWorkflow_OptLbl: Label 'POSSales,Automatic,With Guests', Locked = true;
+        ParamPOSWorkflow_OptCptLbl: Label 'POSSales,Automatic,With Guests';
+        ParamAdmissionCode_CptLbl: Label 'Admission Code';
+        ParamAdmissionCode_DescLbl: Label 'Specifies the Admission Code';
+        ParamDefaultinputValue_CptLbl: Label 'Default Input Value';
+        ParamDefaultinputValue_DescLbl: Label 'Specifies the Default Input Value';
+        ParamSuppressWelcomeMessage_CptLbl: Label 'Suppress Welcome Message';
+        ParamSuppressWelcomeMessage_DescLbl: Label 'Specifies if welcome message will be shown';
         MemberCardPrompt: Label 'Enter Member Card Number';
-        MemberNumberPrompt: Label 'Enter Member Number';
-        MembershipNumberPrompt: Label 'Enter Membership Number';
         MembershipTitle: Label 'Member Arrival - Membership Management.';
-        DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
-        POSWorkflowMethod: Option POS,Automatic,GuestCheckin;
-        MEMBER_REQUIRED: Label 'Member identification must be specified.';
-
-    local procedure ActionCode(): Code[20]
     begin
-        exit('MM_MEMBER_ARRIVAL');
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        // NOTE: Dont forget to update the EAN box parameter setup in OnInitEanBoxParameters()
+        WorkflowConfig.AddOptionParameter('DialogPrompt',
+                                        ParamDialogPrompt_OptLbl,
+                                        SelectStr(2, ParamDialogPrompt_OptLbl),
+                                        ParamDialogPrompt_CptLbl,
+                                        ParamDialogPrompt_DescLbl,
+                                        ParamDialogPrompt_OptCptLbl);
+        WorkflowConfig.AddOptionParameter('POSWorkflow',
+                                ParamPOSWorkflow_OptLbl,
+                                SelectStr(1, ParamPOSWorkflow_OptLbl),
+                                ParamPOSWorkflow_CptLbl,
+                                ParamPOSWorkflow_DescLbl,
+                                ParamPOSWorkflow_OptCptLbl);
+        WorkflowConfig.AddTextParameter('AdmissionCode', '', ParamAdmissionCode_CptLbl, ParamAdmissionCode_DescLbl);
+        WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDefaultinputValue_CptLbl, ParamDefaultinputValue_DescLbl);
+        WorkflowConfig.AddBooleanParameter('SuppressWelcomeMessage', false, ParamSuppressWelcomeMessage_CptLbl, ParamSuppressWelcomeMessage_DescLbl);
+        WorkflowConfig.AddLabel('MemberCardPrompt', MemberCardPrompt);
+        WorkflowConfig.AddLabel('MembershipTitle', MembershipTitle);
     end;
 
-    local procedure ActionVersion(): Text[30]
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     begin
-        exit('1.22');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-          ActionCode(),
-          ActionDescription,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-
-            Sender.RegisterWorkflowStep('membercard_number', '(param.DefaultInputValue.length == 0 && param.DialogPrompt == 1) && input ({caption: labels.MemberCardPrompt, title: labels.MembershipTitle, value: param.DefaultInputValue}).cancel(abort);');
-
-            Sender.RegisterWorkflowStep('9', 'respond ();');
-            Sender.RegisterWorkflow(false);
-
-            // NOTE: Dont forget to update the EAN box parameter setup in OnInitEanBoxParameters()
-            Sender.RegisterOptionParameter('DialogPrompt', 'Member Number,Member Card Number,Membership Number,Facial Recognition,No Prompt', 'Member Card Number');
-            Sender.RegisterOptionParameter('POSWorkflow', 'POSSales,Automatic,With Guests', 'POSSales');
-            Sender.RegisterTextParameter('AdmissionCode', '');
-            Sender.RegisterTextParameter('DefaultInputValue', '');
-            Sender.RegisterBooleanParameter('SuppressWelcomeMessage', false);
+        case Step of
+            'MemberArrival':
+                SetMemberArrival(Context, Setup);
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-        Captions.AddActionCaption(ActionCode(), 'MemberCardPrompt', MemberCardPrompt);
-        Captions.AddActionCaption(ActionCode(), 'MemberNumberPrompt', MemberNumberPrompt);
-        Captions.AddActionCaption(ActionCode(), 'MembershipNumberPrompt', MembershipNumberPrompt);
-        Captions.AddActionCaption(ActionCode(), 'MembershipTitle', MembershipTitle);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure SetMemberArrival(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup")
     var
-        JSON: Codeunit "NPR POS JSON Management";
         MemberCardNumber: Text[100];
         DialogPrompt: Integer;
         DialogMethodType: Option;
@@ -67,15 +61,14 @@
         AdmissionCode: Code[20];
         DefaultInputValue: Text;
         ShowWelcomeMessage: Boolean;
+        POSActionMemberArrival: Codeunit "NPR MM POS Action: Member ArrB";
+        DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
+        POSWorkflowMethod: Option POS,Automatic,GuestCheckin;
     begin
+        ShowWelcomeMessage := not (Context.GetBooleanParameter('SuppressWelcomeMessage'));
+        DefaultInputValue := Context.GetStringParameter('DefaultInputValue');
+        DialogPrompt := Context.GetIntegerParameter('DialogPrompt');
 
-        if (not Action.IsThisAction(ActionCode())) then
-            exit;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        ShowWelcomeMessage := not (JSON.GetBooleanParameter('SuppressWelcomeMessage'));
-        DefaultInputValue := JSON.GetStringParameterOrFail('DefaultInputValue', ActionCode());
-        DialogPrompt := JSON.GetIntegerParameterOrFail('DialogPrompt', ActionCode());
         if (DialogPrompt < 0) then
             DialogPrompt := 1;
 
@@ -87,7 +80,7 @@
             1:
                 begin
                     DialogMethodType := DialogMethod::NO_PROMPT;
-                    MemberCardNumber := CopyStr(GetInput(JSON, 'membercard_number'), 1, MaxStrLen(MemberCardNumber));
+                    MemberCardNumber := CopyStr(Context.GetString('membercard_number'), 1, MaxStrLen(MemberCardNumber));
                 end;
             2:
                 MemberCardNumber := '';
@@ -100,107 +93,13 @@
                 Error('POS Action: Dialog Prompt with ID %1 is not implemented.', DialogPrompt);
         end;
 
-        POSWorkflowType := JSON.GetIntegerParameter('POSWorkflow');
+        POSWorkflowType := Context.GetIntegerParameter('POSWorkflow');
         if (POSWorkflowType < 0) then
             POSWorkflowType := POSWorkflowMethod::POS;
 
-        AdmissionCode := CopyStr(JSON.GetStringParameter('AdmissionCode'), 1, MaxStrLen(AdmissionCode));
+        AdmissionCode := CopyStr(Context.GetStringParameter('AdmissionCode'), 1, MaxStrLen(AdmissionCode));
 
-        if (DefaultInputValue <> '') then
-            MemberCardNumber := CopyStr(DefaultInputValue, 1, MaxStrLen(MemberCardNumber));
-
-        if (WorkflowStep = '9') then
-            MemberArrival(POSSession, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, ShowWelcomeMessage);
-
-        Handled := true;
-    end;
-
-    local procedure MemberArrival(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; POSWorkflowType: Option; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ShowWelcomeMessage: Boolean)
-    var
-        //Member: Record "NPR MM Member";
-        MemberCard: Record "NPR MM Member Card";
-        Membership: Record "NPR MM Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        ThisShouldBeEmpty_SaleLinePOS: Record "NPR POS Sale Line";
-        ExternalTicketNo: Text[30];
-        MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
-        POSActionMemberManagement: Codeunit "NPR MM POS Action: MemberMgmt.";
-        MembershipEvents: Codeunit "NPR MM Membership Events";
-        PosSetup: Codeunit "NPR POS Setup";
-        ExternalItemNo: Code[50];
-        LogEntryNo: Integer;
-        ResponseCode: Integer;
-        ResponseMessage: Text;
-        Token: Text[100];
-    begin
-
-        if (InputMethod = DialogMethod::NO_PROMPT) and (ExternalMemberCardNo = '') then
-            if (not SelectMemberCardUI(ExternalMemberCardNo)) then
-                Error(MEMBER_REQUIRED);
-
-        POSSession.GetSetup(PosSetup);
-
-        case POSWorkflowType of
-            POSWorkflowMethod::POS:
-                POSActionMemberManagement.MemberArrival(POSSession, InputMethod, ExternalMemberCardNo, '');
-            POSWorkflowMethod::Automatic,
-            POSWorkflowMethod::GuestCheckin:
-                begin
-                    LogEntryNo := MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, 'POS', LogEntryNo, ResponseMessage, ResponseCode);
-                    Commit();
-
-                    MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, true, ExternalMemberCardNo);
-                    MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, 'POS', LogEntryNo, ResponseMessage, ResponseCode);
-                    Commit();
-
-                    if (ResponseCode <> 0) then
-                        Error(ResponseMessage);
-
-                    MemberCard.Get(MembershipManagement.GetCardEntryNoFromExtCardNo(ExternalMemberCardNo));
-                    Membership.Get(MemberCard."Membership Entry No.");
-                    MembershipSetup.Get(Membership."Membership Code");
-
-                    MembershipEvents.OnBeforePOSMemberArrival(ThisShouldBeEmpty_SaleLinePOS, MembershipSetup."Community Code", MembershipSetup.Code, MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MemberCard."Entry No.", ExternalMemberCardNo);
-
-                    ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemForMembership(MemberCard."Membership Entry No.");
-
-                    if (POSWorkflowType = POSWorkflowMethod::Automatic) then
-                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ExternalItemNo, AdmissionCode, POSSetup.GetPOSUnitNo(), 1, '', ExternalTicketNo, ShowWelcomeMessage);
-
-                    if (POSWorkflowType = POSWorkflowMethod::GuestCheckin) then begin
-                        MemberTicketManager.PromptForMemberGuestArrival(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, POSSetup.GetPOSUnitNo(), Token);
-                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ExternalItemNo, AdmissionCode, POSSetup.GetPOSUnitNo(), 1, Token, ExternalTicketNo, ShowWelcomeMessage);
-                    end;
-
-                    MemberLimitationMgr.UpdateLogEntry(LogEntryNo, 0, ExternalTicketNo);
-                    Commit();
-
-                end;
-        end;
-    end;
-
-    local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
-    begin
-        JSON.SetScopeRoot();
-        if (not JSON.SetScope('$' + Path)) then
-            exit('');
-
-        exit(JSON.GetString('input'));
-    end;
-
-    local procedure SelectMemberCardUI(var ExtMemberCardNo: Text[100]): Boolean
-    var
-        MemberCard: Record "NPR MM Member Card";
-    begin
-
-        if (ACTION::LookupOK <> PAGE.RunModal(0, MemberCard)) then
-            exit(false);
-
-        ExtMemberCardNo := MemberCard."External Card No.";
-        exit(ExtMemberCardNo <> '');
+        POSActionMemberArrival.SetMemberArrival(ShowWelcomeMessage, DefaultInputValue, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, Setup);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
@@ -213,15 +112,12 @@
             EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeExtMemberCardNo();
             EanBoxEvent."Module Name" := 'Membership Management';
-
             EanBoxEvent.Description := CopyStr(MMMemberCard.FieldCaption("External Card No."), 1, MaxStrLen(EanBoxEvent.Description));
-
             EanBoxEvent."Action Code" := ActionCode();
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
@@ -236,7 +132,6 @@
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'Function', false, 'Member Arrival');
                 end;
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
@@ -253,20 +148,28 @@
         MMMemberCard.SetRange("External Card No.", UpperCase(EanBoxValue));
         if not MMMemberCard.IsEmpty() then
             InScope := true;
-
     end;
 
     local procedure EventCodeExtMemberCardNo(): Code[20]
     begin
-
         exit('MEMBER_ARRIVAL');
-
     end;
 
     local procedure CurrCodeunitId(): Integer
     begin
-
         exit(CODEUNIT::"NPR MM POS Action: Member Arr.");
+    end;
 
+    procedure ActionCode(): Text
+    begin
+        exit(Format(Enum::"NPR POS Workflow"::MM_MEMBER_ARRIVAL));
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+        //###NPR_INJECT_FROM_FILE:MMPOSActionMemberArr.js###
+'let main=async({workflow:l,popup:r,captions:t,parameters:e})=>{if(e.DefaultInputValue.length==0&&e.DialogPrompt==1){let a=await r.input({caption:t.MemberCardPrompt,title:t.MembershipTitle,value:e.DefaultInputValue});if(a===null)return" ";await l.respond("MemberArrival",{membercard_number:a})}else await l.respond("MemberArrival")};'
+        );
     end;
 }
