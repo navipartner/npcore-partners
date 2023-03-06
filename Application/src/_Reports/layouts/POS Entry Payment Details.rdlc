@@ -7,7 +7,6 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>e1f3b6ce-e892-4a41-a89c-3a02be773711</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -22,10 +21,10 @@
                   <Width>2.1503cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.79365cm</Width>
+                  <Width>1.94683cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.81062cm</Width>
+                  <Width>2.21446cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>2.16478cm</Width>
@@ -34,13 +33,13 @@
                   <Width>2.43322cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>2.19689cm</Width>
+                  <Width>1.93884cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>3.07003cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>3.28168cm</Width>
+                  <Width>3.05887cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -942,7 +941,7 @@
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
             <Height>0.67372in</Height>
-            <Width>18.90118cm</Width>
+            <Width>18.97733cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -953,7 +952,7 @@
         <Height>1.79917cm</Height>
         <Style />
       </Body>
-      <Width>18.99999cm</Width>
+      <Width>18.97733cm</Width>
       <Page>
         <PageHeader>
           <Height>2.87558cm</Height>
