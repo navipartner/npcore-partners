@@ -15,10 +15,23 @@ codeunit 61000 "NPRPTE Integration Test Reset"
         POSEntryOutputLog: Record "NPR POS Entry Output Log";
         POSAuditLog: Record "NPR POS Audit Log";
         EnvironmentInfo: Codeunit "Environment Information";
+        TMTicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        TMTicket: Record "NPR TM Ticket";
+        TMDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TMTicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        TMTicketNotifEntry: Record "NPR TM Ticket Notif. Entry";
+        MMMember: Record "NPR MM Member";
+        MMMemberCard: Record "NPR MM Member Card";
+        MMMembershipEntry: Record "NPR MM Membership Entry";
+        MMMembersPointsEntry: Record "NPR MM Members. Points Entry";
+        MMSponsorsTicketEntry: Record "NPR MM Sponsors. Ticket Entry";
+        MMMemberInfoCapture: Record "NPR MM Member Info Capture";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpDcCoupon: Record "NPR NpDc Coupon";
+        ExchangeLabel: Record "NPR Exchange Label";
+        POSRMALine: Record "NPR POS RMA Line";
     begin
         if not EnvironmentInfo.IsSandbox() then
-            exit;
-        if not (CurrentClientType in [ClientType::Api, ClientType::OData, ClientType::ODataV4, ClientType::SOAP]) then
             exit;
 
         POSEntry.DeleteAll();
@@ -33,7 +46,28 @@ codeunit 61000 "NPRPTE Integration Test Reset"
         POSEntryOutputLog.DeleteAll();
         POSAuditLog.DeleteAll();
 
+        NpRvVoucher.DeleteAll();
+        NpDcCoupon.DeleteAll();
+        ExchangeLabel.DeleteAll();
+        POSRMALine.DeleteAll();
+
+        TMTicket.DeleteAll();
+        TMDetTicketAccessEntry.DeleteAll();
+        TMTicketReservationReq.DeleteAll();
+        TMTicketNotifEntry.DeleteAll();
+        TMTicketAccessEntry.DeleteAll();
+
+        MMMember.DeleteAll();
+        MMMemberCard.DeleteAll();
+        MMMembershipEntry.DeleteAll();
+        MMMembersPointsEntry.DeleteAll();
+        MMSponsorsTicketEntry.DeleteAll();
+        MMMemberInfoCapture.DeleteAll();
+
         POSUnit.ModifyAll(Status, POSUnit.Status::OPEN);
+
+        if GuiAllowed then
+            Message('State reset');
     end;
 
 
