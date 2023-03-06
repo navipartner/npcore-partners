@@ -78,3 +78,9 @@
     href: howto/take_photo_pos.md
   - name: Limit payment types to specific items
     href: howto/belgian_vouchers.md
+  - name: Change Responsibility Center from the POS sale
+    href: howto/change_responsibility_center.md
+  - name: Change a bin from the POS sale
+    href: howto/change_bin_pos.md
+  - name: Send an e-mail receipt from the POS
+    href: howto/send_receipt_pos.md

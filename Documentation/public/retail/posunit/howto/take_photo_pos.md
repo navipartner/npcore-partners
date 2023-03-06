@@ -7,7 +7,7 @@ The **Take Photo** feature can be enabled on POS units, and give an option to ca
 - Add the **Take Photo** [button to the POS menu](add_button_to_pos_menu.md) you want it to be displayed in.       
   The action you need to attach to the button is **TAKE_PHOTO**.
 
-### Procedure
+## Procedure
 
 1. Click **POS** in the Role Center's ribbon, followed by **Open POS**.     
    The POS login screen is displayed.
