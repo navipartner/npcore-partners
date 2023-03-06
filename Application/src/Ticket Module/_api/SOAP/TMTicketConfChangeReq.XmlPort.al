@@ -182,18 +182,36 @@ xmlport 6060108 "NPR TM Ticket Conf. Change Req"
                                         XmlName = 'external_id';
                                         Occurrence = Optional;
                                     }
-                                    textattribute(StartDateTime)
+                                    textattribute(UTCstart)
                                     {
                                         XmlName = 'start';
                                         Occurrence = Optional;
                                     }
-
-                                    textattribute(UntilDateTime)
+                                    textattribute(LocalStartDate)
+                                    {
+                                        XmlName = 'start_date';
+                                        Occurrence = Optional;
+                                    }
+                                    textattribute(LocalStartTime)
+                                    {
+                                        XmlName = 'start_time';
+                                        Occurrence = Optional;
+                                    }
+                                    textattribute(UTCfinish)
                                     {
                                         XmlName = 'finish';
                                         Occurrence = Optional;
                                     }
-
+                                    textattribute(LocalEndDate)
+                                    {
+                                        XmlName = 'end_date';
+                                        Occurrence = Optional;
+                                    }
+                                    textattribute(LocalEndTime)
+                                    {
+                                        XmlName = 'end_time';
+                                        Occurrence = Optional;
+                                    }
                                     trigger OnPreXmlItem()
                                     begin
                                         Reservation.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
@@ -204,15 +222,20 @@ xmlport 6060108 "NPR TM Ticket Conf. Change Req"
                                     var
                                         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
                                     begin
-                                        StartDateTime := '';
-                                        UntilDateTime := '';
+                                        UTCstart := Format(CreateDateTime(0D, 0T), 0, 9);
+                                        UTCfinish := Format(CreateDateTime(0D, 0T), 0, 9);
                                         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', Reservation."External Adm. Sch. Entry No.");
                                         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-                                        if (AdmissionScheduleEntry.FindLast()) then begin
-                                            StartDateTime := Format(CreateDatetime(AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time"), 0, 9);
-                                            UntilDateTime := Format(CreateDatetime(AdmissionScheduleEntry."Admission End Date", AdmissionScheduleEntry."Admission End Time"), 0, 9);
-                                        end;
 
+                                        if (AdmissionScheduleEntry.FindFirst()) then begin
+                                            LocalStartDate := Format(AdmissionScheduleEntry."Admission Start Date", 0, 9);
+                                            LocalStartTime := Format(AdmissionScheduleEntry."Admission Start Time", 0, 9);
+                                            LocalEndDate := Format(AdmissionScheduleEntry."Admission End Date", 0, 9);
+                                            LocalEndTime := Format(AdmissionScheduleEntry."Admission End Time", 0, 9);
+
+                                            UTCstart := Format(CreateDateTime(AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time"), 0, 9);
+                                            UTCfinish := Format(CreateDateTime(AdmissionScheduleEntry."Admission End Date", AdmissionScheduleEntry."Admission End Time"), 0, 9);
+                                        end;
                                     end;
                                 }
 
