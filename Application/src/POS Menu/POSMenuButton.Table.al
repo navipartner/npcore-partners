@@ -1127,7 +1127,7 @@
 
         foreach String in ColorList do begin
             TempRetailList.Number += 1;
-            TempRetailList.Choice := String;
+            TempRetailList.Choice := CopyStr(String, 1, MaxStrLen(TempRetailList.Choice));
             TempRetailList.Insert();
         end;
 
