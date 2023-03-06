@@ -554,12 +554,6 @@
                         ToolTip = 'Specifies the value of the Only with Sales field';
                         ApplicationArea = NPRRetail;
                     }
-                    field("vis varer"; visvarer)
-                    {
-                        Caption = 'Show Items';
-                        ToolTip = 'Specifies the value of the Print Items field';
-                        ApplicationArea = NPRRetail;
-                    }
                     field("last Year"; lastYear)
                     {
                         Caption = 'Show Last Year';
@@ -819,7 +813,6 @@
         lastYear: Boolean;
         LastYearShow: Boolean;
         LastYearShowFooter: Boolean;
-        visvarer: Boolean;
         antalfjor: array[5] of Decimal;
         db: Decimal;
         dbVare: array[5] of Decimal;
