@@ -2,6 +2,35 @@
 
 Learn which new features and improvements have been introduced in the newest versions of the NP Retail solution:
 
+## Version 19.0 (March 7th 2023)
+
+### Limiting payment types to specific items
+
+You can now create payment methods that are used on the POS for purchasing only the items or item categories you single out during its creation. This option is especially useful when you wish to establish vouchers as viable types of payment for specific items only.
+
+For more information and operating instructions, refer to the following articles:
+
+- [Meal, eco, and consumption vouchers](retail/posunit/explanation/belgian_voucher.md)
+- [Limit payment types to specific items](retail/posunit/howto/belgian_vouchers.md)
+
+### Bin change from the POS
+
+With the new release, if there are multiple bins in a single store location, you can choose which bin the item is taken from during the POS sale. This is done with the new **CHANGE_BIN** POS action that can be added to the POS menu as a button.
+
+For more information and operating instructions, refer to the article on [Changing the bin from a POS sale](retail/posunit/howto/change_bin_pos.md).
+
+### Responsibility center change from the POS
+
+You can now change the selected [responsibility center](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-responsibility-centers) from an open POS sale. When changing the responsibility center, the dimensions in the POS sale change to the dimensions of the newly selected responsibility center. This is done with the new **CHANGE_RESP_CENTER** POS action that can be added to the POS menu as a button. 
+
+For more information and operating instructions, refer to the article on [Changing the Responsibility Center from a POS sale](retail/posunit/howto/change_responsibility_center.md).
+
+### Email ticket action
+
+You can now send emails with purchase receipts to customers from the POS. This can be done with the new **SEND_RECEIPT** POS action that can be added to the POS menu as a button. 
+
+For more information and operating instructions, refer to the article on [Sending receipt to customers on purchase](retail/posunit/howto/send_receipt_pos.md).
+
 ## Version 18.0 (January 28th 2023)
 
 ### Take a photo (from the POS)
