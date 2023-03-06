@@ -21,12 +21,10 @@ codeunit 85119 "NPR POS Act.CreateMember Tests"
         MembershipSalesSetupItemNumber: Code[20];
         POSActCreateMemberB: Codeunit "NPR POS Action Create Member B";
         SalePOS: Record "NPR POS Sale";
-        CreateDemoData: Codeunit "NPR MM Member Create Demo Data";
     begin
         //[GIVEN] given
         LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
-        //CreateDemoData.CreateDemoData(false);
         CreateSetup();
         //[WHEN] when
         POSActCreateMemberB.CreateMembershipWrapper(POSSale, MembershipSalesSetupItemNumber);
@@ -42,7 +40,6 @@ codeunit 85119 "NPR POS Act.CreateMember Tests"
     var
         MMSalesSetup: Record "NPR MM Members. Sales Setup";
     begin
-        //MMSalesSetup.FindFirst();
         MMSalesSetup.Get(MMSalesSetup.Type::ITEM, '320100');
         SelectMembershipPage.SetRecord(MMSalesSetup);
         ActionResponse := Action::LookupOK;
@@ -66,7 +63,7 @@ codeunit 85119 "NPR POS Act.CreateMember Tests"
         ItemNo := MemberLibrary.CreateScenario_SmokeTest()
     end;
 
-    local procedure CreateSetup()
+    procedure CreateSetup()
     var
         Item: Record Item;
         MembershipSetup: Record "NPR MM Membership Setup";
