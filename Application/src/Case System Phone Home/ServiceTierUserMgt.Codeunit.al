@@ -173,7 +173,7 @@
     begin
         OnShouldCheckIsUsingRegularInvoicing(CheckIsUsingRegularInvoicing);
         if CheckIsUsingRegularInvoicing then begin
-            IsUsingRegularInvoicing(UsingRegularInvoicing, WebServiceCallSucceeded, IsSaas);
+            IsUsingRegularInvoicing(UsingRegularInvoicing, WebServiceCallSucceeded, IsSaas, AzureAdTenantId);
             if not WebServiceCallSucceeded then
                 exit;
 
@@ -187,13 +187,12 @@
         UpdateUserLockedMessage(IsSaas, AzureAdTenantId, UserLoginType);
     end;
 
-    local procedure IsUsingRegularInvoicing(var UsingRegularInvoicing: Boolean; var WebServiceCallSucceeded: Boolean; IsSaas: Boolean)
+    local procedure IsUsingRegularInvoicing(var UsingRegularInvoicing: Boolean; var WebServiceCallSucceeded: Boolean; IsSaas: Boolean; AzureAdTenantId: Text)
     var
         UseRegularInvoicing: Text;
-        AzureADTenant: Codeunit "Azure AD Tenant";
     begin
         if IsSaas then begin
-            if not TryInitAndSendRequestFromSaasEnvironment('GetSaasTenantUseRegularInvoicing', AzureADTenant.GetAadTenantId(), UseRegularInvoicing) then
+            if not TryInitAndSendRequestFromSaasEnvironment('GetSaasTenantUseRegularInvoicing', AzureAdTenantId, UseRegularInvoicing) then
                 exit;
         end else begin
             if not TryInitAndSendRequest('GetTenantUseRegularInvoicing', '', '', TenantId(), UseRegularInvoicing) then

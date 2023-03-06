@@ -20,16 +20,26 @@ codeunit 6059815 "NPR Stripe Notification Mgt."
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Stripe Check Subs. Status", 'OnSubscriptionCanceled', '', false, false)]
     local procedure HandleOnSubscriptionCanceled(ThrowSubscriptionIsNotValidErr: Boolean)
+    var
+        POSSession: Codeunit "NPR POS Session";
     begin
-        ErrorIfThrowSubscriptionCanceled(ThrowSubscriptionIsNotValidErr);
-        CreateAndSendSubscriptionCanceledNotification();
+        if ThrowSubscriptionIsNotValidErr then begin
+            if not TryErrorSubscriptionCanceled() then
+                POSSession.SetErrorOnInitialize(true);
+        end else
+            CreateAndSendSubscriptionCanceledNotification();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Stripe Check Subs. Status", 'OnSubscriptionUnpaid', '', false, false)]
     local procedure HandleOnSubscriptionUnpaid(ThrowSubscriptionIsNotValidErr: Boolean)
+    var
+        POSSession: Codeunit "NPR POS Session";
     begin
-        ErrorIfThrowSubscriptionUnpaid(ThrowSubscriptionIsNotValidErr);
-        CreateAndSendSubscriptionUnpaidNotification();
+        if ThrowSubscriptionIsNotValidErr then begin
+            if not TryErrorSubscriptionUnpaid() then
+                POSSession.SetErrorOnInitialize(true);
+        end else
+            CreateAndSendSubscriptionUnpaidNotification();
     end;
 
     local procedure CreateAndSendTrialExpiresNotification(TrialDaysLeft: Integer)
@@ -98,20 +108,20 @@ codeunit 6059815 "NPR Stripe Notification Mgt."
         SubscriptionNotification.Send();
     end;
 
-    local procedure ErrorIfThrowSubscriptionCanceled(ThrowSubscriptionIsNotValidErr: Boolean)
+    [TryFunction]
+    local procedure TryErrorSubscriptionCanceled()
     var
         SubscriptionCanceledErr: Label 'Your subscription for the NP Retail POS app has been canceled. Please reactivate a subscription or contact us to solve this issue.';
     begin
-        if ThrowSubscriptionIsNotValidErr then
-            Error(SubscriptionCanceledErr)
+        Error(SubscriptionCanceledErr)
     end;
 
-    local procedure ErrorIfThrowSubscriptionUnpaid(ThrowSubscriptionIsNotValidErr: Boolean)
+    [TryFunction]
+    local procedure TryErrorSubscriptionUnpaid()
     var
         SubscriptionUnpaidErr: Label 'Your subscription for the NP Retail POS app has not been paid. Please proceed with payment for your subscription or contact us to solve this issue.';
     begin
-        if ThrowSubscriptionIsNotValidErr then
-            Error(SubscriptionUnpaidErr);
+        Error(SubscriptionUnpaidErr);
     end;
 
     internal procedure ActivateSubscription(SubscriptionNotification: Notification)
