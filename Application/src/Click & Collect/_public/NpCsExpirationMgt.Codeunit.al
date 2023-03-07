@@ -123,13 +123,16 @@
     end;
 
     procedure ScheduleUpdateExpirationStatus(NpCsDocument: Record "NPR NpCs Document"; NotBefore: DateTime)
+    var
+        NpCsTaskProcessorSetup: Codeunit "NPR NpCs Task Processor Setup";
     begin
-        TASKSCHEDULER.CreateTask(CurrCodeunitId(), 0, true, CompanyName, NotBefore, NpCsDocument.RecordId);
+        if not NpCsTaskProcessorSetup.ScheduleUpdateExpirationStatus(NpCsDocument) then
+            TaskScheduler.CreateTask(CurrCodeunitId(), 0, true, CompanyName, NotBefore, NpCsDocument.RecordId);
     end;
 
     local procedure CurrCodeunitId(): Integer
     begin
-        exit(CODEUNIT::"NPR NpCs Expiration Mgt.");
+        exit(Codeunit::"NPR NpCs Expiration Mgt.");
     end;
 }
 

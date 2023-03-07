@@ -212,8 +212,11 @@
     //--- Posting ---
 
     local procedure ScheduleDocumentPosting(var NpCsDocument: Record "NPR NpCs Document"): Boolean
-
+    var
+        NpCsTaskProcessorSetup: Codeunit "NPR NpCs Task Processor Setup";
     begin
+        if NpCsTaskProcessorSetup.ScheduleDocumentPosting(NpCsDocument) then
+            exit(true);
         exit(not IsNullGuid(TaskScheduler.CreateTask(Codeunit::"NPR NpCs Post Document", 0, true, CompanyName, CurrentDateTime + 10000, NpCsDocument.RecordId)));
 
     end;
