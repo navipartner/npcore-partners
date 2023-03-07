@@ -178,16 +178,6 @@ codeunit 6014641 "NPR BTF Service API"
         Page.Run(Page::"NPR BTF Service Endpoint", ServiceEndPoint);
     end;
 
-    [Obsolete('Use DownloadErrorLog')]
-    procedure DownloadErrorLogResponse(ErrorLog: Record "NPR BTF EndPoint Error Log")
-    begin
-    end;
-
-    [Obsolete('Use ShowWhoInitiateRequest')]
-    procedure ShowWhoInitiateWebReqSending(ErrorLog: Record "NPR BTF EndPoint Error Log")
-    begin
-    end;
-
     procedure DownloadErrorLog(EntryNo: Integer)
     var
         ErrorLog: Record "NPR BTF EndPoint Error Log";

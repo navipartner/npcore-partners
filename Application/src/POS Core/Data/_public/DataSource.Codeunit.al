@@ -158,6 +158,7 @@
         end;
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure AddColumn(FieldNo: Text; Caption: Text; DataType: Enum "NPR Data Type"; Visible: Boolean; var ColumnOut: Codeunit "NPR Data Column");
     begin
         MakeSureIsConstructed();
