@@ -50,7 +50,7 @@
 
         CreateTicketRequest(Token, MembershipRole, SponsorshipTicketSetup);
 
-        if (0 <> TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage)) then begin
+        if (0 <> TicketRequestManager.IssueTicketFromReservationToken(Token, true, ResponseMessage)) then begin
             TicketRequestManager.DeleteReservationRequest(Token, true);
             exit(false);
         end;
@@ -92,7 +92,7 @@
             TicketReservationRequest."Created Date Time" := CurrentDateTime;
             TicketReservationRequest.Insert();
         until (TicketAdmissionBOM.Next() = 0);
-        Commit();
+
     end;
 
     local procedure FinalizeTicketReservation(MembershipRole: Record "NPR MM Membership Role"; var SponsorshipTicketSetup: Record "NPR MM Sponsors. Ticket Setup"; var ResponseMessage: Text): Boolean
