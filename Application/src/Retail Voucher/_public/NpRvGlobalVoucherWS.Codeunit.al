@@ -446,7 +446,7 @@
         end;
     end;
 
-
+    [Obsolete('In next release goes internal')]
     procedure InvokeRedeemPartnerVouchers(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
         NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";

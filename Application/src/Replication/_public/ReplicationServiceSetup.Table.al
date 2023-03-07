@@ -275,6 +275,7 @@
         Error(RenameNotAllowedErr);
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure RegisterService(pAPIVersion: Code[20]; pServiceUrl: Text[250]; pName: Text[100]; pEnabled: Boolean; pAuthType: Enum "NPR API Auth. Type"; pTenant: Text[50])
     begin
         Rec."API Version" := pAPIVersion;

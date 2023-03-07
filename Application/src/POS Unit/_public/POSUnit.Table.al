@@ -343,59 +343,12 @@
         Modify();
     end;
 
-
-    [Obsolete('Use codeunit "NPR POS Pricing Profile"')]
-    procedure GetProfile(var POSPricingProfile: Record "NPR POS Pricing Profile"): Boolean
-    begin
-        Clear(POSPricingProfile);
-        if "POS Pricing Profile" = '' then
-            exit;
-        exit(POSPricingProfile.Get("POS Pricing Profile"));
-    end;
-
     procedure GetProfile(var POSViewProfile: Record "NPR POS View Profile"): Boolean
     begin
         Clear(POSViewProfile);
         if "POS View Profile" = '' then
             exit;
         exit(POSViewProfile.Get("POS View Profile"));
-    end;
-
-    [Obsolete('Use codeunit "NPR Self Service Profile"')]
-    procedure GetProfile(var SSProfile: Record "NPR SS Profile"): Boolean
-    begin
-        Clear(SSProfile);
-        if "POS Self Service Profile" = '' then
-            exit;
-        exit(SSProfile.Get("POS Self Service Profile"));
-    end;
-
-
-    [Obsolete('Use codeunit "NPR POS Proxy - Display"')]
-    procedure GetProfile(var DisplayProfile: Record "NPR Display Setup"): Boolean
-    begin
-        Clear(DisplayProfile);
-        if "POS Display Profile" = '' then
-            exit;
-        exit(DisplayProfile.Get("POS Display Profile"));
-    end;
-
-    [Obsolete('Use module "Tax Free"')]
-    procedure GetProfile(var TaxFreeProfile: Record "NPR Tax Free POS Unit"): Boolean
-    begin
-        Clear(TaxFreeProfile);
-        if "POS Tax Free Profile" = '' then
-            exit;
-        exit(TaxFreeProfile.Get("POS Tax Free Profile"));
-    end;
-
-    [Obsolete('Use codeunit "NPR POS Security Profile"')]
-    procedure GetProfile(var SecurityProfile: Record "NPR POS Security Profile"): Boolean
-    begin
-        Clear(SecurityProfile);
-        if "POS Security Profile" = '' then
-            exit;
-        exit(SecurityProfile.Get("POS Security Profile"));
     end;
 
     procedure GetProfile(var POSAuditProfile: Record "NPR POS Audit Profile"): Boolean
@@ -412,15 +365,6 @@
         if "POS End of Day Profile" = '' then
             exit;
         exit(POSEoDProfile.Get("POS End of Day Profile"));
-    end;
-
-    [Obsolete('For public access use codeunit "NPR POS Inventory Profile"')]
-    procedure GetProfile(var PosInventoryProfile: Record "NPR POS Inventory Profile"): Boolean
-    begin
-        Clear(PosInventoryProfile);
-        if "POS Inventory Profile" = '' then
-            exit;
-        exit(PosInventoryProfile.Get("POS Inventory Profile"));
     end;
 
     internal procedure GetCurrentPOSUnit(): Code[10]

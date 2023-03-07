@@ -32,46 +32,55 @@ codeunit 6059992 "NPR HL Integration Events"
     begin
     end;
 
+    [Obsolete('In next release goes internal')]
     [IntegrationEvent(false, false)]
     procedure OnGenerateMemberUrlParameters(HLMember: Record "NPR HL HeyLoyalty Member"; NewMember: Boolean; var UrlParametersJObject: JsonObject)
     begin
     end;
 
+    [Obsolete('In next release goes internal')]
     [IntegrationEvent(false, false)]
     procedure OnAfterAddAttributeToUrlParameters(HLMember: Record "NPR HL HeyLoyalty Member"; NewMember: Boolean; HLMemberAttribute: Record "NPR HL Member Attribute"; var UrlParametersJObject: JsonObject)
     begin
     end;
 
+    [Obsolete('In next release goes internal')]
     [IntegrationEvent(false, false)]
     procedure OnUpdateHLMember(Member: Record "NPR MM Member"; MemberDeleted: Boolean; var HLMember: Record "NPR HL HeyLoyalty Member")
     begin
     end;
 
+    [Obsolete('In next release goes internal')]
     [IntegrationEvent(false, false)]
     procedure OnReadHLResponseField_OnUpdateHLMember(var HLMember: Record "NPR HL HeyLoyalty Member"; ResponseFieldName: Text; HLMemberJToken: JsonToken)
     begin
     end;
 
+    [Obsolete('In next release goes internal')]
     [IntegrationEvent(false, false)]
     procedure OnUpdateHLMemberWithDataFromHeyLoyalty(var HLMember: Record "NPR HL HeyLoyalty Member"; HLMemberJToken: JsonToken; OnlyEssentialFields: Boolean)
     begin
     end;
 
+    [Obsolete('In next release goes internal')]
     [IntegrationEvent(false, false)]
     procedure OnUpdateMemberFromHL(HLMember: Record "NPR HL HeyLoyalty Member"; var Member: Record "NPR MM Member")
     begin
     end;
 
+    [Obsolete('In next release goes internal')]
     [IntegrationEvent(false, false)]
     procedure OnAfterUpdateMemberFromHL(HLMember: Record "NPR HL HeyLoyalty Member"; Member: Record "NPR MM Member")
     begin
     end;
 
+    [Obsolete('In next release goes internal')]
     [IntegrationEvent(false, false)]
     procedure OnCheckIfBCMemberUpdateIsRequired(xHLMember: Record "NPR HL HeyLoyalty Member"; HLMember: Record "NPR HL HeyLoyalty Member"; var UpdatedIsRequired: Boolean)
     begin
     end;
 
+    [Obsolete('In next release goes internal')]
     [IntegrationEvent(false, false)]
     procedure OnUnsubscribeMember(var HLMember: Record "NPR HL HeyLoyalty Member"; HLMemberJToken: JsonToken)
     begin

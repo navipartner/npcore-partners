@@ -122,6 +122,8 @@
     /// </summary>
     /// <param name="CodeunitID">Parameter is only to have an object that users can setup output config for. It can be empty.</param>
     /// <param name="PrinterDevice">Which driver to use for job generation</param>
+    ///
+    [Obsolete('In next release goes internal')]
     procedure ProcessBuffer(CodeunitID: Integer; PrinterDevice: Enum "NPR Line Printer Device")
     begin
         PrintBuffer('', CodeunitId, 0, PrinterDevice);
@@ -215,6 +217,7 @@
         OutputLogging.LogLinePrintJob(TemplateCode, CodeunitId, ReportId, LinePrinter, 1);
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure GetColumnCount(var PrintBufferIn: Record "NPR RP Print Buffer" temporary) Columns: Integer
     begin
         PrintBufferIn.SetRange("Line No.", PrintBufferIn."Line No.");
@@ -635,6 +638,7 @@
     begin
     end;
 
+    [Obsolete('In next release goes internal')]
     [IntegrationEvent(true, false)]
     procedure OnFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID; var Skip: Boolean; var Handled: Boolean)
     begin

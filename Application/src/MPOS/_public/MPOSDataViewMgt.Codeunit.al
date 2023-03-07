@@ -1,15 +1,5 @@
 codeunit 6059827 "NPR MPOS Data View Mgt."
 {
-
-    [Obsolete('Use LookUpDataView(Enum "NPR MPOS Data View Type"; Text)')]
-    procedure LookupDataViewCode(var DataView: Record "NPR MPOS Data View"; var DataViewCode: Text): Boolean
-    var
-        IDataViewType: Interface "NPR MPOS IDataViewType";
-    begin
-        IDataViewType := DataView."Data View Type";
-        exit(IDataViewType.LookupCode(DataViewCode));
-    end;
-
     procedure LookUpDataView(DataViewType: Enum "NPR MPOS Data View Type"; var DataViewCode: Text): Boolean
     var
         IDataViewType: Interface "NPR MPOS IDataViewType";
@@ -51,6 +41,15 @@ codeunit 6059827 "NPR MPOS Data View Mgt."
         IDataViewCategory.Preveiw(Rec.SystemId);
     end;
 
+    [Obsolete('In next release goes internal')]
+    procedure Preview_(Rec: Record "NPR MPOS Data View")
+    var
+        IDataViewCategory: Interface "NPR MPOS IDataViewCategory";
+    begin
+        IDataViewCategory := Rec."Data View Category";
+        IDataViewCategory.Preveiw(Rec.SystemId);
+    end;
+
     procedure PreviewCategory(DataViewCategory: Enum "NPR MPOS Data View Category"; SystemId: Guid)
     var
         IDataViewCategory: Interface "NPR MPOS IDataViewCategory";
@@ -76,7 +75,7 @@ codeunit 6059827 "NPR MPOS Data View Mgt."
         exit(Result);
     end;
 
-    [Obsolete('Use DeleteIndentLevels(Integer; Enum "NPR MPOS Data View Type"; Enum "NPR MPOS Data View Category")')]
+    [Obsolete('In next release goes internal')]
     procedure DeleteLevels(var Rec: Record "NPR MPOS Data View")
     var
         DataView: Record "NPR MPOS Data View";
@@ -121,5 +120,5 @@ codeunit 6059827 "NPR MPOS Data View Mgt."
                         DataView.DeleteAll(true);
                 end;
         end;
-    end;    
+    end;
 }

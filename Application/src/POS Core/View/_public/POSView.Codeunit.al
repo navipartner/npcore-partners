@@ -43,12 +43,6 @@
         _type := NewType;
     end;
 
-    [Obsolete('This procedure will be internal for future releases -SetType2, without option to access externally')]
-    procedure SetType(NewType: Enum "NPR View Type");
-    begin
-        _type := NewType;
-    end;
-
     procedure AddDataSource(DataSource: Codeunit "NPR Data Source");
     begin
         if (_dataSources.Contains(DataSource.Id())) then

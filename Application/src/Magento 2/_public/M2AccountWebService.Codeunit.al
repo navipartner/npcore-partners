@@ -497,6 +497,7 @@
         exit(AccountManager.AuthenticatePassword(TmpOneTimePassword, TmpContact, ReasonText));
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure DoChangePassword(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary; var TmpContact: Record Contact temporary): Boolean
     var
         AccountManager: Codeunit "NPR M2 Account Manager";

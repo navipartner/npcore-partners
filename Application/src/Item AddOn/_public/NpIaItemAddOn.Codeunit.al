@@ -5,14 +5,14 @@ codeunit 6059900 "NPR NpIa Item AddOn"
         ItemAddOnImpl: Codeunit "NPR NpIa Item AddOn Mgt.";
     begin
         exit(ItemAddOnImpl.InsertPOSAddOnLines(ItemAddOn, SelectedAddOnLines, POSSession, AppliesToLineNo, CompulsoryAddOn));
-    end; 
+    end;
 
     procedure InsertMandatoryPOSAddOnLinesSilent(ItemAddOn: Record "NPR NpIa Item AddOn"; POSSession: Codeunit "NPR POS Session"; AppliesToLineNo: Integer; CompulsoryAddOn: Boolean): Boolean
     var
-        ItemAddOnImpl: Codeunit "NPR NpIa Item AddOn Mgt.";    
+        ItemAddOnImpl: Codeunit "NPR NpIa Item AddOn Mgt.";
     begin
         exit(ItemAddOnImpl.InsertMandatoryPOSAddOnLinesSilent(ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn));
-    end;    
+    end;
 
     procedure GetUnitPricePctFromMaster(AddOnNo: Code[20]; AddOnLineNo: Integer): Decimal
     var
@@ -33,7 +33,7 @@ codeunit 6059900 "NPR NpIa Item AddOn"
         ItemAddOnLineSetup: Codeunit "NPR NpIa Item AddOn Line Setup";
     begin
         ItemAddOnLineSetup.DeleteSetup(AddOnNo, AddOnLineNo);
-    end;    
+    end;
 
     procedure BeforeInsertPOSAddOnLine(SalePOS: Record "NPR POS Sale"; AppliesToLineNo: Integer; var NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line")
     begin
@@ -50,6 +50,7 @@ codeunit 6059900 "NPR NpIa Item AddOn"
         OnRunBeforeInsertSetup(NpIaItemAddOnLine, IsHandled);
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure FilterAttachedItemAddonLines(SaleLinePOS: Record "NPR POS Sale Line"; AppliesToLineNo: Integer; var SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn")
     begin
         OnFilterAttachedItemAddonLines(SaleLinePOS, AppliesToLineNo, SaleLinePOSAddOn);
@@ -60,15 +61,16 @@ codeunit 6059900 "NPR NpIa Item AddOn"
         OnCopyItemAddOnLinesToTempBeforeInsert(FromItemAddOnLine, ToItemAddOnLine, IsHandled);
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS: Record "NPR POS Sale Line"; var SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn")
     begin
         OnFilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
-    end; 
+    end;
 
     procedure FilterItemAddOnLine(var ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; ItemAddOn: Record "NPR NpIa Item AddOn"; POSSession: Codeunit "NPR POS Session"; AppliesToLineNo: Integer; CompulsoryAddOn: Boolean)
     begin
         OnFilterItemAddOnLine(ItemAddOnLine, ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn);
-    end;   
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertPOSAddOnLine(SalePOS: Record "NPR POS Sale"; AppliesToLineNo: Integer; var NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line")
@@ -93,15 +95,15 @@ codeunit 6059900 "NPR NpIa Item AddOn"
     [IntegrationEvent(false, false)]
     local procedure OnFilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS: Record "NPR POS Sale Line"; var SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn")
     begin
-    end; 
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnFilterItemAddOnLine(var ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; ItemAddOn: Record "NPR NpIa Item AddOn"; POSSession: Codeunit "NPR POS Session"; AppliesToLineNo: Integer; CompulsoryAddOn: Boolean)
     begin
-    end;  
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnCopyItemAddOnLinesToTempBeforeInsert(FromItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var ToItemAddOnLine: Record "NPR NpIa Item AddOn Line"; var IsHandled: Boolean)
     begin
-    end;         
+    end;
 }

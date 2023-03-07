@@ -535,6 +535,7 @@
 
     #region Insert to Item Category Buffer
 
+    [Obsolete('In next release goes internal')]
     procedure InsertItemCategoryToBuffer(ItemRootCategoryCode: Code[20]; var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; SalespersonCode: Code[20]; GlobalDimension1Code: Code[20]; GlobalDimension2Code: Code[20]; CalcFieldsDict: Dictionary of [Integer, Decimal])
     var
         ItemCategory: Record "Item Category";
@@ -619,6 +620,7 @@
         ItemCategoryBuffer.Insert();
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure InsertUncatagorizedToItemCategoryBuffer(ItemCategoryCode: Code[20]; Description: Text[100]; var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; SalespersonCode: Code[20]; CalcFieldsDict: Dictionary of [Integer, Decimal])
     begin
         ItemCategoryBuffer.Init();
@@ -635,6 +637,7 @@
         InsertCalcFieldsInItemCategoryBuffer(ItemCategoryBuffer, CalcFieldsDict);
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure AddItemCategoryParentsToBuffer(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary)
     var
         TempItemCategoryBuffer: Record "NPR Item Category Buffer" temporary;
@@ -706,7 +709,7 @@
     #endregion
 
     #region Sorting and Formating
-
+    [Obsolete('In next release goes internal')]
     procedure SortItemCategoryBuffer(var ItemCategoryBuffer: Record "NPR Item Category Buffer"; FieldNo: Integer; Ascending: Boolean)
     begin
         if ItemCategoryBuffer.IsEmpty() then
@@ -781,6 +784,7 @@
             until TempItemCategoryBuffer.Next() = 0;
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure FormatIndentationInItemCategories(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; NumberOfSpaces: Integer)
     begin
         ItemCategoryBuffer.Reset();
@@ -792,6 +796,7 @@
             until ItemCategoryBuffer.Next() = 0;
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure SetOrderNoInItemCategoryBuffer(var ItemCategoryBuffer: Record "NPR Item Category Buffer")
     var
         Index: Integer;
@@ -886,6 +891,7 @@
         end;
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure SetCalcFieldValue(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; FieldNo: Integer; Value: Decimal)
     begin
         if CheckIfCalcFieldExistsInItemCategoryBuffer(FieldNo) = 0 then
@@ -1045,6 +1051,7 @@
         end;
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure SetCalcFieldsInItemCategoryBuffer(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; CalcFieldsDictionary: Dictionary of [Integer, Decimal])
     var
         DictKey: Integer;
@@ -1156,7 +1163,7 @@
 
     #endregion
 
-
+    [Obsolete('In next release goes internal')]
     procedure DeleteItemCategoryBuffer(ItemCategoryCode: Code[20]; SalespersonCode: Code[20]; GlobalDimensionCode1: Code[20]; GlobalDimensionCode2: Code[20]; var ItemCatagoryBuffer: Record "NPR Item Category Buffer" temporary; var ItemCategoryBufferFull: Record "NPR Item Category Buffer" temporary)
     var
         TempItemCategoryBuffer: Record "NPR Item Category Buffer" temporary;
