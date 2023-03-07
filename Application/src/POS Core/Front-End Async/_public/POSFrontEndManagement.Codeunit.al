@@ -399,13 +399,6 @@
         _Framework.InvokeFrontEndAsync(Request.GetJson());
     end;
 
-    [Obsolete('This procedure will be internal for future releases without option to access externally')]
-    procedure InvokeFrontEndMethod(Request: Interface "NPR Front-End Async Request")
-    begin
-        MakeSureFrameworkIsAvailable(true);
-        InvokeFrontEndAsync(Request);
-    end;
-
     internal procedure InvokeFrontEndMethod2(Request: Interface "NPR Front-End Async Request")
     begin
         MakeSureFrameworkIsAvailable(true);
@@ -579,6 +572,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure ConfigureFont(Font: Interface "NPR Font Definition")
     var
         Request: Codeunit "NPR Front-End: ConfigFont.";
@@ -588,6 +582,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure ConfigureReusableWorkflow("Action": Codeunit "NPR Workflow Action")
     var
         Request: Codeunit "NPR Front-End: CfgReusableWkf.";
@@ -964,6 +959,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure WorkflowCallCompleted(Request: Codeunit "NPR Front-End: WkfCallCompl.")
     begin
         MakeSureFrameworkIsInitialized();
@@ -1078,16 +1074,17 @@
             Request.GetContent().Add(TraceID, TraceObject);
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure Trace(Request: Interface "NPR Front-End Async Request"; TraceKey: Text; TraceValue: Text)
     begin
         PrepareTraceObject(Request, TraceKey).Add(TraceKey, TraceValue);
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure Trace(Request: Interface "NPR Front-End Async Request"; TraceKey: Text; TraceValue: Integer)
     begin
         PrepareTraceObject(Request, TraceKey).Add(TraceKey, TraceValue);
     end;
-
     #endregion
 
     #region Event Publishers
