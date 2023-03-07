@@ -78,7 +78,7 @@
         exit(Successful);
     end;
 
-    procedure AttemptValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[20]; var ResponseMessage: Text): Boolean
+    procedure AttemptValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; var ResponseMessage: Text): Boolean
     begin
 
         _AttemptFunction := _AttemptFunction::VALIDATE_ARRIVAL;
