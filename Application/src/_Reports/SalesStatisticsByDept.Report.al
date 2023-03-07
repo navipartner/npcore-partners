@@ -528,7 +528,7 @@
         }
         dataitem("Item Category"; "Item Category")
         {
-            RequestFilterFields = "NPR Date Filter", "NPR Global Dimension 1 Filter", "NPR Global Dimension 2 Filter", "NPR Vendor Filter";
+            RequestFilterFields = "NPR Date Filter", "NPR Global Dimension 1 Filter", "NPR Global Dimension 2 Filter", "NPR Vendor Filter", "NPR Salesperson/Purch. Filter";
         }
     }
 
@@ -575,6 +575,7 @@
 
                         ToolTip = 'Specifies the value of the Sales Person field';
                         ApplicationArea = NPRRetail;
+                        Visible = false;
                     }
                 }
             }
@@ -628,6 +629,7 @@
             FilterList := "Item Category".GetFilters
         else
             FilterList := "Item Category".GETFILTERS + ' SalesPerson: ' + SalesPerson;
+        SalesPerson := "Item Category"."NPR Salesperson/Purch. Filter";
         dateFilter := "Item Category".GetFilter("NPR Date Filter");
         dateMin := "Item Category".GetRangeMin("NPR Date Filter");
         dateMax := "Item Category".GetRangeMax("NPR Date Filter");
