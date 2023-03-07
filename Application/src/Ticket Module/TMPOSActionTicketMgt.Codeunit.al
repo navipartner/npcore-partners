@@ -36,21 +36,23 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
     // WORKFLOW 3 START
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        FunctionOptionString: Text[250];
-        InputOptionString: Text;
+        SuppressWelcomeMessage: Label 'Suppress Welcome Message';
+        PrintTicketOnArrival: Label 'Print Ticket On Arrival';
+        DefaultTicketNumber: Label 'Default Ticket Number';
+        AdmissionCodeCaption: Label 'Admission Code';
+        AdmissionCodeDescription: Label 'Admission Code';
+        InputOptionLabel: Label 'Standard,MPOS NFC Scan', locked = true, MaxLength = 250;
+        InputMethodDescription: Label 'Determines how to input the ticket number.';
+        FunctionOptionLabel: Label 'Admission Count,Register Arrival,Revoke Reservation,Edit Reservation,Reconfirm Reservation,Edit Ticketholder,Change Confirmed Ticket Quantity,Pickup Ticket Reservation,Convert To Membership,Register Departure,Additional Experience', Locked = true, MaxLength = 250;
     begin
-        FunctionOptionString := 'Admission Count,Register Arrival,Revoke Reservation,Edit Reservation,' +
-            'Reconfirm Reservation,Edit Ticketholder,Change Confirmed Ticket Quantity,Pickup Ticket Reservation,' +
-            'Convert To Membership,Register Departure,Additional Experience';
-        InputOptionString := 'Standard,MPOS NFC Scan';
         WorkflowConfig.AddActionDescription(ActionDescription());
         WorkflowConfig.AddJavascript(GetActionScript());
-        WorkflowConfig.AddOptionParameter('Function', FunctionOptionString, 'Register Arrival', 'Function', 'Function', FunctionOptionString);
-        WorkflowConfig.AddOptionParameter('InputMethod', InputOptionString, 'Standard', 'Input Method', 'Determines how to input the ticket number.', InputOptionString);
-        WorkflowConfig.AddTextParameter('Admission Code', '', 'Admission Code', 'Admission Code');
-        WorkflowConfig.AddTextParameter('DefaultTicketNumber', '', 'Default Ticket Number', 'Default Ticket Number');
-        WorkflowConfig.AddBooleanParameter('PrintTicketOnArrival', false, 'Print Ticket On Arrival', 'Print Ticket On Arrival');
-        WorkflowConfig.AddBooleanParameter('SuppressWelcomeMessage', false, 'Suppress Welcome Message', 'Suppress Welcome Message');
+        WorkflowConfig.AddOptionParameter('Function', FunctionOptionLabel, 'Register Arrival', 'Function', 'Function', FunctionOptionLabel);
+        WorkflowConfig.AddOptionParameter('InputMethod', InputOptionLabel, 'Standard', 'Input Method', InputMethodDescription, InputOptionLabel);
+        WorkflowConfig.AddTextParameter('Admission Code', '', AdmissionCodeCaption, AdmissionCodeDescription);
+        WorkflowConfig.AddTextParameter('DefaultTicketNumber', '', DefaultTicketNumber, DefaultTicketNumber);
+        WorkflowConfig.AddBooleanParameter('PrintTicketOnArrival', false, PrintTicketOnArrival, PrintTicketOnArrival);
+        WorkflowConfig.AddBooleanParameter('SuppressWelcomeMessage', false, SuppressWelcomeMessage, SuppressWelcomeMessage);
         WorkflowConfig.AddLabel('TicketPrompt', TicketNumberPrompt);
         WorkflowConfig.AddLabel('TicketQtyPrompt', TicketQtyPrompt);
         WorkflowConfig.AddLabel('TicketTitle', TicketTitle);
@@ -279,7 +281,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
         exit(QtyChanged);
     end;
 
-    local procedure ActionDescription(): Text
+    local procedure ActionDescription(): Text[250]
     begin
         exit('This action handles ticket management functions.');
     end;
