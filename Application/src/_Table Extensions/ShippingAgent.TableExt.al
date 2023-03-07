@@ -1,6 +1,5 @@
 tableextension 6014429 "NPR Shipping Agent" extends "Shipping Agent"
 {
-    Caption = 'Shipping Agent';
     fields
     {
         field(6014440; "NPR Shipping Agent Demand"; Option)
