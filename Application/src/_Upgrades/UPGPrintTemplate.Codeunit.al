@@ -37,15 +37,20 @@ codeunit 6150696 "NPR UPG Print Template"
 
         if RPTemplateLine.FindSet(true) then
             repeat
-                ArchiveVersionIfNecessary(RPTemplateLine."Template Code");
-                IncreaseVersionIfNecessary(RPTemplateLine."Template Code");
-                RPTemplateLine.Validate("Processing Codeunit", ToProcessingCU);
-                RPTemplateLine.Validate("Processing Function ID", ToProcessingFunctionId);
-                RPTemplateLine.Validate("Processing Function Parameter", ToProcessingFunctionParameter);
-                RPTemplateLine.Modify();
-                if RPTemplateHeader.Get(RPTemplateLine."Template Code") then
-                    if not RPTemplateHeader.Archived then
-                        RPTemplateHeader.Validate(Archived, true);
+                if RPTemplateHeader.Get(RPTemplateLine."Template Code") then begin
+                    if (RPTemplateHeader."Printer Type" = RPTemplateHeader."Printer Type"::Line) then begin
+                        ArchiveVersionIfNecessary(RPTemplateLine."Template Code");
+                        IncreaseVersionIfNecessary(RPTemplateLine."Template Code");
+                        RPTemplateLine.Validate("Processing Codeunit", ToProcessingCU);
+                        RPTemplateLine.Validate("Processing Function ID", ToProcessingFunctionId);
+                        RPTemplateLine.Validate("Processing Function Parameter", ToProcessingFunctionParameter);
+                        RPTemplateLine.Modify();
+
+                        RPTemplateHeader.Get(RPTemplateLine."Template Code");
+                        if not RPTemplateHeader.Archived then
+                            RPTemplateHeader.Validate(Archived, true);
+                    end
+                end
             until RPTemplateLine.Next() = 0;
     end;
 
