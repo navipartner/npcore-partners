@@ -238,6 +238,8 @@
 #endif
         i: Integer;
         OffSet: Integer;
+        VariableName: Text;
+        VariabelNameTooLongErr: Label 'Variablename %1 is longer than the max. supported lenght (%2 characters)';
     begin
         if CodeString = '' then
             exit;
@@ -248,8 +250,13 @@
         while Match.Success() do begin
             TempVariable.Init();
             TempVariable."Line No." := i;
-            TempVariable."Variable Name" := CopyStr(Match.Value(), 1, MaxStrLen(TempVariable."Variable Name"));
-            TempVariable."Variable Name" := CopyStr(TempVariable."Variable Name", 3, StrLen(TempVariable."Variable Name") - 4);
+            VariableName := Match.Value();
+            VariableName := CopyStr(VariableName, 3, StrLen(VariableName) - 4);
+            if StrLen(VariableName) > MaxStrLen(TempVariable."Variable Name") then
+                Error(VariabelNameTooLongErr, VariableName, MaxStrLen(TempVariable."Variable Name"));
+# pragma warning disable AA0139
+            TempVariable."Variable Name" := VariableName;
+# pragma warning restore
             TempVariable."Variable Type" := TempVariable."Variable Type"::Mailchimp;
             TempVariable.Insert();
             i += 1;
@@ -263,8 +270,13 @@
         while Match.Success() do begin
             TempVariable.Init();
             TempVariable."Line No." := i + OffSet;
-            TempVariable."Variable Name" := CopyStr(Match.Value(), 1, MaxStrLen(TempVariable."Variable Name"));
-            TempVariable."Variable Name" := CopyStr(TempVariable."Variable Name", 3, StrLen(TempVariable."Variable Name") - 4);
+            VariableName := Match.Value();
+            VariableName := CopyStr(VariableName, 3, StrLen(VariableName) - 4);
+            if StrLen(VariableName) > MaxStrLen(TempVariable."Variable Name") then
+                Error(VariabelNameTooLongErr, VariableName, MaxStrLen(TempVariable."Variable Name"));
+# pragma warning disable AA0139
+            TempVariable."Variable Name" := VariableName;
+# pragma warning restore
             TempVariable."Variable Type" := TempVariable."Variable Type"::Handlebars;
             TempVariable.Insert();
             i += 1;
@@ -278,8 +290,13 @@
                 if TempMatch.Success then begin
                     TempVariable.Init();
                     TempVariable."Line No." := i;
-                    TempVariable."Variable Name" := TempMatch.ReadValue();
-                    TempVariable."Variable Name" := CopyStr(TempVariable."Variable Name", 3, StrLen(TempVariable."Variable Name") - 4);
+                    VariableName := TempMatch.ReadValue();
+                    VariableName := CopyStr(VariableName, 3, StrLen(VariableName) - 4);
+                    if StrLen(VariableName) > MaxStrLen(TempVariable."Variable Name") then
+                        Error(VariabelNameTooLongErr, VariableName, MaxStrLen(TempVariable."Variable Name"));
+# pragma warning disable AA0139
+                    TempVariable."Variable Name" := VariableName;
+# pragma warning restore
                     TempVariable."Variable Type" := TempVariable."Variable Type"::Mailchimp;
                     TempVariable.Insert();
                     i += 1;
@@ -294,8 +311,13 @@
                 if TempMatch.Success then begin
                     TempVariable.Init();
                     TempVariable."Line No." := i + OffSet;
-                    TempVariable."Variable Name" := TempMatch.ReadValue();
-                    TempVariable."Variable Name" := CopyStr(TempVariable."Variable Name", 3, StrLen(TempVariable."Variable Name") - 4);
+                    VariableName := TempMatch.ReadValue();
+                    VariableName := CopyStr(VariableName, 3, StrLen(VariableName) - 4);
+                    if StrLen(VariableName) > MaxStrLen(TempVariable."Variable Name") then
+                        Error(VariabelNameTooLongErr, VariableName, MaxStrLen(TempVariable."Variable Name"));
+# pragma warning disable AA0139
+                    TempVariable."Variable Name" := VariableName;
+# pragma warning restore
                     TempVariable."Variable Type" := TempVariable."Variable Type"::Handlebars;
                     TempVariable.Insert();
                 end;
@@ -424,7 +446,7 @@
                 TempMagentoPicture.Name := CopyStr(PictureName, 1, MaxStrLen(TempMagentoPicture.Name));
                 TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
                 TempGroups.Get(1);
-                TempMagentoPicture."Mime Type" := TempGroups.ReadValue();
+                TempMagentoPicture."Mime Type" := CopyStr(TempGroups.ReadValue(), 1, MaxStrLen(TempMagentoPicture."Mime Type"));
                 TempGroups.Get(2);
                 Base64Image := TempGroups.ReadValue();
                 TempMagentoPicture.Insert(false);
