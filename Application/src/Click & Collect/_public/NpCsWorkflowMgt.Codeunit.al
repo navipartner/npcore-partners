@@ -17,13 +17,19 @@
     end;
 
     procedure ScheduleRunWorkflow(var NpCsDocument: Record "NPR NpCs Document")
+    var
+        NpCsTaskProcessorSetup: Codeunit "NPR NpCs Task Processor Setup";
     begin
-        TASKSCHEDULER.CreateTask(CurrCodeunitId(), 0, true, CompanyName, CurrentDateTime, NpCsDocument.RecordId);
+        if not NpCsTaskProcessorSetup.ScheduleRunWorkflow(NpCsDocument) then
+            TaskScheduler.CreateTask(CurrCodeunitId(), 0, true, CompanyName, CurrentDateTime, NpCsDocument.RecordId);
     end;
 
     procedure ScheduleRunWorkflowDelay(var NpCsDocument: Record "NPR NpCs Document"; DelayMS: Integer)
+    var
+        NpCsTaskProcessorSetup: Codeunit "NPR NpCs Task Processor Setup";
     begin
-        TASKSCHEDULER.CREATETASK(CurrCodeunitId(), 0, TRUE, COMPANYNAME, CURRENTDATETIME + DelayMS, NpCsDocument.RECORDID);
+        if not NpCsTaskProcessorSetup.ScheduleRunWorkflow(NpCsDocument) then
+            TaskScheduler.CreateTask(CurrCodeunitId(), 0, true, CompanyName, CurrentDateTime + DelayMS, NpCsDocument.RecordId);
     end;
 
     local procedure RunWorkflow(var NpCsDocument: Record "NPR NpCs Document")
@@ -58,7 +64,7 @@
 
         Commit();
         ClearLastError();
-        clear(RunWorkflowStep);
+        Clear(RunWorkflowStep);
         RunWorkflowStep.SetWorkflowFunctionType(WorkflowFunctionType::"Send Order");
         if not RunWorkflowStep.Run(NpCsDocument) then
             InsertLogEntry(NpCsDocument, NpCsWorkflowModule, '', true, GetLastErrorText());
@@ -79,7 +85,7 @@
         PrevStatus := NpCsDocument."Processing Status";
         Commit();
         ClearLastError();
-        clear(RunWorkflowStep);
+        Clear(RunWorkflowStep);
         RunWorkflowStep.SetWorkflowFunctionType(WorkflowFunctionType::"Order Status");
         if not RunWorkflowStep.Run(NpCsDocument) then
             InsertLogEntry(NpCsDocument, NpCsWorkflowModule, '', true, GetLastErrorText());
@@ -101,7 +107,7 @@
 
         Commit();
         ClearLastError();
-        clear(RunWorkflowStep);
+        Clear(RunWorkflowStep);
         RunWorkflowStep.SetWorkflowFunctionType(WorkflowFunctionType::"Post Processing");
         if not RunWorkflowStep.Run(NpCsDocument) then begin
             LastErrorText := GetLastErrorText();
@@ -112,7 +118,7 @@
         Commit();
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     internal procedure SendOrder(var NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text)
     begin
     end;
@@ -123,7 +129,7 @@
     begin
         Commit();
         ClearLastError();
-        clear(RunWorkflowStep);
+        Clear(RunWorkflowStep);
         RunWorkflowStep.SetWorkflowFunctionType(WorkflowFunctionType::"Send Notification to Store");
         RunWorkflowStep.SetNotificationType(1);  //Email
         if not RunWorkflowStep.Run(NpCsDocument) then
@@ -131,7 +137,7 @@
 
         Commit();
         ClearLastError();
-        clear(RunWorkflowStep);
+        Clear(RunWorkflowStep);
         RunWorkflowStep.SetWorkflowFunctionType(WorkflowFunctionType::"Send Notification to Store");
         RunWorkflowStep.SetNotificationType(2);  //Sms
         if not RunWorkflowStep.Run(NpCsDocument) then
@@ -161,7 +167,7 @@
 
         Commit();
         ClearLastError();
-        clear(RunWorkflowStep);
+        Clear(RunWorkflowStep);
         RunWorkflowStep.SetWorkflowFunctionType(WorkflowFunctionType::"Send Notification to Customer");
         RunWorkflowStep.SetNotificationType(1);  //Email
         if not RunWorkflowStep.Run(NpCsDocument) then
@@ -169,7 +175,7 @@
 
         Commit();
         ClearLastError();
-        clear(RunWorkflowStep);
+        Clear(RunWorkflowStep);
         RunWorkflowStep.SetWorkflowFunctionType(WorkflowFunctionType::"Send Notification to Customer");
         RunWorkflowStep.SetNotificationType(2);  //Sms
         if not RunWorkflowStep.Run(NpCsDocument) then
@@ -178,12 +184,12 @@
         Commit();
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     internal procedure UpdateOrderStatus(var NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text)
     begin
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     internal procedure PerformPostProcessing(var NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text)
     begin
     end;
@@ -243,7 +249,7 @@
                 exit;
             NpCsDocument.CalcFields("Callback Data");
         end;
-        NpCsDocument."Callback Data".CreateInStream(InStr, TEXTENCODING::UTF8);
+        NpCsDocument."Callback Data".CreateInStream(InStr, TextEncoding::UTF8);
         XmlDocument.ReadFrom(InStr, Document);
         Document.GetRoot(Element);
 
@@ -295,7 +301,7 @@
         NpCsDocumentLogEntry."Workflow Type" := NpCsWorkflowModule.Type;
         NpCsDocumentLogEntry."Workflow Module" := NpCsWorkflowModule.Code;
         NpCsDocumentLogEntry."Log Message" := CopyStr(LogMessage, 1, MaxStrLen(NpCsDocumentLogEntry."Log Message"));
-        NpCsDocumentLogEntry."Error Message".CreateOutStream(OutStr, TEXTENCODING::UTF8);
+        NpCsDocumentLogEntry."Error Message".CreateOutStream(OutStr, TextEncoding::UTF8);
         OutStr.WriteText(ErrorMessage);
         NpCsDocumentLogEntry."Error Entry" := ErrorEntry;
         NpCsDocumentLogEntry.Insert(true);
@@ -303,7 +309,7 @@
 
     local procedure CurrCodeunitId(): Integer
     begin
-        exit(CODEUNIT::"NPR NpCs Workflow Mgt.");
+        exit(Codeunit::"NPR NpCs Workflow Mgt.");
     end;
 
     local procedure IsReadyForArchivation(NpCsDocument: Record "NPR NpCs Document"): Boolean
