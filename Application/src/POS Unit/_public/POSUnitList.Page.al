@@ -51,6 +51,7 @@
                 {
                     ToolTip = 'Defines Scenarios Profile attached to Unit. Depending on scenario profile will initiate defined actions in POS';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 field("POS Type"; Rec."POS Type")
                 {
