@@ -28,7 +28,35 @@ class NpBcptMgmt
 
     [string] GetToken()
     {
-        if ($null -eq $this.Token) {
+        $requestNewToken = ($null -eq $this.Token -or $this.Token -eq '')
+        
+        # Validate token expiration
+        if (-not $requestNewToken) {
+            $parts = $this.Token.Split('.')
+            $data = $parts[1] # Data in 2nd segment
+
+            $jsonTokenBase64 = $data.Replace('–', '+').Replace('_', '/')
+            switch($jsonTokenBase64.Length % 4) {
+                0 {break}
+                2 {$jsonTokenBase64 += '=='; break}
+                3 {$jsonTokenBase64 += '='; break}
+                DEFAULT {Write-Warning 'Illegal base64 string!'}
+            }
+
+            $jsonToken = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($jsonTokenBase64))
+            $tokenData = $jsonToken | ConvertFrom-Json
+
+            $expiration = (Get-Date -Date "01-01-1970") + ([System.TimeSpan]::FromSeconds(($tokenData.exp)))
+            $currentDateTime = [System.DateTime]::UtcNow.AddMinutes(-10)
+
+            $requestNewToken = ($expiration -le $currentDateTime)
+            if ($requestNewToken) {
+                Write-Host "Token will expire soon... $($expiration)"
+            }
+        }
+
+        if ($requestNewToken) {
+            Write-Host "Requesting new token..."
             $authority = "https://login.microsoftonline.com/"
             $resource = "https://api.businesscentral.dynamics.com"
             $credential = $this.GetCredentials()
