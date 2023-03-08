@@ -659,6 +659,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SET_ACTIVE_EVENT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Chg.Actv.Event";
     }
+    value(128; PRINT_TEMPLATE)
+    {
+        Caption = 'PRINT_TEMPLATE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Print Template";
+    }
     value(129; QUICK_LOGIN)
     {
         Caption = 'QUICK_LOGIN', Locked = true, MaxLength = 20;
@@ -694,10 +699,20 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'RV_GET_WAITER_PAD', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Get WPad";
     }
-    value(128; PRINT_TEMPLATE)
+    value(138; RV_SET_PARTYSIZE)
     {
-        Caption = 'PRINT_TEMPLATE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Print Template";
+        Caption = 'RV_SET_PARTYSIZE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Set No.of Guests";
+    }
+    value(139; RV_SAVE_LAYOUT)
+    {
+        Caption = 'RV_SAVE_LAYOUT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Save Layout";
+    }
+    value(140; "RV_RUN_W/PAD_ACTION")
+    {
+        Caption = 'RV_RUN_W/PAD_ACTION', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Run WPad Act.";
     }
     value(6014600; BALANCE_V4)
     {
