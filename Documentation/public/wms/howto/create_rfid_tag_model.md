@@ -14,3 +14,8 @@ To create CS RFID tag models in Business Central, follow the provided steps:
 5. Tick **Discontinue** if the family/model is not in use anymore. 
 6. In the **Tag Length**, you can specify how many digits the tag will consist of.     
    All changes are automatically saved.
+
+### Related links
+
+- [Set up RFID functionalities in Business Central](rfid_setup.md)
+- [Perform shop and stock count in NP RFID](stock_count_rfid.md)
