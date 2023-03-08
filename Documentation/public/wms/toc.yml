@@ -20,6 +20,10 @@
     href: explanation/inventory_adjustments.md
   - name: MatrixScan inventory counting
     href: explanation/matrixcount.md
+  - name: NP RFID app features
+    href: explanation/np_rfid.md
+  - name: RFID administrative sections in Business Central
+    href: explanation/rfid_features.md
 
 - name: How-to
   items: 
@@ -43,6 +47,8 @@
     href: howto/create_rfid_tag_model.md
   - name: Perform shop and stock count in NP RFID
     href: howto/stock_count_rfid.md
+  - name: Set up RFID functionalities in Business Central
+    href: howto/rfid_setup.md
 
 - name: Reference
   items: 
