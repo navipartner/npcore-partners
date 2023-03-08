@@ -238,9 +238,12 @@
                             InventoryQty[i] := TempQuantity;
                             i += 1;
                             TempQuantity := 0;
+                            if i = 7 then
+                                CurrReport.Skip();
                         end;
                     end;
 
+                    i := 1;
                     if Location.FindSet() then
                         repeat
                             ItemLedgEntry.SetRange("Location Code");
@@ -255,6 +258,8 @@
                                 InventoryQty[i] := TempQuantity;
                                 i += 1;
                                 TempQuantity := 0;
+                                if i = 7 then
+                                    CurrReport.Skip();
                             end;
                         until Location.Next() = 0;
 
