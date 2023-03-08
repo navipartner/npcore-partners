@@ -1,69 +1,26 @@
-﻿codeunit 6151132 "NPR TM POS Action - Seating"
+codeunit 6151132 "NPR TM POS Action - Seating" implements "NPR IPOS Workflow"
 {
     Access = Internal;
     // TM1.43/TSA /20190618 CASE 357359 Initial Version
     // TM1.45/TSA /20191112 CASE 322432 edit reservation
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Version 3 UX missing';
 
 
-    trigger OnRun()
-    begin
-    end;
-
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'This is a built-in action for running the ticket seating functionality';
-
-    local procedure ActionCode(): Code[20]
     begin
-        exit('TM_SEATING');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
     end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-  ActionCode(),
-  ActionDescription,
-  ActionVersion(),
-  Sender.Type::Generic,
-  Sender."Subscriber Instances Allowed"::Multiple)
-then begin
-            Sender.RegisterWorkflowStep('1', 'respond();');
-            Sender.RegisterWorkflow(false);
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', false, false)]
-    local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     var
-        JSON: Codeunit "NPR POS JSON Management";
+        POSSession: Codeunit "NPR POS Session";
+        JObject: JsonObject;
     begin
-
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScopeParameters(ActionCode());
+        Context.InitializeJObjectParser(JObject);
 
         ShowSeating(FrontEnd, POSSession);
     end;
@@ -82,6 +39,14 @@ then begin
 
         TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", TicketToken);
         SeatingUI.ShowSelectSeatUI(FrontEnd, TicketToken, true);
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:TMPOSActionSeating.js###
+'let main=async({})=>await workflow.respond();'
+        )
     end;
 }
 
