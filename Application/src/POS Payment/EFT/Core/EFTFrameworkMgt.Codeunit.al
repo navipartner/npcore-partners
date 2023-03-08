@@ -253,8 +253,8 @@
 
         case ProcessingType of
             EftTransactionRequest."Processing Type"::GIFTCARD_LOAD,
-          EftTransactionRequest."Processing Type"::PAYMENT,
-          EftTransactionRequest."Processing Type"::REFUND:
+            EftTransactionRequest."Processing Type"::PAYMENT,
+            EftTransactionRequest."Processing Type"::REFUND:
                 EFTPaymentMgt.HandleIntegrationResponse(EftTransactionRequest);
             else
                 HandleOtherIntegrationResponse(EftTransactionRequest);
@@ -442,6 +442,16 @@
         EFTInterface.OnSendRequestSynchronously(EFTTransactionRequest, Handled);
         if not Handled then
             Error('EFT Integration %1 is not subscribing to SendRequest correctly.', EFTTransactionRequest."Integration Type");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl B", 'OnAfterLoadFromQuote', '', false, false)]
+    local procedure UpdateEFTTransRequests(POSQuoteEntry: Record "NPR POS Saved Sale Entry"; SalePOS: Record "NPR POS Sale")
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        EFTTransactionRequest.SetRange("Sales Ticket No.", POSQuoteEntry."Sales Ticket No.");
+        if not EFTTransactionRequest.IsEmpty() then
+            EFTTransactionRequest.ModifyAll("Sales Ticket No.", SalePOS."Sales Ticket No.");
     end;
 
     [IntegrationEvent(false, false)]

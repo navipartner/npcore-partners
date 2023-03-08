@@ -4,10 +4,8 @@
     Caption = 'POS Saved Sale Lines';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR POS Saved Sale Line";
-    ApplicationArea = NPRRetail;
 
     layout
     {
