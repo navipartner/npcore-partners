@@ -99,7 +99,7 @@ report 6014438 "NPR POS Posting Action"
         PerPeriodRegisterPosting := DoPerPeriodRegisterPosting;
     end;
 
-    internal procedure SetPOSEntries(POSEntryWithFilters: Record "NPR POS Entry")
+    internal procedure SetPOSEntries(var POSEntryWithFilters: Record "NPR POS Entry")
     begin
         POSEntryWithFilter.Reset();
         POSEntryWithFilter.CopyFilters(POSEntryWithFilters);
