@@ -179,7 +179,7 @@ report 6014437 "NPR Item Categ. List. M/Y new"
 
     requestpage
     {
-
+        SaveValues = true;
         layout
         {
             area(content)
@@ -215,9 +215,6 @@ report 6014437 "NPR Item Categ. List. M/Y new"
             }
         }
 
-        actions
-        {
-        }
     }
 
     labels
