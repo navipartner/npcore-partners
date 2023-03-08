@@ -291,24 +291,31 @@
     internal procedure ProcessRecord(DataLogSubscriber: Record "NPR Data Log Subscriber"; DataLogRecord: Record "NPR Data Log Record")
     var
         DataLogProcessingEntry: Record "NPR Data Log Processing Entry";
+        DirectProcessing: Boolean;
     begin
         if DataLogSubscriber."Data Processing Codeunit ID" <= 0 then
             exit;
 
         DataLogProcessingEntry.Init();
         DataLogProcessingEntry."Entry No." := 0;
-        DataLogProcessingEntry."Inserted at" := CurrentDateTime;
+        DataLogProcessingEntry."Inserted at" := CurrentDateTime();
         DataLogProcessingEntry."Subscriber Code" := DataLogSubscriber.Code;
         DataLogProcessingEntry."Table Number" := DataLogSubscriber."Table ID";
         DataLogProcessingEntry."Data Log Entry No." := DataLogRecord."Entry No.";
         DataLogProcessingEntry."Data Log Record Value" := CopyStr(format(DataLogRecord."Record ID"), 1, MaxStrLen(DataLogProcessingEntry."Data Log Record Value"));
         DataLogProcessingEntry.Insert(true);
 
-        if DataLogSubscriber."Direct Data Processing" then
-            CODEUNIT.Run(CODEUNIT::"NPR Data Log Processing Mgt.", DataLogProcessingEntry)
+        // Certain license types in Business Central (at the time of development; device users and delegated admins)
+        // cannot create tasks on the task scheduler. This causes a runtime error.
+        // To ensure that we avoid that, we will force a user not being able to create a task to use
+        // direct processing.
+        DirectProcessing := ((DataLogSubscriber."Direct Data Processing") or (not TaskScheduler.CanCreateTask()));
+
+        if (DirectProcessing) then
+            Codeunit.Run(Codeunit::"NPR Data Log Processing Mgt.", DataLogProcessingEntry)
         else
             TaskScheduler.CreateTask(
-              CODEUNIT::"NPR Data Log Processing Mgt.", CODEUNIT::"NPR Data Log Proces. Err. Mgt.", true, CompanyName,
+              Codeunit::"NPR Data Log Processing Mgt.", Codeunit::"NPR Data Log Proces. Err. Mgt.", true, CompanyName(),
               DataLogRecord."Log Date" + (DataLogSubscriber."Delayed Data Processing (sec)" * 1000), DataLogProcessingEntry.RecordId);
     end;
 
