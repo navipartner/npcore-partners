@@ -1,7 +1,7 @@
 ﻿report 6014416 "NPR Sale Statistics per Vendor"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sale Statistics per Vendor.rdlc';
@@ -183,6 +183,7 @@
 
     requestpage
     {
+        SaveValues = true;
         layout
         {
             area(content)
