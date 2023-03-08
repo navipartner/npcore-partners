@@ -659,6 +659,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SET_ACTIVE_EVENT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Chg.Actv.Event";
     }
+    value(127; TM_SEATING)
+    {
+        Caption = 'TM_SEATING', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR TM POS Action - Seating";
+    }
     value(128; PRINT_TEMPLATE)
     {
         Caption = 'PRINT_TEMPLATE', Locked = true, MaxLength = 20;
