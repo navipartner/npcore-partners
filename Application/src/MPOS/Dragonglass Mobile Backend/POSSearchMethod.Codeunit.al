@@ -4,21 +4,19 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', false, false)]
     local procedure OnPreSearch(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
     var
-        Json: Codeunit "NPR POS JSON Management";
+        Json: Codeunit "NPR POS JSON Helper";
         SearchType: Text;
         SearchTerm: Text;
         LastKey: Text;
-        RetrievingSearchTypeLbl: Label 'Retrieving search type';
-        RetrievingSearchTermLbl: Label 'Retrieving search term';
     begin
         if Method <> 'Search' then
             exit;
 
         Handled := true;
 
-        Json.InitializeJObjectParser(Context, FrontEnd);
-        SearchType := Json.GetStringOrFail('type', RetrievingSearchTypeLbl);
-        SearchTerm := Json.GetStringOrFail('search', RetrievingSearchTermLbl);
+        Json.InitializeJObjectParser(Context);
+        SearchType := Json.GetString('type');
+        SearchTerm := Json.GetString('search');
         LastKey := Json.GetString('lastKey');
 
         case SearchType of
