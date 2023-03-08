@@ -9,7 +9,7 @@
         ParamFromLocation_CaptOptLbl: Label 'POS Store,Location Filter Parameter';
         ParamFromLocation_NameLbl: Label 'Location From';
         ParamFromLocation_DescLbl: Label 'Specifies from location';
-        ParamSorting_OptLbl: Label 'Entry No.,Reference No.,Processing expires at';
+        ParamSorting_OptLbl: Label 'Entry No.,Reference No.,Processing expires at', Locked = true;
         ParamSorting_NameLbl: Label 'Sorting';
         ParamSorting_DescLbl: Label 'Specifies sorting';
     begin
@@ -19,14 +19,18 @@
         WorkflowConfig.SetCustomJavaScriptLogic('enable', 'return row.getField("CollectInStore.UnprocessedOrdersExists").rawValue;');
         WorkflowConfig.AddOptionParameter('Location From',
                                           ParamFromLocation_OptLbl,
+#pragma warning disable AA0139
                                           SelectStr(1, ParamFromLocation_OptLbl),
+#pragma warning restore
                                           ParamFromLocation_NameLbl,
                                           ParamFromLocation_DescLbl,
                                           ParamFromLocation_CaptOptLbl);
         WorkflowConfig.AddTextParameter('Location Filter', '', ParamLocationFilterLbl, ParamLocationFilterLbl);
         WorkflowConfig.AddOptionParameter('Sorting',
                                           ParamSorting_OptLbl,
+#pragma warning disable AA0139
                                           SelectStr(1, ParamSorting_OptLbl),
+#pragma warning restore
                                           ParamSorting_NameLbl,
                                           ParamSorting_DescLbl,
                                           ParamSorting_OptLbl);
