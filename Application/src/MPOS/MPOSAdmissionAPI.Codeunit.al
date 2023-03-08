@@ -39,7 +39,7 @@
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         TicketSetup: Record "NPR TM Ticket Setup";
-        JsonMgt: Codeunit "NPR POS JSON Management";
+        JsonHelper: Codeunit "NPR POS JSON Helper";
         JSBridge: Page "NPR JS Bridge";
         JSONtext: Text;
         AdmissionCode: Code[20];
@@ -55,9 +55,9 @@
 
         JSONtext := BuildJSONParams(TicketSetup.GetTicketAdmissionWebUrl(true), '', '', '', AdmissionFailedErr);
 
-        JsonMgt.InitializeJObjectParser(Context, FrontEnd);
+        JsonHelper.InitializeJObjectParser(Context);
 #pragma warning disable AA0139
-        AdmissionCode := JsonMgt.GetStringParameter('AdmissionCode');
+        AdmissionCode := JsonHelper.GetStringParameter('AdmissionCode');
 #pragma warning restore
         JSBridge.SetParameters('Admission', JSONtext, AdmissionCode);
 

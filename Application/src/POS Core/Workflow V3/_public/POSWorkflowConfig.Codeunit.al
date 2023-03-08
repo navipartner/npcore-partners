@@ -56,7 +56,7 @@ codeunit 6059786 "NPR POS Workflow Config"
         AddParameter(Name, TempParameter."Data Type"::Decimal, Format(DefaultValue, 0, 9), '', CaptionName, CaptionDescription, '');
     end;
 
-    procedure AddOptionParameter(Name: Text[30]; Options: Text[250]; DefaultValue: Text[250]; CaptionName: Text; CaptionDescription: Text; CaptionOptions: Text)
+    procedure AddOptionParameter(Name: Text; Options: Text; DefaultValue: Text[250]; CaptionName: Text; CaptionDescription: Text; CaptionOptions: Text)
     begin
         AddParameter(Name, TempParameter."Data Type"::Option, DefaultValue, Options, CaptionName, CaptionDescription, CaptionOptions);
     end;
