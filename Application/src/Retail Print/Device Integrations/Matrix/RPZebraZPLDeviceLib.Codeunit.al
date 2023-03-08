@@ -758,13 +758,6 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
         if Align > 0 then
             FieldBlock(StrLength, 1, 0, Justify, 0);
 
-        // Check if € symbol
-        if StrPos(TextIn, '€') > 0 then begin
-            FieldHex();
-            TextIn := TextIn.Replace('€', '_15');
-        end;
-
-
         //^FD
         FieldData(TextIn);
 
