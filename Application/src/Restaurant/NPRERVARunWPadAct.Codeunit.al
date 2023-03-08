@@ -1,60 +1,70 @@
-﻿codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
+codeunit 6150677 "NPR NPRE RVA: Run WPad Act." implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
+    var
+        ActionDescription: Label 'This built-in action allows to run Waiter Pad related functions directly from Restaurant View';
+        ParamWaiterPadCode_CptLbl: Label 'Waiter Pad Code';
+        ParamWaiterPadCode_DescLbl: Label 'Defines waiter pad number the action is to be run upon. The parameter is set automatically by the system on the runtime.';
+        ParamWaiterPadAction_OptLbl: Label 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Open Waiter Pad', MaxLength = 250;
+        ParamWaiterPadAction_NameLbl: Label 'Waiter Pad Action';
+        ParamWaiterPadAction_DescLbl: Label 'Defines which waiter pad action is to be run by the POS action.';
+        ParamWaiterPadAction_CaptOptLbl: Label 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Open Waiter Pad';
+        ParamLinesToSend_OptLbl: Label 'New/Updated,All', MaxLength = 250;
+        ParamLinesToSend_NameLbl: Label 'Lines to Send to Kitchen';
+        ParamLinesToSend_DescLbl: Label 'Defines which waiter pad lines are to be sent to kitchen, if ''Send Kitchen Order'' is selected as Waiter Pad Action.';
+        ParamLinesToSend_CaptOptLbl: Label 'New/Updated,All';
+        ParamServingStep_CptLbl: Label 'Serving Step to Request';
+        ParamServingStep_DescLbl: Label 'Defines which serving step is to be requested, if ''Request Specific Serving'' is selected as Waiter Pad Action.';
+        ParamReturnToDefaultView_CptLbl: Label 'Return to Default View on Finish';
+        ParamReturnToDefaultView_DescLbl: Label 'Switch to the default view defined for the POS Unit after the Waiter Pad Action has completed.';
+    begin
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddTextParameter('WaiterPadCode', '', ParamWaiterPadCode_CptLbl, ParamWaiterPadCode_DescLbl);
+        WorkflowConfig.AddOptionParameter('WaiterPadAction',
+                                          ParamWaiterPadAction_OptLbl,
+#pragma warning disable AA0139
+                                          SelectStr(1, ParamWaiterPadAction_OptLbl),
+#pragma warning restore
+                                          ParamWaiterPadAction_NameLbl,
+                                          ParamWaiterPadAction_DescLbl,
+                                          ParamWaiterPadAction_CaptOptLbl);
+        WorkflowConfig.AddOptionParameter('LinesToSend',
+                                          ParamLinesToSend_OptLbl,
+#pragma warning disable AA0139
+                                          SelectStr(1, ParamLinesToSend_OptLbl),
+#pragma warning restore
+                                          ParamLinesToSend_NameLbl,
+                                          ParamLinesToSend_DescLbl,
+                                          ParamLinesToSend_CaptOptLbl);
+        WorkflowConfig.AddTextParameter('ServingStep', '', ParamServingStep_CptLbl, ParamServingStep_DescLbl);
+        WorkflowConfig.AddBooleanParameter('ReturnToDefaultView', false, ParamReturnToDefaultView_CptLbl, ParamReturnToDefaultView_DescLbl);
+    end;
+
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    var
+        POSSession: Codeunit "NPR POS Session";
+        ReturnToDefaultView: Boolean;
+    begin
+        if not Context.GetBooleanParameter('ReturnToDefaultView', ReturnToDefaultView) then
+            ReturnToDefaultView := false;
+
+        RunWaiterPadAction(Context);
+
+        if ReturnToDefaultView then begin
+            POSSession.GetSale(Sale);
+            Sale.SelectViewForEndOfSale(POSSession);
+        end;
+    end;
+
     local procedure ActionCode(): Code[20]
     begin
         exit('RV_RUN_W/PAD_ACTION');
     end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.1');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action");
-    var
-        ActionDescription: Label 'This built-in action allows to run Waiter Pad related functions directly from Restaurant View';
-    begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescription, ActionVersion()) then begin
-            Sender.RegisterWorkflow20(
-                'await workflow.respond();' +
-                'if ($context.ShowResultMessage) {' +
-                '   popup.message($context.ResultMessageText);' +
-                '};');
-
-            Sender.RegisterTextParameter('WaiterPadCode', '');
-            Sender.RegisterOptionParameter('WaiterPadAction', 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Open Waiter Pad', 'Print Pre-Receipt');
-            Sender.RegisterOptionParameter('LinesToSend', 'New/Updated,All', 'New/Updated');
-            Sender.RegisterTextParameter('ServingStep', '');
-            Sender.RegisterBooleanParameter('ReturnToDefaultView', false);
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
-    local procedure OnAction20(Action: Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
-    var
-        POSSale: Codeunit "NPR POS Sale";
-        ReturnToDefaultView: Boolean;
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        ReturnToDefaultView := Context.GetBooleanParameter('ReturnToDefaultView');
-
-        RunWaiterPadAction(Context);
-
-        if ReturnToDefaultView then begin
-            POSSession.GetSale(POSSale);
-            POSSale.SelectViewForEndOfSale(POSSession);
-        end;
-
-        POSSession.RequestRefreshData();
-    end;
-
-    local procedure RunWaiterPadAction(Context: Codeunit "NPR POS JSON Management");
+    local procedure RunWaiterPadAction(Context: Codeunit "NPR POS JSON Helper");
     var
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPad2: Record "NPR NPRE Waiter Pad";
@@ -68,8 +78,8 @@
         ResultMessageText: Text;
         WPadIsOpenedInPOSSale: Label 'The waiter pad is opened in a POS sale at the moment and might have unsaved changes. Are you sure you want to continue on running the action?';
     begin
-        WaiterPad."No." := CopyStr(Context.GetStringParameterOrFail('WaiterPadCode', ActionCode()), 1, MaxStrLen(WaiterPad."No."));
-        WPadAction := Context.GetIntegerParameterOrFail('WaiterPadAction', ActionCode());
+        WaiterPad."No." := CopyStr(Context.GetStringParameter('WaiterPadCode'), 1, MaxStrLen(WaiterPad."No."));
+        WPadAction := Context.GetIntegerParameter('WaiterPadAction');
 
         WaiterPad.Find();
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
@@ -165,75 +175,6 @@
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
-    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text);
-    var
-        CaptionLinesToSend: Label 'Lines to Send to Kitchen';
-        CaptionReturnToDefaultView: Label 'Return to Default View on Finish';
-        CaptionServingStep: Label 'Serving Step to Request';
-        CaptionWaiterPadAction: Label 'Waiter Pad Action';
-        CaptionWaiterPadCode: Label 'Waiter Pad Code';
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'WaiterPadCode':
-                Caption := CaptionWaiterPadCode;
-            'WaiterPadAction':
-                Caption := CaptionWaiterPadAction;
-            'LinesToSend':
-                Caption := CaptionLinesToSend;
-            'ServingStep':
-                Caption := CaptionServingStep;
-            'ReturnToDefaultView':
-                Caption := CaptionReturnToDefaultView;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
-    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text);
-    var
-        DescLinesToSend: Label 'Defines which waiter pad lines are to be sent to kitchen, if ''Send Kitchen Order'' is selected as Waiter Pad Action';
-        DescReturnToDefaultView: Label 'Switch to the default view defined for the POS Unit after the Waiter Pad Action has completed';
-        DescServingStep: Label 'Defines which serving step is to be requested, if ''Request Specific Serving'' is selected as Waiter Pad Action';
-        DescWaiterPadAction: Label 'Defines which waiter pad action is to be run by the POS action';
-        DescWaiterPadCode: Label 'Defines waiter pad number the action is to be run upon. The parameter is set automatically by the system on the runtime';
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'WaiterPadCode':
-                Caption := DescWaiterPadCode;
-            'WaiterPadAction':
-                Caption := DescWaiterPadAction;
-            'LinesToSend':
-                Caption := DescLinesToSend;
-            'ServingStep':
-                Caption := DescServingStep;
-            'ReturnToDefaultView':
-                Caption := DescReturnToDefaultView;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', true, false)]
-    local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text);
-    var
-        OptionLinesToSend: Label 'New/Updated,All';
-        OptionWaiterPadAction: Label 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Open Waiter Pad';
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-
-        case POSParameterValue.Name of
-            'WaiterPadAction':
-                Caption := OptionWaiterPadAction;
-            'LinesToSend':
-                Caption := OptionLinesToSend;
-        end;
-    end;
-
     local procedure LookupServingStep(var SelectedServingStep: Code[10]): Boolean;
     var
         FlowStatus: Record "NPR NPRE Flow Status";
@@ -251,5 +192,13 @@
             exit(true);
         end;
         exit(false);
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+        //###NPR_INJECT_FROM_FILE:NPRERVARunWPadAct.js###
+'let main=async({workflow:s,context:e,popup:a})=>{await s.respond(),e.ShowResultMessage&&a.message(e.ResultMessageText)};'
+        );
     end;
 }

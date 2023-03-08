@@ -1,43 +1,27 @@
-﻿codeunit 6150683 "NPR NPRE RVA: Save Layout"
+codeunit 6150683 "NPR NPRE RVA: Save Layout" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-    local procedure ActionCode(): Code[20]
-    begin
-        exit('RV_SAVE_LAYOUT');
-    end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.3');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action");
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This built-in action stores the restaurant layout from the front-end editor.';
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescription, ActionVersion()) then begin
-            Sender.RegisterWorkflow20('await workflow.respond();');
-        end;
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
-    local procedure OnAction20(Action: Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
         NPREFrontendAssistant: Codeunit "NPR NPRE Frontend Assistant";
+        POSSession: Codeunit "NPR POS Session";
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
         UpdatedRestaurantCode := '';
         SaveLayout(Context);
         if UpdatedRestaurantCode <> '' then
             NPREFrontendAssistant.SetRestaurant(POSSession, FrontEnd, UpdatedRestaurantCode);
     end;
 
-    local procedure SaveLayout(Context: Codeunit "NPR POS JSON Management");
+    local procedure SaveLayout(Context: Codeunit "NPR POS JSON Helper");
     var
         JArray: JsonArray;
         JObject: JsonObject;
@@ -312,6 +296,14 @@
     begin
         if RestaurantCode <> '' then
             UpdatedRestaurantCode := RestaurantCode;
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+        //###NPR_INJECT_FROM_FILE:NPRERVASaveLayout.js###
+'let main=async({})=>await workflow.respond();'
+        );
     end;
 
     var
