@@ -39,7 +39,9 @@
 
         WorkflowConfig.AddOptionParameter('Location From',
                                           LocationFromPOptLbl,
+#pragma warning disable AA0139
                                           SelectStr(1, LocationFromPOptLbl),
+#pragma warning restore
                                           LocationFromParamLbl,
                                           LocationFromDescLbl,
                                           LocationFromPOpt_CptLbl);
@@ -48,7 +50,9 @@
         WorkflowConfig.AddTextParameter('Prepaid Text', PrepaidAmountLbl, ParamPrepaidLbl, ParamPrepaidCaptLbl);
         WorkflowConfig.AddOptionParameter('Sorting',
                                           ParamSortingOptLbl,
+#pragma warning disable AA0139
                                           SelectStr(1, ParamSortingOptLbl),
+#pragma warning restore
                                           ParamSortingLbl,
                                           ParamSortingLbl,
                                           ParamSortingOpt_CptLbl);
@@ -228,7 +232,9 @@
 
         Handled := true;
 
+#pragma warning disable AA0139
         LocationFilter := POSMenuMgt.GetPOSMenuButtonLocationFilter(POSSession, ActionCode());
+#pragma warning restore
         ProcessedOrdersExists := GetProcessedOrdersExists(LocationFilter);
         DataRow.Fields().Add('ProcessedOrdersExists', ProcessedOrdersExists);
         if ProcessedOrdersExists then
