@@ -80,7 +80,7 @@ table 6014672 "NPR MPOS Data View"
     var
         DataViewMgt: Codeunit "NPR MPOS Data View Mgt.";
     begin
-        DataViewMgt.DeleteLevels(Rec);
+        DataViewMgt.DeleteIndentLevels(Rec.Indent, Rec."Data View Type", Rec."Data View Category");
     end;
 
     internal procedure InitRec(DataViewType: Enum "NPR MPOS Data View Type"; DataViewCategory: Enum "NPR MPOS Data View Category")
