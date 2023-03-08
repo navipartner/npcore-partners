@@ -4,13 +4,19 @@ The NP WMS solution provides a variety of tools and processes for managing and t
 
 This solution is recommended for any business which uses warehouses in its operations, regardless of its capacity, as it vastly improves organization, structure, and space management of warehouses. 
 
+One of the staples of the WMS solution is the RFID system. There are several required items for the RFID system to become fully operational: 
+
+- A reader that the system is connected to
+- An antenna with a radio signal
+- An RFID tag that retrieves the signal with attached information.
+
 ## Onboarding
 
 The initial setup of NP WMS consists of the following steps:
 
 1. To get started, you need to [download and install the NP WMS extension for Business Central](./howto/Install-NP-WMS.md), as well as the [accompanying mobile applications](./howto/install-mobile-apps.md). 
 
-2. (Optional) Download and install one of the preset WMS templates provided by NaviPartner, to accelerate the setup procedure:
+2. (Optional) [Download and install one of the preset WMS templates](howto/fetch-setup-data.md) provided by NaviPartner, to accelerate the setup procedure:
 
 - Live templates - provides sample setups of NP WMS
 - Test Data - provides the necessary data for testing NP WMS

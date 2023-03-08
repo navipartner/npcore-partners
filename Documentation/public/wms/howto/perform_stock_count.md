@@ -11,7 +11,7 @@ To perform the stock count in Business Central, follow the provided steps:
 1. Click the ![Lightbulb that opens the Tell Me feature](../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Physical Inventory Journals** and choose the related link.
 2. To prepare the list of items which will be counted, click **Prepare**, and then **Calculate Inventory**.      
    The **Calculate Inventory** popup window is displayed. Here, you can add information such as posting date, document number, and apply the filters for item groups. 
-3. Apply the filter to determine according to which criteria the item group will be selected in the **Filter totals by** section (for example, according to the warehouse location).
+3. Apply the filter to determine according to which criteria the item group will be selected in the **Filter totals by** section (for example, according to the warehouse location).      
    The list of physical inventory journal entries corresponding to the filter criteria is displayed.   
    The **Qty. (Calculated)** field contains the stock level recorded in Business Central, while the **Qty. (Phys. Inventory)** field contains the actual physical quantity of items in the warehouse, as determined by the physical count. Business Central will default the same value in both fields, as there will be no difference. 
 
