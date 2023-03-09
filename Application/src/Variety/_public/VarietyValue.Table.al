@@ -162,7 +162,7 @@
             exit(',');
     end;
 
-    internal procedure FindNewSortOrder(ValueToCheck: Code[20]): Integer
+    internal procedure FindNewSortOrder(ValueToCheck: Code[50]): Integer
     var
         VarietyVal: Record "NPR Variety Value";
         DecSep: Text[1];
