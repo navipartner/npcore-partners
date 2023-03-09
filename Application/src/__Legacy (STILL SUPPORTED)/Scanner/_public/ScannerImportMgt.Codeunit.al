@@ -28,7 +28,9 @@ codeunit 6059780 "NPR Scanner Import Mgt."
         if TryGetItemNoFromItem(ScannedCode, ItemNo) then
             exit;
 
+# pragma warning disable AA0139 
         if TryGetItemNoFromItemReference(ScannedCode, ItemNo, VariantCode) then
+# pragma warning restore
             exit;
 
         Error(CannotFindItemErr, ScannedCode);
@@ -84,7 +86,7 @@ codeunit 6059780 "NPR Scanner Import Mgt."
     procedure CreateErrorMessage(var TempErrorMessage: Record "Error Message" temporary)
     begin
         TempErrorMessage.ID += 1;
-        TempErrorMessage.Description := GetLastErrorText();
+        TempErrorMessage.Description := CopyStr(GetLastErrorText(), 1, StrLen(TempErrorMessage.Description));
         TempErrorMessage.Insert();
     end;
 
