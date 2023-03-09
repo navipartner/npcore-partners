@@ -655,15 +655,23 @@
                 {
                     ShowCaption = false;
                     Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Not in use anymore.';
                     field("Customer Posting Group"; Rec."Customer Posting Group")
                     {
                         ToolTip = 'Specifies the customer posting group.';
                         ApplicationArea = NPRRetail;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Not in use anymore.';
+                        Visible = false;
                     }
                     field("Payment Terms Code"; Rec."Payment Terms Code")
                     {
                         ToolTip = 'Specifies the payment terms code.';
                         ApplicationArea = NPRRetail;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Not in use anymore.';
+                        Visible = false;
                     }
                 }
 
