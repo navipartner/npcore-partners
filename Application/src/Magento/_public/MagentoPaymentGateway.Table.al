@@ -206,6 +206,9 @@
     [Obsolete('Migrating to interface and individual setup tables for integrations. Move your secret management there')]
     internal procedure HasApiPassword(): Boolean
     begin
+        if (not IsolatedStorage.Contains(Rec."Api Password Key", DataScope::Company)) then
+            exit(false);
+
         exit(GetApiPassword() <> '');
     end;
 

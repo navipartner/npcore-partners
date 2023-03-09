@@ -125,7 +125,6 @@ codeunit 6151474 "NPR UPG PG To Interface"
     local procedure MovePGAdyen(PaymentGateway: Record "NPR Magento Payment Gateway")
     var
         PGAdyen: Record "NPR PG Adyen Setup";
-        Token: Text;
         Offset: Integer;
     begin
         if (PGAdyen.Get(PaymentGateway.Code)) then
@@ -148,9 +147,8 @@ codeunit 6151474 "NPR UPG PG To Interface"
         end;
 
         PGAdyen."API Username" := PaymentGateway."Api Username";
-        Token := PaymentGateway.GetApiPassword();
-        if (Token <> '') then
-            PGAdyen.SetAPIPassword(Token);
+        if (PaymentGateway.HasApiPassword()) then
+            PGAdyen.SetAPIPassword(PaymentGateway.GetApiPassword());
         PGAdyen."Merchant Name" := PaymentGateway."Merchant Name";
 
         PGAdyen.Insert();
@@ -159,7 +157,6 @@ codeunit 6151474 "NPR UPG PG To Interface"
     local procedure MovePGBambora(PaymentGateway: Record "NPR Magento Payment Gateway")
     var
         PGBambora: Record "NPR PG Bambora Setup";
-        Password: Text;
     begin
         if (PGBambora.Get(PaymentGateway.Code)) then
             exit;
@@ -167,9 +164,8 @@ codeunit 6151474 "NPR UPG PG To Interface"
         PGBambora.Init();
         PGBambora.Code := PaymentGateway.Code;
         PGBambora."Access Token" := PaymentGateway."Api Username";
-        Password := PaymentGateway.GetApiPassword();
-        if (Password <> '') then
-            PGBambora.SetSecretToken(Password);
+        if (PaymentGateway.HasApiPassword()) then
+            PGBambora.SetSecretToken(PaymentGateway.GetApiPassword());
         PGBambora."Merchant ID" := PaymentGateway."Merchant ID";
 
         PGBambora.Insert();
@@ -178,7 +174,6 @@ codeunit 6151474 "NPR UPG PG To Interface"
     local procedure MovePGDibs(PaymentGateway: Record "NPR Magento Payment Gateway")
     var
         DibsSetup: Record "NPR PG Dibs Setup";
-        Password: Text;
     begin
         if (DibsSetup.Get(PaymentGateway.Code)) then
             exit;
@@ -187,9 +182,8 @@ codeunit 6151474 "NPR UPG PG To Interface"
         DibsSetup.Code := PaymentGateway.Code;
         DibsSetup."Api Url" := PaymentGateway."Api Url";
         DibsSetup."Api Username" := PaymentGateway."Api Username";
-        Password := PaymentGateway.GetApiPassword();
-        if (Password <> '') then
-            DibsSetup.SetApiPassword(Password);
+        if (PaymentGateway.HasApiPassword()) then
+            DibsSetup.SetApiPassword(PaymentGateway.GetApiPassword());
         DibsSetup."Merchant ID" := PaymentGateway."Merchant ID";
 
         DibsSetup.Insert();
@@ -198,7 +192,6 @@ codeunit 6151474 "NPR UPG PG To Interface"
     local procedure MovePGNetaxept(PaymentGateway: Record "NPR Magento Payment Gateway")
     var
         PGNetaxept: Record "NPR PG Netaxept Setup";
-        AccessToken: Text;
     begin
         if (PGNetaxept.Get(PaymentGateway.Code)) then
             exit;
@@ -210,9 +203,8 @@ codeunit 6151474 "NPR UPG PG To Interface"
         else
             PGNetaxept.Environment := PGNetaxept.Environment::Production;
 
-        AccessToken := PaymentGateway.GetApiPassword();
-        if (AccessToken <> '') then
-            PGNetaxept.SetApiAccessToken(AccessToken);
+        if (PaymentGateway.HasApiPassword()) then
+            PGNetaxept.SetApiAccessToken(PaymentGateway.GetApiPassword());
         PGNetaxept."Merchant ID" := PaymentGateway."Merchant ID";
 
         PGNetaxept.Insert();
@@ -242,16 +234,14 @@ codeunit 6151474 "NPR UPG PG To Interface"
     local procedure MovePGQuickPay(PaymentGateway: Record "NPR Magento Payment Gateway")
     var
         QuickPaySetup: Record "NPR PG Quickpay Setup";
-        Token: Text;
     begin
         if (QuickPaySetup.Get(PaymentGateway.Code)) then
             exit;
 
         QuickPaySetup.Init();
         QuickPaySetup.Code := PaymentGateway.Code;
-        Token := PaymentGateway.GetApiPassword();
-        if (Token <> '') then
-            QuickPaySetup.SetApiPassword(Token);
+        if (PaymentGateway.HasApiPassword()) then
+            QuickPaySetup.SetApiPassword(PaymentGateway.GetApiPassword());
         QuickPaySetup.Insert();
     end;
 }
