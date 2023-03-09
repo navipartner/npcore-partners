@@ -960,6 +960,7 @@
         if POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale"] then begin
             if ((POSSalesLine.Type <> POSSalesLine.Type::Voucher) and
                 (POSSalesLine.Type <> POSSalesLine.Type::Payout) and
+                (POSSalesLine.Type <> POSSalesLine.Type::Customer) and
                 (POSSalesLine.Type <> POSSalesLine.Type::"G/L Account")) then begin
                 POSWorkshiftCheckpoint."Direct Net Turnover (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
                 POSWorkshiftCheckpoint."Direct Turnover (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
