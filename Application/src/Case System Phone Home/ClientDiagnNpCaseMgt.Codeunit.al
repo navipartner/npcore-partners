@@ -219,7 +219,8 @@
         if not IsSaas then
             XmlElementLoginInfo.Add(AddElement('user_login_type', UserLoginType, MethodNS));
 
-        XmlElementLoginInfo.Add(AddElement('application_version', GetRetailVersion() + ' ' + GetBaseAppVersion(), MethodNS));
+        XmlElementLoginInfo.Add(AddElement('application_version', GetRetailVersion(), MethodNS));
+        XmlElementLoginInfo.Add(AddElement('base_application_version', GetBaseAppVersion(), MethodNS));
         XmlElementLoginInfo.Add(AddElement('environment_name', EnvironmentInformation.GetEnvironmentName(), MethodNS));
         XmlElementLoginInfo.Add(AddElement('pos_unit_no', GetPosUnitNo(), MethodNS));
 
@@ -238,12 +239,11 @@
     local procedure GetBaseAppVersion(): Text
     var
         BaseAppModInfo: ModuleInfo;
-        BaseAppLabel: Label 'Base: %1', Comment = '%1=Version', Locked = true;
         BaseAppID: Guid;
     begin
         BaseAppID := '437dbf0e-84ff-417a-965d-ed2bb9650972';
         NavApp.GetModuleInfo(BaseAppID, BaseAppModInfo);
-        exit(StrSubstNo(BaseAppLabel, format(BaseAppModInfo.AppVersion())));
+        exit(format(BaseAppModInfo.AppVersion()));
     end;
 
     local procedure GetPosUnitNo(): text[10]
