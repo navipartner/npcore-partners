@@ -300,7 +300,7 @@
             TempRetailPriceLogEntry.Init();
             TempRetailPriceLogEntry."Entry No." := i;
             ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
-            TempRetailPriceLogEntry."Item No." := ChangeLogEntry."Primary Key Field 1 Value";
+            TempRetailPriceLogEntry."Item No." := CopyStr(ChangeLogEntry."Primary Key Field 1 Value", 1, MaxStrLen(TempRetailPriceLogEntry."Item No."));
             TempRetailPriceLogEntry."Variant Code" := '';
             if Evaluate(TempRetailPriceLogEntry."Old Value", ChangeLogEntry."Old Value", 9) then;
             if Evaluate(TempRetailPriceLogEntry."New Value", ChangeLogEntry."New Value", 9) then;
@@ -337,7 +337,7 @@
                 TempRetailPriceLogEntry.Init();
                 TempRetailPriceLogEntry."Entry No." := i;
                 ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
-                TempRetailPriceLogEntry."Item No." := ChangeLogEntry."Primary Key Field 1 Value";
+                TempRetailPriceLogEntry."Item No." := CopyStr(ChangeLogEntry."Primary Key Field 1 Value", 1, MaxStrLen(TempRetailPriceLogEntry."Item No."));
                 TempRetailPriceLogEntry."Variant Code" := '';
                 if Evaluate(TempRetailPriceLogEntry."Old Value", ChangeLogEntry."Old Value", 9) then;
                 if Evaluate(TempRetailPriceLogEntry."New Value", ChangeLogEntry."New Value", 9) then;
@@ -374,7 +374,7 @@
                 TempRetailPriceLogEntry.Init();
                 TempRetailPriceLogEntry."Entry No." := i;
                 ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
-                TempRetailPriceLogEntry."Item No." := ChangeLogEntry."Primary Key Field 2 Value";
+                TempRetailPriceLogEntry."Item No." := CopyStr(ChangeLogEntry."Primary Key Field 2 Value", 1, MaxStrLen(TempRetailPriceLogEntry."Item No."));
                 TempRetailPriceLogEntry."Variant Code" := '';
                 if Evaluate(TempRetailPriceLogEntry."Old Value", ChangeLogEntry."Old Value", 9) then;
                 if Evaluate(TempRetailPriceLogEntry."New Value", ChangeLogEntry."New Value", 9) then;
@@ -409,7 +409,7 @@
             TempRetailPriceLogEntry.Init();
             TempRetailPriceLogEntry."Entry No." := i;
             ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
-            TempRetailPriceLogEntry."Item No." := ChangeLogEntry."Primary Key Field 2 Value";
+            TempRetailPriceLogEntry."Item No." := CopyStr(ChangeLogEntry."Primary Key Field 2 Value", 1, MaxStrLen(TempRetailPriceLogEntry."Item No."));
             TempRetailPriceLogEntry."Variant Code" := '';
             if Evaluate(TempRetailPriceLogEntry."Old Value", ChangeLogEntry."Old Value", 9) then;
             if Evaluate(TempRetailPriceLogEntry."New Value", ChangeLogEntry."New Value", 9) then;
