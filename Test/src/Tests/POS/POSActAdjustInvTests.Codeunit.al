@@ -25,6 +25,7 @@ codeunit 85049 "NPR POS Act. Adjust Inv. Tests"
         POSActionBusinessLogic: Codeunit "NPR POS Action: Adjust Inv. B";
         ItemNo: Code[20];
         ReasonCode: Code[10];
+        CustomDescription: text[100];
     begin
         // [Given] POS & Payment setup
         LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
@@ -38,7 +39,7 @@ codeunit 85049 "NPR POS Act. Adjust Inv. Tests"
         POSSession.GetSaleLine(POSSaleLine);
         Quantity := LibraryRandom.RandDec(100, 4);
 
-        POSActionBusinessLogic.PerformAdjustInventory(POSSale, POSSaleLine, Quantity, ReasonCode);
+        POSActionBusinessLogic.PerformAdjustInventory(POSSale, POSSaleLine, Quantity, ReasonCode, CustomDescription);
 
         Item.Get(ItemNo);
         Item.CalcFields(Inventory);
