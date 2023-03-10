@@ -216,6 +216,8 @@
                     SaleLinePOS := TempSaleLinePOS;
                     SaleLinePOS.Insert(false);
                 end;
+
+                OnCheckSalesLineUpdateDisc(SaleLinePOS, TempSaleLinePOS);
                 TempSaleLinePOS.Delete();
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
 
@@ -366,6 +368,11 @@
 
     [IntegrationEvent(false, false)]
     internal procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; SalePOS: Record "NPR POS Sale"; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckSalesLineUpdateDisc(var SaleLinePOS: Record "NPR POS Sale Line"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     begin
     end;
 }
