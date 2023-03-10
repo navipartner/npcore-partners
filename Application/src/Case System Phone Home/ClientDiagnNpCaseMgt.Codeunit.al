@@ -289,9 +289,6 @@
         XmlElementComputerInfo := XmlElement.Create('computer_info', MethodNS);
         XmlElementComputerInfo.Add(AddElement('client_name', _ActiveSession."Client Computer Name", MethodNS));
         XmlElementComputerInfo.Add(AddElement('serial_number', SerialNumber(), MethodNS));
-        XmlElementComputerInfo.Add(AddElement('os_version', '', MethodNS));
-        XmlElementComputerInfo.Add(AddElement('mac_addresses', '', MethodNS));
-        XmlElementComputerInfo.Add(AddElement('platform_version', '', MethodNS));
 
         Element.Add(XmlElementComputerInfo);
     end;
