@@ -51,75 +51,73 @@
 
         MemberInfoCapture.LockTable(true);
 
+        // MemberInfoCapture has a filter - refresh to first record of that filter
         MemberInfoCapture.FindSet();
-        repeat
 
-            MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
+        MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
 
-            case MembershipSalesSetup."Business Flow Type" of
-                MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
-                    begin
-                        if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
-                            Error(FORCED_ROLLBACK);
+        case MembershipSalesSetup."Business Flow Type" of
+            MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
+                begin
+                    if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
+                        Error(FORCED_ROLLBACK);
 
-                        MembershipEntryNo := MemberManagement.CreateMembership(MembershipSalesSetup, MemberInfoCapture, false);
+                    MembershipEntryNo := MemberManagement.CreateMembership(MembershipSalesSetup, MemberInfoCapture, false);
+                    MemberManagement.AddMemberAndCard(MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
+
+                    MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
+                    MemberInfoCapture.Modify();
+
+                    while (MemberInfoCapture.Next() <> 0) do begin
                         MemberManagement.AddMemberAndCard(MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
-
                         MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
                         MemberInfoCapture.Modify();
-
-                        while (MemberInfoCapture.Next() <> 0) do begin
-                            MemberManagement.AddMemberAndCard(MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
-                            MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
-                            MemberInfoCapture.Modify();
-                        end;
                     end;
+                end;
 
-                MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER:
-                    begin
-                        repeat
-                            if (not IsForeignMembership(MembershipSalesSetup."Membership Code")) then
-                                MemberManagement.AddMemberAndCard(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
-                            MemberInfoCapture.Modify();
+            MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER:
+                begin
+                    repeat
+                        if (not IsForeignMembership(MembershipSalesSetup."Membership Code")) then
+                            MemberManagement.AddMemberAndCard(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
+                        MemberInfoCapture.Modify();
 
-                        until (MemberInfoCapture.Next() = 0);
-                        Error(FORCED_ROLLBACK);
-                    end;
+                    until (MemberInfoCapture.Next() = 0);
+                    Error(FORCED_ROLLBACK);
+                end;
 
-                MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER:
-                    begin
+            MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER:
+                begin
 
-                        if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
-                            Error(NOT_SUPPORTED_FOR_REMOTE);
+                    if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
+                        Error(NOT_SUPPORTED_FOR_REMOTE);
 
-                        MemberManagement.AddAnonymousMember(MemberInfoCapture, MemberInfoCapture.Quantity);
-                        Error(FORCED_ROLLBACK);
-                    end;
+                    MemberManagement.AddAnonymousMember(MemberInfoCapture, MemberInfoCapture.Quantity);
+                    Error(FORCED_ROLLBACK);
+                end;
 
-                MembershipSalesSetup."Business Flow Type"::ADD_CARD:
-                    begin
+            MembershipSalesSetup."Business Flow Type"::ADD_CARD:
+                begin
 
-                        if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
-                            Error(NOT_SUPPORTED_FOR_REMOTE);
+                    if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
+                        Error(NOT_SUPPORTED_FOR_REMOTE);
 
-                        MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
-                        Error(FORCED_ROLLBACK);
-                    end;
+                    MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
+                    Error(FORCED_ROLLBACK);
+                end;
 
-                MembershipSalesSetup."Business Flow Type"::REPLACE_CARD:
-                    begin
+            MembershipSalesSetup."Business Flow Type"::REPLACE_CARD:
+                begin
 
-                        if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
-                            Error(NOT_SUPPORTED_FOR_REMOTE);
+                    if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
+                        Error(NOT_SUPPORTED_FOR_REMOTE);
 
-                        if (MemberInfoCapture."Replace External Card No." <> '') then
-                            MemberManagement.BlockMemberCard(MemberManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
-                        MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
-                        Error(FORCED_ROLLBACK);
-                    end;
-            end;
-
-        until (MemberInfoCapture.Next() = 0);
+                    if (MemberInfoCapture."Replace External Card No." <> '') then
+                        MemberManagement.BlockMemberCard(MemberManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
+                    MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
+                    Error(FORCED_ROLLBACK);
+                end;
+        end;
 
     end;
 
@@ -137,113 +135,111 @@
         RemoteMembership: Boolean;
     begin
 
+        // MemberInfoCapture has a filter - refresh to first record of that filter
         MemberInfoCapture.FindSet();
-        repeat
 
-            case MemberInfoCapture."Information Context" of
+        case MemberInfoCapture."Information Context" of
 
-                MemberInfoCapture."Information Context"::NEW:
-                    begin
+            MemberInfoCapture."Information Context"::NEW:
+                begin
 
-                        MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
-                        RemoteMembership := IsForeignMembership(MembershipSalesSetup."Membership Code");
+                    MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
+                    RemoteMembership := IsForeignMembership(MembershipSalesSetup."Membership Code");
 
-                        if (MembershipSalesSetup."Business Flow Type" <> MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER) then
-                            if (MemberInfoCapture.Quantity <> 1) then
-                                Error(MSG_1101);
+                    if (MembershipSalesSetup."Business Flow Type" <> MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER) then
+                        if (MemberInfoCapture.Quantity <> 1) then
+                            Error(MSG_1101);
 
-                        if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::MEMBERSHIP) then begin
+                    if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::MEMBERSHIP) then begin
 
-                            if (RemoteMembership) then begin
-                                RemoteCreateMembership(MemberInfoCapture, MembershipSalesSetup);
-                                repeat
-                                    RemoteAddMember(MemberInfoCapture, MembershipSalesSetup);
-                                until (MemberInfoCapture.Next() = 0);
-                                //TODO: Consider - RemoteActivateMembership (MemberInfoCapture, MembershipSalesSetup);
+                        if (RemoteMembership) then begin
+                            RemoteCreateMembership(MemberInfoCapture, MembershipSalesSetup);
+                            repeat
+                                RemoteAddMember(MemberInfoCapture, MembershipSalesSetup);
+                            until (MemberInfoCapture.Next() = 0);
+                            //TODO: Consider - RemoteActivateMembership (MemberInfoCapture, MembershipSalesSetup);
 
-                            end else begin
-                                MemberManagement.AddMembershipLedgerEntry_NEW(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Document Date", MembershipSalesSetup, MemberInfoCapture);
-                            end;
-
+                        end else begin
+                            MemberManagement.AddMembershipLedgerEntry_NEW(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Document Date", MembershipSalesSetup, MemberInfoCapture);
                         end;
 
+                    end;
+
+                    if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER) then begin
+                        repeat
+
+                            if (RemoteMembership) then begin
+                                RemoteAddMember(MemberInfoCapture, MembershipSalesSetup);
+                            end else begin
+                                MemberManagement.AddMemberAndCard(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
+                            end;
+
+                        until (MemberInfoCapture.Next() = 0);
+
+                    end;
+
+                    if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER) then begin
+                        MemberManagement.AddAnonymousMember(MemberInfoCapture, MemberInfoCapture.Quantity);
+                    end;
+
+                    if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::REPLACE_CARD) then begin
+                        MemberManagement.BlockMemberCard(MemberManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
+                        MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
+                        if (MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER, MembershipSalesSetup."Member Card Type"::PASSSERVER]) then
+                            MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
+                    end;
+
+                    if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_CARD) then begin
+                        if (RemoteMembership) then begin
+                            RemoteCardAdd(MemberInfoCapture, MembershipSalesSetup);
+                        end else begin
+                            MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
+                            if (MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER, MembershipSalesSetup."Member Card Type"::PASSSERVER]) then
+                                MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
+                        end;
+                    end;
+
+                end;
+
+            MemberInfoCapture."Information Context"::REGRET:
+                begin
+                    MemberManagement.RegretMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price");
+                end;
+
+            MemberInfoCapture."Information Context"::RENEW:
+                begin
+                    MemberManagement.RenewMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price");
+                end;
+
+            MemberInfoCapture."Information Context"::UPGRADE:
+                begin
+                    MemberManagement.UpgradeMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price");
+
+                    if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.")) then begin
                         if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER) then begin
                             repeat
-
-                                if (RemoteMembership) then begin
-                                    RemoteAddMember(MemberInfoCapture, MembershipSalesSetup);
-                                end else begin
-                                    MemberManagement.AddMemberAndCard(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
-                                end;
-
+                                MemberManagement.AddMemberAndCard(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
                             until (MemberInfoCapture.Next() = 0);
-
                         end;
 
                         if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER) then begin
                             MemberManagement.AddAnonymousMember(MemberInfoCapture, MemberInfoCapture.Quantity);
                         end;
-
-                        if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::REPLACE_CARD) then begin
-                            MemberManagement.BlockMemberCard(MemberManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
-                            MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
-                            if (MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER, MembershipSalesSetup."Member Card Type"::PASSSERVER]) then
-                                MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
-                        end;
-
-                        if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_CARD) then begin
-                            if (RemoteMembership) then begin
-                                RemoteCardAdd(MemberInfoCapture, MembershipSalesSetup);
-                            end else begin
-                                MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
-                                if (MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER, MembershipSalesSetup."Member Card Type"::PASSSERVER]) then
-                                    MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
-                            end;
-                        end;
-
                     end;
 
-                MemberInfoCapture."Information Context"::REGRET:
-                    begin
-                        MemberManagement.RegretMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price");
-                    end;
+                end;
 
-                MemberInfoCapture."Information Context"::RENEW:
-                    begin
-                        MemberManagement.RenewMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price");
-                    end;
+            MemberInfoCapture."Information Context"::EXTEND:
+                begin
+                    MemberManagement.ExtendMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price");
+                end;
 
-                MemberInfoCapture."Information Context"::UPGRADE:
-                    begin
-                        MemberManagement.UpgradeMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price");
+            MemberInfoCapture."Information Context"::CANCEL:
+                begin
+                    MemberManagement.CancelMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price");
+                end;
 
-                        if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.")) then begin
-                            if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER) then begin
-                                repeat
-                                    MemberManagement.AddMemberAndCard(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
-                                until (MemberInfoCapture.Next() = 0);
-                            end;
-
-                            if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER) then begin
-                                MemberManagement.AddAnonymousMember(MemberInfoCapture, MemberInfoCapture.Quantity);
-                            end;
-                        end;
-
-                    end;
-
-                MemberInfoCapture."Information Context"::EXTEND:
-                    begin
-                        MemberManagement.ExtendMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price");
-                    end;
-
-                MemberInfoCapture."Information Context"::CANCEL:
-                    begin
-                        MemberManagement.CancelMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price");
-                    end;
-
-            end;
-        until (MemberInfoCapture.Next() = 0);
-
+        end;
     end;
 
     local procedure IsForeignMembership(MembershipCode: Code[20]): Boolean
