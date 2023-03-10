@@ -2,7 +2,7 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
 {
     Access = Internal;
 
-    procedure PerformAdjustInventory(POSSale: Codeunit "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line"; Quantity: Decimal; ReturnReasonCode: Code[10])
+    procedure PerformAdjustInventory(POSSale: Codeunit "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line"; Quantity: Decimal; ReturnReasonCode: Code[10]; CustomDescription: text[100])
     var
         TempItemJnlLine: Record "Item Journal Line" temporary;
         SalePOS: Record "NPR POS Sale";
@@ -16,7 +16,7 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
         if not ConfirmAdjustInventory(SaleLinePOS, Quantity) then
             exit;
 
-        CreateItemJnlLine(SalePOS, SaleLinePOS, Quantity, ReturnReasonCode, TempItemJnlLine);
+        CreateItemJnlLine(SalePOS, SaleLinePOS, Quantity, ReturnReasonCode, TempItemJnlLine, CustomDescription);
         PostItemJnlLine(TempItemJnlLine);
 
         Message(Text005, Quantity);
@@ -40,13 +40,14 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
         exit(PerformAdjustInventory);
     end;
 
-    local procedure CreateItemJnlLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; Quantity: Decimal; ReturnReasonCode: Code[10]; var TempItemJnlLine: Record "Item Journal Line" temporary)
+    local procedure CreateItemJnlLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; Quantity: Decimal; ReturnReasonCode: Code[10]; var TempItemJnlLine: Record "Item Journal Line" temporary; CustomDescription: Text[100])
     begin
         TempItemJnlLine.Init();
         TempItemJnlLine.Validate("Item No.", SaleLinePOS."No.");
         TempItemJnlLine.Validate("Posting Date", Today);
         TempItemJnlLine."Document No." := SaleLinePOS."Sales Ticket No.";
         TempItemJnlLine."NPR Register Number" := SaleLinePOS."Register No.";
+
         TempItemJnlLine."NPR Document Time" := Time;
         if SaleLinePOS."Variant Code" <> '' then
             TempItemJnlLine.Validate("Variant Code", SaleLinePOS."Variant Code");
@@ -60,6 +61,8 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
         TempItemJnlLine.Validate("Shortcut Dimension 1 Code", SaleLinePOS."Shortcut Dimension 1 Code");
         TempItemJnlLine.Validate("Shortcut Dimension 2 Code", SaleLinePOS."Shortcut Dimension 2 Code");
         TempItemJnlLine.Validate("Salespers./Purch. Code", SalePOS."Salesperson Code");
+        if CustomDescription <> '' then
+            TempItemJnlLine.Description := CopyStr(CustomDescription, 1, MaxStrLen(TempItemJnlLine.Description));
         TempItemJnlLine.Insert();
     end;
 
