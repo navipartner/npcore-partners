@@ -36,6 +36,7 @@
         POSUnit.Get(UnitNo);
         POSBinMovement := false;
 
+        PaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
         PaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftCheckpointEntryNo);
         PaymentBinCheckpoint.SetFilter("Payment Method No.", '=%1', PaymentMethodCode);
         PaymentBinCheckpoint.SetFilter("Payment Bin No.", '=%1', BinNo);
