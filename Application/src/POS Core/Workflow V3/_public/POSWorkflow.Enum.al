@@ -704,6 +704,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'RV_GET_WAITER_PAD', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Get WPad";
     }
+    value(137; MM_MEMBER_BACKEND)
+    {
+        Caption = 'MM_MEMBER_BACKEND', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR MM POS Action: BackEnd Fun";
+    }
     value(138; RV_SET_PARTYSIZE)
     {
         Caption = 'RV_SET_PARTYSIZE', Locked = true, MaxLength = 20;
