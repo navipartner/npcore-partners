@@ -197,12 +197,6 @@
         _TmpSelectionBuffer.Insert();
     end;
 
-    internal procedure SetSelectionBuffer(RecVariant: Variant)
-    begin
-        _TmpSelectionBuffer.GetTable(RecVariant);
-        _SelectionBufferOpen := true;
-    end;
-
     internal procedure PrintSelection(ReportType: Integer)
     var
         RetailJournalLine: Record "NPR Retail Journal Line";
