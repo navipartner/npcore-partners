@@ -23,7 +23,9 @@ codeunit 6014495 "NPR HWC Report Printer"
                 end else begin
                     Payload.ReadFrom(StrSubstNo('{"version":1,"description":"%1","papertrays":[{"papersourcekind":%2,"paperkind":%3}]}', CopyStr(StrSubstNo(HardwareConnectorLbl, HWCPrinter.Name), 1, 250), HWCPrinter."Paper Source".AsInteger(), HWCPrinter."Paper Size".AsInteger()));
                 end;
+#pragma warning disable AA0139
                 Printers.Add('NPR_HWC_' + HWCPrinter.ID, Payload);
+#pragma warning restore AA0139
                 Clear(Payload);
             until HWCPrinter.Next() = 0;
     end;
