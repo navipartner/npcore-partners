@@ -2,7 +2,6 @@
 {
     AutoSplitKey = true;
     Caption = 'Lines';
-    DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = None;
     SourceTable = "NPR Retail Journal Line";
@@ -271,17 +270,11 @@
         Rec.SetupNewLine(xRec);
     end;
 
-    trigger OnOpenPage()
-    begin
-        IsWebClient := not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Desktop]);
-    end;
-
     var
         LabelLibrary: Codeunit "NPR Label Library";
         Print: Boolean;
         Caption_DeletePrintedLines: Label 'Delete printed lines?';
         SkipConfirm: Boolean;
-        IsWebClient: Boolean;
 
     procedure GetSelectionFilter(var Lines: Record "NPR Retail Journal Line")
     var
@@ -320,20 +313,8 @@
     procedure PrintSelection(ReportType: Integer)
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
-        TempRetailJnlLine: Record "NPR Retail Journal Line" temporary;
         RecRef: RecordRef;
     begin
-        if IsWebClient then begin
-            if RetailJnlLine.FindSet() then begin
-                repeat
-                    TempRetailJnlLine.Init();
-                    TempRetailJnlLine := RetailJnlLine;
-                    TempRetailJnlLine.Insert();
-                until RetailJnlLine.Next() = 0;
-            end;
-            LabelLibrary.SetSelectionBuffer(TempRetailJnlLine);
-        end;
-
         LabelLibrary.PrintSelection(ReportType);
 
         If SkipConfirm then
@@ -344,9 +325,10 @@
             if RetailJnlLine.FindSet() then
                 repeat
                     RecRef.GetTable(RetailJnlLine);
-                    if LabelLibrary.SelectionContains(RecRef) then
+                    if LabelLibrary.SelectionContains(RecRef) then begin
                         RetailJnlLine.Delete(true);
-                    RecRef.Close();
+                        LabelLibrary.ToggleLine(RecRef);
+                    end;
                 until RetailJnlLine.Next() = 0;
         end;
     end;
