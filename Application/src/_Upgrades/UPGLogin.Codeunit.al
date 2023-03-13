@@ -17,14 +17,14 @@ codeunit 6060017 "NPR UPG Login"
             exit;
         end;
 
-        UpgradePOSMenuPaymentButtons();
+        UpgradePOSMenuLoginButtons();
         UpgradeNamedActionProfiles();
 
         UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Login"));
         LogMessageStopwatch.LogFinish();
     end;
 
-    local procedure UpgradePOSMenuPaymentButtons()
+    local procedure UpgradePOSMenuLoginButtons()
     var
         POSMenuButton: Record "NPR POS Menu Button";
     begin
@@ -45,12 +45,12 @@ codeunit 6060017 "NPR UPG Login"
         POSNamedActionProfile: Record "NPR POS Setup";
         ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
     begin
-        POSNamedActionProfile.SetRange("Payment Action Code", 'LOGIN-BUTTON');
+        POSNamedActionProfile.SetRange("Login Action Code", 'LOGIN-BUTTON');
         if not POSNamedActionProfile.FindSet(true) then
             exit;
 
         repeat
-            POSNamedActionProfile."Payment Action Code" := 'LOGIN';
+            POSNamedActionProfile."Login Action Code" := 'LOGIN';
             POSNamedActionProfile.Modify(true);
             ParamMgt.RefreshParameters(POSNamedActionProfile.RecordId, '', POSNamedActionProfile.FieldNo("Login Action Code"), POSNamedActionProfile."Login Action Code");
         until POSNamedActionProfile.Next() = 0;
