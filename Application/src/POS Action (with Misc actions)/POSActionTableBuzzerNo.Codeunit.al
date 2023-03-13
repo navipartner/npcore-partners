@@ -1,75 +1,54 @@
-﻿codeunit 6150780 "NPR POS Action: TableBuzzerNo"
+﻿codeunit 6150780 "NPR POS Action: TableBuzzerNo" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config")
     var
-        ActionDescription: Label 'Insert a table buzzer number ';
+        ActionDescriptionLbl: Label 'Insert a table buzzer number';
+        DialogTypeParam_OptLbl: Label 'TextField,Numpad', Locked = true;
+        DialogTypeParam_OptCptLbl: Label 'TextField,Numpad';
+        DialogTypeParam_CptLbl: Label 'Dialog Type';
+        DialogTypeParam_DescLbl: Label 'Specifies Dialog Type';
+        ComTextPatterParam_Cptbl: Label 'Comment Text Pattern';
+        ComTextPatterParam_Descbl: Label 'Specifies Comment Text Pattern';
         Prompt_EnterComment: Label 'Enter Table Buzzer Number';
-        BuzzerText: Label 'Table Buzzer %1';
-        ReadingErr: Label 'reading in %1';
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('textfield', 'if (param.DialogType == param.DialogType["TextField"]) {input(labels.prompt).respond();}');
-            Sender.RegisterWorkflowStep('numpad', 'if (param.DialogType == param.DialogType["Numpad"]) {numpad(labels.prompt).respond();}');
-            Sender.RegisterOptionParameter('DialogType', 'TextField,Numpad', 'TextField');
-            Sender.RegisterTextParameter('CommentTextPattern', '');
-            Sender.RegisterWorkflow(false);
-        end;
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
+        WorkflowConfig.AddOptionParameter(
+            'DialogType',
+            DialogTypeParam_OptLbl,
+#pragma warning disable AA0139
+            SelectStr(1, DialogTypeParam_OptLbl),
+#pragma warning restore 
+            DialogTypeParam_CptLbl,
+            DialogTypeParam_DescLbl,
+            DialogTypeParam_OptCptLbl);
+        WorkflowConfig.AddTextParameter('CommentTextPattern', '', ComTextPatterParam_Cptbl, ComTextPatterParam_Descbl);
+        WorkflowConfig.AddLabel('prompt', Prompt_EnterComment);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure GetActionScript(): Text
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        InputPosCommentLine(Context, POSSession, FrontEnd);
-        Handled := true;
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionTableBuzzerNo.js###
+'let main=async({workflow:t,captions:p,parameters:i,context:a})=>{i.DialogType==i.DialogType.TextField?a.input=await popup.input({caption:p.prompt}):a.input=await popup.numpad({caption:p.prompt}),await t.respond()};'
+        );
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     begin
-        Captions.AddActionCaption(ActionCode(), 'prompt', Prompt_EnterComment);
+        OnActionInsertTableBuzzer(Context, SaleLine);
     end;
 
-    local procedure InputPosCommentLine(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnActionInsertTableBuzzer(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line")
     var
-        JSON: Codeunit "NPR POS JSON Management";
-        Line: Record "NPR POS Sale Line";
-        SaleLine: Codeunit "NPR POS Sale Line";
+        BusinessLogic: Codeunit "NPR POS Act:TableBuzzerNo BL";
         CommentTextPattern: Text;
+        InputText: Text;
     begin
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-
-        CommentTextPattern := JSON.GetStringParameterOrFail('CommentTextPattern', ActionCode());
-        if CommentTextPattern = '' then
-            CommentTextPattern := BuzzerText;
-
-        Line."Line Type" := Line."Line Type"::Comment;
-        Line.Description := StrSubstNo(CommentTextPattern, JSON.GetStringOrFail('value', StrSubstNo(ReadingErr, ActionCode())));
-
-        POSSession.GetSaleLine(SaleLine);
-        SaleLine.InsertLine(Line);
-
-        POSSession.RequestRefreshData();
-    end;
-
-    local procedure ActionCode(): Code[20]
-    begin
-        exit('INSERT_TABLE_BUZZER');
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.2');
+        CommentTextPattern := Context.GetStringParameter('CommentTextPattern');
+        InputText := Context.GetString('input');
+        BusinessLogic.InputPosCommentLine(SaleLine, CommentTextPattern, InputText);
     end;
 }
