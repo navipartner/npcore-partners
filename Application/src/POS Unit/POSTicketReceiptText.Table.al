@@ -51,7 +51,7 @@
         Rec."Rcpt. Txt. Profile Code" := ProfileCode;
         Rec."Line No." := LineNo;
         Rec.Init();
-        Rec."Receipt Text" := ReceiptText;
+        Rec."Receipt Text" := CopyStr(ReceiptText, 1, MaxStrLen(Rec."Receipt Text"));
         Rec.Insert();
     end;
 }
