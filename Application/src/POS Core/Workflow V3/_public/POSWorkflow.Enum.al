@@ -724,6 +724,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'RV_RUN_W/PAD_ACTION', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Run WPad Act.";
     }
+    value(146; "SETTAXLIABLE")
+    {
+        Caption = 'SETTAXLIABLE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Set Tax Liable";
+    }
     value(6014600; BALANCE_V4)
     {
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;
