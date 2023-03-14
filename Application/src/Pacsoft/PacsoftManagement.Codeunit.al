@@ -9,7 +9,7 @@
     var
 
         PackageProviderSetup: Record "NPR Shipping Provider Setup";
-        SendShipmentAgainQst: label 'The shipment was already sent to Pacsoft, do you wish to send it again?';
+        SendShipmentAgainQst: Label 'The shipment was already sent to Pacsoft, do you wish to send it again?';
 
     procedure SendDocuments()
     var
@@ -27,7 +27,7 @@
     procedure SendDocument(var ShipmentDocument: Record "NPR Shipping Provider Document"; WithDialog: Boolean)
     var
         OutStr: OutStream;
-        DocumentSentMsg: label 'Document sent.';
+        DocumentSentMsg: Label 'Document sent.';
     begin
         if not InitPackageProvider() then exit;
 
@@ -51,7 +51,7 @@
                                                 '.xml';
         ShipmentDocument."Request XML".CreateOutStream(OutStr);
         ShipmentDocument.SetRecFilter();
-        XMLPORT.Export(XMLPORT::"NPR Pacsoft Shipment Document", OutStr, ShipmentDocument);
+        Xmlport.Export(Xmlport::"NPR Pacsoft Shipment Document", OutStr, ShipmentDocument);
         ShipmentDocument.Modify();
 
         Clear(OutStr);
@@ -70,7 +70,7 @@
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
-        XMLResponce: xmlport "NPR Pacsoft Response";
+        XMLResponce: XmlPort "NPR Pacsoft Response";
         InStr: InStream;
         URI: Text[250];
     begin
@@ -138,10 +138,10 @@
         ShipDocService: Record "NPR Pacsoft Shipm. Doc. Serv.";
         CustomsItemRows: Record "NPR Pacsoft Customs Item Rows";
         CompanyInfo: Record "Company Information";
-        TextNoNotification: label 'Please select a Notification service';
-        TextNoItemRows: label 'Please fill at least one Customs Item Row.';
-        TextBeforeToday: label 'must be today or later.';
-        TextNoCustomsDocument: label 'can not be blank.';
+        TextNoNotification: Label 'Please select a Notification service';
+        TextNoItemRows: Label 'Please fill at least one Customs Item Row.';
+        TextBeforeToday: Label 'must be today or later.';
+        TextNoCustomsDocument: Label 'can not be blank.';
         Found: Boolean;
     begin
         if ShipmentDocument."Entry No." = 0 then exit;
@@ -223,6 +223,10 @@
     var
         Document: XmlDocument;
         Element: XmlElement;
+        Nodelist: XmlNodeList;
+        AttributeCollection: XmlAttributeCollection;
+        Attribute: XmlAttribute;
+        Node: XmlNode;
         InStr: InStream;
         OutStr: OutStream;
     begin
@@ -232,6 +236,17 @@
 
         ShipmentDocument."Request XML".CreateInStream(InStr);
         XmlDocument.ReadFrom(InStr, Document);
+
+        if Document.SelectNodes('//shipment', Nodelist) then begin
+            foreach Node in NodeList do begin
+                AttributeCollection := Node.AsXmlElement().Attributes();
+                if AttributeCollection.Get('orderno', attribute) then begin
+                    if Attribute.Value = '' then
+                        node.Remove();
+                end;
+            end;
+        end;
+
         Document.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'no'));
         Document.GetRoot(Element);
 
@@ -265,7 +280,7 @@
 
     local procedure InitPackageProvider(): Boolean;
     begin
-        if not PackageProviderSetup.GET() then
+        if not PackageProviderSetup.Get() then
             exit(false);
 
         if not PackageProviderSetup."Enable Shipping" then
@@ -278,10 +293,10 @@
 
     procedure CheckBalance()
     begin
-        message(Text001);
+        Message(Text001);
     end;
 
-    procedure SendDocument(var ShipmentDocument: Record "NPR shipping provider Document")
+    procedure SendDocument(var ShipmentDocument: Record "NPR Shipping Provider Document")
     var
         OutStr: OutStream;
     begin
@@ -305,7 +320,7 @@
                                                 '.xml';
         ShipmentDocument."Request XML".CreateOutStream(OutStr);
         ShipmentDocument.SetRecFilter();
-        XMLPORT.Export(XMLPORT::"NPR Pacsoft Shipment Document", OutStr, ShipmentDocument);
+        Xmlport.Export(Xmlport::"NPR Pacsoft Shipment Document", OutStr, ShipmentDocument);
         ShipmentDocument.Modify();
 
         Clear(OutStr);
@@ -315,9 +330,9 @@
 
     end;
 
-    procedure PrintDocument(var ShipmentDocument: Record "NPR shipping provider Document")
+    procedure PrintDocument(var ShipmentDocument: Record "NPR Shipping Provider Document")
     begin
-        message(Text001);
+        Message(Text001);
     end;
 
     procedure PrintShipmentDocument(var SalesShipmentHeader: Record "Sales Shipment Header")
@@ -332,7 +347,7 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', false, false)]
-    local procedure SalesPostOnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20])
+    local procedure SalesPostOnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20])
     var
 
         SalesShptHeader: Record "Sales Shipment Header";
@@ -353,6 +368,6 @@
     end;
 
     var
-        Text001: label 'Not available for Pacsoft';
+        Text001: Label 'Not available for Pacsoft';
 }
 
