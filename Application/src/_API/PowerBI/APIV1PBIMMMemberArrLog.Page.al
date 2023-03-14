@@ -44,7 +44,10 @@ page 6150795 "NPR APIV1 PBIMMMemberArrLog"
                 {
                     Caption = 'Local Date', Locked = true;
                 }
-
+                field(responseType; Rec."Response Type")
+                {
+                    Caption = 'Response Type', Locked = true;
+                }
             }
         }
     }
