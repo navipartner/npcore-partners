@@ -98,7 +98,8 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         POSActionParameter.SetRange(Name, 'itemIdentifyerType');
         if POSActionParameter.FindSet() then
             repeat
-                POSActionParameter.Rename(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType');
+                if not POSActionParameter.Get(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType') then
+                    POSActionParameter.Rename(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType');
             until POSActionParameter.Next() = 0;
     end;
 
@@ -209,7 +210,8 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         POSActionParameter.SetRange(Name, 'itemIdentifyerType');
         if POSActionParameter.FindSet() then
             repeat
-                POSActionParameter.Rename(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType');
+                If not POSActionParameter.Get(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType') then
+                    POSActionParameter.Rename(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType');
             until POSActionParameter.Next() = 0;
     end;
 
