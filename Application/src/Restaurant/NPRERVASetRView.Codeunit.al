@@ -1,39 +1,24 @@
-﻿codeunit 6150681 "NPR NPRE RVA: Set R-View"
+codeunit 6150681 "NPR NPRE RVA: Set R-View" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-    local procedure ActionCode(): Code[20]
-    begin
-        exit('RV_SET_R-VIEW');
-    end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.2');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action");
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This built-in action saves currently selected items to Waiter Pad and switches to the Restaurant View';
+        ParamReturnToDefaultEndOfSaleView_CptLbl: Label 'Return To Default End Of Sale View';
+        ParamReturnToDefaultEndOfSaleView_DescLbl: Label 'Specifies if default sale view will bve shown after sale end.';
     begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescription, ActionVersion()) then begin
-            Sender.RegisterWorkflow20('await workflow.respond();');
-
-            Sender.RegisterBooleanParameter('ReturnToDefaultEndOfSaleView', false);
-        end;
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddBooleanParameter('ReturnToDefaultEndOfSaleView', false, ParamReturnToDefaultEndOfSaleView_CptLbl, ParamReturnToDefaultEndOfSaleView_DescLbl);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
-    local procedure OnAction20(Action: Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    var
+        POSSession: Codeunit "NPR POS Session";
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
         SaveToWaiterPad(POSSession);
         SelectRestaurantView(POSSession, Context);
-        POSSession.RequestRefreshData();
     end;
 
     local procedure SaveToWaiterPad(POSSession: Codeunit "NPR POS Session");
@@ -56,14 +41,24 @@
         POSSale.Modify(true, false);
     end;
 
-    local procedure SelectRestaurantView(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management");
+    local procedure SelectRestaurantView(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Helper");
     var
         POSSale: Codeunit "NPR POS Sale";
+        ReturnToDefaultEndOfSaleView: Boolean;
     begin
-        if Context.GetBooleanParameter('ReturnToDefaultEndOfSaleView') then begin
+        if Context.GetBooleanParameter('ReturnToDefaultEndOfSaleView', ReturnToDefaultEndOfSaleView) and
+           ReturnToDefaultEndOfSaleView then begin
             POSSession.GetSale(POSSale);
             POSSale.SelectViewForEndOfSale(POSSession);
         end else
             POSSession.ChangeViewRestaurant();
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+        //###NPR_INJECT_FROM_FILE:NPRERVASetRView.js###
+'let main=async({})=>await workflow.respond();'
+        );
     end;
 }
