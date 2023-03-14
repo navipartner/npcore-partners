@@ -37,20 +37,28 @@ param (
 
 Clear-Host
 
+# Add UI.Client
+$uiclientPath = (Join-Path $PSScriptRoot "TestRunner\Microsoft.Dynamics.Framework.UI.Client.dll")
+Add-type -Path $uiclientPath
+
 # Add ActiveDirectory client
 $aadActiveDirectoryPath = (Join-Path $PSScriptRoot "TestRunner\Microsoft.IdentityModel.Clients.ActiveDirectory.dll")
 Add-type -Path $aadActiveDirectoryPath
 
 # Add AadTokenProvider
 $aadTokenProviderScriptPath = Join-Path $PSScriptRoot "TestRunner\AadTokenProvider.ps1"
-. "$aadTokenProviderScriptPath"
+. "$aadTokenProviderScriptPath" -Force
+
+# Add ClientContext
+$cctxScriptPath = Join-Path $PSScriptRoot "TestRunner\ClientContext.ps1"
+. "$cctxScriptPath" -Force
 
 # Import AL Test Runner functions
 #Import-Module (Join-Path $PSScriptRoot "TestRunner\ALTestRunner.psm1") -Force
 
 # Include NpBcptMgmt
 $npBcptMgmt = Join-Path $PSScriptRoot "NpBcptMgmt.ps1"
-. "$npBcptMgmt"
+. "$npBcptMgmt" -Force
 
 $bcptMgmt = [NpBcptMgmt]::new($Username, $Password, $TenantId, $SandboxName, $CompanyName, $ClientId, $aadActiveDirectoryPath)
 
