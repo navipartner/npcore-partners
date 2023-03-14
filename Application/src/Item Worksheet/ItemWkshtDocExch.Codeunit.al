@@ -77,16 +77,36 @@
                         if Format(ErrorMessage2."Record ID") = Format(ErrorMessage."Record ID") then begin
                             case ErrorMessage2."Field Number" of
                                 ItemWorksheetLine.FieldNo("Vendor Item No."):
+#IF NOT CLOUD OR BC20
                                     VendorItemNo := ErrorMessage2.Description;
+#ELSE
+                                    VendorItemNo := ErrorMessage2.Message;
+#ENDIF
                                 ItemWorksheetLine.FieldNo("Item Category Code"):
+#IF NOT CLOUD OR BC20
                                     ItemGroupText := ErrorMessage2.Description;
+#ELSE
+                                    ItemGroupText := ErrorMessage2.Message;
+#ENDIF
                                 ItemWorksheetLine.FieldNo(Description):
+#IF NOT CLOUD OR BC20
                                     VendorItemDescription := ErrorMessage2.Description;
+#ELSE
+                                    VendorItemDescription := ErrorMessage2.Message;
+#ENDIF
                                 ItemWorksheetLine.FieldNo("Vendor No."):
+#IF NOT CLOUD OR BC20
                                     VendorNo := ErrorMessage2.Description;
+#ELSE
+                                    VendorNo := ErrorMessage2.Message;
+#ENDIF
                                 ItemWorksheetLine.FieldNo("Direct Unit Cost"):
                                     begin
+#IF NOT CLOUD OR BC20
                                         Evaluate(DirectUnitCost, ErrorMessage2.Description, 9);
+#ELSE
+                                        Evaluate(DirectUnitCost, ErrorMessage2.Message, 9);
+#ENDIF
                                         Clear(DirectUnitCost);
                                     end;
                             end;
