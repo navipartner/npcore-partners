@@ -162,7 +162,6 @@
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         ReturnCode: Integer;
-        ReasonText: Text;
     begin
 
         if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
@@ -173,9 +172,6 @@
 
         if (SaleLinePOS.IsTemporary) then
             exit;
-
-        if (not CheckCrossLineSalesRules(SaleLinePOS, ReasonText)) then
-            Error(ReasonText);
 
         ReturnCode := MemberRetailIntegration.NewMemberSalesInfoCapture(SaleLinePOS);
         if (ReturnCode < 0) then
@@ -231,58 +227,6 @@
             end;
         end;
 
-    end;
-
-    internal procedure CheckCrossLineSalesRules(SaleLinePOS: Record "NPR POS Sale Line"; var ReasonText: Text): Boolean
-    var
-        ValidateAcrossSalesLines: Record "NPR POS Sale Line";
-        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        MixedSaleRuleOption: Option ALLOW,MEMBERSHIP_ITEM,SAME_ITEM,DISALLOW;
-        TotalItemCount: Integer;
-        MembershipItemCount: Integer;
-        LimitedByItem: Code[20];
-        MixedSalesNotAllowedLbl: Label 'Mixed sales is not allowed due to policy specified on item %1 in %2';
-    begin
-        MixedSaleRuleOption := MixedSaleRuleOption::ALLOW;
-
-        ValidateAcrossSalesLines.SetFilter("Register No.", '=%1', SaleLinePOS."Register No.");
-        ValidateAcrossSalesLines.SetFilter("Sales Ticket No.", '=%1', SaleLinePOS."Sales Ticket No.");
-        if (ValidateAcrossSalesLines.FindSet()) then begin
-            repeat
-                if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, ValidateAcrossSalesLines."No.")) then
-                    if (MembershipSalesSetup."Mixed Sale Policy" > MixedSaleRuleOption) then begin
-                        MixedSaleRuleOption := MembershipSalesSetup."Mixed Sale Policy";
-                        LimitedByItem := ValidateAcrossSalesLines."No.";
-                    end;
-            until (ValidateAcrossSalesLines.Next() = 0);
-
-            if (MixedSaleRuleOption > MixedSaleRuleOption::ALLOW) then begin
-                ValidateAcrossSalesLines.FindSet();
-                repeat
-                    TotalItemCount += 1;
-                    if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, ValidateAcrossSalesLines."No.")) then begin
-
-                        if (MixedSaleRuleOption = MixedSaleRuleOption::SAME_ITEM) then
-                            if (SaleLinePOS."No." = ValidateAcrossSalesLines."No.") then
-                                MembershipItemCount += 1;
-
-                        if (MixedSaleRuleOption = MixedSaleRuleOption::MEMBERSHIP_ITEM) then
-                            if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::MEMBERSHIP) then
-                                MembershipItemCount += 1;
-
-                        if (MixedSaleRuleOption = MixedSaleRuleOption::DISALLOW) then
-                            MembershipItemCount := 1;
-                    end;
-                until (ValidateAcrossSalesLines.Next() = 0);
-
-                if (TotalItemCount <> MembershipItemCount) then begin
-                    ReasonText := StrSubstNo(MixedSalesNotAllowedLbl, LimitedByItem, MembershipSalesSetup.TableCaption());
-                    exit(false);
-                end;
-            end;
-        end;
-
-        exit(true);
     end;
 
     procedure MemberArrival(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100]; ForeignCommunityCode: Code[20])

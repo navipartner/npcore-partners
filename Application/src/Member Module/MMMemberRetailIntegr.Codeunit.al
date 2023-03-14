@@ -493,7 +493,7 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         i: Integer;
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        MemberLinesToSuggest, MemberInfoCaptureCount : Integer;
+        MemberLinesToSuggest: Integer;
         ReasonMessage: Text;
         AttemptCreateMembership: Codeunit "NPR Membership Attempt Create";
     begin
@@ -509,6 +509,9 @@
 
         if (SaleLinePOS.Quantity <> 1) then
             exit(-1101);
+
+        if (not CheckCrossLineSalesRules(SaleLinePOS, gLastMessage)) then
+            exit(-1100);
 
         if ((MembershipSalesSetup."Membership Code" = '') and
           (MembershipSalesSetup."Business Flow Type" in [MembershipSalesSetup."Business Flow Type"::ADD_CARD, MembershipSalesSetup."Business Flow Type"::REPLACE_CARD])) then begin
@@ -531,19 +534,15 @@
         MemberInfoCapture.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
 
         // create defaults depending how my "revisit" to member info capture occurs
-        case MembershipSalesSetup."Business Flow Type" of
-            MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
-                begin
-                    MemberLinesToSuggest := MembershipSetup."Membership Member Cardinality";
-                    if ((MembershipSalesSetup."Suggested Membercount In Sales" > 0) and
-                        (MembershipSalesSetup."Suggested Membercount In Sales" < MembershipSetup."Membership Member Cardinality"))
-                    then
-                        MemberLinesToSuggest := MembershipSalesSetup."Suggested Membercount In Sales";
-
-                    MemberInfoCaptureCount := MemberInfoCapture.Count();
-                    if (MemberLinesToSuggest <> MemberInfoCaptureCount) then begin
-                        if MemberInfoCaptureCount > 0 then
-                            MemberInfoCapture.DeleteAll();
+        if (MemberInfoCapture.IsEmpty()) then begin
+            case MembershipSalesSetup."Business Flow Type" of
+                MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
+                    begin
+                        MemberLinesToSuggest := MembershipSetup."Membership Member Cardinality";
+                        if ((MembershipSalesSetup."Suggested Membercount In Sales" > 0) and
+                            (MembershipSalesSetup."Suggested Membercount In Sales" < MembershipSetup."Membership Member Cardinality"))
+                        then
+                            MemberLinesToSuggest := MembershipSalesSetup."Suggested Membercount In Sales";
 
                         for i := 1 to MemberLinesToSuggest do begin
                             MemberInfoCapture.Init();
@@ -551,28 +550,18 @@
                             MemberInfoCapture."Receipt No." := SaleLinePOS."Sales Ticket No.";
                             MemberInfoCapture."Line No." := SaleLinePOS."Line No.";
                             MemberInfoCapture."First Name" := StrSubstNo(MEMBER_NAME, i);
+                            MemberInfoCapture."Item No." := SaleLinePOS."No.";
+                            MemberInfoCapture."Membership Code" := MembershipSalesSetup."Membership Code";
+                            MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
                             MemberInfoCapture.Insert();
                         end;
-
-                        Commit();
                     end;
 
-                    MemberInfoCapture.LockTable(true);
-                    MemberInfoCapture.FindSet();
-                    repeat
-                        MemberInfoCapture."Item No." := SaleLinePOS."No.";
-                        MemberInfoCapture."Membership Code" := MembershipSalesSetup."Membership Code";
-                        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
-                        MemberInfoCapture.Modify();
-                    until (MemberInfoCapture.Next() = 0);
-                end;
-
-            MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER,
-            MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER,
-            MembershipSalesSetup."Business Flow Type"::ADD_CARD,
-            MembershipSalesSetup."Business Flow Type"::REPLACE_CARD:
-                begin
-                    if (MemberInfoCapture.IsEmpty()) then begin
+                MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER,
+                MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER,
+                MembershipSalesSetup."Business Flow Type"::ADD_CARD,
+                MembershipSalesSetup."Business Flow Type"::REPLACE_CARD:
+                    begin
                         MemberInfoCapture.Init();
                         MemberInfoCapture."Entry No." := 0;
                         MemberInfoCapture."Receipt No." := SaleLinePOS."Sales Ticket No.";
@@ -581,21 +570,17 @@
                         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
                         MemberInfoCapture.Insert();
                     end;
-                end;
 
-            else
-                Error('Business Flow Type %1 not handled when preparing user input.', MembershipSalesSetup."Business Flow Type");
+                else
+                    Error('Business Flow Type %1 not handled when preparing user input.', MembershipSalesSetup."Business Flow Type");
+            end;
         end;
 
         Commit();
         if (DisplayMemberInfoCaptureDialog(SaleLinePOS)) then begin
             Commit();
-            MemberInfoCapture.LockTable();
 
-            MemberInfoCapture.Reset();
-            MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
-            MemberInfoCapture.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
-            MemberInfoCapture.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
+            MemberInfoCapture.FindFirst();
 
             if (MemberInfoCapture."Information Context" = MemberInfoCapture."Information Context"::NEW) then begin
                 if (MembershipSalesSetup."Auto-Admit Member On Sale" = MembershipSalesSetup."Auto-Admit Member On Sale"::ASK) then
@@ -607,7 +592,6 @@
             end;
 
             Commit();
-
             AttemptCreateMembership.SetAttemptCreateMembershipForcedRollback();
             if (not AttemptCreateMembership.run(MemberInfoCapture)) then
                 if (not AttemptCreateMembership.WasSuccessful(ReasonMessage)) then
@@ -639,6 +623,58 @@
         end;
 
         exit(-1102);
+    end;
+
+    internal procedure CheckCrossLineSalesRules(SaleLinePOS: Record "NPR POS Sale Line"; var ReasonText: Text): Boolean
+    var
+        ValidateAcrossSalesLines: Record "NPR POS Sale Line";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        MixedSaleRuleOption: Option ALLOW,MEMBERSHIP_ITEM,SAME_ITEM,DISALLOW;
+        TotalItemCount: Integer;
+        MembershipItemCount: Integer;
+        LimitedByItem: Code[20];
+        MixedSalesNotAllowedLbl: Label 'Mixed sales is not allowed due to policy specified on item %1 in %2';
+    begin
+        MixedSaleRuleOption := MixedSaleRuleOption::ALLOW;
+
+        ValidateAcrossSalesLines.SetFilter("Register No.", '=%1', SaleLinePOS."Register No.");
+        ValidateAcrossSalesLines.SetFilter("Sales Ticket No.", '=%1', SaleLinePOS."Sales Ticket No.");
+        if (ValidateAcrossSalesLines.FindSet()) then begin
+            repeat
+                if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, ValidateAcrossSalesLines."No.")) then
+                    if (MembershipSalesSetup."Mixed Sale Policy" > MixedSaleRuleOption) then begin
+                        MixedSaleRuleOption := MembershipSalesSetup."Mixed Sale Policy";
+                        LimitedByItem := ValidateAcrossSalesLines."No.";
+                    end;
+            until (ValidateAcrossSalesLines.Next() = 0);
+
+            if (MixedSaleRuleOption > MixedSaleRuleOption::ALLOW) then begin
+                ValidateAcrossSalesLines.FindSet();
+                repeat
+                    TotalItemCount += 1;
+                    if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, ValidateAcrossSalesLines."No.")) then begin
+
+                        if (MixedSaleRuleOption = MixedSaleRuleOption::SAME_ITEM) then
+                            if (SaleLinePOS."No." = ValidateAcrossSalesLines."No.") then
+                                MembershipItemCount += 1;
+
+                        if (MixedSaleRuleOption = MixedSaleRuleOption::MEMBERSHIP_ITEM) then
+                            if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::MEMBERSHIP) then
+                                MembershipItemCount += 1;
+
+                        if (MixedSaleRuleOption = MixedSaleRuleOption::DISALLOW) then
+                            MembershipItemCount := 1;
+                    end;
+                until (ValidateAcrossSalesLines.Next() = 0);
+
+                if (TotalItemCount <> MembershipItemCount) then begin
+                    ReasonText := StrSubstNo(MixedSalesNotAllowedLbl, LimitedByItem, MembershipSalesSetup.TableCaption());
+                    exit(false);
+                end;
+            end;
+        end;
+
+        exit(true);
     end;
 
     procedure DisplayMemberInfoCaptureDialog(SaleLinePOS: Record "NPR POS Sale Line") LookupOK: Boolean
@@ -708,7 +744,7 @@
             POSSalesLine."Unit Price", POSSalesLine."Amount Excl. VAT", POSSalesLine."Amount Incl. VAT", POSSalesLine.Description, POSSalesLine.Quantity);
     end;
 
-    local procedure IssueMembershipFromEndOfSaleWorker(ReceiptNo: Code[20]; ReceiptLine: Integer; SalesDate: Date; UnitPrice: Decimal; Amount_LCY: Decimal; AmountInclVat_LCY: Decimal; Description: Text; Quantity: Decimal)
+    internal procedure IssueMembershipFromEndOfSaleWorker(ReceiptNo: Code[20]; ReceiptLine: Integer; SalesDate: Date; UnitPrice: Decimal; Amount_LCY: Decimal; AmountInclVat_LCY: Decimal; Description: Text; Quantity: Decimal)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         CreateMembership: Codeunit "NPR Membership Attempt Create";
