@@ -689,11 +689,6 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'CHANGE_RESP_CENTER', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAct:Change Resp. Center";
     }
-    value(136; MM_MEMBER_ARRIVAL)
-    {
-        Caption = 'MM_MEMBER_ARRIVAL', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR MM POS Action: Member Arr.";
-    }
     value(133; RV_SELECT_TABLE)
     {
         Caption = 'RV_SELECT_TABLE', Locked = true, MaxLength = 20;
@@ -708,6 +703,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     {
         Caption = 'RV_GET_WAITER_PAD', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Get WPad";
+    }
+    value(136; MM_MEMBER_ARRIVAL)
+    {
+        Caption = 'MM_MEMBER_ARRIVAL', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR MM POS Action: Member Arr.";
     }
     value(137; MM_MEMBER_BACKEND)
     {
@@ -729,6 +729,31 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'RV_RUN_W/PAD_ACTION', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Run WPad Act.";
     }
+    value(141; "RV_SET_R-VIEW")
+    {
+        Caption = 'RV_SET_R-VIEW', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Set R-View";
+    }
+    value(142; RV_SET_TABLE_STATUS)
+    {
+        Caption = 'RV_SET_TABLE_STATUS', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Set Table Status";
+    }
+    value(143; "RV_SET_W/PAD_STATUS")
+    {
+        Caption = 'RV_SET_W/PAD_STATUS', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Set WPad Status";
+    }
+    value(144; SAVE_TO_WAITER_PAD)
+    {
+        Caption = 'SAVE_TO_WAITER_PAD', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR NPRE POSAction: Save2Wa.";
+    }
+    value(146; "SETTAXLIABLE")
+    {
+        Caption = 'SETTAXLIABLE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Set Tax Liable";
+    }
     value(147; PRINT_WAITER_PAD)
     {
         Caption = 'PRINT_WAITER_PAD', Locked = true, MaxLength = 20;
@@ -743,11 +768,6 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     {
         Caption = 'NEW_WAITER_PAD', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR NPRE POSAction: New Wa.";
-    }
-    value(146; "SETTAXLIABLE")
-    {
-        Caption = 'SETTAXLIABLE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Set Tax Liable";
     }
     value(6014600; BALANCE_V4)
     {
