@@ -7,6 +7,34 @@ query 6014421 "NPR Sales Statistics By Dept"
     {
         dataitem(Item_Ledger_Entry; "Item Ledger Entry")
         {
+            column(Entry_Type; "Entry Type")
+            {
+
+            }
+            column(Posting_Date; "Posting Date")
+            {
+
+            }
+            column(Global_Dimension_1_Code; "Global Dimension 1 Code")
+            {
+
+            }
+            column(Global_Dimension_2_Code; "Global Dimension 2 Code")
+            {
+
+            }
+            column(Item_Category_Code; "Item Category Code")
+            {
+
+            }
+            column(Source_Type; "Source Type")
+            {
+
+            }
+            column(Source_No_; "Source No.")
+            {
+
+            }
             filter(Filter_Entry_Type; "Entry Type")
             {
             }
@@ -25,18 +53,22 @@ query 6014421 "NPR Sales Statistics By Dept"
             filter(Filter_Source_No; "Source No.")
             {
             }
-            filter(Filter_Item_Category_Code;"Item Category Code")
+            filter(Filter_Item_Category_Code; "Item Category Code")
             {
             }
+
             column(Quantity; Quantity)
             {
                 Method = Sum;
             }
-            dataitem(Item;Item)
+            dataitem(Item; Item)
             {
                 DataItemLink = "No." = Item_Ledger_Entry."Item No.";
                 SqlJoinType = InnerJoin;
-                filter(Vendor_No_;"Vendor No.")
+                filter(Filter_Vendor_No; "Vendor No.")
+                {
+                }
+                column(Vendor_No; "Vendor No.")
                 {
                 }
             }

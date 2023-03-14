@@ -169,7 +169,7 @@
                             if dim2Filter <> '' then
                                 ILEByDeptQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
                             if vendorFilter <> '' then
-                                ILEByDeptQuery.SetFilter(Vendor_No_, vendorFilter);
+                                ILEByDeptQuery.SetFilter(Filter_Vendor_No, vendorFilter);
                             ILEByDeptQuery.Open();
                             while ILEByDeptQuery.Read() do
                                 VELocQty += -ILEByDeptQuery.Quantity;
@@ -257,7 +257,7 @@
                             if dim2Filter <> '' then
                                 ILEByDeptLastYearQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
                             if vendorFilter <> '' then
-                                ILEByDeptLastYearQuery.SetFilter(Vendor_No_, vendorFilter);
+                                ILEByDeptLastYearQuery.SetFilter(Filter_Vendor_No, vendorFilter);
                             if dateFilter <> '' then begin
                                 ILEByDeptLastYearQuery.SetRange(Filter_Posting_Date,
                                 CalcDate('<-1Y>', dateMin),
@@ -372,7 +372,7 @@
                             if dim2Filter <> '' then
                                 ILEByDeptQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
                             if vendorFilter <> '' then
-                                ILEByDeptQuery.SetFilter(Vendor_No_, vendorFilter);
+                                ILEByDeptQuery.SetFilter(Filter_Vendor_No, vendorFilter);
                             ILEByDeptQuery.Open();
                             while ILEByDeptQuery.Read() do
                                 VETotalQuantity += -ILEByDeptQuery.Quantity;
@@ -493,7 +493,7 @@
                                 if dim2Filter <> '' then
                                     ILEByDeptLastYearQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
                                 if vendorFilter <> '' then
-                                    ILEByDeptLastYearQuery.SetFilter(Vendor_No_, vendorFilter);
+                                    ILEByDeptLastYearQuery.SetFilter(Filter_Vendor_No, vendorFilter);
                                 if dateFilter <> '' then begin
                                     ILEByDeptLastYearQuery.SetRange(Filter_Posting_Date,
                                     CalcDate('<-1Y>', dateMin),
@@ -693,7 +693,7 @@
                     if dim2Filter <> '' then
                         ILEByDeptQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
                     if vendorFilter <> '' then
-                        ILEByDeptQuery.SetFilter(Vendor_No_, vendorFilter);
+                        ILEByDeptQuery.SetFilter(Filter_Vendor_No, vendorFilter);
                     ILEByDeptQuery.Open();
                     while ILEByDeptQuery.Read() do
                         VETotalQuantity += -ILEByDeptQuery.Quantity;
@@ -773,7 +773,7 @@
                         if dim2Filter <> '' then
                             ILEByDeptLastYearQuery.SetFilter(Filter_Global_Dimension_2_Code, dim2Filter);
                         if vendorFilter <> '' then
-                            ILEByDeptLastYearQuery.SetFilter(Vendor_No_, vendorFilter);
+                            ILEByDeptLastYearQuery.SetFilter(Filter_Vendor_No, vendorFilter);
                         if dateFilter <> '' then begin
                             ILEByDeptLastYearQuery.SetRange(Filter_Posting_Date,
                             CalcDate('<-1Y>', dateMin),
