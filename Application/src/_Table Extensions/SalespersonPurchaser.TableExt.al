@@ -166,7 +166,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         }
 #ENDIF
         key("NPR Key3"; "NPR Maximum Cash Returnsale")
-        {           
+        {
         }
 
     }
@@ -191,10 +191,14 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         SalesLCY := 0;
         ValueEntryWithVendor.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
         ValueEntryWithVendor.SetFilter(Filter_Sales_Person, Code);
-        ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, "NPR Global Dimension 1 Filter");
-        ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1', "Date Filter");
-        ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, "NPR Item Category Filter");
-        ValueEntryWithVendor.SetFilter(Item_No, "NPR Item Filter");
+        if GetFilter("NPR Global Dimension 1 Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, GetFilter("NPR Global Dimension 1 Filter"));
+        if GetFilter("Date Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, GetFilter("Date Filter"));
+        if GetFilter("NPR Item Category Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, GetFilter("NPR Item Category Filter"));
+        if GetFilter("NPR Item Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Item_No, GetFilter("NPR Item Filter"));
         ValueEntryWithVendor.Open();
         while ValueEntryWithVendor.Read() do
             SalesLCY += ValueEntryWithVendor.Sum_Sales_Amount_Actual;
@@ -208,9 +212,12 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         DiscountAmount := 0;
         ValueEntryWithVendor.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
         ValueEntryWithVendor.SetFilter(Filter_Sales_Person, Code);
-        ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, "NPR Global Dimension 1 Filter");
-        ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1', "Date Filter");
-        ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, "NPR Item Category Filter");
+        if GetFilter("NPR Global Dimension 1 Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, GetFilter("NPR Global Dimension 1 Filter"));
+        if GetFilter("Date Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, GetFilter("Date Filter"));
+        if GetFilter("NPR Item Category Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, GetFilter("NPR Item Category Filter"));
         ValueEntryWithVendor.Open();
         while ValueEntryWithVendor.Read() do
             DiscountAmount += -ValueEntryWithVendor.Sum_Discount_Amount;
@@ -224,9 +231,12 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         COGSLCY := 0;
         ValueEntryWithVendor.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
         ValueEntryWithVendor.SetFilter(Filter_Sales_Person, Code);
-        ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1', "Date Filter");
-        ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, "NPR Item Category Filter");
-        ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, "NPR Global Dimension 1 Filter");
+        if GetFilter("Date Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, GetFilter("Date Filter"));
+        if GetFilter("NPR Item Category Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, GetFilter("NPR Item Category Filter"));
+        if GetFilter("NPR Global Dimension 1 Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, GetFilter("NPR Global Dimension 1 Filter"));
         ValueEntryWithVendor.Open();
         while ValueEntryWithVendor.Read() do
             COGSLCY += -ValueEntryWithVendor.Sum_Cost_Amount_Actual;
@@ -240,10 +250,14 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         SalesQty := 0;
         ValueEntryWithVendor.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
         ValueEntryWithVendor.SetFilter(Filter_Sales_Person, Code);
-        ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1', "Date Filter");
-        ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, "NPR Item Category Filter");
-        ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, "NPR Global Dimension 1 Filter");
-        ValueEntryWithVendor.SetFilter(Item_No, "NPR Item Filter");
+        if GetFilter("Date Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, GetFilter("Date Filter"));
+        if GetFilter("NPR Item Category Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, GetFilter("NPR Item Category Filter"));
+        if GetFilter("NPR Global Dimension 1 Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, GetFilter("NPR Global Dimension 1 Filter"));
+        if GetFilter("NPR Item Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Item_No, GetFilter("NPR Item Filter"));
         ValueEntryWithVendor.Open();
         while ValueEntryWithVendor.Read() do
             SalesQty += -ValueEntryWithVendor.Sum_Valued_Quantity;
@@ -257,10 +271,14 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         ItemGroupSalesLCY := 0;
         ValueEntryWithVendor.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
         ValueEntryWithVendor.SetFilter(Filter_Sales_Person, Code);
-        ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1', "Date Filter");
-        ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, "NPR Global Dimension 1 Filter");
-        ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, "NPR Item Category Filter");
-        ValueEntryWithVendor.SetFilter(Item_No, "NPR Item Filter");
+        if GetFilter("Date Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, GetFilter("Date Filter"));
+        if GetFilter("NPR Global Dimension 1 Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, GetFilter("NPR Global Dimension 1 Filter"));
+        if GetFilter("NPR Item Category Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, GetFilter("NPR Item Category Filter"));
+        if GetFilter("NPR Item Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Item_No, GetFilter("NPR Item Filter"));
         ValueEntryWithVendor.SetFilter(Filter_Group_sale, '%1', true);
         ValueEntryWithVendor.Open();
         while ValueEntryWithVendor.Read() do
