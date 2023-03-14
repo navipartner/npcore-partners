@@ -37,14 +37,11 @@
 
                     trigger OnDrillDown()
                     var
-                        ItemLedgerEntry: Record "Item Ledger Entry";
-                        ItemLedgerEntries: Page "Item Ledger Entries";
+                        ItemLedgEntryStat: Page "NPR Item Ledg Entry Stat.";
                     begin
+                        ItemLedgEntryStat.InitFilters(Dim1Filter, Dim2Filter, Periodestart, Periodeslut, LastYear, ItemCategoryFilter, Rec."No.");
 
-                        SetItemLedgerEntryFilter(ItemLedgerEntry);
-                        ItemLedgerEntries.SetTableView(ItemLedgerEntry);
-                        ItemLedgerEntries.Editable(false);
-                        ItemLedgerEntries.RunModal();
+                        ItemLedgEntryStat.RunModal();
                     end;
                 }
                 field("-LastYear Sale Quantity"; -"LastYear Sale Quantity")
@@ -178,17 +175,15 @@
 
     internal procedure Calc()
     var
-        ItemLedgerEntry: Record "Item Ledger Entry";
+        ILEByDeptQuery: Query "NPR Sales Statistics By Dept";
         CostAmount: Decimal;
         SalesAmount: Decimal;
     begin
         //Calc()
         SetValueEntryFilter(CostAmount, SalesAmount);
+        "Sale Quantity" := 0;
+        SetItemLedgerEntryFilter(ILEByDeptQuery, "Sale Quantity", Rec."No.");
 
-        SetItemLedgerEntryFilter(ItemLedgerEntry);
-        ItemLedgerEntry.CalcSums(Quantity);
-
-        "Sale Quantity" := ItemLedgerEntry.Quantity;
         "Sale Amount" := SalesAmount;
         "Profit Amount" := SalesAmount + CostAmount;
         if "Sale Amount" <> 0 then
@@ -200,11 +195,10 @@
         LastYear := true;
 
         SetValueEntryFilter(CostAmount, SalesAmount);
+        "LastYear Sale Quantity" := 0;
 
-        SetItemLedgerEntryFilter(ItemLedgerEntry);
-        ItemLedgerEntry.CalcSums(Quantity);
+        SetItemLedgerEntryFilter(ILEByDeptQuery, "LastYear Sale Quantity", Rec."No.");
 
-        "LastYear Sale Quantity" := ItemLedgerEntry.Quantity;
         "LastYear Sale Amount" := SalesAmount;
         "LastYear Profit Amount" := SalesAmount + CostAmount;
         if "LastYear Sale Amount" <> 0 then
@@ -215,33 +209,37 @@
         LastYear := false;
     end;
 
-    internal procedure SetItemLedgerEntryFilter(var ItemLedgerEntry: Record "Item Ledger Entry")
+    internal procedure SetItemLedgerEntryFilter(var ILEByDeptQuery: Query "NPR Sales Statistics By Dept"; var TotalQuantity: Decimal; VendorFilter: Code[20])
     begin
         //SetItemLedgerEntryFilter
-        ItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
-        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
-        ItemLedgerEntry.SetRange("Source Type", ItemLedgerEntry."Source Type"::Vendor);
-        ItemLedgerEntry.SetRange("Source No.", Rec."No.");
+        ILEByDeptQuery.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+        ILEByDeptQuery.SetRange(Filter_Vendor_No, VendorFilter);
+
         if not LastYear then
-            ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
+            ILEByDeptQuery.SetFilter(Filter_Posting_Date, '%1..%2', Periodestart, Periodeslut)
         else
-            ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
+            ILEByDeptQuery.SetFilter(Filter_Posting_Date, '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
 
 
         if ItemCategoryFilter <> '' then
-            ItemLedgerEntry.SetRange("Item Category Code", ItemCategoryFilter)
+            ILEByDeptQuery.SetRange(Filter_Item_Category_Code, ItemCategoryFilter)
         else
-            ItemLedgerEntry.SetRange("Item Category Code");
+            ILEByDeptQuery.SetRange(Filter_Item_Category_Code);
 
         if Dim1Filter <> '' then
-            ItemLedgerEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
+            ILEByDeptQuery.SetRange(Filter_Global_Dimension_1_Code, Dim1Filter)
         else
-            ItemLedgerEntry.SetRange("Global Dimension 1 Code");
+            ILEByDeptQuery.SetRange(Filter_Global_Dimension_1_Code);
 
         if Dim2Filter <> '' then
-            ItemLedgerEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
+            ILEByDeptQuery.SetRange(Filter_Global_Dimension_2_Code, Dim2Filter)
         else
-            ItemLedgerEntry.SetRange("Global Dimension 2 Code");
+            ILEByDeptQuery.SetRange(Filter_Global_Dimension_2_Code);
+        if ILEByDeptQuery.Open() then begin
+            while ILEByDeptQuery.Read() do
+                TotalQuantity += -ILEByDeptQuery.Quantity;
+            ILEByDeptQuery.Close();
+        end;
     end;
 
     internal procedure SetValueEntryFilter(var CostAmount: Decimal; var SalesAmount: Decimal)
@@ -281,8 +279,9 @@
     internal procedure ChangeEmptyFilter(): Boolean
     var
         Vendor: Record Vendor;
-        ItemLedgerEntry: Record "Item Ledger Entry";
+        ILEByDeptQuery: Query "NPR Sales Statistics By Dept";
         Current: Record Vendor;
+        TotalQuantity: Decimal;
         "Count": Integer;
         txtDlg: Label 'Processing Vendor #1######## @2@@@@@@@@';
         Dlg: Dialog;
@@ -296,15 +295,13 @@
             Dlg.Open(txtDlg);
             if Vendor.Find('-') then
                 repeat
+                    TotalQuantity := 0;
                     Count += 1;
                     Dlg.Update(1, Vendor."No.");
                     Dlg.Update(2, Round(Count / Vendor.Count() * 10000, 1, '='));
-                    SetItemLedgerEntryFilter(ItemLedgerEntry);
-                    ItemLedgerEntry.SetRange("Source Type", ItemLedgerEntry."Source Type"::Vendor);
-                    ItemLedgerEntry.SetRange("Source No.", Vendor."No.");
+                    SetItemLedgerEntryFilter(ILEByDeptQuery, TotalQuantity, Vendor."No.");
 
-                    ItemLedgerEntry.CalcSums(Quantity);
-                    if ItemLedgerEntry.Quantity <> 0 then begin
+                    if TotalQuantity <> 0 then begin
                         Rec.Get(Vendor."No.");
                         Rec.Mark(true);
                     end;
