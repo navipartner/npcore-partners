@@ -1,123 +1,75 @@
-﻿codeunit 6150665 "NPR NPRE POSAction: New Wa."
+codeunit 6150665 "NPR NPRE POSAction: New Wa." implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
     var
-        Text000: Label 'Create new Waiter Pad on Seating';
         Text001: Label 'There are already active waiter pad(s) on seating %1.\Press Yes to add new waiterpad.\Press No to abort.';
         Text002: Label 'Waiter Pad added for seating %1.';
-        Text003: Label 'Open new waiter pad?';
-        Text004: Label 'New Waiter Pad';
-        NumberOfGuestsLbl: Label 'Number of guests';
 
-    local procedure ActionCode(): Code[20]
-    begin
-        exit('NEW_WAITER_PAD');
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.1');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction(
-          ActionCode(),
-          Text000,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('addPresetValuesToContext', 'respond();');
-            Sender.RegisterWorkflowStep('seatingInput',
-              'if ((!context.seatingCode) || (!param.UseSeatingFromContext)) {' +
-              '  if (param.FixedSeatingCode) {' +
-              '    context.seatingCode = param.FixedSeatingCode;' +
-              '    respond();' +
-              '  } else {' +
-              '    switch(param.InputType + "") {' +
-              '      case "0":' +
-              '        stringpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
-              '        break;' +
-              '      case "1":' +
-              '        intpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
-              '        break;' +
-              '      case "2":' +
-              '        respond();' +
-              '        break;' +
-              '    }' +
-              '  }' +
-              '}'
-            );
-            Sender.RegisterWorkflowStep('confirmNewWaiterPad',
-              'if (context.confirmString) {' +
-                'confirm(labels["ConfirmLabel"], context.confirmString, true, true).no(abort);' +
-              '}'
-            );
-            Sender.RegisterWorkflowStep('SetNumberOfGuests',
-              'if (param.AskForNumberOfGuests) {' +
-              '  intpad(labels["NumberOfGuestsLabel"]).respond("numberOfGuests").cancel(abort);' +
-              '}'
-            );
-            Sender.RegisterWorkflowStep('newWaiterPad',
-              'if (context.seatingCode) {' +
-              '  respond();' +
-              '}'
-            );
-            Sender.RegisterWorkflowStep('actionMessage',
-              'if (context.actionMessage) {' +
-              '  message(labels["ActionMessageLabel"], context.actionMessage);' +
-              '}'
-            );
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterDataSourceBinding(ThisDataSource());
-
-            Sender.RegisterOptionParameter('InputType', 'stringPad,intPad,List', 'stringPad');
-            Sender.RegisterTextParameter('FixedSeatingCode', '');
-            Sender.RegisterTextParameter('SeatingFilter', '');
-            Sender.RegisterTextParameter('LocationFilter', '');
-            Sender.RegisterBooleanParameter('OpenWaiterPad', false);
-            Sender.RegisterBooleanParameter('AskForNumberOfGuests', false);
-            Sender.RegisterBooleanParameter('UseSeatingFromContext', false);
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         NPRESeating: Record "NPR NPRE Seating";
+        ActionDescription: Label 'This built-in action splits waiter pads (bills). It can be run from both Sale and Restaurant View';
+        ParamInputType_OptionLbl: Label 'stringPad,intPad,List', locked = true;
+        ParamInputType_CptLbl: Label 'Seating Selection Method';
+        ParamInputType_DescLbl: Label 'Specifies seating selection method.';
+        ParamInputType_OptionCptLbl: Label 'stringPad,intPad,List';
+        ParamFixedSeatingCode_CptLbl: Label 'Fixed Seating Code';
+        ParamFixedSeatingCode_DescLbl: Label 'Specifies seating number the action is to be run upon.';
+        ParamSeatingFilter_CptLbl: Label 'Seating Filter';
+        ParamSeatingFilter_DescLbl: Label 'Specifies a filter for seating.';
+        ParamLocationFilter_CptLbl: Label 'Location Filter';
+        ParamLocationFilter_DescLbl: Label 'Specifies a filter for seating location.';
+        ParamOpenWaiterPad_CptLbl: Label 'Open Waiter Pad';
+        ParamOpenWaiterPad_DescLbl: Label 'Open waiter pad after creation.';
+        ParamAskForNumberOfGuests_CptLbl: Label 'Ask for number of guests';
+        ParamAskForNumberOfGuests_DescLbl: Label 'Ask for number of guests before ne waiter pad is created.';
+        ParamUseSeatingFromContext_CptLbl: Label 'Use seating from context';
+        ParamUseSeatingFromContext_DescLbl: Label 'Use seating code from context.';
+        ConfirmLbl: Label 'Open new waiter pad?';
+        ActionMessageLbl: Label 'New Waiter Pad';
+        NumberOfGuestsLbl: Label 'Number of guests';
     begin
-        Captions.AddActionCaption(ActionCode(), 'InputTypeLabel', NPRESeating.TableCaption);
-        Captions.AddActionCaption(ActionCode(), 'ConfirmLabel', Text003);
-        Captions.AddActionCaption(ActionCode(), 'ActionMessageLabel', Text004);
-        Captions.AddActionCaption(ActionCode(), 'NumberOfGuestsLabel', NumberOfGuestsLbl);
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.SetDataSourceBinding(ThisDataSource());
+        WorkflowConfig.AddOptionParameter('InputType',
+                                        ParamInputType_OptionLbl,
+#pragma warning disable AA0139
+                                        CopyStr(SelectStr(1, ParamInputType_OptionLbl), 1, 250),
+#pragma warning restore
+                                        ParamInputType_CptLbl,
+                                        ParamInputType_DescLbl,
+                                        ParamInputType_OptionCptLbl);
+        WorkflowConfig.AddTextParameter('FixedSeatingCode', '', ParamFixedSeatingCode_CptLbl, ParamFixedSeatingCode_DescLbl);
+        WorkflowConfig.AddTextParameter('SeatingFilter', '', ParamSeatingFilter_CptLbl, ParamSeatingFilter_DescLbl);
+        WorkflowConfig.AddTextParameter('LocationFilter', '', ParamLocationFilter_CptLbl, ParamLocationFilter_DescLbl);
+        WorkflowConfig.AddBooleanParameter('OpenWaiterPad', false, ParamOpenWaiterPad_CptLbl, ParamOpenWaiterPad_DescLbl);
+        WorkflowConfig.AddBooleanParameter('AskForNumberOfGuests', false, ParamAskForNumberOfGuests_CptLbl, ParamAskForNumberOfGuests_DescLbl);
+        WorkflowConfig.AddBooleanParameter('UseSeatingFromContext', false, ParamUseSeatingFromContext_CptLbl, ParamUseSeatingFromContext_DescLbl);
+        WorkflowConfig.AddLabel('InputTypeLabel', NPRESeating.TableCaption);
+        WorkflowConfig.AddLabel('ConfirmLabel', ConfirmLbl);
+        WorkflowConfig.AddLabel('ActionMessageLabel', ActionMessageLbl);
+        WorkflowConfig.AddLabel('NumberOfGuestsLabel', NumberOfGuestsLbl);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        JSON: Codeunit "NPR POS JSON Management";
+        POSSession: Codeunit "NPR POS Session";
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        case WorkflowStep of
+        case Step of
             'addPresetValuesToContext':
-                OnActionAddPresetValuesToContext(JSON, FrontEnd, POSSession);
+                AddPresetValuesToContext(Context, POSSession);
             'seatingInput':
-                OnActionSeatingInput(JSON, FrontEnd);
+                SeatingInput(Context);
             'SetNumberOfGuests':
-                OnActionSetNumberOfGuests(JSON, FrontEnd);
+                SetNumberOfGuests(Context);
             'newWaiterPad':
-                OnActionNewWaiterPad(JSON, FrontEnd, POSSession);
+                NewWaiterPad(Context, POSSession);
         end;
-
-        Handled := true;
     end;
 
-    local procedure OnActionSeatingInput(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure SeatingInput(JSON: Codeunit "NPR POS JSON Helper")
     var
         Seating: Record "NPR NPRE Seating";
         WaiterPadPOSManagement: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
@@ -129,17 +81,14 @@
         ConfirmString := GetConfirmString(Seating);
         if ConfirmString <> '' then
             JSON.SetContext('confirmString', ConfirmString);
-
-        FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure OnActionSetNumberOfGuests(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure SetNumberOfGuests(JSON: Codeunit "NPR POS JSON Helper")
     begin
-        JSON.SetContext('numberOfGuests', JSON.GetString('numberOfGuests'));
-        FrontEnd.SetActionContext(ActionCode(), JSON);
+        JSON.SetContext('numberOfGuests', JSON.GetInteger('numberOfGuests'));
     end;
 
-    local procedure OnActionNewWaiterPad(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure NewWaiterPad(JSON: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
     var
         Seating: Record "NPR NPRE Seating";
         WaiterPad: Record "NPR NPRE Waiter Pad";
@@ -150,10 +99,10 @@
         SeatingCode: Code[20];
         NumberOfGuests: Integer;
         OpenWaiterPad: Boolean;
-        NoSeatingInContextErr: Label 'SeatingCode was not found in context';
     begin
-        SeatingCode := CopyStr(JSON.GetStringOrFail('seatingCode', NoSeatingInContextErr), 1, MaxStrLen(SeatingCode));
-        NumberOfGuests := JSON.GetInteger('numberOfGuests');
+        SeatingCode := CopyStr(JSON.GetString('seatingCode'), 1, MaxStrLen(SeatingCode));
+        if not JSON.GetInteger('numberOfGuests', NumberOfGuests) then
+            NumberOfGuests := 0;
         Seating.Get(SeatingCode);
 
         POSSession.GetSale(POSSale);
@@ -167,7 +116,6 @@
         SalePOS.Validate("NPRE Pre-Set Seating Code", SeatingCode);
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
-        POSSession.RequestRefreshData();
         Commit();
 
         if OpenWaiterPad then begin
@@ -176,10 +124,9 @@
         end;
 
         JSON.SetContext('actionMessage', StrSubstNo(Text002, Seating.Description));
-        FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure OnActionAddPresetValuesToContext(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure AddPresetValuesToContext(JSON: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
     var
         SalePOS: Record "NPR POS Sale";
         Seating: Record "NPR NPRE Seating";
@@ -196,8 +143,6 @@
             Seating.Get(SalePOS."NPRE Pre-Set Seating Code");
             JSON.SetContext('seatingCode', SalePOS."NPRE Pre-Set Seating Code");
         end;
-
-        FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
     local procedure GetConfirmString(NPRESeating: Record "NPR NPRE Seating") ConfirmString: Text
@@ -305,5 +250,13 @@
         DataRow.Add('WPadStatus', WaiterPad."Status Description FF");
         DataRow.Add('MealFlowStatus', WaiterPad."Serving Step Description");
         DataRow.Add('AssignedWaiter', StrSubstNo(AssignedWiaterLbl, WaiterPad."Assigned Waiter Code", Salesperson.Name));
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+        //###NPR_INJECT_FROM_FILE:NPREPOSActionNewWa.js###
+'let main=async({workflow:s,popup:i,parameters:n,context:e,captions:a})=>{if(await s.respond("addPresetValuesToContext"),!e.seatingCode||!n.UseSeatingFromContext)if(e.seatingCode="",n.FixedSeatingCode)e.seatingCode=n.FixedSeatingCode;else switch(n.InputType+""){case"0":e.seatingCode=await i.input({caption:a.InputTypeLabel});break;case"1":e.seatingCode=await i.numpad({caption:a.InputTypeLabel});break;case"2":await s.respond("seatingInput");break}if(!!e.seatingCode&&!(e.confirmString&&(result=await i.confirm({caption:a.ConfirmLabel,label:a.confirmString}),result))&&!(n.AskForNumberOfGuests&&(e.numberOfGuests=await i.numpad({caption:a.NumberOfGuestsLabel}),!e.numberOfGuests))&&(e.seatingCode&&await s.respond("newWaiterPad"),e.actionMessage)){await i.message({caption:a.ActionMessageLabel,label:a.actionMessage});return}};'
+        );
     end;
 }
