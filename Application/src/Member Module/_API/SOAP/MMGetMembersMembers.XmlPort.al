@@ -11,7 +11,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
         {
             textelement(getmembers)
             {
-                tableelement(tmpmemberinforequest; "NPR MM Member Info Capture")
+                tableelement(TempMemberInfoRequest; "NPR MM Member Info Capture")
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
@@ -22,19 +22,26 @@ xmlport 6060130 "NPR MM Get Members. Members"
                         XmlName = 'cache_instance_id';
                         Occurrence = Optional;
                     }
-                    fieldelement(membershipnumber; tmpMemberInfoRequest."External Membership No.")
+                    fieldelement(membershipnumber; TempMemberInfoRequest."External Membership No.")
                     {
                     }
-                    fieldelement(membernumber; tmpMemberInfoRequest."External Member No")
+                    fieldelement(membernumber; TempMemberInfoRequest."External Member No")
                     {
                     }
-                    fieldelement(cardnumber; tmpMemberInfoRequest."External Card No.")
+                    fieldelement(cardnumber; TempMemberInfoRequest."External Card No.")
                     {
                     }
-                    textelement(includememberimage)
+                    textelement(IncludeMemberImageXmlText)
                     {
                         MaxOccurs = Once;
                         MinOccurs = Zero;
+                        XmlName = 'includememberimage';
+
+                        trigger OnAfterAssignVariable()
+                        begin
+                            if (not Evaluate(_IncludeMemberImageBool, IncludeMemberImageXmlText)) then
+                                _IncludeMemberImageBool := false;
+                        end;
                     }
                 }
                 textelement(response)
@@ -58,98 +65,149 @@ xmlport 6060130 "NPR MM Get Members. Members"
                     {
                         MaxOccurs = Once;
                     }
-                    tableelement(tmpmemberinforesponse; "NPR MM Member Info Capture")
+                    tableelement(TempMemberInfoResponse; "NPR MM Member Info Capture")
                     {
                         MaxOccurs = Unbounded;
                         MinOccurs = Zero;
                         XmlName = 'member';
                         UseTemporary = true;
-                        textattribute(memberrole)
-                        {
-                            XmlName = 'role';
 
-                            trigger OnBeforePassVariable()
-                            var
-                                MembershipRole: Record "NPR MM Membership Role";
-                            begin
-                                if (MembershipRole.Get(tmpMemberInfoResponse."Membership Entry No.", tmpMemberInfoResponse."Member Entry No")) then
-                                    MemberRole := Format(MembershipRole."Member Role");
-                            end;
-                        }
-                        fieldattribute(contactno; tmpMemberInfoResponse."Contact No.")
+                        fieldattribute(contactno; TempMemberInfoResponse."Contact No.")
                         {
 
                         }
-                        fieldelement(membernumber; tmpMemberInfoResponse."External Member No")
+                        fieldelement(membernumber; TempMemberInfoResponse."External Member No")
                         {
                         }
-                        fieldelement(firstname; tmpMemberInfoResponse."First Name")
+                        fieldelement(firstname; TempMemberInfoResponse."First Name")
                         {
                         }
-                        fieldelement(middlename; tmpMemberInfoResponse."Middle Name")
+                        fieldelement(middlename; TempMemberInfoResponse."Middle Name")
                         {
                         }
-                        fieldelement(lastname; tmpMemberInfoResponse."Last Name")
+                        fieldelement(lastname; TempMemberInfoResponse."Last Name")
                         {
                         }
-                        fieldelement(address; tmpMemberInfoResponse.Address)
+                        fieldelement(address; TempMemberInfoResponse.Address)
                         {
                         }
-                        fieldelement(postcode; tmpMemberInfoResponse."Post Code Code")
+                        fieldelement(postcode; TempMemberInfoResponse."Post Code Code")
                         {
                         }
-                        fieldelement(city; tmpMemberInfoResponse.City)
+                        fieldelement(city; TempMemberInfoResponse.City)
                         {
                         }
-                        fieldelement(country; tmpMemberInfoResponse.Country)
+                        fieldelement(country; TempMemberInfoResponse.Country)
                         {
-                            fieldattribute(countrycode; tmpMemberInfoResponse."Country Code")
+                            fieldattribute(countrycode; TempMemberInfoResponse."Country Code")
                             {
                                 XmlName = 'code';
                             }
                         }
-                        fieldelement(birthday; tmpMemberInfoResponse.Birthday)
+                        fieldelement(birthday; TempMemberInfoResponse.Birthday)
                         {
                         }
-                        fieldelement(gender; tmpMemberInfoResponse.Gender)
+                        fieldelement(gender; TempMemberInfoResponse.Gender)
                         {
                         }
-                        fieldelement(newsletter; tmpMemberInfoResponse."News Letter")
+                        fieldelement(newsletter; TempMemberInfoResponse."News Letter")
                         {
                         }
-                        fieldelement(phoneno; tmpMemberInfoResponse."Phone No.")
+                        fieldelement(phoneno; TempMemberInfoResponse."Phone No.")
                         {
                         }
-                        fieldelement(email; tmpMemberInfoResponse."E-Mail Address")
+                        fieldelement(email; TempMemberInfoResponse."E-Mail Address")
                         {
                         }
                         textelement(base64Image)
                         {
+                            XmlName = 'base64Image';
+
+                            trigger OnBeforePassVariable()
+                            var
+                                MemberMgt: Codeunit "NPR MM Membership Mgt.";
+                            begin
+                                base64Image := '';
+                                if (_IncludeMemberImageBool) then
+                                    MemberMgt.GetMemberImage(TempMemberInfoResponse."Member Entry No", base64Image);
+                            end;
                         }
                         textelement(memberships)
                         {
                             MaxOccurs = Once;
-                            textelement(membership)
+
+                            tableelement(MemberMembership; "NPR MM Membership Role")
                             {
-                                fieldelement(membershipnumber; tmpMemberInfoResponse."External Membership No.")
+                                XmlName = 'membership';
+                                MinOccurs = Zero;
+                                MaxOccurs = Unbounded;
+
+                                fieldelement(MembershipNumber; MemberMembership."External Membership No.")
                                 {
+                                    XmlName = 'membershipnumber';
+                                    textattribute(MemberRoleName)
+                                    {
+                                        XmlName = 'role';
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            MemberRoleName := Format(MemberMembership."Member Role");
+                                        end;
+                                    }
+
+                                    textattribute(GDPR_State)
+                                    {
+                                        XmlName = 'gdpr_approval';
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            MemberMembership.CalcFields("GDPR Approval");
+                                            GDPR_State := Format(MemberMembership."GDPR Approval");
+                                        end;
+                                    }
                                 }
-                                fieldelement(username; tmpMemberInfoResponse."User Logon ID")
+                                fieldelement(username; MemberMembership."User Logon ID")
                                 {
+                                    XmlName = 'username';
                                 }
+
+                                trigger OnPreXmlItem()
+                                begin
+                                    MemberMembership.SetFilter("Member Entry No.", '=%1', TempMemberInfoResponse."Member Entry No");
+                                    MemberMembership.SetFilter(Blocked, '=%1', false);
+                                end;
                             }
                         }
                         textelement(cards)
                         {
-                            textelement(card)
+                            tableelement(MemberCard; "NPR MM Member Card")
                             {
-                                fieldelement(cardnumber; tmpMemberInfoResponse."External Card No.")
+                                XmlName = 'card';
+                                MinOccurs = Zero;
+                                MaxOccurs = Unbounded;
+
+                                fieldelement(ExtCardNumber; MemberCard."External Card No.")
                                 {
-                                    fieldattribute(membershipnumber; tmpMemberInfoResponse."External Membership No.")
+                                    XmlName = 'cardnumber';
+                                    fieldattribute(ExtMembershipNumberCard; MemberCard."External Membership No.")
                                     {
                                         XmlName = 'membershipnumber';
                                     }
+                                    fieldattribute(ExpiryDate; MemberCard."Valid Until")
+                                    {
+                                        XmlName = 'expirydate';
+                                    }
                                 }
+
+                                trigger OnPreXmlItem()
+                                begin
+                                    if (TempMemberInfoResponse."Card Entry No." <> 0) then begin
+                                        MemberCard.SetFilter("Entry No.", '=%1', TempMemberInfoResponse."Card Entry No.");
+                                    end else begin
+                                        MemberCard.SetFilter("Member Entry No.", '=%1', TempMemberInfoResponse."Member Entry No");
+                                    end;
+                                    MemberCard.SetFilter(Blocked, '=%1', false);
+                                    MemberCard.SetFilter("Valid Until", '=%1|>%2', 0D, Today());
+                                end;
                             }
                         }
                         textelement(approvaltext)
@@ -160,7 +218,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
                             var
                                 MembershipRole: Record "NPR MM Membership Role";
                             begin
-                                MembershipRole.Get(tmpMemberInfoResponse."Membership Entry No.", tmpMemberInfoResponse."Member Entry No");
+                                MembershipRole.Get(TempMemberInfoResponse."Membership Entry No.", TempMemberInfoResponse."Member Entry No");
                                 MembershipRole.CalcFields("GDPR Approval");
                                 ApprovalText := Format(MembershipRole."GDPR Approval");
                             end;
@@ -169,22 +227,22 @@ xmlport 6060130 "NPR MM Get Members. Members"
                         {
                             MaxOccurs = Once;
                             MinOccurs = Zero;
-                            tableelement(tmpattributevalueset; "NPR Attribute Value Set")
+                            tableelement(TempAttributeValueSet; "NPR Attribute Value Set")
                             {
                                 LinkFields = "Attribute Set ID" = field("Member Entry No");
-                                LinkTable = tmpMemberInfoResponse;
+                                LinkTable = TempMemberInfoResponse;
                                 MinOccurs = Zero;
                                 XmlName = 'attribute';
                                 UseTemporary = true;
-                                fieldattribute(code; TmpAttributeValueSet."Attribute Code")
+                                fieldattribute(code; TempAttributeValueSet."Attribute Code")
                                 {
                                 }
-                                fieldattribute(value; TmpAttributeValueSet."Text Value")
+                                fieldattribute(value; TempAttributeValueSet."Text Value")
                                 {
                                 }
                             }
                         }
-                        fieldelement(notificationmethod; tmpMemberInfoResponse."Notification Method")
+                        fieldelement(notificationmethod; TempMemberInfoResponse."Notification Method")
                         {
                         }
                         textelement(RequestFieldUpdate)
@@ -198,7 +256,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
                                 XmlName = 'field';
                                 MinOccurs = Zero;
                                 MaxOccurs = Unbounded;
-                                LinkTable = tmpMemberInfoResponse;
+                                LinkTable = TempMemberInfoResponse;
                                 LinkFields = "Member Entry No." = field("Member Entry No");
                                 fieldattribute(EntryNo; TempRequestMemberUpdate."Entry No.")
                                 {
@@ -220,7 +278,13 @@ xmlport 6060130 "NPR MM Get Members. Members"
                                     MinOccurs = Once;
                                     MaxOccurs = Once;
                                 }
+
+                                trigger OnPreXmlItem()
+                                begin
+                                    TempRequestMemberUpdate.SetFilter("Member Entry No.", '=%1', TempMemberInfoResponse."Member Entry No");
+                                end;
                             }
+
                         }
                         textelement(Wallets)
                         {
@@ -233,7 +297,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
                                 XmlName = 'wallet';
                                 MinOccurs = Zero;
                                 MaxOccurs = Unbounded;
-                                LinkTable = tmpMemberInfoResponse;
+                                LinkTable = TempMemberInfoResponse;
                                 LinkFields = "Membership Entry No." = field("Membership Entry No."), "Member Entry No." = field("Member Entry No");
                                 UseTemporary = true;
                                 CalcFields = "Membership Code";
@@ -297,27 +361,15 @@ xmlport 6060130 "NPR MM Get Members. Members"
 
     var
         NOT_FOUND: Label 'Filter combination removed all results.';
+        _IncludeMemberImageBool: Boolean;
 
     internal procedure ClearResponse()
     begin
 
-        tmpMemberInfoResponse.DeleteAll();
+        TempMemberInfoResponse.DeleteAll();
     end;
 
     internal procedure AddResponse(MembershipEntryNo: Integer; MemberExternalNumber: Code[20]; MemberExternalCardNo: Code[100])
-    var
-        Membership: Record "NPR MM Membership";
-        MembershipRole: Record "NPR MM Membership Role";
-        Member: Record "NPR MM Member";
-        MemberCard: Record "NPR MM Member Card";
-        NPRAttributeKey: Record "NPR Attribute Key";
-        NPRAttributeValueSet: Record "NPR Attribute Value Set";
-        RequestMemberUpdate: Record "NPR MM Request Member Update";
-        TempBlob: Codeunit "Temp Blob";
-        OutStr: OutStream;
-        InStr: InStream;
-        Base64Convert: Codeunit "Base64 Convert";
-        IncludeMemberImageBool: Boolean;
     begin
 
         errordescription := '';
@@ -326,68 +378,125 @@ xmlport 6060130 "NPR MM Get Members. Members"
         if (MembershipEntryNo <= 0) then
             exit;
 
-        Membership.Get(MembershipEntryNo);
+        TempMemberInfoRequest.Reset();
+        TempMemberInfoRequest.FindSet();
+        repeat
+            // one member info request record for each member matching the requested search conditions
+            BuildResultSet(TempMemberInfoRequest."External Membership No.", TempMemberInfoRequest."External Member No", TempMemberInfoRequest."External Card No.");
 
-        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-        MembershipRole.SetFilter(Blocked, '=%1', false);
+        until (TempMemberInfoRequest.Next() = 0);
 
-        MembershipRole.SetFilter("Member Role", '<>%1&<>%2', MembershipRole."Member Role"::ANONYMOUS, MembershipRole."Member Role"::GUARDIAN);
+        if (TempMemberInfoResponse.Count() = 0) then
+            AddErrorResponse(NOT_FOUND);
+
+    end;
+
+    internal procedure GetResponse(var TmpMemberInfoResponseOut: Record "NPR MM Member Info Capture"; var TmpAttributeValueSetOut: Record "NPR Attribute Value Set"; var ResponseMessage: Text): Boolean
+    begin
+        TmpMemberInfoResponseOut.Copy(TempMemberInfoResponse, true);
+        TmpAttributeValueSetOut.Copy(TempAttributeValueSet, true);
+        ResponseMessage := errordescription;
+
+        exit(status = '1');
+    end;
+
+    internal procedure AddErrorResponse(ErrorMessage: Text)
+    begin
+
+        errordescription := ErrorMessage;
+        status := '0';
+    end;
+
+
+    local procedure BuildResultSet(ExtMembershipNo: Code[20]; ExtMemberNo: Code[20]; ExtCardNumber: Text[100])
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipRole: Record "NPR MM Membership Role";
+        Member: Record "NPR MM Member";
+        MemberCard: Record "NPR MM Member Card";
+        NPRAttributeKey: Record "NPR Attribute Key";
+        NPRAttributeValueSet: Record "NPR Attribute Value Set";
+        RequestMemberUpdate: Record "NPR MM Request Member Update";
+    begin
+
+        if (ExtMembershipNo = '') and (ExtMemberNo = '') and (ExtCardNumber = '') then
+            exit;
+
+        if (ExtMembershipNo <> '') then begin
+            Membership.SetFilter("External Membership No.", '=%1', ExtMembershipNo);
+            Membership.SetFilter(Blocked, '=%1', false);
+            if (Membership.FindFirst()) then begin
+                MembershipRole.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+            end else begin
+                exit; // An invalid membership will invalidate the result
+            end;
+        end;
+
+        if (ExtMemberNo <> '') then begin
+            Member.SetFilter("External Member No.", '=%1', ExtMemberNo);
+            Member.SetFilter(Blocked, '=%1', false);
+            if (Member.FindFirst()) then begin
+                MembershipRole.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
+            end else begin
+                exit; // An invalid member will invalidate the result
+            end;
+        end;
+
+        if (ExtCardNumber <> '') then begin
+            MemberCard.SetFilter("External Card No.", '=%1', UpperCase(ExtCardNumber));
+            MemberCard.SetFilter(Blocked, '=%1', false);
+            if (MemberCard.FindFirst()) then begin
+                MembershipRole.SetFilter("Membership Entry No.", '=%1', MemberCard."Membership Entry No.");
+                MembershipRole.SetFilter("Member Entry No.", '=%1', MemberCard."Member Entry No.");
+            end else begin
+                exit; // An invalid card will invalidate the result
+            end;
+        end;
 
         if (MembershipRole.FindSet()) then begin
             repeat
-                TempWallet.TransferFields(MembershipRole, true);
-                TempWallet.Insert();
 
-                tmpMemberInfoResponse.Init();
+                TempMemberInfoResponse.Init();
                 Member.Get(MembershipRole."Member Entry No.");
+                Membership.Get(MembershipRole."Membership Entry No.");
 
-                tmpMemberInfoResponse.TransferFields(Member, true);
+                TempMemberInfoResponse.TransferFields(Member, true);
 
-                if Evaluate(IncludeMemberImageBool, includememberimage) and IncludeMemberImageBool then
-                    if Member.Image.HasValue() then begin
-                        TempBlob.CreateOutStream(OutStr);
-                        Member.Image.ExportStream(OutStr);
-                        TempBlob.CreateInStream(InStr);
-                        base64Image := Base64Convert.ToBase64(InStr);
-                    end;
+                TempMemberInfoResponse."User Logon ID" := MembershipRole."User Logon ID";
+                TempMemberInfoResponse."External Membership No." := Membership."External Membership No.";
+                TempMemberInfoResponse."External Member No" := Member."External Member No.";
+                TempMemberInfoResponse."Member Entry No" := MembershipRole."Member Entry No.";
+                TempMemberInfoResponse."Membership Entry No." := MembershipRole."Membership Entry No.";
+                TempMemberInfoResponse."Contact No." := MembershipRole."Contact No.";
 
-                MemberCard.SetCurrentKey("Member Entry No.");
-                MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
-                MemberCard.SetFilter("Valid Until", '>=%1|=%2', Today, 0D);
-                MemberCard.SetFilter(Blocked, '=%1', false);
-                if (MemberCard.FindFirst()) then begin
-                    tmpMemberInfoResponse."External Card No." := MemberCard."External Card No.";
-                    tmpMemberInfoResponse."Valid Until" := MemberCard."Valid Until";
-                end;
-
-                tmpMemberInfoResponse."User Logon ID" := MembershipRole."User Logon ID";
-                tmpMemberInfoResponse."External Membership No." := Membership."External Membership No.";
-                tmpMemberInfoResponse."External Member No" := Member."External Member No.";
-                tmpMemberInfoResponse."Member Entry No" := Member."Entry No.";
-                tmpMemberInfoResponse."Membership Entry No." := MembershipRole."Membership Entry No.";
-                tmpMemberInfoResponse."Contact No." := MembershipRole."Contact No.";
+                if (ExtCardNumber <> '') then
+                    TempMemberInfoResponse."Card Entry No." := MemberCard."Entry No.";
 
                 MembershipRole.CalcFields("GDPR Approval");
                 case MembershipRole."GDPR Approval" of
                     MembershipRole."GDPR Approval"::ACCEPTED:
-                        tmpMemberInfoResponse."GDPR Approval" := tmpMemberInfoResponse."GDPR Approval"::ACCEPTED;
+                        TempMemberInfoResponse."GDPR Approval" := TempMemberInfoResponse."GDPR Approval"::ACCEPTED;
                     MembershipRole."GDPR Approval"::REJECTED:
-                        tmpMemberInfoResponse."GDPR Approval" := tmpMemberInfoResponse."GDPR Approval"::REJECTED;
+                        TempMemberInfoResponse."GDPR Approval" := TempMemberInfoResponse."GDPR Approval"::REJECTED;
                     MembershipRole."GDPR Approval"::PENDING:
-                        tmpMemberInfoResponse."GDPR Approval" := tmpMemberInfoResponse."GDPR Approval"::PENDING;
+                        TempMemberInfoResponse."GDPR Approval" := TempMemberInfoResponse."GDPR Approval"::PENDING;
                     else
-                        tmpMemberInfoRequest."GDPR Approval" := tmpMemberInfoRequest."GDPR Approval"::NA;
+                        TempMemberInfoResponse."GDPR Approval" := TempMemberInfoResponse."GDPR Approval"::NA;
                 end;
 
+                TempMemberInfoResponse."Entry No." := TempMemberInfoResponse.Count() + 1;
+                TempMemberInfoResponse.Insert();
+
+                // Pre-fill auxillary tables
                 NPRAttributeKey.SetFilter("Table ID", '=%1', DATABASE::"NPR MM Member");
                 NPRAttributeKey.SetFilter("MDR Code PK", '=%1', Format(Member."Entry No.", 0, '<integer>'));
                 if (NPRAttributeKey.FindFirst()) then begin
                     NPRAttributeValueSet.SetFilter("Attribute Set ID", '=%1', NPRAttributeKey."Attribute Set ID");
                     if (NPRAttributeValueSet.FindSet()) then begin
                         repeat
-                            TmpAttributeValueSet.TransferFields(NPRAttributeValueSet, true);
-                            TmpAttributeValueSet."Attribute Set ID" := Member."Entry No.";
-                            TmpAttributeValueSet.Insert();
+                            TempAttributeValueSet.TransferFields(NPRAttributeValueSet, true);
+                            TempAttributeValueSet."Attribute Set ID" := Member."Entry No.";
+                            TempAttributeValueSet.Insert();
                         until (NPRAttributeValueSet.Next() = 0);
                     end;
                 end;
@@ -401,36 +510,9 @@ xmlport 6060130 "NPR MM Get Members. Members"
                     until (RequestMemberUpdate.Next() = 0);
                 end;
 
-                if (not Member.Blocked) then
-                    if (tmpMemberInfoResponse.Insert()) then;
-
-                if ((MemberExternalNumber <> '') and (MemberExternalNumber <> Member."External Member No.")) then
-                    if (tmpMemberInfoResponse.Delete()) then;
-
-                if ((MemberExternalCardNo <> '') and (MemberExternalCardNo <> tmpMemberInfoResponse."External Card No.")) then
-                    if (tmpMemberInfoResponse.Delete()) then;
-
             until (MembershipRole.Next() = 0);
         end;
 
-        if (tmpMemberInfoResponse.Count() = 0) then
-            AddErrorResponse(NOT_FOUND);
-    end;
-
-    internal procedure GetResponse(var TmpMemberInfoResponseOut: Record "NPR MM Member Info Capture"; var TmpAttributeValueSetOut: Record "NPR Attribute Value Set"; var ResponseMessage: Text): Boolean
-    begin
-        TmpMemberInfoResponseOut.Copy(tmpMemberInfoResponse, true);
-        TmpAttributeValueSetOut.Copy(TmpAttributeValueSet, true);
-        ResponseMessage := errordescription;
-
-        exit(status = '1');
-    end;
-
-    internal procedure AddErrorResponse(ErrorMessage: Text)
-    begin
-
-        errordescription := ErrorMessage;
-        status := '0';
     end;
 
 }
