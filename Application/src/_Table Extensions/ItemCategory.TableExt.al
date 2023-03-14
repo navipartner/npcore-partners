@@ -248,10 +248,14 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
         ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, Code);
         ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, "NPR Global Dimension 1 Code");
         ValueEntryWithVendor.SetFilter(Filter_Dim_2_Code, "NPR Global Dimension 2 Code");
-        ValueEntryWithVendor.SetFilter(Filter_Vendor_No, "NPR Vendor Filter");
-        ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1', "NPR Date Filter");
-        ValueEntryWithVendor.SetFilter(Filter_Salespers_Purch_Code, "NPR Salesperson/Purch. Filter");
-        ValueEntryWithVendor.SetFilter(Filter_Location_Code, "NPR Location Filter");
+        if GetFilter("NPR Vendor Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Vendor_No, GetFilter("NPR Vendor Filter"));
+        if GetFilter("NPR Date Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, GetFilter("NPR Date Filter"));
+        if GetFilter("NPR Salesperson/Purch. Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Salespers_Purch_Code, GetFilter("NPR Salesperson/Purch. Filter"));
+        if GetFilter("NPR Location Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Location_Code, GetFilter("NPR Location Filter"));
         ValueEntryWithVendor.Open();
         while ValueEntryWithVendor.Read() do begin
             SalesLCY += ValueEntryWithVendor.Sum_Sales_Amount_Actual;
@@ -269,10 +273,14 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
         ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, Code);
         ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, "NPR Global Dimension 1 Code");
         ValueEntryWithVendor.SetFilter(Filter_Dim_2_Code, "NPR Global Dimension 2 Code");
-        ValueEntryWithVendor.SetFilter(Filter_Vendor_No, "NPR Vendor Filter");
-        ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1', "NPR Date Filter");
-        ValueEntryWithVendor.SetFilter(Filter_Salespers_Purch_Code, "NPR Salesperson/Purch. Filter");
-        ValueEntryWithVendor.SetFilter(Filter_Location_Code, "NPR Location Filter");
+        if GetFilter("NPR Vendor Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Vendor_No, GetFilter("NPR Vendor Filter"));
+        if GetFilter("NPR Date Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, GetFilter("NPR Date Filter"));
+        if GetFilter("NPR Salesperson/Purch. Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Salespers_Purch_Code, GetFilter("NPR Salesperson/Purch. Filter"));
+        if GetFilter("NPR Location Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Location_Code, GetFilter("NPR Location Filter"));
         ValueEntryWithVendor.Open();
         while ValueEntryWithVendor.Read() do begin
             PurchasesLCY += ValueEntryWithVendor.Sum_Cost_Amount_Actual;
@@ -288,9 +296,12 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
         ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, Code);
         ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, "NPR Global Dimension 1 Code");
         ValueEntryWithVendor.SetFilter(Filter_Dim_2_Code, "NPR Global Dimension 2 Code");
-        ValueEntryWithVendor.SetFilter(Filter_Vendor_No, "NPR Vendor Filter");
-        ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1', "NPR Date Filter");
-        ValueEntryWithVendor.SetFilter(Filter_Location_Code, "NPR Location Filter");
+        if GetFilter("NPR Vendor Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Vendor_No, GetFilter("NPR Vendor Filter"));
+        if GetFilter("NPR Date Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, GetFilter("NPR Date Filter"));
+        if GetFilter("NPR Location Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Location_Code, GetFilter("NPR Location Filter"));
         ValueEntryWithVendor.Open();
         while ValueEntryWithVendor.Read() do begin
             InventoryValue += ValueEntryWithVendor.Sum_Cost_Amount_Actual;
