@@ -10,6 +10,10 @@
 
 [CmdletBinding()]
 param (
+    [Parameter(Mandatory = $false)]
+    [ValidateSet('Cloud','Crane')]
+    [String]$BcType = 'Cloud',
+
     [Parameter(Mandatory = $true)]
     [string]$Username,
 
@@ -17,22 +21,28 @@ param (
     [string]$Password,
 
     [Parameter(Mandatory = $false)]
-    [Object[]]$SuiteCodes = @('POS5S1', 'POS5S1', 'POS7S1', 'POS1S1'), # empty array => run all tests; duplicates allowed; ordered
-
-    [Parameter(Mandatory = $false)]
-    [string]$TenantId = "c068e6f9-9a49-4b37-b118-09c8e5b97ab0",
-
-    [Parameter(Mandatory = $false)]
-    [string]$SandboxName = "NPRetailBCPT-Sandbox",
+    [Object[]]$SuiteCodes = @('POS1S1'),
 
     [Parameter(Mandatory = $false)]
     [string]$CompanyName = "CRONUS Danmark A/S",
 
     [Parameter(Mandatory = $false)]
-    [string]$ClientId = "e7aed49c-17a3-49ae-9385-bfa901e61e48", # AAD app registration
+    [string]$TenantId = "c068e6f9-9a49-4b37-b118-09c8e5b97ab0", # Only for BcType=Cloud
 
     [Parameter(Mandatory = $false)]
-    [int]$TestPageId = 149002
+    [string]$SandboxName = "NPRetailBCPT-Sandbox-5", # Only for BcType=Cloud
+
+    [Parameter(Mandatory = $false)]
+    [string]$ClientId = "e7aed49c-17a3-49ae-9385-bfa901e61e48",  # Only for BcType=Cloud
+
+    [Parameter(Mandatory = $false)]
+    [int]$TestPageId = 149002,
+
+    [Parameter(Mandatory = $false)]
+    [bool]$SingleRun = $false,
+
+    [Parameter(Mandatory = $false)]
+    [bool]$SkipDelayBeforeStart = $true
 )
 
 Clear-Host
@@ -60,7 +70,9 @@ $cctxScriptPath = Join-Path $PSScriptRoot "TestRunner\ClientContext.ps1"
 $npBcptMgmt = Join-Path $PSScriptRoot "NpBcptMgmt.ps1"
 . "$npBcptMgmt" -Force
 
-$bcptMgmt = [NpBcptMgmt]::new($Username, $Password, $TenantId, $SandboxName, $CompanyName, $ClientId, $aadActiveDirectoryPath)
+$bcptMgmt = [NpBcptMgmt]::new($BcType, $Username, $Password, $TenantId, $SandboxName, $CompanyName, $ClientId, $aadActiveDirectoryPath)
+
+$apiAuthParams = $bcptMgmt.ApiAuthParams()
 
 # Wait for environment, in case it's not ready
 Write-Host "Check environment status" -ForegroundColor Green
@@ -72,9 +84,7 @@ Write-Host "Using internal Service Url:" -ForegroundColor Green
 Write-Host "$($internalServiceUrl) `r`n"
 
 # Get companies
-$companies = @(Invoke-BcSaaS `
-    -AuthorizationType "AAD" `
-    -BearerToken $bcptMgmt.GetToken() `
+$companies = @(Invoke-BcSaaS @apiAuthParams `
     -BaseServiceUrl $bcptMgmt.GetApiBaseUrl() `
     -Path 'companies')
 
@@ -86,9 +96,7 @@ Write-Host ($company | Out-String)
 # Get Installed apps
 Write-Host "Get Installed Apps:" -ForegroundColor Green
 try {
-    $apps = @(Invoke-BcSaaS `
-        -AuthorizationType "AAD" `
-        -BearerToken $bcptMgmt.GetToken() `
+    $apps = @(Invoke-BcSaaS @apiAuthParams `
         -BaseServiceUrl $bcptMgmt.GetApiBaseUrl() `
         -CompanyId $($company.id) `
         -APIPublisher "navipartner" `
@@ -108,9 +116,7 @@ catch {
 
 # Get BCPT suites
 Write-Host "Available BCPT suite codes:" -ForegroundColor Green
-$suites = @(Invoke-BcSaaS `
-    -AuthorizationType "AAD" `
-    -BearerToken $bcptMgmt.GetToken() `
+$suites = @(Invoke-BcSaaS @apiAuthParams `
     -BaseServiceUrl $bcptMgmt.GetApiBaseUrl() `
     -CompanyId $($company.id) `
     -APIPublisher "microsoft" `
@@ -138,9 +144,6 @@ if ($selectedSuites.Count -eq 0) {
 }
 Write-Host "`r`n"
 
-# Create BCPT credential
-$bcptCredential = New-Object System.Management.Automation.PSCredential "$($Username)", (ConvertTo-SecureString -String "$($Password)" -AsPlainText -Force)
-
 # Wait for BCPT
 $bcptMgmt.WaitForBcpt(10, 1800)
 
@@ -157,26 +160,35 @@ try {
         $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
         Write-Host "Running BCPT for '$($suiteCode)'..." -ForegroundColor Green
 
-        $params = @{
-            Credential = $bcptCredential
-            AuthorizationType = "AAD"
-        }
-        
         try {
-            Invoke-Command -ScriptBlock { Param( $location, [HashTable] $params, $suiteCode, $internalServiceUrl, $testPage, $sandboxName, $clientId)
+            Invoke-Command -ScriptBlock { Param($bcType, $location, [HashTable] $params, $suiteCode, $internalServiceUrl, $testPage, $sandboxName, $clientId)
                 
+                # Crane
+                if ($bcType -eq "Crane") {
+                    $params += @{
+                        Environment = 'OnPrem'
+                    }
+                }
+                # Cloud
+                else {
+                    $params += @{
+                        Environment = 'PROD'
+                        SandboxName = "$($sandboxName)"
+                        ClientId = "$($clientId)"
+                    }
+                }
+
                 Set-Location $location
 
                 .\RunBCPTTests.ps1 @params `
                     -BCPTTestRunnerInternalFolderPath $location `
                     -SuiteCode "$($suiteCode)" `
                     -ServiceUrl "$internalServiceUrl" `
-                    -Environment PROD `
-                    -SandboxName "$($sandboxName)" `
-                    -ClientId "$($clientId)" `
-                    -TestRunnerPage ([int]$testPage)
+                    -TestRunnerPage ([int]$testPage) `
+                    -SingleRun:$($SingleRun) `
+                    -SkipDelayBeforeStart:$($SkipDelayBeforeStart)
                 
-            } -ArgumentList (Join-Path -Path $PSScriptRoot -ChildPath "TestRunner"), $params, $suiteCode, $internalServiceUrl, $TestPageId, $SandboxName, $ClientId
+            } -ArgumentList $BcType, (Join-Path -Path $PSScriptRoot -ChildPath "TestRunner"), $apiAuthParams, $suiteCode, $internalServiceUrl, $TestPageId, $SandboxName, $ClientId
         }
         catch {
             $_
@@ -191,18 +203,6 @@ try {
         # Wait for bcpt
         $bcptMgmt.WaitForBcpt(10, 1800)
     }
-
-    #$bcptLogEntries = @(. "$invokeSaasApi" ` `
-    #    -AuthorizationType "AAD" `
-    #    -BearerToken $bcptMgmt.GetToken() `
-    #    -BaseServiceUrl $bcptMgmt.GetApiBaseUrl() `
-    #    -CompanyId $($company.id) `
-    #    -APIPublisher "microsoft" `
-    #    -APIGroup "PerformancToolkit" `
-    #    -Path "bcptLogEntries")
-    #Write-Host ($bcptLogEntries | Out-String)
-    #
-    #Save-ResultsAsXUnitFile -TestRunResultObject $bcptLogEntries -ResultsFilePath (Join-Path $PSScriptRoot "logs\Results.xml")
 
     Write-Host "BCPT runner completed" -ForegroundColor Green
     Write-Host "`r`n"
