@@ -171,10 +171,12 @@ try {
                 }
                 # Cloud
                 else {
-                    $params += @{
+                    $params = @{
                         Environment = 'PROD'
                         SandboxName = "$($sandboxName)"
                         ClientId = "$($clientId)"
+                        Credential = $bcptMgmt.GetCredentials()
+                        AuthorizationType = "AAD"
                     }
                 }
 
@@ -217,8 +219,10 @@ catch {
     Write-Host "------------------------------------------------"
     Write-Host "traces"
     Write-Host "| where timestamp > todatetime('$($runStarted)')"
-    Write-Host "| where timestamp <= todatetime('$((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))')"
-    Write-Host "| where customDimensions.environmentName == '$($SandboxName)'"
+    Write-Host "| where timestamp <= todatetime('$((Get-Date).AddMinutes(2).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))')"
+    if ($BcType -eq 'Cloud') {
+        Write-Host "| where customDimensions.environmentName == '$($SandboxName)'"
+    }
     Write-Host "| order by timestamp asc"
     Write-Host "------------------------------------------------"
 }

@@ -21,6 +21,7 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
         NoOfPOSUnitsParamLbl: Label 'NoOfPOSUnits', Locked = true;
         ParamValidationErr: Label 'Parameter is not defined in the correct format. The expected format is "%1"', Comment = '%1 - expected format';
         GetLastPosUnitErr: Label 'Unable to find last created POS Unit';
+        GetGenBusinessPostingGroupErr: Label 'Unable to find Gen. Business Posting Group';
 
 
     local procedure InitTest();
@@ -155,12 +156,29 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
         InsertReminderTerms();
     end;
 
+    local procedure GetFirstGenBusPostGroup(Filter: Text) ReturnCode: Code[20]
+    var
+        GenBusPostGroup: Record "Gen. Business Posting Group";
+    begin
+        GenBusPostGroup.Reset();
+        GenBusPostGroup.SetFilter(Code, Filter);
+        if GenBusPostGroup.FindFirst() then
+            ReturnCode := GenBusPostGroup.Code
+        else
+            Error(GetGenBusinessPostingGroupErr);
+    end;
+
     local procedure InsertGeneralPostingSetup()
     var
         GeneralPostingSetup: Record "General Posting Setup";
+        DomesticGenBusPosGroupCode: Code[20];
+        ExportGenBusPosGroupCode: Code[20];
     begin
-        if not GeneralPostingSetup.Get('INDENLANDS', 'MISC') then begin
-            GeneralPostingSetup.Validate("Gen. Bus. Posting Group", 'INDENLANDS');
+        DomesticGenBusPosGroupCode := GetFirstGenBusPostGroup('INDENLANDS|DOMESTIC');
+        ExportGenBusPosGroupCode := GetFirstGenBusPostGroup('UDLAND|EXPORT');
+
+        if not GeneralPostingSetup.Get(DomesticGenBusPosGroupCode, 'MISC') then begin
+            GeneralPostingSetup.Validate("Gen. Bus. Posting Group", DomesticGenBusPosGroupCode);
             GeneralPostingSetup.Validate("Gen. Prod. Posting Group", 'MISC');
             GeneralPostingSetup.Validate("Sales Account", '01030');
             GeneralPostingSetup.Validate("Sales Credit Memo Account", '01030');
@@ -171,8 +189,8 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
             GeneralPostingSetup.Insert(true);
         end;
 
-        if not GeneralPostingSetup.Get('UDLAND', 'MISC') then begin
-            GeneralPostingSetup.Validate("Gen. Bus. Posting Group", 'UDLAND');
+        if not GeneralPostingSetup.Get(ExportGenBusPosGroupCode, 'MISC') then begin
+            GeneralPostingSetup.Validate("Gen. Bus. Posting Group", ExportGenBusPosGroupCode);
             GeneralPostingSetup.Validate("Gen. Prod. Posting Group", 'MISC');
             GeneralPostingSetup.Validate("Sales Account", '01010');
             GeneralPostingSetup.Validate("Sales Credit Memo Account", '01010');
@@ -188,9 +206,14 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
     local procedure InsertVATPostingSetup()
     var
         VATPostingSetup: Record "VAT Posting Setup";
+        DomesticGenBusPosGroupCode: Code[20];
+        ExportGenBusPosGroupCode: Code[20];
     begin
-        if not VATPostingSetup.Get('INDENLANDS', 'VAT25') then begin
-            VATPostingSetup.Validate("VAT Bus. Posting Group", 'INDENLANDS');
+        DomesticGenBusPosGroupCode := GetFirstGenBusPostGroup('INDENLANDS|DOMESTIC');
+        ExportGenBusPosGroupCode := GetFirstGenBusPostGroup('UDLAND|EXPORT');
+
+        if not VATPostingSetup.Get(DomesticGenBusPosGroupCode, 'VAT25') then begin
+            VATPostingSetup.Validate("VAT Bus. Posting Group", DomesticGenBusPosGroupCode);
             VATPostingSetup.Validate("VAT Prod. Posting Group", 'VAT25');
             VATPostingSetup.Validate("VAT Identifier", 'VAT25');
             VATPostingSetup.Validate("VAT %", 25);
@@ -200,8 +223,8 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
             VATPostingSetup.Insert(true);
         end;
 
-        if not VATPostingSetup.Get('UDLAND', 'VAT25') then begin
-            VATPostingSetup.Validate("VAT Bus. Posting Group", 'UDLAND');
+        if not VATPostingSetup.Get(ExportGenBusPosGroupCode, 'VAT25') then begin
+            VATPostingSetup.Validate("VAT Bus. Posting Group", ExportGenBusPosGroupCode);
             VATPostingSetup.Validate("VAT Prod. Posting Group", 'VAT25');
             VATPostingSetup.Validate("VAT Identifier", 'VAT25');
             VATPostingSetup.Validate("VAT %", 25);
