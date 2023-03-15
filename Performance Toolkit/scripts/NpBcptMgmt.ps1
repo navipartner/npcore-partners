@@ -1,5 +1,7 @@
 class NpBcptMgmt
 {
+    [ValidateSet('Cloud','Crane')]
+    [String] $BcType
     [string] $Username
     [string] $Password
     [String] $TenantId
@@ -10,8 +12,9 @@ class NpBcptMgmt
     [string] $AadActiveDirectoryPath
     [string] $Token
 
-    NpBcptMgmt([string] $Username, [string] $Password, [String] $TenantId, [String] $SandboxName, [String] $CompanyName, [String] $ClientId, [string] $AadActiveDirectoryPath)
+    NpBcptMgmt([String] $BcType, [string] $Username, [string] $Password, [String] $TenantId, [String] $SandboxName, [String] $CompanyName, [String] $ClientId, [string] $AadActiveDirectoryPath)
     {
+        $this.BcType = $BcType
         $this.Username = $Username
         $this.Password = $Password
         $this.TenantId = $TenantId
@@ -19,6 +22,41 @@ class NpBcptMgmt
         $this.CompanyName = $CompanyName
         $this.ClientId = $ClientId
         $this.AadActiveDirectoryPath = $AadActiveDirectoryPath
+    }
+
+    [void] WaitForEnvironment()
+    {
+        # Crane
+        if ($this.BcType -eq 'Crane') {
+            return;
+        }
+        # Cloud
+        else {
+            $isReady = $false
+            Do {
+                $response = Invoke-RestMethod -UseBasicParsing -Method Get -Uri "https://businesscentral.dynamics.com/$($this.TenantId)/$($this.SandboxName)/deployment/url"
+                Write-Host "Status: $($response.status)"
+                if ($response.status -eq "Ready") {
+                    Write-Host "Environment '$($this.SandboxName)' is ready."
+                    $isReady = $true
+                } else {
+                    Write-Host "Waiting for environment '$($this.SandboxName)', status: $($response.status)" -NoNewline 
+                    Start-Sleep -Seconds 30
+                }
+            } while ($isReady -eq $false)
+        }
+    }
+
+    [string] GetInternalServiceUrl()
+    {
+        # Crane
+        if ($this.BcType -eq 'Crane') {
+            return "https://$($this.Username).dynamics-retail.net/BC/?company=$([Uri]::EscapeDataString($this.CompanyName))&tenant=default";
+        }
+        # Cloud
+        else {
+            return "https://businesscentral.dynamics.com/$($this.TenantId)/$($this.SandboxName)?company=$([Uri]::EscapeDataString($this.CompanyName))"
+        }
     }
 
     [PSCredential] GetCredentials()
@@ -66,43 +104,29 @@ class NpBcptMgmt
         return $this.Token
     }
 
-    [string] GetInternalServiceUrl()
-    {
-        return "https://businesscentral.dynamics.com/$($this.TenantId)/$($this.SandboxName)?company=$([Uri]::EscapeDataString($this.CompanyName))"
-    }
-
-    [void] WaitForEnvironment()
-    {
-        $isReady = $false
-        Do {
-            $response = Invoke-RestMethod -UseBasicParsing -Method Get -Uri "https://businesscentral.dynamics.com/$($this.TenantId)/$($this.SandboxName)/deployment/url"
-            Write-Host "Status: $($response.status)"
-            if ($response.status -eq "Ready") {
-                Write-Host "Environment '$($this.SandboxName)' is ready."
-                $isReady = $true
-            } else {
-                Write-Host "Waiting for environment '$($this.SandboxName)', status: $($response.status)" -NoNewline 
-                Start-Sleep -Seconds 30
-            }
-        } while ($isReady -eq $false)
-    }
-
     [Uri] GetApiBaseUrl()
     {
-        return [Uri]"https://api.businesscentral.dynamics.com/v2.0/$($this.TenantId)/$($this.SandboxName)"
+        # Crane
+        if ($this.BcType -eq 'Crane') {
+            return [Uri]"https://$($this.Username).dynamics-retail.net/BC";
+        }
+        # Cloud
+        else {
+            return [Uri]"https://api.businesscentral.dynamics.com/v2.0/$($this.TenantId)/$($this.SandboxName)"
+        }
     }
 
     [void] WaitForBcpt([int]$sleepInterval = 5, [int]$timeout = 1800)
     {
+        $apiAuthParams = $this.ApiAuthParams()
+
         $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
         $isBcptInProgress = $false
         Do
         {
-            $checkBcptUrl = "https://api.businesscentral.dynamics.com/v2.0/$($this.TenantId)/$($this.SandboxName)/ODataV4/BCPTTestSuite_IsAnyTestRunInProgress?company=$([Uri]::EscapeDataString($this.CompanyName))"
-            $checkRunning = @(Invoke-BcSaaS `
-                -AuthorizationType "AAD" `
-                -BearerToken $this.GetToken() `
+            $checkBcptUrl = "$($this.GetApiBaseUrl().ToString())/ODataV4/BCPTTestSuite_IsAnyTestRunInProgress?company=$([Uri]::EscapeDataString($this.CompanyName))"
+            $checkRunning = @(Invoke-BcSaaS @apiAuthParams `
                 -BaseServiceUrl $checkBcptUrl `
                 -Method "POST" `
                 -NotApi)
@@ -135,6 +159,25 @@ class NpBcptMgmt
 
         $stopwatch.Stop()
     }
+
+    [Hashtable] ApiAuthParams()
+    {
+        # Crane
+        if ($this.BcType -eq 'Crane') {
+            return @{
+                AuthorizationType = "NavUserPassword"
+                Credential = $this.GetCredentials()
+            }
+        }
+        # Cloud
+        else {
+            return @{
+                AuthorizationType = "AAD"
+                BearerToken = $this.GetToken()
+            }
+        }
+    }
+
 }
 
 function Invoke-BcSaaS {
