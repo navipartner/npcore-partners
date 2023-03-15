@@ -42,7 +42,9 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
         WorkflowConfig.AddOptionParameter(
             'DiscountType',
             ParameterDiscType_OptionsLbl,
+#pragma warning disable AA0139
             SelectStr(3, ParameterDiscType_OptionsLbl),
+#pragma warning restore
             ParameterDiscType_CaptionLbl,
             ParameterDiscType_CaptionLbl,
             ParameterDiscType_OptionCaptionLbl);
