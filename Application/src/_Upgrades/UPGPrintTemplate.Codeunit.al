@@ -63,7 +63,7 @@ codeunit 6150696 "NPR UPG Print Template"
         if RPTemplateHeader.Get(Template) then
             if not RPTemplateHeader.Archived then begin
                 RPTemplateHeader."Version Comments" := Caption_AutoArchive;
-                RPTemplateHeader."Version" := RPTemplateMgt.GetNextVersionNumber(RPTemplateHeader);
+                RPTemplateHeader."Version" := CopyStr(RPTemplateMgt.GetNextVersionNumber(RPTemplateHeader), 1, MaxStrLen(RPTemplateHeader."Version"));
                 RPTemplateHeader.Validate(Archived, true);
             end;
     end;
