@@ -4,7 +4,7 @@ resources:
   repositories:
   - repository: scriptsRepo
     type: git
-    name: 'NpCore/NpDevOps'
+    name: 'NpCore/NpDevOps'  
 
 stages:
 - template: /YAML/ZAL Build Definitions/PR Validation build.yml@scriptsRepo
@@ -74,3 +74,5 @@ stages:
     testApps:
       - 'Performance Toolkit'
       - 'Test'
+    nowarn: AL0432
+    
