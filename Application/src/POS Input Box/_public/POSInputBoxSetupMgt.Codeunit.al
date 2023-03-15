@@ -177,7 +177,10 @@
             EanBoxParameter."Default Value" := POSActionParameter."Default Value";
             EanBoxParameter.Options := POSActionParameter.Options;
             EanBoxParameter.Value := POSActionParameter."Default Value";
-            EanBoxParameter.OptionValueInteger := -1;
+            if EanBoxParameter."Data Type" = EanBoxParameter."Data Type"::Option then
+                EanBoxParameter.OptionValueInteger := 0
+            else
+                EanBoxParameter.OptionValueInteger := -1;
             EanBoxParameter.Insert(true);
         end;
     end;
