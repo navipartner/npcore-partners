@@ -121,7 +121,7 @@ codeunit 6151474 "NPR UPG PG To Interface"
 
         exit(true);
     end;
-
+#pragma warning disable AA0139
     local procedure MovePGAdyen(PaymentGateway: Record "NPR Magento Payment Gateway")
     var
         PGAdyen: Record "NPR PG Adyen Setup";
@@ -153,6 +153,7 @@ codeunit 6151474 "NPR UPG PG To Interface"
 
         PGAdyen.Insert();
     end;
+#pragma warning restore AA0139
 
     local procedure MovePGBambora(PaymentGateway: Record "NPR Magento Payment Gateway")
     var
