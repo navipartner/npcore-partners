@@ -390,7 +390,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:NPREPOSActionSplitBill.js###
-'let main=async({workflow:i,popup:a,parameters:t,context:e,captions:s})=>{debugger;if(await i.respond("AddPresetValuesToContext"),!e.seatingCode)if(e.seatingCode="",t.SeatingCode)e.seatingCode=t.SeatingCode;else switch(t.InputType+""){case"0":e.seatingCode=await a.input({caption:s.SeatingIDLbl});break;case"1":e.seatingCode=await a.numpad({caption:s.SeatingIDLbl});break;case"2":await i.respond("SelectSeating");break}!e.seatingCode||(e.waiterPadNo||await i.respond("SelectWaiterPad"),e.waiterPadNo&&(await i.respond("GenerateSplitBillContext"),console.log("Context: "+JSON.stringify(e)),result=await a.hospitality.splitBill({caption:s.PopupCaption,items:e.items,bills:e.bills}),result&&await i.respond("DoSplit",result)))};'
+'let main=async({workflow:a,popup:e,parameters:t,context:i,captions:s})=>{debugger;if(await a.respond("AddPresetValuesToContext"),!i.seatingCode)if(i.seatingCode="",t.SeatingCode)i.seatingCode=t.SeatingCode;else switch(t.InputType+""){case"0":i.seatingCode=await e.input({caption:s.SeatingIDLbl});break;case"1":i.seatingCode=await e.numpad({caption:s.SeatingIDLbl});break;case"2":await a.respond("SelectSeating");break}!i.seatingCode||(i.waiterPadNo||await a.respond("SelectWaiterPad"),i.waiterPadNo&&(await a.respond("GenerateSplitBillContext"),console.log("Context: "+JSON.stringify(i)),result=await e.hospitality.splitBill({caption:s.PopupCaption,waiterPadNo:i.waiterPadNo,items:i.items,bills:i.bills}),result&&await a.respond("DoSplit",result)))};'
         );
     end;
 }
