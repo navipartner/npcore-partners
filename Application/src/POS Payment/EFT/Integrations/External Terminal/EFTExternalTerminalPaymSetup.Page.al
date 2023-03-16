@@ -25,7 +25,6 @@
                 {
                     ToolTip = 'If Enabled window for entering bank approval code will pop up.';
                     ApplicationArea = NPRRetail;
-                    Editable = false;
                 }
             }
         }
