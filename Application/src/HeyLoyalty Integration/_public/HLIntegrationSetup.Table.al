@@ -1,6 +1,6 @@
 table 6059800 "NPR HL Integration Setup"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'HeyLoyalty Integration Setup';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR HL Integration Setup";

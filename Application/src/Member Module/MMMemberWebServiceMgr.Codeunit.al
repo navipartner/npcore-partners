@@ -1350,23 +1350,27 @@
 
     end;
 
-    local procedure TransferAttributes(RequestAttributes: XmlElement; MemberInfoCapture: Record "NPR MM Member Info Capture")
+    local procedure TransferAttributes(RequestAttributes: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
-        AttributeCode: Code[20];
-        AttributeValue: Text[250];
+        MembershipEvents: Codeunit "NPR MM Membership Events";
+        AttributeCode: Text;
+        AttributeValue: Text;
         NodeList: XmlNodeList;
         Node: XmlNode;
+        Handled: Boolean;
     begin
 
         if (not NpXmlDomMgt.FindNodes(RequestAttributes.AsXmlNode(), 'request/attributes/attribute', NodeList)) then
             exit;
 
         foreach Node in NodeList do begin
-            AttributeCode := CopyStr(NpXmlDomMgt.GetXmlAttributeText(Node.AsXmlElement(), 'code', true), 1, MaxStrLen(AttributeCode));
-            AttributeValue := '';
-            AttributeValue := CopyStr(NpXmlDomMgt.GetXmlAttributeText(Node.AsXmlElement(), 'value', false), 1, MaxStrLen(AttributeValue));
+            AttributeCode := NpXmlDomMgt.GetXmlAttributeText(Node.AsXmlElement(), 'code', true);
+            AttributeValue := NpXmlDomMgt.GetXmlAttributeText(Node.AsXmlElement(), 'value', false);
 
-            ApplyAttributesToMemberInfoCapture(MemberInfoCapture."Entry No.", AttributeCode, AttributeValue);
+            Handled := false;
+            MembershipEvents.OnBeforeApplyAttributeToMemberInfoCapture(MemberInfoCapture, AttributeCode, AttributeValue, Handled);
+            if not Handled then
+                ApplyAttributesToMemberInfoCapture(MemberInfoCapture."Entry No.", CopyStr(UpperCase(AttributeCode), 1, 20), CopyStr(AttributeValue, 1, 250));
         end;
 
     end;

@@ -73,6 +73,7 @@ codeunit 6060000 "NPR HL Upsert Member"
             MemberInfoCapture."Country Code" := HLMember."Country Code"
         else
             MemberInfoCapture.Country := HLMember."HL Country Name";
+        MemberInfoCapture."Store Code" := HLMember."Store Code";
 
         DataLogMgt.DisableDataLog(true);
         CreateMember(MembershipSalesSetup, MemberInfoCapture, MembershipEntry);
@@ -141,6 +142,7 @@ codeunit 6060000 "NPR HL Upsert Member"
         Member."Country Code" := HLMember."Country Code";
         if HLMember."Country Code" = '' then
             Member.Country := HLMember."HL Country Name";
+        Member."Store Code" := HLMember."Store Code";
         AttributeMgt.UpdateMemberAttributesFromHLMember(HLMember);
         HLIntegrationEvents.OnUpdateMemberFromHL(HLMember, Member);
 

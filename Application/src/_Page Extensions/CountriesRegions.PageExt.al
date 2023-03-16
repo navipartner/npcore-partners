@@ -4,11 +4,28 @@ pageextension 6014429 "NPR Countries/Regions" extends "Countries/Regions"
     {
         addafter("ISO Numeric Code")
         {
-            field("NPR HL Country ID"; Rec."NPR HL Country ID")
+            field("NPR HL Country ID"; HeyLoyaltyCountryID)
             {
+                Caption = 'HeyLoyalty Country ID';
                 ToolTip = 'Specifies the id used for the country at HeyLoyalty.';
                 ApplicationArea = NPRHeyLoyalty;
+
+                trigger OnValidate()
+                begin
+                    CurrPage.SaveRecord();
+                    HLMappedValueMgt.SetMappedValue(Rec.RecordId(), Rec.FieldNo(Code), HeyLoyaltyCountryID, true);
+                    CurrPage.Update(false);
+                end;
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    begin
+        HeyLoyaltyCountryID := HLMappedValueMgt.GetMappedValue(Rec.RecordId(), Rec.FieldNo(Code), false);
+    end;
+
+    var
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
+        HeyLoyaltyCountryID: Text[100];
 }

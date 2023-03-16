@@ -90,7 +90,8 @@ codeunit 6059997 "NPR HL Send Members"
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
         HLFieldID: Text[50];
     begin
-        HLMember.Validate("Country Code");  //throw an error, if there's no country mapping setup
+        HLMember.Validate("Country Code");  //throw an error, if there's no Country mapping setup
+        HLMember.Validate("Store Code");  //throw an error, if there's no Cs Store mapping setup
 
         UrlParametersJObject.Add('firstname', HLMember."First Name");
         UrlParametersJObject.Add('lastname', HLMember."Last Name");
@@ -103,6 +104,7 @@ codeunit 6059997 "NPR HL Send Members"
         UrlParametersJObject.Add('postalcode', HLMember."Post Code Code");
         UrlParametersJObject.Add('city', HLMember.City);
         UrlParametersJObject.Add('country', HLMember."HL Country ID");
+        UrlParametersJObject.Add('shop', HLMember."HL Store Name");
         HLFieldID := HLIntegrationMgt.HLMembershipCodeFieldID();
         if HLFieldID <> '' then begin
             HLMember.Validate("Membership Code");  //refresh HL Membership Name
@@ -119,6 +121,7 @@ codeunit 6059997 "NPR HL Send Members"
         NPRAttribute: Record "NPR Attribute";
         HLMemberAttribute: Record "NPR HL Member Attribute";
         AttributeMgt: Codeunit "NPR HL Attribute Mgt.";
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
     begin
         if NPRAttribute.FindSet() then
             repeat
@@ -129,8 +132,8 @@ codeunit 6059997 "NPR HL Send Members"
                         HLMemberAttribute.Init();
                     HLMemberAttribute.Validate("Attribute Value Code");
                     if HLMemberAttribute."HeyLoyalty Attribute Value" = '' then
-                        HLMemberAttribute."HeyLoyalty Attribute Value" := NPRAttribute."HeyLoyalty Default Value";
-                    UrlParametersJObject.Add(NPRAttribute."HeyLoyalty Field ID", HLMemberAttribute."HeyLoyalty Attribute Value");
+                        HLMemberAttribute."HeyLoyalty Attribute Value" := HLMappedValueMgt.GetMappedValue(NPRAttribute.RecordId(), 0, false);
+                    UrlParametersJObject.Add(HLMappedValueMgt.GetMappedValue(NPRAttribute.RecordId(), NPRAttribute.FieldNo(Code), true), HLMemberAttribute."HeyLoyalty Attribute Value");
                     HLIntegrationEvents.OnAfterAddAttributeToUrlParameters(HLMember, NewMember, HLMemberAttribute, UrlParametersJObject);
                 end;
             until NPRAttribute.Next() = 0;

@@ -1,8 +1,6 @@
 ﻿table 6014557 "NPR Attribute Lookup Value"
 {
-    Access = Internal;
-    // NPRx.xx/TSA/22-04-15 CASE209946 - Entity and Shortcut Attributes
-
+    Access = Public;
     Caption = 'Attribute Code Lookup Value';
     DrillDownPageID = "NPR Attribute Value Lookup";
     LookupPageID = "NPR Attribute Value Lookup";
@@ -35,6 +33,8 @@
         {
             Caption = 'HeyLoyalty Value';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'HeyLoyalty values are now stored in a dedicated mapping table 6059839 "NPR HL Mapped Value".';
         }
     }
 
@@ -49,4 +49,3 @@
     {
     }
 }
-

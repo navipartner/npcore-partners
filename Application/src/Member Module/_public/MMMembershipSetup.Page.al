@@ -22,10 +22,18 @@
                     ToolTip = 'Specifies the value of the Code field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
-                field("HeyLoyalty Name"; Rec."HeyLoyalty Name")
+                field("HeyLoyalty Name"; HeyLoyaltyName)
                 {
+                    Caption = 'HeyLoyalty Name';
                     ToolTip = 'Specifies the id used for the membership at HeyLoyalty.';
                     ApplicationArea = NPRHeyLoyalty;
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.SaveRecord();
+                        HLMappedValueMgt.SetMappedValue(Rec.RecordId(), Rec.FieldNo(Description), HeyLoyaltyName, true);
+                        CurrPage.Update(false);
+                    end;
                 }
                 field(Description; Rec.Description)
                 {
@@ -451,6 +459,8 @@
     }
 
     var
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
+        HeyLoyaltyName: Text[100];
         PROCESSING: Label 'Processing: %1';
         PENDING: Label 'Pending: %1';
         SENT: Label 'Sent: %1';
@@ -467,6 +477,11 @@
     begin
 
         Rec.SetFilter(Blocked, '=%1', false);
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        HeyLoyaltyName := HLMappedValueMgt.GetMappedValue(Rec.RecordId(), Rec.FieldNo(Description), false);
     end;
 
     local procedure CreateMissingWallets(MembershipCode: Code[20])
