@@ -124,11 +124,15 @@
         {
             Caption = 'HeyLoyalty Field ID';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'HeyLoyalty values are now stored in a dedicated mapping table 6059839 "NPR HL Mapped Value".';
         }
         field(801; "HeyLoyalty Default Value"; Text[50])
         {
             Caption = 'Default HeyLoyalty Value';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'HeyLoyalty values are now stored in a dedicated mapping table 6059839 "NPR HL Mapped Value".';
         }
         field(802; "HL Auto Create New Values"; Boolean)
         {

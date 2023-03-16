@@ -987,6 +987,7 @@
         NPRAttrVisible10: Boolean;
         AGE_VERIFICATION: Label 'Member %1 does not meet the age constraint of %2 years set on this product.';
         _PreSelectedCustomerContact: Boolean;
+        _PosUnitNo: Code[10];
 
     local procedure CheckEmail()
     var
@@ -1250,6 +1251,9 @@
             GuardianMandatory := true;
 
         end;
+
+        if (Rec."Store Code" = '') and (_PosUnitNo <> '') then
+            Rec."Store Code" := Rec.GetCsStoreCode(_PosUnitNo);
 
         if (Rec."Item No." <> '') then begin
             MembershipSalesSetup.SetFilter(Type, '=%1', MembershipSalesSetup.Type::ITEM);
@@ -1703,5 +1707,9 @@
     begin
         NPRAttrManagement.OnPageLookUp(GetAttributeTableId(), AttributeNumber, Format(AttributeNumber, 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
     end;
-}
 
+    procedure SetPOSUnit(PosUnitNoIn: Code[10])
+    begin
+        _PosUnitNo := PosUnitNoIn;
+    end;
+}

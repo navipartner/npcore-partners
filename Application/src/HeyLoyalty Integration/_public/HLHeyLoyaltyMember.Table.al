@@ -1,6 +1,6 @@
 table 6059801 "NPR HL HeyLoyalty Member"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'HeyLoyalty Member';
     DataClassification = CustomerContent;
     LookupPageId = "NPR HL HeyLoyalty Members";
@@ -84,6 +84,7 @@ table 6059801 "NPR HL HeyLoyalty Member"
             trigger OnValidate()
             var
                 CountryRegion: Record "Country/Region";
+                HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
             begin
                 if "Country Code" = '' then begin
                     "HL Country ID" := '';
@@ -91,8 +92,7 @@ table 6059801 "NPR HL HeyLoyalty Member"
                 end;
 
                 CountryRegion.Get("Country Code");
-                CountryRegion.TestField("NPR HL Country ID");
-                "HL Country ID" := CountryRegion."NPR HL Country ID";
+                "HL Country ID" := CopyStr(HLMappedValueMgt.GetMappedValue(CountryRegion.RecordId(), CountryRegion.FieldNo(Code), true), 1, MaxStrLen("HL Country ID"));
             end;
         }
         field(40; "Member Created Datetime"; DateTime)
@@ -118,7 +118,7 @@ table 6059801 "NPR HL HeyLoyalty Member"
                 "HL Membership Name" := MemberMgt.GetMembershipHLName("Membership Code");
             end;
         }
-        field(52; "HL Membership Name"; Text[50])
+        field(52; "HL Membership Name"; Text[100])
         {
             Caption = 'HeyLoyalty Membership Name';
             DataClassification = CustomerContent;
@@ -177,6 +177,32 @@ table 6059801 "NPR HL HeyLoyalty Member"
             Caption = 'HeyLoyalty Country Name';
             DataClassification = CustomerContent;
         }
+        field(110; "Store Code"; Code[20])
+        {
+            Caption = 'Store Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NpCs Store";
+            ValidateTableRelation = false;
+
+            trigger OnValidate()
+            var
+                NpCsStore: Record "NPR NpCs Store";
+                HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
+            begin
+                if "Store Code" = '' then begin
+                    "HL Store Name" := '';
+                    exit;
+                end;
+
+                NpCsStore.Get("Store Code");
+                "HL Store Name" := HLMappedValueMgt.GetMappedValue(NpCsStore.RecordId(), NpCsStore.FieldNo(Name), true);
+            end;
+        }
+        field(115; "HL Store Name"; Text[100])
+        {
+            Caption = 'HeyLoyalty Store Name';
+            DataClassification = CustomerContent;
+        }
         field(200; "Update from HL Error"; Boolean)
         {
             Caption = 'Update from HL Error';
@@ -209,29 +235,50 @@ table 6059801 "NPR HL HeyLoyalty Member"
             HLMemberAttribute.DeleteAll();
     end;
 
-    procedure FindCountryCode(): Code[10]
+    internal procedure FindCountryCode(): Code[10]
     var
         Country: Record "Country/Region";
+        HLMappedValue: Record "NPR HL Mapped Value";
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
+        RecRef: RecordRef;
     begin
         if "HL Country ID" = '' then
             exit('');
-        Country.SetCurrentKey("NPR HL Country ID");
-        Country.SetRange("NPR HL Country ID", "HL Country ID");
-        if Country.FindFirst() then
+        HLMappedValueMgt.FilterWhereUsed(Database::"Country/Region", Country.FieldNo(Code), "HL Country ID", false, HLMappedValue);
+        if HLMappedValue.FindFirst() then begin
+            RecRef.Get(HLMappedValue."BC Record ID");
+            RecRef.SetTable(Country);
             exit(Country.Code);
+        end;
 
         if "HL Country Name" = '' then
             exit('');
         Country.Reset();
         Country.SetFilter(Name, '@' + "HL Country Name");
         if Country.FindFirst() then begin
-            Country."NPR HL Country ID" := "HL Country ID";
-            Country.Modify(true);
+            HLMappedValueMgt.SetMappedValue(Country.RecordId(), Country.FieldNo(Code), "HL Country ID", false);
             exit(Country.Code);
         end;
     end;
 
-    procedure SetErrorMessage(NewErrorText: Text)
+    internal procedure FindStoreCode(): Code[20]
+    var
+        HLMappedValue: Record "NPR HL Mapped Value";
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
+        NpCsStore: Record "NPR NpCs Store";
+        RecRef: RecordRef;
+    begin
+        if "HL Store Name" <> '' then begin
+            HLMappedValueMgt.FilterWhereUsed(Database::"NPR NpCs Store", NpCsStore.FieldNo(Name), "HL Store Name", false, HLMappedValue);
+            HLMappedValue.FindFirst();
+            RecRef.Get(HLMappedValue."BC Record ID");
+            RecRef.SetTable(NpCsStore);
+            exit(NpCsStore.Code);
+        end;
+        exit('');
+    end;
+
+    internal procedure SetErrorMessage(NewErrorText: Text)
     var
         OutStream: OutStream;
     begin
@@ -242,7 +289,7 @@ table 6059801 "NPR HL HeyLoyalty Member"
         OutStream.WriteText(NewErrorText);
     end;
 
-    procedure GetErrorMessage(): Text
+    internal procedure GetErrorMessage(): Text
     var
         TypeHelper: Codeunit "Type Helper";
         InStream: InStream;
