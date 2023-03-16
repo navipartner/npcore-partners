@@ -200,7 +200,7 @@
         EftTransactionRequest."Card Name" := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(EftTransactionRequest."Card Name"));
 
         Request.Get('ApprovalCode', JToken);
-        EftTransactionRequest."Authorisation Number" := copystr(JToken.AsValue().AsText(), 1, MaxStrLen(EftTransactionRequest."Authorisation Number"));
+        EftTransactionRequest."Authorisation Number" := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(EftTransactionRequest."Authorisation Number"));
 
     end;
 
