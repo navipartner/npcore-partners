@@ -268,4 +268,23 @@
         PrintReportSelection_Customer(ReportUsage, VariantSH, CurstomerNoFieldNo);
 
     end;
+
+#IF CLOUD AND NOT (BC17 or BC18 or BC19 or BC20) 
+    [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnEnqueueMailingJobOnBeforeRunJobQueueEnqueue', '', false, false)]
+    local procedure OnEnqueueMailingJobOnBeforeRunJobQueueEnqueue(RecordIdToProcess: RecordID; ParameterString: Text; Description: Text; var JobQueueEntry: Record "Job Queue Entry"; var IsHandled: Boolean)
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+    begin
+        if IsHandled then
+            exit;
+        if not EnvironmentInformation.IsSaaS() then
+            exit;
+        if TaskScheduler.CanCreateTask() then
+            exit;
+        if JobQueueEntry."Object ID to Run" <> Codeunit::"Document-Mailing" then
+            exit;
+        Codeunit.Run(Codeunit::"Document-Mailing", JobQueueEntry);
+        IsHandled := true;
+    end;
+#ENDIF
 }
