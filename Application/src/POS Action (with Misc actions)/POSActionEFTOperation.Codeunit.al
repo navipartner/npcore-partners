@@ -1,6 +1,8 @@
-﻿codeunit 6150846 "NPR POS Action: EFT Operation"
+codeunit 6150846 "NPR POS Action: EFT Operation"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Used only for backwards compatibility. It can be deleted once everything is moved to v3';
 
     var
         ActionDescription: Label 'This is a template for POS Action';

@@ -2,7 +2,7 @@
 {
     Access = Internal;
     ObsoleteState = Pending;
-    ObsoleteReason = 'Replaced by codeunit 6014405 "NPR POS Action: EFTGiftCard 2"';
+    ObsoleteReason = 'Replaced by codeunit 6059884 "NPR POS Action: EFTGiftCard 2"';
 
     var
         ActionDescription: Label 'Sale of EFT Gift Cards';
