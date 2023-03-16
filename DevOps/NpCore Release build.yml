@@ -65,4 +65,3 @@ stages:
       testApps:
       - 'Performance Toolkit'
       - 'Test'
-      nowarn: AL0432
