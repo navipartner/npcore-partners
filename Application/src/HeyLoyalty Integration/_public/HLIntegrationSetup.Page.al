@@ -1,6 +1,6 @@
 page 6150720 "NPR HL Integration Setup"
 {
-    Extensible = false;
+    Extensible = true;
     Caption = 'HeyLoyalty Integration Setup';
     DeleteAllowed = false;
     InsertAllowed = false;

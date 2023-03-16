@@ -68,4 +68,13 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnPOSCreateMembershipOnIdentifyCsStore(PosUnitNo: Code[10]; var CsStoreCode: Code[20]; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeApplyAttributeToMemberInfoCapture(var MemberInfoCapture: Record "NPR MM Member Info Capture"; AttributeCode: Text; AttributeValue: Text; var Handled: Boolean)
+    begin
+    end;
 }

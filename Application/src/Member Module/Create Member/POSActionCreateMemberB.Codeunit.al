@@ -16,10 +16,10 @@ codeunit 6060106 "NPR POS Action Create Member B"
 
     local procedure CreateMembershipAndAssignToSales(var POSSale: Record "NPR POS Sale"; ItemNumber: Code[20]): Boolean
     begin
-        exit(AssignToSales(POSSale, CreateMembership(ItemNumber)));
+        exit(AssignToSales(POSSale, CreateMembership(ItemNumber, POSSale."Register No.")));
     end;
 
-    local procedure CreateMembership(ItemNumber: Code[20]) MembershipEntryNo: Integer
+    local procedure CreateMembership(ItemNumber: Code[20]; PosUnitNo: Code[10]) MembershipEntryNo: Integer
     var
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
@@ -56,6 +56,7 @@ codeunit 6060106 "NPR POS Action Create Member B"
         MemberInfoCapturePage.SetTableView(MemberInfoCapture);
 
         Commit();
+        MemberInfoCapturePage.SetPOSUnit(PosUnitNo);
         MemberInfoCapturePage.LookupMode(true);
         PageAction := MemberInfoCapturePage.RunModal();
         if (not (PageAction = Action::LookupOK)) then
@@ -79,5 +80,4 @@ codeunit 6060106 "NPR POS Action Create Member B"
 
         exit(POSActionMemberMgmt.AssignMembershipToPOSSale(POSSale, MembershipEntryNo, MemberCard."External Card No."));
     end;
-
 }

@@ -23,30 +23,30 @@
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("R_PhoneNo"; Rec."Phone No.")
+                field(R_PhoneNo; Rec."Phone No.")
                 {
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Phone No. field';
                 }
-                field("R_FirstName"; Rec."First Name")
+                field(R_FirstName; Rec."First Name")
                 {
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the First Name field';
                 }
-                field("R_LastName"; Rec."Last Name")
+                field(R_LastName; Rec."Last Name")
                 {
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the Last Name field';
 
                 }
-                field("R_Email"; Rec."E-Mail Address")
+                field(R_Email; Rec."E-Mail Address")
                 {
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = false;
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                 }
-                field("R_ExternalCardNo"; Rec."External Card No.")
+                field(R_ExternalCardNo; Rec."External Card No.")
                 {
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the External Card No. field';
@@ -82,7 +82,25 @@
 
 
     var
+        _PosUnitNo: Code[10];
         ShowImportMemberAction: Boolean;
+
+    trigger OnOpenPage()
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        CsStoreCode: Code[20];
+    begin
+        if _PosUnitNo = '' then
+            exit;
+        CsStoreCode := Rec.GetCsStoreCode(_PosUnitNo);
+        if CsStoreCode = '' then
+            exit;
+        MemberInfoCapture.Copy(Rec);
+        MemberInfoCapture.SetRange("Store Code", '');
+        if MemberInfoCapture.IsEmpty() then
+            exit;
+        MemberInfoCapture.ModifyAll("Store Code", CsStoreCode);
+    end;
 
     internal procedure SetShowImportAction()
     begin
@@ -126,4 +144,8 @@
         end;
     end;
 
+    procedure SetPOSUnit(PosUnitNoIn: Code[10])
+    begin
+        _PosUnitNo := PosUnitNoIn;
+    end;
 }

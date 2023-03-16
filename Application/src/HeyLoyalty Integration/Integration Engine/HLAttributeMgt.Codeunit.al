@@ -84,6 +84,7 @@ codeunit 6059990 "NPR HL Attribute Mgt."
         NPRAttributeValue: Record "NPR Attribute Lookup Value";
         HLMemberAttribute: Record "NPR HL Member Attribute";
         xHLMemberAttribute: Record "NPR HL Member Attribute";
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
         Updated: Boolean;
     begin
         HLMemberAttribute."HeyLoyalty Member Entry No." := HLMember."Entry No.";
@@ -109,10 +110,11 @@ codeunit 6059990 "NPR HL Attribute Mgt."
         if not NPRAttributeValue.Get(AttributeCode, AttributeValueCode) then begin
             NPRAttributeValue."Attribute Code" := AttributeCode;
             NPRAttributeValue."Attribute Value Code" := AttributeValueCode;
-            NPRAttributeValue."HeyLoyalty Value" := AttributeValueCode;
-        end;
+            HLMemberAttribute."HeyLoyalty Attribute Value" := AttributeValueCode;
+        end else
+            HLMemberAttribute."HeyLoyalty Attribute Value" :=
+                HLMappedValueMgt.GetMappedValue(NPRAttributeValue.RecordId, NPRAttributeValue.FieldNo("Attribute Value Name"), false);
         HLMemberAttribute."Attribute Value Code" := NPRAttributeValue."Attribute Value Code";
-        HLMemberAttribute."HeyLoyalty Attribute Value" := NPRAttributeValue."HeyLoyalty Value";
 
         Updated := Format(xHLMemberAttribute) <> Format(HLMemberAttribute);
         if Updated then
@@ -123,16 +125,30 @@ codeunit 6059990 "NPR HL Attribute Mgt."
 
     procedure UpdateHLMemberAttributeFromHL(HLMember: Record "NPR HL HeyLoyalty Member"; HeyLoyaltyFieldID: Text; HeyLoyaltyAttributeValue: Text; HeyLoyaltyAttributeValueDescription: Text): Boolean
     var
+        HLMappedValue: Record "NPR HL Mapped Value";
         HLMemberAttribute: Record "NPR HL Member Attribute";
         xHLMemberAttribute: Record "NPR HL Member Attribute";
         NPRAttribute: Record "NPR Attribute";
         NPRAttributeValue: Record "NPR Attribute Lookup Value";
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
+        RecRef: RecordRef;
+        Found: Boolean;
     begin
         if HeyLoyaltyFieldID = '' then
             exit(false);
 
-        NPRAttribute.SetRange("HeyLoyalty Field ID", CopyStr(HeyLoyaltyFieldID, 1, MaxStrLen(NPRAttribute."HeyLoyalty Field ID")));
-        if not (NPRAttribute.FindFirst() and IsSendAttributeToHL(NPRAttribute)) then
+        Found := false;
+        HLMappedValueMgt.FilterWhereUsed(
+            Database::"NPR Attribute", NPRAttribute.FieldNo(Code), CopyStr(HeyLoyaltyFieldID, 1, MaxStrLen(HLMappedValue.Value)), false, HLMappedValue);
+        if HLMappedValue.Find('-') then
+            repeat
+                Found := RecRef.Get(HLMappedValue."BC Record ID");
+                if Found then
+                    RecRef.SetTable(NPRAttribute);
+            until Found or (HLMappedValue.Next() = 0);
+        if Found then
+            Found := IsSendAttributeToHL(NPRAttribute);
+        if not Found then
             exit(false);
 
         HLMemberAttribute."HeyLoyalty Member Entry No." := HLMember."Entry No.";
@@ -146,18 +162,31 @@ codeunit 6059990 "NPR HL Attribute Mgt."
             xHLMemberAttribute := HLMemberAttribute;
         HLMemberAttribute."HeyLoyalty Attribute Value" := CopyStr(HeyLoyaltyAttributeValue, 1, MaxStrLen(HLMemberAttribute."HeyLoyalty Attribute Value"));
 
-        NPRAttributeValue.SetRange("Attribute Code", NPRAttribute.Code);
-        NPRAttributeValue.SetRange("Attribute Value Code", HLMemberAttribute."Attribute Value Code");
-        NPRAttributeValue.SetRange("HeyLoyalty Value", HLMemberAttribute."HeyLoyalty Attribute Value");
-        if NPRAttributeValue.IsEmpty() then begin
-            NPRAttributeValue.SetRange("Attribute Value Code");
-            if NPRAttribute."HL Auto Create New Values" then
-                if NPRAttributeValue.IsEmpty() then
-                    CreateAttributeValue(NPRAttribute.Code, HLMemberAttribute."HeyLoyalty Attribute Value", HeyLoyaltyAttributeValueDescription);
+        Found := false;
+        HLMappedValueMgt.FilterWhereUsed(
+            Database::"NPR Attribute Lookup Value", NPRAttributeValue.FieldNo("Attribute Value Name"), HLMemberAttribute."HeyLoyalty Attribute Value", false, HLMappedValue);
+        if HLMappedValue.Find('-') then
+            repeat
+                if RecRef.Get(HLMappedValue."BC Record ID") then begin
+                    RecRef.SetTable(NPRAttributeValue);
+                    NPRAttributeValue.Mark(NPRAttributeValue."Attribute Code" = NPRAttribute.Code);
+                    Found :=
+                        (NPRAttributeValue."Attribute Code" = NPRAttribute.Code) and
+                        (NPRAttributeValue."Attribute Value Code" = HLMemberAttribute."Attribute Value Code");
+                end;
+            until Found or (HLMappedValue.Next() = 0);
+        if not Found then begin
+            NPRAttributeValue.MarkedOnly(true);
+            Found := NPRAttributeValue.FindFirst();
+            if not Found and NPRAttribute."HL Auto Create New Values" then begin
+                CreateAttributeValue(NPRAttribute.Code, HLMemberAttribute."HeyLoyalty Attribute Value", HeyLoyaltyAttributeValueDescription, NPRAttributeValue);
+                Found := true;
+            end;
         end;
-        if NPRAttributeValue.FindFirst() then begin
+        if Found then begin
             HLMemberAttribute."Attribute Value Code" := NPRAttributeValue."Attribute Value Code";
-            HLMemberAttribute."HeyLoyalty Attribute Value" := NPRAttributeValue."HeyLoyalty Value";
+            HLMemberAttribute."HeyLoyalty Attribute Value" :=
+                HLMappedValueMgt.GetMappedValue(NPRAttributeValue.RecordId, NPRAttributeValue.FieldNo("Attribute Value Name"), false);
         end else
             HLMemberAttribute."Attribute Value Code" := CopyStr(HLMemberAttribute."HeyLoyalty Attribute Value", 1, MaxStrLen(HLMemberAttribute."Attribute Value Code"));
 
@@ -198,15 +227,16 @@ codeunit 6059990 "NPR HL Attribute Mgt."
     procedure IsSendAttributeToHL(NPRAttribute: Record "NPR Attribute"): Boolean
     var
         NPRAttributeID: Record "NPR Attribute ID";
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
     begin
-        if NPRAttribute."HeyLoyalty Field ID" = '' then
+        if HLMappedValueMgt.GetMappedValue(NPRAttribute.RecordId(), NPRAttribute.FieldNo(Code), false) = '' then
             exit(false);
         exit(NPRAttributeID.Get(Database::"NPR MM Member", NPRAttribute.Code));
     end;
 
-    local procedure CreateAttributeValue(AttributeCode: Code[20]; HeyLoyaltyAttributeValue: Text[50]; HeyLoyaltyAttributeValueDescription: Text)
+    local procedure CreateAttributeValue(AttributeCode: Code[20]; HeyLoyaltyAttributeValue: Text[50]; HeyLoyaltyAttributeValueDescription: Text; var NPRAttributeValue: Record "NPR Attribute Lookup Value")
     var
-        NPRAttributeValue: Record "NPR Attribute Lookup Value";
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
     begin
         if (AttributeCode = '') or (HeyLoyaltyAttributeValue = '') then
             exit;
@@ -225,8 +255,8 @@ codeunit 6059990 "NPR HL Attribute Mgt."
         else
             NPRAttributeValue."Attribute Value Name" := HeyLoyaltyAttributeValue;
         NPRAttributeValue."Attribute Value Description" := NPRAttributeValue."Attribute Value Name";
-        NPRAttributeValue."HeyLoyalty Value" := HeyLoyaltyAttributeValue;
         NPRAttributeValue.Insert();
+        HLMappedValueMgt.SetMappedValue(NPRAttributeValue.RecordId, NPRAttributeValue.FieldNo("Attribute Value Name"), HeyLoyaltyAttributeValue, false);
     end;
 
     [IntegrationEvent(false, false)]

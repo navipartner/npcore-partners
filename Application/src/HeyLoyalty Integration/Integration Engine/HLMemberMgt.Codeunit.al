@@ -273,6 +273,7 @@ codeunit 6059995 "NPR HL Member Mgt."
         HLMember.City := Member.City;
         HLMember."Post Code Code" := Member."Post Code Code";
         HLMember."Country Code" := Member."Country Code";
+        HLMember."Store Code" := Member."Store Code";
         HLMember."Member Created Datetime" := Member."Created Datetime";
         HLMember.Deleted := MemberDeleted;
         HLMember.Anonymized := MemberAnonymized;
@@ -325,14 +326,18 @@ codeunit 6059995 "NPR HL Member Mgt."
     procedure UpdateHLMemberWithDataFromHeyLoyalty(var HLMember: Record "NPR HL HeyLoyalty Member"; HLMemberJToken: JsonToken; OnlyEssentialFields: Boolean) Updated: Boolean
     var
         xHLMember: Record "NPR HL HeyLoyalty Member";
+        HLMappedValue: Record "NPR HL Mapped Value";
         MembershipSetup: Record "NPR MM Membership Setup";
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
         UpsertMemberBatch: Codeunit "NPR HL Upsert Member Batch";
+        RecRef: RecordRef;
         HLMemberFieldsJToken: JsonToken;
         ResponseFieldNames: List of [Text];
         HLCountryID: Text;
         MembershipHLFieldID: Text[50];
         ResponseFieldName: Text;
         AttributeUpdated: Boolean;
+        Found: Boolean;
     begin
         xHLMember := HLMember;
         xHLMember.Find();
@@ -380,17 +385,31 @@ codeunit 6059995 "NPR HL Member Mgt."
 #pragma warning restore
                                     HLMember."Country Code" := HLMember.FindCountryCode();
                                 end;
+                            'shop':
+                                begin
+#pragma warning disable AA0139
+                                    HLMember."HL Store Name" := JsonHelper.GetJText(HLMemberJToken, 'fields.shop.value', MaxStrLen(HLMember."HL Store Name"), false);
+#pragma warning restore
+                                    HLMember."Store Code" := HLMember.FindStoreCode();
+                                end;
                             MembershipHLFieldID:
                                 begin
 #pragma warning disable AA0139
                                     HLMember."HL Membership Name" :=
                                         JsonHelper.GetJText(HLMemberJToken, StrSubstNo('fields.%1.value', HLIntegrationMgt.HLMembershipCodeFieldID()), MaxStrLen(HLMember."HL Membership Name"), false);
 #pragma warning restore
-                                    MembershipSetup.SetRange("HeyLoyalty Name", HLMember."HL Membership Name");
-                                    if MembershipSetup.FindFirst() then begin
-                                        HLMember."Membership Code" := MembershipSetup.Code;
-                                        HLMember."HL Membership Name" := MembershipSetup."HeyLoyalty Name";
-                                    end;
+                                    Found := false;
+                                    HLMappedValueMgt.FilterWhereUsed(
+                                        Database::"NPR MM Membership Setup", MembershipSetup.FieldNo(Description), HLMember."HL Membership Name", false, HLMappedValue);
+                                    if HLMappedValue.find('-') then
+                                        repeat
+                                            Found := RecRef.Get(HLMappedValue."BC Record ID");
+                                            if Found then begin
+                                                RecRef.SetTable(MembershipSetup);
+                                                HLMember."Membership Code" := MembershipSetup.Code;
+                                                HLMember."HL Membership Name" := HLMappedValue.Value;
+                                            end;
+                                        until Found or (HLMappedValue.Next() = 0);
                                 end;
                             else
                                 AttributeUpdated := ParseAttribute(HLMember, HLMemberJToken, ResponseFieldName) or AttributeUpdated;
@@ -492,6 +511,7 @@ codeunit 6059995 "NPR HL Member Mgt."
             (xHLMember."Post Code Code" <> HLMember."Post Code Code") or
             (xHLMember.City <> HLMember.City) or
             (xHLMember."Country Code" <> HLMember."Country Code") or
+            (xHLMember."Store Code" <> HLMember."Store Code") or
             (xHLMember."Member Created Datetime" <> HLMember."Member Created Datetime") or
             (xHLMember."Unsubscribed at" <> HLMember."Unsubscribed at");
 
@@ -538,13 +558,14 @@ codeunit 6059995 "NPR HL Member Mgt."
         exit(false);
     end;
 
-    procedure GetMembershipHLName(MembershipCode: Code[20]): Text[50]
+    procedure GetMembershipHLName(MembershipCode: Code[20]): Text[100]
     var
         MembershipSetup: Record "NPR MM Membership Setup";
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
     begin
         if not MembershipSetup.Get(MembershipCode) then
-            Clear(MembershipSetup);
-        exit(MembershipSetup."HeyLoyalty Name");
+            exit('');
+        exit(HLMappedValueMgt.GetMappedValue(MembershipSetup.RecordId(), MembershipSetup.FieldNo(Description), false));
     end;
 
     local procedure MemberIsAnonymized(Member: Record "NPR MM Member"): Boolean

@@ -1,6 +1,6 @@
 codeunit 6059998 "NPR HL Skip Attribute Update"
 {
-    Access = Internal;
+    Access = Public;
     EventSubscriberInstance = Manual;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR HL Attribute Mgt.", 'OnCheckIfIsCascadeUpdate', '', false, false)]

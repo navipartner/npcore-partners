@@ -1,6 +1,6 @@
 page 6150753 "NPR HL HeyLoyalty Members"
 {
-    Extensible = false;
+    Extensible = true;
     Caption = 'HeyLoyalty Members';
     PageType = List;
     Editable = false;
@@ -70,6 +70,17 @@ page 6150753 "NPR HL HeyLoyalty Members"
                 {
                     ToolTip = 'Specifies the value of the Country Code field.';
                     ApplicationArea = NPRHeyLoyalty;
+                }
+                field("Store Code"; Rec."Store Code")
+                {
+                    ToolTip = 'Specifies the store code assigned to the member.';
+                    ApplicationArea = NPRHeyLoyalty;
+                }
+                field("HL Store Name"; Rec."HL Store Name")
+                {
+                    ToolTip = 'Specifies HeyLoyalty name of the store assigned to the member.';
+                    ApplicationArea = NPRHeyLoyalty;
+                    Visible = false;
                 }
                 field("No. of Attributes"; Rec."No. of Attributes")
                 {

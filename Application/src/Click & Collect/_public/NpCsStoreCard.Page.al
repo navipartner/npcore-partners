@@ -17,26 +17,35 @@
                     ShowCaption = false;
                     field("Code"; Rec.Code)
                     {
-
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Code field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Company Name"; Rec."Company Name")
                     {
-
                         ToolTip = 'Specifies the value of the Company Name field';
                         ApplicationArea = NPRRetail;
                     }
                     field(Name; Rec.Name)
                     {
-
                         ToolTip = 'Specifies the value of the Name field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("HeyLoyalty Name"; HeyLoyaltyName)
+                    {
+                        Caption = 'HeyLoyalty Name';
+                        ToolTip = 'Specifies the name used for the store at HeyLoyalty.';
+                        ApplicationArea = NPRHeyLoyalty;
+
+                        trigger OnValidate()
+                        begin
+                            CurrPage.SaveRecord();
+                            HLMappedValueMgt.SetMappedValue(Rec.RecordId(), Rec.FieldNo(Name), HeyLoyaltyName, true);
+                            CurrPage.Update(false);
+                        end;
+                    }
                     field("Local Store"; Rec."Local Store")
                     {
-
                         ToolTip = 'Specifies the value of the Local Store field';
                         ApplicationArea = NPRRetail;
 
@@ -47,13 +56,11 @@
                     }
                     field("Opening Hour Set"; Rec."Opening Hour Set")
                     {
-
                         ToolTip = 'Specifies the value of the Opening Hour Set field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Magento Description"; Format(Rec."Magento Description".HasValue))
                     {
-
                         Caption = 'Magento Description';
                         ToolTip = 'Specifies the value of the Magento Description field';
                         ApplicationArea = NPRRetail;
@@ -86,21 +93,18 @@
                     ShowCaption = false;
                     field("Store Stock Item Url"; Rec."Store Stock Item Url")
                     {
-
                         ToolTip = 'Specifies the value of the Store Stock Item Url field';
                         Importance = Additional;
                         ApplicationArea = NPRRetail;
                     }
                     field("Store Stock Status Url"; Rec."Store Stock Status Url")
                     {
-
                         ToolTip = 'Specifies the value of the Store Stock Status Url field';
                         Importance = Additional;
                         ApplicationArea = NPRRetail;
                     }
                     field("Service Url"; Rec."Service Url")
                     {
-
                         ToolTip = 'Specifies the value of the Service Url field';
                         ApplicationArea = NPRRetail;
                     }
@@ -125,7 +129,6 @@
                             Visible = IsBasicAuthVisible;
                             field("Service Username"; Rec."Service Username")
                             {
-
                                 ToolTip = 'Specifies the value of the Service Username field';
                                 ApplicationArea = NPRRetail;
                             }
@@ -160,13 +163,11 @@
 
                     field("Geolocation Latitude"; Rec."Geolocation Latitude")
                     {
-
                         ToolTip = 'Specifies the value of the Geolocation Latitude field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Geolocation Longitude"; Rec."Geolocation Longitude")
                     {
-
                         ToolTip = 'Specifies the value of the Geolocation Longitude field';
                         ApplicationArea = NPRRetail;
                     }
@@ -177,25 +178,21 @@
                 Caption = 'Order';
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-
                     ToolTip = 'Specifies the value of the Location Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Bill-to Customer No."; Rec."Bill-to Customer No.")
                 {
-
                     ToolTip = 'Specifies the value of the Bill-to Customer No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Prepayment Account No."; Rec."Prepayment Account No.")
                 {
-
                     ToolTip = 'Specifies the value of the Prepayment Account No. field';
                     ApplicationArea = NPRRetail;
                 }
@@ -205,13 +202,11 @@
                 Caption = 'Store Notification';
                 field("E-mail"; Rec."E-mail")
                 {
-
                     ToolTip = 'Specifies the value of the E-mail field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Mobile Phone No."; Rec."Mobile Phone No.")
                 {
-
                     ToolTip = 'Specifies the value of the Mobile Phone No. field';
                     ApplicationArea = NPRRetail;
                 }
@@ -221,73 +216,61 @@
                 Caption = 'Contact';
                 field("Contact Name"; Rec."Contact Name")
                 {
-
                     ToolTip = 'Specifies the value of the Contact Name field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contact Name 2"; Rec."Contact Name 2")
                 {
-
                     ToolTip = 'Specifies the value of the Contact Name 2 field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contact Address"; Rec."Contact Address")
                 {
-
                     ToolTip = 'Specifies the value of the Contact Address field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contact Address 2"; Rec."Contact Address 2")
                 {
-
                     ToolTip = 'Specifies the value of the Contact Address 2 field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contact Post Code"; Rec."Contact Post Code")
                 {
-
                     ToolTip = 'Specifies the value of the Contact Post Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contact City"; Rec."Contact City")
                 {
-
                     ToolTip = 'Specifies the value of the Contact City field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contact Country/Region Code"; Rec."Contact Country/Region Code")
                 {
-
                     ToolTip = 'Specifies the value of the Contact Country/Region Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contact County"; Rec."Contact County")
                 {
-
                     ToolTip = 'Specifies the value of the Contact County field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contact Phone No."; Rec."Contact Phone No.")
                 {
-
                     ToolTip = 'Specifies the value of the Contact Phone No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contact E-mail"; Rec."Contact E-mail")
                 {
-
                     ToolTip = 'Specifies the value of the Contact E-mail field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Contact Fax No."; Rec."Contact Fax No.")
                 {
-
                     ToolTip = 'Specifies the value of the Contact Fax No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Store Url"; Rec."Store Url")
                 {
-
                     ToolTip = 'Specifies the value of the Store Url field';
                     ApplicationArea = NPRRetail;
                 }
@@ -297,7 +280,6 @@
                 Caption = 'Workflows';
                 SubPageLink = "Store Code" = FIELD(Code);
                 ApplicationArea = NPRRetail;
-
             }
             part("POS Relations"; "NPR NpCs Store Card POSRelat.")
             {
@@ -305,7 +287,6 @@
                 SubPageLink = "Store Code" = FIELD(Code);
                 Visible = Rec."Local Store";
                 ApplicationArea = NPRRetail;
-
             }
         }
     }
@@ -322,7 +303,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Validate Store Setup action';
                 ApplicationArea = NPRRetail;
 
@@ -344,7 +324,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Update Contact Information action';
                 ApplicationArea = NPRRetail;
 
@@ -364,7 +343,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Show Address action';
                 ApplicationArea = NPRRetail;
 
@@ -383,7 +361,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Show Geolocation action';
                 ApplicationArea = NPRRetail;
 
@@ -401,7 +378,6 @@
             {
                 Caption = 'Stores by Distance';
                 Image = List;
-
                 ToolTip = 'Executes the Stores by Distance action';
                 ApplicationArea = NPRRetail;
 
@@ -420,7 +396,6 @@
                 Image = List;
                 RunObject = Page "NPR NpCs Store Stock Items";
                 RunPageLink = "Store Code" = FIELD(Code);
-
                 ToolTip = 'Executes the Store Stock Items action';
                 ApplicationArea = NPRRetail;
             }
@@ -438,6 +413,7 @@
         if WebServiceAuthHelper.HasApiPassword(Rec."API Password Key") then
             pw := '***';
         WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
+        HeyLoyaltyName := HLMappedValueMgt.GetMappedValue(Rec.RecordId(), Rec.FieldNo(Name), false);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -449,6 +425,8 @@
     end;
 
     var
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
+        HeyLoyaltyName: Text[100];
         [InDataSet]
         pw: Text[200];
 

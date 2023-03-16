@@ -1,6 +1,6 @@
 table 6059802 "NPR HL Member Attribute"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'HeyLoyalty Member Attribute';
     DrillDownPageID = "NPR HL Member Attributes";
     LookupPageID = "NPR HL Member Attributes";
@@ -36,9 +36,10 @@ table 6059802 "NPR HL Member Attribute"
             trigger OnValidate()
             var
                 NPRAttributeValue: Record "NPR Attribute Lookup Value";
+                HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
             begin
                 if NPRAttributeValue.Get("Attribute Code", "Attribute Value Code") then
-                    "HeyLoyalty Attribute Value" := NPRAttributeValue."HeyLoyalty Value"
+                    "HeyLoyalty Attribute Value" := HLMappedValueMgt.GetMappedValue(NPRAttributeValue.RecordId, NPRAttributeValue.FieldNo("Attribute Value Name"), false)
                 else
                     "HeyLoyalty Attribute Value" := '';
             end;
@@ -57,7 +58,7 @@ table 6059802 "NPR HL Member Attribute"
             FieldClass = FlowField;
             CalcFormula = Lookup("NPR Attribute Lookup Value"."Attribute Value Name" WHERE("Attribute Code" = FIELD("Attribute Code"), "Attribute Value Code" = FIELD("Attribute Value Code")));
         }
-        field(20; "HeyLoyalty Attribute Value"; Text[50])
+        field(20; "HeyLoyalty Attribute Value"; Text[100])
         {
             Caption = 'HeyLoyalty Attribute Value';
             DataClassification = CustomerContent;

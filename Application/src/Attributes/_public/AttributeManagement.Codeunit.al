@@ -1070,7 +1070,7 @@
 
         AttrLookupValue.SetFilter("Attribute Code", '=%1', AttributeCode);
         if (PartOfText = '') then begin
-            if (PAGE.RunModal(0, AttrLookupValue) = ACTION::LookupOK) then
+            if (Page.RunModal(0, AttrLookupValue) = ACTION::LookupOK) then
                 Text := AttrLookupValue."Attribute Value Code";
             exit(true);
         end;
@@ -1316,7 +1316,7 @@
         if not Attribute."LookUp Table" then begin
             NPRAttributeLookupValue.Reset();
             NPRAttributeLookupValue.SetFilter("Attribute Code", Attribute.Code);
-            if PAGE.RunModal(PAGE::"NPR Attribute Value Lookup", NPRAttributeLookupValue) = ACTION::LookupOK then begin
+            if Page.RunModal(Page::"NPR Attribute Value Lookup", NPRAttributeLookupValue) = ACTION::LookupOK then begin
                 Value := NPRAttributeLookupValue."Attribute Value Code";
             end;
         end else begin
@@ -1331,7 +1331,7 @@
                     TEMPNPRAttributeLookupValue."Attribute Value Description" := FieldRefDescription.Value;
                     TEMPNPRAttributeLookupValue.Insert();
                 until (0 = RecRef.Next());
-            if PAGE.RunModal(PAGE::"NPR Attribute Value Lookup", TEMPNPRAttributeLookupValue) = ACTION::LookupOK then begin
+            if Page.RunModal(Page::"NPR Attribute Value Lookup", TEMPNPRAttributeLookupValue) = ACTION::LookupOK then begin
                 Value := TEMPNPRAttributeLookupValue."Attribute Value Code";
             end;
         end;
@@ -1341,162 +1341,162 @@
         end;
     end;
 
-    internal procedure MakeText(VAR Text: Text[250]): Integer;
-    VAR
+    internal procedure MakeText(var Text: Text[250]): Integer;
+    var
         StandardText: Record "Standard Text";
         PartOfText: Text[132];
         Position: Integer;
         Length: Integer;
-    BEGIN
+    begin
         Position := 1;
-        Length := STRLEN(Text);
+        Length := StrLen(Text);
         ReadCharacter(' ', Text, Position, Length);
         if not ReadSymbol('?', Text, Position, Length) then
             exit(0);
-        PartOfText := CopyStr(COPYSTR(Text, Position), 1, MaxStrLen(PartOfText));
+        PartOfText := CopyStr(CopyStr(Text, Position), 1, MaxStrLen(PartOfText));
         if PartOfText = '' then begin
-            if PAGE.RUNMODAL(0, StandardText) = ACTION::LookupOK then
+            if Page.RunModal(0, StandardText) = ACTION::LookupOK then
                 Text := StandardText.Description;
             exit(0);
         end;
-        StandardText.Code := COPYSTR(Text, Position, MAXSTRLEN(StandardText.Code));
-        if not StandardText.FIND('=>') or
-           (UPPERCASE(PartOfText) <> COPYSTR(StandardText.Code, 1, STRLEN(PartOfText)))
+        StandardText.Code := CopyStr(Text, Position, MaxStrLen(StandardText.Code));
+        if not StandardText.Find('=>') or
+           (UpperCase(PartOfText) <> CopyStr(StandardText.Code, 1, StrLen(PartOfText)))
         then
             exit(Position);
         Text := StandardText.Description;
         exit(0);
     end;
 
-    local procedure ReadCharacter(Character: Text[50]; Text: Text; VAR Position: Integer; Length: Integer);
+    local procedure ReadCharacter(Character: Text[50]; Text: Text; var Position: Integer; Length: Integer);
     begin
-        while (Position <= Length) and (STRPOS(Character, UPPERCASE(COPYSTR(Text, Position, 1))) <> 0) do
+        while (Position <= Length) and (StrPos(Character, UpperCase(CopyStr(Text, Position, 1))) <> 0) do
             Position := Position + 1;
     end;
 
-    local procedure ReadSymbol(Token: Text[30]; Text: Text; VAR Position: Integer; Length: Integer): Boolean;
+    local procedure ReadSymbol(Token: Text[30]; Text: Text; var Position: Integer; Length: Integer): Boolean;
     begin
-        if Token <> COPYSTR(Text, Position, STRLEN(Token)) then
+        if Token <> CopyStr(Text, Position, StrLen(Token)) then
             exit(false);
-        Position := Position + STRLEN(Token);
+        Position := Position + StrLen(Token);
         ReadCharacter(' ', Text, Position, Length);
         exit(true);
     end;
 
-    internal procedure MakeDateText(VAR DateText: Text[250]): Integer;
-    VAR
+    internal procedure MakeDateText(var DateText: Text[250]): Integer;
+    var
         Date: Date;
         PartOfText: Text;
         Position: Integer;
         Length: Integer;
-    BEGIN
+    begin
         Position := 1;
-        Length := STRLEN(DateText);
+        Length := StrLen(DateText);
         ReadCharacter(' ', DateText, Position, Length);
         if not FindText(PartOfText, DateText, Position, Length) then
             exit(0);
         case PartOfText of
-            COPYSTR('TODAY', 1, STRLEN(PartOfText)), COPYSTR(TodayText, 1, STRLEN(PartOfText)):
+            CopyStr('TODAY', 1, StrLen(PartOfText)), CopyStr(TodayText, 1, StrLen(PartOfText)):
                 Date := Today();
-            COPYSTR('WORKDATE', 1, STRLEN(PartOfText)), COPYSTR(WorkdateText, 1, STRLEN(PartOfText)):
+            CopyStr('WORKDATE', 1, StrLen(PartOfText)), CopyStr(WorkdateText, 1, StrLen(PartOfText)):
                 Date := WorkDate();
             else
                 exit(0);
         end;
-        Position := Position + STRLEN(PartOfText);
+        Position := Position + StrLen(PartOfText);
         ReadCharacter(' ', DateText, Position, Length);
         if Position > Length then begin
-            DateText := FORMAT(Date);
+            DateText := Format(Date);
             exit(0);
         end;
         exit(Position);
-    END;
+    end;
 
-    LOCAL PROCEDURE FindText(VAR PartOfText: Text; Text: Text; Position: Integer; Length: Integer): Boolean;
-    VAR
+    local procedure FindText(var PartOfText: Text; Text: Text; Position: Integer; Length: Integer): Boolean;
+    var
         Position2: Integer;
-    BEGIN
+    begin
         Position2 := Position;
         ReadCharacter(AlphabetText, Text, Position, Length);
         if Position = Position2 then
             exit(false);
-        PartOfText := UPPERCASE(COPYSTR(Text, Position2, Position - Position2));
+        PartOfText := UpperCase(CopyStr(Text, Position2, Position - Position2));
         exit(true);
-    END;
+    end;
 
-    internal PROCEDURE MakeDateTimeText(VAR DateTimeText: Text[250]): Integer;
-    VAR
+    internal procedure MakeDateTimeText(var DateTimeText: Text[250]): Integer;
+    var
         Date: Date;
         Time: Time;
-    BEGIN
+    begin
         if GetSeparateDateTime(DateTimeText, Date, Time) then begin
             if Date = 0D then
                 exit(0);
             if Time = 000000T then
                 Time := 000000T;
-            DateTimeText := FORMAT(CREATEDATETIME(Date, Time));
+            DateTimeText := Format(CreateDateTime(Date, Time));
         end;
         exit(0);
-    END;
+    end;
 
-    internal PROCEDURE GetSeparateDateTime(DateTimeText: Text; VAR Date: Date; VAR Time: Time): Boolean;
-    VAR
+    internal procedure GetSeparateDateTime(DateTimeText: Text; var Date: Date; var Time: Time): Boolean;
+    var
         DateText: Text[250];
         TimeText: Text;
         Position: Integer;
         Length: Integer;
-    BEGIN
+    begin
         if DateTimeText in [NowText, 'NOW'] then
-            DateTimeText := FORMAT(CURRENTDATETIME);
+            DateTimeText := Format(CurrentDateTime());
         Date := 0D;
         Time := 000000T;
         Position := 1;
-        Length := STRLEN(DateTimeText);
+        Length := StrLen(DateTimeText);
         ReadCharacter(' ', DateTimeText, Position, Length);
         ReadUntilCharacter(' ', DateTimeText, Position, Length);
-        DateText := CopyStr(DELCHR(COPYSTR(DateTimeText, 1, Position - 1), '<>'), 1, MaxStrLen(DateText));
-        TimeText := DELCHR(COPYSTR(DateTimeText, Position), '<>');
+        DateText := CopyStr(DelChr(CopyStr(DateTimeText, 1, Position - 1), '<>'), 1, MaxStrLen(DateText));
+        TimeText := DelChr(CopyStr(DateTimeText, Position), '<>');
         if DateText = '' then
             exit(true);
 
         if MakeDateText(DateText) = 0 then;
-        if not EVALUATE(Date, DateText) then
+        if not Evaluate(Date, DateText) then
             exit(false);
 
         if TimeText = '' then
             exit(true);
 
         if MakeTimeText(TimeText) = 0 then;
-        if EVALUATE(Time, TimeText) then
+        if Evaluate(Time, TimeText) then
             exit(true);
-    END;
+    end;
 
-    LOCAL PROCEDURE ReadUntilCharacter(Character: Text[50]; Text: Text; VAR Position: Integer; Length: Integer);
-    BEGIN
-        while (Position <= Length) and (STRPOS(Character, UPPERCASE(COPYSTR(Text, Position, 1))) = 0) do
+    local procedure ReadUntilCharacter(Character: Text[50]; Text: Text; var Position: Integer; Length: Integer);
+    begin
+        while (Position <= Length) and (StrPos(Character, UpperCase(CopyStr(Text, Position, 1))) = 0) do
             Position := Position + 1;
-    END;
+    end;
 
-    internal PROCEDURE MakeTimeText(VAR TimeText: Text): Integer;
-    VAR
+    internal procedure MakeTimeText(var TimeText: Text): Integer;
+    var
         PartOfText: Text;
         Position: Integer;
         Length: Integer;
-    BEGIN
+    begin
         Position := 1;
-        Length := STRLEN(TimeText);
+        Length := StrLen(TimeText);
         ReadCharacter(' ', TimeText, Position, Length);
         if not FindText(PartOfText, TimeText, Position, Length) then
             exit(0);
-        if PartOfText <> COPYSTR(TimeText, 1, STRLEN(PartOfText)) then
+        if PartOfText <> CopyStr(TimeText, 1, StrLen(PartOfText)) then
             exit(0);
-        Position := Position + STRLEN(PartOfText);
+        Position := Position + StrLen(PartOfText);
         ReadCharacter(' ', TimeText, Position, Length);
         if Position <= Length then
             exit(Position);
-        TimeText := FORMAT(000000T + ROUND(TIME - 000000T, 1000));
+        TimeText := Format(000000T + Round(Time() - 000000T, 1000));
         exit(0);
-    END;
+    end;
 
     procedure GetAttributeSetID(POSSalesLineNo: Code[20]; TableNo: Integer; var AttributeSetID: Integer) ReturnValue: Boolean
     var
@@ -1511,4 +1511,3 @@
         end;
     end;
 }
-

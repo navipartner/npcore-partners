@@ -378,6 +378,8 @@
         {
             Caption = 'HeyLoyalty Name';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'HeyLoyalty values are now stored in a dedicated mapping table 6059839 "NPR HL Mapped Value".';
         }
     }
 

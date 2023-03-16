@@ -132,15 +132,31 @@
                 {
                     Caption = 'HeyLoyalty Integration';
 
-                    field("HeyLoyalty Field ID"; Rec."HeyLoyalty Field ID")
+                    field("HeyLoyalty Field ID"; HeyLoyaltyFieldID)
                     {
+                        Caption = 'HeyLoyalty Field ID';
                         ToolTip = 'Specifies the field id used to store the attribute values at HeyLoyalty.';
                         ApplicationArea = NPRHeyLoyalty;
+
+                        trigger OnValidate()
+                        begin
+                            CurrPage.SaveRecord();
+                            HLMappedValueMgt.SetMappedValue(Rec.RecordId(), Rec.FieldNo(Code), HeyLoyaltyFieldID, true);
+                            CurrPage.Update(false);
+                        end;
                     }
-                    field("Default HeyLoyalty Value"; Rec."HeyLoyalty Default Value")
+                    field("Default HeyLoyalty Value"; DefaultHeyLoyaltyValue)
                     {
+                        Caption = 'Default HeyLoyalty Value';
                         ToolTip = 'Specifies the default attribute value to be sent to HeyLoyalty in cases, when the attribute has no value assigned for the object in BC.';
                         ApplicationArea = NPRHeyLoyalty;
+
+                        trigger OnValidate()
+                        begin
+                            CurrPage.SaveRecord();
+                            HLMappedValueMgt.SetMappedValue(Rec.RecordId(), 0, DefaultHeyLoyaltyValue, true);
+                            CurrPage.Update(false);
+                        end;
                     }
                     field("HL Auto Create New Values"; Rec."HL Auto Create New Values")
                     {
@@ -192,5 +208,15 @@
             }
         }
     }
-}
 
+    trigger OnAfterGetRecord()
+    begin
+        HeyLoyaltyFieldID := HLMappedValueMgt.GetMappedValue(Rec.RecordId(), Rec.FieldNo(Code), false);
+        DefaultHeyLoyaltyValue := HLMappedValueMgt.GetMappedValue(Rec.RecordId(), 0, false);
+    end;
+
+    var
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
+        DefaultHeyLoyaltyValue: Text[100];
+        HeyLoyaltyFieldID: Text[100];
+}

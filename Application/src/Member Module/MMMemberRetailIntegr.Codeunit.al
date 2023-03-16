@@ -705,11 +705,13 @@
             if (GuiAllowed()) then begin
                 if (MemberInfoCapture.Count() > 1) then begin
                     MemberInfoCaptureListPage.SetTableView(MemberInfoCapture);
+                    MemberInfoCaptureListPage.SetPOSUnit(SaleLinePOS."Register No.");
                     MemberInfoCaptureListPage.LookupMode(true);
                     MemberInfoCaptureListPage.Editable(true);
                     PageAction := MemberInfoCaptureListPage.RunModal();
                 end else begin
                     MemberInfoCapturePage.SetTableView(MemberInfoCapture);
+                    MemberInfoCapturePage.SetPOSUnit(SaleLinePOS."Register No.");
                     MemberInfoCapturePage.LookupMode(true);
                     MemberInfoCapturePage.Editable(true);
                     PageAction := MemberInfoCapturePage.RunModal();

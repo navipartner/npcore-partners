@@ -444,5 +444,23 @@
         if TenantMedia.Get(Image.MediaId()) then
             TenantMedia.CalcFields(Content);
     end;
-}
 
+    internal procedure GetCsStoreCode(PosUnitNo: Code[10]): Code[20]
+    var
+        NpCsStore: Record "NPR NpCs Store";
+        POSUnit: Record "NPR POS Unit";
+        MembershipEvents: Codeunit "NPR MM Membership Events";
+        CsStoreCode: Code[20];
+        Handled: Boolean;
+    begin
+        MembershipEvents.OnPOSCreateMembershipOnIdentifyCsStore(PosUnitNo, CsStoreCode, Handled);
+        if Handled then
+            exit(CsStoreCode);
+
+        if not PosUnit.get(PosUnitNo) or (POSUnit."POS Store Code" = '') then
+            exit('');
+        if NpCsStore.Get(PosUnit."POS Store Code") then
+            exit(NpCsStore.Code);
+        exit('');
+    end;
+}

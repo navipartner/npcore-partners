@@ -91,6 +91,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Login"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeReceiptText'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG PG To Interface"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'MoveHeyLoyaltyValueMappings'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -321,6 +322,11 @@
                 end;
             Codeunit::"NPR UPG PG To Interface":
                 Exit('NPR_UPG_PG_To_Interface_20221204');
+            Codeunit::"NPR HL App Upgrade":
+                case UpgradeStep of
+                    'MoveHeyLoyaltyValueMappings':
+                        exit('MoveHeyLoyaltyValueMappings_20230314');
+                end;
         end;
     end;
 }
