@@ -5,6 +5,7 @@
     trigger OnRun()
     begin
         ShowProgressDialog := GuiAllowed;
+        _LineNumber := 0;
         Code(Rec);
     end;
 
@@ -17,7 +18,7 @@
         TextErrorGJLinesnotmade: Label '%1 were not be created from buffer.';
         TextUnknownError: Label 'Unknown Error.';
         PostingDescriptionLbl: Label '%1: %2';
-        LineNumber: Integer;
+        _LineNumber: Integer;
         TextPaymentDescription: Label '%1 Payments on %2';
         ProgressWindow: Dialog;
         TextNothingToPost: Label 'Nothing to Post.';
@@ -108,7 +109,7 @@
         CreateGenJnlLinesFromPOSPostingBuffer(TempPOSPostingBuffer, TempGenJournalLine);
 
         if IsSalesTaxEnabled then
-            POSSalesTax.CreateGenJournalLinesFromSalesTax(TempPOSPostingBuffer, TempGenJournalLine, POSEntry, LineNumber);
+            POSSalesTax.CreateGenJournalLinesFromSalesTax(TempPOSPostingBuffer, TempGenJournalLine, POSEntry, _LineNumber);
 
         if (not TempPOSPostingBuffer.IsEmpty) and (TempGenJournalLine.IsEmpty) then
             Error(TextErrorGJLinesnotmade, TempGenJournalLine.TableCaption);
@@ -1394,11 +1395,11 @@
                                                         POSPostingProfile: Record "NPR POS Posting Profile";
                                                         TaxCalcType: Enum "Tax Calculation Type"; var GenJournalLine: Record "Gen. Journal Line")
     begin
-        LineNumber := LineNumber + 10000;
+        _LineNumber := _LineNumber + 10000;
         GenJournalLine.Init();
         GenJournalLine."Journal Template Name" := POSPostingProfile."Journal Template Name";
         GenJournalLine."Journal Batch Name" := '';
-        GenJournalLine."Line No." := LineNumber;
+        GenJournalLine."Line No." := _LineNumber;
         GenJournalLine."System-Created Entry" := true;
         GenJournalLine."Account Type" := AccountType;
         if GenJournalLine."Account Type" = GenJournalLine."Account Type"::Customer then
@@ -1476,11 +1477,11 @@
         TempPosPostingProfile.Copy(POSPostingProfile);
         TempPosPostingProfile."VAT Customer No." := '';
 
-        LineNumber := LineNumber + 10000;
+        _LineNumber := _LineNumber + 10000;
         GenJournalLine.Init();
         GenJournalLine."Journal Template Name" := POSPostingProfile."Journal Template Name";
         GenJournalLine."Journal Batch Name" := '';
-        GenJournalLine."Line No." := LineNumber;
+        GenJournalLine."Line No." := _LineNumber;
         GenJournalLine."System-Created Entry" := true;
         GenJournalLine."Account Type" := AccountType;
         GenJournalLine."Account No." := AccountNo;
