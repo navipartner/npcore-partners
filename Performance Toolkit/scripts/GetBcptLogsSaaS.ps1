@@ -1,5 +1,9 @@
 [CmdletBinding()]
 param (
+    [Parameter(Mandatory = $false)]
+    [ValidateSet('Cloud','Crane')]
+    [String]$BcType = 'Cloud',
+
     [Parameter(Mandatory = $true)]
     [string]$Username,
 
@@ -10,16 +14,16 @@ param (
     [Object[]]$SuiteCodes = @(),
 
     [Parameter(Mandatory = $false)]
-    [string]$TenantId = "c068e6f9-9a49-4b37-b118-09c8e5b97ab0",
-
-    [Parameter(Mandatory = $false)]
-    [string]$SandboxName = "NPRetailBCPT-Sandbox-5",
-
-    [Parameter(Mandatory = $false)]
     [string]$CompanyName = "CRONUS Danmark A/S",
 
     [Parameter(Mandatory = $false)]
-    [string]$ClientId = "e7aed49c-17a3-49ae-9385-bfa901e61e48" # AAD app registration
+    [string]$TenantId = "c068e6f9-9a49-4b37-b118-09c8e5b97ab0", # Only for BcType=Cloud
+    
+    [Parameter(Mandatory = $false)]
+    [string]$SandboxName = "NPRetailBCPT-Sandbox-5", # Only for BcType=Cloud
+
+    [Parameter(Mandatory = $false)]
+    [string]$ClientId = "e7aed49c-17a3-49ae-9385-bfa901e61e48" # Only for BcType=Cloud
 )
 
 Clear-Host
@@ -39,12 +43,12 @@ $aadTokenProviderScriptPath = Join-Path $PSScriptRoot "TestRunner\AadTokenProvid
 $npBcptMgmt = Join-Path $PSScriptRoot "NpBcptMgmt.ps1"
 . "$npBcptMgmt"
 
-$bcptMgmt = [NpBcptMgmt]::new($Username, $Password, $TenantId, $SandboxName, $CompanyName, $ClientId, $aadActiveDirectoryPath)
+$bcptMgmt = [NpBcptMgmt]::new($BcType, $Username, $Password, $TenantId, $SandboxName, $CompanyName, $ClientId, $aadActiveDirectoryPath)
+
+$apiAuthParams = $bcptMgmt.ApiAuthParams()
 
 # Get companies
-$companies = @(Invoke-BcSaaS `
-    -AuthorizationType "AAD" `
-    -BearerToken $bcptMgmt.GetToken() `
+$companies = @(Invoke-BcSaaS @apiAuthParams `
     -BaseServiceUrl $bcptMgmt.GetApiBaseUrl() `
     -Path 'companies')
 
@@ -61,9 +65,7 @@ $SuiteCodes | ForEach-Object {
     $suiteCode = $_
 
     # Get last version
-    $versionCode = @(Invoke-BcSaaS `
-        -AuthorizationType "AAD" `
-        -BearerToken $bcptMgmt.GetToken() `
+    $versionCode = @(Invoke-BcSaaS @apiAuthParams `
         -BaseServiceUrl $bcptMgmt.GetApiBaseUrl() `
         -CompanyId $($company.id) `
         -APIPublisher "microsoft" `
@@ -74,9 +76,7 @@ $SuiteCodes | ForEach-Object {
     $lastVersion = ($versionCode.version)
     Write-Host "Last version for $($suiteCode) is $($lastVersion), get log entries:"
 
-    $bcptLogEntries = @(Invoke-BcSaaS `
-        -AuthorizationType "AAD" `
-        -BearerToken $bcptMgmt.GetToken() `
+    $bcptLogEntries = @(Invoke-BcSaaS @apiAuthParams `
         -BaseServiceUrl $bcptMgmt.GetApiBaseUrl() `
         -CompanyId $($company.id) `
         -APIPublisher "microsoft" `
