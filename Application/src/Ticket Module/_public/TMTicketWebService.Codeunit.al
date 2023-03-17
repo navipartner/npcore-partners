@@ -429,15 +429,15 @@
         exit(1);
 
     end;
-
-    procedure OfflineTicketValidation(var OfflineTicketValidationXmlPort: XmlPort "NPR TM Offline Ticket Valid.") Success: Boolean
+#pragma warning disable AA0245 
+    procedure OfflineTicketValidation(var OfflineTicketValidation: XmlPort "NPR TM Offline Ticket Valid.") Success: Boolean
     var
         ImportEntry: Record "NPR Nc Import Entry";
         OutStr: OutStream;
         FileNameLbl: Label 'OfflineTicketValidation-%1.xml', Locked = true;
     begin
 
-        OfflineTicketValidationXmlPort.Import();
+        OfflineTicketValidation.Import();
 
         InsertImportEntry('OfflineTicketValidation', ImportEntry);
         ImportEntry."Document ID" := CreateDocumentId();
@@ -446,16 +446,17 @@
         ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
-        OfflineTicketValidationXmlPort.SetDestination(OutStr);
-        OfflineTicketValidationXmlPort.Export();
+        OfflineTicketValidation.SetDestination(OutStr);
+        OfflineTicketValidation.Export();
         ImportEntry.Modify(true);
         Commit();
 
-        OfflineTicketValidationXmlPort.ProcessImportedRecords();
+        OfflineTicketValidation.ProcessImportedRecords();
 
         Commit();
         exit(true);
     end;
+#pragma warning restore
 
     procedure SetReservationAttributes(var Attributes: XmlPort "NPR TM Ticket Set Attr.") Success: Boolean
     var
@@ -523,20 +524,24 @@
 
     end;
 
-    procedure SendETicket(var SendETicketXmlPort: XmlPort "NPR TM Send eTicket")
+#pragma warning disable AA0245 
+    procedure SendETicket(var SendETicket: XmlPort "NPR TM Send eTicket")
     begin
 
-        SendETicketXmlPort.Import();
-        SendETicketXmlPort.CreateResponse();
+        SendETicket.Import();
+        SendETicket.CreateResponse();
 
     end;
+#pragma warning restore
 
-    procedure ListTicketItems(var ListTicketItemsXmlPort: XmlPort "NPR TM List Ticket Items")
+#pragma warning disable AA0245 
+    procedure ListTicketItems(var ListTicketItems: XmlPort "NPR TM List Ticket Items")
     begin
 
-        ListTicketItemsXmlPort.CreateResponse();
+        ListTicketItems.CreateResponse();
 
     end;
+#pragma warning restore
 
     local procedure InsertImportEntry(WebServiceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
     var
