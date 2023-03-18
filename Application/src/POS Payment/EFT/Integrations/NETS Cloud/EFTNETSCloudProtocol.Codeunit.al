@@ -1,5 +1,6 @@
 ﻿codeunit 6184534 "NPR EFT NETSCloud Protocol"
 {
+#pragma warning disable AA0139
     Access = Internal;
 
     var
@@ -698,4 +699,5 @@
     begin
         EFTNETSCloudIntegration.HandleProtocolResponse(EftTransactionRequest);
     end;
+#pragma warning restore AA0139
 }

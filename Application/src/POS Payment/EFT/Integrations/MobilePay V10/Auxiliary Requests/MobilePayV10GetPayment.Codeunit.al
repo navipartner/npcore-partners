@@ -78,7 +78,9 @@
 
         if (not TempMobilePayV10Payment.Get(paymentId)) then begin
             TempMobilePayV10Payment.Init();
+#pragma warning disable AA0139
             TempMobilePayV10Payment.PaymentId := paymentId;
+#pragma warning restore AA0139
             TempMobilePayV10Payment.Insert();
         end;
 

@@ -1,5 +1,6 @@
 ﻿codeunit 6014527 "NPR Credit Card Prot. Helper"
 {
+#pragma warning disable AA0139
     Access = Internal;
     trigger OnRun()
     begin
@@ -45,5 +46,6 @@
 
         exit(POSPaymentMethod.Get(EFTBINGroupPaymentLink."Payment Type POS"));
     end;
+#pragma warning restore AA0139
 }
 

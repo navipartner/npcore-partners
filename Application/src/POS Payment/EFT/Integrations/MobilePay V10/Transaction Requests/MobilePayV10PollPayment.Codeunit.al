@@ -89,8 +89,10 @@
         end;
 
         if jsonResponse.SelectToken('customerToken', jsonToken) then begin
+#pragma warning disable AA0139
             eftTrxRequest."External Customer ID" := jsonToken.AsValue().AsText();
             eftTrxRequest."External Customer ID Provider" := 'storebox';
+#pragma warning restore AA0139
             eftTrxRequest.Modify();
         end;
 

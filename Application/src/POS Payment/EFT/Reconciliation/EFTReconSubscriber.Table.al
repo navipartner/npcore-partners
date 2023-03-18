@@ -1,5 +1,6 @@
 ﻿table 6014629 "NPR EFT Recon. Subscriber"
 {
+#pragma warning disable AA0139
     Access = Internal;
     Caption = 'EFT Recon. Subscriber';
     DataClassification = CustomerContent;
@@ -160,5 +161,6 @@
     local procedure UpdateDescription()
     begin
     end;
+#pragma warning restore AA0139
 }
 

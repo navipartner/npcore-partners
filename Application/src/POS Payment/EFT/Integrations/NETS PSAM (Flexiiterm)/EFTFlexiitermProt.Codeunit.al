@@ -1,5 +1,6 @@
 ﻿codeunit 6184516 "NPR EFT Flexiiterm Prot."
 {
+#pragma warning disable AA0139
     Access = Internal;
 
     procedure ConstructTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Request: JsonObject)
@@ -197,4 +198,5 @@
 
         NewRequest.Add('BCSuccess', BCSuccess);
     end;
+#pragma warning restore AA0139
 }

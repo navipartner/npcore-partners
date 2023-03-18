@@ -1,5 +1,6 @@
 ﻿codeunit 6184538 "NPR EFT NETSCloud Resp. Parser"
 {
+#pragma warning disable AA0139
     Access = Internal;
 
     trigger OnRun()
@@ -644,4 +645,5 @@
     begin
         JObject.ReadFrom(OptionalData);
     end;
+#pragma warning restore AA0139
 }

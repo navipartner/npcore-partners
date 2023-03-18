@@ -101,7 +101,9 @@ codeunit 6060014 "NPR POS Action Pepper Payment" implements "NPR IPOS Workflow"
         Payments: Codeunit "NPR POS Action: Payment WF2 BL";
     begin
         Response.ReadFrom('{}');
+#pragma warning disable AA0139
         Response.Add('success', Payments.AttemptEndCurrentSale(Context.GetString('paymentNo')));
+#pragma warning restore AA0139
         exit(Response);
     end;
 
