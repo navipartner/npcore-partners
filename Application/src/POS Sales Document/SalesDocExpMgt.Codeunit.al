@@ -1145,7 +1145,7 @@ then
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, false)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
-        Sender.DiscoverPOSSalesWorkflow(OnFinishCreditSaleCode(), OnFinishCreditSaleDescription, CurrCodeunitId(), 'OnFinishCreditSale');
+        Sender.DiscoverPOSSalesWorkflow(OnFinishCreditSaleCode(), OnFinishCreditSaleDescription, WorkflowCodeunitId(), 'OnFinishCreditSale');
     end;
 
     local procedure OnFinishCreditSaleCode(): Code[20]
@@ -1153,9 +1153,9 @@ then
         exit('FINISH_CREDIT_SALE');
     end;
 
-    local procedure CurrCodeunitId(): Integer
+    local procedure WorkflowCodeunitId(): Integer
     begin
-        exit(CODEUNIT::"NPR Sales Doc. Exp. Mgt.");
+        exit(Codeunit::"NPR Credit Sale Post-Process");
     end;
 
     local procedure InvokeOnFinishCreditSaleWorkflow(SalePOS: Record "NPR POS Sale")
