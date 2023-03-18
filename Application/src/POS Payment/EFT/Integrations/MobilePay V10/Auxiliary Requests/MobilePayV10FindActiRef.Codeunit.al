@@ -71,7 +71,9 @@
         end;
 
         jsonArray.Get(0, jsonToken);
+#pragma warning disable AA0139
         eftTrxRequest."Reference Number Output" := jsonToken.AsValue().AsText();
+#pragma warning restore AA0139
         eftTrxRequest.Successful := true;
         eftTrxRequest."External Result Known" := true;
         eftTrxRequest.Modify();

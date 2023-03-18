@@ -301,7 +301,9 @@
 
         mobilePayUnitSetup."Store ID" := tempMobilePayStores."Store ID";
         mobilePayUnitSetup."Merchant POS ID" := EftSetup."POS Unit No.";
+#pragma warning disable AA0139
         mobilePayUnitSetup."Beacon ID" := posUnitId;
+#pragma warning restore AA0139
         mobilePayUnitSetup."Only QR" := IsQROnlyPosUnit(posUnitId);
         if (mobilePayUnitSetup."Only QR") then begin
             Clear(mobilePayUnitSetup."Beacon ID");

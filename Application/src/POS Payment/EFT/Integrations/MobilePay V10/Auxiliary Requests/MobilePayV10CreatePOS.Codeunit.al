@@ -76,7 +76,9 @@
             // Supposing we are in QR only mode without QR being preassigned, let's generate a new one.
             // This is useful especially for MPOS units which can render whatever code and don't depend
             // on any physical QR sticker or even device.
+#pragma warning disable AA0139
             mobilePayUnitSetup."Beacon ID" := Format(CreateGuid()).TrimStart('{').TrimEnd('}').ToLower();
+#pragma warning restore AA0139
             mobilePayUnitSetup.Modify();
         end;
         jsonRequest.Add('beaconId', mobilePayUnitSetup."Beacon ID");
@@ -107,7 +109,9 @@
         mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, true, '');
 
         jsonResponse.SelectToken('posId', jsonToken);
+#pragma warning disable AA0139
         mobilePayUnitSetup."MobilePay POS ID" := jsonToken.AsValue().AsText();
+#pragma warning restore AA0139
         mobilePayUnitSetup.Modify();
 
         eftTrxRequest."External Result Known" := true;

@@ -78,7 +78,9 @@
 
         if (not TempMobilePayV10RefundBuff.Get(refundId)) then begin
             TempMobilePayV10RefundBuff.Init();
+#pragma warning disable AA0139
             TempMobilePayV10RefundBuff.RefundId := refundId;
+#pragma warning restore AA0139
             TempMobilePayV10RefundBuff.Insert();
         end;
 
