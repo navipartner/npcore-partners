@@ -19,9 +19,9 @@ codeunit 6060166 "NPR POS Post PayIn PayOut JQ"
         POSPostEntries.SetPostItemEntries(false);
         POSPostEntries.SetPostPerPeriodRegister(true);
 
-        POSEntry.SetFilter("Post Entry Status", '<%1', 2);
-        POSEntry.SetRange("Is Pay-in Pay-out", true);
         POSEntry.SetCurrentKey("Post Entry Status");
+        POSEntry.SetFilter("Post Entry Status", '<%1', 2);
+        POSEntry.SetRange("Prioritized Posting", true);
         if not POSEntry.FindSet() then
             exit;
 
@@ -32,7 +32,7 @@ codeunit 6060166 "NPR POS Post PayIn PayOut JQ"
                     Clear(POSEntry2);
                     POSEntry2.SetCurrentKey("POS Period Register No.");
                     POSEntry2.SetFilter("POS Period Register No.", '=%1', POSEntry."POS Period Register No.");
-                    POSEntry2.SetRange("Is Pay-in Pay-out", true);
+                    POSEntry2.SetRange("Prioritized Posting", true);
                     POSPostEntries.Run(POSEntry2);
                     Commit();
                     POSPostEntries.GetGLPostingErrorEntries(ErrorEntries);

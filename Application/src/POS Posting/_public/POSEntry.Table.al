@@ -381,6 +381,14 @@
                                                                 Type = filter(Payout)));
             Editable = false;
         }
+        field(214; "Prioritized Posting"; Boolean)
+        {
+            Caption = 'Prioritized Posting';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR POS Entry Sales Line" where("POS Entry No." = FIELD("Entry No."), "Exclude from Posting" = const(false),
+                                                                Type = filter(Payout | Customer)));
+            Editable = false;
+        }
         field(230; "No. of Print Output Entries"; Integer)
         {
             CalcFormula = Count("NPR POS Entry Output Log" WHERE("POS Entry No." = FIELD("Entry No."),
