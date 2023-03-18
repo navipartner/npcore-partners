@@ -86,7 +86,9 @@
         mobilePayProtocol.PreHandlerTheResponse(reqMessage, respMessage, jsonResponse, true, '');
 
         jsonResponse.SelectToken('paymentId', jsonToken);
+#pragma warning disable AA0139
         eftTrxRequest."Reference Number Output" := jsonToken.AsValue().AsText();
+#pragma warning restore AA0139
         eftTrxRequest.Modify();
     end;
 }

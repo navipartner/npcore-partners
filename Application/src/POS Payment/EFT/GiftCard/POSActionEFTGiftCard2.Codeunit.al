@@ -31,6 +31,7 @@ codeunit 6059884 "NPR POS Action: EFTGiftCard 2" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('InvalidAmount', InvalidAmountLbl);
     end;
 
+#pragma warning disable AA0139
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     var
         EFTGiftCardBusinessLogic: Codeunit "NPR POS Action: EFTGiftCard B.";
@@ -42,6 +43,7 @@ codeunit 6059884 "NPR POS Action: EFTGiftCard 2" implements "NPR IPOS Workflow"
                 EFTGiftCardBusinessLogic.InsertVoucherDiscountLine(Context.GetInteger('eftEntryNo'), Context.GetDecimal('discountPct'), Context.GetDecimal('amount'));
         end;
     end;
+#pragma warning restore AA0139
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
     local procedure OnLookupParameter(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)

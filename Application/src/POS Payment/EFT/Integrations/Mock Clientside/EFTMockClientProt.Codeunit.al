@@ -636,7 +636,9 @@
         repeat
             StreamIn.ReadText(ReceiptLineText);
             CreditCardTransaction."Entry No." := EntryNo;
+#pragma warning disable AA0139
             CreditCardTransaction.Text := ReceiptLineText;
+#pragma warning restore AA0139
             CreditCardTransaction.Insert();
             EntryNo += 1;
         until (StreamIn.EOS);

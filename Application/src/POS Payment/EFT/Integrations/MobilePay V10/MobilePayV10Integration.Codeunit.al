@@ -6,6 +6,8 @@
 */
 codeunit 6014518 "NPR MobilePayV10 Integration"
 {
+
+#pragma warning disable AA0139
     Access = Internal;
     trigger OnRun()
     begin
@@ -264,6 +266,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
             MobilePayUnitSetupOut.Insert();
         end;
     end;
+
     internal procedure HandleProtocolResponse(var eftTrxRequest: Record "NPR EFT Transaction Request")
     var
         eftInterface: Codeunit "NPR EFT Interface";
@@ -444,4 +447,5 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
             EFTInterface.OnDiscoverIntegrations(tmpEFTIntegrationType);
         end;
     end;
+#pragma warning restore AA0139
 }

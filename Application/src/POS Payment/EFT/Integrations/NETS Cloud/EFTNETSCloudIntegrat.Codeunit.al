@@ -455,7 +455,9 @@
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
 
         EFTTransactionRequest."Integration Version Code" := '1.2.7'; //Nets Connect@Cloud REST 1.2.7
+#pragma warning disable AA0139
         EFTTransactionRequest."Hardware ID" := GetTerminalID(EFTSetup);
+#pragma warning restore AA0139
         if GetEnvironment(EFTSetup) <> 0 then
             EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::"TEST Remote";
 
@@ -569,7 +571,9 @@
         foreach JToken in JArray do begin
             TempRetailList.Number += 1;
             JToken.SelectToken('terminalId', JTokenId);
+#pragma warning disable AA0139
             TempRetailList.Choice := JTokenId.AsValue().AsText();
+#pragma warning restore AA0139
             TempRetailList.Insert();
         end;
 

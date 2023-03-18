@@ -616,13 +616,13 @@ codeunit 6184496 "NPR Pepper Library HWC"
             EFTTransactionRequest."Result Display Text" := CopyStr(PepperTrxTransaction.GetTrx_DisplayText(), 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
             EFTTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EFTTransactionRequest), 1, MaxStrLen(EFTTransactionRequest."POS Description"));
         end;
-
+#pragma warning disable AA0139
         if (PepperTrxTransaction.GetTrx_JournalLevel(LocalCommentText)) then
             AddToCommentBatch(StrSubstNo('Journal: %1', LocalCommentText));
 
         if (PepperTrxTransaction.GetTrx_ReferralText(LocalCommentText)) then
             AddToCommentBatch(StrSubstNo('Referral: %1', LocalCommentText));
-
+#pragma warning restore AA0139
         if (PepperTrxTransaction.GetTrx_AdditionalParameters(LocalCommentText)) then
             AddToCommentBatch(StrSubstNo('Additional Parameters: %1', LocalCommentText));
 

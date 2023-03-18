@@ -1,5 +1,6 @@
 ﻿codeunit 6184542 "NPR EFT NETS BAXI Resp. Pars."
 {
+#pragma warning disable AA0139
     Access = Internal;
 
     trigger OnRun()
@@ -498,4 +499,5 @@
         LogDict.Add('OrganizationNumber', OrganizationNumber);
         Session.LogMessage('NPR_BAXI_NATIVE_METADATA', '', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, LogDict);
     end;
+#pragma warning restore AA0139
 }
