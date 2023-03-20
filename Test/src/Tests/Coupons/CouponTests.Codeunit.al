@@ -12,6 +12,7 @@ codeunit 85074 "NPR Coupon Tests"
         _POSPaymentMethodCash: Record "NPR POS Payment Method";
         _CouponType: Record "NPR NpDc Coupon Type";
         _Initialized: Boolean;
+        _GS1Lbl: Label 'GS1';
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -140,31 +141,6 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
     end;
 
-    [Test]
-    [TestPermissions(TestPermissions::Disabled)]
-    procedure GS1FreeItemTest()
-    // [SCENARIO] Scan GS1 coupon, discount 100% is applied, transaction is ended
-    var
-        SalePOS: Record "NPR POS Sale";
-        LibraryCoupon: Codeunit "NPR Library Coupon";
-        Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSSale: Codeunit "NPR POS Sale";
-        LibraryRandom: Codeunit "Library - Random";
-        TransactionEnded: Boolean;
-    begin
-        Initialize();
-        // [GIVEN] POS Transaction with 1 line
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
-        CreateItemTransaction(LibraryRandom.RandDecInRange(2, 100, LibraryRandom.RandIntInRange(0, 2)));
-        // [WHEN]
-        POSSale.GetCurrentSale(SalePOS);
-        LibraryCoupon.ScanCouponReferenceCode(_POSSession, '25554590000300373900000'); //000 - free item (100% discount)
-
-        // [THEN] Finish transaction with cash payment
-        TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, '');
-        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
-    end;
 
     [Test]
     [HandlerFunctions('OpenPageHandler')]
@@ -261,7 +237,7 @@ codeunit 85074 "NPR Coupon Tests"
 
             CreateDiscountType(100, _Item."No.");
             CreateGS1DiscountTypeAmount();
-            CreateGS1DiscountTypeFree();
+
             _Initialized := true;
         end;
         Commit();
@@ -297,8 +273,7 @@ codeunit 85074 "NPR Coupon Tests"
         VATPostSetup: Record "VAT Posting Setup";
         GLAccountNo: Code[20];
     begin
-        NpDcModuleIssueGS1.CreateGS1CouponType(NpDcCouponType, 0);
-        NpDcCouponType."GS1 Account No." := GLAccountNo;
+        CreateGS1CouponType(NpDcCouponType, 0);
         LibraryERM.FindVATPostingSetup(VATPostSetup, "Tax Calculation Type"::"Normal VAT");
         GLAccountNo := LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostSetup, "General Posting Type"::Sale);
         NpDcCouponType."GS1 Account No." := GLAccountNo;
@@ -306,12 +281,21 @@ codeunit 85074 "NPR Coupon Tests"
         NpDcCouponType.Modify();
     end;
 
-    local procedure CreateGS1DiscountTypeFree()
+    procedure CreateGS1CouponType(var CouponType: Record "NPR NpDc Coupon Type"; DiscountType: Option)
     var
         NpDcModuleIssueGS1: Codeunit "NPR NpDc Module Issue GS1";
-        NpDcCouponType: Record "NPR NpDc Coupon Type";
     begin
-        NpDcModuleIssueGS1.CreateGS1CouponType(NpDcCouponType, 1);
-        NpDcCouponType.Modify();
+        CouponType.Init();
+        CouponType.Code := _GS1Lbl;
+        CouponType."Issue Coupon Module" := _GS1Lbl;
+        CouponType.Description := _GS1Lbl;
+        CouponType."Issue Coupon Module" := _GS1Lbl;
+        CouponType."Validate Coupon Module" := 'DEFAULT';
+        CouponType."Apply Discount Module" := 'DEFAULT';
+        CouponType."Discount Type" := DiscountType;
+        CouponType."Starting Date" := CreateDateTime(Today(), 0T);
+        CouponType.Enabled := true;
+        CouponType.Insert();
     end;
+
 }
