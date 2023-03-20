@@ -458,7 +458,7 @@
     begin
         DeAuditAux."Error Message".CreateOutStream(StrOut, TextEncoding::UTF8);
         StrOut.Write(GetLastErrorText);
-        DeAuditAux.Modify();
+        DeAuditAux."Has Error" := true;
     end;
 
     procedure SetDSFINVKErrorMsg(var DSFINVKClosing: Record "NPR DSFINVK Closing")
