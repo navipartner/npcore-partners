@@ -1,9 +1,7 @@
 ﻿page 6014434 "NPR VAT Prod Post Group Mapper"
 {
     Extensible = False;
-
-
-    Caption = 'VAT Prod Post Group Mapper List';
+    Caption = 'VAT Posting Setup Mapper List';
     PageType = List;
     SourceTable = "NPR VAT Post. Group Mapper";
     UsageCategory = Lists;

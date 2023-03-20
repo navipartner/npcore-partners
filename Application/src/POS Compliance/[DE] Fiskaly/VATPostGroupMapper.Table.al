@@ -1,7 +1,7 @@
 ﻿table 6014578 "NPR VAT Post. Group Mapper"
 {
     Access = Internal;
-    Caption = 'VAT Product Posting Group Mapper';
+    Caption = 'VAT Posting Setup Mapper';
     DataClassification = CustomerContent;
 
     fields
