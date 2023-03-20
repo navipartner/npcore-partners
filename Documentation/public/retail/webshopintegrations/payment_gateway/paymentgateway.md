@@ -11,6 +11,16 @@ NP Retail comes with a module to handle the payments done on web orders. The out
 - [Nets Easy](https://www.nets.eu/payments/online)
 - [QuickPay](https://quickpay.net)
 
+The module enables you to use a combination of Payment Service Providers for capturing, refunding, and cancelling transactions based on operations performed in Business Central.
+
+> [!NOTE]
+> If your Payment Service Provider is not shown on this list, your partner has an [option of developing a custom integration](https://github.com/navipartner/payment-gateway-integration-example/). 
+
 ## How-to guides on setup
 
 - [Set up Bambora payment integration](./howto/bambora.md)
+
+## Related links
+
+- [Payment Gateways (reference guide)](./reference/payment_gateways.md)
+- [Payment Gateway Integration Example](https://github.com/navipartner/payment-gateway-integration-example/)
