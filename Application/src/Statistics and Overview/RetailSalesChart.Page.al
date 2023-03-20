@@ -47,7 +47,7 @@
                     Caption = 'Day';
 
                     ToolTip = 'Filter by day';
-                    Image = filter;
+                    Image = Filter;
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -62,7 +62,7 @@
                     Caption = 'Week';
 
                     ToolTip = 'Filter by week';
-                    Image = filter;
+                    Image = Filter;
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -77,7 +77,7 @@
                     Caption = 'Month';
 
                     ToolTip = 'Filter by month';
-                    Image = filter;
+                    Image = Filter;
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -92,7 +92,7 @@
                     Caption = 'Quarter';
 
                     ToolTip = 'Filter by quarter';
-                    Image = filter;
+                    Image = Filter;
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -107,7 +107,7 @@
                     Caption = 'Year';
 
                     ToolTip = 'Filter by year';
-                    Image = filter;
+                    Image = Filter;
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -200,6 +200,4 @@
         if TaskId = BackgroundTaskId then
             BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
     end;
-
 }
-
