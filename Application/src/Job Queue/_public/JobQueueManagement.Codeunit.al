@@ -486,7 +486,11 @@
             repeat
                 if ErrorMessageText <> '' then
                     ErrorMessageText := ErrorMessageText + TypeHelper.CRLFSeparator();
+#IF BC22
+                ErrorMessageText := ErrorMessageText + ErrorMessage.Message;
+#ELSE
                 ErrorMessageText := ErrorMessageText + ErrorMessage.Description;
+#ENDIF
             until ErrorMessage.Next() = 0;
 
         CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
