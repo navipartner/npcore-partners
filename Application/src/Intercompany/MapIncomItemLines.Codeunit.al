@@ -632,7 +632,11 @@
 
         ErrorMessage.SetContext(IncomingDocument);
         ErrorMessage.LogMessage(RelatedRec, FieldNo,
+#IF BC22
+          MessageType, CopyStr(ProcessingMessage, 1, MaxStrLen(ErrorMessage.Message)));
+#ELSE
           MessageType, CopyStr(ProcessingMessage, 1, MaxStrLen(ErrorMessage.Description)));
+#ENDIF 
     end;
 
     local procedure DeleteIntermediateData(DataExch: Record "Data Exch.")

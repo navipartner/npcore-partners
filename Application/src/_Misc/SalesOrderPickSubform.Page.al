@@ -1140,7 +1140,7 @@
                         ShowLineDisc();
                     end;
                 }
-                action("ExplodeBOM_Functions")
+                action(ExplodeBOM_Functions)
                 {
                     AccessByPermission = TableData "BOM Component" = R;
                     Caption = 'E&xplode BOM';
@@ -1418,7 +1418,11 @@
         OrderPromisingLine.SetRange("Source ID", Rec."Document No.");
         OrderPromisingLine.SetRange("Source Line No.", Rec."Line No.");
 
+#IF BC22
+        OrderPromisingLines.SetSource(OrderPromisingLine."Source Type"::Sales);
+#ELSE
         OrderPromisingLines.SetSourceType(OrderPromisingLine."Source Type"::Sales.AsInteger());
+#ENDIF 
         OrderPromisingLines.SetTableView(OrderPromisingLine);
         OrderPromisingLines.RunModal();
     end;
