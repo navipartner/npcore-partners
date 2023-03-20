@@ -1,62 +1,50 @@
-﻿codeunit 6150875 "NPR POS Action: Raptor"
+codeunit 6150875 "NPR POS Action: Raptor" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
-        ActionDescription: Label 'An action to run Raptor integration functions';
-
-    local procedure ActionCode(): Code[20]
+        ActionDescription: Label 'An action to run Raptor integration functions.';
+        ParamRaptorActionCode_CptLbl: Label 'Raptor Action Code';
+        ParamRaptorActionCode_DescLbl: Label 'Raptor action code that should be run.';
     begin
-        exit('RAPTOR');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddTextParameter('RaptorActionCode', '', ParamRaptorActionCode_CptLbl, ParamRaptorActionCode_DescLbl);
     end;
 
-    local procedure ActionVersion(): Text[30]
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
+    var
+        POSSession: Codeunit "NPR POS Session";
     begin
-        exit('2.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        if Sender.DiscoverAction20(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion())
-        then begin
-            Sender.RegisterWorkflow20(
-              'await workflow.respond(); ' +
-              'if ($context.ActionFailed) {if ($context.ActionFailReasonMsg.length > 0) {await popup.message($context.ActionFailReasonMsg);};}');
-            Sender.RegisterTextParameter('RaptorActionCode', '');
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-        Handled := true;
-
         if not TryToRunAction(Context, POSSession) then begin
             Context.SetContext('ActionFailed', true);
             Context.SetContext('ActionFailReasonMsg', GetLastErrorText);
         end;
     end;
 
+    local procedure ActionCode(): Code[20]
+    begin
+        exit(FORMAT("NPR POS workflow"::RAPTOR));
+    end;
+
     [TryFunction]
-    local procedure TryToRunAction(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure TryToRunAction(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
     var
         RaptorAction: Record "NPR Raptor Action";
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         RaptorMgt: Codeunit "NPR Raptor Management";
         RaptorActionCode: Code[20];
+        ResultOut: Text;
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.TestField("Customer No.");
 
-        RaptorActionCode := CopyStr(Context.GetStringParameter('RaptorActionCode'), 1, MaxStrLen(RaptorActionCode));
+        if not Context.GetStringParameter('RaptorActionCode', ResultOut) then
+            ResultOut := '';
+        RaptorActionCode := CopyStr(ResultOut, 1, MaxStrLen(RaptorActionCode));
         if RaptorActionCode <> '' then
             RaptorAction.Get(RaptorActionCode)
         else
@@ -103,6 +91,14 @@
                     RaptorAction.Find();
                 end;
         end;
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionRaptor.js###
+'let main=async({workflow:i,context:a,popup:s})=>{await i.respond(),a.ActionFailed&&a.ActionFailReasonMsg.length>0&&await s.message(a.ActionFailReasonMsg)};'
+        )
     end;
 }
 
