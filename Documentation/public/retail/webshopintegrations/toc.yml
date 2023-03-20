@@ -42,3 +42,7 @@
     items:
     - name: Set up Bambora payment integration
       href: payment_gateway/howto/bambora.md
+  - name: Reference
+    items:
+    - name: Payment Gateways (reference guide)
+      href: payment_gateway/reference/payment_gateways.md
