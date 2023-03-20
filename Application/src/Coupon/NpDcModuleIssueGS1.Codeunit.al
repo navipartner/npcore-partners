@@ -38,6 +38,7 @@ codeunit 6060028 "NPR NpDc Module Issue GS1"
         DiscountType: Option "Discount Amount","Discount %";
         ReferenceNumber: Text[50];
         TooLongErr: Label 'Maximal length of %1 can be %2 characters', Comment = '%1 Reference No. caption, %2 length of Reference No.';
+        NoCouponTypeErr: Label 'GS1 coupon type does not exist. Please create one first.';
     begin
         if StrLen(ReferenceNo) > MaxStrLen(Coupon."Reference No.") then
             Error(TooLongErr, Coupon.FieldCaption("Reference No."), MaxStrLen(Coupon."Reference No."));
@@ -49,7 +50,7 @@ codeunit 6060028 "NPR NpDc Module Issue GS1"
 
 
         if not GetGS1CouponType(CouponType, DiscountType) then
-            CreateGS1CouponType(CouponType, DiscountType);
+            Error(NoCouponTypeErr);
 
         if FindCoupon(ReferenceNumber, Coupon) then
             IssueCouponQty(Coupon)
@@ -64,26 +65,11 @@ codeunit 6060028 "NPR NpDc Module Issue GS1"
         exit(CouponType.FindFirst());
     end;
 
-    procedure CreateGS1CouponType(var CouponType: Record "NPR NpDc Coupon Type"; DiscountType: Option)
-    begin
-        CouponType.Init();
-        CouponType.Code := CopyStr(ModuleCode() + '-' + Format(DiscountType), 1, MaxStrLen(CouponType.Code)); //we know that this is going to be 5 characters
-        CouponType."Issue Coupon Module" := ModuleCode();
-        CouponType.Description := ModuleCode();
-        CouponType."Issue Coupon Module" := ModuleCode();
-        CouponType."Validate Coupon Module" := 'DEFAULT';
-        CouponType."Apply Discount Module" := 'DEFAULT';
-        CouponType."Discount Type" := DiscountType;
-        CouponType."Starting Date" := CreateDateTime(Today(), 0T);
-        CouponType.Enabled := true;
-        CouponType.Insert();
-    end;
 
     local procedure IssueGS1Coupon(ReferenceNo: Text[50]; CouponType: Record "NPR NpDc Coupon Type"; DiscountAmount: Decimal)
     var
         Coupon: Record "NPR NpDc Coupon";
     begin
-
         Coupon.Init();
         Coupon."Reference No." := ReferenceNo;
         Coupon.Validate("Coupon Type", CouponType.Code);
@@ -144,6 +130,7 @@ codeunit 6060028 "NPR NpDc Module Issue GS1"
     var
         Number: Integer;
         Decimals: Integer;
+        NotSupportedErr: Label 'GS1 discount 100% off currently not supported';
     begin
         if not Evaluate(Decimals, CopyStr(Discount, 4, 1)) then
             exit(false);
@@ -151,8 +138,7 @@ codeunit 6060028 "NPR NpDc Module Issue GS1"
             exit(false);
 
         if Number = 0 then begin
-            DiscountNumeric := 100;
-            DiscountType := 1;
+            Error(NotSupportedErr);
         end else begin
             DiscountNumeric := Number / (Power(10, Decimals));
             DiscountType := 0;
