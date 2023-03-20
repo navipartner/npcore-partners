@@ -59,15 +59,20 @@ codeunit 6150800 "NPR Consignor Tracking"
         LocScope: Text;
         JsonResult: JsonToken;
         Expiresin: Integer;
+        ClientID: Text;
+        ClientSecret: Text;
 
     begin
         BaseUrl := 'https://www.consignorportal.com/idsrv/connect/token';
         LocScope := 'client_credentials';
+        ClientID := PackageProviderSetup."Api User";
+        ClientSecret := PackageProviderSetup."Api Key";
 
         RequestBody := StrSubstNo('grant_type=%3&client_id=%1&client_secret=%2',
-                        TypeHelper.UrlEncode(PackageProviderSetup."Api User"),
-                        TypeHelper.UrlEncode(PackageProviderSetup."Api Key"),
+                        TypeHelper.UrlEncode(ClientID),
+                        TypeHelper.UrlEncode(ClientSecret),
                         TypeHelper.UrlEncode(LocScope));
+
         if ExecuteCall('POST', JsonResult, BaseUrl, RequestBody, '') then begin
             if Evaluate(Expiresin, GetJsonText(JsonResult, 'expires_in', 0)) then
                 Timeout := Expiresin * (1000 - 100);
