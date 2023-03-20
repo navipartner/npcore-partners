@@ -6,6 +6,7 @@
     PageType = List;
     UsageCategory = Administration;
     SourceTable = "NPR DE POS Audit Log Aux. Info";
+    SourceTableView = SORTING("POS Entry No.") ORDER(Descending);
     ApplicationArea = NPRRetail;
 
     layout
