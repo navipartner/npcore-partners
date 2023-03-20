@@ -86,7 +86,11 @@ codeunit 6059780 "NPR Scanner Import Mgt."
     procedure CreateErrorMessage(var TempErrorMessage: Record "Error Message" temporary)
     begin
         TempErrorMessage.ID += 1;
+#IF BC22
+        TempErrorMessage.Message := CopyStr(GetLastErrorText(), 1, StrLen(TempErrorMessage.Message));
+#ELSE
         TempErrorMessage.Description := CopyStr(GetLastErrorText(), 1, StrLen(TempErrorMessage.Description));
+#ENDIF 
         TempErrorMessage.Insert();
     end;
 
