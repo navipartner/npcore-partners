@@ -91,7 +91,7 @@ page 6014483 "NPR API V1 - Mixed Disc. Lines"
                 {
                     Caption = 'variantCode', Locked = true;
                 }
-                field(vendorItemNo; Rec."Vendor Item No.")
+                field(vendorItemNo; Rec."Vend Item No.")
                 {
                     Caption = 'vendorItemNo', Locked = true;
                 }

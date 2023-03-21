@@ -60,12 +60,12 @@
 
                 Item.Get("Item No.");
                 if ItemVend.Get("Vendor No.", "Item No.", "Variant Code") then begin
-                    "Vendor Item No." := CopyStr(ItemVend."Vendor Item No.", 1, MaxStrLen("Vendor Item No."));
+                    "Vend Item No." := ItemVend."Vendor Item No.";
                 end else begin
                     if "Vendor No." = Item."Vendor No." then
-                        "Vendor Item No." := CopyStr(Item."Vendor Item No.", 1, MaxStrLen("Vendor Item No."))
+                        "Vend Item No." := Item."Vendor Item No."
                     else
-                        "Vendor Item No." := '';
+                        "Vend Item No." := '';
                 end;
                 "Supply From" := "Vendor No.";
             end;
@@ -162,6 +162,8 @@
         {
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. field';
         }
         field(23; "Sales Order No."; Code[20])
         {
@@ -189,6 +191,11 @@
             DataClassification = CustomerContent;
             Editable = false;
             TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Sell-to Customer No."));
+        }
+        field(27; "Vend Item No."; Text[50])
+        {
+            Caption = 'Vendor Item No.';
+            DataClassification = CustomerContent;
         }
         field(28; "Order Address Code"; Code[10])
         {

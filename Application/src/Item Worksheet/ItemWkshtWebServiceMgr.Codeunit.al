@@ -179,10 +179,10 @@
         ItemWorksheetLine.Insert(true);
         ItemWorksheetLine.Action := ItemWorksheetLine.Action::CreateNew;
         ItemWorksheetLine.Validate("Item No.", GetXmlText(Element, 'ItemNo', MaxStrLen(ItemWorksheetLine."Item No."), false));
-        ItemWorksheetLine.Validate("Vendor Item No.",
+        ItemWorksheetLine.Validate("Vend Item No.",
             GetXmlText(
                 Element, 'VendorItemNo',
-                MaxStrLen(ItemWorksheetLine."Vendor Item No."), true));
+                MaxStrLen(ItemWorksheetLine."Vend Item No."), true));
 
         ItemWorksheetLine.Validate("Vendor No.",
             GetXmlText(

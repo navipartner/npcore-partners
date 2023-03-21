@@ -146,7 +146,7 @@
                     ToolTip = 'Specifies the value of the Vendor No. field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Vendor Item No."; Rec."Vendor Item No.")
+                field("Vendor Item No."; Rec."Vend Item No.")
                 {
 
                     ToolTip = 'Specifies the value of the Vendor Item No. field';

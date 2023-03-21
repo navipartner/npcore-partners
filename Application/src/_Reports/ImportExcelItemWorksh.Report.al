@@ -226,9 +226,9 @@
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Vendor No."), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 ItemWorksheetLine.Validate("Vendor No.", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
-                        if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Vendor Item No."), MappedColumnNo, FieldLength) then
+                        if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Vend Item No."), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
-                                ItemWorksheetLine.Validate("Vendor Item No.", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
+                                ItemWorksheetLine.Validate("Vend Item No.", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo(Description), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 ItemWorksheetLine.Validate(Description, CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
@@ -298,7 +298,7 @@
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 1) then
                             ItemWorksheetLine.Validate("Item No.", ExcelBuf2."Cell Value as Text");
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 5) then
-                            ItemWorksheetLine.Validate("Vendor Item No.", ExcelBuf2."Cell Value as Text");
+                            ItemWorksheetLine.Validate("Vend Item No.", ExcelBuf2."Cell Value as Text");
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 11) then
                             ItemWorksheetLine.Validate("Vendor No.", ExcelBuf2."Cell Value as Text");
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 2) then
