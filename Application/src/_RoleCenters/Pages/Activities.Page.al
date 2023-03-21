@@ -130,13 +130,23 @@
                         DrillDownSalesOrderList(Rec.FieldNo("Sales Return Orders"));
                     end;
                 }
-                field(CollectDocumentList; Rec."Collect Document List")
+            }
+            cuegroup(Purchase)
+            {
+                Caption = 'Purchase';
+                field(PurchaseOrderList; Rec."Purchase Order List")
                 {
-                    Caption = 'Collect Document List';
+                    Caption = 'Purchase Orders';
                     ShowCaption = true;
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the number of the Collect Documents. If you click you can drilldown to the list of Collect Documents.';
+                    ToolTip = 'Displays the number of the Purchase Orders made. If you click you can drilldown to the list of Purchase Orders.';
 
+                    trigger OnDrillDown()
+                    var
+                        PurchaseOrderListPage: Page "Purchase Order List";
+                    begin
+                        PurchaseOrderListPage.RunModal();
+                    end;
                 }
             }
             cuegroup("Incoming Documents")
