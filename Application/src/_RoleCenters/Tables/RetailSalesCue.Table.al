@@ -177,6 +177,12 @@
             FieldClass = FlowField;
             CalcFormula = count("NPR NpCs Document");
         }
+        field(112; "Purchase Order List"; Integer)
+        {
+            Caption = 'Purchase Order List';
+            FieldClass = FlowField;
+            CalcFormula = count("Purchase Header" where("Document Type" = filter(Order)));
+        }
     }
 
     keys
