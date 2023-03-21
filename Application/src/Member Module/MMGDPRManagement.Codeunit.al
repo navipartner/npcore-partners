@@ -579,9 +579,9 @@
 #pragma warning restore
     end;
 
-    local procedure GetUserId(): Code[30]
+    local procedure GetUserId(): Code[50]
     begin
-        exit(CopyStr(UserId, 1, 30));
+        exit(CopyStr(UserId, 1, 50));
     end;
 
 }

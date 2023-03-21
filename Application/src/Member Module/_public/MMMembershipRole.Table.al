@@ -56,7 +56,7 @@
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(17; "Blocked By"; Code[30])
+        field(17; "Blocked By"; Code[50])
         {
             Caption = 'Blocked By';
             DataClassification = EndUserIdentifiableInformation;
