@@ -1,8 +1,8 @@
 ﻿report 6060151 "NPR Event Team Template"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Event Team Template.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -430,7 +430,7 @@
                     FromTo := '';
                     if Note.HasValue() then begin
                         CalcFields(Note);
-                        Note.CreateInStream(NoteInStream);
+                        Note.CreateInStream(NoteInStream, TextEncoding::UTF8);
                         NoteText.Read(NoteInStream);
                         FromTo := StrSubstNo(FromToLbl, GetUserName("User ID"), GetUserName("To User ID"));
                     end;
