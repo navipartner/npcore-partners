@@ -58,7 +58,7 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl" implements "NPR IPOS Workflow"
             'select_quote':
                 FrontEnd.WorkflowResponse(SelectQuote(Context));
             'preview':
-                FrontEnd.WorkflowResponse(Preview(Context));
+                Preview(Context);
             'load_from_quote':
                 LoadFromQuote(Context);
         end;
@@ -89,10 +89,9 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl" implements "NPR IPOS Workflow"
         end;
 
         Response.Add('quote_entry_no', POSQuoteEntry."Entry No.");
-
     end;
 
-    local procedure Preview(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
+    local procedure Preview(Context: Codeunit "NPR POS JSON Helper")
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         QuoteEntryNo: BigInteger;
@@ -108,8 +107,7 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl" implements "NPR IPOS Workflow"
         POSQuoteEntry.SetRecFilter();
         POSQuoteEntry.FilterGroup(0);
         IF Page.RunModal(Page::"NPR POS Saved Sale Card", POSQuoteEntry) <> Action::LookupOK then
-            Response.Add('quote_entry_no', '');
-
+            Error('');
     end;
 
     local procedure LoadFromQuote(Context: Codeunit "NPR POS JSON Helper")
@@ -121,7 +119,7 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl" implements "NPR IPOS Workflow"
         POSSession: Codeunit "NPR POS Session";
         CannotLoad: Label 'The POS Saved Sale is missing essential data and cannot be loaded.';
         POSActionLoadPOSSvSlB: Codeunit "NPR POS Action: LoadPOSSvSl B";
-
+        PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
     begin
         QuoteEntryNo := Context.GetInteger('quote_entry_no');
         POSQuoteEntry.Get(QuoteEntryNo);
@@ -130,9 +128,10 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl" implements "NPR IPOS Workflow"
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find();
 
-        if POSActionLoadPOSSvSlB.LoadFromQuote(POSQuoteEntry, SalePOS) then
-            POSActionLoadPOSSvSlB.InsertParkedSale(POSQuoteEntry, SalePOS)
-        else
+        if POSActionLoadPOSSvSlB.LoadFromQuote(POSQuoteEntry, SalePOS) then begin
+            POSActionLoadPOSSvSlB.InsertParkedSale(POSQuoteEntry, SalePOS);
+            PosItemCheckAvail.CheckAvailability_PosSale(SalePOS, false);
+        end else
             Error(CannotLoad);
     end;
 

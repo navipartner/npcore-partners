@@ -434,6 +434,8 @@
         NewCollectDocumentNodes: XmlNodeList;
         NewCollectDocumentNode: XmlNode;
         xSalePOS: Record "NPR POS Sale";
+        NPRDimMgt: Codeunit "NPR Dimension Mgt.";
+        UpdateDim: Boolean;
         POSCrossRefLbl: Label '%1_%2', Locked = true;
     begin
         if not XmlDoc.GetRoot(Root) then
@@ -442,7 +444,7 @@
             exit;
 
         RecRef.GetTable(SalePOS);
-        FindFields(RecRef, true, TempSalePOSFieldBuffer, true);
+        FindFields(RecRef, false, TempSalePOSFieldBuffer, true);
         if TempSalePOSFieldBuffer.Get(RecRef.Number, SalePOS.FieldNo("User ID")) then
             TempSalePOSFieldBuffer.Delete();
         if TempSalePOSFieldBuffer.Get(RecRef.Number, SalePOS.FieldNo("Server Instance ID")) then
@@ -482,8 +484,25 @@
         SalePOS.Delete();//To keep systemId intact from saved sale we delete and re-insert the active POS sales header being loaded into.            
         Xml2RecRef(Root, TempSalePOSFieldBuffer, RecRef);
         RecRef.SetTable(SalePOS);
+        UpdateDim :=
+            (SalePOS."Register No." <> xSalePOS."Register No.") or
+            (SalePOS."POS Store Code" <> xSalePOS."POS Store Code") or
+            (SalePOS."Salesperson Code" <> xSalePOS."Salesperson Code");
+        SalePOS."Register No." := xSalePOS."Register No.";
+        SalePOS."Sales Ticket No." := xSalePOS."Sales Ticket No.";
+        SalePOS."POS Store Code" := xSalePOS."POS Store Code";
+        SalePOS."Location Code" := xSalePOS."Location Code";
+        SalePOS."Salesperson Code" := xSalePOS."Salesperson Code";
         SalePOS.Date := xSalePOS.Date;
         SalePOS."Start Time" := xSalePOS."Start Time";
+        if UpdateDim then
+            SalePOS.CreateDim(
+                Database::"NPR POS Unit", SalePOS."Register No.",
+                Database::"NPR POS Store", SalePOS."POS Store Code",
+                Database::Job, SalePOS."Event No.",
+                Database::Customer, SalePOS."Customer No.",
+                Database::"Salesperson/Purchaser", SalePOS."Salesperson Code",
+                Database::"Responsibility Center", SalePOS."Responsibility Center");
         SalePOS.Insert(false, true);
 
         Root.SelectNodes('pos_info_transactions/pos_info_transaction', POSInfoTransactionNodes);
@@ -512,6 +531,13 @@
             SaleLinePOS."Register No." := SalePOS."Register No.";
             SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
             SaleLinePOS.Date := SalePOS.Date;
+            SaleLinePOS."Location Code" := SalePOS."Location Code";
+            if UpdateDim then
+                SaleLinePOS.CreateDim(
+                    NPRDimMgt.LineTypeToTableNPR(SaleLinePOS."Line Type"), SaleLinePOS."No.",
+                    NPRDimMgt.DiscountTypeToTableNPR(SaleLinePOS."Discount Type"), SaleLinePOS."Discount Code",
+                    Database::"NPR NPRE Seating", SaleLinePOS."NPRE Seating Code",
+                    Database::"Responsibility Center", SaleLinePOS."Responsibility Center");
             SaleLinePOS.Insert(true, true);
 
             Element.SelectNodes('pos_info_transactions/pos_info_transaction', POSInfoTransactionNodes);
