@@ -92,6 +92,14 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeReceiptText'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG PG To Interface"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'MoveHeyLoyaltyValueMappings'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetLine'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'RegistItemWorkshLine'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'RetailCampaignItems'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'MixedDiscountLine'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'PeriodDiscountLine'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'RetailReplDemandLine'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetExcelColumn'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetFieldSetup'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -326,6 +334,25 @@
                 case UpgradeStep of
                     'MoveHeyLoyaltyValueMappings':
                         exit('MoveHeyLoyaltyValueMappings_20230314');
+                end;
+            Codeunit::"NPR UPG Vend Item No Expansion":
+                case UpgradeStep of
+                    'ItemWorksheetLine':
+                        exit('NPR-VendItemNo_ItemWorksheetLine-20230105');
+                    'RegistItemWorkshLine':
+                        exit('NPR-VendItemNo_RegistItemWorkshLine-20230105');
+                    'RetailCampaignItems':
+                        exit('NPR-VendItemNo_RetailCampaignItems-20230105');
+                    'MixedDiscountLine':
+                        exit('NPR-VendItemNo_MixedDiscountLine-20230105');
+                    'PeriodDiscountLine':
+                        exit('NPR-VendItemNo_PeriodDiscountLine-20230105');
+                    'RetailReplDemandLine':
+                        exit('NPR-VendItemNo_RetailReplDemandLine-20230105');
+                    'ItemWorksheetExcelColumn':
+                        exit('NPR-VendItemNo_ItemWorksheetExcelColumn-20230105');
+                    'ItemWorksheetFieldSetup':
+                        exit('NPR-VendItemNo_ItemWorksheetFieldSetup-20230105');
                 end;
         end;
     end;

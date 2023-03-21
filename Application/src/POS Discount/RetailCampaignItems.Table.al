@@ -175,6 +175,8 @@
         {
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. field';
         }
         field(127; "Variant Code"; Code[10])
         {
@@ -206,6 +208,11 @@
         {
             Caption = 'Location Filter';
             FieldClass = FlowFilter;
+        }
+        field(134; "Vend Item No."; Text[50])
+        {
+            Caption = 'Vendor Item No.';
+            DataClassification = CustomerContent;
         }
         field(135; "Starting Time"; Time)
         {
@@ -428,13 +435,13 @@
                                     "Campaign Unit Cost" := PeriodDiscountLine."Campaign Unit Cost";
                                     "Unit Cost" := PeriodDiscountLine."Unit Cost Purchase";
                                     "Vendor No." := PeriodDiscountLine."Vendor No.";
-                                    "Vendor Item No." := PeriodDiscountLine."Vendor Item No.";
+                                    "Vend Item No." := PeriodDiscountLine."Vend Item No.";
                                     "Variant Code" := PeriodDiscountLine."Variant Code";
                                     "Starting Time" := PeriodDiscountLine."Starting Time";
                                     "Ending Time" := PeriodDiscountLine."Ending Time";
                                     if Item.Get("Item No.") then begin
                                         "Unit Cost" := Item."Unit Cost";
-                                        "Vendor Item No." := CopyStr(Item."Vendor Item No.", 1, MaxStrLen("Vendor Item No."));
+                                        "Vend Item No." := Item."Vendor Item No.";
                                         "Vendor No." := Item."Vendor No.";
                                         "Units per Parcel" := Item."Units per Parcel";
 
@@ -494,7 +501,7 @@
                                     "Unit Cost" := MixedDiscountLine."Unit cost";
                                     if Item.Get("Item No.") then begin
                                         "Unit Cost" := Item."Unit Cost";
-                                        "Vendor Item No." := CopyStr(Item."Vendor Item No.", 1, MaxStrLen("Vendor Item No."));
+                                        "Vend Item No." := Item."Vendor Item No.";
                                         "Vendor No." := Item."Vendor No.";
                                         "Units per Parcel" := Item."Units per Parcel";
                                         if not Item.Blocked then begin

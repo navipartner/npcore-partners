@@ -39,6 +39,8 @@
         {
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. field';
         }
         field(8; "Internal Bar Code"; Code[50])
         {
@@ -75,6 +77,11 @@
             InitValue = Undefined;
             OptionCaption = 'Inventory,Service,,,,,,,,Undefined';
             OptionMembers = Inventory,Service,,,,,,,,Undefined;
+        }
+        field(14; "Vend Item No."; Text[50])
+        {
+            Caption = 'Vendor Item No.';
+            DataClassification = CustomerContent;
         }
         field(15; "Shelf No."; Code[10])
         {

@@ -26,7 +26,7 @@
 
                 Item.Get("Item No.");
                 "Vendor No." := Item."Vendor No.";
-                "Vendor Item No." := CopyStr(Item."Vendor Item No.", 1, MaxStrLen("Vendor Item No."));
+                "Vend Item No." := Item."Vendor Item No.";
             end;
         }
         field(3; Description; Text[100])
@@ -198,6 +198,8 @@
         {
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. field';
         }
         field(27; "Variant Code"; Code[10])
         {
@@ -208,6 +210,11 @@
         field(28; "Last Date Modified"; Date)
         {
             Caption = 'Last Date Modified';
+            DataClassification = CustomerContent;
+        }
+        field(29; "Vend Item No."; Text[50])
+        {
+            Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
         }
         field(30; "Date Filter"; Date)

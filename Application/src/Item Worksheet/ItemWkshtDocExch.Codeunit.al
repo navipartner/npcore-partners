@@ -28,7 +28,7 @@
         if (ItemGroupText <> '') and (StrLen(ItemGroupText) <= MaxStrLen(ItemCategory.Code)) then
             if ItemCategory.Get(ItemGroupText) then
                 ItemWorksheetLine.Validate("Item Category Code", ItemGroupText);
-        ItemWorksheetLine.Validate("Vendor Item No.", CopyStr(VendorItemNo, 1, MaxStrLen(ItemWorksheetLine."Vendor Item No.")));
+        ItemWorksheetLine.Validate("Vend Item No.", CopyStr(VendorItemNo, 1, MaxStrLen(ItemWorksheetLine."Vend Item No.")));
         ItemWorksheetLine.Validate(Description, CopyStr(VendorItemDescription, 1, MaxStrLen(ItemWorksheetLine.Description)));
         ItemWorksheetLine.Validate("Direct Unit Cost", DirectUnitCost);
         ItemWorksheetLine.Modify(true);
@@ -43,7 +43,7 @@
         ItemWorksheetLine2.SetRange("Worksheet Template Name", ItemWorksheet."Item Template Name");
         ItemWorksheetLine2.SetRange("Worksheet Name", ItemWorksheet.Name);
         ItemWorksheetLine2.SetFilter("Vendor No.", VendorNo);
-        ItemWorksheetLine2.SetFilter("Vendor Item No.", VendorItemNo);
+        ItemWorksheetLine2.SetFilter("Vend Item No.", VendorItemNo);
         if ItemWorksheetLine2.FindLast() then
             exit(true)
         else
@@ -65,7 +65,7 @@
         NoOfMissingItems := 0;
         ErrorMessage.SetRange("Context Record ID", IncomingDocument.RecordId);
         ErrorMessage.SetRange("Table Number", DATABASE::"NPR Item Worksheet Line");
-        ErrorMessage.SetRange("Field Number", ItemWorksheetLine.FieldNo("Vendor Item No."));
+        ErrorMessage.SetRange("Field Number", ItemWorksheetLine.FieldNo("Vend Item No."));
         if ErrorMessage.FindSet() then
             repeat
                 NoOfMissingItems := NoOfMissingItems + 1;
@@ -78,7 +78,7 @@
 #IF NOT CLOUD OR BC21 OR BC20
 #pragma warning disable AL0432
                             case ErrorMessage2."Field Number" of
-                                ItemWorksheetLine.FieldNo("Vendor Item No."):
+                                ItemWorksheetLine.FieldNo("Vend Item No."):
                                     VendorItemNo := ErrorMessage2.Description;
                                 ItemWorksheetLine.FieldNo("Item Category Code"):
                                     ItemGroupText := ErrorMessage2.Description;
@@ -95,7 +95,7 @@
 #pragma warning restore AL0432
 #ELSE
                             case ErrorMessage2."Field Number" of
-                                ItemWorksheetLine.FieldNo("Vendor Item No."):
+                                ItemWorksheetLine.FieldNo("Vend Item No."):
                                     VendorItemNo := ErrorMessage2.Message;
                                 ItemWorksheetLine.FieldNo("Item Category Code"):
                                     ItemGroupText := ErrorMessage2.Message;
@@ -118,7 +118,7 @@
         ErrorMessage.Reset();
         ErrorMessage.SetRange("Context Record ID", IncomingDocument.RecordId);
         ErrorMessage.SetRange("Table Number", DATABASE::"NPR Item Worksheet Line");
-        ErrorMessage.SetFilter("Field Number", '<>%1', ItemWorksheetLine.FieldNo("Vendor Item No."));
+        ErrorMessage.SetFilter("Field Number", '<>%1', ItemWorksheetLine.FieldNo("Vend Item No."));
         ErrorMessage.DeleteAll(true);
     end;
 

@@ -19,13 +19,13 @@
             exit;
         ItemNo := '';
         VendorNo := ItemWorksheetLine."Vendor No.";
-        if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Vendor Item No.", 1, true, CodeVar, VendorNo, ItemNo, CodeVar) then         // Unblocked items Vendor Item No.
+        if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Vend Item No.", 1, true, CodeVar, VendorNo, ItemNo, CodeVar) then         // Unblocked items Vendor Item No.
             if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Internal Bar Code", 2, true, CodeVar, VendorNo, ItemNo, CodeVar) then                 // Unblocked items Barcode
                 if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Vendors Bar Code", 1, true, CodeVar, VendorNo, ItemNo, CodeVar) then         // Unblocked items Vendor Barcode
                     if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Vendors Bar Code", 2, true, CodeVar, VendorNo, ItemNo, CodeVar) then                 // Unblocked items Vendor Barcode
-                        if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Vendor Item No.", 1, false, CodeVar, VendorNo, ItemNo, CodeVar) then    // All items Vendor Item No.
+                        if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Vend Item No.", 1, false, CodeVar, VendorNo, ItemNo, CodeVar) then    // All items Vendor Item No.
                             if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Internal Bar Code", 2, false, CodeVar, VendorNo, ItemNo, CodeVar) then            // All itmes Barcode
-                                if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Vendor Item No.", 0, false, CodeVar, VendorNo, ItemNo, CodeVar) then// All places vendor item no.
+                                if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Vend Item No.", 0, false, CodeVar, VendorNo, ItemNo, CodeVar) then// All places vendor item no.
                                     if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Internal Bar Code", 0, false, CodeVar, VendorNo, ItemNo, CodeVar) then        // All places Barcode
                                         exit;
         if VendorNo <> '' then
@@ -45,7 +45,7 @@
     begin
         if FindItemNo(
             ItemWorksheetLine."Vendors Bar Code",
-            ItemWorksheetLine."Vendor Item No.", ItemWorksheetLine."Vendor No.", ItemNo, VarCode) then
+            ItemWorksheetLine."Vend Item No.", ItemWorksheetLine."Vendor No.", ItemNo, VarCode) then
             ItemWorksheetLine.Validate("Item No.", ItemNo)
         else
             ItemWorksheetLine.Validate("Item No.", '');
@@ -101,13 +101,13 @@
         end;
 
         //Duplicate Vendor Item no
-        if ItemWorksheetLine."Vendor Item No." <> '' then begin
-            ItemWorksheetLine2.SetRange("Vendor Item No.", ItemWorksheetLine."Vendor Item No.");
+        if ItemWorksheetLine."Vend Item No." <> '' then begin
+            ItemWorksheetLine2.SetRange("Vend Item No.", ItemWorksheetLine."Vend Item No.");
             if not ItemWorksheetLine2.IsEmpty() then
                 GenerateDuplicateError(
-                    ItemWorksheetLine, ItemWorksheetLine.FieldCaption("Vendor Item No."),
-                    ItemWorksheetLine."Vendor Item No.", ItemWorksheet.TableCaption, ItemWorksheetLine."Worksheet Name");
-            ItemWorksheetLine2.SetRange("Vendor Item No.");
+                    ItemWorksheetLine, ItemWorksheetLine.FieldCaption("Vend Item No."),
+                    ItemWorksheetLine."Vend Item No.", ItemWorksheet.TableCaption, ItemWorksheetLine."Worksheet Name");
+            ItemWorksheetLine2.SetRange("Vend Item No.");
         end;
 
         //Duplicate Barcode

@@ -186,7 +186,7 @@
         Window: Dialog;
         NoOfRecords: Integer;
         CombineBy: Option All,ItemNo,VendorItemNo,VendorBarCode,InternalBarCode;
-        CombineLineAsBakcgroundTask, VarietySet: Boolean;
+        CombineLineAsBakcgroundTask, VarietySet : Boolean;
     begin
         ItemWorksheetLine.Reset();
         ItemWorksheetLine.SetFilter("Worksheet Template Name", '=%1', ItemWorksheet."Item Template Name");
@@ -198,7 +198,7 @@
         if ItemWorksheetLine.FindSet() then begin
             ItemWorksheetTemplate.Get(ItemWorksheetLine."Worksheet Template Name");
             CombineBy := ItemWorksheetTemplate."Combine Variants to Item by";
-            CombineLineAsBakcgroundTask := ItemWrkshCombineLine.CanCreateTask(ItemWorksheetTemplate);            
+            CombineLineAsBakcgroundTask := ItemWrkshCombineLine.CanCreateTask(ItemWorksheetTemplate);
             repeat
                 LineCount := LineCount + 1;
                 if GuiAllowed() then
@@ -209,7 +209,7 @@
                         TaskScheduler.CreateTask(Codeunit::"NPR Item Wrksh. Combine Line", 0, true, CompanyName(), CurrentDateTime(), ItemWorksheetLine.RecordId)
                     else
                         CombineLine(ItemWorksheetLine, CombineBy);
-                end;                    
+                end;
             until ItemWorksheetLine.Next() = 0;
         end;
         if GuiAllowed() then
@@ -267,14 +267,14 @@
             CombineBy::All:
                 begin
                     ItemWorksheetLine2.SetRange("Item No.", ItemWorksheetLine."Item No.");
-                    ItemWorksheetLine2.SetRange("Vendor Item No.", ItemWorksheetLine."Vendor Item No.");
+                    ItemWorksheetLine2.SetRange("Vend Item No.", ItemWorksheetLine."Vend Item No.");
                     ItemWorksheetLine2.SetRange("Vendors Bar Code", ItemWorksheetLine."Vendors Bar Code");
                     ItemWorksheetLine2.SetRange("Internal Bar Code", ItemWorksheetLine."Internal Bar Code");
                 end;
             CombineBy::ItemNo:
                 ItemWorksheetLine2.SetRange("Item No.", ItemWorksheetLine."Item No.");
             CombineBy::VendorItemNo:
-                ItemWorksheetLine2.SetRange("Vendor Item No.", ItemWorksheetLine."Vendor Item No.");
+                ItemWorksheetLine2.SetRange("Vend Item No.", ItemWorksheetLine."Vend Item No.");
             CombineBy::VendorBarCode:
                 ItemWorksheetLine2.SetRange("Vendors Bar Code", ItemWorksheetLine."Vendors Bar Code");
             CombineBy::InternalBarCode:
@@ -530,16 +530,16 @@
 
                     else  //other fields matched by name
                       begin
-                            J := 0;
-                            repeat
-                                J := J + 1;
-                                ItemFldRef := ItemRecRef.FieldIndex(J);
-                                if ItemFldRef.Name = ItemWorksheetFldRef.Name then begin
-                                    if ItemFldRef.Active then
-                                        InsertDefaultFieldSetupLine(ItemWorksheetLine, SetLevel, ItemWorksheetFldRef, ItemFldRef);
-                                end;
-                            until (J = ItemRecRef.FieldCount) or (ItemFldRef.Name = ItemRecRef.Name);
-                        end;
+                        J := 0;
+                        repeat
+                            J := J + 1;
+                            ItemFldRef := ItemRecRef.FieldIndex(J);
+                            if ItemFldRef.Name = ItemWorksheetFldRef.Name then begin
+                                if ItemFldRef.Active then
+                                    InsertDefaultFieldSetupLine(ItemWorksheetLine, SetLevel, ItemWorksheetFldRef, ItemFldRef);
+                            end;
+                        until (J = ItemRecRef.FieldCount) or (ItemFldRef.Name = ItemRecRef.Name);
+                    end;
                 end;
             end;
         until I = ItemWorksheetRecRef.FieldCount;

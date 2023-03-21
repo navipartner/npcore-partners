@@ -47,7 +47,7 @@ xmlport 6060040 "NPR Item Worksh. Import/Export"
                     {
                         MinOccurs = Zero;
                     }
-                    fieldelement(VendorItemNo; "Item Worksheet Line"."Vendor Item No.")
+                    fieldelement(VendorItemNo; "Item Worksheet Line"."Vend Item No.")
                     {
                         MinOccurs = Zero;
                     }

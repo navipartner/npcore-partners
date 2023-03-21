@@ -144,7 +144,7 @@ page 6014476 "NPR APIV1 - Camp. Disc. Lines"
                 {
                     Caption = 'variantCode', Locked = true;
                 }
-                field(vendorItemNo; Rec."Vendor Item No.")
+                field(vendorItemNo; Rec."Vend Item No.")
                 {
                     Caption = 'vendorItemNo', Locked = true;
                 }
