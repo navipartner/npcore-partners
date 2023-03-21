@@ -45,7 +45,7 @@
                             if ("Variant Code" <> '') and ItemVariant.Get("No.", "Variant Code") then
                                 "Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen("Description 2"));
                             "Vendor No." := Item."Vendor No.";
-                            "Vendor Item No." := CopyStr(Item."Vendor Item No.", 1, MaxStrLen("Vendor Item No."));
+                            "Vend Item No." := Item."Vendor Item No.";
                         end;
                     "Disc. Grouping Type"::"Item Group":
                         begin
@@ -154,6 +154,13 @@
             DataClassification = CustomerContent;
         }
         field(41; "Vendor Item No."; Code[20])
+        {
+            Caption = 'Vendor Item No.';
+            DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. field';
+        }
+        field(42; "Vend Item No."; Text[50])
         {
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;

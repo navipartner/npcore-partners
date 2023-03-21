@@ -150,7 +150,7 @@
     var
     begin
         GetItem(_ItemWkshLine."Item No.");
-        Item.Validate(Item."Vendor Item No.", _ItemWkshLine."Vendor Item No.");
+        Item.Validate(Item."Vendor Item No.", _ItemWkshLine."Vend Item No.");
         if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Vendor No.")) then
             Item.Validate(Item."Vendor No.", _ItemWkshLine."Vendor No.");
         Item.Validate(Item.Description, _ItemWkshLine.Description);
@@ -223,8 +223,8 @@
     local procedure UpdateItem()
     begin
         GetItem(_ItemWkshLine."Item No.");
-        if (Item."Vendor Item No." <> _ItemWkshLine."Vendor Item No.") and (_ItemWkshLine."Vendor Item No." <> '') then
-            Item.Validate(Item."Vendor Item No.", _ItemWkshLine."Vendor Item No.");
+        if (Item."Vendor Item No." <> _ItemWkshLine."Vend Item No.") and (_ItemWkshLine."Vend Item No." <> '') then
+            Item.Validate(Item."Vendor Item No.", _ItemWkshLine."Vend Item No.");
         if (Item."Vendor No." <> _ItemWkshLine."Vendor No.") and (_ItemWkshLine."Vendor No." <> '') then
             Item.Validate(Item."Vendor No.", _ItemWkshLine."Vendor No.");
         if (Item.Description <> _ItemWkshLine.Description) and (_ItemWkshLine.Description <> '') then
@@ -557,7 +557,7 @@
         RegisteredWorksheetLine.Action := _ItemWkshLine.Action;
         RegisteredWorksheetLine."Existing Item No." := _ItemWkshLine."Existing Item No.";
         RegisteredWorksheetLine."Item No." := _ItemWkshLine."Item No.";
-        RegisteredWorksheetLine."Vendor Item No." := _ItemWkshLine."Vendor Item No.";
+        RegisteredWorksheetLine."Vend Item No." := _ItemWkshLine."Vend Item No.";
         RegisteredWorksheetLine."Internal Bar Code" := _ItemWkshLine."Internal Bar Code";
         RegisteredWorksheetLine."Vendor No." := _ItemWkshLine."Vendor No.";
         RegisteredWorksheetLine.Description := _ItemWkshLine.Description;
@@ -728,7 +728,7 @@
     end;
 
     internal procedure CopyToRegisteredWorksheetVariantLine(LineNo: Integer; ItemWkshVariantLine: Record "NPR Item Worksh. Variant Line")
-    var 
+    var
         RegisteredWorksheetVariantLine: Record "NPR Reg. Item Wsht Var. Line";
     begin
         RegisteredWorksheetVariantLine."Registered Worksheet No." := LastRegisteredWorksheetNo();

@@ -1,6 +1,7 @@
 ﻿codeunit 6060057 "NPR Item Works. Purch. Integr."
 {
     Access = Internal;
+
     var
         RegisteredButNotFoundErr: Label 'And Item Worksheet Line was registered but not found in Registered Item Lines.';
         OneLineFoundQst: Label 'One Item Worksheet Line found. Would you like to created the item with description %1?', Comment = '%1 = Description';
@@ -114,40 +115,40 @@
                     exit(true);
                 end;
             else begin
-                    //More than one item worksheet in the selection
-                    if ItemWorksheet.FindSet() then
-                        repeat
-                            MatchToItemWorksheetLine(ItemWorksheet, VendorItemNo, TempItemWorksheetLine, TempItemWorksheetVariantLine);
-                            if (TempItemWorksheetVariantLine.Count() > 0) or (TempItemWorksheetLine.Count() > 0) then begin
-                                TempItemWorksheetWithPossibleMatch := ItemWorksheet;
-                                TempItemWorksheetWithPossibleMatch.Insert();
-                            end;
-                        until ItemWorksheet.Next() = 0;
-                    case TempItemWorksheetWithPossibleMatch.Count() of
-                        0:
+                //More than one item worksheet in the selection
+                if ItemWorksheet.FindSet() then
+                    repeat
+                        MatchToItemWorksheetLine(ItemWorksheet, VendorItemNo, TempItemWorksheetLine, TempItemWorksheetVariantLine);
+                        if (TempItemWorksheetVariantLine.Count() > 0) or (TempItemWorksheetLine.Count() > 0) then begin
+                            TempItemWorksheetWithPossibleMatch := ItemWorksheet;
+                            TempItemWorksheetWithPossibleMatch.Insert();
+                        end;
+                    until ItemWorksheet.Next() = 0;
+                case TempItemWorksheetWithPossibleMatch.Count() of
+                    0:
+                        exit(false);
+                    1:
+                        begin
+                            ItemWorksheet.Get(TempItemWorksheetWithPossibleMatch."Item Template Name", TempItemWorksheetWithPossibleMatch.Name);
+                        end;
+                    else begin
+                        //More than one of these item worksheets contains a matching line
+                        if not GuiAllowed then
                             exit(false);
-                        1:
-                            begin
-                                ItemWorksheet.Get(TempItemWorksheetWithPossibleMatch."Item Template Name", TempItemWorksheetWithPossibleMatch.Name);
-                            end;
-                        else begin
-                                //More than one of these item worksheets contains a matching line
-                                if not GuiAllowed then
-                                    exit(false);
-                                if TempItemWorksheetWithPossibleMatch.FindSet() then
-                                    repeat
-                                        TempItemWorksheetWithPossibleMatch.Mark(true);
-                                    until TempItemWorksheetWithPossibleMatch.Next() = 0;
-                                TempItemWorksheetWithPossibleMatch.MarkedOnly(true);
-                                ItemWorksheets.SetTableView(TempItemWorksheetWithPossibleMatch);
-                                if ItemWorksheets.RunModal() <> ACTION::LookupOK then begin
-                                    ItemWorksheets.GetRecord(ItemWorksheet);
-                                    exit(true);
-                                end else
-                                    exit(false);
-                            end;
+                        if TempItemWorksheetWithPossibleMatch.FindSet() then
+                            repeat
+                                TempItemWorksheetWithPossibleMatch.Mark(true);
+                            until TempItemWorksheetWithPossibleMatch.Next() = 0;
+                        TempItemWorksheetWithPossibleMatch.MarkedOnly(true);
+                        ItemWorksheets.SetTableView(TempItemWorksheetWithPossibleMatch);
+                        if ItemWorksheets.RunModal() <> ACTION::LookupOK then begin
+                            ItemWorksheets.GetRecord(ItemWorksheet);
+                            exit(true);
+                        end else
+                            exit(false);
                     end;
                 end;
+            end;
         end;
     end;
 
@@ -160,9 +161,9 @@
         ItemWorksheetLine.SetRange("Worksheet Name", ItemWorksheet.Name);
         //Matching criterea Item Worksheet Line
         //Vendor Item No.
-        ItemWorksheetLine.SetFilter("Vendor Item No.", VendorItemNo);
+        ItemWorksheetLine.SetFilter("Vend Item No.", VendorItemNo);
         AddItemWorksheetLinesToTemp(ItemWorksheetLine, TempItemWorksheetLine);
-        ItemWorksheetLine.SetFilter("Vendor Item No.", '');
+        ItemWorksheetLine.SetFilter("Vend Item No.", '');
 
         //Internal Bar Code
         ItemWorksheetLine.SetFilter("Internal Bar Code", VendorItemNo);

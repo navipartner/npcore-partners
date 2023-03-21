@@ -103,6 +103,8 @@
         {
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. field';
 
             trigger OnValidate()
             begin
@@ -152,6 +154,18 @@
             InitValue = Undefined;
             OptionCaption = 'Inventory,Service,,,,,,,,Undefined';
             OptionMembers = Inventory,Service,,,,,,,,Undefined;
+        }
+        field(14; "Vend Item No."; Text[50])
+        {
+            Caption = 'Vendor Item No.';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                ItemWorksheetItemMgt.MatchItemNo(Rec);
+                if ("Existing Item No." = '') then
+                    Validate(Action);
+            end;
         }
         field(15; "Shelf No."; Code[10])
         {
@@ -1821,7 +1835,7 @@
         VarCode: Code[10];
         ItemNo: Code[20];
     begin
-        if FindItemNo("Vendors Bar Code", "Internal Bar Code", "Vendor Item No.", "Vendor No.", ItemNo, VarCode) then begin
+        if FindItemNo("Vendors Bar Code", "Internal Bar Code", "Vend Item No.", "Vendor No.", ItemNo, VarCode) then begin
             Validate("Item No.", ItemNo);
         end else begin
             Validate("Item No.", '');
@@ -1982,12 +1996,12 @@
             ItemWorksheetTemplate."Item No. Creation by"::VendorItemNo:
                 begin
                     NoSeriesMgt.TestManual("No. Series");
-                    if "Vendor Item No." = '' then
+                    if "Vend Item No." = '' then
                         exit('');
                     Prefix := ItemNoPrefix();
-                    if StrLen(Prefix + "Vendor Item No.") < MaxStrLen("Vendor Item No.") then
-                        exit(CopyStr(Prefix + "Vendor Item No.", 1, 20));
-                    exit("Vendor Item No.");
+                    if StrLen(Prefix + "Vend Item No.") < MaxStrLen("Vend Item No.") then
+                        exit(CopyStr(Prefix + "Vend Item No.", 1, 20));
+                    exit("Vend Item No.");
                 end;
         end;
     end;
@@ -2799,8 +2813,8 @@
                     DuplicateItemWorksheetLine.Delete(true);
             exit;
         end;
-        if "Vendor Item No." <> '' then begin
-            DuplicateItemWorksheetLine.SetFilter("Vendor Item No.", "Vendor Item No.");
+        if "Vend Item No." <> '' then begin
+            DuplicateItemWorksheetLine.SetFilter("Vend Item No.", "Vend Item No.");
             if DuplicateItemWorksheetLine.FindLast() then
                 if OldLineContainsSameVarieties(DuplicateItemWorksheetLine) then
                     DuplicateItemWorksheetLine.Delete(true);
@@ -3031,11 +3045,11 @@
                     case ItemWorksheetTemplate."Item Info Query By" of
                         ItemWorksheetTemplate."Item Info Query By"::"Vendor No. and Vendor Item No.":
                             begin
-                                Item.SetRange("Vendor Item No.", "Vendor Item No.");
+                                Item.SetRange("Vendor Item No.", "Vend Item No.");
                                 Item.SetRange("Vendor No.", "Vendor No.");
                             end;
                         ItemWorksheetTemplate."Item Info Query By"::"Vendor Item No. Only":
-                            Item.SetRange("Vendor Item No.", "Vendor Item No.");
+                            Item.SetRange("Vendor Item No.", "Vend Item No.");
                     end;
                     EndpointManagement.CreateOutboundEndpointQuery(QueryName, Item, OnlyNewAndUpdated);
                 end;
@@ -3046,12 +3060,12 @@
                     case ItemWorksheetTemplate."Item Info Query By" of
                         ItemWorksheetTemplate."Item Info Query By"::"Vendor No. and Vendor Item No.":
                             begin
-                                ItemWorksheetLine.SetRange("Vendor Item No.", "Vendor Item No.");
+                                ItemWorksheetLine.SetRange("Vend Item No.", "Vend Item No.");
                                 ItemWorksheetLine.SetRange("Vendor No.", "Vendor No.");
                             end;
                         ItemWorksheetTemplate."Item Info Query By"::"Vendor Item No. Only":
                             begin
-                                ItemWorksheetLine.SetRange("Vendor Item No.", "Vendor Item No.");
+                                ItemWorksheetLine.SetRange("Vend Item No.", "Vend Item No.");
                             end;
                     end;
                     EndpointManagement.CreateOutboundEndpointQuery(QueryName, ItemWorksheetLine, OnlyNewAndUpdated);
@@ -3211,8 +3225,8 @@
         "Tax Group Code" := Item."Tax Group Code";
         if "Vendor No." = '' then
             "Vendor No." := Item."Vendor No.";
-        if "Vendor Item No." = '' then
-            "Vendor Item No." := CopyStr(ItemNumberManagement.GetItemItemVendorNo(Item."No.", '', "Vendor No."), 1, MaxStrLen("Vendor Item No."));
+        if "Vend Item No." = '' then
+            "Vend Item No." := CopyStr(ItemNumberManagement.GetItemItemVendorNo(Item."No.", '', "Vendor No."), 1, MaxStrLen("Vend Item No."));
 
         if ItemWorksheetTemplate2.Get("Worksheet Template Name") then;
         if ("Internal Bar Code" = '') and not ItemWorksheetTemplate2."Do not Apply Internal Barcode" then

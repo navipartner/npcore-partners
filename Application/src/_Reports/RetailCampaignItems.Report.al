@@ -1,8 +1,8 @@
 ﻿report 6014616 "NPR Retail Campaign Items"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Campaign Items.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -54,7 +54,7 @@
                 column(RetailCampaignItemsUnitPrice; "Retail Campaign Items"."Unit Price")
                 {
                 }
-                column(RetailCampaignItemsVendorItemNo; "Retail Campaign Items"."Vendor Item No.")
+                column(RetailCampaignItemsVendorItemNo; "Retail Campaign Items"."Vend Item No.")
                 {
                 }
                 column(RetailCampaignItemsVendorNo; "Retail Campaign Items"."Vendor No.")

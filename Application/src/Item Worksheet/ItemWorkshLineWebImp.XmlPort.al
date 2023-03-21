@@ -62,7 +62,7 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
                     {
                         MinOccurs = Zero;
                     }
-                    fieldelement(VendorItemNo; "Item Worksheet Line"."Vendor Item No.")
+                    fieldelement(VendorItemNo; "Item Worksheet Line"."Vend Item No.")
                     {
                         MinOccurs = Zero;
                     }
