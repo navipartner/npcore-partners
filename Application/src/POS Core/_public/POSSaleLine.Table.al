@@ -1723,7 +1723,8 @@
 
     trigger OnInsert()
     begin
-        "Created At" := CurrentDateTime; //Not the same as built-in SystemCreatedAt, as this timestamp stays intact across parking/loading and is kept on POS entry sales/payment lines.        
+        if "Created At" = 0DT then
+            "Created At" := CurrentDateTime(); //Not the same as built-in SystemCreatedAt, as this timestamp stays intact across parking/loading and is kept on POS entry sales/payment lines.        
     end;
 
     trigger OnDelete()
