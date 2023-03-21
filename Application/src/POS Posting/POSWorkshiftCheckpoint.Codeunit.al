@@ -949,6 +949,7 @@
         if (POSEntry."Entry Type" <> POSEntry."Entry Type"::"Credit Sale") then begin
             if ((POSSalesLine.Type <> POSSalesLine.Type::Voucher) and
                 (POSSalesLine.Type <> POSSalesLine.Type::Payout) and
+                (POSSalesLine.Type <> POSSalesLine.Type::Customer) and
                 (POSSalesLine.Type <> POSSalesLine.Type::"G/L Account")) then begin
 
                 POSWorkshiftCheckpoint."Turnover (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
