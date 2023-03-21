@@ -729,6 +729,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'RV_RUN_W/PAD_ACTION', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Run WPad Act.";
     }
+    value(150; "RUN_ITEM_ADDONS")
+    {
+        Caption = 'RUN_ITEM_ADDONS', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Run Item AddOn";
+    }
     value(141; "RV_SET_R-VIEW")
     {
         Caption = 'RV_SET_R-VIEW', Locked = true, MaxLength = 20;
