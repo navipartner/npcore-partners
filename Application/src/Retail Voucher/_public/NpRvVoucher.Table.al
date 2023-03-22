@@ -417,6 +417,11 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(1100; "Disabled for Web Service"; Boolean)
+        {
+            Caption = 'Disabled for Web Service';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

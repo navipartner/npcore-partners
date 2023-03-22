@@ -84,6 +84,12 @@
                         ToolTip = 'Specifies the value of the Allow Top-up field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("Disabled for Web Service"; Rec."Disabled for Web Service")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Disabled for Web Service field. Web shops usually interact with web service.';
+                    }
+                    
                 }
                 group(Control6014422)
                 {
