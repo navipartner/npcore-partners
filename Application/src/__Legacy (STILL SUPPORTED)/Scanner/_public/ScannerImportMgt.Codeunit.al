@@ -87,9 +87,9 @@ codeunit 6059780 "NPR Scanner Import Mgt."
     begin
         TempErrorMessage.ID += 1;
 #IF BC22
-        TempErrorMessage.Message := CopyStr(GetLastErrorText(), 1, StrLen(TempErrorMessage.Message));
+        TempErrorMessage.Message := CopyStr(GetLastErrorText(), 1, MaxStrLen(TempErrorMessage.Message));
 #ELSE
-        TempErrorMessage.Description := CopyStr(GetLastErrorText(), 1, StrLen(TempErrorMessage.Description));
+        TempErrorMessage.Description := CopyStr(GetLastErrorText(), 1, MaxStrLen(TempErrorMessage.Description));
 #ENDIF 
         TempErrorMessage.Insert();
     end;
