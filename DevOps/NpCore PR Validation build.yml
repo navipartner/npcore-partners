@@ -72,5 +72,7 @@ stages:
       objectCaption: 'NP Retail'
     runTests: true
     testApps:
-      - 'Performance Toolkit'
-      - 'Test'
+    - 'Performance Toolkit'
+    - 'Test'
+    outputLogExcludeFilters:
+    - (?=^[\w\W]*(AL0432):[\w\W]*)(?!^[\w\W]*AL0432:[\w\W]*(Tag:[\w\W]*))
