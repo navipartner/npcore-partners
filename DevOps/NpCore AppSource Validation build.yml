@@ -32,3 +32,5 @@ stages:
       objectId: 6014400
       objectName: 'NPR NP RETAIL'
       objectCaption: 'NP Retail'
+    outputLogExcludeFilters:
+    - (?=^[\w\W]*(AL0432):[\w\W]*)(?!^[\w\W]*AL0432:[\w\W]*(Tag:[\w\W]*))
