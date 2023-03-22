@@ -457,7 +457,6 @@
         Assert: Codeunit "Assert";
         VoucherAmount: Decimal;
         TransactionEnded: Boolean;
-        Text005: Label 'Invalid Reference No. %1';
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -880,11 +879,8 @@
     // [SCENARIO] Issue Voucher In POS Transaction, set Max Voucher Count on Voucher Type and exceed it
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         Assert: Codeunit "Assert";
         VoucherAmount: Decimal;
-        TransactionEnded: Boolean;
         MaxCountErr: Label '%1 for %2 %3 is exceeded.';
     begin
         Initialize();
@@ -910,12 +906,8 @@
     // [SCENARIO] Set fixed amount on Voucher Type, create Voucher with random amount and created Voucher should have fixed amount
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         Assert: Codeunit "Assert";
         FixedVoucherAmount, RandomVoucherAmount : Decimal;
-        TransactionEnded: Boolean;
-        MaxCountErr: Label '%1 for %2 %3 is exceeded.';
     begin
         exit; //TODO: [Test result: FAIL] Fixing in progress
         Initialize();
@@ -937,14 +929,9 @@
     // [SCENARIO] Set fixed amount on Voucher Type, create Voucher with random amount and created Voucher should have fixed amount
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         Assert: Codeunit "Assert";
         VoucherAmount: Decimal;
-        TransactionEnded: Boolean;
-        MaxCountErr: Label '%1 for %2 %3 is exceeded.';
         StartingDateTime, EndingDateTime : DateTime;
-        LibraryRandom: Codeunit "Library - Random";
     begin
         Initialize();
         VoucherAmount := GetRandomVoucherAmount(_VoucherTypePartial."Payment Type");
@@ -995,6 +982,28 @@
         SetStoreGroupPerVoucherType('');//cleanup
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TestDisabledOnWeb()
+    // [SCENARIO] Create voucher, disable it for web, API function should return error
+    var
+        Voucher, NpRvVoucher : Record "NPR NpRv Voucher";
+        ExtVoucherWS: codeunit "NPR NpRv Ext. Voucher WS";
+        Assert: Codeunit "Assert";
+        DisabledErr: Label 'Voucher with reference number %1 is disabled for web service.';
+    begin
+        Initialize();
+
+        // Create voucher with any amount
+        CreateVoucherInPOSTransaction(NpRvVoucher, 100, _VoucherTypePartial.Code);
+        // Check
+        ExtVoucherWS.FindVoucher(_VoucherTypePartial.Code, NpRvVoucher."Reference No.", Voucher);
+        Assert.AreEqual(Voucher."No.", NpRvVoucher."No.", 'Find Voucher before disabling for web not according to test scenario.');
+        NpRvVoucher."Disabled for Web Service" := true;
+        NpRvVoucher.Modify();
+        asserterror ExtVoucherWS.FindVoucher(_VoucherTypePartial.Code, NpRvVoucher."Reference No.", Voucher);
+        Assert.ExpectedError(StrSubstNo(DisabledErr, NpRvVoucher."Reference No."));
+    end;
 
 
 
@@ -1166,7 +1175,6 @@
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
         POSActionCheckVoucherB: codeunit "NPR POS Action:Check Voucher B";
-        Assert: Codeunit "Assert";
         VoucherAmount: Decimal;
     begin
         // [SCENARIO] Scanned Reference No. open Voucher Card Page
