@@ -1,6 +1,6 @@
 ﻿page 6151558 "NPR NpXml Template Triggers"
 {
-    Extensible = False;
+    Extensible = false;
     AutoSplitKey = true;
     Caption = 'Xml Template Triggers';
     DelayedInsert = true;
@@ -66,14 +66,12 @@
                 field("Generic Parent Codeunit ID"; Rec."Generic Parent Codeunit ID")
                 {
 
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Generic Parent Codeunit ID field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Generic Parent Codeunit Name"; Rec."Generic Parent Codeunit Name")
                 {
 
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Generic Parent Codeunit Name field';
                     ApplicationArea = NPRRetail;
                 }
