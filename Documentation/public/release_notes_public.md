@@ -13,11 +13,15 @@ For more information and operating instructions, refer to the following articles
 - [Meal, eco, and consumption vouchers](retail/posunit/explanation/belgian_voucher.md)
 - [Limit payment types to specific items](retail/posunit/howto/belgian_vouchers.md)
 
+> [!Video https://share.synthesia.io/1bfaa867-e9d0-41b8-b660-9af1b51026c0]
+
 ### Bin change from the POS
 
 With the new release, if there are multiple bins in a single store location, you can choose which bin the item is taken from during the POS sale. This is done with the new **CHANGE_BIN** POS action that can be added to the POS menu as a button.
 
 For more information and operating instructions, refer to the article on [Changing the bin from a POS sale](retail/posunit/howto/change_bin_pos.md).
+
+> [!Video https://share.synthesia.io/20e98ccd-0283-4092-b0ca-627b84fcdbc2]
 
 ### Responsibility center change from the POS
 
@@ -25,11 +29,23 @@ You can now change the selected [responsibility center](https://learn.microsoft.
 
 For more information and operating instructions, refer to the article on [Changing the Responsibility Center from a POS sale](retail/posunit/howto/change_responsibility_center.md).
 
+> [!Video https://share.synthesia.io/5b7d04a9-c202-49fe-90bf-c2dc8da3ecf7]
+
 ### Sending email receipts from the POS
 
 You can now send emails with purchase receipts to customers from the POS. This can be done with the new **SEND_RECEIPT** POS action that can be added to the POS menu as a button. 
 
 For more information and operating instructions, refer to the article on [Sending receipt to customers on purchase](retail/posunit/howto/send_receipt_pos.md).
+
+> [!Video https://share.synthesia.io/7e37de5d-ab4e-4217-9e46-dafee10ccabb]
+
+### Display 2 control
+
+You can now get the customer's signature on the second display upon returning of items, and enclose that with the invoice for that transaction.
+
+For more information and operating instruction refer to the article on [Display 2 Control setup].
+
+> [!Video https://share.synthesia.io/bcb78cc7-925f-4182-bfdb-79fa15061b2e]
 
 ## Version 18.0 (January 28th 2023)
 
@@ -37,7 +53,7 @@ For more information and operating instructions, refer to the article on [Sendin
 
 You can now take photos of products and other items (like documents) directly from the POS. Among other things, this feature significantly improves the return process, allowing cashiers to capture the state of items at the moment of their return, and record the transaction receipts.
 
-For more information and operating instructions, refer to the article on the [Take Photo on POS](retail/posunit/howto/take_photo_pos.md) feature.
+For more information and operating instructions, refer to the article on [returning items with the help of the second POS screen](retail/posunit/howto/take_photo_pos.md).
 
 > [!Video https://share.synthesia.io/d67f2a75-b897-46d8-80e1-50a83e9603b1]
 
