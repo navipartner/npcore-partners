@@ -84,6 +84,7 @@
                 "VAT Bus. Posting Group" := POSPostingProfile."VAT Bus. Posting Group";
 
                 if "Customer No." <> '' then begin
+                    "Contact No." := '';
                     Cust.Get("Customer No.");
                     Name := Cust.Name;
                     Address := Cust.Address;
