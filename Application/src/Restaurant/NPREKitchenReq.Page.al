@@ -11,7 +11,6 @@
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -22,80 +21,67 @@
                 IndentationColumn = 0;
                 field("Request No."; Rec."Request No.")
                 {
-
                     ToolTip = 'Specifies the value of the Request No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Order ID"; Rec."Order ID")
                 {
-
                     ToolTip = 'Specifies the value of the Order ID field';
                     ApplicationArea = NPRRetail;
                 }
-                field(Type; Rec.Type)
+                field("Line Type"; Rec."Line Type")
                 {
-
                     ToolTip = 'Specifies the value of the Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-
                     ToolTip = 'Specifies the value of the No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-
                     ToolTip = 'Specifies the value of the Variant Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-
                     ToolTip = 'Specifies the value of the Quantity field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
-
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Qty. Changed"; Rec."Qty. Changed")
                 {
-
                     BlankZero = true;
                     ToolTip = 'Specifies the value of the Qty. Changed field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Serving Step"; Rec."Serving Step")
                 {
-
                     ToolTip = 'Specifies the value of the Serving Step field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Created Date-Time"; Rec."Created Date-Time")
                 {
-
                     ToolTip = 'Specifies the value of the Created Date-Time field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Serving Requested Date-Time"; Rec."Serving Requested Date-Time")
                 {
-
                     ToolTip = 'Specifies the value of the Serving Requested Date-Time field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Line Status"; Rec."Line Status")
                 {
-
                     ToolTip = 'Specifies the value of the Line Status field';
                     ApplicationArea = NPRRetail;
                 }
@@ -114,21 +100,18 @@
                 }
                 field("No. of Kitchen Stations"; Rec."No. of Kitchen Stations")
                 {
-
                     Visible = IsExpediteMode;
                     ToolTip = 'Specifies the value of the No. of Kitchen Stations field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Restaurant Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(SeatingCode; Rec.SeatingCode())
                 {
-
                     Caption = 'Seating Code';
                     ToolTip = 'Specifies the value of the Seating Code field';
                     ApplicationArea = NPRRetail;
@@ -142,7 +125,6 @@
                               "Kitchen Station" = field("Kitchen Station Filter");
                 Visible = IsExpediteMode;
                 ApplicationArea = NPRRetail;
-
             }
             usercontrol(TimerControl; "NPR TimerControl")
             {
@@ -180,7 +162,6 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = IsExpediteMode;
-
                     ToolTip = 'Executes the Set Served action';
                     ApplicationArea = NPRRetail;
 
@@ -202,7 +183,6 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
-
                     ToolTip = 'Executes the Start Production action';
                     ApplicationArea = NPRRetail;
 
@@ -220,7 +200,6 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
-
                     ToolTip = 'Executes the End Production action';
                     ApplicationArea = NPRRetail;
 
@@ -242,7 +221,6 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
-
                     ToolTip = 'Executes the Accept Qty. Change action';
                     ApplicationArea = NPRRetail;
 
@@ -264,7 +242,6 @@
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
-
                     ToolTip = 'Executes the Show/Hide Finished action';
                     ApplicationArea = NPRRetail;
 
@@ -289,7 +266,6 @@
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Visible = IsExpediteMode;
-
                     ToolTip = 'Executes the Show/Hide Served action';
                     ApplicationArea = NPRRetail;
 
@@ -334,9 +310,9 @@
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
         KitchenStationAction: Option "Accept Qty. Change","Start Production","End Production";
         ViewMode: Option Expedite,"Kitchen Station";
-        StationNotFound: Label 'System was not able to identify kitchen station to apply the action to.';
         IsExpediteMode: Boolean;
         TimerStarted: Boolean;
+        StationNotFound: Label 'System was not able to identify kitchen station to apply the action to.';
         ViewModeListLbl: Label 'Expedite View,Kitchen Station View';
 
     local procedure GetPageCaption(): Text

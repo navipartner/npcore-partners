@@ -10,14 +10,14 @@ codeunit 6151558 "NPR UPG Types"
         UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Types', 'OnUpgradePerCompany');
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Types")) then begin
-            LogMessageStopwatch.LogFinish();
-            exit;
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Types")) then begin
+            UpdateTypes();
+            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Types"));
         end;
-
-        UpdateTypes();
-
-        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Types"));
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Types", 'UpgradeKitcheRequests')) then begin
+            UpgradeKitcheRequests();
+            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Types", 'UpgradeKitcheRequests'));
+        end;
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -153,7 +153,7 @@ codeunit 6151558 "NPR UPG Types"
                     begin
                         POSSavedSaleLine."Line Type" := POSSavedSaleLine."Line Type"::"Item Category";
                         POSSavedSaleLine.Modify();
-                    end;                                        
+                    end;
                 POSSavedSaleLine.Type::Payment:
                     begin
                         POSSavedSaleLine."Line Type" := POSSavedSaleLine."Line Type"::"POS Payment";
@@ -201,13 +201,31 @@ codeunit 6151558 "NPR UPG Types"
                     begin
                         WaiterPadLine."Line Type" := WaiterPadLine."Line Type"::"Item Category";
                         WaiterPadLine.Modify();
-                    end;                                        
+                    end;
                 WaiterPadLine.Type::Payment:
                     begin
                         WaiterPadLine."Line Type" := WaiterPadLine."Line Type"::"POS Payment";
                         WaiterPadLine.Modify();
                     end;
             end;
-        until WaiterPadLine.Next() = 0;        
-    end;    
+        until WaiterPadLine.Next() = 0;
+    end;
+
+    local procedure UpgradeKitcheRequests()
+    var
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+    begin
+        if KitchenRequest.IsEmpty() then
+            exit;
+        KitchenRequest.FindSet(true);
+        repeat
+            case KitchenRequest.Type of
+                KitchenRequest.Type::Item:
+                    KitchenRequest."Line Type" := KitchenRequest."Line Type"::Item;
+                KitchenRequest.Type::Comment:
+                    KitchenRequest."Line Type" := KitchenRequest."Line Type"::Comment;
+            end;
+            KitchenRequest.Modify();
+        until KitchenRequest.Next() = 0;
+    end;
 }
