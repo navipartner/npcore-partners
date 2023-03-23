@@ -42,7 +42,7 @@ codeunit 6150638 "NPR HL Integration Events Mgt."
                     Member.Blocked := true;
                     Member."Block Reason" := Member."Block Reason"::USER_REQUEST;
                     Member."Blocked At" := CurrentDateTime();
-                    Member."Blocked By" := UserId();
+                    Member."Blocked By" := CopyStr(UserId(), 1, MaxStrLen(Member."Blocked By"));
                     Member.Modify();
                     Member.Validate(Blocked);
                 end;
