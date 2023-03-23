@@ -1,9 +1,6 @@
 codeunit 6150866 "NPR POS Action: Contact Select" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Not used';
-
 
     local procedure ActionCode(): Code[20]
     begin

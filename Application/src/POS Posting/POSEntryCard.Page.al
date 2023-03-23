@@ -109,6 +109,11 @@
                     ToolTip = 'Specifies the value of the Customer No. field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Contact No."; Rec."Contact No.")
+                {
+                    ToolTip = 'Specifies the value of the Contact No. field';
+                    ApplicationArea = NPRRetail;
+                }
                 field(LastOpenSalesDocumentNo; LastOpenSalesDocumentNo)
                 {
                     Caption = 'Last Open Sales Doc.';
