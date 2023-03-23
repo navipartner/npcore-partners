@@ -186,6 +186,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
     begin
         DimensionValue.FilterGroup(2);
         DimensionValue.SetRange("Dimension Code", DimCode);
+        DimensionValue.SetRange(Blocked, false);
         DimensionValue.FilterGroup(0);
         if DimValueCode <> '' then begin
             DimensionValue."Dimension Code" := DimCode;
