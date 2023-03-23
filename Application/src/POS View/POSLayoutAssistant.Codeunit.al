@@ -200,7 +200,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
             'POSLayout_SelectPaymentMethod':
                 begin
                     if xSelectedEntityCode <> '' then begin
-                        POSPaymentMethod.Code := xSelectedEntityCode;
+                        POSPaymentMethod.Code := CopyStr(xSelectedEntityCode, 1, MaxStrLen(POSPaymentMethod.Code));
                         if POSPaymentMethod.Find('=><') then
                             POSPaymentMethodList.SetRecord(POSPaymentMethod);
                     end;
