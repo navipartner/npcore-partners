@@ -93,7 +93,7 @@ page 6150624 "NPR POS Dimension Value"
             CurrPage.Update(false);
             exit;
         end;
-
+        DimValue.SetRange(Blocked, false);
         SearchDim(_SearchBox, DimValue);
 
         Rec.Copy(DimValue);
