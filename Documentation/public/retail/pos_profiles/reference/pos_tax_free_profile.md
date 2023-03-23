@@ -1,5 +1,9 @@
 # POS tax-free profile (reference guide)
 
+If a shop is tax-free, all sales performed in it are exempt from the payment of certain taxes/duties. In the tax-free profile, it's necessary to set a handler for the Global Blue or the Premier Tax Free interface. The POS Tax Free Profile is used for setting up the tax-free integration when POS sales are performed. When established, it ensures that certain types of goods aren't taxed. 
+
+Global Blue and Premier are both companies that provide tax-free shipping services. Their IC2 solution is available on POS terminals, as well as on other channels. It's possible to set up [Global Blue Tax Free](../../postaxfree/howto/globalblue.md) and Premier Tax Free services in NP Retail.
+
 The following tax-free parameters are linked to each POS unit, and can be configured to suit your business needs:
 
 | Field Name      | Description |
