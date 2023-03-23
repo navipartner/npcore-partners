@@ -111,6 +111,12 @@
                     ApplicationArea = NPRRetail;
                     Visible = not _IsSimpleView;
                 }
+                field("Contact No."; Rec."Contact No.")
+                {
+                    ToolTip = 'Specifies the contact account number that the entry is linked to.';
+                    ApplicationArea = NPRRetail;
+                    Visible = not _IsSimpleView;
+                }
                 field(LastOpenSalesDocumentNo; LastOpenSalesDocumentNo)
                 {
                     Caption = 'Last Open Sales Doc.';
