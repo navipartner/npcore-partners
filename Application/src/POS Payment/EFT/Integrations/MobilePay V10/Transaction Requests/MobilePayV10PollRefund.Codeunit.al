@@ -89,11 +89,13 @@
                 paymentResult := paymentResult::RejectedByMobilePayDueToAgeRestrictions;
         end;
 
+#pragma warning disable AA0139
         if jsonResponse.SelectToken('customerToken', jsonToken) then begin
             eftTrxRequest."External Customer ID" := jsonToken.AsValue().AsText();
             eftTrxRequest."External Customer ID Provider" := 'storebox';
             eftTrxRequest.Modify();
         end;
+#pragma warning restore AA0139
 
         if paymentResult.AsInteger() <> eftTrxRequest."Result Code" then begin
             eftTrxRequest."Result Code" := paymentResult.AsInteger();
