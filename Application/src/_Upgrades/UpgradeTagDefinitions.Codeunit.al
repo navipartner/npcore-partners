@@ -86,6 +86,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG MPOS QR Code"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG DE Audit Setup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Types"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Types", 'UpgradeKitcheRequests'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG PaymentV2"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR TM Calendar Upgrade"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Login"));
@@ -306,7 +307,12 @@
             Codeunit::"NPR UPG DE Audit Setup":
                 Exit('RemoveDEFiskalyPOSWorkflowStep');
             Codeunit::"NPR UPG Types":
-                Exit('NPRUPGTypes-5b2bdcc7-e8b0-4099-8581-aeef6f231f1c');
+                case UpgradeStep of
+                    '':
+                        Exit('NPRUPGTypes-5b2bdcc7-e8b0-4099-8581-aeef6f231f1c');
+                    'UpgradeKitcheRequests':
+                        Exit('UpgradeKitcheRequests_20230323');
+                end;
             Codeunit::"NPR Job Queue Upgrade":
                 Exit('NPRUpgradePriceLogTaskQue');
             Codeunit::"NPR UPG PaymentV2":
