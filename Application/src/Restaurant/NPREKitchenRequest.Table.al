@@ -79,10 +79,19 @@
             InitValue = Item;
             OptionCaption = ',Item,,,,,,,,Comment';
             OptionMembers = ,Item,,,,,,,,Comment;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use Line Type';
+        }
+        field(101; "Line Type"; Enum "NPR POS Sale Line Type")
+        {
+            Caption = 'Type';
+            DataClassification = CustomerContent;
+            InitValue = Item;
+            ValuesAllowed = Item, Comment;
 
             trigger OnValidate()
             begin
-                if Type <> xRec.Type then begin
+                if "Line Type" <> xRec."Line Type" then begin
                     TestChangesAllowed();
                     RevertToNewLineState();
                 end;
@@ -92,7 +101,7 @@
         {
             Caption = 'No.';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST(Item)) Item;
+            TableRelation = IF ("Line Type" = CONST(Item)) Item;
 
             trigger OnValidate()
             begin
@@ -104,8 +113,8 @@
                         exit;
                 end;
 
-                case Type of
-                    Type::Item:
+                case "Line Type" of
+                    "Line Type"::Item:
                         begin
                             GetItem();
                             Item.TestField(Blocked, false);
@@ -120,7 +129,7 @@
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."));
+            TableRelation = if ("Line Type" = const(Item)) "Item Variant".Code where("Item No." = field("No."));
         }
         field(120; Description; Text[100])
         {
@@ -139,15 +148,15 @@
         {
             Caption = 'Unit of Measure Code';
             DataClassification = CustomerContent;
-            TableRelation = if (Type = const(Item),
+            TableRelation = if ("Line Type" = const(Item),
                                 "No." = filter(<> '')) "Item Unit of Measure".Code where("Item No." = field("No."));
 
             trigger OnValidate()
             var
                 UOMMgt: Codeunit "Unit of Measure Management";
             begin
-                case Type of
-                    Type::Item:
+                case "Line Type" of
+                    "Line Type"::Item:
                         begin
                             GetItem();
                             "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
@@ -261,12 +270,12 @@
         KitchenOrderLine := Rec;
         Init();
         "Restaurant Code" := KitchenOrderLine."Restaurant Code";
-        Type := KitchenOrderLine.Type;
+        "Line Type" := KitchenOrderLine."Line Type";
     end;
 
     local procedure GetItem()
     begin
-        TestField(Type, Type::Item);
+        TestField("Line Type", "Line Type"::Item);
         TestField("No.");
         if "No." <> Item."No." then
             Item.Get("No.");
@@ -286,7 +295,7 @@
     begin
         Init();
         "Request No." := 0;
-        Type := WaiterPadLine."Line Type";
+        "Line Type" := WaiterPadLine."Line Type";
         "No." := WaiterPadLine."No.";
         "Variant Code" := WaiterPadLine."Variant Code";
         Description := WaiterPadLine.Description;
