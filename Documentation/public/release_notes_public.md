@@ -39,11 +39,11 @@ For more information and operating instructions, refer to the article on [Sendin
 
 > [!Video https://share.synthesia.io/7e37de5d-ab4e-4217-9e46-dafee10ccabb]
 
-### Display 2 control
+### Second display control
 
 You can now get the customer's signature on the second display upon returning of items, and enclose that with the invoice for that transaction.
 
-For more information and operating instruction refer to the article on [Display 2 Control setup].
+For more information and operating instruction refer to the article on [returning items with the help of the second POS screen](retail/posunit/howto/take_photo_pos.md).
 
 > [!Video https://share.synthesia.io/bcb78cc7-925f-4182-bfdb-79fa15061b2e]
 
@@ -53,7 +53,7 @@ For more information and operating instruction refer to the article on [Display 
 
 You can now take photos of products and other items (like documents) directly from the POS. Among other things, this feature significantly improves the return process, allowing cashiers to capture the state of items at the moment of their return, and record the transaction receipts.
 
-For more information and operating instructions, refer to the article on [returning items with the help of the second POS screen](retail/posunit/howto/take_photo_pos.md).
+For more information and operating instructions, refer to the article on the [Take Photo](retail/posunit/howto/take_photo_pos.md) feature.
 
 > [!Video https://share.synthesia.io/d67f2a75-b897-46d8-80e1-50a83e9603b1]
 
