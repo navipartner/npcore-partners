@@ -31,16 +31,17 @@ codeunit 6059885 "NPR POS Display Profile Upg."
             repeat
                 if (DisplayProfile.Get(POSUnit."No.") or
                 ((POSUnit."POS Display Profile" <> '') and
-                DisplayProfile.Get(POSUnit."POS Display Profile"))) then begin
-                    UnitDisplay."Media Downloaded" := DisplayProfile."Media Downloaded";
-                    UnitDisplay."Screen No." := DisplayProfile."Screen No.";
-                    UnitDisplay.POSUnit := POSUnit."No.";
-                    UnitDisplay.Insert();
-                    if (POSUnit."POS Display Profile" = '') then begin
-                        POSUnit."POS Display Profile" := DisplayProfile."Register No.";
-                        POSUnit.Modify();
+                DisplayProfile.Get(POSUnit."POS Display Profile"))) then
+                    if not UnitDisplay.Get(POSUnit."No.") then begin
+                        UnitDisplay."Media Downloaded" := DisplayProfile."Media Downloaded";
+                        UnitDisplay."Screen No." := DisplayProfile."Screen No.";
+                        UnitDisplay.POSUnit := POSUnit."No.";
+                        UnitDisplay.Insert();
+                        if (POSUnit."POS Display Profile" = '') then begin
+                            POSUnit."POS Display Profile" := DisplayProfile."Register No.";
+                            POSUnit.Modify();
+                        end;
                     end;
-                end;
             until (POSUnit.Next() = 0);
         end;
         UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR POS Display Profile Upg."));

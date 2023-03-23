@@ -163,9 +163,11 @@
     begin
         if SalesPriceMaintGroups.FindSet() then
             repeat
-                SalesPriceMaintGroups2.Init();
-                SalesPriceMaintGroups2.TransferFields(SalesPriceMaintGroups);
-                SalesPriceMaintGroups2.Insert();
+                if not SalesPriceMaintGroups2.Get(SalesPriceMaintGroups.Id, SalesPriceMaintGroups."Item Group") then begin
+                    SalesPriceMaintGroups2.Init();
+                    SalesPriceMaintGroups2.TransferFields(SalesPriceMaintGroups);
+                    SalesPriceMaintGroups2.Insert();
+                end;
             until SalesPriceMaintGroups.Next() = 0;
     end;
 

@@ -54,18 +54,19 @@
                 repeat
                     RetailVoucherType.SetRange("Account No.", Register."Gift Voucher Account");
                     RetailVoucherType.SetRange("Payment Type", GiftVoucher."Payment Type No.");
-                    if not RetailVoucherType.FindFirst() then begin
-                        RetailVoucherType.Reset();
-                        RetailVoucherTypeCode := IncStr(RetailVoucherTypeCode);
-                        RetailVoucherType.Code := RetailVoucherTypeCode;
-                        RetailVoucherType.Init();
-                        RetailVoucherType."Account No." := Register."Gift Voucher Account";
+                    if not RetailVoucherType.FindFirst() then
+                        if not RetailVoucherType.Get(RetailVoucherTypeCode) then begin
+                            RetailVoucherType.Reset();
+                            RetailVoucherTypeCode := IncStr(RetailVoucherTypeCode);
+                            RetailVoucherType.Code := RetailVoucherTypeCode;
+                            RetailVoucherType.Init();
+                            RetailVoucherType."Account No." := Register."Gift Voucher Account";
 #pragma warning disable AA0139
-                        RetailVoucherType."Payment Type" := GiftVoucher."Payment Type No.";
+                            RetailVoucherType."Payment Type" := GiftVoucher."Payment Type No.";
 #pragma warning restore
-                        RetailVoucherType.Description := CopyStr(RetailVoucherTypeDescLbl, 1, MaxStrLen(RetailVoucherType.Description));
-                        RetailVoucherType.Insert();
-                    end;
+                            RetailVoucherType.Description := CopyStr(RetailVoucherTypeDescLbl, 1, MaxStrLen(RetailVoucherType.Description));
+                            RetailVoucherType.Insert();
+                        end;
                     RetailVoucher."No." := GiftVoucher."No.";
                     if not RetailVoucher.Find() then begin
                         RetailVoucher.Init();

@@ -35,7 +35,8 @@
         ItemReference.SetRange("Reference Type", 4);
         if ItemReference.FindSet(true, true) then
             repeat
-                ItemReference.Rename(ItemReference."Item No.", ItemReference."Variant Code", ItemReference."Unit of Measure", ItemReference."Reference Type"::"NPR Retail Serial No.", ItemReference."Reference Type No.", ItemReference."Reference No.");
+                if not ItemReference.Get(ItemReference."Item No.", ItemReference."Variant Code", ItemReference."Unit of Measure", ItemReference."Reference Type"::"NPR Retail Serial No.", ItemReference."Reference Type No.", ItemReference."Reference No.") then
+                    ItemReference.Rename(ItemReference."Item No.", ItemReference."Variant Code", ItemReference."Unit of Measure", ItemReference."Reference Type"::"NPR Retail Serial No.", ItemReference."Reference Type No.", ItemReference."Reference No.");
             until ItemReference.Next() = 0;
     end;
 }

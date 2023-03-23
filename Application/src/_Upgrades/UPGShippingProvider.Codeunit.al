@@ -29,17 +29,20 @@ codeunit 6059829 "NPR Upgrade Shipping Provider"
             exit;
         end;
 
-        if PacsoftSetup.Get() then begin
-            ShippingProviderSetup.Init();
-            ShippingProviderSetup.TransferFields(PacsoftSetup);
-            ShippingProviderSetup.Insert();
-        end;
+        if PacsoftSetup.Get() then
+            if not ShippingProviderSetup.Get(PacsoftSetup."Primary Key") then begin
+                ShippingProviderSetup.Init();
+                ShippingProviderSetup.TransferFields(PacsoftSetup);
+                ShippingProviderSetup.Insert();
+            end;
 
         if PacsoftshipmentDocuments.FindSet() then
             repeat
-                ShipmentProviderDocs.Init();
-                ShipmentProviderDocs.TransferFields(PacsoftshipmentDocuments);
-                ShipmentProviderDocs.Insert();
+                if not ShipmentProviderDocs.Get(PacsoftshipmentDocuments."Entry No.") then begin
+                    ShipmentProviderDocs.Init();
+                    ShipmentProviderDocs.TransferFields(PacsoftshipmentDocuments);
+                    ShipmentProviderDocs.Insert();
+                end;
             until PacsoftshipmentDocuments.Next() = 0;
 
         if not ShippingProviderSetup.Get() then begin
@@ -134,8 +137,10 @@ codeunit 6059829 "NPR Upgrade Shipping Provider"
         end;
         if ServicesCombination.FindSet() then
             repeat
-                ShippingProviderservices.TransferFields(ServicesCombination);
-                ShippingProviderservices.Insert();
+                if not ShippingProviderservices.Get(ServicesCombination."Shipping Agent", ServicesCombination."Shipping Service", ServicesCombination."Service Code") then begin
+                    ShippingProviderservices.TransferFields(ServicesCombination);
+                    ShippingProviderservices.Insert();
+                end;
             until ServicesCombination.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider", 'NPRPackageServices'));
