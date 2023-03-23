@@ -1,6 +1,11 @@
 # Set up RFID functionalities in Business Central
 
-RFID tags are unique scannable identifiers of items. They consist of printable chips that are generated on the basis of numerical data you provide in the **RFID Setup** page. The RFID module is based on the connection between a scanner and the NP RFID app. 
+RFID tags are unique scannable identifiers of items. They consist of printable chips that are generated on the basis of numerical data provided in the **RFID Setup** page. 
+
+The NP RFID functionalities can be grouped into two segments:
+
+- NP WMS extension installed in the Business Central database
+- NP RFID apps installed on the scanner
 
 To set up the RFID functionalities, follow the provided steps: 
 
