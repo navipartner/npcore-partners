@@ -115,7 +115,9 @@ codeunit 6150661 "NPR NPRE POSAction: Print Wa." implements "NPR IPOS Workflow"
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
         JSON.SetScopeRoot();
+#pragma warning disable AA0139         
         WaiterPadNo := JSON.GetString('waiterPadNo');
+#pragma warning restore
         NPREWaiterPad.Get(WaiterPadNo);
         HospitalityPrint.PrintWaiterPadPreReceiptPressed(NPREWaiterPad);
     end;
