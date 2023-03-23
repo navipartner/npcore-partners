@@ -10,7 +10,7 @@ To learn more about the counting process, refer to the article on [performing th
 
 ## Shipping and Receiving (SHIP)
 
-The **SHIP** section is used for recording the item shipping and receiving operations. Every time items are shipped or received, you can record the process with the app, and then scan the shipped/received items to check if everything is in order. 
+The **SHIP** section is used for recording the shipping and receiving operations. Every time items are shipped or received, you can record the process with the app, and then scan the shipped/received items to check if everything is in order. 
 
 A prerequisite for recording these processes is to create the accompanying documents in Business Central:
 
@@ -21,7 +21,7 @@ A prerequisite for recording these processes is to create the accompanying docum
 After the necessary documents have been created, you can initiate the shipping/receiving process, count the items that are to be shipped, and finalize the process. 
 
  > [!Note]
- > The shipping/receiving contents are usually stored in boxes, and then in areas separate from the warehouse, so that no additional RFID tags are picked up during the scan.
+ > The shipping/receiving contents are usually stored in boxes, and it's recommended to place them in areas separate from the warehouse, so that no additional RFID tags are picked up during the scan.
 
 When the process is finalized, you can see the results in the **RFID Documents** section in Business Central. A document is automatically generated when the counting is done, and it contains the total number of scanned RFID tags. 
 

@@ -7,12 +7,12 @@ The RFID administrative sections are used to help you perform various jobs relat
 The **Counting Schedule** administrative section is used for scheduling counting jobs in shops and stockrooms. You simply need to specify the **Location Code** of the store, and the days on which the count will be performed. The **Earliest Start Date/Time** field is automatically generated according to the specified location's working hours and the selected days for the count.  
 
 > [!Note]
-> It's recommended to schedule each count if there is a large number of items that need to be scanned, as a physical journal entry needs to be created for each performed scan. Therefore, if physical inventory journal entries are created for countings on a scheduled basis, the time required for this will be reduced. 
+> It's recommended to schedule each count if there is a large number of items that need to be scanned, as a physical journal entry needs to be created each time the counting is done. Therefore, if physical inventory journal entries are created for counting on a scheduled basis, the time required for counting will be reduced. 
 
 
 ## Antenna
 
-The **Antenna** section is used for setting up the process of importing RFID documents from software other than Business Central (e.g. Magento), and for storing these imported documents. If an external scanner is used for inventory scan, any related data can be uploaded and stored in this section. 
+The **Antenna** section is used for setting up the process of importing RFID documents from software other than Business Central, and for storing these imported documents. If an external scanner is used for the RFID scan, any related data can be uploaded and stored in Business Central. 
 
 
 ## Joined Tags

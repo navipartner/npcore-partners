@@ -9,9 +9,9 @@ The NP RFID app is used for optimizing the inventory management across different
 
 ## Prerequisites for using the NP RFID features
 
-- Download and install the [WMS extension for Business Central](Install-NP-WMS.md), and perform the necessary authentication with [the QR code scan](create-qr-codes.md).
-- Download and install the [NP RFID app](../howto/install-mobile-apps.md).
-- Perform the necessary [initial setup for the RFID functionalities](rfid_setup.md). 
+- Download and install the [WMS extension for Business Central](Install-NP-WMS.md).
+- Download and install the [NP RFID app](../howto/install-mobile-apps.md) on a mobile device, and perform the necessary authentication with [the QR code scan](create-qr-codes.md).
+- Perform the [initial setup for the RFID functionalities](rfid_setup.md). 
 
 ## Counting - common steps
 
