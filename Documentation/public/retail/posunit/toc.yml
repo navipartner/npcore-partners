@@ -84,3 +84,5 @@
     href: howto/change_bin_pos.md
   - name: Send an e-mail receipt from the POS
     href: howto/send_receipt_pos.md
+  - name: Return items with the second POS screen
+    href: howto/display_2_control.md
