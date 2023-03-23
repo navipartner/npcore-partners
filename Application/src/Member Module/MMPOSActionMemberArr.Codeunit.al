@@ -21,19 +21,22 @@
         ParamSuppressWelcomeMessage_DescLbl: Label 'Specifies if welcome message will be shown';
         MemberCardPrompt: Label 'Enter Member Card Number';
         MembershipTitle: Label 'Member Arrival - Membership Management.';
+        ParamPOSWorkflow_DefaultValue, ParamDialogPrompt_DefaultValue : Text[250];
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
         // NOTE: Dont forget to update the EAN box parameter setup in OnInitEanBoxParameters()
+        ParamDialogPrompt_DefaultValue := CopyStr(SelectStr(2, ParamDialogPrompt_OptLbl), 1, 250);
         WorkflowConfig.AddOptionParameter('DialogPrompt',
                                         ParamDialogPrompt_OptLbl,
-                                        SelectStr(2, ParamDialogPrompt_OptLbl),
+                                        ParamDialogPrompt_DefaultValue,
                                         ParamDialogPrompt_CptLbl,
                                         ParamDialogPrompt_DescLbl,
                                         ParamDialogPrompt_OptCptLbl);
+        ParamPOSWorkflow_DefaultValue := CopyStr(SelectStr(1, ParamPOSWorkflow_OptLbl), 1, 250);
         WorkflowConfig.AddOptionParameter('POSWorkflow',
                                 ParamPOSWorkflow_OptLbl,
-                                SelectStr(1, ParamPOSWorkflow_OptLbl),
+                                ParamPOSWorkflow_DefaultValue,
                                 ParamPOSWorkflow_CptLbl,
                                 ParamPOSWorkflow_DescLbl,
                                 ParamPOSWorkflow_OptCptLbl);
@@ -160,7 +163,7 @@
         exit(CODEUNIT::"NPR MM POS Action: Member Arr.");
     end;
 
-    procedure ActionCode(): Text
+    procedure ActionCode(): Code[20]
     begin
         exit(Format(Enum::"NPR POS Workflow"::MM_MEMBER_ARRIVAL));
     end;

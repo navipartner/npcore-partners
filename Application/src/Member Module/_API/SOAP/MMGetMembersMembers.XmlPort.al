@@ -185,7 +185,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
                                 MinOccurs = Zero;
                                 MaxOccurs = Unbounded;
 
-                                fieldelement(ExtCardNumber; MemberCard."External Card No.")
+                                fieldelement(ExtCardNumberField; MemberCard."External Card No.")
                                 {
                                     XmlName = 'cardnumber';
                                     fieldattribute(ExtMembershipNumberCard; MemberCard."External Membership No.")
