@@ -15,7 +15,7 @@
 
     local procedure ActionVersion(): Text[30]
     begin
-        exit('1.9');
+        exit('1.10');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -42,6 +42,7 @@
             Sender.RegisterOptionParameter('Type', 'X-Report (prel),Z-Report (final),Close Workshift', 'X-Report (prel)');
             Sender.RegisterBooleanParameter('Auto-Open Cash Drawer', false);
             Sender.RegisterTextParameter('Cash Drawer No.', '');
+            Sender.RegisterBooleanParameter('SuppressParkedSalesDialog', false);
 
             Sender.RegisterWorkflow(false);
         end;
@@ -65,6 +66,7 @@
         OpenUnit: Boolean;
         CurrentView: Codeunit "NPR POS View";
         EntryNo: Integer;
+        HidePopup: Boolean;
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -75,6 +77,7 @@
 
         OpenUnit := JSON.GetBooleanParameter('Auto-Open Cash Drawer');
         CashDrawerNo := CopyStr(JSON.GetStringParameter('Cash Drawer No.'), 1, MaxStrLen(CashDrawerNo));
+        HidePopup := JSON.GetBooleanParameter('SuppressParkedSalesDialog');
 
         EndOfDayType := JSON.GetIntegerParameterOrFail('Type', ActionCode());
         if (EndOfDayType < 0) then
@@ -92,7 +95,7 @@
         case WorkflowStep of
             'ValidateRequirements':
                 begin
-                    if (not (POSEndOfDay.ValidateRequirements(POSUnit."No.", SalePOS."Sales Ticket No."))) then
+                    if (not (POSEndOfDay.ValidateRequirements(POSUnit."No.", SalePOS."Sales Ticket No.", HidePopup))) then
                         FrontEnd.ContinueAtStep('EndOfWorkflow');
                     POSCreateEntry.InsertUnitCloseBeginEntry(POSUnit."No.", SalespersonPurchaser.Code);
                 end;
@@ -333,4 +336,31 @@
         RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Balancing (POS Entry)".AsInteger());
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
+    local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        CaptionSavedSalesOption: Label 'Suppress Parked Sales Dialog';
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'SuppressParkedSalesDialog':
+                Caption := CaptionSavedSalesOption;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
+    local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
+    var
+        DescSavedSalesOption: Label 'Specifies whether to suppress parked sales dialog.';
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'SuppressParkedSalesDialog':
+                Caption := DescSavedSalesOption;
+        end;
+    end;
 }
