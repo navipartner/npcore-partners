@@ -11,25 +11,24 @@ Each POS unit can have a different set of posting rules. The first thing is to s
 6. Set the value of the **Source Code** field to **Retail**.
 7. Set the predefined posting group in the field **General Business Posting Group**. 
 8. Set the predefined VAT posting group in the **VAT Business Posting Group** field.
+9. (Optional) If the posting profile is set up for the US localization, populate the **Tax Area Code** and **Tax Liable** fields.
+10. (Optional) If the posting to the General Ledger is done by posting the period compression, populate the **POS period Register No. Series** field.
+11. (Optional) If a customer is assigned to a specific POS store, populate the **VAT Customer No.** field.
+12. Define how the POS entries will be posted in **Posting Compression**.     
 
-> [!NOTE]
-> - The **Tax Area Code** and **Tax Liable** fields are only relevant for the US localization.
-> - The **POS period Register No. Series** is defined only if the posting to the General Ledger is done by posting the period compression.
-> - The **VAT Customer No.** is used if a customer is assigned to the POS store. 
-
-9. Define how the POS entries will be posted in **Posting Compression**.   
    - **Uncompressed** – Every POS entry line is posted as-is in the General Ledger. 
    - **Per POS Entry** – The lines are compressed per an account code within that entry.        
       *Example:* If there are 3 lines for sale with the same revenue account, the entry is compressed into one line in the General Ledger entry for that transaction. 
    - **Per POS Period** – All transactions within that POS period are compressed per the same General Ledger account.       
-      *Example:* 100 sales lines are compressed as 1 line in the General Ledger.
+      *Example:* 100 sales lines are compressed as 1 line in the General Ledger.      
+      
 
-10. Specify the value of the **Journal Template Name**, which will be assigned to **General Journal Lines** in the POS Posting activity.
-11. Use the **Max POS Posting Differences** field to define the maximum allowed difference caused by the difference between currencies.
-12. Define the G/L account on which these differences will be posted in **Difference Account**.
-13. Use the **POS Sales Rounding Account** field to define the G/L account in which all sales rounding amounts will be posted.
-14. Define on which decimal spaces the rounding will be performed in the **POS Sales Amount Rounding** field.
-15. Define how the rounding will be performed in **Rounding Type**.    
+13. Specify the value of the **Journal Template Name**, which will be assigned to **General Journal Lines** in the POS Posting activity.
+14. Use the **Max POS Posting Differences** field to define the maximum allowed difference caused by the difference between currencies.
+15. Define the G/L account on which these differences will be posted in **Difference Account**.
+16. Use the **POS Sales Rounding Account** field to define the G/L account in which all sales rounding amounts will be posted.
+17. Define on which decimal spaces the rounding will be performed in the **POS Sales Amount Rounding** field.
+18. Define how the rounding will be performed in **Rounding Type**.    
     The possible settings are **Nearest**, **Up** or **Down**.
 
 ![POS_posting](../images/POS_posting.png)
