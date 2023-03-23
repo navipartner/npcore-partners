@@ -234,7 +234,7 @@ codeunit 6059990 "NPR HL Attribute Mgt."
         exit(NPRAttributeID.Get(Database::"NPR MM Member", NPRAttribute.Code));
     end;
 
-    local procedure CreateAttributeValue(AttributeCode: Code[20]; HeyLoyaltyAttributeValue: Text[50]; HeyLoyaltyAttributeValueDescription: Text; var NPRAttributeValue: Record "NPR Attribute Lookup Value")
+    local procedure CreateAttributeValue(AttributeCode: Code[20]; HeyLoyaltyAttributeValue: Text[100]; HeyLoyaltyAttributeValueDescription: Text; var NPRAttributeValue: Record "NPR Attribute Lookup Value")
     var
         HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
     begin
