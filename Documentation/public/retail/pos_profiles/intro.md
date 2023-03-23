@@ -20,3 +20,5 @@ Each one is dedicated to setting up different aspects of POS units:
 | [**POS Unit Receipt Profile**](reference/POS_unit_Receipt_profile.md) | Provide additional custom text in the receipt footer area depending on your business needs. |
 | [**POS View Profile**](reference/POS_view_profile.md) | Add a custom POS theme, and configure various visual components that will be displayed on the POS unit screen. |
 | [**POS Tax Free Profile**](reference/pos_tax_free_profile.md) | Set up the POS tax-free profile for transactions in all tax-exempt regions. |
+| [**POS Scenarios**](reference/pos_scenarios.md) | Select different workflows that dictate the behavior of the POS. |
+| [**POS Inventory Profile**](howto/pos_inventory_profile.md) | The POS Inventory Profile is used for configuring stockout warnings on the POS. |
