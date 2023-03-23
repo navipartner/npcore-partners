@@ -160,6 +160,8 @@
     local procedure FindNotInStockLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var ErrorMessage: Record "Error Message")
     var
         Msg: Text;
+        AvailableInventoryDescLbl: Label 'The available inventory for item %1 - %2 is lower than the entered quantity at this location.';
+        AvailableInventoryDesc2Lbl: Label 'The available inventory for item %1 - %2 %3 is lower than the entered quantity at this location.';
     begin
         if not TempSaleLinePOS.FindSet() then
             exit;
@@ -168,11 +170,11 @@
             TempSaleLinePOS."MR Anvendt antal" := CalcInventory(TempSaleLinePOS);
             if TempSaleLinePOS."MR Anvendt antal" < TempSaleLinePOS."Quantity (Base)" then begin
                 Clear(Msg);
-                Msg := TempSaleLinePOS."No.";
-                Msg += ' ' + TempSaleLinePOS.Description;
                 if TempSaleLinePOS."Description 2" <> '' then
-                    Msg += ' ' + TempSaleLinePOS."Description 2";
-                Msg += ': ' + Format(TempSaleLinePOS."MR Anvendt antal");
+                    Msg := StrSubstNo(AvailableInventoryDesc2Lbl, TempSaleLinePOS."No.", TempSaleLinePOS.Description, TempSaleLinePOS."Description 2")
+                else
+                    Msg := StrSubstNo(AvailableInventoryDescLbl, TempSaleLinePOS."No.", TempSaleLinePOS.Description);
+
                 ErrorMessage.LogSimpleMessage(ErrorMessage."Message Type"::Error, Msg);
             end;
         until TempSaleLinePOS.Next() = 0;
