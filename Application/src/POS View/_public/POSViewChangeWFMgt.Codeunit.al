@@ -6,7 +6,8 @@
     var
         POSSession: Codeunit "NPR POS Session";
     begin
-        POSSession.GetSession(POSSession, true);
+        if not POSSession.IsInitialized() then
+            Error(SessionNotInitializedErrorMessageLbl);
         OnAfterLogin(Rec, POSSession);
         Commit();
     end;
@@ -15,6 +16,7 @@
         Text000: Label 'When POS View is changed to Payment';
         BlockPaymentWFDescriptionLbl: Label 'Block payment if Sale contains Items with insufficient Inventory';
         Text003: Label 'When POS View is changed from Login to Sale';
+        SessionNotInitializedErrorMessageLbl: Label 'Session is not initialized.';
 
     // Discovery
 
