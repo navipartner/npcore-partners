@@ -46,9 +46,7 @@ codeunit 6150696 "NPR UPG Print Template"
                         RPTemplateLine.Validate("Processing Function Parameter", ToProcessingFunctionParameter);
                         RPTemplateLine.Modify();
 
-                        RPTemplateHeader.Get(RPTemplateLine."Template Code");
-                        if not RPTemplateHeader.Archived then
-                            RPTemplateHeader.Validate(Archived, true);
+                        ArchiveVersionIfNecessary(RPTemplateLine."Template Code");
                     end
                 end
             until RPTemplateLine.Next() = 0;
