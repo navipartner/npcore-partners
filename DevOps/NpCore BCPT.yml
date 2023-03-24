@@ -1,0 +1,71 @@
+trigger: none
+
+resources:
+  repositories:
+  - repository: scriptsRepo
+    type: git
+    name: 'NpCore/NpDevOps'
+
+stages:
+  - template: /YAML/ZAL Build Definitions/BCPT.yml@scriptsRepo
+    parameters:
+      pool:
+        name: NP Core Pipelines
+        demands: 
+        - docker
+        # Now only 2019 is available but in the future it will be every newer version.
+        # Then we will probably remove this requirement as it will alwyas TRUE.
+        - Agent.OS -equals Windows_NT
+        - Agent.OSVersion -equals 10.0.17763
+      
+      containerDefinitions:
+        - name: vLatest_CLOUD
+          alwaysRun: true
+
+      testTargets:
+        - 'prerelease_latest'
+        - 'release_latest'
+
+      appDependencies:
+        - id: 992c2309-cca4-43cb-9e41-911f482ec088
+          name: NP Retail
+          publisher: NaviPartner
+        - id: ef12bed6-ad9b-4460-b8ee-be8dc0e6fb6c
+          name: NP Retail Performance Toolkit
+          publisher: NaviPartner
+          nugetPackage: 'NaviPartner.NPRetail'
+      
+      importRapidStartFiles:
+        - 'MINIMAL-NPRWITHBCPT.rapidstart'
+      
+      runSuiteCodes:
+        - 'INITDATA'
+        - 'POS1S1'
+        - 'POS1S5'
+        - 'POS1S10'
+        - 'POS2S1'
+        - 'POS2S5'
+        - 'POS2S10'
+        - 'POS3S1'
+        - 'POS3S5'
+        - 'POS3S10'
+        - 'POS4S1'
+        - 'POS4S5'
+        - 'POS4S10'
+        - 'POS5S1'
+        - 'POS5S5'
+        - 'POS5S10'
+        - 'POS6S1'
+        - 'POS6S5'
+        - 'POS6S10'
+        - 'POS7S1'
+        - 'POS7S5'
+        - 'POS7S10'
+        - 'POS8S1'
+        - 'POS8S5'
+        - 'POS8S10'
+        - 'POS9S1'
+        - 'POS9S5'
+        - 'POS9S10'
+        - 'POS10'
+        - 'POS11'
