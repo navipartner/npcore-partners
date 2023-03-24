@@ -1,8 +1,6 @@
 ﻿codeunit 6151590 "NPR NpDc Coupon Mgt."
 {
     var
-        Text000: Label 'This action handles Scan Discount Coupon.';
-        Text001: Label 'Scan Coupon';
         Text002: Label 'Discount Coupon';
         Text003: Label 'Coupon Reference No. is too long';
         Text004: Label 'Invalid Coupon Reference No.';
@@ -401,7 +399,7 @@
         ArchiveClosedCoupon(Coupon);
     end;
 
-    local procedure PostSaleLinePOS(var SaleLinePos: Record "NPR POS Sale Line")
+    internal procedure PostSaleLinePOS(var SaleLinePos: Record "NPR POS Sale Line")
     var
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
     begin
@@ -672,58 +670,7 @@
 
     local procedure ActionCode(): Code[20]
     begin
-        exit('SCAN_COUPON');
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
-    begin
-        if not Sender.DiscoverAction(
-          ActionCode(),
-          Text000,
-          ActionVersion(),
-          Sender.Type::Generic,
-          Sender."Subscriber Instances Allowed"::Multiple) then
-            exit;
-
-        Sender.RegisterWorkflowStep('init', 'windowTitle = labels.CouponTitle;');
-        Sender.RegisterWorkflowStep('coupon_input', 'if (!param.ReferenceNo) {' +
-                                                    '  input ({caption: labels.ScanCouponPrompt, title: windowTitle, value: param.ReferenceNo}).store("CouponCode").cancel(abort);' +
-                                                    '} else {' +
-                                                    '  context.CouponCode = param.ReferenceNo;' +
-                                                    '}');
-        Sender.RegisterWorkflowStep('validate_coupon', 'respond ();');
-        Sender.RegisterWorkflow(false);
-
-        Sender.RegisterTextParameter('ReferenceNo', '');
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    begin
-        Captions.AddActionCaption(ActionCode(), 'ScanCouponPrompt', Text001);
-        Captions.AddActionCaption(ActionCode(), 'CouponTitle', Text002);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
-    local procedure OnScanCoupon("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        CouponReferenceNo: Text;
-        ReadingScanCouponErr: Label 'reading from OnScanCoupon subscriber';
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        CouponReferenceNo := JSON.GetStringOrFail('CouponCode', ReadingScanCouponErr);
-        ScanCoupon(POSSession, CouponReferenceNo);
+        exit(FORMAT("NPR POS Workflow"::SCAN_COUPON));
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnBeforeDeleteEvent', '', true, true)]
@@ -808,7 +755,6 @@
         SaleLinePOS.Description := Coupon.Description;
         SaleLinePOS.Quantity := 1;
         SaleLineOut.InsertLine(SaleLinePOS);
-        POSSession.RequestRefreshData();
 
         SaleLinePOSCoupon.Init();
         SaleLinePOSCoupon."Register No." := SaleLinePOS."Register No.";
@@ -827,7 +773,6 @@
         POSSession.GetSale(POSSale);
         POSSale.RefreshCurrent();
         SaleLineOut.SetPosition(SaleLinePOS.GetPosition(false));
-        POSSession.RequestRefreshData();
     end;
 
     #endregion Pos Functionality
@@ -928,7 +873,7 @@
     #endregion Ean Box Event Handling
     #region Generate Reference No
 
-    local procedure GetAmountPerQty(Coupon: Record "NPR NpDc Coupon"): Decimal
+    internal procedure GetAmountPerQty(Coupon: Record "NPR NpDc Coupon"): Decimal
     var
         NpDcCouponEntry: Record "NPR NpDc Coupon Entry";
     begin

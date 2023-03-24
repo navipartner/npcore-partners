@@ -1,6 +1,8 @@
-﻿codeunit 6014493 "NPR MPOS Admission API"
+codeunit 6014493 "NPR MPOS Admission API"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore.';
 
     var
         ActionDescriptionLbl: Label 'Start Admission API page for Mobile POS.';
