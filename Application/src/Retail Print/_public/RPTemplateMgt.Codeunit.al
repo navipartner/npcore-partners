@@ -41,6 +41,9 @@
     var
         RPTemplateArchive: Record "NPR RP Template Archive";
         RPTemplateSetup: Record "NPR RP Template Setup";
+        VersionList: list of [Text];
+        Version: Text;
+        VersionFilter: Text;
     begin
         if not RPTemplateSetup.Get() then begin
             RPTemplateSetup.Init();
@@ -48,9 +51,24 @@
         end;
 
         NewVersion := IncrementVersionNumber(TemplateHeader.Version);
-        if RPTemplateArchive.Get(TemplateHeader.Code, NewVersion) then begin //Assume RPTemplateArchive holds the highest version number instead.
-            RPTemplateArchive.SetCurrentKey("Archived at");
+
+        if RPTemplateArchive.Get(TemplateHeader.Code, NewVersion) then begin //Assume RPTemplateArchive holds the highest version number    
+            VersionList := NewVersion.Split(',');
+            foreach Version in VersionList do begin
+                if VersionFilter <> '' then
+                    VersionFilter += ',';
+
+                if StrPos(Version, RPTemplateSetup."Version Prefix") = 1 then
+                    VersionFilter += '*'
+                else
+                    VersionFilter += Version;
+            end;
+
+            RPTemplateArchive.SetFilter(Code, TemplateHeader.Code);
+            RPTemplateArchive.SetFilter(Version, VersionFilter);
+            RPTemplateArchive.SetCurrentKey(Version);
             RPTemplateArchive.FindLast();
+
             NewVersion := IncrementVersionNumber(RPTemplateArchive.Version);
         end;
     end;
