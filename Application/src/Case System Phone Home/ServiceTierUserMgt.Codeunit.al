@@ -33,7 +33,10 @@
 
     local procedure InitCaseSystemCallback(TempClientDiagnostic: Record "NPR Client Diagnostic v2" temporary)
     var
+        Company: Record Company;
+        NPREnvironmentInfo: Record "NPR Environment Information";
         EnvironmentInformation: Codeunit "Environment Information";
+        NPREnvironmentMgt: Codeunit "NPR Environment Mgt.";
         SessionId: Integer;
     begin
         if NavApp.IsInstalling() then
@@ -43,6 +46,16 @@
             exit;
 
         if EnvironmentInformation.IsSandbox() then
+            exit;
+
+        if Company.Get(CompanyName()) then
+            if Company."Evaluation Company" then
+                exit;
+
+        if NPREnvironmentInfo.IsEmpty then
+            exit;
+
+        if NPREnvironmentMgt.IsDemo() or NPREnvironmentMgt.IsTest() then
             exit;
 
         if StartSession(SessionId, Codeunit::"NPR Invoke CaseSystem Login", CompanyName, TempClientDiagnostic) then;
