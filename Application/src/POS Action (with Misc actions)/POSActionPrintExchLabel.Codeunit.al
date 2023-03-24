@@ -1,70 +1,41 @@
-﻿codeunit 6150788 "NPR POS Action: PrintExchLabel"
+codeunit 6150788 "NPR POS Action: PrintExchLabel" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
-        ReadingErr: Label 'reading in %1 of %2';
-
-    local procedure ActionCode(): Code[20]
-    begin
-        exit('PRINT_EXCH_LABEL');
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('2.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    var
-        ActionDescriptionLbl: Label 'This is a built-in action for printing exchange labels';
-    begin
-        if Sender.DiscoverAction20(ActionCode(), ActionDescriptionLbl, ActionVersion()) then begin
-            Sender.RegisterWorkflow20(
-                'await workflow.respond("AddPresetValuesToContext");' +
-                'if (($parameters.Setting == $parameters.Setting["Package"]) || ($parameters.Setting == $parameters.Setting["Selection"])) {' +
-                '    var result = await popup.calendarPlusLines({' +
-                '        title: $labels.title,' +
-                '        caption: $labels.calendar,' +
-                '        date: $context.defaultdate,' +
-                '        dataSource: "BUILTIN_SALELINE",' +
-                '        filter: (line) => {' +
-                '            return ((line.fields[5] == 1) && (parseFloat(line.fields[12]) > 0));' + /*Only lines of "Type" = Item & "Quantity" > 0*/
-                '        }' +
-                '    });' +
-                '} else {' +
-                '   var result = await popup.datepad({ title: $labels.title, caption: $labels.validfrom, required: true, value: $context.defaultdate });' +
-                '};' +
-                'if (result === null) { return };' +
-                'workflow.respond("PrintExchangeLabels", { UserSelection: result });'
-            );
-
-            Sender.RegisterOptionParameter('Setting', 'Single,Line Quantity,All Lines,Selection,Package', 'Single');
-            Sender.RegisterBooleanParameter('PreventNegativeQty', true);
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    var
+        ActionDescription: Label 'This is a built-in action for printing exchange labels';
+        ParamSetting_NameLbl: Label 'Setting';
+        ParamSetting_OptLbl: Label 'Single,Line Quantity,All Lines,Selection,Package', Locked = true;
+        ParamSetting_DescLbl: Label 'Defines setting for printing.';
+        ParamSetting_OptDescLbl: Label 'Single,Line Quantity,All Lines,Selection,Package';
+        ParamPreventNegativeQty_CptLbl: Label 'Prevent Negative Quantity';
+        ParamPreventNegativeQty_DescLbl: Label 'Denies negative quantity.';
         CalendarCaptionLbl: Label 'Select a valid from date and the lines to include';
         TitleLbl: Label 'Print Exchange Label';
         ValidFromLbl: Label 'Valid From Date';
     begin
-        Captions.AddActionCaption(ActionCode(), 'title', TitleLbl);
-        Captions.AddActionCaption(ActionCode(), 'validfrom', ValidFromLbl);
-        Captions.AddActionCaption(ActionCode(), 'calendar', CalendarCaptionLbl);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddOptionParameter('Setting',
+                                          ParamSetting_OptLbl,
+#pragma warning disable AA0139
+                                          SelectStr(1, ParamSetting_OptLbl),
+#pragma warning restore                                          
+                                          ParamSetting_NameLbl,
+                                          ParamSetting_DescLbl,
+                                          ParamSetting_OptDescLbl);
+        WorkflowConfig.AddBooleanParameter('PreventNegativeQty', false, ParamPreventNegativeQty_CptLbl, ParamPreventNegativeQty_DescLbl);
+        WorkflowConfig.AddLabel('title', TitleLbl);
+        WorkflowConfig.AddLabel('validfrom', ValidFromLbl);
+        WorkflowConfig.AddLabel('calendar', CalendarCaptionLbl);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
+    var
+        POSSession: Codeunit "NPR POS Session";
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-        Handled := true;
-
-        CASE WorkflowStep OF
+        CASE Step OF
             'AddPresetValuesToContext':
                 AddPresetValuesToContext(Context, POSSession);
             'PrintExchangeLabels':
@@ -72,7 +43,7 @@
         end;
     end;
 
-    local procedure AddPresetValuesToContext(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure AddPresetValuesToContext(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
     var
         POSSetup: Codeunit "NPR POS Setup";
         DefaultValidFromDate: Date;
@@ -84,7 +55,7 @@
         Context.SetContext('defaultdate', Format(DefaultValidFromDate, 0, 9));
     end;
 
-    local procedure PrintExchangeLabels(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
+    local procedure PrintExchangeLabels(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
     var
         PrintLines: Record "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -100,7 +71,8 @@
         PreventNegativeQty: Boolean;
         CannotbeNegErr: Label 'cannot be negative';
     begin
-        PreventNegativeQty := Context.GetBooleanParameter('PreventNegativeQty');
+        if not Context.GetBooleanParameter('PreventNegativeQty', PreventNegativeQty) then
+            PreventNegativeQty := false;
         if PreventNegativeQty then begin
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
@@ -109,8 +81,8 @@
         end;
 
         Context.SetScopeRoot();
-        Setting := Context.GetIntegerParameterOrFail('Setting', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
-        UserSelectionJToken := Context.GetJTokenOrFail('UserSelection', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
+        Setting := Context.GetIntegerParameter('Setting');
+        UserSelectionJToken := Context.GetJToken('UserSelection');
         case Setting of
             Setting::Single,
             Setting::"Line Quantity",
@@ -145,5 +117,13 @@
         end;
 
         ExchangeLabelMgt.PrintLabelsFromPOSWithoutPrompts(Setting, PrintLines, ValidFromDate);
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionPrintExchLabel.js###
+'let main=async({workflow:i,parameters:e,captions:t,popup:l,context:d})=>{debugger;if(await i.respond("AddPresetValuesToContext"),e.Setting==e.Setting.Package||e.Setting==e.Setting.Selection)var a=await l.calendarPlusLines({title:t.title,caption:t.calendar,date:d.defaultdate,dataSource:"BUILTIN_SALELINE",filter:n=>n.fields[5]==1&&parseFloat(n.fields[12])>0});else var a=await l.datepad({title:t.title,caption:t.validfrom,required:!0,value:d.defaultdate});a!==null&&i.respond("PrintExchangeLabels",{UserSelection:a})};'
+        )
     end;
 }
