@@ -142,6 +142,12 @@
                     ToolTip = 'Specifies the value of the Variant Description field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Location Code"; Rec."Location Code")
+                {
+
+                    ToolTip = 'Specifies the value of the Location Code field';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Location Name"; Rec."Location Name")
                 {
 
