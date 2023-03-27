@@ -1,6 +1,6 @@
 ﻿page 6151504 "NPR Nc Import List"
 {
-    Extensible = False;
+    Extensible = true;
     Caption = 'Import List';
     DelayedInsert = true;
     PageType = List;
