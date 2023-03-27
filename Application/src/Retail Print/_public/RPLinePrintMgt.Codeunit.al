@@ -23,36 +23,36 @@
     #region Programmatic Printing, instead of user configured.        
     internal procedure AddTextField(Column: Integer; Align: Integer; Text: Text)
     begin
-        UpdateField(Column, Align, 0, '', CopyStr(Text, 1, 100), false);
+        UpdateField(Column, Align, 0, '', CopyStr(Text, 1, 100), false, 0);
     end;
 
     internal procedure AddDecimalField(Column: Integer; Align: Integer; Decimal: Decimal)
     begin
         case DecimalRounding of
             DecimalRounding::"2":
-                UpdateField(Column, Align, 0, '', Format(Decimal, 0, '<Precision,2:2><Standard Format,2>'), false);
+                UpdateField(Column, Align, 0, '', Format(Decimal, 0, '<Precision,2:2><Standard Format,2>'), false, 0);
             DecimalRounding::"3":
-                UpdateField(Column, Align, 0, '', Format(Decimal, 0, '<Precision,3:3><Standard Format,2>'), false);
+                UpdateField(Column, Align, 0, '', Format(Decimal, 0, '<Precision,3:3><Standard Format,2>'), false, 0);
             DecimalRounding::"4":
-                UpdateField(Column, Align, 0, '', Format(Decimal, 0, '<Precision,4:4><Standard Format,2>'), false);
+                UpdateField(Column, Align, 0, '', Format(Decimal, 0, '<Precision,4:4><Standard Format,2>'), false, 0);
             DecimalRounding::"5":
-                UpdateField(Column, Align, 0, '', Format(Decimal, 0, '<Precision,5:5><Standard Format,2>'), false);
+                UpdateField(Column, Align, 0, '', Format(Decimal, 0, '<Precision,5:5><Standard Format,2>'), false, 0);
         end;
     end;
 
     internal procedure AddDateField(Column: Integer; Align: Integer; Date: Date)
     begin
-        UpdateField(Column, Align, 0, '', Format(Date, 0), false);
+        UpdateField(Column, Align, 0, '', Format(Date, 0), false, 0);
     end;
 
-    internal procedure AddBarcode(BarcodeType: Text[30]; BarcodeValue: Text; BarcodeWidth: Integer; HideHRI: Boolean)
+    internal procedure AddBarcode(BarcodeType: Text[30]; BarcodeValue: Text; BarcodeWidth: Integer; HideHRI: Boolean; BarcodeHeight: Integer)
     begin
-        UpdateField(1, 0, BarcodeWidth, BarcodeType, BarcodeValue, HideHRI);
+        UpdateField(1, 0, BarcodeWidth, BarcodeType, BarcodeValue, HideHRI, BarcodeHeight);
     end;
 
     internal procedure AddLine(Text: Text)
     begin
-        UpdateField(1, 0, 0, '', CopyStr(Text, 1, 100), false);
+        UpdateField(1, 0, 0, '', CopyStr(Text, 1, 100), false, 0);
         NewLine();
     end;
 
@@ -479,7 +479,7 @@
             SetUnderLine(TemplateLine.Underline);
             SetFont(TemplateLine."Type Option");
 
-            UpdateField(TemplateLine."Template Column No.", TemplateLine.Align, TemplateLine.Width, TemplateLine."Type Option", TemplateLine."Processing Value", TemplateLine."Hide HRI");
+            UpdateField(TemplateLine."Template Column No.", TemplateLine.Align, TemplateLine.Width, TemplateLine."Type Option", TemplateLine."Processing Value", TemplateLine."Hide HRI", TemplateLine.Height);
 
             if TemplateLine."Pad Char" <> '' then
                 NewLine();
@@ -586,7 +586,7 @@
             FourColumnDistribution[4] := 0.25;
     end;
 
-    local procedure UpdateField(Column: Integer; Align: Integer; Width: Integer; Font: Text[30]; Text: Text[2048]; HideHRI: Boolean)
+    local procedure UpdateField(Column: Integer; Align: Integer; Width: Integer; Font: Text[30]; Text: Text[2048]; HideHRI: Boolean; Height: Integer)
     begin
         if AutoLineBreak and (LastColumnNo >= Column) then begin
             LastColumnNo := 0;
@@ -601,6 +601,7 @@
         else
             TempBuffer.Font := Font;
         TempBuffer.Width := Width;
+        TempBuffer.Height := Height;
         TempBuffer."Pad Char" := PadChar;
         TempBuffer.Bold := CurrentBold;
         TempBuffer.Underline := CurrentUnderLine;

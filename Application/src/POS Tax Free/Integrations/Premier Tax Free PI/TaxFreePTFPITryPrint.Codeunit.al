@@ -137,9 +137,9 @@ codeunit 6060033 "NPR Tax Free PTFPI Try Print"
                     end;
                 end;
             (Font in ['CODE128']):
-                Printer.AddBarcode(Font, Value, 2, false);
+                Printer.AddBarcode(Font, Value, 2, false, 40);
             (Font in ['QR']):
-                Printer.AddBarcode(Font, Value, 6, false);
+                Printer.AddBarcode(Font, Value, 6, false, 0);
         end;
 
         if CR then
