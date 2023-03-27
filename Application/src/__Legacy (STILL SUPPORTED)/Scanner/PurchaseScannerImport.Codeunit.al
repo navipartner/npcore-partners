@@ -46,8 +46,12 @@ codeunit 6059801 "NPR Purchase Scanner Import" implements "NPR IScanner Import"
     local procedure CreateLine()
     var
         PurchaseLine: Record "Purchase Line";
+        ItemReference: Record "Item Reference";
         ScannerImportMgt: Codeunit "NPR Scanner Import Mgt.";
+        ItemNo: Code[20];
+        VariantCode: Code[10];
     begin
+        ScannerImportMgt.GetItemAndVariantCodeFromScannedCode(ItemCode, ItemNo, VariantCode);
         PurchaseLine.Init();
         PurchaseLine."Document Type" := PurchaseHeader."Document Type";
         PurchaseLine."Document No." := PurchaseHeader."No.";
@@ -55,9 +59,15 @@ codeunit 6059801 "NPR Purchase Scanner Import" implements "NPR IScanner Import"
         PurchaseLine.Insert();
 
         PurchaseLine.Type := PurchaseLine.Type::Item;
-        PurchaseLine.Validate("No.", ScannerImportMgt.GetItemNoFromScannedCode(ItemCode));
+        PurchaseLine.Validate("No.", ItemNo);
+        if VariantCode <> '' then
+            PurchaseLine.Validate("Variant Code", VariantCode);
         Evaluate(PurchaseLine.Quantity, Quantity);
         PurchaseLine.Validate(Quantity);
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+        ItemReference.SetRange("Reference No.", ItemCode);
+        if ItemReference.FindFirst() then
+            PurchaseLine."Item Reference No." := ItemReference."Reference No.";
         PurchaseLine.Modify();
 
         LineNo += 10000;
