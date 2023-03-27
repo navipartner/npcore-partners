@@ -140,6 +140,8 @@
                     ShowCaption = true;
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Displays the number of the Purchase Orders made. If you click you can drilldown to the list of Purchase Orders.';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     var
