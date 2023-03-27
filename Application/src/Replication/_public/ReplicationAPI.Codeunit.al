@@ -673,7 +673,7 @@
             'decimal':
                 begin
                     GenericDec := FRef.Value;
-                    if evaluate(GenericDec2, SourceTxt) then
+                    if evaluate(GenericDec2, SourceTxt.Replace('.', GetSystemDecimalSeparator())) then // json decimal separator is always 'point'
                         If GenericDec <> GenericDec2 then begin
                             FRef.Value(GenericDec2);
                             ValueChanged := true;
@@ -702,6 +702,16 @@
 
     end;
 
+    local procedure GetSystemDecimalSeparator(): Text
+    var
+        MyDecimal: Decimal;
+        MyDecimalAsText: Text;
+    begin
+        MyDecimal := 10000.25;
+        MyDecimalAsText := format(MyDecimal);
+        exit(format(MyDecimalAsText[7]));
+    end;
+
     procedure GetJTokenMainObjectFromContent(Content: Codeunit "Temp Blob"; var JToken: JsonToken): Boolean
     var
         InStr: InStream;
@@ -710,7 +720,7 @@
         Content.CreateInStream(InStr);
         Instr.ReadText(JsonTxt);
         if not JToken.ReadFrom(JsonTxt) then
-            Exit(false);
+            exit(false);
 
         exit(true);
     end;
