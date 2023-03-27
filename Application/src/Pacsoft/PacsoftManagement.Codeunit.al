@@ -73,50 +73,65 @@
         XMLResponce: XmlPort "NPR Pacsoft Response";
         InStr: InStream;
         URI: Text[250];
+        Filename: Text;
+        FileData: Text;
+        TypeHelper: Codeunit "Type Helper";
+        HardwareConnectorMgt: Codeunit "NPR Hardware Connector Mgt.";
+        response: JsonObject;
     begin
         ShipmentDocument.CalcFields("Request XML");
         if not ShipmentDocument."Request XML".HasValue() then
             exit;
 
-        URI := StrSubstNo(PackageProviderSetup."Send Order URI", PackageProviderSetup.Session, PackageProviderSetup.User, PackageProviderSetup.Pin);
+        if (PackageProviderSetup."Use Online Connect") and (PackageProviderSetup."Online Connect file Path" <> '') then begin
+            if (not (PackageProviderSetup."Online Connect file Path"[StrLen(PackageProviderSetup."Online Connect file Path")] = '/')) then
+                PackageProviderSetup."Online Connect file Path" += '/';
+            Filename := PackageProviderSetup."Online Connect file Path" + Format(ShipmentDocument."Entry No.") + '.xml';
+            ShipmentDocument."Request XML".CreateInStream(InStr, TextEncoding::UTF8);
+            FileData := TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.LFSeparator());
+            response := HardwareConnectorMgt.WriteTextRequest(Filename, FileData);
+        end else begin
 
-        ShipmentDocument."Request XML".CreateInStream(InStr);
-        Content.WriteFrom(InStr);
-        Content.GetHeaders(Headers);
-        Headers.Remove('Content-Type');
-        Headers.Add('Content-Type', 'text/xml; charset=utf-8');
+            URI := StrSubstNo(PackageProviderSetup."Send Order URI", PackageProviderSetup.Session, PackageProviderSetup.User, PackageProviderSetup.Pin);
 
-        RequestMessage.Content(Content);
-        RequestMessage.SetRequestUri(URI);
-        RequestMessage.Method := 'POST';
+            ShipmentDocument."Request XML".CreateInStream(InStr);
+            Content.WriteFrom(InStr);
+            Content.GetHeaders(Headers);
+            Headers.Remove('Content-Type');
+            Headers.Add('Content-Type', 'text/xml; charset=utf-8');
 
-        Client.Timeout(120000);
-        Client.Send(RequestMessage, ResponseMessage);
+            RequestMessage.Content(Content);
+            RequestMessage.SetRequestUri(URI);
+            RequestMessage.Method := 'POST';
 
-        if not ResponseMessage.IsSuccessStatusCode() then
-            Error(ResponseMessage.ReasonPhrase());
+            Client.Timeout(120000);
+            Client.Send(RequestMessage, ResponseMessage);
 
-        ShipmentDocument."Response XML Name" := 'Response ' +
-                                                  Format(Today) +
-                                                  ' ' +
-                                                  Format(Time, 0, '<Hours24,2>-<Minutes,2>-<Seconds,2>') +
-                                                  ' ' +
-                                                  Format(ShipmentDocument."Entry No.") +
-                                                  '.xml';
-        StoreResponseOfSentPacsoftShipmentDocument(ShipmentDocument, ResponseMessage);
-        ShipmentDocument.Modify();
+            if not ResponseMessage.IsSuccessStatusCode() then
+                Error(ResponseMessage.ReasonPhrase());
 
-        Clear(InStr);
-        ShipmentDocument."Response XML".CreateInStream(InStr);
-        XMLResponce.SetShipmentDocument(ShipmentDocument);
-        XMLResponce.SetSource(InStr);
-        XMLResponce.Import();
-        XMLResponce.GetShipmentDocument(ShipmentDocument);
+            ShipmentDocument."Response XML Name" := 'Response ' +
+                                                      Format(Today) +
+                                                      ' ' +
+                                                      Format(Time, 0, '<Hours24,2>-<Minutes,2>-<Seconds,2>') +
+                                                      ' ' +
+                                                      Format(ShipmentDocument."Entry No.") +
+                                                      '.xml';
+            StoreResponseOfSentPacsoftShipmentDocument(ShipmentDocument, ResponseMessage);
+            ShipmentDocument.Modify();
 
-        if ShipmentDocument.Status = '201' then
-            ShipmentDocument."Export Time" := CurrentDateTime();
+            Clear(InStr);
+            ShipmentDocument."Response XML".CreateInStream(InStr);
+            XMLResponce.SetShipmentDocument(ShipmentDocument);
+            XMLResponce.SetSource(InStr);
+            XMLResponce.Import();
+            XMLResponce.GetShipmentDocument(ShipmentDocument);
 
-        ShipmentDocument.Modify();
+            if ShipmentDocument.Status = '201' then
+                ShipmentDocument."Export Time" := CurrentDateTime();
+
+            ShipmentDocument.Modify();
+        end;
     end;
 
     local procedure StoreResponseOfSentPacsoftShipmentDocument(var ShipmentDocument: Record "NPR Shipping Provider Document"; ResponseMessage: HttpResponseMessage)
@@ -238,11 +253,11 @@
         XmlDocument.ReadFrom(InStr, Document);
 
         if Document.SelectNodes('//shipment', Nodelist) then begin
-            foreach Node in NodeList do begin
+            foreach Node in Nodelist do begin
                 AttributeCollection := Node.AsXmlElement().Attributes();
-                if AttributeCollection.Get('orderno', attribute) then begin
+                if AttributeCollection.Get('orderno', Attribute) then begin
                     if Attribute.Value = '' then
-                        node.Remove();
+                        Node.Remove();
                 end;
             end;
         end;

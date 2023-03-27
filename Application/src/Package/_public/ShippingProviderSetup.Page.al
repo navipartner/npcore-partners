@@ -73,6 +73,16 @@ page 6014574 "NPR Shipping Provider Setup"
                     ToolTip = 'Specifies the value of the Password field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Use Online Connect"; Rec."Use Online Connect")
+                {
+                    ToolTip = 'Specifies the value of the Use Online Connect field.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Online Connect file Path"; Rec."Online Connect file Path")
+                {
+                    ToolTip = 'Specifies the value of the Online Connect file Path field.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Link to Print Message"; Rec."Link to Print Message")
                 {
 

@@ -182,6 +182,16 @@ table 6014574 "NPR Shipping Provider Setup"
             Caption = 'Shipping Provider';
             DataClassification = CustomerContent;
         }
+        field(200; "Use Online Connect"; Boolean)
+        {
+            Caption = 'Use Online Connect';
+            DataClassification = CustomerContent;
+        }
+        field(201; "Online Connect file Path"; Text[250])
+        {
+            Caption = 'Online Connect file Path';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
