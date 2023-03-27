@@ -46,6 +46,7 @@ codeunit 6059802 "NPR Sales Scanner Import" implements "NPR IScanner Import"
     local procedure CreateLine()
     var
         SalesLine: Record "Sales Line";
+        ItemReference: Record "Item Reference";
         ScannerImportMgt: Codeunit "NPR Scanner Import Mgt.";
         ItemNo: Code[20];
         VariantCode: Code[10];
@@ -64,6 +65,10 @@ codeunit 6059802 "NPR Sales Scanner Import" implements "NPR IScanner Import"
             SalesLine.Validate("Variant Code", VariantCode);
         Evaluate(SalesLine.Quantity, Quantity);
         SalesLine.Validate(Quantity);
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+        ItemReference.SetRange("Reference No.", ItemCode);
+        if ItemReference.FindFirst() then
+            SalesLine."Item Reference No." := ItemReference."Reference No.";
         SalesLine.Modify();
 
         LineNo += 10000;
