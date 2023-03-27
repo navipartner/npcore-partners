@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-codeunit 6014667 "NPR EFT Recon. Teller / AMEX"
+﻿codeunit 6014667 "NPR EFT Recon. Teller / AMEX"
 {
     Access = Internal;
 
@@ -80,6 +79,7 @@ codeunit 6014667 "NPR EFT Recon. Teller / AMEX"
         StripReferenceNo(Reconciliation);
         Reconciliation.Modify(true);
     end;
+
     local procedure HandleLineType110(var ReconHeader: Record "NPR EFT Reconciliation"; DataArray: array[40] of Text; LineCounter: Integer; EntryType: Integer)
     var
         ReconLine: Record "NPR EFT Recon. Line";
@@ -219,17 +219,30 @@ codeunit 6014667 "NPR EFT Recon. Teller / AMEX"
 
     local procedure Split(Input: Text; var OutputArray: array[40] of Text)
     var
+#if BC17
         RegEx: dotnet Regex;
         Parts: dotnet Array;
+#else
+        Regex: Codeunit Regex;
+        Result: List of [Text];
+#endif
         I: Integer;
         NoOfParts: Integer;
     begin
+#if BC17
         Parts := RegEx.Split(Input, '(?:,|\n|^)("(?:(?:"")*[^"]*)*"|[^",\n]*|(?:\n|$))');
         // element 0, 2, 4, 6, ... are blank ?? bug in regex-expression?
         NoOfParts := Parts.Length;
         NoOfParts := (NoOfParts DIV 2);
         for I := 0 to NoOfParts - 1 do
             OutputArray[I + 1] := Parts.GetValue((I * 2) + 1);
+#else
+        RegEx.Split(Input, '(?:,|\n|^)("(?:(?:"")*[^"]*)*"|[^",\n]*|(?:\n|$))', 40, Result);
+        NoOfParts := Result.Count;
+        NoOfParts := (NoOfParts DIV 2);
+        for I := 1 to NoOfParts do
+            OutputArray[I] := Result.Get(I * 2);
+#endif        
     end;
 
     local procedure Strip(Input: Text): Text
@@ -281,4 +294,3 @@ codeunit 6014667 "NPR EFT Recon. Teller / AMEX"
             Handled := ImportFile(EFTReconciliation);
     end;
 }
-#endif
