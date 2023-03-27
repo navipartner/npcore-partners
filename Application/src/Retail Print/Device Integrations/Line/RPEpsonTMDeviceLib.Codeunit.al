@@ -306,7 +306,10 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
     begin
         SelectJustification(1);
         SetBarCodeWidth(POSPrintBuffer.Width);
-        SetBarCodeHeight(POSPrintBuffer.Height);
+        if (POSPrintBuffer.Height > 0) and (POSPrintBuffer.Height < 256) then
+            SetBarCodeHeight(POSPrintBuffer.Height)
+        else
+            SetBarCodeHeight(40);
 
         case POSPrintBuffer.Font of
             'UPC-A':
