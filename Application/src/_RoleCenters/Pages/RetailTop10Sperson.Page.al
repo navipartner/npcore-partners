@@ -7,9 +7,9 @@
     PageType = ListPart;
     SourceTable = "Salesperson/Purchaser";
     SourceTableTemporary = true;
-    UsageCategory = None;    
-    SourceTableView = sorting("NPR Maximum Cash Returnsale") order (Descending);
-                      
+    UsageCategory = None;
+    SourceTableView = sorting("NPR Maximum Cash Returnsale") order(Descending);
+
     layout
     {
         area(content)
@@ -210,7 +210,7 @@
         until (TempSalespersonPurchaser.Next() = 0) or (StartNo < 10);
     end;
 
-    local procedure CalculateSalesPersonSalesQty(TempSalesPersonPurchaser: Record "Salesperson/Purchaser" temporary)
+    local procedure CalculateSalesPersonSalesQty(var TempSalesPersonPurchaser: Record "Salesperson/Purchaser" temporary)
     var
         SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
