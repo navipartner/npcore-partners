@@ -143,14 +143,6 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'View or edit the POS Unit List';
                     ApplicationArea = NPRRetail;
                 }
-                action("POS Themes")
-                {
-                    Caption = 'POS Themes';
-                    RunObject = Page "NPR POS Themes";
-
-                    ToolTip = 'View or edit the POS Themes';
-                    ApplicationArea = NPRRetail;
-                }
                 action("POS Input Box Events")
                 {
                     Caption = 'POS Input Box Events';
