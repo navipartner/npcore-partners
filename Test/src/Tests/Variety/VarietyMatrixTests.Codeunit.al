@@ -14,7 +14,6 @@ codeunit 85097 "NPR Variety Matrix Tests"
         TransferLine: Record "Transfer Line";
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        VarietySetup: Record "NPR Variety Setup";
         TransferOrder: TestPage "Transfer Order";
     begin
         // [SCENARIO] Item with variants is set on the transfer order but no variety setup is present
@@ -38,7 +37,6 @@ codeunit 85097 "NPR Variety Matrix Tests"
         TransferLine: Record "Transfer Line";
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        VarietySetup: Record "NPR Variety Setup";
         TransferOrder: TestPage "Transfer Order";
     begin
         // [SCENARIO] Item with variants is set on the transfer order but variety setup is not enabled
@@ -63,7 +61,6 @@ codeunit 85097 "NPR Variety Matrix Tests"
         TransferLine: Record "Transfer Line";
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        VarietySetup: Record "NPR Variety Setup";
         TransferOrder: TestPage "Transfer Order";
     begin
         // [SCENARIO] Item with variants is set on the transfer order with variety setup but popup matrix is disabled           
@@ -82,12 +79,35 @@ codeunit 85097 "NPR Variety Matrix Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure VarietyMatrixPopupTransferOrder_NoPopupForTransferOrder()
+    var
+        TransferHeader: Record "Transfer Header";
+        TransferLine: Record "Transfer Line";
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        TransferOrder: TestPage "Transfer Order";
+    begin
+        // [SCENARIO] Item with variants is set on the transfer order with variety setup but popup on transfer order is disabled           
+        // [GIVEN] Variety setup, random locations, transfer header, item with variants
+        InitializeData();
+        VarietySetup.Validate("Pop up on Transfer Order", false);
+        VarietySetup.Modify(true);
+        InitTransferOrderWithItem(0, TransferHeader, Item);
+        InitItemVariant(Item, ItemVariant);
+        // [WHEN] Item is added to the transfer order
+        EditTransferOrderAndAddItem(TransferHeader, Item, TransferOrder);
+        // [THEN] Line is created without variant code
+        GetFirstTransferLine(TransferHeader, TransferLine);
+        CheckLine(Item, TransferLine, '', 0);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure VarietyMatrixPopupTransferOrder_ItemHasNoVariants()
     var
         TransferHeader: Record "Transfer Header";
         TransferLine: Record "Transfer Line";
         Item: Record Item;
-        VarietySetup: Record "NPR Variety Setup";
         TransferOrder: TestPage "Transfer Order";
     begin
         // [SCENARIO] Item without variants is set on the transfer order with variety setup
@@ -110,7 +130,6 @@ codeunit 85097 "NPR Variety Matrix Tests"
         TransferLine: Record "Transfer Line";
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        VarietySetup: Record "NPR Variety Setup";
         TransferOrder: TestPage "Transfer Order";
     begin
         // [SCENARIO] Item with variants is set on the transfer order with variety setup and popup matrix enabled
@@ -135,7 +154,6 @@ codeunit 85097 "NPR Variety Matrix Tests"
         Item: Record Item;
         ItemVariant1: Record "Item Variant";
         ItemVariant2: Record "Item Variant";
-        VarietySetup: Record "NPR Variety Setup";
         TransferOrder: TestPage "Transfer Order";
     begin
         // [SCENARIO] Item with 2 variants is set on the transfer order with variety setup and popup matrix enabled

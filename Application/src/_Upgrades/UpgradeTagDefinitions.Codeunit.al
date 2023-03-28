@@ -360,6 +360,8 @@
                     'ItemWorksheetFieldSetup':
                         exit('NPR-VendItemNo_ItemWorksheetFieldSetup-20230105');
                 end;
+            Codeunit::"NPR Upgrade Variety Setup":
+                exit('NPR_Upgrade_Variety_Setup_20230314');
         end;
     end;
 }
