@@ -29,6 +29,7 @@ codeunit 6059957 "NPR UPG Cust. Config. Temp."
     local procedure DoUpgrade()
     var
         MagentoSetup: Record "NPR Magento Setup";
+        ConfigTemplateHeaderToCheck: Record "Config. Template Header";
         ConfTemplateCode: Code[10];
     begin
         if not MagentoSetup.Get() then
@@ -37,10 +38,11 @@ codeunit 6059957 "NPR UPG Cust. Config. Temp."
         if (MagentoSetup."Customer Posting Group" = '') and (MagentoSetup."Payment Terms Code" = '') then
             exit;
 
-        if MagentoSetup."Customer Config. Template Code" <> '' then begin
-            SetFieldsOnConfTemplate(MagentoSetup);
-            exit;
-        end;
+        if MagentoSetup."Customer Config. Template Code" <> '' then
+            if ConfigTemplateHeaderToCheck.Get(MagentoSetup."Customer Config. Template Code") then begin
+                SetFieldsOnConfTemplate(MagentoSetup);
+                exit;
+            end;
 
         CreateNewTemplate(ConfTemplateCode, MagentoSetup."Customer Posting Group", MagentoSetup."Payment Terms Code");
         if ConfTemplateCode = '' then
