@@ -8,17 +8,17 @@ let main = async ({ workflow, parameters, captions }) => {
     };
     if (parameters.AskExtDocNo) {
         extDocNo = await popup.input(captions.ExtDocNo);
-        if (extDocNo === "" || extDocNo === null)
+        if (extDocNo === null)
             return;
     };
     if (parameters.AskAttention) {
         attention = await popup.input(captions.Attention);
-        if (attention === "" || attention === null)
+        if (attention === null)
             return;
     };
     if (parameters.AskYourRef) {
         yourref = await popup.input(captions.YourRef);
-        if (yourref === "" || yourref === null)
+        if (yourref === null)
             return;
     };
     const { createdSalesHeader, createdSalesHeaderDocumentType, additionalParameters } = await workflow.respond("exportDocument", { extDocNo: extDocNo, attention: attention, yourref: yourref });
