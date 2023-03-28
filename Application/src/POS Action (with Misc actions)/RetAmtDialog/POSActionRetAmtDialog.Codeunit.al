@@ -5,11 +5,6 @@ codeunit 6150855 "NPR POS Action: Ret.Amt.Dialog" implements "NPR IPOS Workflow"
     var
         ActionDescription: Label 'Show the return amount (change) after sale ends for mPOS.';
 
-    local procedure ActionCode(): Code[20]
-    begin
-        exit(Format(Enum::"NPR POS Workflow"::SHOW_RET_AMT_DIALOG));
-    end;
-
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         LabelConfirmEndOfSaleTitleLbl: Label '(MPOS) End of Sale';
@@ -53,50 +48,6 @@ codeunit 6150855 "NPR POS Action: Ret.Amt.Dialog" implements "NPR IPOS Workflow"
           Format(ReturnAmount, 0, '<Precision,2:2><Standard Format,0>'));
 
         JSON.SetContext('confirm_message', HTML);
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
-    local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
-    begin
-        if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
-            exit;
-        if Rec."Subscriber Function" <> 'ShowReturnAmountDialog' then
-            exit;
-
-        Rec.Description := ActionDescription;
-        Rec."Sequence No." := 80;
-        Rec.Enabled := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure ShowReturnAmountDialog(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
-    var
-        POSUnit: Record "NPR POS Unit";
-        POSSession: Codeunit "NPR POS Session";
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-        POSAction: Record "NPR POS Action";
-        POSEntry: Record "NPR POS Entry";
-    begin
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-            exit;
-        if POSSalesWorkflowStep."Subscriber Function" <> 'ShowReturnAmountDialog' then
-            exit;
-        POSUnit.Get(SalePOS."Register No.");
-        if POSUnit."POS Type" <> POSUnit."POS Type"::MPOS then
-            exit;
-
-        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Cancelled Sale");
-        if not POSEntry.IsEmpty then
-            exit;
-
-        POSFrontEnd.GetSession(POSSession);
-        POSSession.RetrieveSessionAction(ActionCode(), POSAction);
-    end;
-
-    local procedure CurrCodeunitId(): Integer
-    begin
-        exit(CODEUNIT::"NPR POS Action: Ret.Amt.Dialog");
     end;
 
     local procedure GetActionScript(): Text
