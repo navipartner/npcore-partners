@@ -63,6 +63,8 @@
                 Printer.SetFont('Control');
                 Printer.AddLine('P');
             until Membership.Next() = 0;
+
+        Printer.ProcessBuffer(Codeunit::"NPR MM POS Receipt Print", Enum::"NPR Line Printer Device"::Epson);
     end;
 
     var
