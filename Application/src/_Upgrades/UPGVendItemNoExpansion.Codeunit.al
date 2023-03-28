@@ -190,8 +190,8 @@ codeunit 6150918 "NPR UPG Vend Item No Expansion"
         if NPRItemWorkshExcelColumn.FindSet() then
             repeat
                 NPRItemWorkshExcelColumn."Map to Field Number" := NPRItemWorksheetLine.FieldNo("Vend Item No.");
-                NPRItemWorkshExcelColumn."Map to Field Name" := NPRItemWorksheetLine.FieldName("Vend Item No.");
-                NPRItemWorkshExcelColumn."Map to Caption" := NPRItemWorksheetLine.FieldCaption("Vend Item No.");
+                NPRItemWorkshExcelColumn."Map to Field Name" := CopyStr(NPRItemWorksheetLine.FieldName("Vend Item No."), 1, MaxStrLen(NPRItemWorkshExcelColumn."Map to Field Name"));
+                NPRItemWorkshExcelColumn."Map to Caption" := CopyStr(NPRItemWorksheetLine.FieldCaption("Vend Item No."), 1, MaxStrLen(NPRItemWorkshExcelColumn."Map to Caption"));
                 NPRItemWorkshExcelColumn.Modify();
             until NPRItemWorkshExcelColumn.Next() = 0;
 
