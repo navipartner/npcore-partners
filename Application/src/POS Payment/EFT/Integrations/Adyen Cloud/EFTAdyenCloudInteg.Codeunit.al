@@ -537,7 +537,9 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
 
         EFTTransactionRequest."Integration Version Code" := '3.0'; //Adyen Terminal API Protocol v3.0
+#pragma warning disable AA0139
         EFTTransactionRequest."Hardware ID" := GetPOIID(EFTSetup);
+#pragma warning restore AA0139
         if GetEnvironment(EFTSetup) <> 0 then
             EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::"TEST Remote";
 
@@ -859,9 +861,10 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         AbortEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
     begin
+#pragma warning disable AA0139
         EFTSetup.FindSetup(RegisterNo, EFTTransactionRequest."Original POS Payment Type Code");
-
         EFTFrameworkMgt.CreateAuxRequest(AbortEFTTransactionRequest, EFTSetup, 1, RegisterNo, SalesTicketNo);
+#pragma warning restore AA0139
         AbortEFTTransactionRequest."Processed Entry No." := EFTTransactionRequest."Entry No.";
         AbortEFTTransactionRequest.Modify();
         Commit();

@@ -286,7 +286,9 @@ codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
 
         foreach Line in Receipt do begin
             CreditCardTransaction."Entry No." := EntryNo;
+#pragma warning disable AA0139
             CreditCardTransaction.Text := Line;
+#pragma warning restore AA0139
             CreditCardTransaction.Insert();
             EntryNo += 1;
 
@@ -317,13 +319,17 @@ codeunit 6184528 "NPR EFT VerifoneVim Resp.Parse"
         //-NPR5.54 [364340]
         TextBuffer := TransactionResponse.MaskedPan;
         if TextBuffer <> '' then begin
+#pragma warning disable AA0139
             EFTTransactionRequest."Card Number" := TextBuffer;
+#pragma warning restore AA0139
         end;
 
         TextBuffer := TransactionResponse.PaymentBrand;
         if TextBuffer <> '' then begin
+#pragma warning disable AA0139
             EFTTransactionRequest."Card Issuer ID" := TextBuffer;
             EFTTransactionRequest."Card Name" := TextBuffer;
+#pragma warning restore AA0139
         end;
         //+NPR5.54 [364340]
 

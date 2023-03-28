@@ -23,7 +23,9 @@
     begin
         Filename := FileManagement.BLOBImportWithFilter(TempBlob, 'Import', EFTReconciliation.Filename, CSVFileType, '*.*');
         if Filename <> '' then begin
+#pragma warning disable AA0139
             EFTReconciliation.Filename := FileManagement.GetFileName(Filename);
+#pragma warning restore AA0139
             EFTReconciliation.Modify(true);
             TempBlob.CreateInstream(IStream, Textencoding::Windows);
             ImportStream(EFTReconciliation, IStream);
@@ -62,9 +64,13 @@
                     begin
                         if Evaluate(EntryType, Strip(DataArray[21])) then;
                         if Reconciliation."Advis ID" = '' then
+#pragma warning disable AA0139
                             Reconciliation."Advis ID" := Strip(DataArray[19]);
+#pragma warning restore AA0139
                         if Reconciliation."Account ID" = '' then
+#pragma warning disable AA0139
                             Reconciliation."Account ID" := Strip(DataArray[16]);
+#pragma warning restore AA0139
                     end;
                 '110':
                     HandleLineType110(Reconciliation, DataArray, LineCounter, EntryType);
@@ -95,14 +101,18 @@
         ReconLine.Amount := String2Decimal(DataArray[8], DataArray[9]);
         if (DataArray[12] = '1440') then
             ReconLine.Amount := -ReconLine.Amount;
+#pragma warning disable AA0139
         ReconLine."Currency Code" := Strip(DataArray[7]);
         ReconLine."Hardware ID" := Strip(DataArray[15]);
         ReconLine."Reference Number" := Strip(DataArray[10]);
+#pragma warning restore AA0139
         AltNo := Strip(DataArray[21]);
         if AltNo <> ReconLine."Reference Number" then
+#pragma warning disable AA0139
             ReconLine."Alt. Reference Number" := AltNo;
         ReconLine."Card Number" := Strip(DataArray[6]);
         ReconLine."Application Account ID" := Strip(DataArray[16]);
+#pragma warning restore AA0139
         ReconLine.Insert();
         if (ReconHeader."First Transaction Date" = 0D) or (ReconLine."Transaction Date" < ReconHeader."First Transaction Date")
         then
@@ -147,8 +157,10 @@
         if not BankAmount.Get(ReconHeader."No.", Strip(DataArray[16])) then begin
             BankAmount.Init();
             BankAmount."Reconciliation No." := ReconHeader."No.";
+#pragma warning disable AA0139
             BankAmount."Application Account ID" := Strip(DataArray[16]);
             BankAmount."Bank Information" := Strip(DataArray[5]);
+#pragma warning restore AA0139
             BankAmount.Insert(true);
         end;
         LineAmount := String2Decimal(DataArray[14], DataArray[15]);
@@ -184,13 +196,17 @@
         end else begin
             BankAmount.Init();
             BankAmount."Reconciliation No." := ReconHeader."No.";
+#pragma warning disable AA0139
             BankAmount."Application Account ID" := Strip(DataArray[16]);
             BankAmount."Bank Information" := Strip(DataArray[5]);
+#pragma warning restore AA0139
             BankAmount."Bank Transfer Date" := String2Date(DataArray[2]);
             BankAmount."Bank Amount" := String2Decimal(DataArray[14], DataArray[15]);
             BankAmount.Insert(true);
         end;
+#pragma warning disable AA0139
         ReconHeader."Bank Information" := Strip(DataArray[5]);
+#pragma warning restore AA0139
         ReconHeader."Bank Transfer Date" := String2Date(DataArray[2]);
         ReconHeader."Bank Amount" += String2Decimal(DataArray[14], DataArray[15]);
     end;
@@ -205,11 +221,15 @@
             repeat
                 Changed := false;
                 if CopyStr(EFTReconLine."Reference Number", 1, 1) = 'C' then begin
+#pragma warning disable AA0139
                     EFTReconLine."Reference Number" := CopyStr(EFTReconLine."Reference Number", 2);
+#pragma warning restore AA0139
                     Changed := true;
                 end;
                 if CopyStr(EFTReconLine."Alt. Reference Number", 1, 1) = 'C' then begin
+#pragma warning disable AA0139
                     EFTReconLine."Alt. Reference Number" := CopyStr(EFTReconLine."Alt. Reference Number", 2);
+#pragma warning restore AA0139
                     Changed := true;
                 end;
                 if Changed then
