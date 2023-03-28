@@ -206,6 +206,36 @@
         {
             Caption = 'Pop up Variety Matrix';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                SetPopupVarietyMatrixOnDocuments(Rec."Pop up Variety Matrix");
+            end;
+        }
+        field(91; "Pop up on Sales Order"; Boolean)
+        {
+            Caption = 'Pop up on Sales Order';
+            DataClassification = CustomerContent;
+        }
+        field(92; "Pop up on Purchase Order"; Boolean)
+        {
+            Caption = 'Pop up on Purchase Order';
+            DataClassification = CustomerContent;
+        }
+        field(93; "Pop up on Transfer Order"; Boolean)
+        {
+            Caption = 'Pop up on Transfer Order';
+            DataClassification = CustomerContent;
+        }
+        field(94; "Pop up on Sales Return Order"; Boolean)
+        {
+            Caption = 'Pop up on Sales Return Order';
+            DataClassification = CustomerContent;
+        }
+        field(95; "Pop up on Purch. Return Order"; Boolean)
+        {
+            Caption = 'Pop up on Purch. Return Order';
+            DataClassification = CustomerContent;
         }
         field(100; "Activate Inventory"; Boolean)
         {
@@ -231,6 +261,15 @@
     fieldgroups
     {
     }
+
+    procedure SetPopupVarietyMatrixOnDocuments(Enable: Boolean)
+    begin
+        Rec."Pop up on Sales Order" := Enable;
+        Rec."Pop up on Sales Return Order" := Enable;
+        Rec."Pop up on Purchase Order" := Enable;
+        Rec."Pop up on Purch. Return Order" := Enable;
+        Rec."Pop up on Transfer Order" := Enable;
+    end;
 
     var
         NoSeriesChangeErr: Label 'No. Series cannot be changed!';
