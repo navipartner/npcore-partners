@@ -38,7 +38,9 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         RemainingAmount: Decimal;
         TextAmountLabel: Label 'Enter Amount';
     begin
+#pragma warning disable AA0139
         PaymentMethodCode := Context.GetStringParameter('paymentNo');
+#pragma warning restore AA0139
 
         Payments.PrepareForPayment(PaymentLine, PaymentMethodCode, WorkflowName, POSPaymentMethod, RemainingAmount);
 
@@ -57,7 +59,9 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         PaymentMethodCode: Code[10];
         Success: Boolean;
     begin
+#pragma warning disable AA0139
         PaymentMethodCode := Context.GetStringParameter('paymentNo');
+#pragma warning restore AA0139
 
         Success := Payments.AttemptEndCurrentSale(PaymentMethodCode);
 
