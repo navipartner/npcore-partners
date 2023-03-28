@@ -49,8 +49,38 @@
                 }
                 field("Pop up Variety Matrix"; Rec."Pop up Variety Matrix")
                 {
-                    ToolTip = 'If item with variants is selected on sales and purchase documents variety matrix will pop up.';
+                    ToolTip = 'Specifies if variety matrix will pop up on documents when item with variants is selected.';
                     ApplicationArea = NPRRetail;
+                }
+                field("Pop up on Sales Order"; Rec."Pop up on Sales Order")
+                {
+                    ToolTip = 'Specifies if a variety matrix will be shown on Sales Order';
+                    ApplicationArea = NPRRetail;
+                    Importance = Additional;
+                }
+                field("Pop up on Sales Return Order"; Rec."Pop up on Sales Return Order")
+                {
+                    ToolTip = 'Specifies if a variety matrix will be shown on Sales Return Order';
+                    ApplicationArea = NPRRetail;
+                    Importance = Additional;
+                }
+                field("Pop up on Purchase Order"; Rec."Pop up on Purchase Order")
+                {
+                    ToolTip = 'Specifies if a variety matrix will be shown on Purchase Order';
+                    ApplicationArea = NPRRetail;
+                    Importance = Additional;
+                }
+                field("Pop up on Purch. Return Order"; Rec."Pop up on Purch. Return Order")
+                {
+                    ToolTip = 'Specifies if a variety matrix will be shown on Purchase Return Order';
+                    ApplicationArea = NPRRetail;
+                    Importance = Additional;
+                }
+                field("Pop up on Transfer Order"; Rec."Pop up on Transfer Order")
+                {
+                    ToolTip = 'Specifies if a variety matrix will be shown on Transfer Order';
+                    ApplicationArea = NPRRetail;
+                    Importance = Additional;
                 }
                 field("Variant No. Series"; Rec."Variant No. Series")
                 {

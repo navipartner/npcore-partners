@@ -16,6 +16,8 @@ pageextension 6014463 "NPR Transfer Order Subform" extends "Transfer Order Subfo
                     exit;
                 if not NPRVarietySetup."Pop up Variety Matrix" then
                     exit;
+                if not NPRVarietySetup."Pop up on Transfer Order" then
+                    exit;
                 if Item.Get(Rec."Item No.") then begin
                     Item.CalcFields("NPR Has Variants");
                     if Item."NPR Has Variants" then begin

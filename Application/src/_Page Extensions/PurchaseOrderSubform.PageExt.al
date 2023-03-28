@@ -14,6 +14,8 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
                     exit;
                 if not NPRVarietySetup."Pop up Variety Matrix" then
                     exit;
+                if not NPRVarietySetup."Pop up on Purchase Order" then
+                    exit;
                 if (Rec.Type = Rec.Type::Item) and Item.Get(Rec."No.") then begin
                     Item.CalcFields("NPR Has Variants");
                     if Item."NPR Has Variants" then
