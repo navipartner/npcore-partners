@@ -558,6 +558,7 @@
         InsertCalcFieldsInItemCategoryBuffer(ItemCategoryBuffer, CalcFieldsDict);
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure InsertItemCategoryToBuffer(ItemRootCategoryCode: Code[20]; var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; SalespersonCode: Code[20]; GlobalDimension1Code: Code[20]; GlobalDimension2Code: Code[20])
     var
         ItemCategory: Record "Item Category";
@@ -591,6 +592,7 @@
         ItemCategoryBuffer.Insert();
     end;
 
+    [Obsolete('In next release goes internal')]
     procedure InsertItemCategoryToBuffer(ItemRootCategoryCode: Code[20]; var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary)
     var
         ItemCategory: Record "Item Category";
