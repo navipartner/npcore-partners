@@ -272,14 +272,6 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'View or edit the Pepper Card Type Group';
                     ApplicationArea = NPRRetail;
                 }
-                action("EFT Reconciliations")
-                {
-                    Caption = 'EFT Reconciliations';
-                    RunObject = Page "NPR EFT Reconciliation List";
-
-                    ToolTip = 'View or edit the EFT Reconciliations';
-                    ApplicationArea = NPRRetail;
-                }
             }
             group("Coupons & Vouchers")
             {
