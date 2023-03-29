@@ -788,6 +788,14 @@
                     ToolTip = 'Executes the Retail Journal List action.';
                     ApplicationArea = NPRRetail;
                 }
+                action("EFT Reconciliations")
+                {
+                    Caption = 'EFT Reconciliations';
+                    RunObject = Page "NPR EFT Reconciliation List";
+
+                    ToolTip = 'View or edit the EFT Reconciliations';
+                    ApplicationArea = NPRRetail;
+                }
 
             }
             group("Retail Documents")
