@@ -93,7 +93,7 @@
                 if TempRetailList.IsEmpty() then begin
                     TempRetailList.SetFilter(Choice, StrSubstNo('@%1*', "Audit Handler"));
                     TempRetailList.FindFirst();
-                    "Audit Handler" := TempRetailList.Choice;
+                    "Audit Handler" := CopyStr(TempRetailList.Choice, 1, MaxStrLen("Audit Handler"));
                 end;
                 "Audit Log Enabled" := true;
             end;

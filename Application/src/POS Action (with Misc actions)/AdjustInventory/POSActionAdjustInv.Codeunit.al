@@ -80,9 +80,9 @@ codeunit 6150848 "NPR POS Action: Adjust Inv." implements "NPR IPOS Workflow"
         if Quantity = 0 then
             exit;
         IF Context.GetString('reasonCode', ReturnReasonTxt) then
-            Evaluate(ReturnReasonCode, ReturnReasonTxt);
-        IF Context.GetString('customDescription', CustomDescription) then
-            CustomDescription := CopyStr(Context.GetString('customDescription'), 1, 100);
+            ReturnReasonCode := CopyStr(ReturnReasonTxt, 1, MaxStrLen(ReturnReasonCode));
+        IF not Context.GetString('customDescription', CustomDescription) then
+            CustomDescription := '';
 
         Context.SetScopeParameters();
         case Context.GetInteger('InputAdjustment') of
@@ -92,7 +92,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv." implements "NPR IPOS Workflow"
                 Quantity := Abs(Quantity);
         end;
 
-        POSActionAdjustInventoryBusinessLogic.PerformAdjustInventory(Sale, SaleLine, Quantity, ReturnReasonCode, CustomDescription);
+        POSActionAdjustInventoryBusinessLogic.PerformAdjustInventory(Sale, SaleLine, Quantity, ReturnReasonCode, CopyStr(CustomDescription, 1, 100));
     end;
 
 
