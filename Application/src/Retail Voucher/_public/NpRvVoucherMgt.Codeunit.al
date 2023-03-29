@@ -18,7 +18,7 @@
     begin
         NpRvSalesLine.SetRange("Voucher No.", Voucher."No.");
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
-        if NpRvSalesLine.FindFirst() then
+        if not NpRvSalesLine.IsEmpty() then
             NpRvSalesLine.DeleteAll();
     end;
 
@@ -62,7 +62,7 @@
             exit;
 
         NpRvSalesLine.SetFilter(Type, '%1|%2|%3', NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up", NpRvSalesLine.Type::"Partner Issue Voucher");
-        if NpRvSalesLine.FindSet(true) then
+        if NpRvSalesLine.FindSet() then
             repeat
                 IssueVouchers(NpRvSalesLine, SaleLinePos);
             until NpRvSalesLine.Next() = 0;
@@ -70,7 +70,7 @@
         if SaleLinePOS."Amount Including VAT" <> 0 then begin
             SetSalesLineFilter(SaleLinePos, NpRvSalesLine);
             NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
-            if NpRvSalesLine.FindSet(true) then
+            if NpRvSalesLine.FindSet() then
                 repeat
                     PostPayment(NpRvSalesLine, SaleLinePos);
                 until NpRvSalesLine.Next() = 0;
@@ -87,7 +87,7 @@
             exit;
 
         NpRvSalesLine.SetFilter(Type, '%1|%2|%3', NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up", NpRvSalesLine.Type::"Partner Issue Voucher");
-        if NpRvSalesLine.FindSet(true) then
+        if NpRvSalesLine.FindSet() then
             repeat
                 IssueVouchers(NpRvSalesLine, SaleLinePos);
             until NpRvSalesLine.Next() = 0;
@@ -95,7 +95,7 @@
         if SaleLinePOS."Amount Including VAT" <> 0 then begin
             SetSalesLineFilter(SaleLinePos, NpRvSalesLine);
             NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
-            if NpRvSalesLine.FindSet(true) then
+            if NpRvSalesLine.FindSet() then
                 repeat
                     PostPayment(NpRvSalesLine, SaleLinePos);
                 until NpRvSalesLine.Next() = 0;
@@ -104,25 +104,17 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
     local procedure OnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale")
-    var
-        Voucher: Record "NPR NpRv Voucher";
-        VoucherEntry: Record "NPR NpRv Voucher Entry";
     begin
-        VoucherEntry.SetFilter("Entry Type", '%1|%2|%3', VoucherEntry."Entry Type"::"Issue Voucher", VoucherEntry."Entry Type"::Payment, VoucherEntry."Entry Type"::"Top-up");
-        VoucherEntry.SetRange("Register No.", SalePOS."Register No.");
-        VoucherEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        if VoucherEntry.IsEmpty then
-            exit;
-
-        VoucherEntry.FindSet();
-        repeat
-            if Voucher.Get(VoucherEntry."Voucher No.") then
-                SendSingleVoucher(Voucher);
-        until VoucherEntry.Next() = 0;
+        SendVoucher(SalePOS);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'OnAfterDebitSalePostEvent', '', true, true)]
     local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR POS Sale"; SalesHeader: Record "Sales Header"; Posted: Boolean)
+    begin
+        SendVoucher(SalePOS);
+    end;
+
+    local procedure SendVoucher(SalePOS: Record "NPR POS Sale")
     var
         Voucher: Record "NPR NpRv Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
@@ -130,7 +122,7 @@
         VoucherEntry.SetFilter("Entry Type", '%1|%2|%3', VoucherEntry."Entry Type"::"Issue Voucher", VoucherEntry."Entry Type"::Payment, VoucherEntry."Entry Type"::"Top-up");
         VoucherEntry.SetRange("Register No.", SalePOS."Register No.");
         VoucherEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        if VoucherEntry.IsEmpty then
+        if VoucherEntry.IsEmpty() then
             exit;
 
         VoucherEntry.FindSet();
@@ -268,8 +260,8 @@
         if NpRvSalesLineReference.Find() then
             NpRvSalesLineReference.Delete();
 
-        PostIssueVoucher(Voucher, VoucherAmount, NpRvSalesLine);
-        MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine);
+        PostIssueVoucher(Voucher, VoucherType, VoucherAmount, NpRvSalesLine);
+        MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine.Id);
     end;
 
     local procedure FindMagentoPaymentLine(NpRvSalesLine: Record "NPR NpRv Sales Line"; var MagentoPaymentLine: Record "NPR Magento Payment Line"): Boolean
@@ -287,15 +279,15 @@
         exit(false);
     end;
 
-    local procedure MarkRetailVoucherSalesLineAsPosted(var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    local procedure MarkRetailVoucherSalesLineAsPosted(NpRvSalesLineId: Guid)
     var
-        NpRvSalesLineToUpdate: Record "NPR NpRv Sales Line";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
     begin
-        if not NpRvSalesLine.Posted then begin
-            NpRvSalesLineToUpdate := NpRvSalesLine;
-            NpRvSalesLineToUpdate.Posted := true;
-            NpRvSalesLineToUpdate.Modify();
-        end;
+        if NpRvSalesLine.Get(NpRvSalesLineId) then
+            if not NpRvSalesLine.Posted then begin
+                NpRvSalesLine.Posted := true;
+                NpRvSalesLine.Modify();
+            end;
     end;
 
     internal procedure GetVoucherQtyAndUnitPriceFromSalesLine(NpRvSalesLine: Record "NPR NpRv Sales Line"; var VoucherQty: Decimal; var VoucherUnitPrice: Decimal): Boolean
@@ -320,19 +312,18 @@
     var
         VoucherEntry: Record "NPR NpRv Voucher Entry";
     begin
+        VoucherEntry.SetCurrentKey("Voucher No.", "Entry Type", "Partner Code");
         VoucherEntry.SetRange("Voucher No.", Voucher."No.");
         VoucherEntry.SetRange("Entry Type", VoucherEntry."Entry Type"::"Issue Voucher");
-        exit(VoucherEntry.FindFirst());
+        exit(not VoucherEntry.IsEmpty());
     end;
 
-    local procedure PostIssueVoucher(Voucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal; var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    local procedure PostIssueVoucher(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; VoucherAmount: Decimal; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         VoucherEntry: Record "NPR NpRv Voucher Entry";
-        VoucherType: Record "NPR NpRv Voucher Type";
-        NPRPOSUnit: Record "NPR POS Unit";
+        POSUnit: Record "NPR POS Unit";
+        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
     begin
-        VoucherType.Get(Voucher."Voucher Type");
-
         VoucherEntry.Init();
         VoucherEntry."Entry No." := 0;
         VoucherEntry."Voucher No." := Voucher."No.";
@@ -348,9 +339,7 @@
                     VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Issue Voucher";
                 end;
             NpRvSalesLine.Type::"Top-up":
-                begin
-                    VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Top-up";
-                end;
+                VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Top-up";
             NpRvSalesLine.Type::"Partner Issue Voucher":
                 begin
                     if not VoucherEntry.Correction then
@@ -367,8 +356,8 @@
         VoucherEntry."Posting Date" := Workdate();
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
         VoucherEntry."Register No." := NpRvSalesLine."Register No.";
-        if NPRPOSUnit.Get(VoucherEntry."Register No.") then
-            VoucherEntry."POS Store Code" := NPRPOSUnit."POS Store Code";
+        if POSUnit.Get(VoucherEntry."Register No.") then
+            VoucherEntry."POS Store Code" := POSUnit."POS Store Code";
         case NpRvSalesLine."Document Source" of
             NpRvSalesLine."Document Source"::POS:
                 begin
@@ -393,18 +382,22 @@
         OnBeforeInsertIssuedVoucherEntry(VoucherEntry, Voucher, NpRvSalesLine);
         VoucherEntry.Insert();
 
+        case VoucherEntry."Entry Type" of
+            VoucherEntry."Entry Type"::"Issue Voucher":
+                NpRvModuleValidGlobal.CreateGlobalVoucher(Voucher);
+            VoucherEntry."Entry Type"::"Top-up":
+                NpRvModuleValidGlobal.TopUpVoucher(VoucherEntry, Voucher);
+        end;
+
         ApplyEntry(VoucherEntry);
     end;
 
 
-    local procedure PostIssueForeignVoucher(Voucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal; var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    local procedure PostIssueForeignVoucher(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; VoucherAmount: Decimal; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         VoucherEntry: Record "NPR NpRv Voucher Entry";
-        VoucherType: Record "NPR NpRv Voucher Type";
-        NPRPOSUnit: Record "NPR POS Unit";
+        POSUnit: Record "NPR POS Unit";
     begin
-        VoucherType.Get(Voucher."Voucher Type");
-
         VoucherEntry.Init();
         VoucherEntry."Entry No." := 0;
         VoucherEntry."Voucher No." := Voucher."No.";
@@ -418,15 +411,15 @@
         VoucherEntry."Posting Date" := WorkDate();
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
         VoucherEntry."Register No." := NpRvSalesLine."Register No.";
-        if NPRPOSUnit.Get(VoucherEntry."Register No.") then
-            VoucherEntry."POS Store Code" := NPRPOSUnit."POS Store Code";
+        if POSUnit.Get(VoucherEntry."Register No.") then
+            VoucherEntry."POS Store Code" := POSUnit."POS Store Code";
         VoucherEntry."Document Type" := VoucherEntry."Document Type"::"POS Entry";
         VoucherEntry."External Document No." := NpRvSalesLine."Sales Ticket No.";
 
         VoucherEntry."Partner Code" := VoucherType."Partner Code";
         VoucherEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(VoucherEntry."User ID"));
         VoucherEntry."Closed by Entry No." := 0;
-        OnBeforeInsertIssuedVoucherEntry(VoucherEntry, Voucher, NpRvSalesLine);
+        OnBeforeInsertIssuedForeignVoucherEntry(VoucherEntry, Voucher, NpRvSalesLine);
         VoucherEntry.Insert();
     end;
 
@@ -503,7 +496,8 @@
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         Voucher: Record "NPR NpRv Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
-        NPRPOSUnit: Record "NPR POS Unit";
+        POSUnit: Record "NPR POS Unit";
+        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
     begin
         if not FindMagentoPaymentLine(NpRvSalesLine, MagentoPaymentLine) then
             exit;
@@ -524,8 +518,8 @@
             VoucherEntry.Amount := MagentoPaymentLine.Amount
         else
             VoucherEntry.Amount := -MagentoPaymentLine.Amount;
-        if NPRPOSUnit.Get(NpRvSalesLine."Register No.") then
-            VoucherEntry."POS Store Code" := NPRPOSUnit."POS Store Code";
+        if POSUnit.Get(NpRvSalesLine."Register No.") then
+            VoucherEntry."POS Store Code" := POSUnit."POS Store Code";
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
         VoucherEntry.Positive := VoucherEntry.Amount > 0;
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
@@ -533,16 +527,20 @@
         OnBeforeInsertPaymentVoucherEntry(VoucherEntry, NpRvSalesLine);
         VoucherEntry.Insert();
 
+        NpRvModuleValidGlobal.RedeemVoucher(VoucherEntry, Voucher);
+        NpRvModuleValidGlobal.RedeemPartnerVouchers(VoucherEntry, Voucher);
+
         ApplyEntry(VoucherEntry);
         ArchiveClosedVoucher(Voucher);
-        MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine);
+        MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine.Id);
     end;
 
     internal procedure PostPayment(var NpRvSalesLine: Record "NPR NpRv Sales Line"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         Voucher: Record "NPR NpRv Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
-        NPRPOSUnit: Record "NPR POS Unit";
+        POSUnit: Record "NPR POS Unit";
+        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
     begin
         Voucher.Get(NpRvSalesLine."Voucher No.");
 
@@ -553,16 +551,19 @@
         VoucherEntry."Posting Date" := SaleLinePOS.Date;
         VoucherEntry.Amount := -SaleLinePOS."Amount Including VAT";
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
-        if NPRPOSUnit.Get(NpRvSalesLine."Register No.") then
-            VoucherEntry."POS Store Code" := NPRPOSUnit."POS Store Code";
+        if POSUnit.Get(NpRvSalesLine."Register No.") then
+            VoucherEntry."POS Store Code" := POSUnit."POS Store Code";
         VoucherEntry.Positive := VoucherEntry.Amount > 0;
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
         OnBeforeInsertPaymentVoucherEntry(VoucherEntry, NpRvSalesLine);
         VoucherEntry.Insert();
 
+        NpRvModuleValidGlobal.RedeemVoucher(VoucherEntry, Voucher);
+        NpRvModuleValidGlobal.RedeemPartnerVouchers(VoucherEntry, Voucher);
+
         ApplyEntry(VoucherEntry);
         ArchiveClosedVoucher(Voucher);
-        MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine);
+        MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine.Id);
     end;
 
     local procedure InitVoucherEntry(var Voucher: Record "NPR NpRv Voucher"; var VoucherEntry: Record "NPR NpRv Voucher Entry")
@@ -593,39 +594,33 @@
         VoucherEntryApply.SetRange("Voucher No.", VoucherEntry."Voucher No.");
         VoucherEntryApply.SetRange(Open, true);
         VoucherEntryApply.SetRange(Positive, not VoucherEntry.Positive);
-        if VoucherEntryApply.FindSet(true, true) then
+        if VoucherEntryApply.FindSet() then
             repeat
-                if Abs(VoucherEntryApply."Remaining Amount") >= Abs(VoucherEntry."Remaining Amount") then begin
-                    VoucherEntryApply."Remaining Amount" += VoucherEntry."Remaining Amount";
-                    if VoucherEntryApply."Remaining Amount" = 0 then begin
-                        VoucherEntryApply."Closed by Entry No." := VoucherEntry."Entry No.";
-                        VoucherEntryApply."Closed by Partner Code" := VoucherEntry."Partner Code";
-                        VoucherEntryApply.Open := false;
-                    end;
-
-                    VoucherEntry."Remaining Amount" := 0;
-                    VoucherEntry."Closed by Entry No." := VoucherEntryApply."Entry No.";
-                    VoucherEntry."Closed by Partner Code" := VoucherEntryApply."Partner Code";
-                    VoucherEntry.Open := false;
-                end else begin
-                    VoucherEntry."Remaining Amount" += VoucherEntryApply."Remaining Amount";
-                    if VoucherEntry."Remaining Amount" = 0 then begin
-                        VoucherEntry."Closed by Entry No." := VoucherEntryApply."Entry No.";
-                        VoucherEntry."Closed by Partner Code" := VoucherEntryApply."Partner Code";
-                        VoucherEntry.Open := false;
-                    end;
-
-                    VoucherEntryApply."Remaining Amount" := 0;
-                    VoucherEntryApply."Closed by Entry No." := VoucherEntry."Entry No.";
-                    VoucherEntryApply."Closed by Partner Code" := VoucherEntry."Partner Code";
-                    VoucherEntryApply.Open := false;
-                end;
+                if Abs(VoucherEntryApply."Remaining Amount") >= Abs(VoucherEntry."Remaining Amount") then
+                    ApplyEntry(VoucherEntryApply, VoucherEntry)
+                else
+                    ApplyEntry(VoucherEntry, VoucherEntryApply);
 
                 VoucherEntry."Partner Clearing" := VoucherEntry."Partner Code" <> VoucherEntry."Closed by Partner Code";
                 VoucherEntryApply."Partner Clearing" := VoucherEntryApply."Partner Code" <> VoucherEntryApply."Closed by Partner Code";
                 VoucherEntry.Modify();
                 VoucherEntryApply.Modify();
             until (VoucherEntryApply.Next() = 0) or not VoucherEntry.Open;
+    end;
+
+    local procedure ApplyEntry(var VoucherEntryApply: Record "NPR NpRv Voucher Entry"; var VoucherEntry: Record "NPR NpRv Voucher Entry")
+    begin
+        VoucherEntryApply."Remaining Amount" += VoucherEntry."Remaining Amount";
+        if VoucherEntryApply."Remaining Amount" = 0 then begin
+            VoucherEntryApply."Closed by Entry No." := VoucherEntry."Entry No.";
+            VoucherEntryApply."Closed by Partner Code" := VoucherEntry."Partner Code";
+            VoucherEntryApply.Open := false;
+        end;
+
+        VoucherEntry."Remaining Amount" := 0;
+        VoucherEntry."Closed by Entry No." := VoucherEntryApply."Entry No.";
+        VoucherEntry."Closed by Partner Code" := VoucherEntryApply."Partner Code";
+        VoucherEntry.Open := false;
     end;
 
     internal procedure ArchiveVouchers(var VoucherFilter: Record "NPR NpRv Voucher")
@@ -646,7 +641,7 @@
 
     local procedure ArchiveVoucher(var Voucher: Record "NPR NpRv Voucher")
     var
-        VoucherEntry: Record "NPR NpRv Voucher Entry";        
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
     begin
         Voucher.CalcFields(Amount);
         if Voucher.Amount <> 0 then begin
@@ -678,8 +673,6 @@
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         NpRvSendingLog: Record "NPR NpRv Sending Log";
     begin
-        if not Voucher.Find() then
-            exit;
         Voucher.CalcFields(Open);
         if Voucher.Open then
             exit;
@@ -836,6 +829,8 @@
         ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
         SalesInvHeader: Record "Sales Invoice Header";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherType: Record "NPR NpRv Voucher Type";
         LastEntry: Boolean;
         CannotBeUnarchived: Label 'The Voucher %1 cannot be unarchived as the document it was last redeemed in has already been posted.', Comment = '%1 = Retail voucher number';
     begin
@@ -860,10 +855,35 @@
                 VoucherEntry."Voucher No." := RestoredVoucherNo;
                 VoucherEntry.Open := true;
                 LastEntry := ArchVoucherEntry.Next() = 0;
-                if not (LastEntry and RemoveLastEntry) then
+                if not (LastEntry and RemoveLastEntry) then begin
                     VoucherEntry.Insert();
+
+                    if Voucher.Get(VoucherEntry."Entry No.") then begin
+                        VoucherType.Get(Voucher."Voucher Type");
+                        ProcessGlobalVoucherEntry(VoucherEntry, Voucher);
+                    end;
+                end;
             until LastEntry;
         ArchVoucherEntry.DeleteAll();
+    end;
+
+    local procedure ProcessGlobalVoucherEntry(VoucherEntry: Record "NPR NpRv Voucher Entry"; Voucher: Record "NPR NpRv Voucher")
+    var
+        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
+    begin
+        case VoucherEntry."Entry Type" of
+            VoucherEntry."Entry Type"::"Issue Voucher":
+                NpRvModuleValidGlobal.CreateGlobalVoucher(Voucher);
+            VoucherEntry."Entry Type"::Payment:
+                begin
+                    NpRvModuleValidGlobal.RedeemVoucher(VoucherEntry, Voucher);
+                    NpRvModuleValidGlobal.RedeemPartnerVouchers(VoucherEntry, Voucher);
+                end;
+            VoucherEntry."Entry Type"::"Partner Payment":
+                NpRvModuleValidGlobal.RedeemPartnerVouchers(VoucherEntry, Voucher);
+            VoucherEntry."Entry Type"::"Top-up":
+                NpRvModuleValidGlobal.TopUpVoucher(VoucherEntry, Voucher);
+        end;
     end;
 
     local procedure UnarchiveVoucherSendingLogs(ArchVoucherNo: Code[20]; RestoredVoucherNo: Code[20])
@@ -1116,22 +1136,23 @@
         OnAfterArchiveVoucher(RetailVoucher, ArchVoucher);
     end;
 
-    internal procedure OpenRetailVoucher(RetailVoucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal)
+    internal procedure OpenRetailVoucher(Voucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal)
     var
         VoucherEntry: Record "NPR NpRv Voucher Entry";
-        VoucherType: Record "NPR NpRv Voucher Type";      
+        VoucherType: Record "NPR NpRv Voucher Type";
         VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
     begin
-        if VoucherMgt.InitialEntryExists(RetailVoucher) then
+        if VoucherMgt.InitialEntryExists(Voucher) then
             exit;
 
-        VoucherType.Get(RetailVoucher."Voucher Type");
+        VoucherType.Get(Voucher."Voucher Type");
 
         VoucherEntry.Init();
         VoucherEntry."Entry No." := 0;
-        VoucherEntry."Voucher No." := RetailVoucher."No.";
+        VoucherEntry."Voucher No." := Voucher."No.";
         VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Issue Voucher";
-        VoucherEntry."Voucher Type" := RetailVoucher."Voucher Type";
+        VoucherEntry."Voucher Type" := Voucher."Voucher Type";
         VoucherEntry.Amount := VoucherAmount;
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
 
@@ -1141,6 +1162,8 @@
         VoucherEntry."Partner Code" := VoucherType."Partner Code";
         VoucherEntry."Closed by Entry No." := 0;
         VoucherEntry.Insert();
+
+        NpRvModuleValidGlobal.CreateGlobalVoucher(Voucher);
     end;
 
     internal procedure PrepareVoucherBuffer(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var SalePOS: Record "NPR POS Sale"; VoucherType: Record "NPR NpRv Voucher Type"; ReferenceNo: Text)
@@ -1189,7 +1212,6 @@
     begin
         VoucherType.Get(VoucherTypeCode);
         CheckVoucherType(VoucherType, SalePOS);
-
 
         PrepareVoucherBuffer(TempNpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber);
         ValidateVoucher(TempNpRvVoucherBuffer);
@@ -1245,7 +1267,7 @@
 
         InsertNpRvSalesLine(TempNpRvVoucherBuffer, SalePOS, NpRvSalesLine, VoucherType, POSLine);
         PaymentNpRvSalesLine := NpRvSalesLine;
-        PostIssueForeignVoucher(Voucher, AmountToCapture, NpRvSalesLine);
+        PostIssueForeignVoucher(Voucher, VoucherType, AmountToCapture, NpRvSalesLine);
 
         ApplyPayment(FrontEnd, POSSession, PaymentNpRvSalesLine, false);
     end;
@@ -1304,7 +1326,7 @@
     begin
         POSQuoteEntry.SetRange("Register No.", POSSaleLine."Register No.");
         POSQuoteEntry.SetRange("Sales Ticket No.", POSSaleLine."Sales Ticket No.");
-        if POSQuoteEntry.FindFirst() then
+        if not POSQuoteEntry.IsEmpty() then
             exit;
         NpRvSalesLine.FindFirst();
         if NpRvVoucherType.Get(NpRvSalesLine."Voucher Type") then
@@ -1313,7 +1335,7 @@
                     if Voucher.Get(NpRvSalesLine."Voucher No.") then begin
                         Voucher.Delete();
                         NpRvVoucherEntry.SetRange("Voucher No.", Voucher."No.");
-                        if NpRvVoucherEntry.FindFirst() then
+                        if not NpRvVoucherEntry.IsEmpty() then
                             NpRvVoucherEntry.DeleteAll();
                     end;
                 end;
@@ -1611,6 +1633,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertIssuedVoucherEntry(var VoucherEntry: Record "NPR NpRv Voucher Entry"; Voucher: Record "NPR NpRv Voucher"; NpRvSalesLine: Record "NPR NpRv Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertIssuedForeignVoucherEntry(var VoucherEntry: Record "NPR NpRv Voucher Entry"; Voucher: Record "NPR NpRv Voucher"; NpRvSalesLine: Record "NPR NpRv Sales Line")
     begin
     end;
 
