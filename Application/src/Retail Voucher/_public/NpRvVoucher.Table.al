@@ -445,7 +445,7 @@
         TestField(Open, false);
 
         NpRvVoucherEntry.SetRange("Voucher No.", "No.");
-        if NpRvVoucherEntry.FindFirst() then
+        if not NpRvVoucherEntry.IsEmpty() then
             NpRvVoucherEntry.DeleteAll();
     end;
 
@@ -572,12 +572,6 @@
     begin
         CalcFields("In-use Quantity");
         exit("In-use Quantity");
-    end;
-
-    [Obsolete('Not being used.')]
-    procedure GetImageContent(var TenantMedia: Record "Tenant Media")
-    begin
-
     end;
 }
 
