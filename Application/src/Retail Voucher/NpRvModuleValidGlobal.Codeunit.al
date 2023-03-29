@@ -31,9 +31,8 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             exit;
 
         repeat
-            if NpRvGlobalVoucherSetup.Get(NpRvVoucherType.Code) then begin
+            if NpRvGlobalVoucherSetup.Get(NpRvVoucherType.Code) then
                 if TryValidateGlobalVoucherSetup(NpRvGlobalVoucherSetup) then;
-            end;
         until NpRvVoucherType.Next() = 0;
     end;
 
@@ -249,36 +248,10 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Voucher Entry", 'OnAfterInsertEvent', '', true, true)]
-    local procedure OnInsertVoucherEntry(var Rec: Record "NPR NpRv Voucher Entry"; RunTrigger: Boolean)
-    var
-        Voucher: Record "NPR NpRv Voucher";
-    begin
-        if Rec.IsTemporary then
-            exit;
-        if not Voucher.Get(Rec."Voucher No.") then
-            exit;
-
-        case Rec."Entry Type" of
-            Rec."Entry Type"::"Issue Voucher":
-                CreateGlobalVoucher(Voucher);
-            Rec."Entry Type"::Payment:
-                begin
-                    RedeemVoucher(Rec, Voucher);
-                    RedeemPartnerVouchers(Rec, Voucher);
-                end;
-            Rec."Entry Type"::"Partner Payment":
-                RedeemPartnerVouchers(Rec, Voucher);
-            Rec."Entry Type"::"Top-up":
-                TopUpVoucher(Rec);
-        end;
-    end;
-
-    local procedure CreateGlobalVoucher(Voucher: Record "NPR NpRv Voucher")
+    internal procedure CreateGlobalVoucher(Voucher: Record "NPR NpRv Voucher")
     var
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
-        NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        NPRPOSUnit: Record "NPR POS Unit";
+        POSUnit: Record "NPR POS Unit";
         StoreCode: Code[10];
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
@@ -292,13 +265,13 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         Voucher.CalcFields("Validate Voucher Module");
         if Voucher."Validate Voucher Module" <> ModuleCode() then
             exit;
-        NpRvVoucherType.Get(Voucher."Voucher Type");
+
         NpRvGlobalVoucherSetup.Get(Voucher."Voucher Type");
         NpRvGlobalVoucherSetup.TestField("Service Url");
 
         Voucher.CalcFields(Amount, "Issue Date", "Issue Register No.", "Issue Document No.", "Issue User ID");
-        if NPRPOSUnit.Get(Voucher."Issue Register No.") then
-            StoreCode := NPRPOSUnit."POS Store Code";
+        if POSUnit.Get(Voucher."Issue Register No.") then
+            StoreCode := POSUnit."POS Store Code";
         RequestXmlText :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
             '<soapenv:Body>' +
@@ -499,8 +472,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvGlobalVoucherSetup.Get(VoucherType.Code);
         NpRvGlobalVoucherSetup.TestField("Service Url");
 
-        Clear(Voucher);
-        Voucher.SetRange("Reference No.", TempNpRvVoucherBuffer."Reference No.");
+        Voucher.SetRange("Reference No.", ReferenceNo);
         Voucher.SetRange("Voucher Type", VoucherType.Code);
         if Voucher.FindFirst() then begin
             if Voucher.CalcInUseQty() > 0 then
@@ -610,7 +582,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
     procedure RedeemVoucher(VoucherEntry: Record "NPR NpRv Voucher Entry"; Voucher: Record "NPR NpRv Voucher")
     var
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
-        VoucherType: Record "NPR NpRv Voucher Type";
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
         ContentHeader: HttpHeaders;
@@ -620,10 +591,10 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         RequestXmlText: Text;
         ResponseText: Text;
     begin
-        VoucherType.Get(VoucherEntry."Voucher Type");
-        if VoucherType."Validate Voucher Module" <> ModuleCode() then
+        Voucher.CalcFields("Validate Voucher Module");
+        if Voucher."Validate Voucher Module" <> ModuleCode() then
             exit;
-        NpRvGlobalVoucherSetup.Get(VoucherType.Code);
+        NpRvGlobalVoucherSetup.Get(Voucher."Voucher Type");
         NpRvGlobalVoucherSetup.TestField("Service Url");
 
         RequestXmlText :=
@@ -631,7 +602,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             '<soapenv:Body>' +
               '<RedeemVouchers xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpRvGlobalVoucherSetup) + '">' +
                 '<vouchers>' +
-                  '<voucher reference_no="' + Voucher."Reference No." + '" voucher_type="' + VoucherType.Code + '" xmlns="urn:microsoft-dynamics-schemas/codeunit/global_voucher_service">' +
+                  '<voucher reference_no="' + Voucher."Reference No." + '" voucher_type="' + Voucher."Voucher Type" + '" xmlns="urn:microsoft-dynamics-schemas/codeunit/global_voucher_service">' +
                     '<amount>' + Format(-VoucherEntry.Amount, 0, 9) + '</amount>' +
                     '<redeem_date>' + Format(VoucherEntry."Posting Date", 0, 9) + '</redeem_date>' +
                     '<redeem_register_no>' + VoucherEntry."Register No." + '</redeem_register_no>' +
@@ -675,7 +646,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvPartner: Record "NPR NpRv Partner";
         NpRvPartnerRelation: Record "NPR NpRv Partner Relation";
         PartnerVoucherEntry: Record "NPR NpRv Voucher Entry";
-        VoucherType: Record "NPR NpRv Voucher Type";
         NpRvPartnerMgt: Codeunit "NPR NpRv Partner Mgt.";
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
@@ -686,8 +656,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         RequestXmlText: Text;
         ResponseText: Text;
     begin
-        VoucherType.Get(Voucher."Voucher Type");
-
         PartnerVoucherEntry.SetCurrentKey("Voucher No.", "Entry Type", "Partner Code");
         PartnerVoucherEntry.SetRange("Voucher No.", VoucherEntry."Voucher No.");
         PartnerVoucherEntry.SetFilter("Entry Type", '%1|%2', PartnerVoucherEntry."Entry Type"::"Issue Voucher", PartnerVoucherEntry."Entry Type"::"Partner Issue Voucher");
@@ -711,7 +679,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             exit;
         if NpRvPartner."Service Url" = '' then
             exit;
-        if not NpRvPartnerRelation.Get(NpRvPartner.Code, VoucherType.Code) then
+        if not NpRvPartnerRelation.Get(NpRvPartner.Code, Voucher."Voucher Type") then
             exit;
 
         RequestXmlText :=
@@ -760,11 +728,9 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         end;
     end;
 
-    procedure TopUpVoucher(VoucherEntry: Record "NPR NpRv Voucher Entry")
+    procedure TopUpVoucher(VoucherEntry: Record "NPR NpRv Voucher Entry"; Voucher: Record "NPR NpRv Voucher")
     var
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
-        Voucher: Record "NPR NpRv Voucher";
-        VoucherType: Record "NPR NpRv Voucher Type";
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
         [NonDebuggable]
@@ -774,18 +740,16 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         RequestXmlText: Text;
         ResponseText: Text;
     begin
-        VoucherType.Get(VoucherEntry."Voucher Type");
-        if not NpRvGlobalVoucherSetup.Get(VoucherType.Code) then
+        if not NpRvGlobalVoucherSetup.Get(Voucher."Voucher Type") then
             exit;
         NpRvGlobalVoucherSetup.TestField("Service Url");
 
-        Voucher.Get(VoucherEntry."Voucher No.");
         RequestXmlText :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
             '<soapenv:Body>' +
               '<TopUpVouchers xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpRvGlobalVoucherSetup) + '">' +
                 '<vouchers>' +
-                  '<voucher reference_no="' + Voucher."Reference No." + '" voucher_type="' + VoucherType.Code + '" xmlns="urn:microsoft-dynamics-schemas/codeunit/global_voucher_service">' +
+                  '<voucher reference_no="' + Voucher."Reference No." + '" voucher_type="' + Voucher."Voucher Type" + '" xmlns="urn:microsoft-dynamics-schemas/codeunit/global_voucher_service">' +
                     '<amount>' + Format(VoucherEntry.Amount, 0, 9) + '</amount>' +
                     '<redeem_date>' + Format(VoucherEntry."Posting Date", 0, 9) + '</redeem_date>' +
                     '<redeem_register_no>' + VoucherEntry."Register No." + '</redeem_register_no>' +
@@ -906,7 +870,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             NpRvVoucher.CalcFields(Amount);
             if (VoucherAmount <> 0) and (NpRvVoucher.Amount <> VoucherAmount) then
                 PostSyncEntry(NpRvVoucher, VoucherAmount - NpRvVoucher.Amount, Node);
-
         end;
     end;
 
@@ -970,7 +933,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
 
         if Evaluate(VoucherAmount, NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'amount', 0, false), 9) then
             Found := true;
-
     end;
 
     internal procedure ThrowGlobalVoucherWSError(ResponseReasonPhrase: Text; ResponseText: Text)
