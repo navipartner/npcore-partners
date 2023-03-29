@@ -51,7 +51,7 @@
             ItemWorksheetLine.Validate("Item No.", '');
     end;
 
-    local procedure FindItemNo(ItemRefNo: Code[50]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[10]): Boolean
+    local procedure FindItemNo(ItemRefNo: Code[50]; VendorsItemNo: Text[50]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[10]): Boolean
     var
         ItemRef: Record "Item Reference";
         Item: Record Item;

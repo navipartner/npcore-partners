@@ -21,17 +21,15 @@ codeunit 6150684 "NPR NPRE RVA: Set WPad Status" implements "NPR IPOS Workflow"
         FlowStatus: Record "NPR NPRE Flow Status";
         WaiterPad: Record "NPR NPRE Waiter Pad";
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
-        NewStatusCode: Text;
+        NewStatusParamValue: Text;
+        NewStatusCode: Code[10];
         ResultMessageText: Text;
     begin
         WaiterPad."No." := CopyStr(Context.GetStringParameter('WaiterPadCode'), 1, MaxStrLen(WaiterPad."No."));
-        if not Context.GetStringParameter('StatusCode', NewStatusCode) then
-            NewStatusCode := '';
-
-        if NewStatusCode = '' then
+        if not Context.GetStringParameter('StatusCode', NewStatusParamValue) or (NewStatusParamValue = '') then
             exit;
 
-        NewStatusCode := CopyStr(NewStatusCode, 1, MaxStrLen(FlowStatus.Code));
+        NewStatusCode := CopyStr(NewStatusParamValue, 1, MaxStrLen(NewStatusCode));
 
         WaiterPad.Find();
 

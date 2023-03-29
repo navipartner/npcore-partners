@@ -266,7 +266,7 @@
             repeat
                 if EventEWSMgt.CreateAttachment(EventReportLayout, Job, MailFor, AttachmentTempBlob, AttachmentName, AttachmentExtension) then begin
                     AttachmentTempBlob.CreateInStream(AttachmentStream);
-                    EmailMessage.AddAttachment(AttachmentName, AttachmentExtension, AttachmentStream);
+                    EmailMessage.AddAttachment(CopyStr(AttachmentName, 1, 250), CopyStr(AttachmentExtension, 1, 250), AttachmentStream);
                     Clear(AttachmentTempBlob);
                 end;
             until EventReportLayout.Next() = 0;

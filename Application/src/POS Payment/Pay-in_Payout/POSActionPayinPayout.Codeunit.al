@@ -47,7 +47,7 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
         AccountNo: Code[20];
     begin
         Response.ReadFrom('{}');
-        AccountNo := UpperCase(Context.GetStringParameter('FixedAccountCode'));
+        AccountNo := CopyStr(UpperCase(Context.GetStringParameter('FixedAccountCode')), 1, MaxStrLen(AccountNo));
 
         if (AccountNo <> '') then
             GLAccount.Get(AccountNo)
