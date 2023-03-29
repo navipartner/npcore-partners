@@ -121,7 +121,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         FileFilter: Label 'Certificate File (*.PFX)|*.PFX';
         ExtFilter: Label 'pfx';
         FileName: Text;
-        CertificateThumbprint: Text[250];
+        CertificateThumbprint: Text;
     begin
         _FRCertificationSetup.Get();
         if _FRCertificationSetup."Signing Certificate".HasValue() then begin
@@ -147,7 +147,9 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
         CertificateThumbprint := _FRCertificationSetup."Signing Certificate Thumbprint";
         X509Certificate2.GetCertificateThumbprint(Base64Cert, _FRCertificationSetup."Signing Certificate Password", CertificateThumbprint);
+#pragma warning disable AA0139
         _FRCertificationSetup."Signing Certificate Thumbprint" := CertificateThumbprint;
+#pragma warning restore AA0139
         _FRCertificationSetup.Modify(true);
 
         Message(CAPTION_CERT_SUCCESS, _FRCertificationSetup."Signing Certificate Thumbprint");
@@ -943,7 +945,9 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
         POSAuditLogAdditionalInfo.Init();
         POSAuditLogAdditionalInfo."POS Audit Log Entry No." := POSAuditLog."Entry No.";
+#pragma warning disable AA0139
         POSAuditLogAdditionalInfo."NPR Version" := Licenseinformation.GetRetailVersion();
+#pragma warning restore AA0139
         RecRef.GetTable(CompanyInformation);
         if RecRef.FieldExist(10802) then
             POSAuditLogAdditionalInfo.APE := RecRef.Field(10802).Value;

@@ -1842,7 +1842,7 @@
         end;
     end;
 
-    internal procedure FindItemNo(ItemRefNo: Code[50]; AltNo: Code[50]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[10]) found: Boolean
+    internal procedure FindItemNo(ItemRefNo: Code[50]; AltNo: Code[50]; VendorsItemNo: Text[50]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[10]) found: Boolean
     var
         ItemRef: Record "Item Reference";
     begin
@@ -2001,7 +2001,7 @@
                     Prefix := ItemNoPrefix();
                     if StrLen(Prefix + "Vend Item No.") < MaxStrLen("Vend Item No.") then
                         exit(CopyStr(Prefix + "Vend Item No.", 1, 20));
-                    exit("Vend Item No.");
+                    exit(CopyStr("Vend Item No.", 1, 20));
                 end;
         end;
     end;

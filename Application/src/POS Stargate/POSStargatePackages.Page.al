@@ -174,7 +174,7 @@ page 6150713 "NPR POS Stargate Packages"
         PackageMethod.SetRange("Method Name", Package.Name);
         PackageMethod.DeleteAll(false);
         foreach Method in Package.Methods do begin
-            PackageMethod."Method Name" := Method;
+            PackageMethod."Method Name" := CopyStr(Method, 1, MaxStrLen(PackageMethod."Method Name"));
             PackageMethod."Package Name" := Package.Name;
             if not PackageMethod.Insert(false) then;
         end;

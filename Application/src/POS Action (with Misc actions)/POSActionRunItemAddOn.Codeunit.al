@@ -117,7 +117,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
         POSActRunItemAddOnB: Codeunit "NPR POS Action: RunItemAddOn B";
     begin
         AppliesToLineNo := Context.GetInteger('BaseLineNo');
-        ApplyItemAddOnNo := Context.GetString('ApplyItemAddOnNo');
+        ApplyItemAddOnNo := CopyStr(Context.GetString('ApplyItemAddOnNo'), 1, MaxStrLen(ApplyItemAddOnNo));
         if not Context.GetBoolean('CompulsoryAddOn', CompulsoryAddOn) then
             CompulsoryAddOn := false;
         if not Context.GetBooleanParameter('SkipItemAvailabilityCheck', SkipItemAvailabilityCheck) then

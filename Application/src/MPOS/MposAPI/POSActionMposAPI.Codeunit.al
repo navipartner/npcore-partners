@@ -14,7 +14,8 @@ codeunit 6060073 "NPR POS Action: Mpos API" implements "NPR IPOS Workflow"
         FunctionOptions := 'Mock';
         FunctionOptionsName := 'Functionality';
         FunctionOptionsDesc := 'Defines which functionality to call on MPOS.';
-        WorkflowConfig.AddOptionParameter(FunctionOptionsName, FunctionOptions, '', FunctionOptionsName, FunctionOptionsDesc, FunctionOptions);
+        WorkflowConfig.AddOptionParameter(
+            CopyStr(FunctionOptionsName, 1, 30), CopyStr(FunctionOptions, 1, 250), '', FunctionOptionsName, FunctionOptionsDesc, FunctionOptions);
         WorkflowConfig.AddTextParameter('Parameters', '', 'Mpos function Parameter', 'Specifies the parameter to the functionality called');
     end;
 
