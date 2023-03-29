@@ -200,6 +200,11 @@
                     ToolTip = 'Specifies the value of the System Id field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Global Reference"; Rec."Global Reference")
+                {
+                    ToolTip = 'Specifies the value of the Global Reference field which is used for returns';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
@@ -208,6 +213,18 @@
     {
         area(navigation)
         {
+            action(POSSalesEntryCard)
+            {
+                Caption = 'POS Entry Card';
+                Image = Card;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                RunObject = page "NPR NpGp POS Sales Entry Card";
+                RunPageLink = "Entry No." = field("POS Entry No.");
+                ToolTip = 'Opens the Sales Entry Card with the full sale';
+                ApplicationArea = NPRRetail;
+            }
             action("Detailed Global POS Sales Entries")
             {
                 Caption = 'Detailed Global POS Sales Entries';
