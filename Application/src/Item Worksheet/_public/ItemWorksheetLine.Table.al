@@ -1963,6 +1963,8 @@
         InventorySetup: Record "Inventory Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         Prefix: Code[4];
+        ItemNoLengthExceededErr: Label 'Length %1 for item no. %2 is longer than %3. Please adjust data or use a different %4 on %5.',
+                                    Comment = '%1 = string length of new item no., %2 = value of new item no., %3 = max. allowed item no. length, %4 = "Item No. Creation by" field caption, %5 = "Item Worksheet Template" table caption';
     begin
         ItemWorksheetTemplate.Get("Worksheet Template Name");
 
@@ -1999,9 +2001,9 @@
                     if "Vend Item No." = '' then
                         exit('');
                     Prefix := ItemNoPrefix();
-                    if StrLen(Prefix + "Vend Item No.") < MaxStrLen("Vend Item No.") then
-                        exit(CopyStr(Prefix + "Vend Item No.", 1, 20));
-                    exit(CopyStr("Vend Item No.", 1, 20));
+                    if StrLen(Prefix + "Vend Item No.") <= MaxStrLen("Item No.") then
+                        exit(CopyStr(Prefix + "Vend Item No.", 1, MaxStrLen("Item No.")));
+                    Error(ItemNoLengthExceededErr, StrLen(Prefix + "Vend Item No."), Prefix + "Vend Item No.", MaxStrLen("Item No."), ItemWorksheetTemplate.FieldCaption("Item No. Creation by"), ItemWorksheetTemplate.TableCaption);
                 end;
         end;
     end;
