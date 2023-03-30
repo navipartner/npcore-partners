@@ -131,9 +131,9 @@
                     end;
                 }
             }
-            cuegroup(Purchase)
+            cuegroup(Purchases)
             {
-                Caption = 'Purchase';
+                Caption = 'Purchases';
                 field(PurchaseOrderList; Rec."Purchase Order List")
                 {
                     Caption = 'Purchase Orders';
