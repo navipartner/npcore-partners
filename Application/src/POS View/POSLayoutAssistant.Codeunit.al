@@ -20,6 +20,8 @@ codeunit 6059925 "NPR POS Layout Assistant"
                 AdjustPOSActionParameters(Context, FrontEnd);
             'RequestWorkflowList':
                 GenerateWorkflowList(Context, FrontEnd);
+            'UserCulture':
+                GetUserCultureName(Context, FrontEnd);
             else
                 exit;
         end;
@@ -358,6 +360,15 @@ codeunit 6059925 "NPR POS Layout Assistant"
                 end;
             until POSAction.Next() = 0;
         Response.Add('workflowList', ActionWorkflows);
+        FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
+    end;
+
+    procedure GetUserCultureName(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        TypeHelper: Codeunit "Type Helper";
+        Response: JsonObject;
+    begin
+        Response.Add('userCultureName', TypeHelper.GetCultureName());
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 
