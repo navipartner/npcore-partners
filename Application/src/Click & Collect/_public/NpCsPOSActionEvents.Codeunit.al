@@ -1,0 +1,29 @@
+codeunit 6059924 "NPR NpCs POS Action Events"
+{
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeSetUnprocessedFilter(LocationFilter: Text; var NpCsDocument: Record "NPR NpCs Document"; var IsHandeled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeSetProcessedFilter(LocationFilter: Text; var NpCsDocument: Record "NPR NpCs Document"; var IsHandeled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeGetUnprocessedOrderQty(LocationFilter: Text; var UnprocessedOrderQty: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeDeliverDocument(POSSession: Codeunit "NPR POS Session"; NpCsDocument: Record "NPR NpCs Document")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnDeliverOrderFilterSalesLine(NpCsDocument: Record "NPR NpCs Document"; SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+
+}
