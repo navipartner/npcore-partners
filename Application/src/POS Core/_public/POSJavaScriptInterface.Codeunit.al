@@ -506,4 +506,30 @@
     local procedure OnProtocolUITimer(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; var Handled: Boolean)
     begin
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
+    local procedure LogV1Actions(Action: Record "NPR POS Action"; var Handled: Boolean)
+    var
+        ActiveSession: Record "Active Session";
+        CustomDimensions: Dictionary of [Text, Text];
+        MessageTextLbl: Label '%1: (%2)', Locked = true;
+    begin
+        if Action.Code = '' then
+            exit;
+
+        // this will not be found if eg. Install of app was triggered via web client and session was closed
+        if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
+            Clear(ActiveSession);
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
+        CustomDimensions.Add('NPR_POSAction', Action.Code);
+        CustomDimensions.Add('NPR_POSAction_version', Format(Action."Workflow Implementation"));
+        CustomDimensions.Add('NPR_POSAction_Description', Action.Description);
+
+        Session.LogMessage('NPR_POSAction_Legacy', StrSubstNo(MessageTextLbl, Action.Code, Format(Action."Workflow Implementation")), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+    end;
 }
