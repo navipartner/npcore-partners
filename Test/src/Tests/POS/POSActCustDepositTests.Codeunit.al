@@ -29,7 +29,7 @@ codeunit 85096 "NPR POS Act. CustDeposit Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         PostedSalesInv: Code[20];
         CustLedgEntry: Record "Cust. Ledger Entry";
-        BALANCING_OF: Label 'Balancing of %1';
+        BALANCING_OF: Label 'Balancing of %1 %2';
     begin
         // [Given] POS & Payment setup
         LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
@@ -48,7 +48,7 @@ codeunit 85096 "NPR POS Act. CustDeposit Tests"
         DepositType := DepositType::ApplyCustomerEntries;
         CustomerEntryView := '';
 
-        POSActionBusinessLogic.CreateDeposit(DepositType, CustomerEntryView, POSSale, POSSaleLine, PromptValue, PromptAmt);
+        POSActionBusinessLogic.CreateDeposit(DepositType, CustomerEntryView, POSSale, POSSaleLine, PromptValue, PromptAmt, false);
 
         POSSale.GetCurrentSale(SalePOS);
 
@@ -66,7 +66,7 @@ codeunit 85096 "NPR POS Act. CustDeposit Tests"
         Assert.IsTrue(SaleLinePOS."Posted Sales Document Type" = SaleLinePOS."Posted Sales Document Type"::INVOICE, 'Posted Sales Document Type inserted');
         Assert.IsTrue(SaleLinePOS."Posted Sales Document No." = CustLedgEntry."Document No.", 'Posted Sales Document No, inserted');
         Assert.IsTrue(SaleLinePOS.Quantity = 1, 'Quantity inserted');
-        Assert.IsTrue(SaleLinePOS.Description = StrSubStno(BALANCING_OF, CustLedgEntry.Description), 'Description inserted');
+        Assert.IsTrue(SaleLinePOS.Description = StrSubStno(BALANCING_OF, FORMAT(CustLedgEntry."Document Type"), CustLedgEntry."Document No."), 'Description inserted');
         Assert.IsTrue(SaleLinePOS."Line Amount" = CustLedgEntry."Remaining Amount", 'Remaining Amount inserted');
     end;
 
@@ -87,7 +87,7 @@ codeunit 85096 "NPR POS Act. CustDeposit Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         PostedSalesInv: Code[20];
         CustLedgEntry: Record "Cust. Ledger Entry";
-        BALANCING_OF: Label 'Balancing of %1';
+        BALANCING_OF: Label 'Balancing of %1 %2';
     begin
         // [Given] POS & Payment setup
         LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
@@ -106,7 +106,7 @@ codeunit 85096 "NPR POS Act. CustDeposit Tests"
         DepositType := DepositType::InvoiceNoPrompt;
         CustomerEntryView := '';
 
-        POSActionBusinessLogic.CreateDeposit(DepositType, CustomerEntryView, POSSale, POSSaleLine, PromptValue, PromptAmt);
+        POSActionBusinessLogic.CreateDeposit(DepositType, CustomerEntryView, POSSale, POSSaleLine, PromptValue, PromptAmt, false);
 
         POSSale.GetCurrentSale(SalePOS);
 
@@ -124,7 +124,7 @@ codeunit 85096 "NPR POS Act. CustDeposit Tests"
         Assert.IsTrue(SaleLinePOS."Posted Sales Document Type" = SaleLinePOS."Posted Sales Document Type"::INVOICE, 'Posted Sales Document Type inserted');
         Assert.IsTrue(SaleLinePOS."Posted Sales Document No." = CustLedgEntry."Document No.", 'Posted Sales Document No, inserted');
         Assert.IsTrue(SaleLinePOS.Quantity = 1, 'Quantity inserted');
-        Assert.IsTrue(SaleLinePOS.Description = StrSubStno(BALANCING_OF, CustLedgEntry.Description), 'Description inserted');
+        Assert.IsTrue(SaleLinePOS.Description = StrSubStno(BALANCING_OF, FORMAT(CustLedgEntry."Document Type"), CustLedgEntry."Document No."), 'Description inserted');
         Assert.IsTrue(SaleLinePOS."Line Amount" = CustLedgEntry."Remaining Amount", 'Remaining Amount inserted');
     end;
 
@@ -145,7 +145,7 @@ codeunit 85096 "NPR POS Act. CustDeposit Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         PostedSalesCrMemo: Code[20];
         CustLedgEntry: Record "Cust. Ledger Entry";
-        BALANCING_OF: Label 'Balancing of %1';
+        BALANCING_OF: Label 'Balancing of %1 %2';
     begin
         // [Given] POS & Payment setup
         LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
@@ -164,7 +164,7 @@ codeunit 85096 "NPR POS Act. CustDeposit Tests"
         DepositType := DepositType::CrMemoNoPrompt;
         CustomerEntryView := '';
 
-        POSActionBusinessLogic.CreateDeposit(DepositType, CustomerEntryView, POSSale, POSSaleLine, PromptValue, PromptAmt);
+        POSActionBusinessLogic.CreateDeposit(DepositType, CustomerEntryView, POSSale, POSSaleLine, PromptValue, PromptAmt, false);
 
         POSSale.GetCurrentSale(SalePOS);
 
@@ -182,7 +182,7 @@ codeunit 85096 "NPR POS Act. CustDeposit Tests"
         Assert.IsTrue(SaleLinePOS."Posted Sales Document Type" = SaleLinePOS."Posted Sales Document Type"::CREDIT_MEMO, 'Posted Sales Document Type inserted');
         Assert.IsTrue(SaleLinePOS."Posted Sales Document No." = CustLedgEntry."Document No.", 'Posted Sales Document No, inserted');
         Assert.IsTrue(SaleLinePOS.Quantity = 1, 'Quantity inserted');
-        Assert.IsTrue(SaleLinePOS.Description = StrSubStno(BALANCING_OF, CustLedgEntry.Description), 'Description inserted');
+        Assert.IsTrue(SaleLinePOS.Description = StrSubStno(BALANCING_OF, FORMAT(CustLedgEntry."Document Type"), CustLedgEntry."Document No."), 'Description inserted');
         Assert.IsTrue(SaleLinePOS."Line Amount" = CustLedgEntry."Remaining Amount", 'Remaining Amount inserted');
     end;
 
@@ -226,7 +226,7 @@ codeunit 85096 "NPR POS Act. CustDeposit Tests"
         DepositType := DepositType::AmountPrompt;
         CustomerEntryView := '';
 
-        POSActionBusinessLogic.CreateDeposit(DepositType, CustomerEntryView, POSSale, POSSaleLine, PromptValue, PromptAmt);
+        POSActionBusinessLogic.CreateDeposit(DepositType, CustomerEntryView, POSSale, POSSaleLine, PromptValue, PromptAmt, false);
 
         POSSale.GetCurrentSale(SalePOS);
 
@@ -283,7 +283,7 @@ codeunit 85096 "NPR POS Act. CustDeposit Tests"
         DepositType := DepositType::MatchCustomerBalance;
         CustomerEntryView := '';
 
-        POSActionBusinessLogic.CreateDeposit(DepositType, CustomerEntryView, POSSale, POSSaleLine, PromptValue, PromptAmt);
+        POSActionBusinessLogic.CreateDeposit(DepositType, CustomerEntryView, POSSale, POSSaleLine, PromptValue, PromptAmt, false);
 
         Customer.Get(SalePOS."Customer No.");
         Customer.CalcFields("Balance (LCY)");

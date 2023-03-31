@@ -7,7 +7,7 @@
     var
         _CustLedgEntryView: Text;
         CONFIRM_BALANCE: Label 'Do you wish to apply %1 %2 for customer %3?';
-        BALANCING_OF: Label 'Balancing of %1';
+        BALANCING_OF: Label 'Balancing of %1 %2';
 
     procedure DeleteExistingLines(SalePOS: Record "NPR POS Sale")
     var
@@ -31,7 +31,7 @@
         _CustLedgEntryView := TableView;
     end;
 
-    procedure SelectCustomerEntries(var POSSession: Codeunit "NPR POS Session"; CustLedgEntryView: Text)
+    procedure SelectCustomerEntries(var POSSession: Codeunit "NPR POS Session"; CustLedgEntryView: Text; CopyDesc: Boolean)
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
@@ -82,11 +82,11 @@
 
         ClearAcceptedPmtTolerance(CustLedgEntry);
         repeat
-            CreateApplyingPOSSaleLine(POSSaleLine, CustLedgEntry);
+            CreateApplyingPOSSaleLine(POSSaleLine, CustLedgEntry, CopyDesc);
         until CustLedgEntry.Next() = 0;
     end;
 
-    procedure BalanceDocument(var POSSession: Codeunit "NPR POS Session"; DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20]; Silent: Boolean)
+    procedure BalanceDocument(var POSSession: Codeunit "NPR POS Session"; DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20]; Silent: Boolean; CopyDesc: Boolean)
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
         POSSale: Codeunit "NPR POS Sale";
@@ -119,10 +119,10 @@
         end else
             SalePOS.TestField("Customer No.", CustLedgEntry."Customer No.");
 
-        CreateApplyingPOSSaleLine(POSSaleLine, CustLedgEntry);
+        CreateApplyingPOSSaleLine(POSSaleLine, CustLedgEntry, CopyDesc);
     end;
 
-    local procedure CreateApplyingPOSSaleLine(var POSSaleLine: Codeunit "NPR POS Sale Line"; CustLedgEntry: Record "Cust. Ledger Entry")
+    local procedure CreateApplyingPOSSaleLine(var POSSaleLine: Codeunit "NPR POS Sale Line"; CustLedgEntry: Record "Cust. Ledger Entry"; CopyDesc: Boolean)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         GenJnlApply: Codeunit "Gen. Jnl.-Apply";
@@ -165,8 +165,9 @@
 
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS.Validate("Unit Price", LineAmount);
-        SaleLinePOS.Description := StrSubstNo(BALANCING_OF, CustLedgEntry.Description);
+        SaleLinePOS.Description := StrSubstNo(BALANCING_OF, FORMAT(CustLedgEntry."Document Type"), CustLedgEntry."Document No.");
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
+        SaleLinePOS."Copy Description" := CopyDesc;
 
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
 

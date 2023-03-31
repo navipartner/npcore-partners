@@ -87,7 +87,7 @@
         POSApplyCustomerEntries: Codeunit "NPR POS Apply Customer Entries";
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
-        POSApplyCustomerEntries.BalanceDocument(_POSSession, CustLedgerEntry."Document Type"::Invoice, DownpaymentInvoiceNo, true);
+        POSApplyCustomerEntries.BalanceDocument(_POSSession, CustLedgerEntry."Document Type"::Invoice, DownpaymentInvoiceNo, true, false);
     end;
 
     local procedure ApplyPrepaymentCreditMemoToOpenPrepaymentInvoices(CreditMemoNo: Text; var SalesHeader: Record "Sales Header")
@@ -194,7 +194,8 @@
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"Customer Deposit";;
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"Customer Deposit";
+        ;
         SaleLinePOS.Validate("No.", CreditMemoCustLedgerEntry."Customer No.");
         SaleLinePOS.Validate("Unit Price", CreditMemoCustLedgerEntry."Remaining Amt. (LCY)");
         SaleLinePOS.Validate(Quantity, 1);
