@@ -22,7 +22,7 @@ codeunit 6060020 "NPR POS Action: Layaway Pay-B"
         if not SelectPrepaymentInvoice(SalesHeader, SalesInvoiceHeader, SelectionMethod) then
             exit;
 
-        POSApplyCustomerEntries.BalanceDocument(POSSession, CustLedgerEntry."Document Type"::Invoice, SalesInvoiceHeader."No.", true);
+        POSApplyCustomerEntries.BalanceDocument(POSSession, CustLedgerEntry."Document Type"::Invoice, SalesInvoiceHeader."No.", true, false);
         InsertCompletionLine(POSSession, SalesHeader, SalesInvoiceHeader);
         CreateLayawayComments(POSSession, SalesHeader, SelectionMethod, SalesInvoiceHeader);
     end;
