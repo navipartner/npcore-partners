@@ -156,6 +156,7 @@
     local procedure OnActionDeliverDocument(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
     var
         NpCsDocument: Record "NPR NpCs Document";
+        NpCsPOSActionEvents: Codeunit "NPR NpCs POS Action Events";
         ConfirmInvDiscAmt: Boolean;
         EntryNo: Integer;
         DeliverText: Text;
@@ -168,6 +169,7 @@
             exit;
 
         NpCsDocument.Get(EntryNo);
+        NpCsPOSActionEvents.OnBeforeDeliverDocument(POSSession, NpCsDocument);
         case NpCsDocument."Document Type" of
             NpCsDocument."Document Type"::Order:
                 begin
@@ -260,7 +262,13 @@
     end;
 
     local procedure SetProcessedFilter(LocationFilter: Text; var NpCsDocument: Record "NPR NpCs Document")
+    var
+        NpCsPOSActionEvents: Codeunit "NPR NpCs POS Action Events";
+        IsHandled: Boolean;
     begin
+        NpCsPOSActionEvents.OnBeforeSetProcessedFilter(LocationFilter, NpCsDocument, IsHandled);
+        if IsHandled then
+            exit;
         NpCsDocument.SetRange(Type, NpCsDocument.Type::"Collect in Store");
         NpCsDocument.SetRange("Processing Status", NpCsDocument."Processing Status"::Confirmed);
         NpCsDocument.SetRange("Delivery Status", NpCsDocument."Delivery Status"::Ready);
