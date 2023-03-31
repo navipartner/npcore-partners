@@ -51,8 +51,10 @@
     procedure RunNextWorkflowStep(var collect_documents: XMLport "NPR NpCs Collect Documents")
     var
         NpCsDocument: Record "NPR NpCs Document";
+        NpCsArchDocument: Record "NPR NpCs Arch. Document";
         TempNpCsDocument: Record "NPR NpCs Document" temporary;
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
+        IsHandled: Boolean;
     begin
         collect_documents.Import();
         collect_documents.RefreshSourceTable();
@@ -64,8 +66,14 @@
                 NpCsDocument.SetRange("Document No.", TempNpCsDocument."Document No.");
                 NpCsDocument.SetRange("From Store Code", TempNpCsDocument."From Store Code");
                 NpCsDocument.SetRange("Reference No.", TempNpCsDocument."Reference No.");
-                NpCsDocument.FindFirst();
-                NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
+                if NpCsDocument.FindFirst() then
+                    NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument)
+                else begin
+                    if FindNpCsArchDocument(TempNpCsDocument, NpCsArchDocument) then
+                        RunNextWorkflowStepOnArchived(NpCsArchDocument, IsHandled);
+                    if not IsHandled then
+                        NpCsDocument.FindFirst();
+                end;
             until TempNpCsDocument.Next() = 0;
     end;
 
@@ -210,7 +218,7 @@
         NcImportType."Import Codeunit ID" := SalesDocCodeunitId;
         NcImportType."Lookup Codeunit ID" := CODEUNIT::"NPR NpCs Lookup Sales Document";
         NcImportType."Webservice Enabled" := true;
-        NcImportType."Webservice Codeunit ID" := CurrCodeunitId();
+        NcImportType."Webservice Codeunit ID" := Codeunit::"NPR NpCs Collect WS";
         NcImportType.Insert(true);
     end;
 
@@ -230,9 +238,29 @@
         ImportEntry.Insert(true);
     end;
 
-    local procedure CurrCodeunitId(): Integer
+    local procedure FindNpCsArchDocument(var TempNpCsDocument: Record "NPR NpCs Document" temporary; NpCsArchDocument: Record "NPR NpCs Arch. Document"): Boolean
     begin
-        exit(CODEUNIT::"NPR NpCs Collect WS");
+        NpCsArchDocument.SetRange(Type, TempNpCsDocument.Type);
+        case TempNpCsDocument.Type of
+            TempNpCsDocument.Type::"Send to Store":
+                begin
+                    NpCsArchDocument.SetRange("Document Type", TempNpCsDocument."Document Type");
+                    NpCsArchDocument.SetRange("Document No.", TempNpCsDocument."Document No.");
+                end;
+            TempNpCsDocument.Type::"Collect in Store":
+                begin
+                    NpCsArchDocument.SetRange("From Document Type", TempNpCsDocument."Document Type");
+                    NpCsArchDocument.SetRange("From Document No.", TempNpCsDocument."Document No.");
+                end;
+        end;
+        NpCsArchDocument.SetRange("From Store Code", TempNpCsDocument."From Store Code");
+        NpCsArchDocument.SetRange("Reference No.", TempNpCsDocument."Reference No.");
+        exit(NpCsArchDocument.FindLast());
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure RunNextWorkflowStepOnArchived(var NpCsArchDocument: Record "NPR NpCs Arch. Document"; var IsHandled: Boolean)
+    begin
     end;
 }
 

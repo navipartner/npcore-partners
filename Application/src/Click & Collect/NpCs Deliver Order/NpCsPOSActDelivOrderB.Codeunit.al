@@ -121,11 +121,13 @@ codeunit 6060069 "NPR NpCs POSAct. Deliv.Order-B"
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
+        NpCsPOSActionEvents: Codeunit "NPR NpCs POS Action Events";
         RemainingAmount: Decimal;
     begin
         SalesHeader.Get(SalesHeader."Document Type"::Order, NpCsDocument."Document No.");
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
+        NpCsPOSActionEvents.OnDeliverOrderFilterSalesLine(NpCsDocument, SalesHeader, SalesLine);
         if SalesLine.IsEmpty() then
             Error(EmptyLinesOnDocumentErr, NpCsDocument."Reference No.");
 
