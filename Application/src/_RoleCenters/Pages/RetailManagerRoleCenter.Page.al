@@ -598,6 +598,14 @@
                             ApplicationArea = NPRRetail;
                             ToolTip = 'Executes the POS Item Sales With Dimensions action.';
                         }
+                        action("NPR POS Item Sal. Gl. Dim. Set")
+                        {
+                            Caption = 'POS Item Sales per Global Dimensions Set';
+                            Image = Report;
+                            RunObject = report "NPR POS Item Sal. Gl. Dim. Set";
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Executes the POS Item Sales per Global Dimensions Set action.';
+                        }
                         action("NPR Item - Loss")
                         {
                             Caption = 'Item - Loss';
