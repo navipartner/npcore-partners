@@ -72,6 +72,26 @@ page 6059925 "NPR APIV1 PBIGLEntry"
                 {
                     Caption = 'Entry No.', Locked = true;
                 }
+                field(vatAmount; Rec."VAT Amount")
+                {
+                    Caption = 'VAT Amount', Locked = true;
+                }
+                field(documentNo; Rec."Document No.")
+                {
+                    Caption = 'Document No.', Locked = true;
+                }
+                field(taxGroupCode; Rec."Tax Group Code")
+                {
+                    Caption = 'Tax Group Code', Locked = true;
+                }
+                field(documentType; Rec."Document Type")
+                {
+                    Caption = 'Document Type', Locked = true;
+                }
+                field(dimensionSetID; Rec."Dimension Set ID")
+                {
+                    Caption = 'Dimension Set ID', Locked = true;
+                }
             }
         }
     }
