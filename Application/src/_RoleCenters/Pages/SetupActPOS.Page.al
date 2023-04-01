@@ -97,18 +97,6 @@
                             System.Hyperlink('https://npminortom.blob.core.windows.net/prod/Setup.exe');
                         end;
                     }
-                    action("Download Major Tom")
-                    {
-                        Caption = 'Download Major Tom';
-                        ToolTip = 'Download Major Tom ';
-                        Image = TileCloud;
-                        ApplicationArea = NPRRetail;
-
-                        trigger OnAction()
-                        begin
-                            System.Hyperlink('https://clickonce.dynamics-retail.com/ClickOnce/Majortom/6.3/install.html');
-                        end;
-                    }
                     action("Download HW Connector")
                     {
                         Caption = 'Download HW Connector';
