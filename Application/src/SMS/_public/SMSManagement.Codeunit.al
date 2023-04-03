@@ -20,13 +20,6 @@
         SMSImplementation.SendSMS(PhoneNo, SenderNo, Message, DelayUntil);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure SendQueuedSMS(MessageLog: Record "NPR SMS Log")
-    var
-        SMSImplementation: Codeunit "NPR SMS Implementation";
-    begin
-        SMSImplementation.SendQueuedSMS(MessageLog);
-    end;
 
     procedure QueueMessages(PhoneNo: List of [Text]; SenderNo: Text; Message: Text; DelayUntil: DateTime)
     var
@@ -64,21 +57,6 @@
         SMSImplementation.InsertMessageLog(PhoneNo, SenderNo, Message, SendDT);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure DiscardOldMessages(MessageLog: Record "NPR SMS Log") IsDiscarded: Boolean
-    var
-        SMSImplementation: Codeunit "NPR SMS Implementation";
-    begin
-        IsDiscarded := SMSImplementation.DiscardOldMessages(MessageLog);
-    end;
-
-    [Obsolete('In next release goes internal')]
-    procedure UpdateMessageLog(MessageLog: Record "NPR SMS Log"; Status: Enum "NPR SMS Log Status"; ErrorMessage: Text)
-    var
-        SMSImplementation: Codeunit "NPR SMS Implementation";
-    begin
-        SMSImplementation.UpdateMessageLog(MessageLog, Status, ErrorMessage);
-    end;
     #endregion
     #region Notification
     procedure QueuedNotification()

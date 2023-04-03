@@ -4,7 +4,7 @@
     trigger OnRun()
     var
         MessageLog: Record "NPR SMS Log";
-        SMSManagement: Codeunit "NPR SMS Management";
+        SMSImplementation: Codeunit "NPR SMS Implementation";
     begin
         SelectLatestVersion();
         MessageLog.LockTable();
@@ -13,8 +13,8 @@
         if MessageLog.FindSet() then
             repeat
                 Commit();
-                if not SMSManagement.DiscardOldMessages(MessageLog) then
-                    SMSManagement.SendQueuedSMS(MessageLog);
+                if not SMSImplementation.DiscardOldMessages(MessageLog) then
+                    SMSImplementation.SendQueuedSMS(MessageLog);
             until MessageLog.Next() = 0;
     end;
 }
