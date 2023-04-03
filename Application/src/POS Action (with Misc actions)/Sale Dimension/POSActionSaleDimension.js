@@ -1,14 +1,15 @@
-let main = async ({ parameters, context, captions }) => {
-    const { DimCaption } = await workflow.respond("GetDimCaption");
+let main = async ({ parameters}) => {
+
+    const{HeadlineTxt, DimCaption} = await workflow.respond("GetCaptions");
 
     if (parameters.ValueSelection == 2) {
-        var result = await popup.numpad({ title: DimCaption, caption: captions.DimTitle });
+        var result = await popup.numpad({ title: HeadlineTxt , caption: DimCaption });
         if (result === null) {
             return (" ");
         }
     }
     if (parameters.ValueSelection == 3) {
-        var result = await popup.input({ title: DimCaption, caption: captions.DimTitle });
+        var result = await popup.input({ title: HeadlineTxt, caption: DimCaption });
         if (result === null) {
             return (" ");
         }
