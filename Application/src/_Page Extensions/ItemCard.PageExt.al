@@ -1057,6 +1057,26 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         MixedDiscountLines.RunModal();
                     end;
                 }
+                action("NPR Price Change History")
+                {
+                    Caption = 'Sales Price History';
+                    Image = History;
+                    Promoted = true;
+                    PromotedCategory = Category6;
+                    ToolTip = 'View all Price History changes specified for this item.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        PriceChangeHistory: Record "NPR Price Change History";
+                        PriceChangeHistoryLines: Page "NPR Price Change History";
+                    begin
+                        PriceChangeHistory.SetRange("Product No.", Rec."No.");
+                        PriceChangeHistory.SetRange("Asset Type", PriceChangeHistory."Asset Type"::Item);
+                        PriceChangeHistoryLines.SetTableView(PriceChangeHistory);
+                        PriceChangeHistoryLines.RunModal();
+                    end;
+                }
             }
         }
 
