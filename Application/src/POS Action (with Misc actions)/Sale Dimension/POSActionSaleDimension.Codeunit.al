@@ -35,7 +35,8 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
         ParamCreateDimValue_CptLbl: Label 'Create Value';
         ParamCreateDimValue_DescLbl: Label 'Specifies if the system will automatically create missing dimension values';
         DimTitle: Label 'Dimension and Statistics';
-
+        ParamHeadlineTxt_CptLbl: Label 'Headline text';
+        ParamHealineTxt_DescLbl: Label 'Specifies popup Headline text';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -74,7 +75,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
         WorkflowConfig.AddIntegerParameter('StatisticsFrequency', 1, ParamStatisticsFrequency_CptLbl, ParamStatisticsFrequency_DescrLbl);
         WorkflowConfig.AddBooleanParameter('ShowConfirmMessage', false, ParamShowConfirmMessage_CptLbl, ParamShowConfirmMessage_DescLbl);
         WorkflowConfig.AddBooleanParameter('CreateDimValue', false, ParamCreateDimValue_CptLbl, ParamCreateDimValue_DescLbl);
-        WorkflowConfig.AddLabel('DimTitle', DimTitle);
+        WorkflowConfig.AddTextParameter('HeadlineTxt', DimTitle, ParamHeadlineTxt_CptLbl, ParamHealineTxt_DescLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -82,19 +83,22 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
 
     begin
         case Step of
-            'GetDimCaption':
-                FrontEnd.WorkflowResponse(GetDimCaption(Context));
+            'GetCaptions':
+                FrontEnd.WorkflowResponse(GetCaptios(Context));
             'InsertDim':
                 FrontEnd.WorkflowResponse(InsertDim(Context));
         end;
     end;
 
-    local procedure GetDimCaption(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
+    local procedure GetCaptios(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
     var
+        HeadLineTxt: Text;
         DimCode: Code[20];
         Dimension: Record Dimension;
         CaptionText: Text;
     begin
+        HeadLineTxt := Context.GetStringParameter('HeadlineTxt');
+        Response.Add('HeadlineTxt', HeadLineTxt);
 
         DimCode := GetDimensionCode(Context);
         CaptionText := DimCode;
@@ -450,7 +454,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionSaleDimension.js###
-'let main=async({parameters:t,context:a,captions:n})=>{const{DimCaption:e}=await workflow.respond("GetDimCaption");if(t.ValueSelection==2){var i=await popup.numpad({title:e,caption:n.DimTitle});if(i===null)return" "}if(t.ValueSelection==3){var i=await popup.input({title:e,caption:n.DimTitle});if(i===null)return" "}await workflow.respond("InsertDim",{DimCode:i})};'
+'let main=async({parameters:t})=>{const{HeadlineTxt:n,DimCaption:a}=await workflow.respond("GetCaptions");if(t.ValueSelection==2){var i=await popup.numpad({title:n,caption:a});if(i===null)return" "}if(t.ValueSelection==3){var i=await popup.input({title:n,caption:a});if(i===null)return" "}await workflow.respond("InsertDim",{DimCode:i})};'
         );
     end;
 }
