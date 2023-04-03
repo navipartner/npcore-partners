@@ -280,6 +280,30 @@
         end;
     end;
 
+    local procedure GetBlobAsText(var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID)
+    var
+        TempBlob: Codeunit "Temp Blob";
+        RecRef: RecordRef;
+        FldRef: FieldRef;
+        IStream: InStream;
+        BlobDataAsText: Text[2048];
+    begin
+        if RecID.TableNo <> 0 then begin
+            Clear(BlobDataAsText);
+            RecRef := RecID.GetRecord();
+
+            if RecRef.FieldExist(TemplateLine."Field") then begin
+                FldRef := RecRef.Field(TemplateLine."Field");
+                TempBlob.FromFieldRef(FldRef);
+                if TempBlob.HasValue() then begin
+                    TempBlob.CreateInStream(IStream);
+                    IStream.Read(BlobDataAsText);
+                    TemplateLine."Processing Value" := BlobDataAsText;
+                end;
+            end;
+        end;
+    end;
+
     local procedure BuildFunctionCodeunitList(var tmpAllObj: Record AllObj temporary)
     var
         AllObj: Record AllObj;
@@ -333,6 +357,7 @@
         AddFunction(tmpRetailList, 'CALC_DATE');
         AddFunction(tmpRetailList, 'RECEIPT_PRINT_COUNT');
         AddFunction(tmpRetailList, 'RECEIPT_REPRINT_COUNT');
+        AddFunction(tmpRetailList, 'BLOB_TO_TEXT');
     end;
 
     local procedure DoFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID; var Handled: Boolean)
@@ -409,6 +434,8 @@
                 GetReceiptPrintCount(TemplateLine."Processing Value", RecID, true);
             'RECEIPT_REPRINT_COUNT':
                 GetReceiptPrintCount(TemplateLine."Processing Value", RecID, false);
+            'BLOB_TO_TEXT':
+                GetBlobAsText(TemplateLine, RecID);
             else
                 case true of
                     CopyStr(TemplateLine."Processing Function ID", 1, 7) = 'CONVERT':
