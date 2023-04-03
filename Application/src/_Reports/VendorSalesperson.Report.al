@@ -1,7 +1,7 @@
 ﻿report 6014529 "NPR Vendor/Salesperson"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/VendorSalesperson.rdlc';
@@ -16,255 +16,154 @@
         {
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.";
-            column(PageNoCaptionLbl; PageNoCaptionLbl)
-            {
-            }
-            column(Report_Caption; Report_Caption_Lbl)
-            {
-            }
-            column(COMPANYNAME; CompanyName)
-            {
-            }
-            column(Salespersonfilter; Salespersonfilter)
-            {
-            }
-            column(VendorFilter; VendorFilter)
-            {
-            }
-            column(No_Vendor; Vendor."No.")
-            {
-            }
-            column(Vendor_Caption; Vendor_Caption_Lbl)
-            {
-            }
-            column(Name_Vendor; Vendor.Name)
-            {
-            }
-            column(No_Caption; No_Caption_Lbl)
-            {
-            }
-            column(Salesperson_Caption; Salesperson_Caption_Lbl)
-            {
-            }
-            column(Turnover_Caption; Turnover_Caption_Lbl)
-            {
-            }
-            column(Cost_Caption; Cost_Caption_Lbl)
-            {
-            }
-            column(DbCaption; DbCaption_Lbl)
-            {
-            }
-            column(CRPct_Caption; CRPct_Caption_Lbl)
-            {
-            }
+            column(ReportTitle; ReportTitleLbl) { }
+            column(CompanyName; CompanyName) { }
+            column(VendorNoLbl; VendorNoLbl) { }
+            column(VendorNameLbl; VendorNameLbl) { }
+
+            column(VendorNo; "No.") { }
+            column(VendorName; Name) { }
+
+            column(TodaysDate; System.Today) { }
+            column(PageNoCap; PageNoLbl) { }
+            column(PageNoTxt; PageNoTxt) { }
+
             dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
             {
-                PrintOnlyIfDetail = false;
-                RequestFilterFields = "Code", "Date Filter";
+                DataItemTableView = sorting(Code);
+                PrintOnlyIfDetail = true;
+                RequestFilterFields = Code, "Date Filter";
+                RequestFilterHeading = 'Salesperson';
 
-                trigger OnAfterGetRecord()
-                var
-                    SalesLCY: Decimal;
-                    COGSLCY: Decimal;
-                begin
-                    currentRec += 1;
+                column(SalesPersonNoLbl; SalesPesonNoLbl) { }
+                column(SalesPersonNameLbl; SalesPersonNameLbl) { }
 
-                    d.Update(2, Round(((currentRec * 10000) / totalRec), 1));
+                column(SalesPersonCode; Code) { }
+                column(SalesPersonName; Name) { }
 
-                    TotalSale := 0;
-                    TotalCOGS := 0;
+                dataitem(Item; Item)
+                {
+                    DataItemTableView = sorting("No.");
+                    column(ItemNoLbl; ItemNoLbl) { }
+                    column(ItemNo; Item."No.") { }
+                    column(ItemDescLbl; ItemDescLbl) { }
+                    column(ItemDesc; Item.Description) { }
 
-                    Item.SetCurrentKey("Vendor No.");
-                    Item.SetRange("Vendor No.", Vendor."No.");
+                    column(TotalSalesPerItem; TotalSalesPerItem) { }
+                    column(TotalCOGSPerItem; TotalCOGSPerItem) { }
+                    column(TotalSalesCaption; TotalSalesLbl) { }
+                    column(TotalSales; TotalSalesPerItem) { }
+                    column(TotalCOGSCaption; TotalCOGSLbl) { }
+                    column(TotalCOGS; TotalCOGSPerItem) { }
 
-                    if Item.Find('-') then
-                        repeat
-                            SetFilter("NPR Item Filter", Item."No.");
-                            NPRGetVESalesLCY(SalesLCY);
-                            NPRGetVECOGSLCY(COGSLCY);
-                            TotalSale += SalesLCY;
-                            TotalCOGS += COGSLCY;
+                    column(InvQtyCaption; InvQtyLbl) { }
+                    column(Quantity; InvoicedQty) { }
+                    column(UOMCaption; UOMLbl) { }
+                    column(Base_Unit_of_Measure; "Base Unit of Measure") { }
+                    column(DiscAmountCaption; DiscAmountLbl) { }
+                    column(DiscAmount; DiscAmount) { }
+                    column(ProfitCap; ProfitLbl) { }
+                    column(Profit; Profit) { }
+                    column(ProfitPercCaption; ProfitPercLbl) { }
+                    column(ProfitPerc; ProfitPerc) { }
+                    column(FiltersLbl; FiltersLbl) { }
+                    column(FiltersText; FiltersText) { }
+                    column(TotalLbl; TotalLbl) { }
 
-                        until Item.Next() = 0 else
-                        CurrReport.Skip();
+                    column(NoCaption; NoCaptionLbl) { }
+                    column(DescCaption; DescCaptionLbl) { }
 
-                    if TotalSale <> 0 then begin
-                        TempVaregruppe.Init();
-                        TempVaregruppe."Item No." := "Salesperson/Purchaser".Code;
-                        TempVaregruppe.Amount := TotalSale;
-                        TempVaregruppe."Amount 2" := TotalCOGS;
-                        if TempVaregruppe.Insert() then;
-
-                    end else
-                        CurrReport.Skip();
-                end;
-
-                trigger OnPreDataItem()
-                begin
-                    TempVaregruppe.DeleteAll();
-
-                    currentRec := 1;
-                    totalRec := (Count() * 2);
-                end;
-            }
-            dataitem("Integer"; "Integer")
-            {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
-                column(Item_No_Varegruppetemp; TempVaregruppe."Item No.")
-                {
-                }
-                column(Name_SalesPerson; SalesPerson.Name)
-                {
-                }
-                column(Amount_Varegruppetemp; TempVaregruppe.Amount)
-                {
-                }
-                column(Amount2_Varegruppetemp; TempVaregruppe."Amount 2")
-                {
-                }
-                column(db; db)
-                {
-                }
-                column(dg; dg)
-                {
-                }
-                column(Total_Caption; Total_Caption_Lbl)
-                {
-                }
-                column(turnovertotal; totalTurnover)
-                {
-                }
-                column(forbrugtotal; forbrugtotal)
-                {
-                }
-                column(dbtotal; dbtotal)
-                {
-                }
-                column(dgtotal; dgtotal)
-                {
-                }
-                column(turnoveralt; totalTotalTurnover)
-                {
-                }
-                column(forbrugalt; forbrugalt)
-                {
-                }
-                column(dbalt; dbalt)
-                {
-                }
-                column(dgalt; dgalt)
-                {
-                }
-
-                trigger OnAfterGetRecord()
-                begin
-                    dg := 0;
-                    db := 0;
-
-                    if Number = 1 then begin
-                        if not TempVaregruppe.Find('-') then
-                            CurrReport.Break();
-                    end else
-                        if TempVaregruppe.Next() = 0 then
-                            CurrReport.Break();
-
-                    if (TempVaregruppe.Amount <> 0) then begin
-                        dg := ((TempVaregruppe.Amount - TempVaregruppe."Amount 2") / TempVaregruppe.Amount) * 100;
-                        db := TempVaregruppe.Amount - TempVaregruppe."Amount 2";
+                    trigger OnPreDataItem()
+                    begin
+                        Item.SetCurrentKey("Vendor No.");
+                        Item.SetRange("Vendor No.", Vendor."No.");
                     end;
 
-                    if SalesPerson.Get(TempVaregruppe."Item No.") then;
+                    trigger OnAfterGetRecord()
+                    begin
+                        TotalSalesPerItem := 0;
+                        TotalCOGSPerItem := 0;
+                        InvoicedQty := 0;
+                        DiscAmount := 0;
+                        Profit := 0;
+                        ProfitPerc := 0;
 
-                    totalTurnover += TempVaregruppe.Amount;
-                    forbrugtotal += TempVaregruppe."Amount 2";
-                    dbtotal += db;
-                end;
+                        ValueEntry.SetCurrentKey("Salespers./Purch. Code", "Posting Date");
+                        ValueEntry.SetFilter("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
+                        ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
+                        ValueEntry.SetRange("Source Type", ValueEntry."Source Type"::Customer);
+                        ValueEntry.SetFilter("Sales Amount (Actual)", '<>0');
+                        ValueEntry.SetRange("Item No.", Item."No.");
+                        ValueEntry.SetFilter("Posting Date", "Salesperson/Purchaser".GetFilter("Date Filter"));
 
-                trigger OnPreDataItem()
-                begin
-                    TempVaregruppe.Ascending(false);
+                        if not ValueEntry.FindSet() then
+                            CurrReport.Skip();
 
-                    totalTurnover := 0;
-                    forbrugtotal := 0;
-                    dbtotal := 0;
-                    dgtotal := 0;
-                end;
+                        repeat
+                            TotalSalesPerItem += Round(ValueEntry."Sales Amount (Actual)", 0.01);
+                            TotalCOGSPerItem += Round(-ValueEntry."Cost Amount (Actual)", 0.01);
+                            InvoicedQty += -ValueEntry."Invoiced Quantity";
+                            DiscAmount += -ValueEntry."Discount Amount";
+                        until ValueEntry.Next() = 0;
+
+                        if TotalCOGSPerItem > 0 then begin
+                            ProfitPerc := Round(((TotalSalesPerItem - TotalCOGSPerItem) / TotalSalesPerItem) * 100);
+                            Profit := Round(TotalSalesPerItem - TotalCOGSPerItem, 0.01);
+                        end;
+                    end;
+                }
             }
-
-            trigger OnAfterGetRecord()
-            begin
-                d.Update(1, Name);
-            end;
-
-            trigger OnPostDataItem()
-            begin
-                d.Close();
-                Clear(d);
-            end;
-
-            trigger OnPreDataItem()
-            begin
-
-                d.Open(Text001 + Text002, navn, taeller);
-                d.Update(1, '');
-                d.Update(2, 1);
-            end;
         }
     }
     requestpage
     {
         SaveValues = true;
     }
-
-    trigger OnInitReport()
-    begin
-        firmaoplysninger.Get();
-        firmaoplysninger.CalcFields(Picture);
-
-    end;
-
     trigger OnPreReport()
     begin
-        Salespersonfilter := "Salesperson/Purchaser".GetFilters;
-        VendorFilter := Vendor.GetFilters;
+        CreateRequestPageFiltersText(FiltersText);
+    end;
+
+    local procedure CreateRequestPageFiltersText(var FiltersTextParam: Text)
+
+    begin
+        Clear(FiltersTextParam);
+        if Vendor.GetFilters() <> '' then
+            FiltersTextParam := Vendor.GetFilters();
+        if ("Salesperson/Purchaser".GetFilters() <> '') and (FiltersTextParam <> '') then
+            FiltersTextParam += ', ' + "Salesperson/Purchaser".GetFilters()
+        else
+            FiltersTextParam += "Salesperson/Purchaser".GetFilters();
     end;
 
     var
-        firmaoplysninger: Record "Company Information";
-        Item: Record Item;
-        TempVaregruppe: Record "Item Amount" temporary;
-        SalesPerson: Record "Salesperson/Purchaser";
-        db: Decimal;
-        dbalt: Decimal;
-        dbtotal: Decimal;
-        dg: Decimal;
-        dgalt: Decimal;
-        dgtotal: Decimal;
-        forbrugalt: Decimal;
-        forbrugtotal: Decimal;
-        TotalCOGS: Decimal;
-        TotalSale: Decimal;
-        totalTotalTurnover: Decimal;
-        totalTurnover: Decimal;
-        d: Dialog;
-        currentRec: Integer;
-        taeller: Integer;
-        totalRec: Integer;
-        Text002: Label '@2@@@@@@@@@@@@@@@@@@@@@@@@@@@@@';
-        Cost_Caption_Lbl: Label 'Cost';
-        CRPct_Caption_Lbl: Label 'CR%';
-        Text001: Label 'Creditor: #1################### \';
-        DbCaption_Lbl: Label 'DB';
-        No_Caption_Lbl: Label 'No.';
-        PageNoCaptionLbl: Label 'Page';
-        Salesperson_Caption_Lbl: Label 'Salesperson';
-        Total_Caption_Lbl: Label 'Total';
-        Turnover_Caption_Lbl: Label 'Turnover';
-        Vendor_Caption_Lbl: Label 'Vendor';
-        Report_Caption_Lbl: Label 'Vendor/Salesperson';
-        navn: Text[30];
-        VendorFilter: Text;
-        Salespersonfilter: Text;
+        ValueEntry: Record "Value Entry";
+        DiscAmount: Decimal;
+        InvoicedQty: Decimal;
+        Profit: Decimal;
+        ProfitPerc: Decimal;
+        TotalCOGSPerItem: Decimal;
+        TotalSalesPerItem: Decimal;
+        FiltersText: Text;
+        PageNoTxt: Text[10];
+        DiscAmountLbl: Label 'Discount Amount';
+        FiltersLbl: Label 'Filters: ';
+        InvQtyLbl: Label 'Invoiced Quantity';
+        ItemDescLbl: Label 'Item Name';
+        ItemNoLbl: Label 'Item No.';
+        PageNoLbl: Label 'Page';
+        ProfitLbl: Label 'Profit';
+        ProfitPercLbl: Label 'Profit %';
+        ReportTitleLbl: Label 'Vendor/Salesperson';
+        SalesPersonNameLbl: Label 'Name';
+        SalesPesonNoLbl: Label 'Salesperson No.';
+        TotalCOGSLbl: Label 'Total COGS';
+        TotalLbl: Label 'Total';
+        TotalSalesLbl: Label 'Total Sales';
+        UOMLbl: Label 'Unit of Measure';
+        VendorNameLbl: Label 'Vendor Name';
+        VendorNoLbl: Label 'Vendor No.';
+        NoCaptionLbl: Label 'No.';
+        DescCaptionLbl: Label 'Description';
 }
 
