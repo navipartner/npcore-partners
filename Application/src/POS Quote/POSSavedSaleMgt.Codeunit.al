@@ -83,6 +83,8 @@
         POSCrossReference: Record "NPR POS Cross Reference";
         NpCsSaleLinePOSRef: Record "NPR NpCs Sale Line POS Ref.";
         SaleLinePOS: Record "NPR POS Sale Line";
+        POSSaleTax: Record "NPR POS Sale Tax";
+        POSSaleTaxLine: Record "NPR POS Sale Tax Line";
         TempNpDcSaleLinePOSNewCouponFieldBuffer: Record "Field" temporary;
         TempNpDcSaleLinePOSCouponFieldBuffer: Record "Field" temporary;
         TempNpIaSaleLinePOSAddOnFieldBuffer: Record "Field" temporary;
@@ -93,6 +95,8 @@
         TempNpCsSaleLinePOSRefFieldBuffer: Record "Field" temporary;
         TempSalePOSFieldBuffer: Record "Field" temporary;
         TempSaleLinePOSFieldBuffer: Record "Field" temporary;
+        TempPOSSaleTaxFieldBuffer: Record "Field" temporary;
+        TempPOSSaleTaxLineFieldBuffer: Record "Field" temporary;
         XmlRoot: XmlElement;
         Element: XmlElement;
         Element2: XmlElement;
@@ -132,6 +136,12 @@
         RecRef.GetTable(NpCsSaleLinePOSRef);
         FindFields(RecRef, false, TempNpCsSaleLinePOSRefFieldBuffer, false);
 
+        RecRef.GetTable(POSSaleTax);
+        FindFields(RecRef, false, TempPOSSaleTaxFieldBuffer, false);
+
+        RecRef.GetTable(POSSaleTaxLine);
+        FindFields(RecRef, false, TempPOSSaleTaxLineFieldBuffer, false);
+
         XmlDocument.ReadFrom('<?xml version="1.0" encoding="utf-8"?><pos_sale />', XmlDoc);
         XmlDoc.GetRoot(XmlRoot);
 
@@ -165,6 +175,30 @@
 
                 RecRef.GetTable(SaleLinePOS);
                 RecRef2Xml(RecRef, Element2, TempSaleLinePOSFieldBuffer);
+
+                POSSaleTax.SetRange("Source Rec. System Id", SaleLinePOS.SystemId);
+                if POSSaleTax.FindSet() then begin
+                    Element3 := XmlElement.Create('pos_sale_tax_summary_lines');
+                    Element2.Add(Element3);
+                    repeat
+                        Element4 := XmlElement.Create('pos_sale_tax_summary_line');
+                        Element3.Add(Element4);
+                        RecRef.GetTable(POSSaleTax);
+                        RecRef2Xml(RecRef, Element4, TempPOSSaleTaxFieldBuffer);
+                    until POSSaleTax.Next() = 0;
+                end;
+
+                POSSaleTaxLine.SetRange("Source Rec. System Id", SaleLinePOS.SystemId);
+                if POSSaleTaxLine.FindSet() then begin
+                    Element3 := XmlElement.Create('pos_sale_tax_lines');
+                    Element2.Add(Element3);
+                    repeat
+                        Element4 := XmlElement.Create('pos_sale_tax_line');
+                        Element3.Add(Element4);
+                        RecRef.GetTable(POSSaleTaxLine);
+                        RecRef2Xml(RecRef, Element4, TempPOSSaleTaxLineFieldBuffer);
+                    until POSSaleTaxLine.Next() = 0;
+                end;
 
                 POSInfoTransaction.SetRange("Register No.", SalePOS."Register No.");
                 POSInfoTransaction.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -405,6 +439,8 @@
         POSCrossReference: Record "NPR POS Cross Reference";
         NpCsSaleLinePOSRef: Record "NPR NpCs Sale Line POS Ref.";
         SaleLinePOS: Record "NPR POS Sale Line";
+        POSSaleTax: Record "NPR POS Sale Tax";
+        POSSaleTaxLine: Record "NPR POS Sale Tax Line";
         TempNpDcSaleLinePOSNewCouponFieldBuffer: Record "Field" temporary;
         TempNpDcSaleLinePOSCouponFieldBuffer: Record "Field" temporary;
         TempNpIaSaleLinePOSAddOnFieldBuffer: Record "Field" temporary;
@@ -415,6 +451,8 @@
         TempNpCsSaleLinePOSRefFieldBuffer: Record "Field" temporary;
         TempSalePOSFieldBuffer: Record "Field" temporary;
         TempSaleLinePOSFieldBuffer: Record "Field" temporary;
+        TempPOSSaleTaxFieldBuffer: Record "Field" temporary;
+        TempPOSSaleTaxLineFieldBuffer: Record "Field" temporary;
         Element: XmlElement;
         Root: XmlElement;
         RecRef: RecordRef;
@@ -437,6 +475,10 @@
         NewDiscountCouponNode: XmlNode;
         NewCollectDocumentNodes: XmlNodeList;
         NewCollectDocumentNode: XmlNode;
+        POSSaleTaxNodes: XmlNodeList;
+        POSSaleTaxNode: XmlNode;
+        POSSaleTaxLineNodes: XmlNodeList;
+        POSSaleTaxLineNode: XmlNode;
         xSalePOS: Record "NPR POS Sale";
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
         UpdateDim: Boolean;
@@ -482,6 +524,12 @@
 
         RecRef.GetTable(NpCsSaleLinePOSRef);
         FindFields(RecRef, false, TempNpCsSaleLinePOSRefFieldBuffer, false);
+
+        RecRef.GetTable(POSSaleTax);
+        FindFields(RecRef, false, TempPOSSaleTaxFieldBuffer, false);
+
+        RecRef.GetTable(POSSaleTaxLine);
+        FindFields(RecRef, false, TempPOSSaleTaxLineFieldBuffer, false);
 
         xSalePOS := SalePOS;
         RecRef.GetTable(SalePOS);
@@ -543,6 +591,24 @@
                     Database::"NPR NPRE Seating", SaleLinePOS."NPRE Seating Code",
                     Database::"Responsibility Center", SaleLinePOS."Responsibility Center");
             SaleLinePOS.Insert(true, true);
+
+            Element.SelectNodes('pos_sale_tax_summary_lines/pos_sale_tax_summary_line', POSSaleTaxNodes);
+            foreach POSSaleTaxNode in POSSaleTaxNodes do begin
+                POSSaleTax.Init();
+                RecRef.GetTable(POSSaleTax);
+                Xml2RecRef(POSSaleTaxNode.AsXmlElement(), TempPOSSaleTaxFieldBuffer, RecRef);
+                RecRef.SetTable(POSSaleTax);
+                POSSaleTax.Insert(true);
+            end;
+
+            Element.SelectNodes('pos_sale_tax_lines/pos_sale_tax_line', POSSaleTaxLineNodes);
+            foreach POSSaleTaxLineNode in POSSaleTaxLineNodes do begin
+                POSSaleTaxLine.Init();
+                RecRef.GetTable(POSSaleTaxLine);
+                Xml2RecRef(POSSaleTaxLineNode.AsXmlElement(), TempPOSSaleTaxLineFieldBuffer, RecRef);
+                RecRef.SetTable(POSSaleTaxLine);
+                POSSaleTaxLine.Insert(true);
+            end;
 
             Element.SelectNodes('pos_info_transactions/pos_info_transaction', POSInfoTransactionNodes);
             foreach POSInfoTransactionNode in POSInfoTransactionNodes do begin
