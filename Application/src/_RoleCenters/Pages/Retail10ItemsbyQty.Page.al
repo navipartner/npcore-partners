@@ -1,15 +1,13 @@
 ﻿page 6059815 "NPR Retail 10 Items by Qty."
 {
-    Extensible = False;
-
+    Extensible = false;
     Caption = 'Top 10 Items by Quantity';
     CardPageID = "Item Card";
     Editable = true;
     PageType = ListPart;
+    RefreshOnActivate = true;
     SourceTable = Item;
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Low-Level Code")
-                      ORDER(Descending);
     UsageCategory = None;
 
     layout
@@ -21,27 +19,24 @@
                 ShowCaption = false;
                 field(StartDate; StartDate)
                 {
-
                     Caption = 'Start Date';
                     ToolTip = 'Specifies the start date used to filter the sales data.';
-
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
-                        ExecuteQuery();
+                        ExecuteQueryBackground();
                     end;
                 }
-                field(Enddate; Enddate)
+                field(Enddate; EndDate)
                 {
-
                     Caption = 'End date';
                     ToolTip = 'Specifies the end date to filter the sales data.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
-                        ExecuteQuery();
+                        ExecuteQueryBackground();
                     end;
                 }
             }
@@ -52,33 +47,27 @@
                 {
                     field("No."; Rec."No.")
                     {
-
-
                         ToolTip = 'Specifies the number of the item.';
-
-
                         ApplicationArea = NPRRetail;
 
                         trigger OnDrillDown()
+                        var
+                            Item: Record Item;
                         begin
                             Item.Get(Rec."No.");
-                            PAGE.Run(PAGE::"Item Card", Item);
+                            Page.Run(Page::"Item Card", Item);
                         end;
                     }
                     field(Description; Rec.Description)
                     {
-
                         ToolTip = 'Specifies the description of the item.';
-
                         ApplicationArea = NPRRetail;
                     }
                     field("Sales (Qty.)"; Rec."Sales (Qty.)")
                     {
-
                         BlankZero = true;
                         Caption = 'Sales (Qty.)';
                         ToolTip = 'Specifies the quantity of items sold.';
-
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -95,7 +84,7 @@
                 Caption = 'Period Length';
                 Image = CostAccounting;
                 Visible = true;
-                action(Day)
+                Action(Day)
                 {
                     Caption = 'Day';
 
@@ -110,7 +99,7 @@
                         UpdateList();
                     end;
                 }
-                action(Week)
+                Action(Week)
                 {
                     Caption = 'Week';
 
@@ -126,7 +115,7 @@
                         UpdateList();
                     end;
                 }
-                action(Month)
+                Action(Month)
                 {
                     Caption = 'Month';
 
@@ -141,7 +130,7 @@
                         UpdateList();
                     end;
                 }
-                action(Quarter)
+                Action(Quarter)
                 {
                     Caption = 'Quarter';
 
@@ -156,7 +145,7 @@
                         UpdateList();
                     end;
                 }
-                action(Year)
+                Action(Year)
                 {
                     Caption = 'Year';
 
@@ -183,38 +172,16 @@
     end;
 
     var
-        Query1: Query "NPR Retail Top 10 ItemsByQty.";
-        Item: Record Item;
-        StartDate: Date;
-        Enddate: Date;
-        PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         CurrDate: Date;
+        EndDate: Date;
+        StartDate: Date;
+        BackgroundTaskId: Integer;
+        PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
 
     local procedure UpdateList()
     begin
         Setdate();
-        ExecuteQuery();
-    end;
-
-    local procedure ExecuteQuery()
-    begin
-        Rec.DeleteAll();
-        Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
-        Query1.SetFilter(Item_Ledger_Entry_Type, 'Sale');
-        Query1.Open();
-        while Query1.Read() do begin
-            if Item.Get(Query1.Item_No) then begin
-                Rec.TransferFields(Item);
-                if Rec.Insert() then
-                    Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
-
-                Rec.CalcFields("Sales (Qty.)");
-                Rec."Low-Level Code" := Round(Rec."Sales (Qty.)", 0.01) * 100;
-                Rec.Modify();
-            end;
-
-        end;
-        Query1.Close();
+        ExecuteQueryBackground();
     end;
 
     local procedure Setdate()
@@ -223,29 +190,73 @@
             PeriodType::Day:
                 begin
                     StartDate := CurrDate;
-                    Enddate := CurrDate;
+                    EndDate := CurrDate;
                 end;
             PeriodType::Week:
                 begin
                     StartDate := CalcDate('<-CW>', CurrDate);
-                    Enddate := CalcDate('<CW>', CurrDate);
+                    EndDate := CalcDate('<CW>', CurrDate);
                 end;
             PeriodType::Month:
                 begin
                     StartDate := CalcDate('<-CM>', CurrDate);
-                    Enddate := CalcDate('<CM>', CurrDate);
+                    EndDate := CalcDate('<CM>', CurrDate);
                 end;
             PeriodType::Quarter:
                 begin
                     StartDate := CalcDate('<-CQ>', CurrDate);
-                    Enddate := CalcDate('<CQ>', CurrDate);
+                    EndDate := CalcDate('<CQ>', CurrDate);
                 end;
             PeriodType::Year:
                 begin
                     StartDate := CalcDate('<-CY>', CurrDate);
-                    Enddate := CalcDate('<CY>', CurrDate);
+                    EndDate := CalcDate('<CY>', CurrDate);
                 end;
         end;
+    end;
+
+    local procedure ExecuteQueryBackground()
+    var
+        Parameters: Dictionary of [Text, Text];
+    begin
+        Parameters.Add('StartDate', Format(StartDate));
+        Parameters.Add('EndDate', Format(EndDate));
+
+        CurrPage.EnqueueBackgroundTask(BackgroundTaskId, Codeunit::"NPR Retail Top 10 Items BT", Parameters);
+    end;
+
+    trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])
+    var
+        i: Integer;
+        LowLevelCode: Integer;
+        RecordCount: Integer;
+    begin
+        Rec.Reset();
+        Rec.DeleteAll();
+        if TaskId <> BackgroundTaskId then
+            exit;
+        if Results.Count() = 0 then
+            exit;
+        Evaluate(RecordCount, Results.Get('Count'));
+        for i := 1 to RecordCount do begin
+            Rec.Init();
+            Rec."No." := CopyStr(Results.Get('No ' + Format(i)), 1, MaxStrLen(Rec."No."));
+            Rec.Description := CopyStr(Results.Get('Description ' + Format(i)), 1, MaxStrLen(Rec.Description));
+            Evaluate(LowLevelCode, Results.Get('LowLevelCode ' + Format(i)));
+            Rec."Low-Level Code" := LowLevelCode;
+            Rec.Insert();
+            Rec.SetFilter("Date Filter", '%1..%2', StartDate, EndDate);
+        end;
+        Rec.SetCurrentKey("Low-Level Code");
+        Rec.Ascending(false);
+    end;
+
+    trigger OnPageBackgroundTaskError(TaskId: Integer; ErrorCode: Text; ErrorText: Text; ErrorCallStack: Text; var IsHandled: Boolean)
+    var
+        BackgrndTaskMgt: Codeunit "NPR Page Background Task Mgt.";
+    begin
+        if TaskId = BackgroundTaskId then
+            BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
     end;
 }
 
