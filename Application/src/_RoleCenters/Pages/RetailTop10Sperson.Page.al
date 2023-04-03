@@ -1,14 +1,14 @@
 ﻿page 6059817 "NPR Retail Top 10 S.person"
 {
-    Extensible = False;
-    Caption = 'Top 10 Sales Persons';
+    Extensible = false;
+    Caption = 'Top 10 Salespersons';
     CardPageID = "NPR Salesperson Card";
     Editable = true;
     PageType = ListPart;
+    RefreshOnActivate = true;
     SourceTable = "Salesperson/Purchaser";
     SourceTableTemporary = true;
     UsageCategory = None;
-    SourceTableView = sorting("NPR Maximum Cash Returnsale") order(Descending);
 
     layout
     {
@@ -19,14 +19,13 @@
                 ShowCaption = false;
                 field(StartDate; StartDate)
                 {
-
                     Caption = 'Start Date';
                     ToolTip = 'The user can specify the Start Date from which wants to see the data';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
-                        UpdateList();
+                        UpdateList(false);
                     end;
                 }
                 field(Enddate; Enddate)
@@ -38,7 +37,7 @@
 
                     trigger OnValidate()
                     begin
-                        UpdateList();
+                        UpdateList(false);
                     end;
                 }
             }
@@ -49,31 +48,27 @@
                 {
                     field("Code"; Rec.Code)
                     {
-
                         ToolTip = 'Specifies the Code of the salesperson';
                         ApplicationArea = NPRRetail;
-
                         trigger OnDrillDown()
                         begin
                             SalesPerson.Get(Rec.Code);
-                            PAGE.Run(PAGE::"NPR Salesperson Card", SalesPerson);
+                            Page.Run(Page::"NPR Salesperson Card", SalesPerson);
                         end;
                     }
                     field(Name; Rec.Name)
                     {
-
                         ToolTip = 'Specifies the Name of the salesperson';
                         ApplicationArea = NPRRetail;
                     }
                     field("Sales (Qty.)"; Rec."NPR Maximum Cash Returnsale")
                     {
-
+                        Caption = 'Sales (Qty.)';
                         ToolTip = 'Specifies the value of the NPR Sales (Qty.) made within the date range';
                         ApplicationArea = NPRRetail;
                     }
-                    field("Sales (LCY)"; SalesLCY)
+                    field("Sales (LCY)"; Rec."NPR Sales (LCY)")
                     {
-
                         BlankZero = true;
                         Caption = 'Sales Amount (Actual)';
                         ToolTip = 'Specifies the value of the Sales Amount (Actual) made within the date range';
@@ -93,7 +88,7 @@
                 Caption = 'Period Length';
                 Image = CostAccounting;
                 Visible = true;
-                action(Day)
+                Action(Day)
                 {
                     Caption = 'Day';
 
@@ -104,10 +99,10 @@
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Day;
-                        UpdateList();
+                        UpdateList(true);
                     end;
                 }
-                action(Week)
+                Action(Week)
                 {
                     Caption = 'Week';
 
@@ -118,10 +113,10 @@
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Week;
-                        UpdateList();
+                        UpdateList(true);
                     end;
                 }
-                action(Month)
+                Action(Month)
                 {
                     Caption = 'Month';
 
@@ -132,10 +127,10 @@
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Month;
-                        UpdateList();
+                        UpdateList(true);
                     end;
                 }
-                action(Quarter)
+                Action(Quarter)
                 {
                     Caption = 'Quarter';
 
@@ -146,10 +141,10 @@
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Quarter;
-                        UpdateList();
+                        UpdateList(true);
                     end;
                 }
-                action(Year)
+                Action(Year)
                 {
                     Caption = 'Year';
 
@@ -160,7 +155,7 @@
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Year;
-                        UpdateList();
+                        UpdateList(true);
                     end;
                 }
             }
@@ -169,59 +164,64 @@
 
     trigger OnOpenPage()
     begin
-        PeriodType := PeriodType::Month;
+        PeriodType := PeriodType::Year;
         CurrDate := Today();
-        UpdateList();
-    end;
-
-
-    trigger OnAfterGetRecord()
-    begin
-        Rec.NPRGetVESalesLCY(SalesLCY);
+        UpdateList(true);
     end;
 
     var
         SalesPerson: Record "Salesperson/Purchaser";
-        StartDate: Date;
-        Enddate: Date;
-        PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
-        SalesLCY: Decimal;
         CurrDate: Date;
+        Enddate: Date;
+        StartDate: Date;
+        BackgroundTaskId: Integer;
+        PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
 
-    local procedure UpdateList()
+    local procedure UpdateList(UpdateDate: Boolean)
     var
-        TempSalespersonPurchaser: Record "Salesperson/Purchaser" temporary;
-        StartNo: Integer;
+        Parameters: Dictionary of [Text, Text];
     begin
-        TempSalespersonPurchaser.DeleteAll();
-        Setdate();
-        CalculateSalesPersonSalesQty(TempSalespersonPurchaser);
-        TempSalespersonPurchaser.SetCurrentKey("NPR Maximum Cash Returnsale");
-        TempSalespersonPurchaser.SetAscending("NPR Maximum Cash Returnsale", false);
-        TempSalespersonPurchaser.SetFilter("NPR Maximum Cash Returnsale", '<>%1', 0);
-        if TempSalespersonPurchaser.IsEmpty() then
-            exit;
-        TempSalespersonPurchaser.FindSet();
-        StartNo := 0;
-        repeat
-            Rec.TransferFields(TempSalespersonPurchaser);
-            if Rec.Insert() then;
-            StartNo += 1;
-        until (TempSalespersonPurchaser.Next() = 0) or (StartNo < 10);
+        if UpdateDate then
+            Setdate();
+        Parameters.Add('StartDate', Format(StartDate));
+        Parameters.Add('EndDate', Format(EndDate));
+
+        CurrPage.EnqueueBackgroundTask(BackgroundTaskId, Codeunit::"NPR Top 10 Salespersons BT", Parameters);
     end;
 
-    local procedure CalculateSalesPersonSalesQty(var TempSalesPersonPurchaser: Record "Salesperson/Purchaser" temporary)
+    trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])
     var
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        DecimalAmount: Decimal;
+        i: Integer;
+        RecordCount: Integer;
     begin
-        SalespersonPurchaser.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
-        if not SalespersonPurchaser.FindSet() then
+        if TaskId <> BackgroundTaskId then
             exit;
-        repeat
-            TempSalesPersonPurchaser.TransferFields(SalespersonPurchaser);
-            SalespersonPurchaser.NPRGetVESalesQty(TempSalesPersonPurchaser."NPR Maximum Cash Returnsale");
-            if TempSalesPersonPurchaser.Insert() then;
-        until SalespersonPurchaser.Next() = 0;
+        Rec.Reset();
+        Rec.DeleteAll();
+        if Results.Count() = 0 then
+            exit;
+        Evaluate(RecordCount, Results.Get('Count'));
+        for i := 1 to RecordCount do begin
+            Rec.Init();
+            Rec.Code := CopyStr(Results.Get('Code ' + Format(i)), 1, MaxStrLen(Rec.Code));
+            Rec.Name := CopyStr(Results.Get('Name ' + Format(i)), 1, MaxStrLen(Rec.Name));
+            Evaluate(DecimalAmount, Results.Get('MaximumCashReturnsale ' + Format(i)));
+            Rec."NPR Maximum Cash Returnsale" := DecimalAmount;
+            Evaluate(DecimalAmount, Results.Get('SalesLCY ' + Format(i)));
+            Rec."NPR Sales (LCY)" := DecimalAmount;
+            Rec.Insert();
+        end;
+        Rec.SetCurrentKey("NPR Sales (LCY)");
+        Rec.Ascending(false);
+    end;
+
+    trigger OnPageBackgroundTaskError(TaskId: Integer; ErrorCode: Text; ErrorText: Text; ErrorCallStack: Text; var IsHandled: Boolean)
+    var
+        BackgrndTaskMgt: Codeunit "NPR Page Background Task Mgt.";
+    begin
+        if TaskId = BackgroundTaskId then
+            BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
     end;
 
     local procedure Setdate()

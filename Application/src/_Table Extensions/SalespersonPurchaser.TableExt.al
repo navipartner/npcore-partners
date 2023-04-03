@@ -28,11 +28,9 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         }
         field(6014403; "NPR Sales (LCY)"; Decimal)
         {
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
             Caption = 'Sales (LCY)';
+            DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
-            FieldClass = FlowField;
         }
         field(6014404; "NPR Discount Amount"; Decimal)
         {
@@ -166,6 +164,9 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         }
 #ENDIF
         key("NPR Key3"; "NPR Maximum Cash Returnsale")
+        {
+        }
+        key("NPR Key4"; "NPR Sales (LCY)")
         {
         }
 
