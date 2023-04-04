@@ -60,6 +60,37 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         }
         moveafter("VAT Registration No."; "Tax Liable")
         moveafter("VAT Registration No."; "Tax Area Code")
+#IF (BC1700 or BC1701 or BC1702 or BC1703 or BC1704 or BC1800 or BC1801 or BC1802 or BC1803)
+        modify(TotalSales2)
+        {
+            Visible = false;
+        }
+#ENDIF
+
+        addafter(TotalSales2)
+        {
+#IF (BC1700 or BC1701 or BC1702 or BC1703 or BC1704 or BC1800 or BC1801 or BC1802 or BC1803)
+            field("NPR Sales (LCY)"; Rec."Sales (LCY)")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Sales Amount (Actual) field';
+
+            }
+#ENDIF
+            field("NPR Total Sales POS"; Rec."NPR Total Sales POS")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Total Sales from POS entries ';
+            }
+
+            field("NPR Total Sales"; Rec."NPR Total Sales")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Total Sales from POS and Backend';
+
+            }
+        }
+
     }
     actions
     {
@@ -208,6 +239,8 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 ToAnonymizeEditable := true
             else
                 ToAnonymizeEditable := false;
+        Rec.CalcFields("NPR Total Sales POS", "Sales (LCY)");
+        Rec."NPR Total Sales" := Rec."NPR Total Sales POS" + Rec."Sales (LCY)";
     end;
 
 
