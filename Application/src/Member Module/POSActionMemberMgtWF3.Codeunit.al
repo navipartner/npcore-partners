@@ -1,139 +1,79 @@
-﻿codeunit 6014479 "NPR POS Action Member Mgt WF2"
+codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
 {
     Access = Internal;
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Not used any more, please use MM_MEMBERMGMT_WF3 instead.';
 
     var
         MemberSelectionMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
 
-    local procedure ActionCode(): Code[20]
-    begin
-        exit('MM_MEMBERMGMT_WF2');
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('2.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, CodeUnit::"NPR POS JSON Management", 'OnDiscoverActions', '', true, true)]
-    local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        FunctionOptionString: Text;
-        ACTION_DESCRIPTION: Label 'This action handles member management functions for workflow 2.0.';
+        Action_Description: Label 'This action handles member management functions for workflow 3.0.';
+        ParamFunction_CptLbl: Label 'Function';
+        ParamFunction_DescLbl: Label 'Specifies the Function used.';
+        ParamFunction_OptLbl: Label 'Member Arrival,Select Membership,View Membership Entry,Regret Membership Entry,Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member,Edit Current Membership', Locked = true;
+        ParamFunction_OptCptLbl: Label 'Member Arrival,Select Membership,View Membership Entry,Regret Membership Entry,Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member,Edit Current Membership';
+        ParamDialogPrompt_CptLbl: Label 'Dialog Prompt';
+        ParamDialogPrompt_DescLbl: Label 'Specifies the type of Dialog Prompt';
+        ParamDialogPrompt_OptLbl: Label 'Member Card Number,Facial Recognition,No Dialog', Locked = true;
+        ParamDialogPrompt_OptCptLbl: Label 'Member Card Number,Facial Recognition,No Dialog';
+        MemberCardPromptLbl: Label 'Enter Member Card Number';
+        MemberNumberPromptLbl: Label 'Enter Member Number';
+        MembershipNumberPromptLbl: Label 'Enter Membership Number';
+        DialogTitleLbl: Label '%1 - Membership Management.';
     begin
-
-        FunctionOptionString := 'Member Arrival,' +
-                                'Select Membership,' +
-                                'View Membership Entry,Regret Membership Entry,' +
-                                'Renew Membership,Extend Membership,Upgrade Membership,' +
-                                'Cancel Membership,Edit Membership,Show Member,Edit Current Membership';
-
-        if (Sender.DiscoverAction20(ActionCode(), ACTION_DESCRIPTION, ActionVersion())) then begin
-            Sender.RegisterWorkflow20(
-
-                'if ($parameters.Function < 0) {$parameters.Function = $parameters.Function["Member Arrival"];};' +
-                'let windowTitle = $labels.DialogTitle.substitute ($parameters.Function);' +
-
-                // Prompt for member card number    
-                'if ($parameters.DefaultInputValue.length == 0 && $parameters.DialogPrompt <= $parameters.DialogPrompt ["Member Card Number"]) {' +
-                    '$context.memberCardInput = await popup.input ({caption: $labels.MemberCardPrompt, title: windowTitle});' +
-                    'if ($context.memberCardInput === null) {return;}' +
-                '}' +
-                // When data is pass from EAN box f.ex.
-                'if ($parameters.DefaultInputValue.length > 0) {' +
-                    '$context.memberCardInput = $parameters.DefaultInputValue;' +
-                '}' +
-
-                // If function is one of the membership alteration actions, fetch the options and prompt teller to choose 
-                'if ($parameters.Function >= $parameters.Function["Regret Membership Entry"] && $parameters.Function <= $parameters.Function["Cancel Membership"] ) {' +
-                    'let lookupProperties = JSON.parse (await workflow.respond ("GetMembershipAlterationLookup"));' +
-                    '$context.memberCardInput = lookupProperties.cardnumber;' +
-                    'let lookupDataArray = JSON.parse(lookupProperties.data);' +
-                    'if (lookupDataArray.length == 0) {' +
-                        'await popup.error ({title: windowTitle, caption: lookupProperties.notFoundMessage});' +
-                        'return;' +
-                    '}' +
-
-                    'let driver = data.createArrayDriver(lookupDataArray);' +
-                    'let source = data.createDataSource(driver);' +
-                    'source.loadAll = false;' +
-                    'let result = await popup.lookup({' +
-                    '   title: lookupProperties.title,' +
-                    '   configuration: {className: "custom-lookup", styleSheet: "", layout: JSON.parse(lookupProperties.layout), result: rows => rows ? rows.map (row => row ? row.itemno : null) : null}, source: source});' +
-
-                    'if (result === null) {return;}' +
-                    '$context.itemNumber = result[0].itemno;' +
-                '}' +
-
-                // Process the main request
-                'let membershipResponse = await workflow.respond ("DoManageMembership");' +
-                'if ($parameters.Function == $parameters.Function["View Membership Entry"]) {' +
-                    'let membershipEntries = JSON.parse (membershipResponse);' +
-                    'let driver = data.createArrayDriver(JSON.parse(membershipEntries.data));' +
-                    'let source = data.createDataSource(driver);' +
-                    'let result = await popup.lookup({' +
-                    '   title: membershipEntries.title,' +
-                    '   configuration: {className: "custom-lookup", styleSheet: "", layout: JSON.parse(membershipEntries.layout)}, source: source});' +
-                '}'
-            );
-
-            Sender.RegisterOptionParameter('Function', FunctionOptionString, 'Member Arrival');
-            Sender.RegisterOptionParameter('DialogPrompt', 'Member Card Number,Facial Recognition,No Dialog', 'Member Card Number');
-            Sender.RegisterTextParameter('DefaultInputValue', '');
-            Sender."Blocking UI" := true;
-
-        end;
+        WorkflowConfig.AddActionDescription(Action_Description);
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddOptionParameter('Function',
+                                        ParamFunction_OptLbl,
+#pragma warning disable AA0139
+                                        SelectStr(1, ParamFunction_OptLbl),
+#pragma warning restore 
+                                        ParamFunction_CptLbl,
+                                        ParamFunction_DescLbl,
+                                        ParamFunction_OptCptLbl);
+        WorkflowConfig.AddOptionParameter('DialogPrompt',
+                                        ParamDialogPrompt_OptLbl,
+#pragma warning disable AA0139
+                                        SelectStr(1, ParamDialogPrompt_OptLbl),
+#pragma warning restore 
+                                        ParamDialogPrompt_CptLbl,
+                                        ParamDialogPrompt_DescLbl,
+                                        ParamDialogPrompt_OptCptLbl);
+        WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDialogPrompt_CptLbl, ParamDialogPrompt_DescLbl);
+        WorkflowConfig.AddLabel('MemberCardPrompt', MemberCardPromptLbl);
+        WorkflowConfig.AddLabel('MemberNumberPrompt', MemberNumberPromptLbl);
+        WorkflowConfig.AddLabel('MembershipNumberPrompt', MembershipNumberPromptLbl);
+        WorkflowConfig.AddLabel('DialogTitle', DialogTitleLbl);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
-    local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        MEMBERCARD_PROMPT: Label 'Enter Member Card Number';
-        MEMBERNUMBER_PROMPT: Label 'Enter Member Number';
-        MEMBERSHIPNUMBER_PROMPT: Label 'Enter Membership Number';
-        DIALOG_TITLE: Label '%1 - Membership Management.';
+        POSSession: Codeunit "NPR POS Session";
     begin
-        Captions.AddActionCaption(ActionCode(), 'MemberCardPrompt', MEMBERCARD_PROMPT);
-        Captions.AddActionCaption(ActionCode(), 'MemberNumberPrompt', MEMBERNUMBER_PROMPT);
-        Captions.AddActionCaption(ActionCode(), 'MembershipNumberPrompt', MEMBERSHIPNUMBER_PROMPT);
-        Captions.AddActionCaption(ActionCode(), 'DialogTitle', DIALOG_TITLE);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', true, true)]
-    local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-
-        if (not Action.IsThisAction(ActionCode())) then
-            exit;
-
-        Handled := true;
-
-        case (WorkflowStep) of
+        case Step of
             'GetMembershipAlterationLookup':
-                Frontend.WorkflowResponse(GetMembershipAlterationLookupChoices(Context, POSSession, State, Frontend));
+                Frontend.WorkflowResponse(GetMembershipAlterationLookupChoices(Context, POSSession, Frontend));
             'DoManageMembership':
-                Frontend.WorkflowResponse(ManageMembershipAction(Context, POSSession, State, Frontend));
+                Frontend.WorkflowResponse(ManageMembershipAction(Context, POSSession, Frontend));
             else
                 exit;
         end;
-
     end;
 
-    procedure ManageMembershipAction(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management") JsonText: Text
+    procedure ManageMembershipAction(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") JsonText: Text
     var
         FunctionId: Integer;
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
-        FunctionId := Context.GetIntegerParameter('Function');
+        if not Context.GetIntegerParameter('Function', FunctionId) then
+            FunctionId := 0;
 
         JsonText := '{}';
         case FunctionId of
             0:
-                POSMemberArrival(Context, POSSession, State, Frontend);
+                POSMemberArrival(Context, POSSession, Frontend);
             1:
-                SelectMembership(Context, POSSession, State, Frontend);
+                SelectMembership(Context, POSSession, Frontend);
             2:
                 JsonText := GetMembershipEntryLookupJson(Context);
             3:
@@ -149,14 +89,14 @@
             8:
                 EditMembership(POSSession);
             9:
-                ShowMember(Context, POSSession, State, Frontend);
+                ShowMember(Context, POSSession, Frontend);
             10:
                 EditActiveMembership(POSSession);
         end;
         exit(JsonText);
     end;
 
-    procedure POSMemberArrival(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure POSMemberArrival(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
@@ -175,11 +115,17 @@
         ExternalMemberCardNo: Text[100];
         ItemDescription: Text;
         ResponseMessage: Text;
+        TextOut: Text;
+        IntegerOut: Integer;
         PlaceHolderLbl: Label '%1/%2', Locked = true;
     begin
+        if not Context.GetString('memberCardInput', TextOut) then
+            TextOut := '';
+        ExternalMemberCardNo := CopyStr(TextOut, 1, MaxStrLen(ExternalMemberCardNo));
 
-        ExternalMemberCardNo := CopyStr(Context.GetString('memberCardInput'), 1, MaxStrLen(ExternalMemberCardNo));
-        FrontEndInputMethod := Context.GetInteger('DialogPrompt');
+        if not Context.GetIntegerParameter('DialogPrompt', IntegerOut) then
+            IntegerOut := 0;
+        FrontEndInputMethod := IntegerOut;
 
         GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true);
 
@@ -220,7 +166,7 @@
 
     end;
 
-    procedure SelectMembership(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management") MembershipEntryNo: Integer
+    procedure SelectMembership(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") MembershipEntryNo: Integer
     var
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
@@ -228,9 +174,16 @@
         POSSale: Codeunit "NPR POS Sale";
         FrontEndInputMethod: Option;
         ExternalMemberCardNo: Text[100];
+        TextOut: Text;
+        IntegerOut: Integer;
     begin
-        ExternalMemberCardNo := CopyStr(Context.GetString('memberCardInput'), 1, MaxStrLen(ExternalMemberCardNo));
-        FrontEndInputMethod := Context.GetInteger('DialogPrompt');
+        if not Context.GetString('memberCardInput', TextOut) then
+            TextOut := '';
+        ExternalMemberCardNo := CopyStr(TextOut, 1, MaxStrLen(ExternalMemberCardNo));
+
+        if not Context.GetIntegerParameter('DialogPrompt', IntegerOut) then
+            IntegerOut := 0;
+        FrontEndInputMethod := IntegerOut;
 
         GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true);
 
@@ -244,12 +197,10 @@
             POSSale.Modify(false, false);
         end;
 
-        POSSession.RequestRefreshData();
-
         exit(Membership."Entry No.");
     end;
 
-    local procedure GetMembershipEntryLookupJson(Context: Codeunit "NPR POS JSON Management") JsonText: Text
+    local procedure GetMembershipEntryLookupJson(Context: Codeunit "NPR POS JSON Helper") JsonText: Text
     var
         MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
@@ -260,9 +211,16 @@
         MembershipEntries: JsonArray;
         MEMBERSHIP_ENTRIES: Label 'Membership Entries.';
         MembershipEntriesJsonText: Text;
+        TextOut: Text;
+        IntegerOut: Integer;
     begin
-        ExternalMemberCardNo := CopyStr(Context.GetString('memberCardInput'), 1, MaxStrLen(ExternalMemberCardNo));
-        FrontEndInputMethod := Context.GetInteger('DialogPrompt');
+        if not Context.GetString('memberCardInput', TextOut) then
+            TextOut := '';
+        ExternalMemberCardNo := CopyStr(TextOut, 1, MaxStrLen(ExternalMemberCardNo));
+
+        if not Context.GetIntegerParameter('DialogPrompt', IntegerOut) then
+            IntegerOut := 0;
+        FrontEndInputMethod := IntegerOut;
 
         GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, false);
 
@@ -285,7 +243,7 @@
 
     end;
 
-    local procedure ExecuteMembershipAlteration(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; AlterationType: Option)
+    local procedure ExecuteMembershipAlteration(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; AlterationType: Option)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
@@ -297,11 +255,13 @@
         MemberInfoEntryNo: Integer;
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
         ExternalMemberCardNo: Text[100];
-        ExecutingMembershipAlterationErr: Label 'executing membership alteration';
+        TextOut: Text;
     begin
-        ItemNo := CopyStr(Context.GetStringOrFail('itemNumber', ExecutingMembershipAlterationErr), 1, MaxStrLen(ItemNo));
+        ItemNo := CopyStr(Context.GetString('itemNumber'), 1, MaxStrLen(ItemNo));
 
-        ExternalMemberCardNo := CopyStr(Context.GetString('memberCardInput'), 1, MaxStrLen(ExternalMemberCardNo));
+        if not Context.GetString('memberCardInput', TextOut) then
+            TextOut := '';
+        ExternalMemberCardNo := CopyStr(TextOut, 1, MaxStrLen(ExternalMemberCardNo));
         GetMembershipFromCardNumberWithUI(MemberSelectionMethod::NO_PROMPT, ExternalMemberCardNo, Membership, MemberCard, false);
 
         case AlterationType of
@@ -385,14 +345,21 @@
 
     end;
 
-    procedure ShowMember(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure ShowMember(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         ExternalMemberCardNo: Text[100];
         FrontEndInputMethod: Option;
+        TextOut: Text;
+        IntegerOut: Integer;
     begin
-        ExternalMemberCardNo := CopyStr(Context.GetString('memberCardInput'), 1, MaxStrLen(ExternalMemberCardNo));
-        FrontEndInputMethod := Context.GetInteger('DialogPrompt');
+        if not Context.GetString('memberCardInput', TextOut) then
+            TextOut := '';
+        ExternalMemberCardNo := CopyStr(TextOut, 1, MaxStrLen(ExternalMemberCardNo));
+
+        if not Context.GetInteger('DialogPrompt', IntegerOut) then
+            IntegerOut := 0;
+        FrontEndInputMethod := IntegerOut;
 
         if ((FrontEndInputMethod = MemberSelectionMethod::NO_PROMPT) and (ExternalMemberCardNo = '')) then
             if (not ChooseMemberCard(ExternalMemberCardNo)) then
@@ -409,7 +376,7 @@
 
     end;
 
-    procedure GetMembershipAlterationLookupChoices(Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management") JsonText: Text
+    procedure GetMembershipAlterationLookupChoices(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") JsonText: Text
     var
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         Membership: Record "NPR MM Membership";
@@ -427,10 +394,16 @@
         UPGRADE_OPTION: Label 'Upgrade options...';
         CANCEL_OPTION: Label 'Cancel options...';
         ExternalMemberCardNo: Text[100];
+        TextOut: Text;
+        IntegerOut: Integer;
     begin
-        FunctionId := Context.GetIntegerParameter('Function');
+        if not Context.GetIntegerParameter('Function', IntegerOut) then
+            IntegerOut := 0;
+        FunctionId := IntegerOut;
 
-        ExternalMemberCardNo := CopyStr(Context.GetString('memberCardInput'), 1, MaxStrLen(ExternalMemberCardNo));
+        if not Context.GetString('memberCardInput', TextOut) then
+            TextOut := '';
+        ExternalMemberCardNo := CopyStr(TextOut, 1, MaxStrLen(ExternalMemberCardNo));
         GetMembershipFromCardNumberWithUI(MemberSelectionMethod::NO_PROMPT, ExternalMemberCardNo, Membership, MemberCard, false);
 
         MembershipAlterationSetup.setfilter("From Membership Code", '=%1', Membership."Membership Code");
@@ -804,8 +777,6 @@
         SaleLinePOS.Validate("Unit Price", Abs(UnitPrice));
         SaleLinePOS."Description 2" := CopyStr(Description2, 1, MaxStrLen(SaleLinePOS."Description 2"));
         SaleLinePOS.Modify();
-
-        POSSession.RequestRefreshData();
     end;
 
     local procedure DeleteMemberInfoCapture(SaleLinePOS: Record "NPR POS Sale Line")
@@ -831,6 +802,14 @@
             MemberInfoCapture."Line No." := LineNo;
             MemberInfoCapture.Modify();
         end;
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionMemberMgtWF3.js### 
+'let main=async({workflow:o,context:i,popup:l,captions:u,parameters:e})=>{e.Function<0&&(e.Function=e.Function["Member Arrival"]);let b=u.DialogTitle.substitute(e.Function);if(e.DefaultInputValue.length==0&&e.DialogPrompt<=e.DialogPrompt["Member Card Number"]&&(i.memberCardInput=await l.input({caption:u.MemberCardPrompt,title:u.windowTitle}),i.memberCardInput===null))return;if(e.DefaultInputValue.length>0&&(i.memberCardInput=e.DefaultInputValue),e.Function>=e.Function["Regret Membership Entry"]&&e.Function<=e.Function["Cancel Membership"]){let t=JSON.parse(await o.respond("GetMembershipAlterationLookup"));i.memberCardInput=t.cardnumber;let n=JSON.parse(t.data);if(n.length==0){await l.error({title:u.windowTitle,caption:t.notFoundMessage});return}let a=data.createArrayDriver(n),r=data.createDataSource(a);r.loadAll=!1;let c=await l.lookup({title:t.title,configuration:{className:"custom-lookup",styleSheet:"",layout:JSON.parse(t.layout),result:d=>d?d.map(s=>s?s.itemno:null):null},source:r});if(c===null)return;i.itemNumber=c[0].itemno}let m=await o.respond("DoManageMembership");if(e.Function==e.Function["View Membership Entry"]){let t=JSON.parse(m),n=data.createArrayDriver(JSON.parse(t.data)),a=data.createDataSource(n),r=await l.lookup({title:t.title,configuration:{className:"custom-lookup",styleSheet:"",layout:JSON.parse(t.layout)},source:a})}};'
+        )
     end;
 }
 

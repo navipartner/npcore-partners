@@ -1,6 +1,9 @@
 ﻿codeunit 6151290 "NPR SS Action: Admin Menu"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore. Use popup defined in POS menu instead.';
+
     var
         ActionDescription: Label 'This built- in action displays the self-service admin menu.';
 

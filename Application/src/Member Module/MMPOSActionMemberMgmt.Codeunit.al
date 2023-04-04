@@ -1,6 +1,8 @@
 ﻿codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used any more, please use MM_MEMBERMGMT_WF3 instead.';
 
     var
         QTY_CANT_CHANGE: Label 'Changing quantity for membership sales is not possible.';
