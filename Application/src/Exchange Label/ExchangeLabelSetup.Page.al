@@ -45,6 +45,12 @@
                     ToolTip = 'Specifies a date to use as the default "valid from"-date. Leave blank to use the date of creation (ie. "today''s date").';
                     ApplicationArea = NPRRetail;
                 }
+                field("Insert Cross Ref. Finish Sale"; Rec."Insert Cross Ref. Finish Sale")
+                {
+
+                    ToolTip = 'Specifies if Cross Reference is inserted after finishing the sale';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
