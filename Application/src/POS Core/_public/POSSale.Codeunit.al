@@ -86,6 +86,11 @@
         Ended := false;
     end;
 
+    procedure IsInitialized(): Boolean
+    begin
+        exit(Initialized);
+    end;
+
     internal procedure GetNextReceiptNo(POSUnitNo: Text) ReceiptNo: Code[20]
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
