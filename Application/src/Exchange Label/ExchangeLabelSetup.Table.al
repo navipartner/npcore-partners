@@ -40,6 +40,11 @@
             Caption = 'Exchange Label Default Date';
             DataClassification = CustomerContent;
         }
+        field(70; "Insert Cross Ref. Finish Sale"; Boolean)
+        {
+            Caption = 'Insert Cross Reference When Finishing Sale';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
