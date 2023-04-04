@@ -430,7 +430,7 @@
     begin
         InitializeSetup();
         if Setup."End of Day Action Code" = '' then
-            Setup."End of Day Action Code" := 'BALANCE_V3';
+            Setup."End of Day Action Code" := 'BALANCE_V4';
         exit(Setup."End of Day Action Code");
     end;
 
