@@ -35,9 +35,15 @@ codeunit 6059860 "NPR End Of Day Worker"
         POSSession: Codeunit "NPR POS Session";
         FrontEnd: Codeunit "NPR POS Front End Management";
         CheckpointEntryNo: Integer;
+        POSUnitIn: Record "NPR POS Unit";
     begin
         POSSession.GetFrontEnd(FrontEnd);
+        if not Sale.IsInitialized() then begin
+            if POSUnitIn.Get(POSUnitNo) then
+                Sale.InitializeNewSale(POSUnitIn, FrontEnd, Setup, Sale);
+        end;
         Sale.GetCurrentSale(SalePOS);
+
         Setup.GetSalespersonRecord(SalespersonPurchaser);
         CheckpointEntryNo := 0;
 
