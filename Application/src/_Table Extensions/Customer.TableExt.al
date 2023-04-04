@@ -219,7 +219,29 @@ tableextension 6014423 "NPR Customer" extends Customer
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
+        field(6014401; "NPR Total Sales POS"; Decimal)
+        {
+            FieldClass = FlowField;
+            CalcFormula = Sum("NPR POS Entry"."Amount Excl. Tax" WHERE("Entry Type" = CONST("Direct Sale"),
+                                                                        "Customer No." = FIELD("No."),
+                                                                        "Entry Date" = FIELD("Date Filter"),
+                                                                        "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
+                                                                        "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+            Caption = 'Total Sales POS';
+            Editable = false;
+        }
+        field(6014406; "NPR Total Sales"; Decimal)
+        {
+            Caption = 'Total Sales';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        modify("Sales (LCY)")
+        {
+            Caption = 'Total Sales ERP';
+        }
     }
+
     keys
     {
         key("NPR Key1"; "NPR Replication Counter")
