@@ -155,7 +155,7 @@
                 {
                     Style = Unfavorable;
                     StyleExpr = EndOfDayActionRefreshNeeded;
-                    ToolTip = 'Specifies a POS action designed to perform end of day balancing of POS units. By default system uses ''BALANCE_V3'', if no value is specified in this field.', Comment = 'BALANCE_V3 is a POS action name. Do not translate it.';
+                    ToolTip = 'Specifies a POS action designed to perform end of day balancing of POS units. By default system uses ''BALANCE_V4'', if no value is specified in this field.', Comment = 'BALANCE_V4 is a POS action name. Do not translate it.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()

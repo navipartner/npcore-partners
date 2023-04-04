@@ -1,6 +1,8 @@
 ﻿codeunit 6150849 "NPR POS Action: EndOfDay V3"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used any more. Please use BALANCE_V4 action instead.';
 
     var
         ActionDescription: Label 'This is the built in function to perform balancing of the register (Version 1)';

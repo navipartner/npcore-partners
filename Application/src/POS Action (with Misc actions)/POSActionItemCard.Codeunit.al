@@ -1,80 +1,56 @@
-﻿codeunit 6150827 "NPR POS Action: Item Card"
+codeunit 6150827 "NPR POS Action: Item Card" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
-        ActionDescription: Label 'This built in function opens the item card page for a selected sales line in the POS';
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+        ActionDescription: Label 'This built in function opens the item card page for a selected sales line in the POS.';
+        ParamRefreshLine_CptLbl: Label 'Refresh Line';
+        ParamRefreshLine_DescLbl: Label 'Specifies if lines should be refreshed.';
+        ParamPageEditable_CptLbl: Label 'Page Editable';
+        ParamPageEditable_DescLbl: Label 'Specifies if the opened page should be editable or not.';
+        ParamSecurity_OptLbl: Label 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', Locked = true;
+        ParamSecurity_NameLbl: Label 'Security';
+        ParamSecurity_DescLbl: Label 'Specifies security option used.';
+        ParamSecurity_OptCptLbl: Label 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword';
     begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterBooleanParameter('RefreshLine', true);
-            Sender.RegisterBooleanParameter('PageEditable', true);
-            Sender.RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
-        end;
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddBooleanParameter('RefreshLine', true, ParamRefreshLine_CptLbl, ParamRefreshLine_DescLbl);
+        WorkflowConfig.AddBooleanParameter('PageEditable', true, ParamPageEditable_CptLbl, ParamPageEditable_DescLbl);
+        WorkflowConfig.AddOptionParameter('Security',
+                                          ParamSecurity_OptLbl,
+#pragma warning disable AA0139
+                                          SelectStr(1, ParamSecurity_OptLbl),
+#pragma warning restore                                          
+                                          ParamSecurity_NameLbl,
+                                          ParamSecurity_DescLbl,
+                                          ParamSecurity_OptCptLbl);
     end;
 
-    local procedure ActionCode(): Code[20]
-    begin
-
-        exit('ITEMCARD');
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-
-        exit('1.2');
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        OpenItemPage(Context, POSSession, FrontEnd);
-        Handled := true;
-    end;
-
-    local procedure OpenItemPage(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     var
-        JSON: Codeunit "NPR POS JSON Management";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        LinePOS: Record "NPR POS Sale Line";
-        Item: Record Item;
-        CurrentView: Codeunit "NPR POS View";
-        RetailItemCard: Page "Item Card";
+        BusinessLogic: Codeunit "NPR POS Action: Item Card-B";
+        POSSession: Codeunit "NPR POS Session";
+        JObject: JsonObject;
+        PageEditable: Boolean;
+        RefreshLine: Boolean;
     begin
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        POSSession.GetCurrentView(CurrentView);
+        Context.InitializeJObjectParser(JObject);
 
-        if (CurrentView.GetType() = CurrentView.GetType() ::Sale) then begin
-            POSSession.GetSale(POSSale);  //Ensure the sale still exists (haven't been seized and finished/cancelled by another session)
-            POSSession.GetSaleLine(POSSaleLine);
-            POSSaleLine.GetCurrentSaleLine(LinePOS);
-            if LinePOS."Line Type" = LinePOS."Line Type"::Item then begin
-                if Item.Get(LinePOS."No.") then begin
-                    Item.SetRecFilter();
-                    RetailItemCard.Editable(JSON.GetBooleanParameter('PageEditable'));
-                    RetailItemCard.SetRecord(Item);
-                    RetailItemCard.RunModal();
-                    if JSON.GetBooleanParameter('RefreshLine') then begin
-                        LinePOS.Validate("No.");
-                        LinePOS.Modify(true);
-                    end;
-                end;
-            end;
-        end;
+        if not Context.GetBooleanParameter('PageEditable', PageEditable) then
+            PageEditable := false;
+        if not Context.GetBooleanParameter('RefreshLine', RefreshLine) then
+            RefreshLine := false;
 
-        POSSession.RequestRefreshData();
+        BusinessLogic.OpenItemPage(POSSession, PageEditable, RefreshLine);
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionItemCard.js###
+'let main=async({})=>await workflow.respond();'
+        )
     end;
 }
