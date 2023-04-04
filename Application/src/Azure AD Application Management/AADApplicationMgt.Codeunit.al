@@ -4,10 +4,10 @@ codeunit 6060060 "NPR AAD Application Mgt."
 
     var
         BadApiResponseErr: Label 'Received a bad response from the API.\Status Code: %1 - %2\Body: %3', Comment = '%1 = status code, %2 = reason phrase, %3 = body';
-        CreatedAzureADAppSuccessMsg: Label 'Successfully created Azure AD application with the following details:\\Client ID: %1\Client Secret: %2\Tenant ID: %3\\The secret expires at: %4\\NOTE! The secret cannot be seen after this message is closed. Copy it to a safe place.\\Remember to grant admin consent to the app before use.', Comment = '%1 = client id, %2 = client secret, %3 = azure ad tenant id, %4 = expiration date';
+        CreatedAzureADAppSuccessMsg: Label 'Successfully created Azure AD application with the following details:\\Client ID: %1\Client Secret: %2\Tenant ID: %3\\The secret expires at: %4\\NOTE! The secret cannot be seen after this message is closed. Copy it to a safe place.\\Remember to grant admin consent to the app before use if you haven''t already done this.', Comment = '%1 = client id, %2 = client secret, %3 = azure ad tenant id, %4 = expiration date';
         CreateAADAppCreationOfSecretFailedMsg: Label 'Successfully created Azure AD application, but FAILED to create a secret.\\Client ID: %1\Tenant ID: %2', Comment = '%1 = client id, %2 = azure ad tenant id';
         CreatedSecretMsg: Label 'Created secret for Azure AD App. Details:\\Client ID: %1\Client Secret: %2\Tenant ID: %3\\Expires: %4\\NOTE! The secret cannot be seen after this message is closed. Copy it to a safe place.', Comment = '%1 = client id, %2 = client secret, %3 = azure ad tenant id, %4 = expiration date';
-        CouldNotCreateAADAppErr: Label 'Coult not create Azure AD App with the Microsoft Graph API.\\Error message: %1', Comment = '%1 = error message';
+        CouldNotCreateAADAppErr: Label 'Could not create Azure AD App with the Microsoft Graph API.\\Error message: %1', Comment = '%1 = error message';
         CouldNotCreateSecretErr: Label 'Could not create secret. Error message was:\\%1';
         MissingPermissionsErr: Label 'You need to have write permission to both %1 and %2. If you do not have access to manage users and Azure AD Applications, you cannot perform this action', Comment = '%1 = table caption of "AAD Application", %2 = table caption of "Access Control"';
         ResponseMalformedValueNotArrayOrObjectErr: Label 'The response from the Graph API is malformed. Expected "value" to be either an array or an object, but it is neither.\\Response: %1', Comment = '%1 = response body';
@@ -15,6 +15,10 @@ codeunit 6060060 "NPR AAD Application Mgt."
         CouldNotGetAccessTokenErr: Label 'Unable to get an access token to Microsoft''s Graph API.\\Error message: %1', Comment = '%1 = error message';
         UserDoestNotExistErr: Label 'The user associated with the Azure AD App (%1) does not exist. System cannot assign permissions. Before the app can be used, make sure to create the user and assign appropriate permissions', Comment = '%1 = Azure AD App Client ID';
         CouldNotFindObjectIdFromAppIdErr: Label 'Could not find Azure AD App Object ID from the given Azure AD App ID (%1)', Comment = '%1 = Azure AD App ID';
+        GrantConsentQst: Label 'Before being able to use the newly created app it requires admin consent to be granted. Do you want to do that now?';
+        ErrorDuringAppConsentErr: Label 'An error occurred while giving consent to the Azure AD app.\\Error message: %1', Comment = '%1 = error message';
+        ConsentFailedErr: Label 'Failed to give consent.';
+        WaitingForAppToBeReadyMsg: Label 'Waiting for the Azure AD App to be ready for approval...';
         [NonDebuggable]
         _AccessToken: Text;
         _AccessTokenExpiry: DateTime;
@@ -24,16 +28,32 @@ codeunit 6060060 "NPR AAD Application Mgt."
         AppJson: JsonObject;
         BufferToken: JsonToken;
         ApplicationId: Text;
+        ApplicationObjectId: Text;
         Secret: Text;
         Expires: DateTime;
         AzureADTenant: Codeunit "Azure AD Tenant";
+        Window: Dialog;
     begin
         AppJson := CreateAzureADApplication(AppDisplayName, PermissionSets);
+
         AppJson.SelectToken('appId', BufferToken);
         ApplicationId := BufferToken.AsValue().AsText();
 
         AppJson.SelectToken('id', BufferToken);
-        if (TryCreateAzureADSecret(BufferToken.AsValue().AsText(), SecretDisplayName, Secret, Expires)) then
+        ApplicationObjectId := BufferToken.AsValue().AsText();
+
+        if (Confirm(GrantConsentQst, true)) then begin
+            // Azure is really slow to actually recognize the new app,
+            // so we sleep here to ensure that it's ready for approval.
+            Window.Open(WaitingForAppToBeReadyMsg);
+            Sleep(20000);
+            Window.Close();
+
+            if (not TryGrantConsentToApp(ApplicationId)) then
+                Message(ErrorDuringAppConsentErr, GetLastErrorText());
+        end;
+
+        if (TryCreateAzureADSecret(ApplicationObjectId, SecretDisplayName, Secret, Expires)) then
             Message(CreatedAzureADAppSuccessMsg, ApplicationId, Secret, AzureADTenant.GetAadTenantId(), Expires)
         else
             Message(CreateAADAppCreationOfSecretFailedMsg, ApplicationId, AzureADTenant.GetAadTenantId());
@@ -122,6 +142,7 @@ codeunit 6060060 "NPR AAD Application Mgt."
         // - Automation.ReadWrite.All
         Request := '{' +
                         '"displayName":"' + DisplayName + '",' +
+                        '"signInAudience": "AzureADMyOrg",' +
                         '"requiredResourceAccess":[{"resourceAppId":"996def3d-b36c-4153-8607-a6fd3c01b89f","resourceAccess":[{"id":"a42b0b75-311e-488d-b67e-8fe84f924341","type":"Role"},{"id":"d365bc00-a990-0000-00bc-160000000001","type":"Role"}]}],' +
                         '"web":{"redirectUris":["' + RedirectUrl + '"]}' +
                     '}';
@@ -142,6 +163,25 @@ codeunit 6060060 "NPR AAD Application Mgt."
             Error(BadApiResponseErr, ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase(), ResponseTxt);
 
         AppJson.ReadFrom(ResponseTxt);
+    end;
+
+    [TryFunction]
+    local procedure TryGrantConsentToApp(AppId: Text)
+    var
+        OAuth2: Codeunit OAuth2;
+        OAuthAuthorityUrl: Text;
+        AzureADTenant: Codeunit "Azure AD Tenant";
+        Success: Boolean;
+        ErrorMsgTxt: Text;
+    begin
+        OAuthAuthorityUrl := StrSubstNo('https://login.microsoftonline.com/%1/adminconsent', AzureADTenant.GetAadTenantId());
+        OAuth2.RequestClientCredentialsAdminPermissions(AppId, OAuthAuthorityUrl, '', Success, ErrorMsgTxt);
+
+        if (not Success) then
+            if (ErrorMsgTxt <> '') then
+                Error(ErrorMsgTxt)
+            else
+                Error(ConsentFailedErr);
     end;
 
     [NonDebuggable]
@@ -288,13 +328,11 @@ codeunit 6060060 "NPR AAD Application Mgt."
                 AccessTokenJson.SelectToken('exp', ExpiryToken) and
                 TryGetJValue(ExpiryToken, ExpiryBigInt)) then
             _AccessTokenExpiry := TypeHelper.EvaluateUnixTimestamp(ExpiryBigInt)
-        else begin
+        else
             // We couldn't read the expiry from the token. Assuming it to be one hour
             // which is the lowest possible value at the time of developing this code.
             // https://learn.microsoft.com/en-us/azure/active-directory/develop/active-directory-configurable-token-lifetimes#access-tokens
-
             _AccessTokenExpiry := CurrentDateTime() + (60 * 60 * 1000);
-        end;
 
         _AccessToken := AccessToken;
         exit(_AccessToken);
