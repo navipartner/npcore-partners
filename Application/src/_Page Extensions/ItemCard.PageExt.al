@@ -511,6 +511,11 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ToolTip = 'Specifies the value of the Meta Description field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("NPR Meta Keywords"; Rec."NPR Meta Keywords")
+                    {
+                        ToolTip = 'Specifies the value of the Meta Keywords field';
+                        ApplicationArea = NPRRetail;
+                    }
                     field("NPR Attribute Set ID"; Rec."NPR Attribute Set ID")
                     {
                         AssistEdit = true;

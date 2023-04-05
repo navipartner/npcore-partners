@@ -187,6 +187,16 @@
             Caption = 'Meta Description Enabled';
             DataClassification = CustomerContent;
         }
+        field(320; "Meta Keywords"; Text[250])
+        {
+            Caption = 'Meta Keywords';
+            DataClassification = CustomerContent;
+        }
+        field(321; "Meta Keywords Enabled"; Boolean)
+        {
+            Caption = 'Meta Keywords Enabled';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Internet Item"; Boolean)
         {
             CalcFormula = Lookup(Item."NPR Magento Item" WHERE("No." = FIELD("Item No.")));
@@ -319,6 +329,9 @@
 
         if "Meta Description Enabled" then
             EnabledFieldsCaption += ',' + FieldCaption("Meta Description");
+
+        if "Meta Keywords Enabled" then
+            EnabledFieldsCaption += ',' + FieldCaption("Meta Keywords");
 
         if EnabledFieldsCaption <> '' then
             EnabledFieldsCaption := CopyStr(EnabledFieldsCaption, 2);

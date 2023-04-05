@@ -95,6 +95,14 @@ page 6150790 "NPR APIV1 - Magento Store Item"
                 {
                     Caption = 'Meta Title Enabled', Locked = true;
                 }
+                field(metaKeywords; Rec."Meta Keywords")
+                {
+                    Caption = 'Meta Keywords', Locked = true;
+                }
+                field(metaKeywordsEnabled; Rec."Meta Keywords Enabled")
+                {
+                    Caption = 'Meta Keywords Enabled', Locked = true;
+                }
                 field(productNewFrom; Rec."Product New From")
                 {
                     Caption = 'Product New From', Locked = true;

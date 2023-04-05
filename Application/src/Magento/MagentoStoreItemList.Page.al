@@ -489,6 +489,29 @@
                                         }
                                     }
                                 }
+                                grid(Control6150673)
+                                {
+                                    ShowCaption = false;
+                                    group(Control6150671)
+                                    {
+                                        ShowCaption = false;
+                                        field("Meta Keywords"; Rec."Meta Keywords")
+                                        {
+                                            ToolTip = 'Specifies the value of the Meta Keywords field';
+                                            ApplicationArea = NPRRetail;
+                                        }
+                                    }
+                                    group(Control6150670)
+                                    {
+                                        ShowCaption = false;
+                                        field("Meta Keywords Enabled"; Rec."Meta Keywords Enabled")
+                                        {
+                                            ShowCaption = false;
+                                            ToolTip = 'Specifies the value of the Meta Keywords Enabled field';
+                                            ApplicationArea = NPRRetail;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

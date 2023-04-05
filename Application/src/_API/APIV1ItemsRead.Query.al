@@ -512,6 +512,10 @@ query 6014410 "NPR APIV1 - Items Read"
             {
                 Caption = 'Meta Description', Locked = true;
             }
+            column(nprMetaKeywords; "NPR Meta Keywords")
+            {
+                Caption = 'Meta Keywords', Locked = true;
+            }
             column(nprProductNewFrom; "NPR Product New From")
             {
                 Caption = 'roduct New From', Locked = true;
