@@ -31,7 +31,7 @@ codeunit 6059909 "NPR TM Calendar Upgrade"
         AdmissionSchedule: Record "NPR TM Admis. Schedule Lines";
     begin
         CustomizedCalendarChange.SetFilter("Source Type", '=%1', CustomizedCalendarChange."Source Type"::Location);
-        if (not CustomizedCalendarChange.FindSet(true, true)) then
+        if (not CustomizedCalendarChange.FindSet(true)) then
             exit;
 
         repeat
@@ -74,7 +74,7 @@ codeunit 6059909 "NPR TM Calendar Upgrade"
         TicketBom: Record "NPR TM Ticket Admission BOM";
     begin
         CustomizedCalendarChange.SetFilter("Source Type", '=%1', CustomizedCalendarChange."Source Type"::Service);
-        if (not CustomizedCalendarChange.FindSet(true, true)) then
+        if (not CustomizedCalendarChange.FindSet(true)) then
             exit;
 
         repeat
