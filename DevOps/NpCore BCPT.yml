@@ -49,6 +49,9 @@ stages:
       runSuiteCodes:
         - 'INITDATA'
         - 'POS1S1'
+        - 'POS9S1'
+        - 'POS9S5'
+        - 'POS9S10'
         - 'POS1S5'
         - 'POS1S10'
         - 'POS2S1'
@@ -72,8 +75,5 @@ stages:
         - 'POS8S1'
         - 'POS8S5'
         - 'POS8S10'
-        - 'POS9S1'
-        - 'POS9S5'
-        - 'POS9S10'
         - 'POS10'
         - 'POS11'
