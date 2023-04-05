@@ -1203,6 +1203,11 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
         }
+        field(6151447; "Meta Keywords"; Text[250])
+        {
+            Caption = 'Meta Keywords';
+            DataClassification = CustomerContent;
+        }
         field(6151450; "Product New From"; Date)
         {
             Caption = 'Product New From';

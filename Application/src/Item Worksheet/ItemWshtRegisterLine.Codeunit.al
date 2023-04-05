@@ -716,6 +716,7 @@
         RegisteredWorksheetLine."Seo Link" := _ItemWkshLine."Seo Link";
         RegisteredWorksheetLine."Meta Title" := _ItemWkshLine."Meta Title";
         RegisteredWorksheetLine."Meta Description" := _ItemWkshLine."Meta Description";
+        RegisteredWorksheetLine."Meta Keywords" := _ItemWkshLine."Meta Keywords";
         RegisteredWorksheetLine."Featured From" := _ItemWkshLine."Featured From";
         RegisteredWorksheetLine."Featured To" := _ItemWkshLine."Featured To";
         RegisteredWorksheetLine."Routing No." := _ItemWkshLine."Routing No.";
