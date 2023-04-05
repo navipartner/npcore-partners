@@ -53,19 +53,41 @@
         }
     }
 
+    actions
+    {
+        area(Processing)
+        {
+            action(SetDefaultsValues)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Set default values';
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                Image = Setup;
+                ToolTip = 'Action sets default values to Graph API setup.';
+
+                trigger OnAction()
+                var
+                    GraphAPIManagement: Codeunit "NPR Graph API Management";
+                begin
+                    GraphAPIManagement.SetDefaultsValues(Rec);
+                    CurrPage.Update();
+                end;
+            }
+        }
+    }
+
     trigger OnOpenPage()
     var
         WizardNotification: Notification;
-        SetupNotFoundLbl: Label 'GraphAPI Setup not found.';
-        RunWizardQst: Label 'Run GraphAPI Wizard now.';
+        SetupNotFoundLbl: Label 'GraphAPI Setup not found. Run action Set default values to fetch default setup values.';
     begin
         if not Rec.Get() then begin
             WizardNotification.Message(SetupNotFoundLbl);
             WizardNotification.Scope := NotificationScope::LocalScope;
-            WizardNotification.AddAction(RunWizardQst, Codeunit::"NPR Graph API Management", 'RunGraphAPIWizard');
             WizardNotification.Send();
         end;
-
     end;
 
 }
