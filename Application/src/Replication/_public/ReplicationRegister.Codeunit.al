@@ -2039,7 +2039,7 @@ codeunit 6014608 "NPR Replication Register"
         if Rec.Code <> ReplicationErrLogEmailTemplateCode then
             exit;
 
-        if ReplicationSetup.Findset(true, false) then
+        if ReplicationSetup.Findset(true) then
             repeat
                 ReplicationSetup."Error Notify Email Address" := '';
                 ReplicationSetup.Modify();
