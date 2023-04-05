@@ -809,6 +809,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SCAN_COUPON', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Scan Coupon";
     }
+    value(164; MM_MEMBER_LOYALTY)
+    {
+        Caption = 'MM_MEMBER_LOYALTY', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR MM POS Action: Member Loy.";
+    }
     value(161; RUNPAGE_ITEM)
     {
         Caption = 'RUNPAGE_ITEM', Locked = true, MaxLength = 20;

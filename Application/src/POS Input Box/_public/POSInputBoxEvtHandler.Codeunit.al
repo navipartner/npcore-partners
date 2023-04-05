@@ -285,7 +285,40 @@
         EventCode := TempEanBoxSetupEvent."Event Code";
 
     end;
+    internal procedure InvokeEanBoxv3(EanBoxValue: Text; POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSAction: Record "NPR POS Action")
+    var
+        EanBoxSetup: Record "NPR Ean Box Setup";
+        TempEanBoxSetupEvent: Record "NPR Ean Box Setup Event" temporary;
+    begin
+        FrontEnd.SetOption('doNotClearTextBox', false);
+        if not FindEanBoxSetup(POSSession, EanBoxSetup) then begin
+            Message(Text001, EanBoxValue);
+            exit;
+        end;
 
+        if not FindEnabledEanBoxEvents(EanBoxSetup, EanBoxValue, TempEanBoxSetupEvent) then begin
+            Message(Text001, EanBoxValue);
+            exit;
+        end;
+
+        if not SelectEanBoxEvent(TempEanBoxSetupEvent) then
+            exit;
+
+        InvokePOSActionv3(EanBoxValue, TempEanBoxSetupEvent, POSSession, FrontEnd, POSAction);
+    end;
+    internal procedure InvokePOSActionv3(EanBoxValue: Text; EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var POSAction: Record "NPR POS Action"): Boolean
+    begin
+        if EanBoxSetupEvent."Action Code" = '' then
+            exit(false);
+
+        if not POSSession.RetrieveSessionAction(EanBoxSetupEvent."Action Code", POSAction) then
+            POSAction.Get(EanBoxSetupEvent."Action Code");
+
+        if (POSAction."Workflow Implementation" = POSAction."Workflow Implementation"::LEGACY) then
+            SetPOSActionParameters(EanBoxValue, EanBoxSetupEvent, POSAction, FrontEnd)
+        else
+            SetPOSActionParametersV3(EanBoxValue, EanBoxSetupEvent, POSAction);
+    end;
     internal procedure SetEanParametersToPOSAction(EanBoxValue: Text; var POSAction: Record "NPR POS Action"; EanBoxSetupEvent: Record "NPR Ean Box Setup Event"): Boolean
     begin
         SetPOSActionParametersV3(EanBoxValue, EanBoxSetupEvent, POSAction);
