@@ -6,7 +6,7 @@
     PageType = Card;
     SourceTable = "NPR TM Ticket Setup";
     UsageCategory = Administration;
-    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced, NPRRetail;
     AdditionalSearchTerms = 'Ticket Wizard, Ticket Application Area';
 
     layout
@@ -261,25 +261,29 @@
         {
             action(ApplicationArea)
             {
-                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced, NPRRetail;
                 Caption = 'Ticket Application Area';
-                RunObject = Page "NPR Ticket App. Area Setup";
                 ToolTip = 'Executes the Ticket Application Area action';
                 Image = SetupList;
+                Ellipsis = true;
+                RunObject = Page "NPR Ticket App. Area Setup";
             }
 
         }
+
         area(Processing)
         {
             action(TicketWizard)
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 ToolTip = 'Create all required setup for a ticket from a single page.';
-                Caption = 'Ticket Wizard';
+                Caption = 'Ticket Item Wizard';
                 Image = Action;
+                Ellipsis = true;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
+
                 trigger OnAction()
                 var
                     TicketWizardMgr: Codeunit "NPR TM Ticket Wizard";
@@ -288,64 +292,164 @@
                 end;
             }
 
-            action(DemoData)
-            {
-                ApplicationArea = NPRTicketAdvanced;
-                Caption = 'Create Demo Data';
-                ToolTip = 'Creates the NPR Demo Setup used when demonstrating ticketing.';
-                Image = CarryOutActionMessage;
-                Promoted = false;
-                Ellipsis = true;
 
-                trigger OnAction()
-                var
-                    TicketDemoSetup: Codeunit "NPR TM Ticket Create Demo Data";
-                begin
-                    TicketDemoSetup.CreateTicketDemoData(false);
-                end;
+            group(Setup)
+            {
+                Caption = 'Setup';
+
+                action(DemoData)
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                    Caption = 'Create Demo Data';
+                    ToolTip = 'Creates the NPR Demo Setup used when demonstrating ticketing.';
+                    Image = CarryOutActionMessage;
+                    Ellipsis = true;
+
+                    trigger OnAction()
+                    var
+                        TicketDemoSetup: Codeunit "NPR TM Ticket Create Demo Data";
+                        ConfirmSetup: Label 'Do you want to setup demo data for ticketing?';
+                    begin
+                        if (Confirm(ConfirmSetup, true)) then
+                            TicketDemoSetup.CreateTicketDemoData(false);
+                    end;
+                }
+
+                action(RetireTicketData)
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                    Caption = 'Delete Obsolete Ticket Data';
+                    ToolTip = 'This action will delete obsolete ticket data, including unused schedule entries.';
+                    Image = DeleteExpiredComponents;
+                    Ellipsis = true;
+
+                    trigger OnAction()
+                    var
+                        RetentionTicketData: Codeunit "NPR TM Retention Ticket Data";
+                    begin
+                        RetentionTicketData.MainWithConfirm();
+                    end;
+                }
+                action(AddRecurringJobToRetireTicketData)
+                {
+                    Caption = 'Schedule Ticket Data Cleanup';
+                    ToolTip = 'Adds a new periodic job, responsible for obsolete ticket data cleanup, including unused schedule entries.';
+                    Image = AddAction;
+                    ApplicationArea = NPRTicketAdvanced;
+                    Ellipsis = true;
+
+                    trigger OnAction()
+                    var
+                        JobQueueEntry: Record "Job Queue Entry";
+                        RetentionTicketData: Codeunit "NPR TM Retention Ticket Data";
+                    begin
+                        if RetentionTicketData.AddTicketDataRetentionJobQueue(JobQueueEntry, false) then
+                            Page.Run(Page::"Job Queue Entry Card", JobQueueEntry);
+                    end;
+                }
+                action(DeployRapidPackageFromAzureBlob)
+                {
+                    Caption = 'Deploy Rapid Package From Azure';
+                    Image = ImportDatabase;
+                    RunObject = page "NPR TM Ticket Rapid Packages";
+                    ToolTip = 'Executes the Deploy Rapid Start Package for Ticket module From Azure Blob Storage';
+                    ApplicationArea = NPRTicketAdvanced;
+                    Ellipsis = true;
+                }
+
+                action(PublishedWebService)
+                {
+                    Caption = 'Publish Ticketing WebServices';
+                    ToolTip = 'Creates and publishes the ticketing web services.';
+                    Image = Setup;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                    trigger OnAction()
+                    var
+                        WebServiceMgt: Codeunit "Web Service Management";
+                        TicketServiceName: Label 'ticket_services', Locked = true;
+                        TicketStatisticsName: Label 'ticket_statistics', Locked = true;
+                        OkMessage: Label 'Services published.';
+                    begin
+                        WebServiceMgt.CreateTenantWebService(5, Codeunit::"NPR TM Ticket WebService", TicketServiceName, true);
+                        WebServiceMgt.CreateTenantWebService(5, Codeunit::"NPR TM Statistics WebService", TicketStatisticsName, true);
+                        Message(OkMessage);
+                    end;
+                }
+
+                group(AzureAAD)
+                {
+                    Caption = 'OAuth Credentials';
+                    Visible = HasAzureADConnection;
+                    Image = XMLSetup;
+
+                    action(CreateNewAzureADApplication)
+                    {
+                        Caption = 'Create New Azure AD Application';
+                        ToolTip = 'Running this action will create an Azure AD App and a accompanying client secret.';
+                        Image = Setup;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                        trigger OnAction()
+                        var
+                            PermissionSets: List of [Code[20]];
+                            AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
+                            AppDisplayNameLbl: Label 'NaviPartner Ticketing Integration';
+                            SecretDisplayNameLbl: Label 'NaviPartner Ticketing Integration - %1', Comment = '%1 = today''s date';
+                        begin
+                            PermissionSets.Add('D365 BUS FULL ACCESS');
+                            PermissionSets.Add('NP RETAIL');
+
+                            AADApplicationMgt.CreateAzureADApplicationAndSecret(AppDisplayNameLbl, StrSubstNo(SecretDisplayNameLbl, Format(Today(), 0, 9)), PermissionSets);
+                        end;
+                    }
+
+                    action(CreateNewAADApplicationSecret)
+                    {
+                        Caption = 'Create New Azure AD Application Secret';
+                        ToolTip = 'Running this action will create a client secret for an existing Azure AD App.';
+                        Image = Setup;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                        trigger OnAction()
+                        var
+                            AppInfo: ModuleInfo;
+                            AADApplication: Record "AAD Application";
+                            AADApplicationList: Page "AAD Application List";
+                            AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
+                            NoAppsToManageErr: Label 'No AAD Apps with App Name like %1 to manage';
+                            SecretDisplayNameLbl: Label 'NaviPartner Ticketing Integration - %1', Comment = '%1 = today''s date';
+                        begin
+                            NavApp.GetCurrentModuleInfo(AppInfo);
+
+                            AADApplication.SetFilter("App Name", '@' + AppInfo.Name);
+                            if (AADApplication.IsEmpty()) then
+                                Error(NoAppsToManageErr, AppInfo.Name);
+
+                            AADApplicationList.LookupMode(true);
+                            AADApplicationList.SetTableView(AADApplication);
+                            if (AADApplicationList.RunModal() <> Action::LookupOK) then
+                                exit;
+
+                            AADApplicationList.GetRecord(AADApplication);
+                            AADApplicationMgt.CreateAzureADSecret(AADApplication."Client Id", StrSubstNo(SecretDisplayNameLbl, Format(Today(), 0, 9)));
+                        end;
+                    }
+                }
             }
 
-            action(RetireTicketData)
-            {
-                ApplicationArea = NPRTicketAdvanced;
-                Caption = 'Delete Obsolete Ticket Data';
-                ToolTip = 'This action will delete obsolete ticket data, including unused schedule entries.';
-                Image = DeleteExpiredComponents;
-                Promoted = false;
-                Ellipsis = true;
-                trigger OnAction()
-                var
-                    RetentionTicketData: Codeunit "NPR TM Retention Ticket Data";
-                begin
-                    RetentionTicketData.MainWithConfirm();
-                end;
-            }
-            action(AddRecurringJobToRetireTicketData)
-            {
-                Caption = 'Schedule Ticket Data Cleanup';
-                ToolTip = 'Adds a new periodic job, responsible for obsolete ticket data cleanup, including unused schedule entries.';
-                Image = AddAction;
-                ApplicationArea = NPRTicketAdvanced;
-
-                trigger OnAction()
-                var
-                    JobQueueEntry: Record "Job Queue Entry";
-                    RetentionTicketData: Codeunit "NPR TM Retention Ticket Data";
-                begin
-                    if RetentionTicketData.AddTicketDataRetentionJobQueue(JobQueueEntry, false) then
-                        Page.Run(Page::"Job Queue Entry Card", JobQueueEntry);
-                end;
-            }
-            action(DeployRapidPackageFromAzureBlob)
-            {
-                Caption = 'Deploy Rapid Package From Azure';
-                Image = ImportDatabase;
-
-                RunObject = page "NPR TM Ticket Rapid Packages";
-                ToolTip = 'Executes the Deploy Rapidstart Package for Ticket module From Azure Blob Storage';
-                ApplicationArea = NPRTicketAdvanced;
-            }
         }
     }
+
+
+    trigger OnOpenPage()
+    var
+        AzureADTenant: Codeunit "Azure AD Tenant";
+    begin
+        HasAzureADConnection := (AzureADTenant.GetAadTenantId() <> '');
+    end;
+
+    var
+        HasAzureADConnection: Boolean;
 }
 
