@@ -874,6 +874,10 @@ page 6014501 "NPR APIV1 - Items"
                 {
                     Caption = 'Meta Description', Locked = true;
                 }
+                field(nprMetaKeywords; Rec."NPR Meta Keywords")
+                {
+                    Caption = 'Meta Keywords', Locked = true;
+                }
                 field(nprProductNewFrom; Rec."NPR Product New From")
                 {
                     Caption = 'roduct New From', Locked = true;

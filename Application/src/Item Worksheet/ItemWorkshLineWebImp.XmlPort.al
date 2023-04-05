@@ -721,6 +721,10 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
                     {
                         MinOccurs = Zero;
                     }
+                    fieldelement(MetaKeywords; "Item Worksheet Line"."Meta Keywords")
+                    {
+                        MinOccurs = Zero;
+                    }
                     fieldelement(FeaturedFrom; "Item Worksheet Line"."Featured From")
                     {
                         MinOccurs = Zero;

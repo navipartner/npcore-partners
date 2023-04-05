@@ -362,6 +362,11 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Meta Description';
             DataClassification = CustomerContent;
         }
+        field(6151447; "NPR Meta Keywords"; Text[250])
+        {
+            Caption = 'Meta Keywords';
+            DataClassification = CustomerContent;
+        }
         field(6151450; "NPR Product New From"; Date)
         {
             Caption = 'Product New From';

@@ -661,6 +661,9 @@
         TempText := GetXmlText(Element, 'MetaDescription', 0, false);
         if TempText <> '' then
             ItemWorksheetLine.Validate("Meta Description", TempText);
+        TempText := GetXmlText(Element, 'MetaKeywords', 0, false);
+        if TempText <> '' then
+            ItemWorksheetLine.Validate("Meta Keywords", TempText);
         TempText := GetXmlText(Element, 'FeaturedFrom', 0, false);
         if TempText <> '' then
             if Evaluate(TempDate, TempText) then

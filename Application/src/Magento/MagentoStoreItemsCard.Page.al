@@ -346,6 +346,20 @@
                         ApplicationArea = NPRRetail;
                     }
                 }
+                grid(MetaKeywordsGrid)
+                {
+                    field("Meta Keywords"; Rec."Meta Keywords")
+                    {
+                        ToolTip = 'Specifies the value of the Meta Keywords field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Meta Keywords Enabled"; Rec."Meta Keywords Enabled")
+                    {
+                        ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Meta Keywords Enabled field';
+                        ApplicationArea = NPRRetail;
+                    }
+                }
             }
             group(MagentoCategoryLinks)
             {
