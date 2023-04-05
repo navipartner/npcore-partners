@@ -3,7 +3,7 @@
     Access = Internal;
 
     var
-        GraphApiSetup: Record "NPR GraphApi Setup";
+        _GraphApiSetup: Record "NPR GraphApi Setup";
 
     internal procedure GetAccessToken(EventExchIntEMail: Record "NPR Event Exch. Int. E-Mail")
     var
@@ -22,7 +22,7 @@
         GetTestGraphAPISetup();
 #IF NOT BC17
         OAuth2.GetDefaultRedirectURL(RedirectURL);
-        OAuth2.AcquireTokenAndTokenCacheByAuthorizationCode(GraphApiSetup."Client Id", GraphApiSetup."Client Secret", GraphApiSetup."OAuth Authority Url", RedirectURL, Scopes, PromptInteraction::Login, AccessToken, TokenCache, AuthCodeError);
+        OAuth2.AcquireTokenAndTokenCacheByAuthorizationCode(_GraphApiSetup."Client Id", _GraphApiSetup."Client Secret", _GraphApiSetup."OAuth Authority Url", RedirectURL, Scopes, PromptInteraction::Login, AccessToken, TokenCache, AuthCodeError);
 #ENDIF
         if (AccessToken = '') or (AuthCodeError <> '') then
             Error(FailErr, AuthCodeError);
@@ -41,7 +41,7 @@
         DeletedMsg: Label 'Event deleted';
     begin
         GetTestGraphAPISetup();
-        URL := GraphApiSetup."Graph Event Url" + CalendarItemID;
+        URL := _GraphApiSetup."Graph Event Url" + CalendarItemID;
         InitializeRequest(EventExchIntEMail, AccessToken, Client, RequestMessage, 'DELETE', URL);
 
         if Client.Send(RequestMessage, ResponseMessage) then
@@ -91,7 +91,7 @@
         AccessToken: Text;
     begin
         GetTestGraphAPISetup();
-        InitializeRequest(EventExchIntEMail, AccessToken, Client, RequestMessage, 'GET', GraphApiSetup."Graph Event Url" + CalendarItemID);
+        InitializeRequest(EventExchIntEMail, AccessToken, Client, RequestMessage, 'GET', _GraphApiSetup."Graph Event Url" + CalendarItemID);
 
         if Client.Send(RequestMessage, ResponseMessage) then
             exit(ResponseMessage.IsSuccessStatusCode())
@@ -108,7 +108,7 @@
         ErrorMsg: Label 'Error getting information for Event ID %1.';
     begin
         GetTestGraphAPISetup();
-        URL := GraphApiSetup."Graph Event Url" + CalendarItemID;
+        URL := _GraphApiSetup."Graph Event Url" + CalendarItemID;
         InitializeRequest(EventExchIntEMail, AccessToken, Client, RequestMessage, 'GET', URL);
 
         if Client.Send(RequestMessage, ResponseMessage) then
@@ -128,14 +128,14 @@
         ResponseMessage: HttpResponseMessage;
     begin
         GetTestGraphAPISetup();
-        InitializeRequest(EventExchIntEMail, AccessToken, Client, RequestMessage, 'POST', GraphApiSetup."Graph Event Url");
+        InitializeRequest(EventExchIntEMail, AccessToken, Client, RequestMessage, 'POST', _GraphApiSetup."Graph Event Url");
 
         SetMessageContent(Request, Content, RequestMessage);
         if Client.Send(RequestMessage, ResponseMessage) then
             if ResponseMessage.IsSuccessStatusCode() then
                 GetEventID(CalendarItemID, ResponseMessage)
             else
-                LogResponse(JobNo, 'Event Create', EventExchIntEMail."E-Mail", GraphApiSetup."Graph Event Url", Request, ResponseMessage);
+                LogResponse(JobNo, 'Event Create', EventExchIntEMail."E-Mail", _GraphApiSetup."Graph Event Url", Request, ResponseMessage);
     end;
 
     internal procedure SendEventRequestUpdate(JobNo: Code[20]; EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; Request: Text; CalendarItemID: Text)
@@ -148,7 +148,7 @@
         UpdatedMsg: Label 'Event updated.';
     begin
         GetTestGraphAPISetup();
-        URL := GraphApiSetup."Graph Event Url" + CalendarItemID;
+        URL := _GraphApiSetup."Graph Event Url" + CalendarItemID;
         InitializeRequest(EventExchIntEMail, AccessToken, Client, RequestMessage, 'PATCH', URL);
 
         SetMessageContent(Request, Content, RequestMessage);
@@ -168,7 +168,7 @@
         ResponseMessage: HttpResponseMessage;
     begin
         GetTestGraphAPISetup();
-        URL := GraphApiSetup."Graph Event Url" + CalendarItemID + '/attachments';
+        URL := _GraphApiSetup."Graph Event Url" + CalendarItemID + '/attachments';
         InitializeRequest(EventExchIntEMail, AccessToken, Client, RequestMessage, 'POST', URL);
         SetMessageContent(Request, Content, RequestMessage);
         if Client.Send(RequestMessage, ResponseMessage) then
@@ -214,7 +214,7 @@
             end;
 
         if AccessToken = '' then begin
-            LogResponse('', 'Refresh Token', EventExchIntEMail."E-Mail", GraphApiSetup."OAuth Token Url", '', ResponseMessage);
+            LogResponse('', 'Refresh Token', EventExchIntEMail."E-Mail", _GraphApiSetup."OAuth Token Url", '', ResponseMessage);
             Commit();
             exit;
         end;
@@ -232,13 +232,13 @@
         OkLbl: Label 'Connection Sucessful. Loged in as %1';
     begin
         GetTestGraphAPISetup();
-        InitializeRequest(EventExchIntEMail, AccessToken, Client, RequestMessage, 'GET', GraphApiSetup."Graph Me Url");
+        InitializeRequest(EventExchIntEMail, AccessToken, Client, RequestMessage, 'GET', _GraphApiSetup."Graph Me Url");
 
         if Client.Send(RequestMessage, ResponseMessage) then begin
             ResponseMessage.Content.ReadAs(Response);
             Message(OkLbl, GetEmail(Response));
         end else begin
-            LogResponse('', 'Test Connection', EventExchIntEMail."E-Mail", GraphApiSetup."Graph Me Url", '', ResponseMessage);
+            LogResponse('', 'Test Connection', EventExchIntEMail."E-Mail", _GraphApiSetup."Graph Me Url", '', ResponseMessage);
             Message(BadResponseErr);
         end;
     end;
@@ -353,17 +353,14 @@
 
     local procedure GetTestGraphAPISetup()
     begin
-        GraphApiSetup.Get();
-        GraphApiSetup.TestField("Client Id");
-        GraphApiSetup.TestField("Client Secret");
-        GraphApiSetup.TestField("Graph Event Url");
-        GraphApiSetup.TestField("Graph Me Url");
-        GraphApiSetup.TestField("OAuth Authority Url");
-        GraphApiSetup.TestField("OAuth Token Url");
+        _GraphApiSetup.Get();
+        _GraphApiSetup.TestField("Client Id");
+        _GraphApiSetup.TestField("Client Secret");
+        _GraphApiSetup.TestField("Graph Event Url");
+        _GraphApiSetup.TestField("Graph Me Url");
+        _GraphApiSetup.TestField("OAuth Authority Url");
+        _GraphApiSetup.TestField("OAuth Token Url");
     end;
-
-
-
 
     local procedure PrepareRefreshTokenRequest(RefreshToken: Text; Client: HttpClient; RequestMessage: HttpRequestMessage)
     var
@@ -377,7 +374,7 @@
         Client.Clear();
         Clear(RequestMessage);
         RequestMessage.Method('POST');
-        RequestMessage.SetRequestUri(GraphApiSetup."OAuth Token Url");
+        RequestMessage.SetRequestUri(_GraphApiSetup."OAuth Token Url");
         RequestMessage.GetHeaders(MessageHeaders);
         MessageHeaders.Clear();
         MessageHeaders.Add('Accept', '*/*');
@@ -401,11 +398,11 @@
 #IF NOT BC17
         OAuth2.GetDefaultRedirectURL(RedirectURL);
 #ENDIF
-        Request := StrSubstNo('client_id=%1', GraphApiSetup."Client Id");
+        Request := StrSubstNo('client_id=%1', _GraphApiSetup."Client Id");
         Request += '&scope=offline_access%20https%3A%2F%2Fgraph.microsoft.com%2FCalendars.ReadWrite';
         Request += StrSubstNo('&redirect_uri=%1', TypeHelper.UrlEncode(RedirectURL));
         Request += '&grant_type=refresh_token';
-        Request += StrSubstNo('&client_secret=%1', GraphApiSetup."Client Secret");
+        Request += StrSubstNo('&client_secret=%1', _GraphApiSetup."Client Secret");
         Request += StrSubstNo('&refresh_token=%1', TypeHelper.UrlEncode(RefreshToken));
     end;
 
@@ -433,27 +430,10 @@
 
     local procedure FetchNewSecret()
     begin
-        GraphApiSetup."Client Secret" := GetKeyVaultValue('GraphAPISecret');
-        GraphApiSetup.Modify();
+        _GraphApiSetup."Client Secret" := GetKeyVaultValue('GraphAPISecret');
+        _GraphApiSetup.Modify();
         Commit();
     end;
-
-#IF BC17
-    procedure RunGraphAPIWizard(GraphAPIWizard: Notification)
-    var
-        AssistedSetup: Codeunit "Assisted Setup";
-    begin
-        AssistedSetup.Run(Page::"NPR GraphApi Setup Wizard");
-    end;
-#ELSE
-    procedure RunGraphAPIWizard(GraphAPIWizard: Notification)
-    var
-        GuidedExperience: Codeunit "Guided Experience";
-        GuidedExperienceType: Enum "Guided Experience Type";
-    begin
-        GuidedExperience.Run(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR GraphApi Setup Wizard");
-    end;
-#ENDIF
 
 
     procedure GetKeyVaultValue(KeyName: Text) Value: Text[50]
@@ -466,5 +446,24 @@
         if StrLen(FetchedValue) > 50 then
             Error(FetchedTooLongErr);
         Value := CopyStr(FetchedValue, 1, 50);
+    end;
+
+
+    procedure SetDefaultsValues(GraphApiSetup: Record "NPR GraphApi Setup")
+    var
+        GraphAPIManagement: Codeunit "NPR Graph API Management";
+        OAuthAuthorityUrlTxt: Label 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize', Locked = true;
+        OAuthTokenUrlTxt: Label 'https://login.microsoftonline.com/common/oauth2/v2.0/token', Locked = true;
+        GraphEventUrl: Label 'https://graph.microsoft.com/v1.0/me/events/', Locked = true;
+        GraphMeUrl: Label 'https://graph.microsoft.com/v1.0/me', Locked = true;
+    begin
+        GraphApiSetup."Client Id" := GraphAPIManagement.GetKeyVaultValue('GraphAPIClientId');
+        GraphApiSetup."Client Secret" := GraphAPIManagement.GetKeyVaultValue('GraphAPISecret');
+        GraphApiSetup."OAuth Authority Url" := OAuthAuthorityUrlTxt;
+        GraphApiSetup."OAuth Token Url" := OAuthTokenUrlTxt;
+        GraphApiSetup."Graph Event Url" := GraphEventUrl;
+        GraphApiSetup."Graph Me Url" := GraphMeUrl;
+        if not GraphApiSetup.Insert() then
+            GraphApiSetup.Modify();
     end;
 }
