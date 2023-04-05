@@ -73,19 +73,7 @@
         exit(true);
     end;
 
-    procedure CreateRecord(var RetailLogo: Record "NPR Retail Logo"; sourceBase64: Text; ESCPOS: Text)
-    var
-        ImageHandler: Codeunit "Image Handler Management";
-        ConvertBase64: Codeunit "Base64 Convert";
-        TempBlob: Codeunit "Temp Blob";
-        OutStr: OutStream;
-        InStr: InStream;
-        Width: Integer;
-        Height: Integer;
-        DotNetEncoding: Codeunit DotNet_Encoding;
-        DotNetBinarwWriter: Codeunit DotNet_BinaryWriter;
-        DotNetStream: Codeunit DotNet_Stream;
-        i: Integer;
+    procedure CreateRecord(var RetailLogo: Record "NPR Retail Logo"; sourceBase64: Text; ESCPOS: Text; Hi: Integer; Lo: Integer; CmdHi: Integer; CmdLo: Integer)
     begin
         sourceBase64 := CopyStr(sourceBase64, StrPos(sourceBase64, 'base64,') + StrLen('base64,'));
 
@@ -95,39 +83,58 @@
         Clear(RetailLogo);
         RetailLogo.NewRecord();
         RetailLogo.Init();
-
         RetailLogo.Keyword := Text000001;
 
-        TempBlob.CreateOutStream(OutStr);
-        ConvertBase64.FromBase64(sourceBase64, OutStr);
-        TempBlob.CreateInStream(InStr);
-        RetailLogo."POS Logo".ImportStream(InStr, RetailLogo.FieldName("POS Logo"));
+        WritePreviewLogo(RetailLogo, sourceBase64);
+        WriteESCPOSLogo(RetailLogo, ESCPOS);
+        WriteOneBitLogo(RetailLogo, sourceBase64);
 
-        ImageHandler.GetImageSize(InStr, Width, Height);
+        RetailLogo."ESCPOS Height Low Byte" := Lo;
+        RetailLogo."ESCPOS Height High Byte" := Hi;
+        RetailLogo."ESCPOS Cmd Low Byte" := CmdLo;
+        RetailLogo."ESCPOS Cmd High Byte" := CmdHi;
+
+        RetailLogo.Insert();
+    end;
+
+    local procedure WritePreviewLogo(var RetailLogo: Record "NPR Retail Logo"; sourceBase64: Text)
+    var
+        ImageHandler: Codeunit "Image Handler Management";
+        ConvertBase64: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
+        OStream: OutStream;
+        IStream: InStream;
+        Width: Integer;
+        Height: Integer;
+    begin
+        TempBlob.CreateOutStream(OStream);
+        ConvertBase64.FromBase64(sourceBase64, OStream);
+        TempBlob.CreateInStream(IStream);
+        RetailLogo."POS Logo".ImportStream(IStream, RetailLogo.FieldName("POS Logo"));
+
+        ImageHandler.GetImageSize(IStream, Width, Height);
 
         RetailLogo.Width := Width;
         RetailLogo.Height := Height;
+    end;
 
-        RetailLogo.Insert();
+    local procedure WriteESCPOSLogo(var RetailLogo: Record "NPR Retail Logo"; ESCPOSBase64: Text)
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+        OStream: OutStream;
+    begin
+        RetailLogo.ESCPOSLogo.CreateOutStream(OStream);
+        Base64Convert.FromBase64(ESCPOSBase64, OStream);
+    end;
 
-        Clear(OutStr);
-        Clear(InStr);
-
-        RetailLogo.ESCPOSLogo.CreateOutStream(OutStr);
-
-        DotNetEncoding.UTF8();
-        DotNetStream.FromOutStream(OutStr);
-        DotNetBinarwWriter.BinaryWriterWithEncoding(DotNetStream, DotNetEncoding);
-        for i := 1 to StrLen(ESCPOS) do
-            DotNetBinarwWriter.WriteChar(ESCPOS[i]);
-
-        Clear(OutStr);
-        RetailLogo.OneBitLogo.CreateOutStream(OutStr);
-        ConvertBase64.FromBase64(sourceBase64, OutStr);
-
+    local procedure WriteOneBitLogo(var RetailLogo: Record "NPR Retail Logo"; sourceBase64: Text)
+    var
+        OStream: OutStream;
+        Base64Convert: Codeunit "Base64 Convert";
+    begin
+        RetailLogo.OneBitLogo.CreateOutStream(OStream);
+        Base64Convert.FromBase64(sourceBase64, OStream);
         RetailLogo.OneBitLogoByteSize := RetailLogo.OneBitLogo.Length;
-
-        RetailLogo.Modify();
     end;
 
     procedure ExportImageBMP(RetailLogo: Record "NPR Retail Logo")
