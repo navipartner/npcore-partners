@@ -13,10 +13,15 @@
         }
         field(10; "Import Pending"; Integer)
         {
-            CalcFormula = Count("NPR Nc Import Entry" WHERE(Imported = CONST(false)));
+            CalcFormula = Count("NPR Nc Import Entry" WHERE(Imported = CONST(false), "Import Type" = field("Import Type Filter")));
             Caption = 'Import Unprocessed';
             Editable = false;
             FieldClass = FlowField;
+        }
+        field(11; "Import Type Filter"; Code[20])
+        {
+            Caption = 'Import Type Filter';
+            FieldClass = FlowFilter;
         }
         field(15; "Tasks Unprocessed"; Integer)
         {
@@ -150,7 +155,7 @@
         {
             Caption = 'Failed imports in the import list';
             FieldClass = FlowField;
-            CalcFormula = count("NPR Nc Import Entry" where("Runtime Error" = const(true)));
+            CalcFormula = count("NPR Nc Import Entry" where("Runtime Error" = const(true), "Import Type" = field("Import Type Filter")));
             Editable = false;
         }
         field(108; "My Incoming Documents"; Integer)
@@ -191,5 +196,12 @@
         {
         }
     }
+
+    internal procedure SetActionableImportEntryTypeFilter()
+    var
+        ImportType: Record "NPR Nc Import Type";
+    begin
+        Rec.SetFilter("Import Type Filter", ImportType.GetActionableTypeFilter());
+    end;
 }
 

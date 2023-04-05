@@ -709,6 +709,8 @@
         ImportType."Import Codeunit ID" := CODEUNIT::"NPR MM Loyalty WebService Mgr";
         ImportType."Webservice Codeunit ID" := CODEUNIT::"NPR MM Loyalty WebService";
 
+        ImportType.Actionable := false;
+
         ImportType.Insert();
     end;
 

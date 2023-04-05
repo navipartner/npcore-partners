@@ -78,7 +78,12 @@
                     ToolTip = 'Specifies the value of the Delay between Retries field';
                     ApplicationArea = NPRNaviConnect;
                 }
-
+                field(Actionable; Rec.Actionable)
+                {
+                    ToolTip = 'Specifies if Import Entries of this type is actionable, meaning that a user can take action and retry the import';
+                    ApplicationArea = NPRNaviConnect;
+                    Visible = false;
+                }
                 field("Background Session Reschedule"; Rec."Background Session Reschedule")
                 {
                     ToolTip = 'Failed import entries can be rescheduled manually by using the action ''Reschedule Selected for Import'' or automatically by setting up the ''Max. Retry Count'' on the ''Import Type''. Normally, the reschedule is done in the user session or when the Job Queue picks up again the import entry to reprocess it. By enabling this setting, the reschedule is done in a new background session';
