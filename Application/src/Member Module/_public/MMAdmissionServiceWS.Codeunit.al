@@ -5,6 +5,7 @@
         WebServiceMgt: Codeunit "Web Service Management";
     begin
         WebServiceMgt.CreateTenantWebService(5, Codeunit::"NPR MM Admission Service WS", 'admission_service', true);
+        WebServiceMgt.CreateTenantWebService(5, Codeunit::"NPR MM Admission Service WS", 'NPR_AdmissionService', true);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Web Service Aggregate", 'OnBeforeInsertEvent', '', true, true)]

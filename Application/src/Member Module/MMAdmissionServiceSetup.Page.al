@@ -100,6 +100,67 @@
                 ToolTip = 'Executes the Published Webservice action';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
+
+            group(AzureAAD)
+            {
+                Caption = 'OAuth Credentials';
+                Visible = HasAzureADConnection;
+                Image = XMLSetup;
+
+                action(CreateNewAzureADApplication)
+                {
+                    Caption = 'Create New Azure AD Application';
+                    ToolTip = 'Running this action will create an Azure AD App and a accompanying client secret.';
+                    Image = Setup;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                    trigger OnAction()
+                    var
+                        PermissionSets: List of [Code[20]];
+                        AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
+                        AppDisplayNameLbl: Label 'NaviPartner Ticketing Integration';
+                        SecretDisplayNameLbl: Label 'NaviPartner Turnstile Integration - %1', Comment = '%1 = today''s date';
+                    begin
+                        PermissionSets.Add('D365 BUS FULL ACCESS');
+                        PermissionSets.Add('NP RETAIL');
+
+                        AADApplicationMgt.CreateAzureADApplicationAndSecret(AppDisplayNameLbl, StrSubstNo(SecretDisplayNameLbl, Format(Today(), 0, 9)), PermissionSets);
+                    end;
+                }
+
+                action(CreateNewAADApplicationSecret)
+                {
+                    Caption = 'Create New Azure AD Application Secret';
+                    ToolTip = 'Running this action will create a client secret for an existing Azure AD App.';
+                    Image = Setup;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                    trigger OnAction()
+                    var
+                        AppInfo: ModuleInfo;
+                        AADApplication: Record "AAD Application";
+                        AADApplicationList: Page "AAD Application List";
+                        AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
+                        NoAppsToManageErr: Label 'No AAD Apps with App Name like %1 to manage';
+                        SecretDisplayNameLbl: Label 'NaviPartner Turnstile Integration - %1', Comment = '%1 = today''s date';
+                    begin
+                        NavApp.GetCurrentModuleInfo(AppInfo);
+
+                        AADApplication.SetFilter("App Name", '@' + AppInfo.Name);
+                        if (AADApplication.IsEmpty()) then
+                            Error(NoAppsToManageErr, AppInfo.Name);
+
+                        AADApplicationList.LookupMode(true);
+                        AADApplicationList.SetTableView(AADApplication);
+                        if (AADApplicationList.RunModal() <> Action::LookupOK) then
+                            exit;
+
+                        AADApplicationList.GetRecord(AADApplication);
+                        AADApplicationMgt.CreateAzureADSecret(AADApplication."Client Id", StrSubstNo(SecretDisplayNameLbl, Format(Today(), 0, 9)));
+                    end;
+                }
+            }
+
             action(Entries)
             {
                 Caption = 'Entries';
@@ -127,14 +188,18 @@
     end;
 
     trigger OnOpenPage()
+    var
+        AzureADTenant: Codeunit "Azure AD Tenant";
     begin
         Rec.Reset();
         if not Rec.Get() then begin
             Rec.Init();
             Rec.Insert();
         end;
+        HasAzureADConnection := (AzureADTenant.GetAadTenantId() <> '');
     end;
 
     var
         WebServiceIsPublished: Boolean;
+        HasAzureADConnection: Boolean;
 }
