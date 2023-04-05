@@ -35,7 +35,7 @@ codeunit 6059933 "NPR Rep. Timestamp Upgrade"
         RepEndpoint: Record "NPR Replication Endpoint";
         ReplicationSetup: Record "NPR Replication Service Setup";
     begin
-        if RepEndpoint.FindSet(true, false) then
+        if RepEndpoint.FindSet(true) then
             Repeat
 #pragma warning disable AA0139
                 RepEndpoint.Path := RepEndpoint.Path.Replace('replicationCounter', 'systemRowVersion');
