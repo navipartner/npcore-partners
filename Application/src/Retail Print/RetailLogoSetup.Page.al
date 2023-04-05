@@ -23,18 +23,11 @@
                     RetailLogoMgtCtrl.InitializeResizeImage(CurrPage."NPR ResizeImage");
                 end;
 
-                trigger returnImage(resizedImage: Text; escpos: Text)
+                trigger returnImage(resizedImage: Text; escpos: Text; Hi: Integer; Lo: Integer; CmdHi: Integer; CmdLo: Integer)
+                var
+                    RetailLogo: Record "NPR Retail Logo";
                 begin
-                    RetailLogoMgtCtrl.CreateRecord(RetailLogo, resizedImage, escpos);
-                end;
-
-                trigger returnESCPOSBytes(Hi: Integer; Lo: Integer; CmdHi: Integer; CmdLo: Integer)
-                begin
-                    RetailLogo."ESCPOS Height Low Byte" := Lo;
-                    RetailLogo."ESCPOS Height High Byte" := Hi;
-                    RetailLogo."ESCPOS Cmd Low Byte" := CmdLo;
-                    RetailLogo."ESCPOS Cmd High Byte" := CmdHi;
-                    RetailLogo.Modify();
+                    RetailLogoMgtCtrl.CreateRecord(RetailLogo, resizedImage, escpos, Hi, Lo, CmdHi, CmdLo);
                 end;
             }
             repeater(Group)
@@ -110,8 +103,6 @@
                 trigger OnAction()
                 begin
                     RetailLogoMgtCtrl.UploadLogo();
-                    CurrPage.Update();
-                    if Rec.FindLast() then;
                 end;
             }
 
@@ -138,7 +129,5 @@
     }
     var
         RetailLogoMgtCtrl: Codeunit "NPR Retail Logo Mgt.";
-
-        RetailLogo: Record "NPR Retail Logo";
 }
 

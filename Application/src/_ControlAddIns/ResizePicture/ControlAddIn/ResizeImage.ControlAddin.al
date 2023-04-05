@@ -12,11 +12,9 @@ controladdin "NPR ResizeImage"
     HorizontalShrink = false;
     Scripts =
         'src/_ControlAddins/ResizePicture/JsScript/ResizeImage.js';
-    StartupScript = 'src/_ControlAddins/ResizePicture/JsScript/Startup.js';
 
     event OnCtrlReady();
-    event returnImage(resizedImage: Text; escpos: Text);
-    event returnESCPOSBytes(Hi: Integer; Lo: Integer; CmdHi: Integer; CmdLo: Integer)
+    event returnImage(resizedImage: Text; escpos: Text; Hi: Integer; Lo: Integer; CmdHi: Integer; CmdLo: Integer);
 
     procedure ResizeImage(sourceBase64: Text; imageExtension: Text);
 }

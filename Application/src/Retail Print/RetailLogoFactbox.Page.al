@@ -26,6 +26,11 @@
                 ToolTip = 'Specifies the value of the Height field';
                 ApplicationArea = NPRRetail;
             }
+            field(Logo; Rec."POS Logo")
+            {
+                ToolTip = 'Specifies the logo for receipt printing';
+                ApplicationArea = NPRRetail;
+            }
         }
     }
     actions

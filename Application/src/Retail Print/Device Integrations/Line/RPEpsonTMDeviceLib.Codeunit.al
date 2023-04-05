@@ -393,14 +393,10 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
 
     local procedure PrintBitmapFromKeyword(Keyword: Text)
     var
-        ESCPOS: Text;
         InStream: InStream;
         RetailLogo: Record "NPR Retail Logo";
         POSUnit: Record "NPR POS Unit";
         RegisterNo: Code[10];
-        DotNetByteArray: Codeunit "DotNet_Array";
-        DotNetStream: Codeunit "DotNet_Stream";
-        DotNetEncoding: Codeunit "DotNet_Encoding";
     begin
         RetailLogo.SetAutoCalcFields(ESCPOSLogo);
         RetailLogo.SetRange(Keyword, Keyword);
@@ -415,28 +411,15 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
         if RetailLogo.FindSet() then
             repeat
                 if RetailLogo.ESCPOSLogo.HasValue() then begin
-                    RetailLogo.ESCPOSLogo.CreateInStream(InStream, TextEncoding::UTF8);
-                    DotNetStream.FromInStream(InStream);
-                    DotNetByteArray.ByteArray(DotNetStream.Length());
-                    DotNetStream.Read(DotNetByteArray, 0, DotNetStream.Length());
-                    DotNetEncoding.UTF8();
-                    ESCPOS := DotNetEncoding.GetString(DotNetByteArray, 0, DotNetByteArray.Length());
+                    StoreGraphicsInBuffer(RetailLogo."ESCPOS Cmd Low Byte", RetailLogo."ESCPOS Cmd High Byte", 48, 112, 48, 1, 1, 49, 0, 2, RetailLogo."ESCPOS Height Low Byte", RetailLogo."ESCPOS Height High Byte");
 
-                    PrintBitmapFromESCPOS(ESCPOS, RetailLogo."ESCPOS Height Low Byte", RetailLogo."ESCPOS Height High Byte", RetailLogo."ESCPOS Cmd Low Byte", RetailLogo."ESCPOS Cmd High Byte");
+                    RetailLogo.ESCPOSLogo.CreateInStream(InStream);
+                    AddStreamToBuffer(InStream);
+
+                    LineFeed();
+                    PrintGraphicsInBuffer();
                 end;
             until RetailLogo.Next() = 0;
-    end;
-
-    procedure PrintBitmapFromESCPOS(ESCPOS: Text; hL: Integer; hH: Integer; cmdL: Integer; cmdH: Integer)
-    begin
-        if ESCPOS = '' then
-            exit;
-
-        StoreGraphicsInBuffer(cmdL, cmdH, 48, 112, 48, 1, 1, 49, 0, 2, hL, hH, ESCPOS); // 0/2 is always the low/high width bytes since 512px is assumed constant.
-
-        LineFeed();
-        PrintGraphicsInBuffer();
-        LineFeed();
     end;
 
     procedure PrintText(var POSPrintBuffer: Record "NPR RP Print Buffer")
@@ -799,11 +782,11 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
         AddStringToBuffer('w' + Format(n));
     end;
 
-    local procedure StoreGraphicsInBuffer(pL: Char; pH: Char; m: Char; fn: Char; a: Char; bx: Char; by: Char; c: Char; xL: Char; xH: Char; yL: Char; yH: Char; Image: Text)
+    local procedure StoreGraphicsInBuffer(pL: Char; pH: Char; m: Char; fn: Char; a: Char; bx: Char; by: Char; c: Char; xL: Char; xH: Char; yL: Char; yH: Char)
     begin
         // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=99
         _DotNetStream.WriteByte(29); //GS
-        AddStringToBuffer('(L' + Format(pL) + Format(pH) + Format(m) + Format(fn) + Format(a) + Format(bx) + Format(by) + Format(c) + Format(xL) + Format(xH) + Format(yL) + Format(yH) + Image);
+        AddStringToBuffer('(L' + Format(pL) + Format(pH) + Format(m) + Format(fn) + Format(a) + Format(bx) + Format(by) + Format(c) + Format(xL) + Format(xH) + Format(yL) + Format(yH));
     end;
 
     local procedure TurnDoubleStrikeModeOnOff(n: Integer)
@@ -851,6 +834,17 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
         DotNetString.Set(String);
         DotNetString.ToCharArray(0, DotNetString.Length(), DotNetCharArray);
         _DotNetEncoding.GetBytes(DotNetCharArray, 0, DotNetCharArray.Length(), DotNetByteArray);
+        _DotNetStream.Write(DotNetByteArray, 0, DotNetByteArray.Length());
+    end;
+
+    local procedure AddStreamToBuffer(var IStream: InStream)
+    var
+        DotNetStream: Codeunit "DotNet_Stream";
+        DotNetByteArray: Codeunit "DotNet_Array";
+    begin
+        DotNetStream.FromInStream(IStream);
+        DotNetByteArray.ByteArray(DotNetStream.Length());
+        DotNetStream.Read(DotNetByteArray, 0, DotNetStream.Length());
         _DotNetStream.Write(DotNetByteArray, 0, DotNetByteArray.Length());
     end;
 

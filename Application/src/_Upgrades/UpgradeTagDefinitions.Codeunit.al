@@ -102,6 +102,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetExcelColumn'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetFieldSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'ShowReturnAmountDialog'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Retail Logo"));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -368,6 +369,8 @@
                 end;
             Codeunit::"NPR Upgrade Variety Setup":
                 exit('NPR_Upgrade_Variety_Setup_20230314');
+            Codeunit::"NPR UPG Retail Logo":
+                exit('NPR_retail_logo_UPG_2023-04-03');
         end;
     end;
 }

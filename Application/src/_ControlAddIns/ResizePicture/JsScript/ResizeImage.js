@@ -42,7 +42,12 @@ function ResizeImage(base64, imageExtension) {
             i, luma;
         var slicebits = '', escpos = '';
 
+        debugger;
+        let byteArray = new Uint8Array(Math.ceil(len/4/8));        
+        let j = 0;
+
         for (i = 0; i < len; i += 4) {
+            
             luma = buffer[i] * 0.3 + buffer[i + 1] * 0.59 + buffer[i + 2] * 0.11;
 
             luma = luma < threshold ? 0 : 255;
@@ -58,39 +63,57 @@ function ResizeImage(base64, imageExtension) {
                 slicebits += '0';
             }
 
-            if (((i / 4 + 1) % 8) === 0) {
-                var char = String.fromCharCode(parseInt(slicebits, 2));
-                escpos += char;
+            if (slicebits.length === 8) {
+                byteArray[j] = parseInt(slicebits, 2);                 
+                j++;
                 slicebits = '';
             }
-
         }
 
         if (slicebits != '') {
             slicebits = slicebits.padEnd(8, '0');
-            var char = String.fromCharCode(parseInt(slicebits, 2));
-            escpos += char;
+            debugger;
+            byteArray[j] = parseInt(slicebits, 2);
         }
 
         ctx.putImageData(idata, 0, 0);
 
-        const newBase64 = canvas.toDataURL('image/bmp');
+        let newBase64 = canvas.toDataURL('image/bmp');
+        let Bytes = GetBytes(canvas.height);
+        let Bytes2 = GetBytes(byteArray.length + 10);
 
-        Microsoft.Dynamics.NAV.InvokeExtensibilityMethod('returnImage', [newBase64, escpos]);
-
-        var Bytes = GetBytes(canvas.height);
-
-        var Bytes2 = GetBytes(escpos.length + 10);
-
-        Microsoft.Dynamics.NAV.InvokeExtensibilityMethod('returnESCPOSBytes', [Bytes[1], Bytes[0], Bytes2[1], Bytes2[0]]);
+        base64arraybuffer(byteArray)
+            .then((result) => Microsoft.Dynamics.NAV.InvokeExtensibilityMethod('returnImage', [newBase64, result, Bytes[1], Bytes[0], Bytes2[1], Bytes2[0]]))
+            .catch(reason => alert(reason));
     }
 }
+
+//https://stackoverflow.com/a/66046176
+async function base64arraybuffer(data) {
+    // Use a FileReader to generate a base64 data URI
+    const base64url = await new Promise((r) => {
+        const reader = new FileReader()
+        reader.onload = () => r(reader.result)
+        reader.readAsDataURL(new Blob([data]))
+    })
+
+    /*
+    The result looks like 
+    "data:application/octet-stream;base64,<your base64 data>", 
+    so we split off the beginning:
+    */
+    return base64url.split(",", 2)[1]
+}
+
 function Base64ToDataUri(base64, imageExtension) {
     return 'data:image/' + imageExtension + ';base64,' + base64
 }
+
 function GetBytes(int) {
     var b = new ArrayBuffer(8);
     b[0] = int & 0xFF;
     b[1] = (int >> 8) & 0xFF;
     return b;
 }
+
+Microsoft.Dynamics.NAV.InvokeExtensibilityMethod('OnCtrlReady', '')
