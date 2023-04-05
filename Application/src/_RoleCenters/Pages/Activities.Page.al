@@ -34,7 +34,7 @@
             cuegroup(FailedTasks)
             {
                 Caption = 'Failed Tasks';
-                field("Failed tasks"; Rec."Failed Webshop Payments")
+                field("Failed tasks"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Failed Webshop Payments"))))
                 {
                     Caption = 'Failed Capturing of Payments';
                     ToolTip = 'Specifies the number of the failed capturing of payments.';
@@ -54,7 +54,7 @@
                     end;
                 }
 
-                field("Failed imports in the import list"; Rec."Failed imports")
+                field("Failed imports in the import list"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Failed imports"))))
                 {
                     Caption = 'Failed Imports in the Import List';
                     ToolTip = 'Specifies the number of failed import entries from the Import List.';

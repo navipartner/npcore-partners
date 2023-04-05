@@ -1390,6 +1390,8 @@
         ImportType."Import Codeunit ID" := Codeunit::"NPR MM Member WebService Mgr";
         ImportType."Webservice Codeunit ID" := Codeunit::"NPR MM Member WebService";
 
+        ImportType.Actionable := false;
+
         ImportType.Insert();
     end;
 

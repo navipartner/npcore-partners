@@ -50,6 +50,7 @@
             Rec.Insert();
         end;
         Rec.SetFilter("Date Filter", '=%1', WorkDate());
+        Rec.SetActionableImportEntryTypeFilter();
     end;
 }
 

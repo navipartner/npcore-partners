@@ -616,6 +616,8 @@
         ImportType."Webservice Codeunit ID" := Codeunit::"NPR TM Ticket WebService";
         ImportType."Lookup Codeunit ID" := Codeunit::"NPR TM View Ticket Requests";
 
+        ImportType.Actionable := false;
+
         ImportType.Insert();
     end;
 
