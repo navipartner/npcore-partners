@@ -169,6 +169,7 @@
             {
                 Caption = 'Import Selected';
                 Image = Start;
+                Enabled = IsActionable;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
@@ -365,10 +366,22 @@
     }
 
     trigger OnOpenPage()
+    var
+        ImportType: Record "NPR Nc Import Type";
     begin
         Rec.SetRange(Imported, false);
+        Rec.SetFilter("Import Type", ImportType.GetActionableTypeFilter());
         if Rec.FindFirst() then;
         WebClient := IsWebClient();
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    var
+        ImportType: Record "NPR Nc Import Type";
+    begin
+        IsActionable := false;
+        if (ImportType.Get(Rec."Import Type")) then
+            IsActionable := ImportType.Actionable;
     end;
 
     var
@@ -381,6 +394,7 @@
         EmptyStyleSheetErr: Label 'XML Stylesheet is empty for Import Type: %1', Comment = '%1="NPR Nc Import Entry"."Import Type"';
         NoFileMatchErr: Label 'No Import Filenames matched %1', Comment = 'DocNo';
         EditFileMsg: Label 'In cloud environments files can not be stored on the server. Please use Export action to download the file, change it and then use Import action to return it into Database.';
+        IsActionable: Boolean;
 
     local procedure AddFile()
     var

@@ -101,6 +101,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'RetailReplDemandLine'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetExcelColumn'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetFieldSetup'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NaviConnect", 'ImportTypeActionable'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'ShowReturnAmountDialog'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Retail Logo"));
     end;
@@ -361,6 +362,11 @@
                         exit('NPR-VendItemNo_ItemWorksheetExcelColumn-20230105');
                     'ItemWorksheetFieldSetup':
                         exit('NPR-VendItemNo_ItemWorksheetFieldSetup-20230105');
+                end;
+            Codeunit::"NPR UPG NaviConnect":
+                case UpgradeStep of
+                    'ImportTypeActionable':
+                        exit('NPR-NC-ImportTypeActionable-20230324');
                 end;
             Codeunit::"NPR UPG POS SalesWorkflowStep":
                 case UpgradeStep of

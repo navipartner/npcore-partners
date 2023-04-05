@@ -241,6 +241,7 @@
         end;
 
         ShowProductVideosActivities := ClientTypeManagement.GetCurrentClientType() <> CLIENTTYPE::Phone;
+        Rec.SetActionableImportEntryTypeFilter();
     end;
 
     trigger OnAfterGetCurrRecord()

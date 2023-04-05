@@ -169,6 +169,12 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
+        field(531; Actionable; Boolean)
+        {
+            Caption = 'Actionable';
+            DataClassification = SystemMetadata;
+            InitValue = true;
+        }
         field(600; "Import List Update Handler"; Enum "NPR Nc IL Update Handler")
         {
             Caption = 'Import List Update Handler';
@@ -176,9 +182,8 @@
 
             trigger OnValidate()
             begin
-                if "Import List Update Handler" <> "Import List Update Handler"::Default then begin
+                if "Import List Update Handler" <> "Import List Update Handler"::Default then
                     "Ftp Enabled" := false;
-                end;
             end;
         }
         field(610; "Background Session Reschedule"; Boolean)
@@ -218,5 +223,20 @@
             exit;
 
         WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, "Webservice Codeunit ID", Description, true);
+    end;
+
+    internal procedure GetActionableTypeFilter() TypeFilter: Text
+    var
+        ImportType: Record "NPR Nc Import Type";
+        RecRef: RecordRef;
+        SelectionFilterMgt: Codeunit SelectionFilterManagement;
+    begin
+        ImportType.SetRange(Actionable, true);
+        RecRef.GetTable(ImportType);
+
+        TypeFilter := SelectionFilterMgt.GetSelectionFilter(RecRef, ImportType.FieldNo(Code));
+
+        if (TypeFilter <> '') then
+            TypeFilter += '|''''';
     end;
 }

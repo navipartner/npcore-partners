@@ -647,6 +647,7 @@
         ImportType."Import Codeunit ID" := CODEUNIT::"NPR M2 Account WebService";
         ImportType."Webservice Codeunit ID" := CODEUNIT::"NPR M2 Account WebService";
         ImportType."Max. Retry Count" := -1;
+        ImportType.Actionable := false;
         ImportType.Insert();
     end;
 
