@@ -137,9 +137,7 @@ page 6150624 "NPR POS Dimension Value"
 
     var
         GLSetup: Record "General Ledger Setup";
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
         _SearchBox: Text;
 
