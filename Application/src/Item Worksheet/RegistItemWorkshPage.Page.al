@@ -499,7 +499,6 @@
 
     var
         RegItemWorksheet: Record "NPR Registered Item Works.";
-        [InDataSet]
         FieldsVisible: Boolean;
         ShowAllInfo: Boolean;
         CurrentWorksheetName: Code[10];

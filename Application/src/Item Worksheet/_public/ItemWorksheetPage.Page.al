@@ -1288,29 +1288,17 @@
         ItemWshtImpExpMgt: Codeunit "NPR Item Wsht. Imp. Exp.";
         LabelLibrary: Codeunit "NPR Label Library";
         SuggestItemWorksheetLines: Report "NPR Suggest Item Worksh. Lines";
-        [InDataSet]
         FieldsEditable: Boolean;
-        [InDataSet]
         NPRAttrEditable: Boolean;
-        [InDataSet]
         NPRAttrVisible01: Boolean;
-        [InDataSet]
         NPRAttrVisible02: Boolean;
-        [InDataSet]
         NPRAttrVisible03: Boolean;
-        [InDataSet]
         NPRAttrVisible04: Boolean;
-        [InDataSet]
         NPRAttrVisible05: Boolean;
-        [InDataSet]
         NPRAttrVisible06: Boolean;
-        [InDataSet]
         NPRAttrVisible07: Boolean;
-        [InDataSet]
         NPRAttrVisible08: Boolean;
-        [InDataSet]
         NPRAttrVisible09: Boolean;
-        [InDataSet]
         NPRAttrVisible10: Boolean;
         NPRAttrVisibleArray: array[40] of Boolean;
         OpenedFromFilteredView: Boolean;
