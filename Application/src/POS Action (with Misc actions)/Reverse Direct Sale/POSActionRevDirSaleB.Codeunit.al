@@ -89,7 +89,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
             SaleLinePOS2."Line No." := 0;
         SaleLinePOSLineNo := SaleLinePOS2."Line No." + 10000;
 
-        if POSSalesLine.FindSet(false, false) then
+        if POSSalesLine.FindSet(false) then
             repeat
                 SaleLinePOS.Init();
                 SaleLinePOS."Register No." := SalePOS."Register No.";
