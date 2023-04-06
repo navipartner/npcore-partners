@@ -134,13 +134,9 @@
     end;
 
     var
-        [InDataSet]
         LSQty: Boolean;
-        [InDataSet]
         LSAmount: Boolean;
-        [InDataSet]
         LPA: Boolean;
-        [InDataSet]
         "LP%": Boolean;
         "Sale Quantity": Decimal;
         "LastYear Sale Quantity": Decimal;

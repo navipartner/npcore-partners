@@ -556,13 +556,9 @@
         DateFilterLastYear: Text[50];
         UsingPeriod: Boolean;
         ItemNoFilter: Code[20];
-        [InDataSet]
         PLYSaleQty: Boolean;
-        [InDataSet]
         PLYSale: Boolean;
-        [InDataSet]
         PLYProfit: Boolean;
-        [InDataSet]
         "PLYProfit%": Boolean;
         PeriodType: Option Day,Week,Month,Quarter,Year,Period;
         ItemCategoryCodeFilter: Code[20];
