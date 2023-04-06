@@ -250,7 +250,7 @@
             end;
         end;
 
-        if RecRef2.FindSet(false, false) then
+        if RecRef2.FindSet(false) then
             repeat
                 ItemNo := RecRef2.Field(ItemNoField).Value;
                 ItemVariantCode := RecRef2.Field(ItemVariantField).Value;
@@ -417,7 +417,7 @@
 
         MasterLineMapMgt.FilterRecRefOnMasterId(RecRef2, RecRef, false);
 
-        if RecRef2.FindSet(false, false) then
+        if RecRef2.FindSet(false) then
             repeat
                 FRef := RecRef2.Field(FieldNo);
                 Evaluate(Dec, Format(FRef.Value));

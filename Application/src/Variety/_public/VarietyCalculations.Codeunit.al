@@ -30,7 +30,7 @@
 
         Item.Get(TMPVrtBuffer."Item No.");
         Item.SetRange("Variant Filter", TMPVrtBuffer."Variant Code");
-        if Location.FindSet(false, false) then
+        if Location.FindSet(false) then
             repeat
                 Item.SetRange("Location Filter", Location.Code);
                 Item.CalcFields("Net Change");

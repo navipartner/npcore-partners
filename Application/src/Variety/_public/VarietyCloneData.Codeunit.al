@@ -831,7 +831,7 @@
             Dia.Update(1, ItemVariant.TableCaption);
         end;
 
-        if ItemVariant.FindSet(true, false) then
+        if ItemVariant.FindSet(true) then
             repeat
                 LineCount += 1;
                 if GuiAllowed then
@@ -865,7 +865,7 @@
             Dia.Update(1, ItemRef.TableCaption);
         end;
 
-        if ItemRef.FindSet(true, false) then
+        if ItemRef.FindSet(true) then
             repeat
                 LineCount += 1;
                 if GuiAllowed then

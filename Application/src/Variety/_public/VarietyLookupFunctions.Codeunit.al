@@ -21,7 +21,7 @@
     begin
         Item.Get(VRTFieldSetup."Item No. (TMPParm)");
         Item.SetRange("Variant Filter", VRTFieldSetup."Variant Code (TMPParm)");
-        if Location.FindSet(false, false) then
+        if Location.FindSet(false) then
             repeat
                 Item.SetRange("Location Filter", Location.Code);
                 Item.CalcFields("Net Change");
@@ -82,7 +82,7 @@
     begin
         Item.Get(ItemNo);
         Item.SetRange("Variant Filter", VariantCode);
-        if Location.FindSet(false, false) then
+        if Location.FindSet(false) then
             repeat
                 Item.SetRange("Location Filter", Location.Code);
                 Item.CalcFields("Net Change");
