@@ -173,7 +173,7 @@
     var
         OptionOut: Text;
     begin
-        if TrySelectStr(1, OptionOut) then
+        if TrySelectStr(0, OptionOut) then
             exit(OptionOut);
     end;
 
