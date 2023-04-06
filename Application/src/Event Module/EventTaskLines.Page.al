@@ -657,9 +657,9 @@
     end;
 
     var
-        [InDataSet]
+
         DescriptionIndent: Integer;
-        [InDataSet]
+
         StyleIsStrong: Boolean;
 
     local procedure SetPurchLineFilters(var PurchLine: Record "Purchase Line")

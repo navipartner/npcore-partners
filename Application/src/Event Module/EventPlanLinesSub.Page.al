@@ -1135,39 +1135,39 @@
         ActiveField: Option " ",Cost,CostLCY,PriceLCY,Price;
         Text001: Label 'This job planning line was automatically generated. Do you want to continue?';
         JobNo: Code[20];
-        [InDataSet]
+
         "Job No.Visible": Boolean;
-        [InDataSet]
+
         "Job Task No.Visible": Boolean;
-        [InDataSet]
+
         "Planning DateEditable": Boolean;
-        [InDataSet]
+
         "Currency DateEditable": Boolean;
-        [InDataSet]
+
         "Document No.Editable": Boolean;
-        [InDataSet]
+
         TypeEditable: Boolean;
-        [InDataSet]
+
         "No.Editable": Boolean;
-        [InDataSet]
+
         DescriptionEditable: Boolean;
-        [InDataSet]
+
         "Unit of Measure CodeEditable": Boolean;
-        [InDataSet]
+
         "Variant CodeEditable": Boolean;
-        [InDataSet]
+
         "Location CodeEditable": Boolean;
-        [InDataSet]
+
         "Work Type CodeEditable": Boolean;
-        [InDataSet]
+
         "Unit PriceEditable": Boolean;
-        [InDataSet]
+
         "Line Discount AmountEditable": Boolean;
-        [InDataSet]
+
         "Line Discount %Editable": Boolean;
-        [InDataSet]
+
         "Line AmountEditable": Boolean;
-        [InDataSet]
+
         "Unit CostEditable": Boolean;
         Text002: Label 'The %1 was successfully transferred to a %2.';
         EventCalendarMgt: Codeunit "NPR Event Calendar Mgt.";
