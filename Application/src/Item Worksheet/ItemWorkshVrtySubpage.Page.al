@@ -361,13 +361,9 @@
         PurchasePriceBold: Boolean;
         RecommendedRetailPriceBold: Boolean;
         SalesPriceBold: Boolean;
-        [InDataSet]
         Variety1InUse: Boolean;
-        [InDataSet]
         Variety2InUse: Boolean;
-        [InDataSet]
         Variety3InUse: Boolean;
-        [InDataSet]
         Variety4InUse: Boolean;
         FieldCaptionNew: array[4] of Text;
         PurchasePriceText: Text[20];
