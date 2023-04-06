@@ -3,24 +3,34 @@ let main = async ({workflow, context, popup, parameters, captions}) => {
     //seatingInput
     if (!context.seatingCode) {
         if (parameters.FixedSeatingCode) {
-            context.seatingCode = parameters.FixedSeatingCode
+            context.seatingCode = parameters.FixedSeatingCode;
         } else {
-            switch(param.InputType + "") {
+            switch(parameters.InputType + "") {
                 case "0":
-                    context.seatingCode = await popup.input({caption: captions.InputTypeLabel});
+                {
+                    let result = await popup.input({caption: captions.InputTypeLabel});
+                    if (!result) {return};
+                    context.seatingCode = result;
                     break;
+                }
                 case "1":
-                    context.seatingCode = await popup.numpad({caption: captions.InputTypeLabel});
+                {
+                    let result = await popup.numpad({caption: captions.InputTypeLabel});
+                    if (!result) {return};
+                    context.seatingCode = result;
                     break;
-                case "2":
-                    await workflow.respond("seatingInput");
-                    break;
+                }
             }
         }
     }
+    await workflow.respond("seatingInput");
+    if (!context.seatingCode) {
+        return;
+    }
+
     //createNewWaiterPad
     if ((context.seatingCode) && (context.confirmString)) {
-        if (await popup.confirm({caption: captions.confirmLabel, label: context.confirmString})){
+        if (await popup.confirm({title: captions.confirmLabel, caption: context.confirmString})){
             await workflow.respond("createNewWaiterPad");
         } else {
             return

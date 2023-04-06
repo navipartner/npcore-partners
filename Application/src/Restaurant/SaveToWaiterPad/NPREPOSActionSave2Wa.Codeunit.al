@@ -2,13 +2,11 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
-    var
-        Text001: Label 'No Water Pad exists on %1\Create new Water Pad?';
-
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         NPRESeating: Record "NPR NPRE Seating";
         ActionDescription: Label 'This built-in action saves currently selected items to Waiter Pad and switches to the Restaurant View';
+        ConfirmLabelLbl: Label 'Create new waiter pad?';
         ParamInputType_OptLbl: Label 'stringPad,intPad,List', locked = true;
         ParamInputType_NameLbl: Label 'Input Type';
         ParamInputType_DescLbl: Label 'Specifies waiter pad input type.';
@@ -43,7 +41,8 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('OpenWaiterPad', false, ParamOpenWaiterPad_CptLbl, ParamOpenWaiterPad_DescLbl);
         WorkflowConfig.AddBooleanParameter('ShowOnlyActiveWaiPad', false, ParamShowOnlyActiveWaiPad_CptLbl, ParamShowOnlyActiveWaiPad_DescLbl);
         WorkflowConfig.AddBooleanParameter('ReturnToDefaultView', false, ParamReturnToDefaultView_CptLbl, ParamReturnToDefaultView_DescLbl);
-        WorkflowConfig.AddLabel('confirmLabel', NPRESeating.TableCaption);
+        WorkflowConfig.AddLabel('InputTypeLabel', NPRESeating.TableCaption);
+        WorkflowConfig.AddLabel('confirmLabel', ConfirmLabelLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -73,7 +72,6 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
-        ConfirmString: Text;
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -84,12 +82,6 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
         if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
             NPRESeating.Get(SalePOS."NPRE Pre-Set Seating Code");
             JSON.SetContext('seatingCode', SalePOS."NPRE Pre-Set Seating Code");
-
-            if SalePOS."NPRE Pre-Set Waiter Pad No." = '' then begin
-                ConfirmString := GetConfirmString(NPRESeating);
-                if ConfirmString <> '' then
-                    JSON.SetContext('confirmString', ConfirmString);
-            end;
         end;
 
         if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
@@ -184,14 +176,14 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
     local procedure GetConfirmString(NPRESeating: Record "NPR NPRE Seating") ConfirmString: Text
     var
         NPRESeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        NoWaiterPadOnSeatingQst: Label 'There are no open waiter pads exist for seating %1. Do you want to create a new one?';
     begin
-        NPRESeatingWaiterPadLink.SetCurrentKey(Closed);
         NPRESeatingWaiterPadLink.SetRange(Closed, false);
         NPRESeatingWaiterPadLink.SetRange("Seating Code", NPRESeating.Code);
-        if NPRESeatingWaiterPadLink.FindFirst() then
+        if not NPRESeatingWaiterPadLink.IsEmpty() then
             exit('');
 
-        ConfirmString := StrSubstNo(Text001, NPRESeating.Code);
+        ConfirmString := StrSubstNo(NoWaiterPadOnSeatingQst, NPRESeating.Code);
         exit(ConfirmString);
     end;
 
@@ -199,7 +191,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:NPREPOSActionSave2Wa.js###
-'let main=async({workflow:e,context:a,popup:i,parameters:n,captions:d})=>{if(await e.respond("AddPresetValuesToContext"),!a.seatingCode)if(n.FixedSeatingCode)a.seatingCode=n.FixedSeatingCode;else switch(param.InputType+""){case"0":a.seatingCode=await i.input({caption:d.InputTypeLabel});break;case"1":a.seatingCode=await i.numpad({caption:d.InputTypeLabel});break;case"2":await e.respond("seatingInput");break}if(a.seatingCode&&a.confirmString)if(await i.confirm({caption:d.confirmLabel,label:a.confirmString}))await e.respond("createNewWaiterPad");else return;a.waiterPadNo||a.seatingCode&&await e.respond("selectWaiterPad"),a.waiterPadNo&&await e.respond("saveSale2Pad")};'
+'let main=async({workflow:a,context:e,popup:n,parameters:t,captions:d})=>{if(await a.respond("AddPresetValuesToContext"),!e.seatingCode)if(t.FixedSeatingCode)e.seatingCode=t.FixedSeatingCode;else switch(t.InputType+""){case"0":{let i=await n.input({caption:d.InputTypeLabel});if(!i)return;e.seatingCode=i;break}case"1":{let i=await n.numpad({caption:d.InputTypeLabel});if(!i)return;e.seatingCode=i;break}}if(await a.respond("seatingInput"),!!e.seatingCode){if(e.seatingCode&&e.confirmString)if(await n.confirm({title:d.confirmLabel,caption:e.confirmString}))await a.respond("createNewWaiterPad");else return;e.waiterPadNo||e.seatingCode&&await a.respond("selectWaiterPad"),e.waiterPadNo&&await a.respond("saveSale2Pad")}};'
         );
     end;
 }
