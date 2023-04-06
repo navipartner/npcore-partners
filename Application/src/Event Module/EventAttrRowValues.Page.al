@@ -61,7 +61,7 @@
     }
 
     var
-        [InDataSet]
+
         FormulaLookupMode: Boolean;
 
     internal procedure SetVisibility()

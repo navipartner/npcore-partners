@@ -223,20 +223,14 @@
         AttrColumnCaption4: Text;
         AttrColumnCaption5: Text;
         AttrColumnVisible: array[5] of Boolean;
-        [InDataSet]
         AttrColumnVisible1: Boolean;
-        [InDataSet]
         AttrColumnVisible2: Boolean;
-        [InDataSet]
         AttrColumnVisible3: Boolean;
-        [InDataSet]
         AttrColumnVisible4: Boolean;
-        [InDataSet]
         AttrColumnVisible5: Boolean;
         AttrColumnValue: array[5] of Text;
         AttrColumnLineNo: array[5] of Integer;
         AttrColumnEditable: Boolean;
-        [InDataSet]
         JobNoVisible: Boolean;
         EventAttrTemplate: Record "NPR Event Attribute Template";
         TemplateName: Code[20];
@@ -245,12 +239,9 @@
         JobNo: Code[20];
         FirstColumnLineNoFetched: Integer;
         LastColumnLineNoFetched: Integer;
-        [InDataSet]
         PreviousColumnSetExists: Boolean;
-        [InDataSet]
         NextColumnSetExists: Boolean;
         EventAttrMgt: Codeunit "NPR Event Attribute Mgt.";
-        [InDataSet]
         FilterMode: Boolean;
         FilterName: Code[20];
         NoEventsInFilter: Label 'There are not events with these attribute filters.';

@@ -1983,13 +1983,13 @@
     end;
 
     var
-        [InDataSet]
+
         InvoiceCurrencyCodeEditable: Boolean;
-        [InDataSet]
+
         CurrencyCodeEditable: Boolean;
         EventCalendarMgt: Codeunit "NPR Event Calendar Mgt.";
         EventAttrMgt: Codeunit "NPR Event Attribute Mgt.";
-        [InDataSet]
+
         AttributeVisibleSet1: Boolean;
         AttributeValue: array[5, 5, 2] of Text;
         RowDescription: array[5, 2] of Text;
@@ -1999,15 +1999,15 @@
         RowDescription4Set1: Text;
         RowDescription5Set1: Text;
         RowEditable: array[5, 2] of Boolean;
-        [InDataSet]
+
         RowEditable1Set1: Boolean;
-        [InDataSet]
+
         RowEditable2Set1: Boolean;
-        [InDataSet]
+
         RowEditable3Set1: Boolean;
-        [InDataSet]
+
         RowEditable4Set1: Boolean;
-        [InDataSet]
+
         RowEditable5Set1: Boolean;
         ColumnCaption: array[5, 2] of Text;
         ColumnCaption1Set1: Text;
@@ -2016,49 +2016,49 @@
         ColumnCaption4Set1: Text;
         ColumnCaption5Set1: Text;
         ColumnEditable: array[5, 2] of Boolean;
-        [InDataSet]
+
         ColumnEditable1Set1: Boolean;
-        [InDataSet]
+
         ColumnEditable2Set1: Boolean;
-        [InDataSet]
+
         ColumnEditable3Set1: Boolean;
-        [InDataSet]
+
         ColumnEditable4Set1: Boolean;
-        [InDataSet]
+
         ColumnEditable5Set1: Boolean;
         ColumnLineNo: array[5, 2] of Integer;
         RowLineNo: array[5, 2] of Integer;
-        [InDataSet]
+
         AttributeVisibleSet2: Boolean;
         RowDescription1Set2: Text;
         RowDescription2Set2: Text;
         RowDescription3Set2: Text;
         RowDescription4Set2: Text;
         RowDescription5Set2: Text;
-        [InDataSet]
+
         RowEditable1Set2: Boolean;
-        [InDataSet]
+
         RowEditable2Set2: Boolean;
-        [InDataSet]
+
         RowEditable3Set2: Boolean;
-        [InDataSet]
+
         RowEditable4Set2: Boolean;
-        [InDataSet]
+
         RowEditable5Set2: Boolean;
         ColumnCaption1Set2: Text;
         ColumnCaption2Set2: Text;
         ColumnCaption3Set2: Text;
         ColumnCaption4Set2: Text;
         ColumnCaption5Set2: Text;
-        [InDataSet]
+
         ColumnEditable1Set2: Boolean;
-        [InDataSet]
+
         ColumnEditable2Set2: Boolean;
-        [InDataSet]
+
         ColumnEditable3Set2: Boolean;
-        [InDataSet]
+
         ColumnEditable4Set2: Boolean;
-        [InDataSet]
+
         ColumnEditable5Set2: Boolean;
         EventAttribute: Record "NPR Event Attribute";
         EventAttributeTemplateName: array[2] of Code[20];
