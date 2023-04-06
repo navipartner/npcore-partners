@@ -138,8 +138,6 @@
 
     var
         pw: Text[200];
-
-        [InDataSet]
         IsBasicAuthVisible, IsOAuth2Visible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         Text000: Label 'Error in Global Voucher Setup\\Close anway?';
