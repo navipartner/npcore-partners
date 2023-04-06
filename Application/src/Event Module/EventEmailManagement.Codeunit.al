@@ -202,7 +202,7 @@
 
 #IF NOT BC17
         EmailMessage.Create(Recipients, EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateHeader.Subject), BodyText, true, CcRecipients, BCCRecipients);
-        AddAttachment(MailFor, Job, EmailMessage);
+        AddAttachment(EventExchIntTemplate."E-mail Template Header Code", MailFor, Job, EmailMessage);
 #if BC18
         Email.AddRelation(EmailMessage, Database::Job, Job.SystemId, EmailRelationType::"Primary Source");
 #else
@@ -250,14 +250,20 @@
         end;
     end;
 #IF NOT BC17
-    local procedure AddAttachment(var MailFor: Option Customer,Team; var Job: Record Job; var EmailMessage: Codeunit "Email Message")
+    local procedure AddAttachment(EmailTemplateHeaderCode: Code[20]; var MailFor: Option Customer,Team; var Job: Record Job; var EmailMessage: Codeunit "Email Message")
     var
         EventReportLayout: Record "NPR Event Report Layout";
+        EmailTemplateHeader: Record "NPR E-mail Template Header";
+        RecRef: RecordRef;
         AttachmentTempBlob: Codeunit "Temp Blob";
         AttachmentStream: InStream;
         AttachmentName: Text;
         AttachmentExtension: Text;
     begin
+        if EmailTemplateHeader.Get(EmailTemplateHeaderCode) and (EmailTemplateHeader.Filename <> '') then begin
+            RecRef.GetTable(Job);
+            AttachmentName := EventEWSMgt.ParseEmailTemplateText(RecRef, EmailTemplateHeader.Filename);
+        end;
 
         EventReportLayout.Reset();
         EventReportLayout.SetRange("Event No.", Job."No.");

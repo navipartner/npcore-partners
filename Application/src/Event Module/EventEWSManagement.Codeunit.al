@@ -171,15 +171,12 @@
 
     end;
 
-
-
     procedure CreateAttachment(EventReportLayout: Record "NPR Event Report Layout"; Job: Record Job; MailFor: Option Customer,Team; var AttachmentTempBlob: Codeunit "Temp Blob"; var AttachmentName: Text; var AttachmentExtension: Text) Sucess: Boolean
     var
         ReportLayoutSelectionLocal: Record "Report Layout Selection";
         OutStream: OutStream;
         RecRef: RecordRef;
     begin
-
         ReportLayoutSelectionLocal.SetTempLayoutSelected(EventReportLayout."Layout Code");
         Job.SetRecFilter();
         RecRef.GetTable(Job);
@@ -188,16 +185,17 @@
             MailFor::Customer:
                 begin
                     AttachmentExtension := '.pdf';
-                    AttachmentName := EventReportLayout.Description + AttachmentExtension;
                     Sucess := Report.SaveAs(EventReportLayout."Report ID", EventReportLayout.GetParameters(), ReportFormat::Pdf, OutStream, RecRef);
                 end;
             MailFor::Team:
                 begin
                     AttachmentExtension := '.docx';
-                    AttachmentName := EventReportLayout.Description + AttachmentExtension;
                     Sucess := Report.SaveAs(EventReportLayout."Report ID", EventReportLayout.GetParameters(), ReportFormat::Word, OutStream, RecRef);
                 end;
         end;
+        if AttachmentName = '' then
+            AttachmentName := EventReportLayout.Description;
+        AttachmentName := AttachmentName + AttachmentExtension;
         ReportLayoutSelectionLocal.SetTempLayoutSelected('');
     end;
 
