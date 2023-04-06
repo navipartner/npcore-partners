@@ -1,20 +1,20 @@
 # Webservice API 
 
-Both SOAP and REST API can used for managing our solutions. Refer to the provided guides to learn more.
+Both SOAP and REST API can used for managing our solutions. Refer to the relevant guides to learn more.
 
 ## REST API
 
-NPRetail is running on top of the Business Central platform which is developed and maintained by Microsoft.  
 The newest versions of Business Central use the OData v4 standard to provide REST webservice APIs.  
-The base application in the ERP system comes with a big set of APIs and NPRetail adds many additional APIs on top for NaviPartners modules.
+The base application in the ERP system comes with a sizeable set of APIs, and NPRetail adds many additional APIs on top, intended for NaviPartner's modules.
 
 ### Microsoft Docs
 
 Read the Microsoft documentation for an introduction to Business Central APIs, authorization options and tips & tricks:
-https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-develop-connect-apps  
-https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-connect-apps-tips  
-https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-connect-apps-filtering
 
+- [Getting started developing connect apps for Dynamics 365 Business Central](https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-develop-connect-apps)
+- [Tips for working with the APIs](https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-connect-apps-tips)
+- [Using filters with API calls](https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-connect-apps-filtering)
+ 
 ### Microsoft API
 
 Refer to the [technical reference](https://docs.microsoft.com/en-us/dynamics365/business-central/dev-itpro/api-reference/v2.0/) of the base ERP APIs developed by Microsoft.  
@@ -22,9 +22,7 @@ Refer to the [technical reference](https://docs.microsoft.com/en-us/dynamics365/
 
 ### NPRetail API
 
-Our APIs are grouped into various domains/modules. Use the navigation menu to explore each of them.  
-We maintain an OpenAPI API sandbox for each, which can either be explored directly in your browser or imported into your favorite software that supports OpenAPI 3:  
-https://openapi.tools/
+NaviPartner APIs are grouped into various domains/modules. An OpenAPI API sandbox is maintained for each, and you can either explore them directly from your browser or import them into your favorite software that supports [OpenAPI 3](https://openapi.tools/).
 
 ## SOAP API
 
