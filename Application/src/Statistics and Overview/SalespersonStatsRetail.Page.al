@@ -129,13 +129,9 @@
         CalcLastYear: Text[50];
         ItemNoFilter: Code[20];
         HideEmpty: Boolean;
-        [InDataSet]
         LSQty: Boolean;
-        [InDataSet]
         LSAmount: Boolean;
-        [InDataSet]
         LPA: Boolean;
-        [InDataSet]
         "LP%": Boolean;
 
     internal procedure SetFilter(GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemCategory: Code[20]; LastYearCalc: Text[50]; ItemFilter: Code[20])
