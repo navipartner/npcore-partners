@@ -126,13 +126,9 @@
 
     var
         RegItemWorksheetLine: Record "NPR Regist. Item Worksh Line";
-        [InDataSet]
         Variety1InUse: Boolean;
-        [InDataSet]
         Variety2InUse: Boolean;
-        [InDataSet]
         Variety3InUse: Boolean;
-        [InDataSet]
         Variety4InUse: Boolean;
         FieldCaptionNew: array[4] of Text;
 

@@ -138,9 +138,7 @@
         ExItemDescription: Text;
         ExItemUnitCost: Text;
         ExItemUnitPrice: Text;
-        [InDataSet]
         ExNoOfChanges: Text;
-        [InDataSet]
         ExNoOfWarnings: Text;
 
     local procedure BuildCaptions()
