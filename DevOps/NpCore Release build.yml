@@ -31,9 +31,12 @@ stages:
         - name: BC1812
 
         - name: BC1905
-
+       
         - name: BC2005_CLOUD
           alwaysRun: true
+
+        - name: BC2105_CLOUD
+          alwaysRun: true          
 
         - name: vLatest_CLOUD
           alwaysRun: true
