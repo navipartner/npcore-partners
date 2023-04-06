@@ -54,7 +54,6 @@ page 6059856 "NPR Stripe POS Users"
     end;
 
     var
-        [InDataSet]
         MonetizationEnabled: Boolean;
 
     local procedure IsMonetizationEnabled(): Boolean
