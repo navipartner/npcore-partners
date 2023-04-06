@@ -248,13 +248,10 @@ page 6059853 "NPR Stripe Create Subs. Wiz."
     var
         MediaResourcesDone, MediaResourcesStandard : Record "Media Resources";
         FormatAddress: Codeunit "Format Address";
-        [InDataSet]
         ActionBackAllowed, ActionFinishAllowed, ActionNextAllowed : Boolean;
         CheckoutControlIsReady, CreditCardInputComplete : Boolean;
-        [InDataSet]
         IsCountyVisible: Boolean;
         IsVATRegistrationNoMandatory: Boolean;
-        [InDataSet]
         TopBannerVisible: Boolean;
         CurrentStep: Integer;
 
