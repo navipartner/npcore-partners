@@ -276,9 +276,9 @@
         CopyJobPrices: Boolean;
         CopyQuantity: Boolean;
         CopyDimensions: Boolean;
-        [InDataSet]
+
         PlanningLineTypeEnable: Boolean;
-        [InDataSet]
+
         LedgerEntryLineTypeEnable: Boolean;
         Text004: Label 'Provide a valid source %1.';
         ConfirmAnswer: Boolean;
