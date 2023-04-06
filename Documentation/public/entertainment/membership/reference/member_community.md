@@ -1,6 +1,6 @@
 # Member community (reference guide)
 
-This is the top level in the setup of members and memberships. It represents a club or an association that is marketing the memberships. The following fields and options are available in the **Member Community** administrative section: 
+Member community is the top level in the setup of members and memberships. It represents a club or an association that is marketing the memberships. The following fields and options are available in the **Member Community** administrative section: 
 
 | Field Name      | Description |
 | ----------- | ----------- |
