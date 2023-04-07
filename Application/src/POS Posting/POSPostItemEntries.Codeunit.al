@@ -286,7 +286,7 @@
 
         if POSSalesLine.IsInventoriableItem() then begin
             GetLocation(POSSalesLine."Location Code");
-            exit(Location."Directed Put-away and Pick" or Location."Bin Mandatory");
+            exit(not Location."NPR No Whse. Entr. for POS" and (Location."Directed Put-away and Pick" or Location."Bin Mandatory"));
         end;
         exit(false);
     end;

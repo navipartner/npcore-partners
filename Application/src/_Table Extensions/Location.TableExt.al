@@ -2,6 +2,11 @@ tableextension 6014418 "NPR Location" extends Location
 {
     fields
     {
+        field(6014400; "NPR No Whse. Entr. for POS"; Boolean)
+        {
+            Caption = 'POS: Do Not Create Whse. Entries';
+            DataClassification = CustomerContent;
+        }
         field(6014473; "NPR Store Group Code"; Code[20])
         {
             Caption = 'Store Group Code';
