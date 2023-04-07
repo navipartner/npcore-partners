@@ -130,7 +130,7 @@
 
                     trigger OnValidate()
                     begin
-                        CurrPage.Update();
+                        CurrPage.Update(false);
                     end;
                 }
                 field(Dim2Filter; Dim2Filter)
@@ -143,7 +143,7 @@
 
                     trigger OnValidate()
                     begin
-                        CurrPage.Update();
+                        CurrPage.Update(false);
                     end;
                 }
                 field(ShowLastYear; ShowLastYear)
