@@ -42,9 +42,12 @@
     var
         MagentoWebsite: Record "NPR Magento Website";
         MagentoWebsiteLink: Record "NPR Magento Website Link";
+        IsHandled: Boolean;
     begin
-        if Item."NPR Magento Name" = '' then
-            Item."NPR Magento Name" := Item.Description;
+        OnSetupSetupMagentoDataOnBeforeSetMagentoName(Item, IsHandled);
+        if not IsHandled then
+            if Item."NPR Magento Name" = '' then
+                Item."NPR Magento Name" := Item.Description;
 
         if AutoUpdateSeoLink(Item) then begin
             Item."NPR Seo Link" := Item."NPR Magento Name";
@@ -838,6 +841,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeItemSeoLinkFormat(Item: Record Item; var SeoLinkText: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetupSetupMagentoDataOnBeforeSetMagentoName(var Item: Record Item; var IsHandled: Boolean)
     begin
     end;
     #endregion
