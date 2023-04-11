@@ -6,6 +6,7 @@ codeunit 6150696 "NPR UPG Print Template"
     trigger OnUpgradePerCompany()
     begin
         UpgradeReceiptText();
+        UpgradeRJLVendorFields();
     end;
 
     local procedure UpgradeReceiptText()
@@ -24,6 +25,65 @@ codeunit 6150696 "NPR UPG Print Template"
 
         UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeReceiptText'));
         LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpgradeRJLVendorFields()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
+        UpgradeTagMgt: Codeunit "Upgrade Tag";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Print Template', 'OnUpgradePerCompany');
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeRJLVendorFields')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        UpgradePrintTemplateRJLVendorFields();
+
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeRJLVendorFields'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpgradePrintTemplateRJLVendorFields()
+    var
+        RPTemplateLine: Record "NPR RP Template Line";
+        RPTemplateLine2: Record "NPR RP Template Line";
+        RPTemplateHeader: Record "NPR RP Template Header";
+        TemplateCode: Code[20];
+    begin
+        RPTemplateLine.SetRange("Data Item Table", 6014422);
+        RPTemplateLine.SetFilter(Field, '%1|%2|%3', 6, 41, 42);
+        if RPTemplateLine.FindSet() then
+            repeat
+                if TemplateCode <> RPTemplateLine."Template Code" then begin
+                    TemplateCode := RPTemplateLine."Template Code";
+
+                    if RPTemplateHeader.Get(RPTemplateLine."Template Code") then begin
+                        ArchiveVersionIfNecessary(RPTemplateLine."Template Code");
+                        IncreaseVersionIfNecessary(RPTemplateLine."Template Code");
+
+                        RPTemplateLine2.SetRange("Template Code", RPTemplateLine."Template Code");
+                        RPTemplateLine2.SetRange("Data Item Table", 6014422);
+                        RPTemplateLine2.SetFilter(Field, '%1|%2|%3', 6, 41, 42);
+
+                        if RPTemplateLine2.FindSet(true) then
+                            repeat
+                                case RPTemplateLine2.Field of
+                                    6:
+                                        RPTemplateLine2.Validate(Field, 15);
+                                    41:
+                                        RPTemplateLine2.Validate(Field, 43);
+                                    42:
+                                        RPTemplateLine2.Validate(Field, 44);
+                                end;
+                                RPTemplateLine2.Modify();
+                            until RPTemplateLine2.Next() = 0;
+
+                        ArchiveVersionIfNecessary(RPTemplateLine."Template Code");
+                    end;
+                end;
+            until RPTemplateLine.Next() = 0;
     end;
 
     local procedure UpgradePrintTemplateProcessingCU(FromProcessingCU: Integer; ToProcessingCU: Integer; FromProcessingFunctionID: Code[30]; ToProcessingFunctionId: Code[30]; FromProcessingFunctionParameter: Text[30]; ToProcessingFunctionParameter: Text[30])
@@ -47,8 +107,8 @@ codeunit 6150696 "NPR UPG Print Template"
                         RPTemplateLine.Modify();
 
                         ArchiveVersionIfNecessary(RPTemplateLine."Template Code");
-                    end
-                end
+                    end;
+                end;
             until RPTemplateLine.Next() = 0;
     end;
 
