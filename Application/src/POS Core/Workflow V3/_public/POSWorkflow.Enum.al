@@ -845,4 +845,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'FOREIGN_VOUCHER_PMT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction ForeignVoucher";
     }
+    value(6150803; ZOOM)
+    {
+        Caption = 'ZOOM', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Zoom";
+    }
 }

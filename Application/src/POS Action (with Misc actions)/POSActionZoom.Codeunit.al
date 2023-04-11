@@ -1,62 +1,29 @@
-﻿codeunit 6150803 "NPR POSAction: Zoom"
+codeunit 6150803 "NPR POS Action: Zoom" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config")
     var
-        ActionDescription: Label 'Zoom a sales line.';
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+        ActionDescriptionLbl: Label 'Zoom a sales line.';
     begin
-        if Sender.DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-        then begin
-            Sender.RegisterWorkflowStep('', 'respond();');
-            Sender.RegisterWorkflow(false);
-            Sender.RegisterDataBinding();
-        end;
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
+        WorkflowConfig.SetDataBinding();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        ZoomLine(POSSession);
-        Handled := true;
-    end;
-
-    local procedure ZoomLine(POSSession: Codeunit "NPR POS Session")
+    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     var
-        Line: Record "NPR POS Sale Line";
-        SaleLine: Codeunit "NPR POS Sale Line";
-        CurrentView: Codeunit "NPR POS View";
+        POSActionZoomB: Codeunit "NPR POS Action: Zoom-B";
+        POSSession: Codeunit "NPR POS Session";
     begin
-
-        POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.GetType() <> CurrentView.GetType() ::Sale) then
-            exit;
-
-        POSSession.GetSaleLine(SaleLine);
-        SaleLine.GetCurrentSaleLine(Line);
-        if (Line."Line No." > 0) then begin
-            PAGE.RunModal(PAGE::"NPR TouchScreen: SalesLineZoom", Line);
-            POSSession.RequestRefreshData();
-        end;
+        POSActionZoomB.ZoomLine(POSSession);
     end;
 
-    local procedure ActionCode(): Code[20]
+    local procedure GetActionScript(): Text
     begin
-        exit('ZOOM');
-    end;
-
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.0');
+        exit(
+        //###NPR_INJECT_FROM_FILE:POSActionZoom.js###
+'let main=async({})=>{await workflow.respond()};'
+        )
     end;
 }
