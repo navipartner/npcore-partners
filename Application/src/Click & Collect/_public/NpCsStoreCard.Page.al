@@ -427,10 +427,7 @@
     var
         HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
         HeyLoyaltyName: Text[100];
-        [InDataSet]
         pw: Text[200];
-
-        [InDataSet]
         IsBasicAuthVisible, IsOAuth2Visible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         Text000: Label 'Error in Store Setup\\Close anway?';

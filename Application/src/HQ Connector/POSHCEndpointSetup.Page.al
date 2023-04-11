@@ -108,10 +108,7 @@
     end;
 
     var
-        [InDataSet]
         pw: Text[200];
-
-        [InDataSet]
         IsBasicAuthVisible, IsOAuth2Visible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
 }
