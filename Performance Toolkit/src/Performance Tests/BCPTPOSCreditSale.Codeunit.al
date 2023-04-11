@@ -60,7 +60,7 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
 
         POSAuditProfile.Get('DEFAULT');
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
-        NoSeriesLine.FindSet(true, true);
+        NoSeriesLine.FindSet(true);
         repeat
             if AllowGapsInSaleFiscalNoSeries <> NoSeriesLine."Allow Gaps in Nos." then begin
                 NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
@@ -71,7 +71,7 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         SalesSetup.Get();
         SalesSetup.TestField("Order Nos.");
         NoSeriesLine.SetRange("Series Code", SalesSetup."Order Nos.");
-        NoSeriesLine.FindSet(true, true);
+        NoSeriesLine.FindSet(true);
         repeat
             if NoSeriesLine."Ending No." <> '' then begin
                 NoSeriesLine."Ending No." := '';
@@ -141,7 +141,9 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         BCPTTestContext.StartScenario('Select Customer');
         POSSession.GetSale(SalePOS);
         SalePOS.GetCurrentSale(POSSale);
+#pragma warning disable AA0181
         Customer.Next((SessionId() mod 4) + 1);
+#pragma warning restore AA0181
         SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
         BCPTTestContext.EndScenario('Select Customer');
         BCPTTestContext.UserWait();
@@ -168,10 +170,10 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
     procedure GetDefaultParameters(): Text[1000]
     begin
         exit(
-            GetDefaultNoOfSalesParameter() + ',' +
+            CopyStr(GetDefaultNoOfSalesParameter() + ',' +
             GetDefaultNoOfLinesPerSaleParameter() + ',' +
             GetDefaultPostSaleParameter() + ',' +
-            GetDefaultAllowGapsInSaleFiscalNoSeriesParameter());
+            GetDefaultAllowGapsInSaleFiscalNoSeriesParameter(), 1, 1000));
     end;
 
     local procedure GetDefaultNoOfSalesParameter(): Text[1000]
@@ -196,10 +198,10 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
 
     procedure ValidateParameters(Parameters: Text[1000])
     begin
-        ValidateNoOfSalesParameter(SelectStr(1, Parameters));
-        ValidateNoOfLinesPerSaleParameter(SelectStr(2, Parameters));
-        ValidatePostSaleParameter(SelectStr(3, Parameters));
-        ValidateAllowGapsInSaleFiscalNoSeriesParameter(SelectStr(4, Parameters));
+        ValidateNoOfSalesParameter(CopyStr(SelectStr(1, Parameters), 1, 1000));
+        ValidateNoOfLinesPerSaleParameter(CopyStr(SelectStr(2, Parameters), 1, 1000));
+        ValidatePostSaleParameter(CopyStr(SelectStr(3, Parameters), 1, 1000));
+        ValidateAllowGapsInSaleFiscalNoSeriesParameter(CopyStr(SelectStr(4, Parameters), 1, 1000));
     end;
 
     local procedure ValidateNoOfSalesParameter(Parameter: Text[1000])

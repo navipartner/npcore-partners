@@ -8,6 +8,11 @@
             "justification": "The name of variables and parameters must be suffixed with the type or object name."
         },
         {
+            "id": "AA0215",
+            "action":"Hidden",
+            "justification": "Follow the style guide about the best practices for naming."
+        },
+        {
             "id": "AA0218",
             "action":"Error",
             "justification": "You must write a tooltip in the Tooltip property for all controls of type Action and Field that exist on page objects."

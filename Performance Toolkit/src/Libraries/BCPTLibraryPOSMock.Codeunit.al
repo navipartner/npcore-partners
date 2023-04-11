@@ -24,7 +24,6 @@ codeunit 88103 "NPR BCPT Library - POS Mock"
 
     procedure InitializePOSSession(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; Salesperson: Record "Salesperson/Purchaser")
     var
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
     begin
         InitializePOSSession(POSSession, POSUnit);
@@ -45,14 +44,13 @@ codeunit 88103 "NPR BCPT Library - POS Mock"
 
     procedure PayAndTryEndSaleAndStartNew(POSSession: Codeunit "NPR POS Session"; PaymentMethod: Code[10]; Amount: Decimal; VoucherNo: Text; PostSaleImmediately: Boolean): Boolean
     var
-        POSActionPayment: Codeunit "NPR POS Action: Payment";
         POSPaymentMethod: Record "NPR POS Payment Method";
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
-        FrontEnd: Codeunit "NPR POS Front End Management";
-        Handled: Boolean;
         NewSalePOS: Record "NPR POS Sale";
-        ActionID: Guid;
+        SalePOS: Record "NPR POS Sale";
+        POSSale: Codeunit "NPR POS Sale";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        POSActionPayment: Codeunit "NPR POS Action: Payment";
+        Handled: Boolean;
     begin
         POSSession.GetFrontEnd(FrontEnd, true);
         POSSession.GetSale(POSSale);
@@ -73,14 +71,12 @@ codeunit 88103 "NPR BCPT Library - POS Mock"
         if NewSalePOS.SystemId = SalePOS.SystemId then
             exit(false); // Sale did not end. This is not an error, it happens in prod whenever you pay less than full amount.
 
-        if PostSaleImmediately then begin
+        if PostSaleImmediately then
             POSPost(SalePOS);
-        end;
 
-        if IsNullGuid(NewSalePOS.SystemId) then begin
+        if IsNullGuid(NewSalePOS.SystemId) then
             // Sale ended, but new one did not start automatically (depends on setup)
             POSSession.StartTransaction();
-        end;
 
         exit(true);
     end;
@@ -126,7 +122,6 @@ codeunit 88103 "NPR BCPT Library - POS Mock"
             SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
         SaleLinePOS.Description := TempVoucher.Description;
         SaleLinePOS.Modify(true);
-        POSSession.RequestRefreshData();
 
         NpRvSalesLine.Init();
         NpRvSalesLine.Id := CreateGuid();
@@ -145,16 +140,8 @@ codeunit 88103 "NPR BCPT Library - POS Mock"
         NpRvSalesLine."Starting Date" := CurrentDateTime;
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        case SalePOS."Customer Type" of
-            SalePOS."Customer Type"::Ord:
-                begin
-                    NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");
-                end;
-            SalePOS."Customer Type"::Cash:
-                begin
-                    NpRvSalesLine.Validate("Contact No.", SalePOS."Customer No.");
-                end;
-        end;
+
+        NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");
 
         NpRvSalesLine.Insert();
 
@@ -167,7 +154,6 @@ codeunit 88103 "NPR BCPT Library - POS Mock"
             NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
             NpRvSalesLineReference.Insert(true);
         end;
-        POSSession.RequestRefreshData();
     end;
 
     procedure SetLineDiscountPctABS(POSSession: Codeunit "NPR POS Session"; PresetMultiLineDiscTarget: Option Auto,"Positive Only","Negative Only",All,Ask; AllowAllLines: Boolean; TotalDiscountAmount: Decimal)
@@ -192,15 +178,14 @@ codeunit 88103 "NPR BCPT Library - POS Mock"
         POSSaleLine.RefreshCurrent();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         POSSaleLine.OnAfterSetQuantity(SaleLinePOS);
-        POSSession.RequestRefreshData();
     end;
 
     local procedure IssueReturnVoucher(POSSession: Codeunit "NPR POS Session"; VoucherTypeCode: Code[20])
     var
         ReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
         VoucherType2: Record "NPR NpRv Voucher Type";
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         PaidAmount, ReturnAmount, SaleAmount, Subtotal : Decimal;
     begin

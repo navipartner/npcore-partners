@@ -10,7 +10,7 @@
     var
         ItemPost: Boolean;
         POSPost: Boolean;
-        MissingEntryErr: Label 'Missing %1, %2 %3';
+        MissingEntryErrLbl: Label 'Missing %1, %2 %3', Comment = '%1 - placeholder, %2 - placeholder, %3 - placeholder';
         CouldNotPostErr: Label 'The POS Entry could not be posted.';
 
     procedure Initialize(_ItemPost: Boolean; _POSPost: Boolean)
@@ -21,7 +21,6 @@
 
     local procedure PostPOSEntry(SalePOS: Record "NPR POS Sale")
     var
-        POSPostingControl: Codeunit "NPR POS Posting Control";
         POSEntry: Record "NPR POS Entry";
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -29,7 +28,7 @@
         POSPostEntries: Codeunit "NPR POS Post Entries";
     begin
         if not POSEntryManagement.FindPOSEntryViaDocumentNo(SalePOS."Sales Ticket No.", POSEntry) then
-            Error(MissingEntryErr, POSEntry.TableCaption, POSEntry.FieldCaption("Document No."), SalePOS."Sales Ticket No.");
+            Error(MissingEntryErrLbl, POSEntry.TableCaption, POSEntry.FieldCaption("Document No."), SalePOS."Sales Ticket No.");
 
         POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
         POSEntry.SetRange("Entry No.", POSEntry."Entry No.");

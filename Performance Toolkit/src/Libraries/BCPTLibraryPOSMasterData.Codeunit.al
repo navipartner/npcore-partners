@@ -30,7 +30,7 @@
             NewItemReference.Init();
             NewItemReference."Item No." := Item."No.";
             NewItemReference."Reference Type" := NewItemReference."Reference Type"::"Bar Code";
-            NewItemReference."Reference No." := LibraryRandom.RandText(50);
+            NewItemReference."Reference No." := CopyStr(LibraryRandom.RandText(50), 1, MaxStrLen(NewItemReference."Reference No."));
             NewItemReference.Insert(true);
         end;
     end;

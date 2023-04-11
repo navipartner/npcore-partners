@@ -254,7 +254,7 @@ codeunit 88007 "NPR BCPT Initialize Data" implements "BCPT Test Param. Provider"
 
     procedure ValidateParameters(Parameters: Text[1000])
     begin
-        ValidateNoOfPOSUnitsParameter(SelectStr(1, Parameters));
+        ValidateNoOfPOSUnitsParameter(CopyStr(SelectStr(1, Parameters), 1, 1000));
     end;
 
     local procedure ValidateNoOfPOSUnitsParameter(Parameter: Text[1000])
