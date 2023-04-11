@@ -231,13 +231,8 @@
     }
 
     var
-        [InDataSet]
         ReceiptGroupVisible: Boolean;
-
-        [InDataSet]
         IdentityGroupVisible: Boolean;
-
-        [InDataSet]
         StatusGroupVisible: Boolean;
 
 

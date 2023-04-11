@@ -159,8 +159,6 @@
     end;
 
     var
-
-        [InDataSet]
         IsBasicAuthVisible, IsOAuth2Visible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         Text000: Label 'Error in Global POS Sales Setup\\Close anway?';
