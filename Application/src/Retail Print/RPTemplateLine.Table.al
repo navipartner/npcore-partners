@@ -176,6 +176,7 @@
                 "Fields": Record "Field";
             begin
                 Fields.SetRange(TableNo, "Data Item Table");
+                Fields.SetFilter(ObsoleteState, '<>%1', Fields.ObsoleteState::Removed);
                 if PAGE.RunModal(PAGE::"NPR Field Lookup", Fields) = ACTION::LookupOK then begin
                     Field := Fields."No.";
                     "Field Name" := Fields.FieldName;
