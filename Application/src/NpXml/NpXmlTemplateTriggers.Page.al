@@ -172,7 +172,6 @@
 
     var
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
-        [InDataSet]
         HasNoLinks: Boolean;
 
     local procedure IndentTableName()
