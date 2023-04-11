@@ -544,8 +544,7 @@
         _Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure GetDataStore(var DataStoreOut: Codeunit "NPR Data Store")
+    internal procedure GetDataStore(var DataStoreOut: Codeunit "NPR Data Store")
     begin
         ErrorIfNotInitialized();
         DataStoreOut := _DataStore;
@@ -710,8 +709,7 @@
         GetFrontEnd(POSFrontEndOut, true);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure GetPOSBackgroundTaskAPI(var POSBackgroundTaskAPIOut: Codeunit "NPR POS Background Task API")
+    internal procedure GetPOSBackgroundTaskAPI(var POSBackgroundTaskAPIOut: Codeunit "NPR POS Background Task API")
     begin
         ErrorIfNotInitialized();
         POSBackgroundTaskAPIOut := _POSBackgroundTaskAPI;

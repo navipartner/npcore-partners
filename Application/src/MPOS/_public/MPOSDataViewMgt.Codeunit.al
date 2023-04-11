@@ -41,8 +41,7 @@ codeunit 6059827 "NPR MPOS Data View Mgt."
         IDataViewCategory.Preveiw(Rec.SystemId);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure Preview_(Rec: Record "NPR MPOS Data View")
+    internal procedure Preview_(Rec: Record "NPR MPOS Data View")
     var
         IDataViewCategory: Interface "NPR MPOS IDataViewCategory";
     begin
@@ -75,8 +74,7 @@ codeunit 6059827 "NPR MPOS Data View Mgt."
         exit(Result);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure DeleteLevels(var Rec: Record "NPR MPOS Data View")
+    internal procedure DeleteLevels(var Rec: Record "NPR MPOS Data View")
     var
         DataView: Record "NPR MPOS Data View";
     begin

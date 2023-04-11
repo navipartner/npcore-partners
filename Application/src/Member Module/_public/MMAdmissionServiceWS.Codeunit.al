@@ -809,8 +809,7 @@
     end;
 
     #region Admis. Scanner Stations
-    [Obsolete('In next release goes internal')]
-    procedure ImportGuestAvatarImage(var AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
+    internal procedure ImportGuestAvatarImage(var AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
     var
         FileManagement: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";
@@ -826,8 +825,7 @@
         AdminsScannerStation.Modify(true);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure DeleteGuestAvatarImage(AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
+    internal procedure DeleteGuestAvatarImage(AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
     var
         DeleteImageQst: Label 'Do you want to delete %1?', Comment = '%1 = Guest Avatar Image';
     begin
@@ -838,8 +836,7 @@
         AdminsScannerStation.Modify(true);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure ImportTurnstileErrorImage(var AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
+    internal procedure ImportTurnstileErrorImage(var AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
     var
         FileManagement: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";
@@ -857,8 +854,7 @@
         AdminsScannerStation.Modify(true);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure DeleteTurnstileErrorImage(AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
+    internal procedure DeleteTurnstileErrorImage(AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
     var
         DeleteImageQst: Label 'Do you want to delete %1?', Comment = '%1 = Turnstile Error Image';
     begin
@@ -869,8 +865,7 @@
         AdminsScannerStation.Modify(true);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure ImportDefaultTurnstileImage(var AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
+    internal procedure ImportDefaultTurnstileImage(var AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
     var
         FileManagement: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";
@@ -888,8 +883,7 @@
         AdminsScannerStation.Modify(true);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure DeleteDefaultTurnstileImage(AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
+    internal procedure DeleteDefaultTurnstileImage(AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
     var
         DeleteImageQst: Label 'Do you want to delete %1?', Comment = '%1 = Default Turnstile Image';
     begin
@@ -903,8 +897,7 @@
     #endregion
     #region Admis. Service Setup
 
-    [Obsolete('In next release goes internal')]
-    procedure ImportGuestAvatarImageToSetup(var AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
+    internal procedure ImportGuestAvatarImageToSetup(var AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
     var
         FileManagement: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";
@@ -921,8 +914,7 @@
         AdminsServiceSetup.Modify(true);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure DeleteGuestAvatarImageToSetup(AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
+    internal procedure DeleteGuestAvatarImageToSetup(AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
     var
         DeleteImageQst: Label 'Do you want to delete %1?', Comment = '%1 = Guest Avatar Image';
     begin
@@ -933,8 +925,7 @@
         AdminsServiceSetup.Modify(true);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure ImportTurnstileErrorImageToSetup(var AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
+    internal procedure ImportTurnstileErrorImageToSetup(var AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
     var
         FileManagement: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";
@@ -952,8 +943,7 @@
         AdminsServiceSetup.Modify(true);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure DeleteTurnstileErrorImageToSetup(AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
+    internal procedure DeleteTurnstileErrorImageToSetup(AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
     var
         DeleteImageQst: Label 'Do you want to delete %1?', Comment = '%1 = Turnstile Error Image';
     begin
@@ -964,8 +954,7 @@
         AdminsServiceSetup.Modify(true);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure ImportDefaultTurnstileImageToSetup(var AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
+    internal procedure ImportDefaultTurnstileImageToSetup(var AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
     var
         FileManagement: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";
@@ -983,8 +972,7 @@
         AdminsServiceSetup.Modify(true);
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure DeleteDefaultTurnstileImageToSetup(AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
+    internal procedure DeleteDefaultTurnstileImageToSetup(AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
     var
         DeleteImageQst: Label 'Do you want to delete %1?', Comment = '%1 = Default Turnstile Image';
     begin
