@@ -89,21 +89,18 @@ Codeunit 6059856 "NPR Main Item Variation Mgt."
         end;
     end;
 
-    [Obsolete('In next release goes internal')]
     [IntegrationEvent(false, false)]
-    procedure OnCheckMainItemVariation2(var MainItemVariation: Record "NPR Main Item Variation"; var Handled: Boolean);
+    internal procedure OnCheckMainItemVariation2(var MainItemVariation: Record "NPR Main Item Variation"; var Handled: Boolean);
     begin
     end;
 
-    [Obsolete('In next release goes internal')]
     [IntegrationEvent(false, false)]
-    procedure OnAddNewItemVariation2(var MainItemVariation: Record "NPR Main Item Variation"; var VariationItem: Record Item; var Handled: Boolean);
+    internal procedure OnAddNewItemVariation2(var MainItemVariation: Record "NPR Main Item Variation"; var VariationItem: Record Item; var Handled: Boolean);
     begin
     end;
 
-    [Obsolete('In next release goes internal')]
     [IntegrationEvent(false, false)]
-    procedure OnRemoveItemVariation2(var MainItemVariation: Record "NPR Main Item Variation"; var Handled: Boolean);
+    internal procedure OnRemoveItemVariation2(var MainItemVariation: Record "NPR Main Item Variation"; var Handled: Boolean);
     begin
     end;
     #endregion
@@ -162,21 +159,18 @@ Codeunit 6059856 "NPR Main Item Variation Mgt."
         MainItemVariation.Insert(true);
     end;
 
-    [Obsolete('Moving Auxiliary Item table fields back to Item table. In next release goes internal')]
     [IntegrationEvent(false, false)]
-    procedure OnCheckMainItemVariation(var MainItemVariation: Record "NPR Main Item Variation"; var Handled: Boolean);
+    internal procedure OnCheckMainItemVariation(var MainItemVariation: Record "NPR Main Item Variation"; var Handled: Boolean);
     begin
     end;
 
-    [Obsolete('Moving Auxiliary Item table fields back to Item table. In next release goes internal')]
     [IntegrationEvent(false, false)]
-    procedure OnAddNewItemVariation(var MainItemVariation: Record "NPR Main Item Variation"; var VariationAuxItem: Record "NPR Auxiliary Item"; var Handled: Boolean);
+    internal procedure OnAddNewItemVariation(var MainItemVariation: Record "NPR Main Item Variation"; var VariationAuxItem: Record "NPR Auxiliary Item"; var Handled: Boolean);
     begin
     end;
 
-    [Obsolete('Moving Auxiliary Item table fields back to Item table. In next release goes internal')]
     [IntegrationEvent(false, false)]
-    procedure OnRemoveItemVariation(var MainItemVariation: Record "NPR Main Item Variation"; var Handled: Boolean);
+    internal procedure OnRemoveItemVariation(var MainItemVariation: Record "NPR Main Item Variation"; var Handled: Boolean);
     begin
     end;
 #pragma warning restore

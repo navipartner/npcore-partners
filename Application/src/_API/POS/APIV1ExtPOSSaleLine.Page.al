@@ -217,8 +217,7 @@ page 6059788 "NPR APIV1 - Ext. POS Sale Line"
     var
         ExternalPOSSale: Record "NPR External POS Sale";
 
-    [Obsolete('In next release goes internal')]
-    procedure SetExternalPOSSale(pExternalPOSSale: Record "NPR External POS Sale")
+    internal procedure SetExternalPOSSale(pExternalPOSSale: Record "NPR External POS Sale")
     var
     begin
         ExternalPOSSale := pExternalPOSSale;
