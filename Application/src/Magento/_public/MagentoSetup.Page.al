@@ -1166,10 +1166,7 @@
     end;
 
     var
-
-        [InDataSet]
         IsBasicAuthVisible, IsOAuth2Visible, IsCustomAuthVisible : Boolean;
-
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         Text002: Label 'Resync of %1 added in the Task List';
         Text00201: Label 'Items';
