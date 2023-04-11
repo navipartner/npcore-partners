@@ -389,8 +389,7 @@
         end;
     end;
 
-    [Obsolete('In next release goes internal')]
-    procedure ToDataset(var CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    internal procedure ToDataset(var CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         DataMgt: Codeunit "NPR POS Data Management";
         AmountExclVAT: Decimal;
