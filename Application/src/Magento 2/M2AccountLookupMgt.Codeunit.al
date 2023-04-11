@@ -71,7 +71,7 @@
     var
         MagentoDisplayGroup: Record "NPR Magento Display Group";
         MagentoSetup: Record "NPR Magento Setup";
-        M2ValueBuffer: Record "NPR M2 Value Buffer";
+        TempM2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
     begin
         if Customer."NPR Magento Display Group" = '' then
             exit;
@@ -82,15 +82,15 @@
             exit;
         end;
 
-        SetupDisplayGroups(M2ValueBuffer);
-        M2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Display Group");
-        if not M2ValueBuffer.FindFirst() then
-            M2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Display Group" + '*');
+        SetupDisplayGroups(TempM2ValueBuffer);
+        TempM2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Display Group");
+        if not TempM2ValueBuffer.FindFirst() then
+            TempM2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Display Group" + '*');
 
-        if not M2ValueBuffer.FindFirst() then
+        if not TempM2ValueBuffer.FindFirst() then
             Error(Text000, Customer.FieldCaption("NPR Magento Display Group"), Customer."NPR Magento Display Group");
 
-        Customer."NPR Magento Display Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Display Group"));
+        Customer."NPR Magento Display Group" := CopyStr(TempM2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Display Group"));
     end;
 
     #endregion
@@ -149,20 +149,20 @@
 
     procedure ValidateShippingGroup(var Customer: Record Customer)
     var
-        M2ValueBuffer: Record "NPR M2 Value Buffer";
+        TempM2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
     begin
         if Customer."NPR Magento Shipping Group" = '' then
             exit;
 
-        SetupShippingGroups(M2ValueBuffer);
-        M2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Shipping Group");
-        if not M2ValueBuffer.FindFirst() then
-            M2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Shipping Group" + '*');
+        SetupShippingGroups(TempM2ValueBuffer);
+        TempM2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Shipping Group");
+        if not TempM2ValueBuffer.FindFirst() then
+            TempM2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Shipping Group" + '*');
 
-        if not M2ValueBuffer.FindFirst() then
+        if not TempM2ValueBuffer.FindFirst() then
             Error(Text000, Customer.FieldCaption("NPR Magento Shipping Group"), Customer."NPR Magento Shipping Group");
 
-        Customer."NPR Magento Shipping Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Shipping Group"));
+        Customer."NPR Magento Shipping Group" := CopyStr(TempM2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Shipping Group"));
     end;
 
     #endregion
@@ -220,20 +220,20 @@
 
     procedure ValidatePaymentGroup(var Customer: Record Customer)
     var
-        M2ValueBuffer: Record "NPR M2 Value Buffer";
+        TempM2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
     begin
         if Customer."NPR Magento Payment Group" = '' then
             exit;
 
-        SetupPaymentGroups(M2ValueBuffer);
-        M2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Payment Group");
-        if not M2ValueBuffer.FindFirst() then
-            M2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Payment Group" + '*');
+        SetupPaymentGroups(TempM2ValueBuffer);
+        TempM2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Payment Group");
+        if not TempM2ValueBuffer.FindFirst() then
+            TempM2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Payment Group" + '*');
 
-        if not M2ValueBuffer.FindFirst() then
+        if not TempM2ValueBuffer.FindFirst() then
             Error(Text000, Customer.FieldCaption("NPR Magento Payment Group"), Customer."NPR Magento Payment Group");
 
-        Customer."NPR Magento Payment Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Payment Group"));
+        Customer."NPR Magento Payment Group" := CopyStr(TempM2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Payment Group"));
     end;
 
     #endregion
@@ -306,7 +306,7 @@
     var
         MagentoCustomerGroup: Record "NPR Magento Customer Group";
         MagentoSetup: Record "NPR Magento Setup";
-        M2ValueBuffer: Record "NPR M2 Value Buffer";
+        TempM2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
     begin
         if Contact."NPR Magento Customer Group" = '' then
             exit;
@@ -317,15 +317,15 @@
             exit;
         end;
 
-        SetupCustomerGroups(M2ValueBuffer);
-        M2ValueBuffer.SetFilter(Value, '@' + Contact."NPR Magento Customer Group");
-        if not M2ValueBuffer.FindFirst() then
-            M2ValueBuffer.SetFilter(Value, '@' + Contact."NPR Magento Customer Group" + '*');
+        SetupCustomerGroups(TempM2ValueBuffer);
+        TempM2ValueBuffer.SetFilter(Value, '@' + Contact."NPR Magento Customer Group");
+        if not TempM2ValueBuffer.FindFirst() then
+            TempM2ValueBuffer.SetFilter(Value, '@' + Contact."NPR Magento Customer Group" + '*');
 
-        if not M2ValueBuffer.FindFirst() then
+        if not TempM2ValueBuffer.FindFirst() then
             Error(Text000, Contact.FieldCaption("NPR Magento Customer Group"), Contact."NPR Magento Customer Group");
 
-        Contact."NPR Magento Customer Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Contact."NPR Magento Customer Group"));
+        Contact."NPR Magento Customer Group" := CopyStr(TempM2ValueBuffer.Value, 1, MaxStrLen(Contact."NPR Magento Customer Group"));
     end;
 
     #endregion
@@ -416,7 +416,7 @@
     var
         MagentoStore: Record "NPR Magento Store";
         MagentoSetup: Record "NPR Magento Setup";
-        M2ValueBuffer: Record "NPR M2 Value Buffer";
+        TempM2ValueBuffer: Record "NPR M2 Value Buffer" temporary;
     begin
         if Customer."NPR Magento Store Code" = '' then
             exit;
@@ -427,15 +427,15 @@
             exit;
         end;
 
-        SetupMagentoStores(M2ValueBuffer);
-        M2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Store Code");
-        if not M2ValueBuffer.FindFirst() then
-            M2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Store Code" + '*');
+        SetupMagentoStores(TempM2ValueBuffer);
+        TempM2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Store Code");
+        if not TempM2ValueBuffer.FindFirst() then
+            TempM2ValueBuffer.SetFilter(Value, '@' + Customer."NPR Magento Store Code" + '*');
 
-        if not M2ValueBuffer.FindFirst() then
+        if not TempM2ValueBuffer.FindFirst() then
             Error(Text000, Customer.FieldCaption("NPR Magento Store Code"), Customer."NPR Magento Store Code");
 
-        Customer."NPR Magento Store Code" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Store Code"));
+        Customer."NPR Magento Store Code" := CopyStr(TempM2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Store Code"));
     end;
 
     #endregion
