@@ -5,6 +5,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     var
         UnitPriceCaption: Label 'This is item is an item group. Specify the unit price for item.';
         UnitPriceTitle: Label 'Unit price is required';
+        StartTime: DateTime;
 
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config")
     var
@@ -128,6 +129,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
 
         POSActionInsertItemB.GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
 
+        LogStartTelem();
+
         if EditDesc then
             CustomDescription := Context.GetString('Desc1');
 
@@ -198,6 +201,35 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         end else
             if not SkipItemAvailabilityCheck then
                 CheckAvailability(PosInventoryProfile, PosItemCheckAvail);
+
+        LogFinishTelem();
+    end;
+
+    local procedure LogStartTelem()
+    begin
+        StartTime := CurrentDateTime();
+    end;
+
+    local procedure LogFinishTelem()
+    var
+        FinishEventIdTok: Label 'NPR_POSActAddItem', Locked = true;
+        LogDict: Dictionary of [Text, Text];
+        MsgTok: Label 'Company:%1, Tenant: %2, Instance: %3, Server: %4, Duration: %5';
+        Msg: Text;
+        ActiveSession: Record "Active Session";
+        ItemAddedDur: Duration;
+    begin
+        if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
+            Clear(ActiveSession);
+        ItemAddedDur := CurrentDateTime() - StartTime;
+        LogDict.Add('NPR_Server', ActiveSession."Server Computer Name");
+        LogDict.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        LogDict.Add('NPR_TenantId', Database.TenantId());
+        LogDict.Add('NPR_CompanyName', CompanyName());
+        LogDict.Add('NPR_UserID', ActiveSession."User ID");
+        LogDict.Add('NPR_POSInitializationDuration', Format(ItemAddedDur));
+        Msg := StrSubstNo(MsgTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", Format(ItemAddedDur));
+        Session.LogMessage(FinishEventIdTok, 'POS Action Add Item: ' + Msg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, LogDict);
     end;
 
 

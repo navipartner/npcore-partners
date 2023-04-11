@@ -762,6 +762,27 @@
             exit;
         POSFrontEnd.GetSession(POSSession);
         POSSession.AddServerStopwatch(Keyword, Duration);
+        LogFinishTelem(Duration);
+    end;
+
+    local procedure LogFinishTelem(EndSaleDuration: Duration)
+    var
+        FinishEventIdTok: Label 'NPR_POSEndSale', Locked = true;
+        LogDict: Dictionary of [Text, Text];
+        MsgTok: Label 'Company:%1, Tenant: %2, Instance: %3, Server: %4, Duration: %5';
+        Msg: Text;
+        ActiveSession: Record "Active Session";
+    begin
+        if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
+            Clear(ActiveSession);
+        LogDict.Add('NPR_Server', ActiveSession."Server Computer Name");
+        LogDict.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        LogDict.Add('NPR_TenantId', Database.TenantId());
+        LogDict.Add('NPR_CompanyName', CompanyName());
+        LogDict.Add('NPR_UserID', ActiveSession."User ID");
+        LogDict.Add('NPR_POSEndSaleDuration', Format(EndSaleDuration));
+        Msg := StrSubstNo(MsgTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", Format(EndSaleDuration));
+        Session.LogMessage(FinishEventIdTok, 'POS End Sale: ' + Msg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, LogDict);
     end;
 
     procedure CheckItemAvailability()
