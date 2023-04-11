@@ -63,7 +63,6 @@
     }
 
     var
-        [InDataSet]
         HasNoLinks: Boolean;
 }
 
