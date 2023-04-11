@@ -26,7 +26,7 @@
             exit;
 
         POSParameterValue.SetRange("Record ID", xRec.RecordId);
-        if POSParameterValue.FindSet(true, true) then
+        if POSParameterValue.FindSet(true) then
             repeat
                 POSParameterValue.Rename(POSParameterValue."Table No.", POSParameterValue.Code, POSParameterValue.ID, Rec.RecordId, POSParameterValue.Name);
             until POSParameterValue.Next() = 0;

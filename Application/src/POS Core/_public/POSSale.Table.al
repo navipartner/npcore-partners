@@ -135,7 +135,7 @@
                     SaleLinePOS.ModifyAll("VAT Base Amount", 0);
                     SaleLinePOS.ModifyAll("Line Amount", 0);
                 end;
-                if SaleLinePOS.FindSet(true, false) then begin
+                if SaleLinePOS.FindSet(true) then begin
                     repeat
                         xSaleLinePOS := SaleLinePOS;
                         Item.Get(SaleLinePOS."No.");
@@ -456,7 +456,7 @@
                 SaleLinePOS.SetRange("Register No.", "Register No.");
                 SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
                 SaleLinePOS.SetRange(Date, Date);
-                if SaleLinePOS.FindSet(true, false) then begin
+                if SaleLinePOS.FindSet(true) then begin
                     SaleLinePOS.ModifyAll(Amount, 0);
                     SaleLinePOS.ModifyAll("Amount Including VAT", 0);
                     SaleLinePOS.ModifyAll("VAT Base Amount", 0);

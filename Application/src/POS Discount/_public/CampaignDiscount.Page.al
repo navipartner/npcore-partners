@@ -519,7 +519,6 @@
     var
         Text10600000: Label 'Enter cost savings in % ';
         Item: Record Item;
-        [InDataSet]
         SubFormVisible: Boolean;
 
     internal procedure TransferToPeriod()

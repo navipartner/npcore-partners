@@ -220,7 +220,6 @@
     end;
 
     var
-        [InDataSet]
         ActionVisible: Boolean;
         DynamicEditable: Boolean;
 

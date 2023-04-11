@@ -73,7 +73,7 @@
             PostPOSEntries(POSEntry);
         end;
 
-        if POSEntry.FindSet(true, true) then
+        if POSEntry.FindSet(true) then
             repeat
                 OnAfterPostPOSEntry(POSEntry, false);
             until POSEntry.Next() = 0;
@@ -188,7 +188,7 @@
             ProgressWindow.Update(2, NoOfRecords);
         end;
 
-        if POSEntry.FindSet(true, true) then
+        if POSEntry.FindSet(true) then
             repeat
                 if ShowProgressDialog then begin
                     LineCount := LineCount + 1;

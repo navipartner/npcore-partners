@@ -673,7 +673,6 @@
         OK: Boolean;
         EarlierPostingDateErr: Label 'You cannot apply and post an entry to an entry with an earlier posting date.\\Instead, post the document of type %1 with the number %2 and then apply it to the document of type %3 with the number %4.';
         PostingDone: Boolean;
-        [InDataSet]
         AppliesToIDVisible: Boolean;
         HasDocumentAttachment: Boolean;
         CustNameVisible: Boolean;
@@ -1235,7 +1234,7 @@
         if IsHandled then
             exit;
 
-        if not AppliedCustLedgEntry.FindSet(false, false) then
+        if not AppliedCustLedgEntry.FindSet(false) then
             exit;
 
         repeat

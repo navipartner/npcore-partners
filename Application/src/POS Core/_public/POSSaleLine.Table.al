@@ -1816,7 +1816,7 @@
             SaleLinePOS.SetRange(Date, Date);
             SaleLinePOS.SetRange("Discount Code", "Discount Code");
             SaleLinePOS.SetFilter("No.", '<>%1', "No.");
-            if SaleLinePOS.FindSet(true, false) then
+            if SaleLinePOS.FindSet(true) then
                 repeat
                     if SaleLinePOS."Line Type" = "Line Type"::"BOM List" then
                         SaleLinePOS.Delete()
@@ -2066,7 +2066,7 @@
                 SaleLinePOS.SetRange("Register No.", "Register No.");
                 SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
                 SaleLinePOS.SetRange("Line No.", FromLineNo, ToLineNo);
-                if SaleLinePOS.FindSet(true, false) then
+                if SaleLinePOS.FindSet(true) then
                     repeat
                         SaleLinePOS."Discount Code" := "Discount Code";
                         SaleLinePOS.Validate("Discount %", 100 - UnitPrice / Sum * 100);
@@ -2459,7 +2459,7 @@
         SaleLinePOS.SetFilter("Main Line No.", '=%1', "Line No.");
         SaleLinePOS.SetFilter(Accessory, '=%1', true); // not really required, would also be one solution for combination items below
         SaleLinePOS.SetFilter("Main Item No.", '=%1', "No."); // not really required, would also be one solution for combination items below
-        if (SaleLinePOS.FindSet(true, false)) then
+        if (SaleLinePOS.FindSet(true)) then
             repeat
                 SaleLinePOS.SetSkipUpdateDependantQuantity(true);
                 SaleLinePOS.Validate(Quantity, SaleLinePOS.Quantity * Quantity / xRec.Quantity);
@@ -2476,7 +2476,7 @@
         SaleLinePOS.SetRange("Line No.", "Line No.", "Line No." + 9999);
         SaleLinePOS.SetRange(Accessory, true);
         SaleLinePOS.SetRange("Main Item No.", "No.");
-        if SaleLinePOS.FindSet(true, false) then
+        if SaleLinePOS.FindSet(true) then
             repeat
                 SaleLinePOS.SetSkipUpdateDependantQuantity(true);
                 SaleLinePOS.Validate(Quantity, SaleLinePOS.Quantity * Quantity / xRec.Quantity);
@@ -2493,7 +2493,7 @@
         SaleLinePOS.SetRange("Combination Item", true);
         SaleLinePOS.SetRange("Main Item No.", "No.");
         SaleLinePOS.SetRange("Combination No.", "Combination No.");
-        if SaleLinePOS.FindSet(true, false) then
+        if SaleLinePOS.FindSet(true) then
             repeat
                 SaleLinePOS.SetSkipUpdateDependantQuantity(true);
                 SaleLinePOS.Validate(Quantity, SaleLinePOS.Quantity * Quantity / xRec.Quantity);
