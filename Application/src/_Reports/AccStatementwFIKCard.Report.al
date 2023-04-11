@@ -848,7 +848,6 @@
         EntriesExists: Boolean;
         IncludeAgingBand: Boolean;
         LogInteraction: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         PrintAllHavingBal: Boolean;
         PrintAllHavingEntry: Boolean;
@@ -857,7 +856,6 @@
         PrintRemaining: Boolean;
         PrintReversedEntries: Boolean;
         PrintUnappliedEntries: Boolean;
-        [InDataSet]
         ShowPrintRemaining: Boolean;
         AgingBandCurrencyCode: Code[20];
         CurrencyCode3: Code[10];

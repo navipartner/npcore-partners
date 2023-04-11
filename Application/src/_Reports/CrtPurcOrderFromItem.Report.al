@@ -204,7 +204,6 @@ report 6014411 "NPR Crt. Purc. Order From Item"
     var
         ItemToProcessG: Record Item;
         OpenPurchDocumentG: Boolean;
-        [InDataSet]
         NotEditableFieldsG: Boolean;
         LocationCodeG: Code[20];
         PurchaseOrderNoG: Code[20];

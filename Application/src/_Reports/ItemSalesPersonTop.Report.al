@@ -1,7 +1,7 @@
 ﻿report 6014474 "NPR Item/Sales Person Top"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/ItemSales Person Top.rdlc';
@@ -239,7 +239,6 @@
         CompanyInfo: Record "Company Information";
         TempItemAmount: Record "Item Amount" temporary;
         Salesperson: Record "Salesperson/Purchaser";
-        [InDataSet]
         ShowSort: Boolean;
         SortOrder: Boolean;
         CalcAmt: Decimal;

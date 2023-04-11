@@ -293,14 +293,12 @@
         IncludeAgingBand: Boolean;
         isInitialized: Boolean;
         LogInteraction: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         PrintAllHavingBal: Boolean;
         PrintAllHavingEntry: Boolean;
         PrintEntriesDue: Boolean;
         PrintReversedEntries: Boolean;
         PrintUnappliedEntries: Boolean;
-        [InDataSet]
         ShowNaviDocsOption: Boolean;
         EndDate: Date;
         StartDate: Date;

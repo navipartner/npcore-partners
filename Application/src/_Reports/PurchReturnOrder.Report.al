@@ -1,8 +1,8 @@
 ﻿report 6014510 "NPR Purch Return Order"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Purch Return Order NP.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -831,7 +831,6 @@
         SegManagement: Codeunit SegManagement;
         Continue: Boolean;
         LogInteraction: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         MoreLines: Boolean;
         ShowInternalInfo: Boolean;

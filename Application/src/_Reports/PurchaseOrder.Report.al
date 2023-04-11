@@ -1193,11 +1193,9 @@
         PurchPostPrepmt: Codeunit "Purchase-Post Prepayments";
         SegManagement: Codeunit SegManagement;
         ArchiveDocument: Boolean;
-        [InDataSet]
         ArchiveDocumentEnable: Boolean;
         Continue: Boolean;
         LogInteraction: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         MoreLines: Boolean;
         ShowInternalInfo: Boolean;
