@@ -243,10 +243,8 @@
         CreateInvtPutAway: Codeunit "Create Inventory Put-away";
         WhseDocPrint: Codeunit "Warehouse Document-Print";
         CreateMovement: Boolean;
-        [InDataSet]
         CreateMovementEditable: Boolean;
         CreatePick: Boolean;
-        [InDataSet]
         CreatePickEditable: Boolean;
         CreatePutAway: Boolean;
         DocumentCreated: Boolean;

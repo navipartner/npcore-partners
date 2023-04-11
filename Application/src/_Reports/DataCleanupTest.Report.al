@@ -1,8 +1,8 @@
 ﻿report 6060101 "NPR Data Cleanup Test"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Data Cleanup Test.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -109,7 +109,6 @@
 
     var
         DataCleanupCVILine: Codeunit "NPR Data Cleanup GCVI Line";
-        [InDataSet]
         TestResult: Boolean;
         TableOption: Option All,Customer,Vendor,Item,GLAccount;
         CleanupAction: Option Delete,Rename,Both;

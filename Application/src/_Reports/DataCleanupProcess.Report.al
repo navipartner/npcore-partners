@@ -1,8 +1,8 @@
 ﻿report 6060102 "NPR Data Cleanup Process"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Data Cleanup Process.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -146,7 +146,6 @@
 
     var
         DataCleanupCVI2: Record "NPR Data Cleanup GCVI";
-        [InDataSet]
         ProcessResult: Boolean;
         TableOption: Option All,Customer,Vendor,Item,GLAccount;
         CleanupAction: Option Delete,Rename,Both;
