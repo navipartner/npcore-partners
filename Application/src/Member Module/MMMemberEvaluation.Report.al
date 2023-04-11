@@ -1,7 +1,7 @@
 ﻿report 6014494 "NPR MM Member Evaluation"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     Caption = 'Member Evaluation';
     UsageCategory = ReportsAndAnalysis;
@@ -360,7 +360,7 @@
                 POSEntry.SetFilter("Document Date", '%1..%2', FromDate, ToDate);
             POSEntry.SetFilter("Sales Document Type", '=%1', POSEntry."Sales Document Type"::Quote);
             TmpAgrBuffer.Color := POSEntry.Count(); // POS Sales Count
-            if POSEntry.FindSet(false, false) then
+            if POSEntry.FindSet(false) then
                 repeat
                     TmpAgrBuffer."Decimal 1" += POSEntry."Amount Incl. Tax"; // Total POS Amount Including Discount and Tax
                     TmpAgrBuffer."Decimal 2" += POSEntry."Discount Amount"; // Total POS Discount

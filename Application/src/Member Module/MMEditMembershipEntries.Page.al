@@ -225,7 +225,6 @@ page 6059844 "NPR MM Edit Membership Entries"
     }
 
     var
-        [InDataSet]
         ListIsEditable: Boolean;
 
     trigger OnInit()

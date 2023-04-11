@@ -237,7 +237,6 @@
 
         OAuth2SetupCode: Code[20];
 
-        [InDataSet]
         IsBasicAuthVisible, IsOAuth2Visible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
 

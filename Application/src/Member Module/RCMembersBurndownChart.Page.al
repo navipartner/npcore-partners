@@ -320,27 +320,16 @@
         MembershipBurndownMgt: Codeunit "NPR RC MM Members.Burndown Mgt";
         StatusText: Text[250];
         NeedsUpdate: Boolean;
-        [InDataSet]
         SalesType: Boolean;
-        [InDataSet]
         OrdersUntilTodayEnabled: Boolean;
-        [InDataSet]
         DelayedOrdersEnabled: Boolean;
-        [InDataSet]
         MonthEnabled: Boolean;
-        [InDataSet]
         QuarterEnabled: Boolean;
-        [InDataSet]
         MembershipValueEnabled: Boolean;
-        [InDataSet]
         MembershipCountEnabled: Boolean;
-        [InDataSet]
         StackedAreaEnabled: Boolean;
-        [InDataSet]
         StackedAreaPctEnabled: Boolean;
-        [InDataSet]
         StackedColumnEnabled: Boolean;
-        [InDataSet]
         StackedColumnPctEnabled: Boolean;
         IsChartAddInReady: Boolean;
         IsChartDataReady: Boolean;
