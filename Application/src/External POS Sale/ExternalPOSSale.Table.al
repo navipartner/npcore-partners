@@ -128,7 +128,7 @@
                     SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
                     SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
                     SaleLinePOS.SetRange(Date, Date);
-                    if SaleLinePOS.FindSet(true, false) then begin
+                    if SaleLinePOS.FindSet(true) then begin
                         repeat
                             xSaleLinePOS := SaleLinePOS;
                             Item.Get(SaleLinePOS."No.");
