@@ -58,7 +58,7 @@ codeunit 88011 "NPR BCPT POS Post Item Entries" implements "BCPT Test Param. Pro
 
         POSAuditProfile.Get('DEFAULT');
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
-        NoSeriesLine.FindSet(true, true);
+        NoSeriesLine.FindSet(true);
         repeat
             if AllowGapsInSaleFiscalNoSeries <> NoSeriesLine."Allow Gaps in Nos." then begin
                 NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
@@ -101,7 +101,7 @@ codeunit 88011 "NPR BCPT POS Post Item Entries" implements "BCPT Test Param. Pro
         i: Integer;
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
     begin
-        for i := 1 to NoOfLinesPerSale do begin
+        for i := 1 to NoOfLinesPerSale do
             if i mod 2 = 1 then begin
                 POSMockLibrary.CreateItemLine(POSSession, Item, BarCodeItemReference, ItemIdentifierType::ItemCrossReference, 1);
                 AmountToPay += Item."Unit Price";
@@ -109,7 +109,6 @@ codeunit 88011 "NPR BCPT POS Post Item Entries" implements "BCPT Test Param. Pro
                 POSMockLibrary.CreateItemLine(POSSession, Item2, BarCodeItemReference2, ItemIdentifierType::ItemCrossReference, 1);
                 AmountToPay += Item2."Unit Price";
             end;
-        end;
     end;
 
     local procedure PaySale(AmountToPay: Decimal)
@@ -127,9 +126,9 @@ codeunit 88011 "NPR BCPT POS Post Item Entries" implements "BCPT Test Param. Pro
     procedure GetDefaultParameters(): Text[1000]
     begin
         exit(
-            GetDefaultNoOfSalesParameter() + ',' +
+            CopyStr(CopyStr(GetDefaultNoOfSalesParameter() + ',' +
             GetDefaultNoOfLinesPerSaleParameter() + ',' +
-            GetDefaultAllowGapsInSaleFiscalNoSeriesParameter());
+            GetDefaultAllowGapsInSaleFiscalNoSeriesParameter(), 1, 1000), 1, 1000));
     end;
 
     local procedure GetDefaultNoOfSalesParameter(): Text[1000]
@@ -149,9 +148,9 @@ codeunit 88011 "NPR BCPT POS Post Item Entries" implements "BCPT Test Param. Pro
 
     procedure ValidateParameters(Parameters: Text[1000])
     begin
-        ValidateNoOfSalesParameter(SelectStr(1, Parameters));
-        ValidateNoOfLinesPerSaleParameter(SelectStr(2, Parameters));
-        ValidateAllowGapsInSaleFiscalNoSeriesParameter(SelectStr(3, Parameters));
+        ValidateNoOfSalesParameter(CopyStr(SelectStr(1, Parameters), 1, 1000));
+        ValidateNoOfLinesPerSaleParameter(CopyStr(SelectStr(2, Parameters), 1, 1000));
+        ValidateAllowGapsInSaleFiscalNoSeriesParameter(CopyStr(SelectStr(3, Parameters), 1, 1000));
     end;
 
     local procedure ValidateNoOfSalesParameter(Parameter: Text[1000])

@@ -7,7 +7,7 @@ codeunit 88106 "NPR BCPT POS Framework: Mock" implements "NPR Framework Interfac
     var
         Initialized: boolean;
 
-        ErrorNotInitialized: label 'Mock framework has not been initialized, but an attempt was made to use it.';
+        ErrorNotInitializedLbl: label 'Mock framework has not been initialized, but an attempt was made to use it.';
 
     procedure Constructor()
     begin
@@ -17,7 +17,7 @@ codeunit 88106 "NPR BCPT POS Framework: Mock" implements "NPR Framework Interfac
     procedure InvokeFrontEndAsync(Request: JsonObject)
     begin
         if not initialized then
-            Error(ErrorNotInitialized);
+            Error(ErrorNotInitializedLbl);
 
         OnMockFrontEndInvoke(Request);
     end;

@@ -52,7 +52,7 @@ codeunit 88006 "NPR BCPT POS DS Create Member" implements "BCPT Test Param. Prov
 
         POSAuditProfile.Get('DEFAULT');
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
-        NoSeriesLine.FindSet(true, true);
+        NoSeriesLine.FindSet(true);
         repeat
             if AllowGapsInSaleFiscalNoSeries <> NoSeriesLine."Allow Gaps in Nos." then begin
                 NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
@@ -121,9 +121,9 @@ codeunit 88006 "NPR BCPT POS DS Create Member" implements "BCPT Test Param. Prov
     procedure GetDefaultParameters(): Text[1000]
     begin
         exit(
-            GetDefaultNoOfSalesParameter() + ',' +
+            CopyStr(GetDefaultNoOfSalesParameter() + ',' +
             GetDefaultPostSaleParameter() + ',' +
-            GetDefaultAllowGapsInSaleFiscalNoSeriesParameter());
+            GetDefaultAllowGapsInSaleFiscalNoSeriesParameter(), 1, 1000));
     end;
 
     local procedure GetDefaultNoOfSalesParameter(): Text[1000]
@@ -143,9 +143,9 @@ codeunit 88006 "NPR BCPT POS DS Create Member" implements "BCPT Test Param. Prov
 
     procedure ValidateParameters(Parameters: Text[1000])
     begin
-        ValidateNoOfSalesParameter(SelectStr(1, Parameters));
-        ValidatePostSaleParameter(SelectStr(2, Parameters));
-        ValidateAllowGapsInSaleFiscalNoSeriesParameter(SelectStr(3, Parameters));
+        ValidateNoOfSalesParameter(CopyStr(SelectStr(1, Parameters), 1, 1000));
+        ValidatePostSaleParameter(CopyStr(SelectStr(2, Parameters), 1, 1000));
+        ValidateAllowGapsInSaleFiscalNoSeriesParameter(CopyStr(SelectStr(3, Parameters), 1, 1000));
     end;
 
     local procedure ValidateNoOfSalesParameter(Parameter: Text[1000])

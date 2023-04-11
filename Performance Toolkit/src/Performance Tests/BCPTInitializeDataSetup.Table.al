@@ -66,7 +66,7 @@ table 88000 "NPR BCPT Initialize Data Setup"
         "Last Initialized POS Unit No." := POSUnit."No.";
     end;
 
-    local procedure SetCreateSalesUntilDateTime(var CreateSalesUntilDateTime: DateTime; var CreateSalesForNoOfMinutes: Integer)
+    local procedure SetCreateSalesUntilDateTime(var CreateSalesUntilDateTime: DateTime; CreateSalesForNoOfMinutes: Integer)
     begin
         CreateSalesUntilDateTime := CurrentDateTime() + (CreateSalesForNoOfMinutes * 1000 * 60);
         if "Create Sales Until Date Time" <> 0DT then begin
