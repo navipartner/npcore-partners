@@ -160,7 +160,6 @@
 
     var
         SMSManagement: Codeunit "NPR SMS Management";
-        [InDataSet]
         RecTypeVisible: Boolean;
         RecGroupVisible: Boolean;
         RecipientType: Enum "NPR SMS Recipient Type";

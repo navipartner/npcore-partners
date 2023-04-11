@@ -150,9 +150,7 @@
     end;
 
     var
-        [InDataSet]
         ClientIdGlobal: Text[200];
-        [InDataSet]
         ClientSecretGlobal: Text[200];
 
     trigger OnAfterGetRecord()

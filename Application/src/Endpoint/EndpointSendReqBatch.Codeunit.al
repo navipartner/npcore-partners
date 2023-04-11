@@ -35,7 +35,7 @@
                 EndpointRequestBatch.SetRange(Status, EndpointRequestBatch.Status::Collecting);
                 //-NPR5.31 [267459]
                 //IF EndpointRequestBatch.FindSet() THEN REPEAT
-                if EndpointRequestBatch.FindSet(true, true) then
+                if EndpointRequestBatch.FindSet(true) then
                     repeat
                         //+NPR5.31 [267459]
                         EndpointRequest.Reset();
