@@ -76,12 +76,12 @@ page 88000 "NPR APIV1InstalledApps"
         if Rec.IsTemporary() then begin
             Rec.DeleteAll();
             GetRequiredApps(RequiredApps);
-            foreach TmpAppId in RequiredApps.Keys() do begin
+            foreach TmpAppId in RequiredApps.Keys() do
                 if (NavApp.GetModuleInfo(TmpAppId, Info)) then begin
                     Rec.Init();
                     Rec."App ID" := Info.Id;
-                    Rec.Name := Info.Name;
-                    Rec.Publisher := Info.Publisher;
+                    Rec.Name := CopyStr(Info.Name, 1, MaxStrLen(Rec.Name));
+                    Rec.Publisher := CopyStr(Info.Publisher, 1, MaxStrLen(Rec.Publisher));
                     Rec."Package ID" := Info.PackageId;
                     Rec."Version Major" := Info.AppVersion.Major;
                     Rec."Version Minor" := Info.AppVersion.Minor;
@@ -89,7 +89,6 @@ page 88000 "NPR APIV1InstalledApps"
                     Rec."Version Revision" := Info.AppVersion.Revision;
                     Rec.Insert();
                 end;
-            end;
         end;
     end;
 
