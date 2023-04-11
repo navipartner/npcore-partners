@@ -4,6 +4,9 @@
         Text000: Label 'Ambigous input, please specify.';
         Text001: Label '"%1" not found.';
         OverMaxLenTextLbl: Label 'Text "%1" has more then max allowed %2 characters.', Comment = '%1-text, %2-max character no.';
+        StartTime: DateTime;
+        SelectEanStartTime: DateTime;
+        SelectEanEndTime: DateTime;
 
     [Obsolete('Only necessary to for v1/v2 workflow. Remove when everything is migrated to v3.')]
     internal procedure InvokeEanBox(EanBoxValue: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management")
@@ -265,6 +268,8 @@
         TempEanBoxSetupEvent: Record "NPR Ean Box Setup Event" temporary;
         ActionCodeMissingErr: label 'For Ean Box Event %1 %2 Action Code is missing.';
     begin
+        LogStartTelem(); //log Ean Scanned
+
         FrontEnd.SetOption('doNotClearTextBox', false);
         if not FindEanBoxSetup(POSSession, EanBoxSetup) then
             Error(Text001, EanBoxValue);
@@ -272,8 +277,12 @@
         if not FindEnabledEanBoxEvents(EanBoxSetup, EanBoxValue, TempEanBoxSetupEvent) then
             Error(Text001, EanBoxValue);
 
+        LogStartSelectEanTelem(); //log time before select Ean
+
         if not SelectEanBoxEvent(TempEanBoxSetupEvent) then
             Error(Text001, EanBoxValue);
+
+        LogEndSelectEanTelem(); //log time after select Ean
 
         if TempEanBoxSetupEvent."Action Code" = '' then
             Error(ActionCodeMissingErr, TempEanBoxSetupEvent."Setup Code", TempEanBoxSetupEvent."Event Code");
@@ -283,6 +292,8 @@
 
         SetupCode := TempEanBoxSetupEvent."Setup Code";
         EventCode := TempEanBoxSetupEvent."Event Code";
+
+        LogFinishTelem(EanBoxValue, POSAction.Code); //log time after POS Action is found
 
     end;
     internal procedure InvokeEanBoxv3(EanBoxValue: Text; POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSAction: Record "NPR POS Action")
@@ -323,4 +334,54 @@
     begin
         SetPOSActionParametersV3(EanBoxValue, EanBoxSetupEvent, POSAction);
     end;
+
+    local procedure LogStartSelectEanTelem()
+    begin
+        SelectEanStartTime := CurrentDateTime();
+    end;
+
+    local procedure LogEndSelectEanTelem()
+    begin
+        SelectEanEndTime := CurrentDateTime();
+    end;
+
+    local procedure LogStartTelem()
+    begin
+        StartTime := CurrentDateTime();
+    end;
+
+    local procedure LogFinishTelem(ScannedValue: Text; POSActionCode: Code[20])
+    var
+        FinishEventIdTok: Label 'NPR_EanBoxValuePOSAction', Locked = true;
+        LogDict: Dictionary of [Text, Text];
+        MsgTok: Label 'Company:%1, Tenant: %2, Instance: %3, Server: %4, POSAction:%5, Duration: %6';
+        Msg: Text;
+        ActiveSession: Record "Active Session";
+        SelectEanDuration: Duration;
+        POSActionDiscovered: Duration;
+    begin
+        if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
+            Clear(ActiveSession);
+
+        POSActionDiscovered := CurrentDateTime() - StartTime;
+        SelectEanDuration := SelectEanEndTime - SelectEanStartTime;
+
+        if SelectEanDuration <> 0 then
+            POSActionDiscovered := POSActionDiscovered - SelectEanDuration;
+
+        LogDict.Add('NPR_Server', ActiveSession."Server Computer Name");
+        LogDict.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        LogDict.Add('NPR_TenantId', Database.TenantId());
+        LogDict.Add('NPR_CompanyName', CompanyName());
+        LogDict.Add('NPR_UserID', ActiveSession."User ID");
+        LogDict.Add('NPR_ScannedValue', ScannedValue);
+        LogDict.Add('NPR_DurationMs', Format(POSActionDiscovered));
+        LogDict.Add('NPR_SelectEanDurationMs', Format(SelectEanDuration));
+        LogDict.add('NPR_ActionCode', POSActionCode);
+        Msg := StrSubstNo(MsgTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", POSActionCode, Format(POSActionDiscovered));
+
+        Session.LogMessage(FinishEventIdTok, 'EanBoxScanned: ' + Msg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, LogDict);
+    end;
+
+
 }
