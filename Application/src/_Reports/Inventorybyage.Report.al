@@ -796,7 +796,6 @@
         PeriodStartDato: array[6] of Date;
         RemainingAmt: array[5, 5] of Decimal;
         AmountCalc: array[5, 5] of Decimal;
-        [InDataSet]
         ShowItem: Boolean;
         n: Integer;
         PageNoCaptionLbl: Label 'Page';
