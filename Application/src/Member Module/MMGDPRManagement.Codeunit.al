@@ -231,7 +231,7 @@
             MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
             MembershipRole.SetFilter(Blocked, '=%1', false);
             MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::ANONYMOUS);
-            if (MembershipRole.FindSet(true, true)) then begin
+            if (MembershipRole.FindSet(true)) then begin
                 repeat
                     if (ValidateAnonymizeMemberRole(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", AgreementCheck, ReasonText)) then begin
                         DoAnonymizeRole(MembershipRole);
@@ -276,7 +276,7 @@
         MembershipRole.Reset();
         MembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
         MembershipRole.SetFilter(Blocked, '=%1', false);
-        if (MembershipRole.FindSet(true, true)) then begin
+        if (MembershipRole.FindSet(true)) then begin
             repeat
                 if (ValidateAnonymizeMemberRole(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", AgreementCheck, ReasonText)) then begin
                     if (MembershipRole."Wallet Pass Id" <> '') then

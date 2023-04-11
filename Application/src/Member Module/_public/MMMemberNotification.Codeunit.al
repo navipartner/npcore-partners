@@ -616,7 +616,7 @@
         MembershipNotification.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
         MembershipNotification.SetFilter("Notification Trigger", '=%1', MembershipNotification."Notification Trigger"::RENEWAL);
         MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        if (MembershipNotification.FindSet(true, true)) then begin
+        if (MembershipNotification.FindSet(true)) then begin
             repeat
                 MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
                 MembershipNotification."Notification Processed At" := CurrentDateTime();
