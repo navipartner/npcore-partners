@@ -88,4 +88,18 @@ table 6059793 "NPR POS Layout"
             exit('');
         exit(POSUnitList.GetSelectionFilter(POSUnit));
     end;
+
+    procedure AssignedToPOSUnits() JArray: JsonArray
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        POSUnit.SetRange("POS Layout Code", Code);
+        if POSUnit.IsEmpty() then
+            exit;
+
+        if POSUnit.FindSet() then
+            repeat
+                JArray.Add(POSUnit."No.");
+            until POSUnit.Next() = 0;
+    end;
 }
