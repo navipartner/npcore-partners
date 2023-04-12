@@ -2,6 +2,20 @@
 
 Learn which new features and improvements have been introduced in the newest versions of the NP Retail solution:
 
+## Version 20.0 (March 27th 2023)
+
+### GS1 coupons posting with G/L account
+
+You can now create a G/L account that is used for posting GS1 flat rate discount coupons. The discount is applied as a new G/L line with a negative amount, which is calculated from the barcode. 
+
+For more information and operating instructions, refer to the [GS 1 coupon setup](retail/coupons/howto/gs1_setup.md) article.
+
+### MobilePay QR code on customer screen 
+
+Customers can now use the MobilePay app to scan QR codes from the customer screen and purchase goods from a store with their electronic wallet.
+
+For more information, refer to the article on [MobilePay feature usage](retail/posunit/howto/mobile_pay_qr.md).
+
 ## Version 19.0 (March 7th 2023)
 
 ### Limiting payment types to specific items
