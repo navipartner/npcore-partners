@@ -388,7 +388,7 @@
                     SeatingWizard.GetNumberingOptions(RowNumberOrder, RowStartNumber, SeatNumberOrder, SeatStartNumber, ContinuousNumbering, SeatingIncrement, SpanSections);
 
                     SelectionFilter.Ascending(RowNumberOrder = RowNumberOrder::ASCENDING);
-                    if (SelectionFilter.FindSet(true, true)) then begin
+                    if (SelectionFilter.FindSet(true)) then begin
                         AssignedNumber := SeatStartNumber;
                         repeat
                             RenumberRowAndSeat(SelectionFilter."Entry No.", RowStartNumber, SeatStartNumber, AssignedNumber, RowNumberOrder, SeatNumberOrder, ContinuousNumbering, SeatingIncrement);

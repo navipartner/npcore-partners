@@ -350,7 +350,7 @@
     begin
 
         CurrPage.SetSelectionFilter(SeatingTemplate);
-        if (SeatingTemplate.FindSet(true, true)) then begin
+        if (SeatingTemplate.FindSet(true)) then begin
             repeat
                 SeatingManagement.DeleteNode(SeatingTemplate."Entry No.");
             until (SeatingTemplate.Next() = 0);
