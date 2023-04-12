@@ -462,7 +462,7 @@
             ImportEntry.ModifyAll("Runtime Error", false, false);
             ImportEntry.ModifyAll("Earliest Import Datetime", 0DT);
             Commit();
-            if ImportEntry.FindSet(true, false) then
+            if ImportEntry.FindSet(true) then
                 repeat
                     NcImportProcessor.ScheduleImport(ImportEntry);
                 until ImportEntry.Next() = 0;
