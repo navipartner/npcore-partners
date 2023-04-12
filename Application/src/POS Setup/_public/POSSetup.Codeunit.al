@@ -199,10 +199,14 @@
             ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Idle Timeout Action Code"), POSSetup."Idle Timeout Action Code");
 
         POSSetup.Reset();
-        POSSetup.SetRange("Idle Timeout Action Code", Action.Code);
+        POSSetup.SetRange("Admin Menu Action Code", Action.Code);
         if POSSetup.FindFirst() then
-            ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Idle Timeout Action Code"), POSSetup."Idle Timeout Action Code");
+            ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Admin Menu Action Code"), POSSetup."Admin Menu Action Code");
 
+        POSSetup.Reset();
+        POSSetup.SetRange("End of Day Action Code", Action.Code);
+        if POSSetup.FindFirst() then
+            ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("End of Day Action Code"), POSSetup."End of Day Action Code");
     end;
 
     #endregion Setup
