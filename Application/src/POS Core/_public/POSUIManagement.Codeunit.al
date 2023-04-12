@@ -416,6 +416,8 @@
         GlobalRecordLbl: Label 'Global_Record_%1_Field_%2', Locked = true;
         Balancing_CashCountFinalizedLbl: Label 'finalized';
         Balancing_CashCountFinalizeLbl: Label 'Finalize';
+        Balancing_CashCountDraft: Label 'Draft';
+        Balancing_CashCountResumeDraft: Label 'There is a drafted counting for this cash count. Do you wish to resume?';
         Balancing_CashCountCompleteBalancingLbl: Label 'Complete balancing';
         Balancing_CashCountTransferAmountTooMuchLbl: Label 'The amount you are attempting to transfer is higher than the counted amount. Please correct this before proceeding.';
         Balancing_CashCountShouldNotExceedCountedAmtLbl: Label 'should not exceed counted amount';
@@ -563,6 +565,8 @@
         Captions.Add('Balancing_CountByTypeCompletedLbl', BalancingCountByTypeCompletedLbl);
         Captions.Add('Balancing_CashCountFinalized', Balancing_CashCountFinalizedLbl);
         Captions.Add('Balancing_CashCountFinalize', Balancing_CashCountFinalizeLbl);
+        Captions.Add('Balancing_CashCountDraft', Balancing_CashCountDraft);
+        Captions.Add('Balancing_CashCountResumeDraft', Balancing_CashCountResumeDraft);
         Captions.Add('Balancing_CashCountCompleteBalancing', Balancing_CashCountCompleteBalancingLbl);
         Captions.Add('Balancing_CashCountTransferAmountTooMuch', Balancing_CashCountTransferAmountTooMuchLbl);
         Captions.Add('Balancing_CashCountShouldNotExceedCountedAmt', Balancing_CashCountShouldNotExceedCountedAmtLbl);
