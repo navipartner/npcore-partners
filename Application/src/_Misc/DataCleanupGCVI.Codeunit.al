@@ -38,7 +38,7 @@
         DataCleanupCVI.SetRange(IsError, false);
         DataCleanupCVI.SetRange(IsRenamed, false);
         DataCleanupCVI.SetFilter(Retries, '<10');
-        if DataCleanupCVI.FindSet(false, false) then
+        if DataCleanupCVI.FindSet(false) then
             repeat
                 DataCleanupCVI2.Get(DataCleanupCVI."Cleanup Action", DataCleanupCVI.Type, DataCleanupCVI."No.");
 

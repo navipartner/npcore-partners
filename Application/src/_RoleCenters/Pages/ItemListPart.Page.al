@@ -345,7 +345,6 @@
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
         IsFoundationEnabled: Boolean;
         RunOnTempRec: Boolean;
-        [InDataSet]
         IsNonInventoriable: Boolean;
 
     internal procedure SelectInItemList(var Item: Record Item): Text

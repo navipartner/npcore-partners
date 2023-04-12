@@ -415,7 +415,6 @@ page 6014486 "NPR Shipping Provider Document"
 
     var
         OKButtonPressed: Boolean;
-        [InDataSet]
         TotalWeightEditable: Boolean;
 
     internal procedure OKButtonWasPressed(): Boolean

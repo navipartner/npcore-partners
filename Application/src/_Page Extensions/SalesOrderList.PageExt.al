@@ -20,6 +20,5 @@ pageextension 6014487 "NPR Sales Order List" extends "Sales Order List"
         }
     }
     var
-        [InDataSet]
         HasNotes: Boolean;
 }
