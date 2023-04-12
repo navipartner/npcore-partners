@@ -40,8 +40,14 @@
     href: payment_gateway/paymentgateway.md
   - name: How-to
     items:
+    - name: Set up Adyen payment integration
+      href: payment_gateway/howto/adyen.md
     - name: Set up Bambora payment integration
       href: payment_gateway/howto/bambora.md
+    - name: Set up Nets Easy payment integration
+      href: payment_gateway/howto/netseasy.md
+    - name: Set up Quickpay payment integration
+      href: payment_gateway/howto/quickpay.md
   - name: Reference
     items:
     - name: Payment Gateways (reference guide)
