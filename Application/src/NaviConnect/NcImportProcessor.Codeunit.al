@@ -211,7 +211,7 @@
             NcImportEntry2.SetRange("Batch Id", NcImportEntry."Batch Id");
             NcImportEntry2.SetRange(Imported, false);
             NcImportEntry2.SetFilter("Entry No.", '>%1', NcImportEntry."Entry No.");
-            IF NcImportEntry2.FindSet(true, false) then
+            IF NcImportEntry2.FindSet(true) then
                 repeat
                     NcImportEntry2."Runtime Error" := true;
                     ErrorTxt := StrSubstNo(ErrorTxtLabel, NcImportEntry."Entry No.");
