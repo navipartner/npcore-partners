@@ -32,7 +32,7 @@
             else
                 Error(Error_Parameter);
 
-        if not RecRef.FindSet(false, false) then
+        if not RecRef.FindSet(false) then
             exit;
 
         Total := RecRef.Count();

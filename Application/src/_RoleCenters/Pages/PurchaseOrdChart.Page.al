@@ -304,33 +304,19 @@
         TrailingSalesOrdersMgt: Codeunit "Trailing Sales Orders Mgt.";
         StatusText: Text[250];
         NeedsUpdate: Boolean;
-        [InDataSet]
         AllOrdersEnabled: Boolean;
-        [InDataSet]
         OrdersUntilTodayEnabled: Boolean;
-        [InDataSet]
         DelayedOrdersEnabled: Boolean;
-        [InDataSet]
         DayEnabled: Boolean;
-        [InDataSet]
         WeekEnabled: Boolean;
-        [InDataSet]
         MonthEnabled: Boolean;
-        [InDataSet]
         QuarterEnabled: Boolean;
-        [InDataSet]
         YearEnabled: Boolean;
-        [InDataSet]
         AmountEnabled: Boolean;
-        [InDataSet]
         NoOfOrdersEnabled: Boolean;
-        [InDataSet]
         StackedAreaEnabled: Boolean;
-        [InDataSet]
         StackedAreaPctEnabled: Boolean;
-        [InDataSet]
         StackedColumnEnabled: Boolean;
-        [InDataSet]
         StackedColumnPctEnabled: Boolean;
         IsChartAddInReady: Boolean;
 
