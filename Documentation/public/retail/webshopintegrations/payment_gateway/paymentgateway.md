@@ -16,9 +16,12 @@ The module enables you to use a combination of Payment Service Providers for cap
 > [!NOTE]
 > If your Payment Service Provider is not shown on this list, your partner has an [option of developing a custom integration](https://github.com/navipartner/payment-gateway-integration-example/). 
 
-## How-to guides on setup
+## Payment Gateway setup in NP Retail
 
 - [Set up Bambora payment integration](./howto/bambora.md)
+- [Set up Quickpay integration](./howto/quickpay.md)
+- [Set up Nets Easy integration](./howto/netseasy.md)
+- [Set up Adyen integration](./howto/adyen.md)
 
 ## Related links
 
