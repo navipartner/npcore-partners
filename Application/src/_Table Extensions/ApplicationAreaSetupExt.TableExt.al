@@ -47,6 +47,11 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NPR HeyLoyalty Integration';
             DataClassification = CustomerContent;
         }
+        field(6060109; "NPR RS Local"; Boolean)
+        {
+            Caption = 'NPR RS Localization';
+            DataClassification = CustomerContent;
+        }
         field(6060110; "NPR RS R Local"; Boolean)
         {
             Caption = 'NPR RS Retail Localization';
