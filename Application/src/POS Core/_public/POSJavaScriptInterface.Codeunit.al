@@ -4,7 +4,6 @@
         _LastView: Codeunit "NPR POS View";
         _Stopwatch: Codeunit "NPR Stopwatch";
 
-
     // The purpose of this function is to detect if there are action codeunits that respond to either OnBeforeWorkflow or OnAction not intended for them.
 
     [Obsolete('Replaced with workflow v3. Delete when last v1 workflow is gone')]
@@ -153,11 +152,41 @@
     end;
 
     local procedure InitializationComplete(POSSession: Codeunit "NPR POS Session")
+    var
+        StartTime: DateTime;
     begin
+        StartTime := CurrentDateTime();
+
         POSSession.DebugWithTimestamp('InitializeUI');
         POSSession.InitializeUI();
         POSSession.DebugWithTimestamp('InitializeSession');
         POSSession.InitializeSession(false);
+
+        LogFinishTelem(StartTime);
+    end;
+
+    local procedure LogFinishTelem(StartTime: DateTime)
+    var
+        FinishEventIdTok: Label 'NPR_POSSessionInitialized', Locked = true;
+        LogDict: Dictionary of [Text, Text];
+        MsgTok: Label 'Company:%1, Tenant: %2, Instance: %3, Server: %4, Duration: %5';
+        Msg: Text;
+        ActiveSession: Record "Active Session";
+        POSInitialized: Duration;
+    begin
+        if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
+            Clear(ActiveSession);
+        POSInitialized := CurrentDateTime() - StartTime;
+
+        LogDict.Add('NPR_Server', ActiveSession."Server Computer Name");
+        LogDict.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        LogDict.Add('NPR_TenantId', Database.TenantId());
+        LogDict.Add('NPR_CompanyName', CompanyName());
+        LogDict.Add('NPR_UserID', ActiveSession."User ID");
+        LogDict.Add('NPR_POSInitializationDuration', Format(POSInitialized));
+
+        Msg := StrSubstNo(MsgTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", Format(POSInitialized));
+        Session.LogMessage(FinishEventIdTok, 'POS Session Initialized: ' + Msg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, LogDict);
     end;
 
     internal procedure RefreshData(FrontEnd: Codeunit "NPR POS Front End Management")
