@@ -12,6 +12,8 @@ codeunit 6059925 "NPR POS Layout Assistant"
                 SavePOSLayoutData(Context);
             'AssignPOSLayout':
                 AssignPOSLayout(Context);
+            'GetAssignedPOSLayout':
+                GetAssignedPOSLayout(Context, FrontEnd);
             'POSLayout_SelectItem', 'POSLayout_SelectCustomer', 'POSLayout_SelectPaymentMethod', 'POSLayout_SelectPOSAction':
                 SelectEntity(Method, Context, FrontEnd);
             'POSLayout_GetPOSActionParameterList':
@@ -55,7 +57,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
                     POSLayoutContent.Add('blob', PropertiesString);
                 end else
                     POSLayoutContent.Add('blob', '');
-                POSLayoutContent.Add('assignedToPOSUnits', POSLayout.AssignedToPOSUnitsFilter());
+                POSLayoutContent.Add('assignedToPOSUnits', POSLayout.AssignedToPOSUnits());
                 POSLayoutList.Add(POSLayoutContent);
             until POSLayout.Next() = 0;
 
@@ -152,6 +154,16 @@ codeunit 6059925 "NPR POS Layout Assistant"
             exit;
         POSSession.GetSetup(Setup);
         Setup.SetPOSUnit(POSUnit);
+    end;
+
+    local procedure GetAssignedPOSLayout(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        POSUnit: Record "NPR POS Unit";
+        Response: JsonObject;
+    begin
+        POSUnit.Get(CopyStr(GetJText(Context.AsToken(), 'POSUnitCode', true), 1, MaxStrLen(POSUnit."No.")));
+        Response.Add('layoutId', POSUnit."POS Layout Code");
+        FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 
     local procedure SelectEntity(Method: Text; Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
