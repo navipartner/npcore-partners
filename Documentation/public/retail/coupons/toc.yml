@@ -8,3 +8,5 @@
   items:
   - name: Create new coupon types and coupons
     href: howto/create_new_coupons.md
+  - name: Create discount coupons with GS 1 coding system
+    href: howto/gs1_setup.md

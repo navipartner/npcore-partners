@@ -86,3 +86,5 @@
     href: howto/send_receipt_pos.md
   - name: Return items with the second POS screen
     href: howto/display_2_control.md
+  - name: Use MobilePay QR code on customer screen 
+    href: howto/mobile_pay_qr.md
