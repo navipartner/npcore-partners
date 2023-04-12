@@ -111,21 +111,25 @@
                 {
                     ToolTip = 'Specifies the number series used for the internal EAN number.';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 field("External EAN No. Series"; Rec."External EAN No. Series")
                 {
                     ToolTip = 'Specifies the value of the External EAN No. Series field';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 field("EAN-Internal"; Rec."EAN-Internal")
                 {
                     ToolTip = 'Specifies the length of the EAN-Internal number';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 field("EAN-External"; Rec."EAN-External")
                 {
                     ToolTip = 'Specifies the length of the EAN-External number';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 group(ItemReferences)
                 {
