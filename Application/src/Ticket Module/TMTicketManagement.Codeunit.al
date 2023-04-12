@@ -3659,7 +3659,7 @@
         StartTime, EndTime : Time;
     begin
         TicketAccessEntry.SetRange("Ticket No.", Ticket."No.");
-        if TicketAccessEntry.FindSet(false, false) then
+        if TicketAccessEntry.FindSet(false) then
             repeat
                 //from reservation
                 DetTicketAccessEntry.SetRange("Ticket No.", Ticket."No.");

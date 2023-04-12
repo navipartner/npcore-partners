@@ -109,7 +109,7 @@
             TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
             TicketReservationRequest.SetRange("Ext. Line Reference No.", Line);
 
-            if (TicketReservationRequest.FindSet(true, false)) then begin
+            if (TicketReservationRequest.FindSet(true)) then begin
                 TicketCreated := false;
                 repeat
                     if TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::NOT_SELECTED then begin
@@ -182,7 +182,7 @@
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::REGISTERED);
 
-        if (TicketReservationRequest.FindSet(true, false)) then begin
+        if (TicketReservationRequest.FindSet(true)) then begin
             TicketReservationRequest.ModifyAll("Expires Date Time", CurrentDateTime() + 1500 * 1000);
             exit;
         end;
@@ -358,7 +358,7 @@
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        if (TicketReservationRequest.FindSet(true, false)) then begin
+        if (TicketReservationRequest.FindSet(true)) then begin
             TicketCreated := true;
             repeat
                 CreateResponse(TicketReservationRequest, TicketReservationResponse);
@@ -886,7 +886,7 @@
         if (TicketReservationRequest.IsEmpty()) then
             Error(NotFound, TicketReservationRequest.GetFilters());
 
-        TicketReservationRequest.FindSet(false, false);
+        TicketReservationRequest.FindSet(false);
         repeat
             NPRAttributeManagement.SetEntryAttributeValue(TableId, NPRAttributeID."Shortcut Attribute ID", TicketReservationRequest."Entry No.", AttributeValue);
         until (TicketReservationRequest.Next() = 0);

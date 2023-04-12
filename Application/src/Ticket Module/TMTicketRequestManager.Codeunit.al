@@ -103,7 +103,7 @@
         if (not TicketAccessStatistics.FindLast()) then
             TicketAccessStatistics.Init();
 
-        if (TicketReservationRequest.FindSet(true, false)) then begin
+        if (TicketReservationRequest.FindSet(true)) then begin
 
             if (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CONFIRMED) then
                 Error(CHANGE_NOT_ALLOWED);
@@ -113,7 +113,7 @@
                 if (TicketReservationRequest."Entry Type" = TicketReservationRequest."Entry Type"::PRIMARY) then begin
                     Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
 
-                    if (Ticket.FindSet(true, true)) then begin
+                    if (Ticket.FindSet(true)) then begin
                         repeat
 
                             DetailedTicketAccessEntry.SetCurrentKey("Ticket No.");
@@ -178,7 +178,7 @@
             TicketReservationRequest.SetRange("Line No.", POSSalesLineNo);
 
 
-        if (TicketReservationRequest.FindSet(true, false)) then begin
+        if (TicketReservationRequest.FindSet(true)) then begin
             repeat
                 if TicketReservationRequest."Line No." = POSSalesLineNo then begin
                     FindTicketByToken(Ticket, Token, TicketReservationRequest."Admission Code", false, TicketReservationRequest."Ext. Line Reference No.");

@@ -391,7 +391,7 @@
             if (not Confirm(CONFIRM_REVOKE_REQUEST, false, RequestCount)) then
                 Error('');
 
-        TicketReservationRequest.FindSet(true, true);
+        TicketReservationRequest.FindSet(true);
         repeat
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
 
