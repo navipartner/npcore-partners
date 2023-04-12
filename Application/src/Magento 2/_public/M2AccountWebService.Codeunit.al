@@ -666,11 +666,14 @@
     local procedure SetFail(var ImportEntry: Record "NPR Nc Import Entry"; FailMessage: Text; var DocumentSourceOutStream: OutStream)
     var
         ImportHandler: Codeunit "NPR Nc Import Processor";
+        OutStr: OutStream;
     begin
         ImportEntry.Get(ImportEntry."Entry No.");
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
         ImportEntry."Error Message" := CopyStr(FailMessage, 1, MaxStrLen(ImportEntry."Error Message"));
+        ImportEntry."Last Error Message".CreateOutStream(OutStr, TEXTENCODING::UTF8);
+        OutStr.WriteText(FailMessage);
         ImportEntry.Modify();
         ImportHandler.EmitTelemetryData(ImportEntry, FailMessage);
 
