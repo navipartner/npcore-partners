@@ -95,6 +95,12 @@
                     ToolTip = 'Specifies the registration number. Will display on sales documents, receipts etc.';
                     ApplicationArea = NPRRetail;
                 }
+
+                field("Exchange Label EAN Code"; Rec."Exchange Label EAN Code")
+                {
+                    ToolTip = 'Specifies the code that creates EAN Label on this store';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group(Communication)
             {
@@ -137,6 +143,7 @@
                     ToolTip = 'Specifies which General and VAT Posting group this store is using as well as journal definitions etc.';
                     ApplicationArea = NPRRetail;
                 }
+
             }
             group(Reporting)
             {
