@@ -62,12 +62,22 @@
             DataClassification = CustomerContent;
             OptionCaption = ' ,EAN8,EAN13';
             OptionMembers = " ",EAN8,EAN13;
+            trigger OnValidate()
+            begin
+                TestNoSeries(Rec."Item Cross Ref. No. Series (I)");
+                if Rec."Item Cross Ref. No. Series (V)" <> Rec."Item Cross Ref. No. Series (I)" then
+                    TestNoSeries(Rec."Item Cross Ref. No. Series (V)");
+            end;
         }
         field(31; "Item Cross Ref. No. Series (I)"; Code[20])
         {
             Caption = 'Item Reference No. Series (Item)';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
+            trigger OnValidate()
+            begin
+                TestNoSeries(Rec."Item Cross Ref. No. Series (I)");
+            end;
         }
         field(32; "Create Item Cross Ref. auto."; Boolean)
         {
@@ -80,6 +90,10 @@
             Caption = 'Item Reference No. Series (Variant)';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
+            trigger OnValidate()
+            begin
+                TestNoSeries(Rec."Item Cross Ref. No. Series (V)");
+            end;
         }
         field(34; "Item Cross Ref. Description(I)"; Option)
         {
@@ -186,15 +200,13 @@
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.43 [317108]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR Variety Clone Data");
+                EventSubscription.SetRange("Publisher Object ID", Codeunit::"NPR Variety Clone Data");
                 EventSubscription.SetRange("Published Function", 'GetNewVariantCode');
-                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
+                if Page.RunModal(Page::"Event Subscriptions", EventSubscription) <> Action::LookupOK then
                     exit;
 
                 Validate("Create Variant Code From", EventSubscription."Subscriber Function");
-                //+NPR5.43 [317108]
             end;
         }
         field(80; "Custom Descriptions"; Boolean)
@@ -269,6 +281,36 @@
         Rec."Pop up on Purchase Order" := Enable;
         Rec."Pop up on Purch. Return Order" := Enable;
         Rec."Pop up on Transfer Order" := Enable;
+    end;
+
+    local procedure TestNoSeries(NoSeriesCode: Code[20])
+    var
+        NoSeriesManagement: Codeunit NoSeriesManagement;
+        NextNo: Code[20];
+        RequiredLength: Integer;
+        InvalidNoSerieErr: Label 'Number Series %1 generates a value (%2) which does not have the required length (%3) for Barcodetype %4';
+        NonNumericErr: Label 'Number Series %1 generates a value (%2) which is not numerical. This value can''t be used to generate a %3 barcode';
+    begin
+        if NoSeriesCode = '' then
+            exit;
+        if not Rec."Create Item Cross Ref. auto." then
+            exit;
+        if Rec."Barcode Type (Item Cross Ref.)" = Rec."Barcode Type (Item Cross Ref.)"::" " then
+            exit;
+        NextNo := NoSeriesManagement.TryGetNextNo(NoSeriesCode, Today);
+        case Rec."Barcode Type (Item Cross Ref.)" of
+            Rec."Barcode Type (Item Cross Ref.)"::EAN13:
+                RequiredLength := 12;
+            Rec."Barcode Type (Item Cross Ref.)"::EAN8:
+                RequiredLength := 7;
+            else
+                exit;
+        end;
+        if StrLen(DelChr(NextNo, '=', '1234567890')) > 0 then
+            Message(NonNumericErr, NoSeriesCode, NextNo, Rec."Barcode Type (Item Cross Ref.)")
+        else
+            if StrLen(NextNo) <> RequiredLength then
+                Message(InvalidNoSerieErr, NoSeriesCode, NextNo, RequiredLength, Rec."Barcode Type (Item Cross Ref.)");
     end;
 
     var
