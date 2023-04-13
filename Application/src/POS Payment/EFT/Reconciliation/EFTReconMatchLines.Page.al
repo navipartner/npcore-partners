@@ -1,13 +1,13 @@
 ﻿page 6059828 "NPR EFT Recon. Match Lines"
 {
-    Extensible = False;
+    Extensible = false;
     AutoSplitKey = true;
     PageType = ListPart;
     SourceTable = "NPR EFT Rec. Match/Score Line";
     UsageCategory = None;
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -58,7 +58,7 @@
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             action("Test Filter")
             {
@@ -88,10 +88,10 @@
     var
         TempRec: Record "NPR EFT Rec. Match/Score Line" temporary;
     begin
-        TempRec.LineType := TempRec.Linetype::AdditionalScore;
+        TempRec.LineType := TempRec.LineType::AdditionalScore;
         TempRec.Insert(false);
-        Rec.FilterGroup(3);
-        Rec.Copyfilter(LineType, TempRec.LineType);
+        Rec.FilterGroup(4);
+        Rec.CopyFilter(LineType, TempRec.LineType);
         ShowAdditionalScore := not TempRec.IsEmpty;
         Rec.FilterGroup(0);
     end;
