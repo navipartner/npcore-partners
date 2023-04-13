@@ -433,7 +433,9 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
         OK: Boolean;
         EarlierPostingDateErr: Label 'You cannot apply and post an entry to an entry with an earlier posting date.\\Instead, post the document of type %1 with the number %2 and then apply it to the document of type %3 with the number %4.';
         PostingDone: Boolean;
+#IF NOT BC22
         [InDataSet]
+#ENDIF
         HasDocumentAttachment: Boolean;
 
     protected var
@@ -875,14 +877,14 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
         OnBeforeHandledChosenEntries(Type, CurrentAmount, CurrencyCode, PostingDate, AppliedCustLedgEntry, IsHandled);
         if IsHandled then
             exit;
-
+#pragma warning disable AL0667
         if not AppliedCustLedgEntry.FindSet(false, false) then
-            exit;
+#pragma warning restore
 
         repeat
             TempAppliedCustLedgEntry := AppliedCustLedgEntry;
             TempAppliedCustLedgEntry.Insert();
-        until AppliedCustLedgEntry.Next() = 0;
+            until AppliedCustLedgEntry.Next() = 0;
 
         FromZeroGenJnl := (CurrentAmount = 0) and (Type = Type::GenJnlLine);
 
