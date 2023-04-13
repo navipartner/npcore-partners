@@ -68,13 +68,11 @@
     var
         ExchangeLabelSetup: Record "NPR Exchange Label Setup";
         String: Codeunit "NPR String Library";
-        StoreCode: Code[3];
         LabelCode: Code[7];
     begin
         ExchangeLabelSetup.Get();
-
         LabelCode := CopyStr(String.PadStrLeft(ExchangeLabel."No.", 7, '0', false), 1, MaxStrLen(LabelCode));
-        exit(CopyStr(CreateEAN(StoreCode + LabelCode, ExchangeLabelSetup."EAN Prefix Exhange Label"), 1, 13));
+        exit(CopyStr(CreateEAN(LabelCode, ExchangeLabelSetup."EAN Prefix Exhange Label"), 1, 13));
     end;
 
     local procedure GetLabelFromLabelNo(LabelNo: Code[7]; var ExchangeLabel: Record "NPR Exchange Label")
@@ -455,44 +453,60 @@
         //+NPR5.53 [372948]
     end;
 
-    procedure CreateEAN(Unique: Code[25]; Prefix: Code[2]) EAN: Code[20]
+    procedure CreateEAN(Unique: Code[7]; Prefix: Code[2]) EAN: Code[20]
     var
-        ErrEAN: Label 'Check No. is invalid for EAN-No.';
-        ErrLength: Label 'EAN Creation number is too long.';
+        POSStore: Record "NPR POS Store";
         VarietySetup: Record "NPR Variety Setup";
         POSUnit: Record "NPR POS Unit";
-        INVALID_EAN_VALUE: Label 'Only digits are allowed when creating EAN: %1';
         UserSetup: Record "User Setup";
+        AfterPrefix: Code[10];
+        ErrEAN: Label 'Check No. is invalid for EAN-No.';
+        ErrLength: Label 'EAN Creation number is too long.(POS Store Code + Exchange Label prefix should be maximum 5 characters)\\Either you decrease POS Store Code or Exchange Label Prefix characters \\ Or you can complete Exchange Label EAN Code in the POS Store Card ';
+        InvalidExchNoLbl: Label 'Only digits are allowed when creating EAN: %1\\ Please check No. Series numbers used for Exchange Label!';
+        InvalidPrefixLbl: Label 'Only digits are allowed when creating EAN: %1\\ Please check EAN Prefix on Exchange Label Setup';
     begin
+        if StrLen(Unique) > 10 then
+            Error(ErrLength);
+
+        if StrLen(DelChr(LowerCase(Unique), '=', '1234567890')) <> 0 then
+            Error(InvalidExchNoLbl, Unique);
+
+        if StrLen(DelChr(LowerCase(Prefix), '=', '1234567890')) <> 0 then
+            Error(InvalidPrefixLbl, Prefix);
+
         if UserSetup.Get(UserId) then
             if POSUnit.Get(UserSetup."NPR POS Unit No.") then;
+        if POSStore.Get(POSUnit."POS Store Code") then;
 
-        if StrLen(Prefix) + StrLen(POSUnit."POS Store Code") + StrLen(Format(Unique)) > 12 then
-            Error(ErrLength);
+        if (StrLen(Prefix) + StrLen(POSUnit."POS Store Code") + StrLen(Format(Unique)) > 12)
+            or (StrLen(DelChr(LowerCase(POSUnit."POS Store Code"), '=', '1234567890')) <> 0)
+         then
+            if POSStore."Exchange Label EAN Code" = '' then
+                Error(ErrLength);
+
+        if POSStore."Exchange Label EAN Code" <> '' then
+            AfterPrefix := POSStore."Exchange Label EAN Code"
+        else
+            AfterPrefix := POSUnit."POS Store Code";
 
         VarietySetup.Get();
 
-        if StrLen(DelChr(LowerCase(Unique), '=', 'abcdefghijklmnopqrstuvwyz')) <> StrLen(Unique) then
-            Error(INVALID_EAN_VALUE, Unique);
-
-        if StrLen(Unique) <= 10 then begin
-            case Prefix of
-                '':
-                    begin
-                        Prefix := Format(VarietySetup."EAN-Internal");
-                        EAN := CopyStr(Format(Prefix) + PadStr('', 10 - StrLen(Format(Unique)), '0') + Format(Unique), 1, MaxStrLen(EAN));
-                    end;
-                else begin
-                    EAN := CopyStr(Format(Prefix) + Format(POSUnit."POS Store Code") +
-                           PadStr('', 12 - StrLen(Prefix) - (StrLen(POSUnit."POS Store Code") + StrLen(Format(Unique))), '0') + Format(Unique), 1, MaxStrLen(EAN));
+        case Prefix of
+            '':
+                begin
+                    Prefix := Format(VarietySetup."EAN-Internal");
+                    EAN := CopyStr(Format(Prefix) + PadStr('', 10 - StrLen(Format(Unique)), '0') + Format(Unique), 1, MaxStrLen(EAN));
                 end;
-            end;
-            EAN := EAN + Format(StrCheckSum(EAN, '131313131313'));
+            else
+                EAN := CopyStr(Format(Prefix) + Format(AfterPrefix) +
+                           PadStr('', 12 - (StrLen(Prefix) + StrLen(AfterPrefix) + StrLen(Format(Unique))), '0') + Format(Unique), 1, MaxStrLen(EAN));
 
-            if StrCheckSum(EAN, '1313131313131') <> 0 then
-                Error(ErrEAN);
-        end else
-            Error(ErrLength);
+        end;
+        EAN := EAN + Format(StrCheckSum(EAN, '131313131313'));
+
+        if StrCheckSum(EAN, '1313131313131') <> 0 then
+            Error(ErrEAN);
+
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeEndSale', '', true, true)]
