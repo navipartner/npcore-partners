@@ -44,16 +44,16 @@
         ItemVariant.TestField("NPR Blocked", false);
 
         case MRecref.Number of
-            DATABASE::"Item Variant":
+            Database::"Item Variant":
                 begin
                     SetupVariant(Item, TMPVRTBuffer, CopyStr(NewValue, 1, 50));
                 end;
-            DATABASE::"Sales Line":
+            Database::"Sales Line":
                 begin
                     MRecref.SetTable(MasterSalesLine);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupSalesLine(MasterSalesLine, Item, ItemVariant));
                 end;
-            DATABASE::"Purchase Line":
+            Database::"Purchase Line":
                 begin
                     MRecref.SetTable(MasterPurchLine);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupPurchLine(MasterPurchLine, Item, ItemVariant));
@@ -64,23 +64,23 @@
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupPriceListLine(PriceListLine, Item, ItemVariant));
                 end;
 
-            DATABASE::"NPR Retail Journal Line":
+            Database::"NPR Retail Journal Line":
                 begin
                     MRecref.SetTable(MasterRetailJournalLine);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupRetailJournalLine(MasterRetailJournalLine, Item, ItemVariant));
                 end;
 
-            DATABASE::"NPR Item Repl. by Store":
+            Database::"NPR Item Repl. by Store":
                 begin
                     MRecref.SetTable(MasterItemReplenishment);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupItemReplenishment(MasterItemReplenishment, Item, ItemVariant));
                 end;
-            DATABASE::"Transfer Line":
+            Database::"Transfer Line":
                 begin
                     MRecref.SetTable(MasterTransferLine);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupTransferLine(MasterTransferLine, Item, ItemVariant));
                 end;
-            DATABASE::"Item Journal Line":
+            Database::"Item Journal Line":
                 begin
                     MRecref.SetTable(MasterItemJnlLine);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupItemJnlLine(MasterItemJnlLine, Item, ItemVariant));
@@ -186,7 +186,6 @@
         if not CreateVariant then
             exit;
 
-        //IF ItemVariant.GetFromVariety(Item."No.", VRTBuffer."Variety 1 Value",
         if GetFromVariety(ItemVariant, Item."No.", VRTBuffer."Variety 1 Value",
                                      VRTBuffer."Variety 2 Value", VRTBuffer."Variety 3 Value",
                                      VRTBuffer."Variety 4 Value") then
@@ -581,7 +580,8 @@
             InputDialog.SetInput(1, Prefix, Text005);
             InputDialog.SetInput(2, CompNo, Text006);
             InputDialog.LookupMode(true);
-            if InputDialog.RunModal() = ACTION::LookupOK then;
+            if InputDialog.RunModal() <> Action::LookupOK then
+                exit;
             InputDialog.InputCodeValue(1, Prefix);
             InputDialog.InputCodeValue(2, CompNo);
 
@@ -686,7 +686,7 @@
             1:
                 TempVRTTable.FindFirst();
             else
-                if not (PAGE.RunModal(0, TempVRTTable) = ACTION::LookupOK) then
+                if not (Page.RunModal(0, TempVRTTable) = Action::LookupOK) then
                     exit;
         end;
 
@@ -776,7 +776,7 @@
         ReferenceNo: Code[50];
     begin
         InputBarcode.LookupMode := true;
-        if InputBarcode.RunModal() <> ACTION::LookupOK then
+        if InputBarcode.RunModal() <> Action::LookupOK then
             exit;
         ReferenceNo := InputBarcode.GetBarcode();
         if ReferenceNo = '' then
