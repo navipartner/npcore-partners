@@ -350,6 +350,19 @@
             DataClassification = CustomerContent;
             TableRelation = "Responsibility Center";
         }
+        field(5710; "Exchange Label EAN Code"; Code[3])
+        {
+            Caption = 'Exchange Label EAN Code';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                NumericErr: label 'Exchange Label EAN Code field should be numeric';
+            begin
+                if StrLen(DelChr(LowerCase("Exchange Label EAN Code"), '=', '1234567890')) <> 0 then
+                    Error(NumericErr);
+            end;
+        }
     }
 
     keys
