@@ -1,6 +1,6 @@
 ﻿page 6059809 "NPR EFT Reconciliation"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'EFT Reconciliation';
     PageType = Card;
     SourceTable = "NPR EFT Reconciliation";
@@ -8,7 +8,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(General)
             {
@@ -179,7 +179,7 @@
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             group(ImportActionGroup)
             {
@@ -233,7 +233,7 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     PromotedOnly = true;
-                    RunObject = Page "NPR EFT Recon. Matching";
+                    RunObject = page "NPR EFT Recon. Matching";
                     RunPageLink = "Reconciliation No." = field("No.");
                     RunPageView = sorting("Reconciliation No.", "Line No.");
                     ToolTip = 'Executes the Match Manually action';
@@ -261,7 +261,7 @@
                 }
             }
         }
-        area(navigation)
+        area(Navigation)
         {
             group(Handlers)
             {
@@ -271,7 +271,7 @@
                     ApplicationArea = NPRRetail;
                     Caption = 'Import Handlers';
                     Image = Import;
-                    RunObject = Page "NPR EFT Recon. Subscribers";
+                    RunObject = page "NPR EFT Recon. Subscribers";
                     RunPageLink = "Provider Code" = field("Provider Code");
                     RunPageView = sorting("Provider Code", Type, "Subscriber Codeunit ID", "Subscriber Function")
                                   where(Type = const(Import));
@@ -282,12 +282,39 @@
                     ApplicationArea = NPRRetail;
                     Caption = 'Matching Handlers';
                     Image = Reconcile;
-                    RunObject = Page "NPR EFT Recon. Subscribers";
+                    RunObject = page "NPR EFT Recon. Subscribers";
                     RunPageLink = "Provider Code" = field("Provider Code");
                     RunPageView = sorting("Provider Code", Type, "Subscriber Codeunit ID", "Subscriber Function")
                                   where(Type = const(Matching));
                     ToolTip = 'Executes the Matching Handlers action';
                 }
+            }
+            group(Setup)
+            {
+                Caption = 'Match and Score Setup';
+                action(MatchingSetup)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Match';
+                    Image = SuggestReconciliationLines;
+                    RunObject = page "NPR EFT Recon. Match List";
+                    RunPageLink = "Provider Code" = field("Provider Code");
+                    RunPageView = sorting(Type, "Provider Code", ID)
+                                  where(Type = const(Match));
+                    ToolTip = 'Shows the list of matching entries';
+                }
+                action(ScoreSetup)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Score';
+                    Image = Setup;
+                    RunObject = page "NPR EFT Recon. Match List";
+                    RunPageLink = "Provider Code" = field("Provider Code");
+                    RunPageView = sorting(Type, "Provider Code", ID)
+                                  where(Type = const(Score));
+                    ToolTip = 'Shows the list of score entries';
+                }
+
             }
         }
     }
@@ -300,6 +327,27 @@
     trigger OnOpenPage()
     begin
         AllowEdit := true;
+    end;
+
+    trigger OnNewRecord(BelowxRec: Boolean)
+    var
+        EFTReconProvider: Record "NPR EFT Recon. Provider";
+        MinValue: Code[20];
+        MaxValue: Code[20];
+    begin
+        if Rec.GetFilter("Provider Code") <> '' then
+            if TryGetFilterProviderCodeRange(MinValue, MaxValue) then
+                if MinValue = MaxValue then
+                    if EFTReconProvider.Get(MinValue) then
+                        Rec."Provider Code" := MinValue;
+
+    end;
+
+    [TryFunction]
+    local procedure TryGetFilterProviderCodeRange(var MinValue: Code[20]; var MaxValue: Code[20])
+    begin
+        MinValue := Rec.GetRangeMin("Provider Code");
+        MaxValue := Rec.GetRangeMax("Provider Code");
     end;
 
     var
