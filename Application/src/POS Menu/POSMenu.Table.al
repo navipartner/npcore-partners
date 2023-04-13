@@ -76,6 +76,11 @@
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used';
         }
+        field(46; "Created on version"; Text[250])
+        {
+            Caption = 'Created on version';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -110,6 +115,24 @@
         POSMenuButton.SetRange("Menu Code", Code);
         if POSMenuButton.FindFirst() then
             POSMenuButton.DeleteAll();
+    end;
+
+    trigger OnInsert()
+    var
+        CurrentModuleInfo: ModuleInfo;
+    begin
+        NavApp.GetCurrentModuleInfo(CurrentModuleInfo);
+        "Created on version" := Format(CurrentModuleInfo.AppVersion);
+    end;
+
+    internal procedure UseOrdinalForOrdering(): Boolean
+    begin
+        //Start using the ordinal for ordering the menu buttons
+        //Only enforced starting with menus created from version 21 and forward.
+
+        if Rec."Created on version" = '' then
+            exit(false);
+        exit(Version.Create(Rec."Created on version").Minor >= 21);
     end;
 }
 
