@@ -1,18 +1,16 @@
 ﻿page 6059835 "NPR EFT Recon. Match List"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'EFT Recon. Match List';
-    CardPageID = "NPR EFT Recon. Match Card";
+    CardPageId = "NPR EFT Recon. Match Card";
     Editable = false;
     PageType = List;
     SourceTable = "NPR EFT Recon. Match/Score";
     SourceTableView = sorting(Type, "Provider Code", ID);
-    UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
-
+    UsageCategory = None;
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -91,7 +89,7 @@
             ShowMatch := true;
             ShowScore := true;
         end else begin
-            Rec.Copyfilter(Type, TempRec.Type);
+            Rec.CopyFilter(Type, TempRec.Type);
             ShowMatch := TempRec.IsEmpty;
             ShowScore := not ShowMatch;
         end;

@@ -1,6 +1,6 @@
 ﻿page 6059824 "NPR EFT Recon. Match Card"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'EFT Recon. Match Card';
     PageType = Card;
     SourceTable = "NPR EFT Recon. Match/Score";
@@ -8,7 +8,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(General)
             {
@@ -30,6 +30,7 @@
                 group(Control6014410)
                 {
                     Visible = Rec.Type = Rec.Type::Match;
+                    ShowCaption = false;
                     field(SequenceNo; Rec."Sequence No.")
                     {
                         ApplicationArea = NPRRetail;
@@ -39,6 +40,7 @@
                 group(Control6014411)
                 {
                     Visible = Rec.Type = Rec.Type::Score;
+                    ShowCaption = false;
                     field(Score; Rec.Score)
                     {
                         ApplicationArea = NPRRetail;
@@ -76,7 +78,7 @@
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             action("Copy Lines")
             {

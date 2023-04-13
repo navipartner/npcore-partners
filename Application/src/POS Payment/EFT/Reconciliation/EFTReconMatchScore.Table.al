@@ -3,7 +3,7 @@
     Access = Internal;
     Caption = 'EFT Recon. Match/Score';
     DataClassification = CustomerContent;
-
+    LookupPageId = "NPR EFT Recon. Match List";
     fields
     {
         field(1; Type; Option)
@@ -33,6 +33,7 @@
         {
             Caption = 'Enabled';
             DataClassification = CustomerContent;
+            InitValue = true;
         }
         field(60; "Sequence No."; Integer)
         {

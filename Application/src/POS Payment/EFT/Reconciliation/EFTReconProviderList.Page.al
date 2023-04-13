@@ -1,9 +1,9 @@
 ﻿page 6059837 "NPR EFT Recon. Provider List"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'EFT Recon. Provider List';
     ContextSensitiveHelpPage = 'retail/eft/howto/reconciliation.html';
-    CardPageID = "NPR EFT Recon. Provider Card";
+    CardPageId = "NPR EFT Recon. Provider Card";
     Editable = false;
     PageType = List;
     SourceTable = "NPR EFT Recon. Provider";
@@ -12,7 +12,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -32,8 +32,20 @@
 
     actions
     {
-        area(navigation)
+        area(Navigation)
         {
+            action(ReconciliationList)
+            {
+                Caption = 'Reconciliations';
+                ApplicationArea = NPRRetail;
+                Image = Reconcile;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                RunObject = page "NPR EFT Reconciliation List";
+                RunPageLink = "Provider Code" = field(Code);
+                ToolTip = 'View or create Reconciliations for this Provider';
+            }
             group(Handlers)
             {
                 Caption = 'Handlers';
@@ -42,7 +54,7 @@
                     ApplicationArea = NPRRetail;
                     Caption = 'Import Handlers';
                     Image = Import;
-                    RunObject = Page "NPR EFT Recon. Subscribers";
+                    RunObject = page "NPR EFT Recon. Subscribers";
                     RunPageLink = "Provider Code" = field(Code);
                     RunPageView = sorting("Provider Code", Type, "Subscriber Codeunit ID", "Subscriber Function")
                                   where(Type = const(Import));
@@ -53,12 +65,39 @@
                     ApplicationArea = NPRRetail;
                     Caption = 'Matching Handlers';
                     Image = Reconcile;
-                    RunObject = Page "NPR EFT Recon. Subscribers";
+                    RunObject = page "NPR EFT Recon. Subscribers";
                     RunPageLink = "Provider Code" = field(Code);
                     RunPageView = sorting("Provider Code", Type, "Subscriber Codeunit ID", "Subscriber Function")
                                   where(Type = const(Matching));
                     ToolTip = 'Executes the Matching Handlers action';
                 }
+            }
+            group(Setup)
+            {
+                Caption = 'Match and Score Setup';
+                action(MatchingSetup)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Match';
+                    Image = SuggestReconciliationLines;
+                    RunObject = page "NPR EFT Recon. Match List";
+                    RunPageLink = "Provider Code" = field(Code);
+                    RunPageView = sorting(Type, "Provider Code", ID)
+                                  where(Type = const(Match));
+                    ToolTip = 'Shows the list of matching entries';
+                }
+                action(ScoreSetup)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Score';
+                    Image = Setup;
+                    RunObject = page "NPR EFT Recon. Match List";
+                    RunPageLink = "Provider Code" = field(Code);
+                    RunPageView = sorting(Type, "Provider Code", ID)
+                                  where(Type = const(Score));
+                    ToolTip = 'Shows the list of score entries';
+                }
+
             }
         }
     }

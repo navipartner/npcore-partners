@@ -1,15 +1,14 @@
 ﻿page 6059838 "NPR EFT Recon. Subscribers"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'EFT Recon. Subscribers';
     PageType = List;
     SourceTable = "NPR EFT Recon. Subscriber";
-    UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
