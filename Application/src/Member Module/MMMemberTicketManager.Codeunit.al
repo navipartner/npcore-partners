@@ -332,7 +332,7 @@
                             TicketReservationRequest.SetCurrentKey("Session Token ID");
                             TicketReservationRequest.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
                             TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::CONFIRMED);
-                            if (TicketReservationRequest.Count() = 1) then
+                            if (not TicketReservationRequest.IsEmpty()) then // Something is "paid" on this request - admission could be blank and could be determined by pos unit later.
                                 TicketIsReused := AttemptTicket.AttemptValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, PosUnitNo, ErrorReason); // Reuse existing ticket (if possible)
                         end;
             until ((Ticket.Next() = 0) or (TicketIsReused));

@@ -1155,11 +1155,17 @@
 
         TicketBom.SetFilter("Item No.", '=%1', ItemNo);
         TicketBom.SetFilter("Variant Code", '=%1', VariantCode);
-        TicketBom.FindSet();
+        TicketBom.SetFilter(Default, '=%1', true);
+        if (TicketBom.FindSet()) then
+            repeat
+                POS_AppendToReservationRequest(Token, SalesReceiptNo, SalesLineNo, ItemNo, VariantCode, TicketBom."Admission Code", Quantity, 0, ExternalMemberNo, 0);
+            until (TicketBom.Next() = 0);
 
-        repeat
-            POS_AppendToReservationRequest(Token, SalesReceiptNo, SalesLineNo, ItemNo, VariantCode, TicketBom."Admission Code", Quantity, 0, ExternalMemberNo, 0);
-        until (TicketBom.Next() = 0);
+        TicketBom.SetFilter(Default, '=%1', false);
+        if (TicketBom.FindSet()) then
+            repeat
+                POS_AppendToReservationRequest(Token, SalesReceiptNo, SalesLineNo, ItemNo, VariantCode, TicketBom."Admission Code", Quantity, 0, ExternalMemberNo, 0);
+            until (TicketBom.Next() = 0);
 
         exit(Token);
     end;
