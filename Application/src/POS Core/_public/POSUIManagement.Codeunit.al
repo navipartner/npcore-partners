@@ -103,7 +103,11 @@
         POSSession.DebugWithTimestamp('Initializing menu [' + Menu.Code + ']');
         InitializeMenuObject(Menu, MenuObj);
 
-        MenuButton.SetCurrentKey("Menu Code", "Parent ID", Blocked, "Register No.");
+        if (CurrentClientType() = ClientType::Phone) and (Menu.UseOrdinalForOrdering()) then
+            MenuButton.SetCurrentKey("Menu Code", Ordinal)
+        else
+            MenuButton.SetCurrentKey("Menu Code", "Parent ID", Blocked, "Register No.");
+        
         MenuButton.SetRange("Menu Code", Menu.Code);
         MenuButton.SetRange("Parent ID", 0);
         MenuButton.SetRange(Blocked, false);
