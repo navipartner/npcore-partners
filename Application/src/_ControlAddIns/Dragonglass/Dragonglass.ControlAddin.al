@@ -1,12 +1,8 @@
 controladdin "NPR Dragonglass"
 {
     Scripts =
-        'src/_ControlAddins/Dragonglass/Scripts/jquery-2.1.1.min.js',
-        'src/_ControlAddins/Dragonglass/Scripts/bundle.js';
-
-    Images =
-        // Bundle - exclude from production builds
-        'src/_ControlAddins/Dragonglass/Scripts/bundle.js.map';
+        'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js',
+        'https://dragonglass.azureedge.net/release/1.0.0/bundle.js';
 
     RequestedHeight = 1;
     RequestedWidth = 1;
