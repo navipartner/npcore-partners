@@ -38,7 +38,6 @@
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
         CustLedgEntry: Record "Cust. Ledger Entry";
-        POSApplyCustomerEntries: Page "NPR POS Apply Cust. Entries";
         AppliesToID: Code[50];
         Confirmed: Boolean;
         AppliesToIDLbl: Label '%1-%2', Locked = true;
@@ -59,11 +58,8 @@
         CustLedgEntry.SetRange(Open, true);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS."Buffer ID" := AppliesToID;
-        POSApplyCustomerEntries.SetPOSSaleLine(SalePOS, SaleLinePOS, SaleLinePOS.FieldNo("Buffer ID"));
-        POSApplyCustomerEntries.SetRecord(CustLedgEntry);
-        POSApplyCustomerEntries.SetTableView(CustLedgEntry);
-        POSApplyCustomerEntries.LookupMode(true);
-        Confirmed := POSApplyCustomerEntries.RunModal() = ACTION::LookupOK;
+
+        Confirmed := SelectCustLedgerEntry(SalePOS, SaleLinePOS, SaleLinePOS.FieldNo("Buffer ID"), CustLedgEntry);
 
         CustLedgEntry.Reset();
         CustLedgEntry.SetCurrentKey("Customer No.", "Applies-to ID", Open);
@@ -86,7 +82,9 @@
         until CustLedgEntry.Next() = 0;
     end;
 
-    procedure BalanceDocument(var POSSession: Codeunit "NPR POS Session"; DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20]; Silent: Boolean; CopyDesc: Boolean)
+    procedure BalanceDocument(var POSSession: Codeunit "NPR POS Session"; DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20];
+                                                  Silent: Boolean;
+                                                  CopyDesc: Boolean)
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
         POSSale: Codeunit "NPR POS Sale";
@@ -249,5 +247,25 @@
             end;
         until SaleLinePOS.Next() = 0;
         Commit();
+    end;
+
+    local procedure SelectCustLedgerEntry(SalePOSIn: Record "NPR POS Sale"; NewSaleLinePOS: Record "NPR POS Sale Line"; ApplnTypeSelect: Integer; var CustLedgEntry: Record "Cust. Ledger Entry"): Boolean
+    var
+        POSApplyCustomerEntries: Page "NPR POS Apply Cust. Entries";
+        MPOSApplyCustEntries: Page "NPR MPOS Apply Cust. Entries";
+    begin
+        if CurrentClientType = ClientType::Phone then begin
+            MPOSApplyCustEntries.SetPOSSaleLine(SalePOSIn, NewSaleLinePOS, ApplnTypeSelect);
+            MPOSApplyCustEntries.SetRecord(CustLedgEntry);
+            MPOSApplyCustEntries.SetTableView(CustLedgEntry);
+            MPOSApplyCustEntries.LookupMode(true);
+            exit(MPOSApplyCustEntries.RunModal() = ACTION::LookupOK);
+        end else begin
+            POSApplyCustomerEntries.SetPOSSaleLine(SalePOSIn, NewSaleLinePOS, ApplnTypeSelect);
+            POSApplyCustomerEntries.SetRecord(CustLedgEntry);
+            POSApplyCustomerEntries.SetTableView(CustLedgEntry);
+            POSApplyCustomerEntries.LookupMode(true);
+            exit(POSApplyCustomerEntries.RunModal() = ACTION::LookupOK);
+        end;
     end;
 }
