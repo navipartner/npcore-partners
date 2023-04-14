@@ -388,7 +388,6 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
         if not POSPrintBuffer."Hide HRI" then
             AddStringToBuffer(POSPrintBuffer.Text);
         LineFeed();
-        SelectJustification(0);
     end;
 
     local procedure PrintBitmapFromKeyword(Keyword: Text)
@@ -425,19 +424,20 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
     procedure PrintText(var POSPrintBuffer: Record "NPR RP Print Buffer")
     var
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
-        JustificationSet: Boolean;
     begin
         if POSPrintBuffer.Bold then TurnExphasizedModeOnOff(1);
         if POSPrintBuffer.UnderLine then TurnUnderlineModeOnOff(1);
         if POSPrintBuffer.DoubleStrike then TurnDoubleStrikeModeOnOff(1);
         if POSPrintBuffer.Align = POSPrintBuffer.Align::Center then begin
-            if LinePrintMgt.GetColumnCount(POSPrintBuffer) = 1 then begin
+            if LinePrintMgt.GetColumnCount(POSPrintBuffer) = 1 then
                 //Allow centering single lines via printer logic, but anything else, i.e. two, three, four columns is handled via space padding as printer alignment is for the entire line.
-                SelectJustification(1);
-                JustificationSet := true;
-            end;
-        end;
-
+                SelectJustification(1)
+            else
+                // Notes in documentation: https://www.epson-biz.com/modules/ref_escpos/index.php?content_id=58 states that we must have this in the beginning of the line when in Standard mode.
+                SelectJustification(0);
+        end else
+            // Notes in documentation: https://www.epson-biz.com/modules/ref_escpos/index.php?content_id=58 states that we must have this in the beginning of the line when in Standard mode.
+            SelectJustification(0);
 
         SetFontFace(POSPrintBuffer.Font);
         AddStringToBuffer(POSPrintBuffer.Text);
@@ -445,10 +445,6 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
         if POSPrintBuffer.Bold then TurnExphasizedModeOnOff(0);
         if POSPrintBuffer.UnderLine then TurnUnderlineModeOnOff(0);
         if POSPrintBuffer.DoubleStrike then TurnDoubleStrikeModeOnOff(0);
-        if JustificationSet then begin
-            SelectJustification(0);
-            JustificationSet := false;
-        end
     end;
 
     procedure SetCharacterCodeForCodepage(Codepage: Integer)
