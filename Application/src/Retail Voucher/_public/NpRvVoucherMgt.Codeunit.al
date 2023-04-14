@@ -1575,6 +1575,77 @@
         VoucherTypeCode := CopyStr(VoucherType, 1, MaxStrLen(VoucherTypeCode));
     end;
 
+    local procedure GenerateVoucherWithReference(VoucherType: Record "NPR NpRv Voucher Type"; var Voucher: Record "NPR NpRv Voucher"; ReferenceNo: Text[50])
+    var
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+        DuplicateReferenceNoErr: Label 'System could not generate a unique reference number for voucher %1 (voucher type %2).', Comment = '%1 - voucher number, %2 - voucher type';
+    begin
+        Voucher.Init();
+        Voucher."No." := '';
+        Voucher.Validate("Voucher Type", VoucherType.Code);
+        if VoucherType."No. Series" <> '' then
+            NoSeriesMgt.InitSeries(Voucher."No. Series", '', 0D, Voucher."No.", Voucher."No. Series");
+
+        if not CheckReferenceNoHasNotBeenUsedBefore(Voucher."No.", ReferenceNo) then
+            Error(DuplicateReferenceNoErr, Voucher."No.", VoucherType.Code);
+
+        Voucher."Reference No." := ReferenceNo;
+        Voucher.Description := CopyStr(Voucher."Reference No." + ' ' + VoucherType.Description, 1, MaxStrLen(Voucher.Description));
+        Voucher.Insert();
+    end;
+
+    procedure IssueVoucher(VoucherTypeCode: Code[20]; ReferenceNo: Text[50]; VoucherAmount: Decimal)
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        VoucherType.Get(VoucherTypeCode);
+        CheckVoucherTypeQty(VoucherType.Code);
+
+        GenerateVoucherWithReference(VoucherType, Voucher, ReferenceNo);
+
+        PostIssueVoucherEntry(Voucher, VoucherAmount, VoucherType);
+    end;
+
+    procedure IssueVouchers(VoucherTypeCode: Code[20]; VoucherQty: Integer; VoucherAmount: Decimal)
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        i: Integer;
+    begin
+
+        NpRvVoucherType.Get(VoucherTypeCode);
+        for i := 1 to VoucherQty do begin
+            Clear(Voucher);
+            GenerateTempVoucher(NpRvVoucherType, Voucher);
+            Voucher.Insert();
+            PostIssueVoucherEntry(Voucher, VoucherAmount, NpRvVoucherType);
+        end;
+    end;
+
+    local procedure PostIssueVoucherEntry(Voucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal; VoucherType: Record "NPR NpRv Voucher Type")
+    var
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+    begin
+        VoucherEntry.Init();
+        VoucherEntry."Entry No." := 0;
+        VoucherEntry."Voucher No." := Voucher."No.";
+        VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Issue Voucher";
+        VoucherEntry."Voucher Type" := Voucher."Voucher Type";
+        VoucherEntry.Amount := VoucherAmount;
+        VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
+        VoucherEntry.Positive := VoucherEntry.Amount > 0;
+        VoucherEntry."Posting Date" := DT2Date(Voucher."Starting Date");
+        VoucherEntry.Open := VoucherEntry.Amount <> 0;
+        VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
+        VoucherEntry."Partner Code" := VoucherType."Partner Code";
+        VoucherEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(VoucherEntry."User ID"));
+        VoucherEntry."Closed by Entry No." := 0;
+        VoucherEntry.Insert();
+
+        ApplyEntry(VoucherEntry);
+    end;
+
 
     #region V3
     internal procedure ApplyPayment(POSSession: Codeunit "NPR POS Session"; NpRvSalesLine: Record "NPR NpRv Sales Line"; EndSale: Boolean; var ActionContext: JsonObject)

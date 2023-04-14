@@ -106,6 +106,71 @@
         Assert.AreEqual(VoucherCount, NpRvVoucher.Count(), 'Count of issued vouchers not according to test scenario.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithReferenceNumberAndAmount()
+    // [SCENARIO] Issue Voucher with amount and reference number
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
+        Assert: Codeunit "Assert";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        VoucherAmount: Decimal;
+        ReferenceNo: Text[50];
+    begin
+        Initialize();
+        // [GIVEN] Voucher Amount and Reference number
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+        ReferenceNo := GetRandomVoucherReferenceNo();
+
+        // [WHEN] Issue voucher
+        NpRvVoucherMgt.IssueVoucher(_VoucherTypeDefault.Code, ReferenceNo, VoucherAmount);
+
+        // [THEN] Voucher and Voucher Entry should Exist with correct amount
+        NpRvVoucher.SetRange("Reference No.", ReferenceNo);
+        Assert.IsTrue(NpRvVoucher.FindFirst(), 'Voucher exists.');
+
+        NpRvVoucherEntry.SetRange("Entry Type", NpRvVoucherEntry."Entry Type"::"Issue Voucher");
+        NpRvVoucherEntry.SetRange("Voucher No.", NpRvVoucher."No.");
+
+        Assert.IsTrue(NpRvVoucherEntry.FindFirst(), 'Voucher Entry exists.');
+        Assert.AreEqual(VoucherAmount, NpRvVoucherEntry.Amount, 'Voucher Amount not according to test scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVouchersWithQuantityNumberAndAmount()
+    // [SCENARIO] Issue Vouchers with quantity and amount
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
+        Assert: Codeunit "Assert";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        VoucherAmount: Decimal;
+        Quantity: Integer;
+        CountBefore: Integer;
+    begin
+        Initialize();
+        // [GIVEN] Voucher Amount and Quantity
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+        Quantity := GetRandomInteger(100);
+
+        CountBefore := NpRvVoucher.Count();
+
+        // [WHEN] Issue vouchers
+        NpRvVoucherMgt.IssueVouchers(_VoucherTypeDefault.Code, Quantity, VoucherAmount);
+
+        // [THEN] Voucher and Voucher Entry should Exist with correct amount
+        Assert.AreEqual(CountBefore + Quantity, NpRvVoucher.Count(), 'Voucher Count not according to test scenario');
+
+        NpRvVoucher.SetRange("Voucher Type", _VoucherTypeDefault.Code);
+        NpRvVoucher.FindLast();
+        NpRvVoucherEntry.SetRange("Entry Type", NpRvVoucherEntry."Entry Type"::"Issue Voucher");
+        NpRvVoucherEntry.SetRange("Voucher No.", NpRvVoucher."No.");
+
+        Assert.IsTrue(NpRvVoucherEntry.FindFirst(), 'Voucher Entry exists.');
+        Assert.AreEqual(VoucherAmount, NpRvVoucherEntry.Amount, 'Voucher Amount not according to test scenario');
+    end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -1106,6 +1171,22 @@
         POSPaymentMethod.Get(PaymentMethod);
         //Avoid lower limit to be zero for those cases where discount amount is greater then zero
         exit(Round(LibraryRandom.RandDecInRange(100, 10000, LibraryRandom.RandIntInRange(0, 2)), POSPaymentMethod."Rounding Precision"));
+    end;
+
+    local procedure GetRandomVoucherReferenceNo(): Text[50]
+    var
+        LibraryRandom: Codeunit "Library - Random";
+    begin
+        LibraryRandom.Init();
+        exit(LibraryRandom.RandText(50));
+    end;
+
+    local procedure GetRandomInteger(Range: Integer): Integer
+    var
+        LibraryRandom: Codeunit "Library - Random";
+    begin
+        LibraryRandom.Init();
+        exit(LibraryRandom.RandInt(Range));
     end;
 
     local procedure SetMaxVoucherCountOnVoucherType(_VoucherTypePartial: Record "NPR NpRv Voucher Type")
