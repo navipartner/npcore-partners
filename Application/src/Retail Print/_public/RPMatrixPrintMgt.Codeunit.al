@@ -18,31 +18,31 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
     #region Programmatic Printing, instead of user configured.
     internal procedure AddTextField(X: Integer; Y: Integer; Align: Integer; Text: Text)
     begin
-        UpdateField(X, Y, 0, Align, 0, 0, '', CopyStr(Text, 1, 100), false);
+        UpdateField(X, Y, Align, 0, 0, 0, '', CopyStr(Text, 1, 100), false);
     end;
 
     internal procedure AddDecimalField(X: Integer; Y: Integer; Align: Integer; Decimal: Decimal)
     begin
         case DecimalRounding of
             DecimalRounding::"2":
-                UpdateField(X, Y, 0, Align, 0, 0, '', Format(Decimal, 0, '<Precision,2:2><Standard Format,2>'), false);
+                UpdateField(X, Y, Align, 0, 0, 0, '', Format(Decimal, 0, '<Precision,2:2><Standard Format,2>'), false);
             DecimalRounding::"3":
-                UpdateField(X, Y, 0, Align, 0, 0, '', Format(Decimal, 0, '<Precision,3:3><Standard Format,2>'), false);
+                UpdateField(X, Y, Align, 0, 0, 0, '', Format(Decimal, 0, '<Precision,3:3><Standard Format,2>'), false);
             DecimalRounding::"4":
-                UpdateField(X, Y, 0, Align, 0, 0, '', Format(Decimal, 0, '<Precision,4:4><Standard Format,2>'), false);
+                UpdateField(X, Y, Align, 0, 0, 0, '', Format(Decimal, 0, '<Precision,4:4><Standard Format,2>'), false);
             DecimalRounding::"5":
-                UpdateField(X, Y, 0, Align, 0, 0, '', Format(Decimal, 0, '<Precision,5:5><Standard Format,2>'), false);
+                UpdateField(X, Y, Align, 0, 0, 0, '', Format(Decimal, 0, '<Precision,5:5><Standard Format,2>'), false);
         end;
     end;
 
     internal procedure AddDateField(X: Integer; Y: Integer; Align: Integer; Date: Date)
     begin
-        UpdateField(X, Y, 0, Align, 0, 0, '', Format(Date, 0), false);
+        UpdateField(X, Y, Align, 0, 0, 0, '', Format(Date, 0), false);
     end;
 
     internal procedure AddBarcode(BarcodeType: Text[30]; BarcodeValue: Text[30]; BarcodeWidth: Integer; Align: Integer; HideHRI: Boolean)
     begin
-        UpdateField(1, 0, BarcodeWidth, Align, 0, 0, BarcodeType, BarcodeValue, HideHRI);
+        UpdateField(1, 0, Align, BarcodeWidth, 0, 0, BarcodeType, BarcodeValue, HideHRI);
     end;
 
     internal procedure NewLine()
