@@ -1,5 +1,4 @@
 ﻿page 6151255 "NPR Activities"
-
 {
     Extensible = False;
     Caption = 'Sales Activities';
@@ -124,10 +123,10 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Displays the number of the Sales Return Orders. If you click you can drilldown to the list of the Sales Return Orders.';
 
-
                     trigger OnDrillDown()
                     begin
-                        DrillDownSalesOrderList(Rec.FieldNo("Sales Return Orders"));
+                        Page.RunModal(Page::"Sales Return Order List");
+                        CurrPage.Update(false);
                     end;
                 }
             }
@@ -214,8 +213,6 @@
                 SalesHeader.SetRange("Posting Date", WorkDate());
             Rec.FieldNo("Shipped Sales Orders"):
                 SalesHeader.SetRange("Shipped Not Invoiced", true);
-            Rec.FieldNo("Sales Return Orders"):
-                SalesHeader.SetRange("Document Type", "Sales Document Type"::"Return Order");
         end;
         Page.RunModal(Page::"Sales Order List", SalesHeader);
         CurrPage.Update(false);
