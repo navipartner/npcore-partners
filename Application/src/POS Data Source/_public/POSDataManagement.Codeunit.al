@@ -9,11 +9,11 @@
     var
         DataSource: Codeunit "NPR Data Source";
     begin
-        GetDataSource(BuiltInSaleLine(), DataSource, Setup);
+        GetDataSource(POSDataSource_BuiltInSaleLine(), DataSource, Setup);
         View.AddDataSource(DataSource);
-        GetDataSource(BuiltInSale(), DataSource, Setup);
+        GetDataSource(POSDataSource_BuiltInSale(), DataSource, Setup);
         View.AddDataSource(DataSource);
-        GetDataSource(BuiltInPaymentLine(), DataSource, Setup);
+        GetDataSource(POSDataSource_BuiltInPaymentLine(), DataSource, Setup);
         View.AddDataSource(DataSource);
     end;
 
@@ -268,17 +268,17 @@
     begin
     end;
 
-    local procedure BuiltInSale(): Text
+    procedure POSDataSource_BuiltInSale(): Text[50]
     begin
         exit('BUILTIN_SALE');
     end;
 
-    local procedure BuiltInSaleLine(): Text
+    procedure POSDataSource_BuiltInSaleLine(): Text[50]
     begin
         exit('BUILTIN_SALELINE');
     end;
 
-    local procedure BuiltInPaymentLine(): Text
+    procedure POSDataSource_BuiltInPaymentLine(): Text[50]
     begin
         exit('BUILTIN_PAYMENTLINE');
     end;

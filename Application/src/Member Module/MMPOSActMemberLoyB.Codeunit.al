@@ -187,12 +187,6 @@ codeunit 6150955 "NPR MM POS Act: Member Loy. B."
         ActionContext.Add('parameters', WorkflowInvocationParametersOut);
     end;
 
-    local procedure ThisDataSource(): Text
-    begin
-
-        exit('BUILTIN_SALE');
-    end;
-
     local procedure ThisExtension(): Text
     begin
 
@@ -203,9 +197,10 @@ codeunit 6150955 "NPR MM POS Act: Member Loy. B."
     local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     var
         MemberCommunity: Record "NPR MM Member Community";
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
 
-        if ThisDataSource() <> DataSourceName then
+        if POSDataMgt.POSDataSource_BuiltInSale() <> DataSourceName then
             exit;
 
         // disable this extension unless member community is setup with loyalty
@@ -218,9 +213,10 @@ codeunit 6150955 "NPR MM POS Act: Member Loy. B."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', false, false)]
     local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         DataSource.AddColumn('RemainingPoints', 'Remaining Points', DataType::String, false);
@@ -233,6 +229,7 @@ codeunit 6150955 "NPR MM POS Act: Member Loy. B."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         POSSale: Codeunit "NPR POS Sale";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         SalePOS: Record "NPR POS Sale";
@@ -246,7 +243,7 @@ codeunit 6150955 "NPR MM POS Act: Member Loy. B."
         PlaceHolderLbl: Label '%1', Locked = true;
     begin
 
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         RemainingPoints := ' -- ';

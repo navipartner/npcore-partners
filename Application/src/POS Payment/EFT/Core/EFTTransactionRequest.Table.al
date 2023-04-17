@@ -506,7 +506,7 @@
         key(Key1; "Entry No.")
         {
         }
-        key(Key2; "Sales Ticket No.")
+        key(Key2; "Sales Ticket No.", "Sales Line No.")
         {
         }
         key(Key3; "Reference Number Output")
@@ -538,7 +538,6 @@
         if IsNullGuid(Token) then
             Token := CreateGuid();
     end;
-
 
     procedure PrintReceipts(IsReprint: Boolean)
     var
@@ -586,4 +585,3 @@
         exit(Type = "Integration Type");
     end;
 }
-
