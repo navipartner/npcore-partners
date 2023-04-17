@@ -7,6 +7,7 @@
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         CollectInStoreLbl: Label 'Collect in Store';
         DeliverCollectInStoreLbl: Label 'Deliver Collect in Store Documents';
         DeliveryLbl: Label 'Collect %1 %2', Comment = '%1=NpCsDocument."Document Type";%2=NpCsDocument."Reference No."';
@@ -32,7 +33,7 @@
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(DeliverCollectInStoreLbl);
 
-        WorkflowConfig.SetDataSourceBinding('BUILTIN_SALELINE');
+        WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSaleLine());
         WorkflowConfig.SetCustomJavaScriptLogic('enable', 'return row.getField("CollectInStore.ProcessedOrdersExists").rawValue;');
         WorkflowConfig.AddLabel('DocumentInputTitle', CollectInStoreLbl);
         WorkflowConfig.AddLabel('ReferenceNo', EnterCollectRefNoLbl);
@@ -207,9 +208,10 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', false, false)]
     local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
     begin
-        if DataSourceName <> 'BUILTIN_SALE' then
+        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale() then
             exit;
         if ExtensionName <> 'CollectInStore' then
             exit;
@@ -223,11 +225,12 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
     local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         POSMenuMgt: Codeunit "NPR POS Menu Mgt.";
         ProcessedOrdersExists: Boolean;
         LocationFilter: Text;
     begin
-        if DataSourceName <> 'BUILTIN_SALE' then
+        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale() then
             exit;
         if ExtensionName <> 'CollectInStore' then
             exit;

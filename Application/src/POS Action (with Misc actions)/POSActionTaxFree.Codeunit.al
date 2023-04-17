@@ -4,6 +4,7 @@
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         ActionDescriptionLbl: Label 'This is a built-in action for toggling tax free before completing sale';
         ParamOperationOptions: Label 'Sale Toggle,Voucher List,Unit List,Print Last,Consolidate', Locked = true;
         ParamOperationOptions_CaptLbl: Label 'Sale Toggle,Voucher List,Unit List,Print Last,Consolidate';
@@ -20,7 +21,7 @@
             ParamOperationOptions_NameLbl,
             ParamOperationOptions_NameLbl,
             ParamOperationOptions_CaptLbl);
-        WorkflowConfig.SetDataSourceBinding('BUILTIN_SALELINE');
+        WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSaleLine());
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")

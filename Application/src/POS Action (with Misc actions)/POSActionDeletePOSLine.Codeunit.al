@@ -55,10 +55,10 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
 
     internal procedure SetPositionForPOSSaleLine(Context: Codeunit "NPR POS JSON Helper"; var POSSaleLine: Codeunit "NPR POS Sale Line")
     var
-        POSDataDriverSaleLine: Codeunit "NPR POS Data Driver: Sale Line";
+        POSDataMgt: Codeunit "NPR POS Data Management";
         Position: Text;
     begin
-        Position := Context.GetPositionFromDataSource(POSDataDriverSaleLine.GetSourceNameText());
+        Position := Context.GetPositionFromDataSource(POSDataMgt.POSDataSource_BuiltInSaleLine());
         IF Position <> '' then
             POSSaleLine.SetPosition(Position);
     end;

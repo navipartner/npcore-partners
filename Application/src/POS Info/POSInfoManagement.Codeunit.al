@@ -616,16 +616,6 @@
 
 
     #region DataSource Extension
-    local procedure BuiltInSale_DataSource(): Text
-    begin
-        exit('BUILTIN_SALE');
-    end;
-
-    local procedure BuiltInSaleLine_DataSource(): Text
-    begin
-        exit('BUILTIN_SALELINE');
-    end;
-
     local procedure ThisExtension(): Text
     begin
         exit('POS_INFO');
@@ -642,8 +632,9 @@
     local procedure OnDiscoverDataSourceExtension(DataSourceName: Text; Extensions: List of [Text])
     var
         POSInfo: Record "NPR POS Info";
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
-        if not (DataSourceName in [BuiltInSale_DataSource(), BuiltInSaleLine_DataSource()]) then
+        if not (DataSourceName in [POSDataMgt.POSDataSource_BuiltInSale(), POSDataMgt.POSDataSource_BuiltInSaleLine()]) then
             exit;
         POSInfo.SetRange("Available in Front-End", true);
         if POSInfo.IsEmpty then
@@ -656,10 +647,11 @@
     local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         POSInfo: Record "NPR POS Info";
+        POSDataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
         POSInfoLbl: Label 'POS Info: %1', Locked = true;
     begin
-        if not ((DataSourceName in [BuiltInSale_DataSource(), BuiltInSaleLine_DataSource()]) and (ExtensionName = ThisExtension())) then
+        if not ((DataSourceName in [POSDataMgt.POSDataSource_BuiltInSale(), POSDataMgt.POSDataSource_BuiltInSaleLine()]) and (ExtensionName = ThisExtension())) then
             exit;
 
         Handled := true;
@@ -679,9 +671,10 @@
         POSInfoTransaction: Record "NPR POS Info Transaction";
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
+        POSDataMgt: Codeunit "NPR POS Data Management";
         POSSale: Codeunit "NPR POS Sale";
     begin
-        if not ((DataSourceName in [BuiltInSale_DataSource(), BuiltInSaleLine_DataSource()]) and (ExtensionName = ThisExtension())) then
+        if not ((DataSourceName in [POSDataMgt.POSDataSource_BuiltInSale(), POSDataMgt.POSDataSource_BuiltInSaleLine()]) and (ExtensionName = ThisExtension())) then
             exit;
 
         Handled := true;

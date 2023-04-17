@@ -52,18 +52,13 @@ codeunit 6150649 "NPR POS Action Tax Free B."
         exit('TAX_FREE');
     end;
 
-    local procedure ThisDataSource(): Text
-    begin
-
-        exit('BUILTIN_SALE');
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
     local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     var
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
-        if ThisDataSource() <> DataSourceName then
+        if POSDataMgt.POSDataSource_BuiltInSale() <> DataSourceName then
             exit;
 
         if TaxFreeUnit.IsEmpty then //Only activate data extension in companies using tax free.
@@ -75,9 +70,10 @@ codeunit 6150649 "NPR POS Action Tax Free B."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', false, false)]
     local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         DataSource.AddColumn('Status', 'Tax Free Enabled', DataType::String, false);
@@ -89,12 +85,13 @@ codeunit 6150649 "NPR POS Action Tax Free B."
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SalePOS: Record "NPR POS Sale";
+        POSDataMgt: Codeunit "NPR POS Data Management";
         POSSale: Codeunit "NPR POS Sale";
         Caption_Disabled: Label 'Disabled';
         Caption_Enabled: Label 'Enabled';
     begin
 
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         POSSession.GetSale(POSSale);
