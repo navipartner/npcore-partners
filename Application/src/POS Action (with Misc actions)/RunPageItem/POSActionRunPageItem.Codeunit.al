@@ -5,13 +5,14 @@ codeunit 6150847 "NPR POS Action: RunPage (Item)" implements "NPR IPOS Workflow"
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        POSDataMgt: Codeunit "NPR POS Data Management";
         ActionDescription: Label 'This is a built-in action for running a page.';
         ParamPageId_CptLbl: Label 'Page ID';
         ParamPageId_DescLbl: Label 'Specifies a page ID that will be opened';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
-        WorkflowConfig.SetDataSourceBinding('BUILTIN_SALELINE');
+        WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSaleLine());
         WorkflowConfig.SetCustomJavaScriptLogic('enable', 'return row.getField(' + Format(SaleLinePOS.FieldNo("Line Type")) + ').rawValue == 1;');
         WorkflowConfig.AddIntegerParameter('PageId', PAGE::"Item Availability by Location", ParamPageId_CptLbl, ParamPageId_DescLbl);
     end;

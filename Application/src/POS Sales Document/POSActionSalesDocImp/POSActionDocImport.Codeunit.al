@@ -132,11 +132,6 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
         end;
     end;
 
-    local procedure ThisDataSource(): Code[50]
-    begin
-        exit('BUILTIN_SALE');
-    end;
-
     local procedure ThisExtension(): Text
     begin
         exit('SalesDoc');
@@ -144,8 +139,10 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', true, false)]
     local procedure OnDiscoverDataSourceExtension(DataSourceName: Text; Extensions: List of [Text])
+    var
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
-        if ThisDataSource() <> DataSourceName then
+        if POSDataMgt.POSDataSource_BuiltInSale() <> DataSourceName then
             exit;
 
         Extensions.Add(ThisExtension());
@@ -154,9 +151,10 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', true, false)]
     local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;
@@ -167,11 +165,12 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', true, false)]
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         POSMenuMgt: Codeunit "NPR POS Menu Mgt.";
         SalesHeader: Record "Sales Header";
         LocationFilter: Text;
     begin
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;

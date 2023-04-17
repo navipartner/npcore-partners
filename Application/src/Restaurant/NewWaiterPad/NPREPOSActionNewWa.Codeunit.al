@@ -9,6 +9,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa." implements "NPR IPOS Workflow"
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         NPRESeating: Record "NPR NPRE Seating";
+        POSDataMgt: Codeunit "NPR POS Data Management";
         ActionDescription: Label 'This built-in action splits waiter pads (bills). It can be run from both Sale and Restaurant View';
         ParamInputType_OptionLbl: Label 'stringPad,intPad,List', locked = true;
         ParamInputType_CptLbl: Label 'Seating Selection Method';
@@ -32,7 +33,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa." implements "NPR IPOS Workflow"
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
-        WorkflowConfig.SetDataSourceBinding(ThisDataSource());
+        WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSale());
         WorkflowConfig.AddOptionParameter('InputType',
                                         ParamInputType_OptionLbl,
 #pragma warning disable AA0139
@@ -171,11 +172,6 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa." implements "NPR IPOS Workflow"
         exit(ConfirmString);
     end;
 
-    local procedure ThisDataSource(): Code[50]
-    begin
-        exit('BUILTIN_SALE');
-    end;
-
     local procedure ThisExtension(): Text
     begin
         exit('NPRE');
@@ -183,8 +179,10 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa." implements "NPR IPOS Workflow"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', true, false)]
     local procedure OnDiscoverDataSourceExtension(DataSourceName: Text; Extensions: List of [Text])
+    var
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
-        if ThisDataSource() <> DataSourceName then
+        if POSDataMgt.POSDataSource_BuiltInSale() <> DataSourceName then
             exit;
 
         Extensions.Add(ThisExtension());
@@ -193,9 +191,10 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa." implements "NPR IPOS Workflow"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', true, false)]
     local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;
@@ -217,9 +216,10 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa." implements "NPR IPOS Workflow"
         Salesperson: Record "Salesperson/Purchaser";
         Seating: Record "NPR NPRE Seating";
         WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSDataMgt: Codeunit "NPR POS Data Management";
         AssignedWiaterLbl: Label '%1 %2', Locked = true;
     begin
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;

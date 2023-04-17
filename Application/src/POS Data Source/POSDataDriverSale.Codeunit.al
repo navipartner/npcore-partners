@@ -15,7 +15,7 @@
         DataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
     begin
-        if Name <> GetSourceNameText() then
+        if Name <> DataMgt.POSDataSource_BuiltInSale() then
             exit;
 
         DataSource.Constructor();
@@ -54,8 +54,9 @@
     local procedure RefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; var CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Sale: Codeunit "NPR POS Sale";
+        DataMgt: Codeunit "NPR POS Data Management";
     begin
-        if DataSource.Id() <> GetSourceNameText() then
+        if DataSource.Id() <> DataMgt.POSDataSource_BuiltInSale() then
             exit;
 
         POSSession.GetSale(Sale);
@@ -67,8 +68,9 @@
     local procedure SetPosition(DataSource: Text; Position: Text; POSSession: Codeunit "NPR POS Session"; var Handled: Boolean)
     var
         Sale: Codeunit "NPR POS Sale";
+        DataMgt: Codeunit "NPR POS Data Management";
     begin
-        if DataSource <> GetSourceNameText() then
+        if DataSource <> DataMgt.POSDataSource_BuiltInSale() then
             exit;
 
         POSSession.GetSale(Sale);
@@ -80,6 +82,7 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnReadDataSourceVariables', '', false, false)]
     local procedure ReadDataSourceVariables(POSSession: Codeunit "NPR POS Session"; RecRef: RecordRef; DataSource: Text; DataRow: Codeunit "NPR Data Row"; var Handled: Boolean)
     var
+        DataMgt: Codeunit "NPR POS Data Management";
         Sale: Codeunit "NPR POS Sale";
         LastSaleTotal: Decimal;
         LastSalePayment: Decimal;
@@ -94,7 +97,7 @@
         ContactBusinessRelation: Record "Contact Business Relation";
 
     begin
-        if DataSource <> GetSourceNameText() then
+        if DataSource <> DataMgt.POSDataSource_BuiltInSale() then
             exit;
 
         POSSession.GetSale(Sale);
@@ -148,8 +151,9 @@
     local procedure POSDataManagementModified(POSSession: Codeunit "NPR POS Session"; DataSource: Text; var Modified: Boolean)
     var
         Sale: Codeunit "NPR POS Sale";
+        DataMgt: Codeunit "NPR POS Data Management";
     begin
-        if DataSource <> GetSourceNameText() then
+        if DataSource <> DataMgt.POSDataSource_BuiltInSale() then
             exit;
 
         POSSession.GetSale(Sale);
@@ -158,13 +162,10 @@
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Data Source Discovery", 'OnDiscoverDataSource', '', false, false)]
     local procedure OnDiscoverDataSource(var Rec: Record "NPR POS Data Source Discovery")
+    var
+        DataMgt: Codeunit "NPR POS Data Management";
     begin
-        Rec.RegisterDataSource(GetSourceNameText(), '(Built-in data source)');
-    end;
-
-    local procedure GetSourceNameText(): Text[50]
-    begin
-        exit('BUILTIN_SALE');
+        Rec.RegisterDataSource(DataMgt.POSDataSource_BuiltInSale(), '(Built-in data source)');
     end;
 
     local procedure GetLastSaleNoText(): Text

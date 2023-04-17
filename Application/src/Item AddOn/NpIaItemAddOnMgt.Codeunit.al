@@ -75,11 +75,6 @@
         if Rec.Find() then;
     end;
 
-    local procedure BuiltInSaleLine(): Text
-    begin
-        exit('BUILTIN_SALELINE');
-    end;
-
     local procedure DataSourceExtensionName(): Text
     begin
         exit('ItemAddOn');
@@ -87,8 +82,10 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
     local procedure OnDiscover(DataSourceName: Text; Extensions: List of [Text])
+    var
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
-        if DataSourceName <> BuiltInSaleLine() then
+        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSaleLine() then
             exit;
         if not ItemAddOnEnabled() then
             exit;
@@ -99,9 +96,10 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', false, false)]
     local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
     begin
-        if DataSourceName <> BuiltInSaleLine() then
+        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSaleLine() then
             exit;
         if ExtensionName <> DataSourceExtensionName() then
             exit;
@@ -116,8 +114,9 @@
     var
         ItemAddOn: Record "NPR NpIa Item AddOn";
         SaleLinePOS: Record "NPR POS Sale Line";
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
-        if DataSourceName <> BuiltInSaleLine() then
+        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSaleLine() then
             exit;
         if ExtensionName <> DataSourceExtensionName() then
             exit;
@@ -416,7 +415,7 @@
         if NotRequiringComments then
             ItemAddOnLine.SetRange("Comment Enabled", false);
         ItemAddOnLine.SetRange(Type, ItemAddOnLine.Type::Quantity);
-        
+
         ItemAddOnUnit.FilterItemAddOnLine(ItemAddOnLine, ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn);
 
         if ItemAddOnLine.IsEmpty() then
@@ -700,7 +699,7 @@
 
     procedure FilterAttachedItemAddonLines(SaleLinePOS: Record "NPR POS Sale Line"; AppliesToLineNo: Integer; var SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn")
     var
-        ItemAddOn: Codeunit "NPR NpIa Item AddOn";    
+        ItemAddOn: Codeunit "NPR NpIa Item AddOn";
     begin
         Clear(SaleLinePOSAddOn);
         SaleLinePOSAddOn.SetRange("Register No.", SaleLinePOS."Register No.");
@@ -999,7 +998,7 @@
         if FromItemAddOnLine.FindSet() then
             repeat
                 ToItemAddOnLine := FromItemAddOnLine;
-                
+
                 ItemAddOn.CopyItemAddOnLinesToTempBeforeInsert(FromItemAddOnLine, ToItemAddOnLine, IsHandled);
                 if not IsHandled then
                     if not ToItemAddOnLine.Find() then

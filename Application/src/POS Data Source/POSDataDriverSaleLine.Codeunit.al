@@ -1,6 +1,7 @@
 ﻿codeunit 6150712 "NPR POS Data Driver: Sale Line"
 {
     Access = Internal;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSource', '', false, false)]
     local procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
@@ -9,7 +10,7 @@
         DataMgt: Codeunit "NPR POS Data Management";
         ShowPricesIncludingVAT: Boolean;
     begin
-        if Name <> GetSourceNameText() then
+        if Name <> DataMgt.POSDataSource_BuiltInSaleLine() then
             exit;
 
         DataSource.Constructor();
@@ -48,9 +49,10 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnRefreshDataSet', '', false, false)]
     local procedure RefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; var CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        DataMgt: Codeunit "NPR POS Data Management";
         SaleLine: Codeunit "NPR POS Sale Line";
     begin
-        if DataSource.Id() <> GetSourceNameText() then
+        if DataSource.Id() <> DataMgt.POSDataSource_BuiltInSaleLine() then
             exit;
 
         POSSession.GetSaleLine(SaleLine);
@@ -63,8 +65,9 @@
     local procedure OnAfterReadDataSourceRow(POSSession: Codeunit "NPR POS Session"; RecRef: RecordRef; DataSource: Text; DataRow: Codeunit "NPR Data Row")
     var
         SaleLine: Record "NPR POS Sale Line";
+        DataMgt: Codeunit "NPR POS Data Management";
     begin
-        if DataSource <> GetSourceNameText() then
+        if DataSource <> DataMgt.POSDataSource_BuiltInSaleLine() then
             exit;
 
         RecRef.SetTable(SaleLine);
@@ -75,9 +78,10 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnSetPosition', '', false, false)]
     local procedure SetPosition(DataSource: Text; Position: Text; POSSession: Codeunit "NPR POS Session"; var Handled: Boolean)
     var
+        DataMgt: Codeunit "NPR POS Data Management";
         SaleLine: Codeunit "NPR POS Sale Line";
     begin
-        if DataSource <> GetSourceNameText() then
+        if DataSource <> DataMgt.POSDataSource_BuiltInSaleLine() then
             exit;
 
         POSSession.GetSaleLine(SaleLine);
@@ -88,12 +92,9 @@
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Data Source Discovery", 'OnDiscoverDataSource', '', false, false)]
     local procedure OnDiscoverDataSource(var Rec: Record "NPR POS Data Source Discovery")
+    var
+        DataMgt: Codeunit "NPR POS Data Management";
     begin
-        Rec.RegisterDataSource(GetSourceNameText(), '(Built-in data source)');
-    end;
-
-    procedure GetSourceNameText(): Text[50]
-    begin
-        exit('BUILTIN_SALELINE');
+        Rec.RegisterDataSource(DataMgt.POSDataSource_BuiltInSaleLine(), '(Built-in data source)');
     end;
 }

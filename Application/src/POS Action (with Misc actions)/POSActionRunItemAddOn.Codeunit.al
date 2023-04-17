@@ -4,6 +4,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         ActionDescription: Label 'This built-in action inserts Item AddOns for a selected POS Sale Line', MaxLength = 250;
         ParamItemAddOn_CptLbl: Label 'Item AddOn No';
         ParamItemAddOn_DescLbl: Label 'Specifies Item AddOn No. This value will override Item AddOn selected on Item Cards';
@@ -14,7 +15,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddTextParameter('ItemAddOnNo', '', ParamItemAddOn_CptLbl, ParamItemAddOn_DescLbl);
         WorkflowConfig.AddBooleanParameter('SkipItemAvailabilityCheck', false, ParamSkipItemAvailbCheck_CptLbl, ParamSkipItemAvailbCheck_DescLbl);
-        WorkflowConfig.SetDataSourceBinding('BUILTIN_SALELINE');
+        WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSaleLine());
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")

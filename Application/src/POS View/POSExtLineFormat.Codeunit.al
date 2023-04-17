@@ -1,19 +1,23 @@
 ﻿codeunit 6150853 "NPR POS Ext.: Line Format."
 {
     Access = Internal;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
     local procedure OnDiscover(DataSourceName: Text; Extensions: List of [Text])
+    var
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
-        if DataSourceName = 'BUILTIN_SALELINE' then
+        if DataSourceName = POSDataMgt.POSDataSource_BuiltInSaleLine() then
             Extensions.Add('LineFormat');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', false, false)]
     local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> 'BUILTIN_SALELINE') or (ExtensionName <> 'LineFormat') then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSaleLine()) or (ExtensionName <> 'LineFormat') then
             exit;
 
         Handled := true;
@@ -27,11 +31,12 @@
     local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SaleLine: Record "NPR POS Sale Line";
+        POSDataMgt: Codeunit "NPR POS Data Management";
         Color: Text;
         Weight: Text;
         Style: Text;
     begin
-        if (DataSourceName <> 'BUILTIN_SALELINE') or (ExtensionName <> 'LineFormat') then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSaleLine()) or (ExtensionName <> 'LineFormat') then
             exit;
 
         Handled := true;

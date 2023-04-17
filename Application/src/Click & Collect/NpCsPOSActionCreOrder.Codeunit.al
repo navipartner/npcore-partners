@@ -4,6 +4,7 @@
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         ActionDescriptionLbl: Label 'This built-in action create collect order from one to another store.';
         ParamFromStoreCode_OptLbl: Label 'POS Relation,Store Code Parameter,Location Filter Parameter', MaxLength = 250;
         ParamFromStoreCode_NameLbl: Label 'From Store Code';
@@ -35,7 +36,7 @@
         WorkflowConfig.AddTextParameter('locationFilter', '', ParamLocFilter_CptLbl, ParamLocFilter_DescLbl);
         WorkflowConfig.AddDecimalParameter('prepaymentPercent', 0, ParamPrepaymentPercent_CptLbl, ParamPrepaymentPercent_DescLbl);
         WorkflowConfig.AddBooleanParameter('checkCustomerCredit', true, ParamCheckCustomerCredit_CptLbl, ParamCheckCustomerCredit_DescLbl);
-        WorkflowConfig.SetDataSourceBinding('BUILTIN_SALELINE');
+        WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSaleLine());
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; SaleMgr: Codeunit "NPR POS Sale"; SaleLineMgr: Codeunit "NPR POS Sale Line"; PaymentLineMgr: Codeunit "NPR POS Payment Line"; SetupMgr: Codeunit "NPR POS Setup");

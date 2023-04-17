@@ -47,11 +47,6 @@ codeunit 6150656 "NPR POS Act:Chg.Actv.Event BL"
         Job.SetRange("NPR Event", true);
     end;
 
-    local procedure ThisDataSource(): Code[50]
-    begin
-        exit('BUILTIN_SALE');
-    end;
-
     local procedure ThisExtension(): Text
     begin
         exit('ACTIVE_EVENT');
@@ -59,8 +54,10 @@ codeunit 6150656 "NPR POS Act:Chg.Actv.Event BL"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', true, false)]
     local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
+    var
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
-        if ThisDataSource() <> DataSourceName then
+        if POSDataMgt.POSDataSource_BuiltInSale() <> DataSourceName then
             exit;
 
         Extensions.Add(ThisExtension());
@@ -69,9 +66,10 @@ codeunit 6150656 "NPR POS Act:Chg.Actv.Event BL"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', true, false)]
     local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;
@@ -85,9 +83,10 @@ codeunit 6150656 "NPR POS Act:Chg.Actv.Event BL"
     var
         Job: Record Job;
         SalePOS: Record "NPR POS Sale";
+        POSDataMgt: Codeunit "NPR POS Data Management";
         POSSale: Codeunit "NPR POS Sale";
     begin
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;

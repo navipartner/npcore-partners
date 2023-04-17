@@ -1,20 +1,6 @@
 ﻿codeunit 6150732 "NPR POS Data Driver: Dim."
 {
     Access = Internal;
-    // NPR5.44/TSA /20180709 CASE 321303 Initial Version
-    // NPR5.48/MMV /20181105 CASE 334588 Fixed mismatch in event subscriber signature
-    // NPR5.52/ALPO/20190912 CASE 368673 Add dimension values to the data source even if there is no value at the moment
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    local procedure ThisDataSource(): Text
-    begin
-
-        exit('BUILTIN_SALE');
-    end;
 
     local procedure ThisExtension(): Text
     begin
@@ -24,9 +10,11 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
     local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
+    var
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
 
-        if ThisDataSource() <> DataSourceName then
+        if POSDataMgt.POSDataSource_BuiltInSale() <> DataSourceName then
             exit;
 
         Extensions.Add(ThisExtension());
@@ -36,9 +24,10 @@
     local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
 
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;
@@ -71,6 +60,7 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         POSSale: Codeunit "NPR POS Sale";
         Setup: Codeunit "NPR POS Setup";
         DimensionManagement: Codeunit DimensionManagement;
@@ -79,7 +69,7 @@
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
 
-        if (DataSourceName <> ThisDataSource()) or (ExtensionName <> ThisExtension()) then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
             exit;
 
         Handled := true;

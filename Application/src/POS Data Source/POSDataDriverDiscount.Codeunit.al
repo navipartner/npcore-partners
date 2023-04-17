@@ -1,10 +1,6 @@
 ﻿codeunit 6014669 "NPR POS Data Driver: Discount"
 {
     Access = Internal;
-    local procedure ThisDataSource(): Text
-    begin
-        exit('BUILTIN_SALELINE');
-    end;
 
     local procedure ThisExtension(): Text
     begin
@@ -13,8 +9,10 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
     local procedure OnDiscoverDataSourceExtension(DataSourceName: Text; Extensions: List of [Text])
+    var
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
-        if DataSourceName <> ThisDataSource() then
+        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSaleLine() then
             exit;
 
         Extensions.Add(ThisExtension());
@@ -24,9 +22,10 @@
     local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        POSDataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
     begin
-        if not ((DataSourceName = ThisDataSource()) and (ExtensionName = ThisExtension())) then
+        if not ((DataSourceName = POSDataMgt.POSDataSource_BuiltInSaleLine()) and (ExtensionName = ThisExtension())) then
             exit;
 
         Handled := true;
@@ -42,9 +41,10 @@
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        POSDataMgt: Codeunit "NPR POS Data Management";
         Setup: Codeunit "NPR POS Setup";
     begin
-        if not ((DataSourceName = ThisDataSource()) and (ExtensionName = ThisExtension())) then
+        if not ((DataSourceName = POSDataMgt.POSDataSource_BuiltInSaleLine()) and (ExtensionName = ThisExtension())) then
             exit;
 
         Handled := true;

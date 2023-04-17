@@ -5,6 +5,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         NPRESeating: Record "NPR NPRE Seating";
+        POSDataMgt: Codeunit "NPR POS Data Management";
         ActionDescription: Label 'This built-in action saves currently selected items to Waiter Pad and switches to the Restaurant View';
         ConfirmLabelLbl: Label 'Create new waiter pad?';
         ParamInputType_OptLbl: Label 'stringPad,intPad,List', locked = true;
@@ -26,7 +27,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
-        WorkflowConfig.SetDataSourceBinding('BUILTIN_SALELINE');
+        WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSaleLine());
         WorkflowConfig.AddOptionParameter('InputType',
                                           ParamInputType_OptLbl,
 #pragma warning disable AA0139

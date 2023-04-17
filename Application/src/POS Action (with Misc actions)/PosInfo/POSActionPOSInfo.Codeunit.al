@@ -9,6 +9,7 @@ codeunit 6150829 "NPR POS Action: POS Info" implements "NPR IPOS Workflow"
 
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config")
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         ActionDescription: Label 'This built in function assigns a POS info code to POS sale or POS sale line.';
         ParamPOSInfoCode_CptLBl: Label 'POS Info Code';
         ParamPOSInfoCode_DescLbl: Label 'Code of POS info record.';
@@ -35,7 +36,7 @@ codeunit 6150829 "NPR POS Action: POS Info" implements "NPR IPOS Workflow"
                                         ParamApplicationScope_OptionCptLbl);
         WorkflowConfig.AddBooleanParameter('ClearPOSInfo', false, ParamClearPOSInfo_CptLbl, ParamClearPOSInfo_DescLbl);
         WorkflowConfig.AddLabel('ConfirmRetry', StrSubstNo(ConfirmRetryLbl, MustBeSpecifiedLbl, ConfirmRetryQst));
-        WorkflowConfig.SetDataSourceBinding('BUILTIN_SALE');
+        WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSale());
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")

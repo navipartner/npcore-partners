@@ -83,4 +83,69 @@ codeunit 6184474 "NPR POS Action: EFT Trx" implements "NPR POS IPaymentWFHandler
             exit;
         PaymentHandler := GetPaymentHandler();
     end;
+
+    #region POS data driver extension
+    local procedure DataSourceExtensionName(): Text
+    begin
+        exit('EFTRequest');
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
+    local procedure OnDiscover(DataSourceName: Text; Extensions: List of [Text])
+    var
+        POSDataMgt: Codeunit "NPR POS Data Management";
+    begin
+        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInPaymentLine() then
+            exit;
+
+        Extensions.Add(DataSourceExtensionName());
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', false, false)]
+    local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        POSDataMgt: Codeunit "NPR POS Data Management";
+        DataType: Enum "NPR Data Type";
+    begin
+        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInPaymentLine() then
+            exit;
+        if ExtensionName <> DataSourceExtensionName() then
+            exit;
+
+        Handled := true;
+
+        DataSource.AddColumn(EFTTransactionRequest.FieldName("Card Number"), EFTTransactionRequest.FieldCaption("Card Number"), DataType::String, false);
+        DataSource.AddColumn(EFTTransactionRequest.FieldName("Authorisation Number"), EFTTransactionRequest.FieldCaption("Authorisation Number"), DataType::String, false);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
+    local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        PaymentLinePOS: Record "NPR POS Sale Line";
+        POSDataMgt: Codeunit "NPR POS Data Management";
+    begin
+        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInPaymentLine() then
+            exit;
+        if ExtensionName <> DataSourceExtensionName() then
+            exit;
+
+        Handled := true;
+
+        RecRef.SetTable(PaymentLinePOS);
+        FindEftTransactionRequest(PaymentLinePOS, EFTTransactionRequest);
+        DataRow.Fields().Add(EFTTransactionRequest.FieldName("Card Number"), EFTTransactionRequest."Card Number");
+        DataRow.Fields().Add(EFTTransactionRequest.FieldName("Authorisation Number"), EFTTransactionRequest."Authorisation Number");
+    end;
+
+    local procedure FindEftTransactionRequest(PaymentLinePOS: Record "NPR POS Sale Line"; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    begin
+        EftTransactionRequest.SetCurrentKey("Sales Ticket No.", "Sales Line No.");
+        EftTransactionRequest.SetRange("Sales Ticket No.", PaymentLinePOS."Sales Ticket No.");
+        EftTransactionRequest.SetRange("Sales Line No.", PaymentLinePOS."Line No.");
+        if not EftTransactionRequest.FindFirst() then
+            Clear(EftTransactionRequest);
+    end;
+    #endregion POS data driver extension
 }

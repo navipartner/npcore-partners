@@ -1,6 +1,7 @@
 codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'Payment Workflow Dispatcher';

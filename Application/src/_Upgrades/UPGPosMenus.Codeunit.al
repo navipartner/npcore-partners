@@ -164,12 +164,12 @@
     local procedure SetPosMenuPaymentButtonsAutoEnabled()
     var
         PosMenuButton: Record "NPR POS Menu Button";
-        PosDataDriverSaleLine: Codeunit "NPR POS Data Driver: Sale Line";
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
         PosMenuButton.SetRange("Action Type", PosMenuButton."Action Type"::PaymentType);
         PosMenuButton.SetFilter("Action Code", '<>%1', '');
         PosMenuButton.ModifyAll(Enabled, PosMenuButton.Enabled::Auto);
         PosMenuButton.SetRange("Data Source Name", '');
-        PosMenuButton.ModifyAll("Data Source Name", PosDataDriverSaleLine.GetSourceNameText());
+        PosMenuButton.ModifyAll("Data Source Name", POSDataMgt.POSDataSource_BuiltInSaleLine());
     end;
 }

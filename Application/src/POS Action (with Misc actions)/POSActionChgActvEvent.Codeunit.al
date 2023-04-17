@@ -4,6 +4,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event" implements "NPR IPOS Workflow"
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         ActionDescription: Label 'Set an Event Management module event as active for current POS unit and sale';
         ParameterDialogType_OptionNameLbl: Label 'TextField,List', Locked = true;
         ParameterDialogType_OptionCaptionsLbl: Label 'TextField,List';
@@ -24,7 +25,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event" implements "NPR IPOS Workflow"
             ParameterDialogType_OptionCaptionsLbl);
         WorkflowConfig.AddBooleanParameter('ClearEvent', false, ParamClearEvent_NameLbl, ParamClearEvent_NameLbl);
         WorkflowConfig.AddBooleanParameter('OnlyCurrentSale', false, ParamCurrSale_NameLbl, ParamCurrSale_NameLbl);
-        WorkflowConfig.SetDataSourceBinding('BUILTIN_SALE');
+        WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSale());
 
         WorkflowConfig.AddLabel('confirmTitle', EventNoLbl);
     end;

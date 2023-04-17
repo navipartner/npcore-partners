@@ -1,8 +1,10 @@
 ﻿codeunit 6151202 "NPR NpCs POSAction Proc. Order" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         ActionDescriptionLbl: Label 'This built-in action process Collect in Store Orders.';
         ParamLocationFilterLbl: Label 'Location Filter';
         ParamFromLocation_OptLbl: Label 'POS Store,Location Filter Parameter', Locked = true;
@@ -15,7 +17,7 @@
     begin
         WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
         WorkflowConfig.AddJavascript(GetActionScript());
-        WorkflowConfig.SetDataSourceBinding('BUILTIN_SALE');
+        WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSale());
         WorkflowConfig.SetCustomJavaScriptLogic('enable', 'return row.getField("CollectInStore.UnprocessedOrdersExists").rawValue;');
         WorkflowConfig.AddOptionParameter('Location From',
                                           ParamFromLocation_OptLbl,
@@ -163,8 +165,9 @@
     local procedure OnDiscover(DataSourceName: Text; Extensions: List of [Text])
     var
         NpCsStore: Record "NPR NpCs Store";
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
-        if DataSourceName <> 'BUILTIN_SALE' then
+        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale() then
             exit;
         if NpCsStore.IsEmpty then
             exit;
@@ -176,8 +179,9 @@
     local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         DataType: Enum "NPR Data Type";
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
-        if DataSourceName <> 'BUILTIN_SALE' then
+        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale() then
             exit;
         if ExtensionName <> 'CollectInStore' then
             exit;
@@ -191,11 +195,12 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
     local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         POSMenuMgt: Codeunit "NPR POS Menu Mgt.";
         UnprocessedOrdersExists: Boolean;
         LocationFilter: Text;
     begin
-        if DataSourceName <> 'BUILTIN_SALE' then
+        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale() then
             exit;
         if ExtensionName <> 'CollectInStore' then
             exit;

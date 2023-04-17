@@ -346,7 +346,7 @@
     local procedure AssignActionSpecifics()
     var
         POSAction: Record "NPR POS Action";
-        PosDataDriverSaleLine: Codeunit "NPR POS Data Driver: Sale Line";
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
         if ("Action Type" = "Action Type"::Action) then begin
             if POSAction.Get("Action Code") then begin
@@ -365,7 +365,7 @@
         end;
         if "Action Type" = "Action Type"::PaymentType then begin
             Enabled := Enabled::Auto;
-            "Data Source Name" := PosDataDriverSaleLine.GetSourceNameText();
+            "Data Source Name" := POSDataMgt.POSDataSource_BuiltInSaleLine();
         end;
     end;
 
@@ -547,7 +547,7 @@
     local procedure HandleEnabled()
     var
         POSAction: Record "NPR POS Action";
-        PosDataDriverSaleLine: Codeunit "NPR POS Data Driver: Sale Line";
+        POSDataMgt: Codeunit "NPR POS Data Management";
     begin
         if Enabled = Enabled::Auto then begin
             if not ("Action Type" in ["Action Type"::Action, "Action Type"::PaymentType]) then
@@ -560,7 +560,7 @@
                     end;
                 "Action Type"::PaymentType:
                     if "Data Source Name" = '' then
-                        "Data Source Name" := PosDataDriverSaleLine.GetSourceNameText();
+                        "Data Source Name" := POSDataMgt.POSDataSource_BuiltInSaleLine();
             end;
         end;
     end;
