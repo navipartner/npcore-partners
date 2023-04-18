@@ -150,6 +150,7 @@
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
         LineWithPrice: Interface "Line With Price";
         PriceCalculation: Interface "Price Calculation";
+        POSUnit: Record "NPR POS Unit";
     begin
         if (SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item) then
             exit;
@@ -165,6 +166,8 @@
         SalesLine."Posting Date" := SalePOS.Date;
         SalesHeader."Posting Date" := SalePOS.Date;
         SalesHeader."Currency Code" := Currency.Code;
+        POSUnit.Get(SalePOS."Register No.");
+        SalesHeader."NPR POS Pricing Profile" := POSUnit."POS Pricing Profile";
         SalesHeader.UpdateCurrencyFactor();
 
         SalesHeader."Bill-to Customer No." := SalePOS."Customer No.";

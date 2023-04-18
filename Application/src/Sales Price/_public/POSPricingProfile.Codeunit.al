@@ -87,11 +87,20 @@ codeunit 6059945 "NPR POS Pricing Profile"
         if not Rec.Get(POSPricingProfileCode) then
             Rec.Init();
         CustomerDiscGroup := Rec."Customer Disc. Group";
-        CustomerPriceGroup := Rec."Customer Price Group";            
+        CustomerPriceGroup := Rec."Customer Price Group";
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnFindItemPrice(ItemPriceCodeunitId: Integer; ItemPriceFunctionName: Text[250]; SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean)
     begin
-    end;        
+    end;
+
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales Line - Price", 'OnAfterAddSources', '', true, true)]
+    local procedure NPRSalesLinePriceOnAfterAddSources(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; PriceType: Enum "Price Type"; var PriceSourceList: Codeunit "Price Source List")
+    begin
+        if PriceType = PriceType::Sale then begin
+            PriceSourceList.Add("Price Source Type"::"NPR POS Price Profile", SalesHeader."NPR POS Pricing Profile");
+        end;
+    end;
 }
