@@ -108,7 +108,6 @@ report 6014442 "NPR POS Item Sal. Gl. Dim. Set"
     labels
     {
         ReportCaptionLbl = 'POS Item Sales per Global Dimensions Set';
-        DateCaptionLbl = 'Date';
         ItemNoCaptionLbl = 'Item No.';
         DescCaptionLbl = 'Description';
         PageCaptionLbl = 'Page';
@@ -218,7 +217,8 @@ report 6014442 "NPR POS Item Sal. Gl. Dim. Set"
         if (POSEntrySalesLine.GetFilters() <> '') and (FiltersText <> '') then
             FiltersText += ', ' + POSEntrySalesLine.GetFilters()
         else
-            FiltersText := POSEntrySalesLine.GetFilters();
+            if (POSEntrySalesLine.GetFilters() <> '') then
+                FiltersText := POSEntrySalesLine.GetFilters();
     end;
 
     local procedure CreateDimensionsFilterText(var DimensionsFilterText: Text[250])
