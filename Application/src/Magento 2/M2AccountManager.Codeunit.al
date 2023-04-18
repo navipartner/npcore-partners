@@ -602,7 +602,8 @@
                 Contact.SetFilter("NPR Magento Password (Md5)", '<>%1', '');
                 if (not Contact.IsEmpty()) then
                     Error('E-Mail and password does not identify a valid magento contact.');
-                Error('Contact not found.');
+
+                Error('Contact with filters: "%1" not found.', Contact.GetFilters());
             end;
 
             // Attempted to authenticate either using one time password or an existing account.
