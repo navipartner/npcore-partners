@@ -5,7 +5,15 @@ The [GS1 system](https://www.gs1us.org/upcs-barcodes-prefixes/additional-ways-to
 > [!Note]
 > The GS1 system ensures that each coupon number is unique when used within the monetary area of the appropriate GS1 monetary organization.
 
-To create GS1 discount coupons, follow the provided steps:
+To create GS1 discount coupons, make sure the prerequisites are met and follow the provided steps:
+
+## Prerequisites
+
+- Create a G/L account for posting GS1 coupon discounts. This G/L account needs to have direct posting enabled.
+
+   ![gs_1](../images/gs_1_gl_account.PNG)
+
+## Procedure
 
 1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Coupon Types** and choose the related link.         
    The list of all existing coupon types is displayed. 
@@ -55,7 +63,12 @@ To create GS1 discount coupons, follow the provided steps:
 1. Open the POS. 
 2. Scan all the items that the customer wishes to purchase.
 3. Click the button you've previously defined, e.g. **Scan Discount Coupon**.       
-   When the coupon is scanned on the POS, a sales line is inserted with the description and the amount to be deducted on the sale. The coupon entries are then created. 
+4. Scan the coupon barcode.
+   When the coupon is scanned on the POS, a sales line is inserted with the description and the amount to be deducted on the sale. The coupon entries are then created.      
+   > [!Note]
+   > The discount is applied as a new G/L line with a negative amount which is calculated from the barcode.         
+
+   ![new_discount_line](../images/new_discount_line.PNG)
 
 ### Related links
 

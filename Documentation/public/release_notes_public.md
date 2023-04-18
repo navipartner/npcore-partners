@@ -10,11 +10,15 @@ You can now create a G/L account that is used for posting GS1 flat rate discount
 
 For more information and operating instructions, refer to the [GS 1 coupon setup](retail/coupons/howto/gs1_setup.md) article.
 
+> [!Video https://share.synthesia.io/37d76d0e-edaa-4067-9bb4-c9dbbe2a7e3b]
+
 ### MobilePay QR code on customer screen 
 
 Customers can now use the MobilePay app to scan QR codes from the customer screen and purchase goods from a store with their electronic wallet.
 
 For more information, refer to the article on [MobilePay feature usage](retail/posunit/howto/mobile_pay_qr.md).
+
+> [!Video https://share.synthesia.io/37f8bf55-6084-4825-b287-23f5a4d1bee4]
 
 ## Version 19.0 (March 7th 2023)
 
