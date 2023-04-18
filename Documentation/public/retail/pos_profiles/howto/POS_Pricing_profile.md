@@ -17,7 +17,9 @@ Each POS can have different customer price lists, customer discount list, and pr
 
  ![POS_2](../images/POS_matching.png)
 
-## Setting POS Pricing Profile on POS Unit
+## Next steps
+
+### Set POS Pricing Profile on POS Unit
 
 The created POS pricing profile needs to be set on a POS unit for the settings to be applied:
 
@@ -26,6 +28,21 @@ The created POS pricing profile needs to be set on a POS unit for the settings t
 3. Add the created profile in the **POS Pricing Profile** field.
 
 ![POS_3](../images/POS_add.png)
+
+## Configure price list for POS Pricing Profile
+
+If you use **Customer Pricing Group** and **Customer Discount Group** for specifying different prices for different customer groups, you can create specific 
+Sales Price List for the POS Price Profile. 
+
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **Sales Price Lists**, and choose the related link.
+2. Click **New**.
+3. Create a price list with **POS Price Profile** as the **Assign-to Type**.
+
+  ![POS_4](../images/POS_Price_Profile_Sales_Price_List.png)
+
+4. Specify **Price List Lines**.
+5. Activate the **Price List**.
+
 
 ### Related links
 
