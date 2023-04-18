@@ -15,26 +15,23 @@
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code of "POS Info".';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a Short Description for the POS Info code.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Message"; Rec.Message)
                 {
-
-                    ToolTip = 'Specifies the value of the Message field';
+                    ToolTip = 'Specifies the message that you want to be displayed on POS.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Once per Transaction"; Rec."Once per Transaction")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Once per Transaction field';
+                    ToolTip = 'Specifies whether the POS Info code is set to be used per lines or per whole transaction (ticket). If activated, the POS Info will be applied for the whole transaction.';
 
                     trigger OnValidate()
                     begin
@@ -51,24 +48,22 @@
                     field("Copy from Header"; Rec."Copy from Header")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Copy from Header field';
+                        ToolTip = 'If active, and if the POS Info Code is applied to the POS Sale Header, this code will be inherited by all new sales lines.';
                     }
                     field("Set POS Sale Line Color to Red"; Rec."Set POS Sale Line Color to Red")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Set POS Sale Line Color to Red field';
+                        ToolTip = 'If active, and if the POS Info Code is applied to a POS Sales Line, the line will be marked in red color.';
                     }
                 }
                 field("Available in Front-End"; Rec."Available in Front-End")
                 {
-
-                    ToolTip = 'Specifies the value of the Available in Front-End field';
+                    ToolTip = 'If active, the POS Info Codes can be identified and available in the front end via a data source extension. Those POS Info Codes can be displayed on POS Menu Button, as well as on the Sales View Status bar and the Caption Box.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec.Type)
                 {
-
-                    ToolTip = 'Specifies the value of the Type field';
+                    ToolTip = 'Specifies how the POS Info Code is used. Show Message - a predefined message from the Message field is displayed on the POS on calling a customer or Item as information pertaining to that customer/item. Request Data - data needs to be selected from a set or inserted manually, and recorded in the POS Info POS Entry List. Write Default Message - a predefined message from the Message field is selected and recorded in the POS Info POS Entry List.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -86,12 +81,12 @@
                     field("Input Mandatory"; Rec."Input Mandatory")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Input Mandatory field';
+                        ToolTip = 'Specifies that the POS Info Code is imperative. There will be an error if user tries to close the Numpad, list of values or Message Windows on the POS without entering or selecting data.';
                     }
                     field("Input Type"; Rec."Input Type")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Input Type field';
+                        ToolTip = 'If Request Data is the selected method, you need to specify in this field what kind of data you will get. Text - manually input text, where the Message field is left BLANK. SubCode - choose from a list created in the POS Info SubCodes. Table - choose from a set of values from a Business Central.';
 
                         trigger OnValidate()
                         begin
@@ -108,7 +103,7 @@
                         field("Table No."; Rec."Table No.")
                         {
                             ApplicationArea = NPRRetail;
-                            ToolTip = 'Specifies the value of the Table No. field';
+                            ToolTip = 'Specifies the number of the table in which users provide their own list of codes and values.';
                         }
                     }
                 }
