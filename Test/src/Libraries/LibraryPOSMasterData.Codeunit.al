@@ -481,6 +481,7 @@
     end;
 
 
+
     procedure CreateItemForPOSSaleUsage(var Item: Record Item; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store")
     var
         LibraryRandom: Codeunit "Library - Random";
@@ -679,6 +680,48 @@
         POSInfo.Validate(Type, Type);
         POSInfo.Validate(Message, MessageTxt);
         POSInfo.Modify(true);
+    end;
+
+    internal procedure CreatePriceProfile(PriceProfileCode: Code[20])
+    var
+        POSPricingProfile: Record "NPR POS Pricing Profile";
+        CustomerPriceGroup: Record "Customer Price Group";
+        LibrarySales: Codeunit "Library - Sales";
+    begin
+        LibrarySales.CreateCustomerPriceGroup(CustomerPriceGroup);
+        POSPricingProfile.Init();
+        POSPricingProfile.Code := PriceProfileCode;
+        POSPricingProfile."Customer Price Group" := CustomerPriceGroup.Code;
+        POSPricingProfile.Insert()
+    end;
+
+    internal procedure CreatePriceListLine(PriceSourceType: Enum "Price Source Type"; SourceNo: Code[20]; ItemNo: Code[20]; Price: Decimal; VATBusPostingGroup: Code[20])
+    var
+        PriceListHeader: Record "Price List Header";
+        PriceListLine: Record "Price List Line";
+        LibraryPriceCalculation: Codeunit "Library - Price Calculation";
+    begin
+        PriceListHeader.SetRange("Source Type", PriceSourceType);
+        PriceListHeader.SetRange("Source No.", SourceNo);
+        if not PriceListHeader.FindFirst() then
+            LibraryPriceCalculation.CreatePriceHeader(PriceListHeader, Enum::"Price Type"::Sale, PriceSourceType, SourceNo);
+
+        PriceListHeader.Validate("Price Includes VAT", true);
+        PriceListHeader.Validate("VAT Bus. Posting Gr. (Price)", VATBusPostingGroup);
+        PriceListHeader.Modify();
+
+        PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
+        PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
+        PriceListLine.SetRange("Asset No.", ItemNo);
+        if not PriceListLine.FindFirst() then
+            LibraryPriceCalculation.CreatePriceListLine(PriceListLine, PriceListHeader, Enum::"Price Amount Type"::Price, Enum::"Price Asset Type"::Item, ItemNo);
+        PriceListLine."Unit Price" := Price;
+        PriceListLine.Modify();
+
+        if PriceListHeader.Status <> PriceListHeader.Status::Active then begin
+            PriceListHeader.Validate(Status, PriceListHeader.Status::Active);
+            PriceListHeader.Modify();
+        end;
     end;
 
 }

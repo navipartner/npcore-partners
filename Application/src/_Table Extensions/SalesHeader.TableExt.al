@@ -6,19 +6,16 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
         {
             Caption = 'Sales Ticket No.';
             DataClassification = CustomerContent;
-            Description = 'NPR7.100.000';
         }
         field(6014401; "NPR Buy-From Vendor No."; Code[20])
         {
             Caption = 'Buy-from Vendor No.';
             DataClassification = CustomerContent;
-            Description = 'NPR7.100.000';
         }
         field(6014406; "NPR Document Time"; Time)
         {
             Caption = 'Document Time';
             DataClassification = CustomerContent;
-            Description = 'NPR7.100.000';
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used.';
         }
@@ -26,7 +23,6 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
         {
             Caption = 'Bill-to Company (IC)';
             DataClassification = CustomerContent;
-            Description = 'NPR7.100.000';
             TableRelation = Company;
             ObsoleteState = Pending;
             ObsoleteReason = 'Not used.';
@@ -42,7 +38,6 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
         {
             Caption = 'Bill-to E-mail';
             DataClassification = CustomerContent;
-            Description = 'PN1.00';
         }
         field(6014415; "NPR Document Processing"; Option)
         {
@@ -50,7 +45,6 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             ObsoleteReason = 'Document Sending Profile from Customer is used.';
             Caption = 'Document Processing';
             DataClassification = CustomerContent;
-            Description = 'PN1.00';
             OptionCaption = 'Print,E-mail,OIO,Print and E-Mail';
             OptionMembers = Print,Email,OIO,PrintAndEmail;
         }
@@ -58,7 +52,6 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
         {
             Caption = 'Delivery Location';
             DataClassification = CustomerContent;
-            Description = 'PS1.00';
         }
         field(6014421; "NPR Package Code"; Code[20])
         {
@@ -77,7 +70,6 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
         {
             Caption = 'Number of packages';
             DataClassification = CustomerContent;
-            Description = 'NPR7.100.000';
             InitValue = 1;
         }
         field(6014451; "NPR Package Quantity"; Integer)
@@ -99,21 +91,24 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
                                                                    "Document Type" = FIELD("Document Type"),
                                                                    "Document No." = FIELD("No.")));
             Caption = 'Payment Amount';
-            Description = 'MAG2.00';
             Editable = false;
             FieldClass = FlowField;
+        }
+        field(6151401; "NPR POS Pricing Profile"; Code[20])
+        {
+            Caption = 'Price Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Pricing Profile";
         }
         field(6151405; "NPR External Order No."; Code[20])
         {
             Caption = 'External Order No.';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
         }
         field(6151415; "NPR Payment No."; Text[50])
         {
             Caption = 'Payment No.';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
             ObsoleteState = Removed;
             ObsoleteReason = 'Not used.';
         }
