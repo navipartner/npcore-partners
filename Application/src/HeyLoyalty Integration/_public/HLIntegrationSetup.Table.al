@@ -17,6 +17,11 @@ table 6059800 "NPR HL Integration Setup"
         {
             Caption = 'Enable Integration';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                HLIntegrationMgt.SetupTaskProcessingJobQueue("Enable Integration" and "Member Integration");
+            end;
         }
         field(15; "Instant Task Enqueue"; Boolean)
         {
@@ -64,12 +69,18 @@ table 6059800 "NPR HL Integration Setup"
                 if not "Member Integration" then
                     exit;
                 HLDataLogSubscrMgt.CreateDataLogSetup("NPR HL Integration Area"::Members);
+                HLIntegrationMgt.SetupTaskProcessingJobQueue("Enable Integration" and "Member Integration");
                 HLIntegrationMgt.RegisterWebhookListeners();
             end;
         }
         field(50; "Membership HL Field ID"; Text[50])
         {
             Caption = 'Membership HL Field ID';
+            DataClassification = CustomerContent;
+        }
+        field(60; "Read Member Data from Webhook"; Boolean)
+        {
+            Caption = 'Read Member Data from Webhook';
             DataClassification = CustomerContent;
         }
     }
@@ -81,14 +92,6 @@ table 6059800 "NPR HL Integration Setup"
             Clustered = true;
         }
     }
-
-    trigger OnModify()
-    var
-        ReloginRequiredMsg: Label 'You have changed %1. You will have to relogin to the system for the changes to take effect.', Comment = '%1 - tablecaption';
-    begin
-        if Format(Rec) <> Format(xRec) then
-            Message(ReloginRequiredMsg, Rec.TableCaption);
-    end;
 
     procedure GetRecordOnce(ReRead: Boolean)
     begin

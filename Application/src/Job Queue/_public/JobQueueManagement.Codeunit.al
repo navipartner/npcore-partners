@@ -254,8 +254,6 @@
         Handled: Boolean;
         Success: Boolean;
     begin
-        if not TaskScheduler.CanCreateTask() then
-            exit;
         CheckRequiredPermissions();
 
         Clear(JobQueueEntryOut);
@@ -353,6 +351,9 @@
     var
         HasStartDT: Boolean;
     begin
+        if not TaskScheduler.CanCreateTask() then
+            exit;
+
         if JobQueueEntry.Status = JobQueueEntry.Status::"In Process" then
             exit;
 

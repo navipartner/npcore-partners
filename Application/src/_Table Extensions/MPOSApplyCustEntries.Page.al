@@ -877,14 +877,14 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
         OnBeforeHandledChosenEntries(Type, CurrentAmount, CurrencyCode, PostingDate, AppliedCustLedgEntry, IsHandled);
         if IsHandled then
             exit;
-#pragma warning disable AL0667
-        if not AppliedCustLedgEntry.FindSet(false, false) then
-#pragma warning restore
+
+        if not AppliedCustLedgEntry.FindSet() then
+            exit;
 
         repeat
             TempAppliedCustLedgEntry := AppliedCustLedgEntry;
             TempAppliedCustLedgEntry.Insert();
-            until AppliedCustLedgEntry.Next() = 0;
+        until AppliedCustLedgEntry.Next() = 0;
 
         FromZeroGenJnl := (CurrentAmount = 0) and (Type = Type::GenJnlLine);
 

@@ -112,6 +112,7 @@ codeunit 6059997 "NPR HL Send Members"
         end;
 
         AddAttributes(HLMember, NewMember, UrlParametersJObject);
+        AddMultiChoiceFields(HLMember, NewMember, UrlParametersJObject);
 
         HLIntegrationEvents.OnGenerateMemberUrlParameters(HLMember, NewMember, UrlParametersJObject);
     end;
@@ -137,6 +138,42 @@ codeunit 6059997 "NPR HL Send Members"
                     HLIntegrationEvents.OnAfterAddAttributeToUrlParameters(HLMember, NewMember, HLMemberAttribute, UrlParametersJObject);
                 end;
             until NPRAttribute.Next() = 0;
+    end;
+
+    local procedure AddMultiChoiceFields(HLMember: Record "NPR HL HeyLoyalty Member"; NewMember: Boolean; var UrlParametersJObject: JsonObject)
+    var
+        HLMultiChoiceField: Record "NPR HL MultiChoice Field";
+        HLMultiChoiceFldOption: Record "NPR HL MultiChoice Fld Option";
+        HLSelectedMCFOption: Record "NPR HL Selected MCF Option";
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
+        HLMultiChoiceFieldMgt: Codeunit "NPR HL MultiChoice Field Mgt.";
+        HLFieldOptionValueJArray: JsonArray;
+        HLFieldName: Text;
+        HLFieldOptionValueName: Text;
+    begin
+        if HLMultiChoiceField.FindSet() then
+            repeat
+                HLFieldName := HLMappedValueMgt.GetMappedValue(HLMultiChoiceField.RecordId(), HLMultiChoiceField.FieldNo(Description), false);
+                if HLFieldName <> '' then
+                    if HLMultiChoiceFieldMgt.AssignedMCFOptionsExist(HLMember.RecordId(), HLMultiChoiceField.Code, HLSelectedMCFOption) then begin
+                        HLMultiChoiceFieldMgt.MarkAssignedMCFOptions(HLSelectedMCFOption, HLMultiChoiceFldOption);
+                        HLMultiChoiceFldOption.MarkedOnly(true);
+                        HLMultiChoiceFldOption.SetRange("Field Code", HLMultiChoiceField.Code);
+                        HLMultiChoiceFldOption.SetCurrentKey("Field Code", "Sort Order");
+                        if HLMultiChoiceFldOption.FindSet() then begin
+                            Clear(HLFieldOptionValueJArray);
+                            repeat
+                                HLFieldOptionValueName := HLMappedValueMgt.GetMappedValue(HLMultiChoiceFldOption.RecordId(), HLMultiChoiceFldOption.FieldNo(Description), false);
+                                if HLFieldOptionValueName <> '' then begin
+                                    HLFieldOptionValueJArray.Add(HLFieldOptionValueName);
+                                    HLIntegrationEvents.OnAfterAddHLMCFOptionToUrlParameters(HLMember, NewMember, HLFieldName, HLFieldOptionValueName, UrlParametersJObject);
+                                end;
+                            until HLMultiChoiceFldOption.Next() = 0;
+                            if HLFieldOptionValueJArray.Count() > 0 then
+                                UrlParametersJObject.Add(HLFieldName, HLFieldOptionValueJArray);
+                        end;
+                    end;
+            until HLMultiChoiceField.Next() = 0;
     end;
 
     local procedure GenerateUrlQueryStringFromParameterJObject(UrlParametersJObject: JsonObject): Text

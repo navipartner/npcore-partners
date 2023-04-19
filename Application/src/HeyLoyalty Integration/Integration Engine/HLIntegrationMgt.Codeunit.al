@@ -7,7 +7,7 @@ codeunit 6059993 "NPR HL Integration Mgt."
         HLSetup: Record "NPR HL Integration Setup";
         HLIntegrationEvents: Codeunit "NPR HL Integration Events";
 
-    //#if Debug
+#if Debug
     trigger OnRun()
     begin
         InvokeGetHLMemberListRequest();
@@ -21,7 +21,7 @@ codeunit 6059993 "NPR HL Integration Mgt."
         ResponseText := SendHeyLoyaltyRequest(NcTask, 'GET', StrSubstNo('%1/%2', GetHLMembersUrl(), 'c7d9d1e0-4de5-423b-9a3e-6f983a28f542'));
         Message(ResponseText);
     end;
-    //#endif
+#endif
 
     [TryFunction]
     procedure InvokeGetMemberListInfo(var ResponseJToken: JsonToken)
@@ -181,7 +181,16 @@ codeunit 6059993 "NPR HL Integration Mgt."
         WebServiceManagement: Codeunit "Web Service Management";
         ServiceNameTok: Label 'heyloyalty_services', Locked = true, MaxLength = 240;
     begin
-        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR HL HeyLoyalty Webservice", ServiceNameTok, true);
+        //WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR HL HeyLoyalty Webservice", ServiceNameTok, true);
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Page, Page::"NPR API - HL Webhook Requests", ServiceNameTok, true);
+    end;
+
+    procedure SetupTaskProcessingJobQueue(Enable: Boolean)
+    var
+        DummyNcTask: Record "NPR Nc Task";
+    begin
+        if Enable then
+            Codeunit.Run(Codeunit::"NPR HL Schedule Send Tasks", DummyNcTask);
     end;
 
     procedure IsEnabled(IntegrationArea: Enum "NPR HL Integration Area"): Boolean
@@ -194,6 +203,8 @@ codeunit 6059993 "NPR HL Integration Mgt."
             exit(AreaIsEnabled);
 
         HLSetup.GetRecordOnce(false);
+        if not HLSetup."Enable Integration" then
+            exit(false);
         case IntegrationArea of
             IntegrationArea::" ":
                 exit(HLSetup."Enable Integration");
@@ -218,7 +229,8 @@ codeunit 6059993 "NPR HL Integration Mgt."
                         [Database::"NPR MM Member",
                          Database::"NPR MM Membership",
                          Database::"NPR MM Membership Role",
-                         Database::"NPR GDPR Consent Log"];
+                         Database::"NPR GDPR Consent Log",
+                         Database::"NPR HL Selected MCF Option"];
             else
                 TableIsIntegrated := false;
         end;
@@ -234,7 +246,7 @@ codeunit 6059993 "NPR HL Integration Mgt."
 
     procedure ConfirmInstantTaskEnqueue(): Boolean
     var
-        AllowedOnlyInTestEnvMsg: Label 'This mode is not only recommended on live environments, as it may lead to incorrect data being sent to HeyLoyalty.\Are you sure you want to enable it?';
+        AllowedOnlyInTestEnvMsg: Label 'This mode is not recommended on live environments, as it may lead to incorrect data being sent to HeyLoyalty.\Are you sure you want to enable it?';
     begin
         exit(Confirm(AllowedOnlyInTestEnvMsg, false));
     end;
@@ -281,5 +293,11 @@ codeunit 6059993 "NPR HL Integration Mgt."
     begin
         HLSetup.GetRecordOnce(false);
         exit(HLSetup."Membership HL Field ID");
+    end;
+
+    procedure ReadWebhookPayloadEnabled(): Boolean
+    begin
+        HLSetup.GetRecordOnce(false);
+        exit(HLSetup."Read Member Data from Webhook");
     end;
 }

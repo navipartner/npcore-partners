@@ -123,169 +123,96 @@
         DataLogRecord.DeleteAll();
     end;
 
-    internal procedure GetNewRecords(SubscriberCode: Code[30]; ModifySubscriber: Boolean; MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary) NewRecords: Boolean
+    internal procedure GetNewRecords(SubscriberCode: Code[30]; SubscriberCompanyName: Text[30]; ModifySubscriber: Boolean; var MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary) NewRecords: Boolean
     var
         DataLogSubscriber: Record "NPR Data Log Subscriber";
         TempDataLogSubscriber: Record "NPR Data Log Subscriber" temporary;
         RecRef: RecordRef;
+        MaxNoOfRecordsReached: Boolean;
     begin
         RecRef.GetTable(TempDataLogRecord);
-        if not RecRef.IsTemporary then
+        if not RecRef.IsTemporary() then
             exit(false);
+        TempDataLogRecord.Reset();
         TempDataLogRecord.DeleteAll();
         TempDataLogSubscriber.DeleteAll();
 
         Clear(DataLogSubscriber);
         DataLogSubscriber.SetRange(Code, SubscriberCode);
-        DataLogSubscriber.SetFilter("Company Name", '%1|%2', '', CompanyName);
+        if SubscriberCompanyName <> '' then
+            DataLogSubscriber.SetRange("Company Name", SubscriberCompanyName)
+        else
+            DataLogSubscriber.SetFilter("Company Name", '%1|%2', '', CompanyName());
         if not DataLogSubscriber.FindSet() then
             exit(false);
 
         repeat
-            InsertNewTempRecords('', DataLogSubscriber."Table ID", DataLogSubscriber."Last Log Entry No.", MaxRecords, TempDataLogRecord);
+            TempDataLogSubscriber := DataLogSubscriber;
+            MaxNoOfRecordsReached := InsertNewTempRecords(TempDataLogSubscriber, MaxRecords, TempDataLogRecord);
             if ModifySubscriber then begin
-                TempDataLogSubscriber.Init();
-                TempDataLogSubscriber := DataLogSubscriber;
-                TempDataLogSubscriber."Last Date Modified" := CurrentDateTime;
+                TempDataLogSubscriber."Last Date Modified" := CurrentDateTime();
                 TempDataLogSubscriber.Insert();
-                Clear(TempDataLogRecord);
             end;
-        until DataLogSubscriber.Next() = 0;
+        until (DataLogSubscriber.Next() = 0) or MaxNoOfRecordsReached;
 
-        if MaxRecords > 0 then begin
-            if TempDataLogRecord.Count() > MaxRecords then begin
-                if MaxRecords = 1 then
-                    TempDataLogRecord.FindFirst()
-                else begin
-                    TempDataLogRecord.FindSet();
-                    TempDataLogRecord.Next(MaxRecords - 1);
-                end;
-                TempDataLogRecord.SetFilter("Entry No.", '>%1', TempDataLogRecord."Entry No.");
-                TempDataLogRecord.DeleteAll();
-                if TempDataLogSubscriber.FindSet() then
-                    repeat
-                        Clear(TempDataLogRecord);
-                        TempDataLogRecord.SetRange("Table ID", TempDataLogSubscriber."Table ID");
-                        if TempDataLogRecord.FindLast() then;
-                        TempDataLogSubscriber."Last Log Entry No." := TempDataLogRecord."Entry No.";
-                        TempDataLogSubscriber.Modify();
-                    until TempDataLogSubscriber.Next() = 0;
-            end;
-            Clear(TempDataLogRecord);
-        end;
+        if ModifySubscriber then
+            UpdateSubscribers(TempDataLogSubscriber);
 
-        if not ModifySubscriber then
-            exit(TempDataLogRecord.FindSet());
-
-        DataLogSubscriber.FindSet();
-        repeat
-            TempDataLogSubscriber.Get(DataLogSubscriber.Code, DataLogSubscriber."Table ID", DataLogSubscriber."Company Name");
-            if TempDataLogSubscriber."Last Log Entry No." > 0 then begin
-                DataLogSubscriber."Last Log Entry No." := TempDataLogSubscriber."Last Log Entry No.";
-                DataLogSubscriber."Last Date Modified" := TempDataLogSubscriber."Last Date Modified";
-                DataLogSubscriber.Modify(true);
-            end;
-            TempDataLogSubscriber.Delete();
-        until DataLogSubscriber.Next() = 0;
-
-        Clear(TempDataLogRecord);
         exit(TempDataLogRecord.FindSet());
     end;
 
-    internal procedure GetNewRecordsCompany(SubscriberCode: Code[30]; SubscriberCompanyName: Text[30]; ModifySubscriber: Boolean; MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary) NewRecords: Boolean
+    local procedure UpdateSubscribers(var TempDataLogSubscriber: Record "NPR Data Log Subscriber" temporary)
     var
         DataLogSubscriber: Record "NPR Data Log Subscriber";
-        TempDataLogSubscriber: Record "NPR Data Log Subscriber" temporary;
-        RecRef: RecordRef;
     begin
-        RecRef.GetTable(TempDataLogRecord);
-        if not RecRef.IsTemporary then
-            exit(false);
-        TempDataLogRecord.DeleteAll();
-        TempDataLogSubscriber.DeleteAll();
-
-        Clear(DataLogSubscriber);
-        DataLogSubscriber.SetRange(Code, SubscriberCode);
-        DataLogSubscriber.SetRange("Company Name", SubscriberCompanyName);
-        if not DataLogSubscriber.FindSet() then
-            exit(false);
-
-        repeat
-            InsertNewTempRecords(SubscriberCompanyName, DataLogSubscriber."Table ID",
-                                 DataLogSubscriber."Last Log Entry No.", MaxRecords, TempDataLogRecord);
-            if ModifySubscriber then begin
-                TempDataLogSubscriber.Init();
-                TempDataLogSubscriber := DataLogSubscriber;
-                TempDataLogSubscriber."Last Date Modified" := CurrentDateTime;
-                TempDataLogSubscriber.Insert();
-                Clear(TempDataLogRecord);
-            end;
-        until DataLogSubscriber.Next() = 0;
-
-        if MaxRecords > 0 then begin
-            if TempDataLogRecord.Count() > MaxRecords then begin
-                if MaxRecords = 1 then
-                    TempDataLogRecord.FindFirst()
-                else begin
-                    TempDataLogRecord.FindSet();
-                    TempDataLogRecord.Next(MaxRecords - 1);
+        if TempDataLogSubscriber.FindSet() then
+            repeat
+                DataLogSubscriber := TempDataLogSubscriber;
+                DataLogSubscriber.Find();
+                if DataLogSubscriber."Last Log Entry No." < TempDataLogSubscriber."Last Log Entry No." then begin
+                    DataLogSubscriber."Last Log Entry No." := TempDataLogSubscriber."Last Log Entry No.";
+                    DataLogSubscriber."Last Date Modified" := TempDataLogSubscriber."Last Date Modified";
+                    DataLogSubscriber.Modify(true);
                 end;
-                TempDataLogRecord.SetFilter("Entry No.", '>%1', TempDataLogRecord."Entry No.");
-                TempDataLogRecord.DeleteAll();
-                if TempDataLogSubscriber.FindSet() then
-                    repeat
-                        Clear(TempDataLogRecord);
-                        TempDataLogRecord.SetRange("Table ID", TempDataLogSubscriber."Table ID");
-                        if TempDataLogRecord.FindLast() then;
-                        TempDataLogSubscriber."Last Log Entry No." := TempDataLogRecord."Entry No.";
-                        TempDataLogSubscriber.Modify();
-                    until TempDataLogSubscriber.Next() = 0;
-            end;
-            Clear(TempDataLogRecord);
-        end;
-
-        if not ModifySubscriber then
-            exit(TempDataLogRecord.FindSet());
-
-        DataLogSubscriber.FindSet();
-        repeat
-            TempDataLogSubscriber.Get(DataLogSubscriber.Code, DataLogSubscriber."Table ID", DataLogSubscriber."Company Name");
-            if TempDataLogSubscriber."Last Log Entry No." > 0 then begin
-                DataLogSubscriber."Last Log Entry No." := TempDataLogSubscriber."Last Log Entry No.";
-                DataLogSubscriber."Last Date Modified" := TempDataLogSubscriber."Last Date Modified";
-                DataLogSubscriber.Modify(true);
-            end;
-            TempDataLogSubscriber.Delete();
-        until DataLogSubscriber.Next() = 0;
-
-        Clear(TempDataLogRecord);
-        exit(TempDataLogRecord.FindSet());
+            until TempDataLogSubscriber.Next() = 0;
     end;
 
-    local procedure InsertNewTempRecords(SubscriberCompanyName: Text[30]; TableID: Integer; var LastLogEntryNo: BigInteger; MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary)
+    local procedure InsertNewTempRecords(var DataLogSubscriber: Record "NPR Data Log Subscriber"; var MaxRecords: Integer; var TempDataLogRecord: Record "NPR Data Log Record" temporary) MaxNoOfRecordsReached: Boolean
     var
         DataLogRecord: Record "NPR Data Log Record";
+        IncludeBefore: DateTime;
         Counter: Integer;
+        NoMoreRecords: Boolean;
     begin
-        Counter := 0;
         Clear(DataLogRecord);
-        if (CompanyName <> '') and (SubscriberCompanyName <> CompanyName) then
-            if not DataLogRecord.ChangeCompany(SubscriberCompanyName) then
+        if (DataLogSubscriber."Company Name" <> CompanyName()) and (DataLogSubscriber."Company Name" <> '') then
+            if not DataLogRecord.ChangeCompany(DataLogSubscriber."Company Name") then
                 exit;
         DataLogRecord.SetCurrentKey("Table ID");
-        DataLogRecord.SetRange("Table ID", TableID);
-        DataLogRecord.SetFilter("Entry No.", '>%1', LastLogEntryNo);
+        DataLogRecord.SetRange("Table ID", DataLogSubscriber."Table ID");
+        DataLogRecord.SetFilter("Entry No.", '>%1', DataLogSubscriber."Last Log Entry No.");
         if (DataLogRecord.IsEmpty()) then
             exit;
 
+        if DataLogSubscriber."Delayed Data Processing (sec)" > 0 then
+            IncludeBefore := CurrentDateTime() - DataLogSubscriber."Delayed Data Processing (sec)" * 1000
+        else
+            IncludeBefore := 0DT;
+        Counter := 0;
+        NoMoreRecords := false;
+        MaxNoOfRecordsReached := false;
+
         DataLogRecord.FindSet();
-        repeat
+        while not (NoMoreRecords or MaxNoOfRecordsReached or ((IncludeBefore <> 0DT) and (DataLogRecord."Log Date" > IncludeBefore))) do begin
             Counter += 1;
-            TempDataLogRecord.Init();
             TempDataLogRecord := DataLogRecord;
             TempDataLogRecord.Insert();
-            LastLogEntryNo := DataLogRecord."Entry No.";
-        until (DataLogRecord.Next() = 0) or ((MaxRecords > 0) and (Counter >= MaxRecords));
+            DataLogSubscriber."Last Log Entry No." := DataLogRecord."Entry No.";
+            NoMoreRecords := DataLogRecord.Next() = 0;
+            MaxNoOfRecordsReached := (MaxRecords > 0) and (Counter >= MaxRecords);
+        end;
+        if MaxRecords > 0 then
+            MaxRecords -= Counter;
     end;
 
     internal procedure ProcessRecord(DataLogSubscriber: Record "NPR Data Log Subscriber"; DataLogRecord: Record "NPR Data Log Record")

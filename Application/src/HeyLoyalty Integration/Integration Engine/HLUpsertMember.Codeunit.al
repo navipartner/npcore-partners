@@ -13,7 +13,7 @@ codeunit 6060000 "NPR HL Upsert Member"
     var
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
-        HLWSMgt: Codeunit "NPR HL HeyLoyalty WS Mgt.";
+        HLWSMgt: Codeunit "NPR HL Member Webhook Handler";
         MemberMgt: Codeunit "NPR HL Member Mgt.";
     begin
         if not HLMember.Find() or HLMember.Deleted then
@@ -126,6 +126,7 @@ codeunit 6060000 "NPR HL Upsert Member"
         AttributeMgt: Codeunit "NPR HL Attribute Mgt.";
         DataLogMgt: Codeunit "NPR Data Log Management";
         HLIntegrationEvents: Codeunit "NPR HL Integration Events";
+        HLMultiChoiceFieldMgt: Codeunit "NPR HL MultiChoice Field Mgt.";
     begin
         xMember := Member;
 
@@ -144,6 +145,7 @@ codeunit 6060000 "NPR HL Upsert Member"
             Member.Country := HLMember."HL Country Name";
         Member."Store Code" := HLMember."Store Code";
         AttributeMgt.UpdateMemberAttributesFromHLMember(HLMember);
+        HLMultiChoiceFieldMgt.UpdateMemberMCFOptionsFromHLMember(HLMember);
         HLIntegrationEvents.OnUpdateMemberFromHL(HLMember, Member);
 
         if Format(xMember) <> Format(Member) then begin

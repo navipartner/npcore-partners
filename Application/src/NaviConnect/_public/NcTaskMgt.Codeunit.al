@@ -12,6 +12,7 @@
         NaviConnectSetup: Record "NPR Nc Setup";
         DataLogSubScriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         Initialized: Boolean;
+        _DialogIsOpen: Boolean;
         Window: Dialog;
         FindNewData2Txt: Label 'Company: #7#####################################\Finding new Data Log records: @1@@@@@@@@@@@@@@@@\Buffering Data Logs to Tasks: @2@@@@@@@@@@@@@@@@\    Task Quantity:            #5################\Removing Duplicate Tasks:     @3@@@@@@@@@@@@@@@@\    Removed Task Quantity:    #6################\Updating the Task List:       @4@@@@@@@@@@@@@@@@';
 
@@ -76,70 +77,86 @@
     internal procedure UpdateTasks(TaskProcessor: Record "NPR Nc Task Processor")
     var
         TaskProcesLine: Record "NPR Nc Task Proces. Line";
-        TempDataLogRecord: Record "NPR Data Log Record" temporary;
-        TempTask: Record "NPR Nc Task" temporary;
-        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
+        NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
+        MaxNoOfDataLogRecordsToProcess: Integer;
+        RemainingNoOfDataLogRecordsToProcess: Integer;
+        MaxNoOfRecordsReached: Boolean;
+        NoMoreTaskProcessLines: Boolean;
+        SkipProcessing: Boolean;
     begin
-        if TaskProcessor.Code = '' then
-            TaskProcessor.Code := NcSetupMgt.NaviConnectDefaultTaskProcessorCode();
+        NcSyncMgt.UpdateTaskProcessor(TaskProcessor);
         Initialize();
-        Clear(TempDataLogRecord);
-        Clear(TempTask);
-        TempDataLogRecord.DeleteAll();
-        TempTask.DeleteAll();
-        if UseDialog() then
+        if UseDialog(false) then begin
             Window.Open(FindNewDataTxt);
+            _DialogIsOpen := true;
+        end;
+        MaxNoOfDataLogRecordsToProcess := NaviConnectSetup."Max Task Count per Batch";
+        OnBeforeUpdateTasks(TaskProcessor, MaxNoOfDataLogRecordsToProcess, SkipProcessing);
+        if SkipProcessing then
+            exit;
+        RemainingNoOfDataLogRecordsToProcess := MaxNoOfDataLogRecordsToProcess;
+        if RemainingNoOfDataLogRecordsToProcess < 0 then
+            RemainingNoOfDataLogRecordsToProcess := 0;
 
-        if DataLogSubScriberMgt.GetNewRecords(TaskProcessor.Code, true,
-                                              NaviConnectSetup."Max Task Count per Batch", TempDataLogRecord) then begin
-            if UseDialog() then
-                Window.Update(1, 10000);
-            InsertTempTasks(TaskProcessor, '', TempDataLogRecord, TempTask);
-            TempDataLogRecord.DeleteAll();
-            DeleteDuplicates(TaskProcessor, TempTask);
-            InsertTasks(TempTask);
+        if UpdateTasks(TaskProcessor, '', RemainingNoOfDataLogRecordsToProcess, true) then
             Commit();
+
+        if UseDialog(true) then begin
+            Window.Close();
+            _DialogIsOpen := false;
         end;
 
-        if UseDialog() then
-            Window.Close();
-
-        Clear(TempDataLogRecord);
-        Clear(TempTask);
-        TempDataLogRecord.DeleteAll();
-        TempTask.DeleteAll();
+        if MaxNoOfDataLogRecordsToProcess > 0 then
+            MaxNoOfRecordsReached := RemainingNoOfDataLogRecordsToProcess <= 0;
+        if MaxNoOfRecordsReached then
+            exit;
 
         TaskProcesLine.SetRange("Task Processor Code", TaskProcessor.Code);
         TaskProcesLine.SetRange(Type, TaskProcesLine.Type::Company);
         TaskProcesLine.SetRange(Code, TaskProcesLine.DataLogCode());
         TaskProcesLine.SetFilter(Value, '<>%1&<>%2', '', CompanyName);
-        if TaskProcesLine.FindSet() then begin
-            if UseDialog() then
-                Window.Open(FindNewData2Txt);
-            repeat
-                if UseDialog() then
-                    Window.Update(7, TaskProcesLine.Value);
-#pragma warning disable AA0139
-                if DataLogSubScriberMgt.GetNewRecordsCompany(TaskProcessor.Code, TaskProcesLine.Value, true,
-                                                      NaviConnectSetup."Max Task Count per Batch", TempDataLogRecord) then begin
-                    if UseDialog() then
-                        Window.Update(1, 10000);
-                    InsertTempTasks(TaskProcessor, TaskProcesLine.Value, TempDataLogRecord, TempTask);
-#pragma warning restore AA0139
-                    TempDataLogRecord.DeleteAll();
-                    DeleteDuplicates(TaskProcessor, TempTask);
-                    InsertTasks(TempTask);
-                end;
-
-                Clear(TempDataLogRecord);
-                Clear(TempTask);
-                TempDataLogRecord.DeleteAll();
-                TempTask.DeleteAll();
-            until TaskProcesLine.Next() = 0;
-
-            if UseDialog() then
-                Window.Close();
+        if not TaskProcesLine.FindSet() then
+            exit;
+        if UseDialog(false) then begin
+            Window.Open(FindNewData2Txt);
+            _DialogIsOpen := true;
         end;
+        while not (MaxNoOfRecordsReached or NoMoreTaskProcessLines) do begin
+            if UseDialog(true) then
+                Window.Update(7, TaskProcesLine.Value);
+#pragma warning disable AA0139
+            if UpdateTasks(TaskProcessor, TaskProcesLine.Value, RemainingNoOfDataLogRecordsToProcess, true) then
+#pragma warning restore AA0139
+                Commit();
+            if MaxNoOfDataLogRecordsToProcess > 0 then
+                MaxNoOfRecordsReached := RemainingNoOfDataLogRecordsToProcess <= 0;
+            NoMoreTaskProcessLines := TaskProcesLine.Next() = 0;
+        end;
+
+        if UseDialog(true) then begin
+            Window.Close();
+            _DialogIsOpen := false;
+        end;
+    end;
+
+    internal procedure UpdateTasks(TaskProcessor: Record "NPR Nc Task Processor"; ProcessCompanyName: Text[30]; var MaxNoOfDataLogRecordsToProcess: Integer; RemoveDuplicates: Boolean): Boolean
+    var
+        TempDataLogRecord: Record "NPR Data Log Record" temporary;
+        TempTask: Record "NPR Nc Task" temporary;
+        Handled: Boolean;
+        NewTasksInserted: Boolean;
+    begin
+        if not DataLogSubScriberMgt.GetNewRecords(TaskProcessor.Code, ProcessCompanyName, true, MaxNoOfDataLogRecordsToProcess, TempDataLogRecord) then
+            exit(false);
+        OnUpdateTasksOnAfterGetNewSetOfDataLogRecords(TaskProcessor, ProcessCompanyName, TempDataLogRecord, NewTasksInserted, Handled);
+        if Handled then
+            exit(NewTasksInserted);
+        if UseDialog(true) then
+            Window.Update(1, 10000);
+        InsertTempTasks(TaskProcessor, ProcessCompanyName, TempDataLogRecord, TempTask);
+        if RemoveDuplicates then
+            DeleteDuplicates(TaskProcessor, TempTask);
+        exit(InsertTasks(TempTask));
     end;
 
     internal procedure CleanTasks()
@@ -180,7 +197,7 @@
             TaskOutput.DeleteAll();
     end;
 
-    local procedure InsertTasks(var TempTask: Record "NPR Nc Task" temporary)
+    local procedure InsertTasks(var TempTask: Record "NPR Nc Task" temporary): Boolean
     var
         DataLogField: Record "NPR Data Log Field";
         Task: Record "NPR Nc Task";
@@ -188,47 +205,49 @@
         Counter: Integer;
         Total: Integer;
     begin
-        if not TempTask.IsTemporary then
-            exit;
-
+        if not TempTask.IsTemporary() then
+            exit(false);
         Clear(TempTask);
+        if not TempTask.FindSet() then
+            exit(false);
 
-        if UseDialog() then begin
+        if UseDialog(true) then begin
             Counter := 0;
             Total := TempTask.Count();
         end;
 
         DataLogField.SetCurrentKey("Table ID", "Data Log Record Entry No.");
 
-        if TempTask.FindSet() then
-            repeat
-                if UseDialog() then begin
-                    Counter += 1;
-                    Window.Update(4, Round((Counter / Total) * 10000, 1));
-                end;
-                Task.Init();
-                Task := TempTask;
-                Task."Entry No." := 0;
-                Task.Insert(true);
+        repeat
+            if UseDialog(true) then begin
+                Counter += 1;
+                Window.Update(4, Round((Counter / Total) * 10000, 1));
+            end;
+            Task.Init();
+            Task := TempTask;
+            Task."Entry No." := 0;
+            Task.Insert(true);
 
-                DataLogField.SetRange("Table ID", TempTask."Table No.");
-                DataLogField.SetRange("Data Log Record Entry No.", TempTask."Entry No.");
-                if DataLogField.FindSet() then
-                    repeat
-                        DataLogField.CalcFields("Field Name");
-                        TaskField.Init();
-                        TaskField."Entry No." := 0;
-                        TaskField."Field No." := DataLogField."Field No.";
-                        TaskField."Field Name" := DataLogField."Field Name";
-                        TaskField."Previous Value" := DataLogField."Previous Field Value";
-                        TaskField."New Value" := DataLogField."Field Value";
-                        if TempTask.Type in [TempTask.Type::Delete] then
-                            TaskField."Previous Value" := TaskField."New Value";
-                        TaskField."Log Date" := DataLogField."Log Date";
-                        TaskField."Task Entry No." := Task."Entry No.";
-                        TaskField.Insert();
-                    until DataLogField.Next() = 0;
-            until TempTask.Next() = 0;
+            DataLogField.SetRange("Table ID", TempTask."Table No.");
+            DataLogField.SetRange("Data Log Record Entry No.", TempTask."Entry No.");
+            if DataLogField.FindSet() then
+                repeat
+                    DataLogField.CalcFields("Field Name");
+                    TaskField.Init();
+                    TaskField."Entry No." := 0;
+                    TaskField."Field No." := DataLogField."Field No.";
+                    TaskField."Field Name" := DataLogField."Field Name";
+                    TaskField."Previous Value" := DataLogField."Previous Field Value";
+                    TaskField."New Value" := DataLogField."Field Value";
+                    if TempTask.Type in [TempTask.Type::Delete] then
+                        TaskField."Previous Value" := TaskField."New Value";
+                    TaskField."Log Date" := DataLogField."Log Date";
+                    TaskField."Task Entry No." := Task."Entry No.";
+                    TaskField.Insert();
+                until DataLogField.Next() = 0;
+        until TempTask.Next() = 0;
+        TempTask.DeleteAll();
+        exit(true);
     end;
 
     local procedure InsertTempTasks(TaskProcessor: Record "NPR Nc Task Processor"; DataLogCompanyName: Text[30]; var TempDataLogRecord: Record "NPR Data Log Record" temporary; var TempTask: Record "NPR Nc Task" temporary)
@@ -242,68 +261,71 @@
         Counter: Integer;
         Total: Integer;
     begin
-        if not TempTask.IsTemporary then
+        if not TempTask.IsTemporary() then
+            exit;
+        if not TempDataLogRecord.FindSet() then
             exit;
 
         i := 0;
-        if (DataLogCompanyName <> '') and (DataLogCompanyName <> CompanyName) then
+        if (DataLogCompanyName <> '') and (DataLogCompanyName <> CompanyName()) then
             DataLogField.ChangeCompany(DataLogCompanyName);
-        if UseDialog() then begin
+        if UseDialog(true) then begin
             Counter := 0;
             Total := TempDataLogRecord.Count();
         end;
-        if TempDataLogRecord.FindSet() then begin
-            DataLogField.SetCurrentKey("Table ID", "Data Log Record Entry No.");
-            TaskSetup.SetCurrentKey("Task Processor Code", "Table No.", "Codeunit ID");
-            TaskSetup.SetRange("Task Processor Code", TaskProcessor.Code);
-            if TaskSetup.FindSet() then
-                repeat
-                    TempTaskSetup.Init();
-                    TempTaskSetup := TaskSetup;
-                    TempTaskSetup.Insert();
-                until TaskSetup.Next() = 0;
+
+        DataLogField.SetCurrentKey("Table ID", "Data Log Record Entry No.");
+        TaskSetup.SetCurrentKey("Task Processor Code", "Table No.", "Codeunit ID");
+        TaskSetup.SetRange("Task Processor Code", TaskProcessor.Code);
+        if TaskSetup.FindSet() then
             repeat
-                if UseDialog() then begin
-                    Counter += 1;
-                    Window.Update(2, Round((Counter / Total) * 10000, 1));
-                end;
-                TempTaskSetup.SetRange("Table No.", TempDataLogRecord."Table ID");
-                TempTaskSetup.SetFilter("Task Processor Code", '<>%1', '');
-                if TempTaskSetup.FindSet() then
-                    repeat
-                        i += 1;
-                        if UseDialog() then begin
-                            if i mod 10 = 0 then
-                                Window.Update(5, i);
+                TempTaskSetup.Init();
+                TempTaskSetup := TaskSetup;
+                TempTaskSetup.Insert();
+            until TaskSetup.Next() = 0;
+
+        repeat
+            if UseDialog(true) then begin
+                Counter += 1;
+                Window.Update(2, Round((Counter / Total) * 10000, 1));
+            end;
+            TempTaskSetup.SetRange("Table No.", TempDataLogRecord."Table ID");
+            TempTaskSetup.SetFilter("Task Processor Code", '<>%1', '');
+            if TempTaskSetup.FindSet() then
+                repeat
+                    i += 1;
+                    if UseDialog(true) then begin
+                        if i mod 10 = 0 then
+                            Window.Update(5, i);
+                    end;
+                    TempDataLogRecord.CalcFields("Table Name");
+                    if not TempTask.Get(TempDataLogRecord."Entry No.") then begin
+                        TempTask.Init();
+                        TempTask."Entry No." := TempDataLogRecord."Entry No.";
+                        TempTask."Task Processor Code" := TempTaskSetup."Task Processor Code";
+                        case TempDataLogRecord."Type of Change" of
+                            TempDataLogRecord."Type of Change"::Insert:
+                                TempTask.Type := TempTask.Type::Insert;
+                            TempDataLogRecord."Type of Change"::Modify:
+                                TempTask.Type := TempTask.Type::Modify;
+                            TempDataLogRecord."Type of Change"::Delete:
+                                TempTask.Type := TempTask.Type::Delete;
+                            TempDataLogRecord."Type of Change"::Rename:
+                                TempTask.Type := TempTask.Type::Rename;
                         end;
-                        TempDataLogRecord.CalcFields("Table Name");
-                        if not TempTask.Get(TempDataLogRecord."Entry No.") then begin
-                            TempTask.Init();
-                            TempTask."Entry No." := TempDataLogRecord."Entry No.";
-                            TempTask."Task Processor Code" := TempTaskSetup."Task Processor Code";
-                            case TempDataLogRecord."Type of Change" of
-                                TempDataLogRecord."Type of Change"::Insert:
-                                    TempTask.Type := TempTask.Type::Insert;
-                                TempDataLogRecord."Type of Change"::Modify:
-                                    TempTask.Type := TempTask.Type::Modify;
-                                TempDataLogRecord."Type of Change"::Delete:
-                                    TempTask.Type := TempTask.Type::Delete;
-                                TempDataLogRecord."Type of Change"::Rename:
-                                    TempTask.Type := TempTask.Type::Rename;
-                            end;
-                            TempTask."Company Name" := DataLogCompanyName;
-                            TempTask."Table No." := TempDataLogRecord."Table ID";
-                            RecordID := TempDataLogRecord."Record ID";
-                            RecRef := RecordID.GetRecord();
-                            TempTask."Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(TempTask."Record Position"));
-                            TempTask."Record ID" := RecordID;
-                            TempTask."Log Date" := TempDataLogRecord."Log Date";
-                            TempTask."Record Value" := CopyStr(DelStr(Format(RecRef.RecordId), 1, StrLen(RecRef.Name) + 2), 1, MaxStrLen(TempTask."Record Value"));
-                            TempTask.Insert();
-                        end;
-                    until TempTaskSetup.Next() = 0;
-            until TempDataLogRecord.Next() = 0;
-        end;
+                        TempTask."Company Name" := DataLogCompanyName;
+                        TempTask."Table No." := TempDataLogRecord."Table ID";
+                        RecordID := TempDataLogRecord."Record ID";
+                        RecRef := RecordID.GetRecord();
+                        TempTask."Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(TempTask."Record Position"));
+                        TempTask."Record ID" := RecordID;
+                        TempTask."Log Date" := TempDataLogRecord."Log Date";
+                        TempTask."Record Value" := CopyStr(DelStr(Format(RecRef.RecordId()), 1, StrLen(RecRef.Name) + 2), 1, MaxStrLen(TempTask."Record Value"));
+                        TempTask.Insert();
+                    end;
+                until TempTaskSetup.Next() = 0;
+        until TempDataLogRecord.Next() = 0;
+        TempDataLogRecord.DeleteAll();
     end;
 
     local procedure DeleteDuplicates(TaskProcessor: Record "NPR Nc Task Processor"; var TempTask: Record "NPR Nc Task" temporary)
@@ -318,10 +340,10 @@
         Total: Integer;
     begin
         Initialize();
-        if not TempTask.IsTemporary then
+        if not TempTask.IsTemporary() then
             exit;
 
-        if UseDialog() then begin
+        if UseDialog(true) then begin
             Counter := 0;
             Total := TempTask.Count();
         end;
@@ -329,7 +351,7 @@
         Counter2 := 0;
         if TempTask.FindSet() then
             repeat
-                if UseDialog() then begin
+                if UseDialog(true) then begin
                     Counter += 1;
                     Window.Update(3, Round((Counter / Total) * 10000, 1));
                 end;
@@ -347,7 +369,7 @@
                 end;
                 DeleteTempTask := not UniqueTask;
                 if DeleteTempTask then begin
-                    if UseDialog() then begin
+                    if UseDialog(true) then begin
                         Counter2 += 1;
                         if Counter2 mod 10 = 0 then
                             Window.Update(6, Counter2);
@@ -612,6 +634,16 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateTasks(TaskProcessor: Record "NPR Nc Task Processor"; var MaxNoOfDataLogRecordsToProcess: Integer; var SkipProcessing: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateTasksOnAfterGetNewSetOfDataLogRecords(TaskProcessor: Record "NPR Nc Task Processor"; ProcessCompanyName: Text[30]; var TempDataLogRecord: Record "NPR Data Log Record" temporary; var NewTasksInserted: Boolean; var Handled: Boolean)
+    begin
+    end;
+
     procedure Initialize()
     var
         NaviConnectSetupMgt: Codeunit "NPR Nc Setup Mgt.";
@@ -635,9 +667,9 @@
         exit(RecRefExists.Find());
     end;
 
-    local procedure UseDialog(): Boolean
+    local procedure UseDialog(CheckDialogIsOpen: Boolean): Boolean
     begin
-        exit(GuiAllowed);
+        exit(GuiAllowed() and (_DialogIsOpen or not CheckDialogIsOpen));
     end;
 
     internal procedure GetRecordPosition(NcTask: Record "NPR Nc Task") RecordPosition: Text
