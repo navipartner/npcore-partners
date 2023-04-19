@@ -305,7 +305,7 @@
         if not PaymentGateway.Get(Rec."Payment Gateway Code") then
             exit;
 
-        CaptureEnabled := (PaymentGateway."Enable Capture" or (PaymentGateway."Capture Codeunit Id" <> 0));
-        RefundEnabled := (PaymentGateway."Enable Refund" or (PaymentGateway."Refund Codeunit Id" <> 0));
+        CaptureEnabled := PaymentGateway."Enable Capture";
+        RefundEnabled := PaymentGateway."Enable Refund";
     end;
 }

@@ -10,28 +10,9 @@ codeunit 6060068 "NPR PG Try Cancel Payment"
         NotInitializedErr: Label 'Codeunit not initialized. This is a programming error. Contact system vendor.';
 
     trigger OnRun()
-    var
-        PaymentLine: Record "NPR Magento Payment Line";
-        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
-        PaymentGateway: Record "NPR Magento Payment Gateway";
     begin
         if (not _Initialized) then
             Error(NotInitializedErr);
-
-        PaymentGateway.Get(Rec."Payment Gateway Code");
-        if (PaymentGateway."Cancel Codeunit Id" <> 0) then begin
-            PaymentLine := Rec;
-            MagentoPmtMgt.CancelPaymentLineEvents(PaymentLine);
-            Rec := PaymentLine;
-
-            // Unfortunately, the old implementation never really considered 
-            // that a cancel could fail.
-            // Therefore, we simply assume that this always succeeds if we
-            // dit not already throw an error.
-            _Response."Response Success" := true;
-
-            exit;
-        end;
 
         CancelPayment();
     end;
