@@ -675,5 +675,14 @@
         if Rec."Price Log Activated" then
             EnablePriceLog(Rec);
     end;
-}
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshJobQueueEntry()
+    var
+        PriceLogSetup: Record "NPR Retail Price Log Setup";
+    begin
+        if not (PriceLogSetup.Get() and PriceLogSetup."Job Queue Activated") then
+            exit;
+        CreatePriceLogJobQueue('');
+    end;
+}

@@ -134,4 +134,13 @@ codeunit 6150811 "NPR NpCs Task Processor Setup"
         exit(false);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshJobQueueEntry()
+    var
+        NpCsTaskProcessorSetup: Record "NPR NpCs Task Processor Setup";
+    begin
+        if not NpCsTaskProcessorSetup.Get() then
+            exit;
+        InitializeTaskProcessors(NpCsTaskProcessorSetup);
+    end;
 }

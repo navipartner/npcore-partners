@@ -71,8 +71,16 @@
     var
         JobQueueEntry: Record "Job Queue Entry";
     begin
-        if not TaskScheduler.CanCreateTask() then
-            exit;
+        SetupTaskProcessingJobQueue(JobQueueEntry, true);
+        SetupTaskCountResetJobQueue(JobQueueEntry, true);
+        SetupDefaultNcImportListProcessingJobQueue(true);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure AddDefaultNCJobQueues_OnRefreshNPRJobQueueList()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
         SetupTaskProcessingJobQueue(JobQueueEntry, true);
         SetupTaskCountResetJobQueue(JobQueueEntry, true);
         SetupDefaultNcImportListProcessingJobQueue(true);
