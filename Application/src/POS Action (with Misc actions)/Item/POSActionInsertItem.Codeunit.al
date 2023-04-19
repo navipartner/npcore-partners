@@ -218,17 +218,20 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         Msg: Text;
         ActiveSession: Record "Active Session";
         ItemAddedDur: Duration;
+        DurationMs: Integer;
     begin
         if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
             Clear(ActiveSession);
         ItemAddedDur := CurrentDateTime() - StartTime;
+        DurationMs := ItemAddedDur;
+
         LogDict.Add('NPR_Server', ActiveSession."Server Computer Name");
         LogDict.Add('NPR_Instance', ActiveSession."Server Instance Name");
         LogDict.Add('NPR_TenantId', Database.TenantId());
         LogDict.Add('NPR_CompanyName', CompanyName());
         LogDict.Add('NPR_UserID', ActiveSession."User ID");
-        LogDict.Add('NPR_POSInitializationDuration', Format(ItemAddedDur));
-        Msg := StrSubstNo(MsgTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", Format(ItemAddedDur));
+        LogDict.Add('NPR_POSInitializationDuration', Format(DurationMs, 0, 9));
+        Msg := StrSubstNo(MsgTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", Format(DurationMs, 0, 9));
         Session.LogMessage(FinishEventIdTok, 'POS Action Add Item: ' + Msg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, LogDict);
     end;
 
