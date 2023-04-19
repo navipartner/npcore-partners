@@ -128,11 +128,11 @@
     internal procedure UseOrdinalForOrdering(): Boolean
     begin
         //Start using the ordinal for ordering the menu buttons
-        //Only enforced starting with menus created from version 21 and forward.
+        //Only enforced starting with menus created from version 20 and forward.
 
         if Rec."Created on version" = '' then
             exit(false);
-        exit(Version.Create(Rec."Created on version").Minor >= 21);
+        exit(Version.Create(Rec."Created on version").Minor >= 20);
     end;
 }
 
