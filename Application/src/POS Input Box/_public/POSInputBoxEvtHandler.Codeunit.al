@@ -296,6 +296,7 @@
         LogFinishTelem(EanBoxValue, POSAction.Code); //log time after POS Action is found
 
     end;
+
     internal procedure InvokeEanBoxv3(EanBoxValue: Text; POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSAction: Record "NPR POS Action")
     var
         EanBoxSetup: Record "NPR Ean Box Setup";
@@ -317,6 +318,7 @@
 
         InvokePOSActionv3(EanBoxValue, TempEanBoxSetupEvent, POSSession, FrontEnd, POSAction);
     end;
+
     internal procedure InvokePOSActionv3(EanBoxValue: Text; EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var POSAction: Record "NPR POS Action"): Boolean
     begin
         if EanBoxSetupEvent."Action Code" = '' then
@@ -330,6 +332,7 @@
         else
             SetPOSActionParametersV3(EanBoxValue, EanBoxSetupEvent, POSAction);
     end;
+
     internal procedure SetEanParametersToPOSAction(EanBoxValue: Text; var POSAction: Record "NPR POS Action"; EanBoxSetupEvent: Record "NPR Ean Box Setup Event"): Boolean
     begin
         SetPOSActionParametersV3(EanBoxValue, EanBoxSetupEvent, POSAction);
@@ -359,15 +362,16 @@
         ActiveSession: Record "Active Session";
         SelectEanDuration: Duration;
         POSActionDiscovered: Duration;
+        DurationMs: Integer;
     begin
         if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
             Clear(ActiveSession);
 
         POSActionDiscovered := CurrentDateTime() - StartTime;
         SelectEanDuration := SelectEanEndTime - SelectEanStartTime;
-
         if SelectEanDuration <> 0 then
             POSActionDiscovered := POSActionDiscovered - SelectEanDuration;
+        DurationMs := POSActionDiscovered;
 
         LogDict.Add('NPR_Server', ActiveSession."Server Computer Name");
         LogDict.Add('NPR_Instance', ActiveSession."Server Instance Name");
@@ -375,10 +379,10 @@
         LogDict.Add('NPR_CompanyName', CompanyName());
         LogDict.Add('NPR_UserID', ActiveSession."User ID");
         LogDict.Add('NPR_ScannedValue', ScannedValue);
-        LogDict.Add('NPR_DurationMs', Format(POSActionDiscovered));
+        LogDict.Add('NPR_DurationMs', Format(DurationMs, 0, 9));
         LogDict.Add('NPR_SelectEanDurationMs', Format(SelectEanDuration));
         LogDict.add('NPR_ActionCode', POSActionCode);
-        Msg := StrSubstNo(MsgTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", POSActionCode, Format(POSActionDiscovered));
+        Msg := StrSubstNo(MsgTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", POSActionCode, Format(DurationMs, 0, 9));
 
         Session.LogMessage(FinishEventIdTok, 'EanBoxScanned: ' + Msg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, LogDict);
     end;
