@@ -714,11 +714,10 @@
         if (not PaymentGateway.Get(PaymentLine."Payment Gateway Code")) then
             exit;
 
-        if (not PaymentGateway."Enable Capture") and (PaymentGateway."Capture Codeunit Id" = 0) then
+        if (not PaymentGateway."Enable Capture") then
             exit;
 
-        if (PaymentGateway."Capture Codeunit Id" = 0) then
-            PaymentGateway.EnsureIntegrationTypeSelected();
+        PaymentGateway.EnsureIntegrationTypeSelected();
 
         Commit();
         Clear(MagentPmtMgt);
@@ -728,12 +727,6 @@
             if ErrorText <> '' then
                 Message(Text000, CopyStr(ErrorText, 1, 900));
         end;
-    end;
-
-    [IntegrationEvent(false, false)]
-    [Obsolete('Moving payment gateway to interface. Implement "NPR IPaymentGateway" and extend "NPR PG Integrations" enum instead.')]
-    local procedure CapturePaymentEvent(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
-    begin
     end;
 
     internal procedure CaptureSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -751,14 +744,6 @@
             repeat
                 CapturePaymentLine(PaymentLine);
             until PaymentLine.Next() = 0;
-    end;
-
-    internal procedure CapturePaymentLineEvents(var PaymentLine: Record "NPR Magento Payment Line")
-    var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
-    begin
-        PaymentGateway.Get(PaymentLine."Payment Gateway Code");
-        CapturePaymentEvent(PaymentGateway, PaymentLine);
     end;
     #endregion
 
@@ -806,11 +791,10 @@
         if (not PaymentGateway.Get(PaymentLine."Payment Gateway Code")) then
             exit;
 
-        if (not PaymentGateway."Enable Refund") and (PaymentGateway."Refund Codeunit Id" = 0) then
+        if (not PaymentGateway."Enable Refund") then
             exit;
 
-        if (PaymentGateway."Refund Codeunit Id" = 0) then
-            PaymentGateway.EnsureIntegrationTypeSelected();
+        PaymentGateway.EnsureIntegrationTypeSelected();
 
         Commit();
         Clear(MagentPmtMgt);
@@ -839,20 +823,6 @@
                     Commit();
             until PaymentLine.Next() = 0;
     end;
-
-    [IntegrationEvent(false, false)]
-    [Obsolete('Moving payment gateway to interface. Implement "NPR IPaymentGateway" and extend "NPR PG Integrations" enum instead.')]
-    local procedure RefundPaymentEvent(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
-    begin
-    end;
-
-    internal procedure RefundPaymentLineEvents(var PaymentLine: Record "NPR Magento Payment Line")
-    var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
-    begin
-        PaymentGateway.Get(PaymentLine."Payment Gateway Code");
-        RefundPaymentEvent(PaymentGateway, PaymentLine);
-    end;
     #endregion
 
     #region Cancel
@@ -868,11 +838,10 @@
             exit;
         if PaymentLine.Amount = 0 then
             exit;
-        if (not PaymentGateway."Enable Cancel") and (PaymentGateway."Cancel Codeunit Id" = 0) then
+        if (not PaymentGateway."Enable Cancel") then
             exit;
 
-        if (PaymentGateway."Cancel Codeunit Id" = 0) then
-            PaymentGateway.EnsureIntegrationTypeSelected();
+        PaymentGateway.EnsureIntegrationTypeSelected();
 
         Commit();
         Clear(MagentoPmtMgt);
@@ -882,20 +851,6 @@
             if (ErrorText <> '') then
                 Message(Text000, CopyStr(ErrorText, 1, 900));
         end;
-    end;
-
-    [IntegrationEvent(false, false)]
-    [Obsolete('Moving payment gateway to interface. Implement "NPR IPaymentGateway" and extend "NPR PG Integrations" enum instead.')]
-    local procedure CancelPaymentEvent(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
-    begin
-    end;
-
-    internal procedure CancelPaymentLineEvents(var PaymentLine: Record "NPR Magento Payment Line")
-    var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
-    begin
-        PaymentGateway.Get(PaymentLine."Payment Gateway Code");
-        CancelPaymentEvent(PaymentGateway, PaymentLine);
     end;
     #endregion
 

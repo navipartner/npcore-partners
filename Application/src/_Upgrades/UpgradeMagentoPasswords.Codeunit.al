@@ -50,7 +50,8 @@
 
         repeat
             if PaymentGateway."Api Password" <> '' then begin
-                PaymentGateway.SetApiPassword(PaymentGateway."Api Password");
+                PaymentGateway."Api Password Key" := CreateGuid();
+                SetSecret(PaymentGateway."Api Password Key", PaymentGateway."Api Password");
                 PaymentGateway."Api Password" := '';
                 PaymentGateway.Modify();
             end;
@@ -69,5 +70,13 @@
             MagentoSetup."Api Password" := '';
             MagentoSetup.Modify();
         end;
+    end;
+
+    local procedure SetSecret(KeyGuid: Guid; Secret: Text)
+    begin
+        if (EncryptionEnabled()) then
+            IsolatedStorage.SetEncrypted(KeyGuid, Secret, DataScope::Company)
+        else
+            IsolatedStorage.Set(KeyGuid, Secret, DataScope::Company);
     end;
 }

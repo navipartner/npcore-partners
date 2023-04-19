@@ -49,59 +49,6 @@ codeunit 85124 "NPR PG CI Test Integration" implements "NPR IPaymentGateway"
     end;
     #endregion
 
-    #region Event based implementation
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CapturePaymentEvent', '', false, false)]
-    local procedure CaptureEvent(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
-    var
-        Success: Boolean;
-    begin
-        if (PaymentGateway."Capture Codeunit Id" <> CurrCodeunitId()) then
-            exit;
-
-        _LastTransactionId := PaymentLine."No.";
-
-        CaptureImpl(Success);
-
-        if (not Success) then
-            exit;
-
-        PaymentLine."Date Captured" := Today();
-        PaymentLine.Modify(true);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'RefundPaymentEvent', '', false, false)]
-    local procedure RefundEvent(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
-    var
-        Success: Boolean;
-    begin
-        if (PaymentGateway."Refund Codeunit Id" <> CurrCodeunitId()) then
-            exit;
-
-        _LastTransactionId := PaymentLine."No.";
-
-        RefundImpl(Success);
-
-        if (not Success) then
-            exit;
-
-        PaymentLine."Date Refunded" := Today();
-        PaymentLine.Modify(true);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CancelPaymentEvent', '', false, false)]
-    local procedure CancelEvent(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
-    var
-        Success: Boolean;
-    begin
-        if (PaymentGateway."Cancel Codeunit Id" <> CurrCodeunitId()) then
-            exit;
-
-        _LastTransactionId := PaymentLine."No.";
-
-        CancelImpl(Success);
-    end;
-    #endregion
-
     #region Inner implementation
     local procedure CaptureImpl(var Success: Boolean)
     begin
@@ -181,9 +128,4 @@ codeunit 85124 "NPR PG CI Test Integration" implements "NPR IPaymentGateway"
         _ShouldCommit := true;
     end;
     #endregion
-
-    local procedure CurrCodeunitId(): Integer
-    begin
-        exit(Codeunit::"NPR PG CI Test Integration");
-    end;
 }

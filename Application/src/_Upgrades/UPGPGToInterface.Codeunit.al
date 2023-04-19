@@ -147,8 +147,8 @@ codeunit 6151474 "NPR UPG PG To Interface"
         end;
 
         PGAdyen."API Username" := PaymentGateway."Api Username";
-        if (PaymentGateway.HasApiPassword()) then
-            PGAdyen.SetAPIPassword(PaymentGateway.GetApiPassword());
+        if (SecretExists(PaymentGateway."Api Password Key")) then
+            PGAdyen.SetAPIPassword(GetSecret(PaymentGateway."Api Password Key"));
         PGAdyen."Merchant Name" := PaymentGateway."Merchant Name";
 
         PGAdyen.Insert();
@@ -165,8 +165,8 @@ codeunit 6151474 "NPR UPG PG To Interface"
         PGBambora.Init();
         PGBambora.Code := PaymentGateway.Code;
         PGBambora."Access Token" := PaymentGateway."Api Username";
-        if (PaymentGateway.HasApiPassword()) then
-            PGBambora.SetSecretToken(PaymentGateway.GetApiPassword());
+        if (SecretExists(PaymentGateway."Api Password Key")) then
+            PGBambora.SetSecretToken(GetSecret(PaymentGateway."Api Password Key"));
         PGBambora."Merchant ID" := PaymentGateway."Merchant ID";
 
         PGBambora.Insert();
@@ -183,8 +183,8 @@ codeunit 6151474 "NPR UPG PG To Interface"
         DibsSetup.Code := PaymentGateway.Code;
         DibsSetup."Api Url" := PaymentGateway."Api Url";
         DibsSetup."Api Username" := PaymentGateway."Api Username";
-        if (PaymentGateway.HasApiPassword()) then
-            DibsSetup.SetApiPassword(PaymentGateway.GetApiPassword());
+        if (SecretExists(PaymentGateway."Api Password Key")) then
+            DibsSetup.SetApiPassword(GetSecret(PaymentGateway."Api Password Key"));
         DibsSetup."Merchant ID" := PaymentGateway."Merchant ID";
 
         DibsSetup.Insert();
@@ -204,8 +204,8 @@ codeunit 6151474 "NPR UPG PG To Interface"
         else
             PGNetaxept.Environment := PGNetaxept.Environment::Production;
 
-        if (PaymentGateway.HasApiPassword()) then
-            PGNetaxept.SetApiAccessToken(PaymentGateway.GetApiPassword());
+        if (SecretExists(PaymentGateway."Api Password Key")) then
+            PGNetaxept.SetApiAccessToken(GetSecret(PaymentGateway."Api Password Key"));
         PGNetaxept."Merchant ID" := PaymentGateway."Merchant ID";
 
         PGNetaxept.Insert();
@@ -241,8 +241,24 @@ codeunit 6151474 "NPR UPG PG To Interface"
 
         QuickPaySetup.Init();
         QuickPaySetup.Code := PaymentGateway.Code;
-        if (PaymentGateway.HasApiPassword()) then
-            QuickPaySetup.SetApiPassword(PaymentGateway.GetApiPassword());
+        if (SecretExists(PaymentGateway."Api Password Key")) then
+            QuickPaySetup.SetApiPassword(GetSecret(PaymentGateway."Api Password Key"));
         QuickPaySetup.Insert();
+    end;
+
+    local procedure SecretExists(KeyGuid: Guid): Boolean
+    begin
+        if (not IsolatedStorage.Contains(KeyGuid, DataScope::Company)) then
+            exit(false);
+
+        exit(GetSecret(KeyGuid) <> '');
+    end;
+
+    local procedure GetSecret(KeyGuid: Guid) Secret: Text
+    begin
+        if (IsNullGuid(KeyGuid)) then
+            exit('');
+
+        IsolatedStorage.Get(KeyGuid, DataScope::Company, Secret);
     end;
 }
