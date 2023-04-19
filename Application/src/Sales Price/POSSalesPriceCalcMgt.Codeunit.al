@@ -166,8 +166,8 @@
         SalesLine."Posting Date" := SalePOS.Date;
         SalesHeader."Posting Date" := SalePOS.Date;
         SalesHeader."Currency Code" := Currency.Code;
-        POSUnit.Get(SalePOS."Register No.");
-        SalesHeader."NPR POS Pricing Profile" := POSUnit."POS Pricing Profile";
+        if POSUnit.Get(SaleLinePOS."Register No.") then
+            SalesHeader."NPR POS Pricing Profile" := POSUnit."POS Pricing Profile";
         SalesHeader.UpdateCurrencyFactor();
 
         SalesHeader."Bill-to Customer No." := SalePOS."Customer No.";
