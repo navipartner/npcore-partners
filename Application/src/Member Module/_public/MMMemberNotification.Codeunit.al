@@ -1300,5 +1300,30 @@
         Error(ReasonText);
     end;
 
-}
+    internal procedure SetJobQueueEntry(Create: Boolean)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        JobQueueDescriptionLbl: Label 'Member Notifications - AutoCreated';
+    begin
+        if Create then begin
+            JobQueueMgt.InitRecurringJobQueueEntry(
+                JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId(), '', JobQueueDescriptionLbl, CurrentDateTime(), 15, '', JobQueueEntry);
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+        end else begin
+            JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+            JobQueueEntry.SetRange("Object ID to Run", CurrCodeunitId());
+            JobQueueEntry.DeleteTasks();
+        end;
+    end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshJobQueueEntry()
+    var
+        MMMemberNotificSetup: Record "NPR MM Member Notific. Setup";
+    begin
+        if MMMemberNotificSetup.IsEmpty() then
+            exit;
+        SetJobQueueEntry(true);
+    end;
+}

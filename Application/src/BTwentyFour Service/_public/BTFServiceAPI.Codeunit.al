@@ -197,7 +197,7 @@ codeunit 6014641 "NPR BTF Service API"
 
     procedure ShowWhoInitiateRequest(EntryNo: Integer)
     var
-        ErrorLog: Record "NPR BTF EndPoint Error Log";    
+        ErrorLog: Record "NPR BTF EndPoint Error Log";
         PageManagement: Codeunit "Page Management";
         RecRef: RecordRef;
     begin
@@ -226,7 +226,7 @@ codeunit 6014641 "NPR BTF Service API"
     procedure InsertImportEntry(var ImportEntry: Record "NPR Nc Import Entry"; ImportTypeCode: Code[20]; Response: Codeunit "Temp Blob"; ServiceEndPoint: Record "NPR BTF Service EndPoint")
     var
         DataTypeManagement: Codeunit "Data Type Management";
-        RecRef: RecordRef;            
+        RecRef: RecordRef;
         EndPoint: Interface "NPR BTF IEndPoint";
         FormatResponse: Interface "NPR BTF IFormatResponse";
     begin
@@ -444,5 +444,16 @@ codeunit 6014641 "NPR BTF Service API"
         end;
 
         exit(ServiceUrl);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshJobQueueEntry()
+    var
+        ServiceEndPoint: Record "NPR BTF Service EndPoint";
+    begin
+        if ServiceEndPoint.FindSet() then
+            repeat
+                ScheduleJobQueueEntry(ServiceEndPoint);
+            until ServiceEndPoint.Next() = 0;
     end;
 }

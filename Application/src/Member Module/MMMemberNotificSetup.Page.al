@@ -344,13 +344,10 @@
 
                     trigger OnAction()
                     var
-                        JobQueueEntry: Record "Job Queue Entry";
-                        JobQueueManagement: Codeunit "NPR Job Queue Management";
-                        JobQueueDescriptionLbl: Label 'Member Notifications - AutoCreated';
+                        MemberNotification: Codeunit "NPR MM Member Notification";
                         JobQueueCreatedMsg: Label 'Member Notifications job successfully created';
                     begin
-                        JobQueueManagement.InitRecurringJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR MM Member Notification", '', JobQueueDescriptionLbl, CurrentDateTime, 15, '', JobQueueEntry);
-                        JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+                        MemberNotification.SetJobQueueEntry(true);
                         Message(JobQueueCreatedMsg);
                     end;
                 }
@@ -363,12 +360,10 @@
 
                     trigger OnAction()
                     var
-                        JobQueueEntry: Record "Job Queue Entry";
+                        MemberNotification: Codeunit "NPR MM Member Notification";
                         JobQueueRemovedMsg: Label 'Member Notifications job successfully removed';
                     begin
-                        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-                        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR MM Member Notification");
-                        JobQueueEntry.DeleteTasks();
+                        MemberNotification.SetJobQueueEntry(false);
                         Message(JobQueueRemovedMsg);
                     end;
                 }

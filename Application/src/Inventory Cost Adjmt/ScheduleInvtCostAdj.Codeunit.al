@@ -108,7 +108,7 @@
         JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
         JobQueueEntry."Object Type to Run" := ObjectTypeToRun;
-        JobQueueEntry."Object ID to Run" := ObjectIdToRun;
+        JobQueueEntry.Validate("Object ID to Run", ObjectIdToRun);
         JobQueueEntry."Earliest Start Date/Time" := AtDateTime;
         exit(JobQueueMgt.JobQueueEntryExists(JobQueueEntry, JobQueueEntryGlobal));
     end;
@@ -166,7 +166,7 @@
     end;
 
 #if not BC17
-/*
+    /*
     local procedure ScheduleBC18()
     var
         SchedulingManager: Codeunit "Cost Adj. Scheduling Manager";
@@ -174,7 +174,7 @@
         SchedulingManager.CreateAdjCostJobQueue();
         SchedulingManager.CreatePostInvCostToGLJobQueue();
     end;
- */
+     */
 #endif
 
     local procedure JobQueueDescription(ObjectTypeToRun: Integer; ObjectIdToRun: Integer): Text
@@ -210,6 +210,12 @@
             if JobQueueEntry.Description = '' then
                 JobQueueEntry.Description := CopyStr(JobQueueDescription(JobQueueEntry."Object Type to Run", JobQueueEntry."Object ID to Run"), 1, MaxStrLen(JobQueueEntry.Description));
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshJobQueueEntry()
+    begin
+        Schedule(true);
     end;
 
     var

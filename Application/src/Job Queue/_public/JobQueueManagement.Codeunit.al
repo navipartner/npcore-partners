@@ -327,10 +327,11 @@
         JobQueueEntry.SetRange("Job Queue Category Code", Parameters."Job Queue Category Code");
         if Format(Parameters."Record ID to Process") <> '' then
             JobQueueEntry.SetFilter("Record ID to Process", Format(Parameters."Record ID to Process"));
-        if JobQueueEntry.IsEmpty() then
+        if JobQueueEntry.IsEmpty() then begin
             JobQueueEntry.SetRange("Job Queue Category Code");
-        if JobQueueEntry.IsEmpty() then
-            exit(false);
+            if JobQueueEntry.IsEmpty() then
+                exit(false);
+        end;
         JobQueueEntry.Find('-');
         repeat
             if not JobQueueEntry.IsExpired(Parameters."Earliest Start Date/Time") then begin
@@ -448,6 +449,29 @@
             JobQueueEntry)
         then
             StartJobQueueEntry(JobQueueEntry);
+    end;
+
+    local procedure RefreshRetentionPolicyJQ()
+    var
+        RetentionPolicySetup: Record "Retention Policy Setup";
+    begin
+        RetentionPolicySetup.SetRange(Enabled, true);
+        if RetentionPolicySetup.IsEmpty() then begin
+            RetentionPolicySetup.SetRange(Enabled);
+            if RetentionPolicySetup.IsEmpty() then
+                exit;
+        end;
+        RetentionPolicySetup.FindFirst();
+        RetentionPolicySetup.Modify();  //will trigger scheduling of recurring retention policy job
+    end;
+
+    internal procedure RefreshNPRJobQueueList()
+    begin
+        AddPosItemPostingJobQueue();
+        AddPosPostingJobQueue();
+        RefreshRetentionPolicyJQ();
+
+        OnRefreshNPRJobQueueList();
     end;
 
     internal procedure CreateAndAssignJobQueueCategory(): Code[10]
@@ -626,6 +650,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertRecurringJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRefreshNPRJobQueueList()
     begin
     end;
 }

@@ -485,6 +485,12 @@
             Error(TokenNotFoundErr, TokenKey);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshJobQueueEntry()
+    begin
+        SetupJobQueue(RaptorSetup.Get() and RaptorSetup."Enable Raptor Functions");
+    end;
+
     [IntegrationEvent(true, false)]
     internal procedure OnProcessRaptorDataLine(RaptorAction: Record "NPR Raptor Action"; UserIdentifier: Text; RaptorDataLineJToken: JsonToken; var RaptorDataBuffer: Record "NPR Raptor Data Buffer"; var Handled: Boolean)
     begin

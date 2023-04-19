@@ -762,9 +762,18 @@
         end;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshJobQueueEntry()
+    var
+        CustomerGDPRSetUp: Record "NPR Customer GDPR SetUp";
+    begin
+        if not CustomerGDPRSetUp.Get() then
+            exit;
+        EnqueueJobEntries(CustomerGDPRSetUp);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterDoAnonymization(CustNo: Code[20])
     begin
     end;
 }
-

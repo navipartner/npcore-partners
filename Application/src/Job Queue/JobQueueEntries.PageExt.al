@@ -50,6 +50,24 @@ pageextension 6014413 "NPR Job Queue Entries" extends "Job Queue Entries"
                     end;
                 end;
             }
+            action("NPR RefreshList")
+            {
+                Caption = 'NPR Refresh List';
+                ToolTip = 'Refreshes the list of NP Retail related job queue entries.';
+                Image = RefreshLines;
+                ApplicationArea = NPRRetail;
+                Visible = false;
+
+                trigger OnAction()
+                var
+                    JobQueueMgt: Codeunit "NPR Job Queue Management";
+                    ConfirmQst: Label 'The action is going to refresh the list of NP Retail related job queue entries. As a result, some of currently existing job queue entries may be deleted or modified, and new entries may be added.\Are you absolutely sure you want to proceed with the action?';
+                begin
+                    if not Confirm(ConfirmQst, false) then
+                        exit;
+                    JobQueueMgt.RefreshNPRJobQueueList();
+                end;
+            }
         }
     }
 }

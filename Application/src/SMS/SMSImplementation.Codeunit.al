@@ -660,6 +660,20 @@ codeunit 6060035 "NPR SMS Implementation"
         PopulateSendList(SendToList, SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", SendTo);
         QueueMessages(SendToList, Sender, SMSBodyText, CurrentDateTime + 1000 * 60); //Delay 1 minute
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshJobQueueEntry()
+    var
+        SMSSetup: Record "NPR SMS Setup";
+    begin
+        if not SMSSetup.Get() then
+            exit;
+        if SMSSetup."Job Queue Category Code" <> '' then
+            CreateMessageJob(SMSSetup."Job Queue Category Code")
+        else
+            SMSSetup.Validate("Job Queue Category Code", GetJobQueueCategoryCode());
+    end;
+
     #endregion Subscribers
     #region Job functions
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
