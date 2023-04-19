@@ -10,25 +10,9 @@ codeunit 6060067 "NPR PG Try Refund Payment"
         NotInitializedErr: Label 'Codeunit not initialized. This is a programming error. Contact system vendor.';
 
     trigger OnRun()
-    var
-        PaymentLine: Record "NPR Magento Payment Line";
-        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
-        PaymentGateway: Record "NPR Magento Payment Gateway";
     begin
         if (not _Initialized) then
             Error(NotInitializedErr);
-
-        PaymentGateway.Get(Rec."Payment Gateway Code");
-        if (PaymentGateway."Refund Codeunit Id" <> 0) then begin
-            PaymentLine := Rec;
-            MagentoPmtMgt.RefundPaymentLineEvents(PaymentLine);
-            Rec := PaymentLine;
-
-            if (Rec."Date Refunded" <> 0D) then
-                _Response."Response Success" := true;
-
-            exit;
-        end;
 
         RefundPayment();
     end;

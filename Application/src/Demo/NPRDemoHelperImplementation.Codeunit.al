@@ -36,9 +36,19 @@ codeunit 6059866 "NPRDemoHelperImplementation"
     procedure UpdatePasswordPaymentGateway(PaymentCode: code[20]; "Demo Password": text)
     var
         MagPaymentGateway: Record "NPR Magento Payment Gateway";
+        AdyenSetup: Record "NPR PG Adyen Setup";
     begin
-        if MagPaymentGateway.get(PaymentCode) then
-            MagPaymentGateway.SetApiPassword("Demo Password");
+        if (not MagPaymentGateway.Get(PaymentCode)) then
+            exit;
+
+        if (PaymentCode <> 'ADYEN') then
+            exit;
+
+        if (not AdyenSetup.Get(PaymentCode)) then
+            exit;
+
+        AdyenSetup.SetAPIPassword("Demo Password");
+        AdyenSetup.Modify(true);
     end;
 
     procedure UpdatePasswordCollectStore(StoreCode: code[20]; Password: text)

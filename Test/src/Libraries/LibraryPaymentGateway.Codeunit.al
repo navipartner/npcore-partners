@@ -14,21 +14,6 @@ codeunit 85127 "NPR Library - Payment Gateway"
     end;
 
     /// <summary>
-    /// Create a new payment gateway with the given codeunit ids
-    /// </summary>
-    /// <param name="CaptureCodeunitId">Codeunit ID used for capturing</param>
-    /// <param name="RefundCodeunitId">Codeunit ID used for refunding</param>
-    /// <param name="CancelCodeunitId">Codeunit ID used for cancelling</param>
-    /// <returns>THe code of the payment gateway created</returns>
-    internal procedure CreatePaymentGateway(CaptureCodeunitId: Integer; RefundCodeunitId: Integer; CancelCodeunitId: Integer): Code[10]
-    var
-        PaymentGateway: Record "NPR Magento Payment Gateway";
-    begin
-        CreatePaymentGateway(CaptureCodeunitId, RefundCodeunitId, CancelCodeunitId, PaymentGateway);
-        exit(PaymentGateway.Code);
-    end;
-
-    /// <summary>
     /// Create a new payment gateway
     /// </summary>
     internal procedure CreatePaymentGateway(IntegrationType: Enum "NPR PG Integrations"; var PaymentGateway: Record "NPR Magento Payment Gateway")
@@ -42,22 +27,6 @@ codeunit 85127 "NPR Library - Payment Gateway"
         PaymentGateway."Enable Capture" := true;
         PaymentGateway."Enable Refund" := true;
         PaymentGateway."Enable Cancel" := true;
-        PaymentGateway.Insert(true);
-    end;
-
-    /// <summary>
-    /// Create a new payment gateway
-    /// </summary>
-    internal procedure CreatePaymentGateway(CaptureCodeunitId: Integer; RefundCodeunitId: Integer; CancelCodeunitId: Integer; var PaymentGateway: Record "NPR Magento Payment Gateway")
-    var
-        LibraryRandom: Codeunit "Library - Random";
-    begin
-        Clear(PaymentGateway);
-        PaymentGateway.Init();
-        PaymentGateway.Code := LibraryRandom.RandText(10);
-        PaymentGateway."Capture Codeunit Id" := CaptureCodeunitId;
-        PaymentGateway."Refund Codeunit Id" := RefundCodeunitId;
-        PaymentGateway."Cancel Codeunit Id" := CancelCodeunitId;
         PaymentGateway.Insert(true);
     end;
 

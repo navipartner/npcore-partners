@@ -10,28 +10,9 @@ codeunit 6060066 "NPR PG Try Capture Payment"
         NotInitializedErr: Label 'Codeunit not initialized. This is a programming error. Contact system vendor.';
 
     trigger OnRun()
-    var
-        PaymentLine: Record "NPR Magento Payment Line";
-        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
-        PaymentGateway: Record "NPR Magento Payment Gateway";
     begin
         if (not _Initialized) then
             Error(NotInitializedErr);
-
-        PaymentGateway.Get(Rec."Payment Gateway Code");
-        if (PaymentGateway."Capture Codeunit Id" <> 0) then begin
-            PaymentLine := Rec;
-            MagentoPmtMgt.CapturePaymentLineEvents(PaymentLine);
-            Rec := PaymentLine;
-
-            if (Rec."Date Captured" <> 0D) then
-                _Response."Response Success" := true;
-
-            if (Rec."Charge ID" <> '') then
-                _Response."Response Operation Id" := Rec."Charge ID";
-
-            exit;
-        end;
 
         CapturePayment();
     end;
