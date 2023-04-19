@@ -80,6 +80,11 @@
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'RetenTableListUpdate_20230223'));
         end;
 
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'HeyLoyaltyWebhookRequests')) then begin
+            AddHeyLoyaltyWebhookRequestRetentionPolicy();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'HeyLoyaltyWebhookRequests'));
+        end;
+
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -170,6 +175,35 @@
         RetenPolAllowedTables.AddAllowedTable(Database::"NPR POS Saved Sale Entry", RecRef.SystemCreatedAtNo(), TableFilters);
 
         CreateRetentionPolicySetup(Database::"NPR POS Saved Sale Entry", GetRetentionPeriodCode(RtnPeriodEnum));
+    end;
+
+    local procedure AddHeyLoyaltyWebhookRequestRetentionPolicy()
+    var
+        HLWebhookRequest: Record "NPR HL Webhook Request";
+        RetentionPolicySetup: Record "Retention Policy Setup";
+        RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
+        RecRef: RecordRef;
+        RtnPeriodEnum: Enum "Retention Period Enum";
+        TableFilters: JsonArray;
+    begin
+        if RetentionPolicySetup.Get(Database::"NPR HL Webhook Request") then
+            RetentionPolicySetup.Delete(true);
+        if RetenPolAllowedTables.IsAllowedTable(Database::"NPR HL Webhook Request") then
+            RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR HL Webhook Request");
+
+        HLWebhookRequest.SetFilter("Processing Status", '<>%1', HLWebhookRequest."Processing Status"::Processed);
+        RtnPeriodEnum := RtnPeriodEnum::"Never Delete";
+        RecRef.GetTable(HLWebhookRequest);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, true, RecRef);
+
+        HLWebhookRequest.SetRange("Processing Status", HLWebhookRequest."Processing Status"::Processed);
+        RtnPeriodEnum := RtnPeriodEnum::"1 Month";
+        RecRef.GetTable(HLWebhookRequest);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, false, RecRef);
+
+        RetenPolAllowedTables.AddAllowedTable(Database::"NPR HL Webhook Request", RecRef.SystemCreatedAtNo(), TableFilters);
+
+        CreateRetentionPolicySetup(Database::"NPR HL Webhook Request", GetRetentionPeriodCode(RtnPeriodEnum));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnBeforeOnRun', '', false, false)]

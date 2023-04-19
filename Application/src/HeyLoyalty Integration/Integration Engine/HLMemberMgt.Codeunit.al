@@ -7,7 +7,7 @@ codeunit 6059995 "NPR HL Member Mgt."
     begin
         if not HLIntegrationMgt.IsEnabled("NPR HL Integration Area"::Members) then
             exit;
-        ProcessDataLogRecord(Rec);
+        ProcessDataLogRecord(Rec, true);
         UpdateDataLogSubscriber(Rec);
     end;
 
@@ -16,7 +16,7 @@ codeunit 6059995 "NPR HL Member Mgt."
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
         JsonHelper: Codeunit "NPR Json Helper";
 
-    local procedure ProcessDataLogRecord(DataLogEntry: Record "NPR Data Log Record")
+    local procedure ProcessDataLogRecord(DataLogEntry: Record "NPR Data Log Record"; Enqueue: Boolean) TaskCreated: Boolean
     var
         Member: Record "NPR MM Member";
         TempMembershipRole: Record "NPR MM Membership Role" temporary;
@@ -30,39 +30,43 @@ codeunit 6059995 "NPR HL Member Mgt."
 
             DataLogEntry."Table ID" = Database::"NPR MM Member":
                 if FindMember(DataLogEntry, Member, TempMembershipRole) then
-                    ProcessMember(Member, TempMembershipRole, DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Delete);
+                    TaskCreated := ProcessMember(Member, TempMembershipRole, DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Delete, Enqueue);
+
+            DataLogEntry."Table ID" = Database::"NPR HL Selected MCF Option":
+                if FindMember(DataLogEntry, Member, TempMembershipRole) then
+                    TaskCreated := ProcessMember(Member, TempMembershipRole, false, Enqueue);
 
             DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Delete:
-                exit;  //only member record deletes are processed
+                exit;  //only member and selected multiple choice field option records deletes are processed
 
             else
                 if FindRelatedMembers(DataLogEntry, TempMembershipRole) then
                     repeat
                         Member.Get(TempMembershipRole."Member Entry No.");
-                        ProcessMember(Member, TempMembershipRole, false);
+                        TaskCreated := ProcessMember(Member, TempMembershipRole, false, Enqueue) or TaskCreated;
                     until TempMembershipRole.Next() = 0;
         end;
         Commit();
     end;
 
-    local procedure ProcessMember(Member: Record "NPR MM Member"; MembershipRole: Record "NPR MM Membership Role"; MemberDeleted: Boolean)
+    local procedure ProcessMember(Member: Record "NPR MM Member"; MembershipRole: Record "NPR MM Membership Role"; MemberDeleted: Boolean; Enqueue: Boolean): Boolean
     var
         HLMember: Record "NPR HL HeyLoyalty Member";
     begin
         if not UpdateHLMember(Member, MembershipRole, MemberDeleted, "NPR HL Auto Create HL Member"::Eligible, HLMember) then
-            exit;
-        ScheduleHLMemberProcessing(HLMember, not MemberIsEligibleForSubscription(Member, MembershipRole, false), CurrentDateTime());
+            exit(false);
+        exit(ScheduleHLMemberProcessing(HLMember, not MemberIsEligibleForSubscription(Member, MembershipRole, false), CurrentDateTime(), Enqueue));
     end;
 
-    procedure ScheduleHLMemberProcessing(HLMember: Record "NPR HL HeyLoyalty Member"; NotBeforeDateTime: DateTime)
+    procedure ScheduleHLMemberProcessing(HLMember: Record "NPR HL HeyLoyalty Member"; NotBeforeDateTime: DateTime; Enqueue: Boolean): Boolean
     begin
-        ScheduleHLMemberProcessing(HLMember, false, NotBeforeDateTime);
+        exit(ScheduleHLMemberProcessing(HLMember, false, NotBeforeDateTime, Enqueue));
     end;
 
-    procedure ScheduleHLMemberProcessing(HLMember: Record "NPR HL HeyLoyalty Member"; Unsubscribe: Boolean; NotBeforeDateTime: DateTime)
+    procedure ScheduleHLMemberProcessing(HLMember: Record "NPR HL HeyLoyalty Member"; Unsubscribe: Boolean; NotBeforeDateTime: DateTime; Enqueue: Boolean) TaskCreated: Boolean
     var
         NcTask: Record "NPR Nc Task";
-        SpfyScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
+        HLScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
         RecRef: RecordRef;
     begin
         RecRef.GetTable(HLMember);
@@ -73,17 +77,22 @@ codeunit 6059995 "NPR HL Member Mgt."
         else
             NcTask.Type := NcTask.Type::Modify;
 
-        if SpfyScheduleSend.InitNcTask(RecRef, Format(HLMember."Entry No."), NcTask.Type, NcTask, false) then
-            SpfyScheduleSend.Enqueue(NcTask, NotBeforeDateTime);
+        TaskCreated := HLScheduleSend.InitNcTask(RecRef, Format(HLMember."Entry No."), NcTask.Type, NcTask, false);
+        if TaskCreated and Enqueue then
+            HLScheduleSend.Enqueue(NcTask, NotBeforeDateTime);
 
         //Create a second 'Delete' request
         if HLMember.Deleted or HLMember.Anonymized then
-            if SpfyScheduleSend.InitNcTask(RecRef, Format(HLMember."Entry No."), NcTask.Type, NcTask, true) then
-                SpfyScheduleSend.Enqueue(NcTask, NotBeforeDateTime);
+            if HLScheduleSend.InitNcTask(RecRef, Format(HLMember."Entry No."), NcTask.Type, NcTask, true) then begin
+                TaskCreated := true;
+                if Enqueue then
+                    HLScheduleSend.Enqueue(NcTask, NotBeforeDateTime);
+            end;
     end;
 
     local procedure FindMember(DataLogEntry: Record "NPR Data Log Record"; var MemberOut: Record "NPR MM Member"; var MembershipRoleOut: Record "NPR MM Membership Role"): Boolean
     var
+        HLSelectedMCFOption: Record "NPR HL Selected MCF Option";
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
         DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
@@ -91,16 +100,32 @@ codeunit 6059995 "NPR HL Member Mgt."
         ProcessRec: Boolean;
     begin
         RecRef := DataLogEntry."Record ID".GetRecord();
-        RecRef.SetTable(Member);
+        case DataLogEntry."Table ID" of
+            Database::"NPR MM Member":
+                begin
+                    RecRef.SetTable(Member);
+                    ProcessRec := Member.Find();
+                    if not ProcessRec and (DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Delete) then
+                        if DataLogSubscriberMgt.RestoreRecordToRecRef(DataLogEntry."Entry No.", true, RecRef) then begin
+                            RecRef.SetTable(Member);
+                            ProcessRec := true;
+                        end;
+                end;
+            Database::"NPR HL Selected MCF Option":
+                begin
+                    RecRef.SetTable(HLSelectedMCFOption);
+                    ProcessRec := RecRef.Get(HLSelectedMCFOption."BC Record ID") and (RecRef.Number() = Database::"NPR MM Member");
+                    if not ProcessRec then
+                        exit(false);
+                    RecRef.SetTable(Member);
+                end;
+            else
+                exit(false);
+        end;
         if not FindMembershipRole(Member, MembershipRole) then
             Clear(MembershipRole);
-        ProcessRec := Member.Find() and TestRequiredFields(Member, MembershipRole, false);
-
-        if not ProcessRec and (DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Delete) then
-            if DataLogSubscriberMgt.RestoreRecordToRecRef(DataLogEntry."Entry No.", true, RecRef) then begin
-                RecRef.SetTable(Member);
-                ProcessRec := TestRequiredFields(Member, MembershipRoleOut, false);
-            end;
+        if ProcessRec then
+            ProcessRec := TestRequiredFields(Member, MembershipRole, false);
 
         MemberOut := Member;
         MembershipRoleOut := MembershipRole;
@@ -250,6 +275,7 @@ codeunit 6059995 "NPR HL Member Mgt."
         Membership: Record "NPR MM Membership";
         xHLMember: Record "NPR HL HeyLoyalty Member";
         AttributeMgt: Codeunit "NPR HL Attribute Mgt.";
+        HLMultiChoiceFieldMgt: Codeunit "NPR HL MultiChoice Field Mgt.";
         MemberAnonymized: Boolean;
         Updated: Boolean;
     begin
@@ -286,7 +312,9 @@ codeunit 6059995 "NPR HL Member Mgt."
             if HLMember.Deleted or HLMember.Anonymized or not MemberIsEligibleForSubscription(Member, MembershipRole, false) then
                 HLMember."Unsubscribed at" := CurrentDateTime();
 
-        Updated := AttributeMgt.UpdateHLMemberAttributesFromMember(HLMember);
+        Updated :=
+            AttributeMgt.UpdateHLMemberAttributesFromMember(HLMember) or
+            HLMultiChoiceFieldMgt.UpdateHLMemberMCFOptionsFromMember(HLMember);
 
         HLIntegrationEvents.OnUpdateHLMember(Member, MemberDeleted, HLMember);
 
@@ -299,7 +327,8 @@ codeunit 6059995 "NPR HL Member Mgt."
 
     procedure GetHLMember(Member: Record "NPR MM Member"; MembershipRole: Record "NPR MM Membership Role"; var HLMember: Record "NPR HL HeyLoyalty Member"; AutoInsert: Enum "NPR HL Auto Create HL Member"): Boolean
     begin
-        Member.TestField("Entry No.");
+        if Member."Entry No." = 0 then
+            exit(false);
         HLMember.SetCurrentKey("Member Entry No.");
         HLMember.SetRange("Member Entry No.", Member."Entry No.");
         if not HLMember.FindLast() then begin
@@ -336,7 +365,8 @@ codeunit 6059995 "NPR HL Member Mgt."
         HLCountryID: Text;
         MembershipHLFieldID: Text[50];
         ResponseFieldName: Text;
-        AttributeUpdated: Boolean;
+        RelatedDataUpdated: Boolean;
+        RelatedDataUpdatedInSubscriber: Boolean;
         Found: Boolean;
     begin
         xHLMember := HLMember;
@@ -411,10 +441,18 @@ codeunit 6059995 "NPR HL Member Mgt."
                                             end;
                                         until Found or (HLMappedValue.Next() = 0);
                                 end;
-                            else
-                                AttributeUpdated := ParseAttribute(HLMember, HLMemberJToken, ResponseFieldName) or AttributeUpdated;
+                            else begin
+                                if ParseAttribute(HLMember, HLMemberJToken, ResponseFieldName) then
+                                    RelatedDataUpdated := true
+                                else
+                                    if ParseMCFOptions(HLMember, HLMemberJToken, ResponseFieldName) then
+                                        RelatedDataUpdated := true;
+                            end;
                         end;
-                        HLIntegrationEvents.OnReadHLResponseField_OnUpdateHLMember(HLMember, ResponseFieldName, HLMemberJToken);
+                        RelatedDataUpdatedInSubscriber := false;
+                        HLIntegrationEvents.OnReadHLResponseField_OnUpdateHLMemberData(HLMember, ResponseFieldName, HLMemberJToken, RelatedDataUpdatedInSubscriber);
+                        if RelatedDataUpdatedInSubscriber then
+                            RelatedDataUpdated := true;
                     end;
                 end;
 
@@ -425,10 +463,10 @@ codeunit 6059995 "NPR HL Member Mgt."
 
         HLIntegrationEvents.OnUpdateHLMemberWithDataFromHeyLoyalty(HLMember, HLMemberJToken, OnlyEssentialFields);
 
-        if (Format(xHLMember) <> Format(HLMember)) or AttributeUpdated then begin
+        if (Format(xHLMember) <> Format(HLMember)) or RelatedDataUpdated then begin
             HLMember.Modify();
             Updated := true;
-            if BCMemberUpdateIsRequired(xHLMember, HLMember) or AttributeUpdated then begin
+            if BCMemberUpdateIsRequired(xHLMember, HLMember) or RelatedDataUpdated then begin
                 Commit();
                 UpsertMemberBatch.UpsertOne(HLMember);
             end;
@@ -447,6 +485,16 @@ codeunit 6059995 "NPR HL Member Mgt."
         if AttributeValue = '' then
             exit(false);
         exit(AttributeMgt.UpdateHLMemberAttributeFromHL(HLMember, ResponseFieldName, AttributeValue, JsonHelper.GetJText(AttributeJToken, StrSubstNo('options.%1', AttributeValue), false)));
+    end;
+
+    local procedure ParseMCFOptions(var HLMember: Record "NPR HL HeyLoyalty Member"; var HLMemberJToken: JsonToken; ResponseFieldName: Text): Boolean
+    var
+        HLMultiChoiceFieldMgt: Codeunit "NPR HL MultiChoice Field Mgt.";
+        HLMCFOptions: JsonToken;
+    begin
+        if HLMemberJToken.SelectToken(StrSubstNo('fields.%1.value', ResponseFieldName), HLMCFOptions) then
+            if HLMCFOptions.IsArray() then
+                exit(HLMultiChoiceFieldMgt.UpdateHLMemberMCFOptionsFromHL(HLMember, CopyStr(ResponseFieldName, 1, 100), HLMCFOptions.AsArray()));
     end;
 
     procedure GetHLEssentialFieldValues(var HLMember: Record "NPR HL HeyLoyalty Member"; HLMemberJToken: JsonToken; Mandatory: Boolean)
@@ -540,6 +588,9 @@ codeunit 6059995 "NPR HL Member Mgt."
         Membership: Record "NPR MM Membership";
     begin
         Clear(MembershipRole);
+        if Member."Entry No." = 0 then
+            exit(false);
+
         MembershipRole.SetRange("Member Entry No.", Member."Entry No.");
         MembershipRole.SetRange(Blocked, false);
         if MembershipRole.Find('-') then
@@ -625,7 +676,7 @@ codeunit 6059995 "NPR HL Member Mgt."
                         if UpdateHLMember(Member, MembershipRole, false, "NPR HL Auto Create HL Member"::Eligible, HLMember) or
                            ((HLMember."Member Entry No." = Member."Entry No.") and (HLMember."HeyLoyalty Id" = ''))
                         then begin
-                            ScheduleHLMemberProcessing(HLMember, not MemberIsEligibleForSubscription(Member, MembershipRole, false), CurrentDateTime());
+                            ScheduleHLMemberProcessing(HLMember, not MemberIsEligibleForSubscription(Member, MembershipRole, false), CurrentDateTime(), true);
                             Commit();
                         end;
             until Member.Next() = 0;
@@ -634,5 +685,32 @@ codeunit 6059995 "NPR HL Member Mgt."
             Window.Close();
             Message(DoneLbl, TotalRecNo);
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", 'OnBeforeUpdateTasks', '', false, false)]
+    local procedure CheckIfHLIntegrationIsEnabled(TaskProcessor: Record "NPR Nc Task Processor"; var MaxNoOfDataLogRecordsToProcess: Integer; var SkipProcessing: Boolean)
+    var
+        HLScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
+    begin
+        if TaskProcessor.Code <> HLScheduleSend.GetHeyLoyaltyTaskProcessorCode() then
+            exit;
+        SkipProcessing := not HLIntegrationMgt.IsEnabled("NPR HL Integration Area"::Members);
+        MaxNoOfDataLogRecordsToProcess := 0;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", 'OnUpdateTasksOnAfterGetNewSetOfDataLogRecords', '', false, false)]
+    local procedure ProcessHLDataLogRecords(TaskProcessor: Record "NPR Nc Task Processor"; ProcessCompanyName: Text[30]; var TempDataLogRecord: Record "NPR Data Log Record"; var NewTasksInserted: Boolean; var Handled: Boolean)
+    var
+        HLScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
+    begin
+        if TaskProcessor.Code <> HLScheduleSend.GetHeyLoyaltyTaskProcessorCode() then
+            exit;
+        if not HLIntegrationMgt.IsEnabled("NPR HL Integration Area"::Members) then
+            exit;
+        Handled := true;
+        if TempDataLogRecord.FindSet() then
+            repeat
+                NewTasksInserted := ProcessDataLogRecord(TempDataLogRecord, false) or NewTasksInserted;
+            until TempDataLogRecord.Next() = 0;
     end;
 }

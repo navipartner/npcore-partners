@@ -22,12 +22,13 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
 
         if NcTask."Task Processor Code" = '' then begin
             NcTask."Task Processor Code" := GetHeyLoyaltyTaskProcessorCode();
-            NcTask.Modify();
+            if NcTask."Entry No." <> 0 then
+                NcTask.Modify();
         end;
 
         NoOfMinutesBetweenRuns := 10;
 
-        JobQueueMgt.ScheduleNcTaskProcessing(JobQueueEntry, NcTask."Task Processor Code", false, '', NoOfMinutesBetweenRuns);
+        JobQueueMgt.ScheduleNcTaskProcessing(JobQueueEntry, NcTask."Task Processor Code", true, '', NoOfMinutesBetweenRuns);
     end;
 
     procedure GetHeyLoyaltyTaskProcessorCode(): Code[20]
@@ -97,8 +98,8 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
     begin
         NcTask.Init();
         NcTask."Entry No." := 0;
-        NcTask."Task Processor Code" := GetHeyLoyaltyTaskProcessorCode();
         NcTask.Type := TaskType;
+        NcTask."Task Processor Code" := GetHeyLoyaltyTaskProcessorCode();
         NcTask."Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(NcTask."Company Name"));
         NcTask."Table No." := RecRef.Number;
         NcTask."Table Name" := CopyStr(RecRef.Name, 1, MaxStrLen(NcTask."Table Name"));
@@ -141,6 +142,7 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
         if HLIntegrationMgt.IsInstantTaskEnqueue() then
             Codeunit.Run(Codeunit::"NPR HL Schedule Send Tasks", NcTask)
         else
-            TaskScheduler.CreateTask(Codeunit::"NPR HL Schedule Send Tasks", 0, true, CompanyName, NotBeforeDateTime, NcTask.RecordId);
+            if TaskScheduler.CanCreateTask() then
+                TaskScheduler.CreateTask(Codeunit::"NPR HL Schedule Send Tasks", 0, true, CompanyName, NotBeforeDateTime, NcTask.RecordId);
     end;
 }

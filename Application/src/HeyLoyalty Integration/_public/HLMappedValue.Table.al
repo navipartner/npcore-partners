@@ -1,6 +1,6 @@
 table 6059839 "NPR HL Mapped Value"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'HeyLoyalty Mapped Value';
     DataClassification = CustomerContent;
 
