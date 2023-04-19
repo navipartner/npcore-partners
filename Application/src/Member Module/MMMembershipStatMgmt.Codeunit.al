@@ -162,17 +162,27 @@ codeunit 6059912 "NPR MM Membership Stat. Mgmt."
         NotBeforeDateTime := CurrentDateTime();
         Evaluate(NextRunDateFormula, '<1D>');
         if JobQueueManagement.InitRecurringJobQueueEntry(
-                    JobQueueEntry."Object Type to Run"::Codeunit,
-                    Codeunit::"NPR MM Membership Stat. Mgmt.",
-                    '',
-                    JobQueueDescription,
-                    NotBeforeDateTime,
-                    040000T,
-                    0T,
-                    NextRunDateFormula,
-                    '',
-                    JobQueueEntry)
-                then
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR MM Membership Stat. Mgmt.",
+            '',
+            JobQueueDescription,
+            NotBeforeDateTime,
+            040000T,
+            0T,
+            NextRunDateFormula,
+            '',
+            JobQueueEntry)
+        then
             JobQueueManagement.StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshJobQueueEntry()
+    var
+        MMMemberCommunity: Record "NPR MM Member Community";
+    begin
+        if MMMemberCommunity.IsEmpty() then
+            exit;
+        CreateJobQueueEntry();
     end;
 }

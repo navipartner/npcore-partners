@@ -53,6 +53,14 @@
             InitJQLogCleanupJob(JobQueueEntry);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshJobQueueEntry()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        AddJQLogCleanupJob(JobQueueEntry, true);
+    end;
+
     procedure AddJQLogCleanupJob(var JobQueueEntry: Record "Job Queue Entry"; Silent: Boolean): Boolean
     var
         ConfirmJobCreationQst: Label 'This function will add a new periodic job (Job Queue Entry), responsible for purging outdated (older than 30 days) Joq Queue Log entries.\Are you sure you want to continue?';

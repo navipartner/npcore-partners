@@ -66,7 +66,7 @@
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateRetentionJobQueue')) then begin
             UpdateRetentionJobQueue();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateRetentionJobQueue'));
-        end;        
+        end;
 #endif
 
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AutoRescheduleRetenPolicy')) then begin
@@ -345,8 +345,8 @@
                 end;
             until JobQueueEntry.Next() = 0;
     end;
-    
-   local procedure UpdateRetentionJobQueue()
+
+    local procedure UpdateRetentionJobQueue()
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobTimeout: Duration;
@@ -364,7 +364,7 @@
                 JobQueueEntry."Ending Time" := 060000T;
                 JobQueueEntry.Modify();
             until JobQueueEntry.Next() = 0;
-    end;    
+    end;
 #endif
 
     local procedure SetAutoRescedulePOSPostGL()

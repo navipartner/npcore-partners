@@ -284,6 +284,19 @@
             exit;
         AddTicketDataRetentionJobQueue(JobQueueEntry, true);
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshJobQueueEntry()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        TicketSetup: Record "NPR TM Ticket Setup";
+    begin
+        if not TicketSetup.ReadPermission() then
+            exit;
+        if not TicketSetup.Get() then
+            exit;
+        AddTicketDataRetentionJobQueue(JobQueueEntry, true);
+    end;
     #endregion
 
     internal procedure GetCutoffDate(): Date
