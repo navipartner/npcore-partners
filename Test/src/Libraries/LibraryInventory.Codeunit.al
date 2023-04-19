@@ -52,6 +52,8 @@ codeunit 85001 "NPR Library - Inventory"
         InventorySetup: Record "Inventory Setup";
         ItemUnitOfMeasure: Record "Item Unit of Measure";
         GeneralPostingSetup: Record "General Posting Setup";
+        GenProdPostGroup: Record "Gen. Product Posting Group";
+        VATProdPostingGroup: Record "VAT Product Posting Group";
         InventoryPostingGroup: Record "Inventory Posting Group";
         TaxGroup: Record "Tax Group";
     begin
@@ -64,6 +66,12 @@ codeunit 85001 "NPR Library - Inventory"
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", '', 1);
 
         LibraryERM.FindGeneralPostingSetupInvtFull(GeneralPostingSetup);
+        if GeneralPostingSetup."Gen. Prod. Posting Group" <> '' then
+            if GenProdPostGroup.Get(GeneralPostingSetup."Gen. Prod. Posting Group") and GenProdPostGroup."Auto Insert Default" and (GenProdPostGroup."Def. VAT Prod. Posting Group" <> '') then
+                if not VATProdPostingGroup.Get(GenProdPostGroup."Def. VAT Prod. Posting Group") then begin
+                    GenProdPostGroup."Auto Insert Default" := false;
+                    GenProdPostGroup.Modify();
+                end;
         if VATPostingSetup."VAT Bus. Posting Group" = '' then
             LibraryERM.FindVATPostingSetupInvt(VATPostingSetup);
         if not InventoryPostingGroup.FindFirst() then

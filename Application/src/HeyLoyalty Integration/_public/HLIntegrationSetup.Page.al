@@ -60,6 +60,13 @@ page 6150720 "NPR HL Integration Setup"
                         Enabled = MemberListIntegrationIsEnabled;
                         ToolTip = 'Specifies the field ID at HeyLoyalty for storing information about membership code.';
                     }
+                    field("Read Member Data from Webhook"; Rec."Read Member Data from Webhook")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        Enabled = MemberListIntegrationIsEnabled;
+                        Importance = Additional;
+                        ToolTip = 'Specifies whether member data is going to be read from received HeyLoyalty webhook payload. If disabled, for each incoming webhook request system will issue an additional GET call to HeyLoyalty server in order to retrieve the most recent member data available at HeyLoyalty.';
+                    }
                 }
             }
             group(Connection)
@@ -112,6 +119,19 @@ page 6150720 "NPR HL Integration Setup"
                         Message(SuccessMsg);
                     end;
                 }
+                action(MultiChoiceFields)
+                {
+                    Caption = 'MultiChoice Fields';
+                    ToolTip = 'Setup integrated HeyLoyalty multiple choice fields.';
+                    ApplicationArea = NPRHeyLoyalty;
+                    Image = SelectMore;
+                    Promoted = true;
+                    PromotedIsBig = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    RunObject = page "NPR HL MultiChoice Fields";
+                }
+
                 action(SyncMembersToHL)
                 {
                     Caption = 'Sync. Members';
@@ -160,7 +180,18 @@ page 6150720 "NPR HL Integration Setup"
             Rec.Init();
             Rec.Insert();
         end;
+        xSetup := Rec;
         UpdateControlVisibility();
+    end;
+
+    trigger OnQueryClosePage(CloseAction: Action): Boolean
+    var
+        SessionSetting: SessionSettings;
+        ReloginRequiredMsg: Label 'You have changed %1. All active users will have to restart their sessions for the changes to take effect.\Do you want to restart your session now?', Comment = '%1 - tablecaption';
+    begin
+        if Format(Rec) <> Format(xSetup) then
+            if Confirm(ReloginRequiredMsg, true, Rec.TableCaption) then
+                SessionSetting.RequestSessionUpdate(false);
     end;
 
     local procedure UpdateControlVisibility()
@@ -170,6 +201,7 @@ page 6150720 "NPR HL Integration Setup"
     end;
 
     var
+        xSetup: Record "NPR HL Integration Setup";
         IntegrationIsEnabled: Boolean;
         MemberListIntegrationIsEnabled: Boolean;
 }

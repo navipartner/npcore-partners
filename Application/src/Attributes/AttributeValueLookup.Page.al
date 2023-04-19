@@ -57,6 +57,11 @@
         HeyLoyaltyName := HLMappedValueMgt.GetMappedValue(Rec.RecordId(), Rec.FieldNo("Attribute Value Name"), false);
     end;
 
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        HeyLoyaltyName := '';
+    end;
+
     var
         HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
         HeyLoyaltyName: Text[100];

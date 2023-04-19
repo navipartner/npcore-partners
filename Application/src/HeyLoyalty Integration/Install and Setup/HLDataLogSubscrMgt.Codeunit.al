@@ -23,6 +23,8 @@ codeunit 6059989 "NPR HL Data Log Subscr. Mgt."
                         IntegrationArea, Database::"NPR MM Membership Role", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, DaysToDuration(7));
                     AddDataLogSetupEntity(
                         IntegrationArea, Database::"NPR GDPR Consent Log", DataLogSetup."Log Insertion"::Detailed, DataLogSetup."Log Modification"::" ", DataLogSetup."Log Deletion"::" ", DaysToDuration(7));
+                    AddDataLogSetupEntity(
+                        IntegrationArea, Database::"NPR HL Selected MCF Option", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, DaysToDuration(7));
                 end;
         end;
         HLIntegrationEvents.OnAfterCreateDataLogSetup(IntegrationArea);
@@ -61,10 +63,9 @@ codeunit 6059989 "NPR HL Data Log Subscr. Mgt."
             HLIntegrationEvents.OnSetupDataLogSubsriberDataProcessingParams(IntegrationArea, DataLogSetup."Table ID", DataLogSubscriber, Handled);
             if not Handled then
                 case IntegrationArea of
-                    IntegrationArea::Members:
+                    IntegrationArea::Members:  //handled by Codeunit::"NPR HL Member Mgt."
                         begin
                             DataLogSubscriber."Direct Data Processing" := false;
-                            DataLogSubscriber."Data Processing Codeunit ID" := Codeunit::"NPR HL Member Mgt.";
                             DataLogSubscriber."Delayed Data Processing (sec)" := 5;
                         end;
                 end;

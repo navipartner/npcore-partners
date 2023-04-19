@@ -213,6 +213,12 @@ table 6059801 "NPR HL HeyLoyalty Member"
             Caption = 'Last Error Message';
             DataClassification = CustomerContent;
         }
+        field(300; "MultiChoice Field Filter"; Code[20])
+        {
+            Caption = 'MultiChoice Field Filter';
+            FieldClass = FlowFilter;
+            TableRelation = "NPR HL MultiChoice Field".Code;
+        }
     }
     keys
     {
@@ -238,15 +244,12 @@ table 6059801 "NPR HL HeyLoyalty Member"
     internal procedure FindCountryCode(): Code[10]
     var
         Country: Record "Country/Region";
-        HLMappedValue: Record "NPR HL Mapped Value";
         HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
         RecRef: RecordRef;
     begin
         if "HL Country ID" = '' then
             exit('');
-        HLMappedValueMgt.FilterWhereUsed(Database::"Country/Region", Country.FieldNo(Code), "HL Country ID", false, HLMappedValue);
-        if HLMappedValue.FindFirst() then begin
-            RecRef.Get(HLMappedValue."BC Record ID");
+        if HLMappedValueMgt.FindMappedValue(Database::"Country/Region", Country.FieldNo(Code), "HL Country ID", RecRef) then begin
             RecRef.SetTable(Country);
             exit(Country.Code);
         end;
@@ -263,15 +266,14 @@ table 6059801 "NPR HL HeyLoyalty Member"
 
     internal procedure FindStoreCode(): Code[20]
     var
-        HLMappedValue: Record "NPR HL Mapped Value";
         HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
         NpCsStore: Record "NPR NpCs Store";
         RecRef: RecordRef;
+        StoreNotFoundErr: Label 'There is no %1 with assigned HeyLoyalty Name %2.', Comment = '%1 - "NPR NpCs Store" table caption, %2 - HeyLoyalty store name';
     begin
         if "HL Store Name" <> '' then begin
-            HLMappedValueMgt.FilterWhereUsed(Database::"NPR NpCs Store", NpCsStore.FieldNo(Name), "HL Store Name", false, HLMappedValue);
-            HLMappedValue.FindFirst();
-            RecRef.Get(HLMappedValue."BC Record ID");
+            if not HLMappedValueMgt.FindMappedValue(Database::"NPR NpCs Store", NpCsStore.FieldNo(Name), "HL Store Name", RecRef) then
+                Error(StoreNotFoundErr, NpCsStore.TableCaption(), "HL Store Name");
             RecRef.SetTable(NpCsStore);
             exit(NpCsStore.Code);
         end;
@@ -309,5 +311,38 @@ table 6059801 "NPR HL HeyLoyalty Member"
             ErrorText := NoErrorMessageTxt;
 
         exit(ErrorText);
+    end;
+
+    internal procedure NoOfAssignedMCFieldOptions(): Integer
+    var
+        HLSelectedMCFOption: Record "NPR HL Selected MCF Option";
+    begin
+        SetHLSelectedMCFOptionFilters(HLSelectedMCFOption);
+        exit(HLSelectedMCFOption.Count());
+    end;
+
+    internal procedure ShowAssigneMCFOptions()
+    var
+        HLMultiChoiceFldOption: Record "NPR HL MultiChoice Fld Option";
+        HLSelectedMCFOption: Record "NPR HL Selected MCF Option";
+        HLMultiChoiceFieldMgt: Codeunit "NPR HL MultiChoice Field Mgt.";
+        HLSelectMCFOptions: Page "NPR HL Select MCF Options";
+    begin
+        SetHLSelectedMCFOptionFilters(HLSelectedMCFOption);
+        HLMultiChoiceFieldMgt.MarkAssignedMCFOptions(HLSelectedMCFOption, HLMultiChoiceFldOption);
+        HLSelectedMCFOption.CopyFilter("Field Code", HLMultiChoiceFldOption."Field Code");
+        HLMultiChoiceFldOption.SetCurrentKey("Field Code", "Sort Order");
+
+        Clear(HLSelectMCFOptions);
+        HLSelectMCFOptions.SetDataset(HLMultiChoiceFldOption);
+        HLSelectMCFOptions.Editable(false);
+        HLSelectMCFOptions.Run();
+    end;
+
+    local procedure SetHLSelectedMCFOptionFilters(var HLSelectedMCFOption: Record "NPR HL Selected MCF Option")
+    begin
+        HLSelectedMCFOption.SetRange("Table No.", Database::"NPR HL HeyLoyalty Member");
+        HLSelectedMCFOption.SetRange("BC Record ID", Rec.RecordId);
+        Rec.CopyFilter("MultiChoice Field Filter", HLSelectedMCFOption."Field Code");
     end;
 }

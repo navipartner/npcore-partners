@@ -25,6 +25,11 @@ pageextension 6014429 "NPR Countries/Regions" extends "Countries/Regions"
         HeyLoyaltyCountryID := HLMappedValueMgt.GetMappedValue(Rec.RecordId(), Rec.FieldNo(Code), false);
     end;
 
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        HeyLoyaltyCountryID := '';
+    end;
+
     var
         HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
         HeyLoyaltyCountryID: Text[100];

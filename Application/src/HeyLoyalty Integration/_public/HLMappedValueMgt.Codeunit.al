@@ -78,6 +78,18 @@ codeunit 6150873 "NPR HL Mapped Value Mgt."
             HLMappedValue.DeleteAll();
     end;
 
+    procedure FindMappedValue(TableNo: Integer; AttachedToFieldNo: Integer; ValueToFind: Text[100]; var RecRef: RecordRef) Found: Boolean
+    var
+        HLMappedValue: Record "NPR HL Mapped Value";
+    begin
+        Clear(RecRef);
+        FilterWhereUsed(TableNo, AttachedToFieldNo, ValueToFind, false, HLMappedValue);
+        if HLMappedValue.Find('-') then
+            repeat
+                Found := RecRef.Get(HLMappedValue."BC Record ID");
+            until Found or (HLMappedValue.Next() = 0);
+    end;
+
     procedure FilterWhereUsed(TableNo: Integer; AttachedToFieldNo: Integer; ValueToFind: Text[100]; ForUpdate: Boolean; var HLMappedValue: Record "NPR HL Mapped Value")
     begin
         HLMappedValue.Reset();
@@ -187,6 +199,38 @@ codeunit 6150873 "NPR HL Mapped Value Mgt."
 
     [EventSubscriber(ObjectType::Table, Database::"Country/Region", 'OnAfterRenameEvent', '', false, false)]
     local procedure Country_MoveMappedValues(var Rec: Record "Country/Region"; var xRec: Record "Country/Region"; RunTrigger: Boolean)
+    begin
+        if Rec.IsTemporary() or not RunTrigger then
+            exit;
+        CopyMappedValues(xRec.RecordId(), Rec.RecordId(), 0, false, true);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR HL MultiChoice Field", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure HLMCField_RemovedMappedValues(var Rec: Record "NPR HL MultiChoice Field"; RunTrigger: Boolean)
+    begin
+        if Rec.IsTemporary() or not RunTrigger then
+            exit;
+        RemoveMappedValues(Rec.RecordId());
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR HL MultiChoice Field", 'OnAfterRenameEvent', '', false, false)]
+    local procedure HLMCField_MoveMappedValues(var Rec: Record "NPR HL MultiChoice Field"; var xRec: Record "NPR HL MultiChoice Field"; RunTrigger: Boolean)
+    begin
+        if Rec.IsTemporary() or not RunTrigger then
+            exit;
+        CopyMappedValues(xRec.RecordId(), Rec.RecordId(), 0, false, true);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR HL MultiChoice Fld Option", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure HLMCFieldOpt_RemovedMappedValues(var Rec: Record "NPR HL MultiChoice Fld Option"; RunTrigger: Boolean)
+    begin
+        if Rec.IsTemporary() or not RunTrigger then
+            exit;
+        RemoveMappedValues(Rec.RecordId());
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR HL MultiChoice Fld Option", 'OnAfterRenameEvent', '', false, false)]
+    local procedure HLMCFieldOpt_MoveMappedValues(var Rec: Record "NPR HL MultiChoice Fld Option"; var xRec: Record "NPR HL MultiChoice Fld Option"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary() or not RunTrigger then
             exit;

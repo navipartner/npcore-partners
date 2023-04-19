@@ -9,7 +9,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -18,7 +17,6 @@
             {
                 field("Table ID"; Rec."Table ID")
                 {
-
                     ToolTip = 'Specifies the value of the Table ID field';
                     ApplicationArea = NPRRetail;
 
@@ -43,25 +41,21 @@
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-
                     ToolTip = 'Specifies the value of the Table Name field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Log Insertion"; Rec."Log Insertion")
                 {
-
                     ToolTip = 'Specifies the value of the Log Insertion field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Log Modification"; Rec."Log Modification")
                 {
-
                     ToolTip = 'Specifies the value of the Log Modification field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ignored Fields"; Rec."Ignored Fields")
                 {
-
                     BlankZero = true;
                     ToolTip = 'Specifies the value of the Ignored Fields field';
                     ApplicationArea = NPRRetail;
@@ -74,25 +68,21 @@
                 }
                 field("Log Deletion"; Rec."Log Deletion")
                 {
-
                     ToolTip = 'Specifies the value of the Log Deletion field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Keep Log for"; Rec."Keep Log for")
                 {
-
                     ToolTip = 'Specifies the value of the Keep Log For field';
                     ApplicationArea = NPRRetail;
                 }
                 field("User ID"; Rec."User ID")
                 {
-
                     ToolTip = 'Specifies the value of the User ID field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Last Date Modified"; Rec."Last Date Modified")
                 {
-
                     ToolTip = 'Specifies the value of the Last Date Modified field';
                     ApplicationArea = NPRRetail;
                 }
@@ -111,7 +101,6 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-
                 ToolTip = 'Executes the Clean Data Log action';
                 ApplicationArea = NPRRetail;
 
@@ -128,7 +117,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Add Records to Data Log action';
                 ApplicationArea = NPRRetail;
 
@@ -145,7 +133,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Set Ignored Fields action';
                 ApplicationArea = NPRRetail;
 
@@ -167,7 +154,6 @@
                 PromotedIsBig = true;
                 RunObject = Page "NPR Data Log Subscribers";
                 RunPageLink = "Table ID" = FIELD("Table ID");
-
                 ToolTip = 'Executes the Data Log Subscribers action';
                 ApplicationArea = NPRRetail;
             }
@@ -181,8 +167,8 @@
                 PromotedIsBig = true;
                 RunObject = Page "NPR Data Log Records";
                 RunPageLink = "Table ID" = FIELD("Table ID");
+                RunPageView = sorting("Table ID") order(descending);
                 ShortCutKey = 'Ctrl+F7';
-
                 ToolTip = 'Executes the Data Log action';
                 ApplicationArea = NPRRetail;
             }

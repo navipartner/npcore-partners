@@ -148,6 +148,9 @@ codeunit 6059994 "NPR Json Helper"
     begin
         if not Token.SelectToken(Path, Token2) then
             exit(false);
+        if Token2.IsArray() then
+            If not Token2.AsArray().Get(0, Token2) then
+                exit(false);
         if not Token2.IsValue() then
             exit(false);
         JValue := Token2.AsValue();

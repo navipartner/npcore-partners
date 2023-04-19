@@ -219,7 +219,7 @@ codeunit 85021 "NPR NpXml Tests"
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         LibraryRandom: Codeunit "Library - Random";
     begin
-        if not NcTaskProcessor.FindFirst() then begin
+        if not NcTaskProcessor.Get('NC') then begin
             NcTaskProcessor.Init();
             NcTaskProcessor.Code := 'NC';
             NcTaskProcessor.Description := CopyStr(LibraryRandom.RandText(10), 1, MaxStrLen(NcTaskProcessor.Description));

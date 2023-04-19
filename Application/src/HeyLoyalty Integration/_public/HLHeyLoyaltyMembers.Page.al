@@ -87,6 +87,19 @@ page 6150753 "NPR HL HeyLoyalty Members"
                     ToolTip = 'Specifies number of additional attributes assigned to the HeyLoyalty member record.';
                     ApplicationArea = NPRHeyLoyalty;
                 }
+                field("No. of MultiChoice Fld Options"; Rec.NoOfAssignedMCFieldOptions())
+                {
+                    Caption = 'No. of MultiChoice Fld Options';
+                    ToolTip = 'Specifies number of HeyLoyalty multiple choice field option values assigned to the HeyLoyalty member record.';
+                    ApplicationArea = NPRHeyLoyalty;
+                    Editable = false;
+                    Visible = ShowNoOfMCFOptions;
+
+                    trigger OnAssistEdit()
+                    begin
+                        Rec.ShowAssigneMCFOptions();
+                    end;
+                }
                 field("HeyLoyalty Id"; Rec."HeyLoyalty Id")
                 {
                     ToolTip = 'Specifies the value of the HeyLoyalty Id field.';
@@ -206,7 +219,7 @@ page 6150753 "NPR HL HeyLoyalty Members"
                 var
                     HLMember: Record "NPR HL HeyLoyalty Member";
                     HLSendMembers: Codeunit "NPR HL Send Members";
-                    HLWSMgt: Codeunit "NPR HL HeyLoyalty WS Mgt.";
+                    HLWSMgt: Codeunit "NPR HL Member Webhook Handler";
                     Window: Dialog;
                     RecNo: Integer;
                     TotalRecNo: Integer;
@@ -277,6 +290,13 @@ page 6150753 "NPR HL HeyLoyalty Members"
         }
     }
 
+    trigger OnOpenPage()
+    var
+        HLMultiChoiceField: Record "NPR HL MultiChoice Field";
+    begin
+        ShowNoOfMCFOptions := not HLMultiChoiceField.IsEmpty();
+    end;
+
     trigger OnAfterGetRecord()
     begin
         LastErrorMessage := Rec.GetErrorMessage();
@@ -284,4 +304,5 @@ page 6150753 "NPR HL HeyLoyalty Members"
 
     var
         LastErrorMessage: Text;
+        ShowNoOfMCFOptions: Boolean;
 }

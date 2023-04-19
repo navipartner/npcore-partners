@@ -2,31 +2,37 @@ codeunit 6059992 "NPR HL Integration Events"
 {
     Access = Public;
 
+    [Obsolete('Goes internal in next release.')]
     [IntegrationEvent(false, false)]
     procedure OnAfterCreateDataLogSetup(IntegrationArea: Enum "NPR HL Integration Area")
     begin
     end;
 
+    [Obsolete('Goes internal in next release.')]
     [IntegrationEvent(false, false)]
     procedure OnSetupDataLogSubsriberDataProcessingParams(IntegrationArea: Enum "NPR HL Integration Area"; TableID: Integer; var DataLogSubscriber: Record "NPR Data Log Subscriber"; var Handled: Boolean)
     begin
     end;
 
+    [Obsolete('Goes internal in next release.')]
     [IntegrationEvent(false, false)]
     procedure OnCheckIfIntegrationAreaIsEnabled(IntegrationArea: Enum "NPR HL Integration Area"; var AreaIsEnabled: Boolean; var Handled: Boolean)
     begin
     end;
 
+    [Obsolete('Goes internal in next release.')]
     [IntegrationEvent(false, false)]
     procedure OnCheckIfIsIntegratedTable(IntegrationArea: Enum "NPR HL Integration Area"; TableId: Integer; var TableIsIntegrated: Boolean; var Handled: Boolean)
     begin
     end;
 
+    [Obsolete('Goes internal in next release.')]
     [IntegrationEvent(false, false)]
     procedure OnBeforeFindRelatedMembers(DataLogEntry: Record "NPR Data Log Record"; var TempMembershipRole: Record "NPR MM Membership Role"; var Handled: Boolean)
     begin
     end;
 
+    [Obsolete('Goes internal in next release.')]
     [IntegrationEvent(false, false)]
     procedure OnFindRelatedMembers(DataLogEntry: Record "NPR Data Log Record"; var TempMembershipRole: Record "NPR MM Membership Role"; var Handled: Boolean)
     begin
@@ -43,12 +49,17 @@ codeunit 6059992 "NPR HL Integration Events"
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnAfterAddHLMCFOptionToUrlParameters(HLMember: Record "NPR HL HeyLoyalty Member"; NewMember: Boolean; HLFieldName: Text; HLFieldOptionValueName: Text; var UrlParametersJObject: JsonObject)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnUpdateHLMember(Member: Record "NPR MM Member"; MemberDeleted: Boolean; var HLMember: Record "NPR HL HeyLoyalty Member")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnReadHLResponseField_OnUpdateHLMember(var HLMember: Record "NPR HL HeyLoyalty Member"; ResponseFieldName: Text; HLMemberJToken: JsonToken)
+    internal procedure OnReadHLResponseField_OnUpdateHLMemberData(var HLMember: Record "NPR HL HeyLoyalty Member"; ResponseFieldName: Text; HLMemberJToken: JsonToken; var HLMemberRelatedDataUpdated: Boolean)
     begin
     end;
 

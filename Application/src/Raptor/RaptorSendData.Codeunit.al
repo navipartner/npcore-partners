@@ -21,11 +21,13 @@
         RaptorMgt: Codeunit "NPR Raptor Management";
         RecRef: RecordRef;
         SessionGUID: Guid;
+        MaxNoOfRecords: Integer;
     begin
         if not (RaptorSetup.Get() and RaptorSetup."Send Data to Raptor") then
             exit;
 
-        if not DataLogSubscriberMgt.GetNewRecords(RaptorMgt.RaptorDataLogSubscriber(), true, 0, TempDataLog) then
+        MaxNoOfRecords := 0;
+        if not DataLogSubscriberMgt.GetNewRecords(RaptorMgt.RaptorDataLogSubscriber(), '', true, MaxNoOfRecords, TempDataLog) then
             exit;
 
         SessionGUID := CreateGuid();

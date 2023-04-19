@@ -484,6 +484,11 @@
         HeyLoyaltyName := HLMappedValueMgt.GetMappedValue(Rec.RecordId(), Rec.FieldNo(Description), false);
     end;
 
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        HeyLoyaltyName := '';
+    end;
+
     local procedure CreateMissingWallets(MembershipCode: Code[20])
     var
         MembershipRole: Record "NPR MM Membership Role";

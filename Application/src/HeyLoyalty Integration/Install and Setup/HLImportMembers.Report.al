@@ -93,7 +93,7 @@ report 6014461 "NPR HL Import Members"
         HLMember: Record "NPR HL HeyLoyalty Member";
         HLMemberEssensialValuesIn: Record "NPR HL HeyLoyalty Member";
         HLMemberMgt: Codeunit "NPR HL Member Mgt.";
-        HLWSMgt: Codeunit "NPR HL HeyLoyalty WS Mgt.";
+        HLWSMgt: Codeunit "NPR HL Member Webhook Handler";
         HLMemberJObject: JsonObject;
         HLMemberFieldsJObject: JsonObject;
         HLMemberStatusesJObject: JsonObject;

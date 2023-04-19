@@ -9,7 +9,7 @@ codeunit 6059990 "NPR HL Attribute Mgt."
         HLMember: Record "NPR HL HeyLoyalty Member";
         Member: Record "NPR MM Member";
         MemberMgt: Codeunit "NPR HL Member Mgt.";
-        SpfyScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
+        HLScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
         IsCascadeUpdate: Boolean;
     begin
         if NPRAttributeKey."Table ID" <> Database::"NPR MM Member" then
@@ -27,7 +27,7 @@ codeunit 6059990 "NPR HL Attribute Mgt."
             exit;
         if UpdateHLMemberAttribute(HLMember, NPRAttributeValueSet) then begin
             MemberMgt.UpdateHLMember(Member, MembershipRole, HLMember);
-            MemberMgt.ScheduleHLMemberProcessing(HLMember, SpfyScheduleSend.NowWithDelayInSeconds(10));
+            MemberMgt.ScheduleHLMemberProcessing(HLMember, HLScheduleSend.NowWithDelayInSeconds(10), true);
         end;
     end;
 
@@ -137,18 +137,10 @@ codeunit 6059990 "NPR HL Attribute Mgt."
         if HeyLoyaltyFieldID = '' then
             exit(false);
 
-        Found := false;
-        HLMappedValueMgt.FilterWhereUsed(
-            Database::"NPR Attribute", NPRAttribute.FieldNo(Code), CopyStr(HeyLoyaltyFieldID, 1, MaxStrLen(HLMappedValue.Value)), false, HLMappedValue);
-        if HLMappedValue.Find('-') then
-            repeat
-                Found := RecRef.Get(HLMappedValue."BC Record ID");
-                if Found then
-                    RecRef.SetTable(NPRAttribute);
-            until Found or (HLMappedValue.Next() = 0);
-        if Found then
-            Found := IsSendAttributeToHL(NPRAttribute);
-        if not Found then
+        if not HLMappedValueMgt.FindMappedValue(Database::"NPR Attribute", NPRAttribute.FieldNo(Code), CopyStr(HeyLoyaltyFieldID, 1, MaxStrLen(HLMappedValue.Value)), RecRef)        then
+            exit(false);
+        RecRef.SetTable(NPRAttribute);
+        if not IsSendAttributeToHL(NPRAttribute) then
             exit(false);
 
         HLMemberAttribute."HeyLoyalty Member Entry No." := HLMember."Entry No.";

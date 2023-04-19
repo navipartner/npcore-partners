@@ -1,6 +1,8 @@
 codeunit 6150638 "NPR HL Integration Events Mgt."
 {
     Access = Public;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Should not have ended up here. PTEs should subscribe directly to Codeunit::"NPR HL Integration Events" events.';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR HL Integration Events", 'OnAfterAddAttributeToUrlParameters', '', false, false)]
     local procedure OnAfterAddAttributeToUrlParameters(NewMember: Boolean; HLMemberAttribute: Record "NPR HL Member Attribute"; var UrlParametersJObject: JsonObject);
@@ -59,11 +61,13 @@ codeunit 6150638 "NPR HL Integration Events Mgt."
         end;
     end;
 
+    [Obsolete('PTEs should subscribe directly to Codeunit::"NPR HL Integration Events" event "OnAfterAddAttributeToUrlParameters".')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAddAttributeToUrlParameters(var Proceed: Boolean; var AttributeCode1: Code[20]; var AttributeCode2: Code[20])
     begin
     end;
 
+    [Obsolete('PTEs should subscribe directly to Codeunit::"NPR HL Integration Events" event "OnAfterUpdateMemberFromHL".')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterUpdateMemberFromHL(var Proceed: Boolean)
     begin
