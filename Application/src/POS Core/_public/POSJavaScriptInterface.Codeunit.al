@@ -173,19 +173,21 @@
         Msg: Text;
         ActiveSession: Record "Active Session";
         POSInitialized: Duration;
+        DurationMs: Integer;
     begin
         if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
             Clear(ActiveSession);
         POSInitialized := CurrentDateTime() - StartTime;
+        DurationMs := POSInitialized;
 
         LogDict.Add('NPR_Server', ActiveSession."Server Computer Name");
         LogDict.Add('NPR_Instance', ActiveSession."Server Instance Name");
         LogDict.Add('NPR_TenantId', Database.TenantId());
         LogDict.Add('NPR_CompanyName', CompanyName());
         LogDict.Add('NPR_UserID', ActiveSession."User ID");
-        LogDict.Add('NPR_POSInitializationDuration', Format(POSInitialized));
+        LogDict.Add('NPR_POSInitializationDuration', Format(DurationMs, 0, 9));
 
-        Msg := StrSubstNo(MsgTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", Format(POSInitialized));
+        Msg := StrSubstNo(MsgTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", Format(DurationMs, 0, 9));
         Session.LogMessage(FinishEventIdTok, 'POS Session Initialized: ' + Msg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, LogDict);
     end;
 
