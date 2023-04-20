@@ -2,6 +2,7 @@ page 6059862 "NPR HWC Printers"
 {
     Extensible = false;
     PageType = List;
+    ContextSensitiveHelpPage = 'retail/printing/howto/setup_print.html';
     ApplicationArea = NPRRetail;
     UsageCategory = Lists;
     DelayedInsert = true;

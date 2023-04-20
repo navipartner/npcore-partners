@@ -165,7 +165,7 @@
         {
             Caption = 'Combine Variants as Background Task';
             DataClassification = CustomerContent;
-        }        
+        }
         field(150; "Match by Item No. Only"; Boolean)
         {
             Caption = 'Match by Item No. Only';

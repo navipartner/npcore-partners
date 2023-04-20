@@ -3,6 +3,7 @@
     Extensible = False;
 
     Caption = 'POS Scenarios';
+    ContextSensitiveHelpPage = 'retail/pos_profiles/reference/pos_scenarios.html';
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;

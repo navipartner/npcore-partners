@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Coupon Modules';
+    ContextSensitiveHelpPage = 'retail/coupons/intro.html';
     Editable = false;
     PageType = List;
     PopulateAllFields = true;

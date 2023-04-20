@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'EFT Mapping Group List';
+    ContextSensitiveHelpPage = 'retail/eft/explanation/EFT_setup.html';
     CardPageID = "NPR EFT BIN Group Card";
     InsertAllowed = false;
     ModifyAllowed = false;

@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Retail Voucher Modules';
+    ContextSensitiveHelpPage = 'retail/Vouchers/intro.html';
     PageType = List;
     SourceTable = "NPR NpRv Voucher Module";
     UsageCategory = Administration;
