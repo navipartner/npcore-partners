@@ -123,11 +123,24 @@
     /// <param name="CodeunitID">Parameter is only to have an object that users can setup output config for. It can be empty.</param>
     /// <param name="PrinterDevice">Which driver to use for job generation</param>
     ///
-    internal procedure ProcessBuffer(CodeunitID: Integer; PrinterDevice: Enum "NPR Line Printer Device")
+    internal procedure ProcessBuffer(CodeunitID: Integer; PrinterDevice: Enum "NPR Line Printer Device"; var PrinterDeviceSettings: Record "NPR Printer Device Settings")
+    var
+        TempRPDeviceSettings: Record "NPR RP Device Settings" temporary;
     begin
-        PrintBuffer('', CodeunitId, 0, PrinterDevice);
+        if PrinterDeviceSettings.FindSet() then
+            repeat
+                TempRPDeviceSettings.Init();
+                TempRPDeviceSettings.Template := '';
+                TempRPDeviceSettings.Name := TempRPDeviceSettings.Name;
+                TempRPDeviceSettings.Value := TempRPDeviceSettings.Value;
+                TempRPDeviceSettings.Insert()
+            until PrinterDeviceSettings.Next() = 0;
+
+        PrintBuffer('', CodeunitId, 0, PrinterDevice, TempRPDeviceSettings);
     end;
     #endregion
+
+    [Obsolete('Will become internal in next version')]
     procedure ProcessTemplate("Code": Code[20]; RecordVariant: Variant)
     var
         DataTypeManagement: Codeunit "Data Type Management";
@@ -137,6 +150,7 @@
         ProcessTemplate(Code, RecRef);
     end;
 
+    [Obsolete('Will become internal in next version')]
     procedure ProcessTemplate("Code": Code[20]; RecRef: RecordRef)
     var
         RPTemplateHeader: Record "NPR RP Template Header";
@@ -170,6 +184,7 @@
 
     local procedure RunPrintEngine(TemplateHeader: Record "NPR RP Template Header"; "Table": Variant)
     var
+        DeviceSettings: Record "NPR RP Device Settings";
         RecRef: RecordRef;
         DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt.";
     begin
@@ -187,14 +202,14 @@
         DataJoinBuffer.SetDecimalRounding(TemplateHeader."Default Decimal Rounding");
         if not DataJoinBuffer.ProcessDataJoin(RecRef, TemplateHeader.Code) then //Pulls data from tables and joins on the linked fields.        
             exit;
+
         ProcessLayout(DataJoinBuffer, TemplateHeader.Code); //Merges layout with data join buffer
-        PrintBuffer(TemplateHeader.Code, CODEUNIT::"NPR RP Line Print Mgt.", 0, TemplateHeader."Line Device"); //Converts generic print buffer to device specific data.
+        PrintBuffer(TemplateHeader.Code, CODEUNIT::"NPR RP Line Print Mgt.", 0, TemplateHeader."Line Device", DeviceSettings); //Converts generic print buffer to device specific data.
     end;
 
-    local procedure PrintBuffer(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; LinePrinter: Interface "NPR ILine Printer")
+    local procedure PrintBuffer(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; LinePrinter: Interface "NPR ILine Printer"; var DeviceSettings: Record "NPR RP Device Settings")
     var
         CurrentLine: Integer;
-        DeviceSettings: Record "NPR RP Device Settings";
         ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
         OutputLogging: Codeunit "NPR RP Templ. Output Log Mgt.";
     begin
@@ -489,7 +504,7 @@
         FieldWidth: Decimal;
         PageWidth: Integer;
     begin
-        if (UpperCase(TempBuffer.Font) in ['CONTROL', 'LOGO', 'COMMAND']) or (TempBuffer.Width <> 0) then
+        if (UpperCase(TempBuffer.Font) in ['LOGO', 'COMMAND']) or (TempBuffer.Width <> 0) then
             exit;
 
         PageWidth := LinePrinter.GetPageWidth(TempBuffer.Font);

@@ -24,6 +24,7 @@ codeunit 6060033 "NPR Tax Free PTFPI Try Print"
 
     local procedure PrintThermalReceipt(var TaxFreeRequest: Record "NPR Tax Free Request")
     var
+        PrinterDeviceSettings: Record "NPR Printer Device Settings";
         ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
         Printer: Codeunit "NPR RP Line Print Mgt.";
         InStream: InStream;
@@ -115,13 +116,13 @@ codeunit 6060033 "NPR Tax Free PTFPI Try Print"
             end;
         end;
 
-        Printer.ProcessBuffer(Codeunit::"NPR Tax Free Receipt", Enum::"NPR Line Printer Device"::Epson);
+        Printer.ProcessBuffer(Codeunit::"NPR Tax Free Receipt", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
     end;
 
     local procedure PrintThermalLine(var Printer: Codeunit "NPR RP Line Print Mgt."; Value: Text; Font: Text[30]; Bold: Boolean; Alignment: Text; CR: Boolean; Underline: Boolean)
     begin
         case true of
-            (Font in ['A11', 'B21', 'Control']):
+            (Font in ['A11', 'B21', 'COMMAND']):
                 begin
                     Printer.SetFont(Font);
                     Printer.SetBold(Bold);

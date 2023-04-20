@@ -5,6 +5,7 @@
 
     trigger OnRun()
     var
+        PrinterDeviceSettings: Record "NPR Printer Device Settings";
         Ticket: Record "NPR TM Ticket";
         TicketType: Record "NPR TM Ticket Type";
     begin
@@ -21,7 +22,7 @@
 
             until Ticket.Next() = 0;
 
-        Printer.ProcessBuffer(Codeunit::"NPR TM Report - Ticket", Enum::"NPR Line Printer Device"::Epson);
+        Printer.ProcessBuffer(Codeunit::"NPR TM Report - Ticket", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
     end;
 
     var
@@ -39,9 +40,8 @@
         PrinterLbl: Label '%1 %2', Locked = true;
         PrinterLbl2Lbl: Label '%1 - %2', Locked = true;
     begin
-        Printer.SetFont('Control');
-        Printer.AddLine('h');
-        Printer.AddLine('G');
+        Printer.SetFont('COMMAND');
+        Printer.AddLine('STOREDLOGO_1');
         Printer.SetFont('A11');
         Printer.SetPadChar('.');
         Printer.AddLine('');
@@ -106,8 +106,8 @@
         Printer.AddBarcode('Code128', Ticket."External Ticket No.", 2, false, 40);
         Printer.AddLine(' ');
 
-        Printer.SetFont('Control');
-        Printer.AddLine('P');
+        Printer.SetFont('COMMAND');
+        Printer.AddLine('PAPERCUT');
     end;
 }
 

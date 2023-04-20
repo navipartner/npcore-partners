@@ -6,6 +6,7 @@
 
     trigger OnRun()
     var
+        PrinterDeviceSettings: Record "NPR Printer Device Settings";
         MembershipEntry: Record "NPR MM Membership Entry";
         MemberRole: Record "NPR MM Membership Role";
         Member: Record "NPR MM Member";
@@ -19,10 +20,8 @@
 
         if Membership.FindSet() then
             repeat
-
-                Printer.SetFont('Control');
-                Printer.AddLine('h');
-                Printer.AddLine('G');
+                Printer.SetFont('COMMAND');
+                Printer.AddLine('STOREDLOGO_1');
                 Printer.SetFont('A11');
                 Printer.SetPadChar('.');
                 Printer.AddLine('');
@@ -60,11 +59,11 @@
                     until (MemberRole.Next() = 0);
                 end;
 
-                Printer.SetFont('Control');
-                Printer.AddLine('P');
+                Printer.SetFont('COMMAND');
+                Printer.AddLine('PAPERCUT');
             until Membership.Next() = 0;
 
-        Printer.ProcessBuffer(Codeunit::"NPR MM POS Receipt Print", Enum::"NPR Line Printer Device"::Epson);
+        Printer.ProcessBuffer(Codeunit::"NPR MM POS Receipt Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
     end;
 
     var
