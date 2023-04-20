@@ -1959,8 +1959,8 @@
         OnDetailedTicketEvent(AdmittedTicketAccessEntry);
         CloseReservationEntry(AdmittedTicketAccessEntry);
 
-        if (FirstAdmission) then
-            NotifyParticipant.CreateFirstAdmissionNotification(TicketAccessEntry);
+        NotifyParticipant.CreateOnAdmissionNotification(TicketAccessEntry, AdmittedTicketAccessEntry, FirstAdmission);
+
     end;
 
     local procedure SetDuration(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; DurationGroupCode: Code[10]; EventDate: Date; EventTime: Time)
