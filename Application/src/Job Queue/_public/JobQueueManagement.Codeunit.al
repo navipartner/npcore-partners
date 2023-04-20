@@ -653,7 +653,11 @@
     begin
     end;
 
+#if (BC17 or BC18 or BC19)
     [IntegrationEvent(false, false)]
+#else
+    [IntegrationEvent(false, false, true)]  //isolated event
+#endif
     local procedure OnRefreshNPRJobQueueList()
     begin
     end;

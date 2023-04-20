@@ -20,7 +20,8 @@ table 6059800 "NPR HL Integration Setup"
 
             trigger OnValidate()
             begin
-                HLIntegrationMgt.SetupTaskProcessingJobQueue("Enable Integration" and "Member Integration");
+                Modify();
+                HLIntegrationMgt.SetupTaskProcessingJobQueue();
             end;
         }
         field(15; "Instant Task Enqueue"; Boolean)
@@ -66,11 +67,12 @@ table 6059800 "NPR HL Integration Setup"
 
             trigger OnValidate()
             begin
-                if not "Member Integration" then
-                    exit;
-                HLDataLogSubscrMgt.CreateDataLogSetup("NPR HL Integration Area"::Members);
-                HLIntegrationMgt.SetupTaskProcessingJobQueue("Enable Integration" and "Member Integration");
-                HLIntegrationMgt.RegisterWebhookListeners();
+                Modify();
+                if "Member Integration" then begin
+                    HLDataLogSubscrMgt.CreateDataLogSetup("NPR HL Integration Area"::Members);
+                    HLIntegrationMgt.RegisterWebhookListeners();
+                end;
+                HLIntegrationMgt.SetupTaskProcessingJobQueue();
             end;
         }
         field(50; "Membership HL Field ID"; Text[50])
