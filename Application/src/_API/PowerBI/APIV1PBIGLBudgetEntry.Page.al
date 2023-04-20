@@ -64,6 +64,30 @@ page 6060035 "NPR APIV1 PBIG/L Budget Entry"
                 {
                     Caption = 'Global Dimension 2 Code', Locked = true;
                 }
+                field(shortcutDimension3Code; ShortcutDimCode[3])
+                {
+                    Caption = 'Shortcut Dimension 3 Code', Locked = true;
+                }
+                field(shortcutDimension4Code; ShortcutDimCode[4])
+                {
+                    Caption = 'Shortcut Dimension 4 Code', Locked = true;
+                }
+                field(shortcutDimension5Code; ShortcutDimCode[5])
+                {
+                    Caption = 'Shortcut Dimension 5 Code', Locked = true;
+                }
+                field(shortcutDimension6Code; ShortcutDimCode[6])
+                {
+                    Caption = 'Shortcut Dimension 6 Code', Locked = true;
+                }
+                field(shortcutDimension7Code; ShortcutDimCode[7])
+                {
+                    Caption = 'Shortcut Dimension 7 Code', Locked = true;
+                }
+                field(shortcutDimension8Code; ShortcutDimCode[8])
+                {
+                    Caption = 'Shortcut Dimension 8 Code', Locked = true;
+                }
                 field(budgetDimension1Code; Rec."Budget Dimension 1 Code")
                 {
                     Caption = 'Budget Dimension 1 Code', Locked = true;
@@ -83,4 +107,13 @@ page 6060035 "NPR APIV1 PBIG/L Budget Entry"
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    begin
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
+    end;
+
+    var
+        DimMgt: Codeunit DimensionManagement;
+        ShortcutDimCode: array[8] of Code[20];
 }
