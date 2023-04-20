@@ -3,6 +3,7 @@
     Extensible = False;
 
     Caption = 'Retail Logo Setup';
+    ContextSensitiveHelpPage = 'retail/posunit/howto/set_up_retail_logo.html';
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR Retail Logo";
