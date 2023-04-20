@@ -185,12 +185,35 @@ codeunit 6059993 "NPR HL Integration Mgt."
         WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Page, Page::"NPR API - HL Webhook Requests", ServiceNameTok, true);
     end;
 
-    procedure SetupTaskProcessingJobQueue(Enable: Boolean)
+    procedure SetupTaskProcessingJobQueue()
+    begin
+        Clear(HLSetup);
+        SetupTaskProcessingJobQueue(IsEnabled(Enum::"NPR HL Integration Area"::Members));
+    end;
+
+    local procedure SetupTaskProcessingJobQueue(Enable: Boolean)
     var
         DummyNcTask: Record "NPR Nc Task";
+        JobQueueEntry: Record "Job Queue Entry";
+        HLScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
+        NcTaskListProcessing: Codeunit "NPR Nc Task List Processing";
+        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
+        ParameterFilterTxt: text;
+        FilterPlaceholderTok: Label '@*%1?%2*', Locked = true;
     begin
         if Enable then
-            Codeunit.Run(Codeunit::"NPR HL Schedule Send Tasks", DummyNcTask);
+            Codeunit.Run(Codeunit::"NPR HL Schedule Send Tasks", DummyNcTask)
+        else begin
+            ParameterFilterTxt := StrSubstNo(FilterPlaceholderTok, NcTaskListProcessing.ParamProcessor(), HLScheduleSend.GetHeyLoyaltyTaskProcessorCode());
+            JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+            JobQueueEntry.SetRange("Object ID to Run", NcSetupMgt.TaskListProcessingCodeunit());
+            JobQueueEntry.SetFilter("Parameter String", ParameterFilterTxt);
+            if JobQueueEntry.FindSet() then
+                repeat
+                    JobQueueEntry.Cancel();
+                    Commit();
+                until JobQueueEntry.Next() = 0;
+        end;
     end;
 
     procedure IsEnabled(IntegrationArea: Enum "NPR HL Integration Area"): Boolean
@@ -299,5 +322,11 @@ codeunit 6059993 "NPR HL Integration Mgt."
     begin
         HLSetup.GetRecordOnce(false);
         exit(HLSetup."Read Member Data from Webhook");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshJobQueueEntry()
+    begin
+        SetupTaskProcessingJobQueue();
     end;
 }
