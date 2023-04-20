@@ -1,9 +1,6 @@
 enum 6014490 "NPR Line Printer Device" implements "NPR ILine Printer"
 {
     Extensible = false;
-#if not BC17
-    Access = Internal;
-#endif
 
     value(0; Epson)
     {
