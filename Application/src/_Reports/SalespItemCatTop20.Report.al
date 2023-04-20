@@ -241,6 +241,7 @@
 
     requestpage
     {
+        SaveValues = true;
         layout
         {
             area(content)
@@ -303,7 +304,11 @@
     trigger OnPreReport()
     var
         SalespersonItemCategory: Query "NPR Salesperson/Item Category";
+
     begin
+        if not CheckIfFilterIsSet() then
+            CurrReport.Quit();
+
         CompanyInformation.Get();
 
         TempSalespersonPurchaser.Reset();
@@ -327,6 +332,17 @@
         SalespersonItemCategory.Close();
 
         FiltersText := POSEntry.GetFilters();
+    end;
+
+    local procedure CheckIfFilterIsSet(): Boolean
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        CheckFilterQst: Label 'This report might take longer to process if you do not enter Salesperson Code filter. Are you sure you want to proceed?';
+    begin
+        if POSEntry.GetFilter("Salesperson Code") = '' then
+            if not ConfirmManagement.GetResponseOrDefault(CheckFilterQst, true) then
+                exit;
+        exit(true);
     end;
 
     var
