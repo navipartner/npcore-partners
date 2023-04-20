@@ -126,6 +126,17 @@
                     ToolTip = 'Specifies the value of the Return Sales Quantity field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Amount Incl. Tax"; Rec."Amount Incl. Tax")
+                {
+                    ToolTip = 'Specifies the value of the Sales Document No. field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Posting Date"; Rec."Posting Date")
+                {
+
+                    ToolTip = 'Specifies the value of the Posting Date field';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
@@ -239,6 +250,29 @@
                     POSPostingAction.RunModal();
                     CurrPage.Update(false);
                 end;
+            }
+            action("Show Entry")
+            {
+                Caption = 'Show Entry';
+                Image = Card;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                Visible = IsMobileClient;
+                ToolTip = 'Executes the Show Entry action for Mobile app';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    NPRPOSEntryCard: Page "NPR POS Entry Card";
+                    NPRPOSEntry: Record "NPR POS Entry";
+                begin
+                    NPRPOSEntry.SetRange("Entry No.", Rec."Entry No.");
+                    NPRPOSEntryCard.SetTableView(NPRPOSEntry);
+                    NPRPOSEntryCard.Runmodal();
+                end;
+
             }
             group(Print)
             {
@@ -415,5 +449,12 @@
             }
         }
     }
+    trigger OnOpenPage()
+    begin
+        IsMobileClient := CurrentClientType = ClientType::Phone;
+    end;
+
+    var
+        IsMobileClient: Boolean;
 }
 
