@@ -1,6 +1,7 @@
 ﻿page 6151125 "NPR NpIa Item AddOns"
 {
     Caption = 'Item AddOns';
+    ContextSensitiveHelpPage = 'retail/posunit/explanation/item_addons.html';
     CardPageID = "NPR NpIa Item AddOn Card";
     Editable = false;
     PageType = List;

@@ -7,6 +7,7 @@
     // NPR5.47/NPKNAV/20181026  CASE 327541-01 Transport NPR5.47 - 26 October 2018
 
     Caption = 'Variety Fields Setup';
+    ContextSensitiveHelpPage = 'retail/webshopintegrations/shopify/explanation/varieties.html';
     PageType = List;
     SourceTable = "NPR Variety Field Setup";
     UsageCategory = Administration;
