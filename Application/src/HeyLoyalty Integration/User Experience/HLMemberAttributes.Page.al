@@ -52,15 +52,15 @@ page 6150754 "NPR HL Member Attributes"
 
     trigger OnOpenPage()
     begin
-        if PageCaption <> '' then
-            CurrPage.Caption := PageCaption;
+        if PageCaptionText <> '' then
+            CurrPage.Caption := PageCaptionText;
     end;
 
     var
-        PageCaption: Text[250];
+        PageCaptionText: Text[250];
 
     procedure SetFormCaption(NewPageCaption: Text[250])
     begin
-        PageCaption := CopyStr(NewPageCaption + ' - ' + CurrPage.Caption, 1, MaxStrLen(PageCaption));
+        PageCaptionText := CopyStr(NewPageCaption + ' - ' + CurrPage.Caption, 1, MaxStrLen(PageCaptionText));
     end;
 }
