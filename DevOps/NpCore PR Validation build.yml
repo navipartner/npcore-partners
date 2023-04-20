@@ -61,7 +61,9 @@ stages:
                                 "NPRMembershipEssential",
                                 "NPRMembershipAdvanced",
                                 "NPRNaviConnect",
-                                "NPRHeyLoyalty")
+                                "NPRHeyLoyalty",
+                                "NPRRSRLocal",
+                                "NPRRSLocal")
       exceptions: (@{Type = "Page"; Id = 6151231; Name = "NPR App. Area Setup" })
     generatePermissions:
       enabled: true

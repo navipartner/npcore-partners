@@ -20,6 +20,14 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
                 Enabled = NoWhseEntrForPOSEnabled;
             }
         }
+        addafter("Country/Region Code")
+        {
+            field("NPR RSR Retail Location"; Rec."NPR RSR Retail Location")
+            {
+                ToolTip = 'Specifies whether location is Retail or Warehouse. If checked, location is Retail';
+                ApplicationArea = NPRRSRLocal;
+            }
+        }
         modify("Bin Mandatory")
         {
             trigger OnAfterValidate()
