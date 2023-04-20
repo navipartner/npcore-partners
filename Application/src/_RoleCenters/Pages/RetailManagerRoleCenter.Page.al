@@ -21,6 +21,7 @@
                 Caption = 'POS Activities';
                 ApplicationArea = NPRRetail;
             }
+#IF NOT BC17
             part(RetailSalesChart; "NPR Retail Sales Chart")
             {
                 ApplicationArea = NPRRetail;
@@ -29,6 +30,7 @@
             {
                 ApplicationArea = NPRRetail;
             }
+#ENDIF
             part(RetailTop10ItemsByQty; "NPR Retail 10 Items by Qty.")
             {
                 ApplicationArea = NPRRetail;
