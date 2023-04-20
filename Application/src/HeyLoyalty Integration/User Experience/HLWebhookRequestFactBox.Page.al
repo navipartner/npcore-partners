@@ -6,9 +6,6 @@ page 6150802 "NPR HL Webhook Request FactBox"
     SourceTable = "NPR HL Webhook Request";
     UsageCategory = None;
     Editable = false;
-#IF NOT BC17
-    AboutText = 'Specifies webhook request details received from HeyLoyalty.';
-#ENDIF
 
     layout
     {
