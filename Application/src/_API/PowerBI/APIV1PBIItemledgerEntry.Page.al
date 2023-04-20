@@ -56,6 +56,30 @@ page 6059929 "NPR APIV1 PBIItemledgerEntry"
                 {
                     Caption = 'Global Dimension 2 Code', Locked = true;
                 }
+                field(shortcutDimension3Code; ShortcutDimCode[3])
+                {
+                    Caption = 'Shortcut Dimension 3 Code', Locked = true;
+                }
+                field(shortcutDimension4Code; ShortcutDimCode[4])
+                {
+                    Caption = 'Shortcut Dimension 4 Code', Locked = true;
+                }
+                field(shortcutDimension5Code; ShortcutDimCode[5])
+                {
+                    Caption = 'Shortcut Dimension 5 Code', Locked = true;
+                }
+                field(shortcutDimension6Code; ShortcutDimCode[6])
+                {
+                    Caption = 'Shortcut Dimension 6 Code', Locked = true;
+                }
+                field(shortcutDimension7Code; ShortcutDimCode[7])
+                {
+                    Caption = 'Shortcut Dimension 7 Code', Locked = true;
+                }
+                field(shortcutDimension8Code; ShortcutDimCode[8])
+                {
+                    Caption = 'Shortcut Dimension 8 Code', Locked = true;
+                }
                 field(postingDate; Rec."Posting Date")
                 {
                     Caption = 'Posting Date', Locked = true;
@@ -127,4 +151,12 @@ page 6059929 "NPR APIV1 PBIItemledgerEntry"
             }
         }
     }
+    trigger OnAfterGetRecord()
+    begin
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
+    end;
+
+    var
+        DimMgt: Codeunit DimensionManagement;
+        ShortcutDimCode: array[8] of Code[20];
 }
