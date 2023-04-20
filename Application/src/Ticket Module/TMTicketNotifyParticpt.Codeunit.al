@@ -753,13 +753,12 @@
         until (ProfileLine.Next() = 0);
     end;
 
-    procedure CreateFirstAdmissionNotification(TicketAccessEntry: Record "NPR TM Ticket Access Entry") NotificationEntryNo: Integer
+    procedure CreateOnAdmissionNotification(TicketAccessEntry: Record "NPR TM Ticket Access Entry"; DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; FirstAdmission: Boolean) NotificationEntryNo: Integer
     var
         Ticket: Record "NPR TM Ticket";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         NotificationProfile: Record "NPR TM Notification Profile";
         ProfileLine: Record "NPR TM Notif. Profile Line";
-        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         Member: Record "NPR MM Member";
     begin
         if (not Ticket.Get(TicketAccessEntry."Ticket No.")) then
@@ -778,14 +777,12 @@
             exit(0);
 
         ProfileLine.SetFilter("Profile Code", '=%1', TicketBOM."Notification Profile Code");
-        ProfileLine.SetFilter("Notification Trigger", '=%1', ProfileLine."Notification Trigger"::FIRST_ADMISSION);
+        ProfileLine.SetFilter("Notification Trigger", '=%1', ProfileLine."Notification Trigger"::ON_EACH_ADMISSION);
+        if (FirstAdmission) then
+            ProfileLine.SetFilter("Notification Trigger", '=%1|=%2', ProfileLine."Notification Trigger"::FIRST_ADMISSION, ProfileLine."Notification Trigger"::ON_EACH_ADMISSION);
+
         ProfileLine.SetFilter(Blocked, '=%1', false);
         if (not ProfileLine.FindSet()) then
-            exit(0);
-
-        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
-        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
-        if (not DetTicketAccessEntry.FindFirst()) then
             exit(0);
 
         GetMember(Ticket."External Member Card No.", Member);
@@ -854,7 +851,6 @@
         AdmSchEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";
         NotificationEntry: Record "NPR TM Ticket Notif. Entry";
-        CalcReminderTime: DateTime;
     begin
 #pragma warning disable AA0217
         Ticket.Get(DetTicketAccessEntry."Ticket No.");
@@ -875,65 +871,31 @@
         if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::WELCOME) then begin
             NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::WELCOME;
             // Schedule based on today
-            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::DAYS) then begin
-                NotificationEntry."Date To Notify" := CalcDate(StrSubstNo('<%1D>', ABS(TicketNotProfileLine.Units)));
-                NotificationEntry."Time To Notify" := Time();
-            end;
-
-            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::HOURS) then begin
-                CalcReminderTime := CurrentDateTime();
-                CalcReminderTime += ABS(TicketNotProfileLine.Units) * 3600 * 1000;
-                NotificationEntry."Date To Notify" := DT2Date(CalcReminderTime);
-                NotificationEntry."Time To Notify" := DT2Time(CalcReminderTime);
-            end;
+            AddUsingProfileTimeOffset(TicketNotProfileLine, NotificationEntry, Today(), Time());
         end;
 
         if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::RESERVATION) then begin
             NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::RESERVE;
             // Schedule ahead of admission start
-            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::DAYS) then begin
-                NotificationEntry."Date To Notify" := CalcDate(StrSubstNo('<-%1D>', ABS(TicketNotProfileLine.Units)), AdmSchEntry."Admission Start Date");
-                NotificationEntry."Time To Notify" := AdmSchEntry."Admission Start Time";
-            end;
-
-            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::HOURS) then begin
-                CalcReminderTime := CreateDateTime(AdmSchEntry."Admission Start Date", AdmSchEntry."Admission Start Time");
-                CalcReminderTime -= ABS(TicketNotProfileLine.Units) * 3600 * 1000;
-                NotificationEntry."Date To Notify" := DT2Date(CalcReminderTime);
-                NotificationEntry."Time To Notify" := DT2Time(CalcReminderTime);
-            end;
+            SubtractUsingProfileTimeOffset(TicketNotProfileLine, NotificationEntry, AdmSchEntry."Admission Start Date", AdmSchEntry."Admission Start Time");
         end;
 
         if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::FIRST_ADMISSION) then begin
             NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::ADMIT;
             // Schedule after admission end
-            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::DAYS) then begin
-                NotificationEntry."Date To Notify" := CalcDate(StrSubstNo('<%1D>', ABS(TicketNotProfileLine.Units)), AdmSchEntry."Admission End Date");
-                NotificationEntry."Time To Notify" := AdmSchEntry."Admission End Time";
-            end;
+            AddUsingProfileTimeOffset(TicketNotProfileLine, NotificationEntry, AdmSchEntry."Admission End Date", AdmSchEntry."Admission End Time");
+        end;
 
-            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::HOURS) then begin
-                CalcReminderTime := CreateDateTime(AdmSchEntry."Admission End Date", AdmSchEntry."Admission End Time");
-                CalcReminderTime += ABS(TicketNotProfileLine.Units) * 3600 * 1000;
-                NotificationEntry."Date To Notify" := DT2Date(CalcReminderTime);
-                NotificationEntry."Time To Notify" := DT2Time(CalcReminderTime);
-            end;
+        if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::ON_EACH_ADMISSION) then begin
+            NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::ADMIT;
+            // Schedule after admission occurred
+            AddUsingProfileTimeOffset(TicketNotProfileLine, NotificationEntry, DT2Date(DetTicketAccessEntry."Created Datetime"), DT2Time(DetTicketAccessEntry."Created Datetime"));
         end;
 
         if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::REVOKE) then begin
             NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::CANCEL_RESERVE;
             // Schedule after NOW
-            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::DAYS) then begin
-                NotificationEntry."Date To Notify" := CalcDate(StrSubstNo('<%1D>', ABS(TicketNotProfileLine.Units)), TODAY);
-                NotificationEntry."Time To Notify" := Time();
-            end;
-
-            if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::HOURS) then begin
-                CalcReminderTime := CreateDateTime(TODAY, Time());
-                CalcReminderTime += ABS(TicketNotProfileLine.Units) * 3600 * 1000;
-                NotificationEntry."Date To Notify" := DT2Date(CalcReminderTime);
-                NotificationEntry."Time To Notify" := DT2Time(CalcReminderTime);
-            end;
+            AddUsingProfileTimeOffset(TicketNotProfileLine, NotificationEntry, Today(), Time());
         end;
 
         if (NotificationEntry."Date To Notify" < Today()) then
@@ -988,6 +950,54 @@
 
         exit(NotificationEntry."Entry No.");
 #pragma warning restore
+    end;
+
+    local procedure AddUsingProfileTimeOffset(TicketNotProfileLine: Record "NPR TM Notif. Profile Line"; var NotificationEntry: Record "NPR TM Ticket Notif. Entry"; DateBase: Date; TimeBase: Time)
+    var
+        CalcReminderTime: DateTime;
+    begin
+        if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::DAYS) then begin
+            NotificationEntry."Date To Notify" := CalcDate(StrSubstNo('<%1D>', Abs(TicketNotProfileLine.Units)), DateBase);
+            NotificationEntry."Time To Notify" := TimeBase;
+        end;
+
+        if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::HOURS) then begin
+            CalcReminderTime := CreateDateTime(DateBase, TimeBase);
+            CalcReminderTime += Abs(TicketNotProfileLine.Units) * 3600 * 1000;
+            NotificationEntry."Date To Notify" := DT2Date(CalcReminderTime);
+            NotificationEntry."Time To Notify" := DT2Time(CalcReminderTime);
+        end;
+
+        if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::MINUTES) then begin
+            CalcReminderTime := CreateDateTime(DateBase, TimeBase);
+            CalcReminderTime += Abs(TicketNotProfileLine.Units) * 60 * 1000;
+            NotificationEntry."Date To Notify" := DT2Date(CalcReminderTime);
+            NotificationEntry."Time To Notify" := DT2Time(CalcReminderTime);
+        end;
+    end;
+
+    local procedure SubtractUsingProfileTimeOffset(TicketNotProfileLine: Record "NPR TM Notif. Profile Line"; var NotificationEntry: Record "NPR TM Ticket Notif. Entry"; DateBase: Date; TimeBase: Time)
+    var
+        CalcReminderTime: DateTime;
+    begin
+        if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::DAYS) then begin
+            NotificationEntry."Date To Notify" := CalcDate(StrSubstNo('<-%1D>', Abs(TicketNotProfileLine.Units)), DateBase);
+            NotificationEntry."Time To Notify" := TimeBase;
+        end;
+
+        if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::HOURS) then begin
+            CalcReminderTime := CreateDateTime(DateBase, TimeBase);
+            CalcReminderTime -= Abs(TicketNotProfileLine.Units) * 3600 * 1000;
+            NotificationEntry."Date To Notify" := DT2Date(CalcReminderTime);
+            NotificationEntry."Time To Notify" := DT2Time(CalcReminderTime);
+        end;
+
+        if (TicketNotProfileLine."Unit of Measure" = TicketNotProfileLine."Unit of Measure"::MINUTES) then begin
+            CalcReminderTime := CreateDateTime(DateBase, TimeBase);
+            CalcReminderTime -= Abs(TicketNotProfileLine.Units) * 60 * 1000;
+            NotificationEntry."Date To Notify" := DT2Date(CalcReminderTime);
+            NotificationEntry."Time To Notify" := DT2Time(CalcReminderTime);
+        end;
     end;
 
     local procedure SetNotificationDetention(var TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; ResponseMessage: Text): Boolean
