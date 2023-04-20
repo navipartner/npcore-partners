@@ -32,8 +32,8 @@
         {
             Caption = 'Unit of Measure';
             DataClassification = CustomerContent;
-            OptionMembers = DAYS,HOURS;
-            OptionCaption = 'Day(s),Hour(s)';
+            OptionMembers = DAYS,HOURS,MINUTES;
+            OptionCaption = 'Day(s),Hour(s),Minute(s)';
         }
         field(25; Units; Integer)
         {
@@ -44,8 +44,8 @@
         {
             Caption = 'Notification Trigger';
             DataClassification = CustomerContent;
-            OptionMembers = RESERVATION,FIRST_ADMISSION,REVOKE,WELCOME;
-            OptionCaption = 'Reservation Reminder,First Admission,Revoke,Welcome';
+            OptionMembers = RESERVATION,FIRST_ADMISSION,REVOKE,WELCOME,ON_EACH_ADMISSION;
+            OptionCaption = 'Reservation Reminder,After First Admission,Revoke,Welcome,On Each Admission';
         }
         field(32; "Detention Time Seconds"; Integer)
         {
