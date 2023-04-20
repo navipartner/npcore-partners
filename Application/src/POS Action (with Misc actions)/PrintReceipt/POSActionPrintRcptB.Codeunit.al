@@ -114,6 +114,7 @@ codeunit 6060086 "NPR POS Action: Print Rcpt.-B"
             if POSEntry.FindFirst() then;
             if PAGE.RunModal(0, POSEntry) <> ACTION::LookupOK then
                 exit('');
+
         end;
         POSEntryManagement.PrintEntry(POSEntry, SettingOption in [SettingOption::"Choose Receipt Large", SettingOption::"Last Receipt Large"]);
         exit(POSEntry."Document No.");

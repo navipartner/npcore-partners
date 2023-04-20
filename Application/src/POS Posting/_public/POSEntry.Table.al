@@ -609,6 +609,8 @@
 
     fieldgroups
     {
+        fieldgroup(Brick; Description, "Document No.", "Amount Incl. Tax", "Customer No.", "Posting Date")
+        { }
     }
 
     trigger OnDelete()
