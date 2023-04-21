@@ -135,8 +135,6 @@
             if (JToken.SelectToken('msg', MsgToken)) then
                 ResponseMsg := MsgToken.AsValue().AsText();
         end;
-
-        exit(true);
     end;
 
     local procedure SetHeader(var Headers: HttpHeaders; HeaderName: Text; HeaderValue: Text)

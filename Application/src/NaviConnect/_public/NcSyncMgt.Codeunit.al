@@ -539,9 +539,10 @@
         ResponseCodeText: Text;
         FolderName: Text;
         i: Integer;
-        FolderExist: Boolean;
         JArray: JsonArray;
         FileObject: JsonObject;
+        FolderExist: Boolean;
+        FolderDoesNotExistLbl: Label 'Folder with that name does not exist';
     begin
         FtpUrl := PathOneLevelUp(FtpUrl, FolderName);
 
@@ -577,8 +578,8 @@
                 Error(JToken.AsValue().AsText());
             end;
         end;
-
-        exit(FolderExist);
+        if not FolderExist then
+            Error(FolderDoesNotExistLbl);
     end;
 
     [TryFunction]
@@ -592,8 +593,8 @@
 
         FTPResponse.Get('StatusCode', JToken);
         ResponseCodeText := JToken.AsValue().AsText();
-
-        exit(ResponseCodeText = '200');
+        if ResponseCodeText <> '200' then
+            Error(ResponseCodeText);
     end;
 
 #pragma warning disable AA0139
@@ -629,8 +630,8 @@
 
         FTPResponse.Get('StatusCode', JToken);
         ResponseCodeText := JToken.AsValue().AsText();
-
-        exit(ResponseCodeText = '200');
+        if ResponseCodeText <> '200' then
+            Error(ResponseCodeText);
     end;
 
     [TryFunction]
@@ -645,7 +646,8 @@
         FTPResponse.Get('StatusCode', JToken);
         ResponseCodeText := JToken.AsValue().AsText();
 
-        exit(ResponseCodeText = '200');
+        if ResponseCodeText <> '200' then
+            Error(ResponseCodeText);
     end;
     #endregion Aux
 
