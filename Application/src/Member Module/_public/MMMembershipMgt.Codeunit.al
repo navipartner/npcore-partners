@@ -392,7 +392,7 @@
                 exit(RaiseError(ReasonText, StrSubstNo(AGE_VERIFICATION, Member."Display Name", MembershipSalesSetup."Age Constraint (Years)"), AGE_VERIFICATION_NO) = 0);
         end;
 
-        MembershipEvents.OnAfterMemberCreateEvent(Membership, Member);
+        MembershipEvents.OnAfterMemberCreateEvent(Membership, Member, MembershipInfoCapture);
         AddMemberCreateNotification(MembershipEntryNo, MembershipSetup, Member, MembershipInfoCapture);
 
         MemberEntryNo := Member."Entry No.";
