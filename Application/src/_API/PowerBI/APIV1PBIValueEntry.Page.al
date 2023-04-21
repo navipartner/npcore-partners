@@ -28,6 +28,10 @@ page 6059969 "NPR APIV1 PBIValueEntry"
                 {
                     Caption = 'Cost Amount (Actual)', Locked = true;
                 }
+                field(costAmountExpected; Rec."Cost Amount (Expected)")
+                {
+                    Caption = 'Cost Amount (Expected)', Locked = true;
+                }
                 field(documentNo; Rec."Document No.")
                 {
                     Caption = 'Document No.';
