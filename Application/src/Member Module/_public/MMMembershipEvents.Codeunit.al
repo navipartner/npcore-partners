@@ -22,7 +22,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnAfterMemberCreateEvent(var Membership: Record "NPR MM Membership"; var Member: Record "NPR MM Member")
+    internal procedure OnAfterMemberCreateEvent(var Membership: Record "NPR MM Membership"; var Member: Record "NPR MM Member"; MemberInfoCapture: Record "NPR MM Member Info Capture")
     begin
     end;
 

@@ -309,6 +309,14 @@ codeunit 6150954 "NPR HL MultiChoice Field Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Membership Events", 'OnAfterSetMemberFields', '', false, false)]
     local procedure UpdateMemberMCFOptionsFromMemberInfoCapture(var Member: Record "NPR MM Member"; MemberInfoCapture: Record "NPR MM Member Info Capture")
     begin
+        if Member."Entry No." = 0 then
+            exit;
+        CopyAssignedMCFOptions(MemberInfoCapture.RecordId(), Member.RecordId());
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Membership Events", 'OnAfterMemberCreateEvent', '', false, false)]
+    local procedure UpdateMemberMCFOptionsFromMemberInfoCaptureOnMemberCreate(var Member: Record "NPR MM Member"; MemberInfoCapture: Record "NPR MM Member Info Capture")
+    begin
         CopyAssignedMCFOptions(MemberInfoCapture.RecordId(), Member.RecordId());
     end;
 
