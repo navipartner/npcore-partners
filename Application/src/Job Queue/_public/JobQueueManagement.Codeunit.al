@@ -453,24 +453,55 @@
 
     local procedure RefreshRetentionPolicyJQ()
     var
+        JobQueueEntry: Record "Job Queue Entry";
+        RetentionPolicyLog: Codeunit "Retention Policy Log";
+        RetentionPolicyLogCategory: Enum "Retention Policy Log Category";
         RetentionPolicySetup: Record "Retention Policy Setup";
+        NextRunDateFormula: DateFormula;
+        JobQueueActivatedNotificationTxt: Label 'A Job Queue Entry to apply the retention policies has been scheduled to run.';
+        JobQueueReadyNotificationTxt: Label 'A Job Queue Entry to apply the retention policies was set to Ready state.';
     begin
-        RetentionPolicySetup.SetRange(Enabled, true);
-        if RetentionPolicySetup.IsEmpty() then begin
-            RetentionPolicySetup.SetRange(Enabled);
-            if RetentionPolicySetup.IsEmpty() then
-                exit;
+        if RetentionPolicySetup.IsEmpty() then
+            exit;
+        if RetentionPolicySetup.WritePermission() and TaskScheduler.CanCreateTask() then begin
+            RetentionPolicySetup.FindFirst();
+            RetentionPolicySetup.Modify();  //will trigger scheduling of recurring retention policy job
+            exit;
         end;
-        RetentionPolicySetup.FindFirst();
-        RetentionPolicySetup.Modify();  //will trigger scheduling of recurring retention policy job
+
+        //Manually create retention policy job queue, if current user does not have sufficient permissions to modify table "Retention Policy Setup" records, or the user cannot schedule tasks.
+        //Based on Codeunit 3998 "Retention Policy Scheduler", procedure ScheduleRecurringRetentionPolicy()
+        if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, 3997) then begin  //3997 = Codeunit::"Retention Policy JQ"
+            if JobQueueEntry.IsReadyToStart() or not TaskScheduler.CanCreateTask() then
+                exit;
+
+            JobQueueEntry.SetStatus(JobQueueEntry.Status::Ready);
+            RetentionPolicyLog.LogInfo(RetentionPolicyLogCategory::"Retention Policy - Schedule", JobQueueReadyNotificationTxt);
+            exit;
+        end;
+
+        Evaluate(NextRunDateFormula, '<1D>');
+        SetJobTimeout(6, 0); // 6hr timeout
+        if InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            3997,
+            '',
+            '',
+            NowWithDelayInSeconds(360),
+            023000T,
+            0T,
+            NextRunDateFormula,
+            CreateAndAssignRetentionPolicyJobQueueCategory(),
+            JobQueueEntry)
+        then
+            if TaskScheduler.CanCreateTask() then begin
+                StartJobQueueEntry(JobQueueEntry);
+                RetentionPolicyLog.LogInfo(RetentionPolicyLogCategory::"Retention Policy - Schedule", JobQueueActivatedNotificationTxt);
+            end;
     end;
 
     internal procedure RefreshNPRJobQueueList()
     begin
-        AddPosItemPostingJobQueue();
-        AddPosPostingJobQueue();
-        RefreshRetentionPolicyJQ();
-
         OnRefreshNPRJobQueueList();
     end;
 
@@ -490,6 +521,17 @@
             SalesSetup.Modify();
         end;
         exit(SalesSetup."Job Queue Category Code");
+    end;
+
+    local procedure CreateAndAssignRetentionPolicyJobQueueCategory(): Code[10]
+    var
+        JobQueueCategory: Record "Job Queue Category";
+        JobQueueCategoryDescTxt: Label 'Retention Policies', MaxLength = 30;
+        JobQueueCategoryTok: Label 'RETENTION', Locked = true, MaxLength = 10;
+    begin
+        if not JobQueueCategory.Get(JobQueueCategoryTok) then
+            JobQueueCategory.InsertRec(JobQueueCategoryTok, JobQueueCategoryDescTxt);
+        exit(JobQueueCategory.Code);
     end;
 
     local procedure EmitTelemetryDataOnError(JobQueueLogEntry: Record "Job Queue Log Entry")
@@ -621,6 +663,24 @@
             exit;
 
         EmitTelemetryDataOnError(JobQueueLogEntry);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RunAddPosItemPostingJobQueue()
+    begin
+        AddPosItemPostingJobQueue();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RunAddPosPostingJobQueue()
+    begin
+        AddPosPostingJobQueue();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RunRefreshRetentionPolicyJQ()
+    begin
+        RefreshRetentionPolicyJQ();
     end;
 
     [IntegrationEvent(false, false)]
