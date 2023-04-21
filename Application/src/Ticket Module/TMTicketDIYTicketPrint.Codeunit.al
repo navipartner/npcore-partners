@@ -230,9 +230,7 @@
         AuthLbl: Label '%1:%2', Locked = true;
         BasicLbl: Label 'Basic %1', Locked = true;
     begin
-
-        if (not TicketSetup.Get()) then
-            exit(false);
+        TicketSetup.Get();
 
         Url := TicketSetup."Print Server Generator URL";
         UserName := TicketSetup."Print Server Gen. Username";
@@ -278,9 +276,9 @@
                         Error(UnexpectedResponseCodeErr, Response.HttpStatusCode)
                     end;
                 else begin
-                        if (not Response.Content.ReadAs(ResponseText)) then
-                            ResponseText := StrSubstNo(XmlErrorTxt, Response.HttpStatusCode(), RequestText, Url);
-                    end;
+                    if (not Response.Content.ReadAs(ResponseText)) then
+                        ResponseText := StrSubstNo(XmlErrorTxt, Response.HttpStatusCode(), RequestText, Url);
+                end;
             end
         end else
             ResponseText := StrSubstNo(XmlErrorTxt, '990', GetLastErrorText(), Url);
