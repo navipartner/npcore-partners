@@ -2,6 +2,8 @@ codeunit 85019 "NPR Tax Free Tests"
 {
     Subtype = Test;
     EventSubscriberInstance = Manual;
+
+#if not BC17    
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('AnswerYesConfirmHandlerNo')]
@@ -148,7 +150,7 @@ codeunit 85019 "NPR Tax Free Tests"
         Assert.IsFalse(TaxFreeVoucher.Get(TaxFreeVoucherSaleLink."Voucher Entry No."), 'Voucher should not be created');
 
     end;
-
+#endif
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('AnswerYesConfirmHandlerNo')]
