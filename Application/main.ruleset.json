@@ -9,7 +9,7 @@
         },
         {
             "id": "AA0005",
-            "action":"Hidden",
+            "action": "None",
             "justification": "Only use BEGIN..END to enclose compound statements."
         },
         {
@@ -24,22 +24,17 @@
         },
         {
             "id": "AA0021",
-            "action":"Hidden",
+            "action": "None",
             "justification": "Variable declarations should be ordered by type."
         },
         {
             "id": "AA0022",
             "action": "Error",
             "justification": "An IF followed by two or more ELSE IF should be replaced with a CASE"
-        },
-        {
-            "id": "AS0053",
-            "action":"Warning",
-            "justification": "The compilation target of an application must be a value that is allowed in a multi-tenant SaaS environment."
         },        
         {
             "id": "AA0072",
-            "action":"Hidden",
+            "action": "None",
             "justification": "The name of variables and parameters must be suffixed with the type or object name."
         },
         {
@@ -49,7 +44,7 @@
         },
         {
             "id": "AA0074",
-            "action":"Hidden",
+            "action": "None",
             "justification": "TextConst and Label variable names should have an approved suffix."
         },
         {
@@ -119,22 +114,22 @@
         },
         {
             "id": "AA0175",
-            "action":"Hidden",
+            "action": "None",
             "justification": "Only find or get records if you are not using values."
         },
         {
             "id": "AA0181",
-            "action":"Hidden",
+            "action": "None",
             "justification": "The FindSet() or Find() methods must be used only in connection with the Next() method."
         },
         {
             "id": "AA0189",
-            "action":"Hidden",
+            "action": "None",
             "justification": "Only use a correct values of ApplicationArea."
         },
         {
             "id": "AA0194",
-            "action":"Hidden",
+            "action": "None",
             "justification": "Remember to specify either the 'OnAction' trigger or 'RunObject' property on an action."
         },
         {
@@ -144,17 +139,17 @@
         },
         {
             "id": "AA0199",
-            "action":"Hidden",
+            "action": "None",
             "justification": "Use only a correct order for ApplicationArea."
         },
         {
             "id": "AA0200",
-            "action":"Hidden",
+            "action": "None",
             "justification": "When ApplicationArea is set to 'All', no other values for ApplicationArea should be specified."
         },
         {
             "id": "AA0201",
-            "action":"Hidden",
+            "action": "None",
             "justification": "When ApplicationArea is set to 'Basic', you must also specify 'Suite'."
         },
         {
@@ -174,7 +169,7 @@
         },
         {
             "id": "AA0205",
-            "action":"Hidden",
+            "action": "None",
             "justification": "Always initialize a variable before usage. This can improve readability and make debugging easier."
         },
         {
@@ -189,7 +184,7 @@
         },
         {
             "id": "AA0210",
-            "action":"Hidden",
+            "action": "None",
             "justification": "Avoid non-indexed fields into filtering. Suboptimal index."
         },
         {
@@ -204,12 +199,12 @@
         },
         {
             "id": "AA0214",
-            "action":"Hidden",
+            "action": "None",
             "justification": "The local record should be modified before saving to the database."
         },        
         {
             "id": "AA0215",
-            "action":"Hidden",
+            "action": "None",
             "justification": "Follow the style guide about the best practices for naming."
         },
         {
@@ -219,7 +214,7 @@
         },
         {
             "id": "AA0217",
-            "action":"Hidden",
+            "action": "None",
             "justification": "Use a text constant or label for format string in StrSubstNo."
         },
         {
@@ -274,12 +269,12 @@
         },
         {
             "id": "AA0232",
-            "action":"Hidden",
+            "action": "None",
             "justification": "The FlowField of a table should be indexed."
         },
         {
             "id": "AA0233",
-            "action":"Hidden",
+            "action": "None",
             "justification": "The 'FindFirst', 'FindLast' and 'Get' methods must be used without the Next() method."
         },        
         {
@@ -294,7 +289,7 @@
         },
         {
             "id": "AA0241",
-            "action":"None",
+            "action": "None",
             "justification": "Use all lowercase letters for reserved language keywords."
         },
         {
@@ -314,7 +309,7 @@
         },
         {
             "id": "AA0448",
-            "action":"Hidden",
+            "action": "None",
             "justification": "You must use the FieldCaption method instead of the FieldName method and TableCaption method instead of TableName method."
         },
         {
@@ -327,11 +322,6 @@
             "action":"None",
             "justification": "Excluding Codecop rules to have few included."
         },
-        {
-            "id": "AL0775",
-            "action":"Error",
-            "justification": "Try method should not specify en explicit return value."
-        },            
         {
             "id": "AL0603",
             "action":"Error",
@@ -348,11 +338,6 @@
             "justification": "The 'with' statement is deprecated."
         },
         {
-            "id": "AL0667",
-            "action":"Error",
-            "justification": "Future Error - '{0}' is being deprecated in the versions: {1} {2}."
-        },        
-        {
             "id":"AS0029",
             "action": "Error",
             "justification": "Pages and PageExtensions must not be deleted."
@@ -364,17 +349,17 @@
         },
         {
             "id": "AS0081",
-            "action":"Hidden",
+            "action": "None",
             "justification": "The InternalsVisibleTo setting will expose your internal objects to any extension with the given name, publisher, and ID. Access modifiers are not designed to be used as a security boundary, but for API development."
         },
         {
             "id": "AS0086",
-            "action":"Hidden",
+            "action": "None",
             "justification": "Fields must not increase in length."
         }, 
         {
             "id": "AS0094",
-            "action":"Hidden",
+            "action": "None",
             "justification": "Permission sets should not be defined in XML. Instead, use the dedicated AL object for 'PermissionSet'."
         },
         {
@@ -409,8 +394,18 @@
         },
         {
             "id": "AW0009",
-            "action": "Hidden",
+            "action": "None",
             "justification": "Skip 'Using Blob with subtype Bitmap is deprecated' warnings. Sticking with Blobs for now."
+        },
+        {
+            "id": "AS0053",
+            "action":"Warning",
+            "justification": "The compilation target of an application must be a value that is allowed in a multi-tenant SaaS environment."
+        },
+        {
+            "id": "AS0103",
+            "action": "None",
+            "justification": "We auto generate permission set in the build pipeline, and this cop is performance heavy"
         }
     ]
 }
