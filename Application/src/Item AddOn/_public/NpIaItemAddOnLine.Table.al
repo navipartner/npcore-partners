@@ -173,17 +173,8 @@
             DataClassification = CustomerContent;
 
             trigger OnLookup()
-            var
-                EventSubscription: Record "Event Subscription";
             begin
-                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpIa Item AddOn Mgt.");
-                EventSubscription.SetRange("Published Function", 'OnSetupGenericParentTable');
-                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
-                    exit;
-
-                "Before Insert Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
-                "Before Insert Function" := EventSubscription."Subscriber Function";
+                LookupOnBeforeInsertCodeunitFunction();
             end;
 
             trigger OnValidate()
@@ -195,12 +186,15 @@
                     exit;
                 end;
 
-                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpIa Item AddOn Mgt.");
-                EventSubscription.SetRange("Published Function", 'OnSetupGenericParentTable');
+                FilterOnBeforeInsertSubscribers(EventSubscription);
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Before Insert Codeunit ID");
-                if "Before Insert Function" <> '' then
+                if "Before Insert Function" <> '' then begin
                     EventSubscription.SetRange("Subscriber Function", "Before Insert Function");
+                    if EventSubscription.IsEmpty() then begin
+                        EventSubscription.SetRange("Subscriber Function");
+                        "Before Insert Function" := '';
+                    end;
+                end;
                 EventSubscription.FindFirst();
             end;
         }
@@ -218,17 +212,8 @@
             DataClassification = CustomerContent;
 
             trigger OnLookup()
-            var
-                EventSubscription: Record "Event Subscription";
             begin
-                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpIa Item AddOn Mgt.");
-                EventSubscription.SetRange("Published Function", 'BeforeInsertPOSAddOnLine');
-                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
-                    exit;
-
-                "Before Insert Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
-                "Before Insert Function" := EventSubscription."Subscriber Function";
+                LookupOnBeforeInsertCodeunitFunction();
             end;
 
             trigger OnValidate()
@@ -240,12 +225,10 @@
                     exit;
                 end;
 
-                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpIa Item AddOn Mgt.");
-                EventSubscription.SetRange("Published Function", 'BeforeInsertPOSAddOnLine');
+                FilterOnBeforeInsertSubscribers(EventSubscription);
                 EventSubscription.SetRange("Subscriber Function", "Before Insert Function");
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Before Insert Codeunit ID");
-                if not EventSubscription.FindFirst() then
+                if EventSubscription.IsEmpty() then
                     EventSubscription.SetRange("Subscriber Codeunit ID");
 
                 EventSubscription.FindFirst();
@@ -289,5 +272,24 @@
     begin
         if Type = Quantity then
             TestField("Item No.");
+    end;
+
+    local procedure LookupOnBeforeInsertCodeunitFunction()
+    var
+        EventSubscription: Record "Event Subscription";
+    begin
+        FilterOnBeforeInsertSubscribers(EventSubscription);
+        if Page.RunModal(Page::"Event Subscriptions", EventSubscription) <> Action::LookupOK then
+            exit;
+
+        "Before Insert Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
+        "Before Insert Function" := EventSubscription."Subscriber Function";
+    end;
+
+    local procedure FilterOnBeforeInsertSubscribers(var EventSubscription: Record "Event Subscription")
+    begin
+        EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+        EventSubscription.SetRange("Publisher Object ID", Codeunit::"NPR NpIa Item AddOn");
+        EventSubscription.SetRange("Published Function", 'OnBeforeInsertPOSAddOnLine');
     end;
 }
