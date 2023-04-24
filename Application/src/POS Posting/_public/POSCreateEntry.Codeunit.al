@@ -1883,7 +1883,9 @@
     begin
         if not MarketingSetup.Get() then
             exit;
-        if not Contact.Get(SalePOS."Contact No.") then
+        if SalePOS."Contact No." = '' then
+            exit;
+        if not Contact.Get(CopyStr(SalePOS."Contact No.", 1, MaxStrLen(Contact."No."))) then
             exit;
         if not POSEntryNavigation.HasBusinessRelation("Contact Business Relation Link To Table"::Customer, MarketingSetup."Bus. Rel. Code for Customers", Contact) then
             exit;

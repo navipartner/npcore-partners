@@ -128,7 +128,7 @@
 
         if SalePOS."Contact No." <> '' then begin
             Contact.SetLoadFields(Name);
-            if not Contact.Get(SalePOS."Contact No.") then
+            if not Contact.Get(CopyStr(SalePOS."Contact No.", 1, MaxStrLen(Contact."No."))) then
                 if Customer."No." <> '' then begin
                     ContactBusinessRelation.SetCurrentKey("Link to Table", "No.");
                     ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
