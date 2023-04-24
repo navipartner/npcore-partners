@@ -1155,7 +1155,11 @@
         trigger OnOpenPage()
         begin
             ArchiveDocument := PurchSetup."Archive Orders";
-            LogInteraction := SegManagement.FindInteractTmplCode(13) <> '';
+#IF BC21 OR BC20 OR BC19 OR BC18 OR BC17
+        LogInteraction := SegManagement.FindInteractTmplCode(13) <> '';
+#ELSE
+            LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type".FromInteger(13)) <> '';
+#ENDIF
 
             LogInteractionEnable := LogInteraction;
         end;

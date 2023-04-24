@@ -804,7 +804,11 @@
 
         trigger OnOpenPage()
         begin
+#IF BC21 OR BC20 OR BC19 OR BC18 OR BC17
             LogInteraction := SegManagement.FindInteractTmplCode(22) <> '';
+#ELSE
+            LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type".FromInteger(22)) <> '';
+#ENDIF
             LogInteractionEnable := LogInteraction;
         end;
     }
