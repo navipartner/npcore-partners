@@ -69,8 +69,8 @@ codeunit 6150858 "NPR POS Action: Start POS" implements "NPR IPOS Workflow"
 
         if (POSUnit."POS End of Day Profile" <> '') then begin
             POSEndofDayProfile.Get(POSUnit."POS End of Day Profile");
-            BalancingIsNotAllowed := (POSEndofDayProfile."Master POS Unit No." <> POSUnit."No.");
             if (POSEndofDayProfile."End of Day Type" = POSEndofDayProfile."End of Day Type"::MASTER_SLAVE) then begin
+                BalancingIsNotAllowed := (POSEndofDayProfile."Master POS Unit No." <> POSUnit."No.");
                 MasterPOSUnit.Get(POSEndofDayProfile."Master POS Unit No.");
 
                 if (POSUnit."No." <> POSEndofDayProfile."Master POS Unit No.") then begin
