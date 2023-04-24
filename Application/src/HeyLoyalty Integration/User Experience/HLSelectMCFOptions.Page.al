@@ -4,7 +4,7 @@ page 6150832 "NPR HL Select MCF Options"
     Caption = 'HL Select MC Field Options';
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = List;
+    PageType = Worksheet;
     SourceTable = "NPR HL MultiChoice Fld Option";
     SourceTableView = sorting("Field Code", "Sort Order");
     UsageCategory = None;
