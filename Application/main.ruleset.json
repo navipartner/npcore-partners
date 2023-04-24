@@ -328,6 +328,11 @@
             "justification": "Excluding Codecop rules to have few included."
         },
         {
+            "id": "AL0775",
+            "action":"Error",
+            "justification": "Try method should not specify en explicit return value."
+        },            
+        {
             "id": "AL0603",
             "action":"Error",
             "justification": "An implicit conversion is being performed from a value of type '{0}' to a value of type '{1}'. This conversion can lead to unexpected runtime issues."
