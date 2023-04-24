@@ -321,7 +321,12 @@
         if (not PrintAllHavingEntry) and (not PrintAllHavingBal) then
             PrintAllHavingBal := true;
 
+#IF BC21 OR BC20 OR BC19 OR BC18 OR BC17
         LogInteraction := SegManagement.FindInteractTmplCode(7) <> '';
+#ELSE
+        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type".FromInteger(7)) <> '';
+#ENDIF
+
         LogInteractionEnable := LogInteraction;
 
         if Format(PeriodLength) = '' then
