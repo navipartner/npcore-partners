@@ -86,7 +86,7 @@ codeunit 6150960 "NPR RP Line Print"
         RPLinePrintMgt.SetPadChar(Char);
     end;
 
-    procedure ProcessBuffer(CodeunitID: Integer; PrinterDevice: Enum "NPR Line Printer Device"; PrinterDeviceSettings: Record "NPR Printer Device Settings")
+    procedure ProcessBuffer(CodeunitID: Integer; PrinterDevice: Enum "NPR Line Printer Device"; var PrinterDeviceSettings: Record "NPR Printer Device Settings")
     begin
         RPLinePrintMgt.ProcessBuffer(CodeunitID, PrinterDevice, PrinterDeviceSettings);
     end;
