@@ -131,8 +131,8 @@
             repeat
                 TempRPDeviceSettings.Init();
                 TempRPDeviceSettings.Template := '';
-                TempRPDeviceSettings.Name := TempRPDeviceSettings.Name;
-                TempRPDeviceSettings.Value := TempRPDeviceSettings.Value;
+                TempRPDeviceSettings.Name := PrinterDeviceSettings.Name;
+                TempRPDeviceSettings.Value := PrinterDeviceSettings.Value;
                 TempRPDeviceSettings.Insert()
             until PrinterDeviceSettings.Next() = 0;
 
