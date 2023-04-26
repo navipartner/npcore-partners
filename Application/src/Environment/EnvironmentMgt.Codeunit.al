@@ -21,9 +21,9 @@ codeunit 6060025 "NPR Environment Mgt."
     end;
 
     var
-        Caption_OptionMessage: Label 'The current environment has changed and is no longer verified! \This is caused by a change in database, tenant or company.\Please verify the new company environment type below:';
+        Caption_OptionMessage: Label 'Company: %1 \\The current environment has changed and is no longer verified! \This is caused by a change in database, tenant or company.\Please verify the new company environment type below:';
         Caption_EnvironmentOption: Label 'Production,Demo,Sandbox / Testing / Development';
-        Caption_NotProdEnv: Label 'The current environment is not set as production.\Some external integrations are handled differently in this mode. You can change this in page "%1"';
+        Caption_NotProdEnv: Label 'The current environment is not set as production. \Some external integrations are handled differently in this mode. You can change this in page "%1"';
         Caption_UnverifiedWarning: Label 'The current environment has been set to unverified!\Some external integrations are handled differently in this mode. You can change this in page "%1"';
         Caption_MissingPermissions: Label 'You are missing permissions for table %1. \If data scrub is necessary for this table in the new environment, then you must switch user/permissions and handle it manually.';
         Caption_CleanJobQueue: Label 'Disable Job Queue entries in this new environment?';
@@ -188,7 +188,7 @@ codeunit 6060025 "NPR Environment Mgt."
             if EnvironmentInformation.IsSandbox() then
                 EnvironmentType := "NPR Environment Type"::SANDBOX.AsInteger() + 1
             else
-                EnvironmentType := StrMenu(Caption_EnvironmentOption, 3, Caption_OptionMessage);
+                EnvironmentType := StrMenu(Caption_EnvironmentOption, 3, StrSubstNo(Caption_OptionMessage, CompanyName));
             if EnvironmentType > 0 then begin
                 NPREnvironmentInfo."Environment Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(NPREnvironmentInfo."Environment Company Name"));
                 NPREnvironmentInfo."Environment Database Name" := ActiveSession."Database Name";
