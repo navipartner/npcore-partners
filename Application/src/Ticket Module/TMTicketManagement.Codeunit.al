@@ -1053,7 +1053,7 @@
     begin
 
         if (not GetTicket(TicketIdentifierType, TicketNumber, Ticket)) then
-            exit;
+            RaiseError(StrSubstNo(INVALID_REFERENCE, REFERENCE, TicketNumber), INVALID_REFERENCE_NO);
 
         TicketRequestManager.LockResources('RegisterArrival');
 
