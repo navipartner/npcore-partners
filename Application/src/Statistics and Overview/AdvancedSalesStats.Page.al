@@ -300,7 +300,7 @@
                         SalesStatisticsReport: Report "NPR Advanced Sales Stat.";
                     begin
 #if BC17 or BC18
-                        SalesStatisticsReport.SetFilter(ViewPosition, Day, Dim1Filter, Dim2Filter, Rec."Period Start",
+                        SalesStatisticsReport.SetFiltersOnType(ViewPosition, Day, Dim1Filter, Dim2Filter, Rec."Period Start",
                                            Rec."Period End", ItemCategoryCodeFilter, LastYearCalc,
                                            (((ViewPosition = ViewPosition::ItemGroup) and HideItemGroup) or
                                              ((ViewPosition = ViewPosition::Item) and HideItem) or
@@ -308,7 +308,7 @@
                                              ((ViewPosition = ViewPosition::Vendor) and HideVendor) or
                                              ((ViewPosition = ViewPosition::Projectcode) and false)));
 #else
-                        SalesStatisticsReport.SetFilter(ViewPosition, PeriodToInteger(Day), Dim1Filter, Dim2Filter, Rec."Period Start",
+                        SalesStatisticsReport.SetFiltersOnType(ViewPosition, PeriodToInteger(Day), Dim1Filter, Dim2Filter, Rec."Period Start",
                                            Rec."Period End", ItemCategoryCodeFilter, LastYearCalc,
                                            (((ViewPosition = ViewPosition::ItemGroup) and HideItemGroup) or
                                              ((ViewPosition = ViewPosition::Item) and HideItem) or

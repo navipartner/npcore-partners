@@ -7,7 +7,6 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>6e623a4c-5689-4955-9b20-29773ac998c8</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -2137,13 +2136,13 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>1.43609cm</Height>
+        <Height>1.40963cm</Height>
         <Style />
       </Body>
       <Width>26.49424cm</Width>
       <Page>
         <PageHeader>
-          <Height>4.42065cm</Height>
+          <Height>4.61468cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -2164,7 +2163,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.0635cm</Top>
-              <Left>0.0635cm</Left>
+              <Left>0.5715cm</Left>
               <Height>0.92302cm</Height>
               <Width>10.46826cm</Width>
               <Style>
@@ -2179,7 +2178,6 @@
                     <TextRun>
                       <Value>=First(Fields!Title.Value, "DataSet_Result")</Value>
                       <Style>
-                        <FontSize>7pt</FontSize>
                         <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
@@ -2189,12 +2187,15 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>1.28638cm</Top>
-              <Left>0.0635cm</Left>
-              <Height>0.423cm</Height>
-              <Width>6.05856cm</Width>
+              <Top>1.07884cm</Top>
+              <Left>0.5715cm</Left>
+              <Height>0.59174cm</Height>
+              <Width>4.73564cm</Width>
               <ZIndex>1</ZIndex>
               <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
             </Textbox>
@@ -2270,8 +2271,8 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>1.74466cm</Top>
-              <Left>0.0635cm</Left>
+              <Top>1.70586cm</Top>
+              <Left>0.5715cm</Left>
               <Height>0.423cm</Height>
               <Width>6.05856cm</Width>
               <ZIndex>4</ZIndex>
@@ -2362,222 +2363,6 @@
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="CompanyName22">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Parameters!GlobalDim1_Caption.Value</Value>
-                      <Style>
-                        <FontSize>7pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.46185cm</Top>
-              <Left>0.03175cm</Left>
-              <Height>0.423cm</Height>
-              <Width>3.60475cm</Width>
-              <ZIndex>8</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyName23">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=First(Fields!Dim1Filter.Value, "DataSet_Result")</Value>
-                      <Style>
-                        <FontSize>7pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.46185cm</Top>
-              <Left>3.70706cm</Left>
-              <Height>0.423cm</Height>
-              <Width>1.10792cm</Width>
-              <ZIndex>9</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyName24">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Parameters!GlobalDim2_Caption.Value</Value>
-                      <Style>
-                        <FontSize>7pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.46185cm</Top>
-              <Left>4.91023cm</Left>
-              <Height>0.423cm</Height>
-              <Width>3.46875cm</Width>
-              <ZIndex>10</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyName25">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=First(Fields!Dim2Filter.Value, "DataSet_Result")</Value>
-                      <Style>
-                        <FontSize>7pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.46185cm</Top>
-              <Left>8.44953cm</Left>
-              <Height>0.423cm</Height>
-              <Width>2.31285cm</Width>
-              <ZIndex>11</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyName26">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Parameters!ItemCategoryFilter_Caption.Value</Value>
-                      <Style>
-                        <FontSize>7pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.46185cm</Top>
-              <Left>10.90349cm</Left>
-              <Height>0.47444cm</Height>
-              <Width>2.41192cm</Width>
-              <ZIndex>12</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyName27">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=First(Fields!ItemCategoryFilter.Value, "DataSet_Result")</Value>
-                      <Style>
-                        <FontSize>7pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.46185cm</Top>
-              <Left>13.45652cm</Left>
-              <Height>0.423cm</Height>
-              <Width>3.42426cm</Width>
-              <ZIndex>13</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyName28">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Parameters!Period_Caption.Value</Value>
-                      <Style>
-                        <FontSize>7pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.51329cm</Top>
-              <Left>17.05718cm</Left>
-              <Height>0.423cm</Height>
-              <Width>4.13083cm</Width>
-              <ZIndex>14</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyName29">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=First(Fields!PeriodFilters.Value, "DataSet_Result")</Value>
-                      <Style>
-                        <FontSize>7pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.51329cm</Top>
-              <Left>21.36439cm</Left>
-              <Height>0.423cm</Height>
-              <Width>4.83449cm</Width>
-              <ZIndex>15</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
             <Textbox Name="Textbox82">
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
@@ -2596,11 +2381,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.56952cm</Top>
+              <Top>3.88702cm</Top>
               <Left>0.5715cm</Left>
               <Height>0.6cm</Height>
               <Width>2.50585cm</Width>
-              <ZIndex>16</ZIndex>
+              <ZIndex>8</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -2629,11 +2414,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.56952cm</Top>
+              <Top>3.88702cm</Top>
               <Left>3.29921cm</Left>
               <Height>0.6cm</Height>
               <Width>6.48437cm</Width>
-              <ZIndex>17</ZIndex>
+              <ZIndex>9</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -2664,11 +2449,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.56952cm</Top>
+              <Top>3.88702cm</Top>
               <Left>9.95997cm</Left>
               <Height>0.6cm</Height>
               <Width>2.2723cm</Width>
-              <ZIndex>18</ZIndex>
+              <ZIndex>10</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -2699,11 +2484,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.56952cm</Top>
+              <Top>3.88702cm</Top>
               <Left>12.34714cm</Left>
               <Height>0.6cm</Height>
               <Width>1.98362cm</Width>
-              <ZIndex>19</ZIndex>
+              <ZIndex>11</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -2734,11 +2519,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.56952cm</Top>
+              <Top>3.88702cm</Top>
               <Left>14.50715cm</Left>
               <Height>0.6cm</Height>
               <Width>1.92119cm</Width>
-              <ZIndex>20</ZIndex>
+              <ZIndex>12</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -2769,11 +2554,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.56952cm</Top>
+              <Top>3.88702cm</Top>
               <Left>16.68676cm</Left>
               <Height>0.6cm</Height>
               <Width>1.83393cm</Width>
-              <ZIndex>21</ZIndex>
+              <ZIndex>13</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -2804,11 +2589,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.56952cm</Top>
+              <Top>3.88702cm</Top>
               <Left>18.69425cm</Left>
               <Height>0.6cm</Height>
               <Width>1.9584cm</Width>
-              <ZIndex>22</ZIndex>
+              <ZIndex>14</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -2839,11 +2624,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.56952cm</Top>
+              <Top>3.88702cm</Top>
               <Left>20.76552cm</Left>
               <Height>0.6cm</Height>
               <Width>2.00606cm</Width>
-              <ZIndex>23</ZIndex>
+              <ZIndex>15</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -2874,11 +2659,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.60217cm</Top>
+              <Top>3.91967cm</Top>
               <Left>22.91269cm</Left>
               <Height>0.6cm</Height>
               <Width>1.9083cm</Width>
-              <ZIndex>24</ZIndex>
+              <ZIndex>16</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -2909,11 +2694,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.60217cm</Top>
+              <Top>3.91967cm</Top>
               <Left>24.94635cm</Left>
               <Height>0.6cm</Height>
               <Width>1.5197cm</Width>
-              <ZIndex>25</ZIndex>
+              <ZIndex>17</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -2944,11 +2729,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.06124cm</Top>
+              <Top>3.37874cm</Top>
               <Left>12.34714cm</Left>
               <Height>0.45889cm</Height>
               <Width>1.98362cm</Width>
-              <ZIndex>26</ZIndex>
+              <ZIndex>18</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -2979,11 +2764,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.09652cm</Top>
+              <Top>3.41402cm</Top>
               <Left>16.68676cm</Left>
               <Height>0.45889cm</Height>
               <Width>1.83393cm</Width>
-              <ZIndex>27</ZIndex>
+              <ZIndex>19</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -3014,11 +2799,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.09652cm</Top>
+              <Top>3.41402cm</Top>
               <Left>20.74701cm</Left>
               <Height>0.45889cm</Height>
               <Width>2.00606cm</Width>
-              <ZIndex>28</ZIndex>
+              <ZIndex>20</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -3049,11 +2834,11 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox82</rd:DefaultName>
-              <Top>3.04212cm</Top>
+              <Top>3.35962cm</Top>
               <Left>24.9621cm</Left>
               <Height>0.45889cm</Height>
               <Width>1.5197cm</Width>
-              <ZIndex>29</ZIndex>
+              <ZIndex>21</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -3066,11 +2851,11 @@
             </Textbox>
             <Rectangle Name="Rectangle1">
               <KeepTogether>true</KeepTogether>
-              <Top>4.04314cm</Top>
+              <Top>4.36064cm</Top>
               <Left>0.5715cm</Left>
               <Height>0.20112cm</Height>
               <Width>25.9103cm</Width>
-              <ZIndex>30</ZIndex>
+              <ZIndex>22</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -3082,6 +2867,53 @@
                 </BottomBorder>
               </Style>
             </Rectangle>
+            <Textbox Name="Textbox2">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Fields!FiltersTextLbl.Value &amp; Fields!FiltersText.Value</Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox2</rd:DefaultName>
+              <Top>2.34405cm</Top>
+              <Left>0.53975cm</Left>
+              <Height>0.44125cm</Height>
+              <Width>25.9263cm</Width>
+              <ZIndex>23</ZIndex>
+              <Visibility>
+                <Hidden>=iif(Len(Fields!FiltersText.Value)&gt;0, false, true)</Hidden>
+              </Visibility>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+                <PaddingTop>2pt</PaddingTop>
+                <PaddingBottom>2pt</PaddingBottom>
+              </Style>
+            </Textbox>
+            <Line Name="Line1">
+              <Top>3.24391cm</Top>
+              <Left>0.53975cm</Left>
+              <Height>0cm</Height>
+              <Width>25.95449cm</Width>
+              <ZIndex>24</ZIndex>
+              <Style>
+                <Border>
+                  <Style>Solid</Style>
+                </Border>
+              </Style>
+            </Line>
           </ReportItems>
           <Style>
             <Border>
@@ -3090,7 +2922,7 @@
           </Style>
         </PageHeader>
         <PageFooter>
-          <Height>1.00542cm</Height>
+          <Height>1.32292cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <Style>
@@ -3470,6 +3302,18 @@ End Function
         </Field>
         <Field Name="Periodeslut">
           <DataField>Periodeslut</DataField>
+        </Field>
+        <Field Name="FiltersTextLbl">
+          <DataField>FiltersTextLbl</DataField>
+        </Field>
+        <Field Name="FiltersText">
+          <DataField>FiltersText</DataField>
+        </Field>
+        <Field Name="Periodstart">
+          <DataField>Periodstart</DataField>
+        </Field>
+        <Field Name="Periodend">
+          <DataField>Periodend</DataField>
         </Field>
         <Field Name="Number_Integer">
           <DataField>Number_Integer</DataField>
