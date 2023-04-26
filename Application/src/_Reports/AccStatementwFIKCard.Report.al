@@ -596,7 +596,7 @@
             begin
                 TempAgingBandBuf.DeleteAll();
                 if "Language Code" <> '' then
-                    CurrReport.Language := Language.GetLanguageID("Language Code");
+                    CurrReport.Language := LanguageManagement.GetLanguageID("Language Code");
                 PrintLine := false;
                 Cust2 := Customer;
                 CopyFilter("Currency Filter", TempCurrency2.Code);
@@ -845,7 +845,7 @@
         DtldCustLedgEntries2: Record "Detailed Cust. Ledg. Entry";
         GLSetup: Record "General Ledger Setup";
         FormatAddr: Codeunit "Format Address";
-        Language: Codeunit Language;
+        LanguageManagement: Codeunit Language;
         SegManagement: Codeunit SegManagement;
         PeriodLength: DateFormula;
         PeriodLength2: DateFormula;

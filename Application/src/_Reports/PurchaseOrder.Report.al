@@ -1011,7 +1011,7 @@
             trigger OnAfterGetRecord()
             begin
                 if "Language Code" <> '' then
-                    CurrReport.Language := Language.GetLanguageID("Language Code");
+                    CurrReport.Language := LanguageManagement.GetLanguageID("Language Code");
 
                 CompanyInfo.Get();
                 CompanyInfo.CalcFields(Picture);
@@ -1191,7 +1191,7 @@
         TempVATAmountLine: Record "VAT Amount Line" temporary;
         ArchiveManagement: Codeunit ArchiveManagement;
         FormatAddr: Codeunit "Format Address";
-        Language: Codeunit Language;
+        LanguageManagement: Codeunit Language;
         PurchCountPrinted: Codeunit "Purch.Header-Printed";
         PurchPost: Codeunit "Purch.-Post";
         PurchPostPrepmt: Codeunit "Purchase-Post Prepayments";
