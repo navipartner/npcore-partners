@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Event Copy Attr./Templ.';
-    DataCaptionExpression = PageCaption;
+    DataCaptionExpression = PageCaptionText;
     PageType = StandardDialog;
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
@@ -65,7 +65,7 @@
         CopySuccessTxt: Label 'Successfully copied to selected event.';
         EventAttrMgt: Codeunit "NPR Event Attribute Mgt.";
         CopyWhat: Option Attributes,CustTemplate,TeamTemplate;
-        PageCaption: Text;
+        PageCaptionText: Text;
         CopyAttributesTxt: Label 'Copy Attributes';
         CopyCustTemplateTxt: Label 'Copy Customer Template';
         CopyTeamTemplateTxt: Label 'Copy Team Template';
@@ -78,11 +78,11 @@
         CopyWhat := CopyWhatHere;
         case CopyWhat of
             CopyWhat::Attributes:
-                PageCaption := CopyAttributesTxt;
+                PageCaptionText := CopyAttributesTxt;
             CopyWhat::CustTemplate:
-                PageCaption := CopyCustTemplateTxt;
+                PageCaptionText := CopyCustTemplateTxt;
             CopyWhat::TeamTemplate:
-                PageCaption := CopyTeamTemplateTxt;
+                PageCaptionText := CopyTeamTemplateTxt;
         end;
     end;
 
