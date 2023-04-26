@@ -527,7 +527,7 @@ codeunit 85039 "NPR French Compliance Tests"
         POSSaleWrapper: Codeunit "NPR POS Sale";
         POSSaleRecord: Record "NPR POS Sale";
         FRAuditSetup: Record "NPR FR Audit Setup";
-        POSActionLogin: Codeunit "NPR POS Action - Login";
+        POSActionLogin: Codeunit "NPR POS Action - Login-B";
         POSSetup: Codeunit "NPR POS Setup";
     begin
         // [Scenario] Check that POS logins are correctly signed
