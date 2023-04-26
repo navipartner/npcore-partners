@@ -540,10 +540,6 @@
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
         DateFilter: Text[50];
-        ItemGroupCheck: Text[250];
-        ItemCheck: Text[250];
-        CustomerCheck: Text[250];
-        VendorCheck: Text[250];
         ViewPosition: Option Period,Salesperson,ItemGroup,Item,Customer,Vendor,Projectcode;
         HideItem: Boolean;
         HideItemGroup: Boolean;
@@ -563,8 +559,6 @@
         PeriodType: Option Day,Week,Month,Quarter,Year,Period;
         ItemCategoryCodeFilter: Code[20];
         DateFilterLbl: Label '%1..%2', Locked = true;
-        CheckValueLbl: Label '%1%2%3', Locked = true;
-        CheckValue2Lbl: Label '%1%2%3%4', Locked = true;
 
     internal procedure Calc()
     var
@@ -719,52 +713,6 @@
                     ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
                     CostAmount := ValueEntry."Cost Amount (Actual)";
                     SalesAmount := ValueEntry."Sales Amount (Actual)";
-                end;
-        end;
-    end;
-
-    internal procedure GetCheckValue(): Text[250]
-    begin
-        case ViewPosition of
-            ViewPosition::ItemGroup:
-                begin
-                    exit(StrSubstNo(CheckValueLbl, Dim1Filter, Dim2Filter, DateFilter));
-                end;
-            ViewPosition::Item,
-            ViewPosition::Customer,
-            ViewPosition::Vendor:
-                begin
-                    exit(StrSubstNo(CheckValue2Lbl, Dim1Filter, Dim2Filter, ItemCategoryCodeFilter, DateFilter));
-                end;
-        end;
-    end;
-
-    internal procedure UpdateHiddenLines(ViewPos: Integer; bForce: Boolean)
-    begin
-        case ViewPos of
-            ViewPosition::ItemGroup:
-                begin
-                    if (ItemGroupCheck <> GetCheckValue()) or bForce then begin
-                        ItemGroupCheck := GetCheckValue();
-                    end;
-                end;
-            ViewPosition::Item:
-                begin
-                    if (ItemCheck <> GetCheckValue()) or bForce then begin
-                        ItemCheck := GetCheckValue();
-                    end;
-                end;
-            ViewPosition::Customer:
-                begin
-                    if (CustomerCheck <> GetCheckValue()) or bForce then begin
-                        CustomerCheck := GetCheckValue();
-                    end;
-                end;
-            ViewPosition::Vendor:
-                begin
-                    if (VendorCheck <> GetCheckValue()) or bForce then begin
-                        VendorCheck := GetCheckValue();
-                    end;
                 end;
         end;
     end;

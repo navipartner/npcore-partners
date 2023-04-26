@@ -6,10 +6,8 @@
     Editable = false;
     InsertAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "Salesperson/Purchaser";
-    ApplicationArea = NPRRetail;
 
     layout
     {

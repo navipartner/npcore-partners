@@ -4,10 +4,8 @@
     Caption = 'Customer Statistics Subform';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = Customer;
-    ApplicationArea = NPRRetail;
 
     layout
     {
