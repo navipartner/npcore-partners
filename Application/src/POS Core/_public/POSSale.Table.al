@@ -69,6 +69,7 @@
                 PricingProfile: Codeunit "NPR POS Pricing Profile";
                 POSSaleTranslation: Codeunit "NPR POS Sale Translation";
                 FoundPostingProfile: Boolean;
+                CustomerHasBeenBlockedMsg: Label 'The customer has been blocked for further business.';
             begin
                 GetPOSUnit();
                 "POS Store Code" := _POSUnit."POS Store Code";
@@ -86,6 +87,10 @@
                 if "Customer No." <> '' then begin
                     "Contact No." := '';
                     Cust.Get("Customer No.");
+
+                    if Cust.Blocked = Cust.Blocked::All then
+                        Error(CustomerHasBeenBlockedMsg);
+
                     Name := Cust.Name;
                     Address := Cust.Address;
                     "Address 2" := Cust."Address 2";
