@@ -3,7 +3,7 @@
     Extensible = False;
     UsageCategory = None;
     Caption = 'Data Log Setup Ignore List';
-    DataCaptionExpression = PageCaption;
+    DataCaptionExpression = PageCaptionText;
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
@@ -83,13 +83,13 @@
         Rec.FilterGroup(2);
         Rec.SetRange(Class, Rec.Class::Normal);
         Rec.FilterGroup(0);
-        PageCaption := Format(Rec.TableNo) + ' ' + Rec.TableName;
+        PageCaptionText := Format(Rec.TableNo) + ' ' + Rec.TableName;
     end;
 
     var
         DataLogSetupField: Record "NPR Data Log Setup (Field)";
         IgnoreMod: Boolean;
-        PageCaption: Text[250];
+        PageCaptionText: Text[250];
         PageIsEditable: Boolean;
 
     local procedure UpdateRec()

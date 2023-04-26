@@ -703,7 +703,7 @@
 
             trigger OnAfterGetRecord()
             begin
-                CurrReport.Language := Language.GetLanguageID("Language Code");
+                CurrReport.Language := LanguageManagement.GetLanguageID("Language Code");
 
                 CompanyInfo.Get();
 
@@ -829,7 +829,7 @@
         SalesPurchPerson: Record "Salesperson/Purchaser";
         TempVATAmountLine: Record "VAT Amount Line" temporary;
         FormatAddr: Codeunit "Format Address";
-        Language: Codeunit Language;
+        LanguageManagement: Codeunit Language;
         PurchCountPrinted: Codeunit "Purch.Header-Printed";
         PurchPost: Codeunit "Purch.-Post";
         SegManagement: Codeunit SegManagement;
