@@ -1,60 +1,53 @@
-﻿codeunit 6150721 "NPR POS Action - Login"
+codeunit 6150721 "NPR POS Action - Login" implements "NPR IPOS Workflow"
 {
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        ActionDescription: Label 'This is a built-in action for completing the login request passed on from the front end.';
-        Text001: Label 'Unknown login type requested by JavaScript: %1.';
-        InvalidStatus: Label 'The register status states that the register cannot be opened at this time.';
-        BalancingRequired: Label 'The register has not been balanced since %1 and must be balanced before selling. Do you want to balance the register now?';
-        IsEoD: Label 'The %1 %2 indicates that this %1 is being balanced and it can''t be opened at this time.';
-        ContinueEoD: Label 'The %1 %2 is marked as being in balancing. Do you want to continue with balancing now?';
-        ManagedPos: Label 'This POS is managed by POS Unit %1 [%2] and it is therefore required that %1 is opened prior to opening this POS.';
-        ReadingErr: Label 'reading in %1';
+        ActionDescriptionLbl: Label 'This is a built-in action for completing the login request passed on from the front end.';
 
-    local procedure ActionCode(): Code[20]
     begin
-        exit('LOGIN');
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
     end;
 
-    local procedure ActionVersion(): Text[30]
-    begin
-        exit('1.0');
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
-    local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
-    begin
-        Sender.DiscoverAction(
-          ActionCode(),
-          ActionDescription,
-          ActionVersion(),
-          Sender.Type::BackEnd,
-          Sender."Subscriber Instances Allowed"::Single);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        JSON: Codeunit "NPR POS JSON Management";
-        Setup: Codeunit "NPR POS Setup";
-        Type: Text;
-        Password: Text;
+        ActionContext: JsonObject;
+    begin
+        case Step of
+            'prepareWorkflow':
+                FrontEnd.WorkflowResponse(OnAction(Context, FrontEnd, Setup, ActionContext));
+        end;
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionLogin.js###
+'let main=async({workflow:a})=>{debugger;let e=await a.respond("prepareWorkflow");e.workflowName!=""&&(e.workflowName=="START_POS"?await a.run(e.workflowName):await a.run(e.workflowName,{parameters:e.parameters}))};'
+        )
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterFindSalesperson(var SalespersonPurchaser: Record "Salesperson/Purchaser")
+    begin
+    end;
+
+    local procedure OnAction(var Context: Codeunit "NPR POS JSON Helper"; var FrontEnd: Codeunit "NPR POS Front End Management"; var Setup: Codeunit "NPR POS Setup"; var ActionContext: JsonObject) Response: JsonObject
+    var
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        BusinessLogic: Codeunit "NPR POS Action - Login-B";
+        POSSession: Codeunit "NPR POS Session";
+        Text001: Label 'Unknown login type requested by JavaScript: %1.';
+        Password: Text;
+        Type: Text;
     begin
-        if not Action.IsThisAction(ActionCode()) then
-            exit;
-
-        Handled := true;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        Type := JSON.GetStringOrFail('type', StrSubstNo(ReadingErr, ActionCode()));
-        POSSession.GetSetup(Setup);
-        Setup.Initialize();
+        Type := Context.GetString('type');
 
         Clear(SalespersonPurchaser);
         case Type of
             'SalespersonCode':
                 begin
-                    Password := JSON.GetStringOrFail('password', StrSubstNo(ReadingErr, ActionCode()));
+                    Password := Context.GetString('password');
                     if (DelChr(Password, '<=>', ' ') = '') then
                         Error('Illegal password.');
 
@@ -64,7 +57,7 @@
                         OnAfterFindSalesperson(SalespersonPurchaser);
                         Setup.SetSalesperson(SalespersonPurchaser);
 
-                        OpenPosUnit(FrontEnd, Setup, POSSession);
+                        BusinessLogic.OpenPosUnit(FrontEnd, Setup, POSSession, ActionContext);
                     end else begin
                         Error('Illegal password.');
                     end;
@@ -73,217 +66,26 @@
             else
                 FrontEnd.ReportBugAndThrowError(StrSubstNo(Text001, Type));
         end;
+        HandleWorkflowResponse(Response, ActionContext);
+        exit(Response);
     end;
 
-    local procedure OpenPosUnit(FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup"; POSSession: Codeunit "NPR POS Session")
+    internal procedure HandleWorkflowResponse(var Response: JsonObject; ActionContextIn: JsonObject): Boolean
     var
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
-        POSUnit: Record "NPR POS Unit";
-        BalanceAge: Integer;
-        IsManagedPOS: Boolean;
-        ManagedByPOSUnit: Record "NPR POS Unit";
-        POSEndofDayProfile: Record "NPR POS End of Day Profile";
-        POSPeriodRegister: Record "NPR POS Period Register";
-        MissingPeriodRegister: Boolean;
+        Jobj: JsonObject;
+        Jtoken: JsonToken;
     begin
-        // This should be inside the START_POS workflow
-        // But to save a roundtrip and becase nested workflows are not perfect yet, I have kept this part here
-
-        Setup.GetPOSUnit(POSUnit);
-        POSUnit.Get(POSUnit."No.");
-        if POSUnit.Status = POSUnit.Status::INACTIVE then
-            POSUnit.FieldError(Status);
-
-        Setup.GetSalespersonRecord(SalespersonPurchaser);
-        CheckPosUnitGroup(SalespersonPurchaser, POSUnit."No.");
-
-        BalanceAge := DaysSinceLastBalance(POSUnit);
-
-        POSEndofDayProfile.Init();
-        if (POSUnit."POS End of Day Profile" <> '') then begin
-            POSEndofDayProfile.Get(POSUnit."POS End of Day Profile");
-            if (POSEndofDayProfile."End of Day Type" = POSEndofDayProfile."End of Day Type"::MASTER_SLAVE) then
-                IsManagedPOS := (POSEndofDayProfile."Master POS Unit No." <> POSUnit."No.");
-            if (IsManagedPOS) then begin
-                ManagedByPOSUnit.Get(POSEndofDayProfile."Master POS Unit No.");
-                BalanceAge := DaysSinceLastBalance(ManagedByPOSUnit);
-            end;
+        if not ActionContextIn.Get('name', Jtoken) then begin
+            Response.Add('workflowName', '');
+            exit(true);
         end;
+        if Jtoken.AsValue().AsText() = '' then
+            exit(true);
 
-        case POSUnit.Status of
+        Response.Add('workflowName', Jtoken.AsValue().AsText());
 
-            POSUnit.Status::OPEN:
-                begin
-                    // This state might happen first time when attaching a POS as a slave with status open when master is state close.
-                    if ((IsManagedPOS) and (ManagedByPOSUnit.Status <> ManagedByPOSUnit.Status::OPEN)) then begin
-                        Message(ManagedPos, ManagedByPOSUnit."No.", ManagedByPOSUnit.Name);
-                        StartEODWorkflow(FrontEnd, POSSession, Setup.ActionCode_EndOfDay(), IsManagedPOS); // will fix status on the managed POS
-                        exit;
-                    end;
-
-                    if (BalanceAge = -1) then begin  // Has never been balanced
-                        StartWorkflow(FrontEnd, POSSession, 'START_POS');
-                        exit;
-                    end;
-
-                    if ((POSEndofDayProfile."End of Day Frequency" = POSEndofDayProfile."End of Day Frequency"::DAILY) and (BalanceAge > 0)) then begin
-                        if (not Confirm(BalancingRequired, true, (Today - BalanceAge))) then
-                            Error(InvalidStatus);
-
-                        // Force a Z-Report or Close WorkShift
-                        StartEODWorkflow(FrontEnd, POSSession, Setup.ActionCode_EndOfDay(), IsManagedPOS);
-                        exit;
-                    end;
-
-                    POSPeriodRegister.SetCurrentKey("POS Unit No.");
-                    POSPeriodRegister.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
-                    MissingPeriodRegister := not POSPeriodRegister.FindLast();
-                    if (MissingPeriodRegister) or ((not MissingPeriodRegister) and (POSPeriodRegister.Status <> POSPeriodRegister.Status::OPEN)) then begin
-                        StartWorkflow(FrontEnd, POSSession, 'START_POS');
-                        exit;
-                    end;
-
-                    StartPOS(POSSession);
-                end;
-
-            POSUnit.Status::CLOSED:
-                begin
-                    if ((POSEndofDayProfile."End of Day Frequency" = POSEndofDayProfile."End of Day Frequency"::DAILY) and (BalanceAge > 0)) then begin
-                        if (IsManagedPOS) then
-                            Error(ManagedPos, ManagedByPOSUnit."No.", ManagedByPOSUnit.Name);
-
-                        if (not Confirm(BalancingRequired, true, Format(Today - BalanceAge))) then
-                            Error(InvalidStatus);
-
-                        StartEODWorkflow(FrontEnd, POSSession, Setup.ActionCode_EndOfDay(), IsManagedPOS);
-                        exit;
-                    end;
-
-                    StartWorkflow(FrontEnd, POSSession, 'START_POS');
-
-                end;
-
-            POSUnit.Status::EOD:
-                begin
-                    if (not Confirm(ContinueEoD, true, POSUnit.TableCaption(), POSUnit."No.")) then
-                        Error(IsEoD, POSUnit.TableCaption(), POSUnit.FieldCaption(Status));
-
-                    StartEODWorkflow(FrontEnd, POSSession, Setup.ActionCode_EndOfDay(), IsManagedPOS);
-                end;
-        end;
-    end;
-
-    internal procedure StartPOS(POSSession: Codeunit "NPR POS Session"): Integer
-    var
-        SalePOS: Record "NPR POS Sale";
-        POSViewProfile: Record "NPR POS View Profile";
-        POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
-        POSSale: Codeunit "NPR POS Sale";
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
-        POSSetup: Codeunit "NPR POS Setup";
-        ResumeFromPOSQuoteNo: Integer;
-        ResumeExistingSale: Boolean;
-    begin
-        ResumeExistingSale := POSResumeSale.SelectUnfinishedSaleToResume(SalePOS, POSSession, ResumeFromPOSQuoteNo);
-
-        POSSession.GetSetup(POSSetup);
-        POSCreateEntry.InsertUnitLoginEntry(POSSetup.GetPOSUnitNo(), POSSetup.Salesperson());
-
-        if ResumeExistingSale and (ResumeFromPOSQuoteNo = 0) then
-            POSSession.ResumeTransaction(SalePOS)
-        else
-            POSSession.StartTransaction();
-        POSSession.GetSale(POSSale);
-        if ResumeFromPOSQuoteNo <> 0 then
-            if POSSale.ResumeFromPOSQuote(ResumeFromPOSQuoteNo) then
-                POSSession.RequestRefreshData();
-        POSSale.GetCurrentSale(SalePOS);
-
-        if ResumeExistingSale then begin
-            POSSession.ChangeViewSale();
-        end else begin
-            POSSetup.GetPOSViewProfile(POSViewProfile);
-            case POSViewProfile."Initial Sales View" of
-                POSViewProfile."Initial Sales View"::SALES_VIEW:
-                    POSSession.ChangeViewSale();
-                POSViewProfile."Initial Sales View"::RESTAURANT_VIEW:
-                    POSSession.ChangeViewRestaurant();
-            end;
-        end;
-    end;
-
-    local procedure StartWorkflow(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; ActionName: Code[20])
-    var
-        POSAction: Record "NPR POS Action";
-    begin
-        if (not POSSession.RetrieveSessionAction(ActionName, POSAction)) then
-            POSAction.Get(ActionName);
-
-        FrontEnd.InvokeWorkflow(POSAction);
-    end;
-
-    local procedure StartEODWorkflow(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; ActionName: Code[20]; ManagedEOD: Boolean)
-    var
-        POSAction: Record "NPR POS Action";
-    begin
-        if (not POSSession.RetrieveSessionAction(ActionName, POSAction)) then
-            POSAction.Get(ActionName);
-
-        POSSession.StartTransaction();
-
-        case ActionName of
-            'BALANCE_V3', 'BALANCE_V4':
-                begin
-                    if (not ManagedEOD) then POSAction.SetWorkflowInvocationParameter('Type', 1, FrontEnd);  // Z-Report, final count
-                    if (ManagedEOD) then POSAction.SetWorkflowInvocationParameter('Type', 2, FrontEnd);  // Close WorkShift - for managed POS
-                end;
-        end;
-
-        FrontEnd.InvokeWorkflow(POSAction);
-    end;
-
-    local procedure DaysSinceLastBalance(POSUnit: Record "NPR POS Unit"): Integer
-    var
-        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-        POSEntry: record "NPR POS Entry";
-    begin
-        POSWorkshiftCheckpoint.SetCurrentKey("POS Unit No.", Open, "Type");
-        POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
-        POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
-        POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
-
-        if (not POSWorkshiftCheckpoint.FindLast()) then
-            exit(-1); // Never been balanced
-
-        POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
-        POSEntry.SetRange("POS Store Code", POSUnit."POS Store Code");
-        POSEntry.SetRange("POS Unit No.", POSUnit."No.");
-        POSEntry.SetFilter("Entry No.", '>%1', POSWorkshiftCheckpoint."POS Entry No.");
-        POSEntry.SetRange("System Entry", false);
-        POSEntry.SetFilter("Entry Type", '<>%1', POSEntry."Entry Type"::"Cancelled Sale");
-        POSEntry.SetLoadFields("Entry Date");
-        if not POSEntry.FindFirst() then
-            exit(0);
-
-        if Today - POSEntry."Entry Date" >= 1 then
-            exit(Today - DT2Date(POSWorkshiftCheckpoint."Created At"));
-    end;
-
-    internal procedure CheckPosUnitGroup(SalespersonPurchaser: Record "Salesperson/Purchaser"; POSUnitNo: Code[20])
-    var
-        POSUnitGroupLine: Record "NPR POS Unit Group Line";
-        SalesPersonNotAllowedErr: Label 'Salesperson %1 is not allowed to access POS Unit %2', Comment = '%1 = Salesperson Name; %2 = Pos Unit No.';
-    begin
-        if SalespersonPurchaser."NPR POS Unit Group" = '' then
-            exit;
-        POSUnitGroupLine.SetRange("POS Unit", POSUnitNo);
-        POSUnitGroupLine.SetRange("No.", SalespersonPurchaser."NPR POS Unit Group");
-        if POSUnitGroupLine.IsEmpty() then
-            Error(SalesPersonNotAllowedErr, SalespersonPurchaser.Name, POSUnitNo);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterFindSalesperson(var SalespersonPurchaser: Record "Salesperson/Purchaser")
-    begin
+        ActionContextIn.Get('parameters', Jtoken);
+        Jobj := Jtoken.AsObject();
+        Response.Add('parameters', Jobj);
     end;
 }
