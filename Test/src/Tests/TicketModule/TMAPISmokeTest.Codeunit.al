@@ -730,6 +730,46 @@ codeunit 85013 "NPR TM API SmokeTest"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure ValidateTicketArrivalFakeTicket()
+    var
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        Assert: Codeunit "Assert";
+        ItemNo: Code[20];
+        ResponseToken: Text;
+        ResponseMessage: Text;
+        ApiOk: Boolean;
+        NumberOfTicketOrders: Integer;
+        TicketQuantityPerOrder: Integer;
+        MemberNumber: Code[20];
+        ScannerStation: Code[10];
+        SendNotificationTo: Text;
+        ExternalOrderNo: Text;
+        PaymentReference: Code[20];
+    begin
+
+        ItemNo := SelectSmokeTestScenario();
+
+        NumberOfTicketOrders := 1;
+        TicketQuantityPerOrder := 1;
+
+        ApiOk := TicketApiLibrary.MakeReservation(NumberOfTicketOrders, ItemNo, TicketQuantityPerOrder, MemberNumber, ScannerStation, ResponseToken, ResponseMessage);
+        Assert.IsTrue(ApiOk, ResponseMessage);
+
+        ExternalOrderNo := ''; // Note: Without External Order No., the ticket will not be valid for arrival, capacity will be allocated only.
+        ApiOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, SendNotificationTo, ExternalOrderNo, ScannerStation, TmpCreatedTickets, ResponseMessage);
+        Assert.IsTrue(ApiOk, ResponseMessage);
+        Assert.AreEqual(TmpCreatedTickets.Count(), NumberOfTicketOrders * TicketQuantityPerOrder, 'Number of tickets confirmed does not match number of tickets requested.');
+
+        // [Test]
+        TmpCreatedTickets.FindFirst();
+        ApiOk := TicketApiLibrary.ValidateTicketArrival('BOGUS-1P!"#!"FUBAR', '', ScannerStation, ResponseMessage);
+        Assert.IsFalse(ApiOk, 'An invalid ticket should not be allowed entry.');
+
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ValidateTicketDeparture()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
