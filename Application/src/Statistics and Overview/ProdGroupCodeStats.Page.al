@@ -4,10 +4,8 @@
     Caption = 'Product Group Code Statistics';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = Item;
-    ApplicationArea = NPRRetail;
 
     layout
     {

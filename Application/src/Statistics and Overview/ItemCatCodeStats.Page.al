@@ -4,10 +4,8 @@
     Caption = 'Item Category Stats Subpage';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = Item;
-    ApplicationArea = NPRRetail;
 
     layout
     {
