@@ -35,7 +35,7 @@ codeunit 85026 "NPR POS Resume Tests"
         PreviousSaleSystemId: Guid;
         PreviousSaleLineSystemId: Guid;
         PreviousSalesTicketNo: Text;
-        POSActionLogin: Codeunit "NPR POS Action - Login";
+        POSActionLogin: Codeunit "NPR POS Action - Login-B";
     begin
         // [Given] POS & Payment setup
         InitializeData();

@@ -106,6 +106,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NaviConnect", 'ImportTypeActionable'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'ShowReturnAmountDialog'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Retail Logo"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG BalanceV4"));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -383,6 +384,8 @@
                 exit('NPR_Upgrade_Variety_Setup_20230314');
             Codeunit::"NPR UPG Retail Logo":
                 exit('NPR_retail_logo_UPG_2023-04-03');
+            Codeunit::"NPR UPG BalanceV4":
+                exit('NPR_UPG_Balance-20230425');
         end;
     end;
 }

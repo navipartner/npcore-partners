@@ -5,7 +5,7 @@ codeunit 6150659 "NPR POS Action: Quick Login B."
     var
         SalePOS: Record "NPR POS Sale";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
-        POSActionLogin: Codeunit "NPR POS Action - Login";
+        POSActionLogin: Codeunit "NPR POS Action - Login-B";
     begin
         POSSale.GetCurrentSale(SalePOS);
 

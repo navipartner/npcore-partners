@@ -830,6 +830,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'MM_MEMBERMGMT_WF3', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Member Mgt WF3";
     }
+    value(145; LOGIN)
+    {
+        Caption = 'LOGIN', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action - Login";
+    }
     value(6014600; BALANCE_V4)
     {
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;
