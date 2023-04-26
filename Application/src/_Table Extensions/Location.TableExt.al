@@ -21,7 +21,7 @@ tableextension 6014418 "NPR Location" extends Location
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
-        field(6014401; "NPR RSR Retail Location"; Boolean)
+        field(6014401; "NPR Retail Location"; Boolean)
         {
             Caption = 'Retail Location';
             DataClassification = CustomerContent;
