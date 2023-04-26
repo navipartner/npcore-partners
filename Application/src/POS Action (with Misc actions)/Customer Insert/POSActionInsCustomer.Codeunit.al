@@ -39,14 +39,23 @@ codeunit 6150726 "NPR POSAction: Ins. Customer" implements "NPR IPOS Workflow"
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         PrevRec: Text;
+        CustomerHasBeenBlockedMsg: Label 'The customer has been blocked for further business and cannot be selected.';
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'SelectCustomerRequired' then
             exit;
 
-        while PAGE.RunModal(0, Customer) <> ACTION::LookupOK do
-            Clear(Customer);
+        OnBeforeLookupCustomerNoSetFilters(Customer);
+
+        repeat
+            while (PAGE.RunModal(0, Customer) <> ACTION::LookupOK) do
+                Clear(Customer);
+
+            if Customer.Blocked = Customer.Blocked::All then
+                Message(CustomerHasBeenBlockedMsg);
+
+        until not (Customer.Blocked = Customer.Blocked::All);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -85,6 +94,11 @@ codeunit 6150726 "NPR POSAction: Ins. Customer" implements "NPR IPOS Workflow"
     local procedure ParameterCardPageId_Name(): Text[30]
     begin
         exit('CardPageId');
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeLookupCustomerNoSetFilters(var Customer: Record Customer)
+    begin
     end;
 }
 
