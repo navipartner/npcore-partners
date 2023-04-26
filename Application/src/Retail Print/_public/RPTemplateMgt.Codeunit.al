@@ -67,7 +67,9 @@
         CustomDimensions.Add('NPR_RP_TemplateLastModifiedAt', Format(RPTemplateHeader."Last Modified At"));
         CustomDimensions.Add('NPR_RP_TemplateLastModifiedBy', RPTemplateHeader."Last Modified By");
 
-        CustomDimensions.Add('NPR_RP_PrintDurationMs', format(DurationMs, 0, 9));
+        CustomDimensions.Add('NPR_RP_PrintDurationMs', Format(DurationMs, 0, 9));
+
+        CustomDimensions.Add('NPR_RP_RecRefSystemId', Format(RecRef.Field(RecRef.SystemIdNo())));
 
         Session.LogMessage('NPR_PrintTemplate', StrSubstNo('Processing of print template (%1) took %2 ms.', TemplateCode, DurationMs), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
