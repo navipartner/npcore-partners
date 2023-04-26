@@ -4,10 +4,8 @@
     Caption = 'Item Statistics Subform';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = Item;
-    ApplicationArea = NPRRetail;
 
     layout
     {

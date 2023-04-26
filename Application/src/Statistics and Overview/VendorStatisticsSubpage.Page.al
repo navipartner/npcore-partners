@@ -4,10 +4,8 @@
     Caption = 'Vendor Statistics Subform';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = Vendor;
-    ApplicationArea = NPRRetail;
 
     layout
     {
