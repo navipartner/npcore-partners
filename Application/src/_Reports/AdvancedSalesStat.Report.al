@@ -37,10 +37,22 @@
             column(PeriodFilters; PeriodFilters)
             {
             }
-            column(Periodestart; Periodestart)
+            column(Periodestart; PeriodStart)
             {
             }
-            column(Periodeslut; Periodeslut)
+            column(Periodeslut; PeriodEnd)
+            {
+            }
+            column(FiltersTextLbl; FiltersTextLbl)
+            {
+            }
+            column(FiltersText; FiltersText)
+            {
+            }
+            column(Periodstart; PeriodStart)
+            {
+            }
+            column(Periodend; PeriodEnd)
             {
             }
             column(Number_Integer; Integer.Number)
@@ -104,10 +116,8 @@
             trigger OnAfterGetRecord()
             begin
                 if Integer.Number = 0 then
-                    exit
-                else begin
+                    exit;
 
-                end;
                 Totals[1] += TempBuffer."Sales qty.";
                 Totals[2] += TempBuffer."Sales qty. last year";
                 Totals[3] += TempBuffer."Sales LCY";
@@ -142,25 +152,19 @@
 
             trigger OnPreDataItem()
             var
-                EmptyLinesEngErr: Label 'There is only empty lines on the report.';
                 EmptyLinesDeErr: Label 'Der er kun tomme linjer på rapporten.';
+                EmptyLinesEngErr: Label 'There is only empty lines on the report.';
             begin
+                CheckDateFilters();
+
                 fillTable();
 
-                // Rewind
                 UpdateSortKey();
-                if not TempBuffer.Find('-') then begin
+                if not TempBuffer.Find('-') then
                     if CurrReport.Language = 1030 then
                         Error(EmptyLinesDeErr)
                     else
                         Error(EmptyLinesEngErr);
-                end;
-
-                if Type = Type::Period then begin
-                    PeriodFilters := StrSubstNo(Pct1Lbl, Periodestart);
-                end else begin
-                    PeriodFilters := StrSubstNo(Pct2Lbl, Periodestart, Periodeslut);
-                end;
             end;
         }
         dataitem(Totalling; "Integer")
@@ -204,47 +208,93 @@
         {
             area(content)
             {
-                field("Periode start"; Periodestart)
+                group(Statistics)
                 {
-                    Caption = 'Period Start';
-                    ToolTip = 'Specifies the value of the Period Start field';
-                    ApplicationArea = NPRRetail;
+                    field("Stats for"; Type)
+                    {
+                        Caption = 'Statistics for';
+                        Tooltip = 'Specifies the value of the Stats for field';
+                        OptionCaption = 'Period,Salesperson,ItemCategory,Item,Customer,Vendor,Project Code';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Sort By"; SortBy)
+                    {
+                        Caption = 'Sort By';
+                        OptionCaption = 'No.,Description,Period Start,Sales qty.,Sales qty. last year,Sales LCY,Sales LCY last year,Profit LCY,Profit LCY last year,Profit %,Profit % last year';
+                        ToolTip = 'Specifies the value of the Sort by field';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
-                field("Sort By"; SortBy)
+
+                group(Period)
                 {
-                    Caption = 'Sort By';
-                    OptionCaption = 'No.,Description,Period Start,Sales qty.,Sales qty. last year,Sales LCY,Sales LCY last year,Profit LCY,Profit LCY last year,Profit %,Profit % last year';
-                    ToolTip = 'Specifies the value of the Sort by field';
-                    ApplicationArea = NPRRetail;
+                    field("Periode start"; PeriodStart)
+                    {
+                        Caption = 'Period Start';
+                        ToolTip = 'Specifies the value of the Period Start field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Period end"; PeriodEnd)
+                    {
+                        Caption = 'Period End';
+                        ToolTip = 'Specifies the value of the Period Start field';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
-                field("Lines field"; Lines)
+
+                group(Filters)
                 {
-                    Caption = 'Lines';
-                    ToolTip = 'Specifies the value of the Lines field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Global Dimension 1 Filter"; Dim1Filter)
-                {
-                    CaptionClass = '1,1,1';
-                    Caption = 'Global Dimension 1 Code';
-                    ToolTip = 'Specifies Global Dimension 1 Filter';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-                    ApplicationArea = NPRRetail;
-                }
-                field("Global Dimension 2 Filter"; Dim2Filter)
-                {
-                    CaptionClass = '1,1,2';
-                    Caption = 'Global Dimension 2 Code';
-                    ToolTip = 'Specifies Global Dimension 2 Filter';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-                    ApplicationArea = NPRRetail;
-                }
-                field("Item Category"; ItemCategoryFilter)
-                {
-                    Caption = 'Item Category';
-                    ToolTip = 'Specifies the default Item Category';
-                    TableRelation = "Item Category".Code;
-                    ApplicationArea = NPRRetail;
+                    field("Salesperson Filter"; SalespersonFilter)
+                    {
+                        Caption = 'Salesperson Code';
+                        ToolTip = 'Specifies the value of the Salesperson Code field.';
+                        TableRelation = "Salesperson/Purchaser".Code;
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Item Category"; ItemCategoryFilter)
+                    {
+                        Caption = 'Item Category';
+                        ToolTip = 'Specifies the default Item Category';
+                        TableRelation = "Item Category".Code;
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Item No."; ItemNoFilter)
+                    {
+                        Caption = 'Item No.';
+                        ToolTip = 'Specifies the value of the Item No. field.';
+                        TableRelation = Item."No.";
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Customer No."; CustomerNoFilter)
+                    {
+                        Caption = 'Customer No.';
+                        ToolTip = 'Specifies the value of the Customer No. field.';
+                        TableRelation = Customer."No.";
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Vendor No."; VendorNoFilter)
+                    {
+                        Caption = 'Vendor No.';
+                        ToolTip = 'Specifies the value of the Vendor No. field.';
+                        TableRelation = Vendor."No.";
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Global Dimension 1 Filter"; Dim1Filter)
+                    {
+                        CaptionClass = '1,1,1';
+                        Caption = 'Department Code';
+                        ToolTip = 'Specifies Global Dimension 1 Filter';
+                        TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Global Dimension 2 Filter"; Dim2Filter)
+                    {
+                        CaptionClass = '1,1,2';
+                        Caption = 'Project Code';
+                        ToolTip = 'Specifies Global Dimension 2 Filter';
+                        TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+                        ApplicationArea = NPRRetail;
+                    }
                 }
             }
         }
@@ -277,173 +327,224 @@
     trigger OnInitReport()
     begin
         Clear(Totals);
-        Lines := 30;
     end;
 
     trigger OnPreReport()
     begin
-
-        Firmaoplysninger.Get();
-        Firmaoplysninger.CalcFields(Picture);
+        CreateRequestPageFiltersText(FiltersText);
+        CompanyInformation.Get();
+        CompanyInformation.CalcFields(Picture);
     end;
 
     var
-        Firmaoplysninger: Record "Company Information";
+        CompanyInformation: Record "Company Information";
         Customer: Record Customer;
         DateRecord: Record Date;
-        Item: Record Item;
-        TempBuffer: Record "NPR Advanced Sales Statistics" temporary;
+        DimensionValue: Record "Dimension Value";
+        _Item: Record Item;
         _ItemCategory: Record "Item Category";
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        TempBuffer: Record "NPR Advanced Sales Statistics" temporary;
         "Salesperson/Purchaser": Record "Salesperson/Purchaser";
         Vendor: Record Vendor;
+        SalesStatisticsByPerson: Query "NPR Sales Statistics By Person";
+        ValueEntryWithVendor: Query "NPR Value Entry With Vendor";
         "Record": RecordRef;
         Caption: FieldRef;
-        EndRef: FieldRef;
         "Field": FieldRef;
         FilterField: FieldRef;
-        StartRef: FieldRef;
+        FilterField2: FieldRef;
         TypeField: FieldRef;
+        CustomerNoFilter: Code[20];
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
         ItemCategoryFilter: Code[20];
-        ProjektKodeSlut: Code[20];
-        ProjektKodeStart: Code[20];
-        Periodeslut: Date;
-        Periodestart: Date;
+        ItemNoFilter: Code[20];
+        ProjectCodeEnd: Code[20];
+        ProjectCodeStart: Code[20];
+        SalespersonFilter: Code[20];
+        VendorNoFilter: Code[20];
+        DateFilter: Date;
+        PeriodEnd: Date;
+        PeriodStart: Date;
         TotalAmt: array[8] of Decimal;
         Totals: array[8] of Decimal;
         d: Dialog;
         "Count": Integer;
         Lines: Integer;
-        TitleCustomer: Label 'Customers';
-        TitleItemCategory: Label 'Item Category';
-        TitleItem: Label 'Items';
-        TitlePeriod: Label 'Period';
+
+        CustomerFilterTitleLbl: Label 'Customer No: ';
+        DeptCodeFilterTitleLbl: Label 'Department Code: ';
         DialogText: Label 'Processing No. #1######## @2@@@@@@@@';
-        TitleSalesperson: Label 'Salespersons';
-        TitleVendor: Label 'Vendor';
+        FiltersTextLbl: Label 'Filters: ';
+        ItemCatFilterTitleLbl: Label 'Item Category: ';
+        ItemFilterTitleLbl: Label 'Item No: ';
+        Pct1Lbl: Label '%1..%2', locked = true;
+        Pct2Lbl: Label '%1';
+        PeriodFilterTitleLbl: Label 'Period: ';
+        ProjectCodeFilterTitleLbl: Label 'Project Code: ';
+        SalespersonFilterTitleLbl: Label 'Salesperson No: ';
+        TitleCustomerLbl: Label 'Customers';
+        TitleItemLbl: Label 'Items';
+        TitleItemCategoryLbl: Label 'Item Category';
+        TitlePeriodLbl: Label 'Period';
+        TitleProjectCodeLbl: Label 'Project Code';
+        TitleSalespersonLbl: Label 'Salespersons';
+        TitleVendorLbl: Label 'Vendors';
+        VendorFilterTitleLbl: Label 'Vendor No: ';
         Day: Option Day,Week,Month,Quarter,Year;
         SortBy: Option "No.",Description,"Period Start","Sales qty.","Sales qty. last year","Sales LCY","Sales LCY last year","Profit LCY","Profit LCY last year","Profit %","Profit % last year";
         Type: Option Period,Salesperson,ItemCategory,Item,Customer,Vendor,Projectcode;
+        FiltersText: Text;
         Title: Text[30];
         CalcLastYear: Text[50];
         PeriodeFilter: Text[255];
         PeriodFilters: Text[255];
-        Pct1Lbl: Label '%1..', locked = true;
-        Pct2Lbl: Label '%1..%2', locked = true;
 
-    internal procedure setFilter(xType: Option Period,Salesperson,ItemCategory,Item,Customer,Vendor,Projectcode; xDay: Option Day,Week,Month,Quarter,Year; GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemCategory: Code[20]; LastYearCalc: Text[50]; hide: Boolean)
+    internal procedure SetFiltersOnType(xType: Option Period,Salesperson,ItemCategory,Item,Customer,Vendor,Projectcode; xDay: Option Day,Week,Month,Quarter,Year; GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemCategory: Code[20]; LastYearCalc: Text[50]; hide: Boolean)
     begin
         Dim1Filter := GlobalDim1;
         Dim2Filter := GlobalDim2;
-        Periodestart := DatoStart;
-        Periodeslut := DatoEnd;
+        PeriodStart := DatoStart;
+        PeriodEnd := DatoEnd;
         ItemCategoryFilter := ItemCategory;
         CalcLastYear := LastYearCalc;
         Day := xDay;
         Type := xType;
 
-        if Type = Type::Period then begin
-            PeriodeFilter := StrSubstNo(Pct1Lbl, Periodestart);
-        end else begin
-            PeriodeFilter := StrSubstNo(Pct2Lbl, Periodestart, Periodeslut);
-        end;
+        PeriodeFilter := StrSubstNo(Pct1Lbl, PeriodStart, PeriodEnd);
     end;
 
     internal procedure fillTable()
     var
-        NoTypeErr: Label 'No Type selected';
-        ILEQuantity: Decimal;
         CostAmount: Decimal;
+        ILEQuantity: Decimal;
         SalesAmount: Decimal;
+        NoTypeErr: Label 'No Type selected';
     begin
         TempBuffer.DeleteAll();
-
         case Type of
             Type::Period:
                 begin
                     Record.Open(DATABASE::Date);
-                    // Datoen skal starte på Periodestart
+
                     FilterField := Record.Field(DateRecord.FieldNo("Period Start"));
-                    FilterField.SetFilter(StrSubstNo(Pct1Lbl,
-                                               Periodestart));
+                    FilterField.SetFilter(StrSubstNo(Pct1Lbl, PeriodStart, PeriodEnd));
+
                     TypeField := Record.Field(DateRecord.FieldNo("Period Type"));
                     TypeField.SetRange(Day);
 
-                    StartRef := Record.Field(DateRecord.FieldNo("Period Start"));
-                    EndRef := Record.Field(DateRecord.FieldNo("Period End"));
-
                     Field := Record.Field(DateRecord.FieldNo("Period Start"));
                     Caption := Record.Field(DateRecord.FieldNo("Period Start"));
-                    Title := TitlePeriod;
+
+                    Title := TitlePeriodLbl;
                 end;
 
             Type::Item:
                 begin
                     Record.Open(DATABASE::Item);
-                    Field := Record.Field(Item.FieldNo("No."));
-                    Caption := Record.Field(Item.FieldNo(Description));
-                    Title := TitleItem;
+
+                    if ItemNoFilter <> '' then begin
+                        FilterField := Record.Field(_Item.FieldNo("No."));
+                        FilterField.SetFilter(Pct2Lbl, ItemNoFilter);
+                    end;
+
+                    if ItemCategoryFilter <> '' then begin
+                        FilterField2 := Record.Field(_Item.FieldNo("Item Category Code"));
+                        FilterField2.SetFilter(Pct2Lbl, ItemCategoryFilter);
+                    end;
+
+                    Field := Record.Field(_Item.FieldNo("No."));
+                    Caption := Record.Field(_Item.FieldNo(Description));
+                    Title := TitleItemLbl;
                 end;
 
             Type::ItemCategory:
                 begin
                     Record.Open(DATABASE::"Item Category");
+
+                    if ItemCategoryFilter <> '' then begin
+                        FilterField := Record.Field(_ItemCategory.FieldNo(Code));
+                        FilterField.SetFilter(StrSubstNo(Pct2Lbl, ItemCategoryFilter));
+                    end;
+
                     Field := Record.Field(_ItemCategory.FieldNo(Code));
                     Caption := Record.Field(_ItemCategory.FieldNo(Description));
-                    Title := TitleItemCategory;
+                    Title := TitleItemCategoryLbl;
                 end;
 
             Type::Salesperson:
                 begin
                     Record.Open(DATABASE::"Salesperson/Purchaser");
+
+                    if SalespersonFilter <> '' then begin
+                        FilterField := Record.Field("Salesperson/Purchaser".FieldNo(Code));
+                        FilterField.SetFilter(StrSubstNo(Pct2Lbl, SalespersonFilter));
+                    end;
+
                     Field := Record.Field("Salesperson/Purchaser".FieldNo(Code));
                     Caption := Record.Field("Salesperson/Purchaser".FieldNo(Name));
-                    Title := TitleSalesperson
+                    Title := TitleSalespersonLbl;
                 end;
 
             Type::Customer:
                 begin
                     Record.Open(DATABASE::Customer);
+
+                    if CustomerNoFilter <> '' then begin
+                        FilterField := Record.Field(Customer.FieldNo("No."));
+                        FilterField.SetFilter(StrSubstNo(Pct2Lbl, CustomerNoFilter));
+                    end;
+
                     Field := Record.Field(Customer.FieldNo("No."));
                     Caption := Record.Field(Customer.FieldNo(Name));
-                    Title := TitleCustomer;
+                    Title := TitleCustomerLbl;
                 end;
 
             Type::Vendor:
                 begin
                     Record.Open(DATABASE::Vendor);
+
+                    if VendorNoFilter <> '' then begin
+                        FilterField := Record.Field(Vendor.FieldNo("No."));
+                        FilterField.SetFilter(StrSubstNo(Pct2Lbl, VendorNoFilter));
+                    end;
+
                     Field := Record.Field(Vendor.FieldNo("No."));
                     Caption := Record.Field(Vendor.FieldNo(Name));
-                    Title := TitleVendor;
+                    Title := TitleVendorLbl;
                 end;
-            else begin
+            Type::Projectcode:
+                begin
+                    Record.Open(Database::"Dimension Value");
+
+                    FilterField := Record.Field(DimensionValue.FieldNo("Global Dimension No."));
+                    FilterField.SetFilter('2');
+
+                    if Dim2Filter <> '' then begin
+                        FilterField := Record.Field(DimensionValue.FieldNo(Code));
+                        FilterField.SetFilter(Dim2Filter);
+                    end;
+
+                    Field := Record.Field(DimensionValue.FieldNo(Code));
+                    Caption := Record.Field(DimensionValue.FieldNo(Name));
+                    Title := TitleProjectCodeLbl;
+                end;
+            else
                 Error(NoTypeErr);
-            end;
         end;
+
+        Lines := Record.Count;
 
         d.Open(DialogText);
         Count := 0;
-        // Henter de data vi skal bruge
-        if Type <> Type::Period then
-            Lines := Record.Count() - 1;
 
-        if Record.Find('-') then begin
+        if Record.Find('-') then
             repeat
                 Count += 1;
                 d.Update(1, Format(Field.Value));
                 d.Update(2, Round(Count / Lines * 10000, 1, '='));
 
-                if Type = Type::Period then begin
-                    Periodestart := StartRef.Value;
-                    Periodeslut := EndRef.Value;
-                end;
-                if Type = Type::Projectcode then begin
-                    ProjektKodeStart := StartRef.Value;
-                    ProjektKodeSlut := EndRef.Value;
-                end;
-
-                // F¢rst beregner vi dette år
                 SetValueEntryFilter(CostAmount, SalesAmount, false, Format(Field.Value));
 
                 SetItemLedgerEntryFilter(ILEQuantity, false, Format(Field.Value));
@@ -457,7 +558,8 @@
                 if not (Type = Type::Projectcode) then
                     TempBuffer.Description := Format(Caption.Value)
                 else
-                    TempBuffer.Description := StrSubstNo(Pct2Lbl, ProjektKodeStart, ProjektKodeSlut);
+                    TempBuffer.Description := StrSubstNo(Pct1Lbl, ProjectCodeStart, ProjectCodeEnd);
+
                 TempBuffer."Sales qty." := ILEQuantity;
                 TempBuffer."Sales LCY" := SalesAmount;
                 TempBuffer."Profit LCY" := SalesAmount + CostAmount;
@@ -466,7 +568,6 @@
                 else
                     TempBuffer."Profit %" := 0;
 
-                // Dernæst sidste år
                 SetValueEntryFilter(CostAmount, SalesAmount, true, Format(Field.Value));
 
                 SetItemLedgerEntryFilter(ILEQuantity, true, Format(Field.Value));
@@ -481,15 +582,10 @@
 
                 TempBuffer.Insert();
             until (Record.Next() = 0) or ((Type = Type::Period) and (Count >= Lines));
-        end;
         d.Close();
-
     end;
 
     internal procedure SetItemLedgerEntryFilter(var ILEQuantity: Decimal; LastYear: Boolean; "Code": Code[20])
-    var
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        SalesStatisticsByPerson: Query "NPR Sales Statistics By Person";
     begin
         ILEQuantity := 0;
         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
@@ -502,25 +598,34 @@
             Type::Salesperson:
                 SalesStatisticsByPerson.SetFilter(Filter_SalesPers_Purch_Code, Code);
             Type::Customer:
-                ItemLedgerEntry.SetRange("Document No.", Code);
+
+                ItemLedgerEntry.SetRange("Source No.", Code);
             Type::Vendor:
                 SalesStatisticsByPerson.SetRange(Filter_Vendor_No_, Code);
             Type::Projectcode:
-                begin
-                    if (ProjektKodeStart <> '') and (ProjektKodeStart <> '') then
-                        ItemLedgerEntry.SetFilter("Global Dimension 2 Code", '%1..%2', ProjektKodeStart, ProjektKodeSlut);
-                end;
+
+                if (ProjectCodeStart <> '') and (ProjectCodeStart <> '') then
+                    ItemLedgerEntry.SetFilter("Global Dimension 2 Code", '%1..%2', ProjectCodeStart, ProjectCodeEnd);
         end;
 
         if not LastYear then begin
-            ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut);
-            SalesStatisticsByPerson.SetFilter(Filter_Posting_Date, '%1..%2', Periodestart, Periodeslut);
-        end else begin
-            ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate('<- 1Y>', Periodestart), CalcDate('<- 1Y>', Periodeslut));
-            SalesStatisticsByPerson.SetFilter(Filter_Posting_Date, '%1..%2', CalcDate('<- 1Y>', Periodestart), CalcDate('<- 1Y>', Periodeslut));
-        end;
+            if Type = Type::Period then begin
+                Evaluate(DateFilter, Code);
+                ItemLedgerEntry.SetFilter("Posting Date", StrSubstNo(Pct2Lbl, DateFilter));
+            end else begin
+                ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', PeriodStart, PeriodEnd);
+                SalesStatisticsByPerson.SetFilter(Filter_Posting_Date, '%1..%2', PeriodStart, PeriodEnd);
+            end;
+        end else
+            if Type = Type::Period then begin
+                Evaluate(DateFilter, Code);
+                ItemLedgerEntry.SetFilter("Posting Date", StrSubstNo(Pct2Lbl, CalcDate('<- 1Y>', DateFilter)));
+            end else begin
+                ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate('<- 1Y>', PeriodStart), CalcDate('<- 1Y>', PeriodEnd));
+                SalesStatisticsByPerson.SetFilter(Filter_Posting_Date, '%1..%2', CalcDate('<- 1Y>', PeriodStart), CalcDate('<- 1Y>', PeriodEnd));
+            end;
 
-        if Type <> Type::ItemCategory then begin
+        if Type <> Type::ItemCategory then
             if ItemCategoryFilter <> '' then begin
                 ItemLedgerEntry.SetRange("Item Category Code", ItemCategoryFilter);
                 SalesStatisticsByPerson.SetRange(Filter_Item_Category_Code, ItemCategoryFilter);
@@ -528,7 +633,6 @@
                 ItemLedgerEntry.SetRange("Item Category Code");
                 SalesStatisticsByPerson.SetRange(Filter_Item_Category_Code);
             end;
-        end;
 
         if Dim1Filter <> '' then begin
             ItemLedgerEntry.SetRange("Global Dimension 1 Code", Dim1Filter);
@@ -538,7 +642,7 @@
             SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_1_Code);
         end;
 
-        if not (Type = Type::Projectcode) then begin
+        if not (Type = Type::Projectcode) then
             if Dim2Filter <> '' then begin
                 ItemLedgerEntry.SetRange("Global Dimension 2 Code", Dim2Filter);
                 SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_2_Code, Dim2Filter);
@@ -546,7 +650,33 @@
                 ItemLedgerEntry.SetRange("Global Dimension 2 Code");
                 SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_2_Code);
             end;
-        end;
+
+        if not (Type = Type::Item) then
+            if ItemNoFilter <> '' then begin
+                ItemLedgerEntry.SetRange("Item No.", ItemNoFilter);
+                SalesStatisticsByPerson.SetRange(Filter_Item_No_, ItemNoFilter);
+            end else begin
+                ItemLedgerEntry.SetRange("Item No.");
+                SalesStatisticsByPerson.SetRange(Filter_Item_No_);
+            end;
+
+        if not (Type = Type::Salesperson) then
+            if SalespersonFilter <> '' then
+                SalesStatisticsByPerson.SetRange(Filter_SalesPers_Purch_Code, SalespersonFilter)
+            else
+                SalesStatisticsByPerson.SetRange(Filter_SalesPers_Purch_Code);
+
+        if not (Type = Type::Customer) then
+            if CustomerNoFilter <> '' then
+                SalesStatisticsByPerson.SetRange(Filter_Source_No, CustomerNoFilter)
+            else
+                SalesStatisticsByPerson.SetRange(Filter_Source_No);
+
+        if not (Type = Type::Vendor) then
+            if VendorNoFilter <> '' then
+                SalesStatisticsByPerson.SetRange(Filter_Vendor_No_, VendorNoFilter)
+            else
+                SalesStatisticsByPerson.SetRange(Filter_Vendor_No_);
 
         case Type of
             Type::Item, Type::ItemCategory, Type::Customer, Type::Projectcode, Type::Period:
@@ -557,17 +687,13 @@
             Type::Salesperson, Type::Vendor:
                 begin
                     SalesStatisticsByPerson.Open();
-                    while SalesStatisticsByPerson.Read() do begin
+                    while SalesStatisticsByPerson.Read() do
                         ILEQuantity += SalesStatisticsByPerson.Quantity;
-                    end;
                 end;
         end;
-
     end;
 
     internal procedure SetValueEntryFilter(var CostAmount: Decimal; var SalesAmount: Decimal; LastYear: Boolean; "Code": Code[20])
-    var
-        ValueEntryWithVendor: Query "NPR Value Entry With Vendor";
     begin
         CostAmount := 0;
         SalesAmount := 0;
@@ -585,35 +711,73 @@
             Type::Vendor:
                 ValueEntryWithVendor.SetRange(Filter_Vendor_No, Code);
             Type::Projectcode:
-                begin
-                    if (ProjektKodeStart <> '') and (ProjektKodeStart <> '') then
-                        ValueEntryWithVendor.SetFilter(Filter_Dim_2_Code, '%1..%2', ProjektKodeStart, ProjektKodeSlut);
-                end;
+
+                if (ProjectCodeStart <> '') and (ProjectCodeStart <> '') then
+                    ValueEntryWithVendor.SetFilter(Filter_Dim_2_Code, '%1..%2', ProjectCodeStart, ProjectCodeEnd);
         end;
 
-        if not LastYear then
-            ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1..%2', Periodestart, Periodeslut)
-        else
-            ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1..%2', CalcDate('<- 1Y>', Periodestart), CalcDate('<- 1Y>', Periodeslut));
+        if not LastYear then begin
+            if Type = Type::Period then begin
+                Evaluate(DateFilter, Code);
+                ValueEntryWithVendor.SetFilter(Filter_DateTime, StrSubstNo(Pct2Lbl, DateFilter));
+            end
+            else
+                ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1..%2', PeriodStart, PeriodEnd);
+        end else
+            if Type = Type::Period then begin
+                Evaluate(DateFilter, Code);
+                ValueEntryWithVendor.SetFilter(Filter_DateTime, StrSubstNo(Pct2Lbl, CalcDate('<- 1Y>', DateFilter)));
+            end
+            else
+                ValueEntryWithVendor.SetFilter(Filter_DateTime, '%1..%2', CalcDate('<- 1Y>', PeriodStart), CalcDate('<- 1Y>', PeriodEnd));
 
-        if Type <> Type::ItemCategory then begin
+        if Type <> Type::ItemCategory then
             if ItemCategoryFilter <> '' then
                 ValueEntryWithVendor.SetRange(Filter_Item_Category_Code, ItemCategoryFilter)
             else
                 ValueEntryWithVendor.SetRange(Filter_Item_Category_Code);
-        end;
 
         if Dim1Filter <> '' then
             ValueEntryWithVendor.SetRange(Filter_Dim_1_Code, Dim1Filter)
         else
             ValueEntryWithVendor.SetRange(Filter_Dim_1_Code);
 
-        if not (Type = Type::Projectcode) then begin
+        if not (Type = Type::Projectcode) then
             if Dim2Filter <> '' then
                 ValueEntryWithVendor.SetRange(Filter_Dim_2_Code, Dim2Filter)
             else
                 ValueEntryWithVendor.SetRange(Filter_Dim_2_Code);
-        end;
+
+        if not (Type = Type::Item) then
+            if ItemNoFilter <> '' then
+                ValueEntryWithVendor.SetRange(Filter_Item_No, ItemNoFilter)
+            else
+                ValueEntryWithVendor.SetRange(Filter_Item_No);
+
+        if not (Type = Type::Salesperson) then
+            if SalespersonFilter <> '' then
+                ValueEntryWithVendor.SetRange(Filter_SalesPers_Purch_Code, SalespersonFilter)
+            else
+                ValueEntryWithVendor.SetRange(Filter_SalesPers_Purch_Code);
+
+        if not (Type = Type::Customer) then
+            if CustomerNoFilter <> '' then
+                ValueEntryWithVendor.SetRange(Filter_Source_No, CustomerNoFilter)
+            else
+                ValueEntryWithVendor.SetRange(Filter_Source_No);
+
+        if not (Type = Type::Vendor) then
+            if VendorNoFilter <> '' then
+                ValueEntryWithVendor.SetRange(Filter_Vendor_No, VendorNoFilter)
+            else
+                ValueEntryWithVendor.SetRange(Filter_Vendor_No);
+
+        if not (Type = Type::Projectcode) then
+            if Dim2Filter <> '' then
+                ValueEntryWithVendor.SetRange(Filter_Dim_2_Code, Dim2Filter)
+            else
+                ValueEntryWithVendor.SetRange(Filter_Dim_2_Code);
+
         ValueEntryWithVendor.Open();
         while ValueEntryWithVendor.Read() do begin
             CostAmount += ValueEntryWithVendor.Sum_Cost_Amount_Actual;
@@ -623,7 +787,6 @@
 
     internal procedure UpdateSortKey()
     begin
-        // UpdateSortKey
         case SortBy of
             SortBy::Description:
                 TempBuffer.SetCurrentKey(Description);
@@ -645,13 +808,48 @@
                 TempBuffer.SetCurrentKey("Profit %");
             SortBy::"Profit % last year":
                 TempBuffer.SetCurrentKey("Profit % last year");
-            else begin
-                if Type = Type::Period then
-                    TempBuffer.SetCurrentKey("Date 1")
-                else
-                    TempBuffer.SetCurrentKey("No.");
-            end;
+            SortBy::"No.":
+                TempBuffer.SetCurrentKey("No.");
         end;
     end;
-}
 
+    local procedure CheckDateFilters()
+    var
+        EmptyFilterErr: Label 'You must enter a value for Period filters.';
+    begin
+        if (PeriodEnd = 0D) or (PeriodStart = 0D) then
+            Error(EmptyFilterErr);
+    end;
+
+    local procedure CreateRequestPageFiltersText(var FiltersTextParam: Text)
+    var
+        Filter2Lbl: Label '%1 %2';
+        FilterLbl: Label ', %1 %2';
+    begin
+        Clear(FiltersTextParam);
+
+        PeriodFilters := StrSubstNo(Pct1Lbl, PeriodStart, PeriodEnd);
+        FiltersTextParam += StrSubstNo(Filter2Lbl, PeriodFilterTitleLbl, PeriodFilters);
+
+        if (SalespersonFilter <> '') then
+            FiltersTextParam += StrSubstNo(FilterLbl, SalespersonFilterTitleLbl, SalespersonFilter);
+
+        if (ItemCategoryFilter <> '') then
+            FiltersTextParam += StrSubstNo(FilterLbl, ItemCatFilterTitleLbl, ItemCategoryFilter);
+
+        if (ItemNoFilter <> '') then
+            FiltersTextParam += StrSubstNo(FilterLbl, ItemFilterTitleLbl, ItemNoFilter);
+
+        if (CustomerNoFilter <> '') then
+            FiltersTextParam += StrSubstNo(FilterLbl, CustomerFilterTitleLbl, CustomerNoFilter);
+
+        if (VendorNoFilter <> '') then
+            FiltersTextParam += StrSubstNo(FilterLbl, VendorFilterTitleLbl, VendorNoFilter);
+
+        if (Dim1Filter <> '') then
+            FiltersTextParam += StrSubstNo(FilterLbl, DeptCodeFilterTitleLbl, Dim1Filter);
+
+        if (Dim2Filter <> '') then
+            FiltersTextParam += StrSubstNo(FilterLbl, ProjectCodeFilterTitleLbl, Dim2Filter)
+    end;
+}
