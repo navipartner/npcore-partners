@@ -37,13 +37,13 @@
             {
                 Caption = 'ACTIVITIES';
                 ApplicationArea = NPRRetail;
-
             }
+#IF NOT BC17
             part(RetailSalesChart; "NPR Retail Sales Chart")
             {
                 ApplicationArea = NPRRetail;
-
             }
+#ENDIF
             part(MyJobQueue; "My Job Queue")
             {
                 Caption = 'Job Queue';
