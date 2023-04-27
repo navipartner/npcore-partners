@@ -42,4 +42,10 @@ enum 6151416 "NPR PG Integrations" implements "NPR IPaymentGateway"
         Caption = 'Quickpay';
         Implementation = "NPR IPaymentGateway" = "NPR Magento Pmt. Quickpay Mgt.";
     }
+
+    value(8; Vipps)
+    {
+        Caption = 'Vipps';
+        Implementation = "NPR IPaymentGateway" = "NPR PG Vipps Integration Mgt.";
+    }
 }

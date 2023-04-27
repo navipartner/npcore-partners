@@ -43,6 +43,10 @@ table 6059813 "NPR PG Payment Request"
         {
             DataClassification = SystemMetadata;
         }
+        field(22; "Payment Line System Id"; Guid)
+        {
+            DataClassification = SystemMetadata;
+        }
     }
 
     /// <summary>

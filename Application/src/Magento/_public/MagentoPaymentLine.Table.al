@@ -157,6 +157,7 @@
         Request."Request Amount" := Rec.Amount;
         Request."Payment Gateway Code" := Rec."Payment Gateway Code";
         Request."Document Table No." := Rec."Document Table No.";
+        Request."Payment Line System Id" := Rec.SystemId;
 
         case Rec."Document Table No." of
             Database::"Sales Header":
