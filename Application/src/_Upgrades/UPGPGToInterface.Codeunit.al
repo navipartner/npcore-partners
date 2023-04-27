@@ -105,7 +105,7 @@ codeunit 6151474 "NPR UPG PG To Interface"
         case CodeunitID of
             Codeunit::"NPR Magento Pmt. Adyen Mgt.":
                 IntegrationType := IntegrationType::Adyen;
-            Codeunit::"NPR Magento Pmt. Bambora Mgt.", 6014405: // Both ids have been used for Bambora
+            Codeunit::"NPR Magento Pmt. Bambora Mgt.", 6014405, 6014623: // All ids have been used for Bambora
                 IntegrationType := IntegrationType::Bambora;
             Codeunit::"NPR Magento Pmt. Dibs Mgt.":
                 IntegrationType := IntegrationType::Dibs;
