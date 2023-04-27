@@ -142,7 +142,6 @@
                     field("Show Message Body (Debug)"; Rec."Show Message Body (Debug)")
                     {
                         ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                        Visible = false;
                         ToolTip = 'Specifies the value of the Show Message Body (Debug) field';
                     }
                 }
