@@ -18,10 +18,12 @@ page 6059903 "NPR Custom Message Page"
                 trigger Ready()
                 begin
                     CurrPage."Message Page".Init(_title, _message);
+                    EmitTelemetry('Init Page');
                 end;
 
                 trigger OKCliked()
                 begin
+                    EmitTelemetry('Close(OkClicked)');
                     CurrPage.Close();
                 end;
             }
@@ -32,10 +34,24 @@ page 6059903 "NPR Custom Message Page"
     begin
         _title := Title;
         _message := Message;
+        EmitTelemetry('Open');
         CurrPage.RunModal();
+    end;
+
+    procedure EmitTelemetry(Message: Text)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+    begin
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        Session.LogMessage('CtrlAddin_CustomMessage', Message, Verbosity::Verbose, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
     var
         _title: Text;
         _message: Text;
+
 }
