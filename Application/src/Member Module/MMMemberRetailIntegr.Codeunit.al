@@ -221,14 +221,15 @@
         exit(MembershipSetup."Ticket Item Barcode");
     end;
 
-    procedure POS_GetExternalTicketItemForMembership(MembershipEntryNo: Integer) TicketItemBarcode: Code[50]
+    procedure POS_GetExternalTicketItemForMembership(MembershipEntryNo: Integer; FailOnError: Boolean) TicketItemBarcode: Code[50]
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
     begin
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
-        MembershipSetup.TestField("Ticket Item Barcode");
+        if (FailOnError) then
+            MembershipSetup.TestField("Ticket Item Barcode");
 
         exit(MembershipSetup."Ticket Item Barcode");
     end;
@@ -455,31 +456,56 @@
         exit(MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD, MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER]);
     end;
 
+    procedure IssueTicketFromMemberScan(Member: Record "NPR MM Member"; ItemCrossReference: Code[50]; var TicketNo: Code[20]; var ResponseMessage: Text): Integer
+    var
+        InvalidItemNo: Label 'Invalid Item Number %1';
+        ItemNo: Code[20];
+        VariantCode: Code[10];
+        ResolvingTable: Integer;
+    begin
+        if (not TranslateBarcodeToItemVariant(ItemCrossReference, ItemNo, VariantCode, ResolvingTable)) then begin
+            ResponseMessage := StrSubstNo(InvalidItemNo, ItemCrossReference);
+            exit(-1);
+        end;
+
+        exit(IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ResponseMessage));
+    end;
+
     procedure IssueTicketFromMemberScan(FailWithError: Boolean; ItemNo: Code[20]; VariantCode: Code[10]; Member: Record "NPR MM Member"; var TicketNo: Code[20]; var ResponseMessage: Text) ResponseCode: Integer
     var
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
+        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Token: Text[100];
+        InvalidTicketType: Label 'Item number %1 has no ticket type specified.';
+        NotTicket: Label 'Ticket Type %1 is not a ticket.';
+        NotificationAddress: Text[100];
+        NotificationMethod: Code[10];
+        NotificationEngine: Option;
     begin
 
         Item.Get(ItemNo);
-        if (not TicketType.Get(Item."NPR Ticket Type")) then
-            exit;
-        if (not TicketType."Is Ticket") then
-            exit;
+        if (not TicketType.Get(Item."NPR Ticket Type")) then begin
+            ResponseMessage := StrSubstNo(InvalidTicketType, ItemNo);
+            exit(-1);
+        end;
+        if (not TicketType."Is Ticket") then begin
+            ResponseMessage := StrSubstNo(NotTicket, TicketType.Code);
+            exit(-1);
+        end;
+
+        MembershipManagement.GetCommunicationMethod_Ticket(Member."Entry No.", 0, NotificationMethod, NotificationAddress, NotificationEngine);
 
         TicketRequestManager.LockResources('IssueTicketFromMemberScan');
 
         Token := TicketRequestManager.CreateReservationRequest(ItemNo, VariantCode, 1, Member."External Member No.");
-        TicketRequestManager.SetReservationRequestExtraInfo(Token, Member."E-Mail Address", Member."External Member No.");
-
+        TicketRequestManager.SetReservationRequestExtraInfo(Token, NotificationAddress, Member."External Member No.");
         ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(Token, FailWithError, ResponseMessage);
         if (ResponseCode <> 0) then
             exit(ResponseCode);
 
         TicketRequestManager.ConfirmReservationRequestWithValidate(Token);
-
         if (not TicketRequestManager.GetTokenTicket(Token, TicketNo)) then
             Error(TICKET_NOT_FOUND);
 

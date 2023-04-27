@@ -274,7 +274,7 @@
         ItemDescription := '';
         MembershipEvents.OnCustomItemDescription(MembershipSetup."Community Code", MembershipSetup.Code, MemberCard."Entry No.", ItemDescription);
 
-        ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemForMembership(Membership."Entry No.");
+        ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemForMembership(Membership."Entry No.", true);
         AddItemToPOS(POSSession, 0, ExternalItemNo, CopyStr(ItemDescription, 1, MaxStrLen(SaleLinePOS.Description)), StrSubstNo(PlaceHolderLbl, Membership."External Membership No.", ExternalMemberCardNo), 1, 0, SaleLinePOS);
 
         case MembershipSetup."Member Information" of
