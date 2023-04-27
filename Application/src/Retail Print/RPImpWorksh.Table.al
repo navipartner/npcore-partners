@@ -119,15 +119,19 @@
     var
         RPTemplateHeader: Record "NPR RP Template Header";
     begin
-        Action := Action::Skip;
+        if RPTemplateHeader.Count() = 0 then
+            SetDefaultAction()
+        else begin
+            Action := Action::Skip;
 
-        if not RPTemplateHeader.Get(Template) then begin
-            "New Template" := true;
-            exit;
+            if not RPTemplateHeader.Get(Template) then begin
+                "New Template" := true;
+                exit;
+            end;
+
+            if not IsSafeVersionIncrease() then
+                Warning := true;
         end;
-
-        if not IsSafeVersionIncrease() then
-            Warning := true;
     end;
 
     procedure SetStyle(): Text
