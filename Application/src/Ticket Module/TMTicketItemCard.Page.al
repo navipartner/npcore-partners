@@ -200,6 +200,18 @@ page 6059884 "NPR TM Ticket Item Card"
                 RunObject = Page "Item Card";
                 RunPageLink = "No." = field("Item No.");
             }
+            Action(NavigateDefaultAdmission)
+            {
+                ToolTip = 'Navigate to Default Admission per POS Unit';
+                ApplicationArea = NPRTicketAdvanced;
+                Caption = 'Default Admission per POS Unit';
+                Image = Default;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category5;
+                RunObject = Page "NPR TM POS Default Admission";
+                RunPageLink = "Item No." = field("Item No."), "Variant Code" = field("Code");
+            }
         }
     }
 

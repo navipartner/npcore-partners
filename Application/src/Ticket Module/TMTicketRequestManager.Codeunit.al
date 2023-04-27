@@ -1109,7 +1109,7 @@
         exit(true);
     end;
 
-    procedure SetReservationRequestExtraInfo(Token: Text[100]; NotificationAddress: Text[80]; ExternalOrderNo: Code[20]): Boolean
+    procedure SetReservationRequestExtraInfo(Token: Text[100]; NotificationAddress: Text[100]; ExternalOrderNo: Code[20]): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin

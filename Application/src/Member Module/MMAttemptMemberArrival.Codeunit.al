@@ -5,11 +5,11 @@
     begin
 
         if (_FunctionOption = _FunctionOption::AttemptArrival) then begin
-            _ResponseCode := DoAttemptMemberArrival(_TicketItemNo, _AdmissionCode, _PosUnitNo, _ScannerStationId, _Member, _MembershipEntryNo, _ResponseMessage);
+            _ResponseCode := DoAttemptMemberArrivalSingle(_TicketItemNo, _AdmissionCode, _PosUnitNo, _Member, _ResponseMessage);
         end;
 
         if (_FunctionOption = _FunctionOption::AttemptArrivalBatch) then begin
-            _ResponseCode := DoAttemptMemberArrival(_MemberInfoCapture, _AdmissionCode, _PosUnitNo, _ScannerStationId, _ResponseMessage);
+            _ResponseCode := DoAttemptMemberArrivalBatch(_MemberInfoCapture, _AdmissionCode, _PosUnitNo, _ResponseMessage);
         end;
 
     end;
@@ -26,6 +26,7 @@
         _ResponseMessage: Text;
         _ResponseCode: Integer;
 
+#pragma warning disable AA0206
     procedure AttemptMemberArrival(TicketItemNo: Code[50]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; ScannerStationId: Code[10]; Member: Record "NPR MM Member"; MembershipEntryNo: Integer)
     var
     begin
@@ -39,7 +40,7 @@
         _ResponseCode := -2; // When DoAttemptMemberArrival() throws error
         _ResponseMessage := 'Member Arrival Attempt failed with error.';
     end;
-
+#pragma warning restore AA0206
     procedure AttemptMemberArrival(var MemberInfoCapture: Record "NPR MM Member Info Capture"; AdmissionCode: Code[20]; PosUnitNo: Code[10]; ScannerStationId: Code[10])
     var
     begin
@@ -60,7 +61,7 @@
         exit(_ResponseCode);
     end;
 
-    local procedure DoAttemptMemberArrival(var MemberInfoCapture: Record "NPR MM Member Info Capture"; AdmissionCode: Code[20]; PosUnitNo: Code[10]; ScannerStationId: Code[10]; var ResponseMessage: Text) ResponseCode: Integer
+    local procedure DoAttemptMemberArrivalBatch(var MemberInfoCapture: Record "NPR MM Member Info Capture"; AdmissionCode: Code[20]; PosUnitNo: Code[10]; var ResponseMessage: Text) ResponseCode: Integer
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         Member: Record "NPR MM Member";
@@ -72,172 +73,64 @@
         MemberInfoCapture.FindSet();
         repeat
             Clear(Member);
-            if (Member.Get(MemberInfoCapture."Member Entry No")) then
+            if (Member.Get(MemberInfoCapture."Member Entry No")) then begin
                 MemberInfoCapture."External Member No" := Member."External Member No.";
 
-            MembershipSetup.Get(MemberInfoCapture."Membership Code");
-            MembershipSetup.TestField("Ticket Item Barcode");
+                MembershipSetup.Get(MemberInfoCapture."Membership Code");
 
-            ResponseCode := DoAttemptMemberArrival(MembershipSetup."Ticket Item Barcode", AdmissionCode, PosUnitNo, ScannerStationId, Member, MemberInfoCapture."Membership Entry No.", ResponseMessage);
-            if (ResponseCode <> 0) then
-                Error(ResponseMessage);
-
+                ResponseCode := DoAttemptMemberArrivalSingle(MembershipSetup."Ticket Item Barcode", AdmissionCode, PosUnitNo, Member, ResponseMessage);
+                if (ResponseCode <> 0) then
+                    Error(ResponseMessage);
+            end;
         until (MemberInfoCapture.Next() = 0);
-
         exit(0); // Success
-
     end;
 
-    local procedure DoAttemptMemberArrival(TicketItemNo: Code[50]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; ScannerStationId: Code[10]; Member: Record "NPR MM Member"; MembershipEntryNo: Integer; var ResponseMessage: Text) ResponseCode: Integer
+    local procedure DoAttemptMemberArrivalSingle(ItemCrossReference: Code[50]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; Member: Record "NPR MM Member"; var ResponseMessage: Text): Integer
     var
         Ticket: Record "NPR TM Ticket";
+        MemberTicketManagement: Codeunit "NPR MM Member Ticket Manager";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        TicketMgr: Codeunit "NPR TM Ticket Management";
-        AttemptTicket: Codeunit "NPR Ticket Attempt Create";
-        VariantCode: Code[10];
-        ItemNo: Code[20];
+        TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketNo: Code[20];
-        ResolvingTable: Integer;
+        TicketIsReused: Boolean;
         NEW_MEMBER_TICKET: Label 'Ticket %1 for admission %2 was created for member %3.';
         MEMBER_TICKET: Label 'Ticket %1 for admission %2 was reused for member %3.';
-        ResponseMsg: Label '%1 does not translate to an item. Check Item Cross-Reference or Item table.';
-        Token: Text[100];
-        NotificationAddress: Text[100];
-        NotificationMethod: Code[10];
-        NotificationEngine: Option;
+        MemberTicketNotSetup: Label 'No ticket reservation found for member %1 that is valid for today, with admission code [%2] or an admission code selected from POS unit [%3].';
     begin
 
-        if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(TicketItemNo, ItemNo, VariantCode, ResolvingTable))) then begin
-            ResponseMessage := StrSubstNo(ResponseMsg, TicketItemNo);
+        TicketIsReused := MemberTicketManagement.SelectReusableTicket(Member."Entry No.", ItemCrossReference, AdmissionCode, PosUnitNo, 1, '', Ticket);
+        if (TicketIsReused) then begin
+            if ((AdmissionCode = '') and (PosUnitNo = '')) then
+                AdmissionCode := '-default-';
+
+            if ((AdmissionCode = '') and (PosUnitNo <> '')) then
+                AdmissionCode := '-pos unit-';
+
+            ResponseMessage := StrSubstNo(MEMBER_TICKET, Ticket."No.", AdmissionCode, Member."External Member No.");
+            exit(0);
+        end;
+
+        // Create new ticket - only possible when ExternalItemNo <> ''
+        if (ItemCrossReference = '') then begin
+            ResponseMessage := StrSubstNo(MemberTicketNotSetup, Member."External Member No.", AdmissionCode, PosUnitNo);
             exit(-1);
         end;
 
-        Ticket.SetCurrentKey("External Member Card No.");
-        Ticket.SetFilter("Item No.", '=%1', ItemNo);
-        Ticket.SetFilter("Variant Code", '=%1', VariantCode);
-        Ticket.SetFilter("Document Date", '=%', Today);
-
-        Ticket.SetFilter("External Member Card No.", '=%1', Member."External Member No.");
-        if (Ticket.FindLast()) then begin
-
-            if (AttemptTicket.AttemptValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, PosUnitNo, ResponseMessage)) then begin
-
-                if (AdmissionCode = '') then
-                    AdmissionCode := '-default-';
-
-                ResponseMessage := StrSubstNo(MEMBER_TICKET, Ticket."No.", AdmissionCode, Member."External Member No.");
-                exit(0);
-            end;
-        end;
-
-        if (not TicketMakeReservation(TicketItemNo, AdmissionCode, Member."External Member No.", ScannerStationId, Token, ResponseMessage)) then
+        if (MemberRetailIntegration.IssueTicketFromMemberScan(Member, ItemCrossReference, TicketNo, ResponseMessage) <> 0) then
             exit(-1);
 
-        MembershipManagement.GetCommunicationMethod_Ticket(Member."Entry No.", MembershipEntryNo, NotificationMethod, NotificationAddress, NotificationEngine);
-        if (not (TicketConfirmReservation(Token, ScannerStationId, TicketNo, NotificationAddress, ResponseMessage))) then
-            exit(-1);
+        TicketManagement.RegisterArrivalScanTicket(0, TicketNo, AdmissionCode, -1, PosUnitNo, false);
 
-        Ticket.Get(TicketNo);
-        TicketMgr.RegisterArrivalScanTicket(0, TicketNo, AdmissionCode, -1, '', false);
 
         if (AdmissionCode = '') then
             AdmissionCode := '-default-';
 
+        if ((AdmissionCode = '') and (PosUnitNo <> '')) then
+            AdmissionCode := '-pos unit-';
+
         ResponseMessage := StrSubstNo(NEW_MEMBER_TICKET, TicketNo, AdmissionCode, Member."External Member No.");
-        exit(ResponseCode);
-
-    end;
-
-    local procedure TicketMakeReservation(ExternalItemNumber: Code[50]; AdmissionCode: Code[20]; MemberReference: Code[20]; ScannerStation: Code[10]; var Token: Text[100]; var ResponseMessage: Text) ReservationStatus: Boolean
-    var
-        SoapMessage: Text;
-        TempBLOBbuffer: Record "NPR BLOB buffer" temporary;
-        iStream: InStream;
-        oStream: OutStream;
-        TicketReservation: XMLport "NPR TM Ticket Reservation";
-        TicketWebService: Codeunit "NPR TM Ticket WebService";
-    begin
-
-#pragma warning disable AA0217
-        SoapMessage :=
-            '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-            '<tickets xmlns="urn:microsoft-dynamics-nav/xmlports/x6060114">' +
-            '   <reserve_tickets token="">' +
-                StrSubstNo('       <ticket external_id="%1" line_no="1" qty="1" admission_schedule_entry="0" member_number="%2" admission_code="%3"/>', ExternalItemNumber, MemberReference, AdmissionCode) +
-            '   </reserve_tickets>' +
-            '</tickets>';
-#pragma warning restore
-
-        TempBLOBbuffer.Insert();
-        TempBLOBbuffer."Buffer 1".CreateOutStream(oStream);
-        oStream.WriteText(SoapMessage);
-        TempBLOBbuffer.Modify();
-
-        TempBLOBbuffer."Buffer 1".CreateInStream(iStream);
-        TicketReservation.SetSource(iStream);
-        TicketReservation.Import();
-
-        TicketWebService.MakeTicketReservation(TicketReservation, ScannerStation);
-        ReservationStatus := TicketReservation.GetResult(Token, ResponseMessage);
-
-        exit(ReservationStatus);
-
-    end;
-
-    local procedure TicketConfirmReservation(Token: Text[100]; ScannerStation: Code[10]; var TicketNumber: Code[20]; NotificationAddress: Text[100]; var ResponseMessage: Text) ConfirmationStatus: Boolean
-    var
-        SoapMessage: Text;
-        TempBLOBbuffer: Record "NPR BLOB buffer" temporary;
-        iStream: InStream;
-        oStream: OutStream;
-        TicketWebService: Codeunit "NPR TM Ticket WebService";
-        TicketConfirmation: XMLport "NPR TM Ticket Confirmation";
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
-        Ticket: Record "NPR TM Ticket";
-        PrePaidLbl: Label 'MembershipPrePaid', MaxLength = 20;
-    begin
-
-#pragma warning disable AA0217
-        SoapMessage :=
-            '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-            '<tickets xmlns="urn:microsoft-dynamics-nav/xmlports/x6060117">' +
-            '  <ticket_tokens>' +
-                StrSubstNo('      <ticket_token>%1</ticket_token>', Token) +
-                StrSubstNo('      <send_notification_to>%1</send_notification_to>', NotificationAddress) +
-                StrSubstNo('      <external_order_no>%1</external_order_no>', PrePaidLbl) +
-            '  </ticket_tokens>' +
-            '</tickets>';
-#pragma warning restore
-
-        TempBLOBbuffer.Insert();
-        TempBLOBbuffer."Buffer 1".CreateOutStream(oStream);
-        oStream.WriteText(SoapMessage);
-        TempBLOBbuffer.Modify();
-
-        TempBLOBbuffer."Buffer 1".CreateInStream(iStream);
-        TicketConfirmation.SetSource(iStream);
-        TicketConfirmation.Import();
-
-        ConfirmationStatus := TicketWebService.ConfirmTicketReservation(TicketConfirmation, ScannerStation);
-
-        ResponseMessage := 'There was a problem with Confirm Ticket Reservation.';
-        TicketReservationResponse.SetFilter("Session Token ID", '=%1', Token);
-        if (TicketReservationResponse.FindFirst()) then begin
-
-            if (TicketReservationResponse.Confirmed) then begin
-                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationResponse."Request Entry No.");
-                if (Ticket.FindFirst()) then
-                    TicketNumber := Ticket."No.";
-                ResponseMessage := '';
-                ConfirmationStatus := true;
-            end else begin
-                ResponseMessage := TicketReservationResponse."Response Message";
-                ConfirmationStatus := false;
-            end;
-        end;
-
-        exit(ConfirmationStatus);
+        exit(0);
 
     end;
 

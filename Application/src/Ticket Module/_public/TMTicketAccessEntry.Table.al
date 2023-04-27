@@ -1,12 +1,5 @@
 ﻿table 6059786 "NPR TM Ticket Access Entry"
 {
-    // NPR4.16/TSA/20150804  CASE 219659 - Added Field "Admission Code"
-    // NPR4.16/TSA/20150804  CASE 219659 - Changed PK Entry No to AutoInc, Extended 2nd key with admission code
-    // TM1.03/TSA/20160113  CASE 231260 - Dropped field Access Point No, changed captions
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.17/TSA /20161025  CASE 256152 Conform to OMA Guidelines
-    // TM1.31/TSA /20180524 CASE 316500 Removed SumIndexField Quantity from key "Ticket No.", "Admission Code"
-
     Caption = 'Ticket Access Entry';
     LookupPageID = "NPR TM Ticket AccessEntry List";
     DataClassification = CustomerContent;

@@ -271,6 +271,7 @@
                 ToolTip = 'Executes the Synchronize Contact action';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 Scope = Repeater;
+                Promoted = true;
 
                 trigger OnAction()
                 begin
