@@ -103,6 +103,9 @@
                 ToolTip = 'Executes the Set new templates to Create/Replace';
                 ApplicationArea = NPRRetail;
                 Image = RefreshLines;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
 
                 trigger OnAction()
                 begin
@@ -119,6 +122,9 @@
                 ToolTip = 'Executes the Set all templates to Skip';
                 ApplicationArea = NPRRetail;
                 Image = RefreshLines;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
 
                 trigger OnAction()
                 begin
