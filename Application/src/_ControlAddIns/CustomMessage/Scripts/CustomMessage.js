@@ -1,6 +1,6 @@
 function Init(titleTxt, messageTxt)
 {
-    console.log(titleTxt + " | " + messageTxt);
+    console.log("Control Addin - CustomMessage: Init");
     let container = document.getElementById("controlAddIn");
     let header = document.createElement("div");
     header.style.width = "100%";
@@ -38,6 +38,8 @@ function Init(titleTxt, messageTxt)
     OkBtn.style.margin = "auto";
     OkBtn.appendChild(OkLabel);
     OkBtn.onclick = (e) => {
+        let time = new Date().toLocaleString();
+        console.log("Control Addin - CustomMessage: OkClicked: " + time);
         Microsoft.Dynamics.NAV.InvokeExtensibilityMethod("OKCliked",[]);
     };
 
@@ -48,4 +50,5 @@ function Init(titleTxt, messageTxt)
     container.appendChild(body);
     container.appendChild(footer);
 }
+console.log("Control Addin - CustomMessage: InvokeExtensibilityMethod(Ready)");
 Microsoft.Dynamics.NAV.InvokeExtensibilityMethod("Ready",[]);
