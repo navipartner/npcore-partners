@@ -25,7 +25,7 @@ codeunit 6150815 "NPR MM POS Action: Member ArrB"
         MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
         POSActionMemberManagement: Codeunit "NPR MM POS Action: MemberMgmt.";
         MembershipEvents: Codeunit "NPR MM Membership Events";
-        ExternalItemNo: Code[50];
+        //ExternalItemNo: Code[50];
         LogEntryNo: Integer;
         ResponseCode: Integer;
         ResponseMessage: Text;
@@ -64,14 +64,14 @@ codeunit 6150815 "NPR MM POS Action: Member ArrB"
 
                     MembershipEvents.OnBeforePOSMemberArrival(ThisShouldBeEmpty_SaleLinePOS, MembershipSetup."Community Code", MembershipSetup.Code, MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MemberCard."Entry No.", ExternalMemberCardNo);
 
-                    ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemForMembership(MemberCard."Membership Entry No.");
+                    //ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemForMembership(MemberCard."Membership Entry No.");
 
                     if (POSWorkflowType = POSWorkflowMethod::Automatic) then
-                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ExternalItemNo, AdmissionCode, PosUnitNo, 1, '', ExternalTicketNo, ShowWelcomeMessage);
+                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, PosUnitNo, 1, '', ExternalTicketNo, ShowWelcomeMessage);
 
                     if (POSWorkflowType = POSWorkflowMethod::GuestCheckin) then begin
                         MemberTicketManager.PromptForMemberGuestArrival(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, PosUnitNo, Token);
-                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ExternalItemNo, AdmissionCode, PosUnitNo, 1, Token, ExternalTicketNo, ShowWelcomeMessage);
+                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, PosUnitNo, 1, Token, ExternalTicketNo, ShowWelcomeMessage);
                     end;
 
                     MemberLimitationMgr.UpdateLogEntry(LogEntryNo, 0, ExternalTicketNo);

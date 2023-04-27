@@ -124,6 +124,7 @@
                 Image = ImportCodes;
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 Scope = Repeater;
+                Promoted = true;
 
                 trigger OnAction()
                 var
