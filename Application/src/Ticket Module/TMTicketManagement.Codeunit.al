@@ -3,7 +3,6 @@
     Access = Internal;
 
     var
-        Text6059776: Label 'This value must be an integer between 1 and 4.';
 
         UNSUPPORTED_VALIDATION_METHOD: Label 'Unsupported Ticket Entry Validation Method.';
         INVALID_REFERENCE: Label 'Invalid %1 %2';
@@ -1770,7 +1769,7 @@
         Error(ResponseMessage);
     end;
 
-    procedure GenerateCertificateNumber(GeneratePattern: Text[30]; TicketNo: Code[20]) PatternOut: Code[30]
+    procedure GenerateNumberPattern(GeneratePattern: Text[30]; TicketNo: Code[20]) PatternOut: Code[30]
     var
         ErrPattern: Label 'Error in Pattern %1';
         PosStartClause: Integer;
@@ -1825,7 +1824,7 @@
                         begin
                             Evaluate(PatternLength, Right);
                             for Itt := 1 to PatternLength do
-                                PatternOut := StrSubstNo(PlaceHolderLbl, PatternOut, GenerateRandom(Left));
+                                PatternOut := StrSubstNo(PlaceHolderLbl, PatternOut, GenerateRandomFromPattern(Left));
                         end;
                     else begin
                         PatternOut := StrSubstNo(PlaceHolderLbl, PatternOut, Pattern);
@@ -1842,7 +1841,7 @@
 #pragma warning restore
     end;
 
-    local procedure GenerateRandom(Pattern: Code[2]) Random: Code[1]
+    internal procedure GenerateRandomFromPattern(Pattern: Code[2]) Random: Code[1]
     var
         Number: Integer;
         RandomCharacter: Code[1];
@@ -1866,60 +1865,43 @@
             exit(RandomCharacter);
     end;
 
-    local procedure GetRandom(Bytes: Integer) RandomInt: Integer
+    local procedure GetRandom(SeedSize: Integer) RandomInt: Integer
     var
-        RandomHexStringLen: Integer;
-        i: Integer;
-        RandomHexString: Text[100];
+        RandomHexString: Text;
+        InvalidValue: Label 'This value must be an integer between 1 and 4.';
     begin
-        if (not (Bytes in [1 .. 4])) then
-            Error(Text6059776);
+        if (not (SeedSize in [1 .. 4])) then
+            Error(InvalidValue);
 
-        RandomHexStringLen := StrLen(RandomHexString);
-        if (RandomHexStringLen < Bytes) then
-            RandomHexString += UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        RandomHexString := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
-        RandomInt := 0;
-        for i := 1 to Bytes do
-            case CopyStr(RandomHexString, i, 1) of
-                '1':
-                    RandomInt += Power(16, Bytes - i);
-                '2':
-                    RandomInt += 2 * Power(16, Bytes - i);
-                '3':
-                    RandomInt += 3 * Power(16, Bytes - i);
-                '4':
-                    RandomInt += 4 * Power(16, Bytes - i);
-                '5':
-                    RandomInt += 5 * Power(16, Bytes - i);
-                '6':
-                    RandomInt += 6 * Power(16, Bytes - i);
-                '7':
-                    RandomInt += 7 * Power(16, Bytes - i);
-                '8':
-                    RandomInt += 8 * Power(16, Bytes - i);
-                '9':
-                    RandomInt += 9 * Power(16, Bytes - i);
-                'A':
-                    RandomInt += 10 * Power(16, Bytes - i);
-                'B':
-                    RandomInt += 11 * Power(16, Bytes - i);
-                'C':
-                    RandomInt += 12 * Power(16, Bytes - i);
-                'D':
-                    RandomInt += 13 * Power(16, Bytes - i);
-                'E':
-                    RandomInt += 14 * Power(16, Bytes - i);
-                'F':
-                    RandomInt += 15 * Power(16, Bytes - i);
-            end;
-
-        if (RandomHexStringLen = Bytes) then
-            RandomHexString := ''
-        else
 #pragma warning disable AA0139
-            RandomHexString := CopyStr(RandomHexString, Bytes + 1);
-#pragma warning restore
+        RandomInt := HexStringToDecimal(CopyStr(RandomHexString, 1, SeedSize));
+#pragma warning restore AA0139
+    end;
+
+    internal procedure HexStringToDecimal(HexString: Text[4]) Result: Integer
+    var
+        InvalidHexDigit: Label 'Invalid hex digit: %1 in string; %2';
+        i, HexLen : Integer;
+        HexDigit: Char;
+        DigitValue: Integer;
+    begin
+        Result := 0;
+        HexLen := StrLen(HexString);
+        HexString := UpperCase(HexString);
+        for i := 1 to HexLen do begin
+            HexDigit := HexString[HexLen - i + 1];
+            case (HexDigit) of
+                '0' .. '9':
+                    DigitValue := HexDigit - '0';
+                'A' .. 'F':
+                    DigitValue := HexDigit - 'A' + 10;
+                else
+                    Error(InvalidHexDigit, HexDigit, HexString);
+            end;
+            Result += DigitValue * Power(16, i - 1);
+        end;
     end;
 
     local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; DurationGroupCode: Code[10]; EventDate: Date; EventTime: Time)

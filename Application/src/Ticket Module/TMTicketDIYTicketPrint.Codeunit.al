@@ -90,6 +90,7 @@
 
     procedure GenerateTicketPrint(EntryNo: Integer; MarkTicketAsPrinted: Boolean; var FailReasonText: Text): Boolean
     var
+        TicketSetup: Record "NPR TM Ticket Setup";
         TicketRequestXml: XmlDocument;
         ServiceResponse: XmlDocument;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -97,16 +98,15 @@
         ErrorText: Text;
         FailReasonLbl: Label 'TicketServer: [%1] %2';
     begin
+        TicketSetup.Get();
+        ClearLastError();
 
         TicketReservationRequest.Get(EntryNo);
         if (TicketReservationRequest."DIY Print Order Requested") then
             exit(true);
 
-        if (not CreateTicketPrintOrderXml(TicketRequestXml, TicketReservationRequest."Session Token ID", MarkTicketAsPrinted, FailReasonText)) then begin
-            //FailReasonText := GetLastErrorText();
+        if (not CreateTicketPrintOrderXml(TicketRequestXml, TicketReservationRequest."Session Token ID", MarkTicketAsPrinted, TicketSetup."Show Message Body (Debug)", FailReasonText)) then
             exit(false);
-        end;
-
 
         if (WebServiceApi(TicketRequestXml, ServiceResponse)) then begin
             FailReasonText := '';
@@ -116,9 +116,8 @@
             exit(true);
         end;
 
-#if DEBUG_TICKET
-        message(GetLastErrorText());
-#endif
+        if (TicketSetup."Show Send Fail Message In POS") then
+            message(GetLastErrorText());
 
         // Examine fault code - might have been produced already
         if (WebExceptionResponse(ServiceResponse, ErrorCode, ErrorText)) then begin
@@ -202,9 +201,7 @@
     [TryFunction]
     local procedure WebServiceApi(XmlIn: XmlDocument; var XmlOut: XmlDocument)
     var
-
         TicketSetup: Record "NPR TM Ticket Setup";
-
         Client: HttpClient;
         Request: HttpRequestMessage;
         Response: HttpResponseMessage;
@@ -289,7 +286,7 @@
         Error(ResponseText);
     end;
 
-    local procedure CreateTicketPrintOrderXml(var XmlDoc: XmlDocument; Token: Text[100]; MarkTicketAsPrinted: Boolean; var FailureReason: Text): Boolean
+    local procedure CreateTicketPrintOrderXml(var XmlDoc: XmlDocument; Token: Text[100]; MarkTicketAsPrinted: Boolean; Verbose: Boolean; var FailureReason: Text): Boolean
     var
         XmlString: Text;
         TempBlob: Codeunit "Temp Blob";
@@ -316,9 +313,8 @@
 
         XmlDocument.ReadFrom(XmlString, XmlDoc);
 
-#if DEBUG_TICKET
-        Message(XmlString);
-#endif
+        if (Verbose) then
+            Message(XmlString);
 
         exit(true);
     end;

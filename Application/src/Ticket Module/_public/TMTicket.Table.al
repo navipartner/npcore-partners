@@ -197,8 +197,10 @@
         "Last Date Modified" := Today();
 
         if "Ticket Type Code" <> '' then begin
-            GetTicketType();
-            "External Ticket No." := TicketMgt.GenerateCertificateNumber(TicketType."External Ticket Pattern", "No.");
+            if ("External Ticket No." = '') then begin
+                GetTicketType();
+                "External Ticket No." := TicketMgt.GenerateNumberPattern(TicketType."External Ticket Pattern", "No.");
+            end;
         end;
     end;
 

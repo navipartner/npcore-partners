@@ -1909,6 +1909,9 @@
 
     local procedure SelectCouponFromLoyaltySetup(var TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary; SubTotal: Decimal; PointsToSpend: Integer)
     begin
+        if (TmpLoyaltyPointsSetup."Point Rate" = 0) then
+            exit;
+
         TmpLoyaltyPointsSetup."Amount LCY" := SubTotal;
         if (PointsToSpend * TmpLoyaltyPointsSetup."Point Rate" < SubTotal) then
             TmpLoyaltyPointsSetup."Amount LCY" := PointsToSpend * TmpLoyaltyPointsSetup."Point Rate";
