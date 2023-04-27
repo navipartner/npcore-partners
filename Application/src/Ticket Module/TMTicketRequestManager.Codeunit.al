@@ -353,7 +353,7 @@
         if ReservationRequest2.FindFirst() then
             ReservationRequest."Authorization Code" := ReservationRequest2."Authorization Code"
         else
-            ReservationRequest."Authorization Code" := CopyStr(TicketManagement.GenerateCertificateNumber(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(ReservationRequest."Authorization Code"));
+            ReservationRequest."Authorization Code" := CopyStr(TicketManagement.GenerateNumberPattern(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(ReservationRequest."Authorization Code"));
         ReservationRequest.Modify();
 
         for i := 1 to Abs(NumberOfTickets) do begin

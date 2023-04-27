@@ -4,6 +4,83 @@ codeunit 85013 "NPR TM API SmokeTest"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure TicketPatternHexStringToDecimal()
+    var
+        Assert: Codeunit "Assert";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        i: Integer;
+        Digits: Label '0123456789ABCDEF', Locked = true;
+    begin
+
+        for i := 0 to 15 do
+            Assert.AreEqual(i, TicketManagement.HexStringToDecimal(CopyStr(Digits, i + 1, 1)), 'Incorrectly converting Hex to Dec, position 0');
+
+        for i := 0 to 15 do
+            Assert.AreEqual((i * 16) + 1, TicketManagement.HexStringToDecimal(CopyStr(Digits, i + 1, 1) + '1'), 'Incorrectly converting Hex to Dec, position 1');
+
+        for i := 0 to 15 do
+            Assert.AreEqual((i * 256) + 1 * 16 + 2, TicketManagement.HexStringToDecimal(CopyStr(Digits, i + 1, 1) + '12'), 'Incorrectly converting Hex to Dec, position 2');
+
+        for i := 0 to 15 do
+            Assert.AreEqual((i * 4096) + 1 * 256 + 2 * 16 + 3, TicketManagement.HexStringToDecimal(CopyStr(Digits, i + 1, 1) + '123'), 'Incorrectly converting Hex to Dec, position 3');
+
+        AssertError TicketManagement.HexStringToDecimal('G');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TicketPatternGenerator()
+    var
+        Assert: Codeunit "Assert";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        RandomCharacter: Code[1];
+        i: Integer;
+    begin
+
+        for i := 1 to 100 do begin
+            RandomCharacter := TicketManagement.GenerateRandomFromPattern('N');
+            Assert.AreEqual('', DelChr(RandomCharacter, '=', '0123456789'), 'Expected a decimal number character.');
+
+            RandomCharacter := TicketManagement.GenerateRandomFromPattern('A');
+            Assert.AreEqual('', DelChr(RandomCharacter, '=', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'Expected a character.');
+
+            RandomCharacter := TicketManagement.GenerateRandomFromPattern('X');
+            Assert.AreEqual('', DelChr(RandomCharacter, '=', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 'Expected an alpha-numeric character.');
+        end;
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TicketPattern()
+    var
+        Assert: Codeunit "Assert";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        Pattern: Code[30];
+    begin
+        Pattern := TicketManagement.GenerateNumberPattern('[S]', '1234567');
+        Assert.AreEqual('1234567', Pattern, 'Expected same pattern to be returned with option S.');
+
+        Pattern := TicketManagement.GenerateNumberPattern('[N*5]', '');
+        Assert.AreEqual(5, StrLen(Pattern), 'Incorrect length of pattern.');
+        Assert.AreEqual('', DelChr(Pattern, '=', '0123456789'), 'Expected decimal number characters only.');
+
+        Pattern := TicketManagement.GenerateNumberPattern('[A*5]', '');
+        Assert.AreEqual(5, StrLen(Pattern), 'Incorrect length of pattern.');
+        Assert.AreEqual('', DelChr(Pattern, '=', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'Expected characters only.');
+
+        Pattern := TicketManagement.GenerateNumberPattern('[X*5]', '');
+        Assert.AreEqual(5, StrLen(Pattern), 'Incorrect length of pattern.');
+        Assert.AreEqual('', DelChr(Pattern, '=', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 'Expected alpha-numeric characters only.');
+
+        Pattern := TicketManagement.GenerateNumberPattern('TM01-[S]-[N*4]-[A*4]-[X*4]', 'AB12');
+        Assert.AreEqual(24, StrLen(Pattern), 'Incorrect length of pattern.');
+        Assert.AreEqual('----', DelChr(Pattern, '=', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 'Incorrect pattern created.');
+
+    end;
+
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ListTicketItems()
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
