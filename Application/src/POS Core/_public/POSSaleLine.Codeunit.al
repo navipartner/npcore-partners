@@ -525,6 +525,11 @@
     local procedure InsertLineInternal(var Line: Record "NPR POS Sale Line"; HandleReturnValue: Boolean) ReturnValue: Boolean
     var
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        POSIssueOnSale: Codeunit "NPR NpDc Module Issue: OnSaleB";
+        HTMLDisplay: Codeunit "NPR POS HTML Disp. Prof.";
+        POSProxyDisplay: Codeunit "NPR POS Proxy - Display";
+        POSActTicketMgt: Codeunit "NPR TM POS Action: Ticket Mgt.";
+        POSActMemberMgt: codeunit "NPR POS Action Member Mgt WF3";
     begin
         Rec := Line;
 
@@ -541,7 +546,13 @@
 
         Rec.UpdateAmounts(Rec);
         POSSalesDiscountCalcMgt.OnAfterInsertSaleLinePOS(Rec);
+        POSIssueOnSale.AddNewSaleCoupons(Rec);
+        HTMLDisplay.UpdateHTMLDisplay(Rec);
+        POSProxyDisplay.UpdateDisplay(Rec);
+        POSActTicketMgt.UpdateTicketOnSaleLineInsert(Rec);
+        POSActMemberMgt.UpdateMembershipOnSaleLineInsert(Rec);
         InvokeOnAfterInsertSaleLineWorkflow(Rec);
+        OnAfterInsertPOSSaleLine(Rec);
         POSSale.RefreshCurrent();
 
         Line := Rec;
@@ -647,6 +658,7 @@
         until POSSalesWorkflowStep.Next() = 0;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed')]
     procedure InvokeOnAfterInsertSaleLineWorkflow(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
@@ -672,8 +684,14 @@
     begin
     end;
 
+    [Obsolete('Use OnAfterInsertPOSSaleLine')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertSaleLine(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertPOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 

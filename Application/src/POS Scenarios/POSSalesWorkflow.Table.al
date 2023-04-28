@@ -6,6 +6,8 @@
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Scenarios";
     LookupPageID = "NPR POS Scenarios";
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Scenarios have been moved to hardcoded codeunit calls for internal steps, and event subscribers for PTE steps';
 
     fields
     {

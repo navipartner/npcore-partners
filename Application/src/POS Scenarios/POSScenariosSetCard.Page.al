@@ -5,8 +5,9 @@
     Caption = 'POS Scenarios Set Card';
     PageType = Card;
     UsageCategory = None;
-
     SourceTable = "NPR POS Sales Workflow Set";
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Scenarios have been moved to hardcoded codeunit calls for internal steps, and event subscribers for PTE steps';
 
 
     layout
