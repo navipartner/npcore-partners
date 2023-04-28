@@ -497,7 +497,8 @@
     begin
         if not RunTrigger then
             exit;
-        SalePOS.Get(Rec."Register No.", Rec."Sales Ticket No.");
+        if not SalePOS.Get(Rec."Register No.", Rec."Sales Ticket No.") then
+            exit;
         if SalePOS."Event No." = '' then
             exit;
         JobPlanningLineInvoice.SetRange("Document Type", JobPlanningLineInvoice."Document Type"::Invoice);
