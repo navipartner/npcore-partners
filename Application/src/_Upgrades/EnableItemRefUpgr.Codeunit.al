@@ -37,7 +37,7 @@
         //Transfer all item reference in cross reference, data update will return it back
         if ItemReference.FindSet() then
             repeat
-                ItemCrossReference.TransferFields(ItemReference);
+                TransferFromItemReferenceToItemCrossReference(ItemReference, ItemCrossReference);
                 if not ItemCrossReference.Insert(false) then
                     ItemCrossReference.Modify(false);
             until ItemReference.Next() = 0;
@@ -73,6 +73,20 @@
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Enable Item Ref. Upgr."));
 
         LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure TransferFromItemReferenceToItemCrossReference(FromItemReference: Record "Item Reference"; var ToItemCrossReference: Record "Item Cross Reference")
+    begin
+        ToItemCrossReference.Init();
+        ToItemCrossReference."Item No." := FromItemReference."Item No.";
+        ToItemCrossReference."Variant Code" := FromItemReference."Variant Code";
+        ToItemCrossReference."Unit of Measure" := FromItemReference."Unit of Measure";
+        ToItemCrossReference."Cross-Reference Type" := FromItemReference."Reference Type".AsInteger();
+        ToItemCrossReference."Cross-Reference Type No." := FromItemReference."Reference Type No.";
+        ToItemCrossReference."Cross-Reference No." := CopyStr(FromItemReference."Reference No.", 1, MaxStrLen(ToItemCrossReference."Cross-Reference No."));
+        ToItemCrossReference.Description := FromItemReference.Description;
+        ToItemCrossReference."Discontinue Bar Code" := FromItemReference."Discontinue Bar Code";
+        ToItemCrossReference."Description 2" := FromItemReference."Description 2";
     end;
 #endif
 }
