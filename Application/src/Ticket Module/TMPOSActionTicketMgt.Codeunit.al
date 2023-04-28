@@ -700,17 +700,10 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterInsertSaleLine', '', true, true)]
-    local procedure UpdateTicketOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
+    procedure UpdateTicketOnSaleLineInsert(SaleLinePOS: Record "NPR POS Sale Line")
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-            exit;
-
-        if POSSalesWorkflowStep."Subscriber Function" <> 'UpdateTicketOnSaleLineInsert' then
-            exit;
-
         if (not IsTicketSalesLine(SaleLinePOS)) then
             exit;
 
@@ -723,7 +716,6 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
 
         if (SaleLinePOS.Quantity < 0) then
             RevokeTicketSales(SaleLinePOS);
-
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeDeletePOSSaleLine', '', true, true)]

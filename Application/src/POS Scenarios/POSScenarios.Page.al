@@ -10,6 +10,8 @@
     SourceTable = "NPR POS Sales Workflow";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Scenarios have been moved to hardcoded codeunit calls for internal steps, and event subscribers for PTE steps';
 
 
     layout
