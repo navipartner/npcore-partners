@@ -6,7 +6,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
     ObsoleteState = Pending;
 #if not CLOUD
     var
-        POSSession: Codeunit "NPR POS Session";
+        GlobPOSSession: Codeunit "NPR POS Session";
         FrontEnd: Codeunit "NPR POS Front End Management";
         Text001: Label 'DLL version: %1';
         Text002: Label 'Previous DLL version: %1';
@@ -199,8 +199,8 @@ codeunit 6184487 "NPR Pepper Library TSD"
         end;
         UpdateEftTransactionRequestCommentBatch(EFTTransactionRequest."Entry No.");
 
-        if (POSSession.IsActiveSession(FrontEnd)) then
-            PepperBeginWorkshift.InvokeBeginWorkshift(FrontEnd, POSSession);
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
+            PepperBeginWorkshift.InvokeBeginWorkshift(FrontEnd, GlobPOSSession);
     end;
 
     local procedure BeginWorkshiftResponse(PepperBeginWorkshift: Codeunit "NPR Pepper Begin Workshift TSD"; EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -269,7 +269,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         Commit();
         EFTTransactionRequest.PrintReceipts(false);
 
-        if (POSSession.IsActiveSession(FrontEnd)) then
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
             FrontEnd.ResumeWorkflow();
     end;
 
@@ -287,7 +287,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         AddToCommentBatch(DEMO_TRANSACTION);
         UpdateEftTransactionRequestCommentBatch(EFTTransactionRequest."Entry No.");
 
-        if (POSSession.IsActiveSession(FrontEnd)) then
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
             FrontEnd.ResumeWorkflow();
     end;
 
@@ -319,8 +319,8 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         UpdateEftTransactionRequestCommentBatch(EFTTransactionRequest."Entry No.");
 
-        if (POSSession.IsActiveSession(FrontEnd)) then
-            PepperEndWorkshift.InvokeEndWorkshiftRequest(FrontEnd, POSSession);
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
+            PepperEndWorkshift.InvokeEndWorkshiftRequest(FrontEnd, GlobPOSSession);
     end;
 
     local procedure EndWorkshiftResponse(PepperEndWorkshift: Codeunit "NPR Pepper End Workshift TSD"; EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -350,7 +350,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         Commit();
         EFTTransactionRequest.PrintReceipts(false);
 
-        if (POSSession.IsActiveSession(FrontEnd)) then
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
             FrontEnd.ResumeWorkflow();
     end;
 
@@ -368,7 +368,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         AddToCommentBatch(DEMO_TRANSACTION);
         UpdateEftTransactionRequestCommentBatch(EFTTransactionRequest."Entry No.");
 
-        if (POSSession.IsActiveSession(FrontEnd)) then
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
             FrontEnd.ResumeWorkflow();
     end;
 
@@ -394,8 +394,8 @@ codeunit 6184487 "NPR Pepper Library TSD"
             exit;
         end;
 
-        if (POSSession.IsActiveSession(FrontEnd)) then
-            PepperTrxTransaction.InvokeDevice(FrontEnd, POSSession);
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
+            PepperTrxTransaction.InvokeDevice(FrontEnd, GlobPOSSession);
     end;
 
     local procedure TrxPaymentOfGoods(EFTTransactionRequest: Record "NPR EFT Transaction Request"; MbxPosReference: Text[20])
@@ -429,8 +429,8 @@ codeunit 6184487 "NPR Pepper Library TSD"
             exit;
         end;
 
-        if (POSSession.IsActiveSession(FrontEnd)) then
-            PepperTrxTransaction.InvokeDevice(FrontEnd, POSSession);
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
+            PepperTrxTransaction.InvokeDevice(FrontEnd, GlobPOSSession);
     end;
 
     local procedure TrxVoidPaymentOfGoods(EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -458,8 +458,8 @@ codeunit 6184487 "NPR Pepper Library TSD"
             exit;
         end;
 
-        if (POSSession.IsActiveSession(FrontEnd)) then
-            PepperTrxTransaction.InvokeDevice(FrontEnd, POSSession);
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
+            PepperTrxTransaction.InvokeDevice(FrontEnd, GlobPOSSession);
     end;
 
     local procedure TrxRefund(EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -487,8 +487,8 @@ codeunit 6184487 "NPR Pepper Library TSD"
             exit;
         end;
 
-        if (POSSession.IsActiveSession(FrontEnd)) then
-            PepperTrxTransaction.InvokeDevice(FrontEnd, POSSession);
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
+            PepperTrxTransaction.InvokeDevice(FrontEnd, GlobPOSSession);
     end;
 
     local procedure TrxResponse(PepperTrxTransaction: Codeunit "NPR Pepper Transaction TSD"; EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -729,8 +729,8 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         UpdateEftTransactionRequestCommentBatch(EFTTransactionRequest."Entry No.");
 
-        if (POSSession.IsActiveSession(FrontEnd)) then
-            PepperAuxFunctions.InvokeAuxRequest(FrontEnd, POSSession);
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
+            PepperAuxFunctions.InvokeAuxRequest(FrontEnd, GlobPOSSession);
     end;
 
     local procedure AuxFunctionResponse(PepperAuxFunctions: Codeunit "NPR Pepper Aux Func. TSD"; EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -786,7 +786,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         EFTTransactionRequest.PrintReceipts(false);
 
         // Get us back to our calling workflow, we are done!
-        if (POSSession.IsActiveSession(FrontEnd)) then
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
             FrontEnd.ResumeWorkflow();
     end;
 
@@ -803,8 +803,8 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         UpdateEftTransactionRequestCommentBatch(EFTTransactionRequest."Entry No.");
 
-        if (POSSession.IsActiveSession(FrontEnd)) then
-            PepperFileMgmtFunctions.InvokeFileMgtRequest(FrontEnd, POSSession);
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
+            PepperFileMgmtFunctions.InvokeFileMgtRequest(FrontEnd, GlobPOSSession);
     end;
 
     local procedure InstallPepperResponse(EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -828,7 +828,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         EFTTransactionRequest.Modify();
 
         // Get us back to our calling workflow, we are done!
-        if (POSSession.IsActiveSession(FrontEnd)) then
+        if (GlobPOSSession.IsActiveSession(FrontEnd)) then
             FrontEnd.ResumeWorkflow();
     end;
 #endif
@@ -1138,19 +1138,19 @@ codeunit 6184487 "NPR Pepper Library TSD"
         exit(1);
     end;
 
-    local procedure CheckTestMode(PepperConfiguration: Record "NPR Pepper Config."): Boolean
+    local procedure CheckTestMode(varPepperConfiguration: Record "NPR Pepper Config."): Boolean
     var
         TxtLocaltestmode: Label 'WARNING: Local test mode cuts communication with the terminal and simulates succesful transactions.';
         TxtRemotetestmode: Label 'WARNING: Remote test mode processes transactions to the terminal as normal but logs them as test. Make sure the terminal is set to test manually!';
     begin
-        case PepperConfiguration.Mode of
-            PepperConfiguration.Mode::"TEST Local":
+        case varPepperConfiguration.Mode of
+            varPepperConfiguration.Mode::"TEST Local":
                 begin
                     Message(TxtLocaltestmode);
                     AddToCommentBatch(TxtLocaltestmode);
                     exit(true);
                 end;
-            PepperConfiguration.Mode::"TEST Remote":
+            varPepperConfiguration.Mode::"TEST Remote":
                 begin
                     Message(TxtRemotetestmode);
                     AddToCommentBatch(TxtRemotetestmode);
@@ -1219,22 +1219,22 @@ codeunit 6184487 "NPR Pepper Library TSD"
         exit(PepperConfig."Default POS Timeout (Seconds)" * 1000);
     end;
 
-    local procedure GetPepperReceiptEncoding(PepperTerminal: Record "NPR Pepper Terminal"): Code[20]
+    local procedure GetPepperReceiptEncoding(varPepperTerminal: Record "NPR Pepper Terminal"): Code[20]
     begin
 
-        if PepperTerminal."Pepper Receipt Encoding" = 0 then
+        if varPepperTerminal."Pepper Receipt Encoding" = 0 then
             exit('')
         else
-            exit(UpperCase(Format(PepperTerminal."Pepper Receipt Encoding", 0)));
+            exit(UpperCase(Format(varPepperTerminal."Pepper Receipt Encoding", 0)));
     end;
 
-    local procedure GetNavReceiptEncoding(PepperTerminal: Record "NPR Pepper Terminal"): Code[20]
+    local procedure GetNavReceiptEncoding(varPepperTerminal: Record "NPR Pepper Terminal"): Code[20]
     begin
 
-        if PepperTerminal."NAV Receipt Encoding" = 0 then
+        if varPepperTerminal."NAV Receipt Encoding" = 0 then
             exit('')
         else
-            exit(UpperCase(Format(PepperTerminal."NAV Receipt Encoding", 0)));
+            exit(UpperCase(Format(varPepperTerminal."NAV Receipt Encoding", 0)));
     end;
 
     local procedure GetResultCodeDescription(ParTransactionType: Code[10]; ParTransactionSubtypeCode: Code[10]; ParResultCode: Integer): Text
