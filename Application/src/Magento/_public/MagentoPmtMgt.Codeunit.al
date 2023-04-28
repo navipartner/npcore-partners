@@ -745,6 +745,26 @@
                 CapturePaymentLine(PaymentLine);
             until PaymentLine.Next() = 0;
     end;
+
+    internal procedure CaptureSalesHeader(SalesHeader: Record "Sales Header")
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        PaymentLine2: Record "NPR Magento Payment Line";
+        SalesHeaderCannotBeCreditType: Label 'Only Sales Headers that are not of credit type can be captured.';
+    begin
+        if (SalesHeader.IsCreditDocType()) then
+            Error(SalesHeaderCannotBeCreditType);
+
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.SetFilter("Payment Gateway Code", '<>%1', '');
+        PaymentLine.SetRange("Date Captured", 0D);
+        if (PaymentLine.FindSet(true)) then
+            repeat
+                PaymentLine2 := PaymentLine;
+                CapturePaymentLine(PaymentLine2);
+            until PaymentLine.Next() = 0;
+    end;
     #endregion
 
     #region Refund
@@ -763,12 +783,32 @@
         RefundSalesCreditMemo(SalesCrMemoHeader);
     end;
 
-    local procedure RefundSalesCreditMemo(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
+    internal procedure RefundSalesCreditMemo(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     begin
         if not HasMagentoPayment(Database::"Sales Cr.Memo Header", Enum::"Sales Document Type".FromInteger(0), SalesCrMemoHeader."No.") then
             exit;
 
         RefundPaymentLines(SalesCrMemoHeader);
+    end;
+
+    internal procedure RefundSalesHeader(SalesHeader: Record "Sales Header")
+    var
+        SalesHeaderMustBeCreditType: Label 'Only Sales Headers that are of the credit type can be refunded.';
+        PaymentLine: Record "NPR Magento Payment Line";
+        PaymentLine2: Record "NPR Magento Payment Line";
+    begin
+        if (not SalesHeader.IsCreditDocType()) then
+            Error(SalesHeaderMustBeCreditType);
+
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.SetFilter("Payment Gateway Code", '<>%1', '');
+        PaymentLine.SetRange("Date Refunded", 0D);
+        if (PaymentLine.FindSet(true)) then
+            repeat
+                PaymentLine2 := PaymentLine;
+                RefundPaymentLine(PaymentLine2);
+            until PaymentLine.Next() = 0;
     end;
 
     internal procedure RefundPaymentLine(PaymentLine: Record "NPR Magento Payment Line")
