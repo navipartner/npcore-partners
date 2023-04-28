@@ -20,16 +20,10 @@ codeunit 6060004 "NPR NpDc Module Issue: OnSaleB"
         PrintCoupons(TempCoupon);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterInsertSaleLine', '', true, true)]
-    local procedure AddNewOnSaleCoupons(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
+    procedure AddNewSaleCoupons(SaleLinePOS: Record "NPR POS Sale Line")
     var
         SalePOS: Record "NPR POS Sale";
     begin
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-            exit;
-
-        if POSSalesWorkflowStep."Subscriber Function" <> 'AddNewOnSaleCoupons' then
-            exit;
         if not TriggerOnSaleCoupon(SaleLinePOS, SalePOS) then
             exit;
 

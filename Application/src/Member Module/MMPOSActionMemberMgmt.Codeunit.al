@@ -159,28 +159,6 @@
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterInsertSaleLine', '', true, true)]
-    local procedure UpdateMembershipOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
-    var
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        ReturnCode: Integer;
-    begin
-
-        if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
-            exit;
-
-        if (POSSalesWorkflowStep."Subscriber Function" <> 'UpdateMembershipOnSaleLineInsert') then
-            exit;
-
-        if (SaleLinePOS.IsTemporary) then
-            exit;
-
-        ReturnCode := MemberRetailIntegration.NewMemberSalesInfoCapture(SaleLinePOS);
-        if (ReturnCode < 0) then
-            if (ReturnCode <> -1102) then
-                Message('%1', MemberRetailIntegration.GetErrorText(ReturnCode));
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeDeletePOSSaleLine', '', true, true)]
     local procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
     var

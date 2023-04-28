@@ -67,8 +67,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         SendInputSignalToHWC();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterInsertSaleLine', '', true, true)]
-    local procedure UpdateDisplayOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
+    procedure UpdateHTMLDisplay(SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
         Context: JsonObject;
@@ -78,10 +77,6 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
     begin
         POSUnit.Get(SaleLinePOS."Register No.");
         if (POSUnit."POS HTML Display Profile" = '') then
-            exit;
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> Codeunit::"NPR POS HTML Disp. Prof." then
-            exit;
-        if POSSalesWorkflowStep."Subscriber Function" <> 'UpdateDisplayOnSaleLineInsert' then
             exit;
 
         ReceiptContent := HtmlDisplayReq.GetReceiptContent(POSUnit."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date);

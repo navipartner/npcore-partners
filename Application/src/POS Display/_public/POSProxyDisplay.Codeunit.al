@@ -71,30 +71,23 @@
                 UpdateDisplayFromSalePOS(Action::Login, TextValue, '');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterInsertSaleLine', '', true, true)]
-    local procedure UpdateDisplayOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
+    procedure UpdateDisplay(SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
-        "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
+        POSAction: Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
-
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-            exit;
-
-        if POSSalesWorkflowStep."Subscriber Function" <> 'UpdateDisplayOnSaleLineInsert' then
-            exit;
         if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
         CustomerDisplayIsActivated(POSUnit, _MatrixIsActivated, _DisplayIsActivated);
         if (not _MatrixIsActivated) and (not _DisplayIsActivated) then
             exit;
-        if not POSSession.IsActiveSession(FrontEnd) then
+        if not POSSession.IsInitialized() then
             exit;
 
         if _DisplayIsActivated then
-            Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::Payment, 0)
+            Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, POSAction::Payment, 0)
         else
             if _MatrixIsActivated then
                 UpdateDisplayFromSaleLinePOS(SaleLinePOS);

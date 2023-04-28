@@ -104,8 +104,14 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetExcelColumn'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetFieldSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NaviConnect", 'ImportTypeActionable'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'ShowReturnAmountDialog'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Retail Logo"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'ShowReturnAmountDialog'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'AddNewOnSaleCoupons'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'UpdateDisplayOnSaleLineInsert'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'PrintWarrantyAfterSaleLine'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'UpdateTicketOnSaleLineInsert'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'UpdateMembershipOnSaleLineInsert'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'MCSSaleLineUpload'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG BalanceV4"));
     end;
 
@@ -379,6 +385,18 @@
                 case UpgradeStep of
                     'ShowReturnAmountDialog':
                         exit('NPR-POSSalesWorkflowStepShowReturnAmountDialog-20230324');
+                    'AddNewOnSaleCoupons':
+                        exit('NPR-AddNewOnSaleCoupons-20230420');
+                    'UpdateDisplayOnSaleLineInsert':
+                        exit('NPR-UpdateDisplayOnSaleLineInsert-20230420');
+                    'PrintWarrantyAfterSaleLine':
+                        exit('NPR-PrintWarrantyAfterSaleLine-20230420');
+                    'UpdateTicketOnSaleLineInsert':
+                        exit('NPR-UpdateTicketOnSaleLineInsert-20230420');
+                    'UpdateMembershipOnSaleLineInsert':
+                        exit('NPR-UpdateMembershipOnSaleLineInsert-20230420');
+                    'MCSSaleLineUpload':
+                        exit('NPR-MCSSaleLineUpload-20230420');
                 end;
             Codeunit::"NPR Upgrade Variety Setup":
                 exit('NPR_Upgrade_Variety_Setup_20230314');

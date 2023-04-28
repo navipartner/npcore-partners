@@ -804,6 +804,20 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         end;
     end;
 
+    procedure UpdateMembershipOnSaleLineInsert(SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
+        ReturnCode: Integer;
+    begin
+        if (SaleLinePOS.IsTemporary) then
+            exit;
+
+        ReturnCode := MemberRetailIntegration.NewMemberSalesInfoCapture(SaleLinePOS);
+        if (ReturnCode < 0) then
+            if (ReturnCode <> -1102) then
+                Message('%1', MemberRetailIntegration.GetErrorText(ReturnCode));
+    end;
+
     local procedure GetActionScript(): Text
     begin
         exit(
