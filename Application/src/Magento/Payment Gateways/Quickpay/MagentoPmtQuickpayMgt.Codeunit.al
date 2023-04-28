@@ -43,7 +43,7 @@
     end;
 
     [TryFunction]
-    local procedure RefundInternal(Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
+    local procedure RefundInternal(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
         JsonBody: JsonObject;
         HttpWebRequest: HttpRequestMessage;
@@ -73,7 +73,7 @@
     end;
 
     [TryFunction]
-    local procedure CancelInternal(Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
+    local procedure CancelInternal(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
