@@ -1,5 +1,17 @@
 pageextension 6014443 "NPR Sales Return Order" extends "Sales Return Order"
 {
+    layout
+    {
+        addlast("Invoice Details")
+        {
+            field("NPR Magento Payment Amount"; Rec."NPR Magento Payment Amount")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the sum of Payment Lines attached to the Sales Return Order';
+            }
+        }
+    }
+
     actions
     {
         addafter("Archive Document")
