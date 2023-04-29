@@ -17,9 +17,6 @@ codeunit 6059786 "NPR POS Workflow Config"
         _DescriptionCaption: Text;
         _NonBlockingUI: Boolean;
         TempParameter: Record "NPR POS Action Parameter" temporary;
-        [Obsolete('All v3 workflows are now blocking by default. Use SetNonBlockingUI to opt-out')]
-        _BlockingUI: Boolean;
-
 
     procedure AddJavascript(Javascript: Text)
     begin
@@ -189,70 +186,5 @@ codeunit 6059786 "NPR POS Workflow Config"
     begin
         exit(_DescriptionCaption);
     end;
-
-    #region obsolete
-    [Obsolete('Replaced by internal function')]
-    procedure CalculateHash(): Text[32]
-    var
-        CryptographyManagement: Codeunit "Cryptography Management";
-        HashAlgorithmType: Option MD5,SHA1,SHA256,SHA384,SHA512;
-        ValueToHash: TextBuilder;
-    begin
-        ValueToHash.Append('<actioncode>' + _ActionCode + '</actioncode>');
-
-        if TempParameter.FindSet() then begin
-            repeat
-                ValueToHash.Append('<parameter>' + TempParameter.Name + '||' + Format(TempParameter."Data Type") + '||' + TempParameter.Options + '</parameter>');
-            until TempParameter.Next() = 0;
-        end;
-
-        ValueToHash.Append('<js>' + _Javascript + '</js>');
-        ValueToHash.Append('<unattended>' + format(_Unattended) + '</unattended>');
-        ValueToHash.Append('<boundtodatasource>' + format(_BoundToDataSource) + '</boundtodatasource>');
-        ValueToHash.Append('<datasourcename>' + _DataSourceName + '</datasourcename>');
-        ValueToHash.Append('<customJSmethod>' + _CustomJSMethod + '</customJSmethod>');
-        ValueToHash.Append('<customJScode>' + _CustomJSCode + '</customJScode>');
-        ValueToHash.Append('<nonblockingui>' + Format(_NonBlockingUI) + '</nonblockingui>');
-
-# pragma warning disable AA0139
-        Exit(CryptographyManagement.GenerateHash(ValueToHash.ToText(), HashAlgorithmType::MD5));
-# pragma warning restore
-    end;
-
-    [Obsolete('Replaced by internal function')]
-    procedure GetConfigValues(var ParametersOut: Record "NPR POS Action Parameter" temporary; var JavascriptOut: Text; var UnattendedOut: Boolean; var BoundToDataSourceOut: Boolean; var DataSourceOut: Text; var CustomJSMethod: Text; var CustomJSCode: Text; var BlockingUI: Boolean; var DescriptionOut: Text)
-    begin
-        ParametersOut.Copy(TempParameter, true);
-        JavascriptOut := _Javascript;
-        UnattendedOut := _Unattended;
-        BoundToDataSourceOut := _BoundToDataSource;
-        DataSourceOut := _DataSourceName;
-        CustomJSMethod := _CustomJSMethod;
-        CustomJSCode := _CustomJSCode;
-        BlockingUI := _BlockingUI;
-        DescriptionOut := _DescriptionCaption;
-    end;
-
-    [Obsolete('Replaced by internal function')]
-    procedure GetCaptions(var LabelsOut: Dictionary of [Text, Text]; var ParameterNamesOut: Dictionary of [Text, Text]; var ParameterDescOut: Dictionary of [Text, Text]; var ParameterOptionCaptionOut: Dictionary of [Text, Text])
-    begin
-        LabelsOut := _Labels;
-        ParameterNamesOut := _ParameterNameCaption;
-        ParameterDescOut := _ParameterDescriptionCaption;
-        ParameterOptionCaptionOut := _ParameterOptionCaption;
-    end;
-
-    [Obsolete('Replaced by internal function')]
-    procedure GetDescription(): Text
-    begin
-        exit(_DescriptionCaption);
-    end;
-
-    [Obsolete('Workflows now block by default, use SetNonBlockingUI to opt-out')]
-    procedure SetBlockingUI()
-    begin
-        _BlockingUI := true;
-    end;
-    #endregion
 
 }
