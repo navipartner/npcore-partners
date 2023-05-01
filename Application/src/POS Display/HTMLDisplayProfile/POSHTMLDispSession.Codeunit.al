@@ -5,6 +5,7 @@ codeunit 6060084 "NPR POS HTML Disp. Session"
 
     var
         hwcGUIDs: JsonObject;
+        lastTicketNo: Code[20];
 
 
     procedure PeekGuid(Guid: Guid): Boolean
@@ -20,5 +21,20 @@ codeunit 6060084 "NPR POS HTML Disp. Session"
     procedure PopGuid(Guid: Guid): Boolean
     begin
         exit(hwcGUIDs.Remove(Guid));
+    end;
+
+    procedure SetLastTicketNo(TicketNo: Code[20])
+    begin
+        lastTicketNo := TicketNo;
+    end;
+
+    procedure GetLastTicketNo(): Code[20]
+    begin
+        exit(lastTicketNo);
+    end;
+
+    procedure ClearLastTicketNo()
+    begin
+        Clear(lastTicketNo);
     end;
 }
