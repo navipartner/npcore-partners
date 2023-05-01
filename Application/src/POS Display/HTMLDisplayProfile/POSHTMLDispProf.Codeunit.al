@@ -64,7 +64,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
     local procedure OnAfterEndSale(SalePOS: Record "NPR POS Sale")
     begin
-        SendInputSignalToHWC();
+        SendInputSignalToHWC(SalePOS."Sales Ticket No.");
     end;
 
     procedure UpdateHTMLDisplay(SaleLinePOS: Record "NPR POS Sale Line")
@@ -193,13 +193,13 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         POSUnit: Record "NPR POS Unit";
         POSEntry: Record "NPR POS Entry";
         ValidatePage: Page "NPR POS HTML Validate Input";
-        HwcGUID: Codeunit "NPR POS HTML Disp. Session";
+        HtmlProfSession: Codeunit "NPR POS HTML Disp. Session";
         Setup: Codeunit "NPR POS Setup";
         ResponseObj: JsonToken;
         InputObj: JsonToken;
         validateResult: Text;
     begin
-        if (not HwcGUID.PopGuid(RequestId)) then
+        if (not HtmlProfSession.PopGuid(RequestId)) then
             exit;
         POSSession.GetSetup(Setup);
         POSUnit.Get(Setup.GetPOSUnitNo());
@@ -213,21 +213,22 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
             case validateResult of
                 'OK':
                     begin
-                        POSEntry.Reset();
-                        POSEntry.SetFilter(POSEntry."POS Unit No.", POSUnit."No.");
+                        POSEntry.SetFilter("Document No.", HtmlProfSession.GetLastTicketNo());
                         POSEntry.FindLast();
                         EnterCustomerInput(InputObj.AsObject(), POSEntry);
                     end;
                 'REDO':
                     begin
-                        SendInputSignalToHWC();
+                        SendInputSignalToHWC(HtmlProfSession.GetLastTicketNo());
+                        exit;
                     end;
                 'CANCEL':
                     begin
                         Message(MsgInputCancelledLabel);
                     end;
             end
-        end
+        end;
+        HtmlProfSession.ClearLastTicketNo();
     end;
 
     /// <summary>
@@ -267,7 +268,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         CostumerInput.Insert();
     end;
 
-    local procedure SendInputSignalToHWC()
+    local procedure SendInputSignalToHWC(TicketNo: Code[20])
     var
         POSSession: Codeunit "NPR POS Session";
         POSEntry: Record "NPR POS Entry";
@@ -275,23 +276,23 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         HtmlProf: Record "NPR POS HTML Disp. Prof.";
         Setup: Codeunit "NPR POS Setup";
         POSSaleLines: Record "NPR POS Entry Sales Line";
+        HtmlProfSession: Codeunit "NPR POS HTML Disp. Session";
         Context: JsonObject;
         JsParam: JsonObject;
         Sum: Decimal;
         cPage: Page "NPR Custom Message Page";
     begin
         POSSession.GetSetup(Setup);
-        POSEntry.Reset();
-        POSEntry.SetFilter(POSEntry."POS Unit No.", Setup.GetPOSUnitNo());
-        if (not POSEntry.FindLast()) then
-            exit;
         if (not POSUnit.Get(Setup.GetPOSUnitNo())) then
             exit;
         if (not HtmlProf.Get(POSUnit."POS HTML Display Profile")) then
             exit;
-        if (POSEntry."Amount Incl. Tax" >= 0) then
-            exit;
         if (not (HtmlProf."CIO: Money Back" <> HtmlProf."CIO: Money Back"::None)) then
+            exit;
+        POSEntry.SetFilter("Document No.", TicketNo);
+        if (not POSEntry.FindLast()) then
+            exit;
+        if (POSEntry."Amount Incl. Tax" >= 0) then
             exit;
         if (POSEntry.CalcFields("Is Pay-in Pay-out") and POSEntry."Is Pay-in Pay-out") then
             exit;
@@ -302,6 +303,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         until POSSaleLines.Next() = 0;
         if (Sum >= 0.00) then
             exit;
+        HtmlProfSession.SetLastTicketNo(TicketNo);
         Context.Add('DisplayAction', 'SendJS');
         JsParam.Add('JSAction', 'GetInput');
         JsParam.Add('InputType', Format(HtmlProf."CIO: Money Back"));
