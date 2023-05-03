@@ -457,13 +457,19 @@
     procedure CopyPurchaseOrder2RetailJnlLines(var PurchaseLine: Record "Purchase Line"; RetailJnlCode: Code[40])
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
+        PurchasePayablesSetup: Record "Purchases & Payables Setup";
         ItemWorksheetCU: Codeunit "NPR Item Worksheet";
     begin
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
-        if GuiAllowed() then
-            Selection := StrMenu(Text004, 1)
+        if GuiAllowed() then begin
+            PurchasePayablesSetup.Get();
+            if PurchasePayablesSetup."NPR Only Qty. On Retail Print" then
+                Selection := 1
+            else
+                Selection := StrMenu(Text004, 1);
+        end
         else
             Selection := 1;
 
