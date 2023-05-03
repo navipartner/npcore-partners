@@ -165,6 +165,30 @@
                         PrintSelection("NPR Report Selection Type"::Sign.AsInteger());
                     end;
                 }
+
+                action(SelectAll)
+                {
+                    Caption = 'Select All Lines to Print';
+                    Image = Check;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
+                    PromotedIsBig = true;
+
+                    ToolTip = 'Executes the Print All Lines Action';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        RecRef: RecordRef;
+                    begin
+                        if Rec.FindSet() then
+                            repeat
+                                RecRef.GetTable(Rec);
+                                LabelLibrary.ToggleLine(RecRef);
+                            until Rec.Next() = 0;
+                    end;
+                }
             }
         }
     }
@@ -175,6 +199,7 @@
     begin
         RecRef.GetTable(Rec);
         Print := LabelLibrary.SelectionContains(RecRef);
+
     end;
 
     trigger OnDeleteRecord(): Boolean
