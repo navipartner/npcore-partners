@@ -15,6 +15,17 @@ tableextension 6014440 "NPR Item Reference" extends "Item Reference"
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
+        field(6151500; "NPR Discontinued Barcode"; Boolean)
+        {
+            Caption = 'Discontinued Barcode';
+            DataClassification = CustomerContent;
+        }
+        field(6151501; "NPR Discontinued Reason"; Option)
+        {
+            Caption = 'Discontinued Barcode Reason';
+            DataClassification = CustomerContent;
+            OptionMembers = " ","Sale","Manual","Inactive","Upgrade","Return";
+        }
     }
 
     keys

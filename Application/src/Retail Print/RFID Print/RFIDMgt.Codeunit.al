@@ -184,5 +184,43 @@
     internal procedure OnBeforeSaveItemReferenceValue(var RetailJournalLine: Record "NPR Retail Journal Line")
     begin
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
+    local procedure OnAfterEndSale(SalePOS: Record "NPR POS Sale")
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        ItemReference: Record "Item Reference";
+    begin
+        if (SalePOS."Sales Ticket No." = '') then
+            exit;
+
+        POSEntrySalesLine.Reset();
+        POSEntrySalesLine.SetRange("POS Unit No.", SalePOS."Register No.");
+        POSEntrySalesLine.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+        POSEntrySalesLine.SetFilter("Retail Serial No.", '<>%1', '');
+
+        if POSEntrySalesLine.FindSet() then begin
+            repeat
+                ItemReference.SetRange("Item No.", POSEntrySalesLine."No.");
+                ItemReference.SetRange("Variant Code", POSEntrySalesLine."Variant Code");
+                ItemReference.SetRange("Unit of Measure", POSEntrySalesLine."Unit of Measure Code");
+                ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"NPR Retail Serial No.");
+                ItemReference.SetRange("Reference No.", POSEntrySalesLine."Retail Serial No.");
+
+                if ItemReference.FindFirst() then begin
+                    if POSEntrySalesLine.Quantity > 0 then begin
+                        ItemReference."NPR Discontinued Barcode" := true;
+                        ItemReference."NPR Discontinued Reason" := ItemReference."NPR Discontinued Reason"::Sale;
+                    end else begin
+                        ItemReference."NPR Discontinued Barcode" := false;
+                        ItemReference."NPR Discontinued Reason" := ItemReference."NPR Discontinued Reason"::Return;
+                    end;
+
+                    ItemReference.Modify(true);
+                end;
+            until POSEntrySalesLine.Next() = 0;
+        end;
+    end;
 }
 

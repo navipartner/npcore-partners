@@ -147,6 +147,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         SaleLinePOS."Shortcut Dimension 2 Code" := POSSalesLine."Shortcut Dimension 2 Code";
         SaleLinePOS."Dimension Set ID" := POSSalesLine."Dimension Set ID";
         SaleLinePOS."Orig.POS Entry S.Line SystemId" := POSSalesLine.SystemId;
+        SaleLinePOS."Serial No. not Created" := POSSalesLine."Retail Serial No.";
     end;
 
     local procedure SetCustomerOnReverseSale(var SalePOS: Record "NPR POS Sale"; SalesTicketNo: Code[20])
