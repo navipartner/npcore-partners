@@ -447,6 +447,14 @@ codeunit 6014608 "NPR Replication Register"
 #ELSE
         MagentoDisplayGroupsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoDisplayGroups/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
 #ENDIF
+
+        MagentoProductRelationsIDLbl: Label 'GetMagentoProductRel', Locked = true;
+        MagentoProductRelationsDescriptionLbl: Label 'Gets Magento Product Relations from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
+        MagentoProductRelationsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoProductRelations/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        MagentoProductRelationsPathLbl: Label '/navipartner/magento/v1.0/companies(%1)/magentoProductRelations/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
     #endregion
 
     #region Register Service with EndPoints
@@ -1741,6 +1749,10 @@ codeunit 6014608 "NPR Replication Register"
         ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoDisplayGroupsEndPointIDLbl, MagentoDisplayGroupsPathLbl,
                         MagentoDisplayGroupsEndPointDescriptionLbl, true, 1500, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
                         1000, Database::"NPR Magento Display Group", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(MagentoServiceCodeLbl, MagentoProductRelationsIDLbl, MagentoProductRelationsPathLbl,
+                        MagentoProductRelationsDescriptionLbl, true, 1600, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                        1000, Database::"NPR Magento Product Relation", false, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
@@ -1976,6 +1988,19 @@ codeunit 6014608 "NPR Replication Register"
         Rec: Record "NPR Magento Display Group";
     begin
         if sender."Table ID" <> Database::"NPR Magento Display Group" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+            Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterMagentoProductRelationFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "NPR Magento Product Relation";
+    begin
+        if sender."Table ID" <> Database::"NPR Magento Product Relation" then
             exit;
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
