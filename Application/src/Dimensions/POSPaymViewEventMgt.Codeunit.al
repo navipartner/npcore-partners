@@ -24,6 +24,7 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnPaymentView', '', true, true)]
     local procedure PopupDimension(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
+        Dimension: Record Dimension;
         POSPaymentViewEventSetup: Record "NPR POS Paym. View Event Setup";
         POSPaymentViewLogEntry: Record "NPR POS Paym. View Log Entry";
         POSSale: Codeunit "NPR POS Sale";
@@ -31,6 +32,7 @@
         POSSalesNo: Integer;
         POSAction: Record "NPR POS Action";
         POSFrontEndMgt: Codeunit "NPR POS Front End Management";
+        HeadlineTextLbl: Label 'Please specify %1', Comment = '%1 - ML dimension code caption';
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
@@ -43,6 +45,7 @@
 
         if SkipPopup(SalePOS, POSPaymentViewEventSetup) then
             exit;
+        Dimension.Get(POSPaymentViewEventSetup."Dimension Code");
 
         POSPaymentViewLogEntry.SetCurrentKey("POS Unit", "Sales Ticket No.");
         POSPaymentViewLogEntry.SetRange("POS Unit", SalePOS."Register No.");
@@ -109,6 +112,7 @@
         POSAction.SetWorkflowInvocationParameter('DimensionSource', '2', POSFrontEndMgt);
         POSAction.SetWorkflowInvocationParameter('DimensionCode', POSPaymentViewEventSetup."Dimension Code", POSFrontEndMgt);
         POSAction.SetWorkflowInvocationParameter('CreateDimValue', POSPaymentViewEventSetup."Create New Dimension Values", POSFrontEndMgt);
+        POSAction.SetWorkflowInvocationParameter('HeadlineTxt', StrSubstNo(HeadlineTextLbl, Dimension.GetMLCodeCaption(GlobalLanguage())), POSFrontEndMgt);
         POSFrontEndMgt.InvokeWorkflow(POSAction);
 
         POSSale.RefreshCurrent();
