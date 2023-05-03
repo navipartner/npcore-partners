@@ -79,19 +79,16 @@
                     }
                     field("Coupon Qty. (Open)"; Rec."Coupon Qty. (Open)")
                     {
-
                         ToolTip = 'Specifies the number of open coupons.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Arch. Coupon Qty."; Rec."Arch. Coupon Qty.")
                     {
-
                         ToolTip = 'Specifies the number of archived coupons.';
                         ApplicationArea = NPRRetail;
                     }
                     field(Enabled; Rec.Enabled)
                     {
-
                         ToolTip = 'Enable if the coupon is in use.';
                         ApplicationArea = NPRRetail;
                     }
