@@ -1231,7 +1231,6 @@
 
         MixedDiscountLine.SetRange(Code, TempMixedDiscount.Code);
         MixedDiscountLine.SetRange("Disc. Grouping Type", MixedDiscountLine."Disc. Grouping Type"::Item, MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group");
-        MixedDiscountLine.SetRange("No.", TempSaleLinePOS."No.");
         if MixedDiscountLine.IsEmpty then
             exit(false);
 
