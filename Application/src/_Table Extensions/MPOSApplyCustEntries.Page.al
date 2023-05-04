@@ -433,7 +433,7 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
         OK: Boolean;
         EarlierPostingDateErr: Label 'You cannot apply and post an entry to an entry with an earlier posting date.\\Instead, post the document of type %1 with the number %2 and then apply it to the document of type %3 with the number %4.';
         PostingDone: Boolean;
-#IF NOT BC22
+#if BC17 or BC18 or BC19 or BC20 or BC21
         [InDataSet]
 #ENDIF
         HasDocumentAttachment: Boolean;
