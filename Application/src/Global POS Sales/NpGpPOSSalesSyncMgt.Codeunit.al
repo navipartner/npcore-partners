@@ -249,6 +249,7 @@
         exit(Codeunit::"NPR NpGp POS Sales WS");
     end;
 
+    [Obsolete('Use codeunit 6150978 "NPR NpGp Try Get Glob Pos Serv"')]
     [TryFunction]
     procedure TryGetGlobalPosSalesService(NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
     var

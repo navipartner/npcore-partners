@@ -126,12 +126,12 @@
 
                 trigger OnAction()
                 var
-                    NpGpPOSSalesSyncMgt: Codeunit "NPR NpGp POS Sales Sync Mgt.";
+                    TryGetGlobalPOSService: Codeunit "NPR NpGp Try Get Glob Pos Serv";
                 begin
-                    if NpGpPOSSalesSyncMgt.TryGetGlobalPosSalesService(Rec) then
+                    if TryGetGlobalPOSService.Run(Rec) then
                         Message(Text001)
                     else
-                        Error(GetLastErrorText);
+                        Error(GetLastErrorText());
                 end;
             }
         }
@@ -152,16 +152,16 @@
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     var
-        NpGpPOSSalesSyncMgt: Codeunit "NPR NpGp POS Sales Sync Mgt.";
+        TryGetGlobalPOSService: Codeunit "NPR NpGp Try Get Glob Pos Serv";
     begin
-        if not NpGpPOSSalesSyncMgt.TryGetGlobalPosSalesService(Rec) then
-            exit(Confirm(Text000, false));
+        if not TryGetGlobalPOSService.Run(Rec) then
+            exit(Confirm(StrSubstNo(Text000, GetLastErrorText()), false));
     end;
 
     var
         IsBasicAuthVisible, IsOAuth2Visible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
-        Text000: Label 'Error in Global POS Sales Setup\\Close anway?';
+        Text000: Label 'Error in Global POS Sales Setup: %1\\Close anway?';
         Text001: Label 'Global POS Sales Setup validated successfully';
         Password: Text[200];
 }
