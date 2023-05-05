@@ -43,11 +43,24 @@
                     ToolTip = 'Specifies the POS action code associated with the event.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Action Description"; Rec."Action Description")
+                field("Action Description"; ActionDescription)
                 {
 
                     ToolTip = 'Specifies the description of the POS action.';
                     ApplicationArea = NPRRetail;
+                    Editable = false;
+                    Caption = 'Action Description';
+
+                    trigger OnDrillDown()
+                    var
+                        POSAction: Record "NPR POS Action";
+                    begin
+                        if ActionDescription = '' then
+                            exit;
+                        POSAction.SetRange(Code, Rec."Action Code");
+                        if POSAction.FindFirst() then
+                            Page.RunModal(Page::"NPR POS Actions", POSAction);
+                    end;
                 }
                 field("POS View"; Rec."POS View")
                 {
@@ -93,6 +106,9 @@
         }
     }
 
+    var
+        ActionDescription: Text[250];
+
     trigger OnOpenPage()
     var
         POSAction: Record "NPR POS Action";
@@ -101,6 +117,18 @@
         POSAction.DiscoverActions();
         EanBoxSetupMgt.DiscoverEanBoxEvents(Rec);
         EanBoxSetupMgt.InitDefaultEanBoxSetup();
+    end;
+
+    trigger OnAfterGetRecord()
+    var
+        POSAction: Record "NPR POS Action";
+        WorkflowCaptionBuffer: Codeunit "NPR Workflow Caption Buffer";
+    begin
+        POSAction.Get(Rec."Action Code");
+        if POSAction."Workflow Implementation" = Enum::"NPR POS Workflow"::LEGACY then
+            ActionDescription := POSAction.Description
+        else
+            ActionDescription := CopyStr(WorkflowCaptionBuffer.GetActionDescription(Rec.Code), 1, MaxStrLen(ActionDescription));
     end;
 }
 

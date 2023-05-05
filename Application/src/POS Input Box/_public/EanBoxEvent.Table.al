@@ -35,10 +35,11 @@
         }
         field(20; "Action Description"; Text[250])
         {
-            CalcFormula = Lookup("NPR POS Action".Description WHERE(Code = FIELD("Action Code")));
             Caption = 'Action Description';
             Editable = false;
-            FieldClass = FlowField;
+            DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Text that should follow user language can not be table data. Change to page variable populated runtime in wokflow v3.';
         }
         field(25; "POS View"; Option)
         {
