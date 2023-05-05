@@ -28,6 +28,7 @@ stages:
           alwaysRun: true
 
       testTargets:
+        - 'current_branch'
         - 'prerelease_latest'
         - 'release_latest'
 
@@ -43,6 +44,21 @@ stages:
       importRapidStartFiles:
         - 'MINIMAL-NPRWITHBCPT.rapidstart'
       
+      compileApps:
+        - 'Application'
+        - 'Performance Toolkit'
+
+      analyzers: ('AppSourceCop','UICop','CodeCop')
+      generatePermissions:
+        enabled: true
+        alObjectsFolder: $(Build.Repository.LocalPath)/Application/src/
+        destinationFileName: /Permissions/NPRETAIL.PermissionSet.al
+        objectId: 6014400
+        objectName: 'NPR NP RETAIL'
+        objectCaption: 'NP Retail'
+      outputLogExcludeFilters:
+        - (?=^[\w\W]*(AL0432):[\w\W]*)(?!^[\w\W]*AL0432:[\w\W]*(Tag:[\w\W]*))
+
       runSuiteCodes:
         - 'INITDATA'
         - 'POS1S1'
