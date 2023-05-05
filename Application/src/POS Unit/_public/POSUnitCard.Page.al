@@ -80,14 +80,19 @@
                 field("POS End of Day Profile"; Rec."POS End of Day Profile")
                 {
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the POS End of Day Profile field';
+                    ToolTip = 'Specifies the value of the POS End of Day Profile field.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ean Box Sales Setup"; Rec."Ean Box Sales Setup")
                 {
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the Ean Box Sales Setup field';
+                    ToolTip = 'Specifies the value of the Ean Box Setup that will be used on Sales screen.';
                     ApplicationArea = NPRRetail;
+                }
+                field("Ean Box Payment Setup"; Rec."Ean Box Payment Setup")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Ean Box Setup that will be used on Payment screen.';
                 }
                 field("POS Unit Receipt Text Profile"; Rec."POS Unit Receipt Text Profile")
                 {

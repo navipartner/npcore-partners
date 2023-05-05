@@ -17,7 +17,19 @@
             Caption = 'Event Code';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR Ean Box Event" WHERE("POS View" = FIELD("POS View"));
+            TableRelation = "NPR Ean Box Event";
+
+            trigger OnLookup()
+            var
+                EanBoxSetup: Record "NPR Ean Box Setup";
+                EanBoxEvent: Record "NPR Ean Box Event";
+            begin
+                EanBoxSetup.Get(Rec."Setup Code");
+                EanBoxEvent.SetRange("POS View", EanBoxSetup."POS View");
+                if Page.RunModal(0, EanBoxEvent) = Action::LookupOK then begin
+                    Rec.Validate("Event Code", EanBoxEvent.Code);
+                end;
+            end;
 
             trigger OnValidate()
             var
@@ -38,8 +50,8 @@
             Caption = 'POS View';
             Editable = false;
             FieldClass = FlowField;
-            OptionCaption = 'Sale';
-            OptionMembers = Sale;
+            OptionCaption = 'Sale,Payment';
+            OptionMembers = Sale,Payment;
         }
         field(6; Enabled; Boolean)
         {

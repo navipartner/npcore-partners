@@ -1203,13 +1203,17 @@
     end;
 
     [Obsolete('Delete when final v1/v2 workflow is gone')]
-    internal procedure ApplyVoucherPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; EndSale: Boolean)
+    internal procedure ApplyVoucherPayment(var VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; EndSale: Boolean)
     var
         TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
         VoucherType: Record "NPR NpRv Voucher Type";
         Voucher: Record "NPR NpRv Voucher";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
     begin
+        if VoucherTypeCode = '' then
+            VoucherTypeCode := GetVoucherTypeFromReferenceNumber(VoucherNumber);
+
+
         VoucherType.Get(VoucherTypeCode);
         CheckVoucherType(VoucherType, SalePOS);
 
@@ -1362,6 +1366,21 @@
             exit;
         if SalePOS."Customer No." <> Voucher."Customer No." then
             Error(WrongCustomerTok, Voucher."Reference No.", Voucher."Customer No.", SalePOS."Customer No.");
+    end;
+
+    local procedure GetVoucherTypeFromReferenceNumber(VoucherNumber: Text): Code[20]
+    var
+        Voucher: Record "NPR NpRv Voucher";
+    begin
+        Voucher.SetRange("Reference No.", VoucherNumber);
+        if Voucher.Count() = 1 then begin
+            Voucher.FindFirst();
+            exit(Voucher."Voucher Type");
+        end else begin
+            Voucher.SetRange("Reference No.", VoucherNumber);
+            if Page.RunModal(0, Voucher) = Action::LookupOK then
+                exit(Voucher."Voucher Type");
+        end;
     end;
 
     procedure CheckVoucherTypeQty(VoucherTypeCode: Code[20])

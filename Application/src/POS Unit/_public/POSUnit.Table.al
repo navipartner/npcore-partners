@@ -121,7 +121,7 @@
         }
         field(200; "Ean Box Sales Setup"; Code[20])
         {
-            Caption = 'POS Input Box Profile';
+            Caption = 'POS Input Box Sales Profile';
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
             TableRelation = "NPR Ean Box Setup" WHERE("POS View" = CONST(Sale));
@@ -132,6 +132,12 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
             TableRelation = "NPR POS Sales Workflow Set";
+        }
+        field(210; "Ean Box Payment Setup"; Code[20])
+        {
+            Caption = 'POS Input Box Payment Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Ean Box Setup" WHERE("POS View" = CONST(Payment));
         }
         field(300; "Item Price Codeunit ID"; Integer)
         {

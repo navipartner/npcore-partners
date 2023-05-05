@@ -347,8 +347,10 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         RequestXmlText: Text;
         ResponseText: Text;
         VoucherAmount: Decimal;
+        VoucherTypeCode: Code[20];
     begin
-        NpRvGlobalVoucherSetup.Get(NpRvVoucherType.Code);
+        if not NpRvGlobalVoucherSetup.Get(NpRvVoucherType.Code) then
+            NpRvGlobalVoucherSetup.FindFirst();
         NpRvGlobalVoucherSetup.TestField("Service Url");
 
         RequestXmlText :=
@@ -391,6 +393,12 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
             Error(Text005, ReferenceNo);
 
         if Evaluate(VoucherAmount, NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'amount', 0, false), 9) then;
+        if NpRvVoucherType.Code = '' then begin
+#pragma warning disable AA0139
+            VoucherTypeCode := NpXmlDomMgt.GetAttributeCode(Node.AsXmlElement(), '', 'voucher_type', MaxStrLen(VoucherTypeCode), true);
+#pragma warning restore
+            NpRvVoucherType.Get(VoucherTypeCode);
+        end;
         Clear(Voucher);
         Voucher.SetRange("Reference No.", ReferenceNo);
         Voucher.SetRange("Voucher Type", NpRvVoucherType.Code);

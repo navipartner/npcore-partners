@@ -22,8 +22,8 @@
         {
             Caption = 'POS View';
             DataClassification = CustomerContent;
-            OptionCaption = 'Sale';
-            OptionMembers = Sale;
+            OptionCaption = 'Sale,Payment';
+            OptionMembers = Sale,Payment;
         }
     }
 

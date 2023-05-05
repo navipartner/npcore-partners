@@ -592,7 +592,8 @@
 
     procedure FindVoucher(VoucherTypeFilter: Text; ReferenceNo: Text[50]; var Voucher: Record "NPR NpRv Voucher"): Boolean
     begin
-        Voucher.SetFilter("Voucher Type", UpperCase(VoucherTypeFilter));
+        if VoucherTypeFilter <> '' then
+            Voucher.SetFilter("Voucher Type", UpperCase(VoucherTypeFilter));
         Voucher.SetRange("Reference No.", ReferenceNo);
         exit(Voucher.FindLast());
     end;

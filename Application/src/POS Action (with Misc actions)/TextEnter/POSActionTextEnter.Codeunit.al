@@ -42,7 +42,7 @@ codeunit 6150722 "NPR POS Action: Text Enter" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionTextEnter.js###
-'let main=async({workflow:e,context:a,captions:o,popup:n})=>{switch(a.id){case"EanBox":const{workflowName:r,workflowVersion:t,setupcode:d,eventcode:s,parameters:i}=await e.respond("prepareRequest");t>1&&await e.run(r,{parameters:i}),t==1&&await e.respond("doLegacyWorkflow",{actionCode:r,setupcode:d,eventcode:s});return;case"PaymentBox":return;default:n.error("Control "+a.id+" "+o.NotHandled);return}};'
+'let main=async({workflow:e,context:a,captions:t,popup:n})=>{switch(a.id){case"EanBox":case"PaymentBox":const{workflowName:r,workflowVersion:o,setupcode:d,eventcode:s,parameters:i}=await e.respond("prepareRequest");o>1&&await e.run(r,{parameters:i}),o==1&&await e.respond("doLegacyWorkflow",{actionCode:r,setupcode:d,eventcode:s});return;default:n.error("Control "+a.id+" "+t.NotHandled);return}};'
         );
     end;
 

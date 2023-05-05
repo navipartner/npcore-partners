@@ -56,6 +56,15 @@
 
                     exit(EanBoxSetup."POS View" = EanBoxSetup."POS View"::Sale);
                 end;
+            CurrView.GetType() ::Payment:
+                begin
+                    if POSUnit."Ean Box Payment Setup" = '' then
+                        exit(false);
+                    if not EanBoxSetup.Get(POSUnit."Ean Box Payment Setup") then
+                        exit(false);
+
+                    exit(EanBoxSetup."POS View" = EanBoxSetup."POS View"::Payment);
+                end;
         end;
 
         exit(false);
