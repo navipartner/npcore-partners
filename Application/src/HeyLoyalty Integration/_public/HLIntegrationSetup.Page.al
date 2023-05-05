@@ -9,7 +9,7 @@ page 6150720 "NPR HL Integration Setup"
     UsageCategory = Administration;
     ApplicationArea = NPRHeyLoyalty;
     ContextSensitiveHelpPage = 'heyloyaltyintegration.html';
-    PromotedActionCategories = 'New,Process,Report,Initial Setup';
+    PromotedActionCategories = 'New,Process,Report,Data Migration';
 
     layout
     {
@@ -63,7 +63,7 @@ page 6150720 "NPR HL Integration Setup"
                     field("Read Member Data from Webhook"; Rec."Read Member Data from Webhook")
                     {
                         ApplicationArea = NPRHeyLoyalty;
-                        Enabled = MemberListIntegrationIsEnabled;
+                        Enabled = false;  //Is not yet supported by HeyLoyalty at the moment
                         Importance = Additional;
                         ToolTip = 'Specifies whether member data is going to be read from received HeyLoyalty webhook payload. If disabled, for each incoming webhook request system will issue an additional GET call to HeyLoyalty server in order to retrieve the most recent member data available at HeyLoyalty.';
                     }
@@ -92,7 +92,7 @@ page 6150720 "NPR HL Integration Setup"
     }
     actions
     {
-        area(Creation)
+        area(Processing)
         {
             group(InitialSetup)
             {
@@ -119,6 +119,40 @@ page 6150720 "NPR HL Integration Setup"
                         Message(SuccessMsg);
                     end;
                 }
+                group("Azure Active Directory OAuth")
+                {
+                    Caption = 'Azure Active Directory OAuth';
+                    Image = XMLSetup;
+                    Visible = HasAzureADConnection;
+                    action("Create Azure AD App")
+                    {
+                        Caption = 'Create Azure AD App';
+                        ToolTip = 'Running this action will create an Azure AD App and a accompaning client secret.';
+                        ApplicationArea = NPRHeyLoyalty;
+                        Image = Setup;
+
+                        trigger OnAction()
+                        var
+                            HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
+                        begin
+                            HLIntegrationMgt.CreateAzureADApplication();
+                        end;
+                    }
+                    action("Create Azure AD App Secret")
+                    {
+                        Caption = 'Create Azure AD App Secret';
+                        ToolTip = 'Running this action will create a client secret for an existing Azure AD App.';
+                        ApplicationArea = NPRHeyLoyalty;
+                        Image = Setup;
+
+                        trigger OnAction()
+                        var
+                            HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
+                        begin
+                            HLIntegrationMgt.CreateAzureADApplicationSecret();
+                        end;
+                    }
+                }
                 action(MultiChoiceFields)
                 {
                     Caption = 'MultiChoice Fields';
@@ -128,10 +162,9 @@ page 6150720 "NPR HL Integration Setup"
                     Promoted = true;
                     PromotedIsBig = true;
                     PromotedOnly = true;
-                    PromotedCategory = Category4;
+                    PromotedCategory = Process;
                     RunObject = page "NPR HL MultiChoice Fields";
                 }
-
                 action(SyncMembersToHL)
                 {
                     Caption = 'Sync. Members';
@@ -195,13 +228,17 @@ page 6150720 "NPR HL Integration Setup"
     end;
 
     local procedure UpdateControlVisibility()
+    var
+        AzureADTenant: Codeunit "Azure AD Tenant";
     begin
         IntegrationIsEnabled := Rec."Enable Integration";
         MemberListIntegrationIsEnabled := Rec."Enable Integration" and Rec."Member Integration";
+        HasAzureADConnection := AzureADTenant.GetAadTenantId() <> '';
     end;
 
     var
         xSetup: Record "NPR HL Integration Setup";
+        HasAzureADConnection: Boolean;
         IntegrationIsEnabled: Boolean;
         MemberListIntegrationIsEnabled: Boolean;
 }
