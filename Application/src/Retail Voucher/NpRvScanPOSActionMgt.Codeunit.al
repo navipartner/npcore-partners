@@ -159,7 +159,7 @@
 
         NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, ReferenceNo, POSLine, SalePOS, POSSession, FrontEnd, POSPaymentLine, POSLine, false);
 
-        JSON.SetContext('VoucherType', VoucherType);
+        JSON.SetContext('VoucherType', VoucherTypeCode);
         FrontEnd.SetActionContext(VoucherPaymentActionCode(), JSON);
     end;
 
@@ -228,4 +228,72 @@
             Error(BlankReferenceNoErr);
         exit(ReferenceNo);
     end;
+
+
+    #region Ean Box Event Handling
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
+    local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
+    var
+        NpDcCoupon: Record "NPR NpDc Coupon";
+    begin
+        if not EanBoxEvent.Get(VoucherPaymentActionCode()) then begin
+            EanBoxEvent.Init();
+            EanBoxEvent.Code := VoucherPaymentActionCode();
+            EanBoxEvent."Module Name" := Text002;
+            EanBoxEvent.Description := CopyStr(NpDcCoupon.FieldCaption("Reference No."), 1, MaxStrLen(EanBoxEvent.Description));
+            EanBoxEvent."Action Code" := VoucherPaymentActionCode();
+            EanBoxEvent."POS View" := EanBoxEvent."POS View"::Payment;
+            EanBoxEvent."Event Codeunit" := CurrCodeunitId();
+            EanBoxEvent.Insert(true);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
+    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
+    begin
+        case EanBoxEvent.Code of
+            VoucherPaymentActionCode():
+                begin
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'ReferenceNo', true, '');
+                end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
+    local procedure SetEanBoxEventInScopeRefNo(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
+        EanBoxTxt: Text[50];
+    begin
+        if EanBoxSetupEvent."Event Code" <> VoucherPaymentActionCode() then
+            exit;
+        if StrLen(EanBoxValue) > MaxStrLen(Voucher."Reference No.") then
+            exit;
+
+        EanBoxTxt := CopyStr(EanBoxValue, 1, MaxStrLen(EanBoxTxt));
+        Voucher.SetRange("Reference No.", EanBoxValue);
+        if not Voucher.IsEmpty() then begin
+            InScope := true;
+            exit;
+        end;
+
+        if NpRvModuleValidGlobal.FindVoucher(EanBoxTxt, NpRvVoucherType, Voucher) then begin
+            InScope := true;
+            exit;
+        end;
+    end;
+
+
+    local procedure CurrCodeunitId(): Integer
+    begin
+        exit(CODEUNIT::"NPR NpRv Scan POSAction Mgt.");
+    end;
+
+    #endregion Ean Box Event Handling
+
+
+
 }
