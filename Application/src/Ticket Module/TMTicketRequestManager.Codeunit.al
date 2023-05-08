@@ -8,7 +8,6 @@
 
     var
         CHANGE_NOT_ALLOWED: Label 'Confirmed tickets can''t be changed.';
-        TOKEN_NOT_FOUND: Label 'The ticket-token %1 was not found, or has incorrect state.';
         TOKEN_EXPIRED: Label 'The ticket-token %1 has expired. Use PreConfirm to re-reserve tickets.';
         EXTERNAL_ITEM_CHANGE: Label 'Changing the sales item when there is an active ticket reservation, is not supported. Please delete the POS line and start over.';
         REVOKE_UNUSED_ERROR: Label 'Ticket %1 has been used for entry to %2 at %3 and can''t be revoked due to the revoke policy set on item %4 for admission %5.';
@@ -49,6 +48,9 @@
         EndTime := Time();
 
         DurationMs := EndTime - StartTime;
+        if (not ActiveSession.Get(ServiceInstanceId(), SessionId())) then
+            Clear(ActiveSession);
+
         CustomDimensions.Add('NPR_LockRequestedBy', Source);
         CustomDimensions.Add('NPR_WaitDurationMs', Format(DurationMs, 0, 9));
 
@@ -92,6 +94,8 @@
         SeatingReservationEntry: Record "NPR TM Seating Reserv. Entry";
         TicketAccessStatistics: Record "NPR TM Ticket Access Stats";
         TicketNotification: Record "NPR TM Ticket Notif. Entry";
+        TokenExpired: Label 'Token %1/%2 is marked as expired.';
+        TokenDeleted: Label 'Token %1/%2 was deleted.';
     begin
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");
@@ -147,6 +151,7 @@
                 end;
 
                 if (not RemoveRequest) then begin
+                    EmitMessageToTelemetry(StrSubstNo(TokenExpired, Token, TicketReservationRequest."Admission Code"));
                     TicketReservationRequest."Admission Created" := false;
                     TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::EXPIRED;
                     TicketReservationRequest."Expires Date Time" := CalculateNewExpireTime();
@@ -154,6 +159,7 @@
                 end;
 
                 if (RemoveRequest) then begin
+                    EmitMessageToTelemetry(StrSubstNo(TokenDeleted, Token, TicketReservationRequest."Admission Code"));
                     TicketReservationResponse.SetFilter("Session Token ID", '=%1', Token);
                     TicketReservationResponse.DeleteAll();
                     TicketReservationRequest.Delete();
@@ -581,6 +587,7 @@
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
+        UNCONFIRMED_TOKEN_NOT_FOUND: Label 'An unconfirmed ticket-token with value %1 was not found.';
     begin
 
         ReservationConfirmed := true;
@@ -594,11 +601,16 @@
             ReservationConfirmed := false;
         end;
 
-        TicketReservationRequest.SetFilter("Request Status", '=%1|=%2', TicketReservationRequest."Request Status"::REGISTERED, TicketReservationRequest."Request Status"::RESERVED);
-        if (not TicketReservationRequest.FindSet()) then begin
-            ResponseMessage := StrSubstNo(TOKEN_NOT_FOUND, Token);
-            ReservationConfirmed := false;
+        if (ReservationConfirmed) then begin
+            TicketReservationRequest.SetFilter("Request Status", '=%1|=%2', TicketReservationRequest."Request Status"::REGISTERED, TicketReservationRequest."Request Status"::RESERVED);
+            if (not TicketReservationRequest.FindSet()) then begin
+                ResponseMessage := StrSubstNo(UNCONFIRMED_TOKEN_NOT_FOUND, Token);
+                ReservationConfirmed := false;
+            end;
         end;
+
+        if (not ReservationConfirmed) then
+            EmitMessageToTelemetry(ResponseMessage);
 
         // Update the response object
         TicketReservationResponse.SetFilter("Session Token ID", '=%1', Token);
@@ -634,6 +646,25 @@
         FinalizePayment(Token);
 
         exit(true);
+    end;
+
+    local procedure EmitMessageToTelemetry(MessageText: Text)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+    begin
+        if (not ActiveSession.Get(ServiceInstanceId(), SessionId())) then
+            Clear(ActiveSession);
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
+
+        Session.LogMessage('NPR_TM_RequestManager', MessageText, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
     procedure ConfirmReservationRequestWithValidate(Token: Text[100])
@@ -792,14 +823,17 @@
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";
+        TOKEN_NOT_FOUND: Label 'The ticket-token %1 with status confirmed, was not found.';
     begin
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::CONFIRMED);
 
-        if (not (TicketReservationRequest.FindSet())) then
+        if (not (TicketReservationRequest.FindSet())) then begin
+            EmitMessageToTelemetry(StrSubstNo(TOKEN_NOT_FOUND, Token));
             Error(TOKEN_NOT_FOUND, Token);
+        end;
 
         repeat
             // Find the linked tickets, ticket can only have reference to one request line (eg the first).
