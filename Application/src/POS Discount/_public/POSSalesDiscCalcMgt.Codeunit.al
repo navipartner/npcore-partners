@@ -190,7 +190,6 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleTax: Record "NPR POS Sale Tax";
-        NPRDimMgt: Codeunit "NPR Dimension Mgt.";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
     begin
         Clear(TempSaleLinePOS);
@@ -224,12 +223,7 @@
                 if POSSaleTaxCalc.Find(POSSaleTax, SaleLinePOS.SystemId) then
                     if POSSaleTax."Calculated Amount Excl. Tax" = 0 then
                         POSSaleTaxCalc.DeleteAllLines(POSSaleTax);
-
-                SaleLinePOS.CreateDim(
-                  NPRDimMgt.LineTypeToTableNPR(SaleLinePOS."Line Type"), SaleLinePOS."No.",
-                  NPRDimMgt.DiscountTypeToTableNPR(SaleLinePOS."Discount Type"), SaleLinePOS."Discount Code",
-                  Database::"NPR NPRE Seating", SaleLinePOS."NPRE Seating Code",
-                  Database::"Responsibility Center", SaleLinePOS."Responsibility Center");
+                SaleLinePOS.CreateDimFromDefaultDim(SaleLinePOS.FieldNo("No."));
                 SaleLinePOS.Modify();
             end;
         until TempSaleLinePOS.Next() = 0;

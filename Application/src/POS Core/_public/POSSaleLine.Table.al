@@ -106,11 +106,7 @@
                         exit;
                 end;
 
-                CreateDim(
-                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
-                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                    Database::"NPR NPRE Seating", "NPRE Seating Code",
-                    Database::"Responsibility Center", "Responsibility Center");
+                CreateDimFromDefaultDim(FieldNo("No."));
             end;
         }
         field(7; "Location Code"; Code[10])
@@ -123,6 +119,8 @@
             begin
                 if "Location Code" <> xRec."Location Code" then
                     GetDefaultBin();
+
+                CreateDimFromDefaultDim(Rec.FieldNo("Location Code"));
             end;
         }
         field(8; "Posting Group"; Code[20])
@@ -1086,11 +1084,7 @@
 
             trigger OnValidate()
             begin
-                CreateDim(
-                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
-                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                    Database::"NPR NPRE Seating", "NPRE Seating Code",
-                    Database::"Responsibility Center", "Responsibility Center");
+                CreateDimFromDefaultDim(FieldNo("Discount Code"));
             end;
         }
         field(402; "Discount Calculated"; Boolean)
@@ -1192,11 +1186,7 @@
 
             trigger OnValidate()
             begin
-                CreateDim(
-                    Database::"NPR NPRE Seating", "NPRE Seating Code",
-                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
-                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                    Database::"Responsibility Center", "Responsibility Center");
+                CreateDimFromDefaultDim(FieldNo("NPRE Seating Code"));
             end;
         }
         field(801; "Insurance Category"; Code[50])
@@ -1245,11 +1235,7 @@
 
             trigger OnValidate()
             begin
-                CreateDim(
-                    Database::"Responsibility Center", "Responsibility Center",
-                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
-                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                    Database::"NPR NPRE Seating", "NPRE Seating Code");
+                CreateDimFromDefaultDim(FieldNo("Responsibility Center"));
             end;
         }
         field(5999; "Buffer Ref. No."; Integer)
@@ -1482,11 +1468,7 @@
 
             trigger OnValidate()
             begin
-                CreateDim(
-                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
-                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                    Database::"NPR NPRE Seating", "NPRE Seating Code",
-                    Database::"Responsibility Center", "Responsibility Center");
+                CreateDimFromDefaultDim(FieldNo("No."));
             end;
         }
         field(6051; "Product Group Code"; Code[10])
@@ -2087,6 +2069,7 @@
         SkipCalcDiscount := NewSkipCalcDiscount;
     end;
 
+    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]). Use CreateDimFromDefaultDim(FieldNo: Integer) to update line dimensions from default dims.', 'BC 20.0')]
     procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20])
     var
         TableID: array[10] of Integer;
@@ -2116,22 +2099,127 @@
         for i := 1 to ArrayLen(TableID) do
             if (TableID[i] <> 0) and (No[i] <> '') then
                 DimMgt.AddDimSource(DefaultDimSource, TableID[i], No[i]);
-#endif
 
-#IF NOT (BC17 or BC18 or BC19)
         "Dimension Set ID" :=
                 DimMgt.GetRecDefaultDimID(
                 Rec, CurrFieldNo, DefaultDimSource, SalePOS.GetPOSSourceCode(),
                 "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", SalePOS."Dimension Set ID", DATABASE::"NPR POS Store");
 #else
         "Dimension Set ID" :=
-                DimMgt.GetRecDefaultDimID(
+            DimMgt.GetRecDefaultDimID(
                 Rec, CurrFieldNo, TableID, No, SalePOS.GetPOSSourceCode(),
                 "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", SalePOS."Dimension Set ID", DATABASE::"NPR POS Store");
 
 #endif
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
     end;
+#IF BC17 or BC18 or BC19
+
+    internal procedure CreateDimFromDefaultDim(FieldNo: Integer)
+    begin
+        case FieldNo of
+            FieldNo("No."):
+                CreateDim(
+                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
+                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
+                    Database::"NPR NPRE Seating", "NPRE Seating Code",
+                    Database::"Responsibility Center", "Responsibility Center");
+            FieldNo("Discount Code"):
+                CreateDim(
+                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
+                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
+                    Database::"NPR NPRE Seating", "NPRE Seating Code",
+                    Database::"Responsibility Center", "Responsibility Center");
+            FieldNo("Responsibility Center"):
+                CreateDim(
+                    Database::"Responsibility Center", "Responsibility Center",
+                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
+                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
+                    Database::"NPR NPRE Seating", "NPRE Seating Code");
+            FieldNo("NPRE Seating Code"):
+                CreateDim(
+                    Database::"NPR NPRE Seating", "NPRE Seating Code",
+                    NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.",
+                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
+                    Database::"Responsibility Center", "Responsibility Center");
+        end;
+    end;
+#ELSE
+
+    local procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCreateDim(IsHandled, Rec, CurrFieldNo, DefaultDimSource);
+        if IsHandled then
+            exit;
+
+        "Shortcut Dimension 1 Code" := '';
+        "Shortcut Dimension 2 Code" := '';
+        "Dimension Set ID" :=
+            DimMgt.GetRecDefaultDimID(
+                Rec, CurrFieldNo, DefaultDimSource, SalePOS.GetPOSSourceCode(),
+                "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", SalePOS."Dimension Set ID", DATABASE::"NPR POS Store");
+
+        OnCreateDimOnBeforeUpdateGlobalDimFromDimSetID(Rec);
+        DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
+
+        OnAfterCreateDim(Rec, CurrFieldNo, xRec);
+    end;
+
+    internal procedure CreateDimFromDefaultDim(FieldNo: Integer)
+    var
+        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
+    begin
+        GetPOSHeader();
+        InitDefaultDimensionSources(DefaultDimSource, FieldNo);
+#ENDIF
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100)
+        if DimMgt.IsDefaultDimDefinedForTable(GetTableValuePair(FieldNo)) then  //First appears in BC21.4
+#ENDIF
+#IF NOT (BC17 or BC18 or BC19)
+            CreateDim(DefaultDimSource);
+        OnAfterCreateDimFromDefaultDim(Rec, xRec, SalePOS, CurrFieldNo, FieldNo);
+    end;
+
+    local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
+    begin
+        DimMgt.AddDimSource(DefaultDimSource, NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.", FieldNo = FieldNo("No."));
+        DimMgt.AddDimSource(DefaultDimSource, NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code", FieldNo = FieldNo("Discount Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", "Responsibility Center", FieldNo = FieldNo("Responsibility Center"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"NPR NPRE Seating", "NPRE Seating Code", FieldNo = FieldNo("NPRE Seating Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
+
+        OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
+    end;
+#ENDIF
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100)
+
+    local procedure GetTableValuePair(FieldNo: Integer) TableValuePair: Dictionary of [Integer, Code[20]]
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeInitTableValuePair(TableValuePair, FieldNo, IsHandled);
+        if IsHandled then
+            exit;
+
+        case FieldNo of
+            FieldNo("No."):
+                TableValuePair.Add(NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.");
+            FieldNo("Discount Code"):
+                TableValuePair.Add(NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code");
+            FieldNo("Responsibility Center"):
+                TableValuePair.Add(Database::"Responsibility Center", "Responsibility Center");
+            FieldNo("NPRE Seating Code"):
+                TableValuePair.Add(Database::"NPR NPRE Seating", "NPRE Seating Code");
+            FieldNo("Location Code"):
+                TableValuePair.Add(Database::Location, "Location Code");
+        end;
+        OnAfterInitTableValuePair(TableValuePair, FieldNo);
+    end;
+#ENDIF
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
@@ -2772,4 +2860,43 @@
     local procedure OnBeforeIsAsmToOrderRequired(POSSaleLine: Record "NPR POS Sale Line"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
+#IF NOT (BC17 or BC18 or BC19)
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeCreateDim(var IsHandled: Boolean; var POSSaleLine: Record "NPR POS Sale Line"; FieldNo: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateDimOnBeforeUpdateGlobalDimFromDimSetID(var POSSaleLine: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateDim(var POSSaleLine: Record "NPR POS Sale Line"; CallingFieldNo: Integer; xPOSSaleLine: Record "NPR POS Sale Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateDimFromDefaultDim(var POSSaleLine: Record "NPR POS Sale Line"; xPOSSaleLine: Record "NPR POS Sale Line"; var POSSale: Record "NPR POS Sale"; CurrFieldNo: Integer; CallingFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInitDefaultDimensionSources(var POSSaleLine: Record "NPR POS Sale Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
+    begin
+    end;
+#ENDIF
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100)
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInitTableValuePair(var TableValuePair: Dictionary of [Integer, Code[20]]; FieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInitTableValuePair(var TableValuePair: Dictionary of [Integer, Code[20]]; FieldNo: Integer)
+    begin
+    end;
+#ENDIF
 }

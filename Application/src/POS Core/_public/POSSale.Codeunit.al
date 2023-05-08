@@ -684,9 +684,8 @@
         Rec."User Session ID" := Database.SessionId();
 
         Rec."Salesperson Code" := Setup.Salesperson();
-        if Rec."Salesperson Code" <> SalePOS_ToResume."Salesperson Code" then begin
-            Rec.CreateDimensionsFromValidateSalesPersonCode();
-        end;
+        if Rec."Salesperson Code" <> SalePOS_ToResume."Salesperson Code" then
+            Rec.CreateDimFromDefaultDim(Rec.FieldNo("Salesperson Code"));
 
         Rec.Modify(true);
 

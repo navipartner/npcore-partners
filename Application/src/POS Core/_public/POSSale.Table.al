@@ -25,7 +25,7 @@
 
             trigger OnValidate()
             begin
-                CreateDimensionsFromValidatePOSStoreCode();
+                CreateDimFromDefaultDim(Rec.FieldNo("POS Store Code"));
             end;
         }
         field(4; "Salesperson Code"; Code[20])
@@ -37,7 +37,7 @@
 
             trigger OnValidate()
             begin
-                CreateDimensionsFromValidateSalesPersonCode();
+                CreateDimFromDefaultDim(Rec.FieldNo("Salesperson Code"));
             end;
         }
         field(5; "Date"; Date)
@@ -173,7 +173,7 @@
                         POSSaleTranslation.AssignLanguageCodeFrom(Rec, _POSStore);
                 end;
 
-                CreateDimensionsFromValidateCustomerNo();
+                CreateDimFromDefaultDim(Rec.FieldNo("Customer No."));
 
                 //Ændring foretaget for at kunne validere på nummer og slette rabatter på linier, ved ændring af kundenummer.
                 Modify();
@@ -218,6 +218,11 @@
         {
             Caption = 'Location Code';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CreateDimFromDefaultDim(Rec.FieldNo("Location Code"));
+            end;
         }
         field(29; "Shortcut Dimension 1 Code"; Code[20])
         {
@@ -580,7 +585,7 @@
 
             trigger OnValidate()
             begin
-                CreateDimensionsFromValidateEventNo();
+                CreateDimFromDefaultDim(Rec.FieldNo("Event No."));
             end;
         }
         field(181; "Event Task No."; Code[20])
@@ -726,7 +731,7 @@
                 SaleLinePOS: Record "NPR POS Sale Line";
                 SaleLinePOS2: Record "NPR POS Sale Line";
             begin
-                CreateDimensionsFromValidateResponsibilityCenter();
+                CreateDimFromDefaultDim(Rec.FieldNo("Responsibility Center"));
 
                 if xRec."Responsibility Center" <> "Responsibility Center" then begin
                     SaleLinePOS.SetRange("Register No.", "Register No.");
@@ -802,6 +807,7 @@
             Rec.Modify();
     end;
 
+    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]). Use CreateDimFromDefaultDim(FieldNo: Integer) to update document dimensions from default dims.', 'BC 20.0')]
     internal procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20]; Type5: Integer; No5: Code[20]; Type6: Integer; No6: Code[20])
     var
         TableID: array[10] of Integer;
@@ -837,8 +843,8 @@
           DimMgt.GetDefaultDimID(DimSource, GetPOSSourceCode(), Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code", 0, 0);
 #ELSE
         "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, TableID, No, GetPOSSourceCode(), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
+            DimMgt.GetRecDefaultDimID(
+                Rec, CurrFieldNo, TableID, No, GetPOSSourceCode(), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 #ENDIF
 
         if (OldDimSetID <> "Dimension Set ID") and SalesLinesExist() then begin
@@ -846,6 +852,70 @@
             UpdateAllLineDim("Dimension Set ID", OldDimSetID);
         end;
     end;
+#IF BC17 or BC18 or BC19
+
+    internal procedure CreateDimFromDefaultDim(FieldNo: Integer)
+    begin
+        case FieldNo of
+            Rec.FieldNo("Customer No."):
+                CreateDimensionsFromValidateCustomerNo();
+            Rec.FieldNo("Salesperson Code"):
+                CreateDimensionsFromValidateSalesPersonCode();
+            Rec.FieldNo("POS Store Code"):
+                CreateDimensionsFromValidatePOSStoreCode();
+            Rec.FieldNo("Responsibility Center"):
+                CreateDimensionsFromValidateResponsibilityCenter();
+            Rec.FieldNo("Event No."):
+                CreateDimensionsFromValidateEventNo();
+        end;
+    end;
+#ELSE
+
+    internal procedure CreateDimFromDefaultDim(FieldNo: Integer)
+    var
+        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
+    begin
+        InitDefaultDimensionSources(DefaultDimSource, FieldNo);
+        CreateDim(DefaultDimSource);
+    end;
+
+    local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
+    begin
+        DimMgt.AddDimSource(DefaultDimSource, Database::Customer, "Customer No.", FieldNo = FieldNo("Customer No."));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Salesperson/Purchaser", "Salesperson Code", FieldNo = FieldNo("Salesperson Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"NPR POS Unit", "Register No.", FieldNo = FieldNo("Register No."));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"NPR POS Store", "POS Store Code", FieldNo = FieldNo("POS Store Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::Location, "Location Code", FieldNo = FieldNo("Location Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", "Responsibility Center", FieldNo = FieldNo("Responsibility Center"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::Job, "Event No.", FieldNo = FieldNo("Event No."));
+
+        OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
+    end;
+
+    local procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
+    var
+        OldDimSetID: Integer;
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCreateDim(Rec, IsHandled, DefaultDimSource);
+        if IsHandled then
+            exit;
+
+        "Shortcut Dimension 1 Code" := '';
+        "Shortcut Dimension 2 Code" := '';
+        OldDimSetID := "Dimension Set ID";
+        "Dimension Set ID" :=
+            DimMgt.GetRecDefaultDimID(
+                Rec, CurrFieldNo, DefaultDimSource, GetPOSSourceCode(), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
+
+        OnCreateDimOnBeforeUpdateLines(Rec, xRec, CurrFieldNo, OldDimSetID, DefaultDimSource);
+        if (OldDimSetID <> "Dimension Set ID") and SalesLinesExist() then begin
+            Modify();
+            UpdateAllLineDim("Dimension Set ID", OldDimSetID);
+        end;
+    end;
+#ENDIF
 
     internal procedure GetPOSSourceCode() SourceCode: Code[10]
     var
@@ -899,6 +969,7 @@
     procedure UpdateAllLineDim(NewParentDimSetID: Integer; OldParentDimSetID: Integer)
     var
         POSSaleLine: Record "NPR POS Sale Line";
+        xPOSSaleLine: Record "NPR POS Sale Line";
         NewDimSetID: Integer;
         IsHandled: Boolean;
     begin
@@ -915,12 +986,17 @@
         POSSaleLine.LockTable();
         if POSSaleLine.FindSet(true) then
             repeat
+                OnUpdateAllLineDimOnBeforeGetPOSSaleLineNewDimSetID(POSSaleLine, NewParentDimSetID, OldParentDimSetID);
                 NewDimSetID := DimMgt.GetDeltaDimSetID(POSSaleLine."Dimension Set ID", NewParentDimSetID, OldParentDimSetID);
+                OnUpdateAllLineDimOnAfterGetPOSSaleLineNewDimSetID(Rec, xRec, POSSaleLine, NewDimSetID, NewParentDimSetID, OldParentDimSetID);
                 if POSSaleLine."Dimension Set ID" <> NewDimSetID then begin
+                    xPOSSaleLine := POSSaleLine;
                     POSSaleLine."Dimension Set ID" := NewDimSetID;
                     DimMgt.UpdateGlobalDimFromDimSetID(
-                      POSSaleLine."Dimension Set ID", POSSaleLine."Shortcut Dimension 1 Code", POSSaleLine."Shortcut Dimension 2 Code");
+                        POSSaleLine."Dimension Set ID", POSSaleLine."Shortcut Dimension 1 Code", POSSaleLine."Shortcut Dimension 2 Code");
+                    OnUpdateAllLineDimOnBeforePOSSaleLineModify(POSSaleLine, xPOSSaleLine);
                     POSSaleLine.Modify();
+                    OnUpdateAllLineDimOnAfterPOSSaleLineModify(POSSaleLine);
                 end;
             until POSSaleLine.Next() = 0;
     end;
@@ -997,6 +1073,26 @@
         end;
     end;
 
+    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Salesperson Code"))')]
+    procedure CreateDimensionsFromValidateSalesPersonCode()
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCreateDimensionsFromValidateSalesPersonCode(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        CreateDim(
+            Database::"Salesperson/Purchaser", "Salesperson Code",
+            Database::"NPR POS Unit", "Register No.",
+            Database::"NPR POS Store", "POS Store Code",
+            Database::Job, "Event No.",
+            Database::Customer, "Customer No.",
+            Database::"Responsibility Center", "Responsibility Center");
+    end;
+#IF BC17 or BC18 or BC19
+
     local procedure CreateDimensionsFromValidateEventNo()
     var
         IsHandled: Boolean;
@@ -1025,26 +1121,8 @@
             exit;
 
         CreateDim(
-            Database::"NPR POS Unit", "Register No.",
             Database::"NPR POS Store", "POS Store Code",
-            Database::Job, "Event No.",
-            Database::Customer, "Customer No.",
-            Database::"Salesperson/Purchaser", "Salesperson Code",
-            Database::"Responsibility Center", "Responsibility Center");
-    end;
-
-    procedure CreateDimensionsFromValidateSalesPersonCode()
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCreateDimensionsFromValidateSalesPersonCode(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
-        CreateDim(
             Database::"NPR POS Unit", "Register No.",
-            Database::"NPR POS Store", "POS Store Code",
             Database::Job, "Event No.",
             Database::Customer, "Customer No.",
             Database::"Salesperson/Purchaser", "Salesperson Code",
@@ -1086,34 +1164,77 @@
             Database::Customer, "Customer No.",
             Database::"Salesperson/Purchaser", "Salesperson Code");
     end;
+#ENDIF
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateAllLineDim(var POSSale: Record "NPR POS Sale"; NewParentDimSetID: Integer; OldParentDimSetID: Integer; var IsHandled: Boolean; xPOSSale: Record "NPR POS Sale")
     begin
     end;
 
+    [Obsolete('New way of dimension handling starting from BC 20.0', 'BC 20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDimensionsFromValidateSalesPersonCode(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
     begin
     end;
 
+    [Obsolete('New way of dimension handling starting from BC 20.0', 'BC 20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDimensionsFromValidateCustomerNo(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
     begin
     end;
 
+    [Obsolete('New way of dimension handling starting from BC 20.0', 'BC 20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDimensionsFromValidatePOSStoreCode(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
     begin
     end;
 
+    [Obsolete('New way of dimension handling starting from BC 20.0', 'BC 20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDimensionsFromValidateEventNo(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
     begin
     end;
 
+    [Obsolete('New way of dimension handling starting from BC 20.0', 'BC 20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDimensionsFromValidateResponsibilityCenter(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
+    begin
+    end;
+#IF NOT (BC17 or BC18 or BC19)
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInitDefaultDimensionSources(var POSSale: Record "NPR POS Sale"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateDim(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateDimOnBeforeUpdateLines(var POSSale: Record "NPR POS Sale"; xPOSSale: Record "NPR POS Sale"; CurrentFieldNo: Integer; OldDimSetID: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
+    begin
+    end;
+#ENDIF
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateAllLineDimOnBeforeGetPOSSaleLineNewDimSetID(var POSSaleLine: Record "NPR POS Sale Line"; NewParentDimSetID: Integer; OldParentDimSetID: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateAllLineDimOnAfterGetPOSSaleLineNewDimSetID(POSSale: Record "NPR POS Sale"; xPOSSale: Record "NPR POS Sale"; POSSaleLine: Record "NPR POS Sale Line"; var NewDimSetID: Integer; NewParentDimSetID: Integer; OldParentDimSetID: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateAllLineDimOnBeforePOSSaleLineModify(var POSSaleLine: Record "NPR POS Sale Line"; xPOSSaleLine: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateAllLineDimOnAfterPOSSaleLineModify(var POSSaleLine: Record "NPR POS Sale Line")
     begin
     end;
 }

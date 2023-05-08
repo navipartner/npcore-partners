@@ -480,7 +480,6 @@
         POSSaleTaxLineNodes: XmlNodeList;
         POSSaleTaxLineNode: XmlNode;
         xSalePOS: Record "NPR POS Sale";
-        NPRDimMgt: Codeunit "NPR Dimension Mgt.";
         UpdateDim: Boolean;
         POSCrossRefLbl: Label '%1_%2', Locked = true;
     begin
@@ -548,13 +547,7 @@
         SalePOS.Date := xSalePOS.Date;
         SalePOS."Start Time" := xSalePOS."Start Time";
         if UpdateDim then
-            SalePOS.CreateDim(
-                Database::"NPR POS Unit", SalePOS."Register No.",
-                Database::"NPR POS Store", SalePOS."POS Store Code",
-                Database::Job, SalePOS."Event No.",
-                Database::Customer, SalePOS."Customer No.",
-                Database::"Salesperson/Purchaser", SalePOS."Salesperson Code",
-                Database::"Responsibility Center", SalePOS."Responsibility Center");
+            SalePOS.CreateDimFromDefaultDim(SalePOS.FieldNo("Register No."));
         SalePOS.Insert(false, true);
 
         Root.SelectNodes('pos_info_transactions/pos_info_transaction', POSInfoTransactionNodes);
@@ -585,11 +578,7 @@
             SaleLinePOS.Date := SalePOS.Date;
             SaleLinePOS."Location Code" := SalePOS."Location Code";
             if UpdateDim then
-                SaleLinePOS.CreateDim(
-                    NPRDimMgt.LineTypeToTableNPR(SaleLinePOS."Line Type"), SaleLinePOS."No.",
-                    NPRDimMgt.DiscountTypeToTableNPR(SaleLinePOS."Discount Type"), SaleLinePOS."Discount Code",
-                    Database::"NPR NPRE Seating", SaleLinePOS."NPRE Seating Code",
-                    Database::"Responsibility Center", SaleLinePOS."Responsibility Center");
+                SaleLinePOS.CreateDimFromDefaultDim(SaleLinePOS.FieldNo("No."));
             SaleLinePOS.Insert(true, true);
 
             Element.SelectNodes('pos_sale_tax_summary_lines/pos_sale_tax_summary_line', POSSaleTaxNodes);
