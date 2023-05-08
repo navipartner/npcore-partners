@@ -380,13 +380,12 @@ codeunit 6059947 "NPR Package Management"
     var
         SalesHeader: Record "Sales Header";
     begin
-
-        if Rec.ISTEMPORARY then
+        if Rec.IsTemporary() then
             exit;
 
         if Rec.Quantity = 0 then
             exit;
-        if not SalesHeader.GET(Rec."Document Type", Rec."Document No.") then
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
             exit;
         if SalesHeader."Shipment Method Code" = '' then
             exit;
@@ -395,10 +394,8 @@ codeunit 6059947 "NPR Package Management"
 
         if PackageProviderSetup."Default Weight" <= 0 then exit;
 
-        if Rec."Net Weight" = 0 then begin
+        if Rec."Net Weight" = 0 then
             Rec."Net Weight" := PackageProviderSetup."Default Weight";
-            Rec.MODIFY();
-        end;
     end;
 
 
