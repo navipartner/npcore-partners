@@ -296,7 +296,10 @@
     var
         Customer: Record Customer;
         GLSetup: Record "General Ledger Setup";
+        DimHandlingModifier: Codeunit "NPR Dim. Handling Modifier";
     begin
+        BindSubscription(DimHandlingModifier);
+
         SalesHeader.Init();
         SalesHeader."Document Type" := DocumentType;
         SalesHeader."No." := '';
@@ -311,9 +314,6 @@
             if Customer."Currency Code" = GLSetup."LCY Code" then
                 SalesHeader.Validate("Currency Code", Customer."Currency Code");
         end;
-        SalesHeader."Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
-        SalesHeader."Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";
-        SalesHeader."Dimension Set ID" := SalePOS."Dimension Set ID";
 
         SalesHeader."Ship-to Name" := SalePOS.Name;
         SalesHeader."Ship-to Address" := SalePOS.Address;
@@ -357,10 +357,10 @@
         SalesHeader.Validate("Prices Including VAT", SalePOS."Prices Including VAT");
 
         TransferInfoFromSalePOS(SalePOS, SalesHeader);
-
         GetImportedFromInvoiceNo(SalePOS, SalesHeader);
-
         SalesHeader.Modify();
+
+        UnbindSubscription(DimHandlingModifier);
     end;
 
     procedure CopySaleCommentLines(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
