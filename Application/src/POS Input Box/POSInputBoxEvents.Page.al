@@ -107,7 +107,7 @@
     }
 
     var
-        ActionDescription: Text[250];
+        ActionDescription: Text;
 
     trigger OnOpenPage()
     var
@@ -128,7 +128,7 @@
         if POSAction."Workflow Implementation" = Enum::"NPR POS Workflow"::LEGACY then
             ActionDescription := POSAction.Description
         else
-            ActionDescription := CopyStr(WorkflowCaptionBuffer.GetActionDescription(Rec.Code), 1, MaxStrLen(ActionDescription));
+            ActionDescription := WorkflowCaptionBuffer.GetActionDescription(Rec."Action Code");
     end;
 }
 
