@@ -31,14 +31,6 @@
                 ApplicationArea = NPRRetail;
             }
 #ENDIF
-            part(RetailTop10ItemsByQty; "NPR Retail 10 Items by Qty.")
-            {
-                ApplicationArea = NPRRetail;
-            }
-            part(RetailTop10Salespersons; "NPR Retail Top 10 S.person")
-            {
-                ApplicationArea = NPRRetail;
-            }
             part("MyReports"; "NPR My Reports")
             {
                 ApplicationArea = NPRRetail;
