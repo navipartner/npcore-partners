@@ -40,7 +40,8 @@ codeunit 6014600 "NPR POS Action: EndOfDay V4" implements "NPR IPOS Workflow"
 
         EndOfDayType := Context.GetIntegerParameter('Type');
         CashDrawerNo := CopyStr(Context.GetStringParameter('Cash Drawer No.'), 1, MaxStrLen(CashDrawerNo));
-        HidePopup := Context.GetBooleanParameter('SuppressParkedSalesDialog');
+        if not Context.GetBooleanParameter('SuppressParkedSalesDialog', HidePopup) then
+            HidePopup := false;
 
         Sale.GetCurrentSale(SalePOS);
 
