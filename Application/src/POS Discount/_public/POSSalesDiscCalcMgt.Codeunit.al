@@ -306,7 +306,7 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        if not TempSaleLinePOS.IsTemporary then
+        if not TempSaleLinePOS.IsTemporary() then
             exit;
 
         SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", Date, "Sale Type", "Line Type", "Discount Type");
@@ -318,6 +318,7 @@
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
         if SaleLinePOS.FindSet() then
             repeat
+                SaleLinePOS.TestField("Price Includes VAT", SalePOS."Prices Including VAT");
                 TempSaleLinePOS := SaleLinePOS;
                 TempSaleLinePOS."Discount Calculated" := false;
                 TempSaleLinePOS."Discount Type" := TempSaleLinePOS."Discount Type"::" ";

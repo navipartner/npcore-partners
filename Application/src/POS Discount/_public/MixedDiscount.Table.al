@@ -513,5 +513,13 @@
             until MixedDiscountLine.Next() = 0;
         //+NPR5.40 [294655]
     end;
-}
 
+    internal procedure AbsoluteAmountDiscount(): Boolean
+    begin
+        exit(
+            "Discount Type" in
+                ["Discount Type"::"Total Amount per Min. Qty.",
+                 "Discount Type"::"Total Discount Amt. per Min. Qty.",
+                 "Discount Type"::"Multiple Discount Levels"]);
+    end;
+}
