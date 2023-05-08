@@ -236,7 +236,7 @@ xmlport 6060117 "NPR TM Ticket Confirmation"
                         trigger OnPreXmlItem()
                         begin
                             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', -2);
-                            if (TempTicketReservationResponse."Request Entry No." <> 0) then
+                            if (TempTicketReservationResponse."Request Entry No." <> 0) and (TempTicketReservationResponse.Confirmed) then
                                 Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TempTicketReservationResponse."Request Entry No.");
                         end;
                     }
