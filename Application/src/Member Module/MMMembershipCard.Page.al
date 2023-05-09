@@ -227,7 +227,7 @@
                     trigger OnLookup(var Text: Text): Boolean
                     begin
 
-                        SetMasterDataAttributeValue(2);
+                        OnAttributeLookup(2);
 
                     end;
 
