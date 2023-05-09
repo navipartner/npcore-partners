@@ -594,6 +594,13 @@
         end;
     }
 
+    labels
+    {
+        CountingDetailsCaptionLbl = 'Counting Details';
+        BankDepositAmountDetailsCaptionLbl = 'Bank Deposit Amount Details';
+        MoveToBinAmountDetailsCaptionLbl = 'Move to Bin Amount Details';
+    }
+
     trigger OnPreReport()
     begin
         if CompanyInfo.Get() then;
