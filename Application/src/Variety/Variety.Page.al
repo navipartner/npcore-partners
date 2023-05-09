@@ -10,6 +10,7 @@
     SourceTable = "NPR Variety";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
+    DelayedInsert = true;
 
 
     layout
@@ -26,9 +27,9 @@
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the variety description.';
                     ApplicationArea = NPRRetail;
+                    ShowMandatory = true;
                 }
                 field("Use in Variant Description"; Rec."Use in Variant Description")
                 {

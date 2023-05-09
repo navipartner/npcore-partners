@@ -15,6 +15,10 @@
             Caption = 'Code';
             DataClassification = CustomerContent;
             NotBlank = true;
+            trigger OnValidate()
+            begin
+                CheckForSpecialCharacters();
+            end;
         }
         field(10; Description; Text[30])
         {
@@ -79,6 +83,15 @@
     fieldgroups
     {
     }
+    trigger OnInsert()
+    begin
+        TestField(Description);
+    end;
+
+    trigger OnModify()
+    begin
+        TestField(Description);
+    end;
 
     trigger OnDelete()
     var
@@ -86,6 +99,17 @@
     begin
         VRTTable.SetRange(Type, Code);
         VRTTable.DeleteAll(true);
+    end;
+
+    local procedure CheckForSpecialCharacters()
+    var
+        Reg: Codeunit "NPR RegEx";
+        SpecialCharsErr: Label 'Only A-Z 0-9 and _ are allowed';
+    begin
+        if "Code" = '' then
+            exit;
+        if not Reg.IsMatch("Code", '^[a-zA-Z0-9 _]*$') then //only allowed letters, numbers and underscore
+            Error(SpecialCharsErr);
     end;
 
     var
