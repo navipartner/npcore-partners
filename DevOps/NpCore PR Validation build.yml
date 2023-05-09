@@ -35,6 +35,9 @@ stages:
         - name: BC2005_CLOUD
           alwaysRun: true
 
+        - name: BC2103_CLOUD
+          alwaysRun: true
+
         - name: vLatest_CLOUD
           compareAppWithSpecificCompareAppVersion: true
           alwaysRun: true

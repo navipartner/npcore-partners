@@ -2175,7 +2175,7 @@
         GetPOSHeader();
         InitDefaultDimensionSources(DefaultDimSource, FieldNo);
 #ENDIF
-#IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100)
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103)
         if DimMgt.IsDefaultDimDefinedForTable(GetTableValuePair(FieldNo)) then  //First appears in BC21.4
 #ENDIF
 #IF NOT (BC17 or BC18 or BC19)
@@ -2194,7 +2194,7 @@
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
     end;
 #ENDIF
-#IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100)
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103)
 
     local procedure GetTableValuePair(FieldNo: Integer) TableValuePair: Dictionary of [Integer, Code[20]]
     var
@@ -2887,7 +2887,7 @@
     begin
     end;
 #ENDIF
-#IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100)
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103)
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInitTableValuePair(var TableValuePair: Dictionary of [Integer, Code[20]]; FieldNo: Integer; var IsHandled: Boolean)
