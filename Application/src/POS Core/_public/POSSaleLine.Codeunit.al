@@ -536,6 +536,7 @@
         CheckMandatoryFields(Line);
 
         InvokeOnBeforeInsertSaleLineWorkflow(Rec);
+        OnBeforeInsertPOSSaleLine(Rec);
 
         if HandleReturnValue then
             ReturnValue := Rec.Insert(true)
@@ -615,17 +616,19 @@
     begin
     end;
     //--- POS Sales Workflow ---
-
+    [Obsolete('Remove after POS Scenario is removed')]
     local procedure OnBeforeInsertSaleLineCode(): Code[20]
     begin
         exit('BEFORE_INSERT_LINE');
     end;
 
+    [Obsolete('Remove after POS Scenario is removed')]
     local procedure OnAfterInsertSaleLineCode(): Code[20]
     begin
         exit('AFTER_INSERT_LINE');
     end;
 
+    [Obsolete('Remove after POS Scenario is removed')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, true)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
@@ -638,6 +641,7 @@
         exit(CODEUNIT::"NPR POS Sale Line");
     end;
 
+    [Obsolete('Remove after POS Scenario is removed')]
     procedure InvokeOnBeforeInsertSaleLineWorkflow(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
@@ -679,6 +683,7 @@
         until POSSalesWorkflowStep.Next() = 0;
     end;
 
+    [Obsolete('Use OnBeforeInsertPOSSaleLine')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertSaleLine(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
@@ -692,6 +697,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertPOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertPOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
