@@ -230,10 +230,7 @@ page 6059982 "NPR POS Entry Sales & Payments"
                 Rec."Line No." := LineNo;
                 LineNo += 1;
 
-                Rec."Entry Date" := POSEntrySalesLine.Entry_Date;
                 Rec."Document No." := POSEntrySalesLine.Document_No_;
-                Rec."Starting Time" := POSEntrySalesLine.Starting_Time;
-                Rec."Ending Time" := POSEntrySalesLine.Ending_Time;
                 Rec."POS Store Code" := POSEntrySalesLine.POS_Store_Code;
                 Rec."POS Unit No." := POSEntrySalesLine.POS_Unit_No_;
                 Rec."Salesperson Code" := POSEntrySalesLine.Salesperson_Code;
@@ -271,10 +268,7 @@ page 6059982 "NPR POS Entry Sales & Payments"
                 Rec."Line No." := LineNo;
                 LineNo += 1;
 
-                Rec."Entry Date" := POSEntryPaymentLine.Entry_Date;
                 Rec."Document No." := POSEntryPaymentLine.Document_No_;
-                Rec."Starting Time" := POSEntryPaymentLine.Starting_Time;
-                Rec."Ending Time" := POSEntryPaymentLine.Ending_Time;
                 Rec."POS Store Code" := POSEntryPaymentLine.POS_Store_Code;
                 Rec."POS Unit No." := POSEntryPaymentLine.POS_Unit_No_;
                 Rec."Salesperson Code" := POSEntryPaymentLine.Salesperson_Code;
