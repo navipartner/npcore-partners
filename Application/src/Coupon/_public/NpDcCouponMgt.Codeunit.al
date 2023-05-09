@@ -625,11 +625,6 @@
         ArchCoupon."Customer No." := Coupon."Customer No.";
         ArchCoupon."Max Use per Sale" := Coupon."Max Use per Sale";
         ArchCoupon."Print Template Code" := Coupon."Print Template Code";
-        ArchCoupon.Open := Coupon.Open;
-        ArchCoupon."Remaining Quantity" := Coupon."Remaining Quantity";
-        ArchCoupon."Issue Coupon Module" := Coupon."Issue Coupon Module";
-        ArchCoupon."Validate Coupon Module" := Coupon."Validate Coupon Module";
-        ArchCoupon."Apply Discount Module" := Coupon."Apply Discount Module";
         ArchCoupon."POS Store Group" := Coupon."POS Store Group";
         ArchCoupon.Insert();
     end;

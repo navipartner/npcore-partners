@@ -97,7 +97,6 @@
         NpRvVoucher."Starting Date" := TempNpRvVoucherBuffer."Starting Date";
         NpRvVoucher."Ending Date" := TempNpRvVoucherBuffer."Ending Date";
         NpRvVoucher."Account No." := TempNpRvVoucherBuffer."Account No.";
-        NpRvVoucher.Amount := TempNpRvVoucherBuffer.Amount;
         NpRvVoucher.Name := TempNpRvVoucherBuffer.Name;
         NpRvVoucher."Name 2" := TempNpRvVoucherBuffer."Name 2";
         NpRvVoucher.Address := TempNpRvVoucherBuffer.Address;
@@ -109,10 +108,6 @@
         NpRvVoucher."E-mail" := TempNpRvVoucherBuffer."E-mail";
         NpRvVoucher."Phone No." := TempNpRvVoucherBuffer."Phone No.";
         NpRvVoucher."Voucher Message" := TempNpRvVoucherBuffer."Voucher Message";
-        NpRvVoucher."Issue Date" := TempNpRvVoucherBuffer."Issue Date";
-        NpRvVoucher."Issue Register No." := TempNpRvVoucherBuffer."Issue Register No.";
-        NpRvVoucher."Issue Document No." := TempNpRvVoucherBuffer."Issue Sales Ticket No.";
-        NpRvVoucher."Issue User ID" := TempNpRvVoucherBuffer."Issue User ID";
         NpRvVoucher."Allow Top-up" := NpRvVoucherType."Allow Top-up";
         NpRvVoucher.Insert(true);
 
