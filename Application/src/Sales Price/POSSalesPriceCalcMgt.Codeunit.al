@@ -163,7 +163,6 @@
         SalesLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
         SalesLine."Variant Code" := SaleLinePOS."Variant Code";
         SalesLine."VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
-        SalesLine."Posting Date" := SalePOS.Date;
         SalesHeader."Posting Date" := SalePOS.Date;
         SalesHeader."Currency Code" := Currency.Code;
         if POSUnit.Get(SaleLinePOS."Register No.") then
@@ -205,7 +204,6 @@
         SalesLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
         SalesLine."Variant Code" := SaleLinePOS."Variant Code";
         SalesLine."VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
-        SalesLine."Posting Date" := SalePOS.Date;
         SalesHeader."Posting Date" := SalePOS.Date;
         SalesHeader."Currency Code" := Currency.Code;
         SalesHeader.UpdateCurrencyFactor();

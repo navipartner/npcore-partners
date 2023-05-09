@@ -227,7 +227,6 @@
                     POSEntryTaxLine."Tax Type" := POSEntryTaxLine."Tax Type"::"Sales and Use Tax";
             end;
             POSEntryTaxLine."Tax Area Code for Key" := POSSaleTaxLine."Tax Area Code for Key";
-            POSEntryTaxLine."Entry Date" := POSSaleTaxLine."Posting Date";
             POSEntryTaxLine."Tax Liable" := POSSaleTaxLine."Tax Liable";
             POSEntryTaxLine."Calc. for Maximum Amount/Qty." := POSSaleTaxLine."Calc. for Maximum Amount/Qty.";
             POSEntryTaxLine."Tax Calculation Type" := POSSaleTaxLine."Tax Calculation Type";
@@ -274,7 +273,6 @@
                     POSEntryTaxLine."Tax Type" := POSEntryTaxLine."Tax Type"::"Sales and Use Tax";
             end;
             POSEntryTaxLine."Tax Area Code for Key" := POSSaleTaxLine."Tax Area Code for Key";
-            POSEntryTaxLine."Entry Date" := POSSaleTaxLine."Posting Date";
             POSEntryTaxLine."Tax Liable" := POSSaleTaxLine."Tax Liable";
             POSEntryTaxLine."Calc. for Maximum Amount/Qty." := POSSaleTaxLine."Calc. for Maximum Amount/Qty.";
             POSEntryTaxLine."Tax Calculation Type" := POSSaleTaxLine."Tax Calculation Type";
