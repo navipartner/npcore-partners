@@ -40,7 +40,7 @@
                     ToolTip = 'Specifies the value of the GDPR Approval field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
-                    trigger OnLookup(var Text: Text): Boolean
+                    trigger OnDrillDown()
                     var
                         GDPRConsentLog: Record "NPR GDPR Consent Log";
                         GDPRConsentLogPage: Page "NPR GDPR Consent Log";
@@ -51,6 +51,7 @@
                         GDPRConsentLog.FilterGroup(0);
                         GDPRConsentLogPage.SetTableView(GDPRConsentLog);
                         GDPRConsentLogPage.RunModal();
+                        CurrPage.Update(false);
                     end;
                 }
                 field("User Logon ID"; Rec."User Logon ID")
