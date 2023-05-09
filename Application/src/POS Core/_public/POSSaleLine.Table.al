@@ -2437,6 +2437,7 @@
     local procedure TestItem()
     var
         ItemVariant: Record "Item Variant";
+        SalesBlockedErr: Label 'You cannot sell this item because the Sales Blocked check box is selected on the item card.';
     begin
         if "No." = '' then
             exit;
@@ -2452,6 +2453,8 @@
             ItemVariant.Get(_Item."No.", "Variant Code");
             ItemVariant.TestField("NPR Blocked", false);
         end;
+        if _Item."Sales Blocked" then
+            Error(SalesBlockedErr);            
     end;
 
     local procedure TestPaymentMethod(POSPaymentMethod: Record "NPR POS Payment Method")
