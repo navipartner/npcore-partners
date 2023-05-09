@@ -181,66 +181,18 @@
 
     internal procedure SetupItemFromCategory(var Item: Record Item; var ItemCategory: Record "Item Category")
     var
-        // TempItem: Record Item temporary;
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
         RecRef: RecordRef;
     begin
         ItemCategory.TestField("NPR Blocked", false);
         ItemCategory.TestField("NPR Main Category", false);
-        ItemCategory.TestField("NPR Item Template Code");
 
         ConfigTemplateHeader.Get(ItemCategory."NPR Item Template Code");
 
         RecRef.GetTable(Item);
         ConfigTemplateMgt.ApplyTemplateLinesWithoutValidation(ConfigTemplateHeader, RecRef);
         RecRef.SetTable(Item);
-
-        // ApplyTemplateToTempItem(TempItem, ItemCategory);
-
-        // if Item.Type <> TempItem.Type then
-        //     Item.Validate(Item.Type, TempItem.Type);
-
-        // Item.Validate(Item."Gen. Prod. Posting Group", TempItem."Gen. Prod. Posting Group");
-        // Item."VAT Prod. Posting Group" := TempItem."VAT Prod. Posting Group";
-        // Item."VAT Bus. Posting Gr. (Price)" := TempItem."VAT Bus. Posting Gr. (Price)";
-        // Item."Tax Group Code" := TempItem."Tax Group Code";
-        // Item.Validate(Item."Inventory Posting Group", TempItem."Inventory Posting Group");
-
-        // Item.Validate(Item."Item Disc. Group", TempItem."Item Disc. Group");
-        // Item.Validate(Item."NPR Guarantee voucher", TempItem."NPR Guarantee voucher");
-        // Item."Costing Method" := TempItem."Costing Method";
-
-        // DefaultDimension2.SetRange("Table ID", DATABASE::Item);
-        // DefaultDimension2.SetRange("No.", Item."No.");
-        // DefaultDimension2.DeleteAll();
-        // DefaultDimension.SetRange("Table ID", DATABASE::"Item Category");
-        // DefaultDimension.SetRange("No.", Item."Item Category Code");
-        // if DefaultDimension.FindSet() then
-        //     repeat
-        //         DefaultDimension2 := DefaultDimension;
-        //         DefaultDimension2."Table ID" := DATABASE::Item;
-        //         DefaultDimension2."No." := Item."No.";
-        //         DefaultDimension2.Insert();
-        //     until DefaultDimension.Next() = 0;
-
-        // Item."Global Dimension 1 Code" := ItemCategory."NPR Global Dimension 1 Code";
-        // Item."Global Dimension 2 Code" := ItemCategory."NPR Global Dimension 2 Code";
-
-        // AddItemUOMIfMissing(item."No.", TempItem."Base Unit of Measure");
-        // AddItemUOMIfMissing(item."No.", TempItem."Sales Unit of Measure");
-        // AddItemUOMIfMissing(item."No.", TempItem."Purch. Unit of Measure");
-
-        // if Item."Base Unit of Measure" <> TempItem."Base Unit of Measure" then begin
-        //     Item.Validate(Item."Base Unit of Measure", TempItem."Base Unit of Measure");
-        //     Item.Validate(Item."Sales Unit of Measure", TempItem."Sales Unit of Measure");
-        //     Item.Validate(Item."Sales Unit of Measure", TempItem."Purch. Unit of Measure");
-        // end;
-
-        // if TempItem."NPR Variety Group" <> '' then
-        // Item.Validate(Item."NPR Variety Group", TempItem."NPR Variety Group");
-
-        // Item.Validate("Item Category Code", ItemCategory.Code);
 
         ApplyItemCategoryDimensionsToItem(ItemCategory, Item, true);
     end;
