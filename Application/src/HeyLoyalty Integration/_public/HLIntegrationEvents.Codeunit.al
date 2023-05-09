@@ -2,39 +2,33 @@ codeunit 6059992 "NPR HL Integration Events"
 {
     Access = Public;
 
-    [Obsolete('Goes internal in next release.')]
     [IntegrationEvent(false, false)]
-    procedure OnAfterCreateDataLogSetup(IntegrationArea: Enum "NPR HL Integration Area")
+    internal procedure OnAfterCreateDataLogSetup(IntegrationArea: Enum "NPR HL Integration Area")
     begin
     end;
 
-    [Obsolete('Goes internal in next release.')]
     [IntegrationEvent(false, false)]
-    procedure OnSetupDataLogSubsriberDataProcessingParams(IntegrationArea: Enum "NPR HL Integration Area"; TableID: Integer; var DataLogSubscriber: Record "NPR Data Log Subscriber"; var Handled: Boolean)
+    internal procedure OnSetupDataLogSubsriberDataProcessingParams(IntegrationArea: Enum "NPR HL Integration Area"; TableID: Integer; var DataLogSubscriber: Record "NPR Data Log Subscriber"; var Handled: Boolean)
     begin
     end;
 
-    [Obsolete('Goes internal in next release.')]
     [IntegrationEvent(false, false)]
-    procedure OnCheckIfIntegrationAreaIsEnabled(IntegrationArea: Enum "NPR HL Integration Area"; var AreaIsEnabled: Boolean; var Handled: Boolean)
+    internal procedure OnCheckIfIntegrationAreaIsEnabled(IntegrationArea: Enum "NPR HL Integration Area"; var AreaIsEnabled: Boolean; var Handled: Boolean)
     begin
     end;
 
-    [Obsolete('Goes internal in next release.')]
     [IntegrationEvent(false, false)]
-    procedure OnCheckIfIsIntegratedTable(IntegrationArea: Enum "NPR HL Integration Area"; TableId: Integer; var TableIsIntegrated: Boolean; var Handled: Boolean)
+    internal procedure OnCheckIfIsIntegratedTable(IntegrationArea: Enum "NPR HL Integration Area"; TableId: Integer; var TableIsIntegrated: Boolean; var Handled: Boolean)
     begin
     end;
 
-    [Obsolete('Goes internal in next release.')]
     [IntegrationEvent(false, false)]
-    procedure OnBeforeFindRelatedMembers(DataLogEntry: Record "NPR Data Log Record"; var TempMembershipRole: Record "NPR MM Membership Role"; var Handled: Boolean)
+    internal procedure OnBeforeFindRelatedMembers(DataLogEntry: Record "NPR Data Log Record"; var TempMembershipRole: Record "NPR MM Membership Role"; var Handled: Boolean)
     begin
     end;
 
-    [Obsolete('Goes internal in next release.')]
     [IntegrationEvent(false, false)]
-    procedure OnFindRelatedMembers(DataLogEntry: Record "NPR Data Log Record"; var TempMembershipRole: Record "NPR MM Membership Role"; var Handled: Boolean)
+    internal procedure OnFindRelatedMembers(DataLogEntry: Record "NPR Data Log Record"; var TempMembershipRole: Record "NPR MM Membership Role"; var Handled: Boolean)
     begin
     end;
 
