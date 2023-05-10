@@ -84,9 +84,7 @@
         end;
     end;
 
-    // The methods subscribes to event posted during end of sale
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
-    local procedure CreateDeFiskalyOnSale(SalePOS: Record "NPR POS Sale")
+    procedure CreateDeFiskalyOnSale(SalePOS: Record "NPR POS Sale")
     var
         PosUnit: Record "NPR POS Unit";
         PosAuditProfile: Record "NPR POS Audit Profile";

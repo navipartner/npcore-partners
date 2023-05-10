@@ -418,12 +418,12 @@
     local procedure EndSale(POSSession: Codeunit "NPR POS Session"; StartNew: Boolean)
     var
         SalePOS: Record "NPR POS Sale";
+        RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         SalesAmount: Decimal;
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         SubTotal: Decimal;
         StartTime: DateTime;
-        RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
     begin
         CheckItemAvailability();
 
@@ -743,9 +743,14 @@
 
     local procedure RunAfterEndSale(xRec: Record "NPR POS Sale")
     var
+        CreateDeFiskalyonSale: Codeunit "NPR Create De Fiskaly on Sale";
         Success: Boolean;
+        FiskalyError: Label 'The error occurred during the fiskaly process: %1';
     begin
         //Any error at this time would leave the POS with inconsistent front-end state.
+        if not CreateDeFiskalyOnSale.Run(xRec) then
+            Message(FiskalyError, GetLastErrorText);
+
         ClearLastError();
         Success := RunAfterEndSale_OnRun(xRec);
         if not Success then
