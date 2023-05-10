@@ -1943,7 +1943,6 @@
             if (NotificationSetup.Get(TempValidCouponToCreate."Notification Code")) then begin
                 Clear(CouponNotification);
                 CouponNotification."Membership Entry No." := MembershipEntryNo;
-                CouponNotification."External Membership No." := Membership."External Membership No.";
                 CouponNotification."Notification Trigger" := CouponNotification."Notification Trigger"::COUPON;
                 CouponNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
                 CouponNotification."Target Member Role" := NotificationSetup."Target Member Role";

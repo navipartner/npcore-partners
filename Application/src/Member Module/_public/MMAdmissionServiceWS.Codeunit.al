@@ -109,9 +109,7 @@
                             MMAdmissionServiceEntry."Card Entry No." := MemberCard."Entry No.";
                             MMAdmissionServiceEntry."External Card No." := MemberCard."External Card No.";
                             MMAdmissionServiceEntry."Member Entry No." := MemberCard."Member Entry No.";
-                            MMAdmissionServiceEntry."External Member No." := MemberCard."External Member No.";
                             MMAdmissionServiceEntry."Membership Entry No." := MemberCard."Membership Entry No.";
-                            MMAdmissionServiceEntry."External Membership No." := MemberCard."External Membership No.";
                             MMAdmissionServiceEntry."Display Name" := Member."Display Name";
 
                             if MMMembership.Get(MemberCard."Membership Entry No.") then begin
@@ -169,7 +167,6 @@
                             MMAdmissionServiceEntry."Member Entry No." := MemberCard."Member Entry No.";
                             MMAdmissionServiceEntry."External Member No." := MemberCard."External Member No.";
                             MMAdmissionServiceEntry."Membership Entry No." := MemberCard."Membership Entry No.";
-                            MMAdmissionServiceEntry."External Membership No." := MemberCard."External Membership No.";
                             MMAdmissionServiceEntry."Display Name" := Member."Display Name";
 
                             if MMMembership.Get(MemberCard."Membership Entry No.") then begin
@@ -683,7 +680,6 @@
                             MMAdmissionServiceEntry."Member Entry No." := MemberCard."Member Entry No.";
                             MMAdmissionServiceEntry."External Member No." := MemberCard."External Member No.";
                             MMAdmissionServiceEntry."Membership Entry No." := MemberCard."Membership Entry No.";
-                            MMAdmissionServiceEntry."External Membership No." := MemberCard."External Membership No.";
                             MMAdmissionServiceEntry."Display Name" := Member."Display Name";
 
                             if MMMembership.Get(MemberCard."Membership Entry No.") then begin
@@ -733,7 +729,6 @@
                             MMAdmissionServiceEntry."Member Entry No." := MemberCard."Member Entry No.";
                             MMAdmissionServiceEntry."External Member No." := MemberCard."External Member No.";
                             MMAdmissionServiceEntry."Membership Entry No." := MemberCard."Membership Entry No.";
-                            MMAdmissionServiceEntry."External Membership No." := MemberCard."External Membership No.";
                             MMAdmissionServiceEntry."Display Name" := Member."Display Name";
 
                             if MMMembership.Get(MemberCard."Membership Entry No.") then begin
