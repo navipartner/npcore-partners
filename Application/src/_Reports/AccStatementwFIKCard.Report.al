@@ -384,7 +384,7 @@
                         column(STRSUBSTNO_Text002_Currency2_Code_; StrSubstNo(Text002, TempCurrency2.Code))
                         {
                         }
-                        column(CustLedgEntry2__Remaining_Amount_; "Remaining Amount")
+                        column(CustLedgEntry2__Remaining_Amount_; RemainingAmount)
                         {
                             AutoFormatExpression = "Currency Code";
                             AutoFormatType = 1;
@@ -401,7 +401,7 @@
                         column(CustLedgEntry2__Due_Date_; Format("Due Date"))
                         {
                         }
-                        column(CustLedgEntry2__Remaining_Amount__Control61; "Remaining Amount")
+                        column(CustLedgEntry2__Remaining_Amount__Control61; RemainingAmount)
                         {
                             AutoFormatExpression = "Currency Code";
                             AutoFormatType = 1;
@@ -419,12 +419,12 @@
                         column(Currency2Code_2nd; TempCurrency2.Code)
                         {
                         }
-                        column(CustLedgEntry2__Remaining_Amount__Control64; "Remaining Amount")
+                        column(CustLedgEntry2__Remaining_Amount__Control64; RemainingAmount)
                         {
                             AutoFormatExpression = "Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(CustLedgEntry2__Remaining_Amount__Control66; "Remaining Amount")
+                        column(CustLedgEntry2__Remaining_Amount__Control66; RemainingAmount)
                         {
                             AutoFormatExpression = "Currency Code";
                             AutoFormatType = 1;
@@ -452,19 +452,20 @@
                         var
                             CustLedgEntry: Record "Cust. Ledger Entry";
                         begin
+                            Clear(RemainingAmount);
                             if IncludeAgingBand then
                                 if ("Posting Date" > EndDate) and ("Due Date" >= EndDate) then
                                     CurrReport.Skip();
                             CustLedgEntry := CustLedgEntry2;
                             CustLedgEntry.SetRange("Date Filter", 0D, EndDate);
                             CustLedgEntry.CalcFields("Remaining Amount");
-                            "Remaining Amount" := CustLedgEntry."Remaining Amount";
-                            if CustLedgEntry."Remaining Amount" = 0 then
+                            RemainingAmount := CustLedgEntry."Remaining Amount";
+                            if RemainingAmount = 0 then
                                 CurrReport.Skip();
 
                             if IncludeAgingBand and ("Posting Date" <= EndDate) then
-                                UpdateBuffer(TempCurrency2.Code, GetDate("Posting Date", "Due Date"), "Remaining Amount");
-                            if ("Due Date" >= EndDate) or ("Remaining Amount" < 0) then
+                                UpdateBuffer(TempCurrency2.Code, GetDate("Posting Date", "Due Date"), RemainingAmount);
+                            if ("Due Date" >= EndDate) or (RemainingAmount < 0) then
                                 CurrReport.Skip();
                         end;
 
@@ -818,7 +819,7 @@
                 PrintAllHavingBal := true;
 
 #IF BC21 OR BC20 OR BC19 OR BC18 OR BC17
-        LogInteraction := SegManagement.FindInteractTmplCode(7) <> '';
+            LogInteraction := SegManagement.FindInteractTmplCode(7) <> '';
 #ELSE
             LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type".FromInteger(7)) <> '';
 #ENDIF
@@ -871,6 +872,7 @@
         StartDate: Date;
         CustBalance: Decimal;
         "Remaining Amount": Decimal;
+        RemainingAmount: Decimal;
         StartBalance: Decimal;
         ChosenOutputMethod: Integer;
         BeforeCaptionLbl: Label '..before';
