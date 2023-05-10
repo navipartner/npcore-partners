@@ -854,6 +854,11 @@
                         NpXmlTemplate.Delete(true);
             end;
         }
+        field(1100; "MSI Integration Area Enabled"; Boolean)
+        {
+            Caption = 'MSI Integration Area Enabled';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

@@ -211,6 +211,8 @@
                         exit('NPR-RetenPolTables-Update-20230223');
                     'HeyLoyaltyWebhookRequests':
                         exit('HeyLoyaltyWebhookRequests-20230330');
+                    'M2RecordChangeLogTable':
+                        exit('NPR-RetPol-M2RecordChangeLogTable-20230510');
                 end;
             Codeunit::"NPR Job Queue Install":
                 Case UpgradeStep of
