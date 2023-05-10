@@ -21,25 +21,25 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the unique code of the EFT BIN Mapping Group';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the Description of the EFT BIN Mapping Group';
                     ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
 
-                    ToolTip = 'Specifies the value of the Priority field';
+                    ToolTip = 'Specifies the Priority of the EFT BIN Mapping Group. A group with the lowest priority will be selected if criteria of the EFT Transaction is valid for multiple EFT BIN Mapping Groups.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Card Issuer ID"; Rec."Card Issuer ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Card Issuer ID field';
+                    ToolTip = 'Specifies the Card Issuer ID of the EFT BIN Mapping Group. Certain EFT Integrations can use this criteria to perform mapping to the EFT BIN Mapping Group.';
                     ApplicationArea = NPRRetail;
                 }
             }
