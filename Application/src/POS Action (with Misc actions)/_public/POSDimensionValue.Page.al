@@ -1,3 +1,4 @@
+#IF NOT BC17
 page 6150624 "NPR POS Dimension Value"
 {
     Caption = 'Dimension Value List';
@@ -9,149 +10,51 @@ page 6150624 "NPR POS Dimension Value"
     InsertAllowed = false;
     ModifyAllowed = false;
     ApplicationArea = NPRRetail;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Auto setting focus on fields is not supported. If requested, please inform the customer how BC works and where the MS idea portal is if they wish the behaviour was different. See case 580270.';
 
     layout
     {
         area(content)
         {
-
             field(SearchBox; _SearchBox)
             {
                 Editable = true;
                 ApplicationArea = NPRRetail;
                 Caption = 'Search Box';
                 ToolTip = 'This is a search box for general search.';
-
-                trigger OnValidate();
-                begin
-                    FilterList();
-                    Clear(_SearchBox);
-                    if CurrentClientType in [ClientType::Phone, ClientType::Tablet] then
-                        CurrPage.SetFieldFocus.SetFocusOnFieldPhone('SearchBox')
-                    else
-                        CurrPage.SetFieldFocus.SetFocusOnField('SearchBox');
-                end;
             }
-
             repeater(Control1)
             {
-                IndentationColumn = NameIndent;
-                IndentationControls = Name;
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = NPRRetail;
-                    Style = Strong;
-                    StyleExpr = Emphasize;
                     ToolTip = 'Specifies the code for the dimension value.';
                 }
                 field(Name; Rec.Name)
                 {
                     ApplicationArea = NPRRetail;
-                    Style = Strong;
-                    StyleExpr = Emphasize;
                     ToolTip = 'Specifies a descriptive name for the dimension value.';
                 }
             }
             usercontrol(SetFieldFocus; "NPR Dimensions SearchFocus")
             {
                 ApplicationArea = NPRRetail;
-                trigger SearchDimensions()
-                begin
-                    if CurrentClientType in [ClientType::Phone, ClientType::Tablet] then
-                        CurrPage.SetFieldFocus.SetFocusOnFieldPhone('SearchBox')
-                    else
-                        CurrPage.SetFieldFocus.SetFocusOnField('SearchBox');
-                end;
             }
         }
     }
-
-    actions
-    {
-    }
-
-    trigger OnAfterGetRecord()
-    begin
-        NameIndent := 0;
-        //FormatLines;
-    end;
-
-    trigger OnOpenPage()
-    begin
-        GLSetup.Get();
-    end;
-
-    local procedure FilterList()
     var
-        DimValue: Record "Dimension Value";
-    begin
-        Rec.Reset();
-        Rec.ClearMarks();
-        Rec.MarkedOnly(false);
-        if (_SearchBox = '') then begin
-            CurrPage.Update(false);
-            exit;
-        end;
-        DimValue.SetRange(Blocked, false);
-        SearchDim(_SearchBox, DimValue);
-
-        Rec.Copy(DimValue);
-        Rec.SetLoadFields();
-        Rec.MarkedOnly(true);
-        CurrPage.Update(false);
-    end;
-
-    local procedure SearchDim(ParamSearchBox: Text; var DimValue: Record "Dimension Value")
-    var
-        DimFound: Boolean;
-    begin
-        DimValue.FilterGroup := -1;
-        ApplyMemberFilter(ParamSearchBox, DimValue);
-        DimValue.SetLoadFields(Code);
-
-        if (DimValue.GetFilters() <> '') then begin
-            DimFound := DimValue.FindSet();
-            if (DimFound) then
-                repeat
-                    DimValue.Mark(true);
-                until (DimValue.Next() = 0);
-        end;
-        DimValue.FilterGroup := 0;
-    end;
-
-    local procedure ApplyMemberFilter(ParamSearchBox: Text; var DimValue: Record "Dimension Value")
-    begin
-        if (StrLen(ParamSearchBox) <= MaxStrLen(DimValue.Code)) then
-            DimValue.SetFilter(Code, '%1', UpperCase(ParamSearchBox));
-
-        if (StrLen(ParamSearchBox) <= MaxStrLen(DimValue.Name)) then
-            DimValue.SetFilter(Name, '%1', '@' + ConvertSpaceToWildcard(ParamSearchBox));
-    end;
-
-    local procedure ConvertSpaceToWildcard(ParamSearchBox: Text): Text
-    var
-    begin
-        exit(ConvertStr(ParamSearchBox, ' ', '*') + '*');
-    end;
-
-    var
-        GLSetup: Record "General Ledger Setup";
-        Emphasize: Boolean;
-        NameIndent: Integer;
         _SearchBox: Text;
 
+    [Obsolete('The page has been removed. See case 580270.')]
     procedure GetSelectionFilter(): Text
-    var
-        DimVal: Record "Dimension Value";
-        SelectionFilterManagement: Codeunit SelectionFilterManagement;
     begin
-        CurrPage.SetSelectionFilter(DimVal);
-        exit(SelectionFilterManagement.GetSelectionFilterForDimensionValue(DimVal));
     end;
 
+    [Obsolete('The page has been removed. See case 580270.')]
     procedure SetSelection(var DimVal: Record "Dimension Value")
     begin
-        CurrPage.SetSelectionFilter(DimVal);
     end;
 }
+#ENDIF
