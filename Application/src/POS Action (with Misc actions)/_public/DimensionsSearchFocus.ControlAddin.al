@@ -1,6 +1,9 @@
+#IF NOT BC17
 controladdin "NPR Dimensions SearchFocus"
 {
-    Scripts = '.scripts/focusSearchBox.js';
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Auto setting focus on fields is not supported. If requested, please inform the customer how BC works and where the MS idea portal is if they wish the behaviour was different. See case 580270.';
+
     RequestedHeight = 1;
     MinimumHeight = 1;
     MaximumHeight = 1;
@@ -12,7 +15,11 @@ controladdin "NPR Dimensions SearchFocus"
     HorizontalStretch = true;
     HorizontalShrink = true;
 
+    [Obsolete('The control add-in has been removed. See case 580270.')]
     event SearchDimensions()
+    [Obsolete('The control add-in has been removed. See case 580270.')]
     procedure SetFocusOnField(FieldNo: Text)
+    [Obsolete('The control add-in has been removed. See case 580270.')]
     procedure SetFocusOnFieldPhone(FieldNo: Text)
 }
+#ENDIF

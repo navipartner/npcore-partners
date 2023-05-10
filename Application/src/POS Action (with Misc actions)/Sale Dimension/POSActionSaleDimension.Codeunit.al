@@ -198,7 +198,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
             if DimensionValue.Find('=><') then;
         end;
 
-        if Page.RunModal(Page::"NPR POS Dimension Value", DimensionValue) <> ACTION::LookupOK then
+        if Page.RunModal(0, DimensionValue) <> ACTION::LookupOK then
             exit(false);
 
         DimValueCode := DimensionValue.Code;
