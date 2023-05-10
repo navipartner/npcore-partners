@@ -85,6 +85,11 @@
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'HeyLoyaltyWebhookRequests'));
         end;
 
+        if (not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'M2RecordChangeLogTable'))) then begin
+            AddAllowedTable(Database::"NPR M2 Record Change Log", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'M2RecordChangeLogTable'));
+        end;
+
         LogMessageStopwatch.LogFinish();
     end;
 

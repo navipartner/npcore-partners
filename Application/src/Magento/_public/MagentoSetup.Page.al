@@ -166,6 +166,30 @@
                     ToolTip = 'Downloads XML Templates for Delete Customer from Azure Blob Storage.';
                 }
             }
+#if not (BC17 or BC18 or BC19 or BC20)
+            group(IntegrationAreas)
+            {
+                Caption = 'Integration Areas';
+                Visible = (Rec."Magento Version" <> Rec."Magento Version"::"1");
+
+                field("MSI Integration Area Enabled"; Rec."MSI Integration Area Enabled")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if the Multi Source Integration integration is enabled';
+
+                    trigger OnValidate()
+                    begin
+                        if (Rec."MSI Integration Area Enabled") then
+                            _IntegrationAreaMgt.EnableArea(Enum::"NPR M2 Integration Area"::"MSI Stock Data", Rec);
+                    end;
+                }
+            }
+            part(IntegrationRecords; "NPR M2 Integration Records")
+            {
+                Caption = 'Integration Records';
+                Visible = (Rec."Magento Version" <> Rec."Magento Version"::"1");
+            }
+#endif
             group(Moduler)
             {
                 field("Variant System"; Rec."Variant System")
@@ -1178,4 +1202,7 @@
         Text003: Label 'Category update initiated';
         Text004: Label 'Brand update initiated';
         Password: Text[200];
+#if not (BC17 or BC18 or BC19 or BC20)
+        _IntegrationAreaMgt: Codeunit "NPR M2 Integration Area Mgt.";
+#endif
 }
