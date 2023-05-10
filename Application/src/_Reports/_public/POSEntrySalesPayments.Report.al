@@ -110,10 +110,7 @@ report 6014440 "NPR POS Entry Sales & Payments"
                 POSEntrySalePayment."Line No." := LineNo;
                 LineNo += 1;
 
-                POSEntrySalePayment."Entry Date" := POSEntrySalesLine.Entry_Date;
                 POSEntrySalePayment."Document No." := POSEntrySalesLine.Document_No_;
-                POSEntrySalePayment."Starting Time" := POSEntrySalesLine.Starting_Time;
-                POSEntrySalePayment."Ending Time" := POSEntrySalesLine.Ending_Time;
                 POSEntrySalePayment."POS Store Code" := POSEntrySalesLine.POS_Store_Code;
                 POSEntrySalePayment."POS Unit No." := POSEntrySalesLine.POS_Unit_No_;
                 POSEntrySalePayment."Salesperson Code" := POSEntrySalesLine.Salesperson_Code;
@@ -146,10 +143,7 @@ report 6014440 "NPR POS Entry Sales & Payments"
                 POSEntrySalePayment."Line No." := LineNo;
                 LineNo += 1;
 
-                POSEntrySalePayment."Entry Date" := POSEntryPaymentLine.Entry_Date;
                 POSEntrySalePayment."Document No." := POSEntryPaymentLine.Document_No_;
-                POSEntrySalePayment."Starting Time" := POSEntryPaymentLine.Starting_Time;
-                POSEntrySalePayment."Ending Time" := POSEntryPaymentLine.Ending_Time;
                 POSEntrySalePayment."POS Store Code" := POSEntryPaymentLine.POS_Store_Code;
                 POSEntrySalePayment."POS Unit No." := POSEntryPaymentLine.POS_Unit_No_;
                 POSEntrySalePayment."Salesperson Code" := POSEntryPaymentLine.Salesperson_Code;

@@ -70,7 +70,7 @@
                 Clear(InventoryAmt);
                 Clear(SalesPeriod);
                 Clear(TurnoverRate);
-                Clear(Inventory);
+                Clear(InventoryQty);
                 Clear(AvgBalanceCostPrice);
 
                 Item2.CopyFilters(Item);
@@ -94,8 +94,8 @@
 
                 // Turnover rate
                 for x := 0 to MonthQty do
-                    Inventory += Calculate("No.", 0D, CalcDate('<-' + Format(x) + Text10600003 + '>', EndDate));
-                AvgBalanceCostPrice := (Inventory / (MonthQty + 1));
+                    InventoryQty += Calculate("No.", 0D, CalcDate('<-' + Format(x) + Text10600003 + '>', EndDate));
+                AvgBalanceCostPrice := (InventoryQty / (MonthQty + 1));
 
                 if AvgBalanceCostPrice <> 0 then
                     TurnoverRate := (SalesCost / AvgBalanceCostPrice) * (12 / (MonthQty + 1))
@@ -150,7 +150,7 @@
                     Clear(InventoryAmt);
                     Clear(SalesPeriod);
                     Clear(TurnoverRate);
-                    Clear(Inventory);
+                    Clear(InventoryQty);
                     Clear(AvgBalanceCostPrice);
 
                     Item2.CopyFilters(Item);
@@ -174,8 +174,8 @@
 
                     // Turnover rate
                     for x := 0 to MonthQty do
-                        Inventory += Calculate("No.", 0D, CalcDate('<-' + Format(x) + Text10600003 + '>', EndDate));
-                    AvgBalanceCostPrice := (Inventory / (MonthQty + 1));
+                        InventoryQty += Calculate("No.", 0D, CalcDate('<-' + Format(x) + Text10600003 + '>', EndDate));
+                    AvgBalanceCostPrice := (InventoryQty / (MonthQty + 1));
 
                     if AvgBalanceCostPrice <> 0 then
                         TurnoverRate := (SalesCost / AvgBalanceCostPrice) * (12 / (MonthQty + 1))
@@ -237,6 +237,7 @@
         AvgBalanceCostPrice: Decimal;
         AvgCost: Decimal;
         InventoryAmt: Decimal;
+        InventoryQty: Decimal;
         PurchaseCostPrice: Decimal;
         SalesCost: Decimal;
         SalesPeriod: Decimal;

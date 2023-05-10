@@ -1,7 +1,7 @@
 ﻿report 6014417 "NPR Inventory per Date"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory per Date.rdlc';
@@ -35,7 +35,7 @@
             column(VendorItemNo_Item; Item."Vendor Item No.")
             {
             }
-            column(NetChange_Item; Item."Net Change")
+            column(NetChange_Item; NetChange)
             {
             }
             column(UnitPrice_Item; Item."Unit Price")
@@ -81,6 +81,9 @@
             var
                 ChooseErr: Label 'Choose either';
             begin
+                Clear(NetChange);
+                NetChange := Item."Net Change";
+
                 if IncludeItemStock then begin
                     if not ("Net Change" <> 0) then
                         CurrReport.Skip();
@@ -105,7 +108,7 @@
                                 Error(ChooseErr);
                             end;
 
-                if ShowNoInventory then Item."Net Change" := 0;
+                if ShowNoInventory then NetChange := 0;
 
                 case SelectCalcMethod of
                     SelectCalcMethod::"Sidste Kostpris":
@@ -294,6 +297,7 @@
         ActualSales: Decimal;
         CostValuation: Decimal;
         GrossAvg: Decimal;
+        NetChange: Decimal;
         DateErr: Label 'Date has to be filled';
         LastDirectCostLbl: Label 'Last Direct Cost';
         UnitCostLbl: Label 'Unit cost';

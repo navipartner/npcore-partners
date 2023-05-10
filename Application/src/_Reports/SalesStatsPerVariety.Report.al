@@ -277,6 +277,9 @@
         Item3: Record Item;
         ItemLedgEntry: Record "Item Ledger Entry";
         TempItemLedgEntry: Record "Item Ledger Entry" temporary;
+        TotalSalesAmountActual: Decimal;
+        TotalCostAmountActual: Decimal;
+        TotalCostAmountNonInvtbl: Decimal;
     begin
         TempItemLedgEntry.Init();
         ItemLedgEntry.Reset();
@@ -287,14 +290,17 @@
         ItemLedgEntry.SetFilter("Location Code", Item2.GetFilter("Location Filter"));
         ItemLedgEntry.SetFilter("Global Dimension 1 Code", Item2.GetFilter("Global Dimension 1 Filter"));
         ItemLedgEntry.SetFilter("Global Dimension 2 Code", Item2.GetFilter("Global Dimension 2 Filter"));
+        Clear(TotalSalesAmountActual);
+        Clear(TotalCostAmountActual);
+        Clear(TotalCostAmountNonInvtbl);
         if ItemLedgEntry.FindSet() then
             repeat
                 ItemLedgEntry.CalcFields("Sales Amount (Actual)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)");
                 TempItemLedgEntry.Quantity += ItemLedgEntry.Quantity;
                 TempItemLedgEntry."Invoiced Quantity" += ItemLedgEntry."Invoiced Quantity";
-                TempItemLedgEntry."Sales Amount (Actual)" += ItemLedgEntry."Sales Amount (Actual)";
-                TempItemLedgEntry."Cost Amount (Actual)" += ItemLedgEntry."Cost Amount (Actual)";
-                TempItemLedgEntry."Cost Amount (Non-Invtbl.)" += ItemLedgEntry."Cost Amount (Non-Invtbl.)";
+                TotalSalesAmountActual += ItemLedgEntry."Sales Amount (Actual)";
+                TotalCostAmountActual += ItemLedgEntry."Cost Amount (Actual)";
+                TotalCostAmountNonInvtbl += ItemLedgEntry."Cost Amount (Non-Invtbl.)";
             until ItemLedgEntry.Next() = 0;
         if Item3.Get(Item2."No.") then;
         Item3.CopyFilters(Item2);
@@ -302,8 +308,8 @@
         Item3.CalcFields(Inventory);
         ItemInventory := Item3.Inventory;
         SalesQty := -TempItemLedgEntry."Invoiced Quantity";
-        SalesAmount := TempItemLedgEntry."Sales Amount (Actual)";
-        COGSAmount := TempItemLedgEntry."Cost Amount (Actual)" + TempItemLedgEntry."Cost Amount (Non-Invtbl.)";
+        SalesAmount := TotalSalesAmountActual;
+        COGSAmount := TotalCostAmountActual + TotalCostAmountNonInvtbl;
         ItemProfit := SalesAmount + COGSAmount;
 
         if SalesAmount <> 0 then

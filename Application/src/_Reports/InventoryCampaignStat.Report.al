@@ -1,7 +1,7 @@
 ﻿report 6014499 "NPR Inventory Campaign Stat."
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory Campaign Stat..rdlc';
@@ -59,7 +59,7 @@
                 {
                     AutoFormatType = 1;
                 }
-                column(PeriodLineUnitPrice; "Unit Price")
+                column(PeriodLineUnitPrice; _UnitPrice)
                 {
                     AutoFormatType = 1;
                 }
@@ -67,11 +67,11 @@
                 {
                     AutoFormatType = 1;
                 }
-                column(PeriodLineQuantitySold; "Quantity Sold")
+                column(PeriodLineQuantitySold; _QuantitySold)
                 {
                     AutoFormatType = 1;
                 }
-                column(PeriodLineTurnover; Turnover)
+                column(PeriodLineTurnover; _Turnover)
                 {
                     AutoFormatType = 1;
                 }
@@ -149,6 +149,10 @@
 
                 trigger OnAfterGetRecord()
                 begin
+                    Clear(_UnitPrice);
+                    Clear(_QuantitySold);
+                    Clear(_Turnover);
+                    _UnitPrice := "Unit Price";
                     if "Distribution Item" then
                         F := 'F'
                     else
@@ -170,7 +174,7 @@
                     end else
                         momsregulering := 1;
 
-                    "Unit Price" := "Unit Price" / momsregulering;
+                    _UnitPrice := _UnitPrice / momsregulering;
                     "Campaign Unit Price" := "Campaign Unit Price" / momsregulering;
 
                     if ("Campaign Unit Price" <> 0) then
@@ -182,11 +186,11 @@
                     Item.SetFilter("Location Filter", "Period Discount Line".GetFilter("Location Filter"));
                     if Item.Find('-') then;
                     Item.CalcFields("COGS (LCY)", "Sales (LCY)", "Sales (Qty.)", Inventory);
-                    "Quantity Sold" := Item."Sales (Qty.)";
+                    _QuantitySold := Item."Sales (Qty.)";
                     if ("Quantity Sold" = 0) and kunvarermedsalg then
                         CurrReport.Skip();
 
-                    Turnover := Item."Sales (LCY)";
+                    _Turnover := Item."Sales (LCY)";
                     if Item."Sales (LCY)" <> 0 then begin
                         db := (Item."Sales (LCY)") - (Item."COGS (LCY)");
                         totdb := totdb + db;
@@ -196,7 +200,7 @@
                         dg := 0;
                     end;
 
-                    restk := purchase - "Quantity Sold";
+                    restk := purchase - _QuantitySold;
                     if restk < 0 then restk := 0;
 
                     Item.SetRange("Date Filter", 0D, "Period Discount"."Ending Date");
@@ -277,6 +281,9 @@
         Item: Record Item;
         PeriodDateFilter: Text;
         VATPostingsetup: Record "VAT Posting Setup";
+        _UnitPrice: Decimal;
+        _QuantitySold: Decimal;
+        _Turnover: Decimal;
         Vendor: Record Vendor;
         kunvarermedsalg: Boolean;
         boughtFor: Decimal;
