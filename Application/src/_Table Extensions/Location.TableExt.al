@@ -26,6 +26,13 @@ tableextension 6014418 "NPR Location" extends Location
             Caption = 'Retail Location';
             DataClassification = CustomerContent;
         }
+#if not (BC17 or BC18 or BC19 or BC20)
+        field(6014402; "NPR Magento 2 Source"; Text[50])
+        {
+            Caption = 'Magento 2 Source';
+            DataClassification = SystemMetadata;
+        }
+#endif
     }
 
     keys

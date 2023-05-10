@@ -28,6 +28,21 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
                 ApplicationArea = NPRRetail;
             }
         }
+#if not (BC17 or BC18 or BC19 or BC20)
+        addlast(content)
+        {
+            group("NPR Magento")
+            {
+                Caption = 'Magento';
+
+                field("NPR Magento 2 Source"; Rec."NPR Magento 2 Source")
+                {
+                    ToolTip = 'Specifies the Magento 2 Source that this Location maps to';
+                    ApplicationArea = NPRRetail;
+                }
+            }
+        }
+#endif
         modify("Bin Mandatory")
         {
             trigger OnAfterValidate()
