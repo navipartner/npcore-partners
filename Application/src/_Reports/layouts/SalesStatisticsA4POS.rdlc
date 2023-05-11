@@ -7,7 +7,6 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>8a92a6d3-8fa8-4f84-8ccd-105a10ebd775</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -35,7 +34,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -75,7 +74,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!AmountLbl.Value</Value>
+                                  <Value>=Parameters!AmountLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -115,7 +114,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Sum(Fields!AmountLCY_POSPaymentLine.Value)</Value>
+                                  <Value>=Sum(Fields!AmountLCY_POSPaymentLine.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -164,7 +163,7 @@
                           <Paragraph>
                             <TextRuns>
                               <TextRun>
-                                <Value EvaluationMode="Auto">=Parameters!PaymentDetailsLbl.Value</Value>
+                                <Value>=Parameters!PaymentDetailsLbl.Value</Value>
                                 <Style>
                                   <FontSize>8pt</FontSize>
                                   <FontWeight>Bold</FontWeight>
@@ -202,7 +201,7 @@
                           <Paragraph>
                             <TextRuns>
                               <TextRun>
-                                <Value EvaluationMode="Auto">=Parameters!PaymentMethodLbl.Value</Value>
+                                <Value>=Parameters!PaymentMethodLbl.Value</Value>
                                 <Style>
                                   <FontSize>8pt</FontSize>
                                   <FontWeight>Bold</FontWeight>
@@ -253,7 +252,7 @@
                           <Paragraph>
                             <TextRuns>
                               <TextRun>
-                                <Value EvaluationMode="Auto">=Fields!PosPaymentmethodcode_POSPaymentLine.Value</Value>
+                                <Value>=Fields!PosPaymentmethodcode_POSPaymentLine.Value</Value>
                                 <Style>
                                   <FontSize>8pt</FontSize>
                                   <FontWeight>Normal</FontWeight>
@@ -325,7 +324,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!SalespersonSumarylbl.Value</Value>
+                                  <Value>=Fields!SalespersonSumarylbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -374,7 +373,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -406,7 +405,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!SalesQTYLbl.Value</Value>
+                                  <Value>=Parameters!SalesQTYLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -441,7 +440,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!SalesAmtLbl.Value</Value>
+                                  <Value>=Parameters!SalesAmtLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -476,7 +475,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!SalesAvgLbl.Value</Value>
+                                  <Value>=Parameters!SalesAvgLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -516,7 +515,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Name_SalesPerson.Value</Value>
+                                  <Value>=Fields!Name_SalesPerson.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -548,7 +547,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=(Fields!POSEntry2_Qty.Value)</Value>
+                                  <Value>=(Fields!POSEntry2_Qty.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -583,7 +582,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!POSEntry2_AmtInclTax.Value</Value>
+                                  <Value>=Fields!POSEntry2_AmtInclTax.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -618,7 +617,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=SUM(Fields!POSEntry2_AmtInclTax.Value)/SUM(Fields!POSEntry2_Qty.Value)</Value>
+                                  <Value>=SUM(Fields!POSEntry2_AmtInclTax.Value)/SUM(Fields!POSEntry2_Qty.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -658,7 +657,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Name_SalesPerson.Value</Value>
+                                  <Value>=Fields!Name_SalesPerson.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -690,7 +689,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=SUM(Fields!POSEntry2_Qty.Value)</Value>
+                                  <Value>=SUM(Fields!POSEntry2_Qty.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -726,7 +725,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=SUM(Fields!POSEntry2_AmtInclTax.Value)</Value>
+                                  <Value>=SUM(Fields!POSEntry2_AmtInclTax.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -762,7 +761,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Sum(Fields!POSEntry2_AmtInclTax.Value) / Sum(Fields!POSEntry2_Qty.Value)</Value>
+                                  <Value>=Sum(Fields!POSEntry2_AmtInclTax.Value) / Sum(Fields!POSEntry2_Qty.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -838,7 +837,7 @@
             <Filters>
               <Filter>
                 <FilterExpression>=Fields!VarTax_.Value</FilterExpression>
-                <Operator>NotEqual</Operator>
+                <Operator>Equal</Operator>
                 <FilterValues>
                   <FilterValue DataType="Integer">1</FilterValue>
                 </FilterValues>
@@ -896,7 +895,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!VATTaxSummarylbl.Value</Value>
+                                  <Value>=Fields!VATTaxSummarylbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -929,7 +928,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                   </Style>
@@ -961,7 +960,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                   </Style>
@@ -993,7 +992,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                   </Style>
@@ -1025,7 +1024,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                   </Style>
@@ -1062,7 +1061,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TaxAreaCodelbl_.Value</Value>
+                                  <Value>=Fields!TaxAreaCodelbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1093,7 +1092,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!VATIdentifierlbl_.Value</Value>
+                                  <Value>=Fields!VATIdentifierlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1124,7 +1123,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TaxCalculationTypelbl_.Value</Value>
+                                  <Value>=Fields!TaxCalculationTypelbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1159,7 +1158,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TaxTypelbl_.Value</Value>
+                                  <Value>=Fields!TaxTypelbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1194,7 +1193,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TaxPerclbl_.Value</Value>
+                                  <Value>=Fields!TaxPerclbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1229,7 +1228,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TaxBaseAmountlbl_.Value</Value>
+                                  <Value>=Fields!TaxBaseAmountlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1264,7 +1263,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TaxAmountlbl_.Value</Value>
+                                  <Value>=Fields!TaxAmountlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1299,7 +1298,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!AmtInclTaxlbl_.Value</Value>
+                                  <Value>=Fields!AmtInclTaxlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1339,7 +1338,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TaxAreaCode_.Value</Value>
+                                  <Value>=Fields!TaxAreaCode_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -1368,7 +1367,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!VATIdentifier_.Value</Value>
+                                  <Value>=Fields!VATIdentifier_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -1397,7 +1396,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TaxCalculationType_.Value</Value>
+                                  <Value>=Fields!TaxCalculationType_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -1426,7 +1425,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TaxType_.Value</Value>
+                                  <Value>=Fields!TaxType_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -1455,7 +1454,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TaxPerc_.Value</Value>
+                                  <Value>=Fields!TaxPerc_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>=Fields!TaxPerc_Format.Value</Format>
@@ -1486,7 +1485,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=SUM(Fields!TaxBaseAmount_.Value)</Value>
+                                  <Value>=SUM(Fields!TaxBaseAmount_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>=Fields!TaxBaseAmount_Format.Value</Format>
@@ -1517,7 +1516,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Sum(Fields!TaxAmount_.Value)</Value>
+                                  <Value>=Sum(Fields!TaxAmount_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>=Fields!TaxAmount_Format.Value</Format>
@@ -1548,7 +1547,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Sum(Fields!AmtInclTax_.Value)</Value>
+                                  <Value>=Sum(Fields!AmtInclTax_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>=Fields!AmtInclTax_Format.Value</Format>
@@ -1648,7 +1647,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Turnoverlbl_.Value</Value>
+                                  <Value>=Fields!Turnoverlbl_.Value</Value>
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1684,7 +1683,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TurnoverLCYlbl_.Value</Value>
+                                  <Value>=Fields!TurnoverLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1712,7 +1711,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!TurnoverLCY_.Value)</Value>
+                                  <Value>=LAST(Fields!TurnoverLCY_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1748,7 +1747,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!DirectTurnoverLCYlbl_.Value</Value>
+                                  <Value>=Fields!DirectTurnoverLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1777,7 +1776,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!DirectTurnoverLCY_.Value</Value>
+                                  <Value>=Fields!DirectTurnoverLCY_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1813,7 +1812,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!DirectSalesLCYlbl_.Value</Value>
+                                  <Value>=Fields!DirectSalesLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -1841,7 +1840,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!DirectItemNetSalesLCY.Value)</Value>
+                                  <Value>=LAST(Fields!DirectItemNetSalesLCY.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -1876,7 +1875,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!DirectReturnSalesLCYlbl_.Value</Value>
+                                  <Value>=Fields!DirectReturnSalesLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -1904,7 +1903,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!DirectReturnSalesLCY_.Value)</Value>
+                                  <Value>=LAST(Fields!DirectReturnSalesLCY_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -1939,7 +1938,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!GLPaymentLCYlbl_.Value</Value>
+                                  <Value>=Fields!GLPaymentLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -1967,7 +1966,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!GLPaymentLCY_.Value)</Value>
+                                  <Value>=LAST(Fields!GLPaymentLCY_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -2002,7 +2001,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!DebtorPaymentLCYlbl_.Value</Value>
+                                  <Value>=Fields!DebtorPaymentLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2030,7 +2029,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!DebtorPaymentLCY_.Value)</Value>
+                                  <Value>=LAST(Fields!DebtorPaymentLCY_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -2065,7 +2064,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!DirectNetTurnoverLCYlbl_.Value</Value>
+                                  <Value>=Fields!DirectNetTurnoverLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2094,7 +2093,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!DirectItemNetSalesLCY.Value) + LAST(Fields!DirectReturnSalesLCY_.Value) + LAST(Fields!GLPaymentLCY_.Value) + LAST(Fields!DebtorPaymentLCY_.Value)</Value>
+                                  <Value>=LAST(Fields!DirectItemNetSalesLCY.Value) + LAST(Fields!DirectReturnSalesLCY_.Value) + LAST(Fields!GLPaymentLCY_.Value) + LAST(Fields!DebtorPaymentLCY_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2130,7 +2129,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!CreditTurnoverLCYlbl_.Value</Value>
+                                  <Value>=Fields!CreditTurnoverLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2159,7 +2158,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!CreditTurnoverLCY_.Value)</Value>
+                                  <Value>=LAST(Fields!CreditTurnoverLCY_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2195,7 +2194,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!CreditRealAmtLCYlbl_.Value</Value>
+                                  <Value>=Fields!CreditRealAmtLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2223,7 +2222,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!CreditRealAmtLCY_.Value)</Value>
+                                  <Value>=LAST(Fields!CreditRealAmtLCY_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -2258,7 +2257,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!CreditRealReturnAmtLCYlbl_.Value</Value>
+                                  <Value>=Fields!CreditRealReturnAmtLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2288,7 +2287,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!CreditRealReturnAmtLCY_.Value)</Value>
+                                  <Value>=LAST(Fields!CreditRealReturnAmtLCY_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -2323,7 +2322,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!CreditNetTurnOverLCYlbl_.Value</Value>
+                                  <Value>=Fields!CreditNetTurnOverLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2354,7 +2353,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!CreditRealAmtLCY_.Value) +LAST(Fields!CreditRealReturnAmtLCY_.Value)</Value>
+                                  <Value>=LAST(Fields!CreditRealAmtLCY_.Value) +LAST(Fields!CreditRealReturnAmtLCY_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2390,7 +2389,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!NetTurnoverLCYlbl_.Value</Value>
+                                  <Value>=Fields!NetTurnoverLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2418,7 +2417,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!DirectItemNetSalesLCY.Value) + LAST(Fields!DirectReturnSalesLCY_.Value) + LAST(Fields!GLPaymentLCY_.Value) + LAST(Fields!DebtorPaymentLCY_.Value) +LAST(Fields!CreditRealAmtLCY_.Value) +LAST(Fields!CreditRealReturnAmtLCY_.Value)</Value>
+                                  <Value>=LAST(Fields!DirectItemNetSalesLCY.Value) + LAST(Fields!DirectReturnSalesLCY_.Value) + LAST(Fields!GLPaymentLCY_.Value) + LAST(Fields!DebtorPaymentLCY_.Value) +LAST(Fields!CreditRealAmtLCY_.Value) +LAST(Fields!CreditRealReturnAmtLCY_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2454,7 +2453,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2482,7 +2481,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2518,7 +2517,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Discountlbl_.Value</Value>
+                                  <Value>=Fields!Discountlbl_.Value</Value>
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2547,7 +2546,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2582,7 +2581,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TotalDiscountLClbl_.Value</Value>
+                                  <Value>=Fields!TotalDiscountLClbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2609,7 +2608,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!TotalDiscountLCY_.Value</Value>
+                                  <Value>=Fields!TotalDiscountLCY_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -2644,7 +2643,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!CreditUnrealSaleAmtLCYlbl_.Value</Value>
+                                  <Value>=Fields!CreditUnrealSaleAmtLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2671,7 +2670,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!CreditUnrealSaleAmtLCY_.Value</Value>
+                                  <Value>=Fields!CreditUnrealSaleAmtLCY_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2705,7 +2704,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2732,7 +2731,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2766,7 +2765,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!ProfitExclVatLbl.Value</Value>
+                                  <Value>=Parameters!ProfitExclVatLbl.Value</Value>
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2795,7 +2794,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2830,7 +2829,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!NetTurnoverLCYLbl.Value</Value>
+                                  <Value>=Parameters!NetTurnoverLCYLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2857,7 +2856,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!NetTurnoverLCY_.Value)</Value>
+                                  <Value>=LAST(Fields!NetTurnoverLCY_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -2892,7 +2891,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!ItemCostTotalLbl.Value</Value>
+                                  <Value>=Parameters!ItemCostTotalLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2919,7 +2918,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!itemCostTotal.Value)</Value>
+                                  <Value>=LAST(Fields!itemCostTotal.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -2954,7 +2953,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!ProfitLCYLbl.Value</Value>
+                                  <Value>=Parameters!ProfitLCYLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2981,7 +2980,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!NetTurnoverLCY_.Value) - LAST(Fields!itemCostTotal.Value)</Value>
+                                  <Value>=LAST(Fields!NetTurnoverLCY_.Value) - LAST(Fields!itemCostTotal.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -3016,7 +3015,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!ProfitPCTLbl.Value</Value>
+                                  <Value>=Parameters!ProfitPCTLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3043,7 +3042,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=(LAST(Fields!itemCostTotal.Value)/LAST(Fields!NetTurnoverLCY_.Value))</Value>
+                                  <Value>=(LAST(Fields!itemCostTotal.Value)/LAST(Fields!NetTurnoverLCY_.Value))</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>0.00%</Format>
@@ -3078,7 +3077,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3105,7 +3104,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3139,7 +3138,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!AdjustedCostDetailsLbl.Value</Value>
+                                  <Value>=Parameters!AdjustedCostDetailsLbl.Value</Value>
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -3168,7 +3167,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3203,7 +3202,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!AdjSalesExclVATLbl.Value</Value>
+                                  <Value>=Parameters!AdjSalesExclVATLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3230,7 +3229,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!AdjSalesExclVAT.Value</Value>
+                                  <Value>=Fields!AdjSalesExclVAT.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3264,7 +3263,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!AdjItemCostTotalLbl.Value</Value>
+                                  <Value>=Parameters!AdjItemCostTotalLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3291,7 +3290,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!AdjitemCostTotal.Value</Value>
+                                  <Value>=Fields!AdjitemCostTotal.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3325,7 +3324,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!AdjProfitLCYLbl.Value</Value>
+                                  <Value>=Parameters!AdjProfitLCYLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3352,7 +3351,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!AdjProfitLCY.Value</Value>
+                                  <Value>=Fields!AdjProfitLCY.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3386,7 +3385,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!AdjProfitPctLbl.Value</Value>
+                                  <Value>=Parameters!AdjProfitPctLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3413,7 +3412,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!AdjProfitPct.Value</Value>
+                                  <Value>=Fields!AdjProfitPct.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3447,7 +3446,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -3475,7 +3474,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3509,7 +3508,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!TurnoverBasketLbl.Value</Value>
+                                  <Value>=Parameters!TurnoverBasketLbl.Value</Value>
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -3538,7 +3537,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3573,7 +3572,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!TurnoverAvgSalesTicketLbl.Value</Value>
+                                  <Value>=Parameters!TurnoverAvgSalesTicketLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3600,7 +3599,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!DirectItemNetSalesLCY.Value)/LAST(Fields!SalesCount_.Value)</Value>
+                                  <Value>=LAST(Fields!DirectItemNetSalesLCY.Value)/LAST(Fields!SalesCount_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -3635,7 +3634,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!ItemQTYLbl.Value</Value>
+                                  <Value>=Parameters!ItemQTYLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3662,7 +3661,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!ItemQty.Value)</Value>
+                                  <Value>=LAST(Fields!ItemQty.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -3697,7 +3696,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Parameters!itemQTYSalesTicket.Value</Value>
+                                  <Value>=Parameters!itemQTYSalesTicket.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3724,7 +3723,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!ItemQty.Value)/LAST(Fields!SalesCount_.Value)</Value>
+                                  <Value>=LAST(Fields!ItemQty.Value)/LAST(Fields!SalesCount_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -3759,7 +3758,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!SalesCountlbl_.Value</Value>
+                                  <Value>=Fields!SalesCountlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3786,7 +3785,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!SalesCount_.Value)</Value>
+                                  <Value>=LAST(Fields!SalesCount_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3820,7 +3819,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!ReturnSalesCountlbl_.Value</Value>
+                                  <Value>=Fields!ReturnSalesCountlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3847,7 +3846,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!ReturnSalesCount_.Value)</Value>
+                                  <Value>=LAST(Fields!ReturnSalesCount_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3881,7 +3880,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!CashDrawerOpenCountlbl_.Value</Value>
+                                  <Value>=Fields!CashDrawerOpenCountlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3908,7 +3907,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!CashDraweropnCount_.Value)</Value>
+                                  <Value>=LAST(Fields!CashDraweropnCount_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3942,7 +3941,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!CancelledSalesCountlbl_.Value</Value>
+                                  <Value>=Fields!CancelledSalesCountlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3969,7 +3968,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!CancellesSalesCount_.Value)</Value>
+                                  <Value>=LAST(Fields!CancellesSalesCount_.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -4003,7 +4002,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!EFTlbl_.Value</Value>
+                                  <Value>=Fields!EFTlbl_.Value</Value>
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -4039,7 +4038,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!EFTLCYlbl_.Value</Value>
+                                  <Value>=Fields!EFTLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -4066,7 +4065,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!EFTLCY.Value)</Value>
+                                  <Value>=LAST(Fields!EFTLCY.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -4101,7 +4100,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!LocalCurrencyLCYlbl_.Value</Value>
+                                  <Value>=Fields!LocalCurrencyLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -4128,7 +4127,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!LocalCurrencyLCY.Value)</Value>
+                                  <Value>=LAST(Fields!LocalCurrencyLCY.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -4163,7 +4162,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -4192,7 +4191,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto" />
+                                  <Value />
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -4228,7 +4227,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!Voucherslbl_.Value</Value>
+                                  <Value>=Fields!Voucherslbl_.Value</Value>
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -4264,7 +4263,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!IssuedVoucherLCYlbl_.Value</Value>
+                                  <Value>=Fields!IssuedVoucherLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -4291,7 +4290,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!IssuedVouchersLCY.Value)</Value>
+                                  <Value>=LAST(Fields!IssuedVouchersLCY.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -4326,7 +4325,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=Fields!RedeemedVoucherLCYlbl_.Value</Value>
+                                  <Value>=Fields!RedeemedVoucherLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -4353,7 +4352,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value EvaluationMode="Auto">=LAST(Fields!RedeemedVoucherLCY.Value)</Value>
+                                  <Value>=LAST(Fields!RedeemedVoucherLCY.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -4504,7 +4503,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=User!UserID</Value>
+                      <Value>=User!UserID</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                       </Style>
@@ -4531,7 +4530,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=First(Fields!CompanyName_.Value, "DataSet_Result")</Value>
+                      <Value>=First(Fields!CompanyName_.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                       </Style>
@@ -4573,7 +4572,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=First(Fields!EntryDate_POSEntry.Value, "DataSet_Result")</Value>
+                      <Value>=First(Fields!EntryDate_POSEntry.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                         <Format>d</Format>
@@ -4604,7 +4603,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=First(Fields!ClosingDatelbl_.Value, "DataSet_Result")</Value>
+                      <Value>=First(Fields!ClosingDatelbl_.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>9pt</FontSize>
                       </Style>
@@ -4643,7 +4642,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Auto">=First(Fields!ReportTitleLbl_.Value, "DataSet_Result")</Value>
+                      <Value>=First(Fields!ReportTitleLbl_.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontSize>11pt</FontSize>
                         <FontWeight>Bold</FontWeight>
