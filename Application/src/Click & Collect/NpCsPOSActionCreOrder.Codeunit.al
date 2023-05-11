@@ -211,10 +211,18 @@
         TempNpCsStore: Record "NPR NpCs Store" temporary;
         FromStoreCode: Code[20];
         NpCsPOSActionCreOrderB: Codeunit "NPR NpCs POSAction Cr. Order B";
+        NpCsPOSActionEvents: Codeunit "NPR NpCs POS Action Events";
+        IsHandled: Boolean;
         MissingStockInCompanyLbl: Label 'All Items might not be in stock in %1. Do you still wish to continue?', Comment = '%1="NPR NpCs Store".Name';
     begin
         FromStoreCode := CopyStr(UpperCase(Context.GetString('fromStoreCode')), 1, MaxStrLen(FromStoreCode));
 
+        NpCsPOSActionEvents.OnBeforeSelectToStore(TempNpCsStore, FromStoreCode, IsHandled);
+        if IsHandled then begin
+            if TempNpCsStore.Code <> '' then
+                Context.SetContext('toStoreCode', TempNpCsStore.Code);
+            exit;
+        end;
         if not NpCsPOSActionCreOrderB.SelectToStoreCode(TempNpCsStore, FromStoreCode) then
             exit;
 

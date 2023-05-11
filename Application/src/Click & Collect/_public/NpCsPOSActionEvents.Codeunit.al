@@ -25,5 +25,9 @@ codeunit 6059924 "NPR NpCs POS Action Events"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeSelectToStore(var TempNpCsStore: Record "NPR NpCs Store" temporary; FromStoreCode: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
 
 }
