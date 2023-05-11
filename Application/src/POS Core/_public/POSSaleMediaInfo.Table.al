@@ -124,16 +124,12 @@ table 6014681 "NPR POS Sale Media Info"
 
     procedure SetImageFromCamera(var POSSaleMediaInfo: Record "NPR POS Sale Media Info")
     var
-        Camera: Page Camera;
+        Camera: Page "NPR NPCamera";
         inStr: InStream;
     begin
-        Clear(Camera);
-        Camera.SetQuality(50);
-        Camera.RunModal();
-        if not Camera.HasPicture() then
+        if (Camera.TakePhoto(inStr)) then
+            POSSaleMediaInfo.Image.ImportStream(inStr, POSSaleMediaInfo.FieldName(Image))
+        else
             Error('');
-
-        Camera.GetPicture(inStr);
-        POSSaleMediaInfo.Image.ImportStream(inStr, POSSaleMediaInfo.FieldName(Image));
     end;
 }
