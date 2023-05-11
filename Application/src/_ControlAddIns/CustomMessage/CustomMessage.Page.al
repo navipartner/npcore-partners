@@ -47,7 +47,7 @@ page 6059903 "NPR Custom Message Page"
         CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
         CustomDimensions.Add('NPR_TenantId', TenantId());
         CustomDimensions.Add('NPR_CompanyName', CompanyName());
-        Session.LogMessage('CtrlAddin_CustomMessage', Message, Verbosity::Verbose, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+        Session.LogMessage('CtrlAddin_CustomMessage', Message, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
     var

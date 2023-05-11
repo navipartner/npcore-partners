@@ -84,20 +84,15 @@ table 6014680 "NPR POS Entry Media Info"
 
     procedure SetImageFromCamera(var POSEntryMediaInfo: Record "NPR POS Entry Media Info")
     var
-        Camera: Page Camera;
+        Camera: Page "NPR NPCamera";
         inStr: InStream;
     begin
         CheckOverrideImage(POSEntryMediaInfo);
-
-        Clear(Camera);
-        Camera.SetQuality(100);
-        Camera.SetEncodingType("Image Encoding"::PNG);
-        Camera.RunModal();
-        if not Camera.HasPicture() then
+        if (Camera.TakePhoto(inStr)) then
+            POSEntryMediaInfo.Image.ImportStream(inStr, POSEntryMediaInfo.FieldName(Image))
+        else
             Error('');
 
-        Camera.GetPicture(inStr);
-        POSEntryMediaInfo.Image.ImportStream(inStr, POSEntryMediaInfo.FieldName(Image));
     end;
 
     procedure CreateNewEntry(POSEntry: Record "NPR POS Entry"; GetImageFrom: Option Import,Camera; OpenList: Boolean)

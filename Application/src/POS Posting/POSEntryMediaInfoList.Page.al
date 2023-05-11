@@ -89,6 +89,7 @@ page 6059873 "NPR POS Entry Media Info List"
                 end;
             }
 
+
             action(SaveToDisc)
             {
                 Caption = 'Save Image';

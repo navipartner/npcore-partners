@@ -5274,15 +5274,14 @@
     var
         MCSPersonGroupsSetup: Record "NPR MCS Person Groups Setup";
         PersonGroups: Record "NPR MCS Person Groups";
-        Camera: Codeunit Camera;
+        Camera: Page "NPR NPCamera";
         MCSFaceServiceAPI: Codeunit "NPR MCS Face Service API";
         PictureStream: InStream;
-        PictureName: Text;
         JsonFacesArr, JsonIdArr : JsonArray;
         NoFaceErr: Label 'No face detected.';
         FaceNotIdentifiedErr: Label 'Face not identified.';
     begin
-        if (Camera.GetPicture(PictureStream, PictureName)) then begin
+        if (Camera.TakePhoto(PictureStream)) then begin
             MCSPersonGroupsSetup.Get(TableID);
             PersonGroups.Get(MCSPersonGroupsSetup."Person Groups Id");
             PersonGroups.TestField(PersonGroupId);
@@ -5298,34 +5297,26 @@
 
     internal procedure TakeMemberInfoPicture(MMMemberInfoCapture: Record "NPR MM Member Info Capture")
     var
-        Camera: Page Camera;
+        Camera: Page "NPR NPCamera";
         PictureStream: InStream;
     begin
-        Clear(Camera);
-        Camera.SetQuality(50);
-        Camera.RunModal();
-        if (Camera.HasPicture()) then begin
-            Camera.GetPicture(PictureStream);
+        if (Camera.TakePhoto(PictureStream)) then begin
             MMMemberInfoCapture.Image.ImportStream(PictureStream, MMMemberInfoCapture.FieldName(Image));
             MMMemberInfoCapture.Modify();
-        end;
+        end
     end;
 
     internal procedure TakeMemberPicture(MMMember: Record "NPR MM Member")
     var
-        Camera: Page Camera;
+        Camera: Page "NPR NPCamera";
         PictureStream: InStream;
     begin
-        Clear(Camera);
-        Camera.SetQuality(50);
-        Camera.RunModal();
-        if (Camera.HasPicture()) then begin
-            Camera.GetPicture(PictureStream);
+        if (Camera.TakePhoto(PictureStream)) then begin
             MMMember.Image.ImportStream(PictureStream, MMMember.FieldName(Image));
             MMMember.Modify();
             Commit();
             TrainFacialRecognitionService(MMMember, PictureStream);
-        end;
+        end
     end;
 
     local procedure TrainFacialRecognitionService(MMMember: Record "NPR MM Member"; PictureStream: InStream)
