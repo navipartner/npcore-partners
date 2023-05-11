@@ -1781,6 +1781,7 @@ codeunit 6184496 "NPR Pepper Library HWC"
         EFTSetup.SetRange("EFT Integration Type", GetIntegrationType());
         if (EFTSetup.FindFirst()) then
             exit;
+
         EFTSetup.SetRange("POS Unit No.", '');
         EFTSetup.FindFirst();
     end;
@@ -2118,15 +2119,13 @@ codeunit 6184496 "NPR Pepper Library HWC"
             exit;
 
         // If there is no Pepper setup, exit fast
-        if (Rec."POS Unit No." <> '') then
-            EFTSetup.SetFilter("POS Unit No.", '=%1', Rec."POS Unit No.");
+        EFTSetup.SetFilter("POS Unit No.", '=%1', Rec."POS Unit No.");
         EFTSetup.SetFilter("EFT Integration Type", '=%1', GetIntegrationType());
         if (not EFTSetup.FindSet()) then
             exit;
 
         // Check that same payment type is not shared across different integrations. 'T' can't be not be both Pepper and Nets at the same time.
-        if (Rec."POS Unit No." <> '') then
-            EFTSetup2.SetFilter("POS Unit No.", '=%1', Rec."POS Unit No.");
+        EFTSetup2.SetFilter("POS Unit No.", '=%1', Rec."POS Unit No.");
         repeat
             EftSetup2.SetFilter("Payment Type POS", '=%1', EFTSetup."Payment Type POS");
             EftSetup2.SetFilter("EFT Integration Type", '<>%1', GetIntegrationType());
@@ -2146,15 +2145,13 @@ codeunit 6184496 "NPR Pepper Library HWC"
             exit;
 
         // If there is no Pepper setup, exit fast
-        if (Rec."POS Unit No." <> '') then
-            EFTSetup.SetFilter("POS Unit No.", '=%1', Rec."POS Unit No.");
+        EFTSetup.SetFilter("POS Unit No.", '=%1', Rec."POS Unit No.");
         EFTSetup.SetFilter("EFT Integration Type", '=%1', GetIntegrationType());
         if (not EFTSetup.FindSet()) then
             exit;
 
         // Check that same payment type is not shared across different integrations. 'T' can't be not be both Pepper and Nets at the same time.
-        if (Rec."POS Unit No." <> '') then
-            EFTSetup2.SetFilter("POS Unit No.", '=%1', Rec."POS Unit No.");
+        EFTSetup2.SetFilter("POS Unit No.", '=%1', Rec."POS Unit No.");
         repeat
             EftSetup2.SetFilter("Payment Type POS", '=%1', EFTSetup."Payment Type POS");
             EftSetup2.SetFilter("EFT Integration Type", '<>%1', GetIntegrationType());
