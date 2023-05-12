@@ -111,6 +111,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         OptionNameUseLocationFrom: Label '<Undefined>,POS Store,POS Sale,SpecificLocation', Locked = true;
         OptionNamePaymentMethCodeFrom: Label 'Sales Header Default,Force Blank Code,Specific Payment Method Code', Locked = true;
         OptionCptPaymentMethCodeFrom: Label 'Sales Header Default,Force Blank Code,Specific Payment Method Code';
+        CaptioneGroupCodesEnabled: Label 'Group Codes Enabled';
+        DescGroupCodesEnabled: Label 'Enables the use of group codes in the sales document export';
+        CaptionGroupCode: Label 'Group Code';
+        DescGroupCode: Label 'Specifies the group code that is going to be assigned to the exported sales document';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -188,6 +192,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         WorkflowConfig.AddIntegerParameter('CustomerLookupPage', 0, CaptionCustomerLookupPage, DescCustomerLookupPage);
         WorkflowConfig.AddBooleanParameter('EnforceCustomerFilter', false, CaptionEnforceCustomerFilter, DescEnforceCustomerFilter);
         WorkflowConfig.AddBooleanParameter('SetPrintProformaInvoice', false, CaptionPrintProformaInvoice, CaptionPrintProformaInvoice);
+        WorkflowConfig.AddBooleanParameter('GroupCodesEnabled', false, CaptioneGroupCodesEnabled, DescGroupCodesEnabled);
+        WorkflowConfig.AddTextParameter('GroupCode', '', CaptionGroupCode, DescGroupCode);
 
         //labels
         WorkflowConfig.AddLabel('ExtDocNo', TextExtDocNoLabel);
@@ -228,15 +234,18 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         CustomerLookupPage: Integer;
     begin
         Sale.GetCurrentSale(SalePOS);
-
         CustomerTableView := Context.GetStringParameter('CustomerTableView');
         CustomerLookupPage := Context.GetIntegerParameter('CustomerLookupPage');
+
         if Context.GetBooleanParameter('SelectCustomer') then
             if not POSActionDocExportB.SelectCustomer(SalePOS, Sale, CustomerTableView, CustomerLookupPage) then
                 SalePOS.TestField("Customer No.");
 
         SetReference(SalePOS, Context);
         SetPricesInclVAT(SalePOS, Context);
+        SetGroupCode(SalePOS,
+                     Context);
+
         SetParameters(SaleLine, Context, RetailSalesDocMgt);
         ValidateSale(SalePOS, RetailSalesDocMgt, Context, CustomerTableView);
 
@@ -463,8 +472,9 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     var
         Location: Record Location;
         PaymentMethod: Record "Payment Method";
-        FilterBuilder: FilterPageBuilder;
         Customer: Record Customer;
+        NPRGroupCodeUtils: Codeunit "NPR Group Code Utils";
+        FilterBuilder: FilterPageBuilder;
     begin
         if POSParameterValue."Action Code" <> 'SALES_DOC_EXP' then
             exit;
@@ -493,6 +503,9 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
                     if FilterBuilder.RunModal() then
                         POSParameterValue.Value := CopyStr(FilterBuilder.GetView(Customer.TableCaption, false), 1, MaxStrLen(POSParameterValue.Value));
                 end;
+            'GroupCode':
+                NPRGroupCodeUtils.LookUpGroupCodeValue(POSParameterValue.Value);
+
         end;
     end;
 
@@ -502,6 +515,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         Location: Record Location;
         PaymentMethod: Record "Payment Method";
         Customer: Record Customer;
+        NPRGroupCode: Record "NPR Group Code";
         PageId: Integer;
         PageMetadata: Record "Page Metadata";
     begin
@@ -536,8 +550,16 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
                     PageMetadata.SetRange(SourceTable, Database::Customer);
                     PageMetadata.FindFirst();
                 end;
+            'GroupCode':
+                begin
+                    if POSParameterValue.Value <> '' then begin
+                        NPRGroupCode.Get(POSParameterValue.Value);
+                    end;
+                end;
         end;
     end;
+
+
 
     local procedure ReadAdditionalParameters(Context: Codeunit "NPR POS JSON Helper"; var PrepaymentIsAmount: Boolean; var PayAndPost: Boolean; var FullPosting: Boolean)
     var
@@ -556,4 +578,86 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
                 FullPosting := JToken.AsValue().AsBoolean();
         end;
     end;
+    #region UnpackGroupCodeSetup
+    local procedure UnpackGroupCodeSetup(Context: Codeunit "NPR POS JSON Helper";
+                                         var GroupCodesEnabled: Boolean;
+                                         var GroupCode: Code[20])
+    begin
+        GroupCodesEnabled := Context.GetBooleanParameter('GroupCodesEnabled');
+#pragma warning disable AA0139
+        GroupCode := Context.GetStringParameter('GroupCode');
+#pragma warning restore
+    end;
+    #endregion UnpackGroupCodeSetup
+
+    #region SelectGroupCode
+    local procedure SelectGroupCode(GroupCodesEnabled: Boolean;
+                                       var GroupCode: Code[20])
+    var
+        NPRGroupCode: Record "NPR Group Code";
+    begin
+
+        if not GroupCodesEnabled then begin
+            GroupCode := '';
+            exit;
+        end;
+
+        if GroupCode <> '' then
+            exit;
+
+        Clear(NPRGroupCode);
+
+        If Page.RunModal(0, NPRGroupCode) <> Action::LookupOK then
+            exit;
+
+        GroupCode := NPRGroupCode.Code;
+
+    end;
+    #endregion SelectGroupCode
+
+    #region SetGroupCode
+    local procedure SetGroupCode(var SalePOS: Record "NPR POS Sale";
+                                    Context: Codeunit "NPR POS JSON Helper")
+    var
+        GroupCodesEnabled: Boolean;
+        GroupCode: Code[20];
+    begin
+        UnpackGroupCodeSetup(Context,
+                             GroupCodesEnabled,
+                             GroupCode);
+
+        SetGroupCode(SalePOS,
+                     GroupCodesEnabled,
+                     GroupCode);
+
+    end;
+    #endregion SetGroupCode
+
+
+    #region SetGroupCode
+    internal procedure SetGroupCode(var SalePOS: Record "NPR POS Sale";
+                                    GroupCodesEnabled: Boolean;
+                                    GroupCode: Code[20])
+    begin
+        SelectGroupCode(GroupCodesEnabled,
+                        GroupCode);
+
+        UpdateGroupCodeInSalesTransaction(SalePOS,
+                                          GroupCode);
+
+    end;
+    #endregion SetGroupCode
+
+
+    #region UpdateGroupCodeInSalesTransaction
+    local procedure UpdateGroupCodeInSalesTransaction(var SalePOS: Record "NPR POS Sale";
+                                                         GroupCode: Code[20])
+    begin
+        if SalePOS."Group Code" = GroupCode then
+            exit;
+
+        SalePOS.Validate("Group Code", GroupCode);
+        SalePOS.Modify(true);
+    end;
+    #endregion UpdateGroupCodeInSalesTransaction
 }

@@ -164,6 +164,12 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             Caption = 'Exchange Label Barcode';
             DataClassification = CustomerContent;
         }
+        field(6151435; "NPR Group Code"; Code[20])
+        {
+            Caption = 'Group Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Group Code".Code;
+        }
     }
 }
 

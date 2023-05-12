@@ -335,6 +335,7 @@
         SalesHeader."Your Reference" := SalePOS.Reference;
         SalesHeader."External Document No." := SalePOS."External Document No.";
         SalesHeader.Validate("Location Code", GetLocationCode(SalePOS));
+        SalesHeader.Validate("NPR Group Code", SalePOS."Group Code");
 
         case UsePaymentMethodCodeFrom of
             UsePaymentMethodCodeFrom::"Specific Payment Method Code":
