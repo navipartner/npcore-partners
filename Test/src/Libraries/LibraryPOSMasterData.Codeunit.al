@@ -724,5 +724,14 @@
         end;
     end;
 
+    #region CreateDefaultGroupCodeSetup
+    internal procedure CreateDefaultGroupCodeSetup(var NPRGroupCode: Record "NPR Group Code")
+    begin
+        NPRGroupCode.Init();
+        NPRGroupCode.Code := 'DEFAULT';
+        NPRGroupCode.Description := 'DEFAULT';
+        NPRGroupCode.Insert();
+    end;
+    #endregion CreateDefaultGroupCodeSetup
 }
 

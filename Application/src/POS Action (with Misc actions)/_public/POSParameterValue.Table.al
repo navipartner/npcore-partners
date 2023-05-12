@@ -470,4 +470,6 @@
             NPRPOSMenuFilterList.GetRecord(NPRPOSMenuFilter);
         exit(NPRPOSMenuFilter."Filter Code");
     end;
+
+
 }

@@ -23,6 +23,10 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
         ParamConfirmDiscAmt_DescLbl: Label 'Enable/Disable Invoice Discount Amount confirmation';
         ParamEnableSalesPerson_CptLbl: Label 'Enable Salesperson from Order';
         ParamEnableSalesPerson_DescLbl: Label 'Keeps salesperson from sales order';
+        ParamGroupCodeFilterEnabled_CptLbl: Label 'Group Code Filter Enabled';
+        ParamGroupCodeFilterEnabled_DescLbl: Label 'Enables the use of group code filter in the sales import list';
+        ParamGroupCodeFilter_CptLbl: Label 'Group Code Filter';
+        ParamGroupCodeFilter_DescLbl: Label 'Specifies the group code filter in the sales import list';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -47,6 +51,8 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('LocationFilter', '', ParamLocation_CptLbl, ParamLocation_DescLbl);
         WorkflowConfig.AddBooleanParameter('ConfirmInvDiscAmt', false, ParamConfirmDiscAmt_CptLbl, ParamConfirmDiscAmt_DescLbl);
         WorkflowConfig.AddBooleanParameter('EnableSalesPersonFromOrder', false, ParamEnableSalesPerson_CptLbl, ParamEnableSalesPerson_DescLbl);
+        WorkflowConfig.AddBooleanParameter('GroupCodeFilterEnabled', false, ParamGroupCodeFilterEnabled_CptLbl, ParamGroupCodeFilterEnabled_DescLbl);
+        WorkflowConfig.AddTextParameter('GroupCodeFilter', '', ParamGroupCodeFilter_CptLbl, ParamGroupCodeFilter_DescLbl);
     end;
 
 
@@ -63,6 +69,8 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
         LocationFilter: Text;
         SalesDocViewString: Text;
         POSActionDocImpB: Codeunit "NPR POS Action: Doc. Import B";
+        GroupCodeFilterEnabled: Boolean;
+        GroupCodeFilter: Text;
     begin
         SelectCustomer := Context.GetBooleanParameter('SelectCustomer');
         DocumentType := Context.GetIntegerParameter('DocumentType');
@@ -71,6 +79,9 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
         LocationFilter := Context.GetStringParameter('LocationFilter');
         SalesPersonFromOrder := Context.GetBooleanParameter('EnableSalesPersonFromOrder');
         ConfirmInvDiscAmt := Context.GetBooleanParameter('ConfirmInvDiscAmt');
+        UnpackGroupCodeFilterSetup(Context,
+                                   GroupCodeFilterEnabled,
+                                   GroupCodeFilter);
 
         POSActionDocImpB.ImportDocument(SelectCustomer,
                                         ConfirmInvDiscAmt,
@@ -79,6 +90,8 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
                                         LocationFilter,
                                         SalesDocViewString,
                                         SalesPersonFromOrder,
+                                        GroupCodeFilterEnabled,
+                                        GroupCodeFilter,
                                         Sale);
     end;
 
@@ -87,6 +100,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
     var
         Location: Record Location;
         SalesHeader: Record "Sales Header";
+        NPRGroupCodeUtils: Codeunit "NPR Group Code Utils";
         LocationList: Page "Location List";
         FilterPageBuilder: FilterPageBuilder;
     begin
@@ -114,6 +128,8 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
                     if LocationList.RunModal() = ACTION::LookupOK then
                         POSParameterValue.Value := CopyStr(LocationList.GetSelectionFilter(), 1, MaxStrLen(POSParameterValue.Value));
                 end;
+            'GroupCodeFilter':
+                NPRGroupCodeUtils.LookUpGroupCodeValue(POSParameterValue.Value);
         end;
     end;
 
@@ -185,6 +201,17 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
 
         DataRow.Add('OpenOrdersQty', SalesHeader.Count());
     end;
+
+    #region UnpackGroupCodeFilterSetup
+    local procedure UnpackGroupCodeFilterSetup(Context: Codeunit "NPR POS JSON Helper";
+                                               var GroupCodeFilterEnabled: Boolean;
+                                               var GroupCodeFilter: Text)
+    begin
+        GroupCodeFilterEnabled := Context.GetBooleanParameter('GroupCodeFilterEnabled');
+        GroupCodeFilter := Context.GetStringParameter('GroupCodeFilter');
+
+    end;
+    #endregion UnpackGroupCodeFilterSetup
 
     local procedure GetActionScript(): Text
     begin

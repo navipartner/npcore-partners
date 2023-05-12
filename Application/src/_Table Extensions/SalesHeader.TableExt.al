@@ -122,5 +122,11 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             Caption = 'Exchange Label Barcode';
             DataClassification = CustomerContent;
         }
+        field(6151435; "NPR Group Code"; Code[20])
+        {
+            Caption = 'Group Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Group Code".Code;
+        }
     }
 }

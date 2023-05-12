@@ -3,12 +3,35 @@ codeunit 6059961 "NPR POS Action: Doc. Import B"
     Access = Internal;
 
     procedure ImportDocument(SelectCustomer: Boolean;
+                             ConfirmInvDiscAmt: Boolean;
+                             DocumentType: Integer;
+                             LocationSource: Option "POS Store","Location Filter Parameter";
+                             LocationFilter: Text;
+                             SalesDocViewString: Text;
+                             SalesPersonFromOrder: Boolean;
+                             POSSale: Codeunit "NPR POS Sale")
+    begin
+        ImportDocument(SelectCustomer,
+                       ConfirmInvDiscAmt,
+                       DocumentType,
+                       LocationSource,
+                       LocationFilter,
+                       SalesDocViewString,
+                       SalesPersonFromOrder,
+                       false,
+                       '',
+                       POSSale);
+    end;
+
+    procedure ImportDocument(SelectCustomer: Boolean;
                             ConfirmInvDiscAmt: Boolean;
                             DocumentType: Integer;
                             LocationSource: Option "POS Store","Location Filter Parameter";
                             LocationFilter: Text;
                             SalesDocViewString: Text;
                             SalesPersonFromOrder: Boolean;
+                            GroupCodeFilterEnabled: Boolean;
+                            GroupCodeFilter: Text;
                             POSSale: Codeunit "NPR POS Sale")
     var
         SalesHeader: Record "Sales Header";
@@ -18,6 +41,8 @@ codeunit 6059961 "NPR POS Action: Doc. Import B"
         if not CheckCustomer(POSSale, SelectCustomer) then
             exit;
 
+        GetGroupCodeFilter(GroupCodeFilterEnabled,
+                           GroupCodeFilter);
         if not
             SelectDocument(
               POSSale,
@@ -25,11 +50,14 @@ codeunit 6059961 "NPR POS Action: Doc. Import B"
               DocumentType,
               SalesDocViewString,
               LocationSource,
-              LocationFilter)
+              LocationFilter,
+              GroupCodeFilter)
         then
             exit;
 
         SalesHeader.TestField("Bill-to Customer No.");
+
+
 
         if ConfirmInvDiscAmt then
             ConfirmInvDiscAmount(SalesHeader);
@@ -89,7 +117,13 @@ codeunit 6059961 "NPR POS Action: Doc. Import B"
         POSSale.RefreshCurrent();
     end;
 
-    local procedure SelectDocument(POSSale: Codeunit "NPR POS Sale"; var SalesHeader: Record "Sales Header"; DocumentType: Integer; SalesDocViewString: Text; LocationSource: Option "POS Store","Location Filter Parameter"; LocationFilter: Text): Boolean
+    local procedure SelectDocument(POSSale: Codeunit "NPR POS Sale";
+                                   var SalesHeader: Record "Sales Header";
+                                   DocumentType: Integer;
+                                   SalesDocViewString: Text;
+                                   LocationSource: Option "POS Store","Location Filter Parameter";
+                                   LocationFilter: Text;
+                                   GroupCodeFilter: Text): Boolean
     var
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         POSStore: Record "NPR POS Store";
@@ -112,6 +146,8 @@ codeunit 6059961 "NPR POS Action: Doc. Import B"
         end;
         if LocationFilter <> '' then
             SalesHeader.SetFilter("Location Code", LocationFilter);
+
+        SalesHeader.SetFilter("NPR Group Code", GroupCodeFilter);
         SalesHeader.FilterGroup(0);
         if SalesHeader.FindFirst() then;
         exit(RetailSalesDocImpMgt.SelectSalesDocument('', SalesHeader));
@@ -126,4 +162,39 @@ codeunit 6059961 "NPR POS Action: Doc. Import B"
         SalePOS.Modify();
         POSSale.RefreshCurrent();
     end;
+
+    #region GetGroupCodeFilter
+    local procedure GetGroupCodeFilter(GroupCodeFilterEnabled: Boolean; var GroupCodeFilter: Text)
+    var
+        NPRGroupCode: Record "NPR Group Code";
+        NPRGroupCodes: Page "NPR Group Codes";
+    begin
+
+        if not GroupCodeFilterEnabled then begin
+            GroupCodeFilter := '';
+            exit;
+        end;
+
+        if GroupCodeFilter <> '' then
+            exit;
+
+        Clear(NPRGroupCodes);
+        NPRGroupCodes.LookupMode(true);
+        if NPRGroupCodes.RunModal() <> action::lookupOK then
+            exit;
+
+        Clear(NPRGroupCode);
+        NPRGroupCodes.SetSelectionFilter(NPRGroupCode);
+
+        NPRGroupCode.SetLoadFields(Code);
+        if not NPRGroupCode.FindSet(false) then
+            exit;
+        repeat
+            GroupCodeFilter += '|' + NPRGroupCode.Code;
+        until NPRGroupCode.Next() = 0;
+
+        GroupCodeFilter := CopyStr(GroupCodeFilter, 2, StrLen(GroupCodeFilter));
+
+    end;
+    #endregion GetGroupCodeFilter
 }

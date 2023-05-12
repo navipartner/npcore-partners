@@ -46,6 +46,14 @@ pageextension 6014445 "NPR Sales List" extends "Sales List"
                 ToolTip = 'Specifies the value of the Open / Due Amount. field including VAT.';
                 ApplicationArea = NPRRetail;
             }
+
+            field("NPR Group Code"; Rec."NPR Group Code")
+            {
+                Caption = 'Group Code';
+                Editable = false;
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Group Code field.';
+            }
         }
     }
 
