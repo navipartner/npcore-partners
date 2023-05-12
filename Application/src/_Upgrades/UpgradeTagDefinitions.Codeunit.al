@@ -227,7 +227,7 @@
                     'CustomCUforPostInvtCostToGL':
                         exit('CustomCUforPostInvtCostToGL-20220530');
                     'AutoRescheduleRetenPolicy':
-                        exit('AutoRescheduleRetenPolicy-20220627');
+                        exit('AutoRescheduleRetenPolicy-20230509');
                     'TMRetentionJQCategory':
                         exit('TMRetentionJQCategory-20220707');
                     'AutoScheduleMembershipStatistics':
