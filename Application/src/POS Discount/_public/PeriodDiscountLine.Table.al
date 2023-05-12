@@ -22,7 +22,7 @@
 
             trigger OnValidate()
             begin
-                CalcFields(Description, "Unit Price");
+               CalcFields(Description, "Unit Price");
 
                 Item.Get("Item No.");
                 "Vendor No." := Item."Vendor No.";

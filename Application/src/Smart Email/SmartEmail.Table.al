@@ -47,7 +47,6 @@
                         if TransactionalEmailVariable."Merge Table ID" <> "Merge Table ID" then begin
                             TransactionalEmailVariable."Merge Table ID" := "Merge Table ID";
                             TransactionalEmailVariable."Field No." := 0;
-                            TransactionalEmailVariable."Field Name" := '';
                             TransactionalEmailVariable.Modify(true);
                         end;
                     until TransactionalEmailVariable.Next() = 0;

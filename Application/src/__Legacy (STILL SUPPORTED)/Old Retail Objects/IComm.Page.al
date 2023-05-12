@@ -151,7 +151,6 @@
                             GetPhoneLookupCU(TempAllObjWithCaption);
                             if PAGE.RunModal(PAGE::"All Objects with Caption", TempAllObjWithCaption) = ACTION::LookupOK then begin
                                 Rec."Number Info Codeunit ID" := TempAllObjWithCaption."Object ID";
-                                Rec."Number Info Codeunit Name" := TempAllObjWithCaption."Object Name";
                             end;
                             //+NPR5.23 [226819]
                         end;
