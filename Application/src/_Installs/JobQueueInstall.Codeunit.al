@@ -255,6 +255,7 @@
             repeat
                 xJobQueueEntry := JobQueueEntry;
                 JobQueueMgt.AutoRestartRetentionPolicyJQ(JobQueueEntry);
+                JobQueueMgt.UpdateRetentionPolicyJQRecurrence(JobQueueEntry);
                 if Format(xJobQueueEntry) <> Format(JobQueueEntry) then
                     JobQueueEntry.Modify();
             until JobQueueEntry.Next() = 0;

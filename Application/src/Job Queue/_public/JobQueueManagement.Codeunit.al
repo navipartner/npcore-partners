@@ -488,7 +488,7 @@
             '',
             '',
             NowWithDelayInSeconds(360),
-            023000T,
+            233000T,
             0T,
             NextRunDateFormula,
             CreateAndAssignRetentionPolicyJobQueueCategory(),
@@ -584,6 +584,7 @@
         Session.LogMessage('NPR_JobQueue', 'Job Queue Error', Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
+    [Obsolete('Goes internal in next release', 'NPR 22.0')]
     procedure AutoRestartRetentionPolicyJQ(var JobQueueEntry: Record "Job Queue Entry")
     begin
         if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
@@ -592,6 +593,20 @@
             JobQueueEntry."NPR Auto-Resched. after Error" := true;
             if JobQueueEntry."NPR Auto-Resched. Delay (sec.)" < 300 then
                 JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 300;
+        end;
+    end;
+
+    internal procedure UpdateRetentionPolicyJQRecurrence(var JobQueueEntry: Record "Job Queue Entry")
+    var
+        NextRunDateFormula: DateFormula;
+    begin
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+           (JobQueueEntry."Object ID to Run" = 3997)  //Codeunit::"Retention Policy JQ"
+        then begin
+            Evaluate(NextRunDateFormula, '<1D>');
+            if JobQueueEntry."Next Run Date Formula" <> NextRunDateFormula then
+                JobQueueEntry.Validate("Next Run Date Formula", NextRunDateFormula);
+            JobQueueEntry.Validate("Starting Time", 233000T);
         end;
     end;
 
@@ -629,6 +644,7 @@
             JobQueueEntry."Rerun Delay (sec.)" := 180;
 
         AutoRestartRetentionPolicyJQ(JobQueueEntry);
+        UpdateRetentionPolicyJQRecurrence(JobQueueEntry);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterFinalizeRun', '', true, false)]
@@ -636,7 +652,7 @@
     var
         JobQueueSendNotif: Codeunit "NPR Job Queue - Send Notif.";
     begin
-        if JobQueueEntry.IsTemporary then
+        if JobQueueEntry.IsTemporary() then
             exit;
         if JobQueueEntry.Status <> JobQueueEntry.Status::Error then
             exit;
@@ -659,7 +675,7 @@
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnBeforeModifyLogEntry', '', true, false)]
     local procedure EmitTelemetry(var JobQueueLogEntry: Record "Job Queue Log Entry")
     begin
-        if JobQueueLogEntry.IsTemporary or (JobQueueLogEntry.Status <> JobQueueLogEntry.Status::Error) then
+        if JobQueueLogEntry.IsTemporary() or (JobQueueLogEntry.Status <> JobQueueLogEntry.Status::Error) then
             exit;
 
         EmitTelemetryDataOnError(JobQueueLogEntry);
