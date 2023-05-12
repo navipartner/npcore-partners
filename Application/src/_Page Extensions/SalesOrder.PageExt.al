@@ -29,6 +29,14 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 ApplicationArea = NPRRetail;
             }
         }
+        addafter(Status)
+        {
+            field("NPR Group Code"; Rec."NPR Group Code")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Group Code field.';
+            }
+        }
         addafter(Control85)
         {
             field("NPR Bill-to Company"; Rec."NPR Bill-to Company")
@@ -97,6 +105,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 ToolTip = 'Specifies the sum of Payment Lines attached to the Sales Order';
             }
         }
+
         modify(Control1900316107)
         {
             Visible = false;

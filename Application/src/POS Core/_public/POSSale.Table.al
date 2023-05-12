@@ -720,6 +720,14 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.53';
         }
+
+        field(720; "Group Code"; Code[20])
+        {
+            Caption = 'Group Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Group Code".Code;
+        }
+
         field(5700; "Responsibility Center"; Code[10])
         {
             Caption = 'Responsibility Center';

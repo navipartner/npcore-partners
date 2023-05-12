@@ -12,6 +12,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         _POSSetup: Record "NPR POS Setup";
         _Customer: Record "Customer";
         _Salesperson: Record "Salesperson/Purchaser";
+        _NPRGroupCode: Record "NPR Group Code";
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -139,7 +140,468 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         SalesShipmentHeader.Get(POSEntrySalesDocLink."Sales Document No");
     end;
 
+    #region ExportToOrderWithoutGroupCodeEnabled
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExportToOrderWithoutGroupCodeEnabled()
+    var
+        SalePOS: Record "NPR POS Sale";
+        SalesHeader: Record "Sales Header";
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        Assert: Codeunit Assert;
+        GroupCodesEnabled: Boolean;
+        GroupCode: Code[10];
+    begin
+        // [Scenario] Check that a successful export to open sales order doesn't have a group code when group code functionality is disabled
 
+        // [Given] POS & Payment setup
+        InitializeData();
+
+        // [Given] Active POS session & sale
+        // [Given] Item line worth 10 LCY
+        // [Given] Customer applied to sale
+        // [Given] Group Code not enabled and group code is not set
+        GroupCodesEnabled := false;
+        GroupCode := '';
+        CreatePOSSaleWithCustomerAndItemLineAndAssignGroupCode(SalePOS,
+                                                               POSSale,
+                                                               GroupCodesEnabled,
+                                                               GroupCode);
+
+        // [When] Exporting to sales order without posting                
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        ExportPOSSAlesToSalesOrder(POSSale,
+                                   false,
+                                   false,
+                                   SalesHeader);
+
+        // [Then] POS Sale's group code should be empty and should match the group code in the created sales header
+        CheckGroupCodeInCreatedSalesDocument(SalePOS,
+                                             SalesHeader,
+                                             GroupCodesEnabled,
+                                             GroupCode);
+
+        // [Then] Sales must not exist after export
+        Assert.IsFalse(SalePOS.Find(), 'Sale must end when exporting to sales order');
+
+    end;
+    #endregion ExportToOrderWithoutGroupCodeEnabled
+
+    #region ExportToOrderWithGroupCodesEnabledAndNoGroupCodeAssignedAndNoGroupCodeChosen
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('NPRGroupCodesCancelOpenPageHandler')]
+    procedure ExportToOrderWithGroupCodesEnabledAndNoGroupCodeAssignedAndNoGroupCodeChosen()
+    var
+        SalePOS: Record "NPR POS Sale";
+        SalesHeader: Record "Sales Header";
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        GroupCodeEnabled: Boolean;
+        GroupCode: Code[10];
+    begin
+        // [Scenario] Check that a successful export to open sales order doesn't have a group code when group code functionality is enabled
+        //and group code is not set and is not chosen
+
+        // [Given] POS & Payment setup
+        InitializeData();
+
+        // [Given] Group Codes Setup
+        NPRLibraryPOSMasterData.CreateDefaultGroupCodeSetup(_NPRGroupCode);
+
+        // [Given] Active POS session & sale
+        // [Given] Item line worth 10 LCY
+        // [Given] Customer applied to sale
+        // [Given] Group Code enabled and group code is not set
+        GroupCodeEnabled := true;
+        GroupCode := '';
+        CreatePOSSaleWithCustomerAndItemLineAndAssignGroupCode(SalePOS,
+                                                               POSSale,
+                                                               GroupCodeEnabled,
+                                                               GroupCode);
+
+
+        // [When] Exporting to sales order without posting                
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        ExportPOSSAlesToSalesOrder(POSSale,
+                                   false,
+                                   false,
+                                   SalesHeader);
+
+        // [Then] POS Sale's group code should be empty and should match the group code in the created sales header
+
+        CheckGroupCodeInCreatedSalesDocument(SalePOS,
+                                             SalesHeader,
+                                             GroupCodeEnabled,
+                                             GroupCode);
+
+        // [Then] Sales must not exist after export
+        Assert.IsFalse(SalePOS.Find(), 'Sale must end when exporting to sales order');
+
+        // [Cleanup] Delete Group Code
+        _NPRGroupCode.Delete();
+    end;
+    #endregion ExportToOrderWithGroupCodesEnabledAndNoGroupCodeAssignedAndNoGroupCodeChosen
+
+    #region ExportToOrderWithGroupCodesEnabledAndNoGroupCodeAssignedAndGroupCodeChosen
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('NPRGroupCodesSelectEnqueuedOptionPageHandler')]
+    procedure ExportToOrderWithGroupCodesEnabledAndNoGroupCodeAssignedAndGroupCodeChosen()
+    var
+        SalePOS: Record "NPR POS Sale";
+        SalesHeader: Record "Sales Header";
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        GroupCodeEnabled: Boolean;
+        GroupCode: Code[10];
+    begin
+        // [Scenario] Check that a successful export to open sales order has group code when group code functionality is enabled
+        //and group code is not set but chosen on runtime
+
+        // [Given] POS & Payment setup
+        InitializeData();
+
+        // [Given] Group Codes Setup
+        NPRLibraryPOSMasterData.CreateDefaultGroupCodeSetup(_NPRGroupCode);
+
+        // [Given] Active POS session & sale
+        // [Given] Item line worth 10 LCY
+        // [Given] Customer applied to sale
+        // [Given] Group Code enabled and group code is not set
+        GroupCodeEnabled := true;
+        GroupCode := '';
+        CreatePOSSaleWithCustomerAndItemLineAndAssignGroupCode(SalePOS,
+                                                               POSSale,
+                                                               GroupCodeEnabled,
+                                                               GroupCode);
+
+        //[Given] NPRGroupCode.Code is selected from a runmodal page
+        GroupCode := _NPRGroupCode.Code;
+
+        // [When] Exporting to sales order without posting                
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        ExportPOSSAlesToSalesOrder(POSSale,
+                                   false,
+                                   false,
+                                   SalesHeader);
+
+        // [Then] POS Sale's group code must match the group code in the created sales header
+        CheckGroupCodeInCreatedSalesDocument(SalePOS,
+                                             SalesHeader,
+                                             GroupCodeEnabled,
+                                             GroupCode);
+
+        // [Then] Sales must not exist after export
+        Assert.IsFalse(SalePOS.Find(), 'Sale must end when exporting to sales order');
+
+        // [Cleanup] Delete Group Code
+        _NPRGroupCode.Delete();
+    end;
+    #endregion ExportToOrderWithGroupCodesEnabledAndNoGroupCodeAssignedAndGroupCodeChosen
+
+
+    #region ExportToOrderWithGroupCodesEnabledAndGroupCodeAssigned
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExportToOrderWithGroupCodesEnabledAndGroupCodeAssigned()
+    var
+        SalePOS: Record "NPR POS Sale";
+        SalesHeader: Record "Sales Header";
+        NPRStoreGroup: Record "NPR Store Group";
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        GroupCodeEnabled: Boolean;
+        GroupCode: Code[10];
+    begin
+        // [Scenario] Check that a successful export to open sales order has group code when group code functionality is enabled
+        //and group code is set
+
+        // [Given] POS & Payment setup
+        InitializeData();
+
+        // [Given] Group Codes Setup
+        NPRLibraryPOSMasterData.CreateDefaultGroupCodeSetup(_NPRGroupCode);
+
+        // [Given] Active POS session & sale
+        // [Given] Item line worth 10 LCY
+        // [Given] Customer applied to sale
+        // [Given] Group Code enabled and group code set with existing value
+        GroupCodeEnabled := true;
+        GroupCode := _NPRGroupCode.Code;
+        CreatePOSSaleWithCustomerAndItemLineAndAssignGroupCode(SalePOS,
+                                                               POSSale,
+                                                               GroupCodeEnabled,
+                                                               GroupCode);
+
+
+        // [When] Exporting to sales order without posting                
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        ExportPOSSAlesToSalesOrder(POSSale,
+                                   false,
+                                   false,
+                                   SalesHeader);
+
+        // [Then] POS Sale's group code must match the group code in the created sales header
+        CheckGroupCodeInCreatedSalesDocument(SalePOS,
+                                             SalesHeader,
+                                             GroupCodeEnabled,
+                                             GroupCode);
+
+        // [Then] Sales must not exist after export
+        Assert.IsFalse(SalePOS.Find(), 'Sale must end when exporting to sales order');
+
+        // [Cleanup] Delete Group Code
+        _NPRGroupCode.Delete();
+    end;
+    #endregion ExportToOrderWithGroupCodesEnabledAndGroupCodeAssigned
+
+    #region ExportToOrderWithGroupCodesEnabledAndNonExistingGroupCodeAssigned
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExportToOrderWithGroupCodesEnabledAndNonExistingGroupCodeAssigned()
+    var
+        SalePOS: Record "NPR POS Sale";
+        SalesHeader: Record "Sales Header";
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit "Assert";
+        GroupCodeEnabled: Boolean;
+        GroupCode: Code[10];
+    begin
+        // [Scenario] Check that a successful export to open sales order has group code when group code functionality is enabled
+        //and group code is set with none existing value
+
+        // [Given] POS & Payment setup
+        InitializeData();
+
+        // [Given]No Group Codes Setup
+        _NPRGroupCode.Reset();
+        if not _NPRGroupCode.IsEmpty then
+            _NPRGroupCode.DeleteAll();
+
+
+        // [Given] Active POS session & sale
+        // [Given] Item line worth 10 LCY
+        // [Given] Customer applied to sale
+        // [Given] Group Code enabled and group code set with none existing value
+        GroupCodeEnabled := true;
+        GroupCode := 'DEFAULT';
+
+        // [When] Exporting to sales order with non existing group code assigned
+        asserterror CreatePOSSaleWithCustomerAndItemLineAndAssignGroupCode(SalePOS,
+                                                                           POSSale,
+                                                                           GroupCodeEnabled,
+                                                                           GroupCode);
+
+        // [Then] The system should return an error that the group code doesn't exist
+        Assert.IsTrue(
+                    GetLastErrorText().Contains('Group Code'),
+                    StrSubstNo('Error message should relate to Group Code behavior, but did not contain the keyword "Group Code"!\\Message: %1', GetLastErrorText()));
+
+
+
+    end;
+    #endregion ExportToOrderWithGroupCodesEnabledAndNonExistingGroupCodeAssigned
+
+
+    #region ExportToOrderWithGroupCodesDisabledAndGroupCodeAssigned
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExportToOrderWithGroupCodesDisabledAndGroupCodeAssigned()
+    var
+        SalePOS: Record "NPR POS Sale";
+        SalesHeader: Record "Sales Header";
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        GroupCodeEnabled: Boolean;
+        GroupCode: Code[10];
+    begin
+        // [Scenario] Check that a successful export to open sales order has group code when group code functionality is not enabled
+        //and group code is set with existing value
+
+        // [Given] POS & Payment setup
+        InitializeData();
+
+        // [Given] Group Codes Setup
+        NPRLibraryPOSMasterData.CreateDefaultGroupCodeSetup(_NPRGroupCode);
+
+        // [Given] Active POS session & sale
+        // [Given] Item line worth 10 LCY
+        // [Given] Customer applied to sale
+        // [Given] Group Code not enabled and group code set with existing value
+        GroupCodeEnabled := false;
+        GroupCode := _NPRGroupCode.Code;
+        CreatePOSSaleWithCustomerAndItemLineAndAssignGroupCode(SalePOS,
+                                                               POSSale,
+                                                               GroupCodeEnabled,
+                                                               GroupCode);
+
+
+        // [When] Exporting to sales order without posting                
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        ExportPOSSAlesToSalesOrder(POSSale,
+                                   false,
+                                   false,
+                                   SalesHeader);
+
+        // [Then] POS Sale's group code should be empty and should match the group code in the created sales header
+        CheckGroupCodeInCreatedSalesDocument(SalePOS,
+                                             SalesHeader,
+                                             GroupCodeEnabled,
+                                             GroupCode);
+
+        // [Then] Sales must not exist after export
+        Assert.IsFalse(SalePOS.Find(), 'Sale must end when exporting to sales order');
+
+        // [Cleanup] Delete Group Code
+        _NPRGroupCode.Delete();
+    end;
+    #endregion ExportToOrderWithGroupCodesDisabledAndGroupCodeAssigned
+
+
+    #region ExportToOrderWithGroupCodesDisabledAndNonExistingGroupCodeAssigned
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExportToOrderWithGroupCodesDisabledAndNonExistingGroupCodeAssigned()
+    var
+        SalePOS: Record "NPR POS Sale";
+        SalesHeader: Record "Sales Header";
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        GroupCodeEnabled: Boolean;
+        GroupCode: Code[10];
+    begin
+        // [Scenario] Check that a successful export to open sales order has group code when group code functionality is not enabled
+        //and group code is set with none existing value
+
+        // [Given] POS & Payment setup
+        InitializeData();
+
+        // [Given]No Group Codes Setup exists
+        _NPRGroupCode.Reset();
+        if not _NPRGroupCode.IsEmpty then
+            _NPRGroupCode.DeleteAll();
+
+        // [Given] Active POS session & sale
+        // [Given] Item line worth 10 LCY
+        // [Given] Customer applied to sale
+        // [Given] Group Code not enabled and group code set with none existing value
+        GroupCodeEnabled := false;
+        GroupCode := 'DEFAULT';
+        CreatePOSSaleWithCustomerAndItemLineAndAssignGroupCode(SalePOS,
+                                                               POSSale,
+                                                               GroupCodeEnabled,
+                                                               GroupCode);
+
+
+        // [When] Exporting to sales order without posting                
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        ExportPOSSAlesToSalesOrder(POSSale,
+                                   false,
+                                   false,
+                                   SalesHeader);
+
+        // [Then] POS Sale's group code should be empty and should match the group code in the created sales header
+        CheckGroupCodeInCreatedSalesDocument(SalePOS,
+                                             SalesHeader,
+                                             GroupCodeEnabled,
+                                             GroupCode);
+
+        // [Then] Sales must not exist after export
+        Assert.IsFalse(SalePOS.Find(), 'Sale must end when exporting to sales order');
+    end;
+    #endregion ExportToOrderWithGroupCodesDisabledAndNonExistingGroupCodeAssigned
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExportToOrderWithFullPostingAndGroupCodeEnabledAndSelected()
+    var
+        SalePOS: Record "NPR POS Sale";
+        SalesHeader: Record "Sales Header";
+        POSEntry: Record "NPR POS Entry";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesShipmentHeader: Record "Sales Shipment Header";
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        GroupCodeEnabled: Boolean;
+        GroupCode: Code[10];
+    begin
+        // [Scenario] Check that you can export to sales order with full posting and group code functionality enabled and group code selected
+
+        // [Given] POS & Payment setup
+        InitializeData();
+
+        // [Given] Group Codes Setup
+        NPRLibraryPOSMasterData.CreateDefaultGroupCodeSetup(_NPRGroupCode);
+
+        // [Given] Active POS session & sale
+        // [Given] Item line worth 10 LCY
+        // [Given] Customer applied to sale
+        // [Given] Group Code enabled and group code set with existing value
+        GroupCodeEnabled := true;
+        GroupCode := _NPRGroupCode.Code;
+        CreatePOSSaleWithCustomerAndItemLineAndAssignGroupCode(SalePOS,
+                                                               POSSale,
+                                                               GroupCodeEnabled,
+                                                               GroupCode);
+
+
+        // [When] Exporting to sales order with posting posting                
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        ExportPOSSAlesToSalesOrder(POSSale,
+                                   true,
+                                   true,
+                                   SalesHeader);
+
+        // [Then] POS Sale's group code should be empty and should match the group code in the created sales header
+        CheckGroupCodeInCreatedSalesDocument(SalePOS,
+                                             SalesHeader,
+                                             GroupCodeEnabled,
+                                             GroupCode);
+
+        // [Then] POS entry as credit sale is created, sale ended and order was posted
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        POSEntry.FindFirst();
+        POSEntry.TestField("Entry Type", POSEntry."Entry Type"::"Credit Sale");
+
+        Assert.IsFalse(SalePOS.Find(), 'Sale must end when exporting to sales order');
+
+        POSEntrySalesDocLink.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesDocLink.SetRange("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type"::HEADER);
+        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::ORDER);
+        POSEntrySalesDocLink.FindFirst();
+        Assert.IsFalse(SalesHeader.Get(SalesHeader."Document Type"::Order, POSEntrySalesDocLink."Sales Document No"), 'Sales Header must be gone after full posting');
+        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE);
+        POSEntrySalesDocLink.FindFirst();
+        SalesInvoiceHeader.Get(POSEntrySalesDocLink."Sales Document No");
+        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::SHIPMENT);
+        POSEntrySalesDocLink.FindFirst();
+        SalesShipmentHeader.Get(POSEntrySalesDocLink."Sales Document No");
+
+    end;
 
     procedure InitializeData()
     var
@@ -165,4 +627,87 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
 
         Commit();
     end;
+
+    #region NPRGroupCodesSelectEnqueuedOptionPageHandler
+    [ModalPageHandler]
+    procedure NPRGroupCodesSelectEnqueuedOptionPageHandler(var NPRGroupCodes: TestPage "NPR Group Codes")
+    begin
+        NPRGroupCodes.GoToRecord(_NPRGroupCode);
+        NPRGroupCodes.OK().Invoke();
+    end;
+    #endregion NPRGroupCodesSelectEnqueuedOptionPageHandler
+
+
+    #region NPRGroupCodesCancelOpenPageHandler
+    [ModalPageHandler]
+    procedure NPRGroupCodesCancelOpenPageHandler(var NPRGroupCodes: TestPage "NPR Group Codes")
+    begin
+        NPRGroupCodes.Cancel().Invoke();
+    end;
+    #endregion NPRGroupCodesCancelOpenPageHandler
+
+    #region CheckGroupCodeInCreatedSalesDocument
+    local procedure CheckGroupCodeInCreatedSalesDocument(SalePOS: Record "NPR POS Sale";
+                                                         SalesHeader: Record "Sales Header";
+                                                         GroupCodesEnabled: Boolean;
+                                                         GroupCode: Code[10])
+    var
+        Assert: Codeunit Assert;
+    begin
+        if GroupCodesEnabled then begin
+            Assert.IsTrue(SalePOS."Group Code" = GroupCode, 'Group Code not assigned correctly to POS Sale');
+            Assert.IsTrue(SalesHeader."NPR Group Code" = GroupCode, 'Group Code not assigned correctly to Sales Header');
+            Assert.IsTrue(SalePOS."Group Code" = SalesHeader."NPR Group Code", 'Sales Header and POS Sales Group Codes match');
+        end else begin
+            Assert.IsTrue(SalePOS."Group Code" = '', 'Group Code not assigned correctly to POS Sale');
+            Assert.IsTrue(SalesHeader."NPR Group Code" = '', 'Group Code not assigned correctly to Sales Header');
+        end;
+
+    end;
+    #endregion CheckGroupCodeInCreatedSalesDocument
+
+    #region CreatePOSSaleWithCustomerAndItemLineAndAssignGroupCode
+    local procedure CreatePOSSaleWithCustomerAndItemLineAndAssignGroupCode(var SalePOS: Record "NPR POS Sale";
+                                                                           var POSSale: Codeunit "NPR POS Sale";
+                                                                           GroupCodeEnabled: Boolean;
+                                                                           GroupCode: Code[10])
+    var
+        Item: Record Item;
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        NPRPOSActionDocExport: Codeunit "NPR POS Action: Doc. Export";
+    begin
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, _Salesperson, POSSale);
+
+        POSSale.GetCurrentSale(SalePOS);
+
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+
+        Item."Unit Price" := 10;
+        Item.Modify();
+
+        NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, _Customer."No.", false);
+
+        NPRPOSActionDocExport.SetGroupCode(SalePOS, GroupCodeEnabled, GroupCode);
+    end;
+    #endregion CreatePOSSaleWithCustomerAndItemLineAndAssignGroupCode
+
+    #region ExportPOSSAlesToSalesOrder
+    local procedure ExportPOSSAlesToSalesOrder(var POSSale: Codeunit "NPR POS Sale";
+                                               Ship: Boolean;
+                                               Invoice: Boolean;
+                                               var SalesHeader: Record "Sales Header")
+    var
+        SalesDocumentExportMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+    begin
+        SalesDocumentExportMgt.SetDocumentTypeOrder();
+        SalesDocumentExportMgt.SetShip(ship);
+        SalesDocumentExportMgt.SetInvoice(Invoice);
+        SalesDocumentExportMgt.ProcessPOSSale(POSSale);
+        SalesDocumentExportMgt.GetCreatedSalesHeader(SalesHeader);
+    end;
+    #endregion ExportPOSSAlesToSalesOrder
 }

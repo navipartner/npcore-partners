@@ -18,6 +18,14 @@ pageextension 6014487 "NPR Sales Order List" extends "Sales Order List"
                 ApplicationArea = NPRRetail;
             }
         }
+        addlast(Control1)
+        {
+            field("NPR Group Code"; Rec."NPR Group Code")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Group Code field.';
+            }
+        }
     }
     var
         HasNotes: Boolean;

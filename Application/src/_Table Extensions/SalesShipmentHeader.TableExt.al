@@ -74,6 +74,12 @@ tableextension 6014403 "NPR Sales Shipment Header" extends "Sales Shipment Heade
             Description = 'MAG2.00';
             DataClassification = CustomerContent;
         }
+        field(6151435; "NPR Group Code"; Code[20])
+        {
+            Caption = 'Group Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Group Code".Code;
+        }
     }
 }
 
