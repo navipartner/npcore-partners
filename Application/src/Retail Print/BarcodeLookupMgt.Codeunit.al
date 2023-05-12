@@ -328,8 +328,6 @@
                 Rec.Validate("Variant Code", ReturnedItemRef."Variant Code");
         end;
         Rec."Cross-Reference No." := ReturnedItemRef."Reference No.";
-        if ReturnedItemRef.Description <> '' then
-            Rec.Description := ReturnedItemRef.Description;
     end;
 
     procedure ICRLookupPeriodicDiscount(var PeriodDiscountLine: Record "NPR Period Discount Line"; var ReturnedItemRef: Record "Item Reference")
