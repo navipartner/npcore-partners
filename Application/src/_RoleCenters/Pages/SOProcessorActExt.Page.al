@@ -60,7 +60,7 @@
             cuegroup("Sales Orders Released Not Shipped")
             {
                 Caption = 'Sales Orders Released Not Shipped';
-                field(ReadyToShip; Rec."Ready to Ship")
+                field(ReadyToShip; ReadyToShipCount)
                 {
 
                     Caption = 'Ready To Ship';
@@ -73,7 +73,7 @@
                         Rec.ShowOrders(Rec.FieldNo("Ready to Ship"));
                     end;
                 }
-                field(PartiallyShipped; Rec."Partially Shipped")
+                field(PartiallyShipped; PartiallyShippedCount)
                 {
 
                     Caption = 'Partially Shipped';
@@ -86,7 +86,7 @@
                         Rec.ShowOrders(Rec.FieldNo("Partially Shipped"));
                     end;
                 }
-                field(DelayedOrders; Rec.Delayed)
+                field(DelayedOrders; DelayedCount)
                 {
 
                     Caption = 'Delayed';
@@ -161,18 +161,26 @@
 
     var
 
+    var
+        ReadyToShipCount: Integer;
+        PartiallyShippedCount: Integer;
+        DelayedCount: Integer;
+
     local procedure CalculateCueFieldValues()
     begin
+        Clear(ReadyToShipCount);
+        Clear(PartiallyShippedCount);
+        Clear(DelayedCount);
         if Rec.FieldActive("Average Days Delayed") then
             Rec."Average Days Delayed" := Rec.CalculateAverageDaysDelayed();
 
         if Rec.FieldActive("Ready to Ship") then
-            Rec."Ready to Ship" := Rec.CountOrders(Rec.FieldNo("Ready to Ship"));
+            ReadyToShipCount := Rec.CountOrders(Rec.FieldNo("Ready to Ship"));
 
         if Rec.FieldActive("Partially Shipped") then
-            Rec."Partially Shipped" := Rec.CountOrders(Rec.FieldNo("Partially Shipped"));
+            PartiallyShippedCount := Rec.CountOrders(Rec.FieldNo("Partially Shipped"));
 
         if Rec.FieldActive(Delayed) then
-            Rec.Delayed := Rec.CountOrders(Rec.FieldNo(Delayed));
+            DelayedCount := Rec.CountOrders(Rec.FieldNo(Delayed));
     end;
 }
