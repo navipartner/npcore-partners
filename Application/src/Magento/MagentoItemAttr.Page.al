@@ -162,7 +162,6 @@
                 Rec."Variant Code" := VariantCode;
                 Rec."Attribute Set ID" := MagentoItemAttribute."Attribute Set ID";
                 Rec."Attribute ID" := MagentoItemAttribute."Attribute ID";
-                Rec.Selected := false;
             end;
             Rec.Insert();
         until MagentoItemAttribute.Next() = 0;

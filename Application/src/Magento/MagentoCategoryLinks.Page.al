@@ -56,11 +56,6 @@
     {
     }
 
-    trigger OnNewRecord(BelowxRec: Boolean)
-    begin
-        Rec."Root No." := RootNo;
-    end;
-
     var
         RootNo: Code[20];
 
