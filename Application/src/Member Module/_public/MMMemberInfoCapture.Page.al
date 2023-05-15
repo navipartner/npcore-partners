@@ -43,7 +43,7 @@
                             end;
 
                             if (PAGE.RunModal(6060127, TempMembership) = ACTION::LookupOK) then begin
-                                SetExternalMembershipNo(TempMembership."External Membership No.");
+                                SetMembershipDetails(TempMembership."External Membership No.");
                                 CurrPage.Update(true);
                             end;
                         end;
@@ -58,7 +58,7 @@
                     trigger OnValidate()
                     begin
 
-                        SetExternalMembershipNo(Rec."External Membership No.");
+                        SetMembershipDetails(Rec."External Membership No.");
                     end;
                 }
                 field(Quantity; Rec.Quantity)
@@ -108,7 +108,7 @@
                                 Rec."E-Mail Address" := TempMember."E-Mail Address";
                                 Rec."Phone No." := TempMember."Phone No.";
 
-                                SetExternalMemberNo(TempMember."External Member No.");
+                                SetMemberDetails(TempMember."External Member No.");
                                 SetDefaultValues();
                                 CurrPage.Update(true);
                             end;
@@ -123,7 +123,7 @@
 
                     trigger OnValidate()
                     begin
-                        SetExternalMemberNo(Rec."External Member No");
+                        SetMemberDetails(Rec."External Member No");
                         SetDefaultValues();
                     end;
                 }
@@ -169,12 +169,17 @@
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
+                        Rec."Replace External Card No." := '';
+                        OnValidateReplaceExternalCardNumber();
+
                         MembershipMemberLookup();
+                        OnValidateReplaceExternalCardNumber();
                     end;
 
                     trigger OnValidate()
                     begin
-                        SetExternalMemberNo(Rec."External Member No");
+                        SetMemberDetails(Rec."External Member No");
+                        OnValidateReplaceExternalCardNumber();
                     end;
                 }
                 field("Replace External Card No."; Rec."Replace External Card No.")
@@ -187,23 +192,29 @@
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         MemberCardLookup(Rec."Member Entry No", true);
+                        OnValidateReplaceExternalCardNumber();
                     end;
 
                     trigger OnValidate()
-                    var
-                        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-                        Member: Record "NPR MM Member";
-                        ReasonText: Text;
                     begin
-                        if (not Member.Get(MembershipManagement.GetMemberFromExtCardNo(Rec."Replace External Card No.", Today, ReasonText))) then
-                            Error(ReasonText);
-
-                        Rec.Validate("External Member No", Member."External Member No.");
-                        CurrPage.Update(true);
-
-                        SetExternalMemberNo(Member."External Member No.");
-                        CurrPage.Update(true);
+                        OnValidateReplaceExternalCardNumber();
                     end;
+                }
+
+                field(MembershipCode; Rec."Membership Code")
+                {
+                    Editable = false;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Shows the membership code associated with the card bing replaced.';
+                    Caption = 'Membership Code';
+                }
+
+                field(ValidUntil; _MembershipValidUntilDate)
+                {
+                    Editable = false;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Show when the membership expires.';
+                    Caption = 'Membership Valid Until';
                 }
             }
             group(Cardholder)
@@ -878,7 +889,7 @@
             Rec.Validate("Document Date", ActivationDate);
 
         if (ShowAddToMembershipSection) then
-            SetExternalMembershipNo(ExternalMembershipNo);
+            SetMembershipDetails(ExternalMembershipNo);
 
         SetDefaultValues();
 
@@ -988,6 +999,7 @@
         AGE_VERIFICATION: Label 'Member %1 does not meet the age constraint of %2 years set on this product.';
         _PreSelectedCustomerContact: Boolean;
         _PosUnitNo: Code[10];
+        _MembershipValidUntilDate: Date;
 
     local procedure CheckEmail()
     var
@@ -1330,21 +1342,23 @@
                 if (MembershipSalesSetup."Membership Code" = '') then
                     MembershipSetup."Card Number Valid Until" := MembershipSalesSetup."Duration Formula";
 
-                case MembershipSetup."Card Expire Date Calculation" of
-                    MembershipSetup."Card Expire Date Calculation"::DATEFORMULA:
-                        Rec."Valid Until" := CalcDate(MembershipSetup."Card Number Valid Until", ValidUntilBaseDate);
-                    MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED:
-                        begin
-                            //Rec."Valid Until" := CalcDate(MembershipSalesSetup."Duration Formula", ValidUntilBaseDate);
-                            MembershipEntry.SetFilter("Membership Entry No.", '=%1', Rec."Membership Entry No.");
-                            MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
-                            MembershipEntry.SetFilter(Blocked, '=%1', false);
-                            if (MembershipEntry.FindLast()) then
-                                if (not MembershipEntry."Activate On First Use") then
-                                    Rec."Valid Until" := MembershipEntry."Valid Until Date";
-                        end;
-                    else
-                        Rec."Valid Until" := 0D;
+                if (not ShowReplaceCardSection) then begin
+                    case MembershipSetup."Card Expire Date Calculation" of
+                        MembershipSetup."Card Expire Date Calculation"::DATEFORMULA:
+                            Rec."Valid Until" := CalcDate(MembershipSetup."Card Number Valid Until", ValidUntilBaseDate);
+                        MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED:
+                            begin
+                                //Rec."Valid Until" := CalcDate(MembershipSalesSetup."Duration Formula", ValidUntilBaseDate);
+                                MembershipEntry.SetFilter("Membership Entry No.", '=%1', Rec."Membership Entry No.");
+                                MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+                                MembershipEntry.SetFilter(Blocked, '=%1', false);
+                                if (MembershipEntry.FindLast()) then
+                                    if (not MembershipEntry."Activate On First Use") then
+                                        Rec."Valid Until" := MembershipEntry."Valid Until Date";
+                            end;
+                        else
+                            Rec."Valid Until" := 0D;
+                    end;
                 end;
 
                 GDPRMandatory := false;
@@ -1385,7 +1399,7 @@
         end;
     end;
 
-    local procedure SetExternalMembershipNo(pExternalMembershipNo: Code[20])
+    local procedure SetMembershipDetails(pExternalMembershipNo: Code[20])
     var
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
@@ -1425,7 +1439,7 @@
 
     end;
 
-    local procedure SetExternalMemberNo(pExternalMemberNo: Code[20])
+    local procedure SetMemberDetails(pExternalMemberNo: Code[20])
     var
         Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
@@ -1469,7 +1483,7 @@
         Rec."Valid Until" := 0D;
 
         Membership.Get(MembershipManagement.GetMembershipFromExtMemberNo(pExternalMemberNo));
-        SetExternalMembershipNo(Membership."External Membership No.");
+        SetMembershipDetails(Membership."External Membership No.");
     end;
 
     local procedure MembershipLookup()
@@ -1489,13 +1503,13 @@
         MembersListPage.GetRecord(Member);
 
         if (ShowAddMemberCardSection) then
-            SetExternalMemberNo(Member."External Member No.");
+            SetMemberDetails(Member."External Member No.");
 
         MemberRole.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
         MemberRole.SetFilter(Blocked, '=%1', false);
         if (MemberRole.FindFirst()) then begin
             Membership.Get(MemberRole."Membership Entry No.");
-            SetExternalMembershipNo(Membership."External Membership No.");
+            SetMembershipDetails(Membership."External Membership No.");
 
         end;
     end;
@@ -1520,13 +1534,13 @@
         MemberRole.SetFilter(Blocked, '=%1', false);
         if (MemberRole.FindFirst()) then begin
             Membership.Get(MemberRole."Membership Entry No.");
-            SetExternalMembershipNo(Membership."External Membership No.");
+            SetMembershipDetails(Membership."External Membership No.");
 
             if (ShowAddMemberCardSection) then
-                SetExternalMemberNo(Member."External Member No.");
+                SetMemberDetails(Member."External Member No.");
 
             if (ShowReplaceCardSection) then begin
-                SetExternalMemberNo(Member."External Member No.");
+                SetMemberDetails(Member."External Member No.");
                 MemberCardLookup(Member."Entry No.", false);
             end;
 
@@ -1664,6 +1678,34 @@
         MemberInfoCapture."E-Mail Address" := Contact."E-Mail";
         MemberInfoCapture."Phone No." := Contact."Phone No.";
         MemberInfoCapture."Contact No." := Contact."No.";
+    end;
+
+    local procedure OnValidateReplaceExternalCardNumber()
+    var
+        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberCard: Record "NPR MM Member Card";
+        Member: Record "NPR MM Member";
+        Membership: Record "NPR MM Membership";
+    begin
+        if (rec."Replace External Card No." = '') then begin
+            Clear(Rec."Valid Until");
+            Clear(Rec."Membership Code");
+            Clear(_MembershipValidUntilDate);
+            exit;
+        end;
+
+        MemberCard.SetFilter("External Card No.", '=%1', rec."Replace External Card No.");
+        MemberCard.FindFirst();
+        Member.Get(MemberCard."Member Entry No.");
+        Membership.Get(MemberCard."Membership Entry No.");
+
+        SetMemberDetails(Member."External Member No.");
+        MembershipManagement.GetMembershipMaxValidUntilDate(Membership."Entry No.", _MembershipValidUntilDate);
+        Rec.Validate("Membership Code", Membership."Membership Code");
+        Rec.Validate("External Member No", Member."External Member No.");
+        Rec.Validate("Valid Until", MemberCard."Valid Until");
+
+        CurrPage.Update(true);
     end;
 
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
