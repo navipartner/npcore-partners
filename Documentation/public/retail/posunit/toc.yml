@@ -90,3 +90,5 @@
     href: howto/mobile_pay_qr.md
   - name: Add new customers from the POS
     href: howto/add_customers_from_pos.md
+  - name: Set up card surcharge for terminal payments
+    href: howto/card_Fee.md
