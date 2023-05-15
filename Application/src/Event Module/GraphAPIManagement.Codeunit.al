@@ -191,12 +191,12 @@
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
-        RefreshToken, NewRefreshToken : Text;
+        RefreshToken, NewRefreshToken, RefreshRequest : Text;
     begin
         GetTestGraphAPISetup();
         RefreshToken := EventExchIntEMail.GetRefreshToken();
 
-        PrepareRefreshTokenRequest(RefreshToken, Client, RequestMessage);
+        PrepareRefreshTokenRequest(RefreshToken, Client, RequestMessage, RefreshRequest);
 
         if Client.Send(RequestMessage, ResponseMessage) then
             if ResponseMessage.IsSuccessStatusCode() then
@@ -205,7 +205,7 @@
                 if SecretProblem(ResponseMessage) then begin
                     FetchNewSecret();
 
-                    PrepareRefreshTokenRequest(RefreshToken, Client, RequestMessage);
+                    PrepareRefreshTokenRequest(RefreshToken, Client, RequestMessage, RefreshRequest);
 
                     if Client.Send(RequestMessage, ResponseMessage) then
                         if ResponseMessage.IsSuccessStatusCode() then
@@ -214,7 +214,7 @@
             end;
 
         if AccessToken = '' then begin
-            LogResponse('', 'Refresh Token', EventExchIntEMail."E-Mail", _GraphApiSetup."OAuth Token Url", '', ResponseMessage);
+            LogResponse('', 'Refresh Token', EventExchIntEMail."E-Mail", _GraphApiSetup."OAuth Token Url", RefreshRequest, ResponseMessage);
             Commit();
             exit;
         end;
@@ -321,7 +321,7 @@
         OutStream.WriteText(NewAccessToken);
         EventExchIntEMail."Refresh Token".CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(NewRefreshToken);
-        EventExchIntEMail."Acces Token Valid Until" := CurrentDateTime() + 1000 * 59 * 59; //token TTL is 59m59s
+        EventExchIntEMail."Acces Token Valid Until" := CurrentDateTime() + 1000 * 50 * 60; //token TTL is 59m59s, but setting the time to 50 min just to be sure
         EventExchIntEMail.Modify();
     end;
 
@@ -362,12 +362,11 @@
         _GraphApiSetup.TestField("OAuth Token Url");
     end;
 
-    local procedure PrepareRefreshTokenRequest(RefreshToken: Text; Client: HttpClient; RequestMessage: HttpRequestMessage)
+    local procedure PrepareRefreshTokenRequest(RefreshToken: Text; Client: HttpClient; RequestMessage: HttpRequestMessage; var RefreshRequest: Text)
     var
         Content: HttpContent;
         MessageHeaders: HttpHeaders;
         ContentHeaders: HttpHeaders;
-        RefreshRequest: Text;
     begin
         RefreshRequest := GetRefreshTokenRequest(RefreshToken);
 
