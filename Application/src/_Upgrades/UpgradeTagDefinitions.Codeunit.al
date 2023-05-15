@@ -114,6 +114,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'MCSSaleLineUpload'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG BalanceV4"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG ItemRef. Disc Barcodes", 'UpgradeDiscBarcodes'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Entry Dims", '20230515'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -411,6 +412,11 @@
                 case UpgradeStep of
                     'UpgradeDiscBarcodes':
                         exit('UpgradeDiscBarcodes');
+                end;
+            Codeunit::"NPR UPG Pos Entry Dims":
+                case UpgradeStep of
+                    '20230515':
+                        exit('PosEntryLineDimFix_20230515');
                 end;
         end;
     end;

@@ -2343,6 +2343,9 @@
         "Tax Liable" := SalePOS."Tax Liable";
         "NPRE Seating Code" := SalePOS."NPRE Pre-Set Seating Code";
         "Responsibility Center" := SalePOS."Responsibility Center";
+        "Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
+        "Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";
+        "Dimension Set ID" := SalePOS."Dimension Set ID";
     end;
 
     local procedure InitFromCustomer()
