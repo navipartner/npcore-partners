@@ -7,11 +7,11 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act." implements "NPR IPOS Workflow"
         ActionDescription: Label 'This built-in action allows to run Waiter Pad related functions directly from Restaurant View';
         ParamWaiterPadCode_CptLbl: Label 'Waiter Pad Code';
         ParamWaiterPadCode_DescLbl: Label 'Defines waiter pad number the action is to be run upon. The parameter is set automatically by the system on the runtime.';
-        ParamWaiterPadAction_OptLbl: Label 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Open Waiter Pad', MaxLength = 250;
+        ParamWaiterPadAction_OptLbl: Label 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Open Waiter Pad', MaxLength = 250, Locked = true;
         ParamWaiterPadAction_NameLbl: Label 'Waiter Pad Action';
         ParamWaiterPadAction_DescLbl: Label 'Defines which waiter pad action is to be run by the POS action.';
         ParamWaiterPadAction_CaptOptLbl: Label 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Open Waiter Pad';
-        ParamLinesToSend_OptLbl: Label 'New/Updated,All', MaxLength = 250;
+        ParamLinesToSend_OptLbl: Label 'New/Updated,All', MaxLength = 250, Locked = true;
         ParamLinesToSend_NameLbl: Label 'Lines to Send to Kitchen';
         ParamLinesToSend_DescLbl: Label 'Defines which waiter pad lines are to be sent to kitchen, if ''Send Kitchen Order'' is selected as Waiter Pad Action.';
         ParamLinesToSend_CaptOptLbl: Label 'New/Updated,All';
