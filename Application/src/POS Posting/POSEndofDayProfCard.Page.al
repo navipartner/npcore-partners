@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'NPR POS End of Day Profile Card';
+    ContextSensitiveHelpPage = 'retail/pos_profiles/reference/POS_End_of_Day_Profile.html';
     PageType = Card;
     SourceTable = "NPR POS End of Day Profile";
     UsageCategory = None;
