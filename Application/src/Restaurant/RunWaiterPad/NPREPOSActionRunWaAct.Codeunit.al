@@ -10,11 +10,11 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act" implements "NPR IPOS Workflow"
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'An action to run Waiter Pad functions directly from Sales View';
-        ParamWaiterPadAction_OptLbl: Label 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Close w/out Saving', MaxLength = 250;
+        ParamWaiterPadAction_OptLbl: Label 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Close w/out Saving', MaxLength = 250, Locked = true;
         ParamWaiterPadAction_NameLbl: Label 'Waiter Pad Action';
         ParamWaiterPadAction_DescLbl: Label 'Defines which waiter pad action is to be run by the POS action.';
         ParamWaiterPadAction_CaptOptLbl: Label 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Close w/out Saving';
-        ParamLinesToSend_OptLbl: Label 'New/Updated,All', MaxLength = 250;
+        ParamLinesToSend_OptLbl: Label 'New/Updated,All', MaxLength = 250, Locked = true;
         ParamLinesToSend_NameLbl: Label 'Lines to Send to Kitchen';
         ParamLinesToSend_DescLbl: Label 'Defines which waiter pad lines are to be sent to kitchen, if ''Send Kitchen Order'' is selected as Waiter Pad Action.';
         ParamLinesToSend_CaptOptLbl: Label 'New/Updated,All';
