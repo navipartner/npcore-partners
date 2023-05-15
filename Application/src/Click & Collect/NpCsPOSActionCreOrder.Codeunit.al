@@ -6,7 +6,8 @@
     var
         POSDataMgt: Codeunit "NPR POS Data Management";
         ActionDescriptionLbl: Label 'This built-in action create collect order from one to another store.';
-        ParamFromStoreCode_OptLbl: Label 'POS Relation,Store Code Parameter,Location Filter Parameter', MaxLength = 250;
+        ParamFromStoreCode_OptLbl: Label 'POS Relation,Store Code Parameter,Location Filter Parameter', MaxLength = 250, Locked = true;
+        ParamFromStoreCode_OptCaptionsLbl: Label 'POS Relation,Store Code Parameter,Location Filter Parameter', MaxLength = 250;
         ParamFromStoreCode_NameLbl: Label 'From Store Code';
         ParamFromStoreCode_DescLbl: Label 'Specifies from Store Code';
         ParamStoreCode_CptLbl: Label 'Store Code';
@@ -31,7 +32,7 @@
 #pragma warning restore                                          
                                           ParamFromStoreCode_NameLbl,
                                           ParamFromStoreCode_DescLbl,
-                                          ParamFromStoreCode_OptLbl);
+                                          ParamFromStoreCode_OptCaptionsLbl);
         WorkflowConfig.AddTextParameter('storeCode', '', ParamStoreCode_CptLbl, ParamStoreCode_DescLbl);
         WorkflowConfig.AddTextParameter('locationFilter', '', ParamLocFilter_CptLbl, ParamLocFilter_DescLbl);
         WorkflowConfig.AddDecimalParameter('prepaymentPercent', 0, ParamPrepaymentPercent_CptLbl, ParamPrepaymentPercent_DescLbl);
