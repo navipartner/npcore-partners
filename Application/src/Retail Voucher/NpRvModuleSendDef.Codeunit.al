@@ -138,6 +138,7 @@
         EmailManagement: Codeunit "NPR E-mail Management";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         RecRef: RecordRef;
+        ErrorMessageTxt: Text;
     begin
         if Voucher.Find() then;
         if Voucher."E-mail Template Code" <> '' then begin
@@ -148,11 +149,11 @@
         RecRef.GetTable(Voucher);
         RecRef.SetRecFilter();
         if EmailTemplateHeader."Report ID" > 0 then
-            EmailManagement.SendReportTemplate(EmailTemplateHeader."Report ID", RecRef, EmailTemplateHeader, Voucher."E-mail", true)
+            ErrorMessageTxt := EmailManagement.SendReportTemplate(EmailTemplateHeader."Report ID", RecRef, EmailTemplateHeader, Voucher."E-mail", true)
         else
-            EmailManagement.SendEmailTemplate(RecRef, EmailTemplateHeader, Voucher."E-mail", true);
+            ErrorMessageTxt := EmailManagement.SendEmailTemplate(RecRef, EmailTemplateHeader, Voucher."E-mail", true);
         Voucher."E-mail Template Code" := EmailTemplateHeader.Code;
-        NpRvVoucherMgt.LogSending(Voucher, NpRvSendingLog."Sending Type"::"E-mail", StrSubstNo(Text002, Voucher."E-mail Template Code"), Voucher."E-mail", '');
+        NpRvVoucherMgt.LogSending(Voucher, NpRvSendingLog."Sending Type"::"E-mail", StrSubstNo(Text002, Voucher."E-mail Template Code"), Voucher."E-mail", ErrorMessageTxt);
     end;
 
     procedure SendVoucherViaSMS(Voucher: Record "NPR NpRv Voucher") LastErrorText: Text
