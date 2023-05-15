@@ -60,7 +60,7 @@ page 6150846 "NPR NPCamera"
     /// </summary>
     /// <param name="ImageStream">Will insert the image bytes into the stream.</param>
     /// <returns>Boolean indicating if it has a picture</returns>
-    procedure TakePhoto(ImageStream: InStream; Profile: Record "NPR NPCamera Profile"): Boolean
+    internal procedure TakePhoto(ImageStream: InStream; Profile: Record "NPR NPCamera Profile"): Boolean
     begin
         SetConfJson(Profile."Pixel X", Profile."Pixel Y", Profile."Quality Value", Format(Profile."File Type"));
         exit(GetPhoto(ImageStream));
