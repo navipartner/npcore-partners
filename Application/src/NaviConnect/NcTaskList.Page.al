@@ -1,7 +1,7 @@
 ﻿page 6151502 "NPR Nc Task List"
 {
     Extensible = False;
-    Caption = 'Task List';
+    Caption = 'NaviConnect Task List';
     InsertAllowed = false;
     PageType = List;
     PromotedActionCategories = 'New,Process,Report,Navigate,NaviPartner';
