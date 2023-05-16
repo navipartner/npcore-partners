@@ -822,7 +822,11 @@
         SecretDisplayNameLbl: Label 'NaviPartner M2 integration - %1', Comment = '%1 = today''s date';
     begin
         PermissionSets.Add('D365 BUS FULL ACCESS');
+#if BC17
         PermissionSets.Add('NP RETAIL');
+#else
+        PermissionSets.Add('NPR NP RETAIL');
+#endif
 
         AADApplicationMgt.CreateAzureADApplicationAndSecret(AppDisplayNameLbl, StrSubstNo(SecretDisplayNameLbl, Format(Today(), 0, 9)), PermissionSets);
     end;

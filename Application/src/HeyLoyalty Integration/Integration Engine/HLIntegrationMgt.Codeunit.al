@@ -338,7 +338,11 @@ codeunit 6059993 "NPR HL Integration Mgt."
         AppDisplayNameLbl: Label 'NaviPartner HeyLoyalty integration', MaxLength = 50, Locked = true;
     begin
         PermissionSets.Add('D365 BUS FULL ACCESS');
+#if BC17
         PermissionSets.Add('NP RETAIL');
+#else
+        PermissionSets.Add('NPR NP RETAIL');
+#endif
 
         AADApplicationMgt.CreateAzureADApplicationAndSecret(AppDisplayNameLbl, SecretDisplayName(), PermissionSets);
     end;
