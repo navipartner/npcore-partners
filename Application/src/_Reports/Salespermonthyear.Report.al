@@ -1,7 +1,7 @@
 report 6014429 "NPR Sales per month year"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales per month yearLast year.rdlc';
@@ -101,9 +101,11 @@ report 6014429 "NPR Sales per month year"
                         SalesAllPersons := SalesAllPersons + SalesLCY;
                     until SalesPersonPurchaser.Next() = 0;
                 end;
-
                 WeekTotal := WeekTotal + SalesAllPersons;
                 MonthTotal := MonthTotal + SalesAllPersons;
+
+                if (SalesAllPersons = 0) and (ShowEmptyLines = false) then
+                    CurrReport.Skip();
 
                 // Month last year
                 LastWeekText := '';
@@ -119,6 +121,7 @@ report 6014429 "NPR Sales per month year"
                         SalesAllPersonsLastYear := SalesAllPersonsLastYear + SalesLCY;
                     until SalesPersonPurchaser.Next() = 0;
                 end;
+
 
                 WeekTotalLastYear := WeekTotalLastYear + SalesAllPersonsLastYear;
                 MonthTotalLastYear := MonthTotalLastYear + SalesAllPersonsLastYear;
@@ -232,6 +235,12 @@ report 6014429 "NPR Sales per month year"
                                 DateComparison := false;
                         end;
                     }
+                    field("Show Empty Lines"; ShowEmptyLines)
+                    {
+                        Caption = 'Show Empty Lines';
+                        ToolTip = 'Specifies the value of the Show Empty Lines field.';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
             }
         }
@@ -321,5 +330,6 @@ report 6014429 "NPR Sales per month year"
         LastWeekText: Text[50];
         Title: Text[50];
         Report_Caption_Lbl: Label 'Sales Per Month Current Year/Last Year';
+        ShowEmptyLines: Boolean;
 }
 
