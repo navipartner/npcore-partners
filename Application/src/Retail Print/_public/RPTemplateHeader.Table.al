@@ -313,7 +313,7 @@ table 6014446 "NPR RP Template Header"
         if "Version Comments" = '' then
             Error(Error_MissingVersionDesc);
 
-        if StrLen(Version) = 0 then
+        if (RPTemplateArchive.Get(Rec.Code, Rec.Version) or (StrLen(Rec.Version) = 0)) then
             Version := PrintTemplateMgt.GetNextVersionNumber(Rec);
 
         Modify();
