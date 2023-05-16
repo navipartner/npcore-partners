@@ -618,6 +618,9 @@
             IncludedFields = "Serial No.";
 #endif
         }
+        key(Key6; Type, "Salesperson Code", "Discount Type")
+        {
+        }
     }
 
     fieldgroups
