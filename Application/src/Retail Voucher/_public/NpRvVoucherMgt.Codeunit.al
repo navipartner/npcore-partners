@@ -623,7 +623,7 @@
         VoucherEntry.Open := false;
     end;
 
-    internal procedure ArchiveVouchers(var VoucherFilter: Record "NPR NpRv Voucher")
+    procedure ArchiveVouchers(var VoucherFilter: Record "NPR NpRv Voucher")
     var
         Voucher: Record "NPR NpRv Voucher";
     begin
