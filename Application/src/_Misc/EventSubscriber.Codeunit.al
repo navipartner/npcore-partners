@@ -26,13 +26,6 @@
             ItemJournalLine."NPR Document Time" := Time;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', true, false)]
-    local procedure SalesPostOnBeforePostSalesDoc(var SalesHeader: Record "Sales Header")
-    begin
-        SalesHeader.TestField("Salesperson Code");
-    end;
-
-
     [EventSubscriber(ObjectType::Page, Page::"Feature Management", 'OnOpenFeatureMgtPage', '', false, false)]
     local procedure NPRFeatureManagementOnOpenFeatureMgtPage(var IgnoreFilter: Boolean)
     begin
