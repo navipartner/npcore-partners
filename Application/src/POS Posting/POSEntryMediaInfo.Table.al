@@ -88,7 +88,7 @@ table 6014680 "NPR POS Entry Media Info"
         inStr: InStream;
     begin
         CheckOverrideImage(POSEntryMediaInfo);
-        if (Camera.TakePhoto(inStr)) then
+        if (Camera.TakePicture(inStr)) then
             POSEntryMediaInfo.Image.ImportStream(inStr, POSEntryMediaInfo.FieldName(Image))
         else
             Error('');
