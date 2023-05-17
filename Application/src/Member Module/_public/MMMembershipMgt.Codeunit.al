@@ -5281,7 +5281,7 @@
         NoFaceErr: Label 'No face detected.';
         FaceNotIdentifiedErr: Label 'Face not identified.';
     begin
-        if (Camera.TakePhoto(PictureStream)) then begin
+        if (Camera.TakePicture(PictureStream)) then begin
             MCSPersonGroupsSetup.Get(TableID);
             PersonGroups.Get(MCSPersonGroupsSetup."Person Groups Id");
             PersonGroups.TestField(PersonGroupId);
@@ -5300,7 +5300,7 @@
         Camera: Page "NPR NPCamera";
         PictureStream: InStream;
     begin
-        if (Camera.TakePhoto(PictureStream)) then begin
+        if (Camera.TakePicture(PictureStream)) then begin
             MMMemberInfoCapture.Image.ImportStream(PictureStream, MMMemberInfoCapture.FieldName(Image));
             MMMemberInfoCapture.Modify();
         end
@@ -5311,7 +5311,7 @@
         Camera: Page "NPR NPCamera";
         PictureStream: InStream;
     begin
-        if (Camera.TakePhoto(PictureStream)) then begin
+        if (Camera.TakePicture(PictureStream)) then begin
             MMMember.Image.ImportStream(PictureStream, MMMember.FieldName(Image));
             MMMember.Modify();
             Commit();
