@@ -14,6 +14,8 @@
     href: explanation/item_categories.md
   - name: Meal, eco, and consumption vouchers
     href: explanation/belgian_voucher.md
+  - name: End-of-day report (POS balance)
+    href: explanation/end_of_day.md
 - name: Reference
   items:
   - name: POS payment view event Setup (reference guide)
@@ -38,9 +40,9 @@
     href: howto/createnew.md
   - name: Configure a receipt printout for a POS unit
     href: howto/receipt-printout.md
-  - name: Balance the POS (V3 Z-report)
+  - name: Generate end-of-day report (POS balance)
     href: howto/balance_the_pos.md
-  - name: Configure the V4 POS balancing feature
+  - name: Configure the POS balancing feature
     href: howto/balance_pos_v4.md
   - name: Configure an opening mechanism for a POS unit cash drawer
     href: howto/ConfigureCashDrawerOpening.md
