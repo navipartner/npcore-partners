@@ -77,10 +77,19 @@
         if not IsEnabled(POSUnit."POS Audit Profile") then
             exit;
 
-        if (POSAuditLog."Action Type" = POSAuditLog."Action Type"::DIRECT_SALE_END) then begin
-            InitDeAuxInfo(DeAuditAux, POSUnitAux, POSAuditLog);
-            OnHandleDEAuditAuxLogBeforeInsert(DeAuditAux);
-            DeAuditAux.Insert(true, true);
+        case POSAuditLog."Action Type" of
+            POSAuditLog."Action Type"::DIRECT_SALE_END:
+                begin
+                    InitDeAuxInfo(DeAuditAux, POSUnitAux, POSAuditLog, Enum::"NPR DE Fiskaly Receipt Type"::RECEIPT);
+                    OnHandleDEAuditAuxLogBeforeInsert(DeAuditAux);
+                    DeAuditAux.Insert(true, true);
+                end;
+            POSAuditLog."Action Type"::CANCEL_SALE_END:
+                begin
+                    InitDeAuxInfo(DeAuditAux, POSUnitAux, POSAuditLog, Enum::"NPR DE Fiskaly Receipt Type"::CANCELLATION);
+                    OnHandleDEAuditAuxLogBeforeInsert(DeAuditAux);
+                    DeAuditAux.Insert(true, true);
+                end;
         end;
     end;
 
@@ -104,7 +113,7 @@
         PosEntry.SetRange("POS Unit No.", SalePOS."Register No.");
         if not PosEntry.FindFirst() then
             exit;
-        if PosEntry."Entry Type" <> PosEntry."Entry Type"::"Direct Sale" then
+        if not (PosEntry."Entry Type" in [PosEntry."Entry Type"::"Direct Sale", PosEntry."Entry Type"::"Cancelled Sale"]) then
             exit;
         if not DeAuditAux.GET(PosEntry."Entry No.") then
             exit;
@@ -170,7 +179,7 @@
             until PaymentLine.Next() = 0;
     end;
 
-    local procedure InitDeAuxInfo(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info"; POSUnitAuxPar: Record "NPR DE POS Unit Aux. Info"; POSAuditLog: Record "NPR POS Audit Log")
+    local procedure InitDeAuxInfo(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info"; POSUnitAuxPar: Record "NPR DE POS Unit Aux. Info"; POSAuditLog: Record "NPR POS Audit Log"; FiskalyTransactionType: Enum "NPR DE Fiskaly Receipt Type")
     var
         Licenseinformation: Codeunit "NPR License Information";
     begin
@@ -180,7 +189,7 @@
         DeAuditAux.Validate("TSS Code", POSUnitAuxPar."TSS Code");
         DeAuditAux."Client ID" := POSUnitAuxPar.SystemId;
         DeAuditAux."Serial Number" := POSUnitAuxPar."Serial Number";
-        DeAuditAux."Fiskaly Transaction Type" := DeAuditAux."Fiskaly Transaction Type"::RECEIPT;
+        DeAuditAux."Fiskaly Transaction Type" := FiskalyTransactionType;
         DeAuditAux."Transaction ID" := POSAuditLog."Active POS Sale SystemId";
         if IsNullGuid(DeAuditAux."Transaction ID") then
             DeAuditAux."Transaction ID" := CreateGuid();
