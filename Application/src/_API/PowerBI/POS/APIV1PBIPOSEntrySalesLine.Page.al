@@ -110,7 +110,10 @@ page 6060002 "NPR APIV1 PBIPOSEntrySalesLine"
                 {
                     Caption = 'Line Dsc. Amt. Incl. VAT (LCY)';
                 }
-
+                field(variantCode; Rec."Variant Code")
+                {
+                    Caption = 'Variant Code';
+                }
             }
         }
     }
