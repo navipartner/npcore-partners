@@ -30,4 +30,20 @@ codeunit 6059924 "NPR NpCs POS Action Events"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeSelectCustomer(var CustomerNo: Code[20]; WorkflowCode: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure CreateOrderOnAfterGetCreatedSalesHeader(var SalesHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterInitSendToStoreDocument(SalesHeader: Record "Sales Header"; NpCsStore: Record "NPR NpCs Store"; NpCsWorkflow: Record "NPR NpCs Workflow"; var NpCsDocument: Record "NPR NpCs Document")
+    begin
+
+    end;
+
 }

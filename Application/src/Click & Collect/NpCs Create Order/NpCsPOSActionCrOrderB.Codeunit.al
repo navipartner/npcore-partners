@@ -75,18 +75,25 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
         Clear(TempSaleLinePOS);
     end;
 
-    procedure SelectCustomer() CustomerNo: Code[20]
+    procedure SelectCustomer(WorkflowCode: Code[20]) CustomerNo: Code[20]
     var
         SalePOS: Record "NPR POS Sale";
         Customer: Record Customer;
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        NpCsPOSActionEvents: Codeunit "NPR NpCs POS Action Events";
+        IsHandled: Boolean;
     begin
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
         if (SalePOS."Customer No." <> '') then
             if Customer.Get(SalePOS."Customer No.") then;
-
-        if Customer."No." = '' then begin
-            if Page.RunModal(0, Customer) <> Action::LookupOK then
-                exit;
-        end;
+        NpCsPOSActionEvents.OnBeforeSelectCustomer(Customer."No.", WorkflowCode, IsHandled);
+        if not IsHandled then
+            if Customer."No." = '' then begin
+                if Page.RunModal(0, Customer) <> Action::LookupOK then
+                    exit;
+            end;
 
         CustomerNo := Customer."No.";
     end;
@@ -140,14 +147,16 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
         POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
+        NpCsPOSActionEvents: Codeunit "NPR NpCs POS Action Events";
     begin
         FromNpCsStore.Get(FromStoreCode);
         ToNpCsStore.Get(ToStoreCode);
         NpCsWorkflow.Get(WorkflowCode);
 
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeader);
-
+        NpCsPOSActionEvents.CreateOrderOnAfterGetCreatedSalesHeader(SalesHeader);
         NpCsCollectMgt.InitSendToStoreDocument(SalesHeader, ToNpCsStore, NpCsWorkflow, NpCsDocument);
+        NpCsPOSActionEvents.OnAfterInitSendToStoreDocument(SalesHeader, ToNpCsStore, NpCsWorkflow, NpCsDocument);
         NpCsDocument."From Store Code" := FromNpCsStore.Code;
         NpCsDocument."To Document Type" := NpCsDocument."To Document Type"::Order;
         NpCsDocument.Modify(true);

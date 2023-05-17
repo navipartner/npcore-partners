@@ -247,10 +247,12 @@
 
     local procedure SelectCustomer(Context: Codeunit "NPR POS JSON Helper")
     var
-        CustomerNo: Code[20];
         NpCsPOSActionCreOrderB: Codeunit "NPR NpCs POSAction Cr. Order B";
+        CustomerNo: Code[20];
+        WorkflowCode: Code[20];
     begin
-        CustomerNo := NpCsPOSActionCreOrderB.SelectCustomer();
+        WorkflowCode := CopyStr(Context.GetString('workflowCode'), 1, MaxStrLen(WorkflowCode));
+        CustomerNo := NpCsPOSActionCreOrderB.SelectCustomer(WorkflowCode);
         Context.SetContext('customerNo', CustomerNo);
     end;
 
