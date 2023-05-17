@@ -1,4 +1,4 @@
-﻿page 6014657 "NPR POS Sales Wfl. Sets Step"
+page 6014657 "NPR POS Sales Wfl. Sets Step"
 {
     Extensible = False;
     Caption = 'POS Sales Workflow Sets';
@@ -7,6 +7,8 @@
     SourceTableTemporary = true;
     DelayedInsert = true;
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore. Retail wizard was modified.';
     layout
     {
         area(content)

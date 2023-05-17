@@ -13,7 +13,7 @@
         {
             repeater(Group)
             {
-                field("POS Store Code"; POSStoreCode)
+                field("POS Store Code"; Rec."POS Store Code")
                 {
 
                     Caption = 'POS Store Code';
@@ -24,15 +24,15 @@
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         if POSStoreCode <> '' then
-                            if TempAllPOSStore.Get(POSStoreCode) then;
+                            if POSStore.Get(POSStoreCode) then;
 
-                        if Page.RunModal(Page::"NPR POS Stores Select", TempAllPOSStore) = Action::LookupOK then begin
-                            POSStoreCode := TempAllPOSStore.Code;
-                            Rec."POS Store Code" := TempAllPOSStore.Code;
+                        if Page.RunModal(Page::"NPR POS Stores Select", POSStore) = Action::LookupOK then begin
+                            POSStoreCode := POSStore.Code;
+                            Rec."POS Store Code" := POSStore.Code;
                         end;
                     end;
                 }
-                field("POS Payment Method Code"; POSPaymentMethodCode)
+                field("POS Payment Method Code"; Rec."POS Payment Method Code")
                 {
 
                     Caption = 'POS Payment Method Code';
@@ -43,15 +43,15 @@
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         if POSPaymentMethodCode <> '' then
-                            if TempAllPOSPaymentMethod.Get(POSPaymentMethodCode) then;
+                            if POSPaymentMethod.Get(POSPaymentMethodCode) then;
 
-                        if Page.RunModal(Page::"NPR POS Pmt Methods Select", TempAllPOSPaymentMethod) = Action::LookupOK then begin
-                            POSPaymentMethodCode := TempAllPOSPaymentMethod.Code;
-                            Rec."POS Payment Method Code" := TempAllPOSPaymentMethod.Code;
+                        if Page.RunModal(Page::"NPR POS Pmt Methods Select", POSPaymentMethod) = Action::LookupOK then begin
+                            POSPaymentMethodCode := POSPaymentMethod.Code;
+                            Rec."POS Payment Method Code" := POSPaymentMethod.Code;
                         end;
                     end;
                 }
-                field("POS Payment Bin Code"; POSPaymentBinNo)
+                field("POS Payment Bin Code"; Rec."POS Payment Bin Code")
                 {
 
                     Caption = 'POS Payment Bin Code';
@@ -62,15 +62,15 @@
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         if POSPaymentBinNo <> '' then
-                            if TempAllPOSPaymentBin.Get(POSPaymentBinNo) then;
+                            if POSPaymentBin.Get(POSPaymentBinNo) then;
 
-                        if Page.RunModal(Page::"NPR POS Payment Bins Select", TempAllPOSPaymentBin) = Action::LookupOK then begin
-                            POSPaymentBinNo := TempAllPOSPaymentBin."No.";
-                            Rec."POS Payment Bin Code" := TempAllPOSPaymentBin."No.";
+                        if Page.RunModal(Page::"NPR POS Payment Bins Select", POSPaymentBin) = Action::LookupOK then begin
+                            POSPaymentBinNo := POSPaymentBin."No.";
+                            Rec."POS Payment Bin Code" := POSPaymentBin."No.";
                         end;
                     end;
                 }
-                field("Close to POS Bin No."; CloseToPOSPaymentBinNo)
+                field("Close to POS Bin No."; Rec."Close to POS Bin No.")
                 {
 
                     Caption = 'Close to POS Bin No.';
@@ -81,11 +81,11 @@
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         if CloseToPOSPaymentBinNo <> '' then
-                            if TempAllPOSPaymentBin.Get(POSPaymentBinNo) then;
+                            if POSPaymentBin.Get(POSPaymentBinNo) then;
 
-                        if Page.RunModal(Page::"NPR POS Payment Bins Select", TempAllPOSPaymentBin) = Action::LookupOK then begin
-                            CloseToPOSPaymentBinNo := TempAllPOSPaymentBin."No.";
-                            Rec."Close to POS Bin No." := TempAllPOSPaymentBin."No.";
+                        if Page.RunModal(Page::"NPR POS Payment Bins Select", POSPaymentBin) = Action::LookupOK then begin
+                            CloseToPOSPaymentBinNo := POSPaymentBin."No.";
+                            Rec."Close to POS Bin No." := POSPaymentBin."No.";
                         end;
                     end;
                 }
@@ -286,6 +286,9 @@
         TempAllPOSStore: Record "NPR POS Store" temporary;
         TempAllPOSPaymentMethod: Record "NPR POS Payment Method" temporary;
         TempAllPOSPaymentBin: Record "NPR POS Payment Bin" temporary;
+        POSStore: Record "NPR POS Store";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        POSPaymentBin: Record "NPR POS Payment Bin";
         POSStoreCode: Code[10];
         POSPaymentMethodCode: Code[10];
         POSPaymentBinNo: Code[10];
@@ -324,6 +327,20 @@
         exit(Rec.FindSet());
     end;
 
+    internal procedure CopyRealToTemp(var DoNotCopy: Boolean)
+    var
+        POSPostingSetup: Record "NPR POS Posting Setup";
+    begin
+        if POSPostingSetup.FindSet() then
+            repeat
+                Rec := POSPostingSetup;
+                if not Rec.Insert() then
+                    Rec.Modify();
+            until POSPostingSetup.Next() = 0;
+
+        DoNotCopy := true;
+    end;
+
     internal procedure CreatePOSPostingSetupData()
     var
         POSPostingSetup: Record "NPR POS Posting Setup";
@@ -334,5 +351,46 @@
                 if not POSPostingSetup.Insert() then
                     POSPostingSetup.Modify();
             until Rec.Next() = 0;
+    end;
+
+    internal procedure ApplyValues(AccountType: Option " ","G/L Account","Bank Account",Customer; AccountNo: Code[20]; DifferenceAccountType: Option " ","G/L Account","Bank Account",Customer; DifferenceAccountNo: Code[20]; DifferenceAccountNoNeg: Code[20])
+    begin
+        if Rec.FindSet() then
+            repeat
+                if AccountType <> AccountType::" " then begin
+                    if AccountType = AccountType::"G/L Account" then
+                        Rec.Validate("Account Type", Rec."Account Type"::"G/L Account");
+                    if AccountType = AccountType::"Bank Account" then
+                        Rec.Validate("Account Type", Rec."Account Type"::"Bank Account");
+                    if AccountType = AccountType::Customer then
+                        Rec.Validate("Account Type", Rec."Account Type"::Customer);
+                end;
+
+                if AccountNo <> '' then
+                    Rec.Validate("Account No.", AccountNo);
+
+                if DifferenceAccountType <> DifferenceAccountType::" " then begin
+                    if DifferenceAccountType = DifferenceAccountType::"G/L Account" then
+                        Rec.Validate("Difference Account Type", Rec."Difference Account Type"::"G/L Account");
+                    if DifferenceAccountType = DifferenceAccountType::"Bank Account" then
+                        Rec.Validate("Difference Account Type", Rec."Difference Account Type"::"Bank Account");
+                    if DifferenceAccountType = DifferenceAccountType::Customer then
+                        Rec.Validate("Difference Account Type", Rec."Difference Account Type"::Customer);
+                end;
+                if DifferenceAccountNo <> '' then
+                    Rec.Validate("Difference Acc. No.", DifferenceAccountNo);
+
+                if DifferenceAccountNoNeg <> '' then
+                    Rec.Validate("Difference Acc. No. (Neg)", DifferenceAccountNoNeg);
+
+                if (AccountType <> AccountType::" ") or
+                   (AccountNo <> '') or
+                   (DifferenceAccountType <> DifferenceAccountType::" ") or
+                   (DifferenceAccountNo <> '') or
+                   (DifferenceAccountNoNeg <> '') then
+                    Rec.Modify();
+            until Rec.Next() = 0;
+
+        Clear(Rec);
     end;
 }

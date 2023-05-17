@@ -4,7 +4,6 @@
     Caption = 'POS Payment Methods';
     PageType = ListPart;
     SourceTable = "NPR POS Payment Method";
-    SourceTableTemporary = true;
     DelayedInsert = true;
     UsageCategory = None;
     layout
@@ -107,12 +106,31 @@
             until POSPaymentMethod.Next() = 0;
     end;
 
+    [Obsolete('Please use procedure POSPaymentMethodsToModify()')]
     internal procedure POSPaymentMethodsToCreate(): Boolean
     begin
         exit(Rec.FindSet());
     end;
 
+    internal procedure POSPaymentMethodsToModify(): Boolean
+    begin
+        exit(Rec.FindSet());
+    end;
+
+    [Obsolete('Please use procedure ModifyPOSPaymentMethodData()')]
     internal procedure CreatePOSPaymentMethodData()
+    var
+        POSPaymentMethod: Record "NPR POS Payment Method";
+    begin
+        if Rec.FindSet() then
+            repeat
+                POSPaymentMethod := Rec;
+                if not POSPaymentMethod.Insert() then
+                    POSPaymentMethod.Modify();
+            until Rec.Next() = 0;
+    end;
+
+    internal procedure ModifyPOSPaymentMethodData()
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin

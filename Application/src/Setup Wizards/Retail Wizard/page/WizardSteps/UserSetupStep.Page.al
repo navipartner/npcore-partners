@@ -1,4 +1,4 @@
-﻿page 6014690 "NPR User Setup Step"
+page 6014690 "NPR User Setup Step"
 {
     Extensible = False;
     Caption = 'User Setup';
@@ -7,6 +7,8 @@
     SourceTableTemporary = true;
     DelayedInsert = true;
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore. Retail wizard was modified.';
 
     layout
     {
