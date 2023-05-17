@@ -141,12 +141,32 @@
         if RetentionPolicySetup.Get(TableId) then
             RetentionPolicySetup.Delete(true);
 
+        RetentionPolicySetup.Init();
         RetentionPolicySetup.Validate("Table Id", TableId);
+#if BC17
         RetentionPolicySetup.Validate("Apply to all records", true);
-        RetentionPolicySetup.Validate("Retention Period", RetentionPeriodCode);
+#else
+        RetentionPolicySetup.Validate("Apply to all records", not LockedRetentionPolicySetupLinesExist(TableId));
+#endif
+        if RetentionPolicySetup."Apply to all records" then
+            RetentionPolicySetup.Validate("Retention Period", RetentionPeriodCode);
         RetentionPolicySetup.Validate(Enabled, true);
         RetentionPolicySetup.Insert(true);
     end;
+
+#if not BC17
+    local procedure LockedRetentionPolicySetupLinesExist(TableId: Integer): Boolean
+    var
+        RetentionPolicySetupLine: Record "Retention Policy Setup Line";
+    begin
+        RetentionPolicySetupLine.SetRange("Table ID", TableId);
+        if RetentionPolicySetupLine.Find('-') then
+            repeat
+                if RetentionPolicySetupLine.IsLocked() then
+                    exit(true);
+            until RetentionPolicySetupLine.Next() = 0;
+    end;
+#endif
 
     local procedure AddPosSavedSalesRetentionPolicy()
     var
