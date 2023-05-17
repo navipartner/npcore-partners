@@ -55,11 +55,6 @@
                     ToolTip = 'You can choose between either Print or No print.';
                     ApplicationArea = NPRRetail;
                 }
-                field("User Experience"; Rec."User Experience")
-                {
-                    ToolTip = 'Specifies which platform will show the End of Day user interface.';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Force Blind Counting"; Rec."Force Blind Counting")
                 {
                     ToolTip = 'If this field is checked on the balancing page the amount won''t be shown in the system.';

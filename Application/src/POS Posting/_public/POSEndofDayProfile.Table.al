@@ -71,6 +71,8 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Business Central,Point of Sale';
             OptionMembers = BC,POS;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not used anymore.';
         }
         field(40; "Force Blind Counting"; Boolean)
         {
