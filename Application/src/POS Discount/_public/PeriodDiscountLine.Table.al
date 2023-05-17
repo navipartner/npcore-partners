@@ -141,12 +141,16 @@
             begin
 
                 if Item.Get("Item No.") then begin
-                    ItemCategory.Get(Item."Item Category Code");
                     if Item."Price Includes VAT" then begin
-                        if ItemCategoryMgt.GetVATPostingSetupFromItemCategory(ItemCategory, VATPostingSetup) then begin
+                        if VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then begin
                             POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
                             VATPct := VATPostingSetup."VAT %";
-                        end;
+                        end else
+                            if ItemCategory.Get(Item."Item Category Code") then
+                                if ItemCategoryMgt.GetVATPostingSetupFromItemCategory(ItemCategory, VATPostingSetup) then begin
+                                    POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                                    VATPct := VATPostingSetup."VAT %";
+                                end;
                     end else
                         VATPct := 0;
 
@@ -327,12 +331,16 @@
             begin
                 if ("Campaign Profit" < 100) and Item.Get("Item No.") then begin
                     GLSetup.Get();
-                    ItemCategory.Get(Item."Item Category Code");
                     if Item."Price Includes VAT" then begin
-                        if ItemCategoryMgt.GetVATPostingSetupFromItemCategory(ItemCategory, VATPostingSetup) then begin
+                        if VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then begin
                             POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
                             VATPct := VATPostingSetup."VAT %";
-                        end;
+                        end else
+                            if ItemCategory.Get(Item."Item Category Code") then
+                                if ItemCategoryMgt.GetVATPostingSetupFromItemCategory(ItemCategory, VATPostingSetup) then begin
+                                    POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                                    VATPct := VATPostingSetup."VAT %";
+                                end;
                     end else
                         VATPct := 0;
 
