@@ -68,7 +68,7 @@ page 6150858 "NPR NPCamera Profile List"
                     Camera: Page "NPR NPCamera";
                     inS: InStream;
                 begin
-                    Camera.TakePhoto(inS, Rec);
+                    Camera.TakePicture(inS, Rec);
                 end;
             }
             action("Test Default")
@@ -85,7 +85,7 @@ page 6150858 "NPR NPCamera Profile List"
                     Camera: Page "NPR NPCamera";
                     inS: InStream;
                 begin
-                    Camera.TakePhoto(inS)
+                    Camera.TakePicture(inS);
                 end;
             }
         }

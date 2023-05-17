@@ -127,7 +127,7 @@ table 6014681 "NPR POS Sale Media Info"
         Camera: Page "NPR NPCamera";
         inStr: InStream;
     begin
-        if (Camera.TakePhoto(inStr)) then
+        if (Camera.TakePicture(inStr)) then
             POSSaleMediaInfo.Image.ImportStream(inStr, POSSaleMediaInfo.FieldName(Image))
         else
             Error('');
