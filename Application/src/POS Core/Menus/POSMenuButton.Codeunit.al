@@ -1,6 +1,8 @@
 ﻿codeunit 6150889 "NPR POS Menu Button" implements "NPR IJsonSerializable", "NPR ISubMenu"
 {
-    Access = Internal;
+#IF NOT BC17
+    Access = Internal;      
+#ENDIF
 
     var
         _caption: Text;

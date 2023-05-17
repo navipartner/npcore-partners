@@ -1,6 +1,8 @@
 ﻿table 6014640 "NPR Tax Free Request"
 {
-    Access = Internal;
+#IF NOT BC17
+    Access = Internal;      
+#ENDIF
     Caption = 'Tax Free Request';
     DataClassification = CustomerContent;
 
