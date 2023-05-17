@@ -263,7 +263,6 @@
         NodeList: XmlNodeList;
         RecRef: RecordRef;
         OrderNo: Code[20];
-        WebsiteCode: Code[20];
         i: Integer;
     begin
         Initialize();
@@ -328,12 +327,15 @@
             end;
         end;
 
-        WebsiteCode := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'website_code', true), 1, MaxStrLen(WebsiteCode));
-        if (MagentoWebsite.Get(WebsiteCode)) and (MagentoWebsite."Global Dimension 1 Code" <> '') then begin
-            SalesHeader.Validate(SalesHeader."Shortcut Dimension 1 Code", MagentoWebsite."Global Dimension 1 Code");
-            SalesHeader.Validate("Shortcut Dimension 2 Code", MagentoWebsite."Global Dimension 2 Code");
+        if MagentoWebsite.Get(NpXmlDomMgt.GetAttributeCode(XmlElement, '', 'website_code', MaxStrLen(MagentoWebsite.Code), true)) then begin
+            SalesHeader.Validate("Location Code", MagentoWebsite."Location Code");
+            if (MagentoWebsite."Global Dimension 1 Code" <> '') then begin
+                SalesHeader.SetHideValidationDialog(true);
+                SalesHeader.Validate(SalesHeader."Shortcut Dimension 1 Code", MagentoWebsite."Global Dimension 1 Code");
+                SalesHeader.Validate("Shortcut Dimension 2 Code", MagentoWebsite."Global Dimension 2 Code");
+                SalesHeader.SetHideValidationDialog(false);
+            end;
         end;
-        SalesHeader.Validate("Location Code", MagentoWebsite."Location Code");
         SalesHeader.Validate("Currency Code", GetCurrencyCode(CopyStr(NpXmlDomMgt.GetElementCode(XmlElement, 'currency_code', MaxStrLen(SalesHeader."Currency Code"), false), 1, MaxStrLen(SalesHeader."Currency Code"))));
         SalesHeader.Modify(true);
     end;

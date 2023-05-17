@@ -645,13 +645,15 @@
             end;
         end;
 
+        SalesHeader.Validate("Location Code", MagentoWebsite."Location Code");
         if MagentoWebsite.Code <> '' then begin
+            SalesHeader.SetHideValidationDialog(true);
             if MagentoWebsite."Global Dimension 1 Code" <> '' then
                 SalesHeader.Validate("Shortcut Dimension 1 Code", MagentoWebsite."Global Dimension 1 Code");
             if MagentoWebsite."Global Dimension 2 Code" <> '' then
                 SalesHeader.Validate("Shortcut Dimension 2 Code", MagentoWebsite."Global Dimension 2 Code");
+            SalesHeader.SetHideValidationDialog(false);
         end;
-        SalesHeader.Validate("Location Code", MagentoWebsite."Location Code");
         SalesHeader.Validate("Currency Code", GetCurrencyCode(CopyStr(NpXmlDomMgt.GetElementCode(XmlElement, 'currency_code', MaxStrLen(SalesHeader."Currency Code"), false), 1, 10)));
         if SalesHeader."Currency Code" <> '' then begin
             CurrencyFactor := NpXmlDomMgt.GetElementDec(XmlElement, 'currency_factor', false);
@@ -1097,7 +1099,7 @@
             SalesLine.Description := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'description', MaxStrLen(SalesLine.Description), true), 1, MaxStrLen(SalesLine.Description));
             if ShipmentMapping.Description <> '' then
                 Salesline.Description := ShipmentMapping.Description;
-           
+
             SalesLine.Modify(true);
         end;
     end;
