@@ -1,6 +1,8 @@
 ﻿table 6014643 "NPR Tax Free Consolidation"
 {
-    Access = Internal;
+#IF NOT BC17
+    Access = Internal;      
+#ENDIF
     Caption = 'Tax Free Consolidation';
     LookupPageID = "NPR Tax Free Consolidation";
     DataClassification = CustomerContent;

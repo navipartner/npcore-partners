@@ -1,6 +1,8 @@
 ﻿table 6014560 "NPR RP Device Settings"
 {
-    Access = Internal;
+#IF NOT BC17
+    Access = Internal;      
+#ENDIF
     Caption = 'Device Settings';
     DataClassification = CustomerContent;
 

@@ -1,6 +1,8 @@
 ﻿table 6014571 "NPR POS Sale Tax Line"
 {
-    Access = Internal;
+#IF NOT BC17
+    Access = Internal;      
+#ENDIF
     DataClassification = CustomerContent;
     Caption = 'POS Sale Tax Line';
 

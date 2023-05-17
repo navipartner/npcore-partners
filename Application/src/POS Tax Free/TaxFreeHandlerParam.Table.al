@@ -1,6 +1,8 @@
 ﻿table 6014642 "NPR Tax Free Handler Param."
 {
-    Access = Internal;
+#IF NOT BC17
+    Access = Internal;      
+#ENDIF
 
     Caption = 'Tax Free Handler Parameters';
     DataClassification = CustomerContent;
