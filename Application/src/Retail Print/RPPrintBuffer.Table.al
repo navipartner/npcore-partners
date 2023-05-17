@@ -1,6 +1,8 @@
 ﻿table 6014541 "NPR RP Print Buffer"
 {
-    Access = Internal;
+#IF NOT BC17
+    Access = Internal;      
+#ENDIF
     Caption = 'Print Buffer';
     DataClassification = CustomerContent;
 

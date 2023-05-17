@@ -1,6 +1,8 @@
 ﻿table 6014477 "NPR Tax Free Voucher"
 {
-    Access = Internal;
+#IF NOT BC17
+    Access = Internal;      
+#ENDIF
 
     Caption = 'Tax Free Voucher';
     LookupPageID = "NPR Tax Free Voucher";

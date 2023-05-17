@@ -1,6 +1,8 @@
 ﻿table 6014438 "NPR CleanCash Trans. Request"
 {
+#IF NOT BC17
     Access = Internal;
+#ENDIF
     DataClassification = CustomerContent;
     Caption = 'CleanCash Trans. Request';
 

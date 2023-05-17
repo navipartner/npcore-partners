@@ -1,6 +1,8 @@
 ﻿table 6014641 "NPR Tax Free POS Unit"
 {
-    Access = Internal;
+#IF NOT BC17
+    Access = Internal;      
+#ENDIF
 
     Caption = 'POS Tax Free Profile';
     LookupPageID = "NPR POS Tax Free Profiles";

@@ -1,6 +1,8 @@
 ﻿table 6014570 "NPR POS Sale Tax"
 {
-    Access = Internal;
+#IF NOT BC17
+    Access = Internal;      
+#ENDIF
     DataClassification = CustomerContent;
     Caption = 'POS Sale Tax';
     LookupPageId = "NPR POS Sale Tax List";
@@ -324,11 +326,11 @@
             SaleLinePOS."VAT Calculation Type"::"Sales Tax":
                 "Source Tax Calc. Type" := "Source Tax Calc. Type"::"Sales Tax";
             else begin
-                    OnSetTaxCalcType(Handled);
-                    if not Handled then
-                        error(UnknownTaxCalculationTypeErr,
-                                FieldCaption("Source Tax Calc. Type"), "Source Tax Calc. Type");
-                end;
+                OnSetTaxCalcType(Handled);
+                if not Handled then
+                    error(UnknownTaxCalculationTypeErr,
+                            FieldCaption("Source Tax Calc. Type"), "Source Tax Calc. Type");
+            end;
         end;
     end;
 

@@ -1,6 +1,8 @@
 ﻿table 6150701 "NPR POS Menu Button"
 {
-    Access = Internal;
+#IF NOT BC17
+    Access = Internal;      
+#ENDIF
     Caption = 'POS Menu Button';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Menu Buttons";

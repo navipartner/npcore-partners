@@ -1,6 +1,8 @@
 ﻿table 6014607 "NPR Auth. Param. Buffer"
 {
-    Access = Internal;
+#IF NOT BC17
+    Access = Internal;      
+#ENDIF
     Caption = 'Authorization Parameters Buffer';
     DataClassification = SystemMetadata;
     TableType = Temporary;
