@@ -95,7 +95,7 @@ For more information and operating instructions, refer to the article on the [PO
 
 ### V4 POS balancing feature - end-of-day process
 
-A new version of the balancing feature has been released. For more information and setup instructions, refer to the article on the [POS balancing feature V4](retail/posunit/howto/balance_pos_v4.md).
+A new version of the balancing feature has been released. For more information and setup instructions, refer to the article on the [POS balancing feature V4](retail/posunit/howto/balance_the_pos.md).
 
 > [!Video https://share.synthesia.io/ec8e0a32-7578-4569-a608-664743059921]
 

@@ -1,7 +1,7 @@
 # POS Display Profile (reference guide)
 
 Each POS unit can have a different display view. The following fields can be set up in each **POS Display Profile**:
-
+ 
 
 | Field Name      | Description |
 | ----------- | ----------- |

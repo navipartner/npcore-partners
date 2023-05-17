@@ -1,57 +1,48 @@
-# Balance the POS V3 (Z-report)
+# Generate end-of-day report (POS balance)
 
-The Z-report, or the end-of-day report, calculates and displays the payments received through that register for the entirety of a day. 
+The POS balance report, or the end-of-day report, contains the payments received throughout the day on the selected POS unit, and is used for cash count and balancing.
 
-You can define the payment bins like bank or safe, and then a common payment bin, where on posting the cash balance, we transfer them out of the default bin.
+To generate the POS balance report and count the contents of the payment bin, make sure the prerequisite is met and follow the provided steps:
 
-The Z-report (Balance V3) transactions consist of three segments:
+## Prerequisite
 
-- Sales on the POS
+- Make sure the balancing processes are [properly configured](balance_pos_v4.md) in Business Central.
 
-- Balancing of Register
+## Procedure
 
-- Auto-count
+1. From the **POS**, click **Other Functions (menu)**, followed by **End of Day Balancing**.     
+   The **POS Workshift Checkpoint** is displayed, along with the [Z-Report overview](../explanation/end_of_day.md). To see all work shift statistics, open the **Show All** tab.
 
-> [!Note]
-> The reports can be printed, if needed
+   ![balance_the_pos_v4_all](../images/balance_pos_v4_balancing_screen_%20all.png)
 
-This article focuses on generating a Z-report and counting the contents of the payment bin.
+2. Click **Cash Count** in the lower left corner when you've reviewed the work shift statistics.      
+   The counting screen is displayed. In the upper right corner, you can see which currencies have been collected in the payment bin, and are ready to be counted and balanced.     
 
-1. From the **POS**, click **Other Functions (menu)**, followed by **End of Day**.     
-   ![POS_19_End_of_day](../images/POS_19_End_of_Day.png "End of Day")     
-   A selection between X-Report and Z-Report is displayed.
-2. Click **Balance Register - (Z-Report)**.   
-   If no sales were made that day, an empty register will be balanced. If there were some sales, the **Workshift Details** window is displayed, and you can see the detailed report of the performed sales for the day. 
+   ![cash_count](../images/cash_count_v4.PNG)
 
-> [!Note]
-> The **Workshift Details** table contains the details of all types of transactions - sales, X-report, Z-report etc. 
+3. Take one of the two possible approaches to counting:
+   - Click the coin icon to select every bill and coin denomination for the selected currency which have been deposited in the bin.
+   - Input the counted amount in the **Counted Amount Incl. Float** field.
 
-3. Click ![ellipsis icon](../../../images/Icons/elipsis_icon.PNG "Three Dots Icon"), and then **Process** followed by **Balance Payment Bin...** in the dropdown list.     
-   The **POS Payment Bin Checkpoint** window is displayed. It contains options for counting, transferring, and closing of the attached payment bin's contents.    
+   > [!Note]
+   > If the calculated and the counted amount are different, this will be recorded in the **Difference** field automatically.
 
-> [!Note]
-> The **Counted Amount Incl. Float** field should include all contents of the bin as counted by the salesperson. It shows how much there should be in the payment bin according to the sales made on the POS.
+4. (Optional) Click the dialog box icon to add a comment which will let users know what caused the difference between the amounts.
+5. Enter the amount that should be deposited to the bank in the **Bank Deposit** field.
+6. Enter the amount that should be deposited to the store safe in the **Move to Bin** field.      
 
-4. Click the value in the **Counted Amount Incl. Float** field, and then the ![ellipsis icon](../../../images/Icons/elipsis_icon.PNG "Three Dots Icon") that is displayed next to that value.    
-   The **Coin Types** window is displayed. It helps facilitate the counting and totaling of the payment bin's contents.\
-5. Click ![ellipsis icon](../../../images/Icons/elipsis_icon.PNG "Three Dots Icon"), and then the **Edit List** button to fill out the list of coin types.   
-   The bottom-right corner of the **Coin Types** page displays the total counted amount.
-6. Click **OK** to save the counting details and then go back to the **POS Payment Bin Checkpoint** page.   
-   The **Counted Amount Incl. Float** field is now populated, and the difference has been calculated and is now displayed in the adequate field. 
+   > [!Note]
+   > Once you provide the amount that should be transferred in one of the fields, the remaining amount is automatically populated in the other field. So, for example, if you enter 3000,00 into the field **New Float Amount**, then the field **Bank Deposit Amount** is automatically populated with the value 635,0.
 
-> [!Note]
-> The **Closing & Transfer** tab is used to transfer cash to another payment bin or a safe, and to deposit cash to a bank bin.
+7. Click **Finalize** once the counting is completed.     
+   The button will become green, indicating that the amount has been saved and processed.
+8. Repeat this process for every currency that needs to be counted.    
+   When you open the POS for the next shift, you will be prompted to state whether the recorded payment bin contents are correct. If the contents are incorrect, you can perform balancing again to correct the mistake.
 
-> [!Tip]
-> The salesperson can either fill out the **New Float Amount** field or the **Bank Deposit Amount** field. The remaining amount is automatically provided in the other field. So, for example, if you enter 3000,00 into the field **New Float Amount**, then the field **Bank Deposit Amount** is automatically populated with the value 635,0.
-
-7. To finalize the counting and closing procedures, click **Close**, and then ick **Yes** when prompted to confirm that you wish to finish counting and post results.   
-   The counted amount will be visible on the **Workshift Details** page.
-8. Finish the entire balancing process by clicking **OK**.    
-   You will then be logged out of the POS, and the Z-report will be printed on the receipt printer.
 
 ### Related links
 
+- [Configure the POS balancing feature](balance_pos_v4.md)
 - [POS Display Profile](../../pos_profiles/reference/POS_Display_profile.md)
 - [Create a new POS unit (by using the existing one for reference)](./createnew.md)   
 - [Configure an opening mechanism for a POS unit cash drawer](./ConfigureCashDrawerOpening.md)
