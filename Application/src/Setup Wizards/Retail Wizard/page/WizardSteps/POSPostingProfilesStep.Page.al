@@ -4,7 +4,6 @@
     Caption = 'POS Posting Profiles';
     PageType = ListPart;
     SourceTable = "NPR POS Posting Profile";
-    SourceTableTemporary = true;
     DelayedInsert = true;
     UsageCategory = None;
     layout

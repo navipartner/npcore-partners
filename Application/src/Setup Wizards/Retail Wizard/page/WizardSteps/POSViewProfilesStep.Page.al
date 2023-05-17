@@ -1,4 +1,4 @@
-﻿page 6014655 "NPR POS View Profiles Step"
+page 6014655 "NPR POS View Profiles Step"
 {
     Extensible = False;
     Caption = 'POS View Profiles';
@@ -6,6 +6,8 @@
     SourceTable = "NPR POS View Profile";
     SourceTableTemporary = true;
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore. Retail wizard was modified.';
 
     layout
     {

@@ -3,7 +3,8 @@
     Extensible = False;
     Caption = 'Salespersons';
     PageType = ListPart;
-    SourceTable = "NPR Salesperson Buffer";
+    SourceTable = "Salesperson/Purchaser";
+    SourceTableTemporary = true;
     UsageCategory = None;
 
     layout
@@ -12,28 +13,17 @@
         {
             repeater(Control1)
             {
-                ShowCaption = false;
-                field("Entry No."; Rec."Entry No.")
-                {
-
-                    Caption = 'Entry No.';
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Entry No. field';
-                    ApplicationArea = NPRRetail;
-                }
                 field("Code"; Rec.Code)
                 {
 
                     ToolTip = 'Specifies the code of the record.';
                     ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    var
-                        Salesperson: Record "NPR Salesperson Buffer";
-                    begin
-                        CheckIfNoAvailableInSalespersonPurchaser(Salesperson, Rec.Code);
-                    end;
+                }
+                field("NPR Register Password"; Rec."NPR Register Password")
+                {
+                    ExtendedDatatype = Masked;
+                    ToolTip = 'Enable defining a password for accessing a POS unit.';
+                    ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
@@ -43,25 +33,6 @@
             }
         }
     }
-
-    internal procedure CopyRealAndTemp(var TempSalesperson: Record "NPR Salesperson Buffer")
-    var
-        Salesperson: Record "Salesperson/Purchaser";
-    begin
-        TempSalesperson.DeleteAll();
-        if Rec.FindSet() then
-            repeat
-                TempSalesperson := Rec;
-                TempSalesperson.Insert();
-            until Rec.Next() = 0;
-
-        TempSalesperson.Init();
-        if Salesperson.FindSet() then
-            repeat
-                TempSalesperson.TransferFields(Salesperson);
-                TempSalesperson.Insert();
-            until Salesperson.Next() = 0;
-    end;
 
     internal procedure CheckIfNoAvailableInSalespersonPurchaser(var SalespersonPurchaser: Record "NPR Salesperson Buffer"; var WantedStartingNo: Code[10]) CalculatedNo: Code[10]
     var
@@ -81,6 +52,18 @@
     internal procedure SalespersonsToCreate(): Boolean
     begin
         exit(Rec.FindSet());
+    end;
+
+    internal procedure CopyRealToTemp()
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+    begin
+        if Salesperson.FindSet() then
+            repeat
+                Rec.TransferFields(Salesperson);
+                if not Rec.Insert() then
+                    Rec.Modify();
+            until Salesperson.Next() = 0;
     end;
 
     internal procedure CreateSalespersonData()

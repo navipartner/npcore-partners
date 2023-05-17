@@ -1,4 +1,4 @@
-﻿page 6014673 "NPR Ean Box Setup Step"
+page 6014673 "NPR Ean Box Setup Step"
 {
     Extensible = False;
     Caption = 'Ean Box Setup';
@@ -7,6 +7,8 @@
     SourceTableTemporary = true;
     DelayedInsert = true;
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore. Retail wizard was modified.';
     layout
     {
         area(content)

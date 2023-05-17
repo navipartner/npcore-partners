@@ -1,8 +1,10 @@
-﻿page 6014651 "NPR Retail Wizard"
+page 6014651 "NPR Retail Wizard"
 {
     Extensible = False;
     Caption = 'Retail Wizard';
     PageType = NavigatePage;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used any more. Retail wizard was modified.';
 
     layout
     {
@@ -1023,7 +1025,6 @@
         UserSetupStepVisible := true;
 
         CurrPage.UserSetupPG.Page.CopyRealAndTempUsers(TempAllUser);
-        CurrPage.SalespersonListPG.Page.CopyRealAndTemp(TempAllSalesperson);
         CurrPage.POSUnitListPG.Page.CopyRealAndTemp(TempAllPOSUnit);
         CurrPage.UserSetupPG.Page.SetGlobals(TempAllSalesperson, TempAllUser, TempAllPOSUnit);
     end;

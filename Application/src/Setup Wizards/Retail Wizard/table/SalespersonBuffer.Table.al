@@ -15,6 +15,11 @@
             Caption = 'Name';
             DataClassification = CustomerContent;
         }
+        field(6014400; "NPR Register Password"; Code[20])
+        {
+            Caption = 'POS Unit Password';
+            DataClassification = CustomerContent;
+        }
         field(6014456; "Entry No."; Integer)
         {
             Caption = 'Entry No.';
@@ -43,8 +48,6 @@
             "Entry No." := SalespersonBuffer."Entry No." + 1;
 
         WantedStartingNo := Code;
-
-        SalespersonPurchaserWP.CopyRealAndTemp(TempAllSalesperson);
         SalespersonPurchaserWP.CheckIfNoAvailableInSalespersonPurchaser(TempAllSalesperson, WantedStartingNo);
 
         Code := WantedStartingNo;

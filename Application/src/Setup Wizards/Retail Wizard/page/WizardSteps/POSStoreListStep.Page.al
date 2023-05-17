@@ -1,4 +1,4 @@
-﻿page 6014653 "NPR POS Store List Step"
+page 6014653 "NPR POS Store List Step"
 {
     Extensible = False;
     Caption = 'POS Stores';
@@ -7,6 +7,8 @@
     SourceTable = "NPR POS Store";
     SourceTableTemporary = true;
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore. Retail wizard was modified.';
 
     layout
     {

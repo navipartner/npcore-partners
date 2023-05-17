@@ -1,4 +1,4 @@
-﻿page 6014652 "NPR Comp. Inf. Step"
+page 6014652 "NPR Comp. Inf. Step"
 {
     Extensible = False;
     Caption = 'Company Information';
@@ -7,6 +7,8 @@
     SourceTable = "Company Information";
     SourceTableTemporary = true;
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore. Retail wizard was modified.';
 
     layout
     {
