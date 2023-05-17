@@ -1,4 +1,4 @@
-﻿page 6014656 "NPR POS EOD Profiles Step"
+page 6014656 "NPR POS EOD Profiles Step"
 {
     Extensible = False;
     Caption = 'POS EOD Profiles';
@@ -7,6 +7,8 @@
     SourceTableTemporary = true;
     DelayedInsert = true;
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore. Retail wizard was modified.';
     layout
     {
         area(content)

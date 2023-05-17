@@ -8,7 +8,7 @@ codeunit 6150950 "NPR Price List Line Change"
     begin
         if Rec.Status <> Rec.Status::Active then
             exit;
-#IF BC17 OR BC18 OR BC19
+#IF BC17 OR BC18 OR BC19 OR BC20
         PriceChangeHistory.SetRange("Product No.", Rec."Asset No.");
 #ELSE
         PriceChangeHistory.SetRange("Product No.", Rec."Product No.");

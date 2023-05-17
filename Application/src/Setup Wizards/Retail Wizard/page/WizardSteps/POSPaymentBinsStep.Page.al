@@ -4,7 +4,6 @@
     Caption = 'POS Payment Bins';
     PageType = ListPart;
     SourceTable = "NPR POS Payment Bin";
-    SourceTableTemporary = true;
     InsertAllowed = false;
     UsageCategory = None;
     layout
@@ -22,26 +21,8 @@
                     Lookup = true;
                     ToolTip = 'Specifies the value of the POS Unit Code field';
                     ApplicationArea = NPRRetail;
-
-                    trigger OnLookup(var Text: Text): Boolean
-                    begin
-                        NoOfPOSPaymentBinsToCreate := 0;
-                        StartingNoPaymentBin := '';
-
-                        if Page.RunModal(Page::"NPR POS Units Select", TempAllPOSUnit) = Action::LookupOK then begin
-                            SelectedPOSUnit := TempAllPOSUnit."No.";
-                            _SelectedPOSStore := TempAllPOSUnit."POS Store Code";
-                            CurrPage.Update(false);
-                        end;
-
-                        Rec.SetRange("Attached to POS Unit No.", SelectedPOSUnit);
-                    end;
+                    TableRelation = "NPR POS Unit"."No.";
                 }
-            }
-            group(Empty)
-            {
-                Caption = '';
-                InstructionalText = ' ';
             }
             group(POSPaymentBinNoOfBins)
             {
@@ -251,6 +232,7 @@
         exit(Rec.FindSet());
     end;
 
+    [Obsolete('Please use procedure CreatePOSPaymentBinData()')]
     internal procedure CreatePOSPaymentBinData(var POSPaymentBinToCreate: Record "NPR POS Payment Bin")
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
@@ -261,5 +243,17 @@
                 if not POSPaymentBin.Insert() then
                     POSPaymentBin.Modify();
             until POSPaymentBinToCreate.Next() = 0;
+    end;
+
+    internal procedure CreatePOSPaymentBinData()
+    var
+        POSPaymentBin: Record "NPR POS Payment Bin";
+    begin
+        if Rec.FindSet() then
+            repeat
+                POSPaymentBin := Rec;
+                if not POSPaymentBin.Insert() then
+                    POSPaymentBin.Modify();
+            until Rec.Next() = 0;
     end;
 }

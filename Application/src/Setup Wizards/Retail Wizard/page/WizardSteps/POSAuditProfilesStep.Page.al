@@ -1,4 +1,4 @@
-﻿page 6014654 "NPR POS Audit Profiles Step"
+page 6014654 "NPR POS Audit Profiles Step"
 {
     Extensible = False;
     Caption = 'POS Audit Profiles';
@@ -7,6 +7,8 @@
     SourceTableTemporary = true;
     DelayedInsert = true;
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore. Retail wizard was modified.';
 
     layout
     {

@@ -1,4 +1,4 @@
-﻿page 6014683 "NPR POS Unit List Step"
+page 6014683 "NPR POS Unit List Step"
 {
     Extensible = False;
     Caption = 'POS Units';
@@ -7,6 +7,8 @@
     SourceTableTemporary = true;
     InsertAllowed = false;
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore. Retail wizard was modified.';
 
     layout
     {

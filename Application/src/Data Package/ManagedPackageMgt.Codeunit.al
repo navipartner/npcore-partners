@@ -322,5 +322,264 @@
 
         IsDialogOpen := false;
     end;
-}
 
+    #region ImportPrintTemplateFromWizard
+    //This is the modified copy of "Download Template data" functionality from Print template list page. 
+    //This copy is modified in a way that Import worksheet page is not shown, but all existing records are set with action Replace, and all new records with action create.
+
+    //[NonDebuggable]
+    procedure DeployPrintTemplatePackage(URL: Text)
+    var
+        Client: HttpClient;
+        ResponseMessage: HttpResponseMessage;
+        JSON: Text;
+        JObject: JsonObject;
+        Jtoken: JsonToken;
+        PrimaryPackageTable: Integer;
+        Handled: Boolean;
+    begin
+        if not Client.Get(URL, ResponseMessage) then
+            Error('Failed to call URL: %1', URL);
+
+        if not ResponseMessage.IsSuccessStatusCode then
+            Error('Web service has returnend an error:\\' + 'Status code: %1\' + 'Status code: %2', ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
+
+        ResponseMessage.Content.ReadAs(JSON);
+
+        JObject.ReadFrom(JSON);
+        JObject.Get('Primary Package Table', Jtoken);
+        PrimaryPackageTable := Jtoken.AsValue().AsInteger();
+        JObject.Get('Data', Jtoken);
+
+        LoadPrintTemplatePackage(Handled, PrimaryPackageTable, Jtoken, 0);
+    end;
+
+    local procedure LoadPrintTemplatePackage(var Handled: Boolean; PrimaryPackageTable: Integer; JObject: JsonToken; LoadType: Option File,Blob,Download)
+    var
+        TempImportWorksheet: Record "NPR RP Imp. Worksh." temporary;
+        TempTemplateHeader: Record "NPR RP Template Header" temporary;
+        TempTemplateLine: Record "NPR RP Template Line" temporary;
+        TempDataItem: Record "NPR RP Data Items" temporary;
+        TempDataItemLinks: Record "NPR RP Data Item Links" temporary;
+        TempDataItemConstraint: Record "NPR RP Data Item Constr." temporary;
+        TempDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary;
+        TempDeviceSettings: Record "NPR RP Device Settings" temporary;
+        TempMediaInfo: Record "NPR RP Template Media Info" temporary;
+        RPTemplateHeader: Record "NPR RP Template Header";
+    begin
+        if Handled then
+            exit;
+        if LoadType = LoadType::Blob then
+            exit;
+        if PrimaryPackageTable <> DATABASE::"NPR RP Template Header" then
+            exit;
+
+        Handled := true;
+
+        if not PrintTemplateParsePackage(JObject, TempTemplateHeader, TempTemplateLine, TempDataItem, TempDataItemLinks, TempDataItemConstraint, TempDataItemConstraintLinks, TempDeviceSettings, TempMediaInfo) then
+            exit;
+
+        repeat
+            TempImportWorksheet.Init();
+            TempImportWorksheet."Entry No." += 1;
+            TempImportWorksheet.Template := TempTemplateHeader.Code;
+            TempImportWorksheet."New Description" := TempTemplateHeader.Description;
+            TempImportWorksheet."New Last Modified At" := TempTemplateHeader."Last Modified At";
+            TempImportWorksheet."New Version" := TempTemplateHeader.Version;
+            TempImportWorksheet.Action := TempImportWorksheet.Action::Create;
+            if RPTemplateHeader.Get(TempTemplateHeader.Code) then begin
+                TempImportWorksheet."Existing Description" := RPTemplateHeader.Description;
+                TempImportWorksheet."Existing Last Modified At" := RPTemplateHeader."Last Modified At";
+                TempImportWorksheet."Existing Version" := RPTemplateHeader.Version;
+                TempImportWorksheet.Action := TempImportWorksheet.Action::Replace;
+            end;
+            TempImportWorksheet.Insert(true);
+        until TempTemplateHeader.Next() = 0;
+
+        ImportPrintTemplatePackage(TempImportWorksheet, TempTemplateHeader, TempTemplateLine, TempDataItem, TempDataItemLinks, TempDataItemConstraint, TempDataItemConstraintLinks, TempDeviceSettings, TempMediaInfo);
+    end;
+
+    local procedure PrintTemplateParsePackage(JToken: JsonToken; var tmpTemplateHeader: Record "NPR RP Template Header" temporary; var tmpTemplateLine: Record "NPR RP Template Line" temporary; var tmpDataItem: Record "NPR RP Data Items" temporary; var tmpDataItemLinks: Record "NPR RP Data Item Links" temporary; var tmpDataItemConstraint: Record "NPR RP Data Item Constr." temporary; var tmpDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary; var tmpDeviceSettings: Record "NPR RP Device Settings" temporary; var tmpMediaInfo: Record "NPR RP Template Media Info" temporary): Boolean
+    var
+        i: Integer;
+        TotalRecords: Integer;
+        TableNo: Integer;
+        RecRef: RecordRef;
+        FieldReference: FieldRef;
+        ConvertHelper: Codeunit "NPR Convert Helper";
+        ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";
+        JObject: JsonObject;
+        JArray: JsonArray;
+        FieldIDList: List of [Text];
+        FieldID: Text;
+    begin
+        JArray := JToken.AsArray();
+        TotalRecords := JArray.Count();
+
+        for i := 0 to TotalRecords - 1 do begin
+            JArray.Get(i, JToken);
+            JObject := JToken.AsObject();
+            JObject.Get('Record', JToken);
+            TableNo := JToken.AsValue().AsInteger();
+
+            case TableNo of
+                DATABASE::"NPR RP Template Header":
+                    RecRef.GetTable(tmpTemplateHeader);
+                DATABASE::"NPR RP Template Line":
+                    RecRef.GetTable(tmpTemplateLine);
+                DATABASE::"NPR RP Data Items":
+                    RecRef.GetTable(tmpDataItem);
+                DATABASE::"NPR RP Data Item Links":
+                    RecRef.GetTable(tmpDataItemLinks);
+                DATABASE::"NPR RP Data Item Constr.":
+                    RecRef.GetTable(tmpDataItemConstraint);
+                DATABASE::"NPR RP Data Item Constr. Links":
+                    RecRef.GetTable(tmpDataItemConstraintLinks);
+                DATABASE::"NPR RP Device Settings":
+                    RecRef.GetTable(tmpDeviceSettings);
+                DATABASE::"NPR RP Template Media Info":
+                    RecRef.GetTable(tmpMediaInfo);
+                else
+                    Error('Unexpected table.');
+            end;
+
+            JObject.Get('Fields', JToken);
+            JObject := JToken.AsObject();
+            FieldIDList := JObject.Keys();
+
+            foreach FieldID in FieldIDList do
+                if ManagedPackageMgt.FieldRefByID(RecRef, FieldID, FieldReference) then begin
+                    JObject.Get(FieldID, JToken);
+                    if not ConvertHelper.JValueToFieldRef(JToken.AsValue(), FieldReference) then
+                        Error('Unexpected field data.');
+                end;
+
+            RecRef.Insert();
+            RecRef.Close();
+        end;
+
+        exit(tmpTemplateHeader.FindSet());
+    end;
+
+    local procedure ImportPrintTemplatePackage(var tmpImportWorksheet: Record "NPR RP Imp. Worksh."; var tmpTemplateHeader: Record "NPR RP Template Header" temporary; var tmpTemplateLine: Record "NPR RP Template Line" temporary; var tmpDataItem: Record "NPR RP Data Items" temporary; var tmpDataItemLinks: Record "NPR RP Data Item Links" temporary; var tmpDataItemConstraint: Record "NPR RP Data Item Constr." temporary; var tmpDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary; var tmpDeviceSettings: Record "NPR RP Device Settings" temporary; var tmpMediaInfo: Record "NPR RP Template Media Info" temporary)
+    var
+        RPTemplateHeader: Record "NPR RP Template Header";
+        RPTemplateLine: Record "NPR RP Template Line";
+        DataItems: Record "NPR RP Data Items";
+        DataItemLinks: Record "NPR RP Data Item Links";
+        DataItemConstraint: Record "NPR RP Data Item Constr.";
+        DataItemConstraintLinks: Record "NPR RP Data Item Constr. Links";
+        DeviceSettings: Record "NPR RP Device Settings";
+        MediaInfo: Record "NPR RP Template Media Info";
+    begin
+        tmpImportWorksheet.SetFilter(Action, '<>%1', tmpImportWorksheet.Action::Skip);
+        if tmpImportWorksheet.FindSet() then
+            repeat
+                if tmpImportWorksheet.Action = tmpImportWorksheet.Action::Replace then
+                    DeleteTemplate(tmpImportWorksheet.Template);
+
+                tmpTemplateHeader.Get(tmpImportWorksheet.Template);
+                tmpTemplateLine.SetRange("Template Code", tmpImportWorksheet.Template);
+                tmpDataItem.SetRange(Code, tmpImportWorksheet.Template);
+                tmpDataItemLinks.SetRange("Data Item Code", tmpImportWorksheet.Template);
+                tmpDataItemConstraint.SetRange("Data Item Code", tmpImportWorksheet.Template);
+                tmpDataItemConstraintLinks.SetRange("Data Item Code", tmpImportWorksheet.Template);
+                tmpDeviceSettings.SetRange(Template, tmpImportWorksheet.Template);
+                tmpMediaInfo.SetRange(Template, tmpImportWorksheet.Template);
+
+                RPTemplateHeader.Init();
+                RPTemplateHeader := tmpTemplateHeader;
+                RPTemplateHeader.Insert();
+
+                if tmpTemplateLine.FindSet() then
+                    repeat
+                        RPTemplateLine.Init();
+                        RPTemplateLine := tmpTemplateLine;
+                        RPTemplateLine.Insert();
+                    until tmpTemplateLine.Next() = 0;
+
+                if tmpDataItem.FindSet() then
+                    repeat
+                        DataItems.Init();
+                        DataItems := tmpDataItem;
+                        DataItems.Insert();
+                    until tmpDataItem.Next() = 0;
+
+                if tmpDataItemLinks.FindSet() then
+                    repeat
+                        DataItemLinks.Init();
+                        DataItemLinks := tmpDataItemLinks;
+                        DataItemLinks.Insert();
+                    until tmpDataItemLinks.Next() = 0;
+
+                if tmpDataItemConstraint.FindSet() then
+                    repeat
+                        DataItemConstraint.Init();
+                        DataItemConstraint := tmpDataItemConstraint;
+                        DataItemConstraint.Insert();
+                    until tmpDataItemConstraint.Next() = 0;
+
+                if tmpDataItemConstraintLinks.FindSet() then
+                    repeat
+                        DataItemConstraintLinks.Init();
+                        DataItemConstraintLinks := tmpDataItemConstraintLinks;
+                        DataItemConstraintLinks.Insert();
+                    until tmpDataItemConstraintLinks.Next() = 0;
+
+                if tmpDeviceSettings.FindSet() then
+                    repeat
+                        DeviceSettings.Init();
+                        DeviceSettings := tmpDeviceSettings;
+                        DeviceSettings.Insert();
+                    until tmpDeviceSettings.Next() = 0;
+
+                if tmpMediaInfo.FindSet() then
+                    repeat
+                        MediaInfo.Init();
+                        MediaInfo := tmpMediaInfo;
+                        MediaInfo.Insert();
+                    until tmpMediaInfo.Next() = 0;
+
+            until tmpImportWorksheet.Next() = 0;
+    end;
+
+    local procedure DeleteTemplate("Code": Text)
+    var
+        RPTemplateHeader: Record "NPR RP Template Header";
+        RPTemplateLine: Record "NPR RP Template Line";
+        DataItems: Record "NPR RP Data Items";
+        DataItemLinks: Record "NPR RP Data Item Links";
+        DataItemConstraint: Record "NPR RP Data Item Constr.";
+        DataItemConstraintLinks: Record "NPR RP Data Item Constr. Links";
+        DeviceSettings: Record "NPR RP Device Settings";
+        MediaInfo: Record "NPR RP Template Media Info";
+        RPTemplateArchive: Record "NPR RP Template Archive";
+    begin
+        RPTemplateHeader.Get(Code);
+        if not RPTemplateHeader.Archived then begin
+            if not RPTemplateArchive.Get(Code, RPTemplateHeader.Version) then begin
+                RPTemplateHeader."Version Comments" := 'Auto archiving before import';
+                RPTemplateHeader.Validate(Archived, true);
+            end;
+        end;
+
+        RPTemplateHeader.SetRange(Code, Code);
+        RPTemplateLine.SetRange("Template Code", Code);
+        DataItems.SetRange(Code, Code);
+        DataItemLinks.SetRange("Data Item Code", Code);
+        DataItemConstraint.SetRange("Data Item Code", Code);
+        DataItemConstraintLinks.SetRange("Data Item Code", Code);
+        DeviceSettings.SetRange(Template, Code);
+        MediaInfo.SetRange(Template, Code);
+
+        RPTemplateHeader.DeleteAll();
+        RPTemplateLine.DeleteAll();
+        DataItems.DeleteAll();
+        DataItemLinks.DeleteAll();
+        DataItemConstraint.DeleteAll();
+        DataItemConstraintLinks.DeleteAll();
+        DeviceSettings.DeleteAll();
+        MediaInfo.DeleteAll();
+    end;
+    #endregion
+}

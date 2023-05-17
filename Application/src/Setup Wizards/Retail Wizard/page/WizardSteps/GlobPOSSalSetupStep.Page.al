@@ -1,4 +1,4 @@
-﻿page 6014682 "NPR Glob. POS Sal. Setup Step"
+page 6014682 "NPR Glob. POS Sal. Setup Step"
 {
     Extensible = False;
     Caption = 'Global POS Sales Setup';
@@ -7,6 +7,8 @@
     SourceTableTemporary = true;
     DelayedInsert = true;
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Not used anymore. Retail wizard was modified.';
     layout
     {
         area(content)
