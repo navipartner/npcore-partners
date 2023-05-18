@@ -42,6 +42,3 @@ For more information about individual fields and options on the **Counting** scr
 ### Generate end-of-day report (POS balance)
 
 Once the necessary configurations are complete, you can move on to [balancing the POS](balance_the_pos.md) at the end of the work shift.
-
-
-> [!Video https://share.synthesia.io/ec8e0a32-7578-4569-a608-664743059921]
