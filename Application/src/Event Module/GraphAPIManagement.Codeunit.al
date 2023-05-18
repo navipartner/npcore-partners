@@ -315,13 +315,14 @@
 
     local procedure SetAccessToken(var EventExchIntEMail: Record "NPR Event Exch. Int. E-Mail"; NewAccessToken: Text; NewRefreshToken: Text)
     var
-        Outstream: OutStream;
+        AccessOutstream: OutStream;
+        RefreshOutstream: OutStream;
     begin
-        EventExchIntEMail."Access Token".CreateOutStream(OutStream, TextEncoding::UTF8);
-        OutStream.WriteText(NewAccessToken);
-        EventExchIntEMail."Refresh Token".CreateOutStream(OutStream, TextEncoding::UTF8);
-        OutStream.WriteText(NewRefreshToken);
-        EventExchIntEMail."Acces Token Valid Until" := CurrentDateTime() + 1000 * 50 * 60; //token TTL is 59m59s, but setting the time to 50 min just to be sure
+        EventExchIntEMail."Access Token".CreateOutStream(AccessOutstream, TextEncoding::UTF8);
+        AccessOutstream.WriteText(NewAccessToken);
+        EventExchIntEMail."Refresh Token".CreateOutStream(RefreshOutstream, TextEncoding::UTF8);
+        RefreshOutstream.WriteText(NewRefreshToken);
+        EventExchIntEMail."Acces Token Valid Until" := CurrentDateTime() + 1000 * 50 * 59; //token TTL is 59m59s
         EventExchIntEMail.Modify();
     end;
 
@@ -389,17 +390,8 @@
     local procedure GetRefreshTokenRequest(RefreshToken: Text) Request: Text
     var
         TypeHelper: Codeunit "Type Helper";
-        RedirectURL: Text;
-#IF NOT BC17
-        OAuth2: Codeunit OAuth2;
-#ENDIF
     begin
-#IF NOT BC17
-        OAuth2.GetDefaultRedirectURL(RedirectURL);
-#ENDIF
         Request := StrSubstNo('client_id=%1', _GraphApiSetup."Client Id");
-        Request += '&scope=offline_access%20https%3A%2F%2Fgraph.microsoft.com%2FCalendars.ReadWrite';
-        Request += StrSubstNo('&redirect_uri=%1', TypeHelper.UrlEncode(RedirectURL));
         Request += '&grant_type=refresh_token';
         Request += StrSubstNo('&client_secret=%1', _GraphApiSetup."Client Secret");
         Request += StrSubstNo('&refresh_token=%1', TypeHelper.UrlEncode(RefreshToken));
