@@ -830,6 +830,22 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'MM_MEMBERMGMT_WF3', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Member Mgt WF3";
     }
+    value(165; M_SCANDITITEMINFO)
+    {
+        Caption = 'M_SCANDITITEMINFO', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR MPOS Action Scan Item Info";
+
+    }
+    value(166; M_SCANDITFINDITEM)
+    {
+        Caption = 'M_SCANDITFINDITEM', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR MPOS Action ScanFind Item";
+    }
+    value(167; M_SCANDITSCAN)
+    {
+        Caption = 'M_SCANDITSCAN', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR MPOS Action Scandit Scan";
+    }
     value(145; LOGIN)
     {
         Caption = 'LOGIN', Locked = true, MaxLength = 20;
