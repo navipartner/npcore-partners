@@ -6,7 +6,8 @@
     Subtype = Install;
     Permissions =
         tabledata "Retention Period" = ri,
-        tabledata "Retention Policy Setup" = rid;
+        tabledata "Retention Policy Setup" = rimd,
+        tabledata "Retention Policy Setup Line" = rimd;
 
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
@@ -138,8 +139,11 @@
     var
         RetentionPolicySetup: Record "Retention Policy Setup";
     begin
-        if RetentionPolicySetup.Get(TableId) then
+        if RetentionPolicySetup.Get(TableId) then begin
+            if not RetentionPolicySetup.WritePermission() then
+                exit;
             RetentionPolicySetup.Delete(true);
+        end;
 
         RetentionPolicySetup.Init();
         RetentionPolicySetup.Validate("Table Id", TableId);
@@ -178,12 +182,14 @@
         TableFilters: JsonArray;
     begin
         if RetentionPolicySetup.Get(Database::"NPR POS Saved Sale Line") then
-            RetentionPolicySetup.Delete(true);
+            if RetentionPolicySetup.WritePermission() then
+                RetentionPolicySetup.Delete(true);
         if RetenPolAllowedTables.IsAllowedTable(Database::"NPR POS Saved Sale Line") then
             RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR POS Saved Sale Line");
 
         if RetentionPolicySetup.Get(Database::"NPR POS Saved Sale Entry") then
-            RetentionPolicySetup.Delete(true);
+            if RetentionPolicySetup.WritePermission() then
+                RetentionPolicySetup.Delete(true);
         if RetenPolAllowedTables.IsAllowedTable(Database::"NPR POS Saved Sale Entry") then
             RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR POS Saved Sale Entry");
 
@@ -212,7 +218,8 @@
         TableFilters: JsonArray;
     begin
         if RetentionPolicySetup.Get(Database::"NPR HL Webhook Request") then
-            RetentionPolicySetup.Delete(true);
+            if RetentionPolicySetup.WritePermission() then
+                RetentionPolicySetup.Delete(true);
         if RetenPolAllowedTables.IsAllowedTable(Database::"NPR HL Webhook Request") then
             RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR HL Webhook Request");
 
