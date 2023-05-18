@@ -16,7 +16,7 @@ codeunit 6059924 "NPR NpCs POS Action Events"
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnBeforeDeliverDocument(POSSession: Codeunit "NPR POS Session"; NpCsDocument: Record "NPR NpCs Document")
+    internal procedure OnBeforeDeliverDocument(POSSession: Codeunit "NPR POS Session"; NpCsDocument: Record "NPR NpCs Document"; DeliverText: Text; var IsHandled: Boolean)
     begin
     end;
 
