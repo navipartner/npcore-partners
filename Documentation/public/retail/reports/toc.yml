@@ -10,3 +10,5 @@
     href: howto/set_up_word_report_layout.md
   - name: Set up global dimensions
     href: howto/set_up_global_dimensions.md
+  - name: Set up event templates
+    href: howto/event_templates.md

@@ -4,7 +4,7 @@ Learn which new features and improvements have been introduced in the newest ver
 
 ## Version 21.0 (March 28th 2023)
 
-In this release, NP Retail has undergone some backend performance enhancements. Furthermore, the V3 POS Balancing feature has been sunsetted and fully replaced with the V4 Balancing feature.
+In this release, NP Retail has undergone some backend performance enhancements. Furthermore, the V3 POS Balancing feature has been sunsetted and fully replaced with the [V4 Balancing feature](retail/posunit/howto/balance_the_pos.md).
 
 ## Version 20.0 (March 27th 2023)
 

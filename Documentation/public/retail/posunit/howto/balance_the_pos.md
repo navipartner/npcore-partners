@@ -39,7 +39,7 @@ To generate the POS balance report and count the contents of the payment bin, ma
 8. Repeat this process for every currency that needs to be counted.    
    When you open the POS for the next shift, you will be prompted to state whether the recorded payment bin contents are correct. If the contents are incorrect, you can perform balancing again to correct the mistake.
 
-
+> [!Video https://share.synthesia.io/ec8e0a32-7578-4569-a608-664743059921]
 ### Related links
 
 - [Configure the POS balancing feature](balance_pos_v4.md)
