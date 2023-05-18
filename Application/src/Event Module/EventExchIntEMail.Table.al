@@ -146,22 +146,24 @@
 
     procedure GetAccessToken(): Text
     var
-        TypeHelper: Codeunit "Type Helper";
         InStream: InStream;
+        Content: Text;
     begin
         CalcFields("Access Token");
-        "Access Token".CreateInStream(InStream, TextEncoding::UTF8);
-        exit(TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.LFSeparator()));
+        "Access Token".CreateInStream(InStream);
+        InStream.ReadText(Content);
+        exit(Content);
     end;
 
     procedure GetRefreshToken(): Text
     var
-        TypeHelper: Codeunit "Type Helper";
         InStream: InStream;
+        Content: Text;
     begin
         CalcFields("Refresh Token");
-        "Refresh Token".CreateInStream(InStream, TextEncoding::UTF8);
-        exit(TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.LFSeparator()));
+        "Refresh Token".CreateInStream(InStream);
+        InStream.ReadText(Content);
+        exit(Content);
     end;
 
 }
