@@ -81,4 +81,19 @@ codeunit 6059847 "NPR Click & Collect"
     begin
         NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, ErrorEntry, ErrorMessage);
     end;
+
+    procedure InsertDeliveryCommentLine(DeliverText: Text; NpCsDocument: Record "NPR NpCs Document"; POSSaleLine: Codeunit "NPR POS Sale Line")
+    var
+        NpCsPOSActDelivOrderB: Codeunit "NPR NpCs POSAct. Deliv.Order-B";
+    begin
+        NpCsPOSActDelivOrderB.InsertDeliveryCommentLine(DeliverText, NpCsDocument, POSSaleLine);
+    end;
+
+    procedure InsertPOSReference(NpCsDocument: Record "NPR NpCs Document"; SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        NpCsPOSActDelivOrderB: Codeunit "NPR NpCs POSAct. Deliv.Order-B";
+    begin
+        NpCsPOSActDelivOrderB.InsertPOSReference(NpCsDocument, SaleLinePOS);
+    end;
+
 }

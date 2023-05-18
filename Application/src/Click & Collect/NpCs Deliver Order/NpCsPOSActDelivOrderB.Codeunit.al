@@ -209,7 +209,7 @@ codeunit 6060069 "NPR NpCs POSAct. Deliv.Order-B"
 
     end;
 
-    local procedure InsertDeliveryCommentLine(DeliverText: Text; NpCsDocument: Record "NPR NpCs Document"; POSSaleLine: Codeunit "NPR POS Sale Line")
+    procedure InsertDeliveryCommentLine(DeliverText: Text; NpCsDocument: Record "NPR NpCs Document"; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
         NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref.";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -237,7 +237,7 @@ codeunit 6060069 "NPR NpCs POSAct. Deliv.Order-B"
         InsertPOSReference(NpCsDocument, SaleLinePOS);
     end;
 
-    local procedure InsertPOSReference(NpCsDocument: Record "NPR NpCs Document"; SaleLinePOS: Record "NPR POS Sale Line")
+    procedure InsertPOSReference(NpCsDocument: Record "NPR NpCs Document"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref.";
     begin

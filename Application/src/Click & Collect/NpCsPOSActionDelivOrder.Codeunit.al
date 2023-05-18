@@ -161,6 +161,7 @@
         ConfirmInvDiscAmt: Boolean;
         EntryNo: Integer;
         DeliverText: Text;
+        IsHandled: Boolean;
     begin
         Context.SetContext('/', false);
         EntryNo := Context.GetInteger('entry_no');
@@ -170,7 +171,9 @@
             exit;
 
         NpCsDocument.Get(EntryNo);
-        NpCsPOSActionEvents.OnBeforeDeliverDocument(POSSession, NpCsDocument);
+        NpCsPOSActionEvents.OnBeforeDeliverDocument(POSSession, NpCsDocument, DeliverText, IsHandled);
+        if IsHandled then
+            exit;
         case NpCsDocument."Document Type" of
             NpCsDocument."Document Type"::Order:
                 begin
