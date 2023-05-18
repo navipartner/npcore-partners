@@ -91,7 +91,7 @@ codeunit 6150955 "NPR MM POS Act: Member Loy. B."
                 EanBoxEventHandler.InvokeEanBoxv3(Coupon."Reference No.", POSSession, FrontEnd, POSAction);
 
                 if POSAction.Code <> '' then
-                    SetActionContent(ActionContext, POSAction.Code);
+                    SetActionContent(ActionContext, POSAction);
             until (TempLoyaltyPointsSetup.Next() = 0);
         end;
     end;
@@ -128,7 +128,7 @@ codeunit 6150955 "NPR MM POS Act: Member Loy. B."
 
         EanBoxEventHandler.InvokeEanBoxv3(Coupon."Reference No.", POSSession, FrontEnd, POSAction);
         if POSAction.Code <> '' then
-            SetActionContent(ActionContext, POSAction.Code);
+            SetActionContent(ActionContext, POSAction);
     end;
 
     procedure SetCustomer(MemberCardNumber: Text[100]; ForeignCommunityCode: Code[20])
@@ -165,16 +165,12 @@ codeunit 6150955 "NPR MM POS Act: Member Loy. B."
         exit(ExtMemberCardNo <> '');
     end;
 
-    local procedure SetActionContent(var ActionContext: JsonObject; ActionName: Code[20])
+    local procedure SetActionContent(var ActionContext: JsonObject; var POSAction: Record "NPR POS Action")
     var
-        POSAction: Record "NPR POS Action";
-        POSSession: Codeunit "NPR POS Session";
         ActionVersion: Integer;
         WorkflowInvocationParametersOut: JsonObject;
         WorkflowInvocationContextOut: JsonObject;
     begin
-        if not POSSession.RetrieveSessionAction(ActionName, POSAction) then
-            POSAction.Get(ActionName);
         ActionVersion := 3;
         if POSAction."Workflow Implementation" = POSAction."Workflow Implementation"::LEGACY then
             ActionVersion := 1;
