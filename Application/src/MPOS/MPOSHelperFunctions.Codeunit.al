@@ -1,6 +1,7 @@
 ﻿codeunit 6059984 "NPR MPOS Helper Functions"
 {
     Access = Internal;
+
     var
         ActiveSession: Record "Active Session";
 
@@ -37,6 +38,21 @@
                 exit;
             ActiveSession.FindFirst();
         end;
+    end;
+
+    internal procedure BuildJSONParams(RequestMethod: Text;
+                                       BaseAddress: Text;
+                                       Endpoint: Text;
+                                       PrintJob: Text;
+                                       RequestType: Text;
+                                       ErrorCaption: Text) JSON: JsonObject
+    begin
+        JSON.Add('RequestMethod', RequestMethod);
+        JSON.Add('BaseAddress', BaseAddress);
+        JSON.Add('Endpoint', Endpoint);
+        JSON.Add('PrintJob', PrintJob);
+        JSON.Add('RequestType', RequestType);
+        JSON.Add('ErrorCaption', ErrorCaption);
     end;
 }
 
