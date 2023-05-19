@@ -2,6 +2,15 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
 {
     layout
     {
+        addafter(Status)
+        {
+            field("NPR Group Code"; Rec."NPR Group Code")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Group Code field.';
+            }
+        }
+
         addafter("Posting Date")
         {
             field("NPR NPPostingDescription1"; Rec."Posting Description")
@@ -84,7 +93,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 begin
                     if not InventorySetup.Get() then
                         exit;
-                    
+
                     RecRef.GetTable(Rec);
                     ScannerImportMgt.ImportFromScanner(InventorySetup."NPR Scanner Provider", Enum::"NPR Scanner Import"::SALES, RecRef);
                 end;
