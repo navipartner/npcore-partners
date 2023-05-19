@@ -10,7 +10,14 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                 Importance = Additional;
                 ToolTip = 'Specifies whether this credit memo is to be posted as a corrective entry.';
             }
+
+            field("NPR Group Code"; Rec."NPR Group Code")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Group Code field.';
+            }
         }
+
         addlast("Credit Memo Details")
         {
             field("NPR Magento Payment Amount"; Rec."NPR Magento Payment Amount")

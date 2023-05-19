@@ -1,5 +1,16 @@
 pageextension 6014404 "NPR Sales Quote" extends "Sales Quote"
 {
+    layout
+    {
+        addafter(Status)
+        {
+            field("NPR Group Code"; Rec."NPR Group Code")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Group Code field.';
+            }
+        }
+    }
     actions
     {
         addafter(Print)
