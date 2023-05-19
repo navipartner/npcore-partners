@@ -2,6 +2,15 @@ pageextension 6014443 "NPR Sales Return Order" extends "Sales Return Order"
 {
     layout
     {
+        addafter(Status)
+        {
+            field("NPR Group Code"; Rec."NPR Group Code")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Group Code field.';
+            }
+        }
+
         addlast("Invoice Details")
         {
             field("NPR Magento Payment Amount"; Rec."NPR Magento Payment Amount")
