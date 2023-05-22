@@ -205,6 +205,7 @@
                             "Quantity (Base)" := CalcBaseQty(Quantity);
 
                             UpdateDependingLinesQuantity();
+                            UpdatePOSSaleLineCoupon();
 
                             if ("Discount Type" = "Discount Type"::Manual) and ("Discount %" <> 0) then
                                 Validate("Discount %");
@@ -2595,6 +2596,23 @@
                 SaleLinePOS.SetSkipCalcDiscount(true);
                 SaleLinePOS.Modify();
             until SaleLinePOS.Next() = 0;
+    end;
+
+    local procedure UpdatePOSSaleLineCoupon()
+    var
+        SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+    begin
+        If "Coupon Applied" then begin
+            SaleLinePOSCoupon.SetRange("Register No.", "Register No.");
+            SaleLinePOSCoupon.SetRange("Sales Ticket No.", "Sales Ticket No.");
+            SaleLinePOSCoupon.SetRange("Sale Line No.", "Line No.");
+            SaleLinePOSCoupon.SetRange(Type, SaleLinePOSCoupon.Type::Discount);
+            if SaleLinePOSCoupon.FindFirst() then
+                if Quantity <> xRec.Quantity then begin
+                    SaleLinePOSCoupon."Discount Amount" := (SaleLinePOSCoupon."Discount Amount" / xRec.Quantity) * Quantity;
+                    SaleLinePOSCoupon.Modify();
+                end;
+        end;
     end;
 
     local procedure GetDescription()
