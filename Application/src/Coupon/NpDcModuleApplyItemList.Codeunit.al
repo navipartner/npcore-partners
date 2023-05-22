@@ -32,7 +32,24 @@
         RemainingQty := -1;
         if NpDcCouponListItem.Get(SaleLinePOSCoupon."Coupon Type", -1) then
             RemainingQty := NpDcCouponListItem."Max. Quantity";
-        NpDcCouponListItem.SetCurrentKey(Priority);
+        case NpDcCouponListItem."Apply Discount" of
+
+            NpDcCouponListItem."Apply Discount"::"Priority":
+                NpDcCouponListItem.SetCurrentKey(Priority);
+
+            NpDcCouponListItem."Apply Discount"::"Highest price":
+                begin
+                    NpDcCouponListItem.SetCurrentKey("Unit Price");
+                    NpDcCouponListItem.SetAscending("Unit Price", false);
+                end;
+
+            NpDcCouponListItem."Apply Discount"::"Lowest price":
+                begin
+                    NpDcCouponListItem.SetCurrentKey("Unit Price");
+                    NpDcCouponListItem.SetAscending("Unit Price", true);
+                end;
+
+        end;
         NpDcCouponListItem.FindSet();
         Coupon.Get(SaleLinePOSCoupon."Coupon No.");
         if Coupon."Discount Type" = Coupon."Discount Type"::"Discount %" then begin
@@ -229,6 +246,29 @@
             exit(0);
 
         TotalAmt := 0;
+
+        if not NpDcCouponListItem.Get(SaleLinePOSCoupon."Coupon Type", -1) then
+            NpDcCouponListItem."Apply Discount" := NpDcCouponListItem."Apply Discount"::Priority;
+
+        case NpDcCouponListItem."Apply Discount" of
+
+            NpDcCouponListItem."Apply Discount"::"Priority":
+                NpDcCouponListItem.SetCurrentKey(Priority);
+
+            NpDcCouponListItem."Apply Discount"::"Highest price":
+                begin
+                    NpDcCouponListItem.SetCurrentKey("Unit Price");
+                    NpDcCouponListItem.SetAscending("Unit Price", false);
+                end;
+
+            NpDcCouponListItem."Apply Discount"::"Lowest price":
+                begin
+                    NpDcCouponListItem.SetCurrentKey("Unit Price");
+                    NpDcCouponListItem.SetAscending("Unit Price", true);
+                end;
+
+        end;
+
         NpDcCouponListItem.FindSet();
         repeat
             if FindSaleLinePOSItems(SaleLinePOSCoupon, NpDcCouponListItem, SaleLinePOS) then begin

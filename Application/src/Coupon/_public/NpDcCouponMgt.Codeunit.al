@@ -181,19 +181,6 @@
         if SaleLinePOSCoupon.IsEmpty then
             exit;
 
-        SaleLinePOSCoupon.SetRange(Type, SaleLinePOSCoupon.Type::Coupon);
-        if SaleLinePOSCoupon.IsEmpty then begin
-            SaleLinePOSCoupon.SetRange(Type, SaleLinePOSCoupon.Type::Discount);
-            if not SaleLinePOSCoupon.IsEmpty then begin
-                SaleLinePOSCoupon.SetSkipCalcDiscount(true);
-                SaleLinePOSCoupon.FindSet();
-                repeat
-                    SaleLinePOSCoupon.Delete();
-                until SaleLinePOSCoupon.Next() = 0;
-            end;
-            exit;
-        end;
-
         SaleLinePOS.SetSkipCalcDiscount(true);
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");

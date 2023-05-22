@@ -122,6 +122,14 @@
             Caption = 'Profit %';
             DataClassification = CustomerContent;
         }
+        field(120; "Apply Discount"; Option)
+        {
+            Caption = 'Apply Discount';
+            OptionCaption = 'Priority,Highest price,Lowest price';
+            OptionMembers = "Priority","Highest price","Lowest price";
+            DataClassification = CustomerContent;
+
+        }
     }
 
     keys
