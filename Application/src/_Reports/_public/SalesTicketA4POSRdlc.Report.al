@@ -1,7 +1,7 @@
 ﻿report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
 {
 #IF NOT BC17
-    Extensible = False;
+    Extensible = True;
 #ENDIF
     RDLCLayout = './src/_Reports/layouts/Sales Ticket A4 - POS.rdlc';
     WordLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Word.docx';
