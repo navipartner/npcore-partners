@@ -1,4 +1,4 @@
-﻿codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow"
+codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow"
 {
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
@@ -14,6 +14,8 @@
         RetailVoucherLbl: Label 'Retail Voucher Payment';
         ReferenceNoLbl: Label 'Enter Reference No.';
         BlankVoucherTypeErr: Label 'Voucher Type doesn''t exist';
+        AskForVoucherType_CptLbl: Label 'Ask for voucher type';
+        AskForVoucherType_DescLbl: Label 'The system is going to ask for the voucher type before scanning';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -24,6 +26,7 @@
         WorkflowConfig.AddLabel('VoucherPaymentTitle', RetailVoucherLbl);
         WorkflowConfig.AddLabel('ReferenceNo', ReferenceNoLbl);
         WorkflowConfig.AddLabel('InvalidVoucherType', BlankVoucherTypeErr);
+        WorkflowConfig.AddBooleanParameter('AskForVoucherType', false, AskForVoucherType_CptLbl, AskForVoucherType_DescLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -31,6 +34,8 @@
         case Step of
             'setVoucherType':
                 FrontEnd.WorkflowResponse(SetVoucherType());
+            'setVoucherTypeFromReferenceNo':
+                FrontEnd.WorkflowResponse(SetVoucherTypeFromReferenceNo(Context));
             'prepareRequest':
                 FrontEnd.WorkflowResponse(VoucherPayment(Context, Sale, PaymentLine, SaleLine));
             'doLegacyWorkflow':
@@ -46,6 +51,16 @@
     begin
         VoucherType := GetVoucherType();
         exit(VoucherType);
+    end;
+
+    local procedure SetVoucherTypeFromReferenceNo(Context: Codeunit "NPR POS JSON Helper") VoucherType: Text
+    var
+        NPRNpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        ReferenceNo: Text;
+
+    begin
+        ReferenceNo := Context.GetString('VoucherRefNo');
+        VoucherType := NPRNpRvVoucherMgt.GetVoucherTypeFromReferenceNumber(ReferenceNo);
     end;
 
     local procedure GetVoucherType(): Code[20]
@@ -135,7 +150,7 @@
         VoucherType: Text;
         VoucherTypeCode: Code[20];
     begin
-        VoucherType := Context.GetStringParameter('VoucherTypeCode');
+        VoucherType := Context.GetString('voucherType');
         Evaluate(VoucherTypeCode, VoucherType);
 
         POSActionScanActionB.EndSale(VoucherTypeCode, Sale, PaymentLine, SaleLine, Setup);
@@ -150,8 +165,13 @@
         Jtoken: JsonToken;
         Jobj: JsonObject;
     begin
+        Response.Add('endSaleWithoutPosting', false);
+        if ActionContextIn.Get('endSaleWithoutPosting', Jtoken) then
+            response.Replace('endSaleWithoutPosting', Jtoken.AsValue().AsBoolean());
+
         if not ActionContextIn.Get('name', Jtoken) then
             exit(true);
+
         if Jtoken.AsValue().AsText() = '' then
             exit(true);
 
@@ -216,7 +236,7 @@
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionScanVoucher2.js###
-'let main=async({workflow:e,parameters:t,popup:o,captions:u})=>{debugger;let r;if(t.VoucherTypeCode?e.context.voucherType=t.VoucherTypeCode:e.context.voucherType=await e.respond("setVoucherType"),e.context.voucherType==null||e.context.voucherType==""||(t.ReferenceNo?r=t.ReferenceNo:r=await o.input({title:u.VoucherPaymentTitle,caption:u.ReferenceNo}),r===null))return;let n=await e.respond("prepareRequest",{VoucherRefNo:r});if(n.tryEndSale){t.EndSale&&await e.respond("endSale");return}n.workflowVersion==1?await e.respond("doLegacyWorkflow",{workflowName:n.workflowName}):await e.run(n.workflowName,{parameters:n.parameters})};'
+'let main=async({workflow:e,parameters:t,popup:o,captions:c})=>{debugger;let r;if(t.VoucherTypeCode)e.context.voucherType=t.VoucherTypeCode;else if(t.AskForVoucherType&&(e.context.voucherType=await e.respond("setVoucherType"),!e.context.voucherType))return;if(t.ReferenceNo?r=t.ReferenceNo:r=await o.input({title:c.VoucherPaymentTitle,caption:c.ReferenceNo}),!r||!e.AskForVoucherType&&!e.context.voucherType&&(e.context.voucherType=await e.respond("setVoucherTypeFromReferenceNo",{VoucherRefNo:r}),!e.context.voucherType))return;let n=await e.respond("prepareRequest",{VoucherRefNo:r});if(n.tryEndSale){t.EndSale&&!n.endSaleWithoutPosting&&await e.respond("endSale");return}n.workflowVersion==1?await e.respond("doLegacyWorkflow",{workflowName:n.workflowName}):await e.run(n.workflowName,{parameters:n.parameters})};'
         );
     end;
 

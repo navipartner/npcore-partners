@@ -341,8 +341,12 @@
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
         if Subtotal >= 0 then begin
-            if EndSale then
+
+            if EndSale then begin
                 DoEndSale(POSSession, VoucherType);
+                ActionContext.Add('endSaleWithoutPosting', true);
+            end;
+
             exit;
         end;
 

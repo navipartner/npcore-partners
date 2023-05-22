@@ -4,21 +4,24 @@ let main = async ({ workflow, parameters, popup, captions }) => {
 
     if (parameters.VoucherTypeCode) {
         workflow.context.voucherType = parameters.VoucherTypeCode
-    } else {
+    } else if (parameters.AskForVoucherType){
         workflow.context.voucherType = await workflow.respond("setVoucherType");
+        if (!workflow.context.voucherType) return;
     }
-    if (workflow.context.voucherType == null || workflow.context.voucherType == "") return;
-
     if (parameters.ReferenceNo) {
         voucher_input = parameters.ReferenceNo;
     } else {
         voucher_input = await popup.input({ title: captions.VoucherPaymentTitle, caption: captions.ReferenceNo })
     };
-    if (voucher_input === null) return;
-
+    if (!voucher_input) return;
+    
+    if (!workflow.AskForVoucherType && !workflow.context.voucherType){
+        workflow.context.voucherType = await workflow.respond("setVoucherTypeFromReferenceNo",  { VoucherRefNo: voucher_input });
+        if (!workflow.context.voucherType ) return;
+    }
     let result = await workflow.respond("prepareRequest", { VoucherRefNo: voucher_input });
     if (result.tryEndSale) {
-        if (parameters.EndSale) {
+        if ((parameters.EndSale) && (!result.endSaleWithoutPosting)) {
             await workflow.respond("endSale");
         };
         return;

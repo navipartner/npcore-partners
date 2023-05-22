@@ -1368,7 +1368,7 @@
             Error(WrongCustomerTok, Voucher."Reference No.", Voucher."Customer No.", SalePOS."Customer No.");
     end;
 
-    local procedure GetVoucherTypeFromReferenceNumber(VoucherNumber: Text): Code[20]
+    internal procedure GetVoucherTypeFromReferenceNumber(VoucherNumber: Text): Code[20]
     var
         Voucher: Record "NPR NpRv Voucher";
     begin
