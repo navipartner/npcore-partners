@@ -52,6 +52,21 @@
                         //+NPR5.46 [327366]
                     end;
                 }
+                field(ApplyDiscount; ApplyDiscount)
+                {
+                    Caption = 'Apply discount on items with';
+                    OptionCaption = 'Priority,Highest price,Lowest price';
+                    Importance = Promoted;
+                    Visible = (NOT ValidationView);
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Apply discount on items with field';
+
+                    trigger OnValidate()
+                    begin
+                        SetTotals();
+                    end;
+
+                }
                 group(Control6014417)
                 {
                     ShowCaption = false;
@@ -199,6 +214,7 @@
         ValidQty: Integer;
         LotValidation: Boolean;
         ValidationView: Boolean;
+        ApplyDiscount: Option "Priority","Highest price","Lowest price";
 
     local procedure AddItems()
     var
@@ -354,6 +370,7 @@
             NpDcCouponListItem."Validation Quantity" := ValidQty;
             NpDcCouponListItem."Lot Validation" := LotValidation;
             //+NPR5.46 [327366]
+            NpDcCouponListItem."Apply Discount" := ApplyDiscount;
             NpDcCouponListItem.Insert(true);
         end;
 
@@ -364,6 +381,8 @@
         NpDcCouponListItem."Validation Quantity" := ValidQty;
         NpDcCouponListItem."Lot Validation" := LotValidation;
         //+NPR5.46 [327366]
+
+        NpDcCouponListItem."Apply Discount" := ApplyDiscount;
 
         if PrevRec <> Format(NpDcCouponListItem) then
             NpDcCouponListItem.Modify(true);
@@ -402,6 +421,7 @@
         LotValidation := NpDcCouponListItem."Lot Validation";
         //+NPR5.46 [327366]
         //+NPR5.45 [312991]
+        ApplyDiscount := NpDcCouponListItem."Apply Discount";
     end;
 
     internal procedure SetValidationView(NewValidationView: Boolean)
