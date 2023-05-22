@@ -50,13 +50,15 @@
         NpCsSendOrder: Codeunit "NPR NpCs Send Order";
         LogMessage: Text;
         SOReleasedLbl: Label 'Sales Order %1 Released ';
+        SendOrderModule: Code[20];
     begin
         NpCsDocument.Find();
         NpCsDocument.TestField(Type, NpCsDocument.Type::"Send to Store");
         NpCsDocument.CalcFields("Send Order Module");
-        if NpCsDocument."Send Order Module" = '' then
-            NpCsDocument."Send Order Module" := NpCsSendOrder.WorkflowCode();
-        NpCsWorkflowModule.Get(NpCsWorkflowModule.Type::"Send Order", NpCsDocument."Send Order Module");
+        SendOrderModule := NpCsDocument."Send Order Module";
+        if SendOrderModule = '' then
+            SendOrderModule := NpCsSendOrder.WorkflowCode();
+        NpCsWorkflowModule.Get(NpCsWorkflowModule.Type::"Send Order", SendOrderModule);
 
         SalesHeader.Get(SalesHeader."Document Type"::Order, NpCsDocument."Document No.");
         if SalesHeader.Status <> SalesHeader.Status::Released then begin
@@ -80,12 +82,14 @@
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
         NpCsUpdateOrderStatus: Codeunit "NPR NpCs Upd. Order Status";
         LogMessage: Text;
+        OrderStatusModule: Code[20];
     begin
         NpCsDocument.TestField(Type, NpCsDocument.Type::"Send to Store");
         NpCsDocument.CalcFields("Order Status Module");
-        if NpCsDocument."Order Status Module" = '' then
-            NpCsDocument."Order Status Module" := NpCsUpdateOrderStatus.WorkflowCode();
-        NpCsWorkflowModule.Get(NpCsWorkflowModule.Type::"Order Status", NpCsDocument."Order Status Module");
+        OrderStatusModule := NpCsDocument."Order Status Module";
+        if OrderStatusModule = '' then
+            OrderStatusModule := NpCsUpdateOrderStatus.WorkflowCode();
+        NpCsWorkflowModule.Get(NpCsWorkflowModule.Type::"Order Status", OrderStatusModule);
         NpCsWorkflowMgt.UpdateOrderStatus(NpCsDocument, LogMessage);
 
         if IsComplete(NpCsDocument) then begin
@@ -137,32 +141,19 @@
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
         NpCsSendOrder: Codeunit "NPR NpCs Send Order";
         LogMessage: Text;
+        SendOrderModule: Code[20];
     begin
         NpCsDocument.CalcFields("Send Order Module");
-        if NpCsDocument."Send Order Module" = '' then
-            NpCsDocument."Send Order Module" := NpCsSendOrder.WorkflowCode();
+        SendOrderModule := NpCsDocument."Send Order Module";
+        if SendOrderModule = '' then
+            SendOrderModule := NpCsSendOrder.WorkflowCode();
 
-        FindNextWorkflowModule(NpCsDocument, NpCsWorkflowModule);
-        case NotificationType of
-            NotificationType::" ":
-                Error(NotInitialized);
-            NotificationType::Email:
-                if NotifyStoreEmail(NpCsDocument, LogMessage) then
-                    NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, false, '');
-            NotificationType::Sms:
-                if NotifyStoreSms(NpCsDocument, LogMessage) then
-                    NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, false, '');
-        end;
-    end;
-
-    local procedure FindNextWorkflowModule(NpCsDocument: Record "NPR NpCs Document"; NpCsWorkflowModule: Record "NPR NpCs Workflow Module")
-    begin
         NpCsWorkflowModule.Init();
         case NpCsDocument."Next Workflow Step" of
             NpCsDocument."Next Workflow Step"::"Send Order":
                 begin
                     NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Send Order";
-                    NpCsWorkflowModule.Code := NpCsDocument."Send Order Module";
+                    NpCsWorkflowModule.Code := SendOrderModule;
                 end;
             NpCsDocument."Next Workflow Step"::"Order Status":
                 begin
@@ -177,6 +168,17 @@
         end;
 
         if NpCsWorkflowModule.Find() then;
+
+        case NotificationType of
+            NotificationType::" ":
+                Error(NotInitialized);
+            NotificationType::Email:
+                if NotifyStoreEmail(NpCsDocument, LogMessage) then
+                    NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, false, '');
+            NotificationType::Sms:
+                if NotifyStoreSms(NpCsDocument, LogMessage) then
+                    NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, false, '');
+        end;
     end;
 
     local procedure NotifyStoreEmail(NpCsDocument: Record "NPR NpCs Document"; var LogMessage: Text): Boolean
@@ -291,9 +293,9 @@
                                 SmsTemplateHeader.Get(NpCsDocument."Store Sms Template (Expired)");
                         end;
                     else begin
-                            if NpCsDocument."Store Sms Template (Pending)" <> '' then
-                                SmsTemplateHeader.Get(NpCsDocument."Store Sms Template (Pending)");
-                        end;
+                        if NpCsDocument."Store Sms Template (Pending)" <> '' then
+                            SmsTemplateHeader.Get(NpCsDocument."Store Sms Template (Pending)");
+                    end;
                 end;
         end;
 

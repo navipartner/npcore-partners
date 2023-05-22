@@ -183,7 +183,6 @@ xmlport 6014402 "NPR Import Replication Setup"
         ReplicationSetup."Service URL" := TempReplicationSetup."Service URL";
         ReplicationSetup."External Database" := TempReplicationSetup."External Database";
         ReplicationSetup.FromCompany := TempReplicationSetup.FromCompany;
-        ReplicationSetup.FromCompanyID := TempReplicationSetup.FromCompanyID;
         ReplicationSetup."From Company ID - External" := TempReplicationSetup."From Company ID - External";
         ReplicationSetup."From Company Tenant" := TempReplicationSetup."From Company Tenant";
         ReplicationSetup."Error Notify Email Address" := TempReplicationSetup."Error Notify Email Address";

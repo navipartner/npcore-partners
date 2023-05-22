@@ -23,9 +23,9 @@
                     ToolTip = 'Specifies the value of the Table No. field';
                     ApplicationArea = NPRRetail;
                 }
-                field("Table Name"; Rec."Table Name")
+                field("Table Name"; IndentedTableName)
                 {
-
+                    Caption = 'Table Name';
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                     ToolTip = 'Specifies the value of the Table Name field';
@@ -161,7 +161,8 @@
 
     trigger OnAfterGetRecord()
     begin
-        IndentTableName();
+        Clear(IndentedTableName);
+        IndentedTableName := IndentTableName(Rec.Level, Rec."Table Name");
         SetHasNoLinks();
     end;
 
@@ -173,11 +174,14 @@
     var
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
         HasNoLinks: Boolean;
+        IndentedTableName: Text;
 
-    local procedure IndentTableName()
+    local procedure IndentTableName(Level: Integer; TableName: Text): Text
     begin
-        if Rec.Level > 0 then
-            Rec."Table Name" := PadStr('', Rec.Level * 3, ' ') + Rec."Table Name";
+        if Level > 0 then
+            exit(PadStr('', Level * 3, ' ') + TableName)
+        else
+            exit(TableName);
     end;
 
     internal procedure MoveDown()
