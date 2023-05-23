@@ -32,8 +32,7 @@
         exit(_type);
     end;
 
-    [Obsolete('This procedure will be internal for future releases -GetType, without option to access externally')]
-    procedure Type(): Enum "NPR View Type";
+    internal procedure Type(): Enum "NPR View Type";
     begin
         exit(_type);
     end;
