@@ -37,6 +37,7 @@
                 "Field": Record "Field";
                 FieldLookup: Page "NPR Field Lookup";
             begin
+                TestField("Parent Link On", "Parent Link On"::"Field");
                 Field.FilterGroup(2);
                 Field.SetRange(TableNo, "Parent Table ID");
                 FieldLookup.SetTableView(Field);
@@ -46,6 +47,7 @@
                     FieldLookup.GetRecord(Field);
                     "Parent Field Name" := Field.FieldName;
                     "Parent Field ID" := Field."No.";
+                    CheckSelectedField(Field, FieldCaption("Parent Field ID"));
                 end;
             end;
 
@@ -53,10 +55,12 @@
             var
                 "Field": Record "Field";
             begin
+                TestField("Parent Link On", "Parent Link On"::"Field");
                 Field.SetRange(TableNo, "Parent Table ID");
                 Field.SetRange("No.", "Parent Field ID");
                 Field.FindFirst();
                 "Parent Field Name" := Field.FieldName;
+                CheckSelectedField(Field, FieldCaption("Parent Field ID"));
             end;
         }
         field(13; "Parent Field Name"; Text[50])
@@ -69,6 +73,7 @@
                 "Field": Record "Field";
                 FieldLookup: Page "NPR Field Lookup";
             begin
+                TestField("Parent Link On", "Parent Link On"::"Field");
                 Field.FilterGroup(2);
                 Field.SetRange(TableNo, "Parent Table ID");
                 FieldLookup.SetTableView(Field);
@@ -78,6 +83,7 @@
                     FieldLookup.GetRecord(Field);
                     "Parent Field Name" := Field.FieldName;
                     "Parent Field ID" := Field."No.";
+                    CheckSelectedField(Field, FieldCaption("Parent Field Name"));
                 end;
             end;
 
@@ -85,6 +91,7 @@
             var
                 "Field": Record "Field";
             begin
+                TestField("Parent Link On", "Parent Link On"::"Field");
                 Field.SetRange(TableNo, "Parent Table ID");
                 Field.SetRange(FieldName, "Parent Field Name");
                 if not Field.FindFirst() then
@@ -92,7 +99,8 @@
                 Field.FindFirst();
 
                 "Parent Field Name" := Field.FieldName;
-                "Parent Field ID" := Field."No."
+                "Parent Field ID" := Field."No.";
+                CheckSelectedField(Field, FieldCaption("Parent Field Name"));
             end;
         }
         field(14; "Table ID"; Integer)
@@ -110,6 +118,7 @@
                 "Field": Record "Field";
                 FieldLookup: Page "NPR Field Lookup";
             begin
+                TestField("Link On", "Link On"::"Field");
                 Field.FilterGroup(2);
                 Field.SetRange(TableNo, "Table ID");
                 FieldLookup.SetTableView(Field);
@@ -119,6 +128,7 @@
                     FieldLookup.GetRecord(Field);
                     "Field Name" := Field.FieldName;
                     "Field ID" := Field."No.";
+                    CheckSelectedField(Field, FieldCaption("Field ID"));
                 end;
             end;
 
@@ -126,10 +136,12 @@
             var
                 "Field": Record "Field";
             begin
+                TestField("Link On", "Link On"::"Field");
                 Field.SetRange(TableNo, "Table ID");
                 Field.SetRange("No.", "Field ID");
                 Field.FindFirst();
                 "Field Name" := Field.FieldName;
+                CheckSelectedField(Field, FieldCaption("Field ID"));
             end;
         }
         field(16; "Field Name"; Text[50])
@@ -142,6 +154,7 @@
                 "Field": Record "Field";
                 FieldLookup: Page "NPR Field Lookup";
             begin
+                TestField("Link On", "Link On"::"Field");
                 Field.FilterGroup(2);
                 Field.SetRange(TableNo, "Table ID");
                 FieldLookup.SetTableView(Field);
@@ -151,6 +164,7 @@
                     FieldLookup.GetRecord(Field);
                     "Field Name" := Field.FieldName;
                     "Field ID" := Field."No.";
+                    CheckSelectedField(Field, FieldCaption("Field Name"));
                 end;
             end;
 
@@ -158,6 +172,7 @@
             var
                 "Field": Record "Field";
             begin
+                TestField("Link On", "Link On"::"Field");
                 Field.SetRange(TableNo, "Table ID");
                 Field.SetRange(FieldName, "Field Name");
                 if not Field.FindFirst() then
@@ -165,7 +180,8 @@
                 Field.FindFirst();
 
                 "Field Name" := Field.FieldName;
-                "Field ID" := Field."No."
+                "Field ID" := Field."No.";
+                CheckSelectedField(Field, FieldCaption("Field Name"));
             end;
         }
         field(17; "Filter Type"; Option)
@@ -182,6 +198,9 @@
                 else begin
                     "Parent Field ID" := 0;
                     "Parent Field Name" := '';
+                    "Parent Link On" := "Parent Link On"::"Field";
+                    "Link On" := "Link On"::"Field";
+                    "Link Type" := "Link Type"::"=";
                 end;
             end;
         }
@@ -250,12 +269,55 @@
                 end;
             end;
         }
-        field(19; "Link Type"; Option)
+        field(19; "Link Type"; Enum "NPR RP Data Item Link Type")
         {
             Caption = 'Link Type';
-            OptionCaption = '=,>,<,<>';
-            OptionMembers = "=",">","<","<>";
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Link Type" <> "Link Type"::"=" then begin
+                    TestField("Filter Type", "Filter Type"::TableLink);
+                    TestField("Parent Link On", "Parent Link On"::"Field");
+                    TestField("Link On", "Link On"::"Field");
+                end;
+            end;
+        }
+        field(20; "Parent Link On"; Enum "NPR RP Data Item Link On")
+        {
+            Caption = 'Parent Link On';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Parent Link On" <> "Parent Link On"::"Field" then begin
+                    TestField("Filter Type", "Filter Type"::TableLink);
+                    "Parent Field ID" := 0;
+                    "Parent Field Name" := '';
+                    "Link On" := "Link On"::"Field";
+                    "Link Type" := "Link Type"::"=";
+                    if "Field ID" <> 0 then
+                        Validate("Field ID");
+                end;
+            end;
+        }
+        field(21; "Link On"; Enum "NPR RP Data Item Link On")
+        {
+            Caption = 'Link On';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Link On" <> "Link On"::"Field" then begin
+                    TestField("Filter Type", "Filter Type"::TableLink);
+                    "Field ID" := 0;
+                    "Field Name" := '';
+                    "Parent Link On" := "Parent Link On"::"Field";
+                    "Link Type" := "Link Type"::"=";
+                    if "Parent Field ID" <> 0 then
+                        Validate("Parent Field ID");
+                end;
+            end;
         }
     }
 
@@ -274,7 +336,8 @@
     trigger OnInsert()
     begin
         ModifiedRec();
-        TestField("Field ID");
+        if "Link On" = "Link On"::"Field" then
+            TestField("Field ID");
     end;
 
     trigger OnModify()
@@ -291,9 +354,22 @@
     var
         RPTemplateHeader: Record "NPR RP Template Header";
     begin
-        if IsTemporary then
+        if IsTemporary() then
             exit;
         if RPTemplateHeader.Get("Data Item Code") then
             RPTemplateHeader.Modify(true);
+    end;
+
+    local procedure CheckSelectedField("Field": Record "Field"; CalledByFieldCaption: Text)
+    var
+        WrontFieldTypeErr: Label 'You must select a field of type "%1" as %2.', Comment = '%1 - required field type, %2 - called by field caption.';
+    begin
+        if ((CalledByFieldCaption in [FieldCaption("Field ID"), FieldCaption("Field Name")]) and
+            ("Parent Link On" = "Parent Link On"::"Record ID") and ("Field ID" <> 0)) or
+           ((CalledByFieldCaption in [FieldCaption("Parent Field ID"), FieldCaption("Parent Field Name")]) and
+            ("Link On" = "Link On"::"Record ID") and ("Parent Field ID" <> 0))
+        then
+            if Field.Type <> Field.Type::RecordID then
+                Error(WrontFieldTypeErr, Format(FieldType::RecordId), CalledByFieldCaption);
     end;
 }
