@@ -40,6 +40,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 DataItemConstraint: Record "NPR RP Data Item Constr.";
                 DataItem: Record "NPR RP Data Items";
             begin
+                TestField("Data Item Link On", "Data Item Link On"::"Field");
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
                 DataItemConstraint.FindFirst();
@@ -54,6 +55,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                     FieldLookup.GetRecord(Field);
                     "Data Item Field Name" := Field.FieldName;
                     "Data Item Field ID" := Field."No.";
+                    CheckSelectedField(Field, FieldCaption("Data Item Field ID"));
                 end;
             end;
 
@@ -63,6 +65,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 DataItemConstraint: Record "NPR RP Data Item Constr.";
                 DataItem: Record "NPR RP Data Items";
             begin
+                TestField("Data Item Link On", "Data Item Link On"::"Field");
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
                 DataItemConstraint.FindFirst();
@@ -72,6 +75,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 Field.SetRange("No.", "Data Item Field ID");
                 Field.FindFirst();
                 "Data Item Field Name" := Field.FieldName;
+                CheckSelectedField(Field, FieldCaption("Data Item Field ID"));
             end;
         }
         field(6; "Data Item Field Name"; Text[50])
@@ -86,6 +90,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 DataItemConstraint: Record "NPR RP Data Item Constr.";
                 DataItem: Record "NPR RP Data Items";
             begin
+                TestField("Data Item Link On", "Data Item Link On"::"Field");
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
                 DataItemConstraint.FindFirst();
@@ -100,6 +105,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                     FieldLookup.GetRecord(Field);
                     "Data Item Field Name" := Field.FieldName;
                     "Data Item Field ID" := Field."No.";
+                    CheckSelectedField(Field, FieldCaption("Data Item Field Name"));
                 end;
             end;
 
@@ -109,6 +115,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 DataItemConstraint: Record "NPR RP Data Item Constr.";
                 DataItem: Record "NPR RP Data Items";
             begin
+                TestField("Data Item Link On", "Data Item Link On"::"Field");
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
                 DataItemConstraint.FindFirst();
@@ -121,7 +128,8 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 Field.FindFirst();
 
                 "Data Item Field Name" := Field.FieldName;
-                "Data Item Field ID" := Field."No."
+                "Data Item Field ID" := Field."No.";
+                CheckSelectedField(Field, FieldCaption("Data Item Field Name"));
             end;
         }
         field(7; "Field ID"; Integer)
@@ -135,6 +143,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 "Field": Record "Field";
                 FieldLookup: Page "NPR Field Lookup";
             begin
+                TestField("Link On", "Link On"::"Field");
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
                 DataItemConstraint.FindFirst();
@@ -148,6 +157,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                     FieldLookup.GetRecord(Field);
                     "Field Name" := Field.FieldName;
                     "Field ID" := Field."No.";
+                    CheckSelectedField(Field, FieldCaption("Field ID"));
                 end;
             end;
 
@@ -156,6 +166,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 "Field": Record "Field";
                 DataItemConstraint: Record "NPR RP Data Item Constr.";
             begin
+                TestField("Link On", "Link On"::"Field");
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
                 DataItemConstraint.FindFirst();
@@ -164,6 +175,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 Field.SetRange("No.", "Field ID");
                 Field.FindFirst();
                 "Field Name" := Field.FieldName;
+                CheckSelectedField(Field, FieldCaption("Field ID"));
             end;
         }
         field(8; "Field Name"; Text[50])
@@ -177,6 +189,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 "Field": Record "Field";
                 FieldLookup: Page "NPR Field Lookup";
             begin
+                TestField("Link On", "Link On"::"Field");
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
                 DataItemConstraint.FindFirst();
@@ -190,6 +203,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                     FieldLookup.GetRecord(Field);
                     "Field Name" := Field.FieldName;
                     "Field ID" := Field."No.";
+                    CheckSelectedField(Field, FieldCaption("Field Name"));
                 end;
             end;
 
@@ -198,6 +212,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
                 "Field": Record "Field";
                 DataItemConstraint: Record "NPR RP Data Item Constr.";
             begin
+                TestField("Link On", "Link On"::"Field");
                 DataItemConstraint.SetRange("Data Item Code", "Data Item Code");
                 DataItemConstraint.SetRange("Line No.", "Constraint Line No.");
                 DataItemConstraint.FindFirst();
@@ -210,6 +225,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
 
                 "Field Name" := Field.FieldName;
                 "Field ID" := Field."No.";
+                CheckSelectedField(Field, FieldCaption("Field Name"));
             end;
         }
         field(9; "Filter Type"; Option)
@@ -227,6 +243,9 @@ table 6014564 "NPR RP Data Item Constr. Links"
                     "Data Item Name" := '';
                     "Data Item Field ID" := 0;
                     "Data Item Field Name" := '';
+                    "Data Item Link On" := "Data Item Link On"::"Field";
+                    "Link On" := "Link On"::"Field";
+                    "Link Type" := "Link Type"::"=";
                 end;
             end;
         }
@@ -305,12 +324,55 @@ table 6014564 "NPR RP Data Item Constr. Links"
             Caption = 'Line No.';
             DataClassification = CustomerContent;
         }
-        field(12; "Link Type"; Option)
+        field(12; "Link Type"; Enum "NPR RP Data Item Link Type")
         {
             Caption = 'Link Type';
-            OptionCaption = '=,>,<,<>';
-            OptionMembers = "=",">","<","<>";
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Link Type" <> "Link Type"::"=" then begin
+                    TestField("Filter Type", "Filter Type"::TableLink);
+                    TestField("Data Item Link On", "Data Item Link On"::"Field");
+                    TestField("Link On", "Link On"::"Field");
+                end;
+            end;
+        }
+        field(20; "Data Item Link On"; Enum "NPR RP Data Item Link On")
+        {
+            Caption = 'Data Item Link On';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Data Item Link On" <> "Data Item Link On"::"Field" then begin
+                    TestField("Filter Type", "Filter Type"::TableLink);
+                    "Data Item Field ID" := 0;
+                    "Data Item Field Name" := '';
+                    "Link On" := "Link On"::"Field";
+                    "Link Type" := "Link Type"::"=";
+                    if "Field ID" <> 0 then
+                        Validate("Field ID");
+                end;
+            end;
+        }
+        field(21; "Link On"; Enum "NPR RP Data Item Link On")
+        {
+            Caption = 'Link On';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Link On" <> "Link On"::"Field" then begin
+                    TestField("Filter Type", "Filter Type"::TableLink);
+                    "Field ID" := 0;
+                    "Field Name" := '';
+                    "Data Item Link On" := "Data Item Link On"::"Field";
+                    "Link Type" := "Link Type"::"=";
+                    if "Data Item Field ID" <> 0 then
+                        Validate("Data Item Field ID");
+                end;
+            end;
         }
     }
 
@@ -333,7 +395,8 @@ table 6014564 "NPR RP Data Item Constr. Links"
     trigger OnInsert()
     begin
         ModifiedRec();
-        TestField("Field ID");
+        if "Link On" = "Link On"::"Field" then
+            TestField("Field ID");
     end;
 
     trigger OnModify()
@@ -355,5 +418,17 @@ table 6014564 "NPR RP Data Item Constr. Links"
         if RPTemplateHeader.Get("Data Item Code") then
             RPTemplateHeader.Modify(true);
     end;
-}
 
+    local procedure CheckSelectedField("Field": Record "Field"; CalledByFieldCaption: Text)
+    var
+        WrontFieldTypeErr: Label 'You must select a field of type "%1" as %2.', Comment = '%1 - required field type, %2 - called by field caption.';
+    begin
+        if ((CalledByFieldCaption in [FieldCaption("Field ID"), FieldCaption("Field Name")]) and
+            ("Data Item Link On" = "Data Item Link On"::"Record ID") and ("Field ID" <> 0)) or
+           ((CalledByFieldCaption in [FieldCaption("Data Item Field ID"), FieldCaption("Data Item Field Name")]) and
+            ("Link On" = "Link On"::"Record ID") and ("Data Item Field ID" <> 0))
+        then
+            if Field.Type <> Field.Type::RecordID then
+                Error(WrontFieldTypeErr, Format(FieldType::RecordId), CalledByFieldCaption);
+    end;
+}
