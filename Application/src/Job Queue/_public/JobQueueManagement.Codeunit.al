@@ -553,7 +553,7 @@
             repeat
                 if ErrorMessageText <> '' then
                     ErrorMessageText := ErrorMessageText + TypeHelper.CRLFSeparator();
-#IF BC22
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
                 ErrorMessageText := ErrorMessageText + ErrorMessage.Message;
 #ELSE
                 ErrorMessageText := ErrorMessageText + ErrorMessage.Description;
