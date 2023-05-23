@@ -202,6 +202,7 @@
         DataItemLinks: Record "NPR RP Data Item Links";
         ParentFieldRef: FieldRef;
         ChildFieldRef: FieldRef;
+        DataItemLinkFailedErr: Label 'System was not able to apply print template data item link at %1 due to the following error: %2', Comment = '%1 - data item link record ID, %2 - error text';
     begin
         if ChildRecRef.Number = 0 then //If not OPEN already
             ChildRecRef.Open(ChildRecord."Table ID");
@@ -216,12 +217,20 @@
         DataItemLinks.SetRange("Table ID", ChildRecRef.Number);
         if DataItemLinks.FindSet() then
             repeat
-                ChildFieldRef := ChildRecRef.Field(DataItemLinks."Field ID");
+                if DataItemLinks."Link On" = DataItemLinks."Link On"::Field then
+                    ChildFieldRef := ChildRecRef.Field(DataItemLinks."Field ID")
+                else
+                    Clear(ChildFieldRef);
                 case DataItemLinks."Filter Type" of
                     DataItemLinks."Filter Type"::TableLink:
                         begin
-                            ParentFieldRef := ParentRecRef.Field(DataItemLinks."Parent Field ID");
-                            SetLinkFilter(ParentFieldRef, ChildFieldRef, DataItemLinks."Link Type");
+                            if DataItemLinks."Parent Link On" = DataItemLinks."Parent Link On"::Field then
+                                ParentFieldRef := ParentRecRef.Field(DataItemLinks."Parent Field ID")
+                            else
+                                Clear(ParentFieldRef);
+                            ClearLastError();
+                            if not SetLinkFilter(DataItemLinks."Parent Link On", ParentRecRef, ParentFieldRef, DataItemLinks."Link On", ChildRecRef, ChildFieldRef, DataItemLinks."Link Type") then
+                                Error(DataItemLinkFailedErr, DataItemLinks.RecordId(), GetLastErrorText());
                         end;
                     DataItemLinks."Filter Type"::"Fixed Filter":
                         ChildFieldRef.SetFilter(DataItemLinks."Filter Value");
@@ -236,6 +245,7 @@
         DataItemConstraint: Record "NPR RP Data Item Constr.";
         DataItemConstraintLinks: Record "NPR RP Data Item Constr. Links";
         DataItemFieldRef: FieldRef;
+        DataItemConstraintLinkFailedErr: Label 'System was not able to apply print template data item constraint link at %1 due to the following error: %2', Comment = '%1 - data item constraint link record ID, %2 - error text';
     begin
         if (RecRefIn.Number = 0) then
             exit(true);
@@ -251,12 +261,20 @@
                 DataItemConstraintLinks.SetRange("Constraint Line No.", DataItemConstraint."Line No.");
                 DataItemConstraintLinks.FindSet();
                 repeat
-                    FieldRef := RecRef.Field(DataItemConstraintLinks."Field ID");
+                    if DataItemConstraintLinks."Link On" = DataItemConstraintLinks."Link On"::Field then
+                        FieldRef := RecRef.Field(DataItemConstraintLinks."Field ID")
+                    else
+                        Clear(FieldRef);
                     case DataItemConstraintLinks."Filter Type" of
                         DataItemConstraintLinks."Filter Type"::TableLink:
                             begin
-                                DataItemFieldRef := RecRefIn.Field(DataItemConstraintLinks."Data Item Field ID");
-                                SetLinkFilter(DataItemFieldRef, FieldRef, DataItemConstraintLinks."Link Type");
+                                if DataItemConstraintLinks."Data Item Link On" = DataItemConstraintLinks."Data Item Link On"::Field then
+                                    DataItemFieldRef := RecRefIn.Field(DataItemConstraintLinks."Data Item Field ID")
+                                else
+                                    Clear(DataItemFieldRef);
+                                ClearLastError();
+                                if not SetLinkFilter(DataItemConstraintLinks."Data Item Link On", RecRefIn, DataItemFieldRef, DataItemConstraintLinks."Link On", RecRef, FieldRef, DataItemConstraintLinks."Link Type") then
+                                    Error(DataItemConstraintLinkFailedErr, DataItemConstraintLinks.RecordId(), GetLastErrorText());
                             end;
                         DataItemConstraintLinks."Filter Type"::"Fixed Filter":
                             FieldRef.SetFilter(DataItemConstraintLinks."Filter Value");
@@ -295,37 +313,84 @@
         exit(true);
     end;
 
-    local procedure SetLinkFilter(var ParentFieldRef: FieldRef; var ChildFieldRef: FieldRef; LinkType: Option "=",">","<","<>")
+    [TryFunction]
+    local procedure SetLinkFilter(ParentLinkOn: Enum "NPR RP Data Item Link On"; ParentRecRef: RecordRef; var ParentFieldRef: FieldRef; ChildLinkOn: Enum "NPR RP Data Item Link On"; var ChildRecRef: RecordRef; var ChildFieldRef: FieldRef; LinkType: Enum "NPR RP Data Item Link Type")
+    var
+        RecID: RecordId;
+        PositionString: Text;
+        RecIDFound: Boolean;
+        ParentLinkedTxt: Label 'Parent,Linked';
+        WrontFieldTypeErr: Label '%1 table field must be of type "%2"', Comment = '%1 - Parent/Linked, %2 - required field type';
+        WrontRecordIdTableErr: Label 'Parent field %1 contains a record id of table %2. Required table is %3.', Comment = '%1 - field caption, %2 - current table No., %3 - required table No.';
     begin
-        case UpperCase(Format(ParentFieldRef.Class)) of
-            'FLOWFIELD':
-                begin
-                    ParentFieldRef.CalcField();
-                    case LinkType of
-                        LinkType::"=":
-                            ChildFieldRef.SetFilter('=%1', ParentFieldRef.Value);
-                        LinkType::">":
-                            ChildFieldRef.SetFilter('>%1', ParentFieldRef.Value);
-                        LinkType::"<":
-                            ChildFieldRef.SetFilter('<%1', ParentFieldRef.Value);
-                        LinkType::"<>":
-                            ChildFieldRef.SetFilter('<>%1', ParentFieldRef.Value);
+        if ParentLinkOn = ParentLinkOn::"Field" then
+            if ParentFieldRef.Class() = FieldClass::FlowField then
+                ParentFieldRef.CalcField();
+
+        if (ParentLinkOn <> ParentLinkOn::"Field") or (ChildLinkOn <> ChildLinkOn::"Field") then begin
+            case true of
+                ParentLinkOn = ParentLinkOn::Position:
+                    begin
+                        ChildFieldRef.SetRange(ParentRecRef.GetPosition(false));
                     end;
-                end;
-            'FLOWFILTER':
-                ChildFieldRef.SetFilter(ParentFieldRef.GetFilter);
-            else begin
-                    case LinkType of
-                        LinkType::"=":
-                            ChildFieldRef.SetFilter('=%1', ParentFieldRef.Value);
-                        LinkType::">":
-                            ChildFieldRef.SetFilter('>%1', ParentFieldRef.Value);
-                        LinkType::"<":
-                            ChildFieldRef.SetFilter('<%1', ParentFieldRef.Value);
-                        LinkType::"<>":
-                            ChildFieldRef.SetFilter('<>%1', ParentFieldRef.Value);
+                ParentLinkOn = ParentLinkOn::"Record ID":
+                    begin
+                        if ChildFieldRef.Type() <> FieldType::RecordId then
+                            Error(WrontFieldTypeErr, SelectStr(2, ParentLinkedTxt), Format(FieldType::RecordId));
+                        ChildFieldRef.SetRange(ParentRecRef.RecordId());
                     end;
-                end;
+                ChildLinkOn = ChildLinkOn::Position:
+                    begin
+                        if ParentFieldRef.Class() = FieldClass::FlowFilter then
+                            PositionString := ParentFieldRef.GetFilter()
+                        else
+                            PositionString := Format(ParentFieldRef.Value);
+                        if PositionString = '' then
+                            Clear(ChildRecRef)  //init primary key fields to default values
+                        else
+                            ChildRecRef.SetPosition(ParentFieldRef.Value);
+                        ChildRecRef.SetRecFilter();
+                    end;
+                ChildLinkOn = ChildLinkOn::"Record ID":
+                    begin
+                        if ParentFieldRef.Type() <> FieldType::RecordId then
+                            Error(WrontFieldTypeErr, SelectStr(1, ParentLinkedTxt), Format(FieldType::RecordId));
+                        if (ParentFieldRef.Class() = FieldClass::FlowFilter) then begin
+                            if ParentFieldRef.GetFilter() <> '' then begin
+                                RecID := ParentFieldRef.GetRangeMax();
+                                RecIDFound := true;
+                            end;
+                        end else
+                            if Format(ParentFieldRef.Value()) <> '' then begin
+                                Evaluate(RecID, ParentFieldRef.Value());
+                                RecIDFound := true;
+                            end;
+                        if RecIDFound then begin
+                            if RecID.TableNo() <> ChildRecRef.Number() then
+                                Error(WrontRecordIdTableErr, ParentFieldRef.Caption(), RecID.TableNo(), ChildRecRef.Number());
+                            ChildRecRef := RecID.GetRecord();
+                        end else
+                            Clear(ChildRecRef);  //init primary key fields to default values
+                        ChildRecRef.SetRecFilter();
+                    end;
+            end;
+            exit;
+        end;
+
+        if ParentFieldRef.Class() = FieldClass::FlowFilter then begin
+            ChildFieldRef.SetFilter(ParentFieldRef.GetFilter());
+            exit;
+        end;
+
+        case LinkType of
+            LinkType::"=":
+                ChildFieldRef.SetFilter('=%1', ParentFieldRef.Value());
+            LinkType::">":
+                ChildFieldRef.SetFilter('>%1', ParentFieldRef.Value());
+            LinkType::"<":
+                ChildFieldRef.SetFilter('<%1', ParentFieldRef.Value());
+            LinkType::"<>":
+                ChildFieldRef.SetFilter('<>%1', ParentFieldRef.Value());
         end;
     end;
 
