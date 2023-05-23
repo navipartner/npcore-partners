@@ -632,7 +632,7 @@
 
         ErrorMessage.SetContext(IncomingDocument);
         ErrorMessage.LogMessage(RelatedRec, FieldNo,
-#IF BC22
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
           MessageType, CopyStr(ProcessingMessage, 1, MaxStrLen(ErrorMessage.Message)));
 #ELSE
           MessageType, CopyStr(ProcessingMessage, 1, MaxStrLen(ErrorMessage.Description)));
