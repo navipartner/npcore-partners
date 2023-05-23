@@ -94,3 +94,5 @@
     href: howto/add_customers_from_pos.md
   - name: Set up card surcharge for terminal payments
     href: howto/card_Fee.md
+  - name: Group code setup
+    href: howto/group_codes.md

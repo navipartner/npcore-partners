@@ -8,8 +8,8 @@ To create new buttons in the POS menu, follow the provided steps:
 
 ![ADDBUTTONS](../images/ADD%20BUTTONS.png)
 
-1. Click **New**.
-2. Insert the [necessary data](../reference/pos_menu_buttons.md) for a button.       
+3. Click **New**.
+4. Insert the [necessary data](../reference/pos_menu_buttons.md) for a button.       
 
 ![NEWBUTTON](../images/NEW%20BUTTON.png)      
 
