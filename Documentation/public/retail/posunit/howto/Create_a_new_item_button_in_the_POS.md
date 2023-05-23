@@ -2,7 +2,7 @@
 
 To create new button for item in POS follow next steps:
 
-1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS menus** and choose the related link.
+1. Click the ![Lightbulb that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **POS Menus** and choose the related link.
 2. Select the line with the menu in which a new button should be added.
 3. Go to **Buttons**.
 4. Add a new line for a new button.
