@@ -2,6 +2,16 @@
 
 Learn which new features and improvements have been introduced in the newest versions of the NP Retail solution:
 
+## Version 23.0 (May 28th 2023)
+
+### Group codes
+
+This feature gives users the ability to mark the POS sale exported from the POS to a standard sales order with a predefined group code. It allows the import of standard sales orders to a POS sale to be filtered by a group code.
+
+A new administrative section **Group Codes** has been added to Business Central to support this addition, along with two new parameters introduced for the **SALES_DOC_EXP** and **SALES_DOC_IMP** POS actions.
+
+For more information and operating instructions, refer to the [Group code setup](retail/posunit/howto/group_codes.md) article.
+
 ## Version 21.0 (March 28th 2023)
 
 In this release, NP Retail has undergone some backend performance enhancements. Furthermore, the V3 POS Balancing feature has been sunsetted and fully replaced with the [V4 Balancing feature](retail/posunit/howto/balance_the_pos.md).
