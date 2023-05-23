@@ -2,7 +2,7 @@
 
 Learn which new features and improvements have been introduced in the newest versions of the NP Retail solution:
 
-## Version 23.0 (May 28th 2023)
+## Version 22.0 (May 28th 2023)
 
 ### Group codes
 
@@ -12,7 +12,7 @@ A new administrative section **Group Codes** has been added to Business Central 
 
 For more information and operating instructions, refer to the [Group code setup](retail/posunit/howto/group_codes.md) article.
 
-## Version 21.0 (March 28th 2023)
+## Version 21.0 (April 28th 2023)
 
 In this release, NP Retail has undergone some backend performance enhancements. Furthermore, the V3 POS Balancing feature has been sunsetted and fully replaced with the [V4 Balancing feature](retail/posunit/howto/balance_the_pos.md).
 
