@@ -1418,7 +1418,7 @@
         OrderPromisingLine.SetRange("Source ID", Rec."Document No.");
         OrderPromisingLine.SetRange("Source Line No.", Rec."Line No.");
 
-#IF BC22
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
         OrderPromisingLines.SetSource(OrderPromisingLine."Source Type"::Sales);
 #ELSE
         OrderPromisingLines.SetSourceType(OrderPromisingLine."Source Type"::Sales.AsInteger());
