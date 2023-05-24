@@ -674,12 +674,13 @@
 
         //Calc qtyÙs
         SalesLine.CalcFields("Reserved Quantity", "Reserved Qty. (Base)");
-        if SalesLine."Document Type" = SalesLine."Document Type"::"Return Order" then begin
-            SalesLine."Reserved Quantity" := -SalesLine."Reserved Quantity";
-            SalesLine."Reserved Qty. (Base)" := -SalesLine."Reserved Qty. (Base)";
-        end;
+
         QtyReserved := SalesLine."Reserved Quantity";
         QtyReservedBase := SalesLine."Reserved Qty. (Base)";
+        if SalesLine."Document Type" = SalesLine."Document Type"::"Return Order" then begin
+            QtyReserved := -QtyReserved;
+            QtyReservedBase := -QtyReservedBase;
+        end;
 
         SalesLineReserve.ReservQuantity(SalesLine, QtyToReserve, QtyToReserveBase);
 
