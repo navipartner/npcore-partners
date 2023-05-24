@@ -67,14 +67,14 @@
                     Editable = false;
                     ToolTip = 'Specifies the code for the currency that amounts are shown in.';
                 }
-                field(ApplyingAmount2; TempApplyingCustLedgEntry.Amount)
+                field(ApplyingAmount2; TempApplyingCustLedgEntry."Sales (LCY)")
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Amount';
                     Editable = false;
                     ToolTip = 'Specifies the amount on the entry to be applied.';
                 }
-                field(ApplyingRemainingAmount; TempApplyingCustLedgEntry."Remaining Amount")
+                field(ApplyingRemainingAmount; TempApplyingCustLedgEntry."Profit (LCY)")
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Remaining Amount';
@@ -811,11 +811,11 @@
                     TempApplyingCustLedgEntry.Description := SalesHeader."Posting Description";
                     TempApplyingCustLedgEntry."Currency Code" := SalesHeader."Currency Code";
                     if TempApplyingCustLedgEntry."Document Type" = TempApplyingCustLedgEntry."Document Type"::"Credit Memo" then begin
-                        TempApplyingCustLedgEntry.Amount := -TotalSalesLine."Amount Including VAT";
-                        TempApplyingCustLedgEntry."Remaining Amount" := -TotalSalesLine."Amount Including VAT";
+                        TempApplyingCustLedgEntry."Sales (LCY)" := -TotalSalesLine."Amount Including VAT";
+                        TempApplyingCustLedgEntry."Profit (LCY)" := -TotalSalesLine."Amount Including VAT";
                     end else begin
-                        TempApplyingCustLedgEntry.Amount := TotalSalesLine."Amount Including VAT";
-                        TempApplyingCustLedgEntry."Remaining Amount" := TotalSalesLine."Amount Including VAT";
+                        TempApplyingCustLedgEntry."Sales (LCY)" := TotalSalesLine."Amount Including VAT";
+                        TempApplyingCustLedgEntry."Profit (LCY)" := TotalSalesLine."Amount Including VAT";
                     end;
                     CalcApplnAmount();
                 end;
@@ -832,11 +832,11 @@
                     TempApplyingCustLedgEntry.Description := ServHeader."Posting Description";
                     TempApplyingCustLedgEntry."Currency Code" := ServHeader."Currency Code";
                     if TempApplyingCustLedgEntry."Document Type" = TempApplyingCustLedgEntry."Document Type"::"Credit Memo" then begin
-                        TempApplyingCustLedgEntry.Amount := -TotalServLine."Amount Including VAT";
-                        TempApplyingCustLedgEntry."Remaining Amount" := -TotalServLine."Amount Including VAT";
+                        TempApplyingCustLedgEntry."Sales (LCY)" := -TotalServLine."Amount Including VAT";
+                        TempApplyingCustLedgEntry."Profit (LCY)" := -TotalServLine."Amount Including VAT";
                     end else begin
-                        TempApplyingCustLedgEntry.Amount := TotalServLine."Amount Including VAT";
-                        TempApplyingCustLedgEntry."Remaining Amount" := TotalServLine."Amount Including VAT";
+                        TempApplyingCustLedgEntry."Sales (LCY)" := TotalServLine."Amount Including VAT";
+                        TempApplyingCustLedgEntry."Profit (LCY)" := TotalServLine."Amount Including VAT";
                     end;
                     CalcApplnAmount();
                 end;
@@ -856,7 +856,7 @@
                             SetCustApplId(false);
                         end;
                         Rec.SetFilter("Entry No.", '<> %1', TempApplyingCustLedgEntry."Entry No.");
-                        ApplyingAmount := TempApplyingCustLedgEntry."Remaining Amount";
+                        ApplyingAmount := TempApplyingCustLedgEntry."Profit (LCY)";
                         ApplnDate := TempApplyingCustLedgEntry."Posting Date";
                         ApplnCurrencyCode := TempApplyingCustLedgEntry."Currency Code";
                     end;
@@ -877,8 +877,8 @@
                         TempApplyingCustLedgEntry.Description := GenJnlLine.Description;
                     end;
                     TempApplyingCustLedgEntry."Currency Code" := GenJnlLine."Currency Code";
-                    TempApplyingCustLedgEntry.Amount := GenJnlLine.Amount;
-                    TempApplyingCustLedgEntry."Remaining Amount" := GenJnlLine.Amount;
+                    TempApplyingCustLedgEntry."Sales (LCY)" := GenJnlLine.Amount;
+                    TempApplyingCustLedgEntry."Profit (LCY)" := GenJnlLine.Amount;
                     CalcApplnAmount();
                 end;
             CalcType::POSLine:
@@ -891,8 +891,8 @@
                     if Customer.Get(TempApplyingCustLedgEntry."Customer No.") then
                         TempApplyingCustLedgEntry.Description := Customer.Name;
                     TempApplyingCustLedgEntry."Currency Code" := '';
-                    TempApplyingCustLedgEntry.Amount := SaleLinePOS."Amount Including VAT";
-                    TempApplyingCustLedgEntry."Remaining Amount" := SaleLinePOS."Amount Including VAT";
+                    TempApplyingCustLedgEntry."Sales (LCY)" := SaleLinePOS."Amount Including VAT";
+                    TempApplyingCustLedgEntry."Profit (LCY)" := SaleLinePOS."Amount Including VAT";
                     CalcApplnAmount();
                 end;
         end;
