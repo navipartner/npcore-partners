@@ -2,7 +2,9 @@
 
 Learn which new features and improvements have been introduced in the newest versions of the NP Retail solution:
 
-## Version 23.0 (June 28th 2023)
+## Version 22.0 (May 28th 2023)
+
+In this release, NP Retail has undergone performance optimization, including transfer of POS to CDN. Additionally, the following features have been developed:
 
 ### Group codes
 
@@ -12,9 +14,21 @@ A new administrative section **Group Codes** has been added to Business Central 
 
 For more information and operating instructions, refer to the [Group code setup](retail/posunit/howto/group_codes.md) article.
 
-## Version 22.0 (May 28th 2023)
+### MPOS actions for improved barcode scanning
 
-In this release, NP Retail has undergone performance optimization, including transfer of POS to CDN.
+Two new MPOS actions for improved barcode scanning have been introduced:
+
+- **M_SCANDITITEMINFO** - users can use the camera on their mobile devices to scan item barcodes and receive the predefined information about that item. 
+
+- **M_SCANDITSCAN** – users can use the camera on their mobile devices to scan item barcodes and find the same barcode in direct vicinity.
+
+For more information and operating instructions, refer to the article on [MPOS action setup for Scandit](retail/mpos/howto/scandit_pos_actions.md).
+
+### New MPOS design
+
+Our MPOS has undergone a complete UI overhaul, making the previous scaled-down version of the regular MPOS more modern and streamlined. 
+
+For operating instructions, refer to the article on [MPOS setup](retail/mpos/howto/MPOS_View.md).
 
 ## Version 21.0 (April 28th 2023)
 
