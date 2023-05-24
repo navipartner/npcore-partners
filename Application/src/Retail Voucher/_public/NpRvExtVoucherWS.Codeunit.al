@@ -49,6 +49,7 @@
 
         DocNo := CreateGuid();
         NpRvVoucher.SetRange("Customer No.", UpperCase(CustomerNo));
+        NpRvVoucher.SetRange("Disabled for Web Service", false);
         if NpRvVoucher.FindSet() then
             repeat
                 LineNo += 10000;
@@ -76,6 +77,7 @@
 
         DocNo := CreateGuid();
         NpRvVoucher.SetFilter("E-mail", '@' + ConvertStr(Email, '@', '?'));
+        NpRvVoucher.SetRange("Disabled for Web Service", false);
         if NpRvVoucher.FindSet() then
             repeat
                 LineNo += 10000;
@@ -281,19 +283,15 @@
     end;
 
     procedure FindVoucher(VoucherTypeFilter: Text; ReferenceNo: Text[50]; var Voucher: Record "NPR NpRv Voucher"): Boolean
-    var
-        DisabledErr: Label 'Voucher with reference number %1 is disabled for web service.';
     begin
         if ReferenceNo = '' then
             exit(false);
 
         Voucher.SetFilter("Voucher Type", UpperCase(VoucherTypeFilter));
         Voucher.SetRange("Reference No.", ReferenceNo);
-        if Voucher.FindLast() then begin
-            if Voucher."Disabled for Web Service" then
-                Error(DisabledErr, ReferenceNo);
+        Voucher.SetRange("Disabled for Web Service", false);
+        if Voucher.FindLast() then
             exit(true);
-        end;
 
         Voucher.SetRange("Voucher Type");
         exit(Voucher.FindLast());
