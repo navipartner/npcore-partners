@@ -572,10 +572,14 @@
 
         DimId := GetValueAsInteger(Context, 'state.backendContext.dimensionId');
         SalesPersonCode := GetValueAsCode20(Context, 'state.backendContext.salesPersonCode');
+
         BalanceEntryToPrint := CheckPointMgr.CreateBalancingEntry(_EodWorkShiftMode::ZREPORT, _POSWorkShiftCheckpoint."POS Unit No.", _POSWorkShiftCheckpoint."Entry No.", DimId);
         ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(_POSWorkShiftCheckpoint."POS Unit No.", SalesPersonCode);
         POSManagePOSUnit.ClosePOSUnitNo(_POSWorkShiftCheckpoint."POS Unit No.", ClosingEntryNo);
         Commit();
+
+        SendEndWorkshiftSMS(_POSWorkShiftCheckpoint."POS Unit No.", BalanceEntryToPrint <> 0, BalanceEntryToPrint);
+        OnAfterZReport(_POSWorkShiftCheckpoint."POS Unit No.", BalanceEntryToPrint <> 0, BalanceEntryToPrint);
 
         POSSession.ChangeViewLogin();
         EndOfDayWorker.PrintEndOfDayReport(_POSWorkShiftCheckpoint."POS Unit No.", BalanceEntryToPrint);
@@ -596,6 +600,52 @@
 
         POSSession.ChangeViewLogin();
         EndOfDayWorker.PrintEndOfDayReport(_POSWorkShiftCheckpoint."POS Unit No.", BalanceEntryToPrint);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterZReport(UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
+    begin
+        // Unit No.:      The POS Unit being balanced
+        // Successful:    EOD posted successfully
+        // Pos Entry No:  can be zero
+    end;
+
+    internal procedure SendEndWorkshiftSMS(UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
+    var
+        RecRef: RecordRef;
+        SMSTemplateHeader: Record "NPR SMS Template Header";
+        POSWorkshifCheckpoint: Record "NPR POS Workshift Checkpoint";
+        POSUnit: Record "NPR POS Unit";
+        POSEndOfdayProfile: Record "NPR POS End of Day Profile";
+        SMSBodyText: Text;
+        Sender: Text;
+        SendTo: Text;
+        SMSImplementation: Codeunit "NPR SMS Implementation";
+        SendToList: list of [Text];
+    begin
+        if not Successful then
+            exit;
+
+        if not POSUnit.Get(UnitNo) then
+            exit;
+
+        if not POSEndOfdayProfile.Get(POSUnit."POS End of Day Profile") then
+            exit;
+
+        if (not SMSTemplateHeader.Get(POSEndOfdayProfile."SMS Profile")) then
+            exit;
+
+        POSWorkshifCheckpoint.Reset();
+        POSWorkshifCheckpoint.SetRange("POS Entry No.", PosEntryNo);
+        if POSWorkshifCheckpoint.FindFirst() then
+            RecRef.GetTable(POSWorkshifCheckpoint);
+
+        SMSBodyText := SMSImplementation.MakeMessage(SMSTemplateHeader, RecRef);
+
+        Sender := SMSTemplateHeader."Alt. Sender";
+
+        SMSImplementation.PopulateSendList(SendToList, SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", SendTo);
+        SMSImplementation.QueueMessages(SendToList, Sender, SMSBodyText, CurrentDateTime + 1000 * 60); //Delay 1 minute;
     end;
 
 }

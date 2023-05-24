@@ -365,4 +365,12 @@
                 Caption := DescSavedSalesOption;
         end;
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workshift Checkpoint", 'OnAfterEndWorkshift', '', true, true)]
+    local procedure CodeUnit6150627OnAfterEndWorkshift(Mode: Option; UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
+    var
+        EndOfDayUIHandler: Codeunit "NPR End Of Day UI Handler";
+    begin
+        EndOfDayUIHandler.SendEndWorkshiftSMS(UnitNo, Successful, PosEntryNo);
+    end;
 }
