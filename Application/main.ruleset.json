@@ -343,6 +343,11 @@
             "justification": "Future Error - '{0}' is being deprecated in the versions: {1} {2}."
         },
         {
+            "id": "AL0748",
+            "action": "Error",
+            "justification": "The return type '{0}' of the {1} method '{2}' has 'Internal' accessibility. The return value will not be usable outside of this module without an implicit conversion."
+        },        
+        {
             "id": "AL0749",
             "action": "Error",
             "justification": "The type '{0}' of the parameter '{1}' of the {2} method '{3}' has 'Internal' accessibility. The method will not be callable outside of this module without an implicit conversion."
