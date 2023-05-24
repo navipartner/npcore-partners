@@ -1055,19 +1055,19 @@
         Voucher, NpRvVoucher : Record "NPR NpRv Voucher";
         ExtVoucherWS: codeunit "NPR NpRv Ext. Voucher WS";
         Assert: Codeunit "Assert";
-        DisabledErr: Label 'Voucher with reference number %1 is disabled for web service.';
+        Found: Boolean;
     begin
         Initialize();
 
         // Create voucher with any amount
         CreateVoucherInPOSTransaction(NpRvVoucher, 100, _VoucherTypePartial.Code);
         // Check
-        ExtVoucherWS.FindVoucher(_VoucherTypePartial.Code, NpRvVoucher."Reference No.", Voucher);
-        Assert.AreEqual(Voucher."No.", NpRvVoucher."No.", 'Find Voucher before disabling for web not according to test scenario.');
+        Found := ExtVoucherWS.FindVoucher(_VoucherTypePartial.Code, NpRvVoucher."Reference No.", Voucher);
+        Assert.AreEqual(true, Found, 'Find Voucher before disabling for web not according to test scenario.');
         NpRvVoucher."Disabled for Web Service" := true;
         NpRvVoucher.Modify();
-        asserterror ExtVoucherWS.FindVoucher(_VoucherTypePartial.Code, NpRvVoucher."Reference No.", Voucher);
-        Assert.ExpectedError(StrSubstNo(DisabledErr, NpRvVoucher."Reference No."));
+        Found := ExtVoucherWS.FindVoucher(_VoucherTypePartial.Code, NpRvVoucher."Reference No.", Voucher);
+        Assert.AreEqual(false, Found, 'Find Voucher before disabling for web not according to test scenario.');
     end;
 
 
