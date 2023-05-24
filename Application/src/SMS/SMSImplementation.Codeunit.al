@@ -281,7 +281,7 @@ codeunit 6060035 "NPR SMS Implementation"
         exit(true);
     end;
 
-    local procedure PopulateSendList(var SMSPhoneList: List of [Text]; SMSRecipientType: enum "NPR SMS Recipient Type"; SMSGroupcode: Code[10]; SendTo: Text)
+    internal procedure PopulateSendList(var SMSPhoneList: List of [Text]; SMSRecipientType: enum "NPR SMS Recipient Type"; SMSGroupcode: Code[10]; SendTo: Text)
     var
         SMSGroupLine: Record "NPR SMS Rcpt. Group Line";
     begin
@@ -618,49 +618,6 @@ codeunit 6060035 "NPR SMS Implementation"
         ErrorNotification();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workshift Checkpoint", 'OnAfterEndWorkshift', '', true, true)]
-    local procedure CodeUnit6150627OnAfterEndWorkshift(Mode: Option; UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
-    var
-        RecRef: RecordRef;
-        SMSTemplateHeader: Record "NPR SMS Template Header";
-        POSWorkshifCheckpoint: Record "NPR POS Workshift Checkpoint";
-        POSUnit: Record "NPR POS Unit";
-        POSEndOfdayProfile: Record "NPR POS End of Day Profile";
-        SMSBodyText: Text;
-        Sender: Text;
-        SendTo: Text;
-        SMSImplementation: Codeunit "NPR SMS Implementation";
-        SendToList: list of [Text];
-    begin
-        if not Successful then
-            exit;
-
-        if not POSUnit.Get(UnitNo) then
-            exit;
-
-        if not POSEndOfdayProfile.Get(POSUnit."POS End of Day Profile") then
-            exit;
-
-        if (not SMSTemplateHeader.Get(POSEndOfdayProfile."SMS Profile")) then
-            exit;
-
-        POSWorkshifCheckpoint.Reset();
-        POSWorkshifCheckpoint.SetRange("POS Entry No.", PosEntryNo);
-        if POSWorkshifCheckpoint.FindFirst() then
-            RecRef.GetTable(POSWorkshifCheckpoint);
-
-        SMSBodyText := SMSImplementation.MakeMessage(SMSTemplateHeader, RecRef);
-
-        Sender := SMSTemplateHeader."Alt. Sender";
-        if Sender = '' then
-            Sender := GetDefaultSender();
-
-        SendTo := NpRegex.MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0, AFReportLinkTag());
-
-        PopulateSendList(SendToList, SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", SendTo);
-        QueueMessages(SendToList, Sender, SMSBodyText, CurrentDateTime + 1000 * 60); //Delay 1 minute
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
     local procedure RefreshJobQueueEntry()
     var
@@ -758,5 +715,6 @@ codeunit 6060035 "NPR SMS Implementation"
     begin
         exit('<<AFReportLink>>');
     end;
+
     #endregion Report Links Azure Functions
 }

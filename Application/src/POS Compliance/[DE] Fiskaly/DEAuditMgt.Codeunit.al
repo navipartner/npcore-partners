@@ -338,6 +338,67 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workshift Checkpoint", 'OnAfterEndWorkshift', '', true, true)]
     local procedure OnAfterEndWorkshiftDeFiscaly(Mode: Option; UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
+    begin
+        DoEndWorkshiftDeFiscaly(UnitNo, Successful, PosEntryNo);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR End Of Day UI Handler", 'OnAfterZReport', '', true, true)]
+    local procedure NPREndOfDayUIHandlerOnAfterZReport(UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
+    begin
+        DoEndWorkshiftDeFiscaly(UnitNo, Successful, PosEntryNo);
+    end;
+
+    local procedure CheckTssJobQueue()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        JobDescLbl: Label 'Auto-created for sending Fiskaly', Locked = true;
+    begin
+        JobQueueEntry.Reset();
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR DE Fiskaly Job");
+        if JobQueueEntry.FindFirst() then
+            exit;
+
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR DE Fiskaly Job",
+            '',
+            JobDescLbl,
+            CurrentDateTime(),
+            10,
+            '',
+            JobQueueEntry)
+        then
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+    end;
+
+    local procedure CheckDSFINVKJobQueue()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        JobDescLbl: Label 'Auto-created for sending DSFINVK', Locked = true;
+    begin
+        JobQueueEntry.Reset();
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR DE Fiskaly DSFINVK Job");
+        if JobQueueEntry.FindFirst() then
+            exit;
+
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR DE Fiskaly DSFINVK Job",
+            '',
+            JobDescLbl,
+            CurrentDateTime(),
+            10,
+            '',
+            JobQueueEntry)
+        then
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+    end;
+
+    local procedure DoEndWorkshiftDeFiscaly(UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
     var
         ConnectionParameters: Record "NPR DE Audit Setup";
         POSWorkshifCheckpoint: Record "NPR POS Workshift Checkpoint";
@@ -407,56 +468,6 @@
         DSFINVKClosing."Has Error" := false;
         Clear(DSFINVKClosing."Error Message");
         DSFINVKClosing.Modify();
-    end;
-
-    local procedure CheckTssJobQueue()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
-        JobDescLbl: Label 'Auto-created for sending Fiskaly', Locked = true;
-    begin
-        JobQueueEntry.Reset();
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR DE Fiskaly Job");
-        if JobQueueEntry.FindFirst() then
-            exit;
-
-        if JobQueueMgt.InitRecurringJobQueueEntry(
-            JobQueueEntry."Object Type to Run"::Codeunit,
-            Codeunit::"NPR DE Fiskaly Job",
-            '',
-            JobDescLbl,
-            CurrentDateTime(),
-            10,
-            '',
-            JobQueueEntry)
-        then
-            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
-    end;
-
-    local procedure CheckDSFINVKJobQueue()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
-        JobDescLbl: Label 'Auto-created for sending DSFINVK', Locked = true;
-    begin
-        JobQueueEntry.Reset();
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR DE Fiskaly DSFINVK Job");
-        if JobQueueEntry.FindFirst() then
-            exit;
-
-        if JobQueueMgt.InitRecurringJobQueueEntry(
-            JobQueueEntry."Object Type to Run"::Codeunit,
-            Codeunit::"NPR DE Fiskaly DSFINVK Job",
-            '',
-            JobDescLbl,
-            CurrentDateTime(),
-            10,
-            '',
-            JobQueueEntry)
-        then
-            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
     end;
 
     procedure SetErrorMsg(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info")
