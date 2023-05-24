@@ -132,7 +132,7 @@
         until VoucherEntry.Next() = 0;
     end;
 
-    internal procedure IssueVouchers(var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    procedure IssueVouchers(var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         VoucherType: Record "NPR NpRv Voucher Type";
