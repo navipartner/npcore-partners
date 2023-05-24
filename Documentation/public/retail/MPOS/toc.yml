@@ -14,3 +14,5 @@
     href: howto/Create_a_new_item_button_in_the_POS.md
   - name: Establish connection between receipt printer and iPad/iPhone
     href: howto/mpos_bluetooth_guide.md
+  - name: Scandit POS action setup for MPOS
+    href: howto/scandit_pos_actions.md

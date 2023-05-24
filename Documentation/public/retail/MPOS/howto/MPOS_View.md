@@ -2,20 +2,38 @@
 
 Mobile view setup is defined exactly in the same way as in the non-mobile scenarios. There are default views for the login, sale, and payment functions. This is the default arrangement that Transcendence applies if there are no custom views defined.
 
-To define a new mobile view:
+To define a new mobile view, follow the provided steps:
 
-1. Create a new POS View record by specifying the register filter to match the register number of the mobile device, and then specifying the M* view you defined.
-2. Prefix it with "M" (this is just a convention, not a rule) – so, for example MPOS-SALE, MPOS-PAY, etc.
+## Prerequisites in Business Central
+
+1. Create three new POS views - **MPOS LOGIN**, **MPOS-SALE**, and **MPOS-PAY**.     
+   
+    ![MPOS VIEW](../images/MPOS%20View%202022-09-20.png) 
+
+   Leave the **JSON** field empty to make the default one automatically selected.
+2. Navigate to the **POS Default Views** administrative section.
+3. Assign a POS unit to the created POS views.      
+   
+   ![mpos_1](../images/mpos_1.PNG)
+
+4. Create the following entries in the **POS Menu** section:
+   - **MOBILE-DRAWER**
+   - **MOBILE-ITEMS**
+   - **MOBILE-PAYMENT**
+   - **SWIPE-ACTIONS**
+5. Create a new MPOS QR code in **MPOS QR Code List**.
+6. Click **Set Defaults**, and then **Create QR Code**.    
+   The necessary QR code is now generated.
+
+## Procedure on the mobile device
+
+1. Download the **NP Retail POS** application from the app store and install it.
+2. Open the **NP Retail POS** app.
+3. Press **D365 BUSINESS CENTRAL - ONPREM** and scan the QR code generated in the last step of the Business Central portion of setup.     
+   This step is only necessary if the app is opened for the first time. 
+4. Navigate to the homepage and press **POS**.
 
 
-![MPOS VIEW](../images/MPOS%20View%202022-09-20.png) 
-
-
-> [!Note]  
-> MPOS uses the same configuration defined in [POS Unit.](../../pos_profiles/reference/POS_view_profile.md)
-
-
-![POS VIEW PROFILE](../images/MPOS%20-%20POS%20Unit%202022-09-20.png) 
 
 ### Related links
 
