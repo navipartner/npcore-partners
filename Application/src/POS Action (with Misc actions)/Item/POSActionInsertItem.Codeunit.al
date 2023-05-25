@@ -3,38 +3,40 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     Access = Internal;
 
     var
+        StartTime: DateTime;
         UnitPriceCaption: Label 'This is item is an item group. Specify the unit price for item.';
         UnitPriceTitle: Label 'Unit price is required';
-        StartTime: DateTime;
 
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This is a built-in action for inserting an item line into the current transaction';
-        ParamItemIdentifierType_CaptionLbl: Label 'Item Identifier Type';
-        ParamItemIdentifierType_DescLbl: Label 'Specifies the Item Identifier Type';
-        ParamItemIdentifierOptionsLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference', Locked = true;
-        ParamItemIdentifierOptions_CaptionLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference';
-        ParamItemNo_CaptionLbl: Label 'Item No.';
-        ParamItemNo_DescLbl: Label 'Specifies the Item No.';
-        ParamEditDescription_CaptionLbl: Label 'Edit Description';
-        ParamEditDescription_DescLbl: Label 'Enable/Disable Edit Description';
+        BOMItemTracking_LeadLbl: Label 'BOM component item {0} of BOM item {1} requires serial number. Please enter serial number.';
+        SerialNoError_titleLbl: Label 'Serial No. error';
+        EditDesc2_titleLbl: Label 'Add or change description 2.';
+        EditDesc_titleLbl: Label 'Add or change description.';
+        ItemTracking_InstrLbl: Label 'Enter serial number now and press OK. Press Cancel to enter serial number later.';
+        ItemTracking_LeadLbl: Label 'This item requires serial number, enter serial number.';
+        ItemTracking_TitleLbl: Label 'Enter Serial Number';
         ParamEditDescription2_CaptionLbl: Label 'Edit Description 2';
         ParamEditDescription2_DescLbl: Label 'Enable/Disable Edit Description 2';
-        ParamUsePreSetUnitPrice_CaptionLbl: Label 'usePreSetUnitPrice';
-        ParamUsePreSetUnitPrice_DescLbl: Label 'Enable/Disable preset of Unit Price';
+        ParamEditDescription_CaptionLbl: Label 'Edit Description';
+        ParamEditDescription_DescLbl: Label 'Enable/Disable Edit Description';
+        ParamItemIdentifierOptions_CaptionLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference';
+        ParamItemIdentifierOptionsLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference', Locked = true;
+        ParamItemIdentifierType_CaptionLbl: Label 'Item Identifier Type';
+        ParamItemIdentifierType_DescLbl: Label 'Specifies the Item Identifier Type';
+        ParamItemNo_CaptionLbl: Label 'Item No.';
+        ParamItemNo_DescLbl: Label 'Specifies the Item No.';
+        ParamItemQty_CaptionLbl: Label 'Item Quantity';
+        ParamItemQty_DescLbl: Label 'Specifies the Item Quantity';
         ParamPreSetUnitPrice_CaptionLbl: Label 'Preset Unit Price';
         ParamPreSetUnitPrice_DescLbl: Label 'Specifies the Preset Unit Price';
         ParamSelectSerialNo_CaptionLbl: Label 'Select Serial No.';
         ParamSelectSerialNo_DescLbl: Label 'Enable/Disable select Serial No. from the list';
         ParamSkipItemAvailabilityCheck_CaptionLbl: Label 'Skip Item Availability Check';
         ParamSkipItemAvailabilityCheck_DescLbl: Label 'Enable/Disable skip Item Availability Check';
-        ParamItemQty_CaptionLbl: Label 'Item Quantity';
-        ParamItemQty_DescLbl: Label 'Specifies the Item Quantity';
-        ItemTracking_TitleLbl: Label 'Enter Serial Number';
-        ItemTracking_LeadLbl: Label 'This item requires serial number, enter serial number.';
-        EditDesc_titleLbl: Label 'Add or change description.';
-        EditDesc2_titleLbl: Label 'Add or change description 2.';
-        ItemTracking_InstrLbl: Label 'Enter serial number now and press OK. Press Cancel to enter serial number later.';
+        ParamUsePreSetUnitPrice_CaptionLbl: Label 'usePreSetUnitPrice';
+        ParamUsePreSetUnitPrice_DescLbl: Label 'Enable/Disable preset of Unit Price';
 
     begin
         WorkflowConfig.SetNonBlockingUI();
@@ -48,6 +50,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('editDesc_lead', EditDesc_titleLbl);
         WorkflowConfig.AddLabel('editDesc2_lead', EditDesc2_titleLbl);
         WorkflowConfig.AddLabel('itemTracking_instructions', ItemTracking_InstrLbl);
+        WorkflowConfig.AddLabel('bomItemTracking_Lead', BOMItemTracking_LeadLbl);
+        WorkflowConfig.AddLabel('serialNoError_title', SerialNoError_titleLbl);
 
         WorkflowConfig.AddOptionParameter(
                        'itemIdentifierType',
@@ -68,14 +72,26 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('SkipItemAvailabilityCheck', false, ParamSkipItemAvailabilityCheck_CaptionLbl, ParamSkipItemAvailabilityCheck_DescLbl);
     end;
 
-    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    procedure RunWorkflow(Step: Text;
+                          Context: Codeunit "NPR POS JSON Helper";
+                          FrontEnd: Codeunit "NPR POS Front End Management";
+                          Sale: Codeunit "NPR POS Sale";
+                          SaleLine: Codeunit "NPR POS Sale Line";
+                          PaymentLine: Codeunit "NPR POS Payment Line";
+                          Setup: Codeunit "NPR POS Setup")
     var
     begin
         case Step of
             'addSalesLine':
-                FrontEnd.WorkflowResponse(Step_AddSalesLine(Context, FrontEnd, Setup));
+                FrontEnd.WorkflowResponse(Step_AddSalesLine(Context,
+                                                             FrontEnd,
+                                                             Setup));
             'checkAvailability':
                 CheckAvailability(Context);
+
+            'assignSerialNo':
+                FrontEnd.WorkflowResponse(AssignSerialNo(Context,
+                                          Setup));
         end;
     end;
 
@@ -84,35 +100,37 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         exit(Item."NPR Item Addon No." <> '')
     end;
 
-    local procedure Step_AddSalesLine(Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
+    local procedure Step_AddSalesLine(Context: Codeunit "NPR POS JSON Helper";
+                                      FrontEnd: Codeunit "NPR POS Front End Management";
+                                      Setup: Codeunit "NPR POS Setup") Response: JsonObject
     var
-        UseSpecificTracking: Boolean;
-        InputSerial: Code[50];
-        UnitPrice: Decimal;
-        ItemIdentifier: Text;
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
         Item: Record Item;
         ItemReference: Record "Item Reference";
-        ItemQuantity: Decimal;
-        UsePresetUnitPrice: Boolean;
-        PresetUnitPrice: Decimal;
-        CustomDescription: Text;
-        CustomDescription2: Text;
-        ValidatedVariantCode: Text;
         PosInventoryProfile: Record "NPR POS Inventory Profile";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
         PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
-        SkipItemAvailabilityCheck: Boolean;
+        POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSession: Codeunit "NPR POS Session";
+        NPRPOSTrackingUtils: Codeunit "NPR POS Tracking Utils";
         EditDesc: Boolean;
         EditDesc2: Boolean;
-        POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
-        SerialSelectionFromList: Boolean;
-        SerialNumberInput: Text;
-        UserInformationErrorWarning: Text;
-        POSStore: Record "NPR POS Store";
-        Success: Boolean;
         GetPromptSerial: Boolean;
+        SerialSelectionFromList: Boolean;
+        SkipItemAvailabilityCheck: Boolean;
+        Success: Boolean;
+        UsePresetUnitPrice: Boolean;
+        UseSpecificTracking: Boolean;
+        ItemQuantity: Decimal;
+        PresetUnitPrice: Decimal;
+        UnitPrice: Decimal;
         BaseLineNo: Integer;
+        ChildBOMLinesWithoutSerialNoJsonArray: JsonArray;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
+        CustomDescription: Text;
+        CustomDescription2: Text;
+        ItemIdentifier: Text;
+        InputSerial: Text[50];
     begin
         ItemIdentifier := Context.GetStringParameter('itemNo');
         ItemIdentifierType := Context.GetIntegerParameter('itemIdentifierType');
@@ -122,12 +140,15 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         SkipItemAvailabilityCheck := Context.GetBooleanParameter('SkipItemAvailabilityCheck');
         EditDesc := Context.GetBooleanParameter('EditDescription');
         EditDesc2 := Context.GetBooleanParameter('EditDescription2');
-        SerialSelectionFromList := Context.GetBooleanParameter('SelectSerialNo');
+        if not Context.GetBooleanParameter('SelectSerialNo', SerialSelectionFromList) then;
 
         if ItemIdentifierType < 0 then
             ItemIdentifierType := 0;
 
-        POSActionInsertItemB.GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
+        POSActionInsertItemB.GetItem(Item,
+                                     ItemReference,
+                                     ItemIdentifier,
+                                     ItemIdentifierType);
 
         LogStartTelem();
 
@@ -140,67 +161,83 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         if UsePresetUnitPrice then
             UnitPrice := PresetUnitPrice;
 
-        if Item."NPR Group sale" then begin
-            Response.ReadFrom('{}');
-            Response.Add('ItemGroupSale', true);
-        end;
+        Response.Add('ItemGroupSale', Item."NPR Group sale");
 
-        if POSActionInsertItemB.ItemRequiresSerialNumberOnSale(Item, UseSpecificTracking) then begin
-            Response.Add('GetPromptSerial', true);
-            GetPromptSerial := true;
-        end;
+
+        GetPromptSerial := NPRPOSTrackingUtils.ItemRequiresSerialNumber(Item,
+                                                                        UseSpecificTracking);
+
+        Response.Add('GetPromptSerial', GetPromptSerial);
 
         Response.Add('useSpecTracking', UseSpecificTracking);
 
-        Success := (not UseSpecificTracking) and (not Item."NPR Group sale") and (not GetPromptSerial);
+        Success := (not UseSpecificTracking) and
+                   (not Item."NPR Group sale") and
+                   (not GetPromptSerial);
+
         Response.Add('Success', Success);
 
-        If Not Success then
-            If Context.GetBoolean('GetPrompt') = true then begin
-                if SerialSelectionFromList then begin
-                    while not POSActionInsertItemB.SerialNumberCanBeUsedForItem(ItemReference, CopyStr(SerialNumberInput, 1, MaxStrLen(InputSerial)), UserInformationErrorWarning, SerialSelectionFromList) do begin
-                        if SerialNumberInput <> '' then
-                            Message(UserInformationErrorWarning);
-                        SerialNumberInput := '';
-                        Setup.GetPOSStore(POSStore);
-                        POSActionInsertItemB.SelectSerialNoFromList(ItemReference, POSStore."Location Code", SerialNumberInput);
-                        if SerialNumberInput = '' then
-                            Error('');
-                    end;
-                end else
-                    if not POSActionInsertItemB.SerialNumberCanBeUsedForItem(ItemReference, CopyStr(SerialNumberInput, 1, MaxStrLen(InputSerial)), UserInformationErrorWarning, SerialSelectionFromList) then begin
-                        SerialNumberInput := '';
-                    end;
-                ValidatedVariantCode := ItemReference."Variant Code";
 
-                if Item."NPR Group sale" then
-                    UnitPrice := Context.GetDecimal('UnitPrice');
 
-                if SerialNumberInput = '' then begin
-                    if (UseSpecificTracking) or (GetPromptSerial) then
-                        InputSerial := CopyStr(Context.GetString('SerialNo'), 1, MaxStrLen(InputSerial))
-                end else
-                    InputSerial := CopyStr(SerialNumberInput, 1, MaxStrLen(InputSerial));
+        If (not Success) then begin
 
-            end else
+            if (not Context.GetBoolean('GetPrompt')) then
                 exit;
+
+            if Context.HasProperty('SerialNo') then
+#pragma warning disable AA0139
+                InputSerial := Context.GetString('SerialNo');
+#pragma warning restore AA0139
+            NPRPOSTrackingUtils.ValidateSerialNo(ItemReference."Item No.",
+                                                 ItemReference."Variant Code",
+                                                 InputSerial,
+                                                 SerialSelectionFromList,
+                                                 Setup);
+
+            if Item."NPR Group sale" then
+                UnitPrice := Context.GetDecimal('UnitPrice');
+
+        end;
 
         Clear(PosItemCheckAvail);
         if not SkipItemAvailabilityCheck then begin
+
             PosItemCheckAvail.GetPosInvtProfile(POSSession, PosInventoryProfile);
+
             if PosInventoryProfile."Stockout Warning" then
                 PosItemCheckAvail.SetxDataset(POSSession);
+
             POSSession.SetAvailabilityCheckState(PosItemCheckAvail);
         end;
 
-        POSActionInsertItemB.AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd);
+        POSActionInsertItemB.AddItemLine(Item,
+                                         ItemReference,
+                                         ItemIdentifierType,
+                                         ItemQuantity,
+                                         UnitPrice,
+                                         CustomDescription,
+                                         CustomDescription2,
+                                         InputSerial,
+                                         POSSession,
+                                         FrontEnd);
+
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        ChildBOMLinesWithoutSerialNoJsonArray := CreateChildBOMLinesSerialNoAssignmentResponse(SaleLinePOS);
+        Response.Add('childBOMLinesWithoutSerialNo', ChildBOMLinesWithoutSerialNoJsonArray);
+
         if IfAddItemAddOns(Item) then begin
+
             Response.Add('AddItemAddOn', true);
+
             BaseLineNo := POSActionInsertItemB.GetLineNo();
+
             Response.Add('BaseLineNo', BaseLineNo);
+
         end else
             if not SkipItemAvailabilityCheck then
-                CheckAvailability(PosInventoryProfile, PosItemCheckAvail);
+                CheckAvailability(PosInventoryProfile,
+                                  PosItemCheckAvail);
 
         LogFinishTelem();
     end;
@@ -212,13 +249,13 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
 
     local procedure LogFinishTelem()
     var
-        FinishEventIdTok: Label 'NPR_POSActAddItem', Locked = true;
-        LogDict: Dictionary of [Text, Text];
-        MsgTok: Label 'Company:%1, Tenant: %2, Instance: %3, Server: %4, Duration: %5';
-        Msg: Text;
         ActiveSession: Record "Active Session";
+        LogDict: Dictionary of [Text, Text];
         ItemAddedDur: Duration;
         DurationMs: Integer;
+        FinishEventIdTok: Label 'NPR_POSActAddItem', Locked = true;
+        MsgTok: Label 'Company:%1, Tenant: %2, Instance: %3, Server: %4, Duration: %5';
+        Msg: Text;
     begin
         if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
             Clear(ActiveSession);
@@ -239,9 +276,9 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     local procedure CheckAvailability(Context: Codeunit "NPR POS JSON Helper")
     var
         PosInventoryProfile: Record "NPR POS Inventory Profile";
-        SkipItemAvailabilityCheck: Boolean;
         PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
         POSSession: Codeunit "NPR POS Session";
+        SkipItemAvailabilityCheck: Boolean;
     begin
         SkipItemAvailabilityCheck := Context.GetBooleanParameter('SkipItemAvailabilityCheck');
 
@@ -261,6 +298,110 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         POSSession.ClearAvailabilityCheckState();
     end;
 
+    #region CreateChildBOMLinesSerialNoAssignmentResponse
+    local procedure CreateChildBOMLinesSerialNoAssignmentResponse(SaleLinePOS: Record "NPR POS Sale Line") ResponseJsonArray: JsonArray;
+    var
+        Item: Record Item;
+        ParentItem: Record Item;
+        ChildBOMLines: Record "NPR POS Sale Line";
+        POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
+        POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
+        useSpecTracking: boolean;
+        CurrJsonObject: JsonObject;
+
+    begin
+
+        POSActionInsertItemB.GetChildBOMLines(SaleLinePOS,
+                                              ChildBOMLines);
+
+        ChildBOMLines.SetLoadFields("No.", "Variant Code",
+                                    "Parent BOM Item No.",
+                                    Description,
+                                    "Parent BOM Line No.");
+
+        if not ChildBOMLines.FindSet(false) then
+            exit;
+
+        repeat
+
+            Item.Get(ChildBOMLines."No.");
+            if POSTrackingUtils.ItemRequiresSerialNumber(Item,
+                                                         useSpecTracking)
+            then begin
+                ParentItem.Get(ChildBOMLines."Parent BOM Item No.");
+
+                Clear(CurrJsonObject);
+                CurrJsonObject.Add('registerNo', ChildBOMLines."Register No.");
+                CurrJsonObject.Add('salesTicketNo', ChildBOMLines."Sales Ticket No.");
+                CurrJsonObject.Add('lineNo', ChildBOMLines."Line No.");
+                CurrJsonObject.Add('no', ChildBOMLines."No.");
+                CurrJsonObject.Add('description', ChildBOMLines.Description);
+                CurrJsonObject.Add('variantCode', ChildBOMLines."Variant Code");
+                CurrJsonObject.Add('parentBOMItemNo', ChildBOMLines."Parent BOM Item No.");
+                CurrJsonObject.Add('parentBOMLineNo', ChildBOMLines."Parent BOM Line No.");
+                CurrJsonObject.Add('parentBOMDescription', ParentItem.Description);
+                CurrJsonObject.Add('useSpecTracking', useSpecTracking);
+                CurrJsonObject.Add('recordID', Format(ChildBOMLines.RecordId));
+                CurrJsonObject.Add('systemID', ChildBOMLines.SystemId);
+                ResponseJsonArray.Add(CurrJsonObject);
+            end;
+        until ChildBOMLines.Next() = 0;
+
+
+    end;
+    #endregion CreateChildBOMLinesSerialNoAssignmentResponse
+
+    #region AssignSerialNo
+    local procedure AssignSerialNo(Context: Codeunit "NPR POS JSON Helper";
+                                   Setup: Codeunit "NPR POS Setup") ResponseJsonObject: JsonObject
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSActionItemInsertTry: Codeunit "NPR POS Action Item Insert Try";
+        AssignSerialNoSuccess: Boolean;
+        SerialSelectionFromList: Boolean;
+        ChildBOMLineJsonObject: JsonObject;
+        ResultToken: JsonToken;
+        AssignSerialNoSuccessErrorText: Text;
+        ChildSystemID: Text;
+        InputSerial: Text[50];
+        WrongSerial_InstrLbl: Label ' Press Yes to re-enter serial number now. Press No to enter serial number later.';
+    begin
+#pragma warning disable AA0139
+        InputSerial := Context.GetString('SerialNo');
+#pragma warning restore AA0139
+        if not Context.GetBooleanParameter('SelectSerialNo', SerialSelectionFromList) then;
+
+        Clear(ChildBOMLineJsonObject);
+        ChildBOMLineJsonObject := Context.GetJsonObject('childBOMLineWithoutSerialNo');
+
+        Clear(ResultToken);
+        ChildBOMLineJsonObject.Get('systemID', ResultToken);
+        ChildSystemID := ResultToken.AsValue().AsText();
+
+        SaleLinePOS.GetBySystemId(ChildSystemID);
+
+        ClearLastError();
+        Clear(POSActionItemInsertTry);
+        POSActionItemInsertTry.SetSaleLine(SaleLinePOS);
+        POSActionItemInsertTry.SetSerialNoInput(InputSerial);
+        POSActionItemInsertTry.SetSerialSelectionFromList(SerialSelectionFromList);
+        POSActionItemInsertTry.SetSetup(Setup);
+        POSActionItemInsertTry.SetFunctionToExecute('AssignSerialNo');
+
+        AssignSerialNoSuccess := POSActionItemInsertTry.Run();
+
+        AssignSerialNoSuccessErrorText := '';
+        if not AssignSerialNoSuccess then begin
+            AssignSerialNoSuccessErrorText := GetLastErrorText();
+            if AssignSerialNoSuccessErrorText <> '' then
+                AssignSerialNoSuccessErrorText += WrongSerial_InstrLbl;
+        end;
+
+        ResponseJsonObject.Add('AssignSerialNoSuccess', AssignSerialNoSuccess);
+        ResponseJsonObject.Add('AssignSerialNoSuccessErrorText', AssignSerialNoSuccessErrorText);
+
+    end;
+    #endregion AssignSerialNo
     procedure ActionCode(): Text
     begin
         exit(Format(enum::"NPR POS Workflow"::ITEM));
@@ -443,7 +584,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionInsertItem.js###
-'let main=async({workflow:e,context:c,scope:S,popup:i,parameters:n,captions:t})=>{if(e.context.GetPrompt=!1,n.EditDescription&&(e.context.Desc1=await i.input({title:t.editDesc_title,caption:t.editDesc_lead,value:c.defaultDescription}),e.context.Desc1===null)||n.EditDescription2&&(e.context.Desc2=await i.input({title:t.editDesc2_title,caption:t.editDesc2_lead,value:c.defaultDescription}),e.context.Desc2===null))return" ";const{ItemGroupSale:l,useSpecTracking:a,GetPromptSerial:d,Success:u,AddItemAddOn:r,BaseLineNo:s}=await e.respond("addSalesLine");if(!u){if(e.context.GetPrompt=!0,l&&!n.usePreSetUnitPrice&&(e.context.UnitPrice=await i.numpad({title:t.UnitpriceTitle,caption:t.UnitPriceCaption}),e.context.UnitPrice===null)||a&&!n.SelectSerialNo&&(e.context.SerialNo=await i.input({title:t.itemTracking_title,caption:t.itemTracking_lead}),e.context.SerialNo===null)||!a&&d&&(e.context.SerialNo=await i.input({title:t.itemTracking_title,caption:t.itemTracking_lead}),e.context.SerialNo===null))return" ";e.context.useSpecTracking=a,await e.respond("addSalesLine")}r&&(await e.run("RUN_ITEM_ADDONS",{context:{BaseLineNo:s},parameters:{SkipItemAvailabilityCheck:!0}}),await e.respond("checkAvailability"))};'
+'let main=async({workflow:e,context:n,scope:u,popup:t,parameters:a,captions:i})=>{debugger;if(e.context.GetPrompt=!1,a.EditDescription&&(e.context.Desc1=await t.input({title:i.editDesc_title,caption:i.editDesc_lead,value:n.defaultDescription}),e.context.Desc1===null)||a.EditDescription2&&(e.context.Desc2=await t.input({title:i.editDesc2_title,caption:i.editDesc2_lead,value:n.defaultDescription}),e.context.Desc2===null))return" ";const{childBOMLinesWithoutSerialNo:S,ItemGroupSale:d,useSpecTracking:l,GetPromptSerial:N,Success:g,AddItemAddOn:x,BaseLineNo:m}=await e.respond("addSalesLine");if(g)for(var s in S)for(var c=!0,r;c;)c=!1,s!="remove"&&(e.context.SerialNo="",e.context.childBOMLineWithoutSerialNo=S[s],a.SelectSerialNo&&e.context.childBOMLineWithoutSerialNo.useSpecTracking?(r=await e.respond("assignSerialNo"),!r.AssignSerialNoSuccess&&r.AssignSerialNoSuccessErrorText&&await t.confirm({title:i.serialNoError_title,caption:r.AssignSerialNoSuccessErrorText})&&(c=!0)):(e.context.SerialNo=await t.input({title:i.itemTracking_title,caption:format(i.bomItemTracking_Lead,e.context.childBOMLineWithoutSerialNo.description,e.context.childBOMLineWithoutSerialNo.parentBOMDescription)}),e.context.SerialNo&&(r=await e.respond("assignSerialNo"),!r.AssignSerialNoSuccess&&r.AssignSerialNoSuccessErrorText&&await t.confirm({title:i.serialNoError_title,caption:r.AssignSerialNoSuccessErrorText})&&(c=!0))));else{if(e.context.GetPrompt=!0,d&&!a.usePreSetUnitPrice&&(e.context.UnitPrice=await t.numpad({title:i.UnitpriceTitle,caption:i.UnitPriceCaption}),e.context.UnitPrice===null)||l&&!a.SelectSerialNo&&(e.context.SerialNo=await t.input({title:i.itemTracking_title,caption:i.itemTracking_lead}),e.context.SerialNo===null)||!l&&N&&(e.context.SerialNo=await t.input({title:i.itemTracking_title,caption:i.itemTracking_lead}),e.context.SerialNo===null))return" ";e.context.useSpecTracking=l,await e.respond("addSalesLine")}x&&(await e.run("RUN_ITEM_ADDONS",{context:{BaseLineNo:m},parameters:{SkipItemAvailabilityCheck:!0}}),await e.respond("checkAvailability"))};function format(e,...n){if(!e.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return e.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(u,t,a)=>{if(t)return t.replace(/(?:{{)|(?:}})/g,i=>i[0]);if(a>=n.length)throw new Error("argument index is out of range in format");return n[a]})}'
         );
     end;
 

@@ -846,6 +846,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'M_SCANDITSCAN', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR MPOS Action Scandit Scan";
     }
+    value(168; ASSIGN_SERIAL_NO)
+    {
+        Caption = 'ASSIGN_SERIAL_NO', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Set Serial No";
+    }
     value(145; LOGIN)
     {
         Caption = 'LOGIN', Locked = true, MaxLength = 20;

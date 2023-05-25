@@ -230,6 +230,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
 
     end;
 
+    [Obsolete('Replaced by function ItemRequiresSerialNo in codeunit NPR POS Tracking Utils')]
     procedure ItemRequiresSerialNumberOnSale(Item: Record Item; var UseSpecificTracking: Boolean): Boolean
     var
         ItemTrackingCode: Record "Item Tracking Code";
@@ -244,6 +245,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         exit(ItemTrackingCode."SN Sales Outbound Tracking");
     end;
 
+    [Obsolete('Replaced by function SerialNumberCanBeUsedByItem in codeunit NPR POS Tracking Utils')]
     procedure SerialNumberCanBeUsedForItem(var ItemRef: Record "Item Reference"; SerialNumber: Code[50]; var UserInformationErrorWarning: Text; SerialSelectionFromList: Boolean) CanBeUsed: Boolean
     var
         Item: Record Item;
@@ -315,6 +317,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         exit(CanBeUsed);
     end;
 
+    [Obsolete('Replaced by function SelectSerialNoFromList in codeunit NPR POS Tracking Utils')]
     procedure SelectSerialNoFromList(var ItemRef: Record "Item Reference"; LocationCode: Code[10]; var SerialNo: Text)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -379,4 +382,40 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             Item.SetRange(Blocked, false);
         Item.SetLoadFields("No.");
     end;
+
+
+    #region GetChildBOMLines
+    internal procedure GetChildBOMLines(SaleLinePOS: Record "NPR POS Sale Line";
+                                        var ChildBOMSaleLinePOS: Record "NPR POS Sale Line")
+    begin
+
+        ChildBOMSaleLinePOS.Reset();
+        ChildBOMSaleLinePOS.SetRange("Register No.", SaleLinePOS."Register No.");
+        ChildBOMSaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+        ChildBOMSaleLinePOS.SetRange("Serial No.", '');
+        ChildBOMSaleLinePOS.SetRange("Parent BOM Item No.", SaleLinePOS."No.");
+        ChildBOMSaleLinePOS.SetRange("Parent BOM Line No.", SaleLinePOS."Line No.");
+        ChildBOMSaleLinePOS.SetFilter("Line Type", '%1|%2', ChildBOMSaleLinePOS."Line Type"::Item, ChildBOMSaleLinePOS."Line Type"::"BOM List");
+
+    end;
+    #endregion GetChildBOMLines
+
+    #region AssingSerialNo
+    internal procedure AssingSerialNo(var SaleLinePOS: Record "NPR POS Sale Line";
+                                      var SerialNoInput: Text[50];
+                                      SerialSelectionFromList: Boolean;
+                                      Setup: Codeunit "NPR POS Setup")
+    var
+        POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
+    begin
+        POSTrackingUtils.ValidateSerialNo(SaleLinePOS."No.",
+                                          SaleLinePOS."Variant Code",
+                                          SerialNoInput,
+                                          SerialSelectionFromList,
+                                          Setup);
+
+        SaleLinePOS.Validate("Serial No.", SerialNoInput);
+        SaleLinePOS.Modify(true);
+    end;
+    #endregion AssingSerialNo
 }

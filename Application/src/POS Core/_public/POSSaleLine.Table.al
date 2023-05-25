@@ -1498,6 +1498,17 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.40';
         }
+        field(6105; "Parent BOM Item No."; Code[20])
+        {
+            Caption = 'Parent BOM Item No.';
+            DataClassification = CustomerContent;
+        }
+        field(6110; "Parent BOM Line No."; Integer)
+        {
+            Caption = 'Parent BOM Line No.';
+            DataClassification = CustomerContent;
+        }
+
         field(7014; "Item Disc. Group"; Code[20])
         {
             Caption = 'Item Disc. Group';
@@ -2033,6 +2044,8 @@
                     SaleLinePOS.Validate("No.");
                     SaleLinePOS.Quantity := BOMComponent."Quantity per" * Rec.Quantity;
                     SaleLinePOS.Validate(Quantity);
+                    SaleLinePOS."Parent BOM Item No." := BOMComponent."Parent Item No.";
+                    SaleLinePOS."Parent BOM Line No." := StartLineNo;
                     Sum += SaleLinePOS."Unit Price" * SaleLinePOS.Quantity;
                     SaleLinePOS.SetSkipUpdateDependantQuantity(false);
                     if not SaleLinePOS.Modify(true) then
@@ -2180,7 +2193,7 @@
         if DimMgt.IsDefaultDimDefinedForTable(GetTableValuePair(FieldNo)) then  //First appears in BC21.4
 #ENDIF
 #IF NOT (BC17 or BC18 or BC19)
-            CreateDim(DefaultDimSource);
+        CreateDim(DefaultDimSource);
         OnAfterCreateDimFromDefaultDim(Rec, xRec, SalePOS, CurrFieldNo, FieldNo);
     end;
 
@@ -2458,7 +2471,7 @@
             ItemVariant.TestField("NPR Blocked", false);
         end;
         if _Item."Sales Blocked" then
-            Error(SalesBlockedErr);            
+            Error(SalesBlockedErr);
     end;
 
     local procedure TestPaymentMethod(POSPaymentMethod: Record "NPR POS Payment Method")
