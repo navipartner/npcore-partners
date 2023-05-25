@@ -31,7 +31,9 @@
         DataCompression: Codeunit "Data Compression";
         ArchiveEntryList: List of [Text];
         ArchiveEntry: Text;
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22
         ArchiveEntrySize: Integer;
+#endif
         InStr: InStream;
         OutStr: OutStream;
     begin
@@ -49,7 +51,11 @@
             DataCompression.GetEntryList(ArchiveEntryList);
             foreach ArchiveEntry in ArchiveEntryList do begin
                 TempBlob.CreateOutStream(OutStr);
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22
                 DataCompression.ExtractEntry(ArchiveEntry, OutStr, ArchiveEntrySize);
+#else
+                DataCompression.ExtractEntry(ArchiveEntry, OutStr);
+#endif
                 ImportVendorCatalogFile.ReadFile('', TempBlob, false, true);
                 Clear(OutStr);
             end;
