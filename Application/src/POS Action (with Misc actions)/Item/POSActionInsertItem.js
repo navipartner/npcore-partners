@@ -1,5 +1,6 @@
 let main = async ({ workflow, context, scope, popup, parameters, captions }) => {
 
+    debugger;
     workflow.context.GetPrompt = false;
 
     if (parameters.EditDescription) {
@@ -16,7 +17,7 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
         }
     }
 
-    const { ItemGroupSale, useSpecTracking, GetPromptSerial, Success, AddItemAddOn, BaseLineNo } = await workflow.respond("addSalesLine");
+    const {childBOMLinesWithoutSerialNo, ItemGroupSale, useSpecTracking, GetPromptSerial, Success, AddItemAddOn, BaseLineNo } = await workflow.respond("addSalesLine");
 
     if (!Success) {
         workflow.context.GetPrompt = true;
@@ -44,9 +45,75 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
         workflow.context.useSpecTracking = useSpecTracking;
         await workflow.respond("addSalesLine");
     }
+    else {
+
+        for (var bomLineKey in childBOMLinesWithoutSerialNo)
+        {
+           var ContinueExecution = true;
+           var response;
+
+            while (ContinueExecution) {
+                ContinueExecution = false;
+
+                if (bomLineKey != "remove") {
+                    
+                    workflow.context.SerialNo = '';
+                    workflow.context.childBOMLineWithoutSerialNo = childBOMLinesWithoutSerialNo[bomLineKey];
+
+                    if (parameters.SelectSerialNo && workflow.context.childBOMLineWithoutSerialNo.useSpecTracking){
+                        response = await workflow.respond("assignSerialNo");
+                        
+                        if(!response.AssignSerialNoSuccess && response.AssignSerialNoSuccessErrorText)
+                        {
+                            if (await popup.confirm({title: captions.serialNoError_title, caption: response.AssignSerialNoSuccessErrorText})) {
+                                ContinueExecution = true;
+                            }
+     
+                        }
+                    } 
+                    else{
+                        workflow.context.SerialNo = await popup.input({ title: captions.itemTracking_title, caption: format(captions.bomItemTracking_Lead, workflow.context.childBOMLineWithoutSerialNo.description, workflow.context.childBOMLineWithoutSerialNo.parentBOMDescription)})
+                               
+                        if (workflow.context.SerialNo) {
+
+                            response = await workflow.respond("assignSerialNo");
+                                    
+                            if(!response.AssignSerialNoSuccess && response.AssignSerialNoSuccessErrorText)
+                            {
+                                if (await popup.confirm({title: captions.serialNoError_title, caption: response.AssignSerialNoSuccessErrorText})) {
+                                    ContinueExecution = true;
+                                }
+         
+                            }
+                        }
+                    }
+                }
+            }
+             
+
+        }
+        
+    }
 
     if (AddItemAddOn) {
         await workflow.run('RUN_ITEM_ADDONS', { context: { BaseLineNo: BaseLineNo }, parameters: { SkipItemAvailabilityCheck: true } });
         await workflow.respond("checkAvailability");
     }
+
+}
+
+function format(fmt, ...args) {
+    if (!fmt.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/)) {
+        throw new Error('invalid format string.');
+    }
+    return fmt.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g, (m, str, index) => {
+        if (str) {
+            return str.replace(/(?:{{)|(?:}})/g, m => m[0]);
+        } else {
+            if (index >= args.length) {
+                throw new Error('argument index is out of range in format');
+            }
+            return args[index];
+        }
+    });
 }
