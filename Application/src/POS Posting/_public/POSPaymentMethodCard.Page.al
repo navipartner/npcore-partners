@@ -1,6 +1,6 @@
 ﻿page 6150619 "NPR POS Payment Method Card"
 {
-    Extensible = False;
+    Extensible = true;
     UsageCategory = None;
     Caption = 'POS Payment Method Card';
     SourceTable = "NPR POS Payment Method";

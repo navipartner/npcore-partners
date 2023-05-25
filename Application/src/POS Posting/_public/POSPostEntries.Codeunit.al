@@ -1365,6 +1365,7 @@
           GenJournalLine);
 
         OnAfterInsertPOSPostingBufferToGenJnl(POSPostingBuffer, GenJournalLine, false);
+        OnAfterInsertPOSPostingBufferToGenJournal(POSPostingBuffer."POS Unit No.", POSPostingBuffer."Line Type", POSPostingBuffer."POS Payment Method Code", POSPostingBuffer."Posting Date", GenJournalLine);
     end;
 
 
@@ -1631,6 +1632,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertPOSPostingBufferToGenJnl(var POSPostingBuffer: Record "NPR POS Posting Buffer"; var GenJournalLine: Record "Gen. Journal Line"; PreviewMode: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertPOSPostingBufferToGenJournal(POSUnitNo: Code[10]; LineType: Option; POSPaymentMethodCode: Code[10]; PostingDate: Date; var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 
