@@ -7,7 +7,7 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:DataSourceID>5fe21bc5-9d71-44aa-8490-c75df93215e6</rd:DataSourceID>
+      <rd:DataSourceID>dfc2e3a6-41c7-4a2a-bcd0-addef131efb4</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -163,17 +163,32 @@
                                 <TablixCells>
                                   <TablixCell>
                                     <CellContents>
-                                      <Image Name="Image1">
-                                        <Source>Database</Source>
-                                        <Value>=Fields!BarCodeTempBlobCol1.Value</Value>
-                                        <MIMEType>image/bmp</MIMEType>
-                                        <Sizing>Fit</Sizing>
+                                      <Textbox Name="Textbox39">
+                                        <KeepTogether>true</KeepTogether>
+                                        <Paragraphs>
+                                          <Paragraph>
+                                            <TextRuns>
+                                              <TextRun>
+                                                <Value>=Fields!BarCodeTempBlobCol1.Value</Value>
+                                                <Style>
+                                                  <FontFamily>=Fields!BarcodeFontFamily.Value</FontFamily>
+                                                  <FontSize>=Fields!BarcodeFontSize.Value</FontSize>
+                                                </Style>
+                                              </TextRun>
+                                            </TextRuns>
+                                            <Style>
+                                              <TextAlign>Center</TextAlign>
+                                            </Style>
+                                          </Paragraph>
+                                        </Paragraphs>
+                                        <rd:DefaultName>Textbox38</rd:DefaultName>
                                         <Style>
                                           <Border>
                                             <Style>None</Style>
                                           </Border>
+                                          <VerticalAlign>Middle</VerticalAlign>
                                         </Style>
-                                      </Image>
+                                      </Textbox>
                                       <ColSpan>2</ColSpan>
                                     </CellContents>
                                   </TablixCell>
@@ -262,8 +277,7 @@
                                                 <Value>=Fields!ItemNo_TMPRetailJournalLineCol1.Value</Value>
                                                 <Style>
                                                   <FontFamily>Courier New</FontFamily>
-                                                  <FontSize>7pt</FontSize>
-                                                  <FontWeight>Bold</FontWeight>
+                                                  <FontSize>5pt</FontSize>
                                                 </Style>
                                               </TextRun>
                                             </TextRuns>
@@ -446,7 +460,7 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
-  <rd:ReportID>d8d4747c-14a1-4c27-9db8-cb472eb0fb12</rd:ReportID>
+  <rd:ReportID>b655740f-3501-4423-ad3f-9d55a813750d</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
@@ -482,6 +496,12 @@ End Function
         </Field>
         <Field Name="BarCodeTempBlobCol1">
           <DataField>BarCodeTempBlobCol1</DataField>
+        </Field>
+        <Field Name="BarcodeFontFamily">
+          <DataField>BarcodeFontFamily</DataField>
+        </Field>
+        <Field Name="BarcodeFontSize">
+          <DataField>BarcodeFontSize</DataField>
         </Field>
         <Field Name="Assortment_TMPRetailJournalLineCol1">
           <DataField>Assortment_TMPRetailJournalLineCol1</DataField>

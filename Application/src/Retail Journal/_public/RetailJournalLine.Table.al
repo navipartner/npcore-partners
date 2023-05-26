@@ -33,11 +33,13 @@
                     "Description 2" := Item."Description 2";
                     "Vend Item No." := Item."Vendor Item No.";
                     "Last Direct Cost" := Item."Last Direct Cost";
-                    "Unit Price" := Item."Unit Price";
                     "Item group" := Item."Item Category Code";
                     "New Item No." := "Item No.";
                     if Item."Sales Unit of Measure" <> '' then
                         "Sales Unit of measure" := Item."Sales Unit of Measure";
+                    if Item."Base Unit of Measure" <> '' then
+                        "Unit of Measure" := Item."Base Unit of Measure";
+                    "Unit Price" := Item."Unit Price";
                     "Unit List Price" := Item."Unit List Price";
 
                     UpdateBarcode();
@@ -47,7 +49,6 @@
                 end;
 
                 "Quantity to Print" := 1;
-
                 FindItemSalesPrice();
                 Validate("Quantity for Discount Calc", 1);
                 calcProfit();
@@ -352,6 +353,23 @@
             TableRelation = "NPR POS Unit";
             DataClassification = CustomerContent;
         }
+        field(48; "Unit of Measure"; Code[10])
+        {
+            Caption = 'Unit of measure';
+            DataClassification = CustomerContent;
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
+
+            trigger OnValidate()
+            var
+                Item: Record Item;
+                PriceListLineUOMMgt: Codeunit "NPR Price List Line UOM";
+            begin
+                Item.Get(Rec."Item No.");
+                Rec."Last Direct Cost" := Item."Last Direct Cost" * PriceListLineUOMMgt.GetQtyPerUOMFromUOM(Rec."Item No.", Rec."Unit of Measure");
+                FindItemSalesPrice();
+                calcProfit();
+            end;
+        }
         field(50; "Location Filter"; Code[10])
         {
             Caption = 'Location Code';
@@ -579,6 +597,7 @@
         TempSaleLinePOS2: Record "NPR POS Sale Line" temporary;
         POSUnit: Record "NPR POS Unit";
         PricingProfile: Codeunit "NPR POS Pricing Profile";
+        PriceListLineUOMMgt: Codeunit "NPR Price List Line UOM";
     begin
         TempSaleLinePOS."Line Type" := TempSaleLinePOS."Line Type"::Item;
         TempSaleLinePOS."No." := "Item No.";
@@ -601,7 +620,7 @@
             TempSalePOS."Customer Disc. Group" := "Customer Disc. Group"
         else
             TempSalePOS."Customer Disc. Group" := PricingProfile.GetCustomerDiscountGroupIfProfileExist(POSUnit."POS Pricing Profile");
-        
+
         if "Calculation Date" <> 0D then
             TempSalePOS.Date := "Calculation Date";
 
@@ -616,16 +635,19 @@
 #pragma warning disable AA0139        
         TempSaleLinePOS."Register No." := "Register No.";
 #pragma warning restore
+        TempSaleLinePOS."Unit of Measure Code" := "Unit of Measure";
+        TempSaleLinePOS."Qty. per Unit of Measure" := PriceListLineUOMMgt.GetQtyPerUOMFromUOM("Item No.", "Unit of Measure");
         POSSalesPriceCalcMgt.FindItemPrice(TempSalePOS, TempSaleLinePOS);
         POSSalesDiscountCalcMgt.InitDiscountPriority(TempDiscountPriority);
         TempSaleLinePOS2 := TempSaleLinePOS;
         TempSaleLinePOS2.Insert();
         TempDiscountPriority.SetCurrentKey(Priority);
-        if TempDiscountPriority.FindSet() then
-            repeat
-                POSSalesDiscountCalcMgt.ApplyDiscount(TempDiscountPriority, TempSalePOS, TempSaleLinePOS2, TempSaleLinePOS, TempSaleLinePOS, 0, true);
-                TempSaleLinePOS2.UpdateAmounts(TempSaleLinePOS2);
-            until (TempDiscountPriority.Next() = 0) or (TempSaleLinePOS2."Discount Type" <> TempSaleLinePOS2."Discount Type"::" ");
+        if TempSaleLinePOS."Allow Line Discount" then
+            if TempDiscountPriority.FindSet() then
+                repeat
+                    POSSalesDiscountCalcMgt.ApplyDiscount(TempDiscountPriority, TempSalePOS, TempSaleLinePOS2, TempSaleLinePOS, TempSaleLinePOS, 0, true);
+                    TempSaleLinePOS2.UpdateAmounts(TempSaleLinePOS2);
+                until (TempDiscountPriority.Next() = 0) or (TempSaleLinePOS2."Discount Type" <> TempSaleLinePOS2."Discount Type"::" ");
         "Discount Price Incl. Vat" := TempSaleLinePOS2."Amount Including VAT";
         "VAT %" := TempSaleLinePOS2."VAT %";
         "Discount Price Excl. VAT" := TempSaleLinePOS2.Amount;
@@ -649,6 +671,7 @@
                 Item1.Validate("Unit Price", "Discount Price Incl. Vat");
                 "Profit % (new)" := Item1."Profit %";
             end else begin
+                Item1."Unit Cost" := "Last Direct Cost";
                 Item1.Validate("Unit Price", "Discount Price Incl. Vat");
                 "Profit % (new)" := Item1."Profit %";
             end;
