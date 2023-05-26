@@ -130,8 +130,7 @@
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
 
         GenJnlApply.CheckAgainstApplnCurrency(SaleLinePOS."Currency Code", CustLedgEntry."Currency Code", "Gen. Journal Account Type"::Customer, true);
-        if (SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"Customer Deposit") and
-           (CustLedgEntry."Document Type" = CustLedgEntry."Document Type"::Invoice) and
+        if (CustLedgEntry."Document Type" = CustLedgEntry."Document Type"::Invoice) and
            (SaleLinePOS.Date <= CustLedgEntry."Pmt. Discount Date")
         then
             LineAmount := (CustLedgEntry."Remaining Amount" - CustLedgEntry."Original Pmt. Disc. Possible")
