@@ -1,10 +1,10 @@
 report 6014431 "NPR S.Person Trn by Item Cat."
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales Person Trn. by Item Cat..rdlc';
+    RDLCLayout = './src/_Reports/layouts/Sales Person Trn. by Item Cat.rdlc';
     Caption = 'Salesperson Turnover per Item Category';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
@@ -12,210 +12,57 @@ report 6014431 "NPR S.Person Trn by Item Cat."
 
     dataset
     {
-        // Report is being reimplemented from scratch in CASE 545413
-        // dataitem("Item Category"; "Item Category")
-        // {
-        //     CalcFields = "NPR Consumption (Amount)", "NPR Sales (Qty.)", "NPR Sales (LCY)";
-        //     RequestFilterFields = "Code", "Description", "NPR Date Filter";
-        //     column(COMPANYNAME; CompanyName)
-        //     {
-        //     }
-        //     column(CompanyInfoPicture; CompanyInformation.Picture)
-        //     {
-        //     }
-        //     column(DateFilter; GetFilter("NPR Date Filter"))
-        //     {
-        //     }
-        //     column(SortSalesPerson; SortSalesPerson)
-        //     {
-        //     }
-        //     column(No; "Code")
-        //     {
-        //     }
-        //     column(Description; Description)
-        //     {
-        //     }
-        //     column(SalesQty; "NPR Sales (Qty.)")
-        //     {
-        //         AutoFormatType = 1;
-        //     }
-        //     column(SaleLCY; "NPR Sales (LCY)")
-        //     {
-        //         AutoFormatType = 1;
-        //     }
-        //     column(db; "NPR Sales (LCY)" - "NPR Consumption (Amount)")
-        //     {
-        //         AutoFormatType = 1;
-        //     }
-        //     column(dg; Dg)
-        //     {
-        //         AutoFormatType = 1;
-        //     }
-        //     column(PercentTotalSale; PercentTotalSale)
-        //     {
-        //         AutoFormatType = 1;
-        //     }
-        //     column(TotalSale; TotalSale)
-        //     {
-        //     }
-        //     dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
-        //     {
-        //         CalcFields = "NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR COGS (LCY)";
-        //         DataItemLink = "NPR Item Category Filter" = FIELD("Code"), "Date Filter" = FIELD("NPR Date Filter");
-        //         column(SalesPersonCode; Code)
-        //         {
-        //         }
-        //         column(SalesPersonName; Name)
-        //         {
-        //         }
-        //         column(SalesPersonSalesQty; "NPR Sales (Qty.)")
-        //         {
-        //             AutoFormatType = 1;
-        //         }
-        //         column(SalesPersonSalesLcy; "NPR Sales (LCY)")
-        //         {
-        //             AutoFormatType = 1;
-        //         }
-        //         column(SalesPersonPercentItemCategorySale; PercentItemCategorySale)
-        //         {
-        //         }
-        //         column(SalesPersonDb; "NPR Sales (LCY)" - "NPR COGS (LCY)")
-        //         {
-        //             AutoFormatType = 1;
-        //         }
-        //         column(SalesPersonDg; Dg)
-        //         {
-        //             AutoFormatType = 1;
-        //         }
+        dataitem(ItemCategoryBuffer; "NPR Item Category Buffer")
+        {
+            DataItemTableView = sorting("Entry No.");
+            column("Code"; "Code") { }
+            column(CodeWithIndentation; "Code with Indentation") { }
+            column(Description; Description) { }
+            column(ParentCategory; "Parent Category") { }
+            column(Has_Children; "Has Children") { }
+            column(Presentation_Order; "Presentation Order") { }
+            column(Indentation; Indentation) { }
 
-        //         trigger OnAfterGetRecord()
-        //         begin
-        //             if "NPR Sales (Qty.)" = 0 then
-        //                 CurrReport.Skip();
+            #region Calc Fields
+            column(SalesQty; "Calc Field 1") { }
+            column(CostExclVAT; "Calc Field 2") { }
+            column(TurnoverExclVAT; "Calc Field 3") { }
 
-        //             Clear(Dg);
-        //             if "NPR Sales (LCY)" <> 0 then
-        //                 Dg := (("NPR Sales (LCY)" - "NPR COGS (LCY)") / "NPR Sales (LCY)") * 100;
+            #endregion
 
-        //             if SortSalesPerson then begin
-        //                 TempVendorAmount.Init();
-        //                 TempVendorAmount."Vendor No." := Code;
+            column(Request_Page_Filters; _RequestPageFilters) { }
+            column(Company_Name; CompanyName()) { }
+            column(Show_Salespersons_In_All_Categories; _ShowSalespersonsInAllCategories) { }
 
-        //                 case SortOrder of
-        //                     SortOrder::Highest:
-        //                         Multpl := -1;
-        //                     SortOrder::Lowest:
-        //                         Multpl := 1;
-        //                 end;
+            dataitem(ItemCategoryBufferDetail; "NPR Item Category Buffer")
+            {
+                DataItemLink = "Code" = field("Code");
+                DataItemTableView = sorting("Entry No.");
+                column(ItemCategoryBufferDetail_Code; "Code") { }
+                column(Salesperson_Code; "Detail Field 1") { }
+                column(Salesperson_Name; "Detail Field 2") { }
 
-        //                 case SortBy of
-        //                     SortBy::Quantity:
-        //                         TempVendorAmount."Amount (LCY)" := Multpl * "NPR Sales (Qty.)";
-        //                     SortBy::Turnover:
-        //                         TempVendorAmount."Amount (LCY)" := Multpl * "NPR Sales (LCY)";
-        //                     SortBy::DB:
-        //                         TempVendorAmount."Amount (LCY)" := Multpl * ("NPR Sales (LCY)" - "NPR COGS (LCY)");
-        //                 end;
-        //                 TempVendorAmount.Insert();
-        //             end;
+                #region Calc Fields
+                column(Salesperson_SalesQty; "Calc Field 1") { }
+                column(Salesperson_COGSLCY; "Calc Field 2") { }
+                column(Salesperson_SalesLCY; "Calc Field 3") { }
 
-        //             Clear(PercentItemCategorySale);
-        //             if "Item Category"."NPR Sales (LCY)" <> 0 then
-        //                 PercentItemCategorySale := '(' + Format(("NPR Sales (LCY)" / "Item Category"."NPR Sales (LCY)" * 100), -4) + '%)';
-        //         end;
+                #endregion
+            }
+        }
 
-        //         trigger OnPreDataItem()
-        //         begin
-        //             TempVendorAmount.DeleteAll();
-        //         end;
-        //     }
-        //     dataitem("Integer"; "Integer")
-        //     {
-        //         DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
-        //         column(IntNumber; Integer.Number)
-        //         {
-        //         }
-        //         column(IntCode; "Salesperson/Purchaser".Code)
-        //         {
-        //         }
-        //         column(IntName; "Salesperson/Purchaser".Name)
-        //         {
-        //         }
-        //         column(IntQty; "Salesperson/Purchaser"."NPR Sales (Qty.)")
-        //         {
-        //             AutoFormatType = 1;
-        //         }
-        //         column(IntLCY; "Salesperson/Purchaser"."NPR Sales (LCY)")
-        //         {
-        //             AutoFormatType = 1;
-        //         }
-        //         column(IntPcttekst; PercentItemCategorySale)
-        //         {
-        //         }
-        //         column(IntDb; "Salesperson/Purchaser"."NPR Sales (LCY)" - "Salesperson/Purchaser"."NPR COGS (LCY)")
-        //         {
-        //             AutoFormatType = 1;
-        //         }
-        //         column(IntDg; Dg)
-        //         {
-        //             AutoFormatType = 1;
-        //         }
-
-        //         trigger OnAfterGetRecord()
-        //         begin
-        //             if Number = 1 then begin
-        //                 if not TempVendorAmount.Find('-') then
-        //                     CurrReport.Break();
-        //             end else
-        //                 if TempVendorAmount.Next() = 0 then
-        //                     CurrReport.Break();
-
-        //             "Salesperson/Purchaser".Get(TempVendorAmount."Vendor No.");
-        //             "Salesperson/Purchaser".CalcFields("NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR COGS (LCY)");
-
-        //             Clear(Dg);
-        //             if "Salesperson/Purchaser"."NPR Sales (LCY)" <> 0 then
-        //                 Dg := (("Salesperson/Purchaser"."NPR Sales (LCY)" - "Salesperson/Purchaser"."NPR COGS (LCY)") / "Salesperson/Purchaser"."NPR Sales (LCY)") * 100;
-
-        //             Clear(PercentItemCategorySale);
-        //             if "Item Category"."NPR Sales (LCY)" <> 0 then
-        //                 PercentItemCategorySale := '(' + Format(("Salesperson/Purchaser"."NPR Sales (LCY)" / "Item Category"."NPR Sales (LCY)" * 100), -4) + '%)';
-        //         end;
-
-        //         trigger OnPreDataItem()
-        //         begin
-        //             if (not SortSalesPerson) then
-        //                 CurrReport.Break();
-        //         end;
-        //     }
-
-        //     trigger OnAfterGetRecord()
-        //     begin
-        //         if not ShowItemsCatWithoutSale then begin
-        //             if "NPR Sales (Qty.)" = 0 then
-        //                 CurrReport.Skip();
-        //         end;
-
-        //         Clear(Dg);
-        //         if "NPR Sales (LCY)" <> 0 then
-        //             Dg := (("NPR Sales (LCY)" - "NPR Consumption (Amount)") / "NPR Sales (LCY)") * 100;
-
-        //         Clear(PercentTotalSale);
-        //         if TotalSale <> 0 then
-        //             PercentTotalSale := ("NPR Sales (LCY)" / TotalSale) * 100;
-        //     end;
-
-        //     trigger OnPreDataItem()
-        //     begin
-        //         ValueEntryQuery.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
-        //         ValueEntryQuery.SetFilter(Filter_DateTime, '%1', "NPR Date Filter");
-        //         ValueEntryQuery.SetFilter(Item_Category_Code, '<>%1', '');
-        //         ValueEntryQuery.Open();
-        //         while ValueEntryQuery.Read() do begin
-        //             TotalSale += ValueEntryQuery.Sum_Sales_Amount_Actual;
-        //         end;
-        //     end;
-        // }
+        dataitem(ItemCategoryFilter; "Item Category")
+        {
+            DataItemTableView = sorting("Code");
+            RequestFilterFields = "Code", "NPR Date Filter";
+            UseTemporary = true;
+        }
+        dataitem(SalespersonPurchaserFilter; "Salesperson/Purchaser")
+        {
+            DataItemTableView = sorting("Code");
+            RequestFilterFields = "Code";
+            UseTemporary = true;
+        }
     }
 
     requestpage
@@ -225,40 +72,21 @@ report 6014431 "NPR S.Person Trn by Item Cat."
         {
             area(content)
             {
-                group(Setting)
+                group(Options)
                 {
-                    Caption = 'Setting';
-                    field("Show ItemCategory with no sales"; ShowItemsCatWithoutSale)
+                    Caption = 'Options';
+                    field("Show Salespersons in All Categories"; _ShowSalespersonsInAllCategories)
                     {
-
-                        Caption = 'Show Item Category With No Sales';
-                        ToolTip = 'Specifies the value of the Show Item Category With No Sales field';
                         ApplicationArea = NPRRetail;
+                        Caption = 'Show Salesperson in All Categories';
+                        ToolTip = 'Use this option to control whether you want to print the individual Salespersons within each category';
                     }
-                    field("Sort salespersons"; SortSalesPerson)
+                    field("Number of Levels"; _NumberofLevels)
                     {
-
-                        Caption = 'Sort Salespersons';
-                        ToolTip = 'Specifies the value of the Sort Salespersons field';
                         ApplicationArea = NPRRetail;
-                    }
-                    field("Sort By"; SortBy)
-                    {
-
-                        Enabled = sortSalesPerson;
-                        Caption = 'Sort By';
-                        OptionCaption = 'Quantity,Turnover,DB';
-                        ToolTip = 'Specifies the value of the SortBy field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field(Sort; SortOrder)
-                    {
-
-                        Editable = sortSalesPerson;
-                        Caption = 'Sort';
-                        OptionCaption = 'Highest,Lowest';
-                        ToolTip = 'Specifies the value of the Sort field';
-                        ApplicationArea = NPRRetail;
+                        Caption = 'Number of Levels';
+                        MinValue = 1;
+                        ToolTip = 'Specifies how many levels of item categories are displayed on the report. Adjust this field to control the level of detail in the report.';
                     }
                 }
             }
@@ -267,42 +95,212 @@ report 6014431 "NPR S.Person Trn by Item Cat."
 
     labels
     {
-        Name = 'ConstValue';
-        NoCap = 'Item Category';
-        SalesPersonCap = 'Sales person';
-        DescCap = 'Description';
-        qtyCap = 'Qty';
-        SalesLcyCap = 'Turnover';
-        PartPctCap = 'Part %';
-        DbCap = 'Margin';
-        DgCap = 'Cover-age. (%)';
-        TotalSalesCap = '% total sales';
-        ReportCap = 'Sales person turnover per Item Category';
+        ReportCaptionLbl = 'Salesperson Turnover per Item Category';
+        SalesPersonCaptionLbl = 'Salesperson';
+        MarginCaptionLbl = 'Margin';
+        PartPctCaptionLbl = 'Part %';
+        PageCaptionLbl = 'Page';
+        NoCaptionLbl = 'No.';
+        DescCaptionLbl = 'Description';
+        SaleQtyCaptionLbl = 'Sales (Qty.)';
+        TurnoverExclVatCaptionLbl = 'Turnover Excl. VAT';
+        ProfitPctCaptionLbl = 'Profit %';
+        InventoryCaptionLbl = 'Inventory';
+        FiltersCaptionLbl = 'Filters:';
     }
 
     trigger OnInitReport()
     begin
-        CompanyInformation.Get();
-        CompanyInformation.CalcFields(Picture);
-        ShowItemsCatWithoutSale := false;
-        SortSalesPerson := false;
-        SortOrder := SortOrder::Highest;
-        SortBy := SortBy::Quantity;
+        _NumberofLevels := 2;
+    end;
+
+    trigger OnPreReport()
+    begin
+        _RequestPageFilters := CreateRequestPageFiltersTxt();
+
+        CreateItemCategoryBufferDataItems(ItemCategoryBuffer, ItemCategoryBufferDetail);
+
+        ItemCategoryBuffer.Reset();
+        ItemCategoryBufferDetail.Reset();
+        _ItemCategoryMgt.AddItemCategoryParentsToBuffer(ItemCategoryBuffer);
+
+        if ItemCategoryFilter.GetFilter(Code) = '' then
+            AddUncategorizedToItemCategoryBuffers(ItemCategoryBuffer, ItemCategoryBufferDetail);
+
+        if ItemCategoryBuffer.IsEmpty() then
+            Error(_EmptyDatasetErrorLbl);
+
+        ItemCategoryBuffer.Reset();
+        ItemCategoryBuffer.SetFilter(Indentation, '>%1', _NumberOfLevels - 1);
+        ItemCategoryBuffer.DeleteAll();
+
+        ItemCategoryBuffer.Reset();
+        _ItemCategoryMgt.UpdateHasChildrenFieldInItemCategoryBuffer(ItemCategoryBuffer);
     end;
 
     var
-        CompanyInformation: Record "Company Information";
-        // ValueEntryQuery: Query "NPR Value Entry With Item Cat";
-        // TempVendorAmount: Record "Vendor Amount" temporary;
-        ShowItemsCatWithoutSale: Boolean;
-        // [InDataSet]
-        SortSalesPerson: Boolean;
-        // Dg: Decimal;
-        // PercentTotalSale: Decimal;
-        // TotalSale: Decimal;
-        // Multpl: Integer;
-        SortOrder: Option Highest,Lowest;
-        SortBy: Option Quantity,Turnover,DB;
-        // PercentItemCategorySale: Text[30];
-}
+        _ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+        _ShowSalespersonsInAllCategories: Boolean;
+        _NumberofLevels: Integer;
+        _RequestPageFilters: Text;
+        _EmptyDatasetErrorLbl: Label 'The report couldn''t be generated, because it was empty. Adjust your filters and try again.';
+        _UncategorizedCategoryCodeLbl: Label '-';
+        _UncategorizedCategoryDescLbl: Label 'Without category';
 
+    local procedure CreateRequestPageFiltersTxt(): Text
+    var
+        RequestPageFiltersTxt: Text;
+    begin
+        if (RequestPageFiltersTxt <> '') and (ItemCategoryFilter.GetFilters() <> '') then
+            RequestPageFiltersTxt += ', ' + ItemCategoryFilter.GetFilters()
+        else
+            RequestPageFiltersTxt += ItemCategoryFilter.GetFilters();
+
+        if (RequestPageFiltersTxt <> '') and (SalespersonPurchaserFilter.GetFilters() <> '') then
+            RequestPageFiltersTxt += ', ' + SalespersonPurchaserFilter.GetFilters()
+        else
+            RequestPageFiltersTxt += SalespersonPurchaserFilter.GetFilters();
+
+        exit(RequestPageFiltersTxt);
+    end;
+
+    local procedure CreateItemCategoryBufferDataItems(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; var ItemCategoryBufferDetail: Record "NPR Item Category Buffer" temporary)
+    var
+        ItemCategory: Record "Item Category";
+        CalcFieldsDict: Dictionary of [Integer, Decimal];
+        DetailFieldsDict: Dictionary of [Integer, Text[100]];
+        ConsumptionAmount: Decimal;
+        SalesLCY: Decimal;
+        SalesQty: Decimal;
+    begin
+        ItemCategory.CopyFilters(ItemCategoryFilter);
+        ItemCategory.SetFilter("NPR Salesperson/Purch. Filter", SalespersonPurchaserFilter.GetFilter("Code"));
+
+        if not ItemCategory.FindSet() then
+            exit;
+
+        repeat
+            Clear(SalesLCY);
+            Clear(SalesQty);
+            Clear(ConsumptionAmount);
+
+            CreateDetailDataitem(ItemCategory.Code, ItemCategoryBufferDetail, SalesQty, ConsumptionAmount, SalesLCY);
+
+            if (SalesLCY <> 0) or (ConsumptionAmount <> 0) then begin
+                _ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
+
+                CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 1"), SalesQty);
+                CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 2"), ConsumptionAmount);
+                CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), SalesLCY);
+
+                _ItemCategoryMgt.InsertItemCategoryToBuffer(ItemCategory.Code, ItemCategoryBuffer, '', '', '', CalcFieldsDict, DetailFieldsDict);
+            end;
+        until ItemCategory.Next() = 0;
+    end;
+
+    local procedure AddUncategorizedToItemCategoryBuffers(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; var ItemCategoryBufferDetail: Record "NPR Item Category Buffer" temporary)
+    var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        CalcFieldsDict: Dictionary of [Integer, Decimal];
+        COGSLCY: Decimal;
+        SalesLCY: Decimal;
+        SalesQty: Decimal;
+        TotalCOGSLCY: Decimal;
+        TotalSalesLCY: Decimal;
+        TotalSalesQty: Decimal;
+        DetailFieldsDict: Dictionary of [Integer, Text[100]];
+    begin
+        SalespersonPurchaser.SetFilter("Code", SalespersonPurchaserFilter.GetFilter("Code"));
+        SalespersonPurchaser.SetFilter("NPR Item Category Filter", '=%1', '');
+
+        if ItemCategoryFilter.GetFilter("NPR Date Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Date Filter", ItemCategoryFilter.GetFilter("NPR Date Filter"));
+
+        if not SalespersonPurchaser.FindSet() then
+            exit;
+
+        repeat
+            Clear(SalesQty);
+            Clear(SalesLCY);
+            Clear(COGSLCY);
+            _ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
+            _ItemCategoryMgt.ClearDetailFieldsDictionary(DetailFieldsDict);
+
+            SalespersonPurchaser.NPRGetVESalesQty(SalesQty);
+            SalespersonPurchaser.NPRGetVESalesLCY(SalesLCY);
+            SalespersonPurchaser.NPRGetVECOGSLCY(COGSLCY);
+
+            if SalesQty > 0 then begin
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 1"), SalesQty);
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 2"), COGSLCY);
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 3"), SalesLCY);
+
+                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 1"), SalespersonPurchaser."Code");
+                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 2"), SalespersonPurchaser.Name);
+
+                _ItemCategoryMgt.InsertUncatagorizedToItemCategoryBuffer(_UncategorizedCategoryCodeLbl, _UncategorizedCategoryDescLbl, ItemCategoryBufferDetail, '', '', '', CalcFieldsDict, DetailFieldsDict);
+
+                TotalSalesQty += SalesQty;
+                TotalCOGSLCY += COGSLCY;
+                TotalSalesLCY += SalesLCY;
+            end;
+        until SalespersonPurchaser.Next() = 0;
+
+
+        if (TotalSalesLCY <> 0) or (TotalCOGSLCY <> 0) then begin
+            _ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
+
+            CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 1"), TotalSalesQty);
+            CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 2"), TotalCOGSLCY);
+            CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), TotalSalesLCY);
+
+            _ItemCategoryMgt.InsertUncatagorizedToItemCategoryBuffer(_UncategorizedCategoryCodeLbl, _UncategorizedCategoryDescLbl, ItemCategoryBuffer, '', '', '', CalcFieldsDict, DetailFieldsDict);
+        end;
+    end;
+
+    local procedure CreateDetailDataitem(ItemCategoryCode: Code[20]; var ItemCategoryBufferDetail: Record "NPR Item Category Buffer" temporary; var TotalSalesQty: Decimal; var TotalCOGSLCY: Decimal; var TotalSalesLCY: Decimal)
+    var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        CalcFieldsDict: Dictionary of [Integer, Decimal];
+        COGSLCY: Decimal;
+        SalesLCY: Decimal;
+        SalesQty: Decimal;
+        DetailFieldsDict: Dictionary of [Integer, Text[100]];
+    begin
+        SalespersonPurchaser.SetFilter("Code", SalespersonPurchaserFilter.GetFilter("Code"));
+        SalespersonPurchaser.SetFilter("NPR Item Category Filter", ItemCategoryCode);
+
+        if ItemCategoryFilter.GetFilter("NPR Date Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Date Filter", ItemCategoryFilter.GetFilter("NPR Date Filter"));
+
+        if not SalespersonPurchaser.FindSet() then
+            exit;
+
+        repeat
+            Clear(SalesQty);
+            Clear(SalesLCY);
+            Clear(COGSLCY);
+            _ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
+            _ItemCategoryMgt.ClearDetailFieldsDictionary(DetailFieldsDict);
+
+            SalespersonPurchaser.NPRGetVESalesQty(SalesQty);
+            SalespersonPurchaser.NPRGetVESalesLCY(SalesLCY);
+            SalespersonPurchaser.NPRGetVECOGSLCY(COGSLCY);
+
+            if SalesQty > 0 then begin
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 1"), SalesQty);
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 2"), COGSLCY);
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 3"), SalesLCY);
+
+                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 1"), SalespersonPurchaser."Code");
+                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 2"), SalespersonPurchaser.Name);
+
+                _ItemCategoryMgt.InsertItemCategoryToBuffer(ItemCategoryCode, ItemCategoryBufferDetail, SalespersonPurchaser.Code, '', '', CalcFieldsDict, DetailFieldsDict);
+
+                TotalSalesQty += SalesQty;
+                TotalCOGSLCY += COGSLCY;
+                TotalSalesLCY += SalesLCY;
+            end;
+        until SalespersonPurchaser.Next() = 0;
+    end;
+}

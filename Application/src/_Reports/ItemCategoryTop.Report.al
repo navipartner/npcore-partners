@@ -61,6 +61,7 @@ report 6014420 "NPR Item Category Top"
                 TempItemCategoryBuffer2: Record "NPR Item Category Buffer" temporary;
                 DepartmentItemCategory: Query "NPR Department/Item Category";
                 CalcFieldsDict: Dictionary of [Integer, Decimal];
+                DetailFieldsDict: Dictionary of [Integer, Text[100]];
                 ProfitLCY: Decimal;
                 ProfitPercentage: Decimal;
                 Index: Integer;
@@ -84,7 +85,7 @@ report 6014420 "NPR Item Category Top"
                 while DepartmentItemCategory.Read() do begin
                     ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
 
-                    ProfitLCY := DepartmentItemCategory.Sales_Amount_Actual + DepartmentItemCategory.Cost_Amount_Actual; // Cost Amount Actial field from Item Ledger Entry is saved with minus sign
+                    ProfitLCY := DepartmentItemCategory.Sales_Amount_Actual + DepartmentItemCategory.Cost_Amount_Actual; // Cost Amount Actual field from Item Ledger Entry is saved with minus sign
                     ProfitPercentage := ProfitLCY / DepartmentItemCategory.Sales_Amount_Actual;
 
                     CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 1"), DepartmentItemCategory.Quantity * (-1));
@@ -92,7 +93,7 @@ report 6014420 "NPR Item Category Top"
                     CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), ProfitLCY);
                     CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 4"), ProfitPercentage);
 
-                    ItemCategoryMgt.InsertItemCategoryToBuffer(DepartmentItemCategory.Item_Category_Code, ItemCategoryBuffer, '', DepartmentItemCategory.Global_Dimension_1_Code, '', CalcFieldsDict);
+                    ItemCategoryMgt.InsertItemCategoryToBuffer(DepartmentItemCategory.Item_Category_Code, ItemCategoryBuffer, '', DepartmentItemCategory.Global_Dimension_1_Code, '', CalcFieldsDict, DetailFieldsDict);
                 end;
                 DepartmentItemCategory.Close();
 
@@ -115,8 +116,7 @@ report 6014420 "NPR Item Category Top"
                     CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), ProfitLCY);
                     CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 4"), ProfitPercentage);
 
-                    ItemCategoryMgt.InsertUncatagorizedToItemCategoryBuffer('-', NotInItemCategoryLbl, ItemCategoryBuffer, DepartmentItemCategory.Global_Dimension_1_Code, CalcFieldsDict);
-
+                    ItemCategoryMgt.InsertUncatagorizedToItemCategoryBuffer('-', NotInItemCategoryLbl, ItemCategoryBuffer, DepartmentItemCategory.Global_Dimension_1_Code, '', '', CalcFieldsDict, DetailFieldsDict);
                 end;
                 DepartmentItemCategory.Close();
 

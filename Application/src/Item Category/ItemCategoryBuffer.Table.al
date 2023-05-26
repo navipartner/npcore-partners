@@ -184,4 +184,17 @@ table 6059807 "NPR Item Category Buffer"
         {
         }
     }
+
+    procedure UpdateHasChildren(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary)
+    begin
+        ItemCategoryBuffer.SetRange("Parent Category", Code);
+        "Has Children" := not ItemCategoryBuffer.IsEmpty();
+        Modify();
+    end;
+
+    procedure HasChildren(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary): Boolean
+    begin
+        ItemCategoryBuffer.SetRange("Parent Category", Code);
+        exit(not ItemCategoryBuffer.IsEmpty());
+    end;
 }
