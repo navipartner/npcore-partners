@@ -143,6 +143,11 @@
     end;
 
     procedure AddFieldToDataSource(DataSource: Codeunit "NPR Data Source"; "Record": Variant; FieldNo: Integer; Visible: Boolean)
+    begin
+        AddFieldToDataSource(DataSource, "Record", FieldNo, Visible, false);
+    end;
+
+    procedure AddFieldToDataSource(DataSource: Codeunit "NPR Data Source"; "Record": Variant; FieldNo: Integer; Visible: Boolean; Editable: Boolean)
     var
         RecRef: RecordRef;
         FieldRef: FieldRef;
@@ -194,7 +199,7 @@
                 exit;
         end;
 
-        DataSource.AddColumn(Format(FieldRef.Number), FieldRef.Caption, DataType, Visible, DataColumn);
+        DataSource.AddColumn(Format(FieldRef.Number), FieldRef.Caption, DataType, Visible, DataColumn, Editable);
         DataColumn.SetWidth(Width);
     end;
 

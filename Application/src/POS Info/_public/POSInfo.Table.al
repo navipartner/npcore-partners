@@ -77,7 +77,7 @@
         }
         field(70; "Set POS Sale Line Color to Red"; Boolean)
         {
-            Caption = 'Set POS Sale Line Color to Red';
+            Caption = 'Highlight POS Line';
             DataClassification = CustomerContent;
 
             trigger OnValidate()

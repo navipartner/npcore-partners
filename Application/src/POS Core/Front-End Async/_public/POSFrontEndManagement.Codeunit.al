@@ -600,10 +600,16 @@
         TempSecureMethod: Record "NPR POS Secure Method" temporary;
         Request: Codeunit "NPR Front-End: CfgSecureMeth.";
         Method: JsonObject;
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         MakeSureFrameworkIsAvailable(true);
 
         TempSecureMethod.RunDiscovery();
+        POSSession.GetSetup(POSSetup);
+        if POSSetup.UsesNewPOSFrontEnd() then
+            TempSecureMethod.SetRange(Type, TempSecureMethod.Type::"Password Server");
+
         if TempSecureMethod.FindSet() then
             repeat
                 Clear(Method);
@@ -615,10 +621,6 @@
                 Request.AddMethod(TempSecureMethod.Code, Method);
             until TempSecureMethod.Next() = 0;
         InvokeFrontEndAsync(Request);
-
-        TempSecureMethod.SetRange(Type, TempSecureMethod.Type::"Password Client");
-        if not TempSecureMethod.IsEmpty then
-            OnRequestSecureMethodsClientPasswordsRegistration();
     end;
 
     procedure ConfigureSecureMethodsClientPasswords(Method: Text; CommaDelimitedPasswords: Text)
@@ -1108,6 +1110,7 @@
     begin
     end;
 
+    [Obsolete('Only server password secure methods will be supported going forward')]
     [BusinessEvent(true)]
     local procedure OnRequestSecureMethodsClientPasswordsRegistration()
     begin

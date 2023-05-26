@@ -30,11 +30,8 @@
 
         Handled := true;
 
-        if not Setup.ShowDiscountFieldsInSaleView() then
-            exit;
-
-        DataSource.AddColumn('Type', SaleLinePOS.FieldCaption("Discount Type"), DataType::String, false);
-        DataSource.AddColumn('Code', SaleLinePOS.FieldCaption("Discount Code"), DataType::String, false);
+        DataSource.AddColumn('Type', SaleLinePOS.FieldCaption("Discount Type"), DataType::String, false, true);
+        DataSource.AddColumn('Code', SaleLinePOS.FieldCaption("Discount Code"), DataType::String, false, true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
@@ -50,8 +47,6 @@
         Handled := true;
 
         POSSession.GetSetup(Setup);
-        if not Setup.ShowDiscountFieldsInSaleView() then
-            exit;
 
         RecRef.SetTable(SaleLinePOS);
 

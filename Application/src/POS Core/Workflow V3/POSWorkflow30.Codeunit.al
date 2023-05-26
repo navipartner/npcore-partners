@@ -19,7 +19,6 @@
         POSSession: Codeunit "NPR POS Session";
 
     begin
-        //todo run interface impl.
         Workflow := Enum::"NPR POS Workflow".FromInteger(Enum::"NPR POS Workflow".Ordinals().Get(Enum::"NPR POS Workflow".Names().IndexOf(_OnRunActionCode)));
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);

@@ -129,24 +129,26 @@
         UI.SetOptions(_Setup);
         DebugWithTimestamp('UI.InitializeCaptions');
         UI.InitializeCaptions();
-        DebugWithTimestamp('UI.InitializeNumberAndDateFormat');
-        UI.InitializeNumberAndDateFormat(_POSUnit);
-        DebugWithTimestamp('UI.InitializeLogo');
-        UI.InitializeLogo(_POSUnit);
-        DebugWithTimestamp('UI.ConfigureFonts');
-        UI.ConfigureFonts();
-        DebugWithTimestamp('UI.InitializeMenus');
-        UI.InitializeMenus(_POSUnit, Salesperson);
+        if not _Setup.UsesNewPOSFrontEnd() then begin
+            DebugWithTimestamp('UI.InitializeLogo');
+            UI.InitializeLogo(_POSUnit);
+            DebugWithTimestamp('UI.InitializeNumberAndDateFormat');
+            UI.InitializeNumberAndDateFormat(_POSUnit);
+            DebugWithTimestamp('UI.ConfigureFonts');
+            UI.ConfigureFonts();
+            DebugWithTimestamp('UI.InitializeMenus');
+            UI.InitializeMenus(_POSUnit, Salesperson);
+            DebugWithTimestamp('InitializeTheme');
+            UI.InitializeTheme(_POSUnit);
+#if not CLOUD
+            DebugWithTimestamp('AdvertiseStargatePackages');
+            _FrontEnd.AdvertiseStargatePackages();
+#endif
+        end;
         DebugWithTimestamp('UI.ConfigureReusableWorkflow');
         UI.ConfigureReusableWorkflows(_Setup);
-        DebugWithTimestamp('AdvertiseStargatePackages');
-#if not CLOUD
-        _FrontEnd.AdvertiseStargatePackages();
         DebugWithTimestamp('InitializeSecureMethods');
-#endif
         _FrontEnd.ConfigureSecureMethods();
-        DebugWithTimestamp('InitializeTheme');
-        UI.InitializeTheme(_POSUnit);
         DebugWithTimestamp('InitializeTelemetricsMetadata');
         _FrontEnd.InitializeTelemetricsMetadata();
         _InitializedUI := true;
@@ -165,10 +167,12 @@
             _Setup.GetSalespersonRecord(Salesperson);
 
             UI.Initialize(_FrontEnd);
-            UI.InitializeMenus(_POSUnit, Salesperson);
+            if not _Setup.UsesNewPOSFrontEnd() then begin
+                UI.InitializeMenus(_POSUnit, Salesperson);
 
-            if (PreviousRegisterNo <> _POSUnit."No.") then
-                UI.InitializeLogo(_POSUnit);
+                if (PreviousRegisterNo <> _POSUnit."No.") then
+                    UI.InitializeLogo(_POSUnit);
+            end;
 
         end;
         StartPOSSession();

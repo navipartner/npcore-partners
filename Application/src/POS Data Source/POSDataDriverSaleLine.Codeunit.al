@@ -8,7 +8,6 @@
         POSUnit: Record "NPR POS Unit";
         SaleLine: Record "NPR POS Sale Line";
         DataMgt: Codeunit "NPR POS Data Management";
-        ShowPricesIncludingVAT: Boolean;
     begin
         if Name <> DataMgt.POSDataSource_BuiltInSaleLine() then
             exit;
@@ -17,26 +16,23 @@
         DataSource.SetId(Name);
         DataSource.SetTableNo(Database::"NPR POS Sale Line");
         Setup.GetPOSUnit(POSUnit);
-        ShowPricesIncludingVAT := POSUnit.ShowPricesIncludingVAT();
 
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("No."), false);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Line Type"), false);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Description), true);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Description 2"), false);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Variant Code"), false);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Quantity), true);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Unit of Measure Code"), false);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Unit Price"), true);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Unit Cost"), false);
-        if Setup.ShowDiscountFieldsInSaleView() then begin
-            DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Discount %"), true);
-            DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Discount Amount"), true);
-        end;
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Amount), not ShowPricesIncludingVAT);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Amount Including VAT"), ShowPricesIncludingVAT);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Location Code"), false);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Bin Code"), false);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Serial No."), false);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("No."), false, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Line Type"), false, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Description), true, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Description 2"), false, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Variant Code"), false, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Quantity), true, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Unit of Measure Code"), false, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Unit Price"), true, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Unit Cost"), false, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Discount %"), Setup.ShowDiscountFieldsInSaleView(), true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Discount Amount"), Setup.ShowDiscountFieldsInSaleView(), true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Amount), not POSUnit.ShowPricesIncludingVAT(), true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Amount Including VAT"), POSUnit.ShowPricesIncludingVAT(), true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Location Code"), false, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Bin Code"), false, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Serial No."), false, true);
 
         DataSource.Totals().Add('AmountExclVAT');
         DataSource.Totals().Add('VATAmount');

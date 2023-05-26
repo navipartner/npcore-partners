@@ -158,18 +158,25 @@
         end;
     end;
 
-    internal procedure AddColumn(FieldNo: Text; Caption: Text; DataType: Enum "NPR Data Type"; Visible: Boolean; var ColumnOut: Codeunit "NPR Data Column");
+    internal procedure AddColumn(FieldNo: Text; Caption: Text; DataType: Enum "NPR Data Type"; Visible: Boolean; var ColumnOut: Codeunit "NPR Data Column"; Editable: Boolean);
     begin
         MakeSureIsConstructed();
-        ColumnOut.Constructor(FieldNo, Caption, DataType, GetMaxOrdinal() + 1, Visible);
+        ColumnOut.Constructor(FieldNo, Caption, DataType, GetMaxOrdinal() + 1, Visible, Editable);
         _columns.Add(ColumnOut.GetJson());
+    end;
+
+    procedure AddColumn(FieldNo: Text; Caption: Text; DataType: Enum "NPR Data Type"; Visible: Boolean; Editable: Boolean);
+    var
+        ColumnOutIgnore: Codeunit "NPR Data Column";
+    begin
+        AddColumn(FieldNo, Caption, DataType, Visible, ColumnOutIgnore, Editable);
     end;
 
     procedure AddColumn(FieldNo: Text; Caption: Text; DataType: Enum "NPR Data Type"; Visible: Boolean);
     var
         ColumnOutIgnore: Codeunit "NPR Data Column";
     begin
-        AddColumn(FieldNo, Caption, DataType, Visible, ColumnOutIgnore);
+        AddColumn(FieldNo, Caption, DataType, Visible, ColumnOutIgnore, false);
     end;
 
     procedure Content(): JsonObject;

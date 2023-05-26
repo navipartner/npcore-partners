@@ -27,6 +27,8 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Custom,Password Client,Password Server';
             OptionMembers = Custom,"Password Client","Password Server";
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Password Server will be the only choice in the future, implicitly';
         }
     }
 

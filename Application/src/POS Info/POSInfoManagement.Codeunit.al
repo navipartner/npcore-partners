@@ -519,6 +519,25 @@
         POSSession.RequestRefreshData();
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Ext.: Line Format.", 'OnGetLineFormat', '', false, false)]
+    local procedure OnGetLineFormat(var Highlighted: Boolean; var Indented: Boolean; SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        POSInfo: Record "NPR POS Info";
+        POSInfoTransaction: Record "NPR POS Info Transaction";
+        Found: Boolean;
+    begin
+        FilterPOSInfoTrans(POSInfoTransaction, '', SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
+        Found := false;
+        if POSInfoTransaction.FindSet() then
+            repeat
+                if POSInfo.Get(POSInfoTransaction."POS Info Code") then
+                    Found := POSInfo."Set POS Sale Line Color to Red";
+            until (POSInfoTransaction.Next() = 0) or Found;
+        if Found then
+            Highlighted := true;
+    end;
+
+
     local procedure FilterPOSInfoTrans(var POSInfoTransaction: Record "NPR POS Info Transaction"; POSInfoCode: Code[20]; RegisterNo: Code[10]; SalesTicketNo: Code[20]; LineNo: Integer)
     begin
         POSInfoTransaction.Reset();
