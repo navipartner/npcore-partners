@@ -16,7 +16,7 @@ query 6014423 "NPR Value Entry With Item Cat"
             filter(Filter_Source_No; "Source No.")
             {
             }
-            filter(Filter_Sales_Person; "Salespers./Purch. Code")
+            column(Filter_Sales_Person; "Salespers./Purch. Code")
             {
             }
             filter(Filter_DateTime; "Posting Date")
@@ -50,6 +50,10 @@ query 6014423 "NPR Value Entry With Item Cat"
                 Method = Sum;
             }
             column(Sum_Valued_Quantity; "Valued Quantity")
+            {
+                Method = Sum;
+            }
+            column(Sum_Invoiced_Quantity; "Invoiced Quantity")
             {
                 Method = Sum;
             }

@@ -13,667 +13,62 @@
 
     dataset
     {
-        // Report is being reimplemented from scratch in CASE 545413
-        // dataitem(ItemCategoryHeader; "Item Category")
-        // {
-        //     CalcFields = "NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)";
-        //     DataItemTableView = sorting("Presentation Order");
-        //     RequestFilterFields = "Code", "NPR Date Filter", "NPR Global Dimension 1 Filter", "NPR Global Dimension 2 Filter", "NPR Vendor Filter";
-        //     column(COMPANYNAME; CompanyName)
-        //     {
-        //     }
-        //     column(Today; Format(Today, 0, 4))
-        //     {
-        //     }
-        //     column(DateFilter_ItemCategoryHeader; ItemCategoryHeader.GetFilter("NPR Date Filter"))
-        //     {
-        //     }
-        //     column(Filters_ItemCategoryHeader; ItemCategoryHeader.GetFilters)
-        //     {
-        //     }
-        //     column(No_ItemCategoryHeader; ItemCategoryHeader."Code")
-        //     {
-        //     }
-        //     column(Description_ItemCategoryHeader; ItemCategoryHeader.Description)
-        //     {
-        //     }
-        //     column(SalesQty_ItemCategoryHeader; ItemCategoryHeader."NPR Sales (Qty.)")
-        //     {
-        //     }
-        //     column(ConsumptionAmount_ItemCategoryHeader; ItemCategoryHeader."NPR Consumption (Amount)")
-        //     {
-        //     }
-        //     column(SaleLCY_ItemCategoryHeader; ItemCategoryHeader."NPR Sales (LCY)")
-        //     {
-        //     }
-        //     column(Profit_ItemCategoryHeader; ItemCategoryHeader."NPR Sales (LCY)" - ItemCategoryHeader."NPR Consumption (Amount)")
-        //     {
-        //     }
-        //     column(TotalProfit_ItemCategoryHeader; TotalProfit)
-        //     {
-        //     }
-        //     column(TotalRevenue_ItemCategoryHeader; TotalRevenue)
-        //     {
-        //     }
-        //     column(TotalConsumption_ItemCategoryHeader; TotalConsumption)
-        //     {
-        //     }
-        //     column(ShowItem; ShowItem)
-        //     {
-        //     }
-        //     column(Profit_ItemCategoryH; Profit)
-        //     {
-        //     }
-        //     column(Coverage_ItemCategoryH; Coverage)
-        //     {
-        //     }
-        //     column(CoveragePct_ItemCategoryH; CoveragePct)
-        //     {
-        //     }
-        //     column(TurnoverPct_ItemCategoryH; TurnoverPct)
-        //     {
-        //     }
-        //     column(Picture_CompanyInformation; CompanyInfo.Picture)
-        //     {
-        //     }
-        //     column(ItemGrpNoLvl0; StrSubstNo(TotalText, "Code"))
-        //     {
-        //     }
-        //     dataitem(Item; Item)
-        //     {
-        //         DataItemLink = "Item Category Code" = FIELD("Code");
-        //         column(No_Item; "No.")
-        //         {
-        //         }
-        //         column(Description_Item; Description)
-        //         {
-        //         }
-        //         column(SalesQty_Item; "Sales (Qty.)")
-        //         {
-        //         }
-        //         column(COGSLCY_Item; "COGS (LCY)")
-        //         {
-        //         }
-        //         column(SalesLCY_Item; "Sales (LCY)")
-        //         {
-        //         }
-        //         column(Inventory; Inventory)
-        //         {
-        //         }
+        dataitem(ItemCategoryBuffer; "NPR Item Category Buffer")
+        {
+            DataItemTableView = sorting("Entry No.");
+            column("Code"; "Code") { }
+            column(CodeWithIndentation; "Code with Indentation") { }
+            column(Description; Description) { }
+            column(ParentCategory; "Parent Category") { }
+            column(Has_Children; "Has Children") { }
+            column(Presentation_Order; "Presentation Order") { }
+            column(Indentation; Indentation) { }
 
-        //         trigger OnAfterGetRecord()
-        //         begin
-        //             if ("Sales (Qty.)" = 0) and OnlySales then
-        //                 CurrReport.Skip();
+            #region Calc Fields
+            column(SalesQty; "Calc Field 1") { }
+            column(CostExclVAT; "Calc Field 2") { }
+            column(TurnoverExclVAT; "Calc Field 3") { }
+            column(Inventory; "Calc Field 4") { }
 
-        //             CalcFields(Inventory);
-        //             SInventory += Inventory;
-        //         end;
+            #endregion
 
-        //         trigger OnPreDataItem()
-        //         begin
-        //             ItemCategoryHeader.CopyFilter("NPR Date Filter", "Date Filter");
-        //             ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "Global Dimension 1 Filter");
-        //             ItemCategoryHeader.CopyFilter("NPR Global Dimension 2 Filter", "Global Dimension 2 Filter");
-        //             ItemCategoryHeader.CopyFilter("NPR Vendor Filter", "Vendor No.");
-        //             if not ShowItem then
-        //                 CurrReport.Break();
-        //         end;
-        //     }
-        //     dataitem(ItemCategorySub1; "Item Category")
-        //     {
-        //         CalcFields = "NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)";
-        //         DataItemLink = "Parent Category" = FIELD("Code");
-        //         DataItemTableView = SORTING("Presentation Order");
-        //         column(No_ItemCategorySub1; "Code")
-        //         {
-        //         }
-        //         column(Description_ItemCategorySub1; Description)
-        //         {
-        //         }
-        //         column(SalesQty_ItemCategorySub1; "NPR Sales (Qty.)")
-        //         {
-        //         }
-        //         column(ConsumptionAmount_ItemCategorySub1; "NPR Consumption (Amount)")
-        //         {
-        //         }
-        //         column(SaleLCY_ItemCategorySub1; "NPR Sales (LCY)")
-        //         {
-        //         }
-        //         column(Profit_ItemCategorySub1; Profit)
-        //         {
-        //         }
-        //         column(Coverage_ItemCategorySub1; Coverage)
-        //         {
-        //         }
-        //         column(CoveragePct_ItemCategorySub1; CoveragePct)
-        //         {
-        //         }
-        //         column(TurnoverPct_ItemCategorySub1; TurnoverPct)
-        //         {
-        //         }
-        //         column(ItemGrpNoLvl1; StrSubstNo(TotalText, "Code"))
-        //         {
-        //         }
-        //         dataitem(Item1; Item)
-        //         {
-        //             DataItemLink = "Item Category Code" = FIELD("Code");
-        //             column(No_Item1; "No.")
-        //             {
-        //             }
-        //             column(Description_Item1; Description)
-        //             {
-        //             }
-        //             column(SalesQty_Item1; "Sales (Qty.)")
-        //             {
-        //             }
-        //             column(COGSLCY_Item1; "COGS (LCY)")
-        //             {
-        //             }
-        //             column(SalesLCY_Item1; "Sales (LCY)")
-        //             {
-        //             }
-        //             column(Inventory1; Inventory)
-        //             {
-        //             }
+            column(Request_Page_Filters; _RequestPageFilters) { }
+            column(Company_Name; CompanyName()) { }
+            column(Show_Items; _ShowItems) { }
+            column(Show_Items_In_All_Categories; _ShowItemsInAllCategories) { }
 
-        //             trigger OnAfterGetRecord()
-        //             begin
-        //                 if ("Sales (Qty.)" = 0) and OnlySales then
-        //                     CurrReport.Skip();
+            dataitem(ItemCategoryBufferDetail; "NPR Item Category Buffer")
+            {
+                DataItemLink = "Code" = field("Code");
+                DataItemTableView = sorting("Entry No.");
+                column(ItemCategoryBufferDetail_Code; "Code") { }
+                column(Detail_Item_No; "Detail Field 1") { }
+                column(Detail_Item_Description; "Detail Field 2") { }
+                column(Detail_Item_Category_Code; "Detail Field 3") { }
+                column(Detail_Presentation_Order; "Presentation Order") { }
 
-        //                 CalcFields(Inventory);
-        //                 SInventory += Inventory;
-        //             end;
+                #region Calc Fields
+                column(SalesQty_Item; "Calc Field 1") { }
+                column(COGSLCY_Item; "Calc Field 2") { }
+                column(SalesLCY_Item; "Calc Field 3") { }
+                column(Inventory_Item; "Calc Field 4") { }
 
-        //             trigger OnPreDataItem()
-        //             begin
-        //                 ItemCategoryHeader.CopyFilter("NPR Date Filter", "Date Filter");
-        //                 ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "Global Dimension 1 Filter");
-        //                 ItemCategoryHeader.CopyFilter("NPR Global Dimension 2 Filter", "Global Dimension 2 Filter");
-        //                 ItemCategoryHeader.CopyFilter("NPR Vendor Filter", "Vendor No.");
-        //                 if not ShowItem then
-        //                     CurrReport.Break();
-        //             end;
-        //         }
-        //         dataitem(ItemCategorySub2; "Item Category")
-        //         {
-        //             CalcFields = "NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)";
-        //             DataItemLink = "Parent Category" = FIELD("Code");
-        //             DataItemTableView = SORTING("Presentation Order");
-        //             column(No_ItemCategorySub2; "Code")
-        //             {
-        //             }
-        //             column(Description_ItemCategorySub2; Description)
-        //             {
-        //             }
-        //             column(SalesQty_ItemCategorySub2; "NPR Sales (Qty.)")
-        //             {
-        //             }
-        //             column(ConsumptionAmount_ItemCategorySub2; "NPR Consumption (Amount)")
-        //             {
-        //             }
-        //             column(SaleLCY_ItemCategorySub2; "NPR Sales (LCY)")
-        //             {
-        //             }
-        //             column(Profit_ItemCategorySub2; Profit)
-        //             {
-        //             }
-        //             column(Coverage_ItemCategorySub2; Coverage)
-        //             {
-        //             }
-        //             column(CoveragePct_ItemCategorySub2; CoveragePct)
-        //             {
-        //             }
-        //             column(TurnoverPct_ItemCategorySub2; TurnoverPct)
-        //             {
-        //             }
-        //             column(ItemGrpNoLvl2; StrSubstNo(TotalText, "Code"))
-        //             {
-        //             }
-        //             dataitem(Item2; Item)
-        //             {
-        //                 DataItemLink = "Item Category Code" = FIELD("Code");
-        //                 column(No_Item2; "No.")
-        //                 {
-        //                 }
-        //                 column(Description_Item2; Description)
-        //                 {
-        //                 }
-        //                 column(SalesQty_Item2; "Sales (Qty.)")
-        //                 {
-        //                 }
-        //                 column(COGSLCY_Item2; "COGS (LCY)")
-        //                 {
-        //                 }
-        //                 column(SalesLCY_Item2; "Sales (LCY)")
-        //                 {
-        //                 }
-        //                 column(Inventory2; Inventory)
-        //                 {
-        //                 }
+                #endregion
+            }
+        }
 
-        //                 trigger OnAfterGetRecord()
-        //                 begin
-        //                     if ("Sales (Qty.)" = 0) and OnlySales then
-        //                         CurrReport.Skip();
-
-        //                     CalcFields(Inventory);
-        //                     SInventory += Inventory;
-        //                 end;
-
-        //                 trigger OnPreDataItem()
-        //                 begin
-        //                     ItemCategoryHeader.CopyFilter("NPR Date Filter", "Date Filter");
-        //                     ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "Global Dimension 1 Filter");
-        //                     ItemCategoryHeader.CopyFilter("NPR Global Dimension 2 Filter", "Global Dimension 2 Filter");
-        //                     ItemCategoryHeader.CopyFilter("NPR Vendor Filter", "Vendor No.");
-        //                     if not ShowItem then
-        //                         CurrReport.Break();
-        //                 end;
-        //             }
-        //             dataitem(ItemCategorySub3; "Item Category")
-        //             {
-        //                 CalcFields = "NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)";
-        //                 DataItemLink = "Parent Category" = FIELD("Code");
-        //                 DataItemTableView = SORTING("Presentation Order");
-        //                 column(No_ItemCategorySub3; "Code")
-        //                 {
-        //                 }
-        //                 column(Description_ItemCategorySub3; Description)
-        //                 {
-        //                 }
-        //                 column(SalesQty_ItemCategorySub3; "NPR Sales (Qty.)")
-        //                 {
-        //                 }
-        //                 column(ConsumptionAmount_ItemCategorySub3; "NPR Consumption (Amount)")
-        //                 {
-        //                 }
-        //                 column(SaleLCY_ItemCategorySub3; "NPR Sales (LCY)")
-        //                 {
-        //                 }
-        //                 column(Profit_ItemCategorySub3; Profit)
-        //                 {
-        //                 }
-        //                 column(Coverage_ItemCategorySub3; Coverage)
-        //                 {
-        //                 }
-        //                 column(CoveragePct_ItemCategorySub3; CoveragePct)
-        //                 {
-        //                 }
-        //                 column(TurnoverPct_ItemCategorySub3; TurnoverPct)
-        //                 {
-        //                 }
-        //                 column(ItemGrpNoLvl3; StrSubstNo(TotalText, "Code"))
-        //                 {
-        //                 }
-        //                 dataitem(Item3; Item)
-        //                 {
-        //                     DataItemLink = "Item Category Code" = FIELD("Code");
-        //                     column(No_Item3; "No.")
-        //                     {
-        //                     }
-        //                     column(Description_Item3; Description)
-        //                     {
-        //                     }
-        //                     column(SalesQty_Item3; "Sales (Qty.)")
-        //                     {
-        //                     }
-        //                     column(COGSLCY_Item3; "COGS (LCY)")
-        //                     {
-        //                     }
-        //                     column(SalesLCY_Item3; "Sales (LCY)")
-        //                     {
-        //                     }
-        //                     column(Inventory3; Inventory)
-        //                     {
-        //                     }
-
-        //                     trigger OnAfterGetRecord()
-        //                     begin
-        //                         if ("Sales (Qty.)" = 0) and OnlySales then
-        //                             CurrReport.Skip();
-
-        //                         CalcFields(Inventory);
-        //                         SInventory += Inventory;
-        //                     end;
-
-        //                     trigger OnPreDataItem()
-        //                     begin
-        //                         ItemCategoryHeader.CopyFilter("NPR Date Filter", "Date Filter");
-        //                         ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "Global Dimension 1 Filter");
-        //                         ItemCategoryHeader.CopyFilter("NPR Global Dimension 2 Filter", "Global Dimension 2 Filter");
-        //                         ItemCategoryHeader.CopyFilter("NPR Vendor Filter", "Vendor No.");
-        //                         if not ShowItem then
-        //                             CurrReport.Break();
-        //                     end;
-        //                 }
-        //                 dataitem(ItemCategorySub4; "Item Category")
-        //                 {
-        //                     CalcFields = "NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)";
-        //                     DataItemLink = "Parent Category" = FIELD("Code");
-        //                     DataItemTableView = SORTING("Presentation Order");
-        //                     column(No_ItemCategorySub4; "Code")
-        //                     {
-        //                     }
-        //                     column(Description_ItemCategorySub4; Description)
-        //                     {
-        //                     }
-        //                     column(SalesQty_ItemCategorySub4; "NPR Sales (Qty.)")
-        //                     {
-        //                     }
-        //                     column(ConsumptionAmount_ItemCategorySub4; "NPR Consumption (Amount)")
-        //                     {
-        //                     }
-        //                     column(SaleLCY_ItemCategorySub4; "NPR Sales (LCY)")
-        //                     {
-        //                     }
-        //                     column(Profit_ItemCategorySub4; Profit)
-        //                     {
-        //                     }
-        //                     column(Coverage_ItemCategorySub4; Coverage)
-        //                     {
-        //                     }
-        //                     column(CoveragePct_ItemCategorySub4; CoveragePct)
-        //                     {
-        //                     }
-        //                     column(TurnoverPct_ItemCategorySub4; TurnoverPct)
-        //                     {
-        //                     }
-        //                     column(ItemGrpNoLvl4; StrSubstNo(TotalText, "Code"))
-        //                     {
-        //                     }
-        //                     dataitem(Item4; Item)
-        //                     {
-        //                         DataItemLink = "Item Category Code" = FIELD("Code");
-        //                         column(No_Item4; "No.")
-        //                         {
-        //                         }
-        //                         column(Description_Item4; Description)
-        //                         {
-        //                         }
-        //                         column(SalesQty_Item4; "Sales (Qty.)")
-        //                         {
-        //                         }
-        //                         column(COGSLCY_Item4; "COGS (LCY)")
-        //                         {
-        //                         }
-        //                         column(SalesLCY_Item4; "Sales (LCY)")
-        //                         {
-        //                         }
-        //                         column(Inventory4; Inventory)
-        //                         {
-        //                         }
-
-        //                         trigger OnAfterGetRecord()
-        //                         begin
-        //                             if ("Sales (Qty.)" = 0) and OnlySales then
-        //                                 CurrReport.Skip();
-
-        //                             CalcFields(Inventory);
-        //                             SInventory += Inventory;
-        //                         end;
-
-        //                         trigger OnPreDataItem()
-        //                         begin
-        //                             ItemCategoryHeader.CopyFilter("NPR Date Filter", "Date Filter");
-        //                             ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "Global Dimension 1 Filter");
-        //                             ItemCategoryHeader.CopyFilter("NPR Global Dimension 2 Filter", "Global Dimension 2 Filter");
-        //                             ItemCategoryHeader.CopyFilter("NPR Vendor Filter", "Vendor No.");
-        //                             if not ShowItem then
-        //                                 CurrReport.Break();
-        //                         end;
-        //                     }
-
-        //                     trigger OnAfterGetRecord()
-        //                     begin
-        //                         if TempItemCategoryPrinted.Get("Code") or (not (LevelsCount >= 4)) then
-        //                             CurrReport.Skip();
-
-        //                         TempItemCategoryPrinted."Code" := "Code";
-        //                         TempItemCategoryPrinted.Insert();
-
-        //                         CalcFields("NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)");
-
-        //                         Clear(Profit);
-        //                         Clear(Coverage);
-        //                         Clear(CoveragePct);
-        //                         Clear(TurnoverPct);
-        //                         Profit := "NPR Sales (LCY)" - "NPR Consumption (Amount)";
-        //                         Coverage := Pct(Profit, "NPR Sales (LCY)");
-        //                         CoveragePct := Pct(Profit, TotalProfit);
-        //                         TurnoverPct := Pct("NPR Sales (LCY)", TotalRevenue);
-
-        //                         SQty += "NPR Sales (Qty.)";
-        //                         SumSale += "NPR Sales (LCY)";
-        //                         SumConsumption += "NPR Consumption (Amount)";
-        //                     end;
-
-        //                     trigger OnPreDataItem()
-        //                     begin
-        //                         ItemCategoryHeader.CopyFilter("NPR Date Filter", "NPR Date Filter");
-        //                         ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "NPR Global Dimension 1 Filter");
-        //                         ItemCategoryHeader.CopyFilter("NPR Global Dimension 2 Filter", "NPR Global Dimension 2 Filter");
-        //                         ItemCategoryHeader.CopyFilter("NPR Vendor Filter", "NPR Vendor Filter");
-        //                     end;
-        //                 }
-
-        //                 trigger OnAfterGetRecord()
-        //                 begin
-        //                     if TempItemCategoryPrinted.Get("Code") or (not (LevelsCount >= 3)) then
-        //                         CurrReport.Skip();
-
-        //                     TempItemCategoryPrinted."Code" := "Code";
-        //                     TempItemCategoryPrinted.Insert();
-
-        //                     CalcFields("NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)");
-
-        //                     Clear(Profit);
-        //                     Clear(Coverage);
-        //                     Clear(CoveragePct);
-        //                     Clear(TurnoverPct);
-        //                     Profit := "NPR Sales (LCY)" - "NPR Consumption (Amount)";
-        //                     Coverage := Pct(Profit, "NPR Sales (LCY)");
-        //                     CoveragePct := Pct(Profit, TotalProfit);
-        //                     TurnoverPct := Pct("NPR Sales (LCY)", TotalRevenue);
-
-        //                     SQty += "NPR Sales (Qty.)";
-        //                     SumSale += "NPR Sales (LCY)";
-        //                     SumConsumption += "NPR Consumption (Amount)";
-        //                 end;
-
-        //                 trigger OnPreDataItem()
-        //                 begin
-        //                     ItemCategoryHeader.CopyFilter("NPR Date Filter", "NPR Date Filter");
-        //                     ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "NPR Global Dimension 1 Filter");
-        //                     ItemCategoryHeader.CopyFilter("NPR Global Dimension 2 Filter", "NPR Global Dimension 2 Filter");
-        //                     ItemCategoryHeader.CopyFilter("NPR Vendor Filter", "NPR Vendor Filter");
-        //                 end;
-        //             }
-
-        //             trigger OnAfterGetRecord()
-        //             begin
-        //                 if TempItemCategoryPrinted.Get("Code") or (not (LevelsCount >= 2)) then
-        //                     CurrReport.Skip();
-
-        //                 TempItemCategoryPrinted."Code" := "Code";
-        //                 TempItemCategoryPrinted.Insert();
-
-        //                 CalcFields("NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)");
-
-        //                 Clear(Profit);
-        //                 Clear(Coverage);
-        //                 Clear(CoveragePct);
-        //                 Clear(TurnoverPct);
-        //                 Profit := "NPR Sales (LCY)" - "NPR Consumption (Amount)";
-        //                 Coverage := Pct(Profit, "NPR Sales (LCY)");
-        //                 CoveragePct := Pct(Profit, TotalProfit);
-        //                 TurnoverPct := Pct("NPR Sales (LCY)", TotalRevenue);
-
-        //                 SQty += "NPR Sales (Qty.)";
-        //                 SumSale += "NPR Sales (LCY)";
-        //                 SumConsumption += "NPR Consumption (Amount)";
-        //             end;
-
-        //             trigger OnPreDataItem()
-        //             begin
-        //                 ItemCategoryHeader.CopyFilter("NPR Date Filter", "NPR Date Filter");
-        //                 ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "NPR Global Dimension 1 Filter");
-        //                 ItemCategoryHeader.CopyFilter("NPR Global Dimension 2 Filter", "NPR Global Dimension 2 Filter");
-        //                 ItemCategoryHeader.CopyFilter("NPR Vendor Filter", "NPR Vendor Filter");
-        //             end;
-        //         }
-
-        //         trigger OnAfterGetRecord()
-        //         begin
-        //             if TempItemCategoryPrinted.Get("Code") or (not (LevelsCount >= 1)) then
-        //                 CurrReport.Skip();
-
-        //             TempItemCategoryPrinted."Code" := "Code";
-        //             TempItemCategoryPrinted.Insert();
-
-        //             CalcFields("NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)");
-
-        //             Clear(Profit);
-        //             Clear(Coverage);
-        //             Clear(CoveragePct);
-        //             Clear(TurnoverPct);
-        //             Profit := "NPR Sales (LCY)" - "NPR Consumption (Amount)";
-        //             Coverage := Pct(Profit, "NPR Sales (LCY)");
-        //             CoveragePct := Pct(Profit, TotalProfit);
-        //             TurnoverPct := Pct("NPR Sales (LCY)", TotalRevenue);
-
-        //             SQty += "NPR Sales (Qty.)";
-        //             SumSale += "NPR Sales (LCY)";
-        //             SumConsumption += "NPR Consumption (Amount)";
-        //         end;
-
-        //         trigger OnPreDataItem()
-        //         begin
-        //             ItemCategoryHeader.CopyFilter("NPR Date Filter", "NPR Date Filter");
-        //             ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "NPR Global Dimension 1 Filter");
-        //             ItemCategoryHeader.CopyFilter("NPR Global Dimension 2 Filter", "NPR Global Dimension 2 Filter");
-        //             ItemCategoryHeader.CopyFilter("NPR Vendor Filter", "NPR Vendor Filter");
-        //         end;
-        //     }
-        //     dataitem("Sum"; "Integer")
-        //     {
-        //         DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
-        //         column(SProfit; SProfit)
-        //         {
-        //         }
-        //         column(SCoverage; SCoverage)
-        //         {
-        //         }
-        //         column(SCoveragePct; SCoveragePct)
-        //         {
-        //         }
-        //         column(STurnoverPct; STurnoverPct)
-        //         {
-        //         }
-        //         column(SSale; SumSale)
-        //         {
-        //         }
-        //         column(SConsumption; SumConsumption)
-        //         {
-        //         }
-        //         column(SInventory; SInventory)
-        //         {
-        //         }
-        //         column(SQty; SQty)
-        //         {
-        //         }
-
-        //         trigger OnAfterGetRecord()
-        //         begin
-
-        //             SProfit := SumSale - SumConsumption;
-        //             SCoverage := Pct(SProfit, SumSale);
-        //             SCoveragePct := Pct(SProfit, TotalProfit);
-        //             STurnoverPct := Pct(SumSale, TotalRevenue);
-
-        //             TSumSale += SumSale;
-        //             TSumConsumption += SumConsumption;
-        //             TSQty += SQty;
-        //         end;
-        //     }
-
-        //     trigger OnAfterGetRecord()
-        //     begin
-
-        //         Clear(SProfit);
-        //         Clear(SumSale);
-        //         Clear(SumConsumption);
-        //         Clear(SCoverage);
-        //         Clear(SCoveragePct);
-        //         Clear(STurnoverPct);
-        //         Clear(SQty);
-
-        //         if TempItemCategoryPrinted.Get("Code") then
-        //             CurrReport.Skip();
-
-        //         TempItemCategoryPrinted."Code" := "Code";
-        //         TempItemCategoryPrinted.Insert();
-
-        //         CalcFields("NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR Consumption (Amount)");
-
-        //         Clear(Profit);
-        //         Clear(Coverage);
-        //         Clear(CoveragePct);
-        //         Clear(TurnoverPct);
-        //         Profit := "NPR Sales (LCY)" - "NPR Consumption (Amount)";
-        //         Coverage := Pct(Profit, "NPR Sales (LCY)");
-        //         CoveragePct := Pct(Profit, TotalProfit);
-        //         TurnoverPct := Pct("NPR Sales (LCY)", TotalRevenue);
-
-        //         SQty += "NPR Sales (Qty.)";
-        //         SumSale += "NPR Sales (LCY)";
-        //         SumConsumption += "NPR Consumption (Amount)";
-        //     end;
-
-        //     trigger OnPreDataItem()
-        //     begin
-        //         TempItemCategoryPrinted.SetCurrentKey("Code");
-        //         TempItemCategoryPrinted.DeleteAll();
-        //     end;
-        // }
-        // dataitem(Total; "Integer")
-        // {
-        //     DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
-        //     column(TSProfit; TSProfit)
-        //     {
-        //     }
-        //     column(TSCoverage; TSCoverage)
-        //     {
-        //     }
-        //     column(TSCoveragePct; TSCoveragePct)
-        //     {
-        //     }
-        //     column(TSTurnoverPct; TSTurnoverPct)
-        //     {
-        //     }
-        //     column(TSSale; TSumSale)
-        //     {
-        //     }
-        //     column(TSConsumption; TSumConsumption)
-        //     {
-        //     }
-        //     column(TSInventory; TSInventory)
-        //     {
-        //     }
-        //     column(TSQty; TSQty)
-        //     {
-        //     }
-
-        //     trigger OnAfterGetRecord()
-        //     begin
-
-        //         TSProfit := TSumSale - TSumConsumption;
-        //         TSCoverage := Pct(TSProfit, TSumSale);
-        //         TSCoveragePct := Pct(TSProfit, TotalProfit);
-        //         TSTurnoverPct := Pct(TSumSale, TotalRevenue);
-        //     end;
-        // }
+        dataitem(ItemCategoryFilter; "Item Category")
+        {
+            DataItemTableView = sorting("Code");
+            RequestFilterFields = "Code", "NPR Date Filter", "NPR Global Dimension 1 Filter", "NPR Global Dimension 2 Filter", "NPR Vendor Filter";
+            UseTemporary = true;
+        }
+        dataitem(ItemFilter; Item)
+        {
+            DataItemTableView = sorting("No.");
+            RequestFilterFields = "No.";
+            UseTemporary = true;
+        }
     }
 
     requestpage
@@ -683,126 +78,335 @@
         {
             area(content)
             {
-                group(Request)
+                group(Options)
                 {
-                    Caption = 'Request';
-                    field("Show Item"; ShowItem)
+                    Caption = 'Options';
+                    field("Show Items"; _ShowItems)
                     {
-                        Caption = 'Print Items';
-
-                        ToolTip = 'Specifies the value of the Print Items field';
                         ApplicationArea = NPRRetail;
+                        Caption = 'Show Items';
+                        ToolTip = 'Use this option to control whether you want to print the individual items within categories without subcategory or just the category itself.';
                     }
-                    field("Only Sales"; OnlySales)
+                    field("Show Items in All Categories"; _ShowItemsInAllCategories)
                     {
-                        Caption = 'Only Sales';
-
-                        ToolTip = 'Specifies the value of the Only Sales field';
                         ApplicationArea = NPRRetail;
+                        Caption = 'Show Items in All Categories';
+                        ToolTip = 'Use this option to control whether you want to print the individual items within each category or just the category itself.';
                     }
-                    field("Levels Count"; LevelsCount)
+                    field("Number of Levels"; _NumberofLevels)
                     {
-                        Caption = 'Levels';
-
-                        ToolTip = 'Specifies the value of the Levels field';
                         ApplicationArea = NPRRetail;
+                        Caption = 'Number of Levels';
+                        MinValue = 1;
+                        ToolTip = 'Specifies how many levels of item categories are displayed on the report. Adjust this field to control the level of detail in the report.';
                     }
                 }
             }
         }
-
-        trigger OnOpenPage()
-        begin
-            LevelsCount := 2;
-        end;
     }
 
     labels
     {
-        Report_Caption = 'Sales Statistics by Item Category';
-        Page_Caption = 'Page';
-        No_Caption = 'No.';
-        Name_Caption = 'Name';
-        SaleQty_Caption = 'Quantity (sale)';
-        CostExclVat_Caption = 'Cost excl. VAT';
-        TurnoverExclVat_Caption = 'Turnover excl. VAT';
-        Percentage_Caption = 'Percentage';
-        ProfitExclVat_Caption = 'Profit excl. VAT';
-        ProfitPct_Caption = 'Profit %';
-        InventoryLbl = 'Inventory';
-        TotalforAllCategoriesLb = 'Total for All Categories';
+        ReportCaptionLbl = 'Sales Statistics by Item Category';
+        PageCaptionLbl = 'Page';
+        NoCaptionLbl = 'No.';
+        DescCaptionLbl = 'Description';
+        SaleQtyCaptionLbl = 'Sales (Qty.)';
+        CostExclVatCaptionLbl = 'Cost Excl. VAT';
+        TurnoverExclVatCaptionLbl = 'Turnover Excl. VAT';
+        ProfitPctCaptionLbl = 'Profit %';
+        InventoryCaptionLbl = 'Inventory';
+        CoverageMarginCaptionLbl = 'Coverage Margin';
+        UnitContributionMarginCaptionLbl = 'Unit Contribution Margin';
+        FiltersCaptionLbl = 'Filters:';
     }
 
     trigger OnInitReport()
     begin
-        CompanyInfo.Get();
-        CompanyInfo.CalcFields(Picture);
-        CaptionClassDim1 := '1,1,1';
-        TxtDim1 := CaptionClassTranslate(CaptionClassDim1);
-        TxtLabeldim1 := GroupByText + TxtDim1;
+        _NumberofLevels := 2;
     end;
 
     trigger OnPreReport()
+    var
+        DetailFieldKeys: List of [Integer];
     begin
-        Clear(TotalProfit);
-        Clear(TotalCoverage);
+        _RequestPageFilters := CreateRequestPageFiltersTxt();
 
-        // ItemCategory1.Reset();
-        // ItemCategoryHeader.CopyFilter("NPR Date Filter", ItemCategory1."NPR Date Filter");
-        // if ItemCategory1.FindSet() then
-        //     repeat
-        //         ItemCategory1.CalcFields("NPR Sales (LCY)", "NPR Consumption (Amount)");
-        //         TotalRevenue += ItemCategory1."NPR Sales (LCY)";
-        //         TotalConsumption += ItemCategory1."NPR Consumption (Amount)";
-        //     until ItemCategory1.Next() = 0;
+        CreateItemCategoryBufferDataItems(ItemCategoryBuffer, ItemCategoryBufferDetail);
 
-        TotalProfit := TotalRevenue - TotalConsumption;
-        TotalCoverage := Pct(TotalProfit, TotalRevenue);
+        if ItemCategoryFilter.GetFilter(Code) = '' then
+            AddUncategorizedToItemCategoryBuffers(ItemCategoryBuffer, ItemCategoryBufferDetail);
+
+        DetailFieldKeys.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 1"));
+
+        ItemCategoryBuffer.Reset();
+        ItemCategoryBufferDetail.Reset();
+        _ItemCategoryMgt.AddItemCategoryParentsToBuffer(ItemCategoryBuffer);
+        _ItemCategoryMgt.AddItemCategoryParentsToBuffer(ItemCategoryBufferDetail, DetailFieldKeys);
+
+        ItemCategoryBuffer.Reset();
+        if ItemCategoryBuffer.IsEmpty() then
+            Error(_EmptyDatasetErrorLbl);
+
+        ItemCategoryBuffer.Reset();
+        ItemCategoryBuffer.SetFilter(Indentation, '>%1', _NumberOfLevels - 1);
+        ItemCategoryBuffer.DeleteAll();
+
+        _ItemCategoryMgt.SortItemCategoryBuffer(ItemCategoryBuffer, ItemCategoryBuffer.FieldNo("Calc Field 1"), true);
+        _ItemCategoryMgt.SortItemCategoryBuffer(ItemCategoryBufferDetail, ItemCategoryBufferDetail.FieldNo("Calc Field 1"), true);
+
+        _ItemCategoryMgt.UpdateHasChildrenFieldInItemCategoryBuffer(ItemCategoryBuffer);
     end;
 
     var
-        CompanyInfo: Record "Company Information";
-        // ItemCategory1: Record "Item Category";
-        // TempItemCategoryPrinted: Record "Item Category" temporary;
-        OnlySales: Boolean;
-        ShowItem: Boolean;
-        // Coverage: Decimal;
-        // CoveragePct: Decimal;
-        // Profit: Decimal;
-        // SCoverage: Decimal;
-        // SCoveragePct: Decimal;
-        // SInventory: Decimal;
-        // SProfit: Decimal;
-        // SQty: Decimal;
-        // STurnoverPct: Decimal;
-        // SumConsumption: Decimal;
-        // SumSale: Decimal;
-        TotalConsumption: Decimal;
-        TotalCoverage: Decimal;
-        TotalProfit: Decimal;
-        TotalRevenue: Decimal;
-        // TSCoverage: Decimal;
-        // TSCoveragePct: Decimal;
-        // TSInventory: Decimal;
-        // TSProfit: Decimal;
-        // TSQty: Decimal;
-        // TSTurnoverPct: Decimal;
-        // TSumConsumption: Decimal;
-        // TSumSale: Decimal;
-        // TurnoverPct: Decimal;
-        LevelsCount: Integer;
-        GroupByText: Label 'Group by ';
-        // TotalText: Label 'Total for Item Category %1';
-        CaptionClassDim1: Text[30];
-        TxtDim1: Text;
-        TxtLabeldim1: Text[100];
+        _ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+        _ShowItems: Boolean;
+        _ShowItemsInAllCategories: Boolean;
+        _NumberofLevels: Integer;
+        _RequestPageFilters: Text;
+        _EmptyDatasetErrorLbl: Label 'The report couldn''t be generated, because it was empty. Adjust your filters and try again.';
+        _TxtShowItem: Label 'Show items';
+        _UncategorizedCategoryCodeLbl: Label '-';
+        _UncategorizedCategoryDescLbl: Label 'Without category';
 
-    internal procedure Pct(Value: Decimal; Total: Decimal) Calculation: Decimal
+    local procedure CreateRequestPageFiltersTxt(): Text
+    var
+        RequestPageFiltersTxt: Text;
     begin
-        if (Value <> 0) and (Total <> 0) then
-            Calculation := (Value / Total) * 100
+        if _ShowItems then
+            RequestPageFiltersTxt += _TxtShowItem;
+
+        if (RequestPageFiltersTxt <> '') and (ItemCategoryFilter.GetFilters() <> '') then
+            RequestPageFiltersTxt += ', ' + ItemCategoryFilter.GetFilters()
         else
-            Calculation := 0;
+            RequestPageFiltersTxt += ItemCategoryFilter.GetFilters();
+
+        if (RequestPageFiltersTxt <> '') and (ItemFilter.GetFilters() <> '') then
+            RequestPageFiltersTxt += ', ' + ItemFilter.GetFilters()
+        else
+            RequestPageFiltersTxt += ItemFilter.GetFilters();
+
+        exit(RequestPageFiltersTxt);
+    end;
+
+    local procedure AddUncategorizedToItemCategoryBuffers(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; var ItemCategoryBufferDetail: Record "NPR Item Category Buffer" temporary)
+    var
+        Item: Record Item;
+        ItemCategoryCode: Code[20];
+        CalcFieldsDict: Dictionary of [Integer, Decimal];
+        ConsumptionAmount: Decimal;
+        Inventory: Decimal;
+        SalesLCY: Decimal;
+        SalesQty: Decimal;
+        TotalConsumptionAmount: Decimal;
+        TotalInventory: Decimal;
+        TotalSalesLCY: Decimal;
+        TotalSalesQty: Decimal;
+        DetailFieldsDict: Dictionary of [Integer, Text[100]];
+    begin
+        ItemCategoryCode := '';
+        Item.SetFilter("Item Category Code", '=%1', ItemCategoryCode);
+        if ItemFilter.GetFilter("No.") <> '' then
+            Item.SetFilter("No.", ItemFilter.GetFilter("No."));
+
+        if not Item.FindSet() then
+            exit;
+
+        repeat
+            Clear(SalesLCY);
+            Clear(ConsumptionAmount);
+            Clear(SalesQty);
+            Clear(Inventory);
+            _ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
+            _ItemCategoryMgt.ClearDetailFieldsDictionary(DetailFieldsDict);
+
+            CalcSalesQty(ItemCategoryCode, Item."No.", SalesQty);
+
+            if SalesQty > 0 then begin
+                CalcSalesLCYAndConsumptionAmount(ItemCategoryCode, Item."No.", SalesLCY, ConsumptionAmount);
+                CalcInventory(ItemCategoryCode, Item."No.", Inventory);
+
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 1"), SalesQty);
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 2"), ConsumptionAmount);
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 3"), SalesLCY);
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 4"), Inventory);
+
+                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 1"), Item."No.");
+                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 2"), Item.Description);
+                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 3"), _UncategorizedCategoryCodeLbl);
+
+                _ItemCategoryMgt.InsertUncatagorizedToItemCategoryBuffer(_UncategorizedCategoryCodeLbl, _UncategorizedCategoryDescLbl, ItemCategoryBufferDetail, '', '', '', CalcFieldsDict, DetailFieldsDict);
+
+                TotalInventory += Inventory;
+                TotalSalesLCY += SalesLCY;
+                TotalSalesQty += SalesQty;
+                TotalConsumptionAmount += ConsumptionAmount;
+            end;
+        until Item.Next() = 0;
+
+        if TotalSalesQty > 0 then begin
+            _ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
+            CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 1"), TotalSalesQty);
+            CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 2"), TotalConsumptionAmount);
+            CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 3"), TotalSalesLCY);
+            CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 4"), TotalInventory);
+
+            _ItemCategoryMgt.InsertUncatagorizedToItemCategoryBuffer(_UncategorizedCategoryCodeLbl, _UncategorizedCategoryDescLbl, ItemCategoryBuffer, '', '', '', CalcFieldsDict, DetailFieldsDict);
+        end;
+    end;
+
+    local procedure CreateItemCategoryBufferDataItems(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; var ItemCategoryBufferDetail: Record "NPR Item Category Buffer" temporary)
+    var
+        ItemCategory: Record "Item Category";
+        CalcFieldsDict: Dictionary of [Integer, Decimal];
+        DetailFieldsDict: Dictionary of [Integer, Text[100]];
+        ConsumptionAmount: Decimal;
+        SalesLCY: Decimal;
+        TotalInventory: Decimal;
+    begin
+        ItemCategory.CopyFilters(ItemCategoryFilter);
+        if ItemFilter.GetFilter("No.") <> '' then
+            ItemCategory.SetFilter("NPR Item Filter", ItemFilter.GetFilter("No."));
+
+        ItemCategory.CalcFields("NPR Sales (Qty.)");
+
+        ItemCategory.SetFilter("NPR Sales (Qty.)", '>%1', 0);
+
+        if not ItemCategory.FindSet() then
+            exit;
+
+        repeat
+            Clear(SalesLCY);
+            Clear(ConsumptionAmount);
+            Clear(TotalInventory);
+            ItemCategory.CalcFields("NPR Sales (Qty.)");
+            ItemCategory.NPRGetVESalesLCYAndConsumptionAmount(SalesLCY, ConsumptionAmount);
+
+            if (SalesLCY <> 0) or (ConsumptionAmount <> 0) then begin
+                _ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
+
+                TotalInventory := CreateDetailDataitem(ItemCategory.Code, ItemCategoryBufferDetail);
+
+                CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 1"), ItemCategory."NPR Sales (Qty.)");
+                CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 2"), ConsumptionAmount);
+                CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), SalesLCY);
+                CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 4"), TotalInventory);
+
+                _ItemCategoryMgt.InsertItemCategoryToBuffer(ItemCategory.Code, ItemCategoryBuffer, '', '', '', CalcFieldsDict, DetailFieldsDict);
+            end;
+        until ItemCategory.Next() = 0;
+    end;
+
+    local procedure CreateDetailDataitem(ItemCategoryCode: Code[20]; var ItemCategoryBufferDetail: Record "NPR Item Category Buffer" temporary): Decimal
+    var
+        Item: Record Item;
+        CalcFieldsDict: Dictionary of [Integer, Decimal];
+        ConsumptionAmount: Decimal;
+        Inventory: Decimal;
+        SalesLCY: Decimal;
+        SalesQty: Decimal;
+        TotalInventory: Decimal;
+        DetailFieldsDict: Dictionary of [Integer, Text[100]];
+    begin
+        Item.SetRange("Item Category Code", ItemCategoryCode);
+
+        if not Item.FindSet() then
+            exit;
+
+        repeat
+            Clear(SalesLCY);
+            Clear(ConsumptionAmount);
+            Clear(SalesQty);
+            Clear(Inventory);
+            _ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
+            _ItemCategoryMgt.ClearDetailFieldsDictionary(DetailFieldsDict);
+
+            CalcSalesQty(ItemCategoryCode, Item."No.", SalesQty);
+
+            if SalesQty > 0 then begin
+
+                CalcSalesLCYAndConsumptionAmount(ItemCategoryCode, Item."No.", SalesLCY, ConsumptionAmount);
+                CalcInventory(ItemCategoryCode, Item."No.", Inventory);
+
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 1"), SalesQty);
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 2"), ConsumptionAmount);
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 3"), SalesLCY);
+                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 4"), Inventory);
+
+                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 1"), Item."No.");
+                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 2"), Item.Description);
+                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 3"), Item."Item Category Code");
+
+                _ItemCategoryMgt.InsertItemCategoryToBuffer(ItemCategoryCode, ItemCategoryBufferDetail, '', '', '', CalcFieldsDict, DetailFieldsDict);
+
+                TotalInventory += Inventory;
+            end;
+        until Item.Next() = 0;
+
+        exit(TotalInventory);
+    end;
+
+    internal procedure CalcSalesLCYAndConsumptionAmount(ItemCategoryCode: Code[20]; ItemNo: Code[20]; var SalesLCY: Decimal; var ConsumptionAmount: Decimal)
+    var
+        ValueEntryWithVendor: Query "NPR Value Entry With Vendor";
+    begin
+        SalesLCY := 0;
+        ConsumptionAmount := 0;
+        ValueEntryWithVendor.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+        ValueEntryWithVendor.SetRange(Filter_Item_Category_Code, ItemCategoryCode);
+        ValueEntryWithVendor.SetRange(Filter_Item_No, ItemNo);
+        ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, ItemCategoryFilter."NPR Global Dimension 1 Code");
+        ValueEntryWithVendor.SetFilter(Filter_Dim_2_Code, ItemCategoryFilter."NPR Global Dimension 2 Code");
+        if ItemCategoryFilter.GetFilter("NPR Vendor Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Vendor_No, ItemCategoryFilter.GetFilter("NPR Vendor Filter"));
+        if ItemCategoryFilter.GetFilter("NPR Date Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, ItemCategoryFilter.GetFilter("NPR Date Filter"));
+
+        ValueEntryWithVendor.Open();
+        while ValueEntryWithVendor.Read() do begin
+            SalesLCY += ValueEntryWithVendor.Sum_Sales_Amount_Actual;
+            ConsumptionAmount += -ValueEntryWithVendor.Sum_Cost_Amount_Actual;
+        end;
+        ValueEntryWithVendor.Close();
+    end;
+
+    internal procedure CalcSalesQty(ItemCategoryCode: Code[20]; ItemNo: Code[20]; var SalesQty: Decimal)
+    var
+        ValueEntryWithVendor: Query "NPR Value Entry With Vendor";
+    begin
+        SalesQty := 0;
+        ValueEntryWithVendor.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+        ValueEntryWithVendor.SetRange(Filter_Item_Category_Code, ItemCategoryCode);
+        ValueEntryWithVendor.SetRange(Filter_Item_No, ItemNo);
+        ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, ItemCategoryFilter."NPR Global Dimension 1 Code");
+        ValueEntryWithVendor.SetFilter(Filter_Dim_2_Code, ItemCategoryFilter."NPR Global Dimension 2 Code");
+        if ItemCategoryFilter.GetFilter("NPR Vendor Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Vendor_No, ItemCategoryFilter.GetFilter("NPR Vendor Filter"));
+        if ItemCategoryFilter.GetFilter("NPR Date Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, ItemCategoryFilter.GetFilter("NPR Date Filter"));
+
+        ValueEntryWithVendor.Open();
+        while ValueEntryWithVendor.Read() do
+            SalesQty += -ValueEntryWithVendor.Sum_Invoiced_Quantity;
+        ValueEntryWithVendor.Close();
+    end;
+
+    internal procedure CalcInventory(ItemCategoryCode: Code[20]; ItemNo: Code[20]; var Inventory: Decimal)
+    var
+        ValueEntryWithVendor: Query "NPR Value Entry With Vendor";
+    begin
+        Inventory := 0;
+        ValueEntryWithVendor.SetRange(Filter_Item_No, ItemNo);
+        ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, ItemCategoryFilter."NPR Global Dimension 1 Code");
+        ValueEntryWithVendor.SetFilter(Filter_Dim_2_Code, ItemCategoryFilter."NPR Global Dimension 2 Code");
+        if ItemCategoryFilter.GetFilter("NPR Vendor Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Vendor_No, ItemCategoryFilter.GetFilter("NPR Vendor Filter"));
+        if ItemCategoryFilter.GetFilter("NPR Date Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, ItemCategoryFilter.GetFilter("NPR Date Filter"));
+
+        ValueEntryWithVendor.Open();
+        while ValueEntryWithVendor.Read() do
+            Inventory += ValueEntryWithVendor.Sum_Item_Ledger_Entry_Quantity;
+        ValueEntryWithVendor.Close();
     end;
 }
-

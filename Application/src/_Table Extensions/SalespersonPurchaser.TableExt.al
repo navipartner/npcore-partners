@@ -261,7 +261,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             ValueEntryWithVendor.SetFilter(Filter_Item_No, GetFilter("NPR Item Filter"));
         ValueEntryWithVendor.Open();
         while ValueEntryWithVendor.Read() do
-            SalesQty += -ValueEntryWithVendor.Sum_Valued_Quantity;
+            SalesQty += -ValueEntryWithVendor.Sum_Invoiced_Quantity;
         ValueEntryWithVendor.Close();
     end;
 

@@ -134,12 +134,12 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
         {
             Caption = 'Sales (Qty.)';
             FieldClass = FlowField;
-            CalcFormula = - Sum("Item Ledger Entry".Quantity
+            CalcFormula = - Sum("Item Ledger Entry"."Invoiced Quantity"
                                 WHERE(
                                     "Entry Type" = CONST(Sale),
                                     "Item Category Code" = FIELD("Code"),
                                     "Posting Date" = FIELD("NPR Date Filter"),
-                                    "Source Type" = const(Vendor),
+                                    "Item No." = FIELD("NPR Item Filter"),
                                     "Source No." = FIELD("NPR Vendor Filter"),
                                     "Global Dimension 1 Code" = FIELD("NPR Global Dimension 1 Filter"),
                                     "Global Dimension 2 Code" = FIELD("NPR Global Dimension 2 Filter"),
@@ -210,6 +210,12 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
+        field(6151480; "NPR Item Filter"; Code[20])
+        {
+            Caption = 'Item Filter';
+            FieldClass = FlowFilter;
+            TableRelation = Item;
+        }
     }
 
     keys
@@ -236,6 +242,29 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
             DimMgt.SaveDefaultDim(DATABASE::"Item Category", Code, FieldNumber, ShortcutDimCode);
             Modify();
         end;
+    end;
+
+    internal procedure NPRGetVESalesQty(var SalesQty: Decimal)
+    var
+        ValueEntryWithVendor: Query "NPR Value Entry With Vendor";
+    begin
+        SalesQty := 0;
+        ValueEntryWithVendor.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
+        ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, Code);
+        ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, "NPR Global Dimension 1 Code");
+        ValueEntryWithVendor.SetFilter(Filter_Dim_2_Code, "NPR Global Dimension 2 Code");
+        if GetFilter("NPR Vendor Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Vendor_No, GetFilter("NPR Vendor Filter"));
+        if GetFilter("NPR Date Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, GetFilter("NPR Date Filter"));
+        if GetFilter("NPR Salesperson/Purch. Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Salespers_Purch_Code, GetFilter("NPR Salesperson/Purch. Filter"));
+        if GetFilter("NPR Location Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Location_Code, GetFilter("NPR Location Filter"));
+        ValueEntryWithVendor.Open();
+        while ValueEntryWithVendor.Read() do
+            SalesQty += -ValueEntryWithVendor.Sum_Invoiced_Quantity;
+        ValueEntryWithVendor.Close();
     end;
 
     internal procedure NPRGetVESalesLCYAndConsumptionAmount(var SalesLCY: Decimal; var ConsumptionAmount: Decimal)

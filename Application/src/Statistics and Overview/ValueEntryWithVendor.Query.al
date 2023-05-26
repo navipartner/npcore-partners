@@ -34,7 +34,6 @@ query 6014424 "NPR Value Entry With Vendor"
             filter(Filter_Cost_Amount_Actual; "Cost Amount (Actual)")
             {
             }
-
             column(Item_Ledger_Entry_Type; "Item Ledger Entry Type")
             {
             }
@@ -80,6 +79,10 @@ query 6014424 "NPR Value Entry With Vendor"
                 Method = Sum;
             }
             column(Sum_Invoiced_Quantity; "Invoiced Quantity")
+            {
+                Method = Sum;
+            }
+            column(Sum_Item_Ledger_Entry_Quantity; "Item Ledger Entry Quantity")
             {
                 Method = Sum;
             }
