@@ -15,6 +15,7 @@
         _isSubtotal: JsonToken;
         _width: JsonToken;
         _isCheckbox: JsonToken;
+        _editable: JsonToken;
 
         LabelFieldId: Label 'fieldId', Locked = true;
         LabelDataType: Label 'dataType', Locked = true;
@@ -137,6 +138,7 @@
         Clear(_isSubtotal);
         Clear(_width);
         Clear(_isCheckbox);
+        Clear(_editable);
     end;
 
     procedure Constructor(
@@ -144,7 +146,8 @@
         ParamCaption: Text;
         ParamDataType: Enum "NPR Data Type";
         ParamOrdinal: Integer;
-        ParamVisible: Boolean
+        ParamVisible: Boolean;
+        ParamEditable: Boolean
     );
     begin
         Initialize();
@@ -178,6 +181,9 @@
 
         _json.Add(LabelIsCheckbox, false);
         _json.Get(LabelIsCheckbox, _isCheckbox);
+
+        _json.Add('editable', ParamEditable);
+        _json.Get('editable', _editable);
 
         _constructed := true;
     end;
@@ -238,6 +244,11 @@
         if not _json.Get(LabelIsCheckbox, _isCheckbox) then begin
             _json.Add(LabelIsCheckbox, false);
             _json.Get(LabelIsCheckbox, _isCheckbox);
+        end;
+
+        if not _json.Get('editable', _editable) then begin
+            _json.Add('editable', false);
+            _json.Get('editable', _editable);
         end;
 
         _constructed := true;

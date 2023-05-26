@@ -37,9 +37,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         POSLayoutList: JsonArray;
         POSLayoutContent: JsonObject;
         Response: JsonObject;
-        Instr: InStream;
         POSLayoutFilter: Text;
-        PropertiesString: Text;
     begin
         POSLayoutFilter := GetJText(Context.AsToken(), 'layoutId', false);
         if POSLayoutFilter <> '' then
@@ -47,17 +45,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         if POSLayout.FindSet() then
             repeat
                 Clear(POSLayoutContent);
-                POSLayoutContent.Add('id', POSLayout.Code);
-                POSLayoutContent.Add('caption', POSLayout.Description);
-                POSLayoutContent.Add('template', POSLayout."Template Name");
-                if POSLayout."Frontend Properties".HasValue() then begin
-                    POSLayout.CalcFields("Frontend Properties");
-                    POSLayout."Frontend Properties".CreateInStream(Instr);
-                    Instr.Read(PropertiesString);
-                    POSLayoutContent.Add('blob', PropertiesString);
-                end else
-                    POSLayoutContent.Add('blob', '');
-                POSLayoutContent.Add('assignedToPOSUnits', POSLayout.AssignedToPOSUnits());
+                AddPOSLayoutToJson(POSLayout, POSLayoutContent);
                 POSLayoutList.Add(POSLayoutContent);
             until POSLayout.Next() = 0;
 
@@ -160,9 +148,18 @@ codeunit 6059925 "NPR POS Layout Assistant"
     var
         POSUnit: Record "NPR POS Unit";
         Response: JsonObject;
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
+        POSLayout: Record "NPR POS Layout";
+        POSLayoutObject: JsonObject;
     begin
-        POSUnit.Get(CopyStr(GetJText(Context.AsToken(), 'POSUnitCode', true), 1, MaxStrLen(POSUnit."No.")));
+        POSSession.GetSetup(POSSetup);
+        POSUnit.Get(POSSetup.GetPOSUnitNo());
         Response.Add('layoutId', POSUnit."POS Layout Code");
+        if POSLayout.Get(POSUnit."POS Layout Code") then begin
+            AddPOSLayoutToJson(POSLayout, POSLayoutObject);
+            Response.Add('POSLayout', POSLayoutObject)
+        end;
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 
@@ -382,6 +379,24 @@ codeunit 6059925 "NPR POS Layout Assistant"
     begin
         Response.Add('userCultureName', TypeHelper.GetCultureName());
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
+    end;
+
+    procedure AddPOSLayoutToJson(POSLayout: Record "NPR POS Layout"; var POSLayoutContentOut: JsonObject)
+    var
+        Instr: InStream;
+        PropertiesString: Text;
+    begin
+        POSLayoutContentOut.Add('id', POSLayout.Code);
+        POSLayoutContentOut.Add('caption', POSLayout.Description);
+        POSLayoutContentOut.Add('template', POSLayout."Template Name");
+        if POSLayout."Frontend Properties".HasValue() then begin
+            POSLayout.CalcFields("Frontend Properties");
+            POSLayout."Frontend Properties".CreateInStream(Instr);
+            Instr.Read(PropertiesString);
+            POSLayoutContentOut.Add('blob', PropertiesString);
+        end else
+            POSLayoutContentOut.Add('blob', '');
+        POSLayoutContentOut.Add('assignedToPOSUnits', POSLayout.AssignedToPOSUnits());
     end;
 
     #region Json Helper functions

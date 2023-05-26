@@ -65,12 +65,6 @@
                     ToolTip = 'Specifies the value of the After End-of-Sale View field';
                     ApplicationArea = NPRRetail;
                 }
-                field("POS - Show discount fields"; Rec."POS - Show discount fields")
-                {
-
-                    ToolTip = 'Specifies the value of the Show Discount field';
-                    ApplicationArea = NPRRetail;
-                }
             }
         }
     }
