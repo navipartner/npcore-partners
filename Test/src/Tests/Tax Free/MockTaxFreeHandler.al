@@ -1,6 +1,8 @@
 codeunit 85018 "NPR Mock Tax Free Handler" implements "NPR Tax Free Handler Interface"
 {
+    Access = Internal;
     EventSubscriberInstance = Manual;
+
     procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean)
     begin
         Constructor(TaxFreeRequest."Handler ID Enum");
@@ -113,8 +115,8 @@ codeunit 85018 "NPR Mock Tax Free Handler" implements "NPR Tax Free Handler Inte
             TaxFreeRequest."Handler ID Enum" = TaxFreeRequest."Handler ID Enum"::PREMIER_PI:
                 IsForeignIIN := true;
             else begin
-                    Error('');
-                end;
+                Error('');
+            end;
         end;
     end;
 

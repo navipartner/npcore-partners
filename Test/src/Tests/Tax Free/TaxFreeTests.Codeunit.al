@@ -1,7 +1,8 @@
 codeunit 85019 "NPR Tax Free Tests"
 {
-    Subtype = Test;
+    Access = Internal;
     EventSubscriberInstance = Manual;
+    Subtype = Test;
 
 #if not BC17    
     [Test]

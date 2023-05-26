@@ -1,5 +1,7 @@
 codeunit 85017 "NPR Library - Tax Free"
 {
+    Access = Internal;
+
     procedure CreateTaxFreePosUnit(PosUnitNo: Code[10]; var TaxFreePosUnit: Record "NPR Tax Free POS Unit");
     begin
         TaxFreePosUnit.Init();
@@ -56,8 +58,8 @@ codeunit 85017 "NPR Library - Tax Free"
             TaxFreePosUnit."Handler ID Enum" in [TaxFreePosUnit."Handler ID Enum"::PREMIER_PI]:
                 DeleteAndCreatePosUnitTaxFreeParameterPFPI(TaxFreePosUnit, tmpHandlerParameter);
             else begin
-                    Error('');
-                end;
+                Error('');
+            end;
         end;
     end;
 

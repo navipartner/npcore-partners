@@ -1,5 +1,7 @@
 codeunit 85012 "NPR Library - Ticket XML API"
 {
+    Access = Internal;
+
     procedure MakeReservation(OrderCount: Integer; ItemNumber: Code[20]; Quantity: Integer; MemberReference: Code[20]; ScannerStation: Code[10]; var Token: Text[100]; var ResponseMessage: Text): Boolean
     begin
         exit(MakeReservation(OrderCount, ItemNumber, Quantity, 0, MemberReference, ScannerStation, Token, ResponseMessage));
