@@ -99,7 +99,7 @@ codeunit 88011 "NPR BCPT POS Post Item Entries" implements "BCPT Test Param. Pro
     local procedure CreateLinesPerSale() AmountToPay: Decimal
     var
         i: Integer;
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
     begin
         for i := 1 to NoOfLinesPerSale do
             if i mod 2 = 1 then begin

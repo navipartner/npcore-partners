@@ -106,7 +106,7 @@ codeunit 88008 "NPR BCPT POS DS Total Disc Amt" implements "BCPT Test Param. Pro
     local procedure CreateLinesPerSale() AmountToPay: Decimal
     var
         i: Integer;
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
     begin
         for i := 1 to NoOfLinesPerSale do begin
             if i = 1 then

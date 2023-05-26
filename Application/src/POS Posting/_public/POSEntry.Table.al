@@ -249,6 +249,12 @@
             Editable = false;
             DataClassification = CustomerContent;
         }
+        field(112; "Discount Amount Incl. VAT"; Decimal)
+        {
+            Caption = 'Discount Amount Incl. VAT';
+            Editable = false;
+            DataClassification = CustomerContent;
+        }
         field(114; "Tax Area Code"; Code[20])
         {
             Caption = 'Tax Area Code';
@@ -515,6 +521,13 @@
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced with table NPR FR POS Audit Log Add. Info';
             CalcFormula = exist("NPR FR POS Audit Log Aux. Info" where("POS Entry No." = field("Entry No.")));
+        }
+        field(830; "RS POS Audit Log"; Boolean)
+        {
+            Editable = false;
+            Caption = 'RS POS Audit Log Aux. Info';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR RS POS Audit Log Aux. Info" where("Audit Entry Type" = const("POS Entry"), "POS Entry No." = field("Entry No.")));
         }
         field(5052; "Contact No."; Code[20])
         {

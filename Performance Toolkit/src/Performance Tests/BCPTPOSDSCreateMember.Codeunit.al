@@ -97,7 +97,7 @@ codeunit 88006 "NPR BCPT POS DS Create Member" implements "BCPT Test Param. Prov
     local procedure CreateSaleLine() AmountToPay: Decimal
     var
         BCPTMembershipEventSubs: Codeunit "NPR BCPT Membership Event Subs";
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
     begin
         BCPTTestContext.StartScenario('Add Sale Line');
         BindSubscription(BCPTMembershipEventSubs);

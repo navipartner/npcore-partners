@@ -109,7 +109,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, '', '', '', POSSession, FrontEnd); // Insert step of item action
     end;
 
-    procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; Quantity: Decimal)
+    procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; Quantity: Decimal)
     var
         POSActionInsertItem: Codeunit "NPR POS Action: Insert Item B";
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -120,7 +120,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSActionInsertItem.AddItemLine(Item, ItemReference, ItemIdentifierType, Quantity, 0, '', '', '', POSSession, FrontEnd); // Insert step of item action
     end;
 
-    procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text)
+    procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text)
     var
         POSActionInsertItem: Codeunit "NPR POS Action: Insert Item B";
         FrontEnd: Codeunit "NPR POS Front End Management";

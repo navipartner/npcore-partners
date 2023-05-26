@@ -38,6 +38,16 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 ApplicationArea = NPRRetail;
             }
         }
+        addafter(Cancelled)
+        {
+            field("NPR RS Audit Entry"; RSAuxSalesInvHeader."NPR RS Audit Entry")
+            {
+                Caption = 'RS Audit Entry';
+                ApplicationArea = NPRRSFiscal;
+                ToolTip = 'Specifies the value of the RS Audit Entry field.';
+                Editable = false;
+            }
+        }
     }
     actions
     {
@@ -81,6 +91,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
         }
     }
     var
+        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
         OIOUBLInstalled: Boolean;
 
     trigger OnOpenPage()
@@ -88,6 +99,11 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
         OIOUBLSetup: Record "NPR OIOUBL Setup";
     begin
         OIOUBLInstalled := OIOUBLSetup.IsOIOUBLInstalled();
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        RSAuxSalesInvHeader.ReadRSAuxSalesInvHeaderFields(Rec);
     end;
 
 }

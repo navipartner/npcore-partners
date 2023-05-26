@@ -57,5 +57,10 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NPR RS Retail Localization';
             DataClassification = CustomerContent;
         }
+        field(6060111; "NPR RS Fiscal"; Boolean)
+        {
+            Caption = 'NPR RS Fiscalisation';
+            DataClassification = CustomerContent;
+        }
     }
 }

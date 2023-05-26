@@ -8,7 +8,7 @@ codeunit 85080 "NPR POS SSAct InsertItem Tests"
         POSUnit: Record "NPR POS Unit";
         POSSession: Codeunit "NPR POS Session";
         POSStore: Record "NPR POS Store";
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,ItemGtin;
         IncreaseByQty: Decimal;
         ItemMaxQty: Decimal;
         ItemMinQty: Decimal;

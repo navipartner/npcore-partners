@@ -5,7 +5,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
     var
         BaseLineNo: Integer;
 
-    procedure GetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference)
+    procedure GetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin)
     var
         FirstRec: Text;
         ItemSearchErrLbl: Label 'Could not find a matching item for input %1';
@@ -14,7 +14,6 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         case ItemIdentifierType of
             ItemIdentifierType::ItemNo:
                 Item.Get(ItemIdentifier);
-
             ItemIdentifierType::ItemCrossReference:
                 begin
                     ItemReference.SetRange("Reference No.", CopyStr(ItemIdentifier, 1, MaxStrLen(ItemReference."Reference No.")));
@@ -49,11 +48,16 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
 
                     Item.Get(ItemReference."Item No.");
                 end;
+            ItemIdentifierType::ItemGtin:
+                begin
+                    Item.SetRange(GTIN, ItemIdentifier);
+                    Item.FindFirst();
+                end;
         end;
         ItemReference."Item No." := Item."No.";
     end;
 
-    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
 
         Line: Record "NPR POS Sale Line";
@@ -68,7 +72,8 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
 
         case ItemIdentifierType of
             ItemIdentifierType::ItemSearch,
-            ItemIdentifierType::ItemNo:
+            ItemIdentifierType::ItemNo,
+            ItemIdentifierType::ItemGtin:
                 begin
                     Line."No." := Item."No.";
                     Line."Variant Code" := ItemReference."Variant Code";

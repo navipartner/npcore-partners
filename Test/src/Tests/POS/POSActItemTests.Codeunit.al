@@ -24,7 +24,7 @@ codeunit 85085 "NPR POS Act. Item Tests"
         POSActionBusinessLogic: Codeunit "NPR POS Action: Insert Item B";
         FrontEnd: Codeunit "NPR POS Front End Management";
         ItemReference: Record "Item Reference";
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
         ItemQuantity: Decimal;
         UnitPrice: Decimal;
         CustomDescription: Text;

@@ -31,7 +31,7 @@ codeunit 88103 "NPR BCPT Library - POS Mock"
         POSSetup.SetSalesperson(Salesperson);
     end;
 
-    procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; Quantity: Decimal)
+    procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; Quantity: Decimal)
     var
         POSActionInsertItem: Codeunit "NPR POS Action: Insert Item B";
         FrontEnd: Codeunit "NPR POS Front End Management";

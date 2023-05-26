@@ -1,0 +1,875 @@
+codeunit 6059942 "NPR RS Audit Mgt."
+{
+    Access = Internal;
+    SingleInstance = true;
+
+    var
+        Enabled: Boolean;
+        Initialized: Boolean;
+
+    #region Subscribers - POS Audit Logging
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnLookupAuditHandler', '', true, true)]
+    local procedure OnLookupAuditHandler(var tmpRetailList: Record "NPR Retail List")
+    begin
+        AddRSAuditHandler(tmpRetailList);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnHandleAuditLogBeforeInsert', '', true, true)]
+    local procedure OnHandleAuditLogBeforeInsert(var POSAuditLog: Record "NPR POS Audit Log")
+    begin
+        HandleOnHandleAuditLogBeforeInsert(POSAuditLog);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSEntry', '', false, false)]
+    local procedure OnAfterInsertPOSEntry(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry");
+    begin
+        HandleCustIdentOnAuditLogAfterPOSEntryInsert(SalePOS, POSEntry);
+    end;
+    #endregion
+
+    #region Subscribers - POS Management
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeInitSale', '', false, false)]
+    local procedure OnBeforeInitSale(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
+    begin
+        CheckAreDataSetAndAccordingToCompliance(FrontEnd);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeEndSale', '', false, false)]
+    local procedure OnBeforeEndSale(var Sender: Codeunit "NPR POS Sale"; SaleHeader: Record "NPR POS Sale");
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        POSUnit.Get(SaleHeader."Register No.");
+        if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+        VerifyPINCodeWithError(POSUnit."No.");
+        VerifyGTINandTaxCategory(SaleHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', false, false)]
+    local procedure OnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale");
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSUnit: Record "NPR POS Unit";
+        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
+        RSPTFPITryPrint: Codeunit "NPR RS PTFPI Try Print";
+        RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
+    begin
+        if not POSUnit.Get(SalePOS."Register No.") then
+            exit;
+        if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        if not GetPOSEntryFromSalesTicketNo(SalePOS."Sales Ticket No.", POSEntry) then
+            exit;
+        if not RSPOSAuditLogAuxInfo.GetAuditFromPOSEntry(POSEntry."Entry No.") then
+            exit;
+
+        case POSEntry."Amount Incl. Tax" > 0 of
+            true:
+                RSTaxCommunicationMgt.CreateNormalSale(RSPOSAuditLogAuxInfo);
+            false:
+                begin
+                    RSTaxCommunicationMgt.CreateNormalRefund(RSPOSAuditLogAuxInfo);
+                    if (POSCheckIfPaymentMethodCashAndDirectSale(POSEntry."Entry No.") or not (RSPOSAuditLogAuxInfo."Audit Entry Type" in [RSPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry"])) then
+                        RSTaxCommunicationMgt.CreateCopyFiscalReceipt(RSPOSAuditLogAuxInfo);
+                end;
+        end;
+
+        RSPTFPITryPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'OnAfterDebitSalePostEvent', '', false, false)]
+    local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR POS Sale"; SalesHeader: Record "Sales Header"; Posted: Boolean);
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSUnit: Record "NPR POS Unit";
+        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
+        RSPTFPITryPrint: Codeunit "NPR RS PTFPI Try Print";
+        RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
+    begin
+        if not POSUnit.Get(SalePOS."Register No.") then
+            exit;
+        if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        if not GetPOSEntryFromSalesTicketNo(SalePOS."Sales Ticket No.", POSEntry) then
+            exit;
+        if not RSPOSAuditLogAuxInfo.GetAuditFromPOSEntry(POSEntry."Entry No.") then
+            exit;
+
+        case POSEntry."Amount Incl. Tax" > 0 of
+            true:
+                RSTaxCommunicationMgt.CreateNormalSale(RSPOSAuditLogAuxInfo);
+            false:
+                begin
+                    RSTaxCommunicationMgt.CreateNormalRefund(RSPOSAuditLogAuxInfo);
+                    RSTaxCommunicationMgt.CreateCopyFiscalReceipt(RSPOSAuditLogAuxInfo);
+                end;
+        end;
+
+        RSPTFPITryPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeInitSale', '', false, false)]
+    local procedure OnBeforeLogin(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
+    begin
+        //Error upon POS Login if any configuration is missing or clearly not set according to compliance
+        FrontEnd.GetSession(POSSession);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
+        if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        VerifyRSCompilanceSetupBeforeLogin(POSUnit);
+        VerifyPINCodeWithError(POSUnit."No.");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Rev. Dir. Sale", 'OnBeforeHendleReverse', '', false, false)]
+    local procedure OnBeforeHendleReverse(Setup: Codeunit "NPR POS Setup"; var SalesTicketNo: Code[20]);
+    var
+        POSUnit: Record "NPR POS Unit";
+        NewSalesTicketNo: Code[20];
+    begin
+        Setup.GetPOSUnit(POSUnit);
+        if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        NewSalesTicketNo := GetPOSEntryNoFromInvoiceCounter(SalesTicketNo);
+        if NewSalesTicketNo <> '' then
+            SalesTicketNo := NewSalesTicketNo;
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR POS Audit Profiles", 'OnHandlePOSAuditProfileAdditionalSetup', '', true, true)]
+    local procedure OnHandlePOSAuditProfileAdditionalSetup(POSAuditProfile: Record "NPR POS Audit Profile")
+    begin
+        if not IsRSAuditEnabled(POSAuditProfile.Code) then
+            exit;
+        OnActionShowSetup();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'CreateSalesHeaderOnBeforeSalesHeaderModify', '', false, false)]
+    local procedure CreateSalesHeaderOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR POS Sale");
+    var
+        RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+    begin
+        RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
+        RSAuxSalesHeader."NPR RS POS Unit" := SalePOS."Register No.";
+        RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
+    local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
+    var
+        Item: Record Item;
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        if not EanBoxEvent.Get(EventCodeItemGtin()) then begin
+            EanBoxEvent.Init();
+            EanBoxEvent.Code := EventCodeItemGtin();
+            EanBoxEvent."Module Name" := CopyStr(Item.TableCaption, 1, MaxStrLen(EanBoxEvent."Module Name"));
+            EanBoxEvent.Description := CopyStr(Item.FieldCaption(GTIN), 1, MaxStrLen(EanBoxEvent.Description));
+            EanBoxEvent."Action Code" := CopyStr(Format(enum::"NPR POS Workflow"::ITEM), 1, MaxStrLen(EanBoxEvent."Action Code"));
+            EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
+            EanBoxEvent."Event Codeunit" := CODEUNIT::"NPR POS Action: Insert Item";
+            EanBoxEvent.Insert(true);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
+    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        case EanBoxEvent.Code of
+            EventCodeItemGtin():
+                begin
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemNo', true, '');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemIdentifierType', false, 'ItemGtin');
+                end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
+    local procedure SetEanBoxEventInScopeGtin(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
+    var
+        Item: Record Item;
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        if EanBoxSetupEvent."Event Code" <> EventCodeItemGtin() then
+            exit;
+        if StrLen(EanBoxValue) > MaxStrLen(Item.GTIN) then
+            exit;
+
+        Item.SetRange(GTIN, EanBoxValue);
+        if not Item.IsEmpty() then
+            InScope := true;
+    end;
+    #endregion
+
+    #region Subscribers - Validations
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Store", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure OnBeforeRenamePOSStore(var Rec: Record "NPR POS Store"; var xRec: Record "NPR POS Store"; RunTrigger: Boolean)
+    begin
+        ErrorOnRenameOfPOSStoreIfAlreadyUsed(xRec);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure OnBeforeRenamePOSUnit(var Rec: Record "NPR POS Unit"; var xRec: Record "NPR POS Unit"; RunTrigger: Boolean)
+    begin
+        ErrorOnRenameOfPOSUnitIfAlreadyUsed(xRec);
+    end;
+    #endregion
+
+    #region Subscribers - Standard Adjustment
+    [EventSubscriber(ObjectType::Page, Page::"VAT Posting Setup", 'OnBeforeValidateEvent', 'VAT %', false, false)]
+    local procedure VATPostingSetup_OnBeforeValidateEvent(var Rec: Record "VAT Posting Setup")
+    var
+        RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+        PreventChangeVATErr: Label 'VAT % can not be changed since it already has posted entries and due Tax Law preventing change if posted entries exist.';
+    begin
+        if RSAuditMgt.IsRSFiscalActive() and RSAuditMgt.CheckIfVATPostingSetupHasEntries(Rec) then
+            Error(PreventChangeVATErr);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnBeforeManualReleaseSalesDoc', '', false, false)]
+    local procedure OnBeforeManualReleaseSalesDoc(var SalesHeader: Record "Sales Header"; PreviewMode: Boolean);
+    begin
+        VerifyIsDataSetOnSalesDocuments(SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnBeforeManualReOpenSalesDoc', '', false, false)]
+    local procedure OnBeforeManualReOpenSalesDoc(var SalesHeader: Record "Sales Header"; PreviewMode: Boolean);
+    begin
+        VerifyIsDataSetOnSalesDocuments(SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnAfterManualReleaseSalesDoc', '', false, false)]
+    local procedure OnAfterManualReleaseSalesDoc(var SalesHeader: Record "Sales Header"; PreviewMode: Boolean);
+    var
+        RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+        RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        case SalesHeader."Document Type" of
+            SalesHeader."Document Type"::Quote, SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice:
+                begin
+                    RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
+                    if RSAuxSalesHeader."NPR RS Audit Entry" in [RSAuxSalesHeader."NPR RS Audit Entry"::" ", RSAuxSalesHeader."NPR RS Audit Entry"::"Proforma Refund"] then
+                        RSTaxCommunicationMgt.CreateProformaSale(SalesHeader);
+                end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnAfterManualReOpenSalesDoc', '', false, false)]
+    local procedure OnAfterManualReOpenSalesDoc(var SalesHeader: Record "Sales Header"; PreviewMode: Boolean);
+    var
+        RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+        RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        case SalesHeader."Document Type" of
+            SalesHeader."Document Type"::Quote, SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice:
+                begin
+                    RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
+                    if RSAuxSalesHeader."NPR RS Audit Entry" in [RSAuxSalesHeader."NPR RS Audit Entry"::"Proforma Sales"] then
+                        RSTaxCommunicationMgt.CreateProformaRefund(SalesHeader, true);
+                end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnBeforeDeleteEvent', '', false, false)]
+    local procedure SalesHeader_OnBeforeDeleteEvent(var Rec: Record "Sales Header"; RunTrigger: Boolean)
+    var
+        RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+        RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(Rec);
+        if RSAuxSalesHeader."NPR RS Audit Entry" in [RSAuxSalesHeader."NPR RS Audit Entry"::"Proforma Sales"] then
+            RSTaxCommunicationMgt.CreateProformaRefund(Rec, false);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', false, false)]
+    local procedure OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header");
+    begin
+        VerifyIsDataSetOnSalesDocuments(SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', false, false)]
+    local procedure OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20]; CommitIsSuppressed: Boolean; InvtPickPutaway: Boolean; var CustLedgerEntry: Record "Cust. Ledger Entry"; WhseShip: Boolean; WhseReceiv: Boolean);
+    var
+        RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
+    begin
+        if SalesInvHdrNo <> '' then
+            RSTaxCommunicationMgt.CreateNormalSale(SalesInvHdrNo);
+        if SalesCrMemoHdrNo <> '' then
+            RSTaxCommunicationMgt.CreateNormalRefund(SalesCrMemoHdrNo);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Correct Posted Sales Invoice", 'OnBeforeSalesHeaderInsert', '', false, false)]
+    local procedure OnBeforeSalesHeaderInsert(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header"; CancellingOnly: Boolean)
+    var
+        RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
+        RSAuxSalesInvHeader.ReadRSAuxSalesInvHeaderFields(SalesInvoiceHeader);
+        RSAuxSalesHeader.TransferFields(RSAuxSalesInvHeader, false);
+        RSAuxSalesHeader."NPR RS Refund Reference" := SalesInvoiceHeader."No.";
+        RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Sell-to Customer No.', false, false)]
+    local procedure SalesHeader_OnAfterValidateEvent(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; CurrFieldNo: Integer)
+    var
+        Customer: Record Customer;
+        RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        Customer.Get(Rec."Sell-to Customer No.");
+        if Customer."VAT Registration No." <> '' then begin
+            RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(Rec);
+            RSAuxSalesHeader."NPR RS Cust. Ident. Type" := RSAuxSalesHeader."NPR RS Cust. Ident. Type"::PIB;
+            RSAuxSalesHeader."NPR RS Customer Ident." := Customer."VAT Registration No.";
+            RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Invoice Header", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure SalesInvoiceHeader_OnAfterDeleteEvent(var Rec: Record "Sales Invoice Header"; RunTrigger: Boolean)
+    var
+        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
+    begin
+        if not RunTrigger then
+            exit;
+        if not IsRSFiscalActive() then
+            exit;
+        RSAuxSalesInvHeader.Get(Rec."No.");
+        RSAuxSalesInvHeader.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterSalesInvHeaderInsert', '', false, false)]
+    local procedure OnAfterSalesInvHeaderInsert(var SalesInvHeader: Record "Sales Invoice Header"; SalesHeader: Record "Sales Header");
+    var
+        RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        RSAuxSalesInvHeader.ReadRSAuxSalesInvHeaderFields(SalesInvHeader);
+        RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
+        RSAuxSalesInvHeader.TransferFields(RSAuxSalesHeader, false);
+        RSAuxSalesInvHeader.SaveRSAuxSalesInvHeaderFields();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterSalesCrMemoHeaderInsert', '', false, false)]
+    local procedure OnAfterSalesCrMemoHeaderInsert(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; SalesHeader: Record "Sales Header");
+    var
+        RSAuxSalesCrMemoHeader: Record "NPR RS Aux Sales CrMemo Header";
+        RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        RSAuxSalesCrMemoHeader.ReadRSAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
+        RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
+        RSAuxSalesCrMemoHeader.TransferFields(RSAuxSalesHeader, false);
+        RSAuxSalesCrMemoHeader.SaveRSAuxSalesCrMemoHeaderFields();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterDeleteAfterPosting', '', false, false)]
+    local procedure OnAfterDeleteAfterPosting(SalesHeader: Record "Sales Header"; SalesInvoiceHeader: Record "Sales Invoice Header"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; CommitIsSuppressed: Boolean);
+    var
+        RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
+        RSAuxSalesHeader.Delete();
+    end;
+    #endregion
+
+    #region Job Queue
+    procedure AddRSAuditBackgroundJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Silent: Boolean): Boolean
+    var
+        ConfirmJobCreationQst: Label 'This function will add a new periodic job (Job Queue Entry), responsible for obsolete ticket data cleanup, including unused schedule entries (if a similar job already exists, system will not add anything).\Are you sure you want to continue?';
+    begin
+        if not Silent then
+            if not Confirm(ConfirmJobCreationQst, true) then
+                exit(false);
+        exit(InitRSAuditBackgroundJobQueue(JobQueueEntry));
+    end;
+
+    local procedure InitRSAuditBackgroundJobQueue(var JobQueueEntry: Record "Job Queue Entry"): Boolean
+    var
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        NextRunDateFormula: DateFormula;
+        JobQueueDescrLbl: Label 'RS Fiscal background processor', MaxLength = 250;
+    begin
+        Evaluate(NextRunDateFormula, '<1D>');
+        JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
+        JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 2700, '');
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR RS Fiscal BG Comm. Batch",
+            '',
+            JobQueueDescrLbl,
+            JobQueueMgt.NowWithDelayInSeconds(300),
+            0T,
+            0T,
+            NextRunDateFormula,
+            DefaultRSAuditCategoryCode(),
+            JobQueueEntry)
+        then begin
+            if not IsRSFiscalActive() then
+                exit;
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+            exit(true);
+        end;
+    end;
+
+    local procedure DefaultRSAuditCategoryCode(): Code[10]
+    var
+        JobQueueCategory: Record "Job Queue Category";
+        ImportListJQCategoryCode: Label 'FISCAL', MaxLength = 10, Locked = true;
+        ImportListJQCategoryDescrLbl: Label 'POS Audit Fiscal Processing', MaxLength = 30;
+    begin
+        JobQueueCategory.InsertRec(ImportListJQCategoryCode, ImportListJQCategoryDescrLbl);
+        exit(JobQueueCategory.Code);
+    end;
+    #endregion
+
+    #region Procedures - Helper functions
+    local procedure OnActionShowSetup()
+    begin
+        Page.RunModal(Page::"NPR RS Fiscalisation Setup");
+    end;
+
+    procedure HandlerCode(): Text
+    var
+        HandlerCodeTxt: Label 'RS_FISKALIZACIJA', Locked = true, MaxLength = 20;
+    begin
+        exit(HandlerCodeTxt);
+    end;
+
+    local procedure EventCodeItemGtin(): Code[20]
+    begin
+        exit('ITEMGTIN');
+    end;
+
+    internal procedure FillCertificationData(Certification: Dictionary of [Text, Text])
+    var
+        CertificationApp: Label 'NP Retail', Locked = true;
+        CertificationDate: Label '00.00.0000.', Locked = true;
+        CertificationIBNo: Label '1230', Locked = true;
+        CertificationVendor: Label 'NAVIPARTNER d.o.o.', Locked = true;
+        CertificationVersion: Label '1.0', Locked = true;
+    begin
+        Certification.Set('Vendor', CertificationVendor);
+        Certification.Set('RSFiscalName', CertificationApp);
+        Certification.Set('RSFiscalIBNo', CertificationIBNo);
+        Certification.Set('RSFiscalVersion', CertificationVersion);
+        Certification.Set('CertificationDate', CertificationDate);
+        Certification.Set('ESIRNo', CertificationIBNo + '/' + CertificationVersion);
+    end;
+
+    local procedure IsRSAuditEnabled(POSAuditProfileCode: Code[20]): Boolean
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+    begin
+        if Initialized then
+            exit(Enabled);
+        if not POSAuditProfile.Get(POSAuditProfileCode) then
+            exit(false);
+        if POSAuditProfile."Audit Handler" <> HandlerCode() then
+            exit(false);
+        Initialized := true;
+        Enabled := true;
+        exit(true);
+    end;
+
+    internal procedure IsRSFiscalActive(): Boolean
+    var
+        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+    begin
+        if not RSFiscalisationSetup.Get() then begin
+            RSFiscalisationSetup.Init();
+            RSFiscalisationSetup.Insert();
+        end;
+        exit(RSFiscalisationSetup."Enable RS Fiscal");
+    end;
+
+    internal procedure EnableApplicationAreaForNPRRSFiscal(EnableAppArea: Boolean)
+    var
+        ApplicationAreaSetup: Record "Application Area Setup";
+    begin
+        case EnableAppArea of
+            true:
+                begin
+                    ApplicationAreaSetup.SetRange("Company Name", CompanyName());
+                    ApplicationAreaSetup.SetRange("NPR RS Fiscal", false);
+                    if ApplicationAreaSetup.IsEmpty() then
+                        ApplicationAreaSetup.ModifyAll("NPR RS Fiscal", true)
+                    else begin
+                        ApplicationAreaSetup.Init();
+                        ApplicationAreaSetup."Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(ApplicationAreaSetup."Company Name"));
+                        ApplicationAreaSetup."NPR RS Fiscal" := true;
+                        ApplicationAreaSetup.Insert();
+                    end;
+
+                end;
+            false:
+                begin
+                    ApplicationAreaSetup.SetRange("Company Name", CompanyName());
+                    ApplicationAreaSetup.SetRange("NPR RS Fiscal", true);
+                    if not ApplicationAreaSetup.IsEmpty() then
+                        ApplicationAreaSetup.ModifyAll("NPR RS Fiscal", false);
+                end;
+        end;
+    end;
+
+    internal procedure CheckIfVATPostingSetupHasEntries(VATPostingSetup: Record "VAT Posting Setup"): Boolean
+    var
+        VATEntry: Record "VAT Entry";
+    begin
+        VATEntry.SetRange("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
+        VATEntry.SetRange("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
+        exit(not VATEntry.IsEmpty());
+    end;
+
+    internal procedure POSCheckIfPaymentMethodCashAndDirectSale(POSEntryNo: Integer): Boolean
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        RSPOSPaymMethMapping: Record "NPR RS POS Paym. Meth. Mapping";
+        ShouldCreateRefundFiscalBillCopy: Boolean;
+    begin
+        if not POSEntry.Get(POSEntryNo) then
+            exit(ShouldCreateRefundFiscalBillCopy);
+
+        if not (POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale"]) then
+            exit(ShouldCreateRefundFiscalBillCopy);
+
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if POSEntryPaymentLine.FindSet() then
+            repeat
+                RSPOSPaymMethMapping.Get(POSEntryPaymentLine."POS Payment Method Code");
+                if not ShouldCreateRefundFiscalBillCopy then
+                    ShouldCreateRefundFiscalBillCopy := RSPOSPaymMethMapping."RS Payment Method" in [RSPOSPaymMethMapping."RS Payment Method"::Cash];
+            until (POSEntryPaymentLine.Next() = 0) or ShouldCreateRefundFiscalBillCopy;
+
+        exit(ShouldCreateRefundFiscalBillCopy);
+    end;
+
+    procedure DocumentCheckIfPaymentMethodCash(PaymentMethodCode: Code[20]): Boolean
+    var
+        RSPaymentMethodMapping: Record "NPR RS Payment Method Mapping";
+    begin
+        if not RSPaymentMethodMapping.Get(PaymentMethodCode) then
+            exit(false);
+        if not (RSPaymentMethodMapping."RS Payment Method" in [RSPaymentMethodMapping."RS Payment Method"::Cash]) then
+            exit(false);
+        exit(true);
+    end;
+
+    local procedure GetPOSEntryFromSalesTicketNo(SalesTicketNo: Code[20]; var POSEntry: Record "NPR POS Entry"): Boolean
+    begin
+        POSEntry.SetFilter("Document No.", '=%1', SalesTicketNo);
+        if (POSEntry.IsEmpty()) then
+            exit(false);
+        exit(POSEntry.FindFirst());
+    end;
+    #endregion
+
+    #region Procedures - Validations
+    local procedure VerifyPINCodeWithError(POSStoreNo: Code[10])
+    var
+        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
+        TaxPINSuccessCode: Label '0100 - SUCCESS', Locked = true;
+        VerifyPinResultTxt: Text;
+    begin
+        RSFiscalisationSetup.Get();
+        if RSFiscalisationSetup."Allow Offline Use" then
+            exit;
+        VerifyPinResultTxt := RSTaxCommunicationMgt.VerifyPIN(POSStoreNo);
+        if VerifyPinResultTxt <> TaxPINSuccessCode then
+            Error(VerifyPinResultTxt);
+    end;
+
+    local procedure CheckAreDataSetAndAccordingToCompliance(FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSUnit: Record "NPR POS Unit";
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
+    begin
+        FrontEnd.GetSession(POSSession);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
+        if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        POSUnit.GetProfile(POSAuditProfile);
+        POSAuditProfile.TestField("Do Not Print Receipt on Sale", false);
+
+        VerifyPINCodeWithError(POSUnit."No.");
+    end;
+
+    local procedure VerifyRSCompilanceSetupBeforeLogin(var POSUnit: Record "NPR POS Unit")
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSStore: Record "NPR POS Store";
+        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
+    begin
+        RSFiscalisationSetup.Get();
+        RSFiscalisationSetup.TestField("Sandbox URL");
+        RSPOSUnitMapping.Get(POSUnit."No.");
+        RSPOSUnitMapping.TestField("RS Sandbox Token");
+        RSPOSUnitMapping.TestField("RS Sandbox JID");
+        RSPOSUnitMapping.TestField("RS Sandbox PIN");
+
+        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        POSAuditProfile.TestField("Sale Fiscal No. Series");
+        POSAuditProfile.TestField("Credit Sale Fiscal No. Series");
+        POSAuditProfile.TestField("Balancing Fiscal No. Series");
+        POSAuditProfile.TestField("Fill Sale Fiscal No. On", POSAuditProfile."Fill Sale Fiscal No. On"::Successful);
+        POSAuditProfile.TestField("Print Receipt On Sale Cancel", false);
+        POSAuditProfile.TestField("Do Not Print Receipt on Sale", false);
+
+        POSStore.Get(POSUnit."POS Store Code");
+        POSStore.TestField("Country/Region Code");
+    end;
+
+    local procedure VerifyIsDataSetOnSalesDocuments(SalesHeader: Record "Sales Header")
+    var
+        POSUnit: Record "NPR POS Unit";
+        RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+        RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
+        NotRSAuditProfileErr: Label 'RS Audit Profile is not selected on POS Unit No.: %1', Comment = '%1 - POS Unit No.';
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
+        RSAuxSalesHeader.TestField("NPR RS POS Unit");
+        POSUnit.Get(RSAuxSalesHeader."NPR RS POS Unit");
+        SalesHeader.TestField("Salesperson Code");
+        if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
+            Error(NotRSAuditProfileErr, POSUnit."No.");
+        RSPOSUnitMapping.Get(POSUnit."No.");
+        RSPOSUnitMapping.TestField("RS Sandbox JID");
+        RSPOSUnitMapping.TestField("RS Sandbox PIN");
+        RSPOSUnitMapping.TestField("RS Sandbox Token");
+    end;
+
+    internal procedure IsDataSetOnSalesInvoiceDoc(RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header"): Boolean
+    var
+        POSUnit: Record "NPR POS Unit";
+        RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+    begin
+        if not IsRSFiscalActive() then
+            exit(false);
+        if RSAuxSalesInvHeader."NPR RS POS Unit" = '' then
+            exit(false);
+        POSUnit.Get(RSAuxSalesInvHeader."NPR RS POS Unit");
+        RSPOSUnitMapping.Get(POSUnit."No.");
+        if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
+            exit(false);
+        if RSPOSUnitMapping."RS Sandbox JID" = '' then
+            exit(false);
+        if RSPOSUnitMapping."RS Sandbox PIN" = 0 then
+            exit(false);
+        if RSPOSUnitMapping."RS Sandbox Token" = '' then
+            exit(false);
+        SalesInvoiceHeader.Get(RSAuxSalesInvHeader."Sales Invoice Header No.");
+        if SalesInvoiceHeader."Salesperson Code" = '' then
+            exit(false);
+        exit(true);
+    end;
+
+    local procedure VerifyGTINandTaxCategory(var SaleHeader: Record "NPR POS Sale")
+    var
+        Item: Record Item;
+        POSSaleLine: Record "NPR POS Sale Line";
+        RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
+        RSFiscalGTINErr: Label 'GTIN number of item can not be less than 8 or grater than 14 characters.';
+        RSTaxCatNameErr: Label 'RS Tax Category Name must be filled for VAT Posting Setup = %1, %2', Comment = '%1 - VAT Bus. Posting Group, %2 - VAT Prod. Posting Group';
+    begin
+        POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
+        POSSaleLine.SetRange("Register No.", SaleHeader."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", SaleHeader."Sales Ticket No.");
+        if POSSaleLine.FindSet() then
+            repeat
+                if POSSaleLine."Line Type" = POSSaleLine."Line Type"::Item then begin
+                    RSVATPostSetupMapping.Get(POSSaleLine."VAT Bus. Posting Group", POSSaleLine."VAT Prod. Posting Group");
+                    if RSVATPostSetupMapping."RS Tax Category Name" = '' then
+                        Error(RSTaxCatNameErr, POSSaleLine."VAT Bus. Posting Group", POSSaleLine."VAT Prod. Posting Group");
+                    Item.Get(POSSaleLine."No.");
+                    if (((StrLen(Item.GTIN) < 8) or (StrLen(Item.GTIN) > 14))) and (StrLen(Item.GTIN) > 0) then
+                        Error(RSFiscalGTINErr);
+                end
+            until POSSaleLine.Next() = 0;
+    end;
+
+    local procedure ErrorOnRenameOfPOSStoreIfAlreadyUsed(OldPOSStore: Record "NPR POS Store")
+    var
+        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
+        CannotRenameErr: Label 'You cannot rename %1 %2 since there is at least one related %3 record and it can cause data discrepancy.', Comment = '%1 - POS Store table caption, %2 - POS Store Code value, %3 - RS POS Audit Log Aux. Info table caption';
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        RSPOSAuditLogAuxInfo.SetRange("POS Store Code", OldPOSStore.Code);
+        if not RSPOSAuditLogAuxInfo.IsEmpty() then
+            Error(CannotRenameErr, OldPOSStore.TableCaption(), OldPOSStore.Code, RSPOSAuditLogAuxInfo.TableCaption());
+    end;
+
+    local procedure ErrorOnRenameOfPOSUnitIfAlreadyUsed(OldPOSUnit: Record "NPR POS Unit")
+    var
+        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
+        CannotRenameErr: Label 'You cannot rename %1 %2 since there is at least one related %3 record and it can cause data discrepancy.', Comment = '%1 - POS Unit table caption, %2 - POS Unit No. value, %3 - RS POS Audit Log Aux. Info table caption';
+    begin
+        if not IsRSAuditEnabled(OldPOSUnit."POS Audit Profile") then
+            exit;
+
+        RSPOSAuditLogAuxInfo.SetRange("POS Unit No.", OldPOSUnit."No.");
+        if not RSPOSAuditLogAuxInfo.IsEmpty() then
+            Error(CannotRenameErr, OldPOSUnit.TableCaption(), OldPOSUnit."No.", RSPOSAuditLogAuxInfo.TableCaption());
+    end;
+    #endregion
+
+    #region Procedures - Misc
+    local procedure AddRSAuditHandler(var TempRetailList: Record "NPR Retail List")
+    begin
+        TempRetailList.Number += 1;
+        TempRetailList.Choice := CopyStr(HandlerCode(), 1, MaxStrLen(TempRetailList.Choice));
+        TempRetailList.Insert();
+    end;
+
+    local procedure HandleOnHandleAuditLogBeforeInsert(var POSAuditLog: Record "NPR POS Audit Log")
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if POSAuditLog."Active POS Unit No." = '' then
+            POSAuditLog."Active POS Unit No." := POSAuditLog."Acted on POS Unit No.";
+
+        if not POSUnit.Get(POSAuditLog."Active POS Unit No.") then
+            exit;
+        if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+        if not POSStore.Get(POSUnit."POS Store Code") then
+            exit;
+        if not (POSAuditLog."Action Type" in [POSAuditLog."Action Type"::DIRECT_SALE_END, POSAuditLog."Action Type"::CREDIT_SALE_END]) then
+            exit;
+
+        POSEntry.Get(POSAuditLog."Record ID");
+        if not (POSEntry."Post Item Entry Status" in [POSEntry."Post Item Entry Status"::"Not To Be Posted"]) then
+            InsertRSPOSAuditLogAuxInfo(POSEntry, POSStore, POSUnit);
+    end;
+
+    local procedure InsertRSPOSAuditLogAuxInfo(POSEntry: Record "NPR POS Entry"; POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit")
+    var
+        Customer: Record Customer;
+        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
+        CustomerVATRegNoRSLabel: Label '10:', Locked = true;
+    begin
+        RSPOSAuditLogAuxInfo.Init();
+        RSPOSAuditLogAuxInfo."Audit Entry Type" := RSPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry";
+        RSPOSAuditLogAuxInfo."POS Entry No." := POSEntry."Entry No.";
+        RSPOSAuditLogAuxInfo."POS Store Code" := POSStore.Code;
+        RSPOSAuditLogAuxInfo."Discount Amount" := POSEntry."Discount Amount Incl. VAT";
+        RSPOSAuditLogAuxInfo."Entry Date" := POSEntry."Entry Date";
+        RSPOSAuditLogAuxInfo."Source Document No." := POSEntry."Document No.";
+        RSPOSAuditLogAuxInfo."Source Document Type" := POSEntry."Sales Document Type";
+        RSPOSAuditLogAuxInfo."POS Entry Type" := POSEntry."Entry Type";
+        RSPOSAuditLogAuxInfo."POS Unit No." := POSUnit."No.";
+        RSFiscalisationSetup.Get();
+        case RSFiscalisationSetup.Training of
+            true:
+                RSPOSAuditLogAuxInfo."RS Invoice Type" := RSPOSAuditLogAuxInfo."RS Invoice Type"::TRAINING;
+            false:
+                RSPOSAuditLogAuxInfo."RS Invoice Type" := RSPOSAuditLogAuxInfo."RS Invoice Type"::NORMAL;
+        end;
+        case POSEntry."Amount Incl. Tax" > 0 of
+            true:
+                RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE;
+            false:
+                RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::REFUND;
+        end;
+        if POSEntry."Customer No." <> '' then begin
+            Customer.Get(POSEntry."Customer No.");
+            RSPOSAuditLogAuxInfo."Customer Identification" := CustomerVATRegNoRSLabel + Customer."VAT Registration No.";
+            RSPOSAuditLogAuxInfo."Email-To" := Customer."E-Mail";
+        end;
+        RSPOSAuditLogAuxInfo.Insert();
+    end;
+
+    local procedure HandleCustIdentOnAuditLogAfterPOSEntryInsert(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry")
+    var
+        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
+        RSPOSSale: Record "NPR RS POS Sale";
+    begin
+        if not RSPOSAuditLogAuxInfo.GetAuditFromPOSEntry(POSEntry."Entry No.") then
+            exit;
+        if not RSPOSSale.Get(SalePOS.SystemId) then
+            exit;
+        if RSPOSSale."RS Customer Identification" <> '' then
+            RSPOSAuditLogAuxInfo."Customer Identification" := RSPOSSale."RS Customer Identification";
+        RSPOSAuditLogAuxInfo."Additional Customer Field" := RSPOSSale."RS Add. Customer Field";
+        RSPOSAuditLogAuxInfo.Modify();
+    end;
+
+    local procedure GetPOSEntryNoFromInvoiceCounter(SalesTicketNo: Code[20]): Code[20]
+    var
+        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
+        NormalSalesFixedAffixLbl: Label 'ПП', Locked = true;
+        TraningSalesFixedAffixLbl: Label 'ОП', Locked = true;
+    begin
+        RSFiscalisationSetup.Get();
+        if RSFiscalisationSetup.Training then
+            RSPOSAuditLogAuxInfo.SetRange("Invoice Counter", SalesTicketNo + TraningSalesFixedAffixLbl)
+        else
+            RSPOSAuditLogAuxInfo.SetRange("Invoice Counter", SalesTicketNo + NormalSalesFixedAffixLbl);
+        if RSPOSAuditLogAuxInfo.FindFirst() then
+            exit(RSPOSAuditLogAuxInfo."Source Document No.");
+    end;
+
+    procedure TermalPrintSalesHeader(SalesHeader: Record "Sales Header")
+    var
+        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
+        RSPTFPITryPrint: Codeunit "NPR RS PTFPI Try Print";
+        AuditLogNotExistingMsg: Label 'RS Audit Log is not existing for this document.';
+        FiscalNotSentMsg: Label 'Fiscal Bill has not been sent to Tax Auth.';
+    begin
+        RSPOSAuditLogAuxInfo.SetRange("Audit Entry Type", RSPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Header");
+        RSPOSAuditLogAuxInfo.SetRange("Source Document Type", SalesHeader."Document Type");
+        RSPOSAuditLogAuxInfo.SetRange("Source Document No.", SalesHeader."No.");
+        if not RSPOSAuditLogAuxInfo.FindLast() then begin
+            Message(AuditLogNotExistingMsg);
+            exit;
+        end;
+        if RSPOSAuditLogAuxInfo.Journal = '' then begin
+            Message(FiscalNotSentMsg);
+            exit;
+        end;
+        RSPTFPITryPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
+    end;
+    #endregion
+}

@@ -131,7 +131,7 @@ codeunit 88009 "NPR BCPT POS Balancing EOD" implements "BCPT Test Param. Provide
     local procedure CreateLinesPerSale() AmountToPay: Decimal
     var
         i: Integer;
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
     begin
         for i := 1 to NoOfLinesPerSale do begin
             if i = 1 then

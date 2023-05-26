@@ -749,6 +749,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SAVE_TO_WAITER_PAD', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR NPRE POSAction: Save2Wa.";
     }
+    value(145; LOGIN)
+    {
+        Caption = 'LOGIN', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action - Login";
+    }
     value(146; "SETTAXLIABLE")
     {
         Caption = 'SETTAXLIABLE', Locked = true, MaxLength = 20;
@@ -851,10 +856,20 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ASSIGN_SERIAL_NO', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Set Serial No";
     }
-    value(145; LOGIN)
+    value(180; "RS_INSERT_CUST_IDENT")
     {
-        Caption = 'LOGIN', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action - Login";
+        Caption = 'INSERT_CUST_IDENT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action - Insert CustId";
+    }
+    value(181; "RS_INSERT_ADD_CUST_F")
+    {
+        Caption = 'INSERT_ADD_CUST_F', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action - Ins. AddCustF";
+    }
+    value(182; "RS_AUDIT_LOOKUP")
+    {
+        Caption = 'RS_AUDIT_LOOKUP', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: RSAudit Lookup";
     }
     value(6014600; BALANCE_V4)
     {

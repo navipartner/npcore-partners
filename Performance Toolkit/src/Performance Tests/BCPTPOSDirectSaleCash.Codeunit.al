@@ -103,7 +103,7 @@ codeunit 88000 "NPR BCPT POS Direct Sale Cash" implements "BCPT Test Param. Prov
     local procedure CreateLinesPerSale() AmountToPay: Decimal
     var
         i: Integer;
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
     begin
         for i := 1 to NoOfLinesPerSale do begin
             if i = 1 then

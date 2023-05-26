@@ -186,6 +186,27 @@
                     ApplicationArea = NPRRetail;
                 }
             }
+            group(RSPosAuditLog)
+            {
+                ShowCaption = false;
+                Visible = ShowRSAudit;
+                field("RS POS Audit Log"; Rec."RS POS Audit Log")
+                {
+                    Caption = 'RS POS Audit Log Exists';
+                    ToolTip = 'Specifies the details of RS POS Audit Log information';
+                    ApplicationArea = NPRRetail;
+                    trigger OnDrillDown()
+                    var
+                        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
+                    begin
+                        RSPOSAuditLogAuxInfo.FilterGroup(10);
+                        RSPOSAuditLogAuxInfo.SetRange("Audit Entry Type", RSPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry");
+                        RSPOSAuditLogAuxInfo.SetRange("POS Entry No.", Rec."Entry No.");
+                        RSPOSAuditLogAuxInfo.FilterGroup(0);
+                        Page.RunModal(Page::"NPR RS POS Audit Log Aux. Info", RSPOSAuditLogAuxInfo);
+                    end;
+                }
+            }
         }
     }
     actions
@@ -244,9 +265,11 @@
         POSAuditProfile: Record "NPR POS Audit Profile";
         CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";
         DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
+        RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
     begin
         Clear(ShowCleanCash);
         Clear(ShowDEAudit);
+        Clear(ShowRSAudit);
         if not POSUnit.Get(Rec."POS Unit No.") then
             exit;
         if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
@@ -256,11 +279,14 @@
                 ShowCleanCash := true;
             DEAuditMgt.HandlerCode():
                 ShowDEAudit := true;
+            RSAuditMgt.HandlerCode():
+                ShowRSAudit := true;
         end;
     end;
 
     var
         ShowCleanCash: Boolean;
         ShowDEAudit: Boolean;
+        ShowRSAudit: Boolean;
 }
 

@@ -24,8 +24,7 @@ stages:
         
       analyzers: ('UICop','CodeCop')
       keyVaultCert:
-        certPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
-        certPassword: 498eH$??nhxUSSFS
+        azureKeyVaultCertName: BusinessCentralKeyVaultReader
         azureADtenantID: ec3af438-38fc-4d9b-b8be-058101411d3a
         azureKeyVaultClientId: b38b8bef-17d2-4368-84ce-f9880a45eed0
       translations:

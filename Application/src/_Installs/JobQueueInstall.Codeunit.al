@@ -33,6 +33,7 @@
             JobQueueMgt.AddPosPostingJobQueue();
             AddInventoryAdjmtJobQueues();
             AddSMSJobQueue();
+            AddRSAuditJobQueue();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddJobQueues'));
         end;
 
@@ -138,6 +139,14 @@
             exit;
         if TicketSetup.Get() then
             RetentionTicketData.AddTicketDataRetentionJobQueue(JobQueueEntry, true);
+    end;
+
+    local procedure AddRSAuditJobQueue()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+    begin
+        RSAuditMgt.AddRSAuditBackgroundJobQueue(JobQueueEntry, true);
     end;
 
     local procedure AddInventoryAdjmtJobQueues()

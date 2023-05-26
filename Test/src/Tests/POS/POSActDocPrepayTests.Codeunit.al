@@ -1,6 +1,7 @@
 codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
 {
     Subtype = Test;
+    TestPermissions = Disabled;
 
     var
         Item: Record Item;

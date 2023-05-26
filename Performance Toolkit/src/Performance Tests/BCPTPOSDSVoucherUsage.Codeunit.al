@@ -95,7 +95,7 @@ codeunit 88004 "NPR BCPT POS DS Voucher Usage" implements "BCPT Test Param. Prov
 
     local procedure CreateSaleLine() AmountToPay: Decimal
     var
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
     begin
         BCPTTestContext.StartScenario('Add Sale Line');
         POSMockLibrary.CreateItemLine(POSSession, Item, BarCodeItemReference, ItemIdentifierType::ItemCrossReference, 1);
