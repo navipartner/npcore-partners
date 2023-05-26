@@ -47,15 +47,15 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
     }
     else {
 
-        for (var bomLineKey in childBOMLinesWithoutSerialNo)
-        {
-           var ContinueExecution = true;
-           var response;
+        for(var bomLineKey = 0; bomLineKey < childBOMLinesWithoutSerialNo.length; bomLineKey++) {
+            
+            var ContinueExecution = true;
+            var response;
 
             while (ContinueExecution) {
                 ContinueExecution = false;
 
-                if (bomLineKey != "remove") {
+                if ((bomLineKey != "remove") && (bomLineKey != "add") && (bomLineKey != "addRange") && (bomLineKey != "aggregate")) {
                     
                     workflow.context.SerialNo = '';
                     workflow.context.childBOMLineWithoutSerialNo = childBOMLinesWithoutSerialNo[bomLineKey];
@@ -68,12 +68,12 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
                             if (await popup.confirm({title: captions.serialNoError_title, caption: response.AssignSerialNoSuccessErrorText})) {
                                 ContinueExecution = true;
                             }
-     
+    
                         }
                     } 
                     else{
                         workflow.context.SerialNo = await popup.input({ title: captions.itemTracking_title, caption: format(captions.bomItemTracking_Lead, workflow.context.childBOMLineWithoutSerialNo.description, workflow.context.childBOMLineWithoutSerialNo.parentBOMDescription)})
-                               
+                            
                         if (workflow.context.SerialNo) {
 
                             response = await workflow.respond("assignSerialNo");
@@ -83,15 +83,15 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
                                 if (await popup.confirm({title: captions.serialNoError_title, caption: response.AssignSerialNoSuccessErrorText})) {
                                     ContinueExecution = true;
                                 }
-         
+        
                             }
                         }
                     }
                 }
             }
-             
-
         }
+
+        
         
     }
 
