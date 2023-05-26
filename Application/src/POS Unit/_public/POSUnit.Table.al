@@ -291,6 +291,12 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Security Profile";
         }
+        field(630; "POS Tax Free Profile"; Code[10])
+        {
+            Caption = 'POS Tax Free Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Tax Free POS Unit";
+        }
         field(5058; "Open Register Password"; Code[20])
         {
             Caption = 'Open POS Unit Password';
@@ -304,12 +310,6 @@
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
             ObsoleteReason = 'Moved to POS View Profile';
-        }
-        field(630; "POS Tax Free Profile"; Code[10])
-        {
-            Caption = 'POS Tax Free Profile';
-            DataClassification = CustomerContent;
-            TableRelation = "NPR Tax Free POS Unit";
         }
     }
 

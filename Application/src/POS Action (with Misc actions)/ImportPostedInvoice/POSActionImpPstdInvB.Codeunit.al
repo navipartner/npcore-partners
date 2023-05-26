@@ -6,6 +6,8 @@ codeunit 6059875 "NPR POS Action: Imp. PstdInv B"
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SalesInvLine: Record "Sales Invoice Line";
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -69,6 +71,12 @@ codeunit 6059875 "NPR POS Action: Imp. PstdInv B"
                 SaleLinePOS."Shortcut Dimension 1 Code" := SalesInvLine."Shortcut Dimension 1 Code";
                 SaleLinePOS."Shortcut Dimension 2 Code" := SalesInvLine."Shortcut Dimension 2 Code";
             end;
+
+            POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE);
+            POSEntrySalesDocLink.SetRange("Sales Document No", SalesInvLine."Document No.");
+            if POSEntrySalesDocLink.FindFirst() then
+                if POSEntrySalesLine.Get(POSEntrySalesDocLink."POS Entry No.", SaleLinePOS."Line No.") then
+                    SaleLinePOS."Orig.POS Entry S.Line SystemId" := POSEntrySalesLine.SystemId;
 
             SaleLinePOS.UpdateAmounts(SaleLinePOS);
             POSSaleLine.InsertLineRaw(SaleLinePOS, false);

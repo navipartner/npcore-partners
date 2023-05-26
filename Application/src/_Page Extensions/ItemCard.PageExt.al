@@ -3,6 +3,18 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
     PromotedActionCategories = 'New,Process,Report,Item,History,Special Sales Prices & Discounts,Approve,Request Approval,Magento,Barcode';
     layout
     {
+        modify(GTIN)
+        {
+            trigger OnBeforeValidate()
+            var
+                RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+                RSFiscalGTINErr: Label 'GTIN number of item can not be less than 8 or grater than 14 characters.';
+            begin
+                if RSAuditMgt.IsRSFiscalActive() and ((StrLen(Rec.GTIN) < 8) or (StrLen(Rec.GTIN) > 14)) then
+                    Error(RSFiscalGTINErr);
+            end;
+        }
+
         addafter(Description)
         {
             field("NPR Description 2"; Rec."Description 2")

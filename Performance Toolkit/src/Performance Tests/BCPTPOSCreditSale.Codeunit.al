@@ -116,7 +116,7 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
     local procedure CreateLinesPerSale()
     var
         i: Integer;
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
     begin
         for i := 1 to NoOfLinesPerSale do begin
             if i = 1 then
