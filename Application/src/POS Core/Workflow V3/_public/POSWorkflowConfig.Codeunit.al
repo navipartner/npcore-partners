@@ -174,6 +174,11 @@ codeunit 6059786 "NPR POS Workflow Config"
         DescriptionOut := _DescriptionCaption;
     end;
 
+    internal procedure GetWorkflowActionParameters(var ParametersOut: Record "NPR POS Action Parameter" temporary)
+    begin
+        ParametersOut.Copy(TempParameter, true);
+    end;
+
     internal procedure GetWorkflowCaptions(var LabelsOut: Dictionary of [Text, Text]; var ParameterNamesOut: Dictionary of [Text, Text]; var ParameterDescOut: Dictionary of [Text, Text]; var ParameterOptionCaptionOut: Dictionary of [Text, Text])
     begin
         LabelsOut := _Labels;

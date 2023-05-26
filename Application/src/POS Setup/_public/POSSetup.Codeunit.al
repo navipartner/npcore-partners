@@ -147,6 +147,14 @@
         end;
     end;
 
+    internal procedure UsesNewPOSFrontEnd(): Boolean
+    var
+        POSLayout: Record "NPR POS Layout";
+    begin
+        Initialize();
+        exit(POSLayout.Get(POSUnitRec."POS Layout Code"));
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnAfterActionUpdated', '', false, false)]
     local procedure OnAfterActionUpdated("Action": Record "NPR POS Action")
     var

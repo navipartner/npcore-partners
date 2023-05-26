@@ -29,16 +29,22 @@
         {
             Caption = 'Client Decimal Separator';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(12; "Client Thousands Separator"; Text[1])
         {
             Caption = 'Client Thousands Separator';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(13; "Client Date Separator"; Text[1])
         {
             Caption = 'Client Date Separator';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(14; "Culture Info (Serialized)"; Blob)
         {
@@ -71,28 +77,38 @@
         {
             Caption = 'Client Currency Symbol';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(23; "Client Number Decimal Digits"; Integer)
         {
             Caption = 'Client Number Decimal Digits';
             DataClassification = CustomerContent;
             MinValue = 0;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(24; "Client Short Date Pattern"; Text[30])
         {
             Caption = 'Client Short Date Pattern';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(25; "Client Day Names"; Text[250])
         {
             Caption = 'Client Day Names';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(30; "POS Theme Code"; Code[10])
         {
             Caption = 'POS Theme Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Theme";
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(40; "Line Order on Screen"; Option)
         {
@@ -135,7 +151,7 @@
         }
         field(80; "Show Prices Including VAT"; Boolean)
         {
-            Caption = 'Show Prices Including VAT';
+            Caption = 'Calculate Prices Including VAT';
             DataClassification = CustomerContent;
         }
         field(5058; "Open Register Password"; Code[20])
@@ -149,6 +165,8 @@
         {
             Caption = 'Show Discount';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Not supported in new POS editor+layout';
         }
     }
 
@@ -162,45 +180,6 @@
     trigger OnInsert()
     begin
         SetFormats(GetDefaultFormats());
-    end;
-
-    local procedure ToCamelCase(String: Text): Text;
-    var
-        Builder: TextBuilder;
-    begin
-        // Some well-known properties that won't camel-case automatically
-        case String of
-            'amDesignator':
-                exit('AMDesignator');
-            'pmDesignator':
-                exit('PMDesignator');
-        end;
-
-        Builder.Append(String.Substring(1, 1).ToUpper());
-        if (StrLen(String)) > 1 then
-            Builder.Append(String.Substring(2));
-        exit(Builder.ToText());
-    end;
-
-    local procedure ConvertPropertyNamesToCamelCase(Object: JsonObject);
-    var
-        Property: Text;
-        Token: JsonToken;
-        Element: JsonToken;
-
-    begin
-        foreach Property in Object.Keys do begin
-            Object.Get(Property, Token);
-            Object.Remove(Property);
-            Object.Add(ToCamelCase(Property), Token);
-            if (Token.IsObject()) then
-                ConvertPropertyNamesToCamelCase(Token.AsObject());
-            if (Token.IsArray()) then
-                foreach Element in Token.AsArray() do begin
-                    if Element.IsObject() then
-                        ConvertPropertyNamesToCamelCase(Element.AsObject());
-                end;
-        end;
     end;
 
     internal procedure SetFormats(CultureJson: JsonObject)

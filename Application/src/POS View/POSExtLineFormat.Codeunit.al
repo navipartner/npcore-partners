@@ -22,9 +22,14 @@
 
         Handled := true;
 
-        DataSource.AddColumn('Color', 'Text color', DataType::String, false);
-        DataSource.AddColumn('Weight', 'Font weight', DataType::String, false);
-        DataSource.AddColumn('Style', 'Font style', DataType::String, false);
+        if Setup.UsesNewPOSFrontEnd() then begin
+            DataSource.AddColumn('Highlighted', 'Line highlight', DataType::Boolean, false);
+            DataSource.AddColumn('Indented', 'Line indention', DataType::Boolean, false);
+        end else begin
+            DataSource.AddColumn('Color', 'Text color', DataType::String, false);
+            DataSource.AddColumn('Weight', 'Font weight', DataType::String, false);
+            DataSource.AddColumn('Style', 'Font style', DataType::String, false);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
@@ -35,6 +40,9 @@
         Color: Text;
         Weight: Text;
         Style: Text;
+        POSSetup: Codeunit "NPR POS Setup";
+        Highlighted: Boolean;
+        Indented: Boolean;
     begin
         if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSaleLine()) or (ExtensionName <> 'LineFormat') then
             exit;
@@ -43,22 +51,38 @@
 
         RecRef.SetTable(SaleLine);
 
-        // Default values: black, normal weight, normal style
-        Color := '';
-        Weight := '';
-        Style := '';
+        POSSession.GetSetup(POSSetup);
 
-        OnGetLineStyle(Color, Weight, Style, SaleLine, POSSession, FrontEnd);
+        if POSSetup.UsesNewPOSFrontEnd() then begin
+            OnGetLineFormat(Highlighted, Indented, SaleLine);
+            DataRow.Fields().Add('Highlighted', Highlighted);
+            DataRow.Fields().Add('Indented', Indented);
+        end else begin
+            // Default values: black, normal weight, normal style
+            Color := '';
+            Weight := '';
+            Style := '';
 
-        DataRow.Fields().Add('Color', Color);
-        DataRow.Fields().Add('Weight', Weight);
-        DataRow.Fields().Add('Style', Style);
+            OnGetLineStyle(Color, Weight, Style, SaleLine, POSSession, FrontEnd);
+
+            DataRow.Fields().Add('Color', Color);
+            DataRow.Fields().Add('Weight', Weight);
+            DataRow.Fields().Add('Style', Style);
+        end;
     end;
 
+    [Obsolete('Move to OnGetLineFormat() subscriber with limited control over styling instead')]
     [BusinessEvent(false)]
 #pragma warning disable AA0150
     local procedure OnGetLineStyle(var Color: Text; var Weight: Text; var Style: Text; SaleLinePOS: Record "NPR POS Sale Line"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
 #pragma warning restore
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetLineFormat(var Highlighted: Boolean; var Indented: Boolean; SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+
 }
