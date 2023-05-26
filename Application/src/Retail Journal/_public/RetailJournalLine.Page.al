@@ -66,6 +66,12 @@
                     ToolTip = 'Specifies the value of the Unit Price field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Unit of Measure"; Rec."Unit of Measure")
+                {
+                    Visible = true;
+                    ToolTip = 'Specifies the value of the Unit of Measure field';
+                    ApplicationArea = NPRRetail;
+                }
                 field(ItemUnitPrice; '')
                 {
                     Caption = 'Unit price(Item Card)';

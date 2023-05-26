@@ -1,11 +1,11 @@
 ﻿#if not BC17
 report 6014428 "NPR Shelf Labels"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Shelf LabelsV18.rdl';
+    RDLCLayout = './src/_Reports/layouts/Shelf LabelsV18.rdlc';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     Caption = 'Shelf Labels';
@@ -90,6 +90,12 @@ report 6014428 "NPR Shelf Labels"
             column(TMPUnitPriceDecimal; TMPUnitPriceDecimal)
             {
             }
+            column(WholeUnitPriceFromRetailJournalLine; WholeUnitPriceFromRetailJournalLine)
+            {
+            }
+            column(DecimalUnitPriceFromRetailJournalLine; DecimalUnitPriceFromRetailJournalLine)
+            {
+            }
             column(NPRAtrributeTextArray1; NPRAtrributeTextArray[1])
             {
             }
@@ -140,6 +146,8 @@ report 6014428 "NPR Shelf Labels"
                 if StrPos(Format(_TMPUnitPrice, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'), ',') > 1 then begin
                     TMPUnitPriceWhole := SelectStr(1, Format(_TMPUnitPrice, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'));
                     TMPUnitPriceDecimal := SelectStr(2, Format(_TMPUnitPrice, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'));
+                    WholeUnitPriceFromRetailJournalLine := SelectStr(1, Format("Unit Price", 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'));
+                    DecimalUnitPriceFromRetailJournalLine := SelectStr(2, Format("Unit Price", 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'));
                 end;
             end;
         }
@@ -208,6 +216,8 @@ report 6014428 "NPR Shelf Labels"
         BeforeCaptionTxt: Text;
         TMPItemCategory: Text;
         TMPUnitPriceDecimal: Text;
+        WholeUnitPriceFromRetailJournalLine: Text;
+        DecimalUnitPriceFromRetailJournalLine: Text;
         TMPUnitPriceWhole: Text;
         NPRAtrributeTextArray: array[20] of Text[50];
         NPRAttributeTextArrayText: array[20] of Text[50];
