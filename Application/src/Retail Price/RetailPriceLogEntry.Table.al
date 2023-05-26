@@ -92,6 +92,11 @@
             Caption = 'New Value';
             DataClassification = CustomerContent;
         }
+        field(110; "Unit of Measure Code"; Code[10])
+        {
+            Caption = 'Unit of Measure Code';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

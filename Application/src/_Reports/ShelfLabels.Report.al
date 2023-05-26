@@ -83,6 +83,12 @@ report 6014428 "NPR Shelf Labels"
             column(TMPUnitPriceDecimal; TMPUnitPriceDecimal)
             {
             }
+            column(WholeUnitPriceFromRetailJournalLine; WholeUnitPriceFromRetailJournalLine)
+            {
+            }
+            column(DecimalUnitPriceFromRetailJournalLine; DecimalUnitPriceFromRetailJournalLine)
+            {
+            }
             column(NPRAtrributeTextArray1; NPRAtrributeTextArray[1])
             {
             }
@@ -133,6 +139,8 @@ report 6014428 "NPR Shelf Labels"
                 if StrPos(Format(_TMPUnitPrice, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'), ',') > 1 then begin
                     TMPUnitPriceWhole := SelectStr(1, Format(_TMPUnitPrice, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'));
                     TMPUnitPriceDecimal := SelectStr(2, Format(_TMPUnitPrice, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'));
+                    WholeUnitPriceFromRetailJournalLine := SelectStr(1, Format("Unit Price", 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'));
+                    DecimalUnitPriceFromRetailJournalLine := SelectStr(2, Format("Unit Price", 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,,>'));
                 end;
             end;
         }
@@ -202,6 +210,8 @@ report 6014428 "NPR Shelf Labels"
         TMPItemCategory: Text;
         TMPUnitPriceDecimal: Text;
         TMPUnitPriceWhole: Text;
+        WholeUnitPriceFromRetailJournalLine: Text;
+        DecimalUnitPriceFromRetailJournalLine: Text;
         NPRAtrributeTextArray: array[20] of Text;
         NPRAttributeTextArrayText: array[20] of Text;
 

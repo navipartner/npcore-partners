@@ -50,7 +50,7 @@
       "publisher": "NaviPartner"
     }
   ],
-  "contextSensitiveHelpUrl": "https://docs.navipartner.com/",  
+  "contextSensitiveHelpUrl": "https://docs.navipartner.com/",
   "showMyCode": true,
   "runtime": "6.0",
   "target": "OnPrem",

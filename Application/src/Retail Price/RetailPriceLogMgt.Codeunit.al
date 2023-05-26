@@ -302,6 +302,8 @@
             ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
             TempRetailPriceLogEntry."Item No." := CopyStr(ChangeLogEntry."Primary Key Field 1 Value", 1, MaxStrLen(TempRetailPriceLogEntry."Item No."));
             TempRetailPriceLogEntry."Variant Code" := '';
+            if Item.Get(TempRetailPriceLogEntry."Item No.") then
+                TempRetailPriceLogEntry."Unit of Measure Code" := Item."Base Unit of Measure";
             if Evaluate(TempRetailPriceLogEntry."Old Value", ChangeLogEntry."Old Value", 9) then;
             if Evaluate(TempRetailPriceLogEntry."New Value", ChangeLogEntry."New Value", 9) then;
             TempRetailPriceLogEntry.Insert();
@@ -339,6 +341,7 @@
                 ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
                 TempRetailPriceLogEntry."Item No." := PriceListLine."Asset No.";
                 TempRetailPriceLogEntry."Variant Code" := '';
+                TempRetailPriceLogEntry."Unit of Measure Code" := PriceListLine."Unit of Measure Code";
                 if Evaluate(TempRetailPriceLogEntry."Old Value", ChangeLogEntry."Old Value", 9) then;
                 if Evaluate(TempRetailPriceLogEntry."New Value", ChangeLogEntry."New Value", 9) then;
                 TempRetailPriceLogEntry.Insert();
@@ -443,6 +446,8 @@
     procedure RetailJnlImportFromPriceLog(RetailJnlHeader: Record "NPR Retail Journal Header")
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
+        RetailPriceLogEntry: Record "NPR Retail Price Log Entry";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
         TempItem: Record Item temporary;
         LineNo: Integer;
     begin
@@ -455,13 +460,24 @@
 
         TempItem.FindSet();
         repeat
-            LineNo += 10000;
+            ItemUnitOfMeasure.Reset();
+            ItemUnitOfMeasure.SetRange("Item No.", TempItem."No.");
+            if ItemUnitOfMeasure.FindSet() then
+                repeat
+                    RetailPriceLogEntry.Reset();
+                    RetailPriceLogEntry.SetRange("Item No.", TempItem."No.");
+                    RetailPriceLogEntry.SetRange("Unit of Measure Code", ItemUnitOfMeasure.Code);
+                    if RetailPriceLogEntry.FindLast() then begin
+                        LineNo += 10000;
+                        RetailJnlLine.Init();
+                        RetailJnlLine.Validate("No.", RetailJnlHeader."No.");
+                        RetailJnlLine."Line No." := LineNo;
+                        RetailJnlLine.Validate("Item No.", TempItem."No.");
+                        RetailJnlLine.validate("Unit of Measure", RetailPriceLogEntry."Unit of Measure Code");
+                        RetailJnlLine.Insert(true);
+                    end;
+                until ItemUnitOfMeasure.Next() = 0;
 
-            RetailJnlLine.Init();
-            RetailJnlLine.Validate("No.", RetailJnlHeader."No.");
-            RetailJnlLine."Line No." := LineNo;
-            RetailJnlLine.Validate("Item No.", TempItem."No.");
-            RetailJnlLine.Insert(true);
         until TempItem.Next() = 0;
     end;
 

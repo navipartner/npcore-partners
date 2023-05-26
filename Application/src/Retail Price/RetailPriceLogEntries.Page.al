@@ -108,6 +108,12 @@
                     ToolTip = 'Specifies the value of the Entry No. field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Unit of Measure Code"; Rec."Unit of Measure Code")
+                {
+
+                    ToolTip = 'Specifies the value of the Unit of Measure Code field';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

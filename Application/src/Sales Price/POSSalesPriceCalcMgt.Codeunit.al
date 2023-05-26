@@ -115,6 +115,7 @@
         end else
             SalesLinePriceExists(SalePOS, SaleLinePOS);
 
+        TempSalesPriceListLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
         CalcBestUnitPrice(TempSalesPriceListLine);
 
         if Item.Get(SaleLinePOS."No.") and Item."NPR Explode BOM auto" then
@@ -253,7 +254,7 @@
             ConvertPriceToVAT(
               Item."Price Includes VAT", Item."VAT Prod. Posting Group",
               Item."VAT Bus. Posting Gr. (Price)", Item."Unit Price");
-            ConvertPriceToUoM('', Item."Unit Price");
+            ConvertPriceToUoM(PriceListLine."Unit of Measure Code", Item."Unit Price");
             ConvertPriceLCYToFCY('', Item."Unit Price");
 
             Clear(BestPriceListLine);
@@ -356,9 +357,15 @@
     end;
 
     local procedure ConvertPriceToUoM(UnitOfMeasureCode: Code[10]; var UnitPrice: Decimal)
+    var
+        PriceListLineUOMCodeunit: Codeunit "NPR Price List Line UOM";
+        TempUnitPrice: Decimal;
     begin
         if UnitOfMeasureCode = '' then
             UnitPrice := UnitPrice * QtyPerUOM;
+        TempUnitPrice := PriceListLineUOMCodeunit.GetUnitPriceFromSalesPriceList(Item."No.", UnitOfMeasureCode);
+        if TempUnitPrice <> 0 then
+            UnitPrice := TempUnitPrice;
     end;
 
     local procedure ConvertPriceLCYToFCY(CurrencyCode: Code[10]; var UnitPrice: Decimal)
