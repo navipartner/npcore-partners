@@ -69,6 +69,7 @@ codeunit 6060000 "NPR HL Upsert Member"
         MemberInfoCapture.City := HLMember.City;
         MemberInfoCapture."Post Code Code" := HLMember."Post Code Code";
         MemberInfoCapture."GDPR Approval" := MemberInfoCapture."GDPR Approval"::ACCEPTED;
+        MemberInfoCapture."News Letter" := HLMember."E-Mail News Letter";
         if HLMember."Country Code" <> '' then
             MemberInfoCapture."Country Code" := HLMember."Country Code"
         else
@@ -144,6 +145,8 @@ codeunit 6060000 "NPR HL Upsert Member"
         if HLMember."Country Code" = '' then
             Member.Country := HLMember."HL Country Name";
         Member."Store Code" := HLMember."Store Code";
+        Member."E-Mail News Letter" := HLMember."E-Mail News Letter";
+
         AttributeMgt.UpdateMemberAttributesFromHLMember(HLMember);
         HLMultiChoiceFieldMgt.UpdateMemberMCFOptionsFromHLMember(HLMember);
         HLIntegrationEvents.OnUpdateMemberFromHL(HLMember, Member);

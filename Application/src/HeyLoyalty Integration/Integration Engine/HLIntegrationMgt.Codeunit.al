@@ -185,6 +185,18 @@ codeunit 6059993 "NPR HL Integration Mgt."
         WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Page, Page::"NPR API - HL Webhook Requests", ServiceNameTok, true);
     end;
 
+    procedure EnableWebhookRequestRetentionPolicy()
+    var
+        RetentionPolicySetup: Record "Retention Policy Setup";
+    begin
+        if not RetentionPolicySetup.WritePermission() then
+            exit;
+        if not RetentionPolicySetup.Get(Database::"NPR HL Webhook Request") or RetentionPolicySetup.Enabled then
+            exit;
+        RetentionPolicySetup.Validate(Enabled, true);
+        RetentionPolicySetup.Modify(true);
+    end;
+
     procedure SetupTaskProcessingJobQueue()
     begin
         Clear(HLSetup);
@@ -322,6 +334,12 @@ codeunit 6059993 "NPR HL Integration Mgt."
     begin
         HLSetup.GetRecordOnce(false);
         exit(HLSetup."Read Member Data from Webhook");
+    end;
+
+    procedure UnsubscribeIfBlocked(): Boolean
+    begin
+        HLSetup.GetRecordOnce(false);
+        exit(HLSetup."Unsubscribe if Blocked");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]

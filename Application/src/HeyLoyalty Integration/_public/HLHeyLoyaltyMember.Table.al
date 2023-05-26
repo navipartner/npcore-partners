@@ -123,6 +123,13 @@ table 6059801 "NPR HL HeyLoyalty Member"
             Caption = 'HeyLoyalty Membership Name';
             DataClassification = CustomerContent;
         }
+        field(60; "E-Mail News Letter"; Option)
+        {
+            Caption = 'E-Mail News Letter';
+            DataClassification = CustomerContent;
+            OptionCaption = ' ,Yes,No';
+            OptionMembers = NOT_SPECIFIED,YES,NO;
+        }
         field(80; "Last Purchased Source Id"; Text[50])
         {
             Caption = 'Last Purchased Source Id';

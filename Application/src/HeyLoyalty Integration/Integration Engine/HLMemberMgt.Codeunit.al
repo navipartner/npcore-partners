@@ -188,7 +188,7 @@ codeunit 6059995 "NPR HL Member Mgt."
         Found: Boolean;
     begin
         Clear(MembershipRoleOut);
-        if not FilteredMembershipRoles.Find('-') then
+        if not FilteredMembershipRoles.Find('+') then
             exit(false);
 
         Found := false;
@@ -197,8 +197,10 @@ codeunit 6059995 "NPR HL Member Mgt."
             if Found then
                 MembershipRoleOut := FilteredMembershipRoles;
         until Found or (FilteredMembershipRoles.Next(-1) = 0);
-        if not Found then
+        if not Found then begin
+            FilteredMembershipRoles.FindLast();
             MembershipRoleOut := FilteredMembershipRoles;
+        end;
 
         exit(true);
     end;
@@ -225,20 +227,21 @@ codeunit 6059995 "NPR HL Member Mgt."
         HLMember: Record "NPR HL HeyLoyalty Member";
     begin
         if not GetHLMember(Member, MembershipRole, HLMember, "NPR HL Auto Create HL Member"::Never) then begin
-            if not MemberIsEligibleForSubscription(Member, MembershipRole, false) then
+            if not MemberIsEligibleForSubscription(Member, MembershipRole, WithError) then
                 exit(false);
             Clear(HLMember);
         end;
 
         if WithError then begin
             Member.TestField("E-Mail Address");
-            HLMember.TestField("Unsubscribed at", 0DT);
+            if (Member."E-Mail News Letter" <> Member."E-Mail News Letter"::YES) and (HLMember."Unsubscribed at" <> 0DT) then
+                Member.TestField("E-Mail News Letter", Member."E-Mail News Letter"::YES);
             exit(true);
         end;
 
         exit(
             (Member."E-Mail Address" <> '') and
-            (HLMember."Unsubscribed at" = 0DT));
+            ((Member."E-Mail News Letter" = Member."E-Mail News Letter"::YES) or (HLMember."Unsubscribed at" = 0DT)));
     end;
 
     procedure MemberIsEligibleForSubscription(Member: Record "NPR MM Member"; MembershipRole: Record "NPR MM Membership Role"; WithError: Boolean): Boolean
@@ -250,18 +253,20 @@ codeunit 6059995 "NPR HL Member Mgt."
             Clear(Membership);
 
         if WithError then begin
-            Member.TestField(Blocked, false);
-            Membership.TestField(Blocked, false);
-            MembershipRole.TestField(Blocked, false);
+            if HLIntegrationMgt.UnsubscribeIfBlocked() then begin
+                Member.TestField(Blocked, false);
+                Membership.TestField(Blocked, false);
+                MembershipRole.TestField(Blocked, false);
+            end;
+            Member.TestField("E-Mail News Letter", Member."E-Mail News Letter"::YES);
             MembershipRole.TestField("GDPR Approval", MembershipRole."GDPR Approval"::ACCEPTED);
             exit(true);
         end;
 
         exit(
             not (
-                Member.Blocked or
-                Membership.Blocked or
-                MembershipRole.Blocked or
+                (HLIntegrationMgt.UnsubscribeIfBlocked() and (Member.Blocked or Membership.Blocked or MembershipRole.Blocked)) or
+                (Member."E-Mail News Letter" <> Member."E-Mail News Letter"::YES) or
                 (MembershipRole."GDPR Approval" <> MembershipRole."GDPR Approval"::ACCEPTED)));
     end;
 
@@ -308,6 +313,7 @@ codeunit 6059995 "NPR HL Member Mgt."
         HLMember."Membership Code" := Membership."Membership Code";
         HLMember."HL Membership Name" := GetMembershipHLName(HLMember."Membership Code");
 
+        HLMember."E-Mail News Letter" := Member."E-Mail News Letter";
         if HLMember."Unsubscribed at" = 0DT then
             if HLMember.Deleted or HLMember.Anonymized or not MemberIsEligibleForSubscription(Member, MembershipRole, false) then
                 HLMember."Unsubscribed at" := CurrentDateTime();
@@ -517,6 +523,10 @@ codeunit 6059995 "NPR HL Member Mgt."
                 HLMember."HL E-mail Status" := HLMember."HL E-mail Status"::" ";
         end;
         HLMember."Unsubscribed at" := GetUnsubscribedAtFromResponse(HLMemberJToken, HLMember."Unsubscribed at");
+        if HLMember."Unsubscribed at" <> 0DT then
+            HLMember."E-Mail News Letter" := HLMember."E-Mail News Letter"::NO
+        else
+            HLMember."E-Mail News Letter" := HLMember."E-Mail News Letter"::YES;
     end;
 
     procedure GetHeyLoyaltyIDFromResponse(HeyLoyaltyResponse: JsonToken; DefaultID: Text[50]): Text[50]

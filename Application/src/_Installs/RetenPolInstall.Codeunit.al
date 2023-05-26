@@ -103,7 +103,7 @@
         RecRef.Open(TableId);
 
         RetenPolAllowedTables.AddAllowedTable(TableId, RecRef.SystemCreatedAtNo(), 0, Enum::"Reten. Pol. Filtering"::Default, RetenPolDeleting, TableFilters);
-        CreateRetentionPolicySetup(TableId, GetRetentionPeriodCode(RtnPeriodEnum));
+        CreateRetentionPolicySetup(TableId, GetRetentionPeriodCode(RtnPeriodEnum), true);
     end;
 
     local procedure GetRetentionPeriodCode(RtnPeriodEnum: Enum "Retention Period Enum"): Code[20]
@@ -135,7 +135,7 @@
         exit(false);
     end;
 
-    local procedure CreateRetentionPolicySetup(TableId: Integer; RetentionPeriodCode: Code[20])
+    local procedure CreateRetentionPolicySetup(TableId: Integer; RetentionPeriodCode: Code[20]; EnablePolicy: Boolean)
     var
         RetentionPolicySetup: Record "Retention Policy Setup";
     begin
@@ -154,7 +154,7 @@
 #endif
         if RetentionPolicySetup."Apply to all records" then
             RetentionPolicySetup.Validate("Retention Period", RetentionPeriodCode);
-        RetentionPolicySetup.Validate(Enabled, true);
+        RetentionPolicySetup.Validate(Enabled, EnablePolicy);
         RetentionPolicySetup.Insert(true);
     end;
 
@@ -205,13 +205,14 @@
 
         RetenPolAllowedTables.AddAllowedTable(Database::"NPR POS Saved Sale Entry", RecRef.SystemCreatedAtNo(), TableFilters);
 
-        CreateRetentionPolicySetup(Database::"NPR POS Saved Sale Entry", GetRetentionPeriodCode(RtnPeriodEnum));
+        CreateRetentionPolicySetup(Database::"NPR POS Saved Sale Entry", GetRetentionPeriodCode(RtnPeriodEnum), true);
     end;
 
     local procedure AddHeyLoyaltyWebhookRequestRetentionPolicy()
     var
         HLWebhookRequest: Record "NPR HL Webhook Request";
         RetentionPolicySetup: Record "Retention Policy Setup";
+        HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
         RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
         RecRef: RecordRef;
         RtnPeriodEnum: Enum "Retention Period Enum";
@@ -235,7 +236,7 @@
 
         RetenPolAllowedTables.AddAllowedTable(Database::"NPR HL Webhook Request", RecRef.SystemCreatedAtNo(), TableFilters);
 
-        CreateRetentionPolicySetup(Database::"NPR HL Webhook Request", GetRetentionPeriodCode(RtnPeriodEnum));
+        CreateRetentionPolicySetup(Database::"NPR HL Webhook Request", GetRetentionPeriodCode(RtnPeriodEnum), HLIntegrationMgt.IsEnabled("NPR HL Integration Area"::Members));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnBeforeOnRun', '', false, false)]

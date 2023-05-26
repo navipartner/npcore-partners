@@ -60,6 +60,12 @@ page 6150720 "NPR HL Integration Setup"
                         Enabled = MemberListIntegrationIsEnabled;
                         ToolTip = 'Specifies the field ID at HeyLoyalty for storing information about membership code.';
                     }
+                    field("Unsubscribe if Blocked"; Rec."Unsubscribe if Blocked")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        Enabled = MemberListIntegrationIsEnabled;
+                        ToolTip = 'Specifies whether member should be unsubscribed from HeyLoyalty, if the member, or their membership has been blocked in BC.';
+                    }
                     field("Read Member Data from Webhook"; Rec."Read Member Data from Webhook")
                     {
                         ApplicationArea = NPRHeyLoyalty;
@@ -114,6 +120,8 @@ page 6150720 "NPR HL Integration Setup"
                         ResponseJToken: JsonToken;
                         SuccessMsg: Label 'Connection successfully established.';
                     begin
+                        CurrPage.SaveRecord();
+                        Clear(HLIntegrationMgt);
                         if not HLIntegrationMgt.InvokeGetMemberListInfo(ResponseJToken) then
                             Error(GetLastErrorText());
                         Message(SuccessMsg);
