@@ -55,6 +55,7 @@
                 SalespersonItemCategory: Query "NPR Salesperson/Item Category";
                 Ascending: Boolean;
                 CalcFieldsDict: Dictionary of [Integer, Decimal];
+                DetailFieldsDict: Dictionary of [Integer, Text[100]];
                 CostExclVAT: Decimal;
                 ProfitExclVAT: Decimal;
                 ProfitPercentage: Decimal;
@@ -89,7 +90,7 @@
                     CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), ProfitPercentage);
                     CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 4"), CostExclVAT);
 
-                    ItemCategoryMgt.InsertItemCategoryToBuffer(SalespersonItemCategory.Item_Category_Code, ItemCategoryBuffer, SalespersonPurchaser.Code, '', '', CalcFieldsDict);
+                    ItemCategoryMgt.InsertItemCategoryToBuffer(SalespersonItemCategory.Item_Category_Code, ItemCategoryBuffer, SalespersonPurchaser.Code, '', '', CalcFieldsDict, DetailFieldsDict);
                 end;
                 SalespersonItemCategory.Close();
 
@@ -116,7 +117,7 @@
                     CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), ProfitPercentage);
                     CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 4"), CostExclVAT);
 
-                    ItemCategoryMgt.InsertUncatagorizedToItemCategoryBuffer('-', 'Without category', ItemCategoryBuffer, SalespersonPurchaser.Code, CalcFieldsDict);
+                    ItemCategoryMgt.InsertUncatagorizedToItemCategoryBuffer('-', 'Without category', ItemCategoryBuffer, SalespersonPurchaser.Code, '', '', CalcFieldsDict, DetailFieldsDict);
                 end;
 
                 SalespersonItemCategory.Close();
