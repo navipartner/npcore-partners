@@ -71,6 +71,7 @@ table 6059800 "NPR HL Integration Setup"
                 if "Member Integration" then begin
                     HLDataLogSubscrMgt.CreateDataLogSetup("NPR HL Integration Area"::Members);
                     HLIntegrationMgt.RegisterWebhookListeners();
+                    HLIntegrationMgt.EnableWebhookRequestRetentionPolicy();
                 end;
                 HLIntegrationMgt.SetupTaskProcessingJobQueue();
             end;
@@ -84,6 +85,12 @@ table 6059800 "NPR HL Integration Setup"
         {
             Caption = 'Read Member Data from Webhook';
             DataClassification = CustomerContent;
+        }
+        field(70; "Unsubscribe if Blocked"; Boolean)
+        {
+            Caption = 'Unsubscribe if Blocked';
+            DataClassification = CustomerContent;
+            InitValue = true;
         }
     }
 

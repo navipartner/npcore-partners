@@ -62,6 +62,8 @@ codeunit 6059997 "NPR HL Send Members"
         RecRef.Get(NcTask."Record ID");
         RecRef.SetTable(HLMember);
 
+        if (HLMember."Unsubscribed at" <> 0DT) and (HLMember."E-Mail News Letter" = HLMember."E-Mail News Letter"::YES) then  //re-subscribe
+            HLMember."HeyLoyalty Id" := '';
         if HLMember."HeyLoyalty Id" = '' then
             HLMember."HeyLoyalty Id" := GetHeyLoyaltyMemberID(HLMember, false);
         if HLMember."HeyLoyalty Id" = '' then begin

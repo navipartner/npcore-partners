@@ -211,7 +211,7 @@
                     'RetenTableListUpdate_20230223':
                         exit('NPR-RetenPolTables-Update-20230223');
                     'HeyLoyaltyWebhookRequests':
-                        exit('HeyLoyaltyWebhookRequests-20230330');
+                        exit('HeyLoyaltyWebhookRequests-20230525');
                     'M2RecordChangeLogTable':
                         exit('NPR-RetPol-M2RecordChangeLogTable-20230510');
                 end;
