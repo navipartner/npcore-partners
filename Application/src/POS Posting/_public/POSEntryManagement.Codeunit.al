@@ -40,6 +40,7 @@
         POSPaymentLine: Record "NPR POS Entry Payment Line";
         CalcItemSalesAmount: Decimal;
         CalcDiscountAmount: Decimal;
+        CalcDiscountAmountInclVAT: Decimal;
         CalcSalesQty: Decimal;
         CalcReturnSalesQty: Decimal;
         CalcTotalAmount: Decimal;
@@ -54,7 +55,7 @@
         if POSEntry."Post Entry Status" >= POSEntry."Post Entry Status"::Posted then
             exit;
 
-        POSSalesLine.SetLoadFields("Exclude from Posting", Type, Quantity, "Line Discount Amount Excl. VAT", "Amount Excl. VAT", "Amount Incl. VAT", "Amount Incl. VAT (LCY)");
+        POSSalesLine.SetLoadFields("Exclude from Posting", Type, Quantity, "Line Discount Amount Excl. VAT", "Amount Excl. VAT", "Amount Incl. VAT", "Amount Incl. VAT (LCY)", "Line Discount Amount Incl. VAT");
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSSalesLine.SetRange("Exclude from Posting", false);
         if POSSalesLine.FindSet() then
@@ -80,6 +81,7 @@
                             CalcReturnSalesQty += POSSalesLine.Quantity;
                     end;
                     CalcDiscountAmount += POSSalesLine."Line Discount Amount Excl. VAT";
+                    CalcDiscountAmountInclVAT += POSSalesLine."Line Discount Amount Incl. VAT";
                 end;
             until POSSalesLine.Next() = 0;
 
@@ -99,6 +101,10 @@
         end;
         if (CalcDiscountAmount <> POSEntry."Discount Amount") then begin
             POSEntry.Validate("Discount Amount", CalcDiscountAmount);
+            EntryModified := true;
+        end;
+        if (CalcDiscountAmountInclVAT <> POSEntry."Discount Amount Incl. VAT") then begin
+            POSEntry.Validate("Discount Amount Incl. VAT", CalcDiscountAmountInclVAT);
             EntryModified := true;
         end;
         if (CalcSalesQty <> POSEntry."Sales Quantity") then begin

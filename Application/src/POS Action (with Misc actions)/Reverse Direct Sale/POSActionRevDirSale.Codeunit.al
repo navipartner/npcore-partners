@@ -60,7 +60,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
             'SelectReturnReason':
                 FrontEnd.WorkflowResponse(SelectReturnReason());
             'handle':
-                HendleReverse(Context);
+                HendleReverse(Context, Setup);
         end;
     end;
 
@@ -74,7 +74,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
         exit(POSAuditProfile."Require Item Return Reason");
     end;
 
-    local procedure HendleReverse(Context: Codeunit "NPR POS JSON Helper")
+    local procedure HendleReverse(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup")
     var
         SalesTicketNo: Code[20];
         ObfucationMethod: Option "None",MI;
@@ -89,6 +89,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
         ReturnReasonCode := CopyStr(Context.GetString('ReturnReasonCode'), 1, MaxStrLen(ReturnReasonCode));
         IncludePaymentLines := Context.GetBooleanParameter('IncludePaymentLines');
 
+        OnBeforeHendleReverse(Setup, SalesTicketNo);
         POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyHeaderDim, ReturnReasonCode, IncludePaymentLines);
     end;
 
@@ -109,5 +110,10 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
 //###NPR_INJECT_FROM_FILE:POSActionRevDirSale.js###
 'let main=async({workflow:e,context:i,scope:c,popup:n,parameters:p,captions:t})=>{if(e.context.receipt=await n.input({title:t.title,caption:t.receiptprompt}),e.context.receipt!==null){if(e.context.receipt.length>50)return await n.error(t.lengtherror)," ";var a=await e.respond("reason");if(a){var r=await e.respond("SelectReturnReason");if(r===null)return}else var r="";await e.respond("handle",{PromptForReason:a,ReturnReasonCode:r})}};'
         );
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeHendleReverse(Setup: Codeunit "NPR POS Setup"; var SalesTicketNo: Code[20])
+    begin
     end;
 }

@@ -104,6 +104,10 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                                       FrontEnd: Codeunit "NPR POS Front End Management";
                                       Setup: Codeunit "NPR POS Setup") Response: JsonObject
     var
+        UseSpecificTracking: Boolean;
+        InputSerial: Text[50];
+        ItemIdentifier: Text;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
         Item: Record Item;
         ItemReference: Record "Item Reference";
         PosInventoryProfile: Record "NPR POS Inventory Profile";
@@ -120,17 +124,13 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         SkipItemAvailabilityCheck: Boolean;
         Success: Boolean;
         UsePresetUnitPrice: Boolean;
-        UseSpecificTracking: Boolean;
         ItemQuantity: Decimal;
         PresetUnitPrice: Decimal;
         UnitPrice: Decimal;
         BaseLineNo: Integer;
         ChildBOMLinesWithoutSerialNoJsonArray: JsonArray;
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
         CustomDescription: Text;
         CustomDescription2: Text;
-        ItemIdentifier: Text;
-        InputSerial: Text[50];
     begin
         ItemIdentifier := Context.GetStringParameter('itemNo');
         ItemIdentifierType := Context.GetIntegerParameter('itemIdentifierType');

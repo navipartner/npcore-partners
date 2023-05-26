@@ -106,7 +106,7 @@ codeunit 6059931 "NPR SS Action: Insert Item B."
 
     end;
 
-    local procedure GetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference)
+    local procedure GetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin)
     var
         FirstRec: Text;
         TagId: Text;
@@ -153,10 +153,15 @@ codeunit 6059931 "NPR SS Action: Insert Item B."
 
                     Item.Get(ItemReference."Item No.");
                 end;
+            ItemIdentifierType::ItemGtin:
+                begin
+                    Item.SetRange(GTIN, ItemIdentifier);
+                    Item.FindFirst();
+                end;
         end;
     end;
 
-    local procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UsePresetUnitPrice: Boolean; PresetUnitPrice: Decimal)
+    local procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UsePresetUnitPrice: Boolean; PresetUnitPrice: Decimal)
     var
         Line: Record "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -179,7 +184,8 @@ codeunit 6059931 "NPR SS Action: Insert Item B."
 
         case ItemIdentifierType of
             ItemIdentifierType::ItemSearch,
-            ItemIdentifierType::ItemNo:
+            ItemIdentifierType::ItemNo,
+            ItemIdentifierType::ItemGtin:
                 begin
                     Line."No." := Item."No.";
                 end;
@@ -358,7 +364,7 @@ codeunit 6059931 "NPR SS Action: Insert Item B."
         exit(SetQuantityToItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity));
     end;
 
-    procedure SetQuantityToItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal): Boolean
+    procedure SetQuantityToItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal): Boolean
     var
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";

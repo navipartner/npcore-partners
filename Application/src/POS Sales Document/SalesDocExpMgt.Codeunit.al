@@ -322,6 +322,8 @@
         SalesHeader."Ship-to Post Code" := SalePOS."Post Code";
         SalesHeader."Ship-to Country/Region Code" := SalePOS."Country Code";
 
+        CreateSalesHeaderOnBeforeSalesHeaderModify(SalesHeader, SalePOS);
+
         SalesHeader.Modify(true);
 
         if SalePOS."Payment Terms Code" <> '' then
@@ -1147,17 +1149,12 @@ then
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, false)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
-        Sender.DiscoverPOSSalesWorkflow(OnFinishCreditSaleCode(), OnFinishCreditSaleDescription, WorkflowCodeunitId(), 'OnFinishCreditSale');
+        Sender.DiscoverPOSSalesWorkflow(OnFinishCreditSaleCode(), OnFinishCreditSaleDescription, Codeunit::"NPR Credit Sale Post-Process", 'OnFinishCreditSale');
     end;
 
     local procedure OnFinishCreditSaleCode(): Code[20]
     begin
         exit('FINISH_CREDIT_SALE');
-    end;
-
-    local procedure WorkflowCodeunitId(): Integer
-    begin
-        exit(Codeunit::"NPR Credit Sale Post-Process");
     end;
 
     local procedure InvokeOnFinishCreditSaleWorkflow(SalePOS: Record "NPR POS Sale")
@@ -1236,6 +1233,11 @@ then
         if NpCsDocument.FindFirst() then
             if NpCsDocument."Next Workflow Step" = NpCsDocument."Next Workflow Step"::"Send Order" then
                 NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure CreateSalesHeaderOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR POS Sale")
+    begin
     end;
 
     [IntegrationEvent(true, false)]

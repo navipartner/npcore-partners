@@ -31,7 +31,6 @@
                     ApplicationArea = NPRRetail;
                     ValuesAllowed = CASH, VOUCHER, CHECK, EFT, PAYOUT, "FOREIGN VOUCHER";
                 }
-
                 field("Return Payment Method Code"; Rec."Return Payment Method Code")
                 {
                     ApplicationArea = NPRRetail;
