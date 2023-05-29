@@ -18,6 +18,9 @@
             group(General)
             {
                 Caption = 'General';
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Not needed.';
                 field(ApplyingPostingDate; TempApplyingCustLedgEntry."Posting Date")
                 {
                     ApplicationArea = NPRRetail;
