@@ -41,11 +41,12 @@ page 6059888 "NPR TM Ticket Item List"
                     ToolTip = 'Specifies the value of the Ticket Type field.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
+                field(Category; _TicketType.Category)
+                {
+                    ToolTip = 'Specifies the value of the Ticket Types Category field.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
             }
-        }
-        area(Factboxes)
-        {
-
         }
     }
 
@@ -53,7 +54,6 @@ page 6059888 "NPR TM Ticket Item List"
     {
         area(Creation)
         {
-
             action(TicketWizard)
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -143,6 +143,7 @@ page 6059888 "NPR TM Ticket Item List"
 
     var
         _Item: Record Item;
+        _TicketType: Record "NPR TM Ticket Type";
         _TicketPaymentType: Option DIRECT,PREPAID,POSTPAID;
         _TicketTypeCodeFilter: Text;
 
@@ -157,7 +158,9 @@ page 6059888 "NPR TM Ticket Item List"
     trigger OnAfterGetRecord()
     begin
         Clear(_Item);
-        if _Item.Get(Rec."Item No.") then;
+        Clear(_TicketType);
+        if (_Item.Get(Rec."Item No.")) then
+            if (_TicketType.Get(_Item."NPR Ticket Type")) then;
     end;
 
     procedure SetTicketTypeFilter(TicketTypeCodeFilter: text)

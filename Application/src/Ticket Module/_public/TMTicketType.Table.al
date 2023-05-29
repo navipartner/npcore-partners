@@ -23,6 +23,11 @@
             TableRelation = "NPR TM Ticket Type";
             DataClassification = CustomerContent;
         }
+        field(17; Category; Code[20])
+        {
+            Caption = 'Category';
+            DataClassification = CustomerContent;
+        }
         field(20; "Print Ticket"; Boolean)
         {
             Caption = 'Print Ticket';
