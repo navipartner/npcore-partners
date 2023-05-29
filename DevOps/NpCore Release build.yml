@@ -28,8 +28,6 @@ stages:
 
         - name: BC1803
 
-        - name: BC1812
-
         - name: BC1905
        
         - name: BC2005_CLOUD
