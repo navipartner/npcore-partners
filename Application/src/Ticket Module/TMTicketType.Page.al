@@ -32,6 +32,11 @@
                     Visible = false;
                     ToolTip = 'Specifies the value of the Related Ticket Type field';
                 }
+                field(Category; Rec.Category)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Category field, listed in the ListTicketItems service.';
+                }
                 field("Print Ticket"; Rec."Print Ticket")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
