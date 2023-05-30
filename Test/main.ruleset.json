@@ -28,6 +28,11 @@
             "justification": "Variable declarations should be ordered by type."
         },
         {
+            "id": "AL0749",
+            "action": "Error",
+            "justification": "The type '{0}' of the parameter '{1}' of the {2} method '{3}' has 'Internal' accessibility. The method will not be callable outside of this module without an implicit conversion."
+        },        
+        {
             "id": "AS0018",
             "action":"Hidden",
             "justification": "A procedure belonging to the public API should not be removed."
