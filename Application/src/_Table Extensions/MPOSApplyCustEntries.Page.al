@@ -419,8 +419,6 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
         Cust: Record Customer;
         GLSetup: Record "General Ledger Setup";
         SalesSetup: Record "Sales & Receivables Setup";
-        TotalSalesLine: Record "Sales Line";
-        TotalServLine: Record "Service Line";
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         CustEntrySetApplID: Codeunit "Cust. Entry-SetAppl.ID";
@@ -451,6 +449,7 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
         AppliedAmount: Decimal;
         ApplyingAmount: Decimal;
         PmtDiscAmount: Decimal;
+        AppliedCustLedgEntryRemainingAmount: Decimal;
         ApplnCurrencyCode: Code[10];
         DifferentCurrenciesInAppln: Boolean;
         CalcType: Option Direct,GenJnlLine,SalesHeader,ServHeader,POSLine;
@@ -496,13 +495,6 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
                     TempApplyingCustLedgEntry."Customer No." := SalesHeader."Bill-to Customer No.";
                     TempApplyingCustLedgEntry.Description := SalesHeader."Posting Description";
                     TempApplyingCustLedgEntry."Currency Code" := SalesHeader."Currency Code";
-                    if TempApplyingCustLedgEntry."Document Type" = TempApplyingCustLedgEntry."Document Type"::"Credit Memo" then begin
-                        TempApplyingCustLedgEntry.Amount := -TotalSalesLine."Amount Including VAT";
-                        TempApplyingCustLedgEntry."Remaining Amount" := -TotalSalesLine."Amount Including VAT";
-                    end else begin
-                        TempApplyingCustLedgEntry.Amount := TotalSalesLine."Amount Including VAT";
-                        TempApplyingCustLedgEntry."Remaining Amount" := TotalSalesLine."Amount Including VAT";
-                    end;
                     CalcApplnAmount();
                 end;
             CalcType::ServHeader:
@@ -517,13 +509,6 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
                     TempApplyingCustLedgEntry."Customer No." := ServHeader."Bill-to Customer No.";
                     TempApplyingCustLedgEntry.Description := ServHeader."Posting Description";
                     TempApplyingCustLedgEntry."Currency Code" := ServHeader."Currency Code";
-                    if TempApplyingCustLedgEntry."Document Type" = TempApplyingCustLedgEntry."Document Type"::"Credit Memo" then begin
-                        TempApplyingCustLedgEntry.Amount := -TotalServLine."Amount Including VAT";
-                        TempApplyingCustLedgEntry."Remaining Amount" := -TotalServLine."Amount Including VAT";
-                    end else begin
-                        TempApplyingCustLedgEntry.Amount := TotalServLine."Amount Including VAT";
-                        TempApplyingCustLedgEntry."Remaining Amount" := TotalServLine."Amount Including VAT";
-                    end;
                     CalcApplnAmount();
                 end;
             CalcType::Direct:
@@ -563,8 +548,6 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
                         TempApplyingCustLedgEntry.Description := GenJnlLine.Description;
                     end;
                     TempApplyingCustLedgEntry."Currency Code" := GenJnlLine."Currency Code";
-                    TempApplyingCustLedgEntry.Amount := GenJnlLine.Amount;
-                    TempApplyingCustLedgEntry."Remaining Amount" := GenJnlLine.Amount;
                     CalcApplnAmount();
                 end;
             CalcType::POSLine:
@@ -577,8 +560,6 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
                     if Customer.Get(TempApplyingCustLedgEntry."Customer No.") then
                         TempApplyingCustLedgEntry.Description := Customer.Name;
                     TempApplyingCustLedgEntry."Currency Code" := '';
-                    TempApplyingCustLedgEntry.Amount := SaleLinePOS."Amount Including VAT";
-                    TempApplyingCustLedgEntry."Remaining Amount" := SaleLinePOS."Amount Including VAT";
                     CalcApplnAmount();
                 end;
         end;
@@ -701,11 +682,13 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
                         ApplnType::"Applies-to Doc. No.":
                             begin
                                 AppliedCustLedgEntry := Rec;
+                                Clear(AppliedCustLedgEntryRemainingAmount);
                                 AppliedCustLedgEntry.CalcFields("Remaining Amount");
+                                AppliedCustLedgEntryRemainingAmount := AppliedCustLedgEntry."Remaining Amount";
                                 if AppliedCustLedgEntry."Currency Code" <> ApplnCurrencyCode then begin
-                                    AppliedCustLedgEntry."Remaining Amount" :=
-                                      CurrExchRate.ExchangeAmtFCYToFCY(
-                                        ApplnDate, AppliedCustLedgEntry."Currency Code", ApplnCurrencyCode, AppliedCustLedgEntry."Remaining Amount");
+                                    AppliedCustLedgEntryRemainingAmount :=
+                                       CurrExchRate.ExchangeAmtFCYToFCY(
+                                         ApplnDate, AppliedCustLedgEntry."Currency Code", ApplnCurrencyCode, AppliedCustLedgEntryRemainingAmount);
                                     AppliedCustLedgEntry."Remaining Pmt. Disc. Possible" :=
                                       CurrExchRate.ExchangeAmtFCYToFCY(
                                         ApplnDate, AppliedCustLedgEntry."Currency Code", ApplnCurrencyCode, AppliedCustLedgEntry."Remaining Pmt. Disc. Possible");
@@ -718,7 +701,7 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
                                 if AppliedCustLedgEntry."Amount to Apply" <> 0 then
                                     AppliedAmount := Round(AppliedCustLedgEntry."Amount to Apply", AmountRoundingPrecision)
                                 else
-                                    AppliedAmount := Round(AppliedCustLedgEntry."Remaining Amount", AmountRoundingPrecision);
+                                    AppliedAmount := Round(AppliedCustLedgEntryRemainingAmount, AmountRoundingPrecision);
                                 OnCalcApplnAmountOnCalcTypeGenJnlLineOnApplnTypeToDocNoOnAfterSetAppliedAmount(Rec, ApplnDate, ApplnCurrencyCode, AppliedAmount);
 
                                 if PaymentToleranceMgt.CheckCalcPmtDiscGenJnlCust(
@@ -754,15 +737,17 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
                         ApplnType::"Applies-to Doc. No.":
                             begin
                                 AppliedCustLedgEntry := Rec;
+                                Clear(AppliedCustLedgEntryRemainingAmount);
                                 AppliedCustLedgEntry.CalcFields("Remaining Amount");
+                                AppliedCustLedgEntryRemainingAmount := AppliedCustLedgEntry."Remaining Amount";
 
                                 if AppliedCustLedgEntry."Currency Code" <> ApplnCurrencyCode then
-                                    AppliedCustLedgEntry."Remaining Amount" :=
-                                      CurrExchRate.ExchangeAmtFCYToFCY(
-                                        ApplnDate, AppliedCustLedgEntry."Currency Code", ApplnCurrencyCode, AppliedCustLedgEntry."Remaining Amount");
+                                    AppliedCustLedgEntryRemainingAmount :=
+                                       CurrExchRate.ExchangeAmtFCYToFCY(
+                                         ApplnDate, AppliedCustLedgEntry."Currency Code", ApplnCurrencyCode, AppliedCustLedgEntryRemainingAmount);
 
                                 OnCalcApplnAmountOnCalcTypeSalesHeaderOnApplnTypeToDocNoOnBeforeSetAppliedAmount(Rec, ApplnDate, ApplnCurrencyCode);
-                                AppliedAmount := Round(AppliedCustLedgEntry."Remaining Amount", AmountRoundingPrecision);
+                                AppliedAmount := Round(AppliedCustLedgEntryRemainingAmount, AmountRoundingPrecision);
 
                                 if not DifferentCurrenciesInAppln then
                                     DifferentCurrenciesInAppln := ApplnCurrencyCode <> AppliedCustLedgEntry."Currency Code";
@@ -996,9 +981,11 @@ page 6150834 "NPR MPOS Apply Cust. Entries"
             CalculateCurrency := true;
 
         if (CurrencyCode <> CalcCustLedgEntry."Currency Code") and CalculateCurrency then begin
+#pragma warning disable AL0780
             CalcCustLedgEntry."Remaining Amount" :=
-              CurrExchRate.ExchangeAmount(
-                CalcCustLedgEntry."Remaining Amount", CalcCustLedgEntry."Currency Code", CurrencyCode, PostingDate);
+             CurrExchRate.ExchangeAmount(
+               CalcCustLedgEntry."Remaining Amount", CalcCustLedgEntry."Currency Code", CurrencyCode, PostingDate);
+#pragma warning restore AL0780
             CalcCustLedgEntry."Remaining Pmt. Disc. Possible" :=
               CurrExchRate.ExchangeAmount(
                 CalcCustLedgEntry."Remaining Pmt. Disc. Possible", CalcCustLedgEntry."Currency Code", CurrencyCode, PostingDate);
