@@ -9,7 +9,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -93,7 +92,7 @@
                 Image = History;
                 RunObject = Page "NPR POS Paym. View Log Entries";
 
-                ToolTip = 'Executes the POS Payment View Log Entries action';
+                ToolTip = 'Opens the POS Payment View Log Entries List';
                 ApplicationArea = NPRRetail;
             }
             action("POS Scenarios")
@@ -102,7 +101,7 @@
                 Image = Setup;
                 RunObject = Page "NPR POS Scenarios";
 
-                ToolTip = 'Executes the POS Scenarios action';
+                ToolTip = 'Opens the POS Scenarios List';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -116,4 +115,3 @@
         end;
     end;
 }
-

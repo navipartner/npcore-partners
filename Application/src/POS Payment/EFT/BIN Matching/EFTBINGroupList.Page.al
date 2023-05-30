@@ -11,7 +11,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -56,10 +55,9 @@
                 Image = List;
                 RunObject = Page "NPR EFT BIN Ranges";
 
-                ToolTip = 'Executes the Show All Ranges action';
+                ToolTip = 'Opens the EFT BIN Ranges List';
                 ApplicationArea = NPRRetail;
             }
         }
     }
 }
-

@@ -9,7 +9,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -19,25 +18,25 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code value associated with the Pepper Card Type';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the Pepper Card Type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Payment Type POS"; Rec."Payment Type POS")
                 {
 
-                    ToolTip = 'Specifies the value of the Payment Type POS field';
+                    ToolTip = 'Specifies the payment type for POS transactions related to the Pepper Card Type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Card Type Group Code"; Rec."Card Type Group Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Card Type Group Code field';
+                    ToolTip = 'Specifies the code of the card type group to which the Pepper Card Type belongs';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -57,10 +56,9 @@
                 RunPageView = SORTING("Card Type Code", "Minimum Amount")
                               ORDER(Ascending);
 
-                ToolTip = 'Executes the Fees action';
+                ToolTip = 'Displays the list of fees associated with the Pepper Card Type';
                 ApplicationArea = NPRRetail;
             }
         }
     }
 }
-
