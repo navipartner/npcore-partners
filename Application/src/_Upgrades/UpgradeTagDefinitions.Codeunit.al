@@ -72,6 +72,8 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Item Blob 2 Media"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Member Blob 2 Media"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'SalesDocExpPaymentMethodCode'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'SalesDocExpRefreshMenuButtonActions'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'SalesDocImpRefreshMenuButtonActions'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'ItemIdentifierType'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'ItemPriceIdentifierType'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'ItemLookupSmartSearch'));
@@ -292,6 +294,10 @@
                 case UpgradeStep of
                     'SalesDocExpPaymentMethodCode':
                         exit('NPR-POSActionPaymentMethodUpgrade-20220127');
+                    'SalesDocExpRefreshMenuButtonActions':
+                        exit('NPR-POSActionSalesDocExpRefreshMenuButtonActions-20230529');
+                    'SalesDocImpRefreshMenuButtonActions':
+                        exit('NPR-POSActionSalesDocImpRefreshMenuButtonActions-20230529');
                     'ItemIdentifierType':
                         exit('NPR-POSActionItemIdentifierType-20220623');
                     'ItemPriceIdentifierType':

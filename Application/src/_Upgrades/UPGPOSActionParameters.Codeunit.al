@@ -10,6 +10,8 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
     trigger OnUpgradePerCompany()
     begin
         SalesDocExpPaymentMethodCode();
+        SalesDocExpRefreshMenuButtonActions();
+        SalesDocImpRefreshMenuButtonActions();
         ItemIdentifierType();
         ItemPriceIdentifierType();
         ItemLookupSmartSearch();
@@ -240,6 +242,75 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
                 EanBoxParameter.Rename(EanBoxParameter."Setup Code", EanBoxParameter."Event Code", EanBoxParameter."Action Code", 'CustomerNo');
             until EanBoxParameter.Next() = 0;
     end;
+
+    local procedure SalesDocExpRefreshMenuButtonActions()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Action Parameters', 'SalesDocExpRefreshMenuButtonActions');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SalesDocExpRefreshMenuButtonActions')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        RefreshPOSAction(Enum::"NPR POS Workflow"::SALES_DOC_EXP);
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SalesDocExpRefreshMenuButtonActions'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+
+
+    local procedure SalesDocImpRefreshMenuButtonActions()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Action Parameters', 'SalesDocImpRefreshMenuButtonActions');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SalesDocImpRefreshMenuButtonActions')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        RefreshPOSAction(Enum::"NPR POS Workflow"::SALES_DOC_IMP);
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SalesDocImpRefreshMenuButtonActions'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure RefreshPOSAction(NPRPOSWorkflow: Enum "NPR POS Workflow")
+    var
+        NPRPOSAction: Record "NPR POS Action";
+    begin
+        NPRPOSAction.Reset();
+        NPRPOSAction.SetRange(Blocked, false);
+        NPRPOSAction.SetRange("Workflow Implementation", NPRPOSWorkflow);
+        NPRPOSAction.SetLoadFields(Code);
+        if not NPRPOSAction.FindSet(false) then
+            exit;
+        repeat
+            RefreshMenuButtonParameters(NPRPOSAction)
+        until NPRPOSAction.Next() = 0;
+    end;
+
+    #region RefreshMenuButtonParameters
+    local procedure RefreshMenuButtonParameters(NPRPOSAction: Record "NPR POS Action")
+    var
+        NPRPOSMenuButton: Record "NPR POS Menu Button";
+    begin
+        NPRPOSMenuButton.Reset();
+        NPRPOSMenuButton.SetRange("Action Type", NPRPOSMenuButton."Action Type"::Action);
+        NPRPOSMenuButton.SetRange("Action Code", NPRPOSAction.Code);
+        if not NPRPOSMenuButton.FindSet(true) then
+            exit;
+
+        repeat
+            if NPRPOSMenuButton.RefreshParametersRequired() then
+                NPRPOSMenuButton.RefreshParameters();
+        until NPRPOSMenuButton.next() = 0;
+    end;
+    #endregion RefreshMenuButtonParameters
 
     local procedure UpgradePOSWorkflow()
     var
