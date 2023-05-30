@@ -814,17 +814,14 @@
         if not IsNullGuid(Rec.SystemId) then
             Rec.Modify();
     end;
+#IF BC17 or BC18 or BC19
 
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]). Use CreateDimFromDefaultDim(FieldNo: Integer) to update document dimensions from default dims.', 'BC 20.0')]
+    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]). Use CreateDimFromDefaultDim(FieldNo: Integer) to update document dimensions from default dims starting from BC 20.0', 'BC 20.0')]
     internal procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20]; Type5: Integer; No5: Code[20]; Type6: Integer; No6: Code[20])
     var
         TableID: array[10] of Integer;
         No: array[10] of Code[20];
         OldDimSetID: Integer;
-#IF NOT (BC17 or BC18 or BC19)
-        DimSource: List of [Dictionary of [Integer, Code[20]]];
-        i: Integer;
-#ENDIF
     begin
         TableID[1] := Type1;
         No[1] := No1;
@@ -842,25 +839,15 @@
         "Shortcut Dimension 2 Code" := '';
         OldDimSetID := "Dimension Set ID";
 
-#IF NOT (BC17 or BC18 or BC19)
-        for i := 1 to ArrayLen(TableID) do
-            if (TableID[i] <> 0) and (No[i] <> '') then
-                DimMgt.AddDimSource(DimSource, TableID[i], No[i]);
-
-        Rec."Dimension Set ID" :=
-          DimMgt.GetDefaultDimID(DimSource, GetPOSSourceCode(), Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code", 0, 0);
-#ELSE
         "Dimension Set ID" :=
             DimMgt.GetRecDefaultDimID(
                 Rec, CurrFieldNo, TableID, No, GetPOSSourceCode(), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-#ENDIF
 
         if (OldDimSetID <> "Dimension Set ID") and SalesLinesExist() then begin
             Modify();
             UpdateAllLineDim("Dimension Set ID", OldDimSetID);
         end;
     end;
-#IF BC17 or BC18 or BC19
 
     internal procedure CreateDimFromDefaultDim(FieldNo: Integer)
     begin
@@ -1080,9 +1067,10 @@
                 Error(CustomerExistLbl);
         end;
     end;
+#IF BC17 or BC18 or BC19
 
-    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Salesperson Code"))')]
-    procedure CreateDimensionsFromValidateSalesPersonCode()
+    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Salesperson Code")) starting from BC 20.0', 'BC 20.0')]
+    local procedure CreateDimensionsFromValidateSalesPersonCode()
     var
         IsHandled: Boolean;
     begin
@@ -1099,8 +1087,8 @@
             Database::Customer, "Customer No.",
             Database::"Responsibility Center", "Responsibility Center");
     end;
-#IF BC17 or BC18 or BC19
 
+    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Event No.")) starting from BC 20.0', 'BC 20.0')]
     local procedure CreateDimensionsFromValidateEventNo()
     var
         IsHandled: Boolean;
@@ -1119,6 +1107,7 @@
             Database::"Responsibility Center", "Responsibility Center");
     end;
 
+    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("POS Store Code")) starting from BC 20.0', 'BC 20.0')]
     local procedure CreateDimensionsFromValidatePOSStoreCode()
     var
         IsHandled: Boolean;
@@ -1137,6 +1126,7 @@
             Database::"Responsibility Center", "Responsibility Center");
     end;
 
+    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Customer No.")) starting from BC 20.0', 'BC 20.0')]
     local procedure CreateDimensionsFromValidateCustomerNo()
     var
         IsHandled: Boolean;
@@ -1155,6 +1145,7 @@
             Database::"Responsibility Center", "Responsibility Center");
     end;
 
+    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Responsibility Center")) starting from BC 20.0', 'BC 20.0')]
     local procedure CreateDimensionsFromValidateResponsibilityCenter()
     var
         IsHandled: Boolean;
@@ -1178,6 +1169,7 @@
     local procedure OnBeforeUpdateAllLineDim(var POSSale: Record "NPR POS Sale"; NewParentDimSetID: Integer; OldParentDimSetID: Integer; var IsHandled: Boolean; xPOSSale: Record "NPR POS Sale")
     begin
     end;
+#IF BC17 or BC18 or BC19
 
     [Obsolete('New way of dimension handling starting from BC 20.0', 'BC 20.0')]
     [IntegrationEvent(false, false)]
@@ -1208,7 +1200,7 @@
     local procedure OnBeforeCreateDimensionsFromValidateResponsibilityCenter(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
     begin
     end;
-#IF NOT (BC17 or BC18 or BC19)
+#ELSE
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var POSSale: Record "NPR POS Sale"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
