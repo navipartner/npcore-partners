@@ -557,6 +557,13 @@
             FieldClass = FlowField;
             CalcFormula = exist("NPR POS Costumer Input" WHERE("POS Entry No." = FIELD("Entry No.")));
         }
+        field(6002; "POS Info Exist"; Boolean)
+        {
+            Caption = 'POS Info Exist';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR POS Info POS Entry" WHERE("POS Entry No." = FIELD("Entry No.")));
+        }
     }
 
     keys

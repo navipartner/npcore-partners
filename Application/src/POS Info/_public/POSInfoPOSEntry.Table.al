@@ -2,6 +2,8 @@
 {
     Caption = 'POS Info POS Entry';
     DataClassification = CustomerContent;
+    LookupPageId = "NPR POS Info POS Entry";
+    DrillDownPageId = "NPR POS Info POS Entry";
 
     fields
     {

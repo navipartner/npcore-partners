@@ -124,6 +124,11 @@
                 ToolTip = 'Specifies the value of the No. of Print Output Entries field';
                 ApplicationArea = NPRRetail;
             }
+            field("POS Info Exist"; Rec."POS Info Exist")
+            {
+                ToolTip = 'Specifies if there are any POS informations related to the POS Entry';
+                ApplicationArea = NPRRetail;
+            }
             field("Images Exist"; Rec."Images Exist")
             {
                 ToolTip = 'Specifies if there are any images related to the POS Entry';
