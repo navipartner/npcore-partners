@@ -195,7 +195,7 @@
             exit;
 
         POSEntrySalesLine.Reset();
-        POSEntrySalesLine.SetRange("POS Unit No.", SalePOS."Register No.");
+        POSEntrySalesLine.SetCurrentKey("Document No.", "Line No.");
         POSEntrySalesLine.SetRange("Document No.", SalePOS."Sales Ticket No.");
         POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
         POSEntrySalesLine.SetFilter("Retail Serial No.", '<>%1', '');
