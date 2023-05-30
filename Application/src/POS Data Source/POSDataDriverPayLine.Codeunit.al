@@ -15,9 +15,9 @@
         DataSource.SetId(Name);
         DataSource.SetTableNo(DATABASE::"NPR POS Sale Line");
 
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Description), true);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Currency Amount"), true);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Amount Including VAT"), true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Description), true, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Currency Amount"), true, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Amount Including VAT"), true, true);
 
         DataSource.Totals().Add('SaleAmount');
         DataSource.Totals().Add('PaidAmount');
