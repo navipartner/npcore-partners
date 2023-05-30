@@ -10,7 +10,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -20,37 +19,37 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code value associated with the Voucher Type';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the Voucher Type';
                     ApplicationArea = NPRRetail;
                 }
                 field("No. Series"; Rec."No. Series")
                 {
 
-                    ToolTip = 'Specifies the value of the No. Series field';
+                    ToolTip = 'Specifies the code of the No. Series field for the Voucher Type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Valid Period"; Rec."Valid Period")
                 {
 
-                    ToolTip = 'Specifies the value of the Valid Period field';
+                    ToolTip = 'Specifies the valid period for the Voucher Type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Voucher Qty. (Open)"; Rec."Voucher Qty. (Open)")
                 {
 
-                    ToolTip = 'Specifies the value of the Voucher Qty. (Open) field';
+                    ToolTip = 'Specifies the quantity of open vouchers for the Voucher Type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Arch. Voucher Qty."; Rec."Arch. Voucher Qty.")
                 {
 
-                    ToolTip = 'Specifies the value of the Archived Voucher Qty. field';
+                    ToolTip = 'Specifies the quantity of archived vouchers for the Voucher Type';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -69,7 +68,7 @@
                 RunPageLink = "Voucher Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
 
-                ToolTip = 'Executes the Vouchers action';
+                ToolTip = 'Opens the Vouchers page for the selected Voucher Type';
                 ApplicationArea = NPRRetail;
             }
             action("Partner Relations")
@@ -79,10 +78,9 @@
                 RunObject = Page "NPR NpRv Partner Relations";
                 RunPageLink = "Voucher Type" = FIELD(Code);
 
-                ToolTip = 'Executes the Partner Relations action';
+                ToolTip = 'Opens the Partner Relations page for the selected Voucher Type';
                 ApplicationArea = NPRRetail;
             }
         }
     }
 }
-

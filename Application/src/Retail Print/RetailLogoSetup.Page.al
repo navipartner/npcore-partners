@@ -10,7 +10,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -36,7 +35,7 @@
                 field(Sequence; Rec.Sequence)
                 {
 
-                    ToolTip = 'Specifies the value of the Sequence field.';
+                    ToolTip = 'Specifies the order or priority of the retail logo';
                     ApplicationArea = NPRRetail;
                 }
                 field(Keyword; Rec.Keyword)
@@ -48,7 +47,7 @@
                 field("Register No."; Rec."Register No.")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ToolTip = 'Specifies the POS unit code associated with the retail logo.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Start Date"; Rec."Start Date")
@@ -131,4 +130,3 @@
     var
         RetailLogoMgtCtrl: Codeunit "NPR Retail Logo Mgt.";
 }
-

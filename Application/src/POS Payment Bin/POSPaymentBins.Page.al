@@ -146,7 +146,7 @@
                 PromotedCategory = Process;
                 Visible = false;
 
-                ToolTip = 'Executes the Transfer Out From Bin action.';
+                ToolTip = 'Moves the items out from the bin to another location.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -163,7 +163,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Insert Initial Float action.';
+                ToolTip = 'dds an initial cash float to the system.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -340,4 +340,3 @@
         //                                               1 / CurrExchRate.ExchangeRate (TransactionDate, CurrencyCode))));
     end;
 }
-

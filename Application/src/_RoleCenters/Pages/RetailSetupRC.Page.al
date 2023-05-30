@@ -444,7 +444,7 @@ page 6151245 "NPR Retail Setup RC"
                     Caption = 'Hardware Conn. Printer Setup';
                     RunObject = Page "NPR HWC Printers";
 
-                    ToolTip = 'Executes the Hardware Connector Report Printer Setup action.';
+                    ToolTip = 'View or edit the Hardware Connector Report Printer Setup';
                     ApplicationArea = NPRRetail;
                 }
                 action("MPOS Report Printers")
@@ -452,7 +452,7 @@ page 6151245 "NPR Retail Setup RC"
                     Caption = 'MPOS Printer Setup';
                     RunObject = Page "NPR MPOS Report Printers";
 
-                    ToolTip = 'Executes the MPOS Report Printer Setup action.';
+                    ToolTip = 'View or edit the MPOS Report Printer Setup';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -645,7 +645,7 @@ page 6151245 "NPR Retail Setup RC"
                     Caption = 'Item AddOns';
                     RunObject = page "NPR NpIa Item AddOns";
 
-                    ToolTip = 'Executes the Item AddOns action.';
+                    ToolTip = 'View or edit the Item AddOns';
                     ApplicationArea = NPRRetail;
                 }
 

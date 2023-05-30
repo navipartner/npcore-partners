@@ -1,10 +1,6 @@
 ﻿page 6184494 "NPR Pepper Terminal List"
 {
     Extensible = False;
-    // NPR5.20\BR\20160316  CASE 231481 Object Created
-    // NPR5.25/BR/20160608  CASE 231481 Added fields Customer ID, License ID, License File, License Action
-    // NPR5.29/BR/20161230  CASE 262269 Fix some ENU Captions, Added field License ID
-
     Caption = 'Pepper Terminal List';
     CardPageID = "NPR Pepper Terminal Card";
     Editable = false;
@@ -12,7 +8,6 @@
     SourceTable = "NPR Pepper Terminal";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-
 
     layout
     {
@@ -23,43 +18,43 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the unique code of the Pepper Terminal';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the Pepper Terminal';
                     ApplicationArea = NPRRetail;
                 }
                 field("Terminal Type Code"; Rec."Terminal Type Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Terminal Type Code field';
+                    ToolTip = 'Specifies the code of the Terminal Type';
                     ApplicationArea = NPRRetail;
                 }
                 field("Instance ID"; Rec."Instance ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Instance ID field';
+                    ToolTip = 'Specifies the ID of the instance';
                     ApplicationArea = NPRRetail;
                 }
                 field("Configuration Code"; Rec."Configuration Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Configuration Code field';
+                    ToolTip = 'Specifies the code of the configuration';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ToolTip = 'Specifies the number of the POS unit';
                     ApplicationArea = NPRRetail;
                 }
                 field("License ID"; Rec."License ID")
                 {
 
-                    ToolTip = 'Specifies the value of the License ID field';
+                    ToolTip = 'Specifies the ID of the license';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -78,7 +73,7 @@
                     Caption = 'License';
                     Image = ImportCodes;
 
-                    ToolTip = 'Executes the License action';
+                    ToolTip = 'Imports the license file for the Pepper Terminal ';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -91,7 +86,7 @@
                     Caption = 'Import';
                     Image = Import;
 
-                    ToolTip = 'Executes the Import action';
+                    ToolTip = 'Imports additional parameters for the Pepper Terminal ';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -108,7 +103,7 @@
                     Caption = 'Show';
                     Image = ElectronicNumber;
 
-                    ToolTip = 'Executes the Show action';
+                    ToolTip = 'Displays the license details for the Pepper Terminal';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -121,7 +116,7 @@
                     Caption = 'Additonal Parameters';
                     Image = ElectronicDoc;
 
-                    ToolTip = 'Executes the Additonal Parameters action';
+                    ToolTip = 'Shows additional parameters for the Pepper Terminal';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -138,7 +133,7 @@
                     Caption = 'Additional parameters';
                     Image = DeleteQtyToHandle;
 
-                    ToolTip = 'Executes the Additional parameters action';
+                    ToolTip = 'Deletes the license associated with the Pepper TerminalExecutes the Additional parameters action';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -151,7 +146,7 @@
                     Caption = 'Export';
                     Image = DeleteXML;
 
-                    ToolTip = 'Executes the Export action';
+                    ToolTip = 'Removes additional parameters for the Pepper Terminal';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -168,7 +163,7 @@
                     Caption = 'License';
                     Image = Export;
 
-                    ToolTip = 'Executes the License action';
+                    ToolTip = 'Exports the license details for the Pepper Terminal';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -181,7 +176,7 @@
                     Caption = 'Additional Parameters';
                     Image = TransmitElectronicDoc;
 
-                    ToolTip = 'Executes the Additional Parameters action';
+                    ToolTip = 'Exports additional parameters for the Pepper Terminal';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -202,10 +197,9 @@
                 RunPageView = SORTING("Entry No.")
                               ORDER(Ascending);
 
-                ToolTip = 'Executes the Transaction Requests action';
+                ToolTip = 'Shows the transaction requests associated with the Pepper Terminal ';
                 ApplicationArea = NPRRetail;
             }
         }
     }
 }
-
