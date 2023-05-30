@@ -64,9 +64,10 @@
         ResolvingTable := 0;
 
         if (StrLen(ItemNo) <= MaxStrLen(ItemReference."Item No.")) and (StrLen(VariantCode) <= MaxStrLen(ItemReference."Variant Code")) then begin
-            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+            ItemReference.SetCurrentKey("Item No.", "Variant Code", "Unit of Measure", "Reference Type", "Reference No.");
             ItemReference.SetRange("Item No.", ItemNo);
             ItemReference.SetRange("Variant Code", VariantCode);
+            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
             ItemReference.SetRange("NPR Label Barcode", true);
             if ItemReference.IsEmpty then
                 ItemReference.SetRange("NPR Label Barcode");
@@ -139,7 +140,7 @@
         Item: Record Item;
         Found: Boolean;
     begin
-        ItemReference.Reset();
+        ItemReference.SetCurrentKey("Item No.", "Variant Code", "Unit of Measure", "Reference Type", "Reference No.");
         ItemReference.SetRange("Item No.", TransferLine."Item No.");
         ItemReference.SetRange("Variant Code", TransferLine."Variant Code");
         ItemReference.SetRange("Unit of Measure", TransferLine."Unit of Measure Code");
@@ -175,22 +176,20 @@
     var
         ItemReference: Record "Item Reference";
     begin
-        ItemReference.Reset();
         ItemReference.SetCurrentKey("Reference No.", "Reference Type", "Reference Type No.");
         ItemReference.SetRange("Reference No.", ReferenceNo);
         ItemReference.SetRange("Reference Type No.", '');
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
-
         ItemReference.SetRange("Item No.", ItemNo);
         ItemReference.SetRange("NPR Label Barcode", true);
         if ItemReference.IsEmpty then
             ItemReference.SetRange("NPR Label Barcode");
-        if not ItemReference.FindFirst() then begin
+        if ItemReference.IsEmpty() then begin
             ItemReference.SetRange("Item No.");
             ItemReference.SetRange("NPR Label Barcode", true);
             if ItemReference.IsEmpty then
                 ItemReference.SetRange("NPR Label Barcode");
-            if not ItemReference.FindFirst() then
+            if ItemReference.IsEmpty() then
                 Error(ItemWithItemRefNoNotFoundErr, ReferenceNo);
             if ItemReference.Count > 1 then begin
                 ClearLastError();
@@ -199,6 +198,7 @@
                         Error(GetLastErrorText());
             end;
         end;
+        if ItemReference.FindFirst() then;
         ReturnedItemRef.Copy(ItemReference);
     end;
 
@@ -222,10 +222,9 @@
         ItemReference3: Record "Item Reference";
     begin
         GetTransferHeader(TransferLine3);
-        ItemReference3.Reset();
         ItemReference3.SetCurrentKey("Reference Type", "Reference Type No.");
-        ItemReference3.SetFilter("Reference Type", '%1', ItemReference3."Reference Type"::" ");
-        ItemReference3.SetFilter("Reference Type No.", '%1', '');
+        ItemReference3.SetRange("Reference Type", ItemReference3."Reference Type"::" ");
+        ItemReference3.SetRange("Reference Type No.", '');
         if PAGE.RunModal(PAGE::"Item Reference List", ItemReference3) = ACTION::LookupOK then
             TransferLine3.Validate("NPR Cross-Reference No.", ItemReference3."Reference No.");
     end;
@@ -252,10 +251,9 @@
         if MixedDiscountLine."Disc. Grouping Type" <> MixedDiscountLine."Disc. Grouping Type"::Item then
             exit;
         GetMixedDiscountHeader(MixedDiscountLine);
-        ItemReference2.Reset();
         ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
-        ItemReference2.SetFilter("Reference Type", '%1', ItemReference2."Reference Type"::"Bar Code");
-        ItemReference2.SetFilter("Reference Type No.", '%1', '');
+        ItemReference2.SetRange("Reference Type", ItemReference2."Reference Type"::"Bar Code");
+        ItemReference2.SetRange("Reference Type No.", '');
         if PAGE.RunModal(PAGE::"Item Reference List", ItemReference2) = ACTION::LookupOK then begin
             MixedDiscountLine."No." := ItemReference2."Item No.";
             MixedDiscountLine.Validate("Cross-Reference No.", ItemReference2."Reference No.");
@@ -305,10 +303,9 @@
         ItemReference2: Record "Item Reference";
     begin
         GetPeriodicDiscountHeader(PeriodDiscountLine);
-        ItemReference2.Reset();
         ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
-        ItemReference2.SetFilter("Reference Type", '%1', ItemReference2."Reference Type"::"Bar Code");
-        ItemReference2.SetFilter("Reference Type No.", '%1', '');
+        ItemReference2.SetRange("Reference Type", ItemReference2."Reference Type"::"Bar Code");
+        ItemReference2.SetRange("Reference Type No.", '');
         if PAGE.RunModal(PAGE::"Item Reference List", ItemReference2) = ACTION::LookupOK then begin
             PeriodDiscountLine."Item No." := ItemReference2."Item No.";
             PeriodDiscountLine.Validate("Cross-Reference No.", ItemReference2."Reference No.");
