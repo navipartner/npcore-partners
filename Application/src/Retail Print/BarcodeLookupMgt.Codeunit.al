@@ -179,7 +179,7 @@
         ItemReference.SetCurrentKey("Reference No.", "Reference Type", "Reference Type No.");
         ItemReference.SetRange("Reference No.", ReferenceNo);
         ItemReference.SetRange("Reference Type No.", '');
-        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+        ItemReference.SetFilter("Reference Type", '%1|%2', ItemReference."Reference Type"::"Bar Code", ItemReference."Reference Type"::"NPR Retail Serial No.");
         ItemReference.SetRange("Item No.", ItemNo);
         ItemReference.SetRange("NPR Label Barcode", true);
         if ItemReference.IsEmpty then
