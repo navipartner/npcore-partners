@@ -10,7 +10,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -52,10 +51,9 @@
                 RunObject = Page "NPR NpRv Partner Relations";
                 RunPageLink = "Partner Code" = FIELD(Code);
 
-                ToolTip = 'Executes the Partner Relations action';
+                ToolTip = 'Opens the Partner Relations List';
                 ApplicationArea = NPRRetail;
             }
         }
     }
 }
-

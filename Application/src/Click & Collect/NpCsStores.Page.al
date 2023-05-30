@@ -59,7 +59,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Show Address action';
+                ToolTip = 'Displays the address of the Collect Store.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -78,7 +78,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Show Geolocation action';
+                ToolTip = 'Displays the geolocation of the Collect Store';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -96,7 +96,7 @@
                 Caption = 'Stores by Distance';
                 Image = List;
 
-                ToolTip = 'Executes the Stores by Distance action';
+                ToolTip = 'Displays the nearby stores based on distance from the current Collect Store';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -115,7 +115,7 @@
                 RunObject = Page "NPR NpCs Store Stock Items";
                 RunPageLink = "Store Code" = FIELD(Code);
 
-                ToolTip = 'Executes the Store Stock Items action';
+                ToolTip = 'Displays the stock items available in the Collect Store';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -128,4 +128,3 @@
         NpCsCollectMgt.InitCollectInStoreService();
     end;
 }
-

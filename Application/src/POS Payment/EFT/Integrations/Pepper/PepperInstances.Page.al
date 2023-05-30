@@ -9,7 +9,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -19,19 +18,19 @@
                 field(ID; Rec.ID)
                 {
 
-                    ToolTip = 'Specifies the value of the ID field';
+                    ToolTip = 'Specifies the unique identifier of the Pepper Instance';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the Pepper Instance';
                     ApplicationArea = NPRRetail;
                 }
                 field("Configuration Code"; Rec."Configuration Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Configuration Code field';
+                    ToolTip = 'Specifies the code for the configuration associated with the Pepper Instance';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -51,10 +50,9 @@
                 RunPageView = SORTING(Code)
                               ORDER(Ascending);
 
-                ToolTip = 'Executes the Terminals action';
+                ToolTip = 'Opens the list of terminals associated with the Pepper Instance';
                 ApplicationArea = NPRRetail;
             }
         }
     }
 }
-

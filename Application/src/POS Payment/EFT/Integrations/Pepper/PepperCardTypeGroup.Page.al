@@ -9,7 +9,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -19,21 +18,16 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code value associated with the Pepper Card Type Group';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the Pepper Card Type Group';
                     ApplicationArea = NPRRetail;
                 }
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

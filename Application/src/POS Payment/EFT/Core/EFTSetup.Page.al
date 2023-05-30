@@ -12,7 +12,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -22,19 +21,19 @@
                 field("Payment Type POS"; Rec."Payment Type POS")
                 {
 
-                    ToolTip = 'Specifies the value of the Payment Type POS field';
+                    ToolTip = 'Select the payment type for the point of sale (POS) transaction.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ToolTip = 'Enter the number or identifier of the POS unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field("EFT Integration Type"; Rec."EFT Integration Type")
                 {
 
-                    ToolTip = 'Specifies the value of the EFT Integration Type field';
+                    ToolTip = 'Choose the type of electronic funds transfer (EFT) integration for processing payments.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -54,7 +53,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the POS Unit Parameters action';
+                ToolTip = 'Configures the parameters for the POS unit.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -73,7 +72,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Payment Type Parameters action';
+                ToolTip = 'Configures the parameters for the payment types.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -87,4 +86,3 @@
         }
     }
 }
-

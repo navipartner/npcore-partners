@@ -119,7 +119,7 @@
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Period Register List";
                     RunPageLink = "POS Unit No." = FIELD("No.");
-                    ToolTip = 'Executes the POS Period Registers action';
+                    ToolTip = 'Opens the POS Period Registers List';
                     ApplicationArea = NPRRetail;
                 }
                 action("POS Entries")
@@ -132,7 +132,7 @@
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry List";
                     RunPageLink = "POS Unit No." = FIELD("No.");
-                    ToolTip = 'Executes the POS Entries action';
+                    ToolTip = 'Opens the POS Entries List';
                     ApplicationArea = NPRRetail;
                 }
                 action("POS Unit Bins")
@@ -141,7 +141,7 @@
                     Image = List;
                     RunObject = Page "NPR POS Unit to Bin Relation";
                     RunPageLink = "POS Unit No." = FIELD("No.");
-                    ToolTip = 'Executes the POS Unit Bins action';
+                    ToolTip = 'Opens the POS Unit Bins List';
                     ApplicationArea = NPRRetail;
                 }
                 action(Workshifts)
@@ -155,7 +155,7 @@
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Workshift Checkpoints";
                     RunPageLink = "POS Unit No." = FIELD("No.");
-                    ToolTip = 'Executes the Workshifts action';
+                    ToolTip = 'Opens the Workshifts List';
                     ApplicationArea = NPRRetail;
                 }
                 action("MPOS QR Code")

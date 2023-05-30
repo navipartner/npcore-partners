@@ -11,7 +11,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -21,25 +20,25 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the code for the Pepper Configuration';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the Pepper Configuration';
                     ApplicationArea = NPRRetail;
                 }
                 field(Version; Rec.Version)
                 {
 
-                    ToolTip = 'Specifies the value of the Version field';
+                    ToolTip = 'Specifies the version of the Pepper Configuration';
                     ApplicationArea = NPRRetail;
                 }
                 field(Mode; Rec.Mode)
                 {
 
-                    ToolTip = 'Specifies the value of the Mode field';
+                    ToolTip = 'Specifies the mode of the Pepper Configuration';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -59,7 +58,7 @@
                 RunPageView = SORTING(ID)
                               ORDER(Ascending);
 
-                ToolTip = 'Executes the Instances action';
+                ToolTip = 'Opens the list of instances associated with the Pepper Configuration';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -73,7 +72,7 @@
                     Caption = 'License';
                     Image = ImportCodes;
 
-                    ToolTip = 'Executes the License action';
+                    ToolTip = 'Imports the license for the Pepper Configuration';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -86,7 +85,7 @@
                     Caption = 'Additional Parameters';
                     Image = Import;
 
-                    ToolTip = 'Executes the Additional Parameters action';
+                    ToolTip = 'Imports additional parameters for the Pepper Configuration';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -103,7 +102,7 @@
                     Caption = 'License';
                     Image = ElectronicNumber;
 
-                    ToolTip = 'Executes the License action';
+                    ToolTip = 'Shows the license file for the Pepper Configuration';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -116,7 +115,7 @@
                     Caption = 'Configuration XML';
                     Image = CreateXMLFile;
 
-                    ToolTip = 'Executes the Configuration XML action';
+                    ToolTip = 'Shows the configuration XML file for the Pepper Configuration';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -129,7 +128,7 @@
                     Caption = 'Additional Parameters';
                     Image = ElectronicDoc;
 
-                    ToolTip = 'Executes the Additional Parameters action';
+                    ToolTip = 'Shows the additional parameters file for the Pepper Configuration';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -146,7 +145,7 @@
                     Caption = 'License';
                     Image = DeleteQtyToHandle;
 
-                    ToolTip = 'Executes the License action';
+                    ToolTip = 'Deletes the license file for the Pepper Configuration';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -159,7 +158,7 @@
                     Caption = 'Additional parameters';
                     Image = DeleteXML;
 
-                    ToolTip = 'Executes the Additional parameters action';
+                    ToolTip = 'Deletes the additional parameters file for the Pepper Configuration';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -176,7 +175,7 @@
                     Caption = 'License';
                     Image = Export;
 
-                    ToolTip = 'Executes the License action';
+                    ToolTip = 'Exports the license file for the Pepper Configuration';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -189,7 +188,7 @@
                     Caption = 'Configuration XML';
                     Image = ExportElectronicDocument;
 
-                    ToolTip = 'Executes the Configuration XML action';
+                    ToolTip = 'Exports the configuration XML file for the Pepper Configuration';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -202,7 +201,7 @@
                     Caption = 'Additional Parameters';
                     Image = TransmitElectronicDoc;
 
-                    ToolTip = 'Executes the Additional Parameters action';
+                    ToolTip = 'Exports the additional parameters file for the Pepper Configuration';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -214,4 +213,3 @@
         }
     }
 }
-

@@ -9,7 +9,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -19,13 +18,13 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the unique code of the Pepper Version';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the description of the Pepper Version';
                     ApplicationArea = NPRRetail;
                 }
                 field("Zip File"; HasInstallFile)
@@ -33,14 +32,14 @@
 
                     Caption = 'Zip File';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the HasInstallFile field';
+                    ToolTip = 'Indicates whether the Pepper Version has an associated installation zip file';
                     ApplicationArea = NPRRetail;
                 }
                 field("Pepper DLL Version"; Rec."Pepper DLL Version")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Pepper DLL Version field';
+                    ToolTip = 'Specifies the version of the Pepper DLL associated with the Pepper Version';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -57,7 +56,7 @@
                 Image = Setup;
                 RunObject = Page "NPR Pepper Config. List";
 
-                ToolTip = 'Executes the Configurations action';
+                ToolTip = 'Configures settings for the Pepper Version';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -70,7 +69,7 @@
                     Caption = 'Zip';
                     Image = Import;
 
-                    ToolTip = 'Executes the Zip action';
+                    ToolTip = 'Imports a zip file for the Pepper Version';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -87,7 +86,7 @@
                     Caption = 'Zip';
                     Image = DeleteQtyToHandle;
 
-                    ToolTip = 'Executes the Zip action';
+                    ToolTip = 'Deletes the zip file associated with the Pepper Version';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -104,7 +103,7 @@
                     Caption = 'Zip';
                     Image = Export;
 
-                    ToolTip = 'Executes the Zip action';
+                    ToolTip = 'Exports the zip file for the Pepper Version';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -129,4 +128,3 @@
         HasInstallFile := Rec."Install Zip File".HasValue();
     end;
 }
-

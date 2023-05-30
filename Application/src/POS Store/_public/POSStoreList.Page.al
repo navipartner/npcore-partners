@@ -9,7 +9,6 @@
     SourceTable = "NPR POS Store";
     UsageCategory = Administration;
 
-
     layout
     {
         area(content)
@@ -106,7 +105,7 @@
                                       "No." = FIELD(Code);
                         ShortCutKey = 'Shift+Ctrl+D';
 
-                        ToolTip = 'Executes the Dimensions-Single action';
+                        ToolTip = 'EOpens the Default Dimensions List';
                     }
                     action("Dimensions-&Multiple")
                     {
@@ -115,18 +114,16 @@
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
 
-                        ToolTip = 'Executes the Dimensions-&Multiple action';
+                        ToolTip = 'Opens the Default Dimensions-Multiple List';
 
                         trigger OnAction()
                         var
                             POSStore: Record "NPR POS Store";
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
-                            //-NPR5.53 [371956]
                             CurrPage.SetSelectionFilter(POSStore);
                             DefaultDimMultiple.SetMultiRecord(POSStore, Rec.FieldNo(Code));
                             DefaultDimMultiple.RunModal();
-                            //-NPR5.53 [371956]
                         end;
                     }
                 }
@@ -137,7 +134,7 @@
                     Image = List;
                     RunObject = Page "NPR POS Unit List";
 
-                    ToolTip = 'Executes the POS Unit List action';
+                    ToolTip = 'Opens the POS Unit List';
                 }
                 action("POS Posting Setup")
                 {
@@ -151,7 +148,7 @@
                     RunObject = Page "NPR POS Posting Setup";
                     RunPageLink = "POS Store Code" = FIELD(Code);
 
-                    ToolTip = 'Executes the POS Posting Setup action';
+                    ToolTip = 'View or edit the POS Posting Setup';
                 }
                 action("POS Period Registers")
                 {
@@ -165,7 +162,7 @@
                     RunObject = Page "NPR POS Period Register List";
                     RunPageLink = "POS Store Code" = FIELD(Code);
 
-                    ToolTip = 'Executes the POS Period Registers action';
+                    ToolTip = 'Opens the POS Period Registers List';
                 }
                 action("POS Entries")
                 {
@@ -179,12 +176,9 @@
                     RunObject = Page "NPR POS Entry List";
                     RunPageLink = "POS Store Code" = FIELD(Code);
 
-                    ToolTip = 'Executes the POS Entries action';
+                    ToolTip = 'Opens the POS Entries List';
                 }
             }
-
         }
     }
-
-
 }

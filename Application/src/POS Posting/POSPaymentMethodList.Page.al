@@ -10,7 +10,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -38,7 +37,7 @@
                 field("Include In Counting"; Rec."Include In Counting")
                 {
 
-                    ToolTip = 'Specifies the value of the Include In Counting field.';
+                    ToolTip = ' Specifies whether the item should be included in the counting process.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Bin for Virtual-Count"; Rec."Bin for Virtual-Count")
@@ -65,7 +64,7 @@
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Vouched By field.';
+                    ToolTip = 'Specifies who vouched for the item.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Post Condensed"; Rec."Post Condensed")
@@ -86,14 +85,14 @@
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Rounding Precision field.';
+                    ToolTip = 'Specifies the decimal precision for rounding.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Rounding Type"; Rec."Rounding Type")
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Rounding Type field.';
+                    ToolTip = 'Specifies the type of rounding to be applied.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NPR Warning pop-up on Return"; Rec."NPR Warning pop-up on Return")
@@ -121,7 +120,7 @@
                 RunObject = Page "NPR POS Posting Setup";
                 RunPageLink = "POS Payment Method Code" = FIELD(Code);
 
-                ToolTip = 'Executes the POS Posting Setup action.';
+                ToolTip = 'View or edit the POS Posting Setup';
                 ApplicationArea = NPRRetail;
             }
             group(History)
@@ -137,12 +136,10 @@
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry Pmt. Line List";
                     RunPageLink = "POS Payment Method Code" = FIELD(Code);
-                    ToolTip = 'Executes the POS Payment Lines action.';
+                    ToolTip = 'Opens the POS Payment Lines List';
                     ApplicationArea = NPRRetail;
                 }
-
             }
         }
     }
 }
-
