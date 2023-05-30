@@ -584,8 +584,7 @@
         Session.LogMessage('NPR_JobQueue', 'Job Queue Error', Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
-    [Obsolete('Goes internal in next release', 'NPR 22.0')]
-    procedure AutoRestartRetentionPolicyJQ(var JobQueueEntry: Record "Job Queue Entry")
+    internal procedure AutoRestartRetentionPolicyJQ(var JobQueueEntry: Record "Job Queue Entry")
     begin
         if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
            (JobQueueEntry."Object ID to Run" = 3997)  //Codeunit::"Retention Policy JQ"
