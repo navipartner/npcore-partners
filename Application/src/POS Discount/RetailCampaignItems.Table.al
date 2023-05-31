@@ -462,7 +462,6 @@
                                     end;
 
                                     "Priority 2" := PeriodDiscountLine.Priority;
-                                    "Unit Price" := PeriodDiscountLine."Unit Price";
                                     "Campaign Unit Price" := PeriodDiscountLine."Campaign Unit Price";
                                     RetailComment.SetRange("Table ID", 6014414);
                                     RetailComment.SetRange("No.", PeriodDiscountLine.Code);
@@ -497,8 +496,6 @@
                                     "Variant Code" := MixedDiscountLine."Variant Code";
                                     "Starting Time" := 0T;
                                     "Ending Time" := 0T;
-                                    "Unit Price" := MixedDiscountLine."Unit price";
-                                    "Unit Cost" := MixedDiscountLine."Unit cost";
                                     if Item.Get("Item No.") then begin
                                         "Unit Cost" := Item."Unit Cost";
                                         "Vend Item No." := Item."Vendor Item No.";
