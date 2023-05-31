@@ -194,7 +194,6 @@
                 POSWorkshiftCheckpointPage.LookupMode(true);
                 PageAction := POSWorkshiftCheckpointPage.RunModal();
                 ConfirmEoD := (PageAction = ACTION::LookupOK);
-                Commit();
             end else begin
                 // Nothing to balance
                 ConfirmEoD := true;
@@ -231,8 +230,6 @@
                         ConfirmEoD := not POSPaymentBinCheckpoint.IsEmpty();
                     end;
                 end;
-
-                Commit();
             end else begin
                 // Nothing to show.
                 ConfirmEoD := true;
@@ -250,6 +247,7 @@
             ConfirmEoD := true;
         end;
 
+        Commit();
         exit(ConfirmEoD);
     end;
 

@@ -56,6 +56,8 @@
         Clear(_Stargate);
 #endif
         _Setup.Initialize();
+        _Setup.GetPOSUnit(_POSUnit);
+
         JavaScriptInterface.Initialize(FrontEndIn);
         _POSBackgroundTaskAPI := POSBackgroundTaskAPI;
 

@@ -880,9 +880,13 @@ codeunit 85020 "NPR POS End of Day"
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
-            POSEndOfDayProfile.Code := 'EOD-TEST';
+            if (not POSEndOfDayProfile.Get('EOD-TEST')) then begin
+                POSEndOfDayProfile.Code := 'EOD-TEST';
+                POSEndOfDayProfile.Insert();
+            end;
             POSEndOfDayProfile."Z-Report UI" := POSEndOfDayProfile."Z-Report UI"::BALANCING;
-            POSEndOfDayProfile.Insert();
+            POSEndOfDayProfile.Modify();
+
             _POSUnit."POS End of Day Profile" := POSEndOfDayProfile.Code;
             _POSUnit.Modify();
 

@@ -438,14 +438,17 @@
         OnAfterInsertPOSPaymentLine(POSSale, POSSaleLine, POSEntry, POSEntryPaymentLine);
     end;
 
-    local procedure InsertPOSBalancingLine(PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp."; POSEntry: Record "NPR POS Entry"; LineNo: Integer; IsBinTransfer: Boolean)
+    local procedure InsertPOSBalancingLine(PaymentBinEntryNo: Integer; POSEntry: Record "NPR POS Entry"; LineNo: Integer; IsBinTransfer: Boolean)
     var
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSBinEntry: Record "NPR POS Bin Entry";
         POSPaymentMethod: Record "NPR POS Payment Method";
         Difference: Decimal;
         POSBalancingLineDescriptionLbl: Label '%1: %2 - %3', Locked = true;
+        PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
     begin
+
+        PaymentBinCheckpoint.Get(PaymentBinEntryNo);
 
         POSBalancingLine.Init();
         POSBalancingLine."POS Entry No." := POSEntry."Entry No.";
@@ -911,20 +914,21 @@
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SalespersonPurchaserLbl: Label '%1: %2', Locked = true;
+        PaymentBinCheckpointQuery: Query "NPR WorkshiftPaymentCheckpoint";
     begin
 
-        PaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftEntryNo);
-        PaymentBinCheckpoint.SetFilter(Status, '=%1', PaymentBinCheckpoint.Status::WIP);
-        PaymentBinCheckpoint.SetFilter("Include In Counting", '<>%1', PaymentBinCheckpoint."Include In Counting"::NO);
-
-        if (not PaymentBinCheckpoint.IsEmpty()) then
+        PaymentBinCheckpointQuery.SetFilter(WorkshiftCheckpointEntryNo, '=%1', WorkshiftEntryNo);
+        PaymentBinCheckpointQuery.SetFilter(Status, '=%1', PaymentBinCheckpoint.Status::WIP);
+        PaymentBinCheckpointQuery.SetFilter(IncludeInCounting, '<>%1', PaymentBinCheckpoint."Include In Counting"::NO);
+        PaymentBinCheckpointQuery.Open();
+        if (PaymentBinCheckpointQuery.Read()) then
             exit(0); // Still work to do before counting is completed
 
-        PaymentBinCheckpoint.SetFilter(Status, '=%1', PaymentBinCheckpoint.Status::READY);
-        if (PaymentBinCheckpoint.IsEmpty()) then
+        PaymentBinCheckpointQuery.Close();
+        PaymentBinCheckpointQuery.SetFilter(Status, '=%1', PaymentBinCheckpoint.Status::READY);
+        PaymentBinCheckpointQuery.Open();
+        if (not PaymentBinCheckpointQuery.Read()) then
             exit(0); // Nothing is ready to post
-
-        PaymentBinCheckpoint.FindSet();
 
         GetPOSPeriodRegister(SalePOS, POSPeriodRegister, false);
 
@@ -975,19 +979,22 @@
             POSWorkshiftCheckpoint.Reset();
             POSWorkshiftCheckpoint.SetCurrentKey("Consolidated With Entry No.");
             POSWorkshiftCheckpoint.SetFilter("Consolidated With Entry No.", '=%1', WorkshiftEntryNo);
-            if (not POSWorkshiftCheckpoint.IsEmpty()) then
-                POSWorkshiftCheckpoint.ModifyAll(Open, false);
+            if (POSWorkshiftCheckpoint.FindSet()) then begin
+                repeat
+                    POSWorkshiftCheckpoint.Open := false;
+                    POSWorkshiftCheckpoint.Modify();
+                until (POSWorkshiftCheckpoint.Next() = 0);
+            end;
         end;
 
         LineNo := 10000;
         repeat
-            InsertPOSBalancingLine(PaymentBinCheckpoint, POSEntry, LineNo, (POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::TRANSFER));
+            InsertPOSBalancingLine(PaymentBinCheckpointQuery.EntryNo, POSEntry, LineNo, (POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::TRANSFER));
             LineNo += 10000;
-            PaymentBinCheckpointUpdate.Get(PaymentBinCheckpoint."Entry No.");
+            PaymentBinCheckpointUpdate.Get(PaymentBinCheckpointQuery.EntryNo);
             PaymentBinCheckpointUpdate.Status := PaymentBinCheckpointUpdate.Status::TRANSFERED;
             PaymentBinCheckpointUpdate.Modify();
-
-        until (PaymentBinCheckpoint.Next() = 0);
+        until (not PaymentBinCheckpointQuery.Read());
 
         exit(POSEntry."Entry No.");
     end;
