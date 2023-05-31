@@ -1,6 +1,6 @@
 ﻿table 6151168 "NPR NpGp POS Sales Line"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'Global Pos Sales Line';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpGp POS Sales Lines";
