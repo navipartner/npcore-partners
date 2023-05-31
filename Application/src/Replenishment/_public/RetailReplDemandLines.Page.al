@@ -1,6 +1,6 @@
 ﻿page 6151070 "NPR Retail Repl. Demand Lines"
 {
-    Extensible = False;
+    Extensible = true;
     // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
     // NPR5.39/JKL /20180222 CASE 299436  added units per parcel
     // NPR5.48/JDH /20181109 CASE 334163 Added Caption to Action

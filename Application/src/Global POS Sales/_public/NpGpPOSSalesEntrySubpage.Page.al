@@ -1,6 +1,6 @@
 ﻿page 6151168 "NPR NpGp POSSalesEntry Subpage"
 {
-    Extensible = False;
+    Extensible = true;
     Caption = 'Sales Lines';
     Editable = false;
     PageType = ListPart;
