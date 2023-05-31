@@ -1,6 +1,6 @@
 ﻿page 6151062 "NPR Distribution Setup"
 {
-    Extensible = False;
+    Extensible = true;
     Caption = 'Distribution Setup';
     PageType = ListPart;
     UsageCategory = Administration;

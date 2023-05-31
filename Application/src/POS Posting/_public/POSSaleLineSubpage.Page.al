@@ -1,6 +1,6 @@
 ﻿page 6150653 "NPR POS Sale Line Subpage"
 {
-    Extensible = False;
+    Extensible = true;
     Caption = 'POS Sale Line Subpage';
     DelayedInsert = false;
     DeleteAllowed = false;
