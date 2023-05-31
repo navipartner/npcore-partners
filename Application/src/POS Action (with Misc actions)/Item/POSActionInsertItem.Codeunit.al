@@ -163,9 +163,10 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
 
         Response.Add('ItemGroupSale', Item."NPR Group sale");
 
-
-        GetPromptSerial := NPRPOSTrackingUtils.ItemRequiresSerialNumber(Item,
-                                                                        UseSpecificTracking);
+        Item.CalcFields("Assembly BOM");
+        if not (Item."Assembly BOM" and Item."NPR Explode BOM auto") then
+            GetPromptSerial := NPRPOSTrackingUtils.ItemRequiresSerialNumber(Item,
+                                                                            UseSpecificTracking);
 
         Response.Add('GetPromptSerial', GetPromptSerial);
 
