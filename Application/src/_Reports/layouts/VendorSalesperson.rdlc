@@ -2051,10 +2051,11 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value />
+                                  <Value>=Sum(Fields!Quantity.Value)</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>6.5pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -2385,10 +2386,11 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value />
+                                  <Value>=Sum(Sum(Fields!Quantity.Value))</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
-                                    <FontSize>6.5pt</FontSize>
+                                    <FontSize>8pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -3292,8 +3294,8 @@
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
-            <Top>1.13586cm</Top>
-            <Left>0.00931cm</Left>
+            <Top>1.01388cm</Top>
+            <Left>0.00932cm</Left>
             <Height>4.03236cm</Height>
             <Width>18.39466cm</Width>
             <Style>
@@ -3321,8 +3323,8 @@
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>No_Caption</rd:DefaultName>
-            <Top>0.12198cm</Top>
-            <Left>0.00791cm</Left>
+            <Top>0cm</Top>
+            <Left>0.00792cm</Left>
             <Height>1.03003cm</Height>
             <Width>2.09316cm</Width>
             <ZIndex>1</ZIndex>
@@ -3367,8 +3369,8 @@
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>No_Caption</rd:DefaultName>
-            <Top>0.12198cm</Top>
-            <Left>2.10107cm</Left>
+            <Top>0cm</Top>
+            <Left>2.10108cm</Left>
             <Height>1.03003cm</Height>
             <Width>4.16217cm</Width>
             <ZIndex>2</ZIndex>
@@ -3415,8 +3417,8 @@
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>No_Caption</rd:DefaultName>
-            <Top>0.12198cm</Top>
-            <Left>6.26324cm</Left>
+            <Top>0cm</Top>
+            <Left>6.26325cm</Left>
             <Height>1.03003cm</Height>
             <Width>1.48239cm</Width>
             <ZIndex>3</ZIndex>
@@ -3463,8 +3465,8 @@
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>No_Caption</rd:DefaultName>
-            <Top>0.12198cm</Top>
-            <Left>7.74563cm</Left>
+            <Top>0cm</Top>
+            <Left>7.74564cm</Left>
             <Height>1.03003cm</Height>
             <Width>1.77873cm</Width>
             <ZIndex>4</ZIndex>
@@ -3511,8 +3513,8 @@
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>No_Caption</rd:DefaultName>
-            <Top>0.12198cm</Top>
-            <Left>9.52436cm</Left>
+            <Top>0cm</Top>
+            <Left>9.52437cm</Left>
             <Height>1.03003cm</Height>
             <Width>2.3672cm</Width>
             <ZIndex>5</ZIndex>
@@ -3559,8 +3561,8 @@
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>No_Caption</rd:DefaultName>
-            <Top>0.12198cm</Top>
-            <Left>11.89156cm</Left>
+            <Top>0cm</Top>
+            <Left>11.89157cm</Left>
             <Height>1.03003cm</Height>
             <Width>2.3672cm</Width>
             <ZIndex>6</ZIndex>
@@ -3607,8 +3609,8 @@
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>No_Caption</rd:DefaultName>
-            <Top>0.12198cm</Top>
-            <Left>14.25876cm</Left>
+            <Top>0cm</Top>
+            <Left>14.25877cm</Left>
             <Height>1.03003cm</Height>
             <Width>2.06772cm</Width>
             <ZIndex>7</ZIndex>
@@ -3655,8 +3657,8 @@
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>No_Caption</rd:DefaultName>
-            <Top>0.12198cm</Top>
-            <Left>16.32648cm</Left>
+            <Top>0cm</Top>
+            <Left>16.32649cm</Left>
             <Height>1.03003cm</Height>
             <Width>2.07749cm</Width>
             <ZIndex>8</ZIndex>
@@ -3683,13 +3685,13 @@
             </Style>
           </Textbox>
         </ReportItems>
-        <Height>2.03473in</Height>
+        <Height>1.98671in</Height>
         <Style />
       </Body>
-      <Width>7.25635in</Width>
+      <Width>7.24566in</Width>
       <Page>
         <PageHeader>
-          <Height>0.95559in</Height>
+          <Height>1.01389in</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
