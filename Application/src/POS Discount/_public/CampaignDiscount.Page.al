@@ -553,8 +553,6 @@
                 PeriodDiscountLine."Discount %" := Percentage;
                 PeriodDiscountLine.Validate("Discount Amount", Item."Unit Price" - PeriodDiscountLine."Campaign Unit Price");
                 PeriodDiscountLine."Campaign Unit Cost" := Item."Unit Cost";
-                PeriodDiscountLine.Description := Item.Description;
-                PeriodDiscountLine."Unit Price Incl. VAT" := true;
                 PeriodDiscountLine."Starting Date" := Rec."Starting Date";
                 PeriodDiscountLine."Ending Date" := Rec."Ending Date";
                 PeriodDiscountLine.Status := Rec.Status;
