@@ -2003,8 +2003,14 @@
         BOMComponent: Record "BOM Component";
         SaleLinePOS: Record "NPR POS Sale Line";
         Item2: Record Item;
+        BOMComponentItem: Record Item;
+        NPRPOSTrackingUtils: Codeunit "NPR POS Tracking Utils";
+        TotalComponentQuantity: Decimal;
+        LineQuantity: Decimal;
         FromLineNo: Integer;
         ToLineNo: Integer;
+        i: Integer;
+        UseSpecTracking: Boolean;
     begin
         if Sum = 0 then begin
             if Quantity = 0 then
@@ -2031,29 +2037,46 @@
                 if BOMComponent."Assembly BOM" then begin
                     ExplodeBOM(BOMComponent."No.", StartLineNo, EndLineNo, Level, UnitPrice, Sum);
                 end else begin
-                    Level += 1;
-                    SaleLinePOS.Init();
-                    SaleLinePOS."Register No." := "Register No.";
-                    SaleLinePOS."Sales Ticket No." := "Sales Ticket No.";
-                    SaleLinePOS.Date := Rec.Date;
-                    SaleLinePOS."Line No." := Round(EndLineNo - (EndLineNo - StartLineNo) / (2 * Level), 1);
-                    if not SaleLinePOS.Insert(true) then
-                        SaleLinePOS.Modify(true);
-                    SaleLinePOS."No." := BOMComponent."No.";
-                    SaleLinePOS.SetSkipUpdateDependantQuantity(true);
-                    SaleLinePOS.Validate("No.");
-                    SaleLinePOS.Quantity := BOMComponent."Quantity per" * Rec.Quantity;
-                    SaleLinePOS.Validate(Quantity);
-                    SaleLinePOS."Parent BOM Item No." := BOMComponent."Parent Item No.";
-                    SaleLinePOS."Parent BOM Line No." := StartLineNo;
-                    Sum += SaleLinePOS."Unit Price" * SaleLinePOS.Quantity;
-                    SaleLinePOS.SetSkipUpdateDependantQuantity(false);
-                    if not SaleLinePOS.Modify(true) then
-                        SaleLinePOS.Insert(true);
-                    if FromLineNo = 0 then
-                        FromLineNo := SaleLinePOS."Line No.";
 
-                    ToLineNo := SaleLinePOS."Line No.";
+                    if not BOMComponentItem.Get(BOMComponent."No.") then
+                        Clear(BOMComponentItem);
+
+                    TotalComponentQuantity := BOMComponent."Quantity per" * Rec.Quantity;
+
+                    i := TotalComponentQuantity;
+                    LineQuantity := BOMComponent."Quantity per" * Rec.Quantity;
+                    if NPRPOSTrackingUtils.ItemRequiresSerialNumber(BOMComponentItem, UseSpecTracking) then begin
+                        i := 0;
+                        LineQuantity := 1;
+                    end;
+
+                    repeat
+                        Level += 1;
+                        i += 1;
+                        SaleLinePOS.Init();
+                        SaleLinePOS."Register No." := "Register No.";
+                        SaleLinePOS."Sales Ticket No." := "Sales Ticket No.";
+                        SaleLinePOS.Date := Rec.Date;
+                        SaleLinePOS."Line No." := Round(EndLineNo - (EndLineNo - StartLineNo) / (2 * Level), 1);
+                        if not SaleLinePOS.Insert(true) then
+                            SaleLinePOS.Modify(true);
+                        SaleLinePOS."No." := BOMComponent."No.";
+                        SaleLinePOS.SetSkipUpdateDependantQuantity(true);
+                        SaleLinePOS.Validate("No.");
+                        SaleLinePOS.Quantity := LineQuantity;
+                        SaleLinePOS.Validate(Quantity);
+                        SaleLinePOS."Parent BOM Item No." := BOMComponent."Parent Item No.";
+                        SaleLinePOS."Parent BOM Line No." := StartLineNo;
+                        Sum += SaleLinePOS."Unit Price" * SaleLinePOS.Quantity;
+                        SaleLinePOS.SetSkipUpdateDependantQuantity(false);
+                        if not SaleLinePOS.Modify(true) then
+                            SaleLinePOS.Insert(true);
+                        if FromLineNo = 0 then
+                            FromLineNo := SaleLinePOS."Line No.";
+
+                        ToLineNo := SaleLinePOS."Line No.";
+
+                    until (i >= TotalComponentQuantity)
                 end;
             until BOMComponent.Next() = 0;
 

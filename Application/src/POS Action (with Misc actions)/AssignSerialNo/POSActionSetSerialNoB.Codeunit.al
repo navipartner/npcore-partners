@@ -28,15 +28,22 @@ codeunit 6151033 "NPR POS Action Set Serial No B"
                                       POSSetup: Codeunit "NPR POS Setup")
     var
         NPRPOSTrackingUtils: Codeunit "NPR POS Tracking Utils";
+        QuantityErrLbl: Label 'Quantity at %1 %2 can only be 1 or -1', Comment = '%1 - field name, %2 - field value';
     begin
         CheckTrackingOptions(SaleLinePOS);
-
 
         NPRPOSTrackingUtils.ValidateSerialNo(SaleLinePOS."No.",
                                              SaleLinePOS."Variant Code",
                                              SerialNumberInput,
                                              SerialSelectionFromList,
                                              POSSetup);
+
+        if (SerialNumberInput <> '') and
+           (Abs(SaleLinePOS.Quantity) <> 1)
+        then
+            Error(QuantityErrLbl,
+                  SaleLinePOS.FieldName("Serial No."),
+                  SerialNumberInput);
 
         SaleLinePOS.Validate("Serial No.", SerialNumberInput);
         SaleLinePOS.Modify(true);
