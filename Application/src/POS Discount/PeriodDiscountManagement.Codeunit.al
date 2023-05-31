@@ -86,9 +86,6 @@
         if PeriodDiscountLine.FindSet() then
             repeat
                 if PeriodDiscountLineIsValid(PeriodDiscountLine, TempSaleLinePOS, TempSalePOS) then begin
-                    PeriodDiscountLine.CalcFields("Unit Price Incl. VAT");
-                    if PeriodDiscountLine."Unit Price Incl. VAT" then
-                        PeriodDiscountLine."Unit Price" := PeriodDiscountLine."Unit Price" / (100 + TempSaleLinePOS."VAT %") * 100;
                     if PeriodDiscountLine."Campaign Unit Price" < Price then begin
                         Price := PeriodDiscountLine."Campaign Unit Price";
                         BestCode := PeriodDiscountLine.Code;
@@ -115,7 +112,6 @@
                 if PeriodDiscountLine."Unit Price Incl. VAT" then
                     PeriodDiscountLine."Campaign Unit Price" := PeriodDiscountLine."Campaign Unit Price" / (100 + TempSaleLinePOS."VAT %") * 100;
             end;
-
             if PeriodDiscountLine."Campaign Unit Price" <= UnitPrice then begin
                 TempSaleLinePOS."Discount %" := 100 - PeriodDiscountLine."Campaign Unit Price" / UnitPrice * 100;
                 TempSaleLinePOS."Discount Type" := TempSaleLinePOS."Discount Type"::Campaign;

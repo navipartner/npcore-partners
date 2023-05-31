@@ -584,10 +584,7 @@
             NPRMixedDiscountLine."Disc. Grouping Type" := NPRMixedDiscountLine."Disc. Grouping Type"::Item;
             NPRMixedDiscountLine.Quantity := 1;
             NPRMixedDiscountLine.Description := Item.Description;
-            NPRMixedDiscountLine."Unit cost" := Item."Unit Cost";
-            NPRMixedDiscountLine."Unit price incl. VAT" := Item."Price Includes VAT";
             NPRMixedDiscountLine.Status := Rec.Status;
-            NPRMixedDiscountLine."Unit price" := Item."Unit Price";
             NPRMixedDiscountLine.Insert();
         until Item.Next() = 0;
         Message(OkMsg, Item.Count, Rec.Code);
