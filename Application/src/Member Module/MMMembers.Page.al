@@ -107,6 +107,16 @@
                     ToolTip = 'Specifies the value of the Country field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(Birthday; Rec.Birthday)
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Birthday field';
+                }
+                field("E-Mail News Letter"; Rec."E-Mail News Letter")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the E-Mail News Letter field';
+                }
                 field("Store Code"; Rec."Store Code")
                 {
                     ToolTip = 'Specifies the value of the Store Code field';
