@@ -108,21 +108,9 @@
         SaleLinePOSCoupon.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOSCoupon.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOSCoupon.SetRange("Sale Date", SalePOS.Date);
+        SaleLinePOSCoupon.SetRange(Type, SaleLinePOSCoupon.Type::Coupon);
         if SaleLinePOSCoupon.IsEmpty then
             exit;
-
-        SaleLinePOSCoupon.SetRange(Type, SaleLinePOSCoupon.Type::Coupon);
-        if SaleLinePOSCoupon.IsEmpty then begin
-            SaleLinePOSCoupon.SetRange(Type, SaleLinePOSCoupon.Type::Discount);
-            if not SaleLinePOSCoupon.IsEmpty then begin
-                SaleLinePOSCoupon.SetSkipCalcDiscount(true);
-                SaleLinePOSCoupon.FindSet();
-                repeat
-                    SaleLinePOSCoupon.Delete();
-                until SaleLinePOSCoupon.Next() = 0;
-            end;
-            exit;
-        end;
 
         SaleLinePOSCoupon.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Date", "Application Sequence No.");
         SaleLinePOSCoupon.FindSet();
@@ -197,9 +185,7 @@
             SaleLinePOS.CalcFields("Coupon Discount Amount");
 
             SaleLinePOS."Discount %" := 0;
-            SaleLinePOS."Discount Amount" -= SaleLinePOS."Coupon Discount Amount";
-            if SaleLinePOS."Discount Amount" > (SaleLinePOS."Unit Price" * SaleLinePOS.Quantity) then
-                SaleLinePOS."Discount %" := 100;
+            SaleLinePOS."Discount Amount" := 0;
             SaleLinePOS.UpdateAmounts(SaleLinePOS);
             SaleLinePOS."Coupon Applied" := false;
             SaleLinePOS."Discount Type" := DiscountType;
