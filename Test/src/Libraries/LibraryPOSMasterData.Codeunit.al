@@ -1,6 +1,13 @@
 ﻿codeunit 85002 "NPR Library - POS Master Data"
 {
+
     procedure CreatePOSUnit(var POSUnit: Record "NPR POS Unit"; POSStoreCode: Code[10]; POSProfileCode: Code[20])
+    var
+    begin
+        CreatePOSUnit('', POSUnit, POSStoreCode, POSProfileCode);
+    end;
+
+    procedure CreatePOSUnit(PosUnitNo: Code[10]; var POSUnit: Record "NPR POS Unit"; POSStoreCode: Code[10]; POSProfileCode: Code[20])
     var
         POSStore: Record "NPR POS Store";
         POSPaymentMethod: Record "NPR POS Payment Method";
@@ -10,24 +17,33 @@
         LibraryUtility: Codeunit "Library - Utility";
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
     begin
-        POSUnit.Init();
-        POSUnit.Validate(
-          "No.",
-          CopyStr(
-            LibraryUtility.GenerateRandomCode(POSUnit.FieldNo("No."), DATABASE::"NPR POS Unit"), 1,
-            LibraryUtility.GetFieldLength(DATABASE::"NPR POS Unit", POSUnit.FieldNo("No."))));
+
+        if (not (POSUnit.Get(PosUnitNo)) or (PosUnitNo = '')) then begin
+            POSUnit.Init();
+            if (PosUnitNo = '') then
+                POSUnit.Validate(
+                    "No.",
+                    CopyStr(
+                    LibraryUtility.GenerateRandomCode(POSUnit.FieldNo("No."), DATABASE::"NPR POS Unit"), 1,
+                    LibraryUtility.GetFieldLength(DATABASE::"NPR POS Unit", POSUnit.FieldNo("No."))))
+            else
+                POSUnit.Validate("No.", PosUnitNo);
+
+            CreatePOSAuditProfile(POSAuditProfile);
+            POSUnit."POS Audit Profile" := POSAuditProfile.Code;
+            CreatePOSBin(POSPaymentBin);
+            POSUnit."Default POS Payment Bin" := POSPaymentBin."No.";
+
+            POSUnit.Insert(true);
+        end;
+
         if POSStoreCode = '' then
             CreatePOSStore(POSStore, POSProfileCode)
         else
             POSStore.Get(POSStoreCode);
+
         POSUnit."POS Store Code" := POSStore.Code;
         POSUnit.Validate(Status, POSUnit.Status::CLOSED);
-        CreatePOSAuditProfile(POSAuditProfile);
-        POSUnit."POS Audit Profile" := POSAuditProfile.Code;
-        POSUnit.Insert(true);
-
-        CreatePOSBin(POSPaymentBin);
-        POSUnit."Default POS Payment Bin" := POSPaymentBin."No.";
         POSUnit.Modify();
 
         POSManagePOSUnit.OpenPosUnit(POSUnit);
@@ -35,25 +51,35 @@
     end;
 
     procedure CreatePOSStore(var POSStore: Record "NPR POS Store"; POSProfileCode: Code[20])
+    begin
+        CreatePOSStore('', POSStore, POSProfileCode);
+    end;
+
+    procedure CreatePOSStore(POSStoreCode: Code[10]; var POSStore: Record "NPR POS Store"; POSProfileCode: Code[20])
     var
         LibraryUtility: Codeunit "Library - Utility";
         Location: Record Location;
         LibraryWarehouse: Codeunit "Library - Warehouse";
     begin
-        POSStore.Init();
-        POSStore.Validate(
-          Code,
-          CopyStr(
-            LibraryUtility.GenerateRandomCode(POSStore.FieldNo(Code), DATABASE::"NPR POS Store"), 1,
-            LibraryUtility.GetFieldLength(DATABASE::"NPR POS Store", POSStore.FieldNo(Code))));
+        if (not (POSStore.Get(POSStoreCode)) or (POSStoreCode = '')) then begin
+            POSStore.Init();
 
-        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
-        POSStore.Validate("Location Code", Location.Code);
-        POSStore."POS Posting Profile" := POSProfileCode;
+            if (POSStoreCode = '') then
+                POSStore.Validate(
+                    Code,
+                    CopyStr(
+                        LibraryUtility.GenerateRandomCode(POSStore.FieldNo(Code), DATABASE::"NPR POS Store"), 1,
+                        LibraryUtility.GetFieldLength(DATABASE::"NPR POS Store", POSStore.FieldNo(Code))))
+            else
+                POSStore.Validate(Code, POSStoreCode);
 
-        POSStore.Insert(true);
+            LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+            POSStore.Validate("Location Code", Location.Code);
+            POSStore."POS Posting Profile" := POSProfileCode;
 
-        CreatePOSPostingSetupSet(POSStore.Code, '', '');
+            POSStore.Insert(true);
+            CreatePOSPostingSetupSet(POSStore.Code, '', '');
+        end;
     end;
 
     procedure CreatePOSBin(var POSPaymentBin: Record "NPR POS Payment Bin")
@@ -189,7 +215,7 @@
         if POSPostingSetup."Difference Acc. No." = '' then begin
             POSPostingSetup."Difference Account Type" := POSPostingSetup."Account Type"::"G/L Account";
             POSPostingSetup."Difference Acc. No." := LibraryERM.CreateGLAccountNo;
-            POSPostingSetup."Difference Acc. No. (Neg)" := LibrarySales.CreateCustomerNo;
+            POSPostingSetup."Difference Acc. No. (Neg)" := POSPostingSetup."Difference Acc. No.";
         end;
         POSPostingSetup.Insert();
     end;
@@ -610,7 +636,10 @@
         LibraryERM: Codeunit "Library - ERM";
     begin
         VoucherType.Init();
-        VoucherType.Code := 'PARTIAL';
+        if (not VoucherType.Get('PARTIAL')) then begin
+            VoucherType.Code := 'PARTIAL';
+            VoucherType.Insert();
+        end;
         VoucherType."Account No." := LibraryERM.CreateGLAccountWithSalesSetup();
         VoucherType."No. Series" := LibraryERM.CreateNoSeriesCode('P');
         VoucherType."Arch. No. Series" := LibraryERM.CreateNoSeriesCode('PA');
@@ -620,7 +649,7 @@
         VoucherType."Apply Payment Module" := CreatePartialApplyVoucherModule();
         VoucherType."Send Voucher Module" := CreateDefaultSendVoucherModule();
         VoucherType."Payment Type" := CreateVoucherPaymentMethod();
-        VoucherType.Insert();
+        VoucherType.Modify();
     end;
 
     procedure CreateDefaultVoucherType(var VoucherType: Record "NPR NpRv Voucher Type"; AllowTopUp: Boolean)
@@ -629,7 +658,10 @@
         LibraryERM: Codeunit "Library - ERM";
     begin
         VoucherType.Init();
-        VoucherType.Code := 'DEFAULT';
+        if (not VoucherType.Get('DEFAULT')) then begin
+            VoucherType.Code := 'DEFAULT';
+            VoucherType.Insert();
+        end;
         VoucherType."Account No." := LibraryERM.CreateGLAccountWithSalesSetup();
         VoucherType."No. Series" := LibraryERM.CreateNoSeriesCode('D');
         VoucherType."Arch. No. Series" := LibraryERM.CreateNoSeriesCode('DA');
@@ -639,7 +671,7 @@
         VoucherType."Apply Payment Module" := CreateDefaultApplyVoucherModule();
         VoucherType."Send Voucher Module" := CreateDefaultSendVoucherModule();
         VoucherType."Payment Type" := CreateVoucherPaymentMethod();
-        VoucherType.Insert();
+        VoucherType.Modify();
     end;
 
     procedure CreateReturnVoucherType(ReturnVoucherType: Code[20]; VoucherType: Code[20])
