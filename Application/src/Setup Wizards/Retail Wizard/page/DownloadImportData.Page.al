@@ -214,7 +214,7 @@ page 6150812 "NPR Download&Import Data"
         LoadTopBanners();
         Commit();
         PrintTemplatepackage := '/retailprinttemplates/templates.json';
-        NPretailpackage := 'NPRETAILSETUP-BASIC.rapidstart';
+        NPretailpackage := 'NPRETAILWIZARDDATA.rapidstart';
     end;
 
     trigger OnOpenPage();
