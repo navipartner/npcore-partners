@@ -70,10 +70,8 @@
         if SaleLinePOS."Amount Including VAT" <> 0 then begin
             SetSalesLineFilter(SaleLinePos, NpRvSalesLine);
             NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
-            if NpRvSalesLine.FindSet() then
-                repeat
-                    PostPayment(NpRvSalesLine, SaleLinePos);
-                until NpRvSalesLine.Next() = 0;
+            if NpRvSalesLine.FindFirst() then
+                PostPayment(NpRvSalesLine, SaleLinePos);
         end;
     end;
 
@@ -95,10 +93,8 @@
         if SaleLinePOS."Amount Including VAT" <> 0 then begin
             SetSalesLineFilter(SaleLinePos, NpRvSalesLine);
             NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
-            if NpRvSalesLine.FindSet() then
-                repeat
-                    PostPayment(NpRvSalesLine, SaleLinePos);
-                until NpRvSalesLine.Next() = 0;
+            if NpRvSalesLine.FindFirst() then
+                PostPayment(NpRvSalesLine, SaleLinePos);
         end;
     end;
 
@@ -589,7 +585,9 @@
             exit;
         if not VoucherEntry.Open then
             exit;
-
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        VoucherEntryApply.ReadIsolation := IsolationLevel::ReadCommitted;
+#ENDIF
         VoucherEntryApply.SetCurrentKey("Voucher No.", Open, Positive);
         VoucherEntryApply.SetRange("Voucher No.", VoucherEntry."Voucher No.");
         VoucherEntryApply.SetRange(Open, true);
@@ -986,6 +984,9 @@
     local procedure SetSalesLineFilter(SaleLinePOS: Record "NPR POS Sale Line"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     begin
         Clear(NpRvSalesLine);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        NpRvSalesLine.ReadIsolation := IsolationLevel::ReadCommitted;
+#ENDIF
         NpRvSalesLine.SetCurrentKey("Retail ID", "Document Source", Type);
         NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
