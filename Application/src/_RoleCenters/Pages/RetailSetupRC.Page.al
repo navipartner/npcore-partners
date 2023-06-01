@@ -33,15 +33,6 @@ page 6151245 "NPR Retail Setup RC"
     {
         area(embedding)
         {
-            action("POS Menus_top")
-            {
-                Caption = 'POS Menus';
-                Image = PaymentJournal;
-                RunObject = Page "NPR POS Menus";
-
-                ToolTip = 'View or edit the POS Menus';
-                ApplicationArea = NPRRetail;
-            }
             action("POS Posting Setup_top")
             {
                 Caption = 'POS Posting Setup';
