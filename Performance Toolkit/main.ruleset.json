@@ -8,8 +8,13 @@
             "justification": "The name of variables and parameters must be suffixed with the type or object name."
         },
         {
+            "id": "AA0210",
+            "action": "None",
+            "justification": "Avoid non-indexed fields into filtering. Suboptimal index."
+        },
+        {
             "id": "AA0215",
-            "action":"Hidden",
+            "action":"None",
             "justification": "Follow the style guide about the best practices for naming."
         },
         {
