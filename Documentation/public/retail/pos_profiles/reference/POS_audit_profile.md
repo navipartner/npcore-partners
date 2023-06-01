@@ -23,6 +23,8 @@ The following options can be set up in the **General** section:
 | **Allow Printing Receipt Copy** | Set up whether a copy is printed or not. Available options are: **Always**, **Once**, **Never**. |
 | **Require Item Return Reason** | If this field is checked in the moment of returning goods in the POS, the cashier will be asked to enter the reason code for the return of the goods. |
 
+> [!Video https://www.youtube.com/embed/JaqGl38lV-s]
+
 ### Related links
 
 - [POS Display Profile](POS_Display_profile.md)

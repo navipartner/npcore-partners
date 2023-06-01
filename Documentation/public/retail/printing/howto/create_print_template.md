@@ -26,6 +26,8 @@ There are multiple system print templates you can choose from, but if you need a
    - **Edit Layout** - Design the layout of the item by providing the X and Y coordinates (for Matrix templates) or the order and content of each line (for Line templates). 
    - **Edit Device Settings** - Configure the device-specific settings. You can override the default settings of a device, typically related to calibration, media specifications or encoding.
 
+> [!Video https://www.youtube.com/embed/VKI0MNWorPA]
+
 ### Related links
 
 - [Set up the printing module (Hardware Connector)](setup_print.md)

@@ -31,6 +31,8 @@ The following options are available in the **Name and Date Formatting** section:
 
 ![nameanddate](../images/Name%20and%20date.PNG)
 
+> [!Video https://www.youtube.com/embed/xmJ_q4eWDY4]
+
 ### Related links
 
 - [POS unit receipt profile](POS_unit_Receipt_profile.md)

@@ -12,6 +12,10 @@ NP Retail is a solution which combines the functionalities of the POS and ERP sy
 
 - If you're unsure whether our solution is supported by your hardware components, refer to the [system requirements](system_requirements.md).
 
+### POS Academy
+
+Refer to our [POS academy video library](pos_academy.md) to get acquainted with the basics of the NP Retail solution. The videos are based around a fictional company and built one upon the other, taking you on a journey through all the necessary steps in POS operation and configuration. The [POS Academy](https://www.navipartner.com/np-pos-academy) showcases real examples and best practices, and its goal is to both demonstrate a way of configuration and inspire viewers to explore new ideas and options.
+
 ### What's new
 
 Learn which [**new features and improvements**](../../release_notes_public.md) have been introduced in the newest versions of the NP Retail solution.
