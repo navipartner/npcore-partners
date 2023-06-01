@@ -58,7 +58,7 @@ codeunit 6059919 "NPR Videos"
     local procedure POSDiscountsFirstPart(var Video: Codeunit Video; AppID: Guid)
     var
         VideoLbl: Label 'https://www.youtube.com/embed/Pn2N0bcTDJ4', locked = true;
-        TitleLbl: Label 'NP POS Academy 04: Discounts ½';
+        TitleLbl: Label 'NP POS Academy 04: Discounts 1/2';
     begin
         Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
     end;
