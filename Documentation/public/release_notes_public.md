@@ -24,11 +24,17 @@ Two new MPOS actions for improved barcode scanning have been introduced:
 
 For more information and operating instructions, refer to the article on [MPOS action setup for Scandit](retail/mpos/howto/scandit_pos_actions.md).
 
-### New MPOS design
+### MPOS redesign
 
 Our MPOS has undergone a complete UI overhaul, making the previous scaled-down version of the regular MPOS more modern and streamlined. 
 
 For operating instructions, refer to the article on [MPOS setup](retail/mpos/howto/MPOS_View.md).
+
+### New POS editor
+
+With the new POS editor, POS buttons and actions can now be configured solely from within the POS UI no longer requiring accompanying setup in Business Central. This means that it's not necessary to leave the POS to change a button or a workflow parameter. Users will be able to see their changes being reflected instantly without jumping back and forth multiple windows. Consequently, the POS configuration is simplified and load time reduced.
+
+For operating instructions, refer to the article on [POS editor activation](retail/posunit/howto/pos_editor.md)
 
 ## Version 21.0 (April 28th 2023)
 
