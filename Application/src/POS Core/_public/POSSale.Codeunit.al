@@ -16,7 +16,6 @@
         LastSaleRetrieved: Boolean;
         SkipItemAvailabilityCheck: Boolean;
         SetDimension01: Label 'Dimension %1 does not exist';
-        SetDimension02: Label 'Dimension Value %1 does not exist for dimension %2';
         EndedSalesAmount: Decimal;
         EndedPaidAmount: Decimal;
         EndedChangeAmount: Decimal;
@@ -295,26 +294,21 @@
     internal procedure SetDimension(DimCode: Code[20]; DimValueCode: Code[20])
     var
         Dim: Record Dimension;
-        DimVal: Record "Dimension Value";
         TempDimSetEntry: Record "Dimension Set Entry" temporary;
         DimMgt: Codeunit DimensionManagement;
         OldDimSetID: Integer;
     begin
+        if DimCode = '' then
+            exit;
         if (not Dim.Get(DimCode)) then
             Error(SetDimension01, DimCode);
 
-        if DimValueCode <> '' then
-            if (not DimVal.Get(Dim.Code, DimValueCode)) then
-                Error(SetDimension02, DimValueCode, DimCode);
-
         DimMgt.GetDimensionSet(TempDimSetEntry, Rec."Dimension Set ID");
         if TempDimSetEntry.Get(TempDimSetEntry."Dimension Set ID", Dim.Code) then
-            if TempDimSetEntry."Dimension Value Code" <> DimValueCode then
-                TempDimSetEntry.Delete();
+            TempDimSetEntry.Delete();
         if DimValueCode <> '' then begin
-            TempDimSetEntry."Dimension Code" := DimVal."Dimension Code";
-            TempDimSetEntry."Dimension Value Code" := DimVal.Code;
-            TempDimSetEntry."Dimension Value ID" := DimVal."Dimension Value ID";
+            TempDimSetEntry."Dimension Code" := DimCode;
+            TempDimSetEntry.Validate("Dimension Value Code", DimValueCode);
             if TempDimSetEntry.Insert() then;
         end;
 

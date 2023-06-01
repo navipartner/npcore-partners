@@ -107,13 +107,14 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetFieldSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NaviConnect", 'ImportTypeActionable'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Retail Logo"));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'ShowReturnAmountDialog'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'AddNewOnSaleCoupons'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'UpdateDisplayOnSaleLineInsert'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'PrintWarrantyAfterSaleLine'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'UpdateTicketOnSaleLineInsert'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'UpdateMembershipOnSaleLineInsert'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS SalesWorkflowStep", 'MCSSaleLineUpload'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'ShowReturnAmountDialog'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'AddNewOnSaleCoupons'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'UpdateDisplayOnSaleLineInsert'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'PrintWarrantyAfterSaleLine'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'UpdateTicketOnSaleLineInsert'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'UpdateMembershipOnSaleLineInsert'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'MCSSaleLineUpload'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'PopupDimension'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG BalanceV4"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG ItemRef. Disc Barcodes", 'UpgradeDiscBarcodes'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Entry Dims", '20230515'));
@@ -391,7 +392,7 @@
                     'ImportTypeActionable':
                         exit('NPR-NC-ImportTypeActionable-20230324');
                 end;
-            Codeunit::"NPR UPG POS SalesWorkflowStep":
+            Codeunit::"NPR UPG POS Scenarios":
                 case UpgradeStep of
                     'ShowReturnAmountDialog':
                         exit('NPR-POSSalesWorkflowStepShowReturnAmountDialog-20230324');
@@ -407,6 +408,8 @@
                         exit('NPR-UpdateMembershipOnSaleLineInsert-20230420');
                     'MCSSaleLineUpload':
                         exit('NPR-MCSSaleLineUpload-20230420');
+                    'PopupDimension':
+                        exit('NPR-PopupDimension-20230531');
                 end;
             Codeunit::"NPR Upgrade Variety Setup":
                 exit('NPR_Upgrade_Variety_Setup_20230314');

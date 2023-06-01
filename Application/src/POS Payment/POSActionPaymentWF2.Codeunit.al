@@ -10,11 +10,14 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         HideZeroAmountName: Label 'Hide Zero Amount Dialog';
         HideZeroAmountDesc: Label 'Hide the amount dialog when amount is zero';
         PaymentMethodCodeName: Label 'Payment Method Code';
+        SwitchToPaymentViewName: Label 'Switch to Payment View';
+        SwitchToPaymentViewDesc: Label 'Automatically switch to Payment view, when the POS action is run from Sale view';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddBooleanParameter('HideAmountDialog', false, HideAmountName, HideAmountDesc);
         WorkflowConfig.AddBooleanParameter('HideZeroAmountDialog', false, HideZeroAmountName, HideZeroAmountDesc);
+        WorkflowConfig.AddBooleanParameter('SwitchToPaymentView', false, SwitchToPaymentViewName, SwitchToPaymentViewDesc);
         WorkflowConfig.AddTextParameter('paymentNo', '', PaymentMethodCodeName, PaymentMethodCodeName);
     end;
 
@@ -39,6 +42,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         RemainingAmount: Decimal;
         TextAmountLabel: Label 'Enter Amount';
     begin
+        SwitchToPaymentView(Context);
 #pragma warning disable AA0139
         PaymentMethodCode := Context.GetStringParameter('paymentNo');
 #pragma warning restore AA0139
@@ -51,7 +55,64 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         Response.Add('paymentDescription', POSPaymentMethod.Description);
         Response.Add('remainingAmount', RemainingAmount);
         Response.Add('amountPrompt', TextAmountLabel);
+        Response.Add('preWorkflows', AddPreWorkflowsToRun(Context));
         exit(Response);
+    end;
+
+    local procedure AddPreWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper") PreWorkflows: JsonObject
+    var
+        SalePOS: Record "NPR POS Sale";
+        POSSale: Codeunit "NPR POS Sale";
+        PmtProcessingEvents: Codeunit "NPR Payment Processing Events";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        PreWorkflows.ReadFrom('{}');
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        AddSaleDimensionWorkflow(SalePOS, PreWorkflows);
+        PmtProcessingEvents.OnAddPreWorkflowsToRun(Context, SalePOS, PreWorkflows);
+    end;
+
+    local procedure SwitchToPaymentView(Context: Codeunit "NPR POS JSON Helper")
+    var
+        CurrentView: Codeunit "NPR POS View";
+        POSSession: Codeunit "NPR POS Session";
+        IsSwitchToPaymentView: Boolean;
+    begin
+        if not (Context.GetBooleanParameter('SwitchToPaymentView', IsSwitchToPaymentView) and IsSwitchToPaymentView) then
+            exit;
+        POSSession.GetCurrentView(CurrentView);
+        if CurrentView.GetType() <> Enum::"NPR View Type"::Sale then
+            exit;
+        POSSession.ChangeViewPayment();
+    end;
+
+    local procedure AddSaleDimensionWorkflow(SalePOS: Record "NPR POS Sale"; PreWorkflows: JsonObject)
+    var
+        Dimension: Record Dimension;
+        POSPmtViewEventSetup: Record "NPR POS Paym. View Event Setup";
+        POSPmtViewEventMgt: Codeunit "NPR POS Paym. View Event Mgt.";
+        ActionParameters: JsonObject;
+        PopupMode: Integer;
+        HeadlineTextLbl: Label 'Please specify %1', Comment = '%1 - ML dimension code caption';
+    begin
+        if not POSPmtViewEventMgt.DimensionIsRequired(SalePOS, POSPmtViewEventSetup) then
+            exit;
+
+        Dimension.Get(POSPmtViewEventSetup."Dimension Code");
+        PopupMode := POSPmtViewEventSetup."Popup Mode";
+        if POSPmtViewEventSetup."Popup Mode" <> POSPmtViewEventSetup."Popup Mode"::List then
+            PopupMode += 1;
+        ActionParameters.Add('ValueSelection', PopupMode);
+        ActionParameters.Add('ApplyTo', 0);
+        ActionParameters.Add('StatisticsFrequency', 1);
+        ActionParameters.Add('ShowConfirmMessage', false);
+        ActionParameters.Add('DimensionSource', 2);
+        ActionParameters.Add('DimensionCode', POSPmtViewEventSetup."Dimension Code");
+        ActionParameters.Add('CreateDimValue', POSPmtViewEventSetup."Create New Dimension Values");
+        ActionParameters.Add('HeadlineTxt', StrSubstNo(HeadlineTextLbl, Dimension.GetMLCodeCaption(GlobalLanguage())));
+
+        PreWorkflows.Add('SALE_DIMENSION', ActionParameters);
     end;
 
     local procedure AttemptEndSale(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
@@ -89,7 +150,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPaymentWF2.Codeunit.js###
-'let main=async({workflow:e,popup:o,scope:d,parameters:i,context:m})=>{const{HideAmountDialog:p,HideZeroAmountDialog:l}=i,{dispatchToWorkflow:s,paymentType:u,remainingAmount:a,paymentDescription:r,amountPrompt:y}=await e.respond("preparePaymentWorkflow");let t=a;if(!p&&(!l||a>0)&&(t=await o.numpad({title:r,caption:y,value:a}),t===null))return;let n=await e.run(s,{context:{paymentType:u,suggestedAmount:t}});n.legacy?(m.fallbackAmount=t,await e.respond("doLegacyPaymentWorkflow")):n.tryEndSale&&await e.respond("tryEndSale")};'
+'let main=async({workflow:e,popup:i,scope:W,parameters:p,context:m})=>{const{HideAmountDialog:s,HideZeroAmountDialog:l}=p,{dispatchToWorkflow:u,paymentType:c,remainingAmount:a,paymentDescription:y,amountPrompt:d,preWorkflows:n}=await e.respond("preparePaymentWorkflow");if(n)for(const f of Object.entries(n)){let[r,g]=f;r&&await e.run(r,{parameters:g})}let t=a;if(!s&&(!l||a>0)&&(t=await i.numpad({title:y,caption:d,value:a}),!t))return;let o=await e.run(u,{context:{paymentType:c,suggestedAmount:t}});o.legacy?(m.fallbackAmount=t,await e.respond("doLegacyPaymentWorkflow")):o.tryEndSale&&await e.respond("tryEndSale")};'
         );
     end;
 }
