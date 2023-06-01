@@ -193,6 +193,7 @@
             TempPOSUnit_.Name := StrSubstNo(POSUnitNameLbl, TempPOSUnit_."No.");
             TempPOSUnit_."POS Store Code" := POSStoreCode;
             TempPOSUnit_."Default POS Payment Bin" := LastNoUsed;
+            TempPOSUnit_."POS Layout Code" := 'DEFAULT';
 
             if POSAuditProfile.Get('DEFAULT') then
                 TempPOSUnit_."POS Audit Profile" := POSAuditProfile.Code;
@@ -216,6 +217,18 @@
             if TempPOSStore_.Next() > 0 then
                 POSStoreCode := TempPOSStore_.Code;
         end;
+    end;
+
+    internal procedure CreateDefaultLayout()
+    var
+        POSLayout: Record "NPR POS Layout";
+    begin
+        if not POSLayout.Get('DEFAULT') then begin
+            POSLayout.Init();
+            POSLayout.Code := 'DEFAULT';
+            POSLayout.Description := 'Default POS Layout';
+            POSLayout.Insert();
+        end
     end;
 
     local procedure CheckIfNoAvailableInPOSUnit(var POSUnit: Record "NPR POS Unit"; var WantedStartingNo: Code[10]) CalculatedNo: Code[10]

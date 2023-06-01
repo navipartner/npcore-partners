@@ -352,6 +352,7 @@ page 6150813 "NPR Create POS Stores & Units"
 
         if (Step = Step::CreatePOSStoresUnitsStep) and (not Backwards) then begin
             CurrPage.POSStoresAndUnitsPG.Page.CreateTempPOSStores();
+            CurrPage.POSStoresAndUnitsPG.Page.CreateDefaultLayout();
             CurrPage.POSStoresAndUnitsPG.Page.CreateTempPOSUnits();
         end;
 
