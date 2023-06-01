@@ -10,6 +10,14 @@ From the customer’s side, the payment flow when purchasing from a local store 
 
 However, to enable Softpay, the following procedure needs to be performed in NP Retail first:
 
+## Prerequisites
+
+- Have an agreement with Softpay.
+- Have a Softpay account.
+- Have an Android phone with the Softpay app **Softpay - mPOS terminal** installed.
+
+## Procedure
+
 1. Click the ![Spyglass that opens the Tell Me feature](../../../images/Icons/Lightbulb_icon.png "Tell Me what you want to do") button, enter **EFT Setup**, and choose the related link.         
    The **EFT Setup** window is displayed.
 2. Create a new entry by clicking the **+** button. 

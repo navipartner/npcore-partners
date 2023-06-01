@@ -37,3 +37,5 @@ To set up the Adyen payment integration in NP Retail, make sure the prerequisite
 ## Related links
 
 - [Payment Gateways](../paymentgateway.md)
+- [Set up button for ADYEN_CLOUD to verify setup and check connection in SALE-LEFT](../../../eft/howto/eft_operation.md)
+- [Set up button for ADYEN_CLOUD to void last transaction](../../../eft/howto/eft_operation.md)
