@@ -96,3 +96,5 @@
     href: howto/card_Fee.md
   - name: Group code setup
     href: howto/group_codes.md
+  - name: Activate POS editor
+    href: howto/pos_editor.md
