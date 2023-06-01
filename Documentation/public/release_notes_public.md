@@ -16,7 +16,7 @@ For more information and operating instructions, refer to the [Group code setup]
 
 ### MPOS actions for improved barcode scanning
 
-Two new MPOS actions for improved barcode scanning have been introduced:
+Two new MPOS actions for improved barcode scanning have been introduced:  
 
 - **M_SCANDITITEMINFO** - users can use the camera on their mobile devices to scan item barcodes and receive the predefined information about that item. 
 
