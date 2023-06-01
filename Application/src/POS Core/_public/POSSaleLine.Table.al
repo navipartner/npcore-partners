@@ -2271,24 +2271,18 @@
     procedure SetDimension(DimCode: Code[20]; DimValueCode: Code[20])
     var
         Dim: Record Dimension;
-        DimVal: Record "Dimension Value";
         TempDimSetEntry: Record "Dimension Set Entry" temporary;
     begin
         if DimCode = '' then
             exit;
-
         Dim.Get(DimCode);
-        if DimValueCode <> '' then
-            DimVal.Get(Dim.Code, DimValueCode);
 
         DimMgt.GetDimensionSet(TempDimSetEntry, Rec."Dimension Set ID");
         if TempDimSetEntry.Get(TempDimSetEntry."Dimension Set ID", Dim.Code) then
-            if TempDimSetEntry."Dimension Value Code" <> DimValueCode then
-                TempDimSetEntry.Delete();
+            TempDimSetEntry.Delete();
         if DimValueCode <> '' then begin
-            TempDimSetEntry."Dimension Code" := DimVal."Dimension Code";
-            TempDimSetEntry."Dimension Value Code" := DimVal.Code;
-            TempDimSetEntry."Dimension Value ID" := DimVal."Dimension Value ID";
+            TempDimSetEntry."Dimension Code" := DimCode;
+            TempDimSetEntry.Validate("Dimension Value Code", DimValueCode);
             if TempDimSetEntry.Insert() then;
         end;
 

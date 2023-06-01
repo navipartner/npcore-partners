@@ -1,4 +1,4 @@
-codeunit 6150945 "NPR UPG POS SalesWorkflowStep"
+codeunit 6150945 "NPR UPG POS Scenarios"
 {
     Access = Internal;
     Subtype = Upgrade;
@@ -9,20 +9,26 @@ codeunit 6150945 "NPR UPG POS SalesWorkflowStep"
 
     trigger OnUpgradePerCompany()
     begin
+        //FINISH_SALE scenario
         ShowReturnAmountDialog();
+
+        //AFTER_INSERT_LINE scenario 
         AddNewOnSaleCoupons();
         UpdateDisplayOnSaleLineInsert();
         PrintWarrantyAfterSaleLine();
         UpdateTicketOnSaleLineInsert();
         UpdateMembershipOnSaleLineInsert();
         MCSSaleLineUpload();
+
+        //PAYMENT_VIEW scenario
+        PopupDimension();
     end;
 
     local procedure ShowReturnAmountDialog()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
     begin
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS SalesWorkflowStep', 'ShowReturnAmountDialog');
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'ShowReturnAmountDialog');
 
         if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ShowReturnAmountDialog')) then begin
             LogMessageStopwatch.LogFinish();
@@ -36,24 +42,35 @@ codeunit 6150945 "NPR UPG POS SalesWorkflowStep"
     end;
 
     local procedure UpgradeShowReturnAmountDialog()
-    var
-        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
     begin
-        POSSalesWorkflowStep.SetRange("Subscriber Function", 'ShowReturnAmountDialog');
-        POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", 6150855);
-        POSSalesWorkflowStep.Setrange("Workflow Code", 'FINISH_SALE');
-        if POSSalesWorkflowStep.FindSet() then
-            POSSalesWorkflowStep.DeleteAll();
+        DeletePOSWorkflowStepFinishSale(6150855, 'ShowReturnAmountDialog');
     end;
 
-    local procedure DeletePOSWorkflowStepAfterInsertLine(SubscriberFunction: Text)
+    local procedure DeletePOSWorkflowStepAfterInsertLine(SubscriberFunction: Text[80])
+    begin
+        DeletePOSWorkflowStep('AFTER_INSERT_LINE', 0, SubscriberFunction);
+    end;
+
+    local procedure DeletePOSWorkflowStepFinishSale(SubscriberCodeunitID: Integer; SubscriberFunction: Text[80])
+    begin
+        DeletePOSWorkflowStep('FINISH_SALE', SubscriberCodeunitID, SubscriberFunction);
+    end;
+
+    local procedure DeletePOSWorkflowStepPaymentView(SubscriberCodeunitID: Integer; SubscriberFunction: Text[80])
+    begin
+        DeletePOSWorkflowStep('PAYMENT_VIEW', SubscriberCodeunitID, SubscriberFunction);
+    end;
+
+    local procedure DeletePOSWorkflowStep(WorkflowCode: Code[20]; SubscriberCodeunitID: Integer; SubscriberFunction: Text[80])
     var
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
     begin
         POSSalesWorkflowStep.Reset();
-        POSSalesWorkflowStep.SetRange("Workflow Code", 'AFTER_INSERT_LINE');
+        POSSalesWorkflowStep.SetRange("Workflow Code", WorkflowCode);
+        if SubscriberCodeunitID <> 0 then
+            POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", SubscriberCodeunitID);
         POSSalesWorkflowStep.SetRange("Subscriber Function", SubscriberFunction);
-        if POSSalesWorkflowStep.FindSet() then
+        if not POSSalesWorkflowStep.IsEmpty() then
             POSSalesWorkflowStep.DeleteAll();
     end;
 
@@ -159,8 +176,33 @@ codeunit 6150945 "NPR UPG POS SalesWorkflowStep"
         LogMessageStopwatch.LogFinish();
     end;
 
+    local procedure PopupDimension()
+    var
+        POSPaymentViewEventSetup: Record "NPR POS Paym. View Event Setup";
+        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'PopupDimension');
+
+        if not UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'PopupDimension')) then begin
+            if POSPaymentViewEventSetup.Get() then begin
+                POSSalesWorkflowStep.SetRange("Workflow Code", 'PAYMENT_VIEW');
+                POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", Codeunit::"NPR POS Paym. View Event Mgt.");  //CU 6151053
+                POSSalesWorkflowStep.SetRange("Subscriber Function", 'PopupDimension');
+                POSSalesWorkflowStep.SetRange(Enabled, true);
+                POSPaymentViewEventSetup."Dimension Popup Enabled" := not POSSalesWorkflowStep.IsEmpty();
+                POSPaymentViewEventSetup."Skip Popup on Dimension Value" := true;  //Show popup only on first payment
+                POSPaymentViewEventSetup.Modify();
+            end;
+            DeletePOSWorkflowStepPaymentView(Codeunit::"NPR POS Paym. View Event Mgt.", 'PopupDimension');
+            UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'PopupDimension'));
+        end;
+
+        LogMessageStopwatch.LogFinish();
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
-        exit(Codeunit::"NPR UPG POS SalesWorkflowStep");
+        exit(Codeunit::"NPR UPG POS Scenarios");
     end;
 }
