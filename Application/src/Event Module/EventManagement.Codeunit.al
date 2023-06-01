@@ -2060,6 +2060,7 @@
 #endif
     var
         SourceCodeSetup: Record "Source Code Setup";
+        Item: Record Item;
     begin
         JobJnlLine."Job No." := POSEntry."Event No.";
         JobJnlLine."Job Task No." := POSEntry."Event Task No.";
@@ -2092,7 +2093,9 @@
         JobJnlLine.UpdateDimensions();
         UpdateJobJnlDimWithPOSSalesLine(POSEntrySalesLine, JobJnlLine);
         JobJnlLine.Validate(Quantity, POSEntrySalesLine.Quantity);
-        JobJnlLine.Validate("Unit Cost", POSEntrySalesLine."Unit Cost");
+        Item.Get(JobJnlLine."No.");
+        if Item."Costing Method" <> Item."Costing Method"::Standard then
+            JobJnlLine.Validate("Unit Cost", POSEntrySalesLine."Unit Cost");
         JobJnlLine.Validate("Unit Price", POSEntrySalesLine."Unit Price");
         JobJnlLine.Validate("Line Discount %", POSEntrySalesLine."Line Discount %");
     end;
