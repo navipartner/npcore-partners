@@ -4,6 +4,8 @@ POS units are a central part of the retail solution. They consist of [hardware](
 
 They are also highly customizable - it's possible to configure each of their many aspects. To find out more, refer to one of the following links.
 
+> [!Video https://www.youtube.com/embed/LLJWAW0QFOc]
+
 ## Highlighted articles
 
 | Module     | Description |

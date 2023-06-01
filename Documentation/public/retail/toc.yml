@@ -24,7 +24,7 @@
   href: sms/toc.yml
 - name: Companies
   href: companies/toc.yml
-- name: GDPR in NP Retail
+- name: GDPR
   href: gdpr/toc.yml
 - name: Click & Collect module
   href: clickandcollect/toc.yml
@@ -32,11 +32,11 @@
   href: attributes/toc.yml
 - name: Reports
   href: reports/toc.yml
-- name: Service Module
+- name: Service module
   href: service_module/toc.yml
 - name: Webshop integrations
   href: webshopintegrations/toc.yml
-- name: Varieties in NP Retail
+- name: Varieties
   href: varieties/toc.yml
 - name: Fiscalization
   href: fiscalization/toc.yml

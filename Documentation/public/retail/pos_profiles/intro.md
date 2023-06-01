@@ -2,6 +2,8 @@
 
 POS profiles are the main features used for configuring POS units. They can be found in the **POS Unit Card** administrative section of all POS units defined in Business Central.
 
+> [!Video https://www.youtube.com/embed/tbnKC-_cBGc]
+
 Each one is dedicated to setting up different aspects of POS units:
 
 | POS Profile     | Description |

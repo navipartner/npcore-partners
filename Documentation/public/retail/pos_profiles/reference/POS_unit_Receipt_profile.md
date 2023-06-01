@@ -17,6 +17,8 @@ The following fields can be defined in the **General** section:
 
 The **POS Sales Ticket Receipt Text** section is used for entering text which will be shown in the receipt footer. If the text was already entered in the **Sales Ticket Receipt Text** field in the **General** section, it will automatically be displayed in this section. The idea behind this section is that the business can maintain it and promote special messages (seasonal greetings or promotions). It's not necessary to modify the print template, only to enter a message in this section. It is an extension to the footer of the sales ticket. 
 
+> [!Video https://www.youtube.com/embed/OJ2V87aDmuA]
+
 ### Related links
 
 - [Balance the POS (Z-report)](../../posunit/howto/balance_the_pos.md)

@@ -39,6 +39,8 @@ The End of Day profile can be used to summarize all data such as transactions, s
 
 ![endofday](../images/End%20of%20day%20profile.PNG)
 
+> [!Video https://www.youtube.com/embed/ox4sPv9T62Q]
+
 ### Related links
 
 - [Balance the POS (Z-report)](../../posunit/howto/balance_the_pos.md)

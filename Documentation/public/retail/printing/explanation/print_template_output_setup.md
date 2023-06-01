@@ -14,6 +14,8 @@ The Matrix printer type requires the specific X and Y coordinates to generate th
 
 The matrix template is used for ZEBRA, BOCA, BLASTER, and CITIZEN printers. 
 
+> [!Video https://www.youtube.com/embed/VKI0MNWorPA]
+
 ### Related links
 
 - [Create a new print template](../howto/create_print_template.md)

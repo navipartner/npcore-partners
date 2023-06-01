@@ -46,6 +46,8 @@ To set up the printing module, follow the provided steps:
 9.  Open the [Hardware Connector Software](../../gettingstarted/hw_connector.md) before you start printing.     
    It needs to be running in the background. 
 
+> [!Video https://www.youtube.com/embed/VKI0MNWorPA]
+
 ### Next steps
 
 - To produce the MPOS HTTP MPOS output type, the printer needs to first be created in **MPOS Report Printer Setup**. 

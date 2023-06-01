@@ -51,6 +51,8 @@ To create new POS store follow the provided steps:
 | **Geolocation Latitude** | Specifies the latitude of the store's location. |
 | **Geolocation Longitude** | Specifies the longitude of the store's location |
 
+> [!Video https://www.youtube.com/embed/AktQ3262OJ8]
+
 ### Related links
 
 - [POS stores](../explanation/POS_store.md)

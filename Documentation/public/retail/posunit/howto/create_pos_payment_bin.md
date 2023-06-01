@@ -43,6 +43,8 @@ To create virtual bins, follow the provided steps:
 
 ![POS_virtual](../images/POS_Virtual.png)
 
+> [!Video https://www.youtube.com/embed/Lo2OjMXLJQg]
+
 ## Next steps
 
 ### POS Posting setup
