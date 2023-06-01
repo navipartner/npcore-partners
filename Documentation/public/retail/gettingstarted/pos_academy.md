@@ -1,6 +1,6 @@
 # POS Academy video library
 
-
+[POS Academy](https://www.navipartner.com/np-pos-academy) is a series of training videos that enables users to become more competent in using NaviPartner’s cloud-based POS solution, such as NP Retail.
 
 ## NP POS Academy 01: Introduction
 

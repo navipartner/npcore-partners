@@ -19,6 +19,8 @@ Sales receipts are created per each POS unit separately, but in most cases all P
 6. To create a new receipt text profile, click **New**, and add all necessary information, including the receipt text in the **POS Unit Receipt Text Profile** field.   
    All changes you add are automatically saved.
 
+> [!Video https://www.youtube.com/embed/OJ2V87aDmuA]
+
 ### Related links
 
 - [Create a new POS unit (by using the existing one for reference)](../../posunit/howto/createnew.md)

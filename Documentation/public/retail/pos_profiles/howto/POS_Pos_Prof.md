@@ -43,6 +43,8 @@ Each POS unit can have a different set of posting rules. The first thing is to s
 
 ![POS_pos](../images/POS_POS_1.png) 
 
+> [!Video https://www.youtube.com/embed/NACqyx-5Jc4]
+
 ### Related links
 
 - [Balance the POS (Z-report)](../../posunit/howto/balance_the_pos.md)
