@@ -429,7 +429,6 @@
         POSEntryPaymentLine."VAT Bus. Posting Group" := POSSaleLine."VAT Bus. Posting Group";
         POSEntryPaymentLine."VAT Prod. Posting Group" := POSSaleLine."VAT Prod. Posting Group";
         POSEntryPaymentLine."POS Payment Line Created At" := POSSaleLine."Created At";
-
         CreatePaymentLineBinEntry(POSEntryPaymentLine);
 
         OnBeforeInsertPOSPaymentLine(POSSale, POSSaleLine, POSEntry, POSEntryPaymentLine);
