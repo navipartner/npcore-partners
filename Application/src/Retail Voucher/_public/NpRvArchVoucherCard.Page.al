@@ -107,6 +107,11 @@
                         ToolTip = 'Specifies the value of the Amount field';
                         ApplicationArea = NPRRetail;
                     }
+                    field(Comment; Rec.Comment)
+                    {
+                        ToolTip = 'Custom comment provided by the user on Voucher creation. Displays any additional information or notes related to the Voucher.';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
             }
             group("Send Voucher")

@@ -422,6 +422,11 @@
             Caption = 'Disabled for Web Service';
             DataClassification = CustomerContent;
         }
+        field(1110; Comment; Text[250])
+        {
+            Caption = 'Comment';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
