@@ -131,6 +131,10 @@ xmlport 6151010 "NPR NpRv Global Vouchers"
                 {
                     MinOccurs = Zero;
                 }
+                fieldelement(company; NpRvVoucherBuffer.Company)
+                {
+                    MinOccurs = Zero;
+                }
             }
         }
     }

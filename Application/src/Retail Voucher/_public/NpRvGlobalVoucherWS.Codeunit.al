@@ -128,6 +128,7 @@
         NpRvVoucherEntry."User ID" := TempNpRvVoucherBuffer."Issue User ID";
         NpRvVoucherEntry."Partner Code" := TempNpRvVoucherBuffer."Issue Partner Code";
         NpRvVoucherEntry."POS Store Code" := TempNpRvVoucherBuffer."POS Store Code";
+        NpRvVoucherEntry.Company := TempNpRvVoucherBuffer.Company;
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry.Insert();
 
@@ -344,6 +345,7 @@
         NpRvVoucherEntry."User ID" := NpRvVoucherBuffer."Redeem User ID";
         NpRvVoucherEntry."Partner Code" := NpRvVoucherBuffer."Redeem Partner Code";
         NpRvVoucherEntry."POS Store Code" := NpRvVoucherBuffer."POS Store Code";
+        NpRvVoucherEntry.Company := NpRvVoucherBuffer.Company;
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry.Insert();
 
@@ -424,6 +426,7 @@
         NpRvVoucherEntry."User ID" := NpRvVoucherBuffer."Redeem User ID";
         NpRvVoucherEntry."Partner Code" := NpRvVoucherBuffer."Redeem Partner Code";
         NpRvVoucherEntry."POS Store Code" := NpRvVoucherBuffer."POS Store Code";
+        NpRvVoucherEntry.Company := NpRvVoucherBuffer.Company;
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry.Insert();
 
@@ -561,6 +564,7 @@
         NpRvVoucherEntry."User ID" := TempNpRvVoucherBuffer."Redeem User ID";
         NpRvVoucherEntry."Partner Code" := TempNpRvVoucherBuffer."Redeem Partner Code";
         NpRvVoucherEntry."POS Store Code" := TempNpRvVoucherBuffer."POS Store Code";
+        NpRvVoucherEntry.Company := TempNpRvVoucherBuffer.Company;
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry.Insert();
 

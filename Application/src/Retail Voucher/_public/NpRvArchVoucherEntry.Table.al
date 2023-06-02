@@ -135,6 +135,13 @@
             Caption = 'POS Store Code';
             DataClassification = CustomerContent;
         }
+        field(100; Company; Text[30])
+        {
+            Caption = 'Company';
+            DataClassification = CustomerContent;
+            TableRelation = Company;
+            ValidateTableRelation = false;
+        }
 
     }
 

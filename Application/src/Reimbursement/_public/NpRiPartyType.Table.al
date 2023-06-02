@@ -1,6 +1,5 @@
 ﻿table 6151104 "NPR NpRi Party Type"
 {
-    Access = Internal;
     Caption = 'Reimbursement Party Type';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRi Party Types";

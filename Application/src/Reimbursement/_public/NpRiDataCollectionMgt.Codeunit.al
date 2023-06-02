@@ -1,6 +1,5 @@
 ﻿codeunit 6151101 "NPR NpRi Data Collection Mgt."
 {
-    Access = Internal;
     TableNo = "NPR NpRi Reimbursement";
 
     trigger OnRun()
@@ -227,7 +226,7 @@
     begin
     end;
 
-    procedure InsertEntry(NpRiReimbursement: Record "NPR NpRi Reimbursement"; Amount: Decimal; RecVariant: Variant; var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry"): Boolean
+    procedure InsertEntry(var NpRiReimbursement: Record "NPR NpRi Reimbursement"; Amount: Decimal; RecVariant: Variant; var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry"): Boolean
     var
         DataTypeMgt: Codeunit "Data Type Management";
         RecRef: RecordRef;
