@@ -1,24 +1,18 @@
-let main = async ({parameters,captions}) => {
+let main = async ({ parameters, captions, context }) => {
 
-    let ScanSalesTicketNo = parameters.ScanSalesTicketNo;
+    context.SelectedSalesTicketNo = parameters.ScanSalesTicketNo;
 
-    switch("" + parameters.QuoteInputType){
-        case "0":
-            ScanSalesTicketNo = await popup.numpad({title: captions.SalesTicketNo, caption: captions.SalesTicketNo});
-            break;
-        case "2":
-            ScanSalesTicketNo = await popup.input({title: captions.SalesTicketNo, caption: captions.SalesTicketNo});
-            break;
-        default:
-            ScanSalesTicketNo = await workflow.respond("select_quote");        
+    if (!context.SelectedSalesTicketNo) {
+        switch ("" + parameters.QuoteInputType) {
+            case "0":
+                context.SelectedSalesTicketNo = await popup.numpad({ title: captions.SalesTicketNo, caption: captions.SalesTicketNo });
+                if (!context.SelectedSalesTicketNo) { return };
+                break;
+            case "2":
+                context.SelectedSalesTicketNo = await popup.input({ title: captions.SalesTicketNo, caption: captions.SalesTicketNo });
+                if (!context.SelectedSalesTicketNo) { return };
+                break;
+        }
     }
-    if (Object.keys(ScanSalesTicketNo).length !== 0)
-    {
-        if (parameters.PreviewBeforeLoad){
-            await workflow.respond("preview",ScanSalesTicketNo)
-        }    
-        await workflow.respond("load_from_quote",ScanSalesTicketNo)
-
-    }
-
+    await workflow.respond();
 };
