@@ -1,4 +1,4 @@
-﻿codeunit 6150682 "NPR NPRE RVA: New WPad" implements "NPR IPOS Workflow"
+codeunit 6150682 "NPR NPRE RVA: New WPad" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
@@ -103,8 +103,8 @@
     local procedure GetActionScript(): Text
     begin
         exit(
-        //###NPR_INJECT_FROM_FILE:NPRERVANewWPad.js###
-'let main=async({workflow:e,context:a})=>{let t={caption:"Welcome",title:"New Waiterpad",settings:[{type:"plusminus",id:"guests",caption:"Number of Guests",minvalue:1,maxvalue:100,value:1},{type:"text",id:"tablename",caption:"Name"}]};a.waiterpadInfo=await popup.configuration(t),await e.respond()};'
+        //###NPR_INJECT_FROM_FILE:PosActionNewWPad.js###
+'let main=async({workflow:t,context:a,captions:e})=>{let i={caption:e.Welcome,title:e.NewWaiterpad,settings:[{type:"plusminus",id:"guests",caption:e.NumberOfGuests,minvalue:1,maxvalue:100,value:1},{type:"text",id:"tablename",caption:e.Name}]};a.waiterpadInfo=await popup.configuration(i),a.waiterpadInfo&&await t.respond()};'
         );
     end;
 }
