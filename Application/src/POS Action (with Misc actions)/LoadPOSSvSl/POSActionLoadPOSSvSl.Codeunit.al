@@ -51,91 +51,63 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl" implements "NPR IPOS Workflow"
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
-    var
-
     begin
-        case Step of
-            'select_quote':
-                FrontEnd.WorkflowResponse(SelectQuote(Context));
-            'preview':
-                Preview(Context);
-            'load_from_quote':
-                LoadFromQuote(Context);
-        end;
+        ValidateAndLoadPosQuote(Context);
     end;
 
-    local procedure SelectQuote(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
+    local procedure ValidateAndLoadPosQuote(Context: Codeunit "NPR POS JSON Helper")
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         SalePOS: Record "NPR POS Sale";
         POSQuoteMgt: Codeunit "NPR POS Saved Sale Mgt.";
         POSSale: Codeunit "NPR POS Sale";
-        SalesTicketNo: Code[20];
-        "Filter": Integer;
         POSSession: Codeunit "NPR POS Session";
+        SalesTicketNo: Text;
+        FilterType: Integer;
+        PreviewBeforeLoad: Boolean;
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        Filter := Context.GetIntegerParameter('Filter');
-        POSQuoteMgt.SetSalePOSFilter(SalePOS, POSQuoteEntry, Filter);
+        FilterType := Context.GetIntegerParameter('Filter');
+        POSQuoteMgt.SetSalePOSFilter(SalePOS, POSQuoteEntry, FilterType);
 
-        SalesTicketNo := CopyStr(Context.GetStringParameter('ScanSalesTicketNo'), 1, MaxStrLen(SalesTicketNo));
-        if SalesTicketNo = '' then begin
+        if not (Context.GetString('SelectedSalesTicketNo', SalesTicketNo) and (SalesTicketNo <> '')) then begin
             if PAGE.RunModal(0, POSQuoteEntry) <> ACTION::LookupOK then
                 exit;
         end else begin
-            POSQuoteEntry.SetRange("Sales Ticket No.", SalesTicketNo);
+            POSQuoteEntry.SetRange("Sales Ticket No.", CopyStr(SalesTicketNo, 1, MaxStrLen(POSQuoteEntry."Sales Ticket No.")));
             POSQuoteEntry.FindFirst();
         end;
-
-        Response.Add('quote_entry_no', POSQuoteEntry."Entry No.");
-    end;
-
-    local procedure Preview(Context: Codeunit "NPR POS JSON Helper")
-    var
-        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        QuoteEntryNo: BigInteger;
-    begin
-        QuoteEntryNo := Context.GetInteger('quote_entry_no');
-        if QuoteEntryNo = 0 then
-            exit;
-
-        if not POSQuoteEntry.Get(QuoteEntryNo) then
-            exit;
-
         POSQuoteEntry.FilterGroup(2);
         POSQuoteEntry.SetRecFilter();
         POSQuoteEntry.FilterGroup(0);
-        IF Page.RunModal(Page::"NPR POS Saved Sale Card", POSQuoteEntry) <> Action::LookupOK then
-            Error('');
+
+        if Context.GetBooleanParameter('PreviewBeforeLoad', PreviewBeforeLoad) and PreviewBeforeLoad then
+            if not Preview(POSQuoteEntry) then
+                exit;
+
+        LoadFromQuote(POSQuoteEntry, SalePOS);
     end;
 
-    local procedure LoadFromQuote(Context: Codeunit "NPR POS JSON Helper")
-    var
-        SalePOS: Record "NPR POS Sale";
-        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        POSSale: Codeunit "NPR POS Sale";
-        QuoteEntryNo: BigInteger;
-        POSSession: Codeunit "NPR POS Session";
-        CannotLoad: Label 'The POS Saved Sale is missing essential data and cannot be loaded.';
-        POSActionLoadPOSSvSlB: Codeunit "NPR POS Action: LoadPOSSvSl B";
-        PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
+    local procedure Preview(var POSQuoteEntry: Record "NPR POS Saved Sale Entry") Confirmed: Boolean
     begin
-        QuoteEntryNo := Context.GetInteger('quote_entry_no');
-        POSQuoteEntry.Get(QuoteEntryNo);
+        Confirmed := Page.RunModal(Page::"NPR POS Saved Sale Card", POSQuoteEntry) = Action::LookupOK;
+    end;
 
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
+    local procedure LoadFromQuote(var POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale")
+    var
+        POSActionLoadPOSSvSlB: Codeunit "NPR POS Action: LoadPOSSvSl B";
+        POSItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
+        CannotLoad: Label 'The POS Saved Sale is missing essential data and cannot be loaded.';
+    begin
         SalePOS.Find();
 
         if POSActionLoadPOSSvSlB.LoadFromQuote(POSQuoteEntry, SalePOS) then begin
             POSActionLoadPOSSvSlB.InsertParkedSale(POSQuoteEntry, SalePOS);
-            PosItemCheckAvail.CheckAvailability_PosSale(SalePOS, false);
+            POSItemCheckAvail.CheckAvailability_PosSale(SalePOS, false);
         end else
             Error(CannotLoad);
     end;
-
-
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
@@ -173,14 +145,12 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl" implements "NPR IPOS Workflow"
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
     begin
-
         if (EanBoxSetupEvent."Event Code" <> EventCodeParkedSale()) then
             exit;
 
         POSQuoteEntry.SetRange("Sales Ticket No.", EanBoxValue);
         if not POSQuoteEntry.IsEmpty() then
             InScope := true;
-
     end;
 
     local procedure EventCodeParkedSale(): Code[20]
@@ -192,7 +162,7 @@ codeunit 6151005 "NPR POS Action: LoadPOSSvSl" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionLoadPOSSvSl.js###
-'let main=async({parameters:a,captions:t})=>{let e=a.ScanSalesTicketNo;switch(""+a.QuoteInputType){case"0":e=await popup.numpad({title:t.SalesTicketNo,caption:t.SalesTicketNo});break;case"2":e=await popup.input({title:t.SalesTicketNo,caption:t.SalesTicketNo});break;default:e=await workflow.respond("select_quote")}Object.keys(e).length!==0&&(a.PreviewBeforeLoad&&await workflow.respond("preview",e),await workflow.respond("load_from_quote",e))};'
+'let main=async({parameters:i,captions:a,context:e})=>{if(e.SelectedSalesTicketNo=i.ScanSalesTicketNo,!e.SelectedSalesTicketNo)switch(""+i.QuoteInputType){case"0":if(e.SelectedSalesTicketNo=await popup.numpad({title:a.SalesTicketNo,caption:a.SalesTicketNo}),!e.SelectedSalesTicketNo)return;break;case"2":if(e.SelectedSalesTicketNo=await popup.input({title:a.SalesTicketNo,caption:a.SalesTicketNo}),!e.SelectedSalesTicketNo)return;break}await workflow.respond()};'
         );
     end;
 }
