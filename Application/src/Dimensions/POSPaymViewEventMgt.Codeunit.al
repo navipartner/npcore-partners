@@ -36,6 +36,7 @@
                 POSPaymentViewLogEntry."POS Sales No." := 0;
             POSSalesNo := POSPaymentViewLogEntry."POS Sales No." + 1;
 
+            POSPaymentViewLogEntry.SetLoadFields();
             POSPaymentViewLogEntry.Init();
             POSPaymentViewLogEntry."Entry No." := 0;
             POSPaymentViewLogEntry."POS Store" := SalePOS."POS Store Code";
