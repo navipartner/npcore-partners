@@ -185,6 +185,11 @@
             Caption = 'POS Store Code';
             DataClassification = CustomerContent;
         }
+        field(2026; Company; Text[30])
+        {
+            Caption = 'Company';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

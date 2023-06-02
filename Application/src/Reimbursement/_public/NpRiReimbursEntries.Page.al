@@ -1,6 +1,5 @@
 ﻿page 6151103 "NPR NpRi Reimburs. Entries"
 {
-    Extensible = False;
     Caption = 'Reimbursement Entries';
     Editable = false;
     PageType = List;
