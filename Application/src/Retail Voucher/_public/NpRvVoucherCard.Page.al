@@ -89,7 +89,7 @@
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Disabled for Web Service field. Web shops usually interact with web service.';
                     }
-                    
+
                 }
                 group(Control6014422)
                 {
@@ -123,6 +123,11 @@
                     {
 
                         ToolTip = 'Specifies the value of the In-use Quantity field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field(Comment; Rec.Comment)
+                    {
+                        ToolTip = 'This field allows users to provide custom comments about the Voucher. It is used to enter any additional information or notes related to the Voucher.';
                         ApplicationArea = NPRRetail;
                     }
                 }
