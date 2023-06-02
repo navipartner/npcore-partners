@@ -1,7 +1,5 @@
 ﻿page 6151101 "NPR NpRi Reimbursement Templ."
 {
-    Extensible = False;
-
     Caption = 'Reimbursement Templates';
     PageType = List;
     SourceTable = "NPR NpRi Reimbursement Templ.";

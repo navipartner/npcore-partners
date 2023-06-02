@@ -1,7 +1,5 @@
 ﻿table 6151105 "NPR NpRi Party"
 {
-    Access = Internal;
-
     Caption = 'Reimbursement Party';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRi Parties";

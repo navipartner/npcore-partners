@@ -354,6 +354,7 @@
         VoucherEntry."Register No." := NpRvSalesLine."Register No.";
         if POSUnit.Get(VoucherEntry."Register No.") then
             VoucherEntry."POS Store Code" := POSUnit."POS Store Code";
+        VoucherEntry.Company := CopyStr(CompanyName(), 1, MaxStrLen(VoucherEntry.Company));
         case NpRvSalesLine."Document Source" of
             NpRvSalesLine."Document Source"::POS:
                 begin
@@ -409,6 +410,7 @@
         VoucherEntry."Register No." := NpRvSalesLine."Register No.";
         if POSUnit.Get(VoucherEntry."Register No.") then
             VoucherEntry."POS Store Code" := POSUnit."POS Store Code";
+        VoucherEntry.Company := CopyStr(CompanyName(), 1, MaxStrLen(VoucherEntry.Company));
         VoucherEntry."Document Type" := VoucherEntry."Document Type"::"POS Entry";
         VoucherEntry."External Document No." := NpRvSalesLine."Sales Ticket No.";
 
@@ -516,6 +518,7 @@
             VoucherEntry.Amount := -MagentoPaymentLine.Amount;
         if POSUnit.Get(NpRvSalesLine."Register No.") then
             VoucherEntry."POS Store Code" := POSUnit."POS Store Code";
+        VoucherEntry.Company := CopyStr(CompanyName(), 1, MaxStrLen(VoucherEntry.Company));
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
         VoucherEntry.Positive := VoucherEntry.Amount > 0;
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
@@ -549,6 +552,7 @@
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
         if POSUnit.Get(NpRvSalesLine."Register No.") then
             VoucherEntry."POS Store Code" := POSUnit."POS Store Code";
+        VoucherEntry.Company := CopyStr(CompanyName(), 1, MaxStrLen(VoucherEntry.Company));
         VoucherEntry.Positive := VoucherEntry.Amount > 0;
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
         OnBeforeInsertPaymentVoucherEntry(VoucherEntry, NpRvSalesLine);
@@ -770,6 +774,7 @@
         ArchVoucherEntry."Document Line No." := VoucherEntry."Document Line No.";
         ArchVoucherEntry."User ID" := VoucherEntry."User ID";
         ArchVoucherEntry."POS Store Code" := VoucherEntry."POS Store Code";
+        ArchVoucherEntry.Company := VoucherEntry.Company;
         ArchVoucherEntry."Partner Code" := VoucherEntry."Partner Code";
         ArchVoucherEntry."Closed by Partner Code" := VoucherEntry."Closed by Partner Code";
         ArchVoucherEntry."Partner Clearing" := VoucherEntry."Partner Clearing";
@@ -979,6 +984,7 @@
         TempNpRvGlobalVoucherBuffer."Issue Partner Code" := NpRvVoucher."Issue Partner Code";
         if NPRPOSUnit.Get(NpRvVoucher."Issue Register No.") then
             TempNpRvGlobalVoucherBuffer."POS Store Code" := NPRPOSUnit."POS Store Code";
+        TempNpRvGlobalVoucherBuffer.Company := CopyStr(CompanyName(), 1, MaxStrlen(TempNpRvGlobalVoucherBuffer.Company));
     end;
 
     local procedure SetSalesLineFilter(SaleLinePOS: Record "NPR POS Sale Line"; var NpRvSalesLine: Record "NPR NpRv Sales Line")

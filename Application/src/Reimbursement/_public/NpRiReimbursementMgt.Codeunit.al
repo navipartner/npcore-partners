@@ -1,6 +1,5 @@
 ﻿codeunit 6151102 "NPR NpRi Reimbursement Mgt."
 {
-    Access = Internal;
 
     TableNo = "NPR NpRi Reimbursement";
 
@@ -159,14 +158,16 @@
     begin
         if NpRiReimbursement.FindSet() then
             repeat
-                if not NpRiReimbursement.Deactivated then begin
-                    RunReimbursement(NpRiReimbursement);
-                    Commit();
-                end;
+                if not NpRiReimbursement.Deactivated then
+                    while NpRiReimbursement."Reimbursement Date" <= Today() do begin
+                        RunReimbursement(NpRiReimbursement);
+                        Commit();
+                    end;
             until NpRiReimbursement.Next() = 0;
     end;
 
-    procedure RunReimbursement(var NpRiReimbursement: Record "NPR NpRi Reimbursement")
+    procedure RunReimbursement(var
+                                   NpRiReimbursement: Record "NPR NpRi Reimbursement")
     var
         NpRiParty: Record "NPR NpRi Party";
         NpRiReimbursement2: Record "NPR NpRi Reimbursement";
@@ -182,9 +183,8 @@
             NpRiReimbursement."Posting Date" := 0D;
             if Format(NpRiParty."Next Posting Date Calculation") <> '' then
                 NpRiReimbursement."Posting Date" := CalcDate(NpRiParty."Next Posting Date Calculation", NpRiReimbursement."Last Posting Date");
-            NpRiReimbursement."Reimbursement Date" := 0D;
             if Format(NpRiParty."Reimburse every") <> '' then
-                NpRiReimbursement."Reimbursement Date" := CalcDate(NpRiParty."Reimburse every", DT2Date(NpRiReimbursement."Last Reimbursement at"));
+                NpRiReimbursement."Reimbursement Date" := CalcDate(NpRiParty."Reimburse every", NpRiReimbursement."Reimbursement Date");
             NpRiReimbursement.Modify(true);
 
             exit;
@@ -195,11 +195,12 @@
             exit;
 
         NpRiReimbursement.TestField("Posting Date");
-        ReimburseApplyEntries(NpRiReimbursement, NpRiReimbursementEntry, NpRiReimbursementEntryApply);
+        CalculateApplyEntry(NpRiReimbursement, NpRiReimbursementEntry, NpRiReimbursementEntryApply);
         NpRiReimbursement.CalcFields("Reimbursement Module");
         OnRunReimbursement(NpRiReimbursement, NpRiReimbursementEntryApply, Handled);
         if not Handled then
             Error(Text002, NpRiReimbursement."Reimbursement Module");
+        ReimburseApplyEntries(NpRiReimbursementEntry, NpRiReimbursementEntryApply);
 
         NpRiReimbursement2 := NpRiReimbursement;
         NpRiReimbursement.Find();
@@ -209,9 +210,8 @@
         NpRiReimbursement."Posting Date" := 0D;
         if Format(NpRiParty."Next Posting Date Calculation") <> '' then
             NpRiReimbursement."Posting Date" := CalcDate(NpRiParty."Next Posting Date Calculation", NpRiReimbursement."Last Posting Date");
-        NpRiReimbursement."Reimbursement Date" := 0D;
         if Format(NpRiParty."Reimburse every") <> '' then
-            NpRiReimbursement."Reimbursement Date" := CalcDate(NpRiParty."Reimburse every", DT2Date(NpRiReimbursement."Last Reimbursement at"));
+            NpRiReimbursement."Reimbursement Date" := CalcDate(NpRiParty."Reimburse every", NpRiReimbursement."Reimbursement Date");
         NpRiReimbursement.Modify(true);
     end;
 
@@ -233,14 +233,8 @@
         exit(NpRiReimbursementEntry.FindFirst());
     end;
 
-    local procedure ReimburseApplyEntries(NpRiReimbursement: Record "NPR NpRi Reimbursement"; var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry")
+    local procedure ReimburseApplyEntries(var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry")
     begin
-        if NpRiReimbursementEntry.IsEmpty then
-            exit;
-
-        NpRiReimbursementEntry.CalcSums(Amount);
-        CreateReimbursementApplicationEntry(NpRiReimbursement, -NpRiReimbursementEntry.Amount, NpRiReimbursementEntryApply);
-
         NpRiReimbursementEntry.FindLast();
         NpRiReimbursementEntry.ModifyAll("Remaining Amount", 0);
         NpRiReimbursementEntry.ModifyAll("Closed by Entry No.", NpRiReimbursementEntryApply."Entry No.");
@@ -250,6 +244,15 @@
         NpRiReimbursementEntryApply.Open := false;
         NpRiReimbursementEntryApply."Closed by Entry No." := NpRiReimbursementEntry."Entry No.";
         NpRiReimbursementEntryApply.Modify(true);
+    end;
+
+    local procedure CalculateApplyEntry(NpRiReimbursement: Record "NPR NpRi Reimbursement"; var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry")
+    begin
+        if NpRiReimbursementEntry.IsEmpty then
+            exit;
+
+        NpRiReimbursementEntry.CalcSums(Amount);
+        CreateReimbursementApplicationEntry(NpRiReimbursement, -NpRiReimbursementEntry.Amount, NpRiReimbursementEntryApply);
     end;
 
     local procedure CreateReimbursementApplicationEntry(NpRiReimbursement: Record "NPR NpRi Reimbursement"; Amount: Decimal; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry")

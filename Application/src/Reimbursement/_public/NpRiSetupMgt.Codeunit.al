@@ -1,7 +1,5 @@
 ﻿codeunit 6151100 "NPR NpRi Setup Mgt."
 {
-    Access = Internal;
-
     [IntegrationEvent(false, false)]
     internal procedure DiscoverModules(var NpRiModule: Record "NPR NpRi Reimbursement Module")
     begin

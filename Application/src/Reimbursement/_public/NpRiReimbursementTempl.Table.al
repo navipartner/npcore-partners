@@ -1,7 +1,5 @@
 ﻿table 6151101 "NPR NpRi Reimbursement Templ."
 {
-    Access = Internal;
-
     Caption = 'Reimbursement Template';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRi Reimbursement Templ.";
