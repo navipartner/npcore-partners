@@ -332,6 +332,11 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(1035; Comment; Text[250])
+        {
+            Caption = 'Comment';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

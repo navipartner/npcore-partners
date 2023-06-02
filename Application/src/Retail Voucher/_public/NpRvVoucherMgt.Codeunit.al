@@ -746,6 +746,7 @@
         ArchVoucher."Send via Print" := Voucher."Send via Print";
         ArchVoucher."Send via E-mail" := Voucher."Send via E-mail";
         ArchVoucher."Send via SMS" := Voucher."Send via SMS";
+        ArchVoucher.Comment := Voucher.Comment;
         OnBeforeInsertArchivedVoucher(Voucher, ArchVoucher);
         ArchVoucher.Insert();
     end;
