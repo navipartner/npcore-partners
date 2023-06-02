@@ -4,5 +4,7 @@ let main = async ({ workflow, context, captions}) => {
                        {"type":"text","id":"tablename","caption":captions.Name},]};
     
     context.waiterpadInfo = await popup.configuration (newWaiterpad);
-    await workflow.respond();
+    if(context.waiterpadInfo) {
+        await workflow.respond();
+    }
 }
