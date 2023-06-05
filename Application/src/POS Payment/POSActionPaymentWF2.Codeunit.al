@@ -150,7 +150,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPaymentWF2.Codeunit.js###
-'let main=async({workflow:e,popup:i,scope:W,parameters:p,context:m})=>{const{HideAmountDialog:s,HideZeroAmountDialog:l}=p,{dispatchToWorkflow:u,paymentType:c,remainingAmount:a,paymentDescription:y,amountPrompt:d,preWorkflows:n}=await e.respond("preparePaymentWorkflow");if(n)for(const f of Object.entries(n)){let[r,g]=f;r&&await e.run(r,{parameters:g})}let t=a;if(!s&&(!l||a>0)&&(t=await i.numpad({title:y,caption:d,value:a}),!t))return;let o=await e.run(u,{context:{paymentType:c,suggestedAmount:t}});o.legacy?(m.fallbackAmount=t,await e.respond("doLegacyPaymentWorkflow")):o.tryEndSale&&await e.respond("tryEndSale")};'
+'let main=async({workflow:e,popup:i,scope:W,parameters:p,context:l})=>{const{HideAmountDialog:m,HideZeroAmountDialog:s}=p,{dispatchToWorkflow:u,paymentType:c,remainingAmount:a,paymentDescription:y,amountPrompt:d,preWorkflows:n}=await e.respond("preparePaymentWorkflow");if(n)for(const f of Object.entries(n)){let[r,g]=f;r&&await e.run(r,{parameters:g})}let t=a;if(!m&&(!s||a>0)&&(t=await i.numpad({title:y,caption:d,value:a}),t===null))return;let o=await e.run(u,{context:{paymentType:c,suggestedAmount:t}});o.legacy?(l.fallbackAmount=t,await e.respond("doLegacyPaymentWorkflow")):o.tryEndSale&&await e.respond("tryEndSale")};'
         );
     end;
 }
