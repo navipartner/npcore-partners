@@ -22,6 +22,7 @@
     var
         BinEntry: Record "NPR POS Bin Entry";
         PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
+        PaymentBinCheckpointQuery: Query "NPR WorkshiftPaymentCheckpoint";
         PreviousZReport: Record "NPR POS Workshift Checkpoint";
         PreviousBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSPaymentMethod: Record "NPR POS Payment Method";
@@ -36,12 +37,11 @@
         POSUnit.Get(UnitNo);
         POSBinMovement := false;
 
-        PaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
-        PaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftCheckpointEntryNo);
-        PaymentBinCheckpoint.SetFilter("Payment Method No.", '=%1', PaymentMethodCode);
-        PaymentBinCheckpoint.SetFilter("Payment Bin No.", '=%1', BinNo);
-
-        if (not PaymentBinCheckpoint.IsEmpty()) then
+        PaymentBinCheckpointQuery.SetFilter(WorkshiftCheckpointEntryNo, '=%1', WorkshiftCheckpointEntryNo);
+        PaymentBinCheckpointQuery.SetFilter(PaymentMethodNo, '=%1', PaymentMethodCode);
+        PaymentBinCheckpointQuery.SetFilter(PaymentBinNo, '=%1', BinNo);
+        PaymentBinCheckpointQuery.Open();
+        if (PaymentBinCheckpointQuery.Read()) then
             exit; // no need to create it again
 
         if (not POSPaymentMethod.Get(PaymentMethodCode)) then
