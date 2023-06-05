@@ -1,8 +1,8 @@
 ﻿report 6060125 "NPR TM Visiting Report"
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/TM Visiting Report.rdlc';
     Caption = 'TM Visiting Report';
@@ -60,6 +60,15 @@
                     PrintOnlyIfDetail = false;
                     column(TicketReservationEntryNo_TMTicket; "TM Ticket"."Ticket Reservation Entry No.")
                     {
+                        IncludeCaption = true;
+                    }
+                    column(ItemNo_TMTicket; "TM Ticket"."Item No.")
+                    {
+                        IncludeCaption = true;
+                    }
+                    column(VariantCode_TMTicket; "TM Ticket"."Variant Code")
+                    {
+                        IncludeCaption = true;
                     }
                     dataitem("TM Ticket Reservation Request"; "NPR TM Ticket Reservation Req.")
                     {
