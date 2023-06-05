@@ -45,6 +45,17 @@
                     TestField("Status Object", "Status Object"::WaiterPadLineMealFlow);
             end;
         }
+        field(20; Auxiliary; Boolean)
+        {
+            Caption = 'Auxiliary';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if Auxiliary then
+                    TestField("Status Object", "Status Object"::WaiterPadLineMealFlow);
+            end;
+        }
         field(90; "Available in Front-End"; Boolean)
         {
             Caption = 'Available in Front-End';

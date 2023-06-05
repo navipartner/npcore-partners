@@ -42,21 +42,15 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Store".Code;
         }
-        field(30; "Auto Send Kitchen Order"; Option)
+        field(30; "Auto Send Kitchen Order"; Enum "NPR NPRE Auto Send Kitch.Order")
         {
             Caption = 'Auto Send Kitchen Order';
             DataClassification = CustomerContent;
-            Description = 'NPR5.52,NPR5.54';
-            OptionCaption = 'Default,No,Yes,Ask';
-            OptionMembers = Default,No,Yes,Ask;
         }
-        field(31; "Resend All On New Lines"; Option)
+        field(31; "Resend All On New Lines"; Enum "NPR NPRE Send All on New Lines")
         {
             Caption = 'Resend All On New Lines';
             DataClassification = CustomerContent;
-            Description = 'NPR5.54';
-            OptionCaption = 'Default,No,Yes,Ask';
-            OptionMembers = Default,No,Yes,Ask;
         }
         field(40; "Send by Print Category"; Boolean)
         {

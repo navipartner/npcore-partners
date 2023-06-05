@@ -119,7 +119,8 @@
         {
             Caption = 'Serving Step Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow));
+            TableRelation = "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow), Auxiliary = Const(false));
+
             trigger OnValidate()
             var
                 ServingStep: Record "NPR NPRE Flow Status";

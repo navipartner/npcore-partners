@@ -556,7 +556,6 @@
         ItemRoutingProfile: Record "NPR NPRE Item Routing Profile";
         NewAssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.";
         PrintCategory: Record "NPR NPRE Print/Prod. Cat.";
-        RestSetup: Record "NPR NPRE Restaurant Setup";
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
         Handled: Boolean;
     begin
@@ -571,7 +570,7 @@
             exit;
 
         case SetupProxy.ServingStepDiscoveryMethod() of
-            RestSetup."Serving Step Discovery Method"::"Legacy (using print tags)":
+            Enum::"NPR NPRE Serv.Step Discovery"::"Legacy (using print tags)":
                 begin
                     if not (Item.Get(WaiterPadLine."No.") and (Item."NPR Print Tags" <> '')) then
                         exit;
@@ -583,7 +582,7 @@
                     AssignWPadLineServingStepsFromPrintCategories(WaiterPadLine, RemoveExisting);
                 end;
 
-            RestSetup."Serving Step Discovery Method"::"Item Routing Profiles":
+            Enum::"NPR NPRE Serv.Step Discovery"::"Item Routing Profiles":
                 begin
                     if not Item.Get(WaiterPadLine."No.") then
                         exit;

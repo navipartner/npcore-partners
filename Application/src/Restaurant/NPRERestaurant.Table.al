@@ -25,47 +25,39 @@
             Caption = 'Name 2';
             DataClassification = CustomerContent;
         }
-        field(20; "Auto Send Kitchen Order"; Option)
+        field(20; "Auto Send Kitchen Order"; Enum "NPR NPRE Auto Send Kitch.Order")
         {
             Caption = 'Auto Send Kitchen Order';
             DataClassification = CustomerContent;
-            OptionCaption = 'Default,No,Yes,Ask';
-            OptionMembers = Default,No,Yes,Ask;
         }
-        field(21; "Resend All On New Lines"; Option)
+        field(21; "Resend All On New Lines"; Enum "NPR NPRE Send All on New Lines")
         {
             Caption = 'Resend All On New Lines';
             DataClassification = CustomerContent;
-            OptionCaption = 'Default,No,Yes,Ask';
-            OptionMembers = Default,No,Yes,Ask;
         }
-        field(30; "Station Req. Handl. On Serving"; Option)
+        field(30; "Station Req. Handl. On Serving"; Enum "NPR NPRE Req.Handl.on Serving")
         {
             Caption = 'Station Req. Handl. On Serving';
             DataClassification = CustomerContent;
-            OptionCaption = 'Default,Do Nothing,Finish Started,Finish All,Finish Started/Cancel Not Started,Cancel All Unfinished';
-            OptionMembers = Default,"Do Nothing","Finish Started","Finish All","Finish Started/Cancel Not Started","Cancel All Unfinished";
         }
         field(40; "Kitchen Printing Active"; Option)
         {
             Caption = 'Kitchen Printing Active';
             DataClassification = CustomerContent;
-            OptionCaption = 'Default,No,Yes';
+            OptionCaption = '<Default>,No,Yes';
             OptionMembers = Default,No,Yes;
         }
         field(50; "KDS Active"; Option)
         {
             Caption = 'KDS Active';
             DataClassification = CustomerContent;
-            OptionCaption = 'Default,No,Yes';
+            OptionCaption = '<Default>,No,Yes';
             OptionMembers = Default,No,Yes;
         }
-        field(60; "Order ID Assign. Method"; Option)
+        field(60; "Order ID Assign. Method"; Enum "NPR NPRE Ord.ID Assign. Method")
         {
             Caption = 'Order ID Assign. Method';
             DataClassification = CustomerContent;
-            OptionCaption = 'Default,Same for Source Document,New Each Time';
-            OptionMembers = Default,"Same for Source Document","New Each Time";
         }
         field(70; "Service Flow Profile"; Code[20])
         {
@@ -73,6 +65,11 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
             TableRelation = "NPR NPRE Serv.Flow Profile";
+        }
+        field(80; "Order Is Ready For Serving"; Enum "NPR NPRE Order Ready Serving")
+        {
+            Caption = 'Order Is Ready For Serving';
+            DataClassification = CustomerContent;
         }
     }
 

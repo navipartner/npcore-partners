@@ -72,6 +72,7 @@
             group(Layout)
             {
                 Caption = 'Layout';
+                Image = ServiceZones;
                 action(Seatings)
                 {
                     Caption = 'Seatings';

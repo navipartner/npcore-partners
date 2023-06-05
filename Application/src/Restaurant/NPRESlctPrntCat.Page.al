@@ -5,9 +5,8 @@
     DataCaptionExpression = '';
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = List;
+    PageType = Worksheet;
     UsageCategory = Administration;
-
     SourceTable = "NPR NPRE Print/Prod. Cat.";
     ApplicationArea = NPRRetail;
 
@@ -19,7 +18,6 @@
             {
                 field(Selected; Selected)
                 {
-
                     Caption = 'Selected';
                     Editable = true;
                     Visible = IsMultiSelectionMode;
@@ -33,21 +31,18 @@
                 }
                 field("Code"; Rec.Code)
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print Tag"; Rec."Print Tag")
                 {
-
                     Editable = false;
                     Visible = ShowPrintTags;
                     ToolTip = 'Specifies the value of the Print Tag field';
@@ -55,7 +50,6 @@
                 }
                 field(AssignedServingSteps; AssignedServingStepsAsString())
                 {
-
                     Caption = 'Appl. Only for Serving Steps';
                     Editable = false;
                     Visible = ShowApplOnServingStep;
@@ -79,11 +73,11 @@
     trigger OnOpenPage()
     var
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
-        ServingStepDiscoveryMethod: Integer;
+        ServingStepDiscoveryMethod: Enum "NPR NPRE Serv.Step Discovery";
     begin
         ServingStepDiscoveryMethod := SetupProxy.ServingStepDiscoveryMethod();
-        ShowPrintTags := ServingStepDiscoveryMethod = 0;
-        ShowApplOnServingStep := (ServingStepDiscoveryMethod = 1) and (SourceRecID.TableNo <> 0);
+        ShowPrintTags := ServingStepDiscoveryMethod = ServingStepDiscoveryMethod::"Legacy (using print tags)";
+        ShowApplOnServingStep := (ServingStepDiscoveryMethod = ServingStepDiscoveryMethod::"Item Routing Profiles") and (SourceRecID.TableNo <> 0);
     end;
 
     var

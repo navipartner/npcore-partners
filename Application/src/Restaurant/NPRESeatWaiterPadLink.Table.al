@@ -41,12 +41,14 @@
             CalcFormula = Lookup("NPR NPRE Seating".Description WHERE(Code = FIELD("Seating Code")));
             Caption = 'Seating Description';
             FieldClass = FlowField;
+            Editable = false;
         }
         field(13; "Waiter Pad Description FF"; Text[80])
         {
             CalcFormula = Lookup("NPR NPRE Waiter Pad".Description WHERE("No." = FIELD("Waiter Pad No.")));
             Caption = 'Waiter Pad Description';
             FieldClass = FlowField;
+            Editable = false;
         }
         field(20; Closed; Boolean)
         {
@@ -66,6 +68,13 @@
             Editable = false;
             FieldClass = FlowField;
             CalcFormula = count("NPR NPRE Seat.: WaiterPadLink" where("Waiter Pad No." = field("Waiter Pad No."), Closed = field(Closed)));
+        }
+        field(40; "Seating No."; Text[20])
+        {
+            Caption = 'Seating No.';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = Lookup("NPR NPRE Seating"."Seating No." WHERE(Code = FIELD("Seating Code")));
         }
     }
 
