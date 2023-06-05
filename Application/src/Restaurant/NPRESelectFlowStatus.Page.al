@@ -5,12 +5,11 @@
     DataCaptionExpression = GetDataCaptionExpr();
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = List;
+    PageType = Worksheet;
     SourceTable = "NPR NPRE Flow Status";
     SourceTableView = SORTING("Status Object", "Flow Order");
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-
 
     layout
     {
@@ -20,7 +19,6 @@
             {
                 field(Selected; Selected)
                 {
-
                     Caption = 'Selected';
                     Editable = true;
                     Visible = IsMultiSelectionMode;
@@ -34,14 +32,12 @@
                 }
                 field("Code"; Rec.Code)
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Status Object"; Rec."Status Object")
                 {
-
                     Editable = false;
                     Enabled = StatusObjectVisible;
                     Visible = StatusObjectVisible;
@@ -50,21 +46,18 @@
                 }
                 field(Description; Rec.Description)
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Flow Order"; Rec."Flow Order")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Flow Order field';
                     ApplicationArea = NPRRetail;
                 }
                 field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsFilterString())
                 {
-
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
                     Visible = ShowPrintCategories;
@@ -110,7 +103,6 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = ShowPrintCategories;
-
                     ToolTip = 'Executes the Print/Prod. Categories action';
                     ApplicationArea = NPRRetail;
 
@@ -126,7 +118,7 @@
     trigger OnAfterGetCurrRecord()
     begin
         ShowPrintCategories :=
-          (Rec."Status Object" = Rec."Status Object"::WaiterPadLineMealFlow) and (ServingStepDiscoveryMethod = 0);
+            (Rec."Status Object" = Rec."Status Object"::WaiterPadLineMealFlow) and (ServingStepDiscoveryMethod = ServingStepDiscoveryMethod::"Legacy (using print tags)");
         PrintCategoriesEnabled := ShowPrintCategories and (Rec.Code <> '');
     end;
 
@@ -156,11 +148,11 @@
         end;
         ServingStepDiscoveryMethod := SetupProxy.ServingStepDiscoveryMethod();
         if ShowPrintCategories then
-            ShowPrintCategories := ServingStepDiscoveryMethod = 0;
+            ShowPrintCategories := ServingStepDiscoveryMethod = ServingStepDiscoveryMethod::"Legacy (using print tags)";
     end;
 
     var
-        ServingStepDiscoveryMethod: Integer;
+        ServingStepDiscoveryMethod: Enum "NPR NPRE Serv.Step Discovery";
         IsMultiSelectionMode: Boolean;
         PrintCategoriesEnabled: Boolean;
         Selected: Boolean;

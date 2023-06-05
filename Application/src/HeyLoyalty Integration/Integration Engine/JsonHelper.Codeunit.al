@@ -134,19 +134,37 @@ codeunit 6059994 "NPR Json Helper"
     procedure GetJBoolean(Token: JsonToken; Path: Text; Required: Boolean): Boolean
     var
         JValue: JsonValue;
+        Value: Boolean;
     begin
-        if GetJValue(Token, Path, JValue) then
-            exit(JValue.AsBoolean());
+        if GetJValue(Token, Path, JValue) then begin
+            if JValueToBoolean(JValue, Value) then
+                exit(Value);
+            case JValue.AsText() of
+                '1':
+                    exit(true);
+                '0', '':
+                    exit(false);
+                else
+                    if Evaluate(Value, JValue.AsText()) then
+                        exit(Value);
+            end;
+        end;
         if Required then
             RequiredValueMissingError(Token, Path);
         exit(false);
+    end;
+
+    [TryFunction]
+    local procedure JValueToBoolean(JValue: JsonValue; ValueOut: Boolean)
+    begin
+        ValueOut := JValue.AsBoolean();
     end;
 
     local procedure GetJValue(Token: JsonToken; Path: Text; var JValue: JsonValue): Boolean
     var
         Token2: JsonToken;
     begin
-        if not Token.SelectToken(Path, Token2) then
+        if not GetJsonToken(Token, Path, Token2) then
             exit(false);
         if Token2.IsArray() then
             If not Token2.AsArray().Get(0, Token2) then
@@ -157,6 +175,17 @@ codeunit 6059994 "NPR Json Helper"
         if JValue.IsNull() or JValue.IsUndefined() then
             exit(false);
         exit(true);
+    end;
+
+    procedure GetJsonToken(Token: JsonToken; TokenKey: Text) TokenOut: JsonToken
+    begin
+        if not GetJsonToken(Token, TokenKey, TokenOut) then
+            RequiredValueMissingError(Token, TokenKey);
+    end;
+
+    procedure GetJsonToken(Token: JsonToken; TokenKey: Text; var TokenOut: JsonToken): Boolean
+    begin
+        exit(Token.SelectToken(TokenKey, TokenOut));
     end;
 
     local procedure RequiredValueMissingError(Token: JsonToken; Path: Text)

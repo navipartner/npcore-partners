@@ -118,6 +118,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG BalanceV4"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG ItemRef. Disc Barcodes", 'UpgradeDiscBarcodes'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Entry Dims", '20230515'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Enum Upgrade", 'UpgradeNPREKitchenOrderStatusEnum'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -286,7 +287,12 @@
                         exit('NpRvGlobalVoucherPasswordUpg-20211029');
                 end;
             Codeunit::"NPR Enum Upgrade":
-                exit('NPREnumUpgrade-20211110');
+                case UpgradeStep of
+                    '':
+                        exit('NPREnumUpgrade-20211110');
+                    'UpgradeNPREKitchenOrderStatusEnum':
+                        exit('NPREKitchenOrderStatusEnumUpgrade_20230601');
+                end;
             Codeunit::"NPR UPG Item Blob 2 Media":
                 exit('NPRMagentoDescription2Media');
             Codeunit::"NPR UPG Member Blob 2 Media":

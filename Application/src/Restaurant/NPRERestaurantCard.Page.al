@@ -16,25 +16,21 @@
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-
                     ToolTip = 'Specifies a code for the Restaurant.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-
                     ToolTip = 'Specifies the name of the Restaurant.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Name 2"; Rec."Name 2")
                 {
-
                     ToolTip = 'Specifies optional additional information about the Restaurant name.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Service Flow Profile"; Rec."Service Flow Profile")
                 {
-
                     ToolTip = 'Specifies the selected Service Flow Profile. A new profile can be created if needed.';
                     ApplicationArea = NPRRetail;
                 }
@@ -44,14 +40,7 @@
                 Caption = 'Kitchen Integration';
                 field("Auto Send Kitchen Order"; Rec."Auto Send Kitchen Order")
                 {
-
                     ToolTip = 'Specifies whether the order will be automatically sent to the kitchen once captured.';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Resend All On New Lines"; Rec."Resend All On New Lines")
-                {
-
-                    ToolTip = 'Specifies whether all lines on the waiter pad are sent to the kitchen when new lines are added to the waiter pad.';
                     ApplicationArea = NPRRetail;
                 }
                 group(Print)
@@ -59,8 +48,12 @@
                     Caption = 'Print';
                     field("Kitchen Printing Active"; Rec."Kitchen Printing Active")
                     {
-
                         ToolTip = 'Specifies whether the kitchen printing is active.';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Resend All On New Lines"; Rec."Resend All On New Lines")
+                    {
+                        ToolTip = 'Specifies whether all lines on the waiter pad are sent to the kitchen when new lines are added to the waiter pad.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -70,13 +63,11 @@
                     Visible = ShowKDS;
                     field("KDS Active"; Rec."KDS Active")
                     {
-
                         ToolTip = 'Specifies whether the KDS is active.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Order ID Assign. Method"; Rec."Order ID Assign. Method")
                     {
-
                         ToolTip = 'Specifies the assignment method of the order ID.';
                         ApplicationArea = NPRRetail;
                     }
@@ -84,6 +75,11 @@
                     {
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies how kitchen station production requests should be handled, if the product has been served prior to finishing production.';
+                    }
+                    field("Order Is Ready For Serving"; Rec."Order Is Ready For Serving")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies when kitchen order is assigned "Ready for Serving" status';
                     }
                 }
             }
@@ -93,13 +89,11 @@
             systempart(Control6014412; Notes)
             {
                 ApplicationArea = NPRRetail;
-
             }
             systempart(Control6014413; Links)
             {
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
         }
     }
@@ -111,31 +105,30 @@
             group(Kitchen)
             {
                 Caption = 'Kitchen';
+                Image = Departments;
                 action(KitchenStations)
                 {
                     Caption = 'Stations';
-                    Image = Departments;
+                    Image = Category;
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Kitchen Stations";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-
                     ToolTip = 'Executes the Stations action';
                     ApplicationArea = NPRRetail;
                 }
                 action(KitchenStationSelection)
                 {
                     Caption = 'Station Selection Setup';
-                    Image = Troubleshoot;
+                    Image = Flow;
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-
                     ToolTip = 'Executes the Station Selection Setup action';
                     ApplicationArea = NPRRetail;
                 }
@@ -148,7 +141,6 @@
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Scope = Repeater;
-
                     ToolTip = 'Executes the Kitchen Requests (Expedite View) action';
                     ApplicationArea = NPRRetail;
 
@@ -161,6 +153,7 @@
             group(Layout)
             {
                 Caption = 'Layout';
+                Image = ServiceZones;
                 action(Locations)
                 {
                     Caption = 'Locations';
@@ -171,7 +164,6 @@
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Seating Location";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-
                     ToolTip = 'Executes the Locations action';
                     ApplicationArea = NPRRetail;
                 }
@@ -184,7 +176,6 @@
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
-
                     ToolTip = 'Executes the Seatings action';
                     ApplicationArea = NPRRetail;
 

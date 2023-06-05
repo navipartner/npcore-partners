@@ -1,6 +1,10 @@
 ﻿codeunit 6150679 "NPR NPRE Frontend Assistant"
 {
     Access = Internal;
+
+    var
+        _JsonHelper: Codeunit "NPR Json Helper";
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnConfigureReusableWorkflows', '', true, true)]
     local procedure OnConfigureReusableWorkflows(var Sender: Codeunit "NPR POS UI Management"; POSSession: Codeunit "NPR POS Session"; Setup: Codeunit "NPR POS Setup");
     var
@@ -134,42 +138,37 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', true, true)]
-    local procedure OnRequestWaiterPadData(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
+    local procedure OnRequestRestaurantViewData(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        JSON: Codeunit "NPR POS JSON Management";
-        RestaurantCode: Code[20];
         LocationCode: Code[20];
     begin
-        if Method <> 'RequestWaiterPadData' then
-            exit;
+        case Method of
+            'RequestWaiterPadData':
+                begin
+                    LocationCode := CopyStr(_JsonHelper.GetJText(Context.AsToken(), 'locationId', false), 1, MaxStrLen(LocationCode));
+                    RefreshWaiterPadData(POSSession, FrontEnd, GetRestaurantCode(Context), LocationCode);
+                end;
+            'RequestRestaurantLayout':
+                begin
+                    RefreshRestaurantLayout(FrontEnd, GetRestaurantCode(Context));
+                end;
+            'RequestKitchenOrders':
+                begin
+                    RefreshKitchenOrders(Context, FrontEnd);
+                end;
+            else
+                exit;
+        end;
 
         Handled := true;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        RestaurantCode := CopyStr(JSON.GetString('restaurantId'), 1, MaxStrLen(RestaurantCode));
-        LocationCode := CopyStr(JSON.GetString('locationId'), 1, MaxStrLen(LocationCode));
-
-        RefreshWaiterPadData(POSSession, FrontEnd, RestaurantCode, LocationCode);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', true, true)]
-    local procedure OnRequestRestaurantLayout(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        RestaurantCode: Code[20];
+    local procedure GetRestaurantCode(Context: JsonObject) RestaurantCode: Code[20]
     begin
-        if Method <> 'RequestRestaurantLayout' then
-            exit;
-
-        Handled := true;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        RestaurantCode := CopyStr(JSON.GetString('restaurantId'), 1, MaxStrLen(RestaurantCode));
-
-        RefreshRestaurantLayout(POSSession, FrontEnd, RestaurantCode);
+        RestaurantCode := CopyStr(_JsonHelper.GetJText(Context.AsToken(), 'restaurantId', false), 1, MaxStrLen(RestaurantCode));
     end;
 
-    procedure RefreshWaiterPadData(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; LocationCode: Code[20]);
+    internal procedure RefreshWaiterPadData(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; LocationCode: Code[20]);
     var
         Seating: Record "NPR NPRE Seating";
         SeatingLocation: Record "NPR NPRE Seating Location";
@@ -232,14 +231,16 @@
         FrontEnd.InvokeFrontEndMethod2(Request);
     end;
 
-    procedure RefreshRestaurantLayout(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]);
+    local procedure RefreshRestaurantLayout(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]);
     var
         FlowStatus: Record "NPR NPRE Flow Status";
         LocationLayout: Record "NPR NPRE Location Layout";
         Restaurant: Record "NPR NPRE Restaurant";
+        TempRestaurant: Record "NPR NPRE Restaurant" temporary;
         Seating: Record "NPR NPRE Seating";
         SeatingLocation: Record "NPR NPRE Seating Location";
         Request: Codeunit "NPR Front-End: Generic";
+        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
         ComponentList: JsonArray;
         ComponentContent: JsonObject;
         LocationList: JsonArray;
@@ -258,15 +259,21 @@
             SeatingLocation.FilterGroup(2);
             SeatingLocation.SetRange("Restaurant Code", RestaurantCode);
             SeatingLocation.FilterGroup(0);
-        end;
-        if Restaurant.FindSet() then
+
+            Restaurant.Get(RestaurantCode);
+            TempRestaurant := Restaurant;
+            TempRestaurant.Insert();
+        end else
+            SetupProxy.GetRestaurantList(TempRestaurant);
+
+        if TempRestaurant.FindSet() then
             repeat
                 Clear(RestaurantContent);
-                RestaurantContent.Add('id', Restaurant.Code);
-                RestaurantContent.Add('caption', Restaurant.Name);
+                RestaurantContent.Add('id', TempRestaurant.Code);
+                RestaurantContent.Add('caption', TempRestaurant.Name);
                 RestaurantList.Add(RestaurantContent);
 
-                SeatingLocation.SetRange("Restaurant Code", Restaurant.Code);
+                SeatingLocation.SetRange("Restaurant Code", TempRestaurant.Code);
                 if SeatingLocation.FindSet() then
                     repeat
                         Clear(LocationContent);
@@ -330,7 +337,7 @@
                         LocationContent.Add('components', ComponentList);
                         LocationList.Add(LocationContent);
                     until SeatingLocation.Next() = 0;
-            until Restaurant.Next() = 0;
+            until TempRestaurant.Next() = 0;
 
         FlowStatus.SetRange("Status Object", FlowStatus."Status Object"::Seating);
         FlowStatus.SetRange("Available in Front-End", true);
@@ -348,10 +355,10 @@
 
         FrontEnd.InvokeFrontEndMethod2(Request);
 
-        RefreshStatus(POSSession, FrontEnd, RestaurantCode, '');
+        RefreshStatus(FrontEnd, RestaurantCode, '');
     end;
 
-    procedure RefreshWaiterPadContent(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; WaiterpadCode: Code[20]);
+    internal procedure RefreshWaiterPadContent(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; WaiterpadCode: Code[20]);
     var
         Seating: Record "NPR NPRE Seating";
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
@@ -430,7 +437,7 @@
         FrontEnd.InvokeFrontEndMethod2(Request);
     end;
 
-    procedure RefreshStatus(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; LocationCode: Code[20]);
+    local procedure RefreshStatus(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; LocationCode: Code[20]);
     var
         Seating: Record "NPR NPRE Seating";
         SeatingLocation: Record "NPR NPRE Seating Location";
@@ -471,7 +478,7 @@
         FrontEnd.InvokeFrontEndMethod2(Request);
     end;
 
-    procedure SetRestaurant(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20])
+    internal procedure SetRestaurant(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20])
     var
         Request: Codeunit "NPR Front-End: Generic";
         Setup: Codeunit "NPR POS Setup";
@@ -487,7 +494,7 @@
         Request.GetContent().Add('restaurantId', RestaurantCode);
         FrontEnd.InvokeFrontEndMethod2(Request);
 
-        RefreshRestaurantLayout(POSSession, FrontEnd, RestaurantCode);
+        RefreshRestaurantLayout(FrontEnd, RestaurantCode);
     end;
 
     local procedure SelectStatusObjects(var NPREFlowStatus: Record "NPR NPRE Flow Status"; var StatusObjectList: JsonArray);
@@ -521,5 +528,49 @@
         if not ColorTable.get(FlowStatus.Color) then
             ColorTable.Init();
         exit(ColorTable.RGBHexCode(false));
+    end;
+
+    local procedure RefreshKitchenOrders(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        Restaurant: Record "NPR NPRE Restaurant";
+        TempRestaurant: Record "NPR NPRE Restaurant" temporary;
+        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+        KitchenOrderList: JsonArray;
+        KitchenOrderContent: JsonObject;
+        Response: JsonObject;
+        RestaurantCode: Code[20];
+        OrderStatusEnumValueName: Text;
+    begin
+        RestaurantCode := GetRestaurantCode(Context);
+        if RestaurantCode <> '' then begin
+            Restaurant.Get(RestaurantCode);
+            TempRestaurant := Restaurant;
+            TempRestaurant.Insert();
+        end else
+            SetupProxy.GetRestaurantList(TempRestaurant);
+
+        KitchenOrder.SetCurrentKey("Restaurant Code", "Order Status", Priority, "Created Date-Time");
+        KitchenOrder.SetRange("Order Status", KitchenOrder."Order Status"::"Ready for Serving", KitchenOrder."Order Status"::Planned);
+
+        TempRestaurant.FindSet();
+        repeat
+            KitchenOrder.SetRange("Restaurant Code", TempRestaurant.Code);
+            if KitchenOrder.FindSet() then
+                repeat
+                    KitchenOrder."Order Status".Names().Get(KitchenOrder."Order Status".Ordinals().IndexOf(KitchenOrder."Order Status".AsInteger()), OrderStatusEnumValueName);
+                    Clear(KitchenOrderContent);
+                    KitchenOrderContent.Add('restaurantId', KitchenOrder."Restaurant Code");
+                    KitchenOrderContent.Add('orderId', KitchenOrder."Order ID");
+                    KitchenOrderContent.Add('orderStatus', KitchenOrder."Order Status".AsInteger());
+                    KitchenOrderContent.Add('orderStatusName', OrderStatusEnumValueName);
+                    KitchenOrderContent.Add('priority', KitchenOrder.Priority);
+                    KitchenOrderContent.Add('orderCreatedDT', KitchenOrder."Created Date-Time");
+                    KitchenOrderList.Add(KitchenOrderContent);
+                until KitchenOrder.Next() = 0;
+        until TempRestaurant.Next() = 0;
+
+        Response.Add('orders', KitchenOrderList);
+        FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 }
