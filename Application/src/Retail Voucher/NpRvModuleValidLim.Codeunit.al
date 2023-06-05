@@ -1,6 +1,9 @@
 ﻿codeunit 6150718 "NPR NpRv Module Valid.: Lim."
 {
     Access = Internal;
+    ObsoleteReason = 'Moving LIMIT from Validation to Apply Payment module';
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR22.0';
     procedure ValidateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
@@ -9,8 +12,14 @@
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
-        VoucherAmtErr: Label 'Voucher amount is higher than the sale amount.';
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        SalesAmount: Decimal;
+        PaidAmount: Decimal;
+        ReturnAmount: Decimal;
+        SubTotal: Decimal;
+        VoucherType: Record "NPR NpRv Voucher Type";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        VoucherAmtErr: Label 'Voucher amount %1 is higher than the Subtotal %2.', Comment = '%1 = Voucher.Amount;%2=Subtotal';
         VourcherRedeemedErr: Label 'The voucher with Reference No. %1 has already been redeemed in another transaction on %2.', Comment = '%1 - voucher reference number, 2% - date';
         InvalidReferenceErr: Label 'Invalid Reference No. %1', Comment = '%1 - Reference Number value';
     begin
@@ -26,10 +35,16 @@
         CheckVoucher(Voucher);
         Voucher.CalcFields(Amount);
         POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        SalePOS.CalcFields("Amount Including VAT");
-        if Voucher.Amount > ABS(SalePOS."Amount Including VAT") then
-            Error(VoucherAmtErr);
+        POSSession.GetPaymentLine(POSPaymentLine);
+
+
+        VoucherType.Get(Voucher."Voucher Type");
+        POSPaymentMethod.Get(VoucherType."Payment Type");
+
+        POSPaymentLine.CalculateBalance(POSPaymentMethod, SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+
+        if Voucher.Amount > ABS(SubTotal) then
+            Error(VoucherAmtErr, FORMAT(Voucher.Amount), Format(SubTotal));
 
         NpRvVoucherMgt.Voucher2Buffer(Voucher, TempNpRvVoucherBuffer);
     end;
@@ -72,62 +87,9 @@
     end;
 
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnInitVoucherModules', '', true, true)]
-    local procedure OnInitVoucherModules(var VoucherModule: Record "NPR NpRv Voucher Module")
-    var
-        ValidateVoucherDefaultDescriptionLbl: Label 'Validate Voucher - Limit';
-    begin
-        if VoucherModule.Get(VoucherModule.Type::"Validate Voucher", ModuleCode()) then
-            exit;
-
-        VoucherModule.Init();
-        VoucherModule.Type := VoucherModule.Type::"Validate Voucher";
-        VoucherModule.Code := ModuleCode();
-        VoucherModule.Description := ValidateVoucherDefaultDescriptionLbl;
-        VoucherModule."Event Codeunit ID" := CurrCodeunitId();
-        VoucherModule.Insert(true);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnHasValidateVoucherSetup', '', true, true)]
-    local procedure OnHasValidateVoucherSetup(VoucherType: Record "NPR NpRv Voucher Type"; var HasValidateSetup: Boolean)
-    begin
-        if VoucherType."Validate Voucher Module" <> ModuleCode() then
-            exit;
-
-        HasValidateSetup := false;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnSetupValidateVoucher', '', true, true)]
-    local procedure OnSetupValidateVoucher(var VoucherType: Record "NPR NpRv Voucher Type")
-    begin
-        if VoucherType."Validate Voucher Module" <> ModuleCode() then
-            exit;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunValidateVoucher', '', true, true)]
-    local procedure OnRunValidateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var Handled: Boolean)
-    begin
-        if Handled then
-            exit;
-        if TempNpRvVoucherBuffer."Validate Voucher Module" <> ModuleCode() then
-            exit;
-        Handled := true;
-        ValidateVoucher(TempNpRvVoucherBuffer);
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckVoucher(var Voucher: Record "NPR NpRv Voucher"; var IsHandled: Boolean)
     begin
-    end;
-
-    local procedure CurrCodeunitId(): Integer
-    begin
-        exit(CODEUNIT::"NPR NpRv Module Valid.: Lim.");
-    end;
-
-    local procedure ModuleCode(): Code[20]
-    begin
-        exit('LIMIT');
     end;
 }
 
