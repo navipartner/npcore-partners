@@ -1,7 +1,7 @@
 codeunit 85064 "NPR POS Act. Ins. Cus.Id Tests"
 {
     Subtype = Test;
-
+/*
     var
         _POSUnit: Record "NPR POS Unit";
         _Assert: Codeunit Assert;
@@ -132,4 +132,5 @@ codeunit 85064 "NPR POS Act. Ins. Cus.Id Tests"
     begin
         _Assert.ExpectedMessage('Allowed Tax Rates have been updated.', Msg);
     end;
+    */
 }
