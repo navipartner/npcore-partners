@@ -42,10 +42,10 @@
     trigger OnOpenPage()
     var
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
-        ServingStepDiscoveryMethod: Integer;
+        ServingStepDiscoveryMethod: Enum "NPR NPRE Serv.Step Discovery";
     begin
         ServingStepDiscoveryMethod := SetupProxy.ServingStepDiscoveryMethod();
-        ShowPrintTags := ServingStepDiscoveryMethod = 0;
+        ShowPrintTags := ServingStepDiscoveryMethod = ServingStepDiscoveryMethod::"Legacy (using print tags)";
     end;
 
     var

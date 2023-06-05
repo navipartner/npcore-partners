@@ -75,6 +75,11 @@
                     ToolTip = 'Specifies the value of the Created Date-Time field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Expected Dine Date-Time"; Rec."Expected Dine Date-Time")
+                {
+                    ToolTip = 'Specifies the date-time the customer requested the order be ready at';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Serving Requested Date-Time"; Rec."Serving Requested Date-Time")
                 {
                     ToolTip = 'Specifies the value of the Serving Requested Date-Time field';
@@ -113,7 +118,14 @@
                 field(SeatingCode; Rec.SeatingCode())
                 {
                     Caption = 'Seating Code';
-                    ToolTip = 'Specifies the value of the Seating Code field';
+                    ToolTip = 'Specifies the seating (table) code the request was created for';
+                    Visible = false;
+                    ApplicationArea = NPRRetail;
+                }
+                field(SeatingNo; Rec.SeatingNo())
+                {
+                    Caption = 'Seating No.';
+                    ToolTip = 'Specifies the seating (table) No. the request was created for';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -290,7 +302,7 @@
         IsExpediteMode := ViewMode = ViewMode::Expedite;
         if IsExpediteMode then begin
             if Rec.GetFilter("Restaurant Code") = '' then
-                if not Restaurant.IsEmpty then begin
+                if not Restaurant.IsEmpty() then begin
                     if Page.RunModal(0, Restaurant) <> Action::LookupOK then
                         Error('');
                     Rec.SetRange("Restaurant Code", Restaurant.Code);

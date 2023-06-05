@@ -2,8 +2,11 @@ codeunit 6059925 "NPR POS Layout Assistant"
 {
     Access = Internal;
 
+    var
+        _JsonHelper: Codeunit "NPR Json Helper";
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', true, true)]
-    local procedure OnRequestPOSLayoutRelatedData(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
+    local procedure OnRequestPOSLayoutRelatedData(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
         case Method of
             'RequestPOSLayoutData':
@@ -39,7 +42,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         Response: JsonObject;
         POSLayoutFilter: Text;
     begin
-        POSLayoutFilter := GetJText(Context.AsToken(), 'layoutId', false);
+        POSLayoutFilter := _JsonHelper.GetJText(Context.AsToken(), 'layoutId', false);
         if POSLayoutFilter <> '' then
             POSLayout.SetFilter(Code, POSLayoutFilter);
         if POSLayout.FindSet() then
@@ -59,7 +62,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         POSLayouts: JsonToken;
         JToken: JsonToken;
     begin
-        POSLayouts := GetJsonToken(Context.AsToken(), 'layouts');
+        POSLayouts := _JsonHelper.GetJsonToken(Context.AsToken(), 'layouts');
         if not POSLayouts.IsArray() then
             exit;
 
@@ -80,7 +83,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
     var
         POSLayout: Record "NPR POS Layout";
     begin
-        POSLayout.Code := CopyStr(GetJText(POSLayoutJToken, 'id', false), 1, MaxStrLen(POSLayout.Code));
+        POSLayout.Code := CopyStr(_JsonHelper.GetJText(POSLayoutJToken, 'id', false), 1, MaxStrLen(POSLayout.Code));
         if (POSLayout.Code = '') or POSLayout.Find() then begin
             POSLayout.Code := '000';
             repeat
@@ -97,7 +100,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
     var
         POSLayout: Record "NPR POS Layout";
     begin
-        if not POSLayout.Get(CopyStr(GetJText(POSLayoutJToken, 'id', true), 1, MaxStrLen(POSLayout.Code))) then begin
+        if not POSLayout.Get(CopyStr(_JsonHelper.GetJText(POSLayoutJToken, 'id', true), 1, MaxStrLen(POSLayout.Code))) then begin
             NewPOSLayout(POSLayoutJToken);
             exit;
         end;
@@ -110,7 +113,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
     var
         POSLayout: Record "NPR POS Layout";
     begin
-        if not POSLayout.Get(CopyStr(GetJText(POSLayoutJToken, 'id', true), 1, MaxStrLen(POSLayout.Code))) then
+        if not POSLayout.Get(CopyStr(_JsonHelper.GetJText(POSLayoutJToken, 'id', true), 1, MaxStrLen(POSLayout.Code))) then
             exit;
 
         POSLayout.Delete(true);
@@ -120,10 +123,10 @@ codeunit 6059925 "NPR POS Layout Assistant"
     var
         OutStr: OutStream;
     begin
-        POSLayout.Description := CopyStr(GetJText(POSLayoutJToken, 'caption', false), 1, MaxStrLen(POSLayout.Description));
-        POSLayout."Template Name" := CopyStr(GetJText(POSLayoutJToken, 'template', false), 1, MaxStrLen(POSLayout."Template Name"));
+        POSLayout.Description := CopyStr(_JsonHelper.GetJText(POSLayoutJToken, 'caption', false), 1, MaxStrLen(POSLayout.Description));
+        POSLayout."Template Name" := CopyStr(_JsonHelper.GetJText(POSLayoutJToken, 'template', false), 1, MaxStrLen(POSLayout."Template Name"));
         POSLayout."Frontend Properties".CreateOutStream(OutStr);
-        OutStr.Write(GetJsonToken(POSLayoutJToken, 'blob').AsValue().AsText());
+        OutStr.Write(_JsonHelper.GetJsonToken(POSLayoutJToken, 'blob').AsValue().AsText());
     end;
 
     local procedure AssignPOSLayout(Context: JsonObject)
@@ -133,8 +136,8 @@ codeunit 6059925 "NPR POS Layout Assistant"
         POSSession: Codeunit "NPR POS Session";
         Setup: Codeunit "NPR POS Setup";
     begin
-        POSLayout.Get(CopyStr(GetJText(Context.AsToken(), 'layoutId', true), 1, MaxStrLen(POSLayout.Code)));
-        POSUnit.Get(CopyStr(GetJText(Context.AsToken(), 'POSUnitCode', true), 1, MaxStrLen(POSUnit."No.")));
+        POSLayout.Get(CopyStr(_JsonHelper.GetJText(Context.AsToken(), 'layoutId', true), 1, MaxStrLen(POSLayout.Code)));
+        POSUnit.Get(CopyStr(_JsonHelper.GetJText(Context.AsToken(), 'POSUnitCode', true), 1, MaxStrLen(POSUnit."No.")));
         POSUnit."POS Layout Code" := POSLayout.Code;
         POSUnit.Modify();
 
@@ -177,7 +180,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         xSelectedEntityCode: Code[20];
         UnsupportedMethodErr: Label 'Unsupported method "%1"', Comment = '%1 - method name';
     begin
-        xSelectedEntityCode := CopyStr(GetJText(Context.AsToken(), 'xSelectedEntityId', false), 1, MaxStrLen(xSelectedEntityCode));
+        xSelectedEntityCode := CopyStr(_JsonHelper.GetJText(Context.AsToken(), 'xSelectedEntityId', false), 1, MaxStrLen(xSelectedEntityCode));
 
         case Method of
             'POSLayout_SelectItem':
@@ -269,7 +272,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         POSAction: Record "NPR POS Action";
         Response: JsonObject;
     begin
-        POSAction.Get(CopyStr(GetJText(Context.AsToken(), 'actionCode', true), 1, MaxStrLen(POSAction.Code)));
+        POSAction.Get(CopyStr(_JsonHelper.GetJText(Context.AsToken(), 'actionCode', true), 1, MaxStrLen(POSAction.Code)));
         AddPOSActionParametersToResponse(POSAction, Response);
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
@@ -285,8 +288,8 @@ codeunit 6059925 "NPR POS Layout Assistant"
         JToken: JsonToken;
         xParameterSet: JsonToken;
     begin
-        POSAction.Get(CopyStr(GetJText(Context.AsToken(), 'actionCode', true), 1, MaxStrLen(POSAction.Code)));
-        if GetJsonToken(Context.AsToken(), 'xParameterSet', xParameterSet) then
+        POSAction.Get(CopyStr(_JsonHelper.GetJText(Context.AsToken(), 'actionCode', true), 1, MaxStrLen(POSAction.Code)));
+        if _JsonHelper.GetJsonToken(Context.AsToken(), 'xParameterSet', xParameterSet) then
             if xParameterSet.IsArray() then
                 ParameterSetJArray := xParameterSet.AsArray();
 
@@ -344,7 +347,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         ActionWorkflows: JsonArray;
         SkipDiscovery: Boolean;
     begin
-        SkipDiscovery := GetJBoolean(Context.AsToken(), 'skipDiscovery', false);
+        SkipDiscovery := _JsonHelper.GetJBoolean(Context.AsToken(), 'skipDiscovery', false);
         if not SkipDiscovery then
             POSAction.DiscoverActions();
         POSAction.SetAutoCalcFields(Workflow, "Custom JavaScript Logic");
@@ -398,87 +401,4 @@ codeunit 6059925 "NPR POS Layout Assistant"
             POSLayoutContentOut.Add('blob', '');
         POSLayoutContentOut.Add('assignedToPOSUnits', POSLayout.AssignedToPOSUnits());
     end;
-
-    #region Json Helper functions
-    local procedure GetJText(Token: JsonToken; Path: Text; Required: Boolean): Text
-    var
-        JValue: JsonValue;
-    begin
-        if GetJValue(Token, Path, JValue) then
-            if not (JValue.IsNull() or JValue.IsUndefined()) then
-                exit(JValue.AsText());
-        if Required then
-            RequiredValueMissingError(Token, Path);
-        exit('');
-    end;
-
-    local procedure GetJBoolean(Token: JsonToken; Path: Text; Required: Boolean): Boolean
-    var
-        JValue: JsonValue;
-        Value: Boolean;
-    begin
-        if GetJValue(Token, Path, JValue) then
-            if not (JValue.IsNull() or JValue.IsUndefined()) then begin
-                if JValueToBoolean(JValue, Value) then
-                    exit(Value);
-                case JValue.AsText() of
-                    '1':
-                        exit(true);
-                    '0', '':
-                        exit(false);
-                    else
-                        if Evaluate(Value, JValue.AsText()) then
-                            exit(Value);
-                end;
-            end;
-        if Required then
-            RequiredValueMissingError(Token, Path);
-        exit(false);
-    end;
-
-    [TryFunction]
-    local procedure JValueToBoolean(JValue: JsonValue; ValueOut: Boolean)
-    begin
-        ValueOut := JValue.AsBoolean();
-    end;
-
-    local procedure GetJValue(Token: JsonToken; Path: Text; var JValue: JsonValue): Boolean
-    var
-        Token2: JsonToken;
-    begin
-        if not Token.SelectToken(Path, Token2) then
-            exit(false);
-        JValue := Token2.AsValue();
-        if JValue.IsNull() or JValue.IsUndefined() then
-            exit(false);
-        exit(true);
-    end;
-
-    local procedure GetJsonToken(Token: JsonToken; TokenKey: Text) TokenOut: JsonToken
-    begin
-        if not GetJsonToken(Token, TokenKey, TokenOut) then
-            RequiredValueMissingError(Token, TokenKey);
-    end;
-
-    local procedure GetJsonToken(Token: JsonToken; TokenKey: Text; var TokenOut: JsonToken): Boolean
-    begin
-        exit(Token.SelectToken(TokenKey, TokenOut));
-    end;
-
-    local procedure RequiredValueMissingError(Token: JsonToken; Path: Text)
-    var
-        ValueMissingErr: Label 'Required value missing: %1';
-    begin
-        Error(ValueMissingErr, GetAbsolutePath(Token, Path));
-    end;
-
-    local procedure GetAbsolutePath(Token: JsonToken; Path: Text) AbsolutePath: Text
-    begin
-        AbsolutePath := Token.Path();
-        if (AbsolutePath <> '') and (Path <> '') then
-            AbsolutePath += '/';
-        AbsolutePath += Path;
-        exit(AbsolutePath);
-    end;
-    #endregion
 }

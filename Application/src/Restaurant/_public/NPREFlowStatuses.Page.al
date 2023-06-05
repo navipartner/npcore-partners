@@ -9,7 +9,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -18,13 +17,11 @@
             {
                 field("Code"; Rec.Code)
                 {
-
                     ToolTip = 'Specifies the value of the Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Status Object"; Rec."Status Object")
                 {
-
                     Enabled = StatusObjectVisible;
                     Visible = StatusObjectVisible;
                     ToolTip = 'Specifies the value of the Status Object field';
@@ -32,26 +29,28 @@
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Flow Order"; Rec."Flow Order")
                 {
-
                     ToolTip = 'Specifies the value of the Flow Order field';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Auxiliary; Rec.Auxiliary)
+                {
+                    Visible = IsServingSteps;
+                    ToolTip = 'Specifies whether this is an auxiliary meal flow (serving) step. When requested, auxiliary steps do not update waiter pad current serving step';
                     ApplicationArea = NPRRetail;
                 }
                 field("Waiter Pad Status Code"; Rec."Waiter Pad Status Code")
                 {
-
                     Visible = IsServingSteps;
                     ToolTip = 'Specifies the value of the Waiter Pad Status Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsFilterString())
                 {
-
                     Caption = 'Print/Prod. Categories';
                     Visible = ShowPrintCategories;
                     ToolTip = 'Specifies the value of the Print/Prod. Categories field';
@@ -102,7 +101,6 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = ShowPrintCategories;
-
                     ToolTip = 'Executes the Print/Prod. Categories action';
                     ApplicationArea = NPRRetail;
 
@@ -118,7 +116,7 @@
     trigger OnAfterGetCurrRecord()
     begin
         IsServingSteps := Rec."Status Object" = Rec."Status Object"::WaiterPadLineMealFlow;
-        ShowPrintCategories := IsServingSteps and (ServingStepDiscoveryMethod = 0);
+        ShowPrintCategories := IsServingSteps and (ServingStepDiscoveryMethod = ServingStepDiscoveryMethod::"Legacy (using print tags)");
         PrintCategoriesEnabled := ShowPrintCategories and (Rec.Code <> '');
     end;
 
@@ -140,11 +138,11 @@
         end;
 
         ServingStepDiscoveryMethod := SetupProxy.ServingStepDiscoveryMethod();
-        ShowPrintCategories := IsServingSteps and (ServingStepDiscoveryMethod = 0);
+        ShowPrintCategories := IsServingSteps and (ServingStepDiscoveryMethod = ServingStepDiscoveryMethod::"Legacy (using print tags)");
     end;
 
     var
-        ServingStepDiscoveryMethod: Integer;
+        ServingStepDiscoveryMethod: Enum "NPR NPRE Serv.Step Discovery";
         IsServingSteps: Boolean;
         PrintCategoriesEnabled: Boolean;
         ShowPrintCategories: Boolean;

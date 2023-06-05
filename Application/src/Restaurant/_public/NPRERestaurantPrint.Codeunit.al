@@ -10,7 +10,6 @@
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
         NowhereToSend: Label 'Neither Kitchen Printing nor KDS is activated. You need to activate at least one of them to be able to use this functionality.';
         ServingReqestedMsg: Label 'Serving of %1 requested for seating %2 (waiter pad %3).';
-        NotTempErr: Label '%1: function call on a non-temporary variable. This is a programming bug, not a user error. Please contact system vendor.';
 
     internal procedure PrintWaiterPadPreReceiptPressed(WaiterPad: Record "NPR NPRE Waiter Pad")
     begin
@@ -24,16 +23,15 @@
 
     internal procedure LinesAddedToWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
     var
-        SeatingLocation: Record "NPR NPRE Seating Location";
         Confirmed: Boolean;
     begin
         SetupProxy.InitializeUsingWaiterPad(WaiterPad);
         case SetupProxy.AutoSendKitchenOrder() of
-            SeatingLocation."Auto Send Kitchen Order"::No:
+            Enum::"NPR NPRE Auto Send Kitch.Order"::No:
                 Confirmed := false;
-            SeatingLocation."Auto Send Kitchen Order"::Yes:
+            Enum::"NPR NPRE Auto Send Kitch.Order"::Yes:
                 Confirmed := true;
-            SeatingLocation."Auto Send Kitchen Order"::Ask:
+            Enum::"NPR NPRE Auto Send Kitch.Order"::Ask:
                 Confirmed := Confirm(PrintKitchOderConfMsg, true);
         end;
         if Confirmed then
@@ -128,7 +126,6 @@
     local procedure BufferWPadLinesForSending(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; var FlowStatus: Record "NPR NPRE Flow Status"; ForceResend: Boolean; var WPadLineBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf."): Boolean
     var
         TempPrintCategory: Record "NPR NPRE Print/Prod. Cat." temporary;
-        SeatingLocation: Record "NPR NPRE Seating Location";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         OutputType: Integer;
         AskResendConfirmation: Boolean;
@@ -146,9 +143,9 @@
             exit(false);
 
         if not ForceResend then begin
-            AskResendConfirmation := SetupProxy.ResendAllOnNewLines() = SeatingLocation."Resend All On New Lines"::Ask;
+            AskResendConfirmation := SetupProxy.ResendAllOnNewLines() = Enum::"NPR NPRE Send All on New Lines"::Ask;
             if not AskResendConfirmation then
-                ForceResend := SetupProxy.ResendAllOnNewLines() = SeatingLocation."Resend All On New Lines"::Yes;
+                ForceResend := SetupProxy.ResendAllOnNewLines() = Enum::"NPR NPRE Send All on New Lines"::Yes;
         end;
 
         WPadLineBuffer.Reset();
@@ -539,7 +536,7 @@
         if WaiterPad."Serving Step Code" <> '' then
             FlowStatus.Get(WaiterPad."Serving Step Code", FlowStatus."Status Object"::WaiterPadLineMealFlow);
         FlowStatusNew.Get(NewFlowStatusCode, FlowStatus."Status Object"::WaiterPadLineMealFlow);
-        if (FlowStatusNew."Flow Order" > FlowStatus."Flow Order") or (WaiterPad."Serving Step Code" = '') then
+        if ((FlowStatusNew."Flow Order" > FlowStatus."Flow Order") or (WaiterPad."Serving Step Code" = '')) and not FlowStatusNew.Auxiliary then
             WaiterPad.Validate("Serving Step Code", NewFlowStatusCode);
         WaiterPad."Last Req. Serving Step Code" := NewFlowStatusCode;
         WaiterPad.Modify();
@@ -561,8 +558,8 @@
     var
         PrintCategory: Record "NPR NPRE Print/Prod. Cat.";
     begin
-        if not PrintCategoryTmp.IsTemporary then
-            Error(NotTempErr, 'CU6150664.InitTempPrintCategoryList');
+        if not PrintCategoryTmp.IsTemporary() then
+            SetupProxy.ThrowNonTempException('CU6150664.InitTempPrintCategoryList');
         PrintCategoryTmp.Reset();
         PrintCategoryTmp.DeleteAll();
         if PrintCategory.FindSet() then
@@ -580,8 +577,8 @@
     var
         FlowStatus: Record "NPR NPRE Flow Status";
     begin
-        if not FlowStatusTmp.IsTemporary then
-            Error(NotTempErr, 'CU6150664.InitTempFlowStatusList');
+        if not FlowStatusTmp.IsTemporary() then
+            SetupProxy.ThrowNonTempException('CU6150664.InitTempFlowStatusList');
 
         FlowStatusTmp.Reset();
         FlowStatusTmp.DeleteAll();

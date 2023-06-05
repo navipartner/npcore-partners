@@ -17,22 +17,20 @@
                 CuegroupLayout = Wide;
                 field("Waiter Pads - Open"; Rec."Waiter Pads - Open")
                 {
-
                     ToolTip = 'Specifies the value of the Waiter Pads - Open field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Kitchen Requests - Open"; Rec."Kitchen Requests - Open")
                 {
-
                     ToolTip = 'Specifies the value of the Kitchen Requests - Open field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Pending Reservations"; Rec."Pending Reservations")
                 {
-
                     Caption = 'Pending Reservations';
                     ToolTip = 'Specifies the value of the Pending Reservations field';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
             }
             cuegroup(TableStatus)
@@ -40,25 +38,21 @@
                 Caption = 'Current Table Status';
                 field("Seatings: Ready"; Rec."Seatings: Ready")
                 {
-
                     ToolTip = 'Specifies the value of the Available field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Seatings: Occupied"; Rec."Seatings: Occupied")
                 {
-
                     ToolTip = 'Specifies the value of the Occupied field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Seatings: Reserved"; Rec."Seatings: Reserved")
                 {
-
                     ToolTip = 'Specifies the value of the Reserved field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Seatings: Cleaning Required"; Rec."Seatings: Cleaning Required")
                 {
-
                     ToolTip = 'Specifies the value of the Cleaning Required field';
                     ApplicationArea = NPRRetail;
                 }
@@ -68,13 +62,11 @@
                 Caption = 'Seats';
                 field("Available seats"; Rec."Available seats")
                 {
-
                     ToolTip = 'Specifies the value of the Available Seats field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Inhouse Guests"; Rec."Inhouse Guests")
                 {
-
                     ToolTip = 'Specifies the value of the Inhouse Guests field';
                     ApplicationArea = NPRRetail;
                 }
@@ -84,7 +76,6 @@
                 Caption = 'My User Tasks';
                 field("Pending User Tasks"; UserTaskManagement.GetMyPendingUserTasksCount())
                 {
-
                     Caption = 'Pending User Tasks';
                     Image = Checklist;
                     ToolTip = 'Specifies the number of pending tasks that are assigned to you or to a group that you are a member of.';
@@ -104,7 +95,6 @@
                 Caption = 'Today''s Summary';
                 field("Turnover (LCY)"; Rec."Turnover (LCY)")
                 {
-
                     ToolTip = 'Specifies the value of the Turnover field';
                     ApplicationArea = NPRRetail;
 
@@ -115,7 +105,6 @@
                 }
                 field("No. of Sales"; Rec."No. of Sales")
                 {
-
                     ToolTip = 'Specifies the value of the No. of Sales field';
                     ApplicationArea = NPRRetail;
 
@@ -126,19 +115,16 @@
                 }
                 field("Total No. of Guests"; Rec."Total No. of Guests")
                 {
-
                     ToolTip = 'Specifies the value of the Total No. of Guests field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Average per Sale (LCY)"; Rec."Average per Sale (LCY)")
                 {
-
                     ToolTip = 'Specifies the value of the Average per Sale field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Average per Guest (LCY)"; Rec."Average per Guest (LCY)")
                 {
-
                     ToolTip = 'Specifies the value of the Average per Guest field';
                     ApplicationArea = NPRRetail;
                 }
@@ -146,21 +132,19 @@
             cuegroup(Reservations)
             {
                 Caption = 'Reservations';
+                Visible = false;
                 field("Completed Reservations"; Rec."Completed Reservations")
                 {
-
                     ToolTip = 'Specifies the value of the Completed field';
                     ApplicationArea = NPRRetail;
                 }
                 field("No-Shows"; Rec."No-Shows")
                 {
-
                     ToolTip = 'Specifies the value of the No-Shows field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Cancelled Reservations"; Rec."Cancelled Reservations")
                 {
-
                     ToolTip = 'Specifies the value of the Cancelled field';
                     ApplicationArea = NPRRetail;
                 }

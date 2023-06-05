@@ -3,51 +3,51 @@
     Access = Internal;
     // The purpose of this codeunit is to abstract retrieval of setup.
     var
-        NPRESetup: Record "NPR NPRE Restaurant Setup";
-        Restaurant: Record "NPR NPRE Restaurant";
-        Seating: Record "NPR NPRE Seating";
-        SeatingLocation: Record "NPR NPRE Seating Location";
-        Initialized: Boolean;
-        NPRESetupRead: Boolean;
+        _NPRESetup: Record "NPR NPRE Restaurant Setup";
+        _Restaurant: Record "NPR NPRE Restaurant";
+        _Seating: Record "NPR NPRE Seating";
+        _SeatingLocation: Record "NPR NPRE Seating Location";
+        _Initialized: Boolean;
+        _NPRESetupRead: Boolean;
 
     procedure SetRestaurant(NewRestaurantCode: Code[20])
     begin
-        if NewRestaurantCode = Restaurant.Code then
+        if NewRestaurantCode = _Restaurant.Code then
             exit;
         if NewRestaurantCode <> '' then
-            Restaurant.Get(NewRestaurantCode)
+            _Restaurant.Get(NewRestaurantCode)
         else
-            Clear(Restaurant);
-        Clear(SeatingLocation);
-        Initialized := false;
+            Clear(_Restaurant);
+        Clear(_SeatingLocation);
+        _Initialized := false;
     end;
 
     procedure SetSeating(NewSeatingCode: Code[20])
     begin
-        if NewSeatingCode = Seating.Code then
+        if NewSeatingCode = _Seating.Code then
             exit;
         if NewSeatingCode <> '' then begin
-            Seating.Get(NewSeatingCode);
-            SetSeatingLocation(Seating."Seating Location");
+            _Seating.Get(NewSeatingCode);
+            SetSeatingLocation(_Seating."Seating Location");
         end else
             InitializeDefault();
     end;
 
     procedure SetSeatingLocation(NewSeatingLocation: Code[10])
     begin
-        if NewSeatingLocation = SeatingLocation.Code then
+        if NewSeatingLocation = _SeatingLocation.Code then
             exit;
         if NewSeatingLocation <> '' then begin
-            SeatingLocation.Get(NewSeatingLocation);
-            if SeatingLocation."Restaurant Code" <> '' then
-                Restaurant.Get(SeatingLocation."Restaurant Code")
+            _SeatingLocation.Get(NewSeatingLocation);
+            if _SeatingLocation."Restaurant Code" <> '' then
+                _Restaurant.Get(_SeatingLocation."Restaurant Code")
             else
-                Clear(Restaurant);
+                Clear(_Restaurant);
         end else
-            Clear(SeatingLocation);
-        if Seating."Seating Location" <> SeatingLocation.Code then
-            Clear(Seating);
-        Initialized := false;
+            Clear(_SeatingLocation);
+        if _Seating."Seating Location" <> _SeatingLocation.Code then
+            Clear(_Seating);
+        _Initialized := false;
     end;
 
     procedure InitializeUsingWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
@@ -65,101 +65,138 @@
     begin
         GetNPRESetup();
 
-        if Restaurant."Auto Send Kitchen Order" = Restaurant."Auto Send Kitchen Order"::Default then
-            Restaurant."Auto Send Kitchen Order" := NPRESetup."Auto Send Kitchen Order" + 1;
-        if SeatingLocation."Auto Send Kitchen Order" = SeatingLocation."Auto Send Kitchen Order"::Default then
-            SeatingLocation."Auto Send Kitchen Order" := Restaurant."Auto Send Kitchen Order";
+        if _Restaurant."Auto Send Kitchen Order" = _Restaurant."Auto Send Kitchen Order"::Default then
+            _Restaurant."Auto Send Kitchen Order" := _NPRESetup."Auto-Send Kitchen Order";
+        if _SeatingLocation."Auto Send Kitchen Order" = _SeatingLocation."Auto Send Kitchen Order"::Default then
+            _SeatingLocation."Auto Send Kitchen Order" := _Restaurant."Auto Send Kitchen Order";
 
-        if Restaurant."Resend All On New Lines" = Restaurant."Resend All On New Lines"::Default then
-            Restaurant."Resend All On New Lines" := NPRESetup."Resend All On New Lines" + 1;
-        if SeatingLocation."Resend All On New Lines" = SeatingLocation."Resend All On New Lines"::Default then
-            SeatingLocation."Resend All On New Lines" := Restaurant."Resend All On New Lines";
+        if _Restaurant."Resend All On New Lines" = _Restaurant."Resend All On New Lines"::Default then
+            _Restaurant."Resend All On New Lines" := _NPRESetup."Re-send All on New Lines";
+        if _SeatingLocation."Resend All On New Lines" = _SeatingLocation."Resend All On New Lines"::Default then
+            _SeatingLocation."Resend All On New Lines" := _Restaurant."Resend All On New Lines";
 
-        if Restaurant."Kitchen Printing Active" = Restaurant."Kitchen Printing Active"::Default then
-            if NPRESetup."Kitchen Printing Active" then
-                Restaurant."Kitchen Printing Active" := Restaurant."Kitchen Printing Active"::Yes
+        if _Restaurant."Kitchen Printing Active" = _Restaurant."Kitchen Printing Active"::Default then
+            if _NPRESetup."Kitchen Printing Active" then
+                _Restaurant."Kitchen Printing Active" := _Restaurant."Kitchen Printing Active"::Yes
             else
-                Restaurant."Kitchen Printing Active" := Restaurant."Kitchen Printing Active"::No;
+                _Restaurant."Kitchen Printing Active" := _Restaurant."Kitchen Printing Active"::No;
 
-        if Restaurant."KDS Active" = Restaurant."KDS Active"::Default then
-            if NPRESetup."KDS Active" then
-                Restaurant."KDS Active" := Restaurant."KDS Active"::Yes
+        if _Restaurant."KDS Active" = _Restaurant."KDS Active"::Default then
+            if _NPRESetup."KDS Active" then
+                _Restaurant."KDS Active" := _Restaurant."KDS Active"::Yes
             else
-                Restaurant."KDS Active" := Restaurant."KDS Active"::No;
+                _Restaurant."KDS Active" := _Restaurant."KDS Active"::No;
 
-        if Restaurant."Order ID Assign. Method" = Restaurant."Order ID Assign. Method"::Default then
-            Restaurant."Order ID Assign. Method" := NPRESetup."Order ID Assign. Method" + 1;
+        if _Restaurant."Order ID Assign. Method" = _Restaurant."Order ID Assign. Method"::Default then
+            _Restaurant."Order ID Assign. Method" := _NPRESetup."Order ID Assignment Method";
 
-        if Restaurant."Service Flow Profile" = '' then
-            Restaurant."Service Flow Profile" := NPRESetup."Default Service Flow Profile";
+        if _Restaurant."Service Flow Profile" = '' then
+            _Restaurant."Service Flow Profile" := _NPRESetup."Default Service Flow Profile";
 
-        if Restaurant."Station Req. Handl. On Serving" = Restaurant."Station Req. Handl. On Serving"::Default then
-            Restaurant."Station Req. Handl. On Serving" := NPRESetup."Station Req. Handl. On Serving" + 1;
+        if _Restaurant."Station Req. Handl. On Serving" = _Restaurant."Station Req. Handl. On Serving"::Default then
+            _Restaurant."Station Req. Handl. On Serving" := _NPRESetup."Kitchen Req. Handl. On Serving";
 
-        Initialized := true;
+        if _Restaurant."Order Is Ready For Serving" = _Restaurant."Order Is Ready For Serving"::Default then
+            _Restaurant."Order Is Ready For Serving" := _NPRESetup."Order Is Ready For Serving";
+
+        _Initialized := true;
     end;
 
     local procedure MakeSureIsInitialized()
     begin
-        if not Initialized then
+        if not _Initialized then
             InitializeSetup();
     end;
 
     local procedure GetNPRESetup()
     begin
-        if NPRESetupRead then
+        if _NPRESetupRead then
             exit;
-        if not NPRESetup.Get() then
-            NPRESetup.Init();
-        NPRESetupRead := true;
+        if not _NPRESetup.Get() then
+            _NPRESetup.Init();
+        _NPRESetupRead := true;
     end;
 
-    procedure AutoSendKitchenOrder(): Integer
+    procedure AutoSendKitchenOrder(): Enum "NPR NPRE Auto Send Kitch.Order"
     begin
         MakeSureIsInitialized();
-        exit(SeatingLocation."Auto Send Kitchen Order");
+        exit(_SeatingLocation."Auto Send Kitchen Order");
     end;
 
-    procedure ResendAllOnNewLines(): Integer
+    procedure ResendAllOnNewLines(): Enum "NPR NPRE Send All on New Lines"
     begin
         MakeSureIsInitialized();
-        exit(SeatingLocation."Resend All On New Lines");
+        exit(_SeatingLocation."Resend All On New Lines");
     end;
 
     procedure KitchenPrintingActivated(): Boolean
     begin
         MakeSureIsInitialized();
-        exit(Restaurant."Kitchen Printing Active" = Restaurant."Kitchen Printing Active"::Yes);
+        exit(_Restaurant."Kitchen Printing Active" = _Restaurant."Kitchen Printing Active"::Yes);
     end;
 
     procedure KDSActivated(): Boolean
     begin
         MakeSureIsInitialized();
-        exit(Restaurant."KDS Active" = Restaurant."KDS Active"::Yes);
+        exit(_Restaurant."KDS Active" = _Restaurant."KDS Active"::Yes);
     end;
 
-    procedure OrderIDAssignmentMethod(): Integer
+    procedure OrderIDAssignmentMethod(): Enum "NPR NPRE Ord.ID Assign. Method"
     begin
         MakeSureIsInitialized();
-        exit(Restaurant."Order ID Assign. Method");
+        exit(_Restaurant."Order ID Assign. Method");
     end;
 
     procedure GetServiceFlowProfile(var ServiceFlowProfileOut: Record "NPR NPRE Serv.Flow Profile")
     begin
         MakeSureIsInitialized();
-        if not ServiceFlowProfileOut.Get(Restaurant."Service Flow Profile") then
+        if not ServiceFlowProfileOut.Get(_Restaurant."Service Flow Profile") then
             Clear(ServiceFlowProfileOut);
     end;
 
-    procedure ServingStepDiscoveryMethod(): Integer
+    procedure ServingStepDiscoveryMethod(): Enum "NPR NPRE Serv.Step Discovery"
     begin
         GetNPRESetup();
-        exit(NPRESetup."Serving Step Discovery Method");
+        exit(_NPRESetup."Serving Step Discovery Method");
     end;
 
-    procedure StationReqHandlingOnServing(): Integer
+    procedure StationReqHandlingOnServing(): Enum "NPR NPRE Req.Handl.on Serving"
     begin
         MakeSureIsInitialized();
-        exit(Restaurant."Station Req. Handl. On Serving");
+        exit(_Restaurant."Station Req. Handl. On Serving");
+    end;
+
+    procedure KitchenOrderIsReadyForServingOn(): Enum "NPR NPRE Order Ready Serving"
+    begin
+        MakeSureIsInitialized();
+        exit(_Restaurant."Order Is Ready For Serving");
+    end;
+
+    procedure GetRestaurantList(var TempRestaurant: Record "NPR NPRE Restaurant")
+    var
+        Restaurant: Record "NPR NPRE Restaurant";
+    begin
+        if not TempRestaurant.IsTemporary() then
+            ThrowNonTempException('CU6150675.GetRestaurantList');
+        if not TempRestaurant.IsEmpty() then
+            exit;
+        if Restaurant.IsEmpty() then begin
+            TempRestaurant.Init();
+            TempRestaurant.Code := '';
+            TempRestaurant.Insert();
+            exit;
+        end;
+        Restaurant.FindSet();
+        repeat
+            TempRestaurant := Restaurant;
+            TempRestaurant.Insert();
+        until Restaurant.Next() = 0;
+    end;
+
+    procedure ThrowNonTempException(CallerName: Text)
+    var
+        MustBeTempMsg: Label '%1: function call on a non-temporary variable. This is a programming bug, not a user error. Please contact system vendor.';
+    begin
+        Error(MustBeTempMsg, CallerName);
     end;
 }

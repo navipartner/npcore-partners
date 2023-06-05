@@ -20,26 +20,21 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Kitchen Order";
         }
-        field(30; "Line Status"; Option)
+        field(30; "Line Status"; Enum "NPR NPRE K.Request Line Status")
         {
             Caption = 'Line Status';
             DataClassification = CustomerContent;
             InitValue = Planned;
-            OptionCaption = 'Ready for Serving,Serving Requested,Planned,Served,Cancelled';
-            OptionMembers = "Ready for Serving","Serving Requested",Planned,Served,Cancelled;
         }
-        field(40; "Production Status"; Option)
+        field(40; "Production Status"; Enum "NPR NPRE K.Req.L. Prod.Status")
         {
             Caption = 'Production Status';
             DataClassification = CustomerContent;
-            OptionCaption = 'Not Started,Started,On Hold,Finished,Cancelled';
-            OptionMembers = "Not Started",Started,"On Hold",Finished,Cancelled;
         }
-        field(45; "Station Production Status"; Option)
+        field(45; "Station Production Status"; Enum "NPR NPRE K.Req.L. Prod.Status")
         {
             Caption = 'Station Production Status';
-            OptionCaption = 'Not Started,Started,,Finished,Cancelled';
-            OptionMembers = "Not Started",Started,,Finished,Cancelled;
+            ValuesAllowed = "Not Started", Started, Finished, Cancelled;
             Editable = false;
             FieldClass = FlowField;
             CalcFormula = lookup("NPR NPRE Kitchen Req. Station"."Production Status"
@@ -60,6 +55,11 @@
         field(70; "Created Date-Time"; DateTime)
         {
             Caption = 'Created Date-Time';
+            DataClassification = CustomerContent;
+        }
+        field(75; "Expected Dine Date-Time"; DateTime)
+        {
+            Caption = 'Expected Dine Date-Time';
             DataClassification = CustomerContent;
         }
         field(80; "Serving Requested Date-Time"; DateTime)
@@ -261,10 +261,6 @@
         TestField("Production Status", "Production Status"::"Not Started");
     end;
 
-    procedure SuppressChangesAllowedTest(Suppress: Boolean)
-    begin
-    end;
-
     local procedure RevertToNewLineState()
     begin
         KitchenOrderLine := Rec;
@@ -281,7 +277,7 @@
             Item.Get("No.");
     end;
 
-    procedure GetNextStationReqLineNo(): Integer
+    internal procedure GetNextStationReqLineNo(): Integer
     var
         KitchenReqStation: Record "NPR NPRE Kitchen Req. Station";
     begin
@@ -291,7 +287,7 @@
         exit(KitchenReqStation."Line No." + 10000);
     end;
 
-    procedure InitFromWaiterPadLine(WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    internal procedure InitFromWaiterPadLine(WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
     begin
         Init();
         "Request No." := 0;
@@ -303,7 +299,7 @@
         "Qty. per Unit of Measure" := WaiterPadLine."Qty. per Unit of Measure";
     end;
 
-    procedure SeatingCode(): Code[20]
+    internal procedure SeatingCode(): Code[20]
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
@@ -315,9 +311,28 @@
                 KitchenReqSourceLink."Source Document Type"::"Waiter Pad":
                     begin
                         SeatingWaiterPadLink.SetRange("Waiter Pad No.", KitchenReqSourceLink."Source Document No.");
-                        if not SeatingWaiterPadLink.FindFirst() then
-                            SeatingWaiterPadLink."Seating Code" := '';
-                        exit(SeatingWaiterPadLink."Seating Code");
+                        if SeatingWaiterPadLink.FindFirst() then
+                            exit(SeatingWaiterPadLink."Seating Code");
+                    end;
+            end;
+        exit('');
+    end;
+
+    internal procedure SeatingNo(): Text[20]
+    var
+        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
+    begin
+        KitchenReqSourceLink.SetCurrentKey("Request No.");
+        KitchenReqSourceLink.SetRange("Request No.", Rec."Request No.");
+        if KitchenReqSourceLink.FindLast() then
+            case KitchenReqSourceLink."Source Document Type" of
+                KitchenReqSourceLink."Source Document Type"::"Waiter Pad":
+                    begin
+                        SeatingWaiterPadLink.SetAutoCalcFields("Seating No.");
+                        SeatingWaiterPadLink.SetRange("Waiter Pad No.", KitchenReqSourceLink."Source Document No.");
+                        if SeatingWaiterPadLink.FindFirst() then
+                            exit(SeatingWaiterPadLink."Seating No.");
                     end;
             end;
         exit('');

@@ -31,12 +31,11 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Kitchen Station".Code WHERE("Restaurant Code" = FIELD("Production Restaurant Code"));
         }
-        field(30; "Production Status"; Option)
+        field(30; "Production Status"; Enum "NPR NPRE K.Req.L. Prod.Status")
         {
             Caption = 'Production Status';
             DataClassification = CustomerContent;
-            OptionCaption = 'Not Started,Started,,Finished,Cancelled';
-            OptionMembers = "Not Started",Started,,Finished,Cancelled;
+            ValuesAllowed = "Not Started", Started, Finished, Cancelled;
         }
         field(40; "Start Date-Time"; DateTime)
         {
@@ -82,18 +81,4 @@
         {
         }
     }
-
-    procedure SetFinished()
-    begin
-        "End Date-Time" := CurrentDateTime();
-        "On Hold" := false;
-        "Production Status" := "Production Status"::Finished;
-        Modify();
-    end;
-
-    procedure SetCancelled()
-    begin
-        "Production Status" := "Production Status"::Cancelled;
-        Modify();
-    end;
 }

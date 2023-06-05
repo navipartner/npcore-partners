@@ -9,7 +9,6 @@
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -18,31 +17,31 @@
             {
                 field("Order ID"; Rec."Order ID")
                 {
-
                     ToolTip = 'Specifies the value of the Order ID field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-
                     ToolTip = 'Specifies the value of the Restaurant Code field';
                     ApplicationArea = NPRRetail;
                 }
-                field(Status; Rec.Status)
+                field("Expected Dine Date-Time"; Rec."Expected Dine Date-Time")
                 {
-
-                    ToolTip = 'Specifies the value of the Status field';
+                    ToolTip = 'Specifies the date-time the customer requested the order be ready at';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Order Status"; Rec."Order Status")
+                {
+                    ToolTip = 'Specifies current status of the order';
                     ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-
                     ToolTip = 'Specifies the value of the Priority field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Created Date-Time"; Rec."Created Date-Time")
                 {
-
                     ToolTip = 'Specifies the value of the Created Date-Time field';
                     ApplicationArea = NPRRetail;
                 }
@@ -54,13 +53,11 @@
             {
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
             systempart(Control6014407; Links)
             {
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
         }
     }
@@ -80,7 +77,6 @@
                 RunObject = Page "NPR NPRE Kitchen Req.";
                 RunPageLink = "Order ID" = FIELD("Order ID");
                 RunPageView = SORTING("Order ID");
-
                 ToolTip = 'Executes the Show Requests action';
                 ApplicationArea = NPRRetail;
             }

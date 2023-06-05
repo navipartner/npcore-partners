@@ -9,7 +9,7 @@
             column(Order_ID; "Order ID")
             {
             }
-            column(Order_Status; Status)
+            column(Order_Status; "Order Status")
             {
             }
             dataitem(KitchenRequest; "NPR NPRE Kitchen Request")

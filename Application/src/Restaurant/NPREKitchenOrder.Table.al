@@ -19,6 +19,15 @@
             InitValue = Planned;
             OptionCaption = 'Active,Planned,Finished,Cancelled';
             OptionMembers = Active,Planned,Finished,Cancelled;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by Enum field 11 "Order Status"';
+            ObsoleteTag = 'NPR23.0';
+        }
+        field(11; "Order Status"; Enum "NPR NPRE Kitchen Order Status")
+        {
+            Caption = 'Order Status';
+            DataClassification = CustomerContent;
+            InitValue = Planned;
         }
         field(20; Priority; Integer)
         {
@@ -40,6 +49,11 @@
             Caption = 'Restaurant Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Restaurant";
+        }
+        field(60; "Expected Dine Date-Time"; DateTime)
+        {
+            Caption = 'Expected Dine Date-Time';
+            DataClassification = CustomerContent;
         }
         field(500; "Kitchen Station Filter"; Code[20])
         {
@@ -69,7 +83,7 @@
         key(Key1; "Order ID")
         {
         }
-        key(Key2; "Restaurant Code", Status, Priority, "Created Date-Time")
+        key(Key2; "Restaurant Code", "Order Status", Priority, "Created Date-Time")
         {
         }
     }

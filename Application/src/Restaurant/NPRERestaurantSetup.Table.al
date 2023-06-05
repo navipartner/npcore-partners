@@ -36,6 +36,9 @@
             DataClassification = CustomerContent;
             OptionCaption = 'No,Yes,Ask';
             OptionMembers = No,Yes,Ask;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by Enum field 16 "Auto-Send Kitchen Order"';
+            ObsoleteTag = 'NPR23.0';
         }
         field(14; "Resend All On New Lines"; Option)
         {
@@ -43,14 +46,29 @@
             DataClassification = CustomerContent;
             OptionCaption = 'No,Yes,Ask';
             OptionMembers = No,Yes,Ask;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by Enum field 17 "Re-send All on New Lines"';
+            ObsoleteTag = 'NPR23.0';
         }
-        field(15; "Serving Step Discovery Method"; Option)
+        field(15; "Serving Step Discovery Method"; Enum "NPR NPRE Serv.Step Discovery")
         {
             Caption = 'Serving Step Discovery Method';
             DataClassification = CustomerContent;
             InitValue = "Item Routing Profiles";
-            OptionCaption = 'Legacy (using print tags),Item Routing Profiles';
-            OptionMembers = "Legacy (using print tags)","Item Routing Profiles";
+        }
+        field(16; "Auto-Send Kitchen Order"; Enum "NPR NPRE Auto Send Kitch.Order")
+        {
+            Caption = 'Auto Send Kitchen Order';
+            DataClassification = CustomerContent;
+            InitValue = Yes;
+            ValuesAllowed = No, Yes, Ask;
+        }
+        field(17; "Re-send All on New Lines"; Enum "NPR NPRE Send All on New Lines")
+        {
+            Caption = 'Re-send All on New Lines';
+            DataClassification = CustomerContent;
+            InitValue = No;
+            ValuesAllowed = No, Yes, Ask;
         }
         field(20; "Kitchen Printing Active"; Boolean)
         {
@@ -68,6 +86,23 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Do Nothing,Finish Started,Finish All,Finish Started/Cancel Not Started,Cancel All Unfinished';
             OptionMembers = "Do Nothing","Finish Started","Finish All","Finish Started/Cancel Not Started","Cancel All Unfinished";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by Enum field 41 "Kitchen Req. Handl. On Serving"';
+            ObsoleteTag = 'NPR23.0';
+        }
+        field(41; "Kitchen Req. Handl. On Serving"; Enum "NPR NPRE Req.Handl.on Serving")
+        {
+            Caption = 'Station Req. Handl. On Serving';
+            DataClassification = CustomerContent;
+            InitValue = "Do Nothing";
+            ValuesAllowed = "Do Nothing", "Finish Started", "Finish All", "Finish Started/Cancel Not Started", "Cancel All Unfinished";
+        }
+        field(50; "Order Is Ready For Serving"; Enum "NPR NPRE Order Ready Serving")
+        {
+            Caption = 'Order Is Ready For Serving';
+            DataClassification = CustomerContent;
+            InitValue = "All Requests";
+            ValuesAllowed = "All Requests", "Any Request";
         }
         field(60; "Order ID Assign. Method"; Option)
         {
@@ -75,6 +110,16 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Same for Source Document,New Each Time';
             OptionMembers = "Same for Source Document","New Each Time";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced by Enum field 61 "Order ID Assignment Method"';
+            ObsoleteTag = 'NPR23.0';
+        }
+        field(61; "Order ID Assignment Method"; Enum "NPR NPRE Ord.ID Assign. Method")
+        {
+            Caption = 'Order ID Assignment Method';
+            DataClassification = CustomerContent;
+            InitValue = "Same for Source Document";
+            ValuesAllowed = "Same for Source Document", "New Each Time";
         }
         field(70; "Seat.Status: Ready"; Code[10])
         {

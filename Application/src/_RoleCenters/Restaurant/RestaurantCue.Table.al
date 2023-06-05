@@ -23,7 +23,7 @@
             Caption = 'Kitchen Requests - Open';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = count("NPR NPRE Kitchen Request" where("Line Status" = filter("Ready for Serving" | "Serving Requested" | Planned)));
+            CalcFormula = count("NPR NPRE Kitchen Request" where("Line Status" = filter("Ready for Serving" | "Serving Requested" | Planned), "Restaurant Code" = field("Restaurant Filter")));
         }
         field(20; "Turnover (LCY)"; Decimal)
         {

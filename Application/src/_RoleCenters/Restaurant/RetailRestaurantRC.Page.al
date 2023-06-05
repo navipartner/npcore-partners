@@ -12,17 +12,14 @@
             part("NP Retail Resturant Cue"; "NPR Restaurant Activities")
             {
                 ApplicationArea = NPRRetail;
-
             }
             part("Team Member Activities No Msgs"; "Team Member Activities No Msgs")
             {
                 ApplicationArea = NPRRetail;
-
             }
             part("MyReports"; "NPR My Reports")
             {
                 ApplicationArea = NPRRetail;
-
             }
             part(Control21; "Report Inbox Part")
             {
@@ -33,7 +30,6 @@
             systempart(MyNotesPart; MyNotes)
             {
                 ApplicationArea = NPRRetail;
-
             }
         }
     }
@@ -44,7 +40,6 @@
         {
             action(WaiterPads)
             {
-
                 Caption = 'Waiter Pads';
                 Image = ShowList;
                 RunObject = Page "NPR NPRE Waiter Pad List";
@@ -53,7 +48,6 @@
             }
             action(KitchenRequests)
             {
-
                 Caption = 'Kitchen Requests (Expedite)';
                 Image = BlanketOrder;
                 RunObject = Page "NPR NPRE Kitchen Req.";
@@ -69,7 +63,6 @@
                 Image = ReferenceData;
                 action(Items)
                 {
-
                     Caption = 'Items';
                     Image = Item;
                     RunObject = Page "Item List";
@@ -78,7 +71,6 @@
                 }
                 action(Customers)
                 {
-
                     Caption = 'Customers';
                     Image = Customer;
                     RunObject = Page "Customer List";
@@ -87,7 +79,6 @@
                 }
                 action(Vendors)
                 {
-
                     Caption = 'Vendors';
                     Image = Vendor;
                     RunObject = Page "Vendor List";
@@ -96,7 +87,6 @@
                 }
                 action(Members)
                 {
-
                     Caption = 'Members';
                     Image = Customer;
                     RunObject = page "NPR MM Members";
@@ -105,7 +95,6 @@
                 }
                 action(Memberships)
                 {
-
                     Caption = 'Memberships';
                     Image = Customer;
                     RunObject = page "NPR MM Memberships";
@@ -120,7 +109,6 @@
                 ToolTip = 'View the posting history.';
                 action(WPSendLog)
                 {
-
                     Caption = 'Waiter Pad Line Send Log';
                     Image = Log;
                     RunObject = Page "NPR NPRE W.Pad Pr.Log Entries";
@@ -129,7 +117,6 @@
                 }
                 action(POSEntries)
                 {
-
                     Caption = 'POS Entry List';
                     Image = Entries;
                     RunObject = Page "NPR POS Entry List";
@@ -138,7 +125,6 @@
                 }
                 action("Posted Sales Invoices")
                 {
-
                     Caption = 'Posted Sales Invoices';
                     Image = PostedOrder;
                     RunObject = Page "Posted Sales Invoices";
@@ -147,7 +133,6 @@
                 }
                 action("Posted Sales Credit Memos")
                 {
-
                     Caption = 'Posted Sales Credit Memos';
                     Image = PostedOrder;
                     RunObject = Page "Posted Sales Credit Memos";
@@ -159,7 +144,6 @@
             {
                 action("POS Item Sales")
                 {
-
                     Caption = 'POS Item Sales by Dims';
                     Image = "Report";
                     RunObject = report "NPR POS Item Sales with Dim.";
@@ -168,7 +152,6 @@
                 }
                 action(RestDailyTurnover)
                 {
-
                     Caption = 'Restaurant Daily Turnover';
                     Image = Report;
                     RunObject = report "NPR NPRE: Rest. Daily Turnover";
@@ -182,7 +165,6 @@
                 Image = Setup;
                 action(RestaurantSetup)
                 {
-
                     Caption = 'Restaurant Setup';
                     Image = Setup;
                     RunObject = Page "NPR NPRE Restaurant Setup";
@@ -194,7 +176,6 @@
                     Caption = 'Grouping';
                     action(FlowStatuses)
                     {
-
                         Caption = 'Flow Statuses';
                         Image = OrderList;
                         RunObject = Page "NPR NPRE Flow Statuses";
@@ -203,7 +184,6 @@
                     }
                     action(PrintProdCategories)
                     {
-
                         Caption = 'Print/Prod. Categories';
                         Image = PrintForm;
                         RunObject = Page "NPR NPRE Print/Prod. Categ.";
@@ -212,7 +192,6 @@
                     }
                     action(ItemRoutingProfiles)
                     {
-
                         Caption = 'Item Routing Profiles';
                         Image = CoupledItem;
                         RunObject = Page "NPR NPRE Item Routing Profiles";
@@ -221,7 +200,6 @@
                     }
                     action(ServiceFlowProfiles)
                     {
-
                         Caption = 'Service Flow Profiles';
                         Image = Flow;
                         RunObject = Page "NPR NPRE Service Flow Profiles";
@@ -234,7 +212,6 @@
                     Caption = 'Restaurant Layout';
                     action(Restaurants)
                     {
-
                         Caption = 'Restaurants';
                         Image = NewBranch;
                         RunObject = Page "NPR NPRE Restaurants";
@@ -243,7 +220,6 @@
                     }
                     action(SeatingLocations)
                     {
-
                         Caption = 'Seating Locations';
                         Image = Zones;
                         RunObject = Page "NPR NPRE Seating Location";
@@ -252,7 +228,6 @@
                     }
                     action(Seating)
                     {
-
                         Caption = 'Seating';
                         Image = Lot;
                         RunObject = Page "NPR NPRE Seating List";
@@ -265,18 +240,16 @@
                     Caption = 'Kitchen';
                     action(Stations)
                     {
-
                         Caption = 'Kitchen Stations';
-                        Image = Departments;
+                        Image = Category;
                         RunObject = Page "NPR NPRE Kitchen Stations";
                         ToolTip = 'Set up kitchen stations, available at each restaurant''s kitchen.';
                         ApplicationArea = NPRRetail;
                     }
                     action(StationSelectionSetup)
                     {
-
                         Caption = 'Kitchen Station Selection Setup';
-                        Image = Troubleshoot;
+                        Image = Flow;
                         RunObject = Page "NPR NPRE Kitchen Station Slct.";
                         ToolTip = 'Set up when each kitchen station is to be used in production.';
                         ApplicationArea = NPRRetail;

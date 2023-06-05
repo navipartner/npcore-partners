@@ -19,13 +19,11 @@
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-        field(20; "Close Waiter Pad On"; Option)
+        field(20; "Close Waiter Pad On"; Enum "NPR NPRE Serv.Flow Close W/Pad")
         {
             Caption = 'Close Waiter Pad On';
             DataClassification = CustomerContent;
             InitValue = Payment;
-            OptionCaption = 'Manual,Pre-Receipt,Payment,Pre-Receipt if Served,Payment if Served';
-            OptionMembers = Manual,"Pre-Receipt",Payment,"Pre-Receipt if Served","Payment if Served";
 
             trigger OnValidate()
             begin
@@ -42,11 +40,10 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(Seating));
         }
-        field(40; "Clear Seating On"; Option)
+        field(40; "Clear Seating On"; Enum "NPR NPRE Serv.Flow Clear Seat.")
         {
             Caption = 'Clear Seating On';
             DataClassification = CustomerContent;
-            OptionMembers = "Waiter Pad Close","Pre-Receipt","Pre-Receipt if Served";
 
             trigger OnValidate()
             begin
@@ -66,9 +63,7 @@
 
     keys
     {
-        key(Key1; "Code")
-        {
-        }
+        key(Key1; "Code") { }
     }
 
     var

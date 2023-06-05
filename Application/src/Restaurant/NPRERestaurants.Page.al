@@ -9,7 +9,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -18,19 +17,16 @@
             {
                 field("Code"; Rec.Code)
                 {
-
                     ToolTip = 'Specifies the value of the Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-
                     ToolTip = 'Specifies the value of the Name field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Name 2"; Rec."Name 2")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Name 2 field';
                     ApplicationArea = NPRRetail;
@@ -43,13 +39,11 @@
             {
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
             systempart(Control6014407; Links)
             {
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
         }
     }
@@ -61,23 +55,22 @@
             group(Kitchen)
             {
                 Caption = 'Kitchen';
+                Image = Departments;
                 action(KitchenStations)
                 {
                     Caption = 'Stations';
-                    Image = Departments;
+                    Image = Category;
                     RunObject = Page "NPR NPRE Kitchen Stations";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-
                     ToolTip = 'Executes the Stations action';
                     ApplicationArea = NPRRetail;
                 }
                 action(KitchenStationSelection)
                 {
                     Caption = 'Station Selection Setup';
-                    Image = Troubleshoot;
+                    Image = Flow;
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-
                     ToolTip = 'Executes the Station Selection Setup action';
                     ApplicationArea = NPRRetail;
                 }
@@ -91,7 +84,6 @@
                     PromotedIsBig = true;
                     Scope = Repeater;
                     Visible = ShowRequests;
-
                     ToolTip = 'Executes the Kitchen Requests (Expedite View) action';
                     ApplicationArea = NPRRetail;
 
@@ -104,13 +96,13 @@
             group(Layout)
             {
                 Caption = 'Layout';
+                Image = ServiceZones;
                 action(Locations)
                 {
                     Caption = 'Locations';
                     Image = Zones;
                     RunObject = Page "NPR NPRE Seating Location";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-
                     ToolTip = 'Executes the Locations action';
                     ApplicationArea = NPRRetail;
                 }
@@ -118,7 +110,6 @@
                 {
                     Caption = 'Seatings';
                     Image = Lot;
-
                     ToolTip = 'Executes the Seatings action';
                     ApplicationArea = NPRRetail;
 
