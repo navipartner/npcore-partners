@@ -92,6 +92,14 @@ page 6059935 "NPR APIV1 PBIPOSEntry"
                 {
                     Caption = 'Amount Incl. Tax', Locked = true;
                 }
+                field(salesDocumentType; Rec."Sales Document Type")
+                {
+                    Caption = 'Sales Document Type', Locked = true;
+                }
+                field(salesDocumentNo; Rec."Sales Document No.")
+                {
+                    Caption = 'Sales Document No.', Locked = true;
+                }
             }
         }
     }
