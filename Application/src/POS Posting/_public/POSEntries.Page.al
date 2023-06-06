@@ -15,126 +15,126 @@
                 field("POS Store Code"; Rec."POS Store Code")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Store Code field';
+                    ToolTip = 'Specifies unique code assigned to POS store';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ToolTip = 'Specifies the identification number of the POS unit';
                     ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Document No. field';
+                    ToolTip = 'Specifies the document number associated with the transaction';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Period Register No."; Rec."POS Period Register No.")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Period Register No. field';
+                    ToolTip = 'Specifies the register number for the POS period';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entry Type"; Rec."Entry Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Entry Type field';
+                    ToolTip = 'Specifies the type of entry for the transaction';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a description about the entry';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entry Date"; Rec."Entry Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Entry Date field';
+                    ToolTip = 'Specifies the date on which transaction is performed';
                     ApplicationArea = NPRRetail;
                 }
                 field("Starting Time"; Rec."Starting Time")
                 {
 
-                    ToolTip = 'Specifies the value of the Starting Time field';
+                    ToolTip = 'Specifies the start time for the transaction';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ending Time"; Rec."Ending Time")
                 {
 
-                    ToolTip = 'Specifies the value of the Ending Time field';
+                    ToolTip = 'Specifies the end time for the transaction';
                     ApplicationArea = NPRRetail;
                 }
                 field("Post Item Entry Status"; Rec."Post Item Entry Status")
                 {
 
-                    ToolTip = 'Specifies the value of the Post Item Entry Status field';
+                    ToolTip = 'Indicates the status of the item entry after posting';
                     ApplicationArea = NPRRetail;
                 }
                 field("Post Entry Status"; Rec."Post Entry Status")
                 {
 
-                    ToolTip = 'Specifies the value of the Post Entry Status field';
+                    ToolTip = 'Indicates the status of the entry after posting';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Customer No. field';
+                    ToolTip = 'Specifies customer''s identification number associated with the transaction';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales Document Type"; Rec."Sales Document Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Sales Document Type field';
+                    ToolTip = 'Specifies the type of sales document';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales Document No."; Rec."Sales Document No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Sales Document No. field';
+                    ToolTip = 'Specifies document number associated with the sales transaction';
                     ApplicationArea = NPRRetail;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Salesperson Code field';
+                    ToolTip = 'Specifies salesperson''s identification number associated with the transaction';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Sales (LCY)"; Rec."Item Sales (LCY)")
                 {
 
-                    ToolTip = 'Specifies the value of the Item Sales (LCY) field';
+                    ToolTip = 'Indicates the sales amount in the local currency';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
 
-                    ToolTip = 'Specifies the value of the Discount Amount field';
+                    ToolTip = 'Specifies the total amount of discount applied';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales Quantity"; Rec."Sales Quantity")
                 {
 
-                    ToolTip = 'Specifies the value of the Sales Quantity field';
+                    ToolTip = 'Specifies the quantity of items sold';
                     ApplicationArea = NPRRetail;
                 }
                 field("Return Sales Quantity"; Rec."Return Sales Quantity")
                 {
 
-                    ToolTip = 'Specifies the value of the Return Sales Quantity field';
+                    ToolTip = 'Specifies the quantity of items returned';
                     ApplicationArea = NPRRetail;
                 }
                 field("Amount Incl. Tax"; Rec."Amount Incl. Tax")
                 {
-                    ToolTip = 'Specifies the value of the Sales Document No. field';
+                    ToolTip = 'Indicates the total amount including taxes for the transaction';
                     ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
 
-                    ToolTip = 'Specifies the value of the Posting Date field';
+                    ToolTip = 'Specifies the date on which transaction is posted';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -152,7 +152,7 @@
                 RunObject = Page "NPR POS Entry Sales Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
 
-                ToolTip = 'Executes the Sales Lines action';
+                ToolTip = 'View detailed information about the sales lines';
                 ApplicationArea = NPRRetail;
             }
             action("Payment Lines")
@@ -162,7 +162,7 @@
                 RunObject = Page "NPR POS Entry Pmt. Line List";
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
 
-                ToolTip = 'Executes the Payment Lines action';
+                ToolTip = 'Access the payment details associated with this entry';
                 ApplicationArea = NPRRetail;
             }
             action("Comment Lines")
@@ -175,7 +175,7 @@
                 RunPageView = SORTING("Table ID", "POS Entry No.", "POS Entry Line No.", Code, "Line No.")
                               ORDER(Ascending);
 
-                ToolTip = 'Executes the Comment Lines action';
+                ToolTip = 'Access the comments associated with this entry';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -190,7 +190,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Find entries action';
+                ToolTip = 'Quickly search for specific entries or documents';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -210,7 +210,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Post Entry action';
+                ToolTip = 'Post this entry to finalize the transaction';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -238,7 +238,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Post Range action';
+                ToolTip = 'Post a range of entries at once';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -260,7 +260,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = IsMobileClient;
-                ToolTip = 'Executes the Show Entry action for Mobile app';
+                ToolTip = 'Open a card view to examine the entry details';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -283,11 +283,11 @@
                     Caption = 'Sales Receipt';
                     Image = PrintCheck;
                     Promoted = true;
-                    PromotedOnly = true;
+                    PromotedOnly = false;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
 
-                    ToolTip = 'Executes the Sales Receipt action';
+                    ToolTip = 'Print a sales receipt for this entry';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -310,11 +310,11 @@
                     Caption = 'Large Sales Receipt';
                     Image = PrintCover;
                     Promoted = true;
-                    PromotedOnly = true;
+                    PromotedOnly = false;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
 
-                    ToolTip = 'Executes the Large Sales Receipt action';
+                    ToolTip = 'Print a detailed sales receipt for this entry';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -333,11 +333,11 @@
                     Caption = 'Balancing';
                     Image = PrintReport;
                     Promoted = true;
-                    PromotedOnly = true;
+                    PromotedOnly = false;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
 
-                    ToolTip = 'Executes the Balancing action';
+                    ToolTip = 'Print the balance and reconcile information for this entry';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -361,11 +361,11 @@
                     Caption = 'EFT Receipt';
                     Image = PrintCheck;
                     Promoted = true;
-                    PromotedOnly = true;
+                    PromotedOnly = false;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
 
-                    ToolTip = 'Executes the EFT Receipt action';
+                    ToolTip = 'Print electronic funds transfer receipt';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -388,7 +388,7 @@
                     RunObject = Page "NPR POS Entry Output Log";
                     RunPageLink = "POS Entry No." = FIELD("Entry No.");
 
-                    ToolTip = 'Executes the Print Log action';
+                    ToolTip = 'Review the printing history and details';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -400,7 +400,7 @@
                     Caption = 'E-mail Log';
                     Image = Email;
 
-                    ToolTip = 'Executes the E-mail Log action';
+                    ToolTip = 'View the history of sent emails';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -436,7 +436,7 @@
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
 
-                    ToolTip = 'Executes the Send as PDF action';
+                    ToolTip = 'Send this entry as a PDF attachment';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
