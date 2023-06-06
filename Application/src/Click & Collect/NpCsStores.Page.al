@@ -26,7 +26,7 @@
                 field(Name; Rec.Name)
                 {
 
-                    ToolTip = 'Specifies the Collect Store’s Name.';
+                    ToolTip = 'Specifies the Collect Store''s Name.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Company Name"; Rec."Company Name")

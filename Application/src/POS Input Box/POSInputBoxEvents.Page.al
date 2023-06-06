@@ -88,7 +88,7 @@
                 Caption = 'Parameters';
                 Image = List;
 
-                ToolTip = 'Executes the Parameters action';
+                ToolTip = 'Initialize EAN box event parameters and open the EAN Box Parameter page for further configuration';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
