@@ -2,13 +2,13 @@
 
 ## Table of contents
 
-1. [What is Business Central Performance Toolkit Extension]()
-2. [How to set Business Central environment in order to use Performance Toolkit]()
-3. [Setting up the data necessary for using Performance Toolkit extension]()
-4. [Running BCPT Suites]()
-5. [BCPT - known limitations for running multiple concurrent sessions]()
-6. [Displaying results of BCPT Suites runs in Application Insight (Telemetry)]()
-7. [Useful material for learning and understanding the Business Central Performance Toolkit - BCPT]()
+1. [What is Business Central Performance Toolkit Extension](https://navipartner.visualstudio.com/NpCore/_git/NpCore?path=/Documentation/internal/developers/BCPT-BusinessCentralPerformanceToolkit.md&_a=preview&anchor=what-is-business-central-performance-toolkit-extension%3F)
+2. [How to set Business Central environment in order to use Performance Toolkit](https://navipartner.visualstudio.com/NpCore/_git/NpCore?path=/Documentation/internal/developers/BCPT-BusinessCentralPerformanceToolkit.md&_a=preview&anchor=how-to-set-business-central-environment-in-order-to-use-performance-toolkit)
+3. [Setting up the data necessary for using Performance Toolkit extension](https://navipartner.visualstudio.com/NpCore/_git/NpCore?path=/Documentation/internal/developers/BCPT-BusinessCentralPerformanceToolkit.md&_a=preview&anchor=setting-up-the-data-necessary-for-using-performance-toolkit-extension)
+4. [Running BCPT Suites](https://navipartner.visualstudio.com/NpCore/_git/NpCore?path=/Documentation/internal/developers/BCPT-BusinessCentralPerformanceToolkit.md&_a=preview&anchor=running-bcpt-suites)
+5. [BCPT - known limitations for running multiple concurrent sessions](https://navipartner.visualstudio.com/NpCore/_git/NpCore?path=/Documentation/internal/developers/BCPT-BusinessCentralPerformanceToolkit.md&_a=preview&anchor=bcpt---known-limitations-for-running-multiple-concurrent-sessions)
+6. [Displaying results of BCPT Suites runs in Application Insight (Telemetry)](https://navipartner.visualstudio.com/NpCore/_git/NpCore?path=/Documentation/internal/developers/BCPT-BusinessCentralPerformanceToolkit.md&_a=preview&anchor=displaying-results-of-bcpt-suites-runs-in-application-insight-(telemetry))
+7. [Useful material for learning and understanding the Business Central Performance Toolkit - BCPT](https://navipartner.visualstudio.com/NpCore/_git/NpCore?path=/Documentation/internal/developers/BCPT-BusinessCentralPerformanceToolkit.md&_a=preview&anchor=useful-material-for-learning-and-understanding-the-business-central-performance-toolkit---bcpt)
 
 ## What is Business Central Performance Toolkit Extension?
 
@@ -26,7 +26,7 @@ The following should be done from the Dynamics 365 Business Central Admin Center
 
 1. Click **New**, and then choose the desired **Environment Name**, set the **Type** to **Sandbox**, and choose the desired **Country**.
 
-**NOTE**: It's suggested to use **DK** (Denmark) for the **Country/Region** when creating a sandbox environment since the Performance Toolkit requires having the [proper data]().      
+**NOTE**: It's suggested to use **DK** (Denmark) for the **Country/Region** when creating a sandbox environment since the Performance Toolkit requires having the [proper data](https://navipartner.visualstudio.com/NpCore/_git/NpCore?path=/Documentation/internal/developers/BCPT-BusinessCentralPerformanceToolkit.md&_a=preview&anchor=setting-up-the-data-necessary-for-using-performance-toolkit-extension).      
 
 2. In the **Environments** tab, select the newly created sandbox environment and specify the **Application Insights Connection String**.
 
@@ -43,9 +43,9 @@ The following should be done from the Dynamics 365 Business Central Admin Center
 ### How to set Crane containers to use Performance Toolkit
 
 1. On the **Crane Containers** page choose the latest Core version as the **Container Template Code**.     
-   This is important, since we want to import the data from [specific Rapid Start package]() manually.
+   This is important, since we want to import the data from [specific Rapid Start package](https://navipartner.visualstudio.com/NpCore/_git/NpCore?path=/Documentation/internal/developers/BCPT-BusinessCentralPerformanceToolkit.md&_a=preview&anchor=import-rapid-start-package-specific-to-performance-toolkit) manually.
 
-**NOTE**: It's suggested to use **DK** (Denmark) under the **Artifact Name** when creating the Crane container environment since **Performance Toolkit** requires having the [proper data]().
+**NOTE**: It's suggested to use **DK** (Denmark) under the **Artifact Name** when creating the Crane container environment since **Performance Toolkit** requires having the [proper data](https://navipartner.visualstudio.com/NpCore/_git/NpCore?path=/Documentation/internal/developers/BCPT-BusinessCentralPerformanceToolkit.md&_a=preview&anchor=setting-up-the-data-necessary-for-using-performance-toolkit-extension).
 
 2. In the **Crane Container Parameters** page add the following generic parameters as true:
 
