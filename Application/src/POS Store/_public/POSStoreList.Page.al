@@ -105,7 +105,7 @@
                                       "No." = FIELD(Code);
                         ShortCutKey = 'Shift+Ctrl+D';
 
-                        ToolTip = 'EOpens the Default Dimensions List';
+                        ToolTip = 'Opens the Default Dimensions List';
                     }
                     action("Dimensions-&Multiple")
                     {
