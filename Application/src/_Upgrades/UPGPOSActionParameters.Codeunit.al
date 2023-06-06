@@ -94,14 +94,20 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
     local procedure UpgradeItemIdentifierType()
     var
         POSActionParameter: Record "NPR POS Parameter Value";
+        POSActionParameter2: Record "NPR POS Parameter Value";
     begin
         POSActionParameter.SetRange("Table No.", Database::"NPR POS Menu Button");
         POSActionParameter.SetRange("Action Code", 'ITEM');
         POSActionParameter.SetRange(Name, 'itemIdentifyerType');
         if POSActionParameter.FindSet() then
             repeat
-                if not POSActionParameter.Get(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType') then
-                    POSActionParameter.Rename(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType');
+                if not POSActionParameter2.Get(POSActionParameter."Table No.", POSActionParameter.Code, POSActionParameter.ID, POSActionParameter."Record ID", 'itemIdentifierType') then begin
+                    POSActionParameter2.Init();
+                    POSActionParameter2 := POSActionParameter;
+                    POSActionParameter2.Name := 'itemIdentifierType';
+                    POSActionParameter2.Insert();
+                    POSActionParameter.Delete();
+                end;
             until POSActionParameter.Next() = 0;
     end;
 
