@@ -19,6 +19,8 @@
                     Caption = 'Task List';
                     ToolTip = 'Specifies the number of the tasks assigned to the current user.';
                     ApplicationArea = NPRRetail;
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     var
@@ -37,6 +39,8 @@
                 {
                     Caption = 'Failed Capturing of Payments';
                     ToolTip = 'Specifies the number of the failed capturing of payments.';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     ApplicationArea = NPRRetail;
 
@@ -57,6 +61,8 @@
                 {
                     Caption = 'Failed Imports in the Import List';
                     ToolTip = 'Specifies the number of failed import entries from the Import List.';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     ApplicationArea = NPRRetail;
 
@@ -80,7 +86,8 @@
                 {
                     Caption = 'Daily Sales Orders';
                     ToolTip = 'Specifies the number of the daily sales orders that have been registered on today''s date.';
-
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     ApplicationArea = NPRRetail;
 
@@ -93,7 +100,8 @@
                 {
                     Caption = 'Sales Orders';
                     ToolTip = 'Specifies the number of the sales orders that have been registered.';
-
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     ApplicationArea = NPRRetail;
 
@@ -107,7 +115,8 @@
                     Caption = 'Shipped Sales Orders';
                     ShowCaption = true;
                     ToolTip = 'Specifies the number of the sales orders that have been shipped.';
-
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     ApplicationArea = NPRRetail;
 
@@ -122,6 +131,8 @@
                     ShowCaption = true;
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Displays the number of the Sales Return Orders. If you click you can drilldown to the list of the Sales Return Orders.';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
                     trigger OnDrillDown()
                     begin
@@ -133,7 +144,7 @@
             cuegroup(Purchases)
             {
                 Caption = 'Purchases';
-                field(PurchaseOrderList; Rec."Purchase Order List")
+                field(PurchaseOrderList; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Purchase Order List"))))
                 {
                     Caption = 'Purchase Orders';
                     ShowCaption = true;
@@ -196,7 +207,7 @@
             BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
     end;
 
-    local procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Integer
+    local procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Decimal
     begin
         if not BackgroundTaskResults.ContainsKey(FieldNo) then
             exit(0);
