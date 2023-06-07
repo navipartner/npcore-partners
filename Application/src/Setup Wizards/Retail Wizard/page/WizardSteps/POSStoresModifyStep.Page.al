@@ -269,6 +269,29 @@ page 6150842 "NPR POS Stores Modify Step"
                 POSStore := Rec;
                 if not POSStore.Insert() then
                     POSStore.Modify();
+                CreatePOSPostingSetup(POSStore.Code)
             until Rec.Next() = 0;
+    end;
+
+    local procedure CreatePOSPostingSetup(POSStoreCode: Code[10])
+    var
+        POSPostingSetup: Record "NPR POS Posting Setup";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        POSPaymentBin: Record "NPR POS Payment Bin";
+    begin
+        POSPaymentMethod.SetRange("Include In Counting", POSPaymentMethod."Include In Counting"::YES);
+        if POSPaymentMethod.FindSet() then
+            repeat
+                POSPaymentBin.SetFilter("No.", 'BANK|SAFE');
+                if POSPaymentBin.FindSet() then
+                    repeat
+                        POSPostingSetup.Init();
+                        POSPostingSetup."POS Store Code" := POSStoreCode;
+                        POSPostingSetup."POS Payment Method Code" := POSPaymentMethod.Code;
+                        POSPostingSetup."POS Payment Bin Code" := POSPaymentBin."No.";
+                        if not POSPostingSetup.Insert() then
+                            POSPostingSetup.Modify();
+                    until POSPaymentBin.Next() = 0
+            until POSPaymentMethod.Next() = 0;
     end;
 }

@@ -30,6 +30,18 @@
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
+                {
+
+                    ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("VAT Bus. Posting Group"; Rec."VAT Bus. Posting Group")
+                {
+
+                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Max. POS Posting Diff. (LCY)"; Rec."Max. POS Posting Diff. (LCY)")
                 {
 
