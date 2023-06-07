@@ -145,7 +145,13 @@
     procedure InsertLine(var Line: Record "NPR POS Sale Line"; IncludeDiscountFields: Boolean) Return: Boolean
     var
         Item: Record Item;
+        SentryScope: Codeunit "NPR Sentry Scope";
+        SentryActiveSpan: Codeunit "NPR Sentry Span";
+        SentryInsertLineSpan: Codeunit "NPR Sentry Span";
     begin
+        if SentryScope.TryGetActiveSpan(SentryActiveSpan) then
+            SentryActiveSpan.StartChildSpan('bc.insert_sale_line', 'bc.insert_sale_line', SentryInsertLineSpan);
+
         if UsePresetLineNo then
             Rec."Line No." := Line."Line No.";
 
@@ -216,6 +222,8 @@
 
         Return := InsertLineInternal(Rec, true);
         Line := Rec;
+
+        SentryInsertLineSpan.Finish();
     end;
 
     procedure DeleteLine()
@@ -465,16 +473,23 @@
     procedure FillVariantThroughLookUp(ItemNo: Code[20]; LocationCode: Code[10]): Code[10]
     var
         ItemVariantBuffer: Record "NPR Item Variant Buffer";
+        SentryScope: Codeunit "NPR Sentry Scope";
+        SentryActiveSpan: Codeunit "NPR Sentry Span";
+        SentryVariantLookupSpan: Codeunit "NPR Sentry Span";
     begin
         FillVariantBuffer(ItemNo, ItemVariantBuffer);
         if ItemVariantBuffer.IsEmpty() then
             exit('');
 
+        if SentryScope.TryGetActiveSpan(SentryActiveSpan) then
+            SentryActiveSpan.StartChildSpan('bc.item_variant_lookup', 'bc.item_variant_lookup', SentryVariantLookupSpan);
         ItemVariantBuffer.SetRange("Location Filter", LocationCode);
-        if Page.RunModal(Page::"NPR Item Variants Lookup", ItemVariantBuffer) = ACTION::LookupOK then
-            exit(ItemVariantBuffer.Code)
-        else
+        if Page.RunModal(Page::"NPR Item Variants Lookup", ItemVariantBuffer) = ACTION::LookupOK then begin
+            SentryVariantLookupSpan.Finish();
+            exit(ItemVariantBuffer.Code);
+        end else begin
             Error(ITEM_REQUIRES_VARIANT, ItemNo);
+        end;
     end;
 
     local procedure FillVariantBuffer(ItemNo: Code[20]; var TempItemVariantBuffer: Record "NPR Item Variant Buffer")

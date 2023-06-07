@@ -417,34 +417,39 @@
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         SubTotal: Decimal;
-        StartTime: DateTime;
+        SentryScope: Codeunit "NPR Sentry Scope";
+        SentryActiveSpan: Codeunit "NPR Sentry Span";
+        SentryEndSaleSpan: Codeunit "NPR Sentry Span";
+        SentryPreEndSaleSpan: Codeunit "NPR Sentry Span";
+        SentryPostEndSaleSpan: Codeunit "NPR Sentry Span";
     begin
+        SentryScope.TryGetActiveSpan(SentryActiveSpan);
+        SentryActiveSpan.StartChildSpan('bc.end_sale.pre_processing', 'bc.end_sale.pre_processing', SentryPreEndSaleSpan);
+
         CheckItemAvailability();
-
         PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
-
         RetailSalesDocMgt.HandleLinkedDocuments(POSSession);
-
         OnBeforeEndSale(Rec);
-
         SalePOS := Rec;
 
-        StartTime := CurrentDateTime;
+        SentryPreEndSaleSpan.Finish();
+        SentryActiveSpan.StartChildSpan('bc.end_sale.pos_entry_write', 'bc.end_sale.pos_entry_write', SentryEndSaleSpan);
 
         ValidateSaleBeforeEnd(Rec);
-
         EndSaleTransaction(SalePOS);
         Commit(); // Sale is now committed to POS entry
-
         Ended := true;
 
-        LogStopwatch('FINISH_SALE', CurrentDateTime - StartTime);
+        SentryEndSaleSpan.Finish();
+        SentryActiveSpan.StartChildSpan('bc.end_sale.post_processing', 'bc.end_sale.post_processing', SentryPostEndSaleSpan);
 
         RunAfterEndSale(SalePOS); //Any error here would leave the front end with inconsistent state as view switch to new sale or login screen has not happened yet.
 
         if StartNew then begin
             SelectViewForEndOfSale(POSSession);
         end;
+
+        SentryPostEndSaleSpan.Finish();
     end;
 
     [CommitBehavior(CommitBehavior::Error)]

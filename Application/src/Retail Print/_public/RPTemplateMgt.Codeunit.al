@@ -23,7 +23,13 @@
         StartTime: Time;
         EndTime: Time;
         DurationMs: Integer;
+        SentryScope: Codeunit "NPR Sentry Scope";
+        SentryActiveSpan: Codeunit "NPR Sentry Span";
+        SentryPrintSpan: Codeunit "NPR Sentry Span";
     begin
+        if SentryScope.TryGetActiveSpan(SentryActiveSpan) then
+            SentryActiveSpan.StartChildSpan('bc.print_template', 'bc.print_template', SentryPrintSpan);
+
         if Record.IsRecordRef then
             RecRef := Record
         else
@@ -45,6 +51,7 @@
                     EndTime := Time();
                 end;
         end;
+        SentryPrintSpan.Finish();
 
         DurationMs := EndTime - StartTime;
 
