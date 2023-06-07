@@ -15,5 +15,16 @@ let main = async ({workflow, parameters, captions, popup, context}) => {
        var result = await popup.datepad({ title: captions.title, caption: captions.validfrom, required: true, value: context.defaultdate });
     };
     if (result === null) { return };
-    workflow.respond("PrintExchangeLabels", { UserSelection: result });
+    
+    if (parameters.Setting != parameters.Setting["All Lines"] ){ 
+        workflow.respond("PrintExchangeLabels", { UserSelection: result });
+    }
+    else{
+        var getPrintLineKeysResult = await workflow.respond("GetPrintLineKeys");
+        
+        for(var i = 0; i < getPrintLineKeysResult.printLineKeys.length; i++) {
+            workflow.context.printLineKey = getPrintLineKeysResult.printLineKeys[i];
+            await workflow.respond("PrintExchangeLabelPerQty", { UserSelection: result });
+        }
+    }
 }
