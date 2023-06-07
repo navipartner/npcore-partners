@@ -31,7 +31,7 @@
                 field(DeviceType; DeviceType)
                 {
                     Caption = 'Device Type';
-                    ToolTip = 'Specifies the value of the Printer Type field';
+                    ToolTip = 'Specifies the device type of the print template';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)

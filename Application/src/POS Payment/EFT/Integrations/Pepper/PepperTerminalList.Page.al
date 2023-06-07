@@ -133,7 +133,7 @@
                     Caption = 'Additional parameters';
                     Image = DeleteQtyToHandle;
 
-                    ToolTip = 'Deletes the license associated with the Pepper TerminalExecutes the Additional parameters action';
+                    ToolTip = 'Deletes the license associated with the Pepper Terminal.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
