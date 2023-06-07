@@ -33,7 +33,7 @@
                 {
 
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Company Name field.';
+                    ToolTip = 'Specifies the Company Name associated with the Collect Store.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Local Store"; Rec."Local Store")
