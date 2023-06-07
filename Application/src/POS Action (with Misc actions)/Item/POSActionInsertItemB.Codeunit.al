@@ -9,7 +9,13 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
     var
         FirstRec: Text;
         ItemSearchErrLbl: Label 'Could not find a matching item for input %1';
+        SentryScope: Codeunit "NPR Sentry Scope";
+        SentryActionSpan: Codeunit "NPR Sentry Span";
+        SentryGetItemSpan: Codeunit "NPR Sentry Span";
     begin
+        SentryScope.TryGetActiveSpan(SentryActionSpan);
+        SentryActionSpan.StartChildSpan('bc.workflow.ITEM.get', 'bc.workflow.ITEM.get', SentryGetItemSpan);
+
         Clear(ItemReference);
         case ItemIdentifierType of
             ItemIdentifierType::ItemNo:
@@ -55,6 +61,8 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
                 end;
         end;
         ItemReference."Item No." := Item."No.";
+
+        SentryGetItemSpan.Finish();
     end;
 
     procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")

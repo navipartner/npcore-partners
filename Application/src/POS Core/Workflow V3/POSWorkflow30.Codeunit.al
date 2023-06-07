@@ -3,7 +3,6 @@
     Access = Internal;
 
     var
-        _Stopwatch: Codeunit "NPR Stopwatch";
         _OnRunActionCode: Text;
         _OnRunWorkflowStep: Text;
         _OnRunContext: Codeunit "NPR POS JSON Helper";
@@ -88,38 +87,35 @@
         Signal: Codeunit "NPR Front-End: WkfCallCompl.";
         Success: Boolean;
         POSSession: Codeunit "NPR POS Session";
+        SentryScope: Codeunit "NPR Sentry Scope";
+        SentryTransaction: Codeunit "NPR Sentry Transaction";
+        SentrySpan: Codeunit "NPR Sentry Span";
+        SentryTraceId: Text;
+        SentryTraceSpanId: Text;
     begin
-        _Stopwatch.ResetAll();
-
         FrontEnd.SetWorkflowID(WorkflowId);
 
-        _Stopwatch.Start('All');
         JavaScriptInterface.ApplyDataState(Context, POSSession, FrontEnd);
         JSON.InitializeJObjectParser(Context);
 
-        _Stopwatch.Start('Action');
+        SentryScope.TryGetActiveTransaction(SentryTransaction);
+        if JSON.GetString('sentryTraceId', SentryTraceId) and JSON.GetString('sentrySpanId', SentryTraceSpanId) then begin
+            SentryTransaction.SetExternalTraceValues(SentryTraceId, SentryTraceSpanId);
+        end;
+        SentryTransaction.StartChildSpan('bc.workflow.invoke:' + ActionCode + ',' + WorkflowStep, 'bc.workflow.invoke', SentrySpan);
+        SentryScope.SetActiveSpan(SentrySpan);
 
         Success := InvokeOnActionThroughOnRun(ActionCode, WorkflowStep, JSON, FrontEnd, Self);
 
-        _Stopwatch.Stop('Action');
+        SentrySpan.Finish();
 
         if Success then begin
-            EmitSuccess(ActionCode, WorkflowStep, JSON, _Stopwatch.ElapsedMilliseconds('Action'));
-            _Stopwatch.Start('Data');
             JavaScriptInterface.RefreshData(FrontEnd);
-            _Stopwatch.Stop('Data');
             Signal.SignalSuccess(WorkflowId, ActionId);
         end else begin
             EmitError(ActionCode, WorkflowStep, JSON, GetLastErrorText());
-            Signal.SignalFailureAndThrowError(WorkflowId, ActionId, GetLastErrorText());
-            FrontEnd.Trace(Signal, 'ErrorCallStack', GetLastErrorCallStack());
+            Signal.SignalFailureAndThrowError(WorkflowId, ActionId, GetLastErrorText);
         end;
-
-        _Stopwatch.Stop('All');
-        FrontEnd.Trace(Signal, 'durationAll', _Stopwatch.ElapsedMilliseconds('All'));
-        FrontEnd.Trace(Signal, 'durationAction', _Stopwatch.ElapsedMilliseconds('Action'));
-        FrontEnd.Trace(Signal, 'durationData', _Stopwatch.ElapsedMilliseconds('Data'));
-        FrontEnd.Trace(Signal, 'durationOverhead', _Stopwatch.ElapsedMilliseconds('All') - _Stopwatch.ElapsedMilliseconds('Action') - _Stopwatch.ElapsedMilliseconds('Data'));
 
         Signal.SetEngine20(JSON.GetContextObject());
 
@@ -152,34 +148,5 @@
         CustomDimensions.Add('NPR_CallStack', GetLastErrorCallStack());
 
         Session.LogMessage('NPR_InvokeAction30_Error', ErrorText, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
-
     end;
-
-    local procedure EmitSuccess(ActionCode: Text; WorkflowStep: Text; JSON: Codeunit "NPR POS Json Helper"; ActionDurationMs: BigInteger)
-    var
-        CustomDimensions: Dictionary of [Text, Text];
-        ActiveSession: Record "Active Session";
-        MessageLabel: Label '%1:%2 (%3 ms)', Locked = true;
-    begin
-
-        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
-            Clear(ActiveSession);
-
-        CustomDimensions.Add('NPR_ActionCode', ActionCode);
-        CustomDimensions.Add('NPR_WorkflowStep', WorkflowStep);
-        CustomDimensions.Add('NPR_ActionContext', JSON.ToString());
-        CustomDimensions.Add('NPR_ActionDurationMs', Format(ActionDurationMs, 0, 9));
-
-        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
-        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
-        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
-        CustomDimensions.Add('NPR_CompanyName', CompanyName());
-        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
-        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
-        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
-
-        Session.LogMessage('NPR_InvokeAction30_Success', StrSubstNo(MessageLabel, ActionCode, WorkflowStep, Format(ActionDurationMs, 0, 9)), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
-
-    end;
-
 }
