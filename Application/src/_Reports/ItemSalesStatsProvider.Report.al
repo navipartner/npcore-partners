@@ -12,228 +12,96 @@
 
     dataset
     {
-        dataitem("Integer"; "Integer")
-        {
-            DataItemTableView = SORTING(Number);
-            MaxIteration = 1;
-            column(COMPANYNAME; CompanyName)
-            {
-            }
-            column(CompanyInfoPicture; CompanyInformation.Picture)
-            {
-            }
-            column(GlobalLanguage; GlobalLanguage)
-            {
-            }
-            column(ShowItem; ShowItem)
-            {
-                AutoFormatType = 1;
-            }
-            column(ShowItemWithSales; ShowItemWithSales)
-            {
-                AutoFormatType = 2;
-            }
-            column(ShowItemCategory; ShowItemCategory)
-            {
-            }
-            column(DateFilter; DateFilter)
-            {
-            }
-            column(FilterDesc; FilterDesc)
-            {
-            }
-            column(InventoryValueDesc; InventoryValueDesc)
-            {
-            }
-
-            trigger OnAfterGetRecord()
-            begin
-                DateFilter := Text10600002 + ' ' + Format(StartDate) + '..' + Format(EndDate);
-            end;
-        }
         dataitem(Vendor; Vendor)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.";
-            column(VendorNo; Vendor."No.")
+
+            column(Vendor_No; "No.") { }
+            column(Vendor_Name; Name) { }
+            column(Request_Page_Filters; _RequestPageFilters) { }
+            column(Company_Name; CompanyName()) { }
+            column(Show_Items; _ShowItems) { }
+            column(NumberOfLevels; _NumberOfLevels) { }
+
+            dataitem(ItemCategory; "Item Category")
             {
-            }
-            column(VendorName; Vendor.Name)
-            {
-            }
-            column(VisVarer_Vendor; ShowItem)
-            {
-                AutoFormatType = 1;
-            }
-            column(ShowItemWithSales_Vendor; ShowItemWithSales)
-            {
-                AutoFormatType = 2;
-            }
-            column(ShowItemCategory_Vendor; ShowItemCategory)
-            {
-            }
-            dataitem(Varegruppe; "Item Category")
-            {
-                DataItemTableView = SORTING(Code);
-                PrintOnlyIfDetail = true;
-                column(ItemCategoryDesc; ItemCategoryDesc)
-                {
-                }
-                column(ItemCategoryNo; Varegruppe.Code)
-                {
-                }
-                column(ItemCategoryFooterDesc; ItemCategoryFooterDesc)
-                {
-                }
+                DataItemTableView = sorting("Code");
+                column(ItemCategory_Code; "Code") { }
+                column(ItemCategory_Description; Description) { }
+                column(ItemCategory_Indentation; Indentation) { }
+                column(ItemCategory_PresentationOrder; "Presentation Order") { }
+                column(ItemCategory_ParentCategory; "Parent Category") { }
+
                 dataitem(Item; Item)
                 {
-                    CalcFields = "Sales (Qty.)", "Sales (LCY)", "Scheduled Receipt (Qty.)", "Qty. on Purch. Order", "COGS (LCY)", "Purchases (Qty.)";
-                    DataItemLink = "Item Category Code" = FIELD(Code);
+                    CalcFields = "Sales (Qty.)", "Sales (LCY)", "Scheduled Receipt (Qty.)", Inventory, "COGS (LCY)", "Purchases (Qty.)";
+                    DataItemLink = "Item Category Code" = field(Code);
+                    DataItemTableView = sorting("No.");
                     RequestFilterFields = "Global Dimension 1 Filter", "Date Filter";
-                    column(ItemDesc; Item.Description)
-                    {
-                    }
-                    column(ItemVendorItemNo; Item."Vendor Item No.")
-                    {
-                    }
-                    column(ItemNo; Item."No.")
-                    {
-                    }
-                    column(ItemItemCategory; Item."Item Category Code")
-                    {
-                    }
-                    column(ItemPurchasesQty; Item."Purchases (Qty.)")
-                    {
-                        AutoFormatType = 1;
-                    }
-                    column(ItemSalesQty; Item."Sales (Qty.)")
-                    {
-                        DecimalPlaces = 0 : 5;
-                    }
-                    column(ItemSalesLCY; Item."Sales (LCY)")
-                    {
-                        AutoFormatType = 1;
-                    }
-                    column(db; GrossCoverage)
-                    {
-                        AutoFormatType = 1;
-                    }
-                    column(dg; Dg)
-                    {
-                        AutoFormatType = 1;
-                    }
-                    column(Item2NetChange; Item2."Net Change")
-                    {
-                        AutoFormatType = 1;
-                    }
-                    column(StockValue; StockValue)
-                    {
-                        AutoFormatType = 1;
-                    }
-                    column(ItemQtyonPurchOrder; Item."Qty. on Purch. Order")
-                    {
-                        AutoFormatType = 1;
-                    }
-                    column(TurnoverRate; TurnoverRate)
-                    {
-                        AutoFormatType = 1;
-                    }
-                    column(forpct; ProfitPriceCoveragePct)
-                    {
-                        AutoFormatType = 1;
-                    }
-                    column(ItemFooterDesc; ItemFooterDesc)
-                    {
-                    }
-                    column(GnsBeholdningKpris; AvgInvPrice)
-                    {
-                    }
-                    column(antalmdr; MonthsCount)
-                    {
-                    }
-                    column(SalesCost; SalesCost)
-                    {
-                    }
 
-                    trigger OnAfterGetRecord()
-                    begin
-                        ItemFooterDesc := Text10600005 + Varegruppe.Code + ' ' + Varegruppe.Description;
-                        if ShowItemWithSales and ("Sales (Qty.)" = 0) then
-                            CurrReport.Skip();
+                    column(Item_No; "No.") { }
+                    column(Item_Description; Description) { }
+                    column(Item_VendorItemNo; "Vendor Item No.") { }
+                    column(Item_ItemCategory; "Item Category Code") { }
+                    column(Item_SalesQty; "Sales (Qty.)") { }
+                    column(Item_PurchasesQty; "Purchases (Qty.)") { }
+                    column(Item_SalesLCY; "Sales (LCY)") { }
+                    column(Item_InventoryQty; Inventory) { }
+                    column(Item_InventoryValue; Inventory * "Last Direct Cost") { }
+                    column(Item_Profit; "Sales (LCY)" - "COGS (LCY)") { }
+                    column(Item_COGSLCY; "COGS (LCY)") { }
 
-                        Clear(PurchPrice);
-                        Clear(StockValue);
-                        Clear(PeriodSales);
-                        Clear(TurnoverRate);
-                        Clear(ItemInventory);
-                        Clear(AvgInvPrice);
-
-                        //Lagerbeholdning Ultimo
-                        Item2.Get("No.");
-                        Item2.SetFilter("Date Filter", '..%1', ValueDate);
-                        Item2.CalcFields("Net Change");
-
-                        //Lagervaerdi
-                        if (ValueMethod = ValueMethod::"kostpris (gns.)") then
-                            ItemCostMgt.CalculateAverageCost(Item, GNSCostPrice, PurchPrice);
-
-                        if (ValueMethod = ValueMethod::"sidste koebspris") then
-                            GNSCostPrice := "Last Direct Cost";
-
-                        SalesCost := ("Sales (Qty.)" * GNSCostPrice);
-
-                        Clear(PurchPrice);
-                        PurchPrice := Round(GNSCostPrice * Item2."Net Change");
-                        Hjemtagelsesomk := Round((GNSCostPrice * Item2."Net Change") / 100 * "Indirect Cost %");
-                        StockValue := PurchPrice + Hjemtagelsesomk;
-                        PeriodSales := "Sales (LCY)";
-
-                        //Calculate  Gross Coverage
-                        GrossCoverage := "Sales (LCY)" - "COGS (LCY)";
-
-                        if "Sales (LCY)" <> 0 then
-                            Dg := (GrossCoverage / "Sales (LCY)") * 100
-                        else
-                            Dg := 0;
-
-                        //Turnover rate
-                        for x := 0 to MonthsCount do
-                            ItemInventory += Calculate(0D, CalcDate('<-' + Format(x) + Text10600003 + '>', EndDate));
-
-                        AvgInvPrice := (ItemInventory / (MonthsCount + 1));
-
-                        if AvgInvPrice <> 0 then begin
-                            TurnoverRate := (SalesCost / AvgInvPrice) * (12 / (MonthsCount + 1));
-                            ProfitPriceCoveragePct := (GrossCoverage * 100 / AvgInvPrice) * (12 / (MonthsCount + 1));
-                        end
-                        else begin
-                            TurnoverRate := 0;
-                            ProfitPriceCoveragePct := 0;
-                        end;
-                    end;
 
                     trigger OnPreDataItem()
                     begin
-                        SetFilter("Date Filter", '%1..%2', StartDate, EndDate);
-                        SetRange("Vendor No.", Vendor."No.");
-                        StartDate := GetRangeMin("Date Filter");
-                        EndDate := GetRangeMax("Date Filter");
-                        MonthsCount := (Date2DMY(EndDate, 3) - Date2DMY(StartDate, 3)) * 12 + (Date2DMY(EndDate, 2) - Date2DMY(StartDate, 2));
+                        Item.SetRange("Vendor No.", Vendor."No.");
+                    end;
+
+                    trigger OnAfterGetRecord()
+                    begin
+                        if "Sales (Qty.)" = 0 then
+                            CurrReport.Skip();
                     end;
                 }
+            }
+            dataitem(ItemCategory2; Integer)
+            {
+                DataItemTableView = sorting(Number) where(Number = const(1));
 
-                trigger OnAfterGetRecord()
-                begin
-                    ItemCategoryDesc := Text10600004 + Code + ' ' + Description;
-                    ItemCategoryFooterDesc := Text10600006 + Vendor.Name;
-                end;
+                column(ItemCategory2_Code; _UncategorizedCategoryCodeLbl) { }
+                column(ItemCategory2_Description; _UncategorizedCategoryDescLbl) { }
 
-                trigger OnPreDataItem()
-                begin
-                    FilterDesc := Text10600001 + GetFilter(Code) + Text10600007 + Item.GetFilter("Global Dimension 1 Filter");
-                    InventoryValueDesc := StrSubstNo(Text10600008, ValueDate, ValueMethod);
-                end;
+                dataitem(Item2; Item)
+                {
+                    CalcFields = "Sales (Qty.)", "Purchases (Qty.)", "Sales (LCY)", Inventory, "COGS (LCY)";
+                    DataItemTableView = sorting("No.") where("Item Category Code" = const(''));
+                    RequestFilterFields = "Global Dimension 1 Filter", "Date Filter";
+
+                    column(Item2_No; "No.") { }
+                    column(Item2_Description; Description) { }
+                    column(Item2_VendorItemNo; "Vendor Item No.") { }
+                    column(Item2_ItemCategory; "Item Category Code") { }
+                    column(Item2_PurchasesQty; "Purchases (Qty.)") { }
+                    column(Item2_SalesQty; "Sales (Qty.)") { }
+                    column(Item2_SalesLCY; "Sales (LCY)") { }
+                    column(Item2_InventoryQty; Inventory) { }
+                    column(Item2_InventoryValue; Inventory * "Last Direct Cost") { }
+                    column(Item2_Profit; "Sales (LCY)" - "COGS (LCY)") { }
+                    column(Item2_COGSLCY; "COGS (LCY)") { }
+
+                    trigger OnPreDataItem()
+                    begin
+                        Item2.SetRange("Vendor No.", Vendor."No.");
+                    end;
+
+                    trigger OnAfterGetRecord()
+                    begin
+                        if "Sales (Qty.)" = 0 then
+                            CurrReport.Skip();
+                    end;
+                }
             }
         }
     }
@@ -241,63 +109,25 @@
     requestpage
     {
         SaveValues = true;
-
         layout
         {
             area(content)
             {
-                group(Setting)
+                group(Options)
                 {
-                    Caption = 'Setting';
-                    field("Value Date"; ValueDate)
+                    Caption = 'Options';
+                    field("Show Items"; _ShowItems)
                     {
-
-                        Caption = 'Value Date';
-                        ToolTip = 'Specifies the value of the Value Date field';
                         ApplicationArea = NPRRetail;
+                        Caption = 'Show Items';
+                        ToolTip = 'Use this option to control whether you want to print the individual items within categories or just the category itself.';
                     }
-                    field("Start Date"; StartDate)
+                    field("Number of Levels"; _NumberOfLevels)
                     {
-                        Caption = 'Start Date';
-                        ToolTip = 'Specifies the value of the Start Date field';
                         ApplicationArea = NPRRetail;
-                        ShowMandatory = true;
-                    }
-                    field("End date"; EndDate)
-                    {
-                        Caption = 'End date';
-                        ToolTip = 'Specifies the value of the End Date field';
-                        ApplicationArea = NPRRetail;
-                        ShowMandatory = true;
-                    }
-                    field("Show Item With Sales"; ShowItemWithSales)
-                    {
-
-                        Caption = 'Only Items With Sale';
-                        ToolTip = 'Specifies the value of the Only Items With Sale field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("Show Item"; ShowItem)
-                    {
-
-                        Caption = 'View Items';
-                        ToolTip = 'Specifies the value of the View Items field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("Show Item Category"; ShowItemCategory)
-                    {
-
-                        Caption = 'Show Item Category';
-                        ToolTip = 'Specifies the value of the Show Item Category field';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field(InventoryValueIsBasedOn; ValueMethod)
-                    {
-
-                        Caption = 'Inventory Value Is Based On:';
-                        OptionCaption = 'Last Purchase Price,Cost Price (avg.)';
-                        ToolTip = 'Specifies the value of the Inventory Value Is Based On: field';
-                        ApplicationArea = NPRRetail;
+                        Caption = 'Number of Levels';
+                        MinValue = 1;
+                        ToolTip = 'Specifies how many levels of item categories are displayed on the report. Adjust this field to control the level of detail in the report.';
                     }
                 }
             }
@@ -306,91 +136,57 @@
 
     labels
     {
-        OnlyItemsWithSaleCap = 'Only items with sales';
-        ShowItemsCap = 'Show items';
-        Report_Caption = 'Item Sales Statistics by Vendor';
-        Desc_Cap = 'Description';
-        VendorItemNo_Cap = 'Supplier item no.';
-        ItemNo_Cap = 'No.';
-        ItemItemCategory_Cap = 'Belong to Item Cat. no.';
-        Purchase_Cap = 'Purchase (qty)';
-        SalesQty_Cap = 'Sales (qty)';
-        SalesAmount_Cap = 'Sales (DKK)';
-        db_Cap = 'Gross';
-        dg_Cap = 'Advance %';
-        varerec_Cap = 'Qty in inventory';
-        lagerv_Cap = 'Value in inventory';
-        Qty_cap = 'Anticipated acces';
-        Oms_Cap = 'Turnover rate';
-        for_Cap = 'Profit/Price coverrage %';
-        Page_Caption = 'Page';
+        ReportCaptionLbl = 'Item Sales Statistics by Vendor';
+        PageCaptionLbl = 'Page';
+        NoCaptionLbl = 'No.';
+        VendorItemNoCaptionLbl = 'Vendor Item No.';
+        DescCaptionLbl = 'Description';
+        FiltersCaptionLbl = 'Filters:';
+        PurchaseQtyCaptionLbl = 'Purchase (Qty.)';
+        SalesQtyCaptionLbl = 'Sales (Qty.)';
+        SalesLCYCaptionLbl = 'Sales (LCY)';
+        ProfitCaptionLbl = 'Profit';
+        InventoryQtyCaptionLbl = 'Inventory (Qty.)';
+        InventoryValueCaptionLbl = 'Inventory Value';
+        UnitContributionMarginCaptionLbl = 'Unit Contribution Margin';
+        TurnoverRateCaptionLbl = 'Turnover rate';
+        ProfitPctCaptionLbl = 'Profit %';
+        VendorTotalCaptionLbl = 'Total for Vendor';
     }
 
     trigger OnPreReport()
-    var
-        DateNotPopulatedErr: Label 'Fields Start date and End Date need to be populated!';
-        StartDateHigherThanEndDateErr: Label 'Field Start date must contain date that is before the End date';
     begin
-        CompanyInformation.Get();
-        CompanyInformation.CalcFields(Picture);
+        CreateRequestPageFiltersTxt(_RequestPageFilters);
+    end;
 
-        if ValueDate = 0D then
-            ValueDate := Today();
-
-        if (StartDate = 0D) or (EndDate = 0D) then
-            Error(DateNotPopulatedErr);
-
-        if (StartDate > EndDate) then
-            Error(StartDateHigherThanEndDateErr);
+    trigger OnInitReport()
+    begin
+        _NumberOfLevels := 3;
+        _ShowItems := true;
     end;
 
     var
-        CompanyInformation: Record "Company Information";
-        Item1: Record Item;
-        Item2: Record Item;
-        ItemCostMgt: Codeunit ItemCostManagement;
-        ShowItem: Boolean;
-        ShowItemCategory: Boolean;
-        ShowItemWithSales: Boolean;
-        EndDate: Date;
-        StartDate: Date;
-        ValueDate: Date;
-        GrossCoverage: Decimal;
-        Dg: Decimal;
-        ProfitPriceCoveragePct: Decimal;
-        AvgInvPrice: Decimal;
-        GNSCostPrice: Decimal;
-        Hjemtagelsesomk: Decimal;
-        ItemInventory: Decimal;
-        PeriodSales: Decimal;
-        PurchPrice: Decimal;
-        SalesCost: Decimal;
-        StockValue: Decimal;
-        TurnoverRate: Decimal;
-        MonthsCount: Integer;
-        x: Integer;
-        Text10600001: Label 'Chosen Vendors';
-        Text10600007: Label 'Department';
-        Text10600002: Label 'For the period';
-        Text10600008: Label 'Inventory is equal to inventories per %1 * %2 + delivery costs';
-        Text10600004: Label 'Item Category';
-        Text10600003: Label 'M';
-        Text10600006: Label 'Total ';
-        Text10600005: Label 'Total for the Item Category';
-        ValueMethod: Option "sidste koebspris","kostpris (gns.)";
-        DateFilter: Text[100];
-        FilterDesc: Text[200];
-        InventoryValueDesc: Text[200];
-        ItemFooterDesc: Text[200];
-        ItemCategoryDesc: Text[200];
-        ItemCategoryFooterDesc: Text[200];
+        _ShowItems: Boolean;
+        _NumberOfLevels: Integer;
+        _RequestPageFilters: Text;
+        _TxtShowItem: Label 'Show items';
+        _UncategorizedCategoryCodeLbl: Label '-';
+        _UncategorizedCategoryDescLbl: Label 'Without category';
 
-    internal procedure Calculate(DateFrom: Date; DateTo: Date): Decimal
+
+    local procedure CreateRequestPageFiltersTxt(var FiltersTxt: Text)
     begin
-        Item1.SetRange("Date Filter", DateFrom, DateTo);
-        Item1.Get(Item."No.");
-        Item1.CalcFields("Purchases (LCY)", "COGS (LCY)");
-        Exit(Item1."Purchases (LCY)" - (Item1."COGS (LCY)"));
+        if _ShowItems then
+            FiltersTxt += _TxtShowItem;
+
+        if (FiltersTxt <> '') and (Vendor.GetFilters() <> '') then
+            FiltersTxt += ', ' + Vendor.GetFilters()
+        else
+            FiltersTxt += Vendor.GetFilters();
+
+        if (FiltersTxt <> '') and (Item.GetFilters() <> '') then
+            FiltersTxt += ', ' + Item.GetFilters()
+        else
+            FiltersTxt += Item.GetFilters();
     end;
 }
-
