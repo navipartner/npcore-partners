@@ -14,6 +14,8 @@ A new administrative section **Group Codes** has been added to Business Central 
 
 For more information and operating instructions, refer to the [Group code setup](retail/posunit/howto/group_codes.md) article.
 
+> [!Video https://share.synthesia.io/a78117b9-9ac9-480d-84d7-c1961842326a]
+
 ### MPOS actions for improved barcode scanning
 
 Two new MPOS actions for improved barcode scanning have been introduced:  
@@ -24,17 +26,23 @@ Two new MPOS actions for improved barcode scanning have been introduced:
 
 For more information and operating instructions, refer to the article on [MPOS action setup for Scandit](retail/mpos/howto/scandit_pos_actions.md).
 
+> [!Video https://share.synthesia.io/af673f15-f1a2-4feb-a335-a9ac2fd45c6c]
+
 ### MPOS redesign
 
 Our MPOS has undergone a complete UI overhaul, making the previous scaled-down version of the regular MPOS more modern and streamlined. 
 
 For operating instructions, refer to the article on [MPOS setup](retail/mpos/howto/MPOS_View.md).
 
+> [!Video https://share.synthesia.io/de9a7cbc-268b-49bb-9df1-56537ed433ec]
+
 ### New POS editor
 
 With the new POS editor, POS buttons and actions can now be configured solely from within the POS UI no longer requiring accompanying setup in Business Central. This means that it's not necessary to leave the POS to change a button or a workflow parameter. Users will be able to see their changes being reflected instantly without jumping back and forth multiple windows. Consequently, the POS configuration is simplified and load time reduced.
 
 For operating instructions, refer to the article on [POS editor activation](retail/posunit/howto/pos_editor.md)
+
+> [!Video https://share.synthesia.io/d9ec4a31-da28-47c1-a964-208d2a29af7f]
 
 ## Version 21.0 (April 28th 2023)
 
