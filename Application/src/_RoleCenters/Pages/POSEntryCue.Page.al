@@ -232,7 +232,7 @@
             BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
     end;
 
-    local procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Integer
+    local procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Decimal
     begin
         if not BackgroundTaskResults.ContainsKey(FieldNo) then
             exit(0);
