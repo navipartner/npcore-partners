@@ -55,11 +55,6 @@
                     ToolTip = 'You can choose between either Print or No print.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Force Blind Counting"; Rec."Force Blind Counting")
-                {
-                    ToolTip = 'If this field is checked on the balancing page the amount won''t be shown in the system.';
-                    ApplicationArea = NPRRetail;
-                }
                 field("SMS Profile"; Rec."SMS Profile")
                 {
                     ToolTip = 'Specifies the SMS template which will be used for sending an SMS after the balancing is done.';
@@ -73,6 +68,11 @@
                 field("X-Report Number Series"; Rec."X-Report Number Series")
                 {
                     ToolTip = 'Specifies the number series used for creating the Document No. in the POS entry for entries created from running the X report.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Force Blind Counting"; Rec."Force Blind Counting")
+                {
+                    ToolTip = 'If this field is checked on the balancing page the amount won''t be shown in the system.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Show Zero Amount Lines"; Rec."Show Zero Amount Lines")
