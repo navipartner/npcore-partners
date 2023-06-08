@@ -368,6 +368,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
                     ActionWorkflow.Add('RequestContext', Workflow.RequestContext());
                     ActionWorkflow.Add('Steps', Workflow.Steps());
                     ActionWorkflow.Add('Content', Workflow.Content());
+                    AddPOSActionParametersToResponse(POSAction, ActionWorkflow);
                     ActionWorkflows.Add(ActionWorkflow);
                 end;
             until POSAction.Next() = 0;
