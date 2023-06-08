@@ -9,6 +9,17 @@ tableextension 6014458 "NPR Price List Header" extends "Price List Header"
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
+        field(6151480; "NPR Location Code"; Code[10])
+        {
+            Caption = 'Location Code';
+            DataClassification = CustomerContent;
+            TableRelation = Location WHERE("NPR Retail Location" = CONST(true));
+        }
+        field(6151481; "NPR Retail Price List"; Boolean)
+        {
+            Caption = 'Retail Price List';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

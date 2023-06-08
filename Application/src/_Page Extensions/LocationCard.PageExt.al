@@ -4,6 +4,11 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
     {
         addafter("Use As In-Transit")
         {
+            field("NPR Retail Location"; Rec."NPR Retail Location")
+            {
+                ToolTip = 'Specifies whether location is Retail or Warehouse. If checked, location is Retail';
+                ApplicationArea = NPRRetail;
+            }
             field("NPR Store Group Code"; Rec."NPR Store Group Code")
             {
                 ToolTip = 'Specifies a Group Code that a set of POS Stores can be grouped into for BI purposes.';
@@ -18,14 +23,6 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
                 ApplicationArea = NPRRetail;
                 Importance = Additional;
                 Enabled = NoWhseEntrForPOSEnabled;
-            }
-        }
-        addafter("Country/Region Code")
-        {
-            field("NPR Retail Location"; Rec."NPR Retail Location")
-            {
-                ToolTip = 'Specifies whether location is Retail or Warehouse. If checked, location is Retail';
-                ApplicationArea = NPRRetail;
             }
         }
 #if not (BC17 or BC18 or BC19 or BC20)
