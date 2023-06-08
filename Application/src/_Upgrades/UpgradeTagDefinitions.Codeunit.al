@@ -6,7 +6,6 @@
     local procedure OnGetPerCompanyTags(var PerCompanyUpgradeTags: List of [Code[250]]);
     begin
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG EFT Profile"));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Tax Calc."));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Scanner Stations"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Register"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG MPOS App Setup", 'NPRMPOSAppSetup'));
@@ -134,8 +133,6 @@
         case UpgradeCodeunitID of
             Codeunit::"NPR UPG EFT Profile":
                 exit('NPRTaxFreePOSUnit-02e65aa9-1e85-4f0a-a1ca-2c27f24b0377');
-            Codeunit::"NPR UPG Tax Calc.":
-                exit(CompanyName() + 'NPRPOSTaxCalc' + Format(Today(), 0, 9));
             Codeunit::"NPR UPG Scanner Stations":
                 exit('ScannerStation-20212402');
             Codeunit::"NPR UPG Register":
