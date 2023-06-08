@@ -16,6 +16,8 @@
     href: explanation/belgian_voucher.md
   - name: End-of-day report (POS balance)
     href: explanation/end_of_day.md
+  - name: Pricing
+    href: explanation/pricing.md
 - name: Reference
   items:
   - name: POS payment view event Setup (reference guide)
@@ -98,3 +100,7 @@
     href: howto/group_codes.md
   - name: Activate POS editor
     href: howto/pos_editor.md
+  - name: Set up sales price
+    href: howto/sales_price_setup.md
+  - name: Set up price worksheet
+    href: howto/price_worksheet.md
