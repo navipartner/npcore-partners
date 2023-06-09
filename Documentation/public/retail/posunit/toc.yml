@@ -18,6 +18,8 @@
     href: explanation/end_of_day.md
   - name: Pricing
     href: explanation/pricing.md
+  - name: Email setup
+    href: explanation/email_setup.md
 - name: Reference
   items:
   - name: POS payment view event Setup (reference guide)

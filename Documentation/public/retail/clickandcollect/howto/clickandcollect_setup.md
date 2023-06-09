@@ -84,7 +84,7 @@ To create a new collect workflow, refer to the provided steps:
    
    #### E-mail Setup
 
-   The email setup procedure slightly differs depending on whether the environment you're in is on-prem or SaaS. 
+   The [email setup](../../posunit/explanation/email_setup.md) procedure slightly differs depending on whether the environment you're in is on-prem or SaaS. 
 
    ##### SaaS
 
