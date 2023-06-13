@@ -100,9 +100,9 @@
                 ToolTip = 'Executing this action a copy of the original receipt will be printed without the original fiscal receipt.';
                 trigger OnAction()
                 var
-                    RSPTFPITryPrint: Codeunit "NPR RS PTFPI Try Print";
+                    RSPTFPITryPrint: Codeunit "NPR RS Fiscal Thermal Print";
                 begin
-                    if Rec.Journal = '' then begin
+                    if Rec.Signature = '' then begin
                         Message(FiscalNotSentMsg);
                         exit;
                     end;
@@ -122,12 +122,12 @@
                 trigger OnAction()
                 var
                     RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-                    RSPTFPITryPrint: Codeunit "NPR RS PTFPI Try Print";
+                    RSPTFPITryPrint: Codeunit "NPR RS Fiscal Thermal Print";
                 begin
                     RSPOSAuditLogAuxInfo.SetRange("Audit Entry Type", Rec."Audit Entry Type");
                     RSPOSAuditLogAuxInfo.SetRange("Audit Entry No.", Rec."Audit Entry No.");
                     RSPOSAuditLogAuxInfo.FindLast();
-                    if RSPOSAuditLogAuxInfo.Journal = '' then begin
+                    if RSPOSAuditLogAuxInfo.Signature = '' then begin
                         Message(FiscalNotSentMsg);
                         exit;
                     end;
@@ -147,17 +147,17 @@
                 trigger OnAction()
                 var
                     RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-                    RSPTFPITryPrint: Codeunit "NPR RS PTFPI Try Print";
+                    RSPTFPITryPrint: Codeunit "NPR RS Fiscal Thermal Print";
                 begin
                     RSPOSAuditLogAuxInfo.SetRange("Audit Entry Type", Rec."Audit Entry Type");
                     RSPOSAuditLogAuxInfo.SetRange("Audit Entry No.", Rec."Audit Entry No.");
                     RSPOSAuditLogAuxInfo.FindLast();
-                    if RSPOSAuditLogAuxInfo.Journal = '' then begin
+                    if RSPOSAuditLogAuxInfo.Signature = '' then begin
                         Message(FiscalNotSentMsg);
                         exit;
                     end;
                     RSPTFPITryPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
-                    if Rec.Journal = '' then begin
+                    if Rec.Signature = '' then begin
                         Message(FiscalNotSentMsg);
                         exit;
                     end;
@@ -169,7 +169,7 @@
 
     trigger OnAfterGetRecord()
     begin
-        SentFiscalToTax := Rec.Journal <> '';
+        SentFiscalToTax := Rec.Signature <> '';
     end;
 
     var

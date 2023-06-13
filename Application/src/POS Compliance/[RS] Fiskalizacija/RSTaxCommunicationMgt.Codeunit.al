@@ -8,6 +8,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+        IsHandled: Boolean;
         StartTime: DateTime;
         Content: HttpContent;
         Headers: HttpHeaders;
@@ -34,6 +35,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
+        IsHandled := false;
+        OnBeforeSendHttpRequestForNormalSale(RequestMessage, ResponseText, RSPOSAuditLogAuxInfo, StartTime, IsHandled);
+        if IsHandled then
+            exit;
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             FillRSAuditFromNormalSaleAndRefundResponse(RSPOSAuditLogAuxInfo, ResponseText, StartTime)
         else
@@ -42,10 +47,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
     internal procedure CreateNormalSale(SalesInvoiceNo: Code[20])
     var
+        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
         RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         SalesInvoiceHeader: Record "Sales Invoice Header";
-        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
+        IsHandled: Boolean;
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         StartTime: DateTime;
         Content: HttpContent;
@@ -75,6 +81,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
+        IsHandled := false;
+        OnBeforeSendHttpRequestForNormalSaleDocument(RequestMessage, ResponseText, SalesInvoiceHeader, StartTime, IsHandled);
+        if IsHandled then
+            exit;
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             FillRSAuditFromNormalSaleAndRefundResponse(SalesInvoiceHeader, ResponseText, StartTime)
         else
@@ -83,10 +93,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
     internal procedure CreateProformaSale(var SalesHeader: Record "Sales Header")
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+        IsHandled: Boolean;
         StartTime: DateTime;
         Content: HttpContent;
         Headers: HttpHeaders;
@@ -115,6 +126,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
+        IsHandled := false;
+        OnBeforeSendHttpRequestForProformaSale(RequestMessage, ResponseText, SalesHeader, StartTime, IsHandled);
+        if IsHandled then
+            exit;
         if SendHttpRequest(RequestMessage, ResponseText, false) then begin
             FillRSAuditFromNormalSaleAndRefundResponse(SalesHeader, ResponseText, false, true, StartTime);
             Message(ProformaCreatedMsg, SalesHeader."No.");
@@ -127,6 +142,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+        IsHandled: Boolean;
         StartTime: DateTime;
         Content: HttpContent;
         Headers: HttpHeaders;
@@ -153,6 +169,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
+        IsHandled := false;
+        OnBeforeSendHttpRequestForNormalRefund(RequestMessage, ResponseText, RSPOSAuditLogAuxInfo, StartTime, IsHandled);
+        if IsHandled then
+            exit;
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             FillRSAuditFromNormalSaleAndRefundResponse(RSPOSAuditLogAuxInfo, ResponseText, StartTime)
         else
@@ -161,12 +181,13 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
     internal procedure CreateNormalRefund(SalesCrMemoNo: Code[20])
     var
+        RSAuxSalesCrMemoHeader: Record "NPR RS Aux Sales CrMemo Header";
         RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        RSAuxSalesCrMemoHeader: Record "NPR RS Aux Sales CrMemo Header";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         StartTime: DateTime;
+        IsHandled: Boolean;
         Content: HttpContent;
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
@@ -196,6 +217,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
+        IsHandled := false;
+        OnBeforeSendHttpRequestForNormalRefundDocument(RequestMessage, ResponseText, SalesCrMemoHeader, StartTime, IsHandled);
+        if IsHandled then
+            exit;
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             FillRSAuditFromNormalSaleAndRefundResponse(SalesCrMemoHeader, ResponseText, StartTime)
         else
@@ -204,10 +229,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
     internal procedure CreateProformaRefund(var SalesHeader: Record "Sales Header"; ModifySalesHeader: Boolean)
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+        IsHandled: Boolean;
         StartTime: DateTime;
         Content: HttpContent;
         Headers: HttpHeaders;
@@ -236,6 +262,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
+        IsHandled := false;
+        OnBeforeSendHttpRequestForProformaRefund(RequestMessage, ResponseText, SalesHeader, StartTime, IsHandled);
+        if IsHandled then
+            exit;
         if SendHttpRequest(RequestMessage, ResponseText, false) then begin
             FillRSAuditFromNormalSaleAndRefundResponse(SalesHeader, ResponseText, true, ModifySalesHeader, StartTime);
             if ModifySalesHeader then
@@ -308,6 +338,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         RSPinStatusResponse: Enum "NPR RS Pin Status Response";
+        IsHandled: Boolean;
         Content: HttpContent;
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
@@ -329,6 +360,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
+        IsHandled := false;
+        OnBeforeSendHttpRequestForVerifyPin(RequestMessage, ResponseText, IsHandled);
+        if IsHandled then
+            exit(ResponseText);
         SendHttpRequest(RequestMessage, ResponseText, false);
         ResponseText := DelChr(ResponseText, '=', '"');
         Evaluate(RSPinStatusResponse, ResponseText);
@@ -340,6 +375,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
+        IsHandled: Boolean;
         ResponseText: Text;
         Url: Text;
     begin
@@ -353,6 +389,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('GET');
         RequestMessage.GetHeaders(Headers);
+        IsHandled := false;
+        OnBeforeSendHttpRequestForSUFConfiguration(RequestMessage, ResponseText, IsHandled);
+        if IsHandled then
+            exit;
         if SendHttpRequest(RequestMessage, ResponseText, true) then
             FillSUFConfigurationSetup(ResponseText)
         else
@@ -364,6 +404,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
+        IsHandled: Boolean;
         ResponseText: Text;
         Url: Text;
     begin
@@ -377,6 +418,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('GET');
         RequestMessage.GetHeaders(Headers);
+        IsHandled := false;
+        OnBeforeSendHttpRequestForAllowedTaxRates(RequestMessage, ResponseText, IsHandled);
+        if IsHandled then
+            exit;
         if SendHttpRequest(RequestMessage, ResponseText, true) then
             FillAllowedTaxRates(ResponseText, false)
         else
@@ -388,6 +433,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     local procedure CreateJSONBodyForRSFiscalNormalSale(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; IsCopy: Boolean): Text
     var
         Item: Record Item;
+        NpRvArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
         POSEntry: Record "NPR POS Entry";
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
@@ -396,6 +442,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSPOSPaymMethMapping: Record "NPR RS POS Paym. Meth. Mapping";
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+        HasArchVoucherEntry: Boolean;
         Certification: Dictionary of [Text, Text];
         JArray: JsonArray;
         JArray2: JsonArray;
@@ -424,6 +471,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             else
                 JObjectHeader.Add('invoiceType', GetEnumValueName(RSPOSAuditLogAuxInfo."RS Invoice Type"));
         JObjectHeader.Add('transactionType', GetEnumValueName(RSPOSAuditLogAuxInfo."RS Transaction Type"));
+        NpRvArchVoucherEntry.SetRange("Entry Type", NpRvArchVoucherEntry."Entry Type"::Payment);
+        NpRvArchVoucherEntry.SetRange("Document No.", RSPOSAuditLogAuxInfo."Source Document No.");
+        HasArchVoucherEntry := NpRvArchVoucherEntry.FindFirst();
+        if HasArchVoucherEntry then
+            POSEntryPaymentLine.SetFilter(Amount, '<%1', 0);
         POSEntryPaymentLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
         if POSEntryPaymentLine.FindSet() then
             repeat
@@ -444,50 +496,55 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JObjectHeader.Add('payment', JArray);
         RSAuditMgt.FillCertificationData(Certification);
         JObjectHeader.Add('invoiceNumber', Certification.Get('ESIRNo'));
-        if IsCopy then begin
-            JObjectHeader.Add('referentDocumentNumber', RSPOSAuditLogAuxInfo."Invoice Number");
-            JObjectHeader.Add('referentDocumentDT', Format(RSPOSAuditLogAuxInfo."SDC DateTime"));
-        end else
-            JObjectHeader.Add('referentDocumentNumber', '');
-        Clear(JObjectLines);
-        JObjectLines.Add('omitQRCodeGen', 1);
-        JObjectLines.Add('omitTextualRepresentation', 0);
-        JObjectHeader.Add('options', JObjectLines);
-        POSEntrySalesLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
-        POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
-        Clear(JArray);
-        if POSEntrySalesLine.FindSet() then
-            repeat
-                Clear(ItemName);
-                Clear(JObjectLines);
-                Clear(JArray2);
-                if not (RSPOSAuditLogAuxInfo."POS Entry Type" in [RSPOSAuditLogAuxInfo."POS Entry Type"::"Credit Sale"]) and
-                    RSPOSPaymMethMapping.Find() then
-                    if RSPOSPaymMethMapping."RS Payment Method" in [RSPOSPaymMethMapping."RS Payment Method"::Other] then
-                        ItemName := OtherPaymentItemPrefixLbl;
-                if StrLen(POSEntrySalesLine."Description 2") > 0 then
-                    ItemName += POSEntrySalesLine.Description + ',' + POSEntrySalesLine."Description 2"
-                else
-                    ItemName += POSEntrySalesLine.Description;
-                JObjectLines.Add('name', ItemName);
-                case POSEntrySalesLine.Type of
-                    POSEntrySalesLine.Type::Item:
-                        begin
-                            POSEntrySalesLine.GetItem(Item);
-                            if Item.GTIN <> '' then
-                                JObjectLines.Add('GTIN', Item.GTIN);
-                        end;
-                end;
-                JObjectLines.Add('quantity', Abs(POSEntrySalesLine.Quantity));
-                JObjectLines.Add('unitPrice', Abs(Round((POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity), 0.01)));
-                RSVATPostSetupMapping.Get(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group");
-                RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
-                JArray2.Add(RSAllowedTaxRates."Tax Category Rate Label");
-                JObjectLines.Add('labels', JArray2);
-                JObjectLines.Add('totalAmount', Abs(POSEntrySalesLine."Amount Incl. VAT"));
-                JArray.Add(JObjectLines);
-            until POSEntrySalesLine.Next() = 0;
-        JObjectHeader.Add('items', JArray);
+        if not HasArchVoucherEntry then
+            if IsCopy then begin
+                JObjectHeader.Add('referentDocumentNumber', RSPOSAuditLogAuxInfo."Invoice Number");
+                JObjectHeader.Add('referentDocumentDT', Format(RSPOSAuditLogAuxInfo."SDC DateTime"));
+            end else
+                JObjectHeader.Add('referentDocumentNumber', '');
+        if IsCopy and HasArchVoucherEntry then
+            CreateJsonForVoucherBasedOnReferenceDocument(RSPOSAuditLogAuxInfo, NpRvArchVoucherEntry, RSPOSPaymMethMapping, JObjectHeader)
+        else begin
+            Clear(JObjectLines);
+            JObjectLines.Add('omitQRCodeGen', 1);
+            JObjectLines.Add('omitTextualRepresentation', 0);
+            JObjectHeader.Add('options', JObjectLines);
+            POSEntrySalesLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
+            POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
+            Clear(JArray);
+            if POSEntrySalesLine.FindSet() then
+                repeat
+                    Clear(ItemName);
+                    Clear(JObjectLines);
+                    Clear(JArray2);
+                    if not (RSPOSAuditLogAuxInfo."POS Entry Type" in [RSPOSAuditLogAuxInfo."POS Entry Type"::"Credit Sale"]) and
+                        RSPOSPaymMethMapping.Find() then
+                        if RSPOSPaymMethMapping."RS Payment Method" in [RSPOSPaymMethMapping."RS Payment Method"::Other] then
+                            ItemName := OtherPaymentItemPrefixLbl;
+                    if StrLen(POSEntrySalesLine."Description 2") > 0 then
+                        ItemName += POSEntrySalesLine.Description + ',' + POSEntrySalesLine."Description 2"
+                    else
+                        ItemName += POSEntrySalesLine.Description;
+                    JObjectLines.Add('name', ItemName);
+                    case POSEntrySalesLine.Type of
+                        POSEntrySalesLine.Type::Item:
+                            begin
+                                POSEntrySalesLine.GetItem(Item);
+                                if Item.GTIN <> '' then
+                                    JObjectLines.Add('GTIN', Item.GTIN);
+                            end;
+                    end;
+                    JObjectLines.Add('quantity', Abs(POSEntrySalesLine.Quantity));
+                    JObjectLines.Add('unitPrice', Abs(Round((POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity), 0.01)));
+                    RSVATPostSetupMapping.Get(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group");
+                    RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
+                    JArray2.Add(RSAllowedTaxRates."Tax Category Rate Label");
+                    JObjectLines.Add('labels', JArray2);
+                    JObjectLines.Add('totalAmount', Abs(POSEntrySalesLine."Amount Incl. VAT"));
+                    JArray.Add(JObjectLines);
+                until POSEntrySalesLine.Next() = 0;
+            JObjectHeader.Add('items', JArray);
+        end;
         JObjectHeader.WriteTo(JsonBodyTxt);
         exit(JsonBodyTxt);
     end;
@@ -592,11 +649,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     var
         Item: Record Item;
         RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
+        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
         RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         RSPaymentMethodMapping: Record "NPR RS Payment Method Mapping";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
-        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
         SalesInvoiceLine: Record "Sales Invoice Line";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         Certification: Dictionary of [Text, Text];
@@ -680,6 +737,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     local procedure CreateJSONBodyForRSFiscalNormalRefund(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"): Text
     var
         Item: Record Item;
+        NpRvArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
         POSEntry: Record "NPR POS Entry";
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
@@ -689,6 +747,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSPOSPaymMethMapping: Record "NPR RS POS Paym. Meth. Mapping";
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+        HasArchVoucherEntry: Boolean;
         Certification: Dictionary of [Text, Text];
         OrigPOSEntry: Guid;
         JArray: JsonArray;
@@ -712,6 +771,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         else
             JObjectHeader.Add('invoiceType', GetEnumValueName(RSPOSAuditLogAuxInfo."RS Invoice Type"));
         JObjectHeader.Add('transactionType', GetEnumValueName(RSPOSAuditLogAuxInfo."RS Transaction Type"));
+        NpRvArchVoucherEntry.SetRange("Entry Type", NpRvArchVoucherEntry."Entry Type"::Payment);
+        NpRvArchVoucherEntry.SetRange("Document No.", RSPOSAuditLogAuxInfo."Source Document No.");
+        HasArchVoucherEntry := NpRvArchVoucherEntry.FindFirst();
+        if HasArchVoucherEntry then
+            POSEntryPaymentLine.SetFilter(Amount, '<%1', 0);
         POSEntryPaymentLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
         if POSEntryPaymentLine.FindSet() then
             repeat
@@ -732,55 +796,59 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JObjectHeader.Add('payment', JArray);
         RSAuditMgt.FillCertificationData(Certification);
         JObjectHeader.Add('invoiceNumber', Certification.Get('ESIRNo'));
-        POSEntrySalesLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
-        POSEntrySalesLine.FindFirst();
-        OrigPOSEntry := POSEntrySalesLine."Orig.POS Entry S.Line SystemId";
-        POSEntrySalesLine.Reset();
-        POSEntrySalesLine.SetRange(SystemId, OrigPOSEntry);
-        POSEntrySalesLine.FindFirst();
-        RSPOSAuditLogAuxInfoReferent.GetAuditFromPOSEntry(POSEntrySalesLine."POS Entry No.");
-        JObjectHeader.Add('referentDocumentNumber', RSPOSAuditLogAuxInfoReferent."Invoice Number");
-        JObjectHeader.Add('referentDocumentDT', RSPOSAuditLogAuxInfoReferent."SDC DateTime");
-        Clear(JObjectLines);
-        JObjectLines.Add('omitQRCodeGen', 1);
-        JObjectLines.Add('omitTextualRepresentation', 0);
-        JObjectHeader.Add('options', JObjectLines);
-        POSEntrySalesLine.Reset();
-        POSEntrySalesLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
-        POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
-        Clear(JArray);
-        if POSEntrySalesLine.FindSet() then
-            repeat
-                Clear(ItemName);
-                Clear(JObjectLines);
-                Clear(JArray2);
-                if not (RSPOSAuditLogAuxInfo."POS Entry Type" in [RSPOSAuditLogAuxInfo."POS Entry Type"::"Credit Sale"]) and
-                    RSPOSPaymMethMapping.Find() then
-                    if RSPOSPaymMethMapping."RS Payment Method" in [RSPOSPaymMethMapping."RS Payment Method"::Other] then
-                        ItemName := OtherPaymentItemPrefixLbl;
-                if StrLen(POSEntrySalesLine."Description 2") > 0 then
-                    ItemName += POSEntrySalesLine.Description + ',' + POSEntrySalesLine."Description 2"
-                else
-                    ItemName += POSEntrySalesLine.Description;
-                JObjectLines.Add('name', ItemName);
-                case POSEntrySalesLine.Type of
-                    POSEntrySalesLine.Type::Item:
-                        begin
-                            POSEntrySalesLine.GetItem(Item);
-                            if Item.GTIN <> '' then
-                                JObjectLines.Add('GTIN', Item.GTIN);
-                        end;
-                end;
-                JObjectLines.Add('quantity', Abs(POSEntrySalesLine.Quantity));
-                JObjectLines.Add('unitPrice', Abs(Round((POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity), 0.01)));
-                RSVATPostSetupMapping.Get(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group");
-                RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
-                JArray2.Add(RSAllowedTaxRates."Tax Category Rate Label");
-                JObjectLines.Add('labels', JArray2);
-                JObjectLines.Add('totalAmount', Abs(POSEntrySalesLine."Amount Incl. VAT"));
-                JArray.Add(JObjectLines);
-            until POSEntrySalesLine.Next() = 0;
-        JObjectHeader.Add('items', JArray);
+        if HasArchVoucherEntry then
+            CreateJsonForVoucherBasedOnReferenceDocument(RSPOSAuditLogAuxInfo, NpRvArchVoucherEntry, RSPOSPaymMethMapping, JObjectHeader)
+        else begin
+            POSEntrySalesLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
+            POSEntrySalesLine.FindFirst();
+            OrigPOSEntry := POSEntrySalesLine."Orig.POS Entry S.Line SystemId";
+            POSEntrySalesLine.Reset();
+            POSEntrySalesLine.SetRange(SystemId, OrigPOSEntry);
+            POSEntrySalesLine.FindFirst();
+            RSPOSAuditLogAuxInfoReferent.GetAuditFromPOSEntry(POSEntrySalesLine."POS Entry No.");
+            JObjectHeader.Add('referentDocumentNumber', RSPOSAuditLogAuxInfoReferent."Invoice Number");
+            JObjectHeader.Add('referentDocumentDT', RSPOSAuditLogAuxInfoReferent."SDC DateTime");
+            Clear(JObjectLines);
+            JObjectLines.Add('omitQRCodeGen', 1);
+            JObjectLines.Add('omitTextualRepresentation', 0);
+            JObjectHeader.Add('options', JObjectLines);
+            POSEntrySalesLine.Reset();
+            POSEntrySalesLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
+            POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
+            Clear(JArray);
+            if POSEntrySalesLine.FindSet() then
+                repeat
+                    Clear(ItemName);
+                    Clear(JObjectLines);
+                    Clear(JArray2);
+                    if not (RSPOSAuditLogAuxInfo."POS Entry Type" in [RSPOSAuditLogAuxInfo."POS Entry Type"::"Credit Sale"]) and
+                        RSPOSPaymMethMapping.Find() then
+                        if RSPOSPaymMethMapping."RS Payment Method" in [RSPOSPaymMethMapping."RS Payment Method"::Other] then
+                            ItemName := OtherPaymentItemPrefixLbl;
+                    if StrLen(POSEntrySalesLine."Description 2") > 0 then
+                        ItemName += POSEntrySalesLine.Description + ',' + POSEntrySalesLine."Description 2"
+                    else
+                        ItemName += POSEntrySalesLine.Description;
+                    JObjectLines.Add('name', ItemName);
+                    case POSEntrySalesLine.Type of
+                        POSEntrySalesLine.Type::Item:
+                            begin
+                                POSEntrySalesLine.GetItem(Item);
+                                if Item.GTIN <> '' then
+                                    JObjectLines.Add('GTIN', Item.GTIN);
+                            end;
+                    end;
+                    JObjectLines.Add('quantity', Abs(POSEntrySalesLine.Quantity));
+                    JObjectLines.Add('unitPrice', Abs(Round((POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity), 0.01)));
+                    RSVATPostSetupMapping.Get(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group");
+                    RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
+                    JArray2.Add(RSAllowedTaxRates."Tax Category Rate Label");
+                    JObjectLines.Add('labels', JArray2);
+                    JObjectLines.Add('totalAmount', Abs(POSEntrySalesLine."Amount Incl. VAT"));
+                    JArray.Add(JObjectLines);
+                until POSEntrySalesLine.Next() = 0;
+            JObjectHeader.Add('items', JArray);
+        end;
         JObjectHeader.WriteTo(JsonBodyTxt);
         exit(JsonBodyTxt);
     end;
@@ -876,11 +944,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     var
         Item: Record Item;
         RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
+        RSAuxSalesCrMemoHeader: Record "NPR RS Aux Sales CrMemo Header";
         RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         RSPaymentMethodMapping: Record "NPR RS Payment Method Mapping";
         RSPOSAuditLogAuxInfoReferent: Record "NPR RS POS Audit Log Aux. Info";
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
-        RSAuxSalesCrMemoHeader: Record "NPR RS Aux Sales CrMemo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         Certification: Dictionary of [Text, Text];
@@ -956,6 +1024,71 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JObjectHeader.WriteTo(JsonBodyTxt);
         exit(JsonBodyTxt);
     end;
+
+    local procedure CreateJsonForVoucherBasedOnReferenceDocument(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; NpRvArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry"; RSPOSPaymMethMapping: Record "NPR RS POS Paym. Meth. Mapping"; var JObjectHeader: JsonObject)
+    var
+        Item: Record Item;
+        NpRvArchVoucherEntrySource: Record "NPR NpRv Arch. Voucher Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
+        RSPOSAuditLogAuxInfoReferent: Record "NPR RS POS Audit Log Aux. Info";
+        RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
+        JArray: JsonArray;
+        JArray2: JsonArray;
+        JObjectLines: JsonObject;
+        OtherPaymentItemPrefixLbl: Label '00:', Locked = true;
+        ItemName: Text;
+    begin
+        NpRvArchVoucherEntrySource.SetRange("Entry Type", NpRvArchVoucherEntry."Entry Type"::"Issue Voucher");
+        NpRvArchVoucherEntrySource.SetRange("Arch. Voucher No.", NpRvArchVoucherEntry."Arch. Voucher No.");
+        if NpRvArchVoucherEntrySource.FindFirst() then begin
+            RSPOSAuditLogAuxInfoReferent.SetRange("Audit Entry Type", RSPOSAuditLogAuxInfoReferent."Audit Entry Type"::"POS Entry");
+            RSPOSAuditLogAuxInfoReferent.SetRange("Source Document No.", NpRvArchVoucherEntrySource."Document No.");
+            RSPOSAuditLogAuxInfoReferent.FindFirst();
+            JObjectHeader.Add('referentDocumentNumber', RSPOSAuditLogAuxInfoReferent."Invoice Number");
+            JObjectHeader.Add('referentDocumentDT', RSPOSAuditLogAuxInfoReferent."SDC DateTime");
+            Clear(JObjectLines);
+            JObjectLines.Add('omitQRCodeGen', 1);
+            JObjectLines.Add('omitTextualRepresentation', 0);
+            JObjectHeader.Add('options', JObjectLines);
+            POSEntrySalesLine.Reset();
+            POSEntrySalesLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfoReferent."POS Entry No.");
+            POSEntrySalesLine.SetFilter(Type, '%1', POSEntrySalesLine.Type::Voucher);
+            Clear(JArray);
+            if POSEntrySalesLine.FindSet() then
+                repeat
+                    Clear(ItemName);
+                    Clear(JObjectLines);
+                    Clear(JArray2);
+                    if not (RSPOSAuditLogAuxInfo."POS Entry Type" in [RSPOSAuditLogAuxInfo."POS Entry Type"::"Credit Sale"]) and
+                        RSPOSPaymMethMapping.Find() then
+                        if RSPOSPaymMethMapping."RS Payment Method" in [RSPOSPaymMethMapping."RS Payment Method"::Other] then
+                            ItemName := OtherPaymentItemPrefixLbl;
+                    if StrLen(POSEntrySalesLine."Description 2") > 0 then
+                        ItemName += POSEntrySalesLine.Description + ',' + POSEntrySalesLine."Description 2"
+                    else
+                        ItemName += POSEntrySalesLine.Description;
+                    JObjectLines.Add('name', ItemName);
+                    case POSEntrySalesLine.Type of
+                        POSEntrySalesLine.Type::Item:
+                            begin
+                                POSEntrySalesLine.GetItem(Item);
+                                if Item.GTIN <> '' then
+                                    JObjectLines.Add('GTIN', Item.GTIN);
+                            end;
+                    end;
+                    JObjectLines.Add('quantity', Abs(POSEntrySalesLine.Quantity));
+                    JObjectLines.Add('unitPrice', Abs(Round((POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity), 0.01)));
+                    RSVATPostSetupMapping.Get(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group");
+                    RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
+                    JArray2.Add(RSAllowedTaxRates."Tax Category Rate Label");
+                    JObjectLines.Add('labels', JArray2);
+                    JObjectLines.Add('totalAmount', Abs(POSEntrySalesLine."Amount Incl. VAT"));
+                    JArray.Add(JObjectLines);
+                until POSEntrySalesLine.Next() = 0;
+            JObjectHeader.Add('items', JArray);
+        end;
+    end;
     #endregion
 
     #region JSON Fiscal Parsers
@@ -995,7 +1128,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
         JsonHeader.Get('journal', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSPOSAuditLogAuxInfo.Journal := DelChr(TempResult, '=', '"');
+        RSPOSAuditLogAuxInfo.SetTextToJournal(DelChr(TempResult, '=', '"'));
 
         JsonHeader.Get('signedBy', JsonTok);
         JsonTok.WriteTo(TempResult);
@@ -1134,7 +1267,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
         JsonHeader.Get('journal', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSPOSAuditLogAuxInfo.Journal := DelChr(TempResult, '=', '"');
+        RSPOSAuditLogAuxInfo.SetTextToJournal(DelChr(TempResult, '=', '"'));
 
         JsonHeader.Get('signedBy', JsonTok);
         JsonTok.WriteTo(TempResult);
@@ -1211,9 +1344,9 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     var
         Customer: Record Customer;
         POSUnit: Record "NPR POS Unit";
+        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
         RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
         SalesInvoiceLine: Record "Sales Invoice Line";
         JsonHeader: JsonObject;
         JsonTok: JsonToken;
@@ -1275,7 +1408,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
         JsonHeader.Get('journal', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSPOSAuditLogAuxInfo.Journal := DelChr(TempResult, '=', '"');
+        RSPOSAuditLogAuxInfo.SetTextToJournal(DelChr(TempResult, '=', '"'));
 
         JsonHeader.Get('signedBy', JsonTok);
         JsonTok.WriteTo(TempResult);
@@ -1328,7 +1461,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JsonHeader.Get('mrc', JsonTok);
         JsonTok.WriteTo(TempResult);
         RSPOSAuditLogAuxInfo.Mrc := DelChr(TempResult, '=', '"');
-#pragma warning restore 
+#pragma warning restore
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
         SalesInvoiceLine.FindSet();
         repeat
@@ -1348,10 +1481,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     var
         Customer: Record Customer;
         POSUnit: Record "NPR POS Unit";
+        RSAuxSalesCrMemoHeader: Record "NPR RS Aux Sales CrMemo Header";
         RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
         RSPaymentMethodMapping: Record "NPR RS Payment Method Mapping";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-        RSAuxSalesCrMemoHeader: Record "NPR RS Aux Sales CrMemo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         JsonHeader: JsonObject;
         JsonTok: JsonToken;
@@ -1412,7 +1545,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
         JsonHeader.Get('journal', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSPOSAuditLogAuxInfo.Journal := DelChr(TempResult, '=', '"');
+        RSPOSAuditLogAuxInfo.SetTextToJournal(DelChr(TempResult, '=', '"'));
 
         JsonHeader.Get('signedBy', JsonTok);
         JsonTok.WriteTo(TempResult);
@@ -1465,7 +1598,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JsonHeader.Get('mrc', JsonTok);
         JsonTok.WriteTo(TempResult);
         RSPOSAuditLogAuxInfo.Mrc := DelChr(TempResult, '=', '"');
-#pragma warning restore 
+#pragma warning restore
         SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
         SalesCrMemoLine.FindSet();
         repeat
@@ -1546,7 +1679,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
         JsonHeader.Get('journal', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSPOSAuditLogAuxCopy.Journal := DelChr(TempResult, '=', '"');
+        RSPOSAuditLogAuxCopy.SetTextToJournal(DelChr(TempResult, '=', '"'));
 
         JsonHeader.Get('signedBy', JsonTok);
         JsonTok.WriteTo(TempResult);
@@ -1599,7 +1732,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JsonHeader.Get('mrc', JsonTok);
         JsonTok.WriteTo(TempResult);
         RSPOSAuditLogAuxCopy.Mrc := DelChr(TempResult, '=', '"');
-#pragma warning restore 
+#pragma warning restore
         RSPOSAuditLogAuxCopy."Fiscal Processing Time" := CurrentDateTime - StartTime;
 
         RSPOSAuditLogAuxCopy.Insert();
@@ -1666,7 +1799,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JsonHeader2.SelectToken('taxpayerAdminPortal', JsonTok);
         JsonTok.WriteTo(TempResult);
         RSFiscalisationSetup."Root URL" := DelChr(TempResult, '=', '"');
-#pragma warning restore 
+#pragma warning restore
         RSFiscalisationSetup.Modify();
     end;
 
@@ -1918,10 +2051,88 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     end;
     #endregion
 
+    #region Automated Test Mockup Helpers
+    procedure TestFillRSAuditFromNormalSaleAndRefundResponse(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; ResponseText: Text; StartTime: DateTime)
+    begin
+        FillRSAuditFromNormalSaleAndRefundResponse(RSPOSAuditLogAuxInfo, ResponseText, StartTime);
+    end;
+
+    procedure TestFillRSAuditFromNormalSaleAndRefundResponse(var SalesInvoiceHeader: Record "Sales Invoice Header"; ResponseText: Text; StartTime: DateTime)
+    begin
+        FillRSAuditFromNormalSaleAndRefundResponse(SalesInvoiceHeader, ResponseText, StartTime);
+    end;
+
+    procedure TestFillRSAuditFromNormalSaleAndRefundResponse(var SalesHeader: Record "Sales Header"; ResponseText: Text; Refund: Boolean; ModifySalesHeader: Boolean; StartTime: DateTime)
+    begin
+        FillRSAuditFromNormalSaleAndRefundResponse(SalesHeader, ResponseText, Refund, ModifySalesHeader, StartTime);
+    end;
+
+    procedure TestFillRSAuditFromNormalSaleAndRefundResponse(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; ResponseText: Text; StartTime: DateTime)
+    begin
+        FillRSAuditFromNormalSaleAndRefundResponse(SalesCrMemoHeader, ResponseText, StartTime);
+    end;
+
+    procedure TextFillSUFConfigurationSetup(ResponseText: Text)
+    begin
+        FillSUFConfigurationSetup(ResponseText);
+    end;
+
+    procedure TestFillAllowedTaxRates(ResponseText: Text; Silent: Boolean)
+    begin
+        FillAllowedTaxRates(ResponseText, Silent);
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForSUFConfiguration(RequestMessage: HttpRequestMessage; var ResponseText: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForAllowedTaxRates(RequestMessage: HttpRequestMessage; var ResponseText: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForNormalSale(RequestMessage: HttpRequestMessage; var ResponseText: Text; var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; StartTime: DateTime; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForNormalSaleDocument(RequestMessage: HttpRequestMessage; var ResponseText: Text; var SalesInvoiceHeader: Record "Sales Invoice Header"; StartTime: DateTime; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForProformaSale(RequestMessage: HttpRequestMessage; var ResponseText: Text; var SalesHeader: Record "Sales Header"; StartTime: DateTime; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSendHttpRequestForNormalRefund(RequestMessage: HttpRequestMessage; var ResponseText: Text; var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; StartTime: DateTime; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSendHttpRequestForNormalRefundDocument(RequestMessage: HttpRequestMessage; var ResponseText: Text; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; StartTime: DateTime; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSendHttpRequestForProformaRefund(RequestMessage: HttpRequestMessage; var ResponseText: Text; var SalesHeader: Record "Sales Header"; StartTime: DateTime; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSendHttpRequestForVerifyPin(RequestMessage: HttpRequestMessage; var ResponseText: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    #endregion
+
     var
+        CustomerVATRegNoRSLabel: Label '10:', Locked = true;
         FinishEventIdTok: Label 'NPR_RS_FISCAL', Locked = true;
+        JSONReadErr: Label 'JSON can''t be read from response text.';
         RSFiscalReceiptFiscalisedLbl: Label 'RS Fiscal Receipt Fiscalised';
         RSFiscalReceiptNotFiscalisedLbl: Label 'RS Fiscal Receipt Error';
-        CustomerVATRegNoRSLabel: Label '10:', Locked = true;
-        JSONReadErr: Label 'JSON can''t be read from response text.';
 }

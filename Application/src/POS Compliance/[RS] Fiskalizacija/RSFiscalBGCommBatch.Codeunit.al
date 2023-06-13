@@ -9,7 +9,7 @@ codeunit 6059936 "NPR RS Fiscal BG Comm. Batch"
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
     begin
-        RSPOSAuditLogAuxInfo.SetFilter(Journal, '%1', '');
+        RSPOSAuditLogAuxInfo.SetFilter(Signature, '%1', '');
         if RSPOSAuditLogAuxInfo.IsEmpty() then
             exit;
         RSPOSAuditLogAuxInfo.FindSet();
