@@ -6,7 +6,7 @@
     trigger OnInstallAppPerCompany()
     begin
         InitPOSSalesWorkflowSteps();
-        InitExchangeLabelSetup();
+        InitSetupTables();
     end;
 
     local procedure InitPOSSalesWorkflowSteps()
@@ -18,6 +18,14 @@
             repeat
                 POSSalesWorkflow.InitPOSSalesWorkflowSteps();
             until POSSalesWorkflow.Next() = 0;
+    end;
+
+    local procedure InitSetupTables()
+    var
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
+    begin
+        InitExchangeLabelSetup();
+        JobQueueManagement.InitJobQueueRefreshSetup();
     end;
 
     local procedure InitExchangeLabelSetup()
