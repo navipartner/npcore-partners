@@ -26,7 +26,6 @@
                 }
                 field("Quantity to Print"; Rec."Quantity to Print")
                 {
-
                     ToolTip = 'Specifies the value of the Quantity to Print field';
                     ApplicationArea = NPRRetail;
                 }
@@ -46,13 +45,11 @@
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Vendor Item No."; Rec."Vend Item No.")
                 {
-
                     ToolTip = 'Specifies the value of the Vendor Item No. field';
                     ApplicationArea = NPRRetail;
                 }
@@ -84,7 +81,6 @@
                 }
                 field("Last Direct Cost"; Rec."Last Direct Cost")
                 {
-
                     ToolTip = 'Specifies the value of the Last Direct Cost field';
                     ApplicationArea = NPRRetail;
                 }
@@ -225,7 +221,6 @@
                     ToolTip = 'Specifies the value of the Vendor Name field';
                     ApplicationArea = NPRRetail;
                 }
-
                 field("Cannot edit unit price"; Rec."Cannot edit unit price")
                 {
                     Visible = false;
@@ -252,11 +247,23 @@
         }
     }
 
+    [IntegrationEvent(true, false)]
+    procedure OnBeforeOnNewRecord(var isHandled: Boolean; var PrintParam: Boolean)
+    begin
+    end;
+
     trigger OnAfterGetRecord()
     var
         RecRef: RecordRef;
+        IsHandled: Boolean;
     begin
         Rec.CalcProfit();
+
+        IsHandled := false;
+        OnBeforeOnNewRecord(IsHandled, Print);
+        if IsHandled then
+            exit;
+
         RecRef.GetTable(Rec);
         Print := LabelLibrary.SelectionContains(RecRef);
     end;
