@@ -61,9 +61,9 @@ codeunit 6150956 "NPR POS Action: RSAudit Lookup" implements "NPR IPOS Workflow"
     begin
         case ParameterShow of
             ParameterShow::AllFiscalised:
-                RSPOSAuditLogAuxInfo.SetFilter(Journal, '<>%1', '');
+                RSPOSAuditLogAuxInfo.SetFilter(Signature, '<>%1', '');
             ParameterShow::AllNonFiscalised:
-                RSPOSAuditLogAuxInfo.SetFilter(Journal, '%1', '');
+                RSPOSAuditLogAuxInfo.SetFilter(Signature, '%1', '');
         end;
         RSPOSAuditLogAuxInfoPage.SetTableView(RSPOSAuditLogAuxInfo);
         RSPOSAuditLogAuxInfoPage.RunModal();
@@ -76,7 +76,7 @@ codeunit 6150956 "NPR POS Action: RSAudit Lookup" implements "NPR IPOS Workflow"
         RSPOSAuditLogAuxInfoPage: Page "NPR RS POS Audit Log Aux. Info";
     begin
         RSPOSAuditLogAuxInfo.SetLoadFields("Audit Entry Type", "Audit Entry No.");
-        RSPOSAuditLogAuxInfo.SetFilter(Journal, '<>%1', '');
+        RSPOSAuditLogAuxInfo.SetFilter(Signature, '<>%1', '');
         RSPOSAuditLogAuxInfo.FindLast();
         RSPOSAuditLogAuxInfo2.SetRange("Audit Entry Type", RSPOSAuditLogAuxInfo."Audit Entry Type");
         RSPOSAuditLogAuxInfo2.SetRange("Audit Entry No.", RSPOSAuditLogAuxInfo."Audit Entry No.");

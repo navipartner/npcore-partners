@@ -11,163 +11,6 @@
       <rd:DataSourceID>059290cb-10a3-4a5b-9012-de040660f0cd</rd:DataSourceID>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="Vendor_No">
-          <DataField>Vendor_No</DataField>
-        </Field>
-        <Field Name="Vendor_Name">
-          <DataField>Vendor_Name</DataField>
-        </Field>
-        <Field Name="Request_Page_Filters">
-          <DataField>Request_Page_Filters</DataField>
-        </Field>
-        <Field Name="Company_Name">
-          <DataField>Company_Name</DataField>
-        </Field>
-        <Field Name="Show_Items">
-          <DataField>Show_Items</DataField>
-        </Field>
-        <Field Name="NumberOfLevels">
-          <DataField>NumberOfLevels</DataField>
-        </Field>
-        <Field Name="ItemCategory_Code">
-          <DataField>ItemCategory_Code</DataField>
-        </Field>
-        <Field Name="ItemCategory_Description">
-          <DataField>ItemCategory_Description</DataField>
-        </Field>
-        <Field Name="ItemCategory_Indentation">
-          <DataField>ItemCategory_Indentation</DataField>
-        </Field>
-        <Field Name="ItemCategory_PresentationOrder">
-          <DataField>ItemCategory_PresentationOrder</DataField>
-        </Field>
-        <Field Name="ItemCategory_ParentCategory">
-          <DataField>ItemCategory_ParentCategory</DataField>
-        </Field>
-        <Field Name="Item_No">
-          <DataField>Item_No</DataField>
-        </Field>
-        <Field Name="Item_Description">
-          <DataField>Item_Description</DataField>
-        </Field>
-        <Field Name="Item_VendorItemNo">
-          <DataField>Item_VendorItemNo</DataField>
-        </Field>
-        <Field Name="Item_ItemCategory">
-          <DataField>Item_ItemCategory</DataField>
-        </Field>
-        <Field Name="Item_SalesQty">
-          <DataField>Item_SalesQty</DataField>
-        </Field>
-        <Field Name="Item_SalesQtyFormat">
-          <DataField>Item_SalesQtyFormat</DataField>
-        </Field>
-        <Field Name="Item_PurchasesQty">
-          <DataField>Item_PurchasesQty</DataField>
-        </Field>
-        <Field Name="Item_PurchasesQtyFormat">
-          <DataField>Item_PurchasesQtyFormat</DataField>
-        </Field>
-        <Field Name="Item_SalesLCY">
-          <DataField>Item_SalesLCY</DataField>
-        </Field>
-        <Field Name="Item_SalesLCYFormat">
-          <DataField>Item_SalesLCYFormat</DataField>
-        </Field>
-        <Field Name="Item_InventoryQty">
-          <DataField>Item_InventoryQty</DataField>
-        </Field>
-        <Field Name="Item_InventoryQtyFormat">
-          <DataField>Item_InventoryQtyFormat</DataField>
-        </Field>
-        <Field Name="Item_InventoryValue">
-          <DataField>Item_InventoryValue</DataField>
-        </Field>
-        <Field Name="Item_InventoryValueFormat">
-          <DataField>Item_InventoryValueFormat</DataField>
-        </Field>
-        <Field Name="Item_Profit">
-          <DataField>Item_Profit</DataField>
-        </Field>
-        <Field Name="Item_ProfitFormat">
-          <DataField>Item_ProfitFormat</DataField>
-        </Field>
-        <Field Name="Item_COGSLCY">
-          <DataField>Item_COGSLCY</DataField>
-        </Field>
-        <Field Name="Item_COGSLCYFormat">
-          <DataField>Item_COGSLCYFormat</DataField>
-        </Field>
-        <Field Name="ItemCategory2_Code">
-          <DataField>ItemCategory2_Code</DataField>
-        </Field>
-        <Field Name="ItemCategory2_Description">
-          <DataField>ItemCategory2_Description</DataField>
-        </Field>
-        <Field Name="Item2_No">
-          <DataField>Item2_No</DataField>
-        </Field>
-        <Field Name="Item2_Description">
-          <DataField>Item2_Description</DataField>
-        </Field>
-        <Field Name="Item2_VendorItemNo">
-          <DataField>Item2_VendorItemNo</DataField>
-        </Field>
-        <Field Name="Item2_ItemCategory">
-          <DataField>Item2_ItemCategory</DataField>
-        </Field>
-        <Field Name="Item2_PurchasesQty">
-          <DataField>Item2_PurchasesQty</DataField>
-        </Field>
-        <Field Name="Item2_PurchasesQtyFormat">
-          <DataField>Item2_PurchasesQtyFormat</DataField>
-        </Field>
-        <Field Name="Item2_SalesQty">
-          <DataField>Item2_SalesQty</DataField>
-        </Field>
-        <Field Name="Item2_SalesQtyFormat">
-          <DataField>Item2_SalesQtyFormat</DataField>
-        </Field>
-        <Field Name="Item2_SalesLCY">
-          <DataField>Item2_SalesLCY</DataField>
-        </Field>
-        <Field Name="Item2_SalesLCYFormat">
-          <DataField>Item2_SalesLCYFormat</DataField>
-        </Field>
-        <Field Name="Item2_InventoryQty">
-          <DataField>Item2_InventoryQty</DataField>
-        </Field>
-        <Field Name="Item2_InventoryQtyFormat">
-          <DataField>Item2_InventoryQtyFormat</DataField>
-        </Field>
-        <Field Name="Item2_InventoryValue">
-          <DataField>Item2_InventoryValue</DataField>
-        </Field>
-        <Field Name="Item2_InventoryValueFormat">
-          <DataField>Item2_InventoryValueFormat</DataField>
-        </Field>
-        <Field Name="Item2_Profit">
-          <DataField>Item2_Profit</DataField>
-        </Field>
-        <Field Name="Item2_ProfitFormat">
-          <DataField>Item2_ProfitFormat</DataField>
-        </Field>
-        <Field Name="Item2_COGSLCY">
-          <DataField>Item2_COGSLCY</DataField>
-        </Field>
-        <Field Name="Item2_COGSLCYFormat">
-          <DataField>Item2_COGSLCYFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -4127,4 +3970,161 @@ End Function
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
   <rd:ReportID>89bf19c4-285a-49eb-86ff-cf064422a9cb</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="Vendor_No">
+          <DataField>Vendor_No</DataField>
+        </Field>
+        <Field Name="Vendor_Name">
+          <DataField>Vendor_Name</DataField>
+        </Field>
+        <Field Name="Request_Page_Filters">
+          <DataField>Request_Page_Filters</DataField>
+        </Field>
+        <Field Name="Company_Name">
+          <DataField>Company_Name</DataField>
+        </Field>
+        <Field Name="Show_Items">
+          <DataField>Show_Items</DataField>
+        </Field>
+        <Field Name="NumberOfLevels">
+          <DataField>NumberOfLevels</DataField>
+        </Field>
+        <Field Name="ItemCategory_Code">
+          <DataField>ItemCategory_Code</DataField>
+        </Field>
+        <Field Name="ItemCategory_Description">
+          <DataField>ItemCategory_Description</DataField>
+        </Field>
+        <Field Name="ItemCategory_Indentation">
+          <DataField>ItemCategory_Indentation</DataField>
+        </Field>
+        <Field Name="ItemCategory_PresentationOrder">
+          <DataField>ItemCategory_PresentationOrder</DataField>
+        </Field>
+        <Field Name="ItemCategory_ParentCategory">
+          <DataField>ItemCategory_ParentCategory</DataField>
+        </Field>
+        <Field Name="Item_No">
+          <DataField>Item_No</DataField>
+        </Field>
+        <Field Name="Item_Description">
+          <DataField>Item_Description</DataField>
+        </Field>
+        <Field Name="Item_VendorItemNo">
+          <DataField>Item_VendorItemNo</DataField>
+        </Field>
+        <Field Name="Item_ItemCategory">
+          <DataField>Item_ItemCategory</DataField>
+        </Field>
+        <Field Name="Item_SalesQty">
+          <DataField>Item_SalesQty</DataField>
+        </Field>
+        <Field Name="Item_SalesQtyFormat">
+          <DataField>Item_SalesQtyFormat</DataField>
+        </Field>
+        <Field Name="Item_PurchasesQty">
+          <DataField>Item_PurchasesQty</DataField>
+        </Field>
+        <Field Name="Item_PurchasesQtyFormat">
+          <DataField>Item_PurchasesQtyFormat</DataField>
+        </Field>
+        <Field Name="Item_SalesLCY">
+          <DataField>Item_SalesLCY</DataField>
+        </Field>
+        <Field Name="Item_SalesLCYFormat">
+          <DataField>Item_SalesLCYFormat</DataField>
+        </Field>
+        <Field Name="Item_InventoryQty">
+          <DataField>Item_InventoryQty</DataField>
+        </Field>
+        <Field Name="Item_InventoryQtyFormat">
+          <DataField>Item_InventoryQtyFormat</DataField>
+        </Field>
+        <Field Name="Item_InventoryValue">
+          <DataField>Item_InventoryValue</DataField>
+        </Field>
+        <Field Name="Item_InventoryValueFormat">
+          <DataField>Item_InventoryValueFormat</DataField>
+        </Field>
+        <Field Name="Item_Profit">
+          <DataField>Item_Profit</DataField>
+        </Field>
+        <Field Name="Item_ProfitFormat">
+          <DataField>Item_ProfitFormat</DataField>
+        </Field>
+        <Field Name="Item_COGSLCY">
+          <DataField>Item_COGSLCY</DataField>
+        </Field>
+        <Field Name="Item_COGSLCYFormat">
+          <DataField>Item_COGSLCYFormat</DataField>
+        </Field>
+        <Field Name="ItemCategory2_Code">
+          <DataField>ItemCategory2_Code</DataField>
+        </Field>
+        <Field Name="ItemCategory2_Description">
+          <DataField>ItemCategory2_Description</DataField>
+        </Field>
+        <Field Name="Item2_No">
+          <DataField>Item2_No</DataField>
+        </Field>
+        <Field Name="Item2_Description">
+          <DataField>Item2_Description</DataField>
+        </Field>
+        <Field Name="Item2_VendorItemNo">
+          <DataField>Item2_VendorItemNo</DataField>
+        </Field>
+        <Field Name="Item2_ItemCategory">
+          <DataField>Item2_ItemCategory</DataField>
+        </Field>
+        <Field Name="Item2_PurchasesQty">
+          <DataField>Item2_PurchasesQty</DataField>
+        </Field>
+        <Field Name="Item2_PurchasesQtyFormat">
+          <DataField>Item2_PurchasesQtyFormat</DataField>
+        </Field>
+        <Field Name="Item2_SalesQty">
+          <DataField>Item2_SalesQty</DataField>
+        </Field>
+        <Field Name="Item2_SalesQtyFormat">
+          <DataField>Item2_SalesQtyFormat</DataField>
+        </Field>
+        <Field Name="Item2_SalesLCY">
+          <DataField>Item2_SalesLCY</DataField>
+        </Field>
+        <Field Name="Item2_SalesLCYFormat">
+          <DataField>Item2_SalesLCYFormat</DataField>
+        </Field>
+        <Field Name="Item2_InventoryQty">
+          <DataField>Item2_InventoryQty</DataField>
+        </Field>
+        <Field Name="Item2_InventoryQtyFormat">
+          <DataField>Item2_InventoryQtyFormat</DataField>
+        </Field>
+        <Field Name="Item2_InventoryValue">
+          <DataField>Item2_InventoryValue</DataField>
+        </Field>
+        <Field Name="Item2_InventoryValueFormat">
+          <DataField>Item2_InventoryValueFormat</DataField>
+        </Field>
+        <Field Name="Item2_Profit">
+          <DataField>Item2_Profit</DataField>
+        </Field>
+        <Field Name="Item2_ProfitFormat">
+          <DataField>Item2_ProfitFormat</DataField>
+        </Field>
+        <Field Name="Item2_COGSLCY">
+          <DataField>Item2_COGSLCY</DataField>
+        </Field>
+        <Field Name="Item2_COGSLCYFormat">
+          <DataField>Item2_COGSLCYFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

@@ -90,6 +90,13 @@
         {
             Caption = 'Journal';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Changing field to be Media type. New field: Receipt Content';
+        }
+        field(17; "Receipt Content"; Media)
+        {
+            Caption = 'Receipt Content';
+            DataClassification = CustomerContent;
         }
         field(18; "Ecrypted Internal Data"; Text[512])
         {
@@ -206,4 +213,28 @@
         {
         }
     }
+
+    procedure GetTextFromJournal() JournalText: Text;
+    var
+        TempBlob: Codeunit "Temp Blob";
+        OutStream: OutStream;
+        InStream: InStream;
+    begin
+        TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
+        Rec."Receipt Content".ExportStream(OutStream);
+        TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
+        InStream.ReadText(JournalText);
+    end;
+
+    procedure SetTextToJournal(JournalText: Text)
+    var
+        TempBlob: Codeunit "Temp Blob";
+        OutStream: OutStream;
+        InStream: InStream;
+    begin
+        TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
+        OutStream.WriteText(JournalText);
+        TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
+        Rec."Receipt Content".ImportStream(InStream, Rec.FieldCaption("Receipt Content"));
+    end;
 }

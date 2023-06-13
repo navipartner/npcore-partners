@@ -110,6 +110,8 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
         IssueVoucherMgtB.IssueVoucherCreate(POSSaleLine, TempVoucher, VoucherType, DiscountType, Quantity, Amount, Discount);
         IssueVoucherMgtB.CreateNpRvSalesLine(POSSale, NpRvSalesLine, TempVoucher, VoucherType, POSSaleLine);
 
+        OnIssueVoucherBeforeNpRvSalesLineModify(POSSale, NpRvSalesLine, TempVoucher, VoucherType, POSSaleLine);
+
         Context.SetScopeRoot();
         NpRvSalesLine."Send via Print" := Context.GetBoolean('SendMethodPrint');
         NpRvSalesLine."Send via E-mail" := Context.GetBoolean('SendMethodEmail');
@@ -215,6 +217,11 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
         end;
 
         NpRvVoucherType.Get(POSParameterValue.Value);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnIssueVoucherBeforeNpRvSalesLineModify(var POSSale: Codeunit "NPR POS Sale"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; var TempVoucher: Record "NPR NpRv Voucher" temporary; var VoucherType: Record "NPR NpRv Voucher Type"; var POSSaleLine: Codeunit "NPR POS Sale Line")
+    begin
     end;
 
 }

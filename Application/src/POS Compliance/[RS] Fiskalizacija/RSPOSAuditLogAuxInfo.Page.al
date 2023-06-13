@@ -141,7 +141,7 @@
                     RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
                     AlreadySentMsg: Label 'Fiscal Bill has already been sent to Tax Auth.';
                 begin
-                    if Rec.Journal <> '' then begin
+                    if Rec.Signature <> '' then begin
                         Message(AlreadySentMsg);
                         exit;
                     end;
@@ -172,7 +172,7 @@
                 var
                     RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
                 begin
-                    if Rec.Journal = '' then begin
+                    if Rec.Signature = '' then begin
                         Message(FiscalNotSentMsg);
                         exit;
                     end;
@@ -198,9 +198,9 @@
                     ToolTip = 'Executing this action the original receipt will be printed without a copy non-fiscal receipt.';
                     trigger OnAction()
                     var
-                        RSPTFPITryPrint: Codeunit "NPR RS PTFPI Try Print";
+                        RSPTFPITryPrint: Codeunit "NPR RS Fiscal Thermal Print";
                     begin
-                        if Rec.Journal = '' then begin
+                        if Rec.Signature = '' then begin
                             Message(FiscalNotSentMsg);
                             exit;
                         end;
@@ -220,7 +220,7 @@
                     trigger OnAction()
                     var
                         RSPOSAuditLogAuxCopy: Record "NPR RS POS Audit Log Aux. Copy";
-                        RSPTFPITryPrint: Codeunit "NPR RS PTFPI Try Print";
+                        RSPTFPITryPrint: Codeunit "NPR RS Fiscal Thermal Print";
                     begin
                         Rec.CalcFields("Fiscal Bill Copies");
                         if not Rec."Fiscal Bill Copies" then
@@ -228,7 +228,7 @@
                         RSPOSAuditLogAuxCopy.SetRange("Audit Entry Type", Rec."Audit Entry Type");
                         RSPOSAuditLogAuxCopy.SetRange("Audit Entry No.", Rec."Audit Entry No.");
                         RSPOSAuditLogAuxCopy.FindLast();
-                        if RSPOSAuditLogAuxCopy.Journal = '' then begin
+                        if RSPOSAuditLogAuxCopy.Signature = '' then begin
                             Message(FiscalNotSentMsg);
                             exit;
                         end;
@@ -247,9 +247,9 @@
                     trigger OnAction()
                     var
                         RSPOSAuditLogAuxCopy: Record "NPR RS POS Audit Log Aux. Copy";
-                        RSPTFPITryPrint: Codeunit "NPR RS PTFPI Try Print";
+                        RSPTFPITryPrint: Codeunit "NPR RS Fiscal Thermal Print";
                     begin
-                        if Rec.Journal = '' then begin
+                        if Rec.Signature = '' then begin
                             Message(FiscalNotSentMsg);
                             exit;
                         end;
@@ -260,7 +260,7 @@
                         RSPOSAuditLogAuxCopy.SetRange("Audit Entry Type", Rec."Audit Entry Type");
                         RSPOSAuditLogAuxCopy.SetRange("Audit Entry No.", Rec."Audit Entry No.");
                         RSPOSAuditLogAuxCopy.FindLast();
-                        if RSPOSAuditLogAuxCopy.Journal = '' then begin
+                        if RSPOSAuditLogAuxCopy.Signature = '' then begin
                             Message(FiscalNotSentMsg);
                             exit;
                         end;
@@ -280,7 +280,7 @@
                     var
                         RSFiscalBillA4v1: Report "NPR RS Fiscal Bill A4 v1";
                     begin
-                        if Rec.Journal = '' then begin
+                        if Rec.Signature = '' then begin
                             Message(FiscalNotSentMsg);
                             exit;
                         end;
@@ -301,7 +301,7 @@
                     var
                         RSFiscalBillA4v2: Report "NPR RS Fiscal Bill A4 V2";
                     begin
-                        if Rec.Journal = '' then begin
+                        if Rec.Signature = '' then begin
                             Message(FiscalNotSentMsg);
                             exit;
                         end;
@@ -419,7 +419,7 @@
 
     trigger OnAfterGetRecord()
     begin
-        SentFiscalToTax := Rec.Journal <> '';
+        SentFiscalToTax := Rec.Signature <> '';
     end;
 
     var

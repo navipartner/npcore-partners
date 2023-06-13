@@ -28,6 +28,12 @@ codeunit 6059942 "NPR RS Audit Mgt."
     #endregion
 
     #region Subscribers - POS Management
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Issue POSAction Mgt.", 'OnIssueVoucherBeforeNpRvSalesLineModify', '', false, false)]
+    local procedure OnIssueVoucherBeforeNpRvSalesLineModify(var POSSale: Codeunit "NPR POS Sale"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; var TempVoucher: Record "NPR NpRv Voucher" temporary; var VoucherType: Record "NPR NpRv Voucher Type"; var POSSaleLine: Codeunit "NPR POS Sale Line");
+    begin
+        FillVATPostingGroupsOnIssueVoucher(POSSale, TempVoucher, POSSaleLine);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeInitSale', '', false, false)]
     local procedure OnBeforeInitSale(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
@@ -52,7 +58,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-        RSPTFPITryPrint: Codeunit "NPR RS PTFPI Try Print";
+        RSPTFPITryPrint: Codeunit "NPR RS Fiscal Thermal Print";
         RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
     begin
         if not POSUnit.Get(SalePOS."Register No.") then
@@ -85,7 +91,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-        RSPTFPITryPrint: Codeunit "NPR RS PTFPI Try Print";
+        RSPTFPITryPrint: Codeunit "NPR RS Fiscal Thermal Print";
         RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
     begin
         if not POSUnit.Get(SalePOS."Register No.") then
@@ -174,9 +180,9 @@ codeunit 6059942 "NPR RS Audit Mgt."
             EanBoxEvent.Code := EventCodeItemGtin();
             EanBoxEvent."Module Name" := CopyStr(Item.TableCaption, 1, MaxStrLen(EanBoxEvent."Module Name"));
             EanBoxEvent.Description := CopyStr(Item.FieldCaption(GTIN), 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := CopyStr(Format(enum::"NPR POS Workflow"::ITEM), 1, MaxStrLen(EanBoxEvent."Action Code"));
+            EanBoxEvent."Action Code" := CopyStr(Format(Enum::"NPR POS Workflow"::ITEM), 1, MaxStrLen(EanBoxEvent."Action Code"));
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
-            EanBoxEvent."Event Codeunit" := CODEUNIT::"NPR POS Action: Insert Item";
+            EanBoxEvent."Event Codeunit" := Codeunit::"NPR POS Action: Insert Item";
             EanBoxEvent.Insert(true);
         end;
     end;
@@ -453,8 +459,10 @@ codeunit 6059942 "NPR RS Audit Mgt."
 
     #region Procedures - Helper functions
     local procedure OnActionShowSetup()
+    var
+        RSFiscalisationSetup: Page "NPR RS Fiscalisation Setup";
     begin
-        Page.RunModal(Page::"NPR RS Fiscalisation Setup");
+        RSFiscalisationSetup.RunModal();
     end;
 
     procedure HandlerCode(): Text
@@ -489,12 +497,12 @@ codeunit 6059942 "NPR RS Audit Mgt."
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
-        if Initialized then
-            exit(Enabled);
         if not POSAuditProfile.Get(POSAuditProfileCode) then
             exit(false);
         if POSAuditProfile."Audit Handler" <> HandlerCode() then
             exit(false);
+        if Initialized then
+            exit(Enabled);
         Initialized := true;
         Enabled := true;
         exit(true);
@@ -528,7 +536,6 @@ codeunit 6059942 "NPR RS Audit Mgt."
                         ApplicationAreaSetup."NPR RS Fiscal" := true;
                         ApplicationAreaSetup.Insert();
                     end;
-
                 end;
             false:
                 begin
@@ -851,10 +858,32 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit(RSPOSAuditLogAuxInfo."Source Document No.");
     end;
 
+    local procedure FillVATPostingGroupsOnIssueVoucher(var POSSale: Codeunit "NPR POS Sale"; var TempVoucher: Record "NPR NpRv Voucher" temporary; var POSSaleLine: Codeunit "NPR POS Sale Line")
+    var
+        GLAccount: Record "G/L Account";
+        POSSaleRecord: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSUnit: Record "NPR POS Unit";
+        VoucherAccountNoNotSetErr: Label 'Account No. is not set on Voucher.';
+    begin
+        POSSale.GetCurrentSale(POSSaleRecord);
+        POSUnit.Get(POSSaleRecord."Register No.");
+        if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+        if not GLAccount.Get(TempVoucher."Account No.") then
+            Error(VoucherAccountNoNotSetErr);
+        GLAccount.TestField("VAT Prod. Posting Group");
+        GLAccount.TestField("VAT Bus. Posting Group");
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        SaleLinePOS."VAT Bus. Posting Group" := GLAccount."VAT Bus. Posting Group";
+        SaleLinePOS."VAT Prod. Posting Group" := GLAccount."VAT Prod. Posting Group";
+        SaleLinePOS.Modify(false);
+    end;
+
     procedure TermalPrintSalesHeader(SalesHeader: Record "Sales Header")
     var
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-        RSPTFPITryPrint: Codeunit "NPR RS PTFPI Try Print";
+        RSPTFPITryPrint: Codeunit "NPR RS Fiscal Thermal Print";
         AuditLogNotExistingMsg: Label 'RS Audit Log is not existing for this document.';
         FiscalNotSentMsg: Label 'Fiscal Bill has not been sent to Tax Auth.';
     begin
@@ -865,7 +894,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             Message(AuditLogNotExistingMsg);
             exit;
         end;
-        if RSPOSAuditLogAuxInfo.Journal = '' then begin
+        if RSPOSAuditLogAuxInfo.Signature = '' then begin
             Message(FiscalNotSentMsg);
             exit;
         end;

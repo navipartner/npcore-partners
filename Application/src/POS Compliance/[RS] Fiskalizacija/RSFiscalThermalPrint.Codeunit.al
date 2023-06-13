@@ -1,4 +1,4 @@
-codeunit 6150981 "NPR RS PTFPI Try Print"
+codeunit 6150981 "NPR RS Fiscal Thermal Print"
 {
     Access = Internal;
 
@@ -24,7 +24,7 @@ codeunit 6150981 "NPR RS PTFPI Try Print"
         PrintRawInputText: Text;
         PrintText: Text;
     begin
-        PrintRawInputText := RSPOSAuditLogAuxInfo.Journal;
+        PrintRawInputText := RSPOSAuditLogAuxInfo.GetTextFromJournal();
         if StrLen(PrintRawInputText) = 0 then
             exit;
 
@@ -47,7 +47,7 @@ codeunit 6150981 "NPR RS PTFPI Try Print"
         PrinterDeviceSettings.Value := 'Windows-1251';
         PrinterDeviceSettings.Insert();
 
-        Printer.ProcessBuffer(Codeunit::"NPR RS PTFPI Try Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
 
         PrintDiscountNonFiscal(RSPOSAuditLogAuxInfo);
         PrintNonFiscalCopyForNormalRefund(RSPOSAuditLogAuxInfo);
@@ -64,7 +64,7 @@ codeunit 6150981 "NPR RS PTFPI Try Print"
         PrintRawInputText: Text;
         PrintText: Text;
     begin
-        PrintRawInputText := RSPOSAuditLogAuxCopy.Journal;
+        PrintRawInputText := RSPOSAuditLogAuxCopy.GetTextFromJournal();
         if StrLen(PrintRawInputText) = 0 then
             exit;
 
@@ -96,7 +96,7 @@ codeunit 6150981 "NPR RS PTFPI Try Print"
         PrinterDeviceSettings.Value := 'Windows-1251';
         PrinterDeviceSettings.Insert();
 
-        Printer.ProcessBuffer(Codeunit::"NPR RS PTFPI Try Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
     end;
     #endregion
 
@@ -127,7 +127,7 @@ codeunit 6150981 "NPR RS PTFPI Try Print"
         PrinterDeviceSettings.Value := 'Windows-1251';
         PrinterDeviceSettings.Insert();
 
-        Printer.ProcessBuffer(Codeunit::"NPR RS PTFPI Try Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
     end;
 
     local procedure PrintNonFiscalCopyForNormalRefund(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")

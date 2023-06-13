@@ -52,9 +52,9 @@ report 6014445 "NPR RS Fiscal Bill A4 V2"
                 RSAuditNotFiscalisedErrLbl: Label 'RS Audit Log %1 has not been fiscalised.', Comment = '%1 = Audit Entry No';
                 NewLine: Text;
             begin
-                if StrLen("NPR RS POS Audit Log Aux. Info".Journal) = 0 then
+                if StrLen("NPR RS POS Audit Log Aux. Info".GetTextFromJournal()) = 0 then
                     Error(RSAuditNotFiscalisedErrLbl, "NPR RS POS Audit Log Aux. Info"."Audit Entry No.");
-                ParseJournalTextToFields("NPR RS POS Audit Log Aux. Info".Journal);
+                ParseJournalTextToFields("NPR RS POS Audit Log Aux. Info".GetTextFromJournal());
 #if not BC17
                 QRCode := GenerateQRCode("NPR RS POS Audit Log Aux. Info"."Verification URL");
 #endif
