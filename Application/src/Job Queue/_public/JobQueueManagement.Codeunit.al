@@ -698,6 +698,22 @@
         RefreshRetentionPolicyJQ();
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
+    local procedure HandleOnCompanyInitialize()
+    begin
+        InitJobQueueRefreshSetup();
+    end;
+
+    internal procedure InitJobQueueRefreshSetup()
+    var
+        JobQueueRefreshSetup: Record "NPR Job Queue Refresh Setup";
+    begin
+        if not JobQueueRefreshSetup.Get() then begin
+            JobQueueRefreshSetup.Init();
+            JobQueueRefreshSetup.Insert();
+        end;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeScheduleNcTaskProcessing(var JobQueueEntry: Record "Job Queue Entry"; TaskProcessorCode: Code[20]; var EnableTaskListUpdate: Boolean; var JobQueueCatagoryCode: Code[10]; var Handled: Boolean)
     begin
