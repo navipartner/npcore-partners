@@ -7,9 +7,11 @@ codeunit 6150867 "NPR POS Action: Doc. Show" implements "NPR IPOS Workflow"
         CaptionSalesView: Label 'Doc. View';
         CaptionSelectCustomer: Label 'Select Customer';
         CaptionSelectType: Label 'Selection Method';
+        CaptionGroupCodeFilter: Label 'Group Code Filter';
         DescSalesView: Label 'Pre-filtered list of sales documents';
         DescSelectCustomer: Label 'Prompt for customer selection if none on sale';
         DescSelectType: Label 'Select via list or attempt to open any POS line related document.';
+        DescGroupCodeFilter: Label 'Specifies the group code filter on the sales list';
         OptionSelectType: Label 'List,SelectedLine', Locked = true;
         OptionSelectType_Caption: Label 'List,Selected Line';
     begin
@@ -25,6 +27,7 @@ codeunit 6150867 "NPR POS Action: Doc. Show" implements "NPR IPOS Workflow"
             CaptionSelectType,
             DescSelectType,
             OptionSelectType_Caption);
+        WorkflowConfig.AddTextParameter(ParameterGroupCodeFilter_Name(), '', CaptionGroupCodeFilter, DescGroupCodeFilter);
         WorkflowConfig.AddTextParameter(ParameterSOViewString_Name(), '', CaptionSalesView, DescSalesView);
     end;
 
@@ -48,14 +51,16 @@ codeunit 6150867 "NPR POS Action: Doc. Show" implements "NPR IPOS Workflow"
     var
         POSActionDocShowB: Codeunit "NPR POS Action: Doc. Show-B";
         SelectCustomer: Boolean;
+        GroupCodeFilter: Text;
         SelectType: Integer;
         SalesOrderViewString: Text;
     begin
         SelectType := Context.GetIntegerParameter(ParameterSelectType_Name());
         SalesOrderViewString := Context.GetStringParameter(ParameterSOViewString_Name());
         SelectCustomer := Context.GetBooleanParameter(ParameterSelectCustomer_Name());
+        GroupCodeFilter := Context.GetStringParameter(ParameterGroupCodeFilter_Name());
 
-        POSActionDocShowB.ShowSaleDocument(Sale, SaleLine, SelectCustomer, SelectType, SalesOrderViewString);
+        POSActionDocShowB.ShowSaleDocument(Sale, SaleLine, SelectCustomer, SelectType, SalesOrderViewString, GroupCodeFilter);
     end;
 
     local procedure ActionCode(): Code[20]
@@ -67,6 +72,7 @@ codeunit 6150867 "NPR POS Action: Doc. Show" implements "NPR IPOS Workflow"
     local procedure OnLookupValue(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
         SalesHeader: Record "Sales Header";
+        NPRGroupCodeUtils: Codeunit "NPR Group Code Utils";
         FilterPageBuilder: FilterPageBuilder;
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
@@ -82,6 +88,10 @@ codeunit 6150867 "NPR POS Action: Doc. Show" implements "NPR IPOS Workflow"
                     end;
                     if FilterPageBuilder.RunModal() then
                         POSParameterValue.Value := CopyStr(FilterPageBuilder.GetView(SalesHeader.TableCaption, false), 1, MaxStrLen(POSParameterValue.Value));
+                end;
+            ParameterGroupCodeFilter_Name():
+                begin
+                    NPRGroupCodeUtils.LookUpGroupCodeValue(POSParameterValue.Value);
                 end;
         end;
     end;
@@ -115,5 +125,11 @@ codeunit 6150867 "NPR POS Action: Doc. Show" implements "NPR IPOS Workflow"
     begin
         exit('SelectCustomer');
     end;
+
+    local procedure ParameterGroupCodeFilter_Name(): Text[30]
+    begin
+        exit('GroupCodeFilter');
+    end;
+
 
 }

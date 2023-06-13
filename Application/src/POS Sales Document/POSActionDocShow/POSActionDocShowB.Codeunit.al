@@ -1,7 +1,7 @@
 codeunit 6059963 "NPR POS Action: Doc. Show-B"
 {
     Access = Internal;
-    procedure ShowSaleDocument(Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; SelectCustomer: Boolean; SelectType: Integer; SalesOrderViewString: Text)
+    procedure ShowSaleDocument(Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; SelectCustomer: Boolean; SelectType: Integer; SalesOrderViewString: Text; GroupCodeFilter: Text)
     var
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -23,12 +23,30 @@ codeunit 6059963 "NPR POS Action: Doc. Show-B"
                 SalesHeader.SetView(SalesOrderViewString);
             if SalePOS."Customer No." <> '' then
                 SalesHeader.SetRange("Bill-to Customer No.", SalePOS."Customer No.");
+            SalesHeader.SetFilter("NPR Group Code", GroupCodeFilter);
             if not LookupSalesDoc(SalesHeader) then
                 exit;
         end;
 
         Page.RunModal(PageMgt.GetPageID(SalesHeader), SalesHeader);
     end;
+
+    procedure ShowSaleDocument(Sale: Codeunit "NPR POS Sale";
+                               SaleLine: Codeunit "NPR POS Sale Line";
+                               SelectCustomer: Boolean;
+                               SelectType: Integer;
+                               SalesOrderViewString: Text)
+    begin
+        ShowSaleDocument(Sale,
+                         SaleLine,
+                         SelectCustomer,
+                         SelectType,
+                         SalesOrderViewString,
+                         '');
+    end;
+
+
+
 
     local procedure LookupSalesDoc(var SalesHeader: Record "Sales Header"): Boolean
     begin
