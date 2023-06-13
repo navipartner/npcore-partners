@@ -1,7 +1,8 @@
 codeunit 85064 "NPR POS Act. Ins. Cus.Id Tests"
 {
+    EventSubscriberInstance = Manual;
     Subtype = Test;
-/*
+
     var
         _POSUnit: Record "NPR POS Unit";
         _Assert: Codeunit Assert;
@@ -14,12 +15,15 @@ codeunit 85064 "NPR POS Act. Ins. Cus.Id Tests"
     procedure InsertCustomerIdentification()
     var
         SalePOS: Record "NPR POS Sale";
-        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSSale: Codeunit "NPR POS Sale";
         RSPOSSale: Record "NPR RS POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryRSFiscal: Codeunit "NPR Library RS Fiscal";
+        POSSale: Codeunit "NPR POS Sale";
         NewDesc: Text;
     begin
         // [Scenario] Activate POS Session and add Additional Customer Identification to it
+        // [Given] Enable Mock response instead of real http response
+        BindSubscription(LibraryRSFiscal);
         // [Given] POS & Payment setup
         InitializeData();
 
@@ -33,6 +37,7 @@ codeunit 85064 "NPR POS Act. Ins. Cus.Id Tests"
         POSSale.GetCurrentSale(SalePOS);
         RSPOSSale.Get(SalePOS.SystemId);
         _Assert.IsTrue(RSPOSSale."RS Customer Identification" = NewDesc, 'New Customer Identification is not inserted.');
+        UnbindSubscription(LibraryRSFiscal);
     end;
 
     internal procedure InitializeData()
@@ -109,8 +114,8 @@ codeunit 85064 "NPR POS Act. Ins. Cus.Id Tests"
 
     local procedure AddAdditionalCustomerIdentification(var SalePOS: Record "NPR POS Sale"; var POSSale: Codeunit "NPR POS Sale"; var NewDesc: Text)
     var
-        LibraryRandom: Codeunit "Library - Random";
         RSPOSSale: Record "NPR RS POS Sale";
+        LibraryRandom: Codeunit "Library - Random";
     begin
         POSSale.GetCurrentSale(SalePOS);
         NewDesc := Format(LibraryRandom.RandIntInRange(111111111, 999999999));
@@ -132,5 +137,4 @@ codeunit 85064 "NPR POS Act. Ins. Cus.Id Tests"
     begin
         _Assert.ExpectedMessage('Allowed Tax Rates have been updated.', Msg);
     end;
-    */
 }

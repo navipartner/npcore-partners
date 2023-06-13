@@ -119,9 +119,9 @@ report 6014453 "NPR RS Fiscal Bill A4 v1"
                 NewLine: Text;
             begin
                 NewLine := PrintNewLine();
-                if StrLen("NPR RS POS Audit Log Aux. Info".Journal) = 0 then
+                if StrLen("NPR RS POS Audit Log Aux. Info".GetTextFromJournal()) = 0 then
                     Error(RSAuditNotFiscalisedErrLbl, "NPR RS POS Audit Log Aux. Info"."Audit Entry No.");
-                ParseJournalTextToFields("NPR RS POS Audit Log Aux. Info".Journal);
+                ParseJournalTextToFields("NPR RS POS Audit Log Aux. Info".GetTextFromJournal());
 #if not BC17
                 QRCode := GenerateQRCode("NPR RS POS Audit Log Aux. Info"."Verification URL");
 #endif
