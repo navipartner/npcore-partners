@@ -60,6 +60,7 @@
     local procedure CreatePostInvCostToGLJobQueue()
     var
         JobQueueMgt: Codeunit "NPR Job Queue Management";
+        PostInventoryCosttoGL: Codeunit "NPR Post Inventory Cost to G/L";
         NotBeforeDateTime: DateTime;
         NextRunDateFormula: DateFormula;
     begin
@@ -70,7 +71,7 @@
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntryGlobal."Object Type to Run"::Codeunit,
             Codeunit::"NPR Post Inventory Cost to G/L",
-            '',
+            PostInventoryCosttoGL.ParamSaveToReportInbox(),
             JobQueueDescription(JobQueueEntryGlobal."Object Type to Run"::Codeunit, Codeunit::"NPR Post Inventory Cost to G/L"),
             NotBeforeDateTime,
             020000T,
@@ -110,7 +111,10 @@
         JobQueueEntry."Object Type to Run" := ObjectTypeToRun;
         JobQueueEntry.Validate("Object ID to Run", ObjectIdToRun);
         JobQueueEntry."Earliest Start Date/Time" := AtDateTime;
-        exit(JobQueueMgt.JobQueueEntryExists(JobQueueEntry, JobQueueEntryGlobal));
+        if not JobQueueMgt.JobQueueEntryExists(JobQueueEntry, JobQueueEntryGlobal) then
+            exit(false);
+
+        exit(JobQueueEntryGlobal.Status <> JobQueueEntryGlobal.Status::"On Hold");
     end;
 
     local procedure GetTimingParameters(var NotBeforeDateTime: DateTime; var NextRunDateFormula: DateFormula)
