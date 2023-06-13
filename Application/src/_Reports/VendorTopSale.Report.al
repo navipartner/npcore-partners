@@ -1,11 +1,11 @@
 ﻿report 6014426 "NPR Vendor Top/Sale"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = false;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Vendor TopSale.rdlc';
-    Caption = 'Vendor Top/Sale';
+    Caption = 'Top Vendor by Item Sales';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
@@ -14,231 +14,131 @@
     {
         dataitem(Vendor; Vendor)
         {
-            CalcFields = "Balance (LCY)";
-            DataItemTableView = SORTING("No.");
-            RequestFilterFields = "No.", "Date Filter", "Global Dimension 1 Filter";
-            column(COMPANYNAME; CompanyName)
-            {
-            }
-            column(Picture_CompanyInfo; CompanyInfo.Picture)
-            {
-            }
-            column(VendorDateFilter; StrSubstNo(Text10600001, VendorDateFilter))
-            {
-            }
-            column(ShowTypeFilter; StrSubstNo(Text10600002, ShowType))
-            {
-            }
-            column(Getfilters; Vendor.TableCaption + ':  ' + GetFilters)
-            {
-            }
-            dataitem("<Kreditorsidsteaar>"; Vendor)
-            {
-                CalcFields = "Balance (LCY)";
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("No.");
-
-                trigger OnAfterGetRecord()
-                begin
-                    NPRGetVESalesLCYSalesQtyCOGSLCY(KreditorsidsteaarSalesLCY, KreditorsidsteaarSalesQty, KreditorsidsteaarCOGS);
-                    if (KreditorsidsteaarSalesLCY = 0) and ("Balance (LCY)" = 0) and (KreditorsidsteaarSalesLCY - KreditorsidsteaarCOGS = 0) then
-                        CurrReport.Skip();
-
-                    TempVendorAmountLastYear.Init();
-                    TempVendorAmountLastYear."Vendor No." := "No.";
-
-                    case ShowType of
-                        ShowType::"Item Sales":
-                            begin
-                                TempVendorAmountLastYear."Amount (LCY)" := Multipl * KreditorsidsteaarSalesLCY;
-                            end;
-                        ShowType::Gains:
-                            begin
-                                TempVendorAmountLastYear."Amount (LCY)" := Multipl * (KreditorsidsteaarSalesLCY - KreditorsidsteaarCOGS);
-                            end;
-                    end;
-
-                    TempVendorAmountLastYear.Insert();
-                    SalesLastYear += KreditorsidsteaarSalesLCY;
-                    DbLastYear += KreditorsidsteaarSalesLCY - KreditorsidsteaarCOGS;
-                end;
-
-                trigger OnPreDataItem()
-                begin
-                    SetRange("Date Filter", StartDateLastYear, EndDateLastYear);
-                    Clear(p);
-                end;
-            }
+            DataItemTableView = sorting("No.");
+            RequestFilterFields = "No.", "Global Dimension 1 Filter", "Date Filter";
 
             trigger OnAfterGetRecord()
+            var
+                Vendor2: Record Vendor;
+                COGSLCY: Decimal;
+                InventoryQty: Decimal;
+                SalesLCY: Decimal;
+                SalesQty: Decimal;
+                Amounts: List of [Decimal];
             begin
-                VendorInt += 1;
                 NPRGetVESalesLCYSalesQtyCOGSLCY(SalesLCY, SalesQty, COGSLCY);
+                case ShowType of
+                    ShowType::"Sales (LCY)":
+                        if (SalesLCY <= 0) then
+                            CurrReport.Skip();
+                    ShowType::"Sales (Qty.)":
+                        if (SalesQty <= 0) then
+                            CurrReport.Skip();
+                    ShowType::Profit:
+                        if ((SalesLCY - COGSLCY) <= 0) then
+                            CurrReport.Skip();
+                end;
 
+                Clear(Amounts);
+                CalcVendorInventoryQty(Vendor, InventoryQty);
+                Amounts.AddRange(SalesLCY, SalesQty, SalesLCY - COGSLCY, InventoryQty, COGSLCY);
 
                 TempVendorAmount.Init();
                 TempVendorAmount."Vendor No." := "No.";
+
                 case ShowType of
-                    ShowType::"Item Sales":
-                        begin
-                            TempVendorAmount."Amount (LCY)" := Multipl * SalesLCY;
-                        end;
-                    ShowType::Gains:
-                        begin
-                            TempVendorAmount."Amount (LCY)" := Multipl * (SalesLCY - COGSLCY);
-                        end;
+                    ShowType::"Sales (LCY)":
+                        TempVendorAmount."Amount (LCY)" := SortDirectionMultiplier * SalesLCY;
+                    ShowType::"Sales (Qty.)":
+                        TempVendorAmount."Amount (LCY)" := SortDirectionMultiplier * SalesQty;
+                    ShowType::Profit:
+                        TempVendorAmount."Amount (LCY)" := SortDirectionMultiplier * (SalesLCY - COGSLCY);
                 end;
 
                 TempVendorAmount.Insert();
-                if (ShowQty = 0) or (i < ShowQty) then
-                    i := i + 1
+
+                Vendor2.Get(Vendor."No.");
+                Vendor2.CopyFilters(Vendor);
+                Vendor2.SetFilter("Date Filter", '%1..%2', StartDateLastYear, EndDateLastYear);
+                Vendor2.NPRGetVESalesLCYSalesQtyCOGSLCY(SalesLCY, SalesQty, COGSLCY);
+                CalcVendorInventoryQty(Vendor2, InventoryQty);
+                Amounts.AddRange(SalesLCY, SalesQty, SalesLCY - COGSLCY, InventoryQty, COGSLCY);
+
+                VendorAmtsDict.Add(Vendor."No.", Amounts);
+
+                TotalSalesLCY += VendorAmtsDict.Get(Vendor."No.").Get(1);
+                TotalSalesQty += VendorAmtsDict.Get(Vendor."No.").Get(2);
+                TotalProfit += VendorAmtsDict.Get(Vendor."No.").Get(3);
+                TotalInventoryQty += VendorAmtsDict.Get(Vendor."No.").Get(4);
+                TotalInventoryValue += VendorAmtsDict.Get(Vendor."No.").Get(5);
+
+                TotalSalesLCYLY += VendorAmtsDict.Get(Vendor."No.").Get(6);
+                TotalSalesQtyLY += VendorAmtsDict.Get(Vendor."No.").Get(7);
+                TotalProfitLY += VendorAmtsDict.Get(Vendor."No.").Get(8);
+                TotalInventoryQtyLY += VendorAmtsDict.Get(Vendor."No.").Get(9);
+                TotalInventoryValueLY += VendorAmtsDict.Get(Vendor."No.").Get(10);
+
+                if (NoOfRecordsToPrint = 0) or (Index < NoOfRecordsToPrint) then
+                    Index := Index + 1
                 else begin
-                    TempVendorAmount.FindLast();
+                    if SortOrder = SortOrder::Ascending then
+                        TempVendorAmount.FindFirst()
+                    else
+                        TempVendorAmount.FindLast();
+                    VendorAmtsDict.Remove(TempVendorAmount."Vendor No.");
                     TempVendorAmount.Delete();
                 end;
-
-                //Item sales
-                if VendorInt = 1 then
-                    MaxAmt := SalesLCY;
-
-                MaxAmount := SalesLCY;
-
-                if MaxAmount > MaxAmt then
-                    MaxAmt := MaxAmount;
-            end;
-
-            trigger OnPostDataItem()
-            begin
-                // Insert order in the temp table which includes last year's values
-                q := 1;
-                if TempVendorAmountLastYear.FindFirst() then
-                    repeat
-                        if not (TempVendorAmountLastYear."Amount (LCY)" = 0.0) then begin
-                            TempVendorAmountLastYear.Delete();
-                            TempVendorAmountLastYear."Amount 2 (LCY)" := q;
-                            TempVendorAmountLastYear.Insert();
-                            q := q + 1;
-                        end;
-                    until TempVendorAmountLastYear.Next() = 0;
             end;
 
             trigger OnPreDataItem()
             begin
-                i := 0;
                 TempVendorAmount.DeleteAll();
-                TempVendorAmountLastYear.DeleteAll();
+                Clear(VendorAmtsDict);
+                Index := 0;
             end;
         }
+
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
-            column(Number_Integer; Integer.Number)
-            {
-            }
-            column(Greyed; Greyed)
-            {
-            }
-            column(No_Vendor; Vendor."No.")
-            {
-            }
-            column(Name_Vendor; Vendor.Name)
-            {
-            }
-            column(SalesLCY_Vendor; SalesLCY)
-            {
-            }
-            column(COGSLCY_Vendor; COGSLCY)
-            {
-            }
-            column(ProfitPct; ProfitPct)
-            {
-            }
-            column(Share; StrSubstNo(Pct1Lbl, Share))
-            {
-            }
-            column(PctOfTotal; StrSubstNo(Pct1Lbl, PctOfTotal))
-            {
-            }
-            column(Stock_Vendor; Vendor3Stock)
-            {
-            }
-            column(PctOfTotalInventory; StrSubstNo(Pct1Lbl, PctOfTotalInventory))
-            {
-            }
-            column(RankingLastYear; RankingLastYear)
-            {
-            }
-            column(AmountLastYear; AmountLastYear)
-            {
-            }
-            column(DgLastYear; StrSubstNo(Pct1Lbl, DgLastYear))
-            {
-            }
-            column(Index; Index)
-            {
-            }
-            column(Show_Type; ShowType)
-            {
-            }
-            column(Sales_LCY_Vendor2; Vendor2SalesLCY)
-            {
-            }
-            column(Profit_Vendor2; Vendor2SalesLCY - Vendor2COGS)
-            {
-            }
-            column(VendorSales; VendorSales)
-            {
-            }
-            column(CostAmtFooter; CostAmtFooter)
-            {
-            }
-            column(VendorProfit; VendorProfit)
-            {
-            }
-            column(SalesPct; SalesPct)
-            {
-            }
-            column(SalesLastYear; SalesLastYear)
-            {
-            }
-            column(DbLastYear; DbLastYear)
-            {
-            }
-            column(SalesPct2; SalesPct2)
-            {
-            }
-            column(ProfitPct2; ProfitPct2)
-            {
-            }
-            column(IndexSales_1; IndexSales[1])
-            {
-            }
-            column(IndexSales_2; IndexSales[2])
-            {
-            }
-            column(IndexDb_1; IndexDb[1])
-            {
-            }
-            column(IndexDb_2; IndexDb[2])
-            {
-            }
-            column(Qty_Vendor; SalesQty)
-            {
-            }
-            column(StockQty; StockQty)
-            {
-            }
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
+
+            column(CompanyName; CompanyProperty.DisplayName()) { }
+            column(RankAccordingToTxt; StrSubstNo(RankAccordingToLbl, SelectStr(ShowType + 1, ShowTypeOptionsLbl))) { }
+            column(Vendor_FilterText; VendorFilterText) { }
+            column(Integer_Number; Number) { }
+            column(Vendor_No; Vendor."No.") { }
+            column(Vendor_Name; Vendor.Name) { }
+
+            column(Vendor_SalesLCY; VendorAmtsDict.Get(Vendor."No.").Get(1)) { }
+            column(Vendor_SalesQty; VendorAmtsDict.Get(Vendor."No.").Get(2)) { }
+            column(Vendor_Profit; VendorAmtsDict.Get(Vendor."No.").Get(3)) { }
+            column(Vendor_InventoryQty; VendorAmtsDict.Get(Vendor."No.").Get(4)) { }
+            column(Vendor_InventoryValue; VendorAmtsDict.Get(Vendor."No.").Get(5)) { }
+
+            column(Vendor_SalesLCY_LY; VendorAmtsDict.Get(Vendor."No.").Get(6)) { }
+            column(Vendor_SalesQty_LY; VendorAmtsDict.Get(Vendor."No.").Get(7)) { }
+            column(Vendor_Profit_LY; VendorAmtsDict.Get(Vendor."No.").Get(8)) { }
+            column(Vendor_InventoryQty_LY; VendorAmtsDict.Get(Vendor."No.").Get(9)) { }
+            column(Vendor_InventoryValue_LY; VendorAmtsDict.Get(Vendor."No.").Get(10)) { }
+
+            column(Vendor_TotalSalesLCY; TotalSalesLCY) { }
+            column(Vendor_TotalSalesQty; TotalSalesQty) { }
+            column(Vendor_TotalProfit; TotalProfit) { }
+            column(Vendor_TotalInventoryQty; TotalInventoryQty) { }
+            column(Vendor_TotalInventoryValue; TotalInventoryValue) { }
+
+            column(Vendor_Top_TotalSalesLCY; TotalTopSalesLCY) { }
+            column(Vendor_Top_TotalProfit; TotalTopProfit) { }
+            column(Vendor_Top_TotalInventoryQty; TotalTopInventoryQty) { }
+
+            column(Vendor_TotalSalesLCY_LY; TotalSalesLCYLY) { }
+            column(Vendor_TotalSalesQty_LY; TotalSalesQtyLY) { }
+            column(Vendor_TotalProfit_LY; TotalProfitLY) { }
+            column(Vendor_TotalInventoryQty_LY; TotalInventoryQtyLY) { }
+            column(Vendor_TotalInventoryValue_LY; TotalInventoryValueLY) { }
 
             trigger OnAfterGetRecord()
             begin
-                Clear(RankingLastYear);
-
-                Counter += 1;
-                if (Counter / 2) = Round((Counter / 2), 1) then
-                    Greyed := false
-                else
-                    Greyed := true;
-
                 if Number = 1 then begin
                     if not TempVendorAmount.FindFirst() then
                         CurrReport.Break();
@@ -246,103 +146,11 @@
                     if TempVendorAmount.Next() = 0 then
                         CurrReport.Break();
 
-                TempVendorAmount."Amount (LCY)" := Multipl * TempVendorAmount."Amount (LCY)";
-
                 Vendor.Get(TempVendorAmount."Vendor No.");
-                Vendor.CalcFields("Balance (LCY)");
-                Vendor.NPRGetVESalesLCYSalesQtyCOGSLCY(SalesLCY, SalesQty, COGSLCY);
-                ProfitPct := "Pct."(SalesLCY - COGSLCY, SalesLCY);
 
-                if (MaxAmt <> 0) then
-                    Share := Round(SalesLCY * 100 / MaxAmt, 1)
-                else
-                    Share := 0;
-
-                TempVendorAmount."Amount (LCY)" := Multipl * TempVendorAmount."Amount (LCY)";
-
-                // Sales last year and db
-                Vendor2.Get(TempVendorAmount."Vendor No.");
-                Vendor2.SetRange("Date Filter", StartDateLastYear, EndDateLastYear);
-                Vendor2.CalcFields("Balance (LCY)");
-                Vendor2.NPRGetVESalesLCYSalesQtyCOGSLCY(Vendor2SalesLCY, Vendor2SalesQty, Vendor2COGS);
-
-
-                // Read last year's ranking
-                TempVendorAmountLastYear.SetFilter("Vendor No.", TempVendorAmount."Vendor No.");
-                if TempVendorAmountLastYear.FindFirst() then
-                    RankingLastYear := TempVendorAmountLastYear."Amount 2 (LCY)";
-
-                case ShowType of
-                    ShowType::"Item Sales":
-                        begin
-                            AmountLastYear := Vendor2SalesLCY;
-                            PctOfTotal := "Pct."(SalesLCY, VendorSales);
-                            Index := "Pct."(SalesLCY, AmountLastYear);
-                        end;
-                    ShowType::Gains:
-                        begin
-                            AmountLastYear := Vendor2SalesLCY - Vendor2COGS;
-                            PctOfTotal := "Pct."(SalesLCY - COGSLCY, VendorProfit);
-                            Index := "Pct."(SalesLCY - COGSLCY, AmountLastYear);
-                        end;
-                end;
-
-                j := IncStr(j);
-
-                // Calculates inventory for that supplier
-                Vendor.CopyFilter("Global Dimension 1 Filter", Vendor3."Global Dimension 1 Filter");
-                Vendor.CopyFilter("NPR Item Category Filter", Vendor3."NPR Item Category Filter");
-
-                Vendor3.Get(TempVendorAmount."Vendor No.");
-                Vendor3.NPRGetVEStock(Vendor3Stock);
-                PctOfTotalInventory := "Pct."(Vendor3Stock, InventoryTotal);
-
-                DgLastYear := "Pct."(Vendor2SalesLCY - Vendor2COGS, Vendor2SalesLCY);
-
-                SalesPct := "Pct."(SalesLCY, VendorSales);
-                ProfitPct2 := "Pct."(Vendor2SalesLCY - Vendor2COGS, DbLastYear);
-                SalesPct2 := "Pct."(Vendor2SalesLCY, SalesLastYear);
-                IndexSales[1] := "Pct."(SalesLCY, Vendor2SalesLCY);
-                IndexSales[2] := "Pct."(VendorSales, SalesLastYear);
-                IndexDb[1] := "Pct."(SalesLCY - COGSLCY, Vendor2SalesLCY - Vendor2COGS);
-                IndexDb[2] := "Pct."(VendorProfit, DbLastYear);
-                Clear(StockQty);
-                ValueEntry2Query.SetFilter(Filter_DateTime, '..%1', Vendor.GetRangeMax("Date Filter"));
-                ValueEntry2Query.SetFilter(ValueEntry2Query.Filter_Dim_1_Code, Vendor."Global Dimension 1 Filter");
-                ValueEntry2Query.SetFilter(Filter_Vendor_No, Vendor."No.");
-                ValueEntry2Query.SetFilter(Filter_Salespers_Purch_Code, Vendor."NPR Salesperson Filter");
-                ValueEntry2Query.SetFilter(Filter_Cost_Amount_Actual, '<>%1', 0);
-                ValueEntry2Query.Open();
-                while ValueEntry2Query.Read() do begin
-                    if ValueEntry2Query.Cost_per_Unit <> 0 then
-                        StockQty += ValueEntry2Query.Sum_Cost_Amount_Actual / ValueEntry2Query.Cost_per_Unit;
-                end;
-            end;
-
-            trigger OnPreDataItem()
-            begin
-                // Calculates sales and consumption in total
-                ValueEntry.SetCurrentKey("Item Ledger Entry Type", "Posting Date");
-                ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                Vendor.CopyFilter("Date Filter", ValueEntry."Posting Date");
-                ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
-                VendorSales := ValueEntry."Sales Amount (Actual)";
-                CostAmtFooter := ValueEntry."Cost Amount (Actual)";
-
-                VendorProfit := VendorSales - Abs(ValueEntry."Cost Amount (Actual)");
-
-                // Calculates the inventory total for the period '..GETRANGEMAX'
-                Vendor3.SetFilter("Global Dimension 1 Filter", Vendor."Global Dimension 1 Filter");
-                Vendor.CopyFilter("NPR Item Category Filter", Vendor3."NPR Item Category Filter");
-
-                Vendor3.SetFilter("Date Filter", '..%1', Vendor.GetRangeMax("Date Filter"));
-                if Vendor3.FindFirst() then
-                    repeat
-                        Vendor3.NPRGetVEStock(Vendor3Stock);
-                        InventoryTotal += Vendor3Stock;
-                    until Vendor3.Next() = 0;
-
-                Clear(Index);
+                TotalTopSalesLCY += VendorAmtsDict.Get(TempVendorAmount."Vendor No.").Get(1);
+                TotalTopProfit += VendorAmtsDict.Get(TempVendorAmount."Vendor No.").Get(3);
+                TotalTopInventoryQty += VendorAmtsDict.Get(TempVendorAmount."Vendor No.").Get(4);
             end;
         }
     }
@@ -350,85 +158,75 @@
     requestpage
     {
         SaveValues = true;
+
         layout
         {
-            area(content)
+            area(Content)
             {
-                field("Show Type"; ShowType)
+                group(Options)
                 {
-                    Caption = 'Show Type';
-                    OptionCaption = 'Item Sales,,Gains,Margin';
-
-                    ToolTip = 'Specifies the value of the Show Type field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Sorting"; SortOrder)
-                {
-                    Caption = 'Sorting';
-                    OptionCaption = 'Show the highest first,Show the lowest first';
-
-                    ToolTip = 'Specifies the value of the Sorting field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Show Quantity"; ShowQty)
-                {
-                    Caption = 'Show Quantity';
-
-                    ToolTip = 'Specifies the value of the Show Quantity field';
-                    ApplicationArea = NPRRetail;
+                    Caption = 'Options';
+                    field("Show Type"; ShowType)
+                    {
+                        ApplicationArea = NPRRetail;
+                        Caption = 'Show';
+                        OptionCaption = 'Sales (LCY),Sales (Qty.),Profit';
+                        ToolTip = 'Specifies field on which to sort the vendors.';
+                    }
+                    field(Quantity; NoOfRecordsToPrint)
+                    {
+                        ApplicationArea = NPRRetail;
+                        Caption = 'Quantity';
+                        MinValue = 1;
+                        ToolTip = 'Specifies the number of vendors that will be included in the report.';
+                    }
+                    field("Sort Order"; SortOrder)
+                    {
+                        ApplicationArea = NPRRetail;
+                        Caption = 'Sort Order';
+                        OptionCaption = 'Ascending,Descending';
+                        ToolTip = 'Specifies the sorting order on the report. Ascending means arranging in increasing order, while Descending means arranging in decreasing order.';
+                    }
                 }
             }
         }
 
         trigger OnOpenPage()
         begin
-            if ShowQty = 0 then
-                ShowQty := 10;
+            if NoOfRecordsToPrint = 0 then
+                NoOfRecordsToPrint := 10;
         end;
     }
 
     labels
     {
-        Page_Caption = 'Page';
-        Report_Caption = 'Top Vendor by Item Sales';
-        Sequence_Caption = 'Ranking';
-        No_Caption = 'No.';
-        Name_Caption = 'Name';
-        SalesLCY_Caption = 'Sales (LCY)';
-        ProfitLCY_Caption = 'Profit (LCY)';
-        Profit_Pct_Caption = '% of Total Profit';
-        BiggestPct_Caption = '% of Highest Sale';
-        ShareTotal_Caption = '% of Total Sales';
-        Inventory_Caption = 'Inventory';
-        InventoryShare_Caption = '% of Total Inventory';
-        LastYear_Caption = 'Last year''s';
-        SalesTotal_Caption = 'Sales';
-        LastYearProfit = 'Last year''s profit %';
-        Index_Caption = 'Index';
-        ThisYear_Caption = 'This Year';
-        Total_Caption = 'Total';
-        SaleTotal_Caption = 'Sale Total';
-        SharePct_Caption = '% of Yearly Sales';
-        Sale_Caption = 'Sale';
-        IndexSale_Caption = 'Index Sale';
-        IndexDb_Caption = 'IndexDb';
-        Qty_Caption = 'Sales (Qty)';
-        Qty_Inventory = 'Inventory (Qty)';
+        ReportCaptionLbl = 'Top Vendor by Item Sales';
+        PageCaptionLbl = 'Page';
+        NoCaptionLbl = 'No.';
+        NameCaptionLbl = 'Name';
+        SalesLCYCaptionLbl = 'Sales (LCY)';
+        ProfitLCYCaptionLbl = 'Profit (LCY)';
+        ProfitPctShareCaptionLbl = '% of Total Profit';
+        ShareTotalCaptionLbl = '% of Total Sales';
+        InventoryValueCaptionLbl = 'Inventory Value';
+        InventoryShareCaptionLbl = '% of Total Inventory (Qty.)';
+        LastYearSalesLCYCaptionLbl = 'Last year''s Sales (LCY)';
+        LastYearSalesQtyCaptionLbl = 'Last year''s Sales (Qty.)';
+        LastYearProfitPctCaptionLbl = 'Last year''s Profit %';
+        IndexCaptionLbl = 'Index';
+        TotalCaptionLbl = 'Total';
+        GrandTotalCaptionLbl = 'Grand Total';
+        GrandTotalPctCaptionLbl = '% of Grand Total';
+        SalesQtyCaptionLbl = 'Sales (Qty.)';
+        InventoryQtyCaptionLbl = 'Inventory (Qty.)';
+        RankCaptionLbl = 'Rank';
+        FiltersCaptionLbl = 'Filters';
     }
 
-    trigger OnInitReport()
-    begin
-        CompanyInfo.Get();
-        CompanyInfo.CalcFields(Picture);
-        Clear(SalesLastYear);
-        Clear(Counter);
-    end;
-
     trigger OnPreReport()
+    var
+        FormatDocument: Codeunit "Format Document";
     begin
-        VendorDateFilter := Vendor.GetFilter("Date Filter");
-
-        j := '2';
         StartDate := Vendor.GetRangeMin("Date Filter");
         EndDate := Vendor.GetRangeMax("Date Filter");
         StartDateLastYear := CalcDate('<-1Y>', StartDate);
@@ -439,78 +237,60 @@
         if EndDate <> NormalDate(EndDate) then
             EndDateLastYear := ClosingDate(EndDateLastYear);
 
-        if SortOrder = SortOrder::Highest then
-            Multipl := -1
+        VendorFilterText := FormatDocument.GetRecordFiltersWithCaptions(Vendor);
+
+        if SortOrder = SortOrder::Ascending then
+            SortDirectionMultiplier := 1
         else
-            Multipl := 1;
+            SortDirectionMultiplier := -1;
     end;
 
     var
-        CompanyInfo: Record "Company Information";
-        ValueEntry: Record "Value Entry";
-        ValueEntry2Query: Query "NPR Value Entry With Vendor";
-        Vendor2: Record Vendor;
-        Vendor3: Record Vendor;
         TempVendorAmount: Record "Vendor Amount" temporary;
-        TempVendorAmountLastYear: Record "Vendor Amount" temporary;
-        Greyed: Boolean;
         EndDate: Date;
         EndDateLastYear: Date;
         StartDate: Date;
         StartDateLastYear: Date;
-        AmountLastYear: Decimal;
-        CostAmtFooter: Decimal;
-        DbLastYear: Decimal;
-        DgLastYear: Decimal;
-        Index: Decimal;
-        IndexDb: array[2] of Decimal;
-        IndexSales: array[2] of Decimal;
-        InventoryTotal: Decimal;
-        MaxAmount: Decimal;
-        MaxAmt: Decimal;
-        PctOfTotal: Decimal;
-        PctOfTotalInventory: Decimal;
-        ProfitPct: Decimal;
-        ProfitPct2: Decimal;
-        RankingLastYear: Decimal;
-        SalesLastYear: Decimal;
-        SalesPct: Decimal;
-        SalesPct2: Decimal;
-        Share: Decimal;
-        StockQty: Decimal;
-        VendorProfit: Decimal;
-        VendorSales: Decimal;
-        Counter: Integer;
-        i: Integer;
-        Multipl: Integer;
-        p: Integer;
-        q: Integer;
-        ShowQty: Integer;
-        VendorInt: Integer;
-        Text10600002: Label 'Order by %1 ';
-        Text10600001: Label 'Period: %1';
-        SortOrder: Option Highest,Lowest;
-        ShowType: Option "Item Sales",,Gains,Margin;
-        j: Text[30];
-        VendorDateFilter: Text;
-        Vendor2SalesLCY: Decimal;
-        Vendor2SalesQty: Decimal;
-        Vendor2COGS: Decimal;
-        Vendor3Stock: Decimal;
-        SalesLCY: Decimal;
-        SalesQty: Decimal;
-        COGSLCY: Decimal;
-        KreditorsidsteaarSalesLCY: Decimal;
-        KreditorsidsteaarSalesQty: Decimal;
-        KreditorsidsteaarCOGS: Decimal;
-        Pct1Lbl: Label '%1%', locked = true;
-# pragma warning disable AA0228
-    local procedure "Pct."(Tal1: Decimal; Tal2: Decimal): Decimal
-    begin
-        if Tal2 = 0 then
-            exit(0);
-        exit(Round(Tal1 / Tal2 * 100, 0.1));
-    end;
-# pragma warning restore
-}
+        TotalInventoryQty: Decimal;
+        TotalInventoryQtyLY: Decimal;
+        TotalInventoryValue: Decimal;
+        TotalInventoryValueLY: Decimal;
+        TotalProfit: Decimal;
+        TotalProfitLY: Decimal;
+        TotalSalesLCY: Decimal;
+        TotalSalesLCYLY: Decimal;
+        TotalSalesQty: Decimal;
+        TotalSalesQtyLY: Decimal;
+        TotalTopInventoryQty: Decimal;
+        TotalTopProfit: Decimal;
+        TotalTopSalesLCY: Decimal;
+        VendorAmtsDict: Dictionary of [Code[20], List of [Decimal]];
+        Index: Integer;
+        NoOfRecordsToPrint: Integer;
+        SortDirectionMultiplier: Integer;
+        RankAccordingToLbl: Label 'Rank according to %1', Comment = '%1 - specifies the selected Show Type option caption.';
+        ShowTypeOptionsLbl: Label 'Sales (LCY),Sales (Qty.),Profit';
+        SortOrder: Option Ascending,Descending;
+        ShowType: Option "Sales (LCY)","Sales (Qty.)",Profit;
+        VendorFilterText: Text;
 
+    local procedure CalcVendorInventoryQty(var Vendor2: Record Vendor; var InventoryQty: Decimal)
+    var
+        ValueEntryWithVendor: Query "NPR Value Entry With Vendor";
+    begin
+        Clear(InventoryQty);
+        ValueEntryWithVendor.SetRange(Filter_Vendor_No, Vendor2."No.");
+        if Vendor2.GetFilter("NPR Item Category Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, Vendor2.GetFilter("NPR Item Category Filter"));
+        if Vendor2.GetFilter("Global Dimension 1 Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, Vendor2.GetFilter("Global Dimension 1 Filter"));
+        if Vendor2.GetFilter("Date Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_DateTime, Vendor2.GetFilter("Date Filter"));
+        if Vendor2.GetFilter("NPR Salesperson Filter") <> '' then
+            ValueEntryWithVendor.SetFilter(Filter_Salespers_Purch_Code, Vendor2.GetFilter("NPR Salesperson Filter"));
+        ValueEntryWithVendor.Open();
+        while ValueEntryWithVendor.Read() do
+            InventoryQty += ValueEntryWithVendor.Sum_Item_Ledger_Entry_Quantity;
+        ValueEntryWithVendor.Close();
+    end;
+}
