@@ -137,7 +137,7 @@
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
     end;
 
-    internal procedure RetailJournalLineShowVariety(RetailJournalLine: Record "NPR Retail Journal Line"; ShowFieldNo: Integer)
+    procedure RetailJournalLineShowVariety(RetailJournalLine: Record "NPR Retail Journal Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
         MasterLineMap: Record "NPR Master Line Map";
