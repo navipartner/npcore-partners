@@ -11,12 +11,16 @@ codeunit 6059879 "NPR POS Action: Quantity B"
         SaleMustBeNegativeErr: Label 'Quantity must be negative on the sales line.';
         WrongQuantityErr: Label 'The minimum number of units to sell must be greater than zero.';
         WrongReturnQuantityErr: Label 'The maximum number of units to return for %1 is %2.', Comment = '%1 = item description, %2 = maximal allowed quantity for return';
+        EFTApprovedErr: Label 'The quantity cannot be changed because the line has been approved by the EFT device.';
     begin
 
         if NegativeInput and (Quantity > 0) then
             Quantity := -Quantity;
 
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if SaleLinePOS."EFT Approved" then
+            Error(EftApprovedErr);
 
         if (SaleLinePOS."Return Sale Sales Ticket No." <> '') then begin
             POSSalesLine.SetRange("Document No.", SaleLinePOS."Return Sale Sales Ticket No.");
