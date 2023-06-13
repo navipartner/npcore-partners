@@ -22,14 +22,20 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
     var
         POSSession: Codeunit "NPR POS Session";
     begin
-        DeletePosLine(POSSession, Context);
+        case Step of
+            'DeletePosLine':
+                DeletePosLine(POSSession, Context);
+            'GetCurrentViewType':
+                FrontEnd.WorkflowResponse(GetCurrentViewType());
+        END;
     end;
 
-    local procedure GetActionScript(): Text
+    local procedure GetActionScript():
+                                Text
     begin
         exit(
-        //###NPR_INJECT_FROM_FILE:POSActionDeleteLine.js###
-'let main=async({workflow:i,parameters:r,captions:t})=>{let e=runtime.getData("BUILTIN_SALELINE");if(!e.length||e._invalid){await popup.error(t.notallowed);return}r.ConfirmDialog&&!await popup.confirm({title:t.title,caption:t.Prompt.substitute(e._current[10])})||i.respond()};'
+//###NPR_INJECT_FROM_FILE:POSActionDeleteLine.js###
+'let main=async({workflow:r,parameters:i,captions:t})=>{debugger;var a=await r.respond("GetCurrentViewType"),e;switch(a.viewType){case"Payment":e=runtime.getData("BUILTIN_PAYMENTLINE");break;default:e=runtime.getData("BUILTIN_SALELINE")}if(!e.length||e._invalid){await popup.error(t.notallowed);return}i.ConfirmDialog&&!await popup.confirm({title:t.title,caption:t.Prompt.substitute(e._current[10])})||r.respond("DeletePosLine")};'
         )
     end;
 
@@ -61,6 +67,15 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
         Position := Context.GetPositionFromDataSource(POSDataMgt.POSDataSource_BuiltInSaleLine());
         IF Position <> '' then
             POSSaleLine.SetPosition(Position);
+    end;
+
+    procedure GetCurrentViewType() Response: JsonObject;
+    var
+        NPRPOSSession: Codeunit "NPR POS Session";
+        NPRPOSView: Codeunit "NPR POS View";
+    begin
+        NPRPOSSession.GetCurrentView(NPRPOSView);
+        Response.Add('viewType', Format(NPRPOSView.GetType()));
     end;
 
     [IntegrationEvent(false, false)]
