@@ -352,7 +352,15 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         Item: Record Item;
         ItemList: Page "Item List";
         LookupOk: Boolean;
+        POSActionPublishers: Codeunit "NPR POS Action Publishers";
+        ItemFound: Boolean;
+        Handled: Boolean;
     begin
+        POSActionPublishers.OnBeforeGetItemFromItemSearch(ItemIdentifierString, ItemFound, Handled);
+
+        if Handled then
+            exit(ItemFound);
+
         SetItemSearchFilter(ItemIdentifierString, Item, true);
         if not Item.FindFirst() then
             exit(false);
