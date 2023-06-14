@@ -4,4 +4,8 @@ enumextension 6014402 "NPR Assisted Setup Group" extends "Assisted Setup Group"
     {
         Caption = 'NP Retail';
     }
+    value(6014401; NPRestaurant)
+    {
+        Caption = 'NP Restaurant';
+    }
 }

@@ -9,7 +9,8 @@
     begin
         AssistedSetup.Remove(Page::"NPR GraphApi Setup Wizard");
         AssistedSetup.Remove(Page::"NPR Magento Wizard");
-        AddRetailSetupsWizard()
+        AddRetailSetupsWizard();
+        AddRestaurantSetupsWizard();
     end;
 
     local procedure AddRetailSetupsWizard()
@@ -31,6 +32,28 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Modify POS Payment Methods", POSPayMethodsSetupTxt, AssistedSetupGroup::NPRetail);
         AssistedSetup.Add(GetAppId(), Page::"NPR Modify POS Posting Setup", POSPOstingSetupSetupTxt, AssistedSetupGroup::NPRetail);
         AssistedSetup.Add(GetAppId(), Page::"NPR Modify Salespeople", SalespeopleSetupTxt, AssistedSetupGroup::NPRetail);
+    end;
+
+    local procedure AddRestaurantSetupsWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        WelcomeVideoTxt: Label 'Welcome to Restaurant Module';
+        FlowStatusSetupTxt: Label 'Welcome to Flow Statuses Setup';
+        PrintProdCatSetupTxt: Label 'Welcome to Print/Production Category Setup';
+        ItemRtngProfilesSetupTxt: Label 'Welcome to Item Routing Profiles Setup';
+        RestServFlowSetupTxt: Label 'Welcome to Restaurant Service Flow Setup';
+        RestLayoutSetupTxt: Label 'Welcome to Restaurant Layout Setup';
+        KitchenLayoutSetupTxt: Label 'Welcome to Kitchen Layout Setup';
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+    begin
+        AssistedSetup.Add(GetAppId(), Codeunit::"NPR Restaurant Welcome Vid.", WelcomeVideoTxt, AssistedSetupGroup::NPRetail);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Download&Import Rest Data", FlowStatusSetupTxt, AssistedSetupGroup::NPRetail);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Modify Flow Statuses", FlowStatusSetupTxt, AssistedSetupGroup::NPRetail);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Modify Print/Prod Category", PrintProdCatSetupTxt, AssistedSetupGroup::NPRetail);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Modify Item Rtng. Profiles", ItemRtngProfilesSetupTxt, AssistedSetupGroup::NPRetail);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Create Rest. Serv. Flow", RestServFlowSetupTxt, AssistedSetupGroup::NPRetail);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Create Restaurant Layout", RestLayoutSetupTxt, AssistedSetupGroup::NPRetail);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Create Kitchen Layout", KitchenLayoutSetupTxt, AssistedSetupGroup::NPRetail);
     end;
 
     procedure GetAppId(): Guid
@@ -56,15 +79,20 @@
         GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR GraphApi Setup Wizard");
         GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Magento Wizard");
         AddRetailSetupsWizard();
+        AddRestaurantSetupsWizard();
         SetupRetailChecklist();
+        SetupRestaurantChecklist();
     end;
 
+    #region Retail
+    //This region contains functions for creating Retail Setup Wizards and Checklist
     local procedure AddRetailSetupsWizard()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
+        Modul: Option Retail,Restaurant;
     begin
 
-        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag()) then
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Retail)) then
             exit;
 
         CreateWelcomeVideoExperience();
@@ -75,7 +103,7 @@
         ModifyPOSPostingSetupWizard();
         ModifySalesPeopleWizard();
 
-        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag());
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Retail));
     end;
 
     local procedure CreateWelcomeVideoExperience()
@@ -321,31 +349,19 @@
     local procedure SetupRetailChecklist()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
+        Modul: Option Retail,Restaurant;
     begin
         if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
             exit;
-        if UpgradeTag.HasUpgradeTag(GetChecklistUpgradeTag()) then
+        if UpgradeTag.HasUpgradeTag(GetChecklistUpgradeTag(Modul::Retail)) then
             exit;
 
-        CreateChecklistItems();
+        CreateRetailChecklistItems();
 
-        UpgradeTag.SetUpgradeTag(GetChecklistUpgradeTag());
+        UpgradeTag.SetUpgradeTag(GetChecklistUpgradeTag(Modul::Retail));
     end;
 
-    local procedure GetChecklistUpgradeTag(): Code[250]
-    begin
-        //For Any change, increase version
-        exit('NPR-Checklist-v1.3');
-    end;
-
-    local procedure GetAssistedSetupUpgradeTag(): Code[250]
-    begin
-        //For Any change, increase version
-        exit('NPR-AssistedSetup-v1.0');
-    end;
-
-
-    local procedure CreateChecklistItems()
+    local procedure CreateRetailChecklistItems()
     var
         TempAllProfile: Record "All Profile" temporary;
     begin
@@ -358,6 +374,392 @@
 #if not BC18
         Checklist.SetChecklistVisibility(true);
 #endif
+    end;
+
+    local procedure AddRetailChecklistItems(var TempAllProfile: Record "All Profile" temporary)
+    begin
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 1100, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Download&Import Data", 1101, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Create POS Stores & Units", 1102, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Posting Profile", 1103, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Payment Methods", 1104, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Posting Setup", 1105, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Salespeople", 1106, TempAllProfile, false);
+        Checklist.InitializeGuidedExperienceItems();
+    end;
+    #endregion
+
+    #region Restaurant
+    //This region contains functions for creating Restaurant Setup Wizards and Checklist
+    local procedure AddRestaurantSetupsWizard()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+        Modul: Option Retail,Restaurant;
+    begin
+
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Restaurant)) then
+            exit;
+
+
+        WelcomeVideoRestaurantExperience();
+        DownloadAndImportRestDataWizard();
+        CreateFlowStatusesWizard();
+        CreatePrintProductionCategoriesWizard();
+        CreateItemRoutingProfilesWizard();
+        CreateRestServiceFlowProfilesWizard();
+        CreateRestaurantLayoutWizard();
+        CreateKitchenLayoutWizard();
+
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Restaurant));
+    end;
+
+    local procedure WelcomeVideoRestaurantExperience()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Welcome Video Restaurant', Locked = true;
+        SetupDescriptionTxt: Label 'Welcome Video Restaurant', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Restaurant Welcome Vid.") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Codeunit,
+                                                Codeunit::"NPR Restaurant Welcome Vid.",
+                                                AssistedSetupGroup::NPRestaurant,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+
+    end;
+
+    local procedure DownloadAndImportRestDataWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Download & Import Predefined Setups.', Locked = true;
+        SetupDescriptionTxt: Label 'Download & Import Predefined Setups.', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Download&Import Rest Data") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Download&Import Rest Data",
+                                                AssistedSetupGroup::NPRetail,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Download&Import Rest Data", 'OnAfterFinishStep', '', false, false)]
+    local procedure DownloadAndImportRestDataWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateDownloadAndImportRestDataWizardStatus();
+    end;
+
+    local procedure UpdateDownloadAndImportRestDataWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Download&Import Rest Data");
+    end;
+
+    local procedure CreateFlowStatusesWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Flow Statuses', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Flow Statuses', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Flow Statuses") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                5,
+                                                ObjectType::Page,
+                                                Page::"NPR Modify Flow Statuses",
+                                                AssistedSetupGroup::NPRestaurant,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Modify Flow Statuses", 'OnAfterFinishStep', '', false, false)]
+    local procedure CreateFlowStatusesWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateCreateFlowStatusesWizardStatus();
+    end;
+
+    local procedure UpdateCreateFlowStatusesWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Modify Flow Statuses");
+    end;
+
+    local procedure CreatePrintProductionCategoriesWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Print/Production Categories', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Print/Production Categories', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Print/Prod Category") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                5,
+                                                ObjectType::Page,
+                                                Page::"NPR Modify Print/Prod Category",
+                                                AssistedSetupGroup::NPRestaurant,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Modify Print/Prod Category", 'OnAfterFinishStep', '', false, false)]
+    local procedure CreatePrintProductionCategoriesWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateCreatePrintProductionCategoriesWizardStatus();
+    end;
+
+    local procedure UpdateCreatePrintProductionCategoriesWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Modify Print/Prod Category");
+    end;
+
+    local procedure CreateItemRoutingProfilesWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Item Routing Profiles', Locked = true;
+        SetupDescriptionTxt: Label 'Setup  Item Routing Profiles', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Item Rtng. Profiles") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                5,
+                                                ObjectType::Page,
+                                                Page::"NPR Modify Item Rtng. Profiles",
+                                                AssistedSetupGroup::NPRestaurant,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Modify Item Rtng. Profiles", 'OnAfterFinishStep', '', false, false)]
+    local procedure CreateItemRoutingProfilesWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateCreateItemRoutingProfilesWizardStatus();
+    end;
+
+    local procedure UpdateCreateItemRoutingProfilesWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Modify Item Rtng. Profiles");
+    end;
+
+    local procedure CreateRestServiceFlowProfilesWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Restaurant Service Flow Profiles', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Restaurant Service Flow Profiles', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Create Rest. Serv. Flow") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                5,
+                                                ObjectType::Page,
+                                                Page::"NPR Create Rest. Serv. Flow",
+                                                AssistedSetupGroup::NPRestaurant,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Create Rest. Serv. Flow", 'OnAfterFinishStep', '', false, false)]
+    local procedure CreateRestServiceFlowProfilesWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateCreateRestServiceFlowProfilesWizardStatus();
+    end;
+
+    local procedure UpdateCreateRestServiceFlowProfilesWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Create Rest. Serv. Flow");
+    end;
+
+    local procedure CreateRestaurantLayoutWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Restaurant Layout', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Restaurant Layout', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Create Restaurant Layout") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                5,
+                                                ObjectType::Page,
+                                                Page::"NPR Create Restaurant Layout",
+                                                AssistedSetupGroup::NPRestaurant,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Create Restaurant Layout", 'OnAfterFinishStep', '', false, false)]
+    local procedure CreateRestaurantLayoutWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateCreateRestaurantLayoutWizardStatus();
+    end;
+
+    local procedure UpdateCreateRestaurantLayoutWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Create Restaurant Layout");
+    end;
+
+    local procedure CreateKitchenLayoutWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Kitchen Layout', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Kitchen Layout', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Create Kitchen Layout") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                5,
+                                                ObjectType::Page,
+                                                Page::"NPR Create Kitchen Layout",
+                                                AssistedSetupGroup::NPRestaurant,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Create Kitchen Layout", 'OnAfterFinishStep', '', false, false)]
+    local procedure CreateKitchenLayoutWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateCreateKitchenLayoutWizardStatus();
+    end;
+
+    local procedure UpdateCreateKitchenLayoutWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Create Restaurant Layout");
+    end;
+
+    local procedure SetupRestaurantChecklist()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+        Modul: Option Retail,Restaurant;
+    begin
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
+        if UpgradeTag.HasUpgradeTag(GetChecklistUpgradeTag(Modul::Restaurant)) then
+            exit;
+
+        CreateRestaurantChecklistItems();
+
+        UpgradeTag.SetUpgradeTag(GetChecklistUpgradeTag(Modul::Restaurant));
+    end;
+
+    local procedure CreateRestaurantChecklistItems()
+    var
+        TempAllProfile: Record "All Profile" temporary;
+    begin
+        AddRoleToList(TempAllProfile, Page::"NPR Retail Restaurant RC");
+        AddRestaurantChecklistItems(TempAllProfile);
+
+        Checklist.MarkChecklistSetupAsDone();
+#if not BC18
+        Checklist.SetChecklistVisibility(true);
+#endif
+    end;
+
+    local procedure AddRestaurantChecklistItems(var TempAllProfile: Record "All Profile" temporary)
+    begin
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Restaurant Welcome Vid.", 1200, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Download&Import Rest Data", 1201, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Flow Statuses", 1202, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Print/Prod Category", 1203, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Item Rtng. Profiles", 1204, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Create Rest. Serv. Flow", 1205, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Create Restaurant Layout", 1206, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Create Kitchen Layout", 1207, TempAllProfile, false);
+        Checklist.InitializeGuidedExperienceItems();
+    end;
+    #endregion
+
+    #region Common Functions
+    //This region contains common functions used by all Setup Wizards and Checklists
+    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant): Code[250]
+    begin
+        case Modul of
+            Modul::Retail:
+                //For Any change, increase version
+                exit('NPR-Checklist-v1.3');
+            Modul::Restaurant:
+                //For Any change, increase version
+                exit('NPR-Checklist-Restaurant-v1.4');
+        end;
+    end;
+
+    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant): Code[250]
+    begin
+        case Modul of
+            Modul::Retail:
+                //For Any change, increase version
+                exit('NPR-AssistedSetup-v1.0');
+            Modul::Restaurant:
+                //For Any change, increase version
+                exit('NPR-AssistedSetup-Restaurant-v1.4');
+        end;
     end;
 
     local procedure AddRoleToList(var TempAllProfile: Record "All Profile" temporary; RoleCenterID: Integer)
@@ -375,18 +777,7 @@
             TempAllProfile.Insert();
         end;
     end;
-
-    local procedure AddRetailChecklistItems(var TempAllProfile: Record "All Profile" temporary)
-    begin
-        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 1100, TempAllProfile, false);
-        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Download&Import Data", 1101, TempAllProfile, false);
-        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Create POS Stores & Units", 1102, TempAllProfile, false);
-        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Posting Profile", 1103, TempAllProfile, false);
-        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Payment Methods", 1104, TempAllProfile, false);
-        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Posting Setup", 1105, TempAllProfile, false);
-        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Salespeople", 1106, TempAllProfile, false);
-        Checklist.InitializeGuidedExperienceItems();
-    end;
+    #endregion
 
     var
         Checklist: Codeunit Checklist;
