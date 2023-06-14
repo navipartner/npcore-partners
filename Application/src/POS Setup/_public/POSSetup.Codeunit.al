@@ -295,7 +295,7 @@
         exit(SelfServiceProfile.IsUnlockPINEnabledIfProfileExist(POSUnitRec."POS Self Service Profile"));
     end;
 
-    internal procedure GetNamedActionSetup(var POSSetupOut: Record "NPR POS Setup")
+    procedure GetNamedActionSetup(var POSSetupOut: Record "NPR POS Setup")
     begin
         POSSetupOut := Setup;
     end;
