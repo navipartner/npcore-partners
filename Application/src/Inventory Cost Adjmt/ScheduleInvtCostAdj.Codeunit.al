@@ -114,7 +114,7 @@
         if not JobQueueMgt.JobQueueEntryExists(JobQueueEntry, JobQueueEntryGlobal) then
             exit(false);
 
-        exit(JobQueueEntryGlobal.Status <> JobQueueEntryGlobal.Status::"On Hold");
+        exit(not (JobQueueEntryGlobal.Status in [JobQueueEntryGlobal.Status::"On Hold", JobQueueEntryGlobal.Status::Error]));
     end;
 
     local procedure GetTimingParameters(var NotBeforeDateTime: DateTime; var NextRunDateFormula: DateFormula)
