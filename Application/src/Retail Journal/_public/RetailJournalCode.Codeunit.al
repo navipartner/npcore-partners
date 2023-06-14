@@ -1,6 +1,6 @@
 ﻿codeunit 6014467 "NPR Retail Journal Code"
 {
-    Access = Internal;
+    Access = Public;
 
     var
         RetailJnlHeader: Record "NPR Retail Journal Header";
@@ -311,7 +311,7 @@
         CopyQuantity2RetailJnlLines(QuantityDiscountLine, RetailJnlCode);
     end;
 
-    procedure CopyQuantity2RetailJnlLines(var QuantityDiscountLine: Record "NPR Quantity Discount Line"; RetailJnlCode: Code[40])
+    local procedure CopyQuantity2RetailJnlLines(var QuantityDiscountLine: Record "NPR Quantity Discount Line"; RetailJnlCode: Code[40])
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
@@ -642,7 +642,7 @@
     end;
 
     [Obsolete('Was used on one call which was replaced by more standardized procedure.')]
-    procedure UpdateDiscount(var RetailJournalLine: Record "NPR Retail Journal Line")
+    internal procedure UpdateDiscount(var RetailJournalLine: Record "NPR Retail Journal Line")
     var
         PeriodDiscountLine: Record "NPR Period Discount Line";
         RetailJournalHeader: Record "NPR Retail Journal Header";

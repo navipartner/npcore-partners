@@ -1258,8 +1258,10 @@ then
     end;
 
     local procedure FindItemReferenceFromSubscriber(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]) Identified: Boolean
+    var
+        IntercompanyEvents: Codeunit "NPR Intercompany Events";
     begin
-        OnMapItemRecerenceToPurchaseLine(EntryNo, HeaderRecordNo, RecordNo, VendorNo, Identified);
+        IntercompanyEvents.OnMapItemRecerenceToPurchaseLine(EntryNo, HeaderRecordNo, RecordNo, VendorNo, Identified);
     end;
 
     local procedure UnitCostRoundingPrecision(AmountTxt: Text): Decimal
@@ -1274,9 +1276,5 @@ then
         exit(Power(10, -NoOfDecimals));
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnMapItemRecerenceToPurchaseLine(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]; var Identified: Boolean)
-    begin
-    end;
 }
 
