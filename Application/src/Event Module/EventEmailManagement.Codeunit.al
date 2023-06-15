@@ -144,13 +144,13 @@
         exit(true);
     end;
 
-
     procedure ProcessMailItemNew(var RecRef: RecordRef; MailFor: Option Customer,Team): Boolean
     var
         Job: Record Job;
         JobPlanningLine: Record "Job Planning Line";
         RecRef2: RecordRef;
         BodyText: Text;
+        Source: Text[250];
         ResourceGroup: Record "Resource Group";
         EMailTemplateHeader: Record "NPR E-mail Template Header";
         Recipients, CcRecipients : List of [Text];
@@ -197,8 +197,8 @@
             CreateBody(BodyText, EMailTemplateHeader.Code, Job."No.", RecRef2);
         end;
 
-        GetEmailAccount(EmailAccount, Job);
-
+        EventEWSMgt.GetOrganizerSetup(Job, Source);
+        GetEmailAccount(EmailAccount);
 
 #IF NOT BC17
         EmailMessage.Create(Recipients, EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateHeader.Subject), BodyText, true, CcRecipients, BCCRecipients);
@@ -278,11 +278,12 @@
             until EventReportLayout.Next() = 0;
     end;
 #ENDIF
-    local procedure GetEmailAccount(var EmailAccount: Record "Email Account"; Job: Record Job)
+    local procedure GetEmailAccount(var EmailAccount: Record "Email Account")
     var
         EventExchIntEMail: Record "NPR Event Exch. Int. E-Mail";
         EmailAccountCodeunit: Codeunit "Email Account";
         NoEmailAccountsErr: Label 'There are no Email Accounts created. First create Email Accounts';
+        NoEmailAccountErr: Label 'Email Account %1 doesn''t exist. Please create it and try again.', Comment = '%1 = email';
     begin
         EmailAccountCodeunit.GetAllAccounts(false, EmailAccount);
         if EmailAccount.IsEmpty() then
@@ -290,10 +291,9 @@
 
         EventEWSMgt.GetEventExchIntEmail(EventExchIntEMail);
         if EventExchIntEMail."E-Mail" <> '' then
-            EmailAccount.SetRange("Email Address", EventExchIntEMail."E-Mail")
-        else
-            EmailAccount.SetRange("Email Address", Job."NPR Organizer E-Mail");
-        EmailAccount.FindFirst();
+            EmailAccount.SetFilter("Email Address", '@' + EventExchIntEMail."E-Mail");
+        if not EmailAccount.FindFirst() then
+            Error(NoEmailAccountErr, EventExchIntEMail."E-Mail");
     end;
 
     procedure SetEventExcIntTemplate(EventExchIntTemplateHere: Record "NPR Event Exch. Int. Template")
