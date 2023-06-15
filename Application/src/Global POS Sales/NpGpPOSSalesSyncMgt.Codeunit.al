@@ -140,7 +140,7 @@
                               '<glob1:bom_item_no>' + POSSalesLine."BOM Item No." + '</glob1:bom_item_no>' +
                               '<glob1:location_code>' + POSSalesLine."Location Code" + '</glob1:location_code>' +
                               '<glob1:description><![CDATA[' + POSSalesLine.Description + ']]></glob1:description>' +
-                              '<glob1:description_2></glob1:description_2>' +
+                              '<glob1:description_2><![CDATA[' + POSSalesLine."Description 2" + ']]></glob1:description_2>' +
                               '<glob1:quantity>' + Format(POSSalesLine.Quantity, 0, 9) + '</glob1:quantity>' +
                               '<glob1:unit_of_measure_code>' + POSSalesLine."Unit of Measure Code" + '</glob1:unit_of_measure_code>' +
                               '<glob1:qty_per_unit_of_measure>' + Format(POSSalesLine."Qty. per Unit of Measure", 0, 9) + '</glob1:qty_per_unit_of_measure>' +
