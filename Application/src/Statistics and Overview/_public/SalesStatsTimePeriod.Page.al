@@ -1,6 +1,6 @@
 ﻿page 6014591 "NPR Sales Stats Time Period"
 {
-    Extensible = False;
+    Extensible = true;
     Caption = 'Sales Statistics by Date';
     PageType = Card;
     UsageCategory = ReportsAndAnalysis;
@@ -99,5 +99,16 @@
         EndDate: Date;
         Dim1Filter: Text;
         Dim2Filter: Text;
-}
 
+    procedure GetGlobals(var _StartDate: Date; var _EndDate: Date; var _StatisticsBy: Option; var _ItemFilter: Text[20]; var _ItemCatFilter: Text[20];
+                         var _Dim1Filter: Text[20]; var _Dim2Filter: Text[20])
+    begin
+        _StartDate := StartDate;
+        _EndDate := EndDate;
+        _StatisticsBy := StatisticsBy;
+        _ItemFilter := ItemNoFilter;
+        _ItemCatFilter := ItemCategoryCodeFilter;
+        _Dim1Filter := CopyStr(Dim1Filter, 1, MaxStrLen(_Dim1Filter));
+        _Dim2Filter := CopyStr(Dim2Filter, 1, MaxStrLen(_Dim2Filter));
+    end;
+}
