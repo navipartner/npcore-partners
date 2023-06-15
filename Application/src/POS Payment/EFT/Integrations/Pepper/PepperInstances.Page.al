@@ -4,6 +4,7 @@
     // NPR5.20\BR\20160316  CASE 231481 Object Created
 
     Caption = 'Pepper Instances';
+    ContextSensitiveHelpPage = 'retail/eft/howto/terminal_setup.html';
     PageType = List;
     SourceTable = "NPR Pepper Instance";
     UsageCategory = Administration;

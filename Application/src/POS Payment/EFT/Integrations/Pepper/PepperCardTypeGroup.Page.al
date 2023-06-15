@@ -4,6 +4,7 @@
     // NPR5.20\BR\20160316  CASE 231481 Object Created
 
     Caption = 'Pepper Card Type Group';
+    ContextSensitiveHelpPage = 'retail/eft/howto/additional_pepper_card_types.html';
     PageType = List;
     SourceTable = "NPR Pepper Card Type Group";
     UsageCategory = Administration;

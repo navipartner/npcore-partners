@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Store Groups';
+    ContextSensitiveHelpPage = 'retail/posunit/explanation/POS_store.html';
     PageType = List;
     SourceTable = "NPR Store Group";
     UsageCategory = Administration;
