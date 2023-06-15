@@ -5,7 +5,6 @@ codeunit 85040 "NPR Library FR NF525"
         FRAuditSetup: Record "NPR FR Audit Setup";
         FRAuditNoSeries: Record "NPR FR Audit No. Series";
         TempBlob: Codeunit "Temp Blob";
-        TempBlob2: Codeunit "Temp Blob";
         DateFormulaVariable: DateFormula;
         OutStream: OutStream;
         InStream: InStream;

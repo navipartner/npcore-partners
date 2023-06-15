@@ -1,7 +1,6 @@
 codeunit 85001 "NPR Library - Inventory"
 {
     var
-        InventorySetup: Record "Inventory Setup";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryERM: Codeunit "Library - ERM";

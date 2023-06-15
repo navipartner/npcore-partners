@@ -21,8 +21,6 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
@@ -81,8 +79,6 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
@@ -147,7 +143,6 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
     var
         SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
-        POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit Assert;
         GroupCodesEnabled: Boolean;
@@ -197,7 +192,6 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
     var
         SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
-        POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         Assert: Codeunit Assert;
@@ -256,7 +250,6 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
     var
         SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
-        POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         Assert: Codeunit Assert;
@@ -316,8 +309,6 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
     var
         SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
-        NPRStoreGroup: Record "NPR Store Group";
-        POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         Assert: Codeunit Assert;
@@ -373,10 +364,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
     procedure ExportToOrderWithGroupCodesEnabledAndNonExistingGroupCodeAssigned()
     var
         SalePOS: Record "NPR POS Sale";
-        SalesHeader: Record "Sales Header";
-        POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         Assert: Codeunit "Assert";
         GroupCodeEnabled: Boolean;
         GroupCode: Code[10];
@@ -424,7 +412,6 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
     var
         SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
-        POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         Assert: Codeunit Assert;
@@ -482,9 +469,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
     var
         SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
-        POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         Assert: Codeunit Assert;
         GroupCodeEnabled: Boolean;
         GroupCode: Code[10];
@@ -541,7 +526,6 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesShipmentHeader: Record "Sales Shipment Header";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
-        POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         Assert: Codeunit Assert;

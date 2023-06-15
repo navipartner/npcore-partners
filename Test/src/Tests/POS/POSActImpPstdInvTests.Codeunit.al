@@ -18,7 +18,6 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
 
     procedure TestPostedInvToPOSNegativeValues()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSession: Codeunit "NPR POS Session";
         LibrarySales: Codeunit "Library - Sales";
@@ -47,7 +46,7 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
 
         POSActImpPstdInvB.SetPosSaleCustomer(POSSale, SalesInvHdr."Bill-to Customer No.");
 
-        POSActImpPstdInvB.PostedInvToPOS(POSSession, SalesInvHdr, true, true, true, true,'');
+        POSActImpPstdInvB.PostedInvToPOS(POSSession, SalesInvHdr, true, true, true, true, '');
 
         SalesInvLine.SetRange("Document No.", SalesInvHdr."No.");
         SalesInvLine.FindFirst();
@@ -80,7 +79,6 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
 
     procedure TestPostedInvToPOSPositiveValues()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSession: Codeunit "NPR POS Session";
         LibrarySales: Codeunit "Library - Sales";
@@ -111,7 +109,7 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
 
         POSActImpPstdInvB.SetPosSaleCustomer(POSSale, SalesInvHdr."Bill-to Customer No.");
 
-        POSActImpPstdInvB.PostedInvToPOS(POSSession, SalesInvHdr, false, true, true, true,'');
+        POSActImpPstdInvB.PostedInvToPOS(POSSession, SalesInvHdr, false, true, true, true, '');
 
         SalesInvLine.SetRange("Document No.", SalesInvHdr."No.");
         SalesInvLine.FindFirst();

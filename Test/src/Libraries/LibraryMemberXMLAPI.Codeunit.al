@@ -68,10 +68,8 @@ codeunit 85015 "NPR Library - Member XML API"
         MemberWebService: Codeunit "NPR MM Member WebService";
         IStream: InStream;
         OStream: OutStream;
-        NameSpace: Text;
         XmlAsText: Text;
         ApiStatus: Boolean;
-        XmlDec: XmlDeclaration;
 
         ApiXmlPort: XmlPort "NPR MM Create Membership";
     begin
@@ -187,10 +185,8 @@ codeunit 85015 "NPR Library - Member XML API"
         MemberWebService: Codeunit "NPR MM Member WebService";
         IStream: InStream;
         OStream: OutStream;
-        NameSpace: Text;
         XmlAsText: Text;
         ApiStatus: Boolean;
-        XmlDec: XmlDeclaration;
 
         ApiXmlPort: XmlPort "NPR MM Add Member";
     begin
@@ -294,10 +290,8 @@ codeunit 85015 "NPR Library - Member XML API"
         MemberWebService: Codeunit "NPR MM Member WebService";
         IStream: InStream;
         OStream: OutStream;
-        NameSpace: Text;
         XmlAsText: Text;
         ApiStatus: Boolean;
-        XmlDec: XmlDeclaration;
 
         ApiXmlPort: XmlPort "NPR MM AddReplaceCard";
     begin
@@ -331,8 +325,6 @@ codeunit 85015 "NPR Library - Member XML API"
         NameSpace: Text;
         XmlDoc: XmlDocument;
         XmlDec: XmlDeclaration;
-
-        ApiXmlPort: XmlPort "NPR MM Get Membership";
         MembershipQuery: XmlElement;
         GetMembership: XmlElement;
         Request: XmlElement;
@@ -364,7 +356,6 @@ codeunit 85015 "NPR Library - Member XML API"
         MemberWebService: Codeunit "NPR MM Member WebService";
         IStream: InStream;
         OStream: OutStream;
-        NameSpace: Text;
         XmlAsText: Text;
         ApiStatus: Boolean;
 
@@ -389,8 +380,6 @@ codeunit 85015 "NPR Library - Member XML API"
         NameSpace: Text;
         XmlDoc: XmlDocument;
         XmlDec: XmlDeclaration;
-
-        ApiXmlPort: XmlPort "NPR MM Get Membership";
         MemberQuery: XmlElement;
         GetMembers: XmlElement;
         Request: XmlElement;
@@ -423,7 +412,6 @@ codeunit 85015 "NPR Library - Member XML API"
         MemberWebService: Codeunit "NPR MM Member WebService";
         IStream: InStream;
         OStream: OutStream;
-        NameSpace: Text;
         XmlAsText: Text;
         ApiStatus: Boolean;
 
@@ -463,7 +451,6 @@ codeunit 85015 "NPR Library - Member XML API"
         Request: XmlElement;
         AttributesElement: XmlElement;
         Attribute: XmlElement;
-        MemberCard: XmlElement;
         Guardian: XmlElement;
         NAttributeCode: Integer;
     begin
@@ -527,7 +514,6 @@ codeunit 85015 "NPR Library - Member XML API"
         MemberWebService: Codeunit "NPR MM Member WebService";
         IStream: InStream;
         OStream: OutStream;
-        NameSpace: Text;
         XmlAsText: Text;
         ApiStatus: Boolean;
 
@@ -586,9 +572,7 @@ codeunit 85015 "NPR Library - Member XML API"
         RemoteMemberMgt: Codeunit "NPR MM NPR Membership";
         IStream: InStream;
         OStream: OutStream;
-        NameSpace: Text;
         XmlAsText: Text;
-        ApiStatus: Boolean;
         RootElement: XmlElement;
         ResponseNode: XmlNode;
 

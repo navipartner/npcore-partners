@@ -14,7 +14,6 @@ codeunit 85042 "NPR Replication API Tests"
     var
         RepSetup: Record "NPR Replication Service Setup";
         ImportType: Record "NPR Nc Import Type";
-        LibraryRandom: Codeunit "Library - Random";
         LibraryUtility: Codeunit "Library - Utility";
         Assert: Codeunit Assert;
 

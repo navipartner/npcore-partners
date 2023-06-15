@@ -3,18 +3,14 @@ codeunit 85111 "NPR SMS Implementation Tests"
     Subtype = Test;
 
     var
-        LibraryRandom: Codeunit "Library - Random";
         Assert: Codeunit "Assert";
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     procedure MakeMessage()
     var
-        SMSSetup: Record "NPR SMS Setup";
         Customer: Record Customer;
         SMSTemplateHeader: Record "NPR SMS Template Header";
-        SMSTemplateLine: Record "NPR SMS Template Line";
-        LibraryRandom: Codeunit "Library - Random";
         SMSManagement: Codeunit "NPR SMS Management";
         SMSMessage: Text[250];
         ExpectedSMSMessage: Text[250];

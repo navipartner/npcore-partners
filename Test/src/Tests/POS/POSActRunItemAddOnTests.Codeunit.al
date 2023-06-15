@@ -18,7 +18,6 @@ codeunit 85140 "NPR POS Act. RunItemAddOnTests"
         Item: Record Item;
         POSSaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        LibraryRandom: Codeunit "Library - Random";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
         POSActionBusinessLogic: Codeunit "NPR POS Action: RunItemAddOn B";

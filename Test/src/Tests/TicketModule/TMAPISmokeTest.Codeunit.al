@@ -86,13 +86,7 @@ codeunit 85013 "NPR TM API SmokeTest"
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         Assert: Codeunit "Assert";
         ItemNo: Code[20];
-        ResponseToken: Text;
-        ResponseMessage: Text;
         ReservationOk: Boolean;
-        NumberOfTicketOrders: Integer;
-        TicketQuantityPerOrder: Integer;
-        MemberNumber: Code[20];
-        ScannerStation: Code[10];
 
         TmpItemVariant: Record "Item Variant" temporary;
     begin
@@ -172,7 +166,6 @@ codeunit 85013 "NPR TM API SmokeTest"
     [TestPermissions(TestPermissions::Disabled)]
     procedure PreConfirmTicketReservation()
     var
-        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         Assert: Codeunit "Assert";
         ItemNo: Code[20];
@@ -183,8 +176,6 @@ codeunit 85013 "NPR TM API SmokeTest"
         TicketQuantityPerOrder: Integer;
         MemberNumber: Code[20];
         ScannerStation: Code[10];
-        SendNotificationTo: Text;
-        ExternalOrderNo: Text;
     begin
 
         ItemNo := SelectSmokeTestScenario();
@@ -380,8 +371,6 @@ codeunit 85013 "NPR TM API SmokeTest"
         NumberOfReservations: Integer;
         MemberNumber: Code[20];
         ScannerStation: Code[10];
-        SendNotificationTo: Text;
-        ExternalOrderNo: Text;
     begin
         NumberOfTicketOrders := Random(2) + 1;
         TicketQuantityPerOrder := Random(5) + 1;
@@ -446,8 +435,6 @@ codeunit 85013 "NPR TM API SmokeTest"
         NumberOfReservations: Integer;
         MemberNumber: Code[20];
         ScannerStation: Code[10];
-        SendNotificationTo: Text;
-        ExternalOrderNo: Text;
     begin
         NumberOfTicketOrders := Random(2) + 1;
         TicketQuantityPerOrder := Random(5) + 1;
@@ -595,11 +582,8 @@ codeunit 85013 "NPR TM API SmokeTest"
     procedure OfflineValidation()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
-        Item: Record "Item";
-        TicketType: Record "NPR TM Ticket Type";
         OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.";
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
-        WebService: Codeunit "NPR TM Ticket WebService";
         Assert: Codeunit "Assert";
         ItemNo: Code[20];
         ResponseToken: Text;
@@ -611,7 +595,6 @@ codeunit 85013 "NPR TM API SmokeTest"
         ScannerStation: Code[10];
         SendNotificationTo: Text;
         ExternalOrderNo: Text;
-        Status: Integer;
         ReferenceName: Code[20];
     begin
 
@@ -707,8 +690,6 @@ codeunit 85013 "NPR TM API SmokeTest"
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         Assert: Codeunit "Assert";
         ItemNo: Code[20];
-        AdmissionCode: Code[20];
-        ApiOk: Boolean;
     begin
 
         ItemNo := SelectSmokeTestScenario();
@@ -742,7 +723,6 @@ codeunit 85013 "NPR TM API SmokeTest"
         ScannerStation: Code[10];
         SendNotificationTo: Text;
         ExternalOrderNo: Text;
-        PaymentReference: Code[20];
     begin
 
         ItemNo := SelectSmokeTestScenario();
@@ -782,7 +762,6 @@ codeunit 85013 "NPR TM API SmokeTest"
         ScannerStation: Code[10];
         SendNotificationTo: Text;
         ExternalOrderNo: Text;
-        PaymentReference: Code[20];
     begin
 
         ItemNo := SelectSmokeTestScenario();
@@ -822,7 +801,6 @@ codeunit 85013 "NPR TM API SmokeTest"
         ScannerStation: Code[10];
         SendNotificationTo: Text;
         ExternalOrderNo: Text;
-        PaymentReference: Code[20];
     begin
 
         ItemNo := SelectSmokeTestScenario();
@@ -896,7 +874,6 @@ codeunit 85013 "NPR TM API SmokeTest"
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
-        DetailedTicketEntry: Record "NPR TM Det. Ticket AccessEntry";
         Assert: Codeunit "Assert";
         ItemNo: Code[20];
         ResponseToken: Text;
@@ -908,7 +885,6 @@ codeunit 85013 "NPR TM API SmokeTest"
         ScannerStation: Code[10];
         SendNotificationTo: Text;
         ExternalOrderNo: Text;
-        PaymentReference: Code[20];
         ExternalTicketNumber: Code[20];
     begin
 

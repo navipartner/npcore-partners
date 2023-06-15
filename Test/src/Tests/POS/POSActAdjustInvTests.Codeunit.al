@@ -19,7 +19,6 @@ codeunit 85049 "NPR POS Act. Adjust Inv. Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryRandom: Codeunit "Library - Random";
-        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
         POSActionBusinessLogic: Codeunit "NPR POS Action: Adjust Inv. B";

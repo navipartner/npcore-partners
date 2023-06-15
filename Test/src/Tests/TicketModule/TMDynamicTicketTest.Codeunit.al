@@ -80,8 +80,6 @@ codeunit 85056 "NPR TM Dynamic Ticket Test"
     [TestPermissions(TestPermissions::Disabled)]
     procedure MakeDynamicTicketReservationAndChangeAPI()
     var
-        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
-        Ticket: Record "NPR TM Ticket";
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
         TmpCurrentRequest: Record "NPR TM Ticket Reservation Req." temporary;
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";

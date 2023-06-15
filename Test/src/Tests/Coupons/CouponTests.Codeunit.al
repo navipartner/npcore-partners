@@ -266,7 +266,6 @@ codeunit 85074 "NPR Coupon Tests"
 
     local procedure CreateGS1DiscountTypeAmount()
     var
-        NpDcModuleIssueGS1: Codeunit "NPR NpDc Module Issue GS1";
         NpDcCouponType: Record "NPR NpDc Coupon Type";
         NpDcModuleApplyGS1: Codeunit "NPR NpDc Module Apply GS1";
         LibraryERM: Codeunit "Library - ERM";
@@ -282,8 +281,6 @@ codeunit 85074 "NPR Coupon Tests"
     end;
 
     procedure CreateGS1CouponType(var CouponType: Record "NPR NpDc Coupon Type"; DiscountType: Option)
-    var
-        NpDcModuleIssueGS1: Codeunit "NPR NpDc Module Issue GS1";
     begin
         CouponType.Init();
         CouponType.Code := _GS1Lbl;

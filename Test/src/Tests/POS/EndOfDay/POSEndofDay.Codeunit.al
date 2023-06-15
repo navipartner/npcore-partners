@@ -21,7 +21,6 @@ codeunit 85020 "NPR POS End of Day"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
@@ -31,7 +30,6 @@ codeunit 85020 "NPR POS End of Day"
         BinCheckPoint: Record "NPR POS Payment Bin Checkp.";
         POSBinEntry: Record "NPR POS Bin Entry";
         SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         DimensionSetId: Integer;
         SalesOffset: Integer;
         NumberOfSales: Integer;
@@ -155,7 +153,6 @@ codeunit 85020 "NPR POS End of Day"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
@@ -165,7 +162,6 @@ codeunit 85020 "NPR POS End of Day"
         BinCheckPoint: Record "NPR POS Payment Bin Checkp.";
         POSBinEntry: Record "NPR POS Bin Entry";
         SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         DimensionSetId: Integer;
         SalesOffset: Integer;
         NumberOfSales: Integer;
@@ -289,7 +285,6 @@ codeunit 85020 "NPR POS End of Day"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
@@ -297,9 +292,7 @@ codeunit 85020 "NPR POS End of Day"
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
         WorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         BinCheckPoint: Record "NPR POS Payment Bin Checkp.";
-        POSBinEntry: Record "NPR POS Bin Entry";
         SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         DimensionSetId: Integer;
         SalesOffset: Integer;
         NumberOfSales: Integer;
@@ -389,17 +382,13 @@ codeunit 85020 "NPR POS End of Day"
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         EFTTest: Codeunit "NPR EFT Tests";
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
         WorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-        BinCheckPoint: Record "NPR POS Payment Bin Checkp.";
-        POSBinEntry: Record "NPR POS Bin Entry";
         SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         DimensionSetId: Integer;
         SalesOffset: Integer;
         NumberOfSales: Integer;
@@ -470,17 +459,13 @@ codeunit 85020 "NPR POS End of Day"
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         EFTTest: Codeunit "NPR EFT Tests";
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
         WorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-        BinCheckPoint: Record "NPR POS Payment Bin Checkp.";
-        POSBinEntry: Record "NPR POS Bin Entry";
         SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         DimensionSetId: Integer;
         SalesOffset: Integer;
         NumberOfSales: Integer;
@@ -550,19 +535,14 @@ codeunit 85020 "NPR POS End of Day"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        EFTTest: Codeunit "NPR EFT Tests";
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
         WorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-        BinCheckPoint: Record "NPR POS Payment Bin Checkp.";
-        POSBinEntry: Record "NPR POS Bin Entry";
         SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         DimensionSetId: Integer;
         SalesOffset: Integer;
         NumberOfSales: Integer;
@@ -630,20 +610,15 @@ codeunit 85020 "NPR POS End of Day"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        EFTTest: Codeunit "NPR EFT Tests";
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
         WorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-        BinCheckPoint: Record "NPR POS Payment Bin Checkp.";
-        POSBinEntry: Record "NPR POS Bin Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         DimensionSetId: Integer;
         SalesOffset: Integer;
         NumberOfSales: Integer;
@@ -713,19 +688,14 @@ codeunit 85020 "NPR POS End of Day"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        EFTTest: Codeunit "NPR EFT Tests";
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
         WorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-        BinCheckPoint: Record "NPR POS Payment Bin Checkp.";
-        POSBinEntry: Record "NPR POS Bin Entry";
         SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         DimensionSetId: Integer;
         SalesOffset: Integer;
         NumberOfSales: Integer;
@@ -823,7 +793,6 @@ codeunit 85020 "NPR POS End of Day"
     procedure InitializeSetupFC(RelativeRate: Decimal)
     var
         Currency: Record Currency;
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         LibraryERM: Codeunit "Library - ERM";
     begin
         InitializeSetupLCY();
@@ -838,10 +807,6 @@ codeunit 85020 "NPR POS End of Day"
     end;
 
     procedure InitializeSetupVoucher()
-    var
-        Currency: Record Currency;
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        LibraryERM: Codeunit "Library - ERM";
     begin
         InitializeSetupLCY();
         _POSPaymentMethod."Processing Type" := _POSPaymentMethod."Processing Type"::VOUCHER;
@@ -852,8 +817,6 @@ codeunit 85020 "NPR POS End of Day"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSEndOfDayProfile: Record "NPR POS End of Day Profile";
-        POSPaymentBin: Record "NPR POS Payment Bin";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
     begin
         if _Initialized then begin

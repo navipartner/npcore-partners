@@ -96,7 +96,6 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     var
         PostGLEntriesJQ: Codeunit "NPR POS Post GL Entries JQ";
         PostItemEntriesJQ: Codeunit "NPR POS Post Item Entries JQ";
-        PeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
         Assert: Codeunit Assert;
         GLEntry: Record "G/L Entry";
@@ -132,7 +131,6 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     var
         PostGLEntriesJQ: Codeunit "NPR POS Post GL Entries JQ";
         PostItemEntriesJQ: Codeunit "NPR POS Post Item Entries JQ";
-        PeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
         Assert: Codeunit Assert;
         GLEntry: Record "G/L Entry";
@@ -202,10 +200,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     procedure ItemPostingContinueOnError()
     var
         PostItemEntriesJQ: Codeunit "NPR POS Post Item Entries JQ";
-        PeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
-        Assert: Codeunit Assert;
-        ItemLedgerEntry: Record "Item Ledger Entry";
         POSEntrySaleLine: Record "NPR POS Entry Sales Line";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
@@ -311,14 +306,11 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item1: Record Item;
         Item2: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
         SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         i: Integer;
     begin
         if NoOfSales < 1 then
@@ -345,8 +337,6 @@ codeunit 85044 "NPR JQ POS Posting Tests"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        GLSetup: Record "General Ledger Setup";
-        POSEntry: Record "NPR POS Entry";
     begin
         if _Initialized then begin
             //Clean any previous mock session

@@ -268,7 +268,6 @@ codeunit 85073 "NPR POS Self Service Tests"
     var
         POSEntry: Record "NPR POS Entry";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
-        SalePOS: Record "NPR POS Sale";
         ActionLoginScreen: Codeunit "NPR SS Action: Login Screen";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
@@ -364,15 +363,12 @@ codeunit 85073 "NPR POS Self Service Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure ItemAddOn()
     var
-        Item: Record Item;
         ItemAddOn: Record "NPR NpIa Item AddOn";
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
-        LibraryRandom: Codeunit "Library - Random";
         ItemAddOnBLogic: Codeunit "NPR SS Action - Item AddOn-BL";
     begin
         // [SCENARIO]

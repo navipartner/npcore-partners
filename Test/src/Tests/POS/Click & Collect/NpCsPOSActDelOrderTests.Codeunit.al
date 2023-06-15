@@ -26,7 +26,6 @@ codeunit 85103 "NPR NpCs POSAct DelOrder Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         NpCsDeliverOrderB: Codeunit "NPR NpCs POSAct. Deliv.Order-B";
         NpCsCreateOrderB: Codeunit "NPR NpCs POSAction Cr. Order B";
-        NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";

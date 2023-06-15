@@ -22,8 +22,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
         tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary;
@@ -95,8 +93,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
         tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary;
@@ -169,8 +165,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
         tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary;
@@ -241,8 +235,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
         tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary;
@@ -311,8 +303,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
         tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary;
@@ -381,7 +371,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
         TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
@@ -456,7 +445,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
         TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
@@ -538,7 +526,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
         TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
@@ -688,8 +675,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
         tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary;
@@ -765,8 +750,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
         tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary;
@@ -843,8 +826,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
         tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary;
@@ -919,8 +900,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
         tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary;
@@ -993,8 +972,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
         tmpHandlerParameter: Record "NPR Tax Free Handler Param." temporary;
@@ -1067,7 +1044,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
         TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
@@ -1145,7 +1121,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
         TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
@@ -1225,7 +1200,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
         POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
         TaxFreeHandler: Codeunit "NPR Tax Free Handler Mgt.";
         SaleEnded: Boolean;
         TaxFreetest: Codeunit "NPR Tax Free Tests";
@@ -1341,8 +1315,6 @@ codeunit 85019 "NPR Tax Free Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
         NPRLibraryTaxFree: Codeunit "NPR Library - Tax Free";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
     begin
         Clear(_ExpectedMessagesList);
         Clear(_ExpectedCnfrmList);
@@ -1371,7 +1343,6 @@ codeunit 85019 "NPR Tax Free Tests"
     var
         NotEligibleMsg: Label 'An error occurred during tax free processing:\Sale is not eligible for tax free voucher. VAT amount or sale date is outside the allowed limits.', Locked = true;
         IssueTaxFreeVoucherCnfrm: Label 'Foreign credit card detected. Should a tax free voucher be issued for this sale?', Locked = true;
-        Caption_UseID: Label 'Does the customer have Global Blue Tax Free identification available?', Locked = True;
         ReissueQst: Label 'Are you sure you want to proceed with reissue of tax free voucher:\\%1: %2\%3: %4\%5: %6\\Reissuing a tax free voucher voids the current voucher and issues a new one in its place.\The current voucher will no longer be valid for tax free refunding.\\Please proceed only if the customer is present in the store!', Locked = true;
         AlreadyVoidedMessage: Label 'An error occurred during tax free processing:\This voucher has already been voided', Locked = true;
         _POSPaymentMethod: Record "NPR POS Payment Method";
@@ -1382,8 +1353,6 @@ codeunit 85019 "NPR Tax Free Tests"
         _POSStore: Record "NPR POS Store";
         _POSSetup: Record "NPR POS Setup";
         _TaxFreePOSUnit: Record "NPR Tax Free POS Unit";
-        _TaxFreeVoucher: Record "NPR Tax Free Voucher";
-        _TmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary;
         _TaxFreeservice: Record "NPR Tax Free GB I2 Service";
         _TaxFreePosUnitPrm: Record "NPR Tax Free GB I2 Param.";
         _LastTrxEntryNo: Integer;

@@ -36,7 +36,6 @@ codeunit 85106 "NPR Library MemberLoyalty"
     internal procedure CreateScenario_Loyalty100(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpRegisterSaleLines: Record "NPR MM Reg. Sales Buffer" temporary; var TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary) SalesItemNo: Code[20]
     var
         LoyaltySetup: Record "NPR MM Loyalty Setup";
-        ItemLoyalty: Record "NPR MM Loy. Item Point Setup";
         MembershipSalesItem: Record "NPR MM Members. Sales Setup";
         MembershipSetup: Record "NPR MM Membership Setup";
         MembershipLibrary: Codeunit "NPR Library - Member Module";

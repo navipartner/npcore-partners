@@ -77,7 +77,6 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         NegativeInput: Boolean;
         SkipItemAvailabilityCheck: Boolean;
         SaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         //[parameters]
         //ReturnReasonCode = '';
@@ -225,7 +224,6 @@ codeunit 85068 "NPR POS Act. Quantity Tests"
         NegativeInput: Boolean;
         SkipItemAvailabilityCheck: Boolean;
         SaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         //[parameters]
         //ReturnReasonCode = '';

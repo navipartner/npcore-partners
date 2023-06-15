@@ -16,7 +16,6 @@ codeunit 85135 "NPR POS Act. Backend Fun Tests"
     procedure BackEndFun()
     var
         POSActionBackEndFun: Codeunit "NPR MM POS Action: BackEnd B";
-        DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSPaymentMethod: Record "NPR POS Payment Method";

@@ -1,4 +1,4 @@
-﻿codeunit 85014 "NPR Library - Member Module"
+codeunit 85014 "NPR Library - Member Module"
 {
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Clone Data", 'CheckIfSkipCreateDefaultBarcode', '', true, true)]
     local procedure CheckIfSkipCreateDefaultBarcode(ItemNo: Code[20]; VariantCode: Code[10]; var SkipCreateDefaultBarcode: Boolean; var Handled: Boolean)
@@ -13,15 +13,8 @@
         Customer: Record Customer;
         Item: Record Item;
         MemberCommunity: Record "NPR MM Member Community";
-        MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
         MembershipSetup: Record "NPR MM Membership Setup";
         POSPostingProfile: Record "NPR POS Posting Profile";
-        AdmissionSchedule: Record "NPR TM Admis. Schedule";
-        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
-        Admission: Record "NPR TM Admission";
-        TicketBom: Record "NPR TM Ticket Admission BOM";
-        TicketSetup: Record "NPR TM Ticket Setup";
-        TicketType: Record "NPR TM Ticket Type";
         NprMasterData: Codeunit "NPR Library - POS Master Data";
         LoyaltyProgramCode: Code[20];
     begin

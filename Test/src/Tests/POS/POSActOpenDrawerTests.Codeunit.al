@@ -16,13 +16,10 @@ codeunit 85120 "NPR POS Act. Open Drawer Tests"
         POSAuditLog: Record "NPR POS Audit Log";
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSPaymentBin: Record "NPR POS Payment Bin";
-        SalePOS: Record "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         OpenDrawerBL: Codeunit "NPR POS Action: Open Drawer B";
         POSSale: Codeunit "NPR POS Sale";
-        POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
         SetupOut: Codeunit "NPR POS Setup";
-        SelectedMethod: Text;
     begin
         // [Given] POS initialization
         LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);

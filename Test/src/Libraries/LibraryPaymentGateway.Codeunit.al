@@ -88,9 +88,9 @@ codeunit 85127 "NPR Library - Payment Gateway"
     end;
 
     /// <summary>
-    /// Create a new Payment Line for the given Sales Invoice Header
+    /// Create a new Payment Line for the given Sales Credit Memo Header
     /// </summary>
-    /// <param name="SalesInvHeader">Sales Invoice Header payment line should be assocaited with</param>
+    /// <param name="SalesCrMemoHeader">Sales Credit Memo Header payment line should be assocaited with</param>
     /// <param name="GatewayCode">Payment Gateway to be used on the given payment line</param>
     internal procedure CreatePaymentLineForSalesCrMemoHeader(SalesCrMemoHeader: Record "Sales Cr.Memo Header"; GatewayCode: Code[10])
     var
@@ -100,9 +100,9 @@ codeunit 85127 "NPR Library - Payment Gateway"
     end;
 
     /// <summary>
-    /// Create a new Payment Line for the given Sales Cr. Memo Header
+    /// Create a new Payment Line for the given Sales Credit Memo Header
     /// </summary>
-    /// <param name="SalesCrMemoHeader">Sales Invoice Header payment line should be assocaited with</param>
+    /// <param name="SalesCrMemoHeader">Sales Credit Memo Header payment line should be assocaited with</param>
     /// <param name="GatewayCode">Payment Gateway to be used on the given payment line</param>
     /// <param name="PaymentLine">Payment Line record that should be operated upon</param>/// 
     internal procedure CreatePaymentLineForSalesCrMemoHeader(SalesCrMemoHeader: Record "Sales Cr.Memo Header"; GatewayCode: Code[10]; var PaymentLine: Record "NPR Magento Payment Line")
@@ -119,7 +119,7 @@ codeunit 85127 "NPR Library - Payment Gateway"
         LibRandom: Codeunit "Library - Random";
     begin
         PaymentLine.Init();
-        PaymentLine."Document Table No." := Database::"Sales Header";
+        PaymentLine."Document Table No." := DocumentTableNo;
         PaymentLine."Document Type" := DocumentType;
         PaymentLine."Document No." := DocumentNo;
         PaymentLine."No." := LibRandom.RandText(MaxStrLen(PaymentLine."No."));

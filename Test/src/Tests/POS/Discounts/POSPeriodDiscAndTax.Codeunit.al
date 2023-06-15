@@ -101,7 +101,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
     procedure ApplyDiscountWhenPOSSaleLineCreatedForNormalTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
-        POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         PeriodDiscountLine: Record "NPR Period Discount Line";
@@ -186,7 +185,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
-        COD: codeunit "NPR POS Normal Tax Backward";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
         LineAmtInclTax: Decimal;
@@ -268,9 +266,7 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         POSSaleTaxLine: Record "NPR POS Sale Tax Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
-        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
-        COD: codeunit "NPR POS Normal Tax Backward";
         LineDiscPct: Array[2] of Decimal;
         LineDiscAmt: Array[2] of Decimal;
         LineAmtInclTax: Array[2] of Decimal;
@@ -1152,7 +1148,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
     procedure ApplyDiscountWhenPOSSaleLineCreatedForRevChrgTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
-        POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         PeriodDiscountLine: Record "NPR Period Discount Line";
@@ -1230,7 +1225,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         LineDiscAmt: Decimal;
         LineAmtInclTax: Decimal;
         LineAmtExclTax: Decimal;
-        UnitPrice: Decimal;
     begin
         // [SCENARIO] Discount is prioritized and applied when POS Sale Line is created
 
@@ -1680,7 +1674,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
     procedure ApplyDiscountWhenPOSSaleLineCreatedForSaleTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
-        POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         TaxArea: Record "Tax Area";
@@ -1876,7 +1869,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         POSEntry: Record "NPR POS Entry";
-        GLEntry: Record "G/L Entry";
         TaxJurisdiction: Record "Tax Jurisdiction";
         TaxDetail: Record "Tax Detail";
         TaxArea: Record "Tax Area";
@@ -1888,7 +1880,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
         LineAmtInclTax: Decimal;
-        LineAmtExclTax: Decimal;
         AmountToPay: Decimal;
         CityTaxRate: Decimal;
         CountyTaxRate: Decimal;
@@ -1986,7 +1977,7 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         VerifyVATforGLEntry(POSEntry, TaxArea);
 
         POSStore.GetProfile(POSPostingProfile);
-        VerifySalesforGLEntry(POSEntry, Item, POSPostingProfile."Gen. Bus. Posting Group");
+        VerifySalesforGLEntry(POSEntry, POSPostingProfile."Gen. Bus. Posting Group");
     end;
 
     [Test]
@@ -1999,7 +1990,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         POSEntry: Record "NPR POS Entry";
-        GLEntry: Record "G/L Entry";
         TaxJurisdiction: Record "Tax Jurisdiction";
         TaxDetail: Record "Tax Detail";
         TaxArea: Record "Tax Area";
@@ -2011,7 +2001,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
         LineAmtInclTax: Decimal;
-        LineAmtExclTax: Decimal;
         AmountToPay: Decimal;
         CityTaxRate: Decimal;
         CountyTaxRate: Decimal;
@@ -2109,7 +2098,7 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         VerifyVATforGLEntry(POSEntry, TaxArea);
 
         POSStore.GetProfile(POSPostingProfile);
-        VerifySalesforGLEntry(POSEntry, Item, POSPostingProfile."Gen. Bus. Posting Group");
+        VerifySalesforGLEntry(POSEntry, POSPostingProfile."Gen. Bus. Posting Group");
     end;
 
     [Test]
@@ -2123,7 +2112,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         Item: Record Item;
         Customer: Record Customer;
         POSEntry: Record "NPR POS Entry";
-        GLEntry: Record "G/L Entry";
         TaxJurisdiction: Record "Tax Jurisdiction";
         TaxDetail: Record "Tax Detail";
         TaxArea: Record "Tax Area";
@@ -2240,7 +2228,7 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
 
         VerifyVATforGLEntry(POSEntry, TaxArea);
 
-        VerifySalesforGLEntry(POSEntry, Item, Customer."Gen. Bus. Posting Group");
+        VerifySalesforGLEntry(POSEntry, Customer."Gen. Bus. Posting Group");
     end;
 
     [Test]
@@ -2254,7 +2242,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         Item: Record Item;
         Customer: Record Customer;
         POSEntry: Record "NPR POS Entry";
-        GLEntry: Record "G/L Entry";
         TaxJurisdiction: Record "Tax Jurisdiction";
         TaxDetail: Record "Tax Detail";
         TaxArea: Record "Tax Area";
@@ -2371,7 +2358,7 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
 
         VerifyVATforGLEntry(POSEntry, TaxArea);
 
-        VerifySalesforGLEntry(POSEntry, Item, Customer."Gen. Bus. Posting Group");
+        VerifySalesforGLEntry(POSEntry, Customer."Gen. Bus. Posting Group");
     end;
 
     [Test]
@@ -2430,7 +2417,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
     procedure ApplyDiscountWhenPOSSaleLineUpdatedQtyForNormalTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
-        POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         PeriodDiscountLine: Record "NPR Period Discount Line";
@@ -2516,7 +2502,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         LineDiscAmt: Decimal;
         LineAmtInclTax: Decimal;
         LineAmtExclTax: Decimal;
-        UnitPrice: Decimal;
         Qty: Decimal;
     begin
         // [SCENARIO] Discount is prioritized and applied when POS Sale Line is modified
@@ -3009,7 +2994,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
     procedure ApplyDiscountWhenPOSSaleLineUpdatedQtyForRevChrgTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
-        POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         PeriodDiscountLine: Record "NPR Period Discount Line";
@@ -3592,7 +3576,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
     procedure ApplyDiscountWhenPOSSaleLineUpdatedForSaleTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
-        POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         TaxArea: Record "Tax Area";
@@ -3799,7 +3782,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         POSEntry: Record "NPR POS Entry";
-        GLEntry: Record "G/L Entry";
         TaxJurisdiction: Record "Tax Jurisdiction";
         TaxDetail: Record "Tax Detail";
         TaxArea: Record "Tax Area";
@@ -3911,7 +3893,7 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         VerifyVATforGLEntry(POSEntry, TaxArea);
 
         POSStore.GetProfile(POSPostingProfile);
-        VerifySalesforGLEntry(POSEntry, Item, POSPostingProfile."Gen. Bus. Posting Group");
+        VerifySalesforGLEntry(POSEntry, POSPostingProfile."Gen. Bus. Posting Group");
     end;
 
     [Test]
@@ -3925,7 +3907,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         Item: Record Item;
         Customer: Record Customer;
         POSEntry: Record "NPR POS Entry";
-        GLEntry: Record "G/L Entry";
         TaxJurisdiction: Record "Tax Jurisdiction";
         TaxDetail: Record "Tax Detail";
         TaxArea: Record "Tax Area";
@@ -3936,9 +3917,7 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
-        LineDiscAmt: Decimal;
         LineAmtInclTax: Decimal;
-        LineAmtExclTax: Decimal;
         AmountToPay: Decimal;
         CityTaxRate: Decimal;
         CountyTaxRate: Decimal;
@@ -4051,7 +4030,7 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         Assert.IsFalse(TaxJurisdiction.IsEmpty(), 'Tax Jurisdiction not found');
 
         VerifyVATforGLEntry(POSEntry, TaxArea);
-        VerifySalesforGLEntry(POSEntry, Item, Customer."Gen. Bus. Posting Group");
+        VerifySalesforGLEntry(POSEntry, Customer."Gen. Bus. Posting Group");
     end;
 
     [Test]
@@ -4109,7 +4088,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
     procedure ApplyDiscountWhenPOSSaleLineDeletedForNormalTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
-        POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         PeriodDiscountLine: Record "NPR Period Discount Line";
@@ -4317,7 +4295,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
     procedure ApplyDiscountWhenPOSSaleLineDeletedForRevChrgTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
-        POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         PeriodDiscountLine: Record "NPR Period Discount Line";
@@ -4525,7 +4502,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
     procedure ApplyDiscountWhenPOSSaleLineDeletedForSaleTaxInDirectSale()
     var
         POSSaleLine: Record "NPR POS Sale Line";
-        POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         TaxArea: Record "Tax Area";
@@ -4921,8 +4897,6 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
     end;
 
     local procedure CreateDiscountLine(PeriodDiscount: Record "NPR Period Discount"; Item: Record Item; DiscPct: Decimal; var PeriodDiscountLine: Record "NPR Period Discount Line")
-    var
-        LibraryUtility: Codeunit "Library - Utility";
     begin
         PeriodDiscountLine.Code := PeriodDiscount.Code;
         PeriodDiscountLine."Item No." := Item."No.";
@@ -4966,11 +4940,10 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         Assert.IsTrue(ABS(GLEntry.Amount + POSEntryTaxLine."Tax Amount") <= 0.01, 'GLEntry.Amount <> POSEntryTaxLine."Tax Amount"');
     end;
 
-    local procedure VerifySalesforGLEntry(POSEntry: Record "NPR POS Entry"; Item: Record Item; GenBusPostingGroup: Code[20])
+    local procedure VerifySalesforGLEntry(POSEntry: Record "NPR POS Entry"; GenBusPostingGroup: Code[20])
     var
         GLEntry: Record "G/L Entry";
         GeneralPostingSetup: Record "General Posting Setup";
-        POSPostingProfile: Record "NPR POS Posting Profile";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
     begin
         GLEntry.SetRange("Document No.", POSEntry."Document No.");

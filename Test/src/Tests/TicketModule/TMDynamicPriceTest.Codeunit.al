@@ -14,7 +14,6 @@ codeunit 85047 "NPR TM Dynamic Price Test"
         TmpAdmScheduleEntryResponseOut: Record "NPR TM Admis. Schedule Entry" temporary;
         ItemNo: Code[20];
         PriceProfileCode: Code[10];
-        DateNotRelevant: Date;
     begin
         ItemNo := SelectDynamicPriceScenario();
 
@@ -66,7 +65,6 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeBookingDate_D()
     var
-        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         TicketPrice: Codeunit "NPR TM Dynamic Price";
         Assert: Codeunit "Assert";
         Rule: Record "NPR TM Dynamic Price Rule";
@@ -113,7 +111,6 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeBookingDate_WD()
     var
-        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         TicketPrice: Codeunit "NPR TM Dynamic Price";
         Assert: Codeunit "Assert";
         Rule: Record "NPR TM Dynamic Price Rule";
@@ -159,7 +156,6 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeBookingDate_M()
     var
-        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         TicketPrice: Codeunit "NPR TM Dynamic Price";
         Assert: Codeunit "Assert";
         Rule: Record "NPR TM Dynamic Price Rule";
@@ -202,7 +198,6 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeBookingDate_Q()
     var
-        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         TicketPrice: Codeunit "NPR TM Dynamic Price";
         Assert: Codeunit "Assert";
         Rule: Record "NPR TM Dynamic Price Rule";
@@ -242,7 +237,6 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeBookingDate_W()
     var
-        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         TicketPrice: Codeunit "NPR TM Dynamic Price";
         Assert: Codeunit "Assert";
         Rule: Record "NPR TM Dynamic Price Rule";
@@ -353,7 +347,6 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeEventDate_D()
     var
-        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         TicketPrice: Codeunit "NPR TM Dynamic Price";
         Assert: Codeunit "Assert";
         Rule: Record "NPR TM Dynamic Price Rule";
@@ -404,7 +397,6 @@ codeunit 85047 "NPR TM Dynamic Price Test"
     [TestPermissions(TestPermissions::Disabled)]
     procedure RelativeUntilEventDate()
     var
-        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         TicketPrice: Codeunit "NPR TM Dynamic Price";
         Assert: Codeunit "Assert";
         Rule: Record "NPR TM Dynamic Price Rule";

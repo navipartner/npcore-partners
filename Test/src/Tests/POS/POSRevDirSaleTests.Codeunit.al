@@ -4,7 +4,6 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
 
     var
         Assert: Codeunit "Assert";
-        Quantity: Decimal;
         Initialized: Boolean;
         POSUnit: Record "NPR POS Unit";
         POSPaymentMethod: Record "NPR POS Payment Method";
@@ -329,7 +328,6 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
     begin
         if Initialized then begin
             //Clean any previous mock session

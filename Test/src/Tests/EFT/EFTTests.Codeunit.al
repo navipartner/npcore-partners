@@ -18,21 +18,10 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure LookupReversedTransaction()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
-        EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
     begin
         exit; //TODO: [Test result: FAIL] Fixing in progress
         // [Scenario] Check that a EFT lookup of a reversed transaction is not possible. (Result is final)
@@ -55,11 +44,8 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
@@ -101,14 +87,8 @@ codeunit 85004 "NPR EFT Tests"
 
     procedure GenericEFTPaymentSuccess(POSSession: Codeunit "NPR POS Session"; SalePOS: Record "NPR POS Sale"; PaymentAmount: Decimal)
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
-        SaleLinePOS: Record "NPR POS Sale Line";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
-        POSSale: Codeunit "NPR POS Sale";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
         // [Scenario] Add payment to an existing sales, can be used from by external test functions to add a successful EFT payment to sales
@@ -141,11 +121,8 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
@@ -192,12 +169,8 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
@@ -244,12 +217,8 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Item: Record Item;
         VoidEFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -307,12 +276,8 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
@@ -362,12 +327,8 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
@@ -417,12 +378,8 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
@@ -470,13 +427,8 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -515,12 +467,8 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
@@ -567,12 +515,8 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
@@ -617,16 +561,9 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure ReferencedRefund()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -667,13 +604,8 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -713,16 +645,9 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('MessageHandler')]
     procedure ReferencedRefundRecoveredPurchase()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -763,16 +688,9 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('MessageHandler')]
     procedure ReferencedRefundRecoveredLookup()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -812,16 +730,8 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('ConfirmNoHandler')]
     procedure ReferencedRefundUnrecoveredPurchase()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -850,16 +760,8 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('ConfirmNoHandler,MessageHandler')]
     procedure ReferencedRefundUnsuccessfulLookup()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -887,16 +789,9 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure VoidSuccess()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -935,16 +830,9 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure VoidFailure()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -984,16 +872,9 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure VoidError()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1033,19 +914,11 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure VoidOfPurchaseWithTip()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Assert: Codeunit Assert;
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
         // [Scenario] Check that a successful EFT void of trx with tip is handled correctly.
@@ -1084,19 +957,11 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure VoidOfPurchaseWithSurcharge()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Assert: Codeunit Assert;
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
         // [Scenario] Check that a successful EFT void of trx with surcharge is handled correctly.
@@ -1135,16 +1000,9 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure DoubleVoid()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1175,16 +1033,9 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('MessageHandler')]
     procedure VoidRecoveredPurchase()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1225,16 +1076,9 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('MessageHandler')]
     procedure VoidRecoveredLookup()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1274,16 +1118,8 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure VoidUnrecoveredPurchase()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1312,16 +1148,8 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('MessageHandler')]
     procedure VoidUnsuccessfulLookup()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1349,16 +1177,9 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure VoidSuccessFromFinishedSale()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1402,16 +1223,8 @@ codeunit 85004 "NPR EFT Tests"
     var
         POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl B";
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1444,18 +1257,9 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure VoidRefund()
     var
-        POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl";
-        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1494,18 +1298,11 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure OpenSuccess()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
         exit; //TODO: [Test result: FAIL] Fixing in progress
@@ -1539,18 +1336,11 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure OpenFailure()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
         // [Scenario] Check that failed EFT open is handled correctly.
@@ -1583,18 +1373,11 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure CloseSuccess()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
         // [Scenario] Check that successful EFT close is handled correctly.
@@ -1627,18 +1410,11 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure CloseFailure()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
         // [Scenario] Check that failed EFT close is handled correctly.
@@ -1672,16 +1448,9 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('MessageHandler')]
     procedure LookupSuccessOfLostPurchaseApproval()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1722,16 +1491,9 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('MessageHandler')]
     procedure LookupSuccessOfLostPurchaseDecline()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1771,16 +1533,9 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('MessageHandler')]
     procedure LookupFailureOfLostPurchase()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1823,13 +1578,8 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -1869,16 +1619,9 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('ConfirmYesHandler,MessageHandler')]
     procedure LookupPromptConfirmIfLastTrxHasUnknownResult()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1923,16 +1666,9 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('ConfirmNoHandler')]
     procedure LookupPromptDeclineIfLastTrxHasUnknownResult()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
@@ -1976,21 +1712,11 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('MessageHandler')]
     procedure DoubleLookupOfLostResult()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
     begin
         // [Scenario] Check that lookup cannot happen more than once.
 
@@ -2023,21 +1749,11 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure LookupOfKnownResult()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
     begin
         // [Scenario] Check that successful EFT lookup of known result is handled correctly.
 
@@ -2064,21 +1780,12 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('MessageHandler')]
     procedure LookupSuccessOfLostPurchaseWithTip()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
     begin
         // [Scenario] Check that successful EFT lookup of lost trx is handled correctly, when lost trx had a tip amount.
 
@@ -2119,21 +1826,12 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('MessageHandler')]
     procedure LookupVoidTransaction()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
     begin
         // [Scenario] Check that a lookup can be performed of an error'ed void trx.
 
@@ -2168,19 +1866,12 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
         SalesAmount: Decimal;
         PaymentAmount: Decimal;
         ChangeAmount: Decimal;
@@ -2227,21 +1918,12 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('MessageHandler')]
     procedure LookupSuccessOfLostPurchaseFromParkedSale()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
         POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl B";
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
     begin
@@ -2286,20 +1968,12 @@ codeunit 85004 "NPR EFT Tests"
     procedure LookupSuccessOfLostPurchaseFromCancelledSale()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
         POSActionCancelSale: Codeunit "NPR POSAction: Cancel Sale B";
     begin
         // [Scenario] Check that a lost purchase in a sale that has been cancelled, is handled correctly when looked up.
@@ -2344,21 +2018,12 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure AuxiliarySuccess()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
     begin
         // [Scenario] Check that a successful auxiliary EFT request is handled correctly
 
@@ -2390,21 +2055,12 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure AuxiliaryFailure()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
     begin
         // [Scenario] Check that a failed auxiliary EFT request is handled correctly
 
@@ -2438,18 +2094,12 @@ codeunit 85004 "NPR EFT Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
         Assert: Codeunit Assert;
         POSEntry: Record "NPR POS Entry";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
@@ -2523,20 +2173,8 @@ codeunit 85004 "NPR EFT Tests"
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
-        POSEntry: Record "NPR POS Entry";
-        POSPaymentLine: Record "NPR POS Entry Payment Line";
-        POSSalesLine: Record "NPR POS Entry Sales Line";
-        SaleEnded: Boolean;
         POSActionEFTGiftCard: Codeunit "NPR POS Action: EFT Gift Card";
         GiftCardPOSPaymentMethod: Record "NPR POS Payment Method";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
@@ -2591,24 +2229,11 @@ codeunit 85004 "NPR EFT Tests"
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
-        POSEntry: Record "NPR POS Entry";
-        POSPaymentLine: Record "NPR POS Entry Payment Line";
-        POSSalesLine: Record "NPR POS Entry Sales Line";
-        SaleEnded: Boolean;
         POSActionEFTGiftCard: Codeunit "NPR POS Action: EFT Gift Card";
         GiftCardPOSPaymentMethod: Record "NPR POS Payment Method";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
-        DiscountLineID: Guid;
         GiftCardEFTSetup: Record "NPR EFT Setup";
     begin
         // [Scenario] Check that gift card load failure is handled correctly
@@ -2660,24 +2285,11 @@ codeunit 85004 "NPR EFT Tests"
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
-        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
-        POSEntry: Record "NPR POS Entry";
-        POSPaymentLine: Record "NPR POS Entry Payment Line";
-        POSSalesLine: Record "NPR POS Entry Sales Line";
-        SaleEnded: Boolean;
         POSActionEFTGiftCard: Codeunit "NPR POS Action: EFT Gift Card";
         GiftCardPOSPaymentMethod: Record "NPR POS Payment Method";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
-        DiscountLineID: Guid;
         GiftCardEFTSetup: Record "NPR EFT Setup";
     begin
         // [Scenario] Check that gift card load error is handled correctly
@@ -2724,30 +2336,12 @@ codeunit 85004 "NPR EFT Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure VoidLoadGiftCard()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
-        POSEntry: Record "NPR POS Entry";
-        POSPaymentLine: Record "NPR POS Entry Payment Line";
-        POSSalesLine: Record "NPR POS Entry Sales Line";
-        SaleEnded: Boolean;
-        POSActionEFTGiftCard: Codeunit "NPR POS Action: EFT Gift Card";
-        GiftCardPOSPaymentMethod: Record "NPR POS Payment Method";
-        POSFrontEndManagement: Codeunit "NPR POS Front End Management";
-        DiscountLineID: Guid;
-        GiftCardEFTSetup: Record "NPR EFT Setup";
     begin
         // [Scenario] Check that a gift card load can be voided.
 
@@ -2784,30 +2378,12 @@ codeunit 85004 "NPR EFT Tests"
     [HandlerFunctions('MessageHandler')]
     procedure LookupLostLoadGiftCardResult()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EntryNo: Integer;
-        Assert: Codeunit Assert;
-        POSEntry: Record "NPR POS Entry";
-        POSPaymentLine: Record "NPR POS Entry Payment Line";
-        POSSalesLine: Record "NPR POS Entry Sales Line";
-        SaleEnded: Boolean;
-        POSActionEFTGiftCard: Codeunit "NPR POS Action: EFT Gift Card";
-        GiftCardPOSPaymentMethod: Record "NPR POS Payment Method";
-        POSFrontEndManagement: Codeunit "NPR POS Front End Management";
-        DiscountLineID: Guid;
-        GiftCardEFTSetup: Record "NPR EFT Setup";
     begin
         // [Scenario] Check that a lost gift card approval can be looked up
 
@@ -2886,7 +2462,6 @@ codeunit 85004 "NPR EFT Tests"
     procedure InitializeData()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
-        ItemRef: Record "Item Reference";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
     begin

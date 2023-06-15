@@ -16,14 +16,9 @@ codeunit 85060 "NPR POS Act. Transfer Ord Test"
     var
         POSActionBusinessLogic: Codeunit "NPR POS Action Transfer Order";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        LibraryRandom: Codeunit "Library - Random";
-        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
 
         POSParameterValue: Record "NPR POS Parameter Value";
-        POSMenuButton: Record "NPR POS Menu Button";
 
         TransferHeader: Record "Transfer Header";
         Location: Record Location;

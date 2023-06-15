@@ -1,4 +1,4 @@
-﻿codeunit 85002 "NPR Library - POS Master Data"
+codeunit 85002 "NPR Library - POS Master Data"
 {
 
     procedure CreatePOSUnit(var POSUnit: Record "NPR POS Unit"; POSStoreCode: Code[10]; POSProfileCode: Code[20])
@@ -13,7 +13,6 @@
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSPaymentBin: record "NPR POS Payment Bin";
-        POSPricingProfile: Record "NPR POS Pricing Profile";
         LibraryUtility: Codeunit "Library - Utility";
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
     begin
@@ -101,7 +100,6 @@
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         POSPaymentBin: Record "NPR POS Payment Bin";
         LibraryUtility: Codeunit "Library - Utility";
-        LibraryRandom: Codeunit "Library - Random";
         LibraryERM: Codeunit "Library - ERM";
         Currency: Record Currency;
     begin
@@ -231,7 +229,6 @@
 
     procedure CreatePOSPaymentMethod(var POSPaymentMethod: Record "NPR POS Payment Method"; No: Text; ProcessingType: Enum "NPR Payment Processing Type")
     var
-        LibraryERM: Codeunit "Library - ERM";
         LibraryUtility: Codeunit "Library - Utility";
     begin
         POSPaymentMethod.Init();
@@ -256,7 +253,6 @@
     procedure CreatePOSAuditProfile(var POSAuditProfile: Record "NPR POS Audit Profile")
     var
         LibraryUtility: Codeunit "Library - Utility";
-        LibraryRandom: Codeunit "Library - Random";
         LibraryNoSeries: Codeunit "NPR Library - No. Series";
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
@@ -415,7 +411,7 @@
             until POSUnit.Next() = 0;
     end;
 
-    local procedure GetRandomPrecision() Precision: Decimal
+    local procedure GetRandomPrecision(): Decimal
     var
         LibraryRandom: Codeunit "Library - Random";
         Denominations: List of [Decimal];
@@ -433,7 +429,6 @@
     local procedure CreateDefaultValidateVoucherModule(): Code[20]
     var
         NpRvVoucherModule: Record "NPR NpRv Voucher Module";
-        LibraryUtility: Codeunit "Library - Utility";
     begin
         NpRvVoucherModule.SetRange(Type, NpRvVoucherModule.Type::"Validate Voucher");
         NpRvVoucherModule.SetRange("Event Codeunit ID", Codeunit::"NPR NpRv Module Valid.: Def.");
@@ -450,7 +445,6 @@
     local procedure CreatePartialApplyVoucherModule(): Code[20]
     var
         NpRvVoucherModule: Record "NPR NpRv Voucher Module";
-        LibraryUtility: Codeunit "Library - Utility";
     begin
         NpRvVoucherModule.SetRange(Type, NpRvVoucherModule.Type::"Apply Payment");
         NpRvVoucherModule.SetRange("Event Codeunit ID", Codeunit::"NPR NpRv Module Pay. - Partial");
@@ -467,7 +461,6 @@
     local procedure CreateDefaultApplyVoucherModule(): Code[20]
     var
         NpRvVoucherModule: Record "NPR NpRv Voucher Module";
-        LibraryUtility: Codeunit "Library - Utility";
     begin
         NpRvVoucherModule.SetRange(Type, NpRvVoucherModule.Type::"Apply Payment");
         NpRvVoucherModule.SetRange("Event Codeunit ID", Codeunit::"NPR NpRv Module Pay.: Default");
@@ -632,7 +625,6 @@
 
     procedure CreatePartialVoucherType(var VoucherType: Record "NPR NpRv Voucher Type"; AllowTopUp: Boolean)
     var
-        LibraryUtility: Codeunit "Library - Utility";
         LibraryERM: Codeunit "Library - ERM";
     begin
         VoucherType.Init();
@@ -654,7 +646,6 @@
 
     procedure CreateDefaultVoucherType(var VoucherType: Record "NPR NpRv Voucher Type"; AllowTopUp: Boolean)
     var
-        LibraryUtility: Codeunit "Library - Utility";
         LibraryERM: Codeunit "Library - ERM";
     begin
         VoucherType.Init();

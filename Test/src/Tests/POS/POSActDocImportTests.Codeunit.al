@@ -17,7 +17,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     [HandlerFunctions('SelectDocumentPageHandler,MessageHandler')]
     procedure ImportQuote()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSession: Codeunit "NPR POS Session";
         LibrarySales: Codeunit "Library - Sales";
@@ -87,7 +86,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     [HandlerFunctions('SelectDocumentPageHandler,MessageHandler')]
     procedure ImportOrder()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSession: Codeunit "NPR POS Session";
         LibrarySales: Codeunit "Library - Sales";
@@ -95,8 +93,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        Customer: Record Customer;
         SelectCustomer, ConfirmInvDiscAmt, SalesPersonFromOrder : Boolean;
         DocumentType: Integer;
         LocationSource: Option "POS Store","Location Filter Parameter";
@@ -153,11 +149,9 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     procedure ImportOrderWithGroupCodeFilterEnabledNoGroupCodeAssignedAndNoGropCodeSelected()
     var
         SalesHeader: record "Sales Header";
-        SaleLinePOS: Record "NPR POS Sale Line";
         SaleLine: Record "Sales Line";
         SalePOS: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibrarySales: Codeunit "Library - Sales";
         POSActionDocImpB: Codeunit "NPR POS Action: Doc. Import B";
@@ -242,7 +236,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     procedure ImportOrderWithGroupCodeFilterEnabledNoGroupCodeAssignedAndGropCodeSelected()
     var
         SalesHeader: record "Sales Header";
-        SaleLinePOS: Record "NPR POS Sale Line";
         SaleLine: Record "Sales Line";
         SalePOS: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
@@ -344,7 +337,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     procedure ImportOrderWithGroupCodeFilterEnabledGroupCodeAssigned()
     var
         SalesHeader: record "Sales Header";
-        SaleLinePOS: Record "NPR POS Sale Line";
         SaleLine: Record "Sales Line";
         SalePOS: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
@@ -643,7 +635,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     procedure ImportOrderWithGroupCodeFilterDisabledAndGroupCodeAssigned()
     var
         SalesHeader: record "Sales Header";
-        SaleLinePOS: Record "NPR POS Sale Line";
         SaleLine: Record "Sales Line";
         SalePOS: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
@@ -739,7 +730,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     [HandlerFunctions('SelectDocumentPageHandler,MessageHandler')]
     procedure ImportInovice()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSession: Codeunit "NPR POS Session";
         LibrarySales: Codeunit "Library - Sales";
@@ -747,7 +737,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Customer: Record Customer;
         SelectCustomer, ConfirmInvDiscAmt, SalesPersonFromOrder : Boolean;
         DocumentType: Integer;
@@ -805,7 +794,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     [HandlerFunctions('SelectDocumentPageHandler,MessageHandler')]
     procedure ImportCreditMemo()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSession: Codeunit "NPR POS Session";
         LibrarySales: Codeunit "Library - Sales";
@@ -813,7 +801,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
-        SaleLinePOS: Record "NPR POS Sale Line";
         SelectCustomer, ConfirmInvDiscAmt, SalesPersonFromOrder : Boolean;
         DocumentType: Integer;
         LocationSource: Option "POS Store","Location Filter Parameter";
@@ -867,7 +854,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     [HandlerFunctions('SelectDocumentPageHandler,MessageHandler')]
     procedure ImportQuoteWithSalesPerson()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSession: Codeunit "NPR POS Session";
         LibrarySales: Codeunit "Library - Sales";
@@ -875,7 +861,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Customer: Record Customer;
         SelectCustomer, ConfirmInvDiscAmt, SalesPersonFromOrder : Boolean;
         DocumentType: Integer;
@@ -937,7 +922,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     [HandlerFunctions('SelectDocumentPageHandler,MessageHandler')]
     procedure ImportOrderWithSalesPerson()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSession: Codeunit "NPR POS Session";
         LibrarySales: Codeunit "Library - Sales";
@@ -945,8 +929,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        Customer: Record Customer;
         SelectCustomer, ConfirmInvDiscAmt, SalesPersonFromOrder : Boolean;
         DocumentType: Integer;
         LocationSource: Option "POS Store","Location Filter Parameter";
@@ -1006,7 +988,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     [HandlerFunctions('SelectDocumentPageHandler,MessageHandler')]
     procedure ImportInoviceWithSalesPerson()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSession: Codeunit "NPR POS Session";
         LibrarySales: Codeunit "Library - Sales";
@@ -1014,7 +995,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Customer: Record Customer;
         SelectCustomer, ConfirmInvDiscAmt, SalesPersonFromOrder : Boolean;
         DocumentType: Integer;
@@ -1076,7 +1056,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     [HandlerFunctions('SelectDocumentPageHandler,MessageHandler')]
     procedure ImportCreditMemoWithSalesPerson()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSession: Codeunit "NPR POS Session";
         LibrarySales: Codeunit "Library - Sales";
@@ -1084,8 +1063,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        Customer: Record Customer;
         SelectCustomer, ConfirmInvDiscAmt, SalesPersonFromOrder : Boolean;
         DocumentType: Integer;
         LocationSource: Option "POS Store","Location Filter Parameter";
@@ -1145,7 +1122,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     [HandlerFunctions('SelectDocumentPageHandler,MessageHandler')]
     procedure ImportBlaketOrder()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSession: Codeunit "NPR POS Session";
         LibrarySales: Codeunit "Library - Sales";
@@ -1153,7 +1129,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Customer: Record Customer;
         SelectCustomer, ConfirmInvDiscAmt, SalesPersonFromOrder : Boolean;
         DocumentType: Integer;
@@ -1210,7 +1185,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     [HandlerFunctions('SelectDocumentPageHandler,MessageHandler')]
     procedure ImportReturnOrder()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSession: Codeunit "NPR POS Session";
         LibrarySales: Codeunit "Library - Sales";
@@ -1218,7 +1192,6 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Customer: Record Customer;
         SelectCustomer, ConfirmInvDiscAmt, SalesPersonFromOrder : Boolean;
         DocumentType: Integer;

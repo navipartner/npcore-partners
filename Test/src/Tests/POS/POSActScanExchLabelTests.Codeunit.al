@@ -17,8 +17,6 @@ codeunit 85102 "NPR POS ActScanExchLabel Tests"
     var
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR POS Sale";
-        TextMsg: Text;
         ExchLabelMgt: Codeunit "NPR Exchange Label Mgt.";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         Item: Record Item;
@@ -86,7 +84,6 @@ codeunit 85102 "NPR POS ActScanExchLabel Tests"
     procedure InitializeData(var Initialized: Boolean; var POSUnit: Record "NPR POS Unit"; var POSStore: Record "NPR POS Store"; var POSPaymentMethod: Record "NPR POS Payment Method")
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         POSSession: Codeunit "NPR POS Session";
         POSSetup: Record "NPR POS Setup";
     begin
@@ -110,7 +107,6 @@ codeunit 85102 "NPR POS ActScanExchLabel Tests"
 
     procedure CreatePOSStore(var POSStore: Record "NPR POS Store"; POSProfileCode: Code[20])
     var
-        LibraryUtility: Codeunit "Library - Utility";
         Location: Record Location;
         LibraryWarehouse: Codeunit "Library - Warehouse";
     begin

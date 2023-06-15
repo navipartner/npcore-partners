@@ -10,7 +10,6 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
         POSUnit: Record "NPR POS Unit";
         POSSale: Codeunit "NPR POS Sale";
         POSStore: Record "NPR POS Store";
-        POSSetup: Record "NPR POS Setup";
         FromAirportCode: Code[3];
         ToAirPortCode: Code[3];
         OperatorFlightNo: Code[8];
@@ -39,7 +38,6 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
         ParamReqLEGAirportCode: Code[3];
         ParamReqTravelToday: Boolean;
         ParamShowTripMessage: Boolean;
-        TestMsg: Text;
 
     begin
         //[Scenario] Boarding pass with 1 travel leg, Required Travel Today = true
@@ -86,7 +84,6 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
         ParamReqLEGAirportCode: Code[3];
         ParamReqTravelToday: Boolean;
         ParamShowTripMessage: Boolean;
-        TestMsg: Text;
         TravelSaveString: Text;
         PlaceHolder3Lbl: Label '%1>%2(%3 %4) | ', Locked = true;
 
@@ -159,7 +156,6 @@ codeunit 85052 "NPR POS Boarding Pass Tests"
         ParamReqLEGAirportCode: Code[3];
         ParamReqTravelToday: Boolean;
         ParamShowTripMessage: Boolean;
-        TestMsg: Text;
 
     begin
         //[Scenario] Boarding pass with 1 travel leg, Required LEG Airport Code = 'AGP'

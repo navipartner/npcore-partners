@@ -30,7 +30,6 @@ codeunit 85003 "NPR Library - POS Mock"
 
     procedure InitializePOSSession(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; Salesperson: Record "Salesperson/Purchaser")
     var
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
     begin
         InitializePOSSession(POSSession, POSUnit);
@@ -39,8 +38,6 @@ codeunit 85003 "NPR Library - POS Mock"
     end;
 
     procedure InitializePOSSessionAndStartSale(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; var POSSale: Codeunit "NPR POS Sale")
-    var
-        POSSetup: Codeunit "NPR POS Setup";
     begin
         InitializePOSSession(POSSession, POSUnit);
         POSSession.StartTransaction();
@@ -173,7 +170,6 @@ codeunit 85003 "NPR Library - POS Mock"
         FrontEnd: Codeunit "NPR POS Front End Management";
         Handled: Boolean;
         NewSalePOS: Record "NPR POS Sale";
-        ActionID: Guid;
     begin
         POSSession.GetFrontEnd(FrontEnd, true);
         POSSession.GetSale(POSSale);
@@ -314,7 +310,6 @@ codeunit 85003 "NPR Library - POS Mock"
     local procedure VoucherPayment(POSSession: Codeunit "NPR POS Session"; VoucherReferenceNo: Text[30]; VoucherTypeCode: Code[20])
     var
         SalePOS: Record "NPR POS Sale";
-        VoucherType: Record "NPR NpRv Voucher Type";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSale: Codeunit "NPR POS Sale";
@@ -428,7 +423,6 @@ codeunit 85003 "NPR Library - POS Mock"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         POSSession: Codeunit "NPR POS Session";
         POSSetup: Record "NPR POS Setup";
         ObjectType: Option ,,,"Report",,"Codeunit","XMLPort",,"Page";
@@ -455,7 +449,6 @@ codeunit 85003 "NPR Library - POS Mock"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         POSSession: Codeunit "NPR POS Session";
         POSSetup: Record "NPR POS Setup";
     begin

@@ -30,7 +30,7 @@ codeunit 85130 "NPR POS Act: Quick Login Tests"
         LibrarySales.CreateSalesperson(Salesperson);
 
         // [WHEN]
-        POSActBusinessLog.OnActionLookupSalespersonCode(Salesperson.Code,POSSale);
+        POSActBusinessLog.OnActionLookupSalespersonCode(Salesperson.Code, POSSale);
 
         // [THEN]
         POSSale.GetCurrentSale(SalePOS);

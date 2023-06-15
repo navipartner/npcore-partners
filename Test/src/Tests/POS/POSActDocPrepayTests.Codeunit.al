@@ -29,16 +29,8 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        LibrarySales: Codeunit "Library - Sales";
-        AutoQtyOpt: Option Disabled,None,All;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
-        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
         PrepaymentValue: Decimal;
         ValueIsAmount: Boolean;
-        LibraryRandom: Codeunit "Library - Random";
         PREPAYMENT: Label 'Prepayment of %1 %2';
         ExpectedPrepayAmt: Decimal;
     begin
@@ -78,13 +70,6 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        LibrarySales: Codeunit "Library - Sales";
-        AutoQtyOpt: Option Disabled,None,All;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
-        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
         PrepaymentValue: Decimal;
         ValueIsAmount: Boolean;
         LibraryRandom: Codeunit "Library - Random";
@@ -126,16 +111,8 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        LibrarySales: Codeunit "Library - Sales";
-        AutoQtyOpt: Option Disabled,None,All;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
-        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
         PrepaymentValue: Decimal;
         ValueIsAmount: Boolean;
-        LibraryRandom: Codeunit "Library - Random";
         ExpectedPrepayAmt: Decimal;
         PREPAYMENT: Label 'Prepayment of %1 %2';
     begin
@@ -187,7 +164,7 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethodCash, POSPaymentMethodCash."Processing Type"::CASH, '', false);
             LibrarySales.CreateCustomer(Customer);
             CheckSalesReceivableSetup();
-            CheckPrepmtAccNo(Customer."Gen. Bus. Posting Group", Item."Gen. Prod. Posting Group");
+            CheckPrepmtAccNo();
 
             Initialized := true;
         end;
@@ -203,18 +180,10 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        LibrarySales: Codeunit "Library - Sales";
-        AutoQtyOpt: Option Disabled,None,All;
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         PrepaymentValue: Decimal;
         ValueIsAmount: Boolean;
-        LibraryRandom: Codeunit "Library - Random";
-        ExpectedPrepayAmt: Decimal;
-        PREPAYMENT: Label 'Prepayment of %1 %2';
-        PrepaymentRefundAmount: Decimal;
         PREPAYMENT_REFUND: Label 'Prepayment refund of %1 %2';
     begin
         // [Scenario] Chose order with prepayment ,post it and then refund prepayment
@@ -246,7 +215,6 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
     procedure CreateSalesOrder(var SalesHeader: Record "Sales Header")
     var
         SalesLine: Record "Sales Line";
-        LibraryInventory: Codeunit "Library - Inventory";
         LibraryRandom: Codeunit "Library - Random";
     begin
         LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
@@ -262,7 +230,7 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         end;
     end;
 
-    local procedure CheckPrepmtAccNo(GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20])
+    local procedure CheckPrepmtAccNo()
     var
         VATPostSetup: Record "VAT Posting Setup";
         GeneralPostingSetup: Record "General Posting Setup";

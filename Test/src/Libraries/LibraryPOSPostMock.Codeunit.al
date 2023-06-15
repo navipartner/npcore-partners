@@ -1,4 +1,4 @@
-﻿codeunit 85025 "NPR Library - POS Post Mock"
+codeunit 85025 "NPR Library - POS Post Mock"
 {
     TableNo = "NPR POS Sale";
 
@@ -21,7 +21,6 @@
 
     local procedure PostPOSEntry(SalePOS: Record "NPR POS Sale")
     var
-        POSPostingControl: Codeunit "NPR POS Posting Control";
         POSEntry: Record "NPR POS Entry";
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";

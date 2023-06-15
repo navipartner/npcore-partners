@@ -267,7 +267,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
         TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         ImportEntry: Record "NPR Nc Import Entry";
-        RequestXmlText, ResponseXmlText : Text;
+        RequestXmlText : Text;
         ResponseCode: Code[20];
         ResponseMessage: Text;
         DocumentId: Text;
@@ -304,7 +304,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
         TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         ImportEntry: Record "NPR Nc Import Entry";
-        RequestXmlText, ResponseXmlText : Text;
+        RequestXmlText : Text;
         ResponseCode: Code[20];
         ResponseMessage: Text;
         DocumentId: Text;
@@ -339,8 +339,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
         TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
         TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
-        ImportEntry: Record "NPR Nc Import Entry";
-        RequestXmlText, ResponseXmlText : Text;
+        RequestXmlText : Text;
         ResponseCode: Code[20];
         ResponseMessage: Text;
         DocumentId: Text;
@@ -424,8 +423,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
         TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
         TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
-        ImportEntry: Record "NPR Nc Import Entry";
-        RequestXmlText, ResponseXmlText : Text;
+        RequestXmlText : Text;
         ResponseCode: Code[20];
         ResponseMessage: Text;
         DocumentId: Text;
@@ -500,7 +498,6 @@ codeunit 85107 "NPR MM Loyalty Test"
 
     local procedure InitializeSales()
     var
-        LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
     begin
         LibraryPOSMock.InitializeData(_isSalesInitialized, _POSUnit, _POSStore, _POSPaymentMethod);
@@ -510,7 +507,6 @@ codeunit 85107 "NPR MM Loyalty Test"
     local procedure InitializeFixedMembershipSetup()
     var
         LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
-        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         ItemLoyalty: Record "NPR MM Loy. Item Point Setup";
     begin
 
@@ -601,9 +597,8 @@ codeunit 85107 "NPR MM Loyalty Test"
     end;
 
     [Normal]
-    local procedure SetScenario_100(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpRegisterSaleLines: Record "NPR MM Reg. Sales Buffer" temporary; var TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary) LoyaltyCode: Code[20]
+    local procedure SetScenario_100(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpRegisterSaleLines: Record "NPR MM Reg. Sales Buffer" temporary; var TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary): Code[20]
     var
-        MembershipLibrary: Codeunit "NPR Library - Member Module";
         LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
         LoyaltySetup: Record "NPR MM Loyalty Setup";
         MembershipSalesItem: Record "NPR MM Members. Sales Setup";

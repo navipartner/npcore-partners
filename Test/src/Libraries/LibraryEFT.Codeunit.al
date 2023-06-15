@@ -19,7 +19,6 @@ codeunit 85000 "NPR Library - EFT"
     procedure CreateEFTPaymentTypePOS(var POSPaymentMethod: Record "NPR POS Payment Method"; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store")
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        LibraryERM: Codeunit "Library - ERM";
         SurchargeItem: Record Item;
         TipItem: Record Item;
     begin
