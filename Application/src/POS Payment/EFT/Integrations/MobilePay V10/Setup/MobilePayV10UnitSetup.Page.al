@@ -7,6 +7,7 @@
     SourceTable = "NPR MobilePayV10 Unit Setup";
     ApplicationArea = NPRRetail;
     Caption = 'MobilePayV10 Unit Setup';
+    ContextSensitiveHelpPage = 'retail/eft/howto/mobilepay.html';
 
     layout
     {

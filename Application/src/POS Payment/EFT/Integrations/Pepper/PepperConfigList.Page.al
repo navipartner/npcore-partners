@@ -4,6 +4,7 @@
     // NPR5.20\BR\20160316  CASE 231481 Object Created
 
     Caption = 'Pepper Configuration List';
+    ContextSensitiveHelpPage = 'retail/eft/howto/terminal_setup.html';
     CardPageID = "NPR Pepper Config. Card";
     Editable = false;
     PageType = List;
