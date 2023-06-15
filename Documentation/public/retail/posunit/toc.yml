@@ -38,6 +38,8 @@
     href: reference/counting_reference.md
   - name: POS menu buttons setup (reference guide)
     href: reference/pos_menu_buttons.md
+  - name: Sales price maintenance (reference guide)
+    href: reference/sales_price_maintenance.md
 - name: How-To  
   items:
   - name: Create a new POS Unit
@@ -106,3 +108,5 @@
     href: howto/sales_price_setup.md
   - name: Set up price worksheet
     href: howto/price_worksheet.md
+  - name: POS Info setup
+    href: howto/pos_info_setup.md

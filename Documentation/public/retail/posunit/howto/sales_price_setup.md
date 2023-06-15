@@ -50,3 +50,8 @@ In this example, you can see that different sales price, item discounts or even 
 Both pricing and discount setup can be performed in one page instead of having to navigate to each Item card to set up pricing and apply discounts individually. 
 
 ![sales_price_3](../images/sales_price_3.PNG)
+
+### Related links
+
+- [Sales price maintenance](../reference/sales_price_maintenance.md)
+- [Pricing](../explanation/pricing.md)

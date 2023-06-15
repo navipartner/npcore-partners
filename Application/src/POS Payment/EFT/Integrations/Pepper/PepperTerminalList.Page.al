@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Pepper Terminal List';
+    ContextSensitiveHelpPage = 'retail/eft/howto/terminal_setup.html';
     CardPageID = "NPR Pepper Terminal Card";
     Editable = false;
     PageType = List;

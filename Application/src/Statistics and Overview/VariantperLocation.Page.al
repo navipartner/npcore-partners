@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Variant per Location';
+    ContextSensitiveHelpPage = 'retail/varieties/intro.html';
     DeleteAllowed = false;
     Editable = false;
     InsertAllowed = false;
