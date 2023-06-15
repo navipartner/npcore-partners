@@ -10,6 +10,10 @@ Usually, we deploy customer apps through Triskilion. Find a NAS service and init
 
 When presented with a page to select time for publishing, please set agreed day/time as per customer approval.
 
+If the customer is on SaaS, they will be visible on the page D365 Tenants, and deployment needs to be done from there. Find the customer on the list, click on action Environments, select the production environment and click Deploy PTE, like this:
+![d365 tenants deploy pte](../.attachments/D365Tenants-DeployPTE.png)
+Notice that we do not support scheduling deployments for these customers, so it's important you do it in approved date/time.
+
 ## C/AL
 
 First, find all the changes by setting a version filter in test environment as ```*#<case no>*``` where ```<case no>``` is case number.
