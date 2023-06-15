@@ -49,6 +49,17 @@ Solution Source: https://www.dynamicsuser.net/t/vs-code-error-on-publishing-coul
 
 ---
 
+### Known issues when working with BC14 apps in VSCode
+
+---
+Process: Opening repo and getting error in app file
+
+Error: **A package with publisher 'Microsoft', name 'Test', and a version compatible with '11.0.0.0' could not be found in the package cache folders: ...\SpejderSport\Application\.alpackages**
+
+Solution: Downgrade your AL Language extension to version 9.5
+
+---
+
 ### C/AL
 
 If you received a fresh restore from hosting, which will have latest objects from live environment, you’re good to start coding. If you’re working on a restore from another case or on a permanent test environment, please compare and merge changes from live first. This can greatly improve quality of deployment later.
