@@ -138,7 +138,7 @@
                 LogResponse(JobNo, 'Event Create', EventExchIntEMail."E-Mail", _GraphApiSetup."Graph Event Url", Request, ResponseMessage);
     end;
 
-    internal procedure SendEventRequestUpdate(JobNo: Code[20]; EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; Request: Text; CalendarItemID: Text)
+    internal procedure SendEventRequestUpdate(JobNo: Code[20]; EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; Request: Text; CalendarItemID: Text; Silent: Boolean)
     var
         AccessToken, URL : Text;
         Client: HttpClient;
@@ -153,7 +153,7 @@
 
         SetMessageContent(Request, Content, RequestMessage);
         if Client.Send(RequestMessage, ResponseMessage) then
-            if ResponseMessage.IsSuccessStatusCode() then
+            if ResponseMessage.IsSuccessStatusCode() and (not Silent) then
                 Message(UpdatedMsg)
             else
                 LogResponse(JobNo, 'Event Update', EventExchIntEMail."E-Mail", URL, Request, ResponseMessage);
@@ -174,6 +174,21 @@
         if Client.Send(RequestMessage, ResponseMessage) then
             if not ResponseMessage.IsSuccessStatusCode() then
                 LogResponse(JobNo, 'Add Event Attachment', EventExchIntEMail."E-Mail", URL, Request, ResponseMessage);
+    end;
+
+    internal procedure DeleteAttachments(JobNo: Code[20]; EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail"; CalendarItemID: Text)
+    var
+        AccessToken, URL : Text;
+        Client: HttpClient;
+        RequestMessage: HttpRequestMessage;
+        ResponseMessage: HttpResponseMessage;
+    begin
+        GetTestGraphAPISetup();
+        URL := _GraphApiSetup."Graph Event Url" + CalendarItemID + '/attachments';
+        InitializeRequest(EventExchIntEMail, AccessToken, Client, RequestMessage, 'DELETE', URL);
+        if Client.Send(RequestMessage, ResponseMessage) then
+            if not ResponseMessage.IsSuccessStatusCode() then
+                LogResponse(JobNo, 'Delete Event Attachments', EventExchIntEMail."E-Mail", URL, '', ResponseMessage);
     end;
 
     internal procedure CreateAttachmentRequest(AttachmentBase64: Text; AttachmentName: Text) Request: Text

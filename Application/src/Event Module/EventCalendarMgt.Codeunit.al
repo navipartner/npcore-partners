@@ -411,16 +411,17 @@
         EventExchIntTemplate: Record "NPR Event Exch. Int. Template";
         EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail";
         Subject, TimeZoneId, EventRequest : Text;
-        AllDayEvent: Boolean;
+        AllDayEvent, NewCalendarItem : Boolean;
         StartingDateTime: DateTime;
         EndingDateTime: DateTime;
         GraphAPIManagement: Codeunit "NPR Graph API Management";
         JAAttendees: JsonArray;
     begin
         GetTemplates(RecRef, CalendarItemID, Job, JobPlanningLine, UseTemplate, EventExchIntTemplate);
+        NewCalendarItem := CalendarItemID = '';
         EventEWSMgt.GetEventExchIntEmail(EventExchIntEmail);
 
-        if CalendarItemID <> '' then begin
+        if not NewCalendarItem then begin
             if not GraphAPIManagement.GetEvent(EventExchIntEmail, CalendarItemID) then begin
                 ProcessCalendarItemID(0, RecRef, '');
                 exit(true);
@@ -447,15 +448,19 @@
         end;
 
         EventRequest := GraphAPIManagement.CreateEventRequest(Subject, StartingDateTime, EndingDateTime, TimeZoneId, ShowAsBusy, ReminderMinutesBeforeStart, JAAttendees, EventBodyText, CalendarCategory);
-        if CalendarItemID = '' then begin
+        if NewCalendarItem then begin
             CalendarItemID := GraphAPIManagement.SendEventRequest(Job."No.", EventExchIntEmail, EventRequest);
         end else
-            GraphAPIManagement.SendEventRequestUpdate(Job."No.", EventExchIntEmail, EventRequest, CalendarItemID);
+            GraphAPIManagement.SendEventRequestUpdate(Job."No.", EventExchIntEmail, EventRequest, CalendarItemID, NewCalendarItem);
         ProcessCalendarItemID(1, RecRef, CalendarItemID);
 
-        if EventEWSMgt.IncludeAttachmentCheck(Job, 1) then
+        if EventEWSMgt.IncludeAttachmentCheck(Job, 1) then begin
+            GraphAPIManagement.DeleteAttachments(Job."No.", EventExchIntEmail, CalendarItemID);
             AddAttachments(Job, EventExchIntEmail, CalendarItemID);
-
+            EventBodyText += ' ';
+            EventRequest := GraphAPIManagement.CreateEventRequest(Subject, StartingDateTime, EndingDateTime, TimeZoneId, ShowAsBusy, ReminderMinutesBeforeStart, JAAttendees, EventBodyText, CalendarCategory);
+            GraphAPIManagement.SendEventRequestUpdate(Job."No.", EventExchIntEmail, EventRequest, CalendarItemID, NewCalendarItem);
+        end;
         exit(true);
     end;
 
