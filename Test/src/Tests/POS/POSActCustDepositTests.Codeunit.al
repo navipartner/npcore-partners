@@ -201,7 +201,6 @@ codeunit 85096 "NPR POS Act. CustDeposit Tests"
         LibrarySales: Codeunit "Library - Sales";
         SaleLinePOS: Record "NPR POS Sale Line";
         PostedSalesInv: Code[20];
-        CustLedgEntry: Record "Cust. Ledger Entry";
         TextDeposit: Label 'Deposit from: %1';
         LibraryRandom: Codeunit "Library - Random";
         Customer: Record Customer;
@@ -258,7 +257,6 @@ codeunit 85096 "NPR POS Act. CustDeposit Tests"
         LibrarySales: Codeunit "Library - Sales";
         SaleLinePOS: Record "NPR POS Sale Line";
         PostedSalesInv: Code[20];
-        CustLedgEntry: Record "Cust. Ledger Entry";
         TextDeposit: Label 'Deposit from: %1';
         Customer: Record Customer;
     begin

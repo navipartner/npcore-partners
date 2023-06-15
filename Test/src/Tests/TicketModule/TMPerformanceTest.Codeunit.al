@@ -58,19 +58,11 @@ codeunit 85050 "NPR TM Performance Test"
 
     procedure Create_Vouchers_NoScan(Quantity: Decimal)
     var
-        Assert: Codeunit "Assert";
-        i: Integer;
-
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
         Item: Record Item;
-        LibraryCoupon: Codeunit "NPR Library Coupon";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
 
         POSSale: Codeunit "NPR POS Sale";
-        Ticket: Record "NPR TM Ticket";
-        CountBefore, CountAfter : Integer;
         UnitPrice: Decimal;
     begin
         UnitPrice := 1.23;
@@ -86,10 +78,7 @@ codeunit 85050 "NPR TM Performance Test"
     var
         Assert: Codeunit "Assert";
         i: Integer;
-
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
         Item: Record Item;
 
         POSSale: Codeunit "NPR POS Sale";
@@ -118,11 +107,8 @@ codeunit 85050 "NPR TM Performance Test"
     var
         Assert: Codeunit "Assert";
         i: Integer;
-
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         TicketStats: Codeunit "NPR TM Ticket Access Stats";
-        SalePOS: Record "NPR POS Sale";
         Item: Record Item;
 
         POSSale: Codeunit "NPR POS Sale";
@@ -163,10 +149,7 @@ codeunit 85050 "NPR TM Performance Test"
     var
         Assert: Codeunit "Assert";
         i: Integer;
-
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
         Item: Record Item;
 
         POSSale: Codeunit "NPR POS Sale";
@@ -196,11 +179,7 @@ codeunit 85050 "NPR TM Performance Test"
     local procedure PosTickets_Create_FromVoucher(TicketsToSell: Integer)
     var
         Assert: Codeunit "Assert";
-        i: Integer;
-
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
         Item: Record Item;
         LibraryCoupon: Codeunit "NPR Library Coupon";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
@@ -235,12 +214,8 @@ codeunit 85050 "NPR TM Performance Test"
     local procedure PosTickets_Cancel_FromVoucher(TicketsToSell: Integer; WithStatistics: Boolean)
     var
         Assert: Codeunit "Assert";
-        i: Integer;
-
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         TicketStats: Codeunit "NPR TM Ticket Access Stats";
-        SalePOS: Record "NPR POS Sale";
         Item: Record Item;
         LibraryCoupon: Codeunit "NPR Library Coupon";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
@@ -287,11 +262,7 @@ codeunit 85050 "NPR TM Performance Test"
     local procedure PosTickets_EndSale_FromVoucher(TicketsToSell: Integer)
     var
         Assert: Codeunit "Assert";
-        i: Integer;
-
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
         Item: Record Item;
         LibraryCoupon: Codeunit "NPR Library Coupon";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
@@ -350,7 +321,6 @@ codeunit 85050 "NPR TM Performance Test"
     local procedure UpdateItemForPOSSaleUsage(var Item: Record Item; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store"; UnitPrice: Decimal; IncludesVat: Boolean)
     var
         LibraryRandom: Codeunit "Library - Random";
-        LibraryInventory: Codeunit "Library - Inventory";
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSMasterData: Codeunit "NPR Library - POS Master Data";
     begin
@@ -379,7 +349,6 @@ codeunit 85050 "NPR TM Performance Test"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         TicketRequestMgr: Codeunit "NPR TM Ticket Request Manager";
     begin
         if _Initialized then begin

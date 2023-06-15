@@ -21,14 +21,7 @@ codeunit 85039 "NPR French Compliance Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure PurchaseSignature()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         EntryNumber1: Integer;
         EntryNumber2: Integer;
         EntryNumber3: Integer;
@@ -76,14 +69,7 @@ codeunit 85039 "NPR French Compliance Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure TicketGrandTotalSignature()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         EntryNumber1: Integer;
         EntryNumber2: Integer;
         EntryNumber3: Integer;
@@ -130,13 +116,9 @@ codeunit 85039 "NPR French Compliance Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure ReprintSignature()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
         POSEntry: Record "NPR POS Entry";
         EntryNo: Integer;
         POSAuditLog: Record "NPR POS Audit Log";
@@ -184,13 +166,6 @@ codeunit 85039 "NPR French Compliance Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure VoidSignature()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
-        Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
         POSEntry: Record "NPR POS Entry";
         EntryNo1: Integer;
         EntryNo2: Integer;
@@ -199,8 +174,6 @@ codeunit 85039 "NPR French Compliance Tests"
         ReturnEntryNo2: Integer;
         ReturnEntryNo3: Integer;
         POSAuditLog: Record "NPR POS Audit Log";
-        SignatureBaseValue: Text;
-        SignatureBaseValueParts: List of [Text];
         PreviousSignature: Text;
     begin
         // [Scenario] Check that return of tickets are correctly signed
@@ -267,22 +240,11 @@ codeunit 85039 "NPR French Compliance Tests"
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure DailyZReportSignature()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         EntryNo: Integer;
         POSAuditLog: Record "NPR POS Audit Log";
-        SignatureBaseValue: Text;
-        SignatureBaseValueParts: List of [Text];
-        PreviousSignature: Text;
-        POSActionEndOfDayV3: Codeunit "NPR POS Action: EndOfDay V3";
         POSSaleWrapper: Codeunit "NPR POS Sale";
-        POSSaleRecord: Record "NPR POS Sale";
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
     begin
         // [Scenario] Check that daily Z reports are correctly signed
@@ -310,22 +272,11 @@ codeunit 85039 "NPR French Compliance Tests"
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure MonthlyPeriodSignature()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         EntryNo: Integer;
         POSAuditLog: Record "NPR POS Audit Log";
-        SignatureBaseValue: Text;
-        SignatureBaseValueParts: List of [Text];
-        PreviousSignature: Text;
-        POSActionEndOfDayV3: Codeunit "NPR POS Action: EndOfDay V3";
         POSSaleWrapper: Codeunit "NPR POS Sale";
-        POSSaleRecord: Record "NPR POS Sale";
         FRAuditSetup: Record "NPR FR Audit Setup";
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
     begin
@@ -359,22 +310,11 @@ codeunit 85039 "NPR French Compliance Tests"
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure YearlyPeriodSignature()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         EntryNo: Integer;
         POSAuditLog: Record "NPR POS Audit Log";
-        SignatureBaseValue: Text;
-        SignatureBaseValueParts: List of [Text];
-        PreviousSignature: Text;
-        POSActionEndOfDayV3: Codeunit "NPR POS Action: EndOfDay V3";
         POSSaleWrapper: Codeunit "NPR POS Sale";
-        POSSaleRecord: Record "NPR POS Sale";
         FRAuditSetup: Record "NPR FR Audit Setup";
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
     begin
@@ -410,20 +350,10 @@ codeunit 85039 "NPR French Compliance Tests"
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         WorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         EntryNo: Integer;
         POSAuditLog: Record "NPR POS Audit Log";
-        SignatureBaseValue: Text;
-        SignatureBaseValueParts: List of [Text];
-        PreviousSignature: Text;
-        POSActionEndOfDayV3: Codeunit "NPR POS Action: EndOfDay V3";
         POSSaleWrapper: Codeunit "NPR POS Sale";
         POSSaleRecord: Record "NPR POS Sale";
         FRAuditSetup: Record "NPR FR Audit Setup";
@@ -449,7 +379,7 @@ codeunit 85039 "NPR French Compliance Tests"
         WorkshiftCheckpoint.FindFirst();
         BindSubscription(FrenchArchiveHandler);
 #if not BC17
-        POSAuditLogMgt.ArchiveWorkshiftPeriod(WorkshiftCheckpoint);        
+        POSAuditLogMgt.ArchiveWorkshiftPeriod(WorkshiftCheckpoint);
 #else
         asserterror POSAuditLogMgt.ArchiveWorkshiftPeriod(WorkshiftCheckpoint); //only supported in later versions
         _FRAuditMgt.Destruct();
@@ -472,23 +402,9 @@ codeunit 85039 "NPR French Compliance Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure LoginSetupValidation()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
-        EntryNo: Integer;
-        POSAuditLog: Record "NPR POS Audit Log";
-        SignatureBaseValue: Text;
-        SignatureBaseValueParts: List of [Text];
-        PreviousSignature: Text;
-        POSActionEndOfDayV3: Codeunit "NPR POS Action: EndOfDay V3";
         POSSaleWrapper: Codeunit "NPR POS Sale";
-        POSSaleRecord: Record "NPR POS Sale";
-        FRAuditSetup: Record "NPR FR Audit Setup";
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
         // [Scenario] Check that POS logins is correctly safeguarded against non-compliant setup
@@ -510,23 +426,12 @@ codeunit 85039 "NPR French Compliance Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure LoginSignature()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
-        EntryNo: Integer;
         POSAuditLog: Record "NPR POS Audit Log";
-        SignatureBaseValue: Text;
-        SignatureBaseValueParts: List of [Text];
-        PreviousSignature: Text;
-        POSActionEndOfDayV3: Codeunit "NPR POS Action: EndOfDay V3";
         POSSaleWrapper: Codeunit "NPR POS Sale";
         POSSaleRecord: Record "NPR POS Sale";
-        FRAuditSetup: Record "NPR FR Audit Setup";
         POSActionLogin: Codeunit "NPR POS Action - Login-B";
         POSSetup: Codeunit "NPR POS Setup";
     begin
@@ -556,23 +461,11 @@ codeunit 85039 "NPR French Compliance Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure CancelSaleSignature()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
-        EntryNo: Integer;
         POSAuditLog: Record "NPR POS Audit Log";
-        SignatureBaseValue: Text;
-        SignatureBaseValueParts: List of [Text];
-        PreviousSignature: Text;
-        POSActionEndOfDayV3: Codeunit "NPR POS Action: EndOfDay V3";
         POSSaleWrapper: Codeunit "NPR POS Sale";
         POSSaleRecord: Record "NPR POS Sale";
-        FRAuditSetup: Record "NPR FR Audit Setup";
         ActionCancelSale: Codeunit "NPR POSAction: Cancel Sale B";
     begin
         // [Scenario] Check that POS sale cancellations are correctly signed
@@ -597,19 +490,9 @@ codeunit 85039 "NPR French Compliance Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure VoucherAndItemPurchaseSignature()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         EntryNo: Integer;
         POSAuditLog: Record "NPR POS Audit Log";
-        SignatureBaseValue: Text;
-        SignatureBaseValueParts: List of [Text];
-        PreviousSignature: Text;
     begin
         // [Scenario] Check that a sale with both voucher and item has correctly signed events
 
@@ -637,19 +520,9 @@ codeunit 85039 "NPR French Compliance Tests"
     [HandlerFunctions('MessageHandler')]
     procedure BrokenTicketSignatureChain()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
         POSEntry: Record "NPR POS Entry";
-        EntryNo: Integer;
         POSAuditLog: Record "NPR POS Audit Log";
-        SignatureBaseValue: Text;
-        SignatureBaseValueParts: List of [Text];
-        PreviousSignature: Text;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         ValidationError: Boolean;
     begin
@@ -681,19 +554,8 @@ codeunit 85039 "NPR French Compliance Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure PartnerModificationSignature()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
-        EntryNo: Integer;
         POSAuditLog: Record "NPR POS Audit Log";
-        SignatureBaseValue: Text;
-        SignatureBaseValueParts: List of [Text];
-        PreviousSignature: Text;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
     begin
         // [Scenario] Check that partner modification logs are signed correctly
@@ -716,19 +578,6 @@ codeunit 85039 "NPR French Compliance Tests"
     [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
     procedure ArchiveSchemaTest()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
-        Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
-        EntryNo: Integer;
-        POSAuditLog: Record "NPR POS Audit Log";
-        SignatureBaseValue: Text;
-        SignatureBaseValueParts: List of [Text];
-        PreviousSignature: Text;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         XmlValidation: Codeunit "Xml Validation";
         FrenchArchiveHandler: Codeunit "NPR French Archive Handler";
@@ -751,7 +600,7 @@ codeunit 85039 "NPR French Compliance Tests"
         POSWorkshiftCheckpoint.FindLast();
 
 #if not BC17
-        POSAuditLogMgt.ArchiveWorkshiftPeriod(POSWorkshiftCheckpoint);        
+        POSAuditLogMgt.ArchiveWorkshiftPeriod(POSWorkshiftCheckpoint);
 #else
         asserterror POSAuditLogMgt.ArchiveWorkshiftPeriod(POSWorkshiftCheckpoint); //only supported in later versions
         _FRAuditMgt.Destruct();
@@ -774,20 +623,8 @@ codeunit 85039 "NPR French Compliance Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure JETInitSignatureTest()
     var
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
-        ReceiptNumber1: Integer;
-        ReceiptNumber2: Integer;
-        ReceiptNumber3: Integer;
         POSAuditLog: Record "NPR POS Audit Log";
-        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
     begin
         // [Scenario] Check that JET init is signed
 
@@ -880,12 +717,10 @@ codeunit 85039 "NPR French Compliance Tests"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         POSAuditProfile: Record "NPR POS Audit Profile";
         NPRLibraryFRNF525: Codeunit "NPR Library FR NF525";
         LibraryERM: Codeunit "Library - ERM";
         VATPostingSetup: Record "VAT Posting Setup";
-        GLAccount: Record "G/L Account";
         POSAuditLog: Record "NPR POS Audit Log";
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSEndOfDayProfile: Record "NPR POS End Of Day Profile";
@@ -893,8 +728,6 @@ codeunit 85039 "NPR French Compliance Tests"
         LibraryRPTemplate: Codeunit "NPR Library - RP Template Data";
         TemplateHeader: Record "NPR RP Template Header";
         ObjectOutputSelection: Record "NPR Object Output Selection";
-        GeneralPostingSetup: Record "General Posting Setup";
-        VATPostingSetup2: Record "VAT Posting Setup";
     begin
         if _Initialized then begin
             //Clean any previous mock session

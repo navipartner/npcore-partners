@@ -114,10 +114,9 @@ codeunit 85101 "NPR POS Action Layaway Tests"
     [HandlerFunctions('ChooseSOListHandler')]
     procedure PayLayaway()
     var
-        CustLedgEntry: Record "Cust. Ledger Entry";        
+        CustLedgEntry: Record "Cust. Ledger Entry";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
         LayawayCancelB: Codeunit "NPR POS Action: Layaway Pay-B";
@@ -153,7 +152,7 @@ codeunit 85101 "NPR POS Action Layaway Tests"
         CustLedgEntry.SetRange("Customer No.", SalesInvHeader."Bill-to Customer No.");
         CustLedgEntry.FindFirst();
         Assert.IsTrue(CustLedgEntry.Open = false, 'Cust Ledger Entry is not closed.');
-        
+
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         SaleLinePOS.FindFirst();
         Assert.IsTrue(SaleLinePOS."Amount Including VAT" = AmountToPay, 'Amount of prepayment invoice is not paid');

@@ -15,9 +15,9 @@ codeunit 85089 "NPR Magento Attributes Test"
 
     [Test]
     procedure VerifyAttributesAreCreated()
-    var   
+    var
         AttributeSetMgt: Codeunit "NPR Magento Attr. Set Mgt.";
-        SetId, Id, DummyId2, GroupId: Integer;
+        SetId, Id, DummyId2, GroupId : Integer;
     begin
         // [SCENARIO] Verify & exercise magento attributes are created
         Initialize();
@@ -26,35 +26,35 @@ codeunit 85089 "NPR Magento Attributes Test"
         Id := CreateMagentoAttribute();
         DummyId2 := CreateMagentoAttribute();
         CreateMagentoAttributeLabel(Id);
-        GroupId := CreateMagentoAttributeGroup();        
+        GroupId := CreateMagentoAttributeGroup();
         SetId := CreateMagentoAttributeSet();
         CreateMagentoAttributeSetValue(SetId, Id, GroupId);
 
         // [THEN] Verify Magento Attributes exists
         Assert.IsTrue(AttributeSetMgt.MagentoAttributeExists(''), 'Magento Attribute not created');
-        Assert.IsTrue(AttributeSetMgt.MagentoAttributeGroupExists(''), 'Magento Attribute Group not created');        
+        Assert.IsTrue(AttributeSetMgt.MagentoAttributeGroupExists(''), 'Magento Attribute Group not created');
         Assert.IsTrue(AttributeSetMgt.MagentoAttributeLabelExists(''), 'Magento Attribute Label not created');
         Assert.IsTrue(AttributeSetMgt.MagentoAttributeSetExists(''), 'Magento Attribute Set not created');
         Assert.IsTrue(AttributeSetMgt.MagentoAttributeSetValuesExists(''), 'Magento Attribute Set Value not created');
 
         // [THEN] Verify number of created Magento Attributes
         Assert.AreEqual(2, AttributeSetMgt.MagentoAttributeCount(''), 'Created more then one attribute');
-        Assert.AreEqual(1, AttributeSetMgt.MagentoAttributeGroupCount(''), 'Created more then one attribute group');        
+        Assert.AreEqual(1, AttributeSetMgt.MagentoAttributeGroupCount(''), 'Created more then one attribute group');
         Assert.AreEqual(1, AttributeSetMgt.MagentoAttributeLabelCount(''), 'Created more then one attribute label');
         Assert.AreEqual(1, AttributeSetMgt.MagentoAttributeSetCount(''), 'Created more then one attribute set');
-        Assert.AreEqual(1, AttributeSetMgt.MagentoAttributeSetValuesCount(''), 'Created more then one attribute set value');        
+        Assert.AreEqual(1, AttributeSetMgt.MagentoAttributeSetValuesCount(''), 'Created more then one attribute set value');
     end;
 
     [Test]
     procedure VerifyAttributesAreUpdated()
-    var   
+    var
         AttributeSetMgt: Codeunit "NPR Magento Attr. Set Mgt.";
         LibraryRandom: Codeunit "Library - Random";
-        ExpectedFieldsAttribute, ExpectedFieldsAttributeLabel, ExpectedFieldsAttributeGroup, ExpectedFieldsAttributeSet, ExpectedFieldsAttributeSetValue: Dictionary of [Text, Text];
-        ActualFieldsAttribute, ActualFieldsAttributeLabel, ActualFieldsAttributeGroup, ActualFieldsAttributeSet, ActualFieldsAttributeSetValue: Dictionary of [Text, Text];
-        FieldsNotUpdated: Dictionary of [Text, Text];    
-        SetId, Id1, Id2, GroupId1, GroupId2, LabelId11, LabelId21, LabelId12, LabelId22, LabelId32: Integer;
-        SetValue1, SetValue2: Text;
+        ExpectedFieldsAttribute, ExpectedFieldsAttributeLabel, ExpectedFieldsAttributeGroup, ExpectedFieldsAttributeSet, ExpectedFieldsAttributeSetValue : Dictionary of [Text, Text];
+        ActualFieldsAttribute, ActualFieldsAttributeLabel, ActualFieldsAttributeGroup, ActualFieldsAttributeSet, ActualFieldsAttributeSetValue : Dictionary of [Text, Text];
+        FieldsNotUpdated: Dictionary of [Text, Text];
+        SetId, Id1, Id2, GroupId1, GroupId2, LabelId11, LabelId21, LabelId12, LabelId22, LabelId32 : Integer;
+        SetValue1, SetValue2 : Text;
     begin
         // [SCENARIO] Verify & exercise magento attributes are created
         Initialize();
@@ -70,8 +70,8 @@ codeunit 85089 "NPR Magento Attributes Test"
         LabelId32 := CreateMagentoAttributeLabel(Id2, LibraryRandom.RandText(100));
 
         GroupId1 := CreateMagentoAttributeGroup();
-        GroupId2 := CreateMagentoAttributeGroup(LibraryRandom.RandText(50));        
-        
+        GroupId2 := CreateMagentoAttributeGroup(LibraryRandom.RandText(50));
+
         SetId := CreateMagentoAttributeSet(LibraryRandom.RandText(50));
         SetValue1 := CreateMagentoAttributeSetValue(SetId, Id1, GroupId2);
         SetValue2 := CreateMagentoAttributeSetValue(SetId, Id2, GroupId2);
@@ -126,18 +126,18 @@ codeunit 85089 "NPR Magento Attributes Test"
         // [THEN] Verify Position is updated 
         AttributeSetMgt.GetMagentoAttributeSetValue(SetId, Id2, GroupId2, ActualFieldsAttributeSetValue);
         Assert.IsTrue(ActualFieldsAttributeSetValue.ContainsKey('Position'), 'Field Position is not prepared for update');
-        Assert.AreEqual(ExpectedFieldsAttributeSetValue.Get('Position'), ActualFieldsAttributeSetValue.Get('Position'), 'Field Position is not updated');               
+        Assert.AreEqual(ExpectedFieldsAttributeSetValue.Get('Position'), ActualFieldsAttributeSetValue.Get('Position'), 'Field Position is not updated');
     end;
 
     [Test]
     procedure VerifyAttributesAreNotUpdated()
-    var   
+    var
         AttributeSetMgt: Codeunit "NPR Magento Attr. Set Mgt.";
         LibraryRandom: Codeunit "Library - Random";
-        UpdateFieldsAttribute, UpdateFieldsAttributeLabel, UpdateFieldsAttributeGroup, UpdateFieldsAttributeSet, UpdateFieldsAttributeSetValue: Dictionary of [Text, Text];
-        FieldsNotUpdatedAttribute, FieldsNotUpdatedAttributeLabel, FieldsNotUpdatedAttributeGroup, FieldsNotUpdatedAttributeSet, FieldsNotUpdatedAttributeSetValue: Dictionary of [Text, Text];    
-        SetId, Id1, Id2, GroupId1, GroupId2, LabelId11, LabelId21, LabelId12, LabelId22, LabelId32: Integer;
-        SetValue1, SetValue2, FieldName, FieldValue: Text;
+        UpdateFieldsAttribute, UpdateFieldsAttributeLabel, UpdateFieldsAttributeGroup, UpdateFieldsAttributeSet, UpdateFieldsAttributeSetValue : Dictionary of [Text, Text];
+        FieldsNotUpdatedAttribute, FieldsNotUpdatedAttributeLabel, FieldsNotUpdatedAttributeGroup, FieldsNotUpdatedAttributeSet, FieldsNotUpdatedAttributeSetValue : Dictionary of [Text, Text];
+        SetId, Id1, Id2, GroupId1, GroupId2, LabelId11, LabelId21, LabelId12, LabelId22, LabelId32 : Integer;
+        SetValue1, SetValue2, FieldName, FieldValue : Text;
     begin
         // [SCENARIO] Verify & exercise magento attributes are created
         Initialize();
@@ -153,8 +153,8 @@ codeunit 85089 "NPR Magento Attributes Test"
         LabelId32 := CreateMagentoAttributeLabel(Id2, LibraryRandom.RandText(100));
 
         GroupId1 := CreateMagentoAttributeGroup();
-        GroupId2 := CreateMagentoAttributeGroup(LibraryRandom.RandText(50));        
-        
+        GroupId2 := CreateMagentoAttributeGroup(LibraryRandom.RandText(50));
+
         SetId := CreateMagentoAttributeSet(LibraryRandom.RandText(50));
         SetValue1 := CreateMagentoAttributeSetValue(SetId, Id1, GroupId2);
         SetValue2 := CreateMagentoAttributeSetValue(SetId, Id2, GroupId2);
@@ -190,10 +190,10 @@ codeunit 85089 "NPR Magento Attributes Test"
         // [THEN] Verify unkown field and flowfield are not updated in Magento Attribute Group
         Assert.AreEqual(1, FieldsNotUpdatedAttributeGroup.Count(), '');
         FieldsNotUpdatedAttributeGroup.Get(FieldName, FieldValue);
-        Assert.IsTrue(FieldValue.Contains('was not found in'), 'Unknown field is updated');    
+        Assert.IsTrue(FieldValue.Contains('was not found in'), 'Unknown field is updated');
 
         // [WHEN] Update unknown field Magento Attribute Set
-        UpdateFieldsAttributeSet.Add(FieldName, Format(true, 0, 9));        
+        UpdateFieldsAttributeSet.Add(FieldName, Format(true, 0, 9));
         UpdateFieldsAttributeSet.Add('Used by Items', Format(LibraryRandom.RandInt(10), 0, 9));
         AttributeSetMgt.UpdateMagentoAttributeSet(SetId, UpdateFieldsAttributeSet, true, FieldsNotUpdatedAttributeSet);
 
@@ -206,7 +206,7 @@ codeunit 85089 "NPR Magento Attributes Test"
         Assert.IsTrue(FieldValue.Contains('Only Normal fields can be updated'), 'Non normal field is updated');
 
         // [WHEN] Update unknown field Magento Attribute Set Value
-        UpdateFieldsAttributeSetValue.Add(FieldName, Format(true, 0, 9));        
+        UpdateFieldsAttributeSetValue.Add(FieldName, Format(true, 0, 9));
         UpdateFieldsAttributeSetValue.Add('Used by Items', Format(LibraryRandom.RandInt(10), 0, 9));
         AttributeSetMgt.UpdateMagentoAttributeSetValue(SetId, Id1, GroupId2, UpdateFieldsAttributeSetValue, true, FieldsNotUpdatedAttributeSetValue);
 
@@ -216,17 +216,17 @@ codeunit 85089 "NPR Magento Attributes Test"
         Assert.IsTrue(FieldValue.Contains('was not found in'), 'Unknown field is updated');
 
         FieldsNotUpdatedAttributeSetValue.Get('Used by Items', FieldValue);
-        Assert.IsTrue(FieldValue.Contains('Only Normal fields can be updated'), 'Non normal field is updated');                              
+        Assert.IsTrue(FieldValue.Contains('Only Normal fields can be updated'), 'Non normal field is updated');
     end;
 
     [Test]
     procedure DeleteMagentoAttribute()
-    var   
+    var
         AttributeSetMgt: Codeunit "NPR Magento Attr. Set Mgt.";
         LibraryRandom: Codeunit "Library - Random";
-        FieldsAttribute, FieldsAttributeLabel: Dictionary of [Text, Text];
-        Id1, Id2, Id3, Id4, LabelId11, LabelId21, LabelId12, LabelId22, LabelId32: Integer;
-        AttributeDesc1, AttributeDesc2, AttributeDesc3, AttributeDesc4, AttributeLabelValue11, AttributeLabelValue21, AttributeLabelValue22, AttributeLabelValue32, SetValue1, SetValue2, FieldName, FieldValue: Text;
+        FieldsAttribute, FieldsAttributeLabel : Dictionary of [Text, Text];
+        Id1, Id2, Id3, Id4, LabelId11, LabelId21, LabelId12, LabelId22, LabelId32 : Integer;
+        AttributeDesc1, AttributeDesc2, AttributeDesc3, AttributeDesc4, AttributeLabelValue11, AttributeLabelValue21, AttributeLabelValue22, AttributeLabelValue32 : Text;
     begin
         // [SCENARIO] Verify & exercise magento attributes are created
         Initialize();
@@ -245,10 +245,10 @@ codeunit 85089 "NPR Magento Attributes Test"
 
         LabelId32 := CreateMagentoAttributeLabel(Id2, LowerCase(LibraryRandom.RandText(100)));
 
-        AttributeDesc3 := LibraryRandom.RandText(50); 
+        AttributeDesc3 := LibraryRandom.RandText(50);
         Id3 := CreateMagentoAttribute(AttributeDesc3);
 
-        AttributeDesc4 := LowerCase(LibraryRandom.RandText(50)); 
+        AttributeDesc4 := LowerCase(LibraryRandom.RandText(50));
         Id4 := CreateMagentoAttribute(AttributeDesc4);
 
         // [WHEN] Delete Magento Attribute
@@ -258,8 +258,8 @@ codeunit 85089 "NPR Magento Attributes Test"
         AttributeSetMgt.DeleteMagentoAttributes(UpperCase(AttributeDesc4), false);
 
         // [THEN] Verify deleted Magento Attributes are not found
-        FieldsAttribute.Get('Description', AttributeDesc1);        
-        Assert.IsTrue(not AttributeSetMgt.MagentoAttributeExists(AttributeDesc1), StrSubstNo('Magento Attribute found for value %1', AttributeDesc1));                
+        FieldsAttribute.Get('Description', AttributeDesc1);
+        Assert.IsTrue(not AttributeSetMgt.MagentoAttributeExists(AttributeDesc1), StrSubstNo('Magento Attribute found for value %1', AttributeDesc1));
         Assert.IsTrue(AttributeSetMgt.MagentoAttributeExists(AttributeDesc2), StrSubstNo('Magento Attribute not found for value %1', AttributeDesc2));
         Assert.IsTrue(not AttributeSetMgt.MagentoAttributeExists(AttributeDesc3), StrSubstNo('Magento Attribute found for value %1', AttributeDesc3));
         Assert.IsTrue(not AttributeSetMgt.MagentoAttributeExists(UpperCase(AttributeDesc4)), StrSubstNo('Magento Attribute found for value %1', AttributeDesc4));
@@ -272,27 +272,25 @@ codeunit 85089 "NPR Magento Attributes Test"
         FieldsAttributeLabel.Get('Value', AttributeLabelValue21);
         AttributeSetMgt.DeleteMagentoAttributeLabels(AttributeLabelValue21, false);
         AttributeSetMgt.GetMagentoAttributeLabel(Id2, LabelId32, FieldsAttributeLabel);
-        FieldsAttributeLabel.Get('Value', AttributeLabelValue32);        
-        AttributeSetMgt.DeleteMagentoAttributeLabels(UpperCase(AttributeLabelValue32), false);   
+        FieldsAttributeLabel.Get('Value', AttributeLabelValue32);
+        AttributeSetMgt.DeleteMagentoAttributeLabels(UpperCase(AttributeLabelValue32), false);
 
         // [THEN] Verify deleted Magento Attribute Labels are not found       
-        Assert.IsTrue(not AttributeSetMgt.MagentoAttributeLabelExists(AttributeLabelValue11), StrSubstNo('Magento Attribute Label found for value %1', AttributeLabelValue11));                
-        Assert.IsTrue(not AttributeSetMgt.MagentoAttributeLabelExists(AttributeLabelValue21), StrSubstNo('Magento Attribute Label found for value %1', AttributeLabelValue21));                
-        Assert.IsTrue(not AttributeSetMgt.MagentoAttributeLabelExists(UpperCase(AttributeLabelValue32)), StrSubstNo('Magento Attribute Label found for value %1', AttributeLabelValue32));        
-        Assert.IsTrue(AttributeSetMgt.MagentoAttributeLabelExists(AttributeLabelValue22), StrSubstNo('Magento Attribute Label not found for value %1', AttributeLabelValue22));        
+        Assert.IsTrue(not AttributeSetMgt.MagentoAttributeLabelExists(AttributeLabelValue11), StrSubstNo('Magento Attribute Label found for value %1', AttributeLabelValue11));
+        Assert.IsTrue(not AttributeSetMgt.MagentoAttributeLabelExists(AttributeLabelValue21), StrSubstNo('Magento Attribute Label found for value %1', AttributeLabelValue21));
+        Assert.IsTrue(not AttributeSetMgt.MagentoAttributeLabelExists(UpperCase(AttributeLabelValue32)), StrSubstNo('Magento Attribute Label found for value %1', AttributeLabelValue32));
+        Assert.IsTrue(AttributeSetMgt.MagentoAttributeLabelExists(AttributeLabelValue22), StrSubstNo('Magento Attribute Label not found for value %1', AttributeLabelValue22));
     end;
 
     [Test]
     procedure VerifyAttributesCantBeAssignedToItem()
-    var   
+    var
         Item: Record Item;
         AttributeSetMgt: Codeunit "NPR Magento Attr. Set Mgt.";
         LibraryRandom: Codeunit "Library - Random";
         LibraryInventory: Codeunit "Library - Inventory";
-        UpdateFieldsAttribute, UpdateFieldsAttributeLabel, UpdateFieldsAttributeGroup, UpdateFieldsAttributeSet, UpdateFieldsAttributeSetValue: Dictionary of [Text, Text];
-        FieldsNotUpdatedAttribute, FieldsNotUpdatedAttributeLabel, FieldsNotUpdatedAttributeGroup, FieldsNotUpdatedAttributeSet, FieldsNotUpdatedAttributeSetValue: Dictionary of [Text, Text];    
-        SetId1, SetId2, Id1, Id2, GroupId1, GroupId2, LabelId11, LabelId21, LabelId12, LabelId22, LabelId32: Integer;
-        SetValue11, SetValue21, SetValue12, SetValue22, FieldName, FieldValue: Text;
+        SetId1, SetId2, Id1, Id2, GroupId1, GroupId2, LabelId11, LabelId21, LabelId12, LabelId22, LabelId32 : Integer;
+        SetValue11, SetValue21, SetValue12, SetValue22 : Text;
     begin
         // [SCENARIO] Verify & exercise magento attributes are created
         Initialize();
@@ -308,8 +306,8 @@ codeunit 85089 "NPR Magento Attributes Test"
         LabelId32 := CreateMagentoAttributeLabel(Id2, LibraryRandom.RandText(100));
 
         GroupId1 := CreateMagentoAttributeGroup();
-        GroupId2 := CreateMagentoAttributeGroup(LibraryRandom.RandText(50));        
-        
+        GroupId2 := CreateMagentoAttributeGroup(LibraryRandom.RandText(50));
+
         SetId1 := CreateMagentoAttributeSet(LibraryRandom.RandText(50));
         SetValue11 := CreateMagentoAttributeSetValue(SetId1, Id1, GroupId1);
         SetValue21 := CreateMagentoAttributeSetValue(SetId1, Id2, GroupId1);
@@ -330,17 +328,15 @@ codeunit 85089 "NPR Magento Attributes Test"
 
     [Test]
     procedure VerifyAttributesCanBeAssignedToItem()
-    var   
+    var
         Item: Record Item;
         MagentoItemAttribute: Record "NPR Magento Item Attr.";
-        MagentoItemAttributeValue: Record "NPR Magento Item Attr. Value";        
+        MagentoItemAttributeValue: Record "NPR Magento Item Attr. Value";
         AttributeSetMgt: Codeunit "NPR Magento Attr. Set Mgt.";
         LibraryRandom: Codeunit "Library - Random";
         LibraryInventory: Codeunit "Library - Inventory";
-        UpdateFieldsAttribute, UpdateFieldsAttributeLabel, UpdateFieldsAttributeGroup, UpdateFieldsAttributeSet, UpdateFieldsAttributeSetValue: Dictionary of [Text, Text];
-        FieldsNotUpdatedAttribute, FieldsNotUpdatedAttributeLabel, FieldsNotUpdatedAttributeGroup, FieldsNotUpdatedAttributeSet, FieldsNotUpdatedAttributeSetValue: Dictionary of [Text, Text];    
-        SetId1, SetId2, Id1, Id2, GroupId1, GroupId2, LabelId11, LabelId21, LabelId12, LabelId22, LabelId32: Integer;
-        SetValue11, SetValue21, SetValue12, SetValue22, FieldName, FieldValue: Text;
+        SetId1, SetId2, Id1, Id2, GroupId1, GroupId2, LabelId11, LabelId21, LabelId12, LabelId22, LabelId32 : Integer;
+        SetValue11, SetValue21, SetValue12, SetValue22 : Text;
     begin
         // [SCENARIO] Verify & exercise magento attributes are created
         Initialize();
@@ -356,8 +352,8 @@ codeunit 85089 "NPR Magento Attributes Test"
         LabelId32 := CreateMagentoAttributeLabel(Id2, LibraryRandom.RandText(100));
 
         GroupId1 := CreateMagentoAttributeGroup();
-        GroupId2 := CreateMagentoAttributeGroup(LibraryRandom.RandText(50));        
-        
+        GroupId2 := CreateMagentoAttributeGroup(LibraryRandom.RandText(50));
+
         SetId1 := CreateMagentoAttributeSet(LibraryRandom.RandText(50));
         SetValue11 := CreateMagentoAttributeSetValue(SetId1, Id1, GroupId1);
         SetValue21 := CreateMagentoAttributeSetValue(SetId1, Id2, GroupId1);
@@ -383,13 +379,10 @@ codeunit 85089 "NPR Magento Attributes Test"
         Assert.AreEqual(5, MagentoItemAttributeValue.Count(), 'More or less then 5 Item Attributes has been created');
         Assert.IsTrue(MagentoItemAttributeValue.Get(Id1, Item."No.", '', LabelId11), StrSubstNo('Item Attribute Value not found for %1', LabelId11));
         Assert.IsFalse(MagentoItemAttributeValue.Get(Id1, Item."No.", '', LabelId32), StrSubstNo('Item Attribute Value not found for %1', LabelId11));
-        Assert.IsTrue(MagentoItemAttributeValue.Get(Id2, Item."No.", '', LabelId32), StrSubstNo('Item Attribute Value not found for %1', LabelId32));        
+        Assert.IsTrue(MagentoItemAttributeValue.Get(Id2, Item."No.", '', LabelId32), StrSubstNo('Item Attribute Value not found for %1', LabelId32));
     end;
 
     local procedure Initialize()
-    var
-        LibraryMagento: Codeunit "NPR Library - Magento";
-        LibraryERM: Codeunit "Library - ERM";
     begin
         if not Initialized then begin
 
@@ -397,7 +390,7 @@ codeunit 85089 "NPR Magento Attributes Test"
         end;
         ResetAttributes();
         Commit();
-    end;    
+    end;
 
     local procedure ResetAttributes()
     var
@@ -416,7 +409,7 @@ codeunit 85089 "NPR Magento Attributes Test"
         Item.SetFilter("NPR Attribute Set ID", '<>0');
         if not Item.IsEmpty() then
             Item.ModifyAll("NPR Attribute Set ID", 0, false);
-    end;  
+    end;
 
 
     local procedure CreateMagentoAttribute(): Integer
@@ -431,7 +424,7 @@ codeunit 85089 "NPR Magento Attributes Test"
         MagentoAttributeSetMgt: Codeunit "NPR Magento Attr. Set Mgt.";
     begin
         exit(MagentoAttributeSetMgt.CreateMagentoAttribute(AttributeDescription, false));
-    end;    
+    end;
 
     local procedure CreateMagentoAttributeLabel(AttributeId: Integer): Integer
     var
@@ -480,5 +473,5 @@ codeunit 85089 "NPR Magento Attributes Test"
         MagentoAttributeSetMgt: Codeunit "NPR Magento Attr. Set Mgt.";
     begin
         exit(MagentoAttributeSetMgt.CreateMagentoAttributeSetValue(AttroibuteSetId, AttributeId, AttributeGroupId, LibraryRandom.RandText(50), false));
-    end;      
+    end;
 }

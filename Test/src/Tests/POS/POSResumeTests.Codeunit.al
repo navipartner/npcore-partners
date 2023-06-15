@@ -19,17 +19,9 @@ codeunit 85026 "NPR POS Resume Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SalePOS: Record "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
         SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
-        Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
-        POSActionSavePOSQuote: codeunit "NPR POS Action: SavePOSSvSl";
-        POSActionLoadPOSQuote: codeunit "NPR POS Action: LoadPOSSvSl";
-        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        POSQuoteLine: Record "NPR POS Saved Sale Line";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSetup: Codeunit "NPR POS Setup";
         PreviousSaleSystemId: Guid;
@@ -82,9 +74,6 @@ codeunit 85026 "NPR POS Resume Tests"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
-        POSEndOfDayTests: Codeunit "NPR POS End of Day";
-        POSUnitNo: Text;
     begin
         if _Initialized then begin
             //Clean any previous mock session

@@ -16,7 +16,6 @@ codeunit 85009 "NPR Library - Magento"
     var
         ItemNo: Code[20];
         LibraryInventory: Codeunit "Library - Inventory";
-        ItemUnitOfMeasure: Record "Item Unit of Measure";
     begin
         ItemNo := Item."No.";
 

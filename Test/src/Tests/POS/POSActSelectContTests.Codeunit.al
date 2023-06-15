@@ -47,7 +47,6 @@ codeunit 85081 "NPR POS Act. SelectCont. Tests"
         POSSale: Record "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         ContactSelect: Codeunit "NPR POS Action: Cont. Select-B";
-        LibrarySales: Codeunit "Library - Sales";
     begin
         // [GIVEN] Active POS session & sale
         InitializeData();

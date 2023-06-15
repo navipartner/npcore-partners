@@ -78,7 +78,7 @@ codeunit 85114 "NPR Library - Member GDPR"
     end;
 
 
-    local procedure CreateMembership(ValidUntilDate: Date; MembershipCode: Code[20]; GDPRAgreementCode: Code[20]) EntryNo: Integer
+    local procedure CreateMembership(ValidUntilDate: Date; MembershipCode: Code[20]; GDPRAgreementCode: Code[20]): Integer
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         GDPRAgreement: Record "NPR GDPR Agreement";
@@ -103,7 +103,7 @@ codeunit 85114 "NPR Library - Member GDPR"
         exit(CreateMembership(ValidUntilDate, MembershipCode));
     end;
 
-    local procedure CreateMembership(ValidUntilDate: Date; MembershipCode: Code[20]) EntryNo: Integer
+    local procedure CreateMembership(ValidUntilDate: Date; MembershipCode: Code[20]): Integer
     var
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";

@@ -7,7 +7,6 @@ codeunit 85109 "NPR POS Action: POS Info Tests"
         Initialized: Boolean;
         POSUnit: Record "NPR POS Unit";
         POSSession: Codeunit "NPR POS Session";
-        LibraryRandom: Codeunit "Library - Random";
         POSStore: Record "NPR POS Store";
 
     [Test]
@@ -16,10 +15,8 @@ codeunit 85109 "NPR POS Action: POS Info Tests"
     procedure ApplyPOSInfoActionOnSaleLines()
     var
         Item: Record Item;
-        Line: Record "NPR POS Sale Line";
         POSInfo: Record "NPR POS Info";
         POSInfoTransaction: Record "NPR POS Info Transaction";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";

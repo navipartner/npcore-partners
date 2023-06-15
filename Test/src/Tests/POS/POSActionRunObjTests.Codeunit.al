@@ -17,7 +17,6 @@ codeunit 85104 "NPR POS Action Run Obj. Tests"
     var
         POSSale: Codeunit "NPR POS Sale";
         RunPageCodeunit: Codeunit "NPR POS Action: Run Object-B";
-        CustomerList: TestPage "Customer List";
     begin
         // [Given] POS & Payment setup
         LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);

@@ -79,7 +79,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
@@ -125,7 +125,6 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSSaleTaxCalc: codeunit "NPR POS Sale Tax Calc.";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         SalesPOS: Record "NPR POS Sale";
     begin
@@ -175,7 +174,6 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSSaleTaxCalc: codeunit "NPR POS Sale Tax Calc.";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         SalesPOS: Record "NPR POS Sale";
     begin
@@ -267,7 +265,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct);
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -339,7 +337,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct);
 
         // [WHEN] Add item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -418,7 +416,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct);
 
         // [WHEN] Add item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -497,7 +495,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct);
 
         // [WHEN] Add item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -569,7 +567,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct);
 
         // [WHEN] Add item to active sale
         LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
@@ -648,7 +646,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct);
 
         // [WHEN] Add item to active sale
         LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
@@ -728,7 +726,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct);
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
@@ -806,7 +804,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -896,7 +894,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -995,7 +993,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1085,7 +1083,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
@@ -1174,7 +1172,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, VATPostingSetup."VAT %", LineDisc, LineDiscPct);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
@@ -1221,7 +1219,6 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSSaleTaxCalc: codeunit "NPR POS Sale Tax Calc.";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryERM: Codeunit "Library - ERM";
     begin
@@ -1272,7 +1269,6 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSSaleTaxCalc: codeunit "NPR POS Sale Tax Calc.";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         LibraryERM: Codeunit "Library - ERM";
     begin
@@ -1361,7 +1357,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct);
 
         // [WHEN] Add item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1440,7 +1436,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct);
 
         // [WHEN] Add item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1519,7 +1515,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct);
 
         // [WHEN] Add item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1591,7 +1587,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct);
 
         // [WHEN] Add item to active sale
         LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
@@ -1670,7 +1666,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct);
 
         // [WHEN] Add item to active sale
         LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
@@ -1750,7 +1746,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct);
 
         // [WHEN] Add Item to active sale
         LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
@@ -1828,7 +1824,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -1916,7 +1912,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -2009,7 +2005,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
@@ -2100,7 +2096,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
@@ -2190,7 +2186,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesForward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
@@ -2284,7 +2280,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         InvDiscAmt := 0;
 
         //Store random decimal values in temporary record
-        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct, InvDiscAmt);
+        SetRandomValuesBackward(TempPOSSaleTaxLine, Item, Qty, 0, LineDisc, LineDiscPct);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLineWithDiscount(POSSession, Item."No.", Qty, LineDiscPct);
@@ -2661,7 +2657,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         Assert.AreEqual(POSPostedTaxAmountLine."Calculated Tax Amount", POSEntry."Tax Amount", 'POSPostedTaxAmountLine."Calculated Tax Amount" <> POSEntry."Tax Amount"');
     end;
 
-    local procedure SetRandomValuesForward(var TempPOSSaleTaxLine: Record "NPR POS Sale Tax Line"; Item: Record Item; Qty: Decimal; TaxPct: Decimal; LineDisc: Decimal; LineDiscPct: Decimal; InvDiscAmt: Decimal)
+    local procedure SetRandomValuesForward(var TempPOSSaleTaxLine: Record "NPR POS Sale Tax Line"; Item: Record Item; Qty: Decimal; TaxPct: Decimal; LineDisc: Decimal; LineDiscPct: Decimal)
     var
         POSSaleTaxCalc: codeunit "NPR POS Sale Tax Calc.";
         Currency: Record Currency;
@@ -2691,7 +2687,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         TempPOSSaleTaxLine."Allow Line Discount" := (TempPOSSaleTaxLine."Discount Amount" > 0) or (TempPOSSaleTaxLine."Discount %" > 0);
     end;
 
-    local procedure SetRandomValuesBackward(var TempPOSSaleTaxLine: Record "NPR POS Sale Tax Line"; Item: Record Item; Qty: Decimal; TaxPct: Decimal; LineDisc: Decimal; LineDiscPct: Decimal; InvDiscAmt: Decimal)
+    local procedure SetRandomValuesBackward(var TempPOSSaleTaxLine: Record "NPR POS Sale Tax Line"; Item: Record Item; Qty: Decimal; TaxPct: Decimal; LineDisc: Decimal; LineDiscPct: Decimal)
     var
         POSSaleTaxCalc: codeunit "NPR POS Sale Tax Calc.";
         Currency: Record Currency;

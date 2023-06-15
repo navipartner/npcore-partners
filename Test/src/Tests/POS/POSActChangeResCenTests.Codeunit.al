@@ -7,7 +7,6 @@ codeunit 85133 "NPR POSAct:Change ResCen Tests"
         POSUnit: Record "NPR POS Unit";
         RespCenter: Record "Responsibility Center";
         Assert: Codeunit Assert;
-        LibrarySales: Codeunit "Library - Sales";
         POSSession: Codeunit "NPR POS Session";
         Initialized: Boolean;
 

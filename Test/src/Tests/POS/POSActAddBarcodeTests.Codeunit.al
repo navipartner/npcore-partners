@@ -3,7 +3,6 @@ codeunit 85048 "NPR POS Act. Add Barcode Tests"
     Subtype = Test;
 
     var
-        LibraryRandom: Codeunit "Library - Random";
         Assert: Codeunit "Assert";
         ItemReference: Record "Item Reference";
         ItemNo: Code[20];

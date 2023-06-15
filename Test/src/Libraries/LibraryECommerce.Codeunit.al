@@ -189,7 +189,6 @@ codeunit 85010 "NPR Library - E-Commerce"
 
     procedure GetCustomerEMailAddress(var EMail: Text[45])
     var
-        Customer: Record Customer;
         LibraryUtility: Codeunit "Library - Utility";
     begin
         if EMail <> '' then

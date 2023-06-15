@@ -5,9 +5,6 @@ codeunit 85125 "NPR POSAction: VAT Refu. Tests"
     var
         POSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
-        FirstLocation: Record Location;
-        SecondLocation: Record Location;
-        ThirdLocation: Record Location;
         POSSession: Codeunit "NPR POS Session";
         Assert: Codeunit "Assert";
         VATRefusionB: Codeunit "NPR POSAction: VAT Refusion-B";
@@ -45,7 +42,6 @@ codeunit 85125 "NPR POSAction: VAT Refu. Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
-        LibraryWarehouse: Codeunit "Library - Warehouse";
         VATAmount: Decimal;
     begin
         // [Given] POS & Payment setup

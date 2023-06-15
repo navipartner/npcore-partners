@@ -35,8 +35,6 @@ codeunit 85018 "NPR Mock Tax Free Handler" implements "NPR Tax Free Handler Inte
     end;
 
     procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesReceiptNo: Code[20]; var SkipRecordHandling: Boolean)
-    var
-        TaxFreeLibrary: codeunit "NPR Library - Tax Free";
     begin
         Constructor(TaxFreeRequest."Handler ID Enum");
         TaxFreeHandlerInterface.OnVoucherIssueFromPOSSale(TaxFreeRequest, SalesReceiptNo, SkipRecordHandling);
@@ -74,8 +72,6 @@ codeunit 85018 "NPR Mock Tax Free Handler" implements "NPR Tax Free Handler Inte
     end;
 
     var
-        TaxFreeGBI2: Codeunit "NPR Tax Free GB I2";
-        NPRTaxFreePTFPI: Codeunit "NPR Tax Free PTF PI";
         ConstructorSet: Boolean;
         TaxFreeHandlerInterface: Interface "NPR Tax Free Handler Interface";
 

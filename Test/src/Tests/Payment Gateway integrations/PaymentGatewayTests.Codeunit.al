@@ -8,7 +8,6 @@ codeunit 85123 "NPR Payment Gateway Tests"
         _Assert: Codeunit Assert;
         _LibPaymentGateway: Codeunit "NPR Library - Payment Gateway";
         _LibSales: Codeunit "Library - Sales";
-        _MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
         _TestIntegration: Codeunit "NPR PG CI Test Integration";
         _PaymentEventType: Option " ",Capture,Refund,Cancel;
 
@@ -60,7 +59,6 @@ codeunit 85123 "NPR Payment Gateway Tests"
         SalesHeader: Record "Sales Header";
         SalesPost: Codeunit "Sales-Post";
         PaymentGateway: Record "NPR Magento Payment Gateway";
-        PaymentLine: Record "NPR Magento Payment Line";
     begin
         // [SCENARIO] When a sales header is posted the system should automatically try to capture the payment.
 
@@ -133,7 +131,6 @@ codeunit 85123 "NPR Payment Gateway Tests"
         SalesHeader: Record "Sales Header";
         SalesPost: Codeunit "Sales-Post";
         PaymentGateway: Record "NPR Magento Payment Gateway";
-        PaymentLine: Record "NPR Magento Payment Line";
     begin
         // [SCENARIO] When a reverse sales header with a payment line is posted it should automatically refund the payment.
 
