@@ -108,16 +108,21 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    procedure PrepareEndWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; var IntegrationRequest: JsonObject; var Mechanism: Enum "NPR EFT Request Mechanism"; var Workflow: Text): Integer
+    procedure PrepareEndWorkshift(EFTSetup: Record "NPR EFT Setup"; RegisterNo: Code[10]; SalesTicketNo: Code[20]; var IntegrationRequest: JsonObject; var Mechanism: Enum "NPR EFT Request Mechanism"; var Workflow: Text): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        EFTFrameworkMgt.CreateEndWorkshiftRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.");
+        EFTFrameworkMgt.CreateEndWorkshiftRequest(EFTTransactionRequest, EFTSetup, RegisterNo, SalesTicketNo);
         EFTFrameworkMgt.PrepareRequestSend(EFTTransactionRequest, IntegrationRequest, Mechanism, Workflow);
         Commit(); // Save the request record data regardless of any later errors when invoking.
 
         exit(EFTTransactionRequest."Entry No.");
+    end;
+
+    procedure PrepareEndWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; var IntegrationRequest: JsonObject; var Mechanism: Enum "NPR EFT Request Mechanism"; var Workflow: Text): Integer
+    begin
+        exit(PrepareEndWorkshift(EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", IntegrationRequest, Mechanism, Workflow));
     end;
 
     procedure PrepareAuxOperation(EFTSetup: Record "NPR EFT Setup"; POSUnitNo: Code[10]; SalesReceiptNo: Code[20]; AuxFunction: Integer; var IntegrationRequest: JsonObject; var Mechanism: Enum "NPR EFT Request Mechanism"; var Workflow: Text): Integer

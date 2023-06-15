@@ -242,7 +242,7 @@
                 exit;
         end;
 
-        EftTransactionMgt.PrepareEndWorkshift(EFTSetup, PosSale, Request, Mechanism, Workflow);
+        EftTransactionMgt.PrepareEndWorkshift(EFTSetup, POSSetup.GetPOSUnitNo(), PosSale."Sales Ticket No.", Request, Mechanism, Workflow);
         Context.Add('request', Request);
         EftWorkflows.Add(Workflow, Context);
     end;
