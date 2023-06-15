@@ -3,13 +3,14 @@ Development should always be performed in the test environment. For apps, this i
 
 ## AL
 
-Normally, you start by creating a container. This is done through case system by using “Request and View Container” action:
+### Container
+Normally, you start by creating a container. This is done through case system by using the **Request and View Container** action:
 
 ![case header - request and view container](../.attachments/CaseHeader-RequestAndViewContainer.png)
 
 Please check [Crane documentation](../Crane-Containers/Crane-Features.md) for more details.
 
-If test environment is created by hosting, or if a customer has permanent test environment, scroll down under [C/AL](#cal) section to see how to find it.
+If the test environment is created by hosting, or if a customer has a permanent test environment, scroll down under [C/AL](#cal) section to see how to find it.
 
 To obtain development port for these test environments, you need to remote to appropriate service.
 
@@ -17,7 +18,7 @@ You start by finding restore in Triskilion and then start a remote inside your c
 
 ![access service remote desktop](../.attachments/AccessingServiceRemoteDesktop.png)
 
-Don't use default NPKNAV username, but your own credentials, in this example for nproot.
+Use your own credentials instead of using the default NPKNAV username in this example for nproot.
 
 Once there, search for Business Central Administration (or if on lower version administration shortcut for that version):
 
@@ -27,19 +28,20 @@ Find the correct service and this is where you see development port:
 
 ![test environment development port](../.attachments/TestEnvironmentDevelopmentPort.png)
 
-
+### Sandbox
+For customers on SaaS, you need to ask hosting to create a sandbox. Although we have an option to create it ourselves, hosting keeps an eye on total available capacity for each customer. So please **DO NOT** create it yourself unless instructed by hosting to do so.
 
 ## C/AL
 
-Some clients have permanent test environments, which they’re accustomed to use for any change we need them to test. If you don’t know where to develop, start off by searching for it in Triskelion.
+Some clients have permanent test environments, which they’re accustomed to using for any changes we need them to test. If you don’t know where to develop, start off by searching for it in Triskelion.
 
 For example, JapanPhoto is one client with permanent test environment:
 
 ![triskilion 2018 - japan photo prelive](../.attachments/Triskilion2018-JapanPhotoPrelive.png)
 
-If you’re not sure if that is correct environment for coding, ask around, or send it to Mark and he’ll point you in the right direction.
+If you’re not sure if that is the correct environment for coding, ask around, or send it to Mark and he’ll point you in the right direction.
 
-If there’s no permanent test environment, you can proceed with creating one in a container or ask hosting for a restore. In most scenarios, if coding is to be done as C/AL it’ll be developed on a restore. You'll notice alot of mention of word restore on cases and teams, this refers to a test environment created by hosting.
+If there’s no permanent test environment, you can proceed with creating one in a container or ask hosting for a restore. In most scenarios, if coding is to be done as C/AL it’ll be developed on a restore. You'll notice the word restore being mentioned often on cases and teams. This refers to a test environment created by hosting.
 
 If customer database is large, hosting might point you to an already restored database. You can get a list in the case system:
 
