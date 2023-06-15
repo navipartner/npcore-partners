@@ -98,8 +98,6 @@ codeunit 85051 "NPR Library Coupon"
     end;
 
     local procedure CreateCouponType(CouponTypeCode: Code[20]; var CouponType: Record "NPR NpDc Coupon Type"): Code[20]
-    var
-        LibNoSeries: Codeunit "NPR Library - No. Series";
     begin
         CreateCouponSetup();
         if (not CouponType.Get(CouponTypeCode)) then begin

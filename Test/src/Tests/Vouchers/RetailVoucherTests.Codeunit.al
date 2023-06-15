@@ -1,4 +1,4 @@
-﻿codeunit 85024 "NPR Retail Voucher Tests"
+codeunit 85024 "NPR Retail Voucher Tests"
 {
     // [Feature] Retail Voucher Test scenarios
     Subtype = Test;

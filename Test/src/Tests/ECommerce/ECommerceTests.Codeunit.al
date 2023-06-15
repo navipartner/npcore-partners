@@ -1037,7 +1037,6 @@ codeunit 85008 "NPR E-Commerce Tests"
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         EcWebService: codeunit "NPR NpEc Webservice";
         Assert: Codeunit Assert;
-        FM: Codeunit "File Management";
     begin
         // [Scenario] Create, update and post sales order
 
@@ -1220,7 +1219,6 @@ codeunit 85008 "NPR E-Commerce Tests"
         RecordLink: Record "Record Link";
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         EcWebService: codeunit "NPR NpEc Webservice";
-        Assert: Codeunit Assert;
     begin
         // [Scenario] Lookup sales order
 
@@ -1710,16 +1708,10 @@ codeunit 85008 "NPR E-Commerce Tests"
         ImportEntry: Record "NPR NC Import Entry";
         ImportType: Record "NPR Nc Import Type";
         PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        Item: Record Item;
-        GLAcc: Record "G/L Account";
-        Vendor: Record Vendor;
-        EcStore: Record "NPR NpEc Store";
         EcDocument: Record "NPR NpEc Document";
         RecordLink: Record "Record Link";
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         EcWebService: codeunit "NPR NpEc Webservice";
-        Assert: Codeunit Assert;
     begin
         // [Scenario] Load purchase invoice
 
@@ -1761,8 +1753,6 @@ codeunit 85008 "NPR E-Commerce Tests"
     end;
 
     local procedure Initialize()
-    var
-        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
     begin
         if not Initialized then begin
             PrepareDataForXml();
@@ -1806,10 +1796,8 @@ codeunit 85008 "NPR E-Commerce Tests"
     var
         Customer: Record Customer;
         VATPostingSetup: Record "VAT Posting Setup";
-        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         LibraryRandom: Codeunit "Library - Random";
         LibraryERM: Codeunit "Library - ERM";
-        LineAmt, LineAmt2 : Decimal;
     begin
         XmlSales.Append('<?xml version="1.0" encoding="UTF-8"?>');
         XmlSales.Append('<sales_orders xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:microsoft-dynamics-nav/xmlports/sales_order">');
@@ -1905,10 +1893,8 @@ codeunit 85008 "NPR E-Commerce Tests"
     var
         Vendor: Record Vendor;
         VATPostingSetup: Record "VAT Posting Setup";
-        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         LibraryRandom: Codeunit "Library - Random";
         LibraryERM: Codeunit "Library - ERM";
-        LineAmt, LineAmt2 : Decimal;
     begin
         XmlPurch.Append('<?xml version="1.0" encoding="UTF-8"?>');
         XmlPurch.Append('<purchase_invoices xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"> xmlns="urn:microsoft-dynamics-nav/xmlports/purchase_invoices">');
@@ -2042,7 +2028,6 @@ codeunit 85008 "NPR E-Commerce Tests"
 
     local procedure LoadXml(ImportType: Record "NPR Nc Import Type"; var ImportEntry: Record "NPR NC Import Entry"; DocName: Text; Xml: TextBuilder)
     var
-        Node: XmlNode;
         Document: XmlDocument;
         XmlDomMgt: Codeunit "XML DOM Management";
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";

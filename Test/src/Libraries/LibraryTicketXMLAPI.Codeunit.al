@@ -24,7 +24,6 @@ codeunit 85012 "NPR Library - Ticket XML API"
         Reservation: XmlElement;
         TicketAdmission: XmlElement;
         Tickets: XmlElement;
-        XMLNameSpace: XmlNamespaceManager;
     begin
 
         TicketAdmissionBOM.SetFilter("Item No.", '=%1', ItemNumber);
@@ -92,7 +91,6 @@ codeunit 85012 "NPR Library - Ticket XML API"
         Reservation: XmlElement;
         TicketAdmission: XmlElement;
         Tickets: XmlElement;
-        XMLNameSpace: XmlNamespaceManager;
     begin
 
         TicketAdmissionBOM.SetFilter("Item No.", '=%1', ItemNumber);
@@ -148,11 +146,9 @@ codeunit 85012 "NPR Library - Ticket XML API"
     var
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
-        Ticket: Record "NPR TM Ticket";
         TicketWebService: Codeunit "NPR TM Ticket WebService";
         PreConfirmReservation: XMLport "NPR TM Ticket PreConfirm";
         IStream: InStream;
-        OrderNumber: Integer;
         OStream: OutStream;
         NameSpace: Text;
         XmlAsText: Text;
@@ -162,7 +158,6 @@ codeunit 85012 "NPR Library - Ticket XML API"
         XmlDoc: XmlDocument;
         TicketTokens: XmlElement;
         Tickets: XmlElement;
-        XMLNameSpace: XmlNamespaceManager;
     begin
 
         if (Token = '') then begin
@@ -212,16 +207,13 @@ codeunit 85012 "NPR Library - Ticket XML API"
         TicketWebService: Codeunit "NPR TM Ticket WebService";
         ConfirmReservation: XMLport "NPR TM Ticket Confirmation";
         IStream: InStream;
-        OrderNumber: Integer;
         OStream: OutStream;
         NameSpace: Text;
         XmlAsText: Text;
-        ReservationStatus: Boolean;
         XmlDec: XmlDeclaration;
         XmlDoc: XmlDocument;
         TicketTokens: XmlElement;
         Tickets: XmlElement;
-        XMLNameSpace: XmlNamespaceManager;
     begin
 
         if (Token = '') then begin
@@ -294,21 +286,17 @@ codeunit 85012 "NPR Library - Ticket XML API"
     var
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
-        Ticket: Record "NPR TM Ticket";
         TicketWebService: Codeunit "NPR TM Ticket WebService";
         CancelReservation: XMLport "NPR TM Ticket Cancel";
         IStream: InStream;
-        OrderNumber: Integer;
         OStream: OutStream;
         NameSpace: Text;
         XmlAsText: Text;
-        ReservationStatus: Boolean;
         XmlDec: XmlDeclaration;
         XmlDoc: XmlDocument;
 
         TicketTokens: XmlElement;
         Tickets: XmlElement;
-        XMLNameSpace: XmlNamespaceManager;
     begin
 
         if (Token = '') then begin
@@ -356,15 +344,12 @@ codeunit 85012 "NPR Library - Ticket XML API"
     procedure GetTicketsPrintURL(var TmpTickets: Record "NPR TM Ticket" temporary; var ResponseMessage: Text): Boolean
     var
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         TicketWebService: Codeunit "NPR TM Ticket WebService";
         GetTicketPrintURL: XMLport "NPR TM Ticket Get Print URL";
         IStream: InStream;
-        OrderNumber: Integer;
         OStream: OutStream;
         NameSpace: Text;
         XmlAsText: Text;
-        ReservationStatus: Boolean;
         XmlDec: XmlDeclaration;
         XmlDoc: XmlDocument;
 
@@ -409,15 +394,12 @@ codeunit 85012 "NPR Library - Ticket XML API"
     procedure OfflineTicketValidation(var TmpTickets: Record "NPR TM Ticket" temporary; ImportRefName: Text[20]; var ResponseMessage: Text): Boolean
     var
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         TicketWebService: Codeunit "NPR TM Ticket WebService";
         OfflineTicketValidation: XMLport "NPR TM Offline Ticket Valid.";
         IStream: InStream;
-        OrderNumber: Integer;
         OStream: OutStream;
         NameSpace: Text;
         XmlAsText: Text;
-        ReservationStatus: Boolean;
         XmlDec: XmlDeclaration;
         XmlDoc: XmlDocument;
 
@@ -484,7 +466,6 @@ codeunit 85012 "NPR Library - Ticket XML API"
         OStream: OutStream;
         NameSpace: Text;
         XmlAsText: Text;
-        ApiStatus: Boolean;
         XmlDec: XmlDeclaration;
         XmlDoc: XmlDocument;
 
@@ -605,7 +586,6 @@ codeunit 85012 "NPR Library - Ticket XML API"
         OStream: OutStream;
         NameSpace: Text;
         XmlAsText: Text;
-        ApiStatus: Boolean;
         XmlDec: XmlDeclaration;
         XmlDoc: XmlDocument;
 
@@ -919,12 +899,9 @@ codeunit 85012 "NPR Library - Ticket XML API"
     procedure SendETicket(Token: Text[100]; var ResponseMessage: Text) Status: Boolean
     var
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
-        Ticket: Record "NPR TM Ticket";
         TicketWebService: Codeunit "NPR TM Ticket WebService";
         SendETicket: XMLport "NPR TM Send eTicket";
         IStream: InStream;
-        OrderNumber: Integer;
         OStream: OutStream;
         NameSpace: Text;
         XmlAsText: Text;
@@ -934,7 +911,6 @@ codeunit 85012 "NPR Library - Ticket XML API"
 
         TicketTokens: XmlElement;
         Tickets: XmlElement;
-        XMLNameSpace: XmlNamespaceManager;
     begin
 
         if (Token = '') then begin

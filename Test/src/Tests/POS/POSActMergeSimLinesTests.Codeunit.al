@@ -20,7 +20,6 @@ codeunit 85100 "NPR POS ActMergeSimLines Tests"
         SalePOS: Record "NPR POS Sale";
         Item: Record Item;
         POSActMrgSimLinesB: Codeunit "NPR POSAction: Merg.Sml.LinesB";
-        SaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         // [Given] Active POS session & sale

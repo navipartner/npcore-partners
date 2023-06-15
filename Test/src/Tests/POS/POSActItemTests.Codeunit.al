@@ -7,7 +7,6 @@ codeunit 85085 "NPR POS Act. Item Tests"
         Quantity: Decimal;
         Initialized: Boolean;
         POSUnit: Record "NPR POS Unit";
-        POSPaymentMethod: Record "NPR POS Payment Method";
         POSSession: Codeunit "NPR POS Session";
         POSStore: Record "NPR POS Store";
 
@@ -16,7 +15,6 @@ codeunit 85085 "NPR POS Act. Item Tests"
     procedure AddSalesLine()
     var
         Item: Record Item;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryRandom: Codeunit "Library - Random";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";

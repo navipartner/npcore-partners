@@ -171,7 +171,6 @@ codeunit 85028 "NPR POS Lib. - Tax Calc."
     var
         NPRLibraryInventory: Codeunit "NPR Library - Inventory";
         LibraryRandom: Codeunit "Library - Random";
-        POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         NPRLibraryInventory.CreateItem(Item);
         Item.Validate("VAT Prod. Posting Group", VATProdPostingGroupCode);

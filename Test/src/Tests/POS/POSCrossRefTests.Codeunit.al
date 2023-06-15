@@ -51,9 +51,6 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure CrossRefSetupLookupTableName()
     var
-        POSCrossRefSetup: Record "NPR POS Cross Ref. Setup";
-        POSSaleLine: Record "NPR POS Sale Line";
-        POSSale: Record "NPR POS Sale";
         POSCrossRefSetupList: TestPage "NPR POS Cross Ref. Setup";
     begin
         // [SCENARIO] Verify table selection on table name lookup
@@ -74,7 +71,6 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure CrossRefSetupValidateUnknownTableNameErr()
     var
-        POSCrossRefSetup: Record "NPR POS Cross Ref. Setup";
         POSCrossRefSetupList: TestPage "NPR POS Cross Ref. Setup";
     begin
         // [SCENARIO] Verify error is thrown when unknown table name is inserted manually
@@ -257,7 +253,6 @@ codeunit 85036 "NPR POS Cross Ref. Tests"
 
     local procedure GetCurrentSaleLine(var POSSaleLine: Record "NPR POS Sale Line")
     var
-        POSSale: Record "NPR POS Sale";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         POSViewProfile: Record "NPR POS View Profile";

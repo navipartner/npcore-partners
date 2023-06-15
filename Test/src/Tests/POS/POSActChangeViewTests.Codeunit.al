@@ -4,7 +4,6 @@ codeunit 85070 "NPR POS Act. Change View Tests"
 
     var
         Assert: Codeunit "Assert";
-        Quantity: Decimal;
         Initialized: Boolean;
         POSUnit: Record "NPR POS Unit";
         POSSession: Codeunit "NPR POS Session";

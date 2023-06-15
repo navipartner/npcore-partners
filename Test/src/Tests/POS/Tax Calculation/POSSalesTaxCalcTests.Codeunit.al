@@ -32,7 +32,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         Item: Record Item;
         TaxArea: Record "Tax Area";
         TaxDetail: Record "Tax Detail";
-        SaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
     begin
@@ -130,7 +129,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         Item: Record Item;
         TaxArea: Record "Tax Area";
         TaxDetail: Record "Tax Detail";
-        SaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
     begin
@@ -236,7 +234,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         TaxArea: Record "Tax Area";
         TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
-        SaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
     begin
@@ -348,7 +345,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         Item: Record Item;
         TaxArea: Record "Tax Area";
         TaxDetail: Record "Tax Detail";
-        SaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
     begin
@@ -397,7 +393,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         TaxArea: Record "Tax Area";
-        TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
         SalePOS: Record "NPR POS Sale";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
@@ -457,7 +452,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         Item: Record Item;
         TaxArea: Record "Tax Area";
         TaxDetail: Record "Tax Detail";
-        SaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
     begin
@@ -506,7 +500,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         TaxArea: Record "Tax Area";
-        TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
         SalePOS: Record "NPR POS Sale";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
@@ -644,7 +637,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         TaxArea: Record "Tax Area";
-        TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -810,7 +802,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         TaxArea: Record "Tax Area";
-        TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
@@ -979,7 +970,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         TaxArea: Record "Tax Area";
-        TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
@@ -1148,7 +1138,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         TaxArea: Record "Tax Area";
-        TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
@@ -1317,7 +1306,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         TaxArea: Record "Tax Area";
-        TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -1415,7 +1403,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         POSPostingProfile: Record "NPR POS Posting Profile";
-        SaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
@@ -1533,7 +1520,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: array[2] of Record Item;
         TaxArea: Record "Tax Area";
-        TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
@@ -1546,7 +1532,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
-        SaleLine: Codeunit "NPR POS Sale Line";
         Qty: array[2] of Decimal;
         LineDisc: array[2] of Decimal;
         LineDiscPct: array[2] of Decimal;
@@ -1677,7 +1662,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         POSEntry: Record "NPR POS Entry";
         POSPostingProfile: Record "NPR POS Posting Profile";
         TaxJurisdiction: Record "Tax Jurisdiction";
-        SaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
@@ -1795,7 +1779,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: array[2] of Record Item;
         TaxArea: Record "Tax Area";
-        TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
@@ -1808,7 +1791,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
-        SaleLine: Codeunit "NPR POS Sale Line";
         Qty: array[2] of Decimal;
         LineDisc: array[2] of Decimal;
         LineDiscPct: array[2] of Decimal;
@@ -1929,12 +1911,10 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         TaxDetail: Record "Tax Detail";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
-        POSActiveTaxAmountLine: array[2] of Record "NPR POS Sale Tax Line";
         POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line";
         SalePOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         TaxJurisdiction: Record "Tax Jurisdiction";
-        SaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
@@ -2048,11 +2028,9 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: array[2] of Record Item;
         TaxArea: Record "Tax Area";
-        TaxAreaLine: Record "Tax Area Line";
         TaxDetail: Record "Tax Detail";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActiveTaxAmount: Record "NPR POS Sale Tax";
-        POSActiveTaxAmountLine: array[2] of Record "NPR POS Sale Tax Line";
         POSPostedTaxAmountLine: Record "NPR POS Entry Tax Line";
         POSEntry: Record "NPR POS Entry";
         SalePOS: Record "NPR POS Sale";
@@ -2061,7 +2039,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSActiveTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
-        SaleLine: Codeunit "NPR POS Sale Line";
         Qty: array[2] of Decimal;
         LineDisc: array[2] of Decimal;
         LineDiscPct: array[2] of Decimal;
@@ -2619,9 +2596,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     var
         GLEntry: Record "G/L Entry";
         GeneralPostingSetup: Record "General Posting Setup";
-        POSPostingProfile: Record "NPR POS Posting Profile";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
-        i: Integer;
     begin
         GLEntry.SetRange("Document No.", POSEntry."Document No.");
         GLEntry.SetRange("Posting Date", POSEntry."Posting Date");
@@ -2658,7 +2633,6 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
     local procedure UpdateTaxJurisdictionSalesTaxAccounts()
     var
-        GLAcc: Record "G/L Account";
         TaxJurisdiction: Record "Tax Jurisdiction";
     begin
         TaxJurisdiction.ModifyAll("Tax Account (Sales)", '');

@@ -4,7 +4,6 @@ codeunit 85053 "NPR Library - Boarding Pass"
     var
         PassengerNameLength: Integer;
         NoOfEmptySpaces: Integer;
-        i: Integer;
         TB: TextBuilder;
     begin
         PassengerNameLength := StrLen(PassengerName);

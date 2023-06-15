@@ -19,7 +19,6 @@ codeunit 85006 "NPR POS Payment Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
@@ -126,7 +125,6 @@ codeunit 85006 "NPR POS Payment Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         SaleEnded: Boolean;
@@ -186,7 +184,6 @@ codeunit 85006 "NPR POS Payment Tests"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
     begin
         if _Initialized then begin
             //Clean any previous mock session

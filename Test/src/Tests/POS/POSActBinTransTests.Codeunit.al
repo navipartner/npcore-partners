@@ -49,13 +49,9 @@ codeunit 85054 "NPR POS Act. Bin Trans. Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item1: Record Item;
         Item2: Record Item;
         POSSale: Codeunit "NPR POS Sale";
-        Assert: Codeunit "Assert";
-        SaleEnded: Boolean;
-        POSEntry: Record "NPR POS Entry";
         i: Integer;
     begin
         if NoOfSales < 1 then

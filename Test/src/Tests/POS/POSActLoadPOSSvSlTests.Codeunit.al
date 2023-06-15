@@ -21,7 +21,6 @@ codeunit 85086 "NPR POS ActLoadPOSSvSl Tests"
         POSActSaveSale: Codeunit "NPR POS Action: SavePOSSvSl B";
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         SalePOS: Record "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
 
     begin

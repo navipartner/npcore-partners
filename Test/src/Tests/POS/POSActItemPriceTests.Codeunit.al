@@ -7,7 +7,6 @@ codeunit 85061 "NPR POS Act. Item Price Tests"
         Quantity: Decimal;
         Initialized: Boolean;
         POSUnit: Record "NPR POS Unit";
-        POSSession: Codeunit "NPR POS Session";
         POSStore: Record "NPR POS Store";
 
     [Test]
@@ -17,8 +16,6 @@ codeunit 85061 "NPR POS Act. Item Price Tests"
         Item: Record Item;
         POSSaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        LibraryRandom: Codeunit "Library - Random";
-        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
         POSActionItemPriceB: Codeunit "NPR POS Action - Item Price B";
@@ -48,8 +45,6 @@ codeunit 85061 "NPR POS Act. Item Price Tests"
         Item: Record Item;
         POSSaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        LibraryRandom: Codeunit "Library - Random";
-        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
         POSActionItemPriceB: Codeunit "NPR POS Action - Item Price B";
@@ -78,8 +73,6 @@ codeunit 85061 "NPR POS Act. Item Price Tests"
         Item: Record Item;
         POSSaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        LibraryRandom: Codeunit "Library - Random";
-        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
         POSActionItemPriceB: Codeunit "NPR POS Action - Item Price B";
@@ -108,17 +101,13 @@ codeunit 85061 "NPR POS Act. Item Price Tests"
     procedure TestDeleteLines()
     var
         Item: Record Item;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        LibraryRandom: Codeunit "Library - Random";
-        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
         POSActionItemPriceB: Codeunit "NPR POS Action - Item Price B";
         POSSession: Codeunit "NPR POS Session";
         SalePOS: Record "NPR POS Sale";
         LineNo: Integer;
-        LineFound: Boolean;
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
         LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);

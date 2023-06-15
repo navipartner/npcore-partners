@@ -23,10 +23,8 @@ codeunit 85080 "NPR POS SSAct InsertItem Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
-        LibraryRandom: Codeunit "Library - Random";
         SaleLinePOS: Record "NPR POS Sale Line";
         SSActInsertItem: Codeunit "NPR SS Action: Insert Item B.";
-        GivenQuantity: Decimal;
         Success: Boolean;
     begin
         //PARAMETERS:
@@ -78,10 +76,8 @@ codeunit 85080 "NPR POS SSAct InsertItem Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
-        LibraryRandom: Codeunit "Library - Random";
         SaleLinePOS: Record "NPR POS Sale Line";
         SSActInsertItem: Codeunit "NPR SS Action: Insert Item B.";
-        GivenQuantity: Decimal;
     begin
         //PARAMETERS:
         //Edit Description = false
@@ -129,10 +125,8 @@ codeunit 85080 "NPR POS SSAct InsertItem Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
-        LibraryRandom: Codeunit "Library - Random";
         SaleLinePOS: Record "NPR POS Sale Line";
         SSActInsertItem: Codeunit "NPR SS Action: Insert Item B.";
-        GivenQuantity: Decimal;
     begin
         //PARAMETERS:
         //Edit Description = false
@@ -183,7 +177,6 @@ codeunit 85080 "NPR POS SSAct InsertItem Tests"
         LibraryRandom: Codeunit "Library - Random";
         SaleLinePOS: Record "NPR POS Sale Line";
         SSActInsertItem: Codeunit "NPR SS Action: Insert Item B.";
-        GivenQuantity: Decimal;
     begin
         //PARAMETERS:
         //Edit Description = false

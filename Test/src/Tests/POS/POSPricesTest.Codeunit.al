@@ -1,4 +1,4 @@
-﻿codeunit 85143 "NPR POS Prices Test"
+codeunit 85143 "NPR POS Prices Test"
 {
     Subtype = Test;
 

@@ -39,8 +39,6 @@ codeunit 85017 "NPR Library - Tax Free"
 
     procedure InitParametersTaxFree(TaxFreePosUnit: Record "NPR Tax Free POS Unit"; var TaxFreeService: Record "NPR Tax Free GB I2 Service"; var tmpHandlerParameter: Record "NPR Tax Free Handler Param.")
     var
-        TaxFreeGBI2: Codeunit "NPR Tax Free GB I2";
-        NPRTaxFreePTFPI: Codeunit "NPR Tax Free PTF PI";
         GlobalBlueIINBlacklist: Record "NPR Tax Free GB IIN Blacklist";
     begin
         case true of
@@ -127,8 +125,6 @@ codeunit 85017 "NPR Library - Tax Free"
 
     procedure GenerateRandomDecBetween(MaxNo: Decimal; MinNo: Decimal; MaxDecNo: Integer) GeneratedNumber: Decimal
     var
-        GeneratedMax: Decimal;
-        GeneratedMin: Decimal;
         RoundingPrec: Decimal;
         i: Integer;
     begin

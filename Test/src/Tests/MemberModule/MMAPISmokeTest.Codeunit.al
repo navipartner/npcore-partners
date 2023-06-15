@@ -38,7 +38,6 @@ codeunit 85016 "NPR MM API Smoke Test"
         MembershipSetup: Record "NPR MM Membership Setup";
         Membership: Record "NPR MM Membership";
         MembershipEntryNo: Integer;
-        ItemNo: Code[20];
         MembershipCode: Code[20];
         LoyaltyProgramCode: Code[20];
         Description: Text[50];
@@ -76,7 +75,6 @@ codeunit 85016 "NPR MM API Smoke Test"
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
         MemberLibrary: Codeunit "NPR Library - Member Module";
-        LibraryInventory: Codeunit "NPR Library - Inventory";
         Assert: Codeunit Assert;
         ResponseMessage: Text;
         ApiStatus: Boolean;
@@ -108,8 +106,6 @@ codeunit 85016 "NPR MM API Smoke Test"
     procedure AddMemberCard()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
-        MemberLibrary: Codeunit "NPR Library - Member Module";
-        LibraryInventory: Codeunit "NPR Library - Inventory";
         Assert: Codeunit Assert;
         ResponseMessage: Text;
         ApiStatus: Boolean;
@@ -147,8 +143,6 @@ codeunit 85016 "NPR MM API Smoke Test"
     procedure ReplaceMemberCard()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
-        MemberLibrary: Codeunit "NPR Library - Member Module";
-        LibraryInventory: Codeunit "NPR Library - Inventory";
         Assert: Codeunit Assert;
         ResponseMessage: Text;
         ApiStatus: Boolean;
@@ -194,7 +188,6 @@ codeunit 85016 "NPR MM API Smoke Test"
     procedure ActivateMembership()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
-        LibraryInventory: Codeunit "NPR Library - Inventory";
         Assert: Codeunit Assert;
         ApiStatus: Boolean;
 
@@ -214,7 +207,6 @@ codeunit 85016 "NPR MM API Smoke Test"
     procedure GetMembershipUsingMember()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
-        LibraryInventory: Codeunit "NPR Library - Inventory";
         Assert: Codeunit Assert;
         ApiStatus: Boolean;
 
@@ -246,7 +238,6 @@ codeunit 85016 "NPR MM API Smoke Test"
     procedure GetMembershipMemberUsingMembership()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
-        LibraryInventory: Codeunit "NPR Library - Inventory";
         Assert: Codeunit Assert;
         ApiStatus: Boolean;
 
@@ -279,7 +270,6 @@ codeunit 85016 "NPR MM API Smoke Test"
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
         MemberLibrary: Codeunit "NPR Library - Member Module";
-        LibraryInventory: Codeunit "NPR Library - Inventory";
         Assert: Codeunit Assert;
         ResponseMessage: Text;
         ApiStatus: Boolean;
@@ -407,7 +397,6 @@ codeunit 85016 "NPR MM API Smoke Test"
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
         Assert: Codeunit Assert;
-        ScannerStation: Code[10];
         ApiStatus: Boolean;
     begin
         Initialize();
@@ -525,7 +514,6 @@ codeunit 85016 "NPR MM API Smoke Test"
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
         MemberLibrary: Codeunit "NPR Library - Member Module";
-        LibraryInventory: Codeunit "NPR Library - Inventory";
         Assert: Codeunit Assert;
         ResponseMessage: Text;
         ApiStatus: Boolean;

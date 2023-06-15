@@ -536,7 +536,6 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
         ReturnAmount: Decimal;
         SubTotal: Decimal;
         Suggestion: Decimal;
-        ForeignSuggestion: Decimal;
     begin
         InitializeData();
 
@@ -751,7 +750,6 @@ codeunit 85023 "NPR POS Payment Rounding Tests"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
     begin
         if _Initialized then begin
             //Clean any previous mock session

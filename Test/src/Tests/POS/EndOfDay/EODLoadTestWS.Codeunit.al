@@ -28,7 +28,6 @@ codeunit 85146 "NPR EODLoadTestWS"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSEntry: Record "NPR POS Entry";
         VATPostingSetup: Record "VAT Posting Setup";
@@ -133,7 +132,6 @@ codeunit 85146 "NPR EODLoadTestWS"
         POSMockFramework: Codeunit "NPR POS Framework: Mock";
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
         _POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
-        UserSetup: record "User Setup";
     begin
         POSMockFramework.Constructor();
         POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
@@ -162,8 +160,6 @@ codeunit 85146 "NPR EODLoadTestWS"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSEndOfDayProfile: Record "NPR POS End of Day Profile";
-        POSPaymentBin: Record "NPR POS Payment Bin";
-        NPRLibraryEFT: Codeunit "NPR Library - EFT";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
     begin
 

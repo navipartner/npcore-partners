@@ -191,7 +191,6 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
         POSPostingProfile: Record "NPR POS Posting Profile";
         LibraryApplicationArea: Codeunit "Library - Application Area";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        LibraryTaxCalc: Codeunit "NPR POS Lib. - Tax Calc.";
         LibraryERM: Codeunit "Library - ERM";
     begin
         if Initialized then begin

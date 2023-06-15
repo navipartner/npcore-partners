@@ -174,7 +174,6 @@ codeunit 85119 "NPR POS Act.CreateMember Tests"
 
     local procedure CreateDemoCustomerTemplate(TemplateCode: Code[10]): Code[10];
     var
-        Customer: Record Customer;
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateLine: Record "Config. Template Line";
     begin
