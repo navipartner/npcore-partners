@@ -87,6 +87,7 @@ codeunit 6150799 "NPR HL Member Webhook Handler"
                 HLMember.Init();
                 HLMember."Entry No." := 0;
                 HLMember."HeyLoyalty Id" := HeyLoyaltyId;
+                HLMember."Created from HeyLoyalty" := true;
                 HLMember.Insert(true);
             end else
                 if (HLMember."HeyLoyalty Id" <> HeyLoyaltyId) and (HLMember."HeyLoyalty Id" <> '') then begin
