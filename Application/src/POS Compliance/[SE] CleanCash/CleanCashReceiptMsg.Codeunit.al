@@ -284,9 +284,9 @@
             LinePrintMgt.AddTextField(2, 2, CleanCashTransactionCopy."CleanCash Unit Id");
             LinePrintMgt.NewLine();
 
-            LinePrintMgt.AddLine(ControlCodeLbl);
-            LinePrintMgt.AddLine(CopyStr(CleanCashTransactionCopy."CleanCash Code", 1, 30));
-            LinePrintMgt.AddLine(CopyStr(CleanCashTransactionCopy."CleanCash Code", 31, 60));
+            LinePrintMgt.AddLine(ControlCodeLbl, 0);
+            LinePrintMgt.AddLine(CopyStr(CleanCashTransactionCopy."CleanCash Code", 1, 30), 0);
+            LinePrintMgt.AddLine(CopyStr(CleanCashTransactionCopy."CleanCash Code", 31, 60), 0);
             LinePrintMgt.NewLine();
         until (CleanCashTransactionCopy.Next() = 0);
 

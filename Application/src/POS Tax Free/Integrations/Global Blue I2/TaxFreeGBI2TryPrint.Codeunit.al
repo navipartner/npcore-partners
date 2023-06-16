@@ -74,13 +74,13 @@ codeunit 6060032 "NPR Tax Free GBI2 Try Print"
 
         if StringUpper.Contains('<IMG>') then begin
             Printer.SetFont('Logo');
-            Printer.AddLine('TAXFREE');
+            Printer.AddLine('TAXFREE', 0);
             exit;
         end;
 
         if StringUpper.Contains('<TEAROFF>') or StringUpper.Contains('<TEAROFF/>') then begin
             Printer.SetFont('COMMAND');
-            Printer.AddLine('PAPERCUT');
+            Printer.AddLine('PAPERCUT', 0);
             exit;
         end;
 

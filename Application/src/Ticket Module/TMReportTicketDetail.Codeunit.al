@@ -50,12 +50,12 @@
         Printer2Lbl: Label '%1 - %2', Locked = true;
     begin
         Printer.SetFont('COMMAND');
-        Printer.AddLine('STOREDLOGO_1');
+        Printer.AddLine('STOREDLOGO_1', 0);
         Printer.SetFont('A11');
         Printer.SetPadChar('.');
-        Printer.AddLine('');
+        Printer.AddLine('', 0);
         Printer.SetPadChar('');
-        Printer.AddLine(' ');
+        Printer.AddLine(' ', 0);
 
         Printer.SetBold(true);
         if Ticket."Item No." <> '' then begin
@@ -105,7 +105,7 @@
             until TicketAccessEntry.Next() = 0;
 
         Printer.SetBold(false);
-        Printer.AddLine(' ');
+        Printer.AddLine(' ', 0);
         Printer.AddTextField(1, 0, '   ' + Txt000001);
         Printer.SetBold(true);
 
@@ -123,7 +123,7 @@
         for i := 1 to ArrayLen(AdmissionCode) do begin
             if (AdmStartTime[i] > 000000T) and Admission.Get(AdmissionCode[i]) then begin
                 if not TimeHeaderCreated then begin
-                    Printer.AddLine(' ');
+                    Printer.AddLine(' ', 0);
                     Printer.AddTextField(1, 0, '   ' + Txt000002);
                     Printer.NewLine();
                     TimeHeaderCreated := true;
@@ -134,14 +134,14 @@
             end;
         end;
 
-        Printer.AddLine(' ');
-        Printer.AddLine(' ');
+        Printer.AddLine(' ', 0);
+        Printer.AddLine(' ', 0);
 
         Printer.AddBarcode('Code128', Ticket."External Ticket No.", 2, false, 40);
-        Printer.AddLine(' ');
+        Printer.AddLine(' ', 0);
 
         Printer.SetFont('COMMAND');
-        Printer.AddLine('PAPERCUT');
+        Printer.AddLine('PAPERCUT', 0);
     end;
 }
 

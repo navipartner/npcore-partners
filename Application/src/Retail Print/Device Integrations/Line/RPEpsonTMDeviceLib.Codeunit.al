@@ -62,7 +62,7 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
             'QRMH':
                 PrintBarcode(POSPrintBuffer);
             'LOGO':
-                PrintBitmapFromKeyword(POSPrintBuffer.Text);
+                PrintBitmapFromKeyword(POSPrintBuffer.Text, POSPrintBuffer.Align);
             else
                 PrintText(POSPrintBuffer);
         end;
@@ -390,7 +390,7 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
         LineFeed();
     end;
 
-    local procedure PrintBitmapFromKeyword(Keyword: Text)
+    local procedure PrintBitmapFromKeyword(Keyword: Text; Alignment: Integer)
     var
         InStream: InStream;
         RetailLogo: Record "NPR Retail Logo";
@@ -410,6 +410,7 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
         if RetailLogo.FindSet() then
             repeat
                 if RetailLogo.ESCPOSLogo.HasValue() then begin
+                    SelectJustification(Alignment);
                     StoreGraphicsInBuffer(RetailLogo."ESCPOS Cmd Low Byte", RetailLogo."ESCPOS Cmd High Byte", 48, 112, 48, 1, 1, 49, 0, 2, RetailLogo."ESCPOS Height Low Byte", RetailLogo."ESCPOS Height High Byte");
 
                     RetailLogo.ESCPOSLogo.CreateInStream(InStream);

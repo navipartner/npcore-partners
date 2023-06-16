@@ -59,7 +59,7 @@
             end;
             if Index = 2 then begin
                 Printer.SetFont('Logo');
-                Printer.AddLine('TAXFREE');
+                Printer.AddLine('TAXFREE', 0);
             end;
 
             if (LinkText <> '') and (RecNumText <> '') and (ContenText = 'QR LOGO') then begin
@@ -87,7 +87,7 @@
             end;
         end;
         Printer.SetFont('COMMAND');
-        Printer.AddLine('PAPERCUT');
+        Printer.AddLine('PAPERCUT', 0);
         Printer.ProcessBuffer(CODEUNIT::"NPR Tax Free Receipt", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
     end;
 

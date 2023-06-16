@@ -18,7 +18,7 @@
         Line: Integer;
     begin
         for Line := 1 to 2 do
-            LinePrintMgt.AddLine(Lines[Line]);
+            LinePrintMgt.AddLine(Lines[Line], 0);
     end;
 
     procedure SetLine(Line1: Text; Line2: Text)
