@@ -2726,23 +2726,25 @@
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         OldLineReference: Integer;
+        PrimaryAssigned: Boolean;
     begin
         OldLineReference := Power(2, 31) - 1;
 
-        // ## TicketReservationRequest.SetCurrentKey("Session Token ID");
-        TicketReservationRequest.SetCurrentKey("Session Token ID", Default);
-        TicketReservationRequest.SetAscending(Default, false);
+        TicketReservationRequest.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
         if (TicketReservationRequest.FindSet()) then begin
             repeat
-                if (TicketReservationRequest."Ext. Line Reference No." <> OldLineReference) then begin
-                    if (not TicketReservationRequest."Primary Request Line") then begin
-                        TicketReservationRequest."Primary Request Line" := true;
-                        TicketReservationRequest.Modify();
-                    end;
-                    OldLineReference := TicketReservationRequest."Ext. Line Reference No.";
-                end
+                TicketReservationRequest."Primary Request Line" := false;
+                if (TicketReservationRequest."Ext. Line Reference No." <> OldLineReference) then
+                    PrimaryAssigned := false;
+
+                if ((TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::REQUIRED) and not (PrimaryAssigned)) then begin
+                    TicketReservationRequest."Primary Request Line" := true;
+                    PrimaryAssigned := true;
+                end;
+
+                TicketReservationRequest.Modify();
+                OldLineReference := TicketReservationRequest."Ext. Line Reference No.";
             until (TicketReservationRequest.Next() = 0);
         end;
     end;
