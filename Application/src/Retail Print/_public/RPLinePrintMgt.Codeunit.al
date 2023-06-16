@@ -50,9 +50,9 @@
         UpdateField(1, 0, BarcodeWidth, BarcodeType, BarcodeValue, HideHRI, BarcodeHeight);
     end;
 
-    internal procedure AddLine(Text: Text)
+    internal procedure AddLine(Text: Text; Alignment: Integer)
     begin
-        UpdateField(1, 0, 0, '', CopyStr(Text, 1, 100), false, 0);
+        UpdateField(1, Alignment, 0, '', CopyStr(Text, 1, 100), false, 0);
         NewLine();
     end;
 
@@ -263,19 +263,19 @@
                         end;
 
                     TemplateLine.Type::FieldCaption,
-                  TemplateLine.Type::Data:
+                    TemplateLine.Type::Data:
                         PrintLine(TemplateLine, DataJoinBuffer);
 
                     TemplateLine.Type::Logo:
                         begin
                             SetFont('Logo');
-                            AddLine(TemplateLine."Type Option");
+                            AddLine(TemplateLine."Type Option", TemplateLine.Align);
                         end;
 
                     TemplateLine.Type::Command:
                         begin
                             SetFont('COMMAND');
-                            AddLine(TemplateLine."Type Option");
+                            AddLine(TemplateLine."Type Option", 0);
                         end;
 
                     TemplateLine.Type::IfDataFound:
