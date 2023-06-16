@@ -51,10 +51,10 @@
 
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Initialized: Boolean;
         TOKEN_INCORRECT_STATE: Label 'The token %1 can''t be changed when in the %2 state.';
         MISSING_CASE: Label 'No handler for %1 [%2].';
         MUST_BE_POSITIVE: Label 'Quantity must be positive.';
+        INVALID_ITEM_REFERENCE: Label 'Reference %1 does not resolve to neither an item reference nor an item number.';
 
     local procedure ImportTicketReservations(Document: XmlDocument; DocumentID: Text[100])
     var
@@ -102,7 +102,7 @@
 
         //Import remaining BOM lines per line no
         foreach Line in Lines do begin
-            AddRemainingReservationReqeuestEntries(Token, Line);
+            AddRemainingReservationRequestEntries(Token, Line);
             //
 
             TicketReservationRequest.SetCurrentKey("Session Token ID", "Admission Inclusion");
@@ -143,7 +143,8 @@
 
         TicketReservationRequest.Init();
         InsertTicketReservation(Element, Token, TicketReservationRequest);
-        Lines.add(TicketReservationRequest."Ext. Line Reference No.");
+        if (not Lines.Contains(TicketReservationRequest."Ext. Line Reference No.")) then
+            Lines.add(TicketReservationRequest."Ext. Line Reference No.");
         exit(true);
     end;
 
@@ -485,7 +486,8 @@
         WrongEntry: Label 'Schedule Entry %1 does not correspond to admission code %2.';
         InvalidEntry: Label 'Invalid schedule entry %1.';
         AlreadyConfirmed: Label 'Change request %1 has already been confirmed.';
-        InvalidToken: Label 'A request for %1 and schedule entry %2 was not found for token %3';
+        InvalidToken: Label 'A request for %1 and schedule entry %2 was not found for token %3.';
+        InvalidChangeRequestToken: Label 'Invalid token %1.';
     begin
         TicketRequestManager.ExpireReservationRequests();
 
@@ -497,7 +499,7 @@
 
         ChangeRequestToken := GetXmlText100(Node.AsXmlElement(), 'Request/ChangeRequestToken', MaxStrLen(ChangeRequestToken), true);
         if (not TicketRequestManager.TokenRequestExists(ChangeRequestToken)) then
-            exit;
+            Error(InvalidChangeRequestToken, ChangeRequestToken);
 
         if (not NpXmlDomMgt.FindNodes(Node, 'Request/Admissions/Admission', AdmissionNodeList)) then
             exit;
@@ -517,7 +519,7 @@
                 if ExtScheduleEntryOld <> -1 then
                     Error(InvalidEntry, ExtScheduleEntryOld)
                 else
-                    CreateAdmisssionEntry(ChangeRequestToken, AdmissionCode, ExtScheduleEntryNew, AdmissionScheduleEntry);
+                    CreateAdmissionEntry(ChangeRequestToken, AdmissionCode, ExtScheduleEntryNew, AdmissionScheduleEntry);
 
 
             if (AdmissionCode <> AdmissionScheduleEntry."Admission Code") then
@@ -550,6 +552,7 @@
 
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', DocumentID);
+        TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
         TicketReservationRequest.FindFirst();
 
         // Shift admission from old schedule entry to new
@@ -569,11 +572,6 @@
         end;
 
         TicketRequestManager.ConfirmChangeRequest(DocumentID);
-
-        TicketReservationRequest.Reset();
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', DocumentID);
-        TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
-        TicketReservationRequest.FindFirst();
 
         if (CreateResponse(TicketReservationRequest, TicketReservationResponse)) then begin
             TicketReservationResponse.Confirmed := true;
@@ -674,7 +672,9 @@
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
     begin
 
-        // One response per external line ref
+        // One response per Ext. Line Reference No.
+        // Primary Request Line links Ticket to Request and Response
+
         TicketReservationRequest2.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
         TicketReservationRequest2.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
         TicketReservationRequest2.SetFilter("Ext. Line Reference No.", '=%1', TicketReservationRequest."Ext. Line Reference No.");
@@ -684,22 +684,34 @@
         TicketReservationResponse.Reset();
         TicketReservationResponse.SetCurrentKey("Request Entry No.");
         TicketReservationResponse.SetFilter("Request Entry No.", '=%1', TicketReservationRequest2."Entry No.");
+        if (TicketReservationResponse.FindFirst()) then begin
+            // unconfirmed change request entry can be reused in order to invalidate the previous token.
+            if (TicketReservationResponse."Session Token ID" <> TicketReservationRequest."Session Token ID") then begin
+                TicketReservationResponse."Session Token ID" := TicketReservationRequest."Session Token ID";
+                TicketReservationResponse."Exires (Seconds)" := 1500;
+                TicketReservationResponse.Status := true;
+                TicketReservationResponse.Confirmed := false;
+                TicketReservationResponse.Modify();
+            end;
+        end;
+
+        TicketReservationResponse.Reset();
+        TicketReservationResponse.SetCurrentKey("Session Token ID", "Exires (Seconds)");
+        TicketReservationResponse.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
+        TicketReservationResponse.SetFilter("Ext. Line Reference No.", '=%1', TicketReservationRequest."Ext. Line Reference No.");
         if (not TicketReservationResponse.FindFirst()) then begin
             TicketReservationResponse.Init();
             TicketReservationResponse."Entry No." := 0;
             TicketReservationResponse."Request Entry No." := TicketReservationRequest2."Entry No.";
             TicketReservationResponse."Session Token ID" := TicketReservationRequest."Session Token ID";
+            TicketReservationResponse."Ext. Line Reference No." := TicketReservationRequest."Ext. Line Reference No.";
             TicketReservationResponse."Exires (Seconds)" := 1500;
             TicketReservationResponse.Status := true;
             TicketReservationResponse.Confirmed := false;
             TicketReservationResponse.Insert();
         end else begin
-            // unconfirmed change request entry can be reused in order to invalidate the previous token.
-            if (TicketReservationResponse."Session Token ID" <> TicketReservationRequest2."Session Token ID") then begin
-                TicketReservationResponse."Session Token ID" := TicketReservationRequest2."Session Token ID";
-                TicketReservationResponse."Exires (Seconds)" := 1500;
-                TicketReservationResponse.Status := true;
-                TicketReservationResponse.Confirmed := false;
+            if (TicketReservationRequest."Primary Request Line") and (TicketReservationResponse."Request Entry No." <> TicketReservationRequest."Entry No.") then begin
+                TicketReservationResponse."Request Entry No." := TicketReservationRequest."Entry No.";
                 TicketReservationResponse.Modify();
             end;
         end;
@@ -786,8 +798,6 @@
         WaitingListOptInAddress: Text[100];
     begin
 
-        Initialize();
-
         Clear(TicketReservationRequest);
         TicketReservationRequest."Session Token ID" := Token;
         TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::WIP;
@@ -795,7 +805,8 @@
 
         TicketReservationRequest."External Item Code" := CopyStr(NpXmlDomMgt.GetXmlAttributeText(Element, 'external_id', true), 1, MaxStrLen(TicketReservationRequest."External Item Code"));
 
-        TicketRequestManager.TranslateBarcodeToItemVariant(TicketReservationRequest."External Item Code", TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", ExternalItemType);
+        if (not TicketRequestManager.TranslateBarcodeToItemVariant(TicketReservationRequest."External Item Code", TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", ExternalItemType)) then
+            Error(INVALID_ITEM_REFERENCE, TicketReservationRequest."External Item Code");
 
         Evaluate(TicketReservationRequest.Quantity, NpXmlDomMgt.GetXmlAttributeText(Element, 'qty', true));
         Evaluate(TicketReservationRequest."Ext. Line Reference No.", NpXmlDomMgt.GetXmlAttributeText(Element, 'line_no', true));
@@ -828,8 +839,6 @@
         ExternalItemType: Integer;
     begin
 
-        Initialize();
-
         TmpTicketReservationRequest.Init();
         TmpTicketReservationRequest."Entry No." := TmpTicketReservationRequest.Count() + 1;
         TmpTicketReservationRequest."Session Token ID" := Token;
@@ -838,7 +847,8 @@
 
         TmpTicketReservationRequest."External Item Code" := CopyStr(NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'external_id', true), 1, MaxStrLen(TmpTicketReservationRequest."External Item Code"));
 
-        TicketRequestManager.TranslateBarcodeToItemVariant(TmpTicketReservationRequest."External Item Code", TmpTicketReservationRequest."Item No.", TmpTicketReservationRequest."Variant Code", ExternalItemType);
+        if (not TicketRequestManager.TranslateBarcodeToItemVariant(TmpTicketReservationRequest."External Item Code", TmpTicketReservationRequest."Item No.", TmpTicketReservationRequest."Variant Code", ExternalItemType)) then
+            Error(INVALID_ITEM_REFERENCE, TmpTicketReservationRequest."External Item Code");
 
         Evaluate(TmpTicketReservationRequest.Quantity, NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'qty', true));
         Evaluate(TmpTicketReservationRequest."Ext. Line Reference No.", NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'line_no', true));
@@ -890,14 +900,6 @@
         repeat
             NPRAttributeManagement.SetEntryAttributeValue(TableId, NPRAttributeID."Shortcut Attribute ID", TicketReservationRequest."Entry No.", AttributeValue);
         until (TicketReservationRequest.Next() = 0);
-    end;
-
-    procedure Initialize()
-    begin
-
-        if (not Initialized) then begin
-            Initialized := true;
-        end;
     end;
 
     local procedure GetWebServiceFunction(ImportTypeCode: Code[20]): Text[100]
@@ -952,7 +954,7 @@
         exit(NpXmlDomMgt.GetXmlText(Element, NodePath, MaxLength, Required));
     end;
 
-    local procedure CreateAdmisssionEntry(ChangeRequestToken: Text[100]; AdmissionCode: Code[20]; ExtScheduleEntryNew: Integer; var AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry")
+    local procedure CreateAdmissionEntry(ChangeRequestToken: Text[100]; AdmissionCode: Code[20]; ExtScheduleEntryNew: Integer; var AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry")
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -976,7 +978,7 @@
             end;
     end;
 
-    local procedure AddRemainingReservationReqeuestEntries(Token: Text[100]; Line: Integer)
+    local procedure AddRemainingReservationRequestEntries(Token: Text[100]; Line: Integer)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
