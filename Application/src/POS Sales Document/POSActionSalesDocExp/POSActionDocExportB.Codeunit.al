@@ -68,7 +68,7 @@ codeunit 6059913 "NPR POS Action: Doc. ExportB"
             Error(Err_Customer_Not_In_Filter, SalePOS."Customer No.");
     end;
 
-    internal procedure SetDocumentType(AmountInclVAT: Decimal; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; DocumentTypePozitive: Option "Order",Invoice,Quote,Restrict; DocumentTypeNegative: Option ReturnOrder,CreditMemo,Restrict)
+    internal procedure SetDocumentType(AmountInclVAT: Decimal; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; DocumentTypePozitive: Option "Order",Invoice,Quote,Restrict,"Blanket Order"; DocumentTypeNegative: Option ReturnOrder,CreditMemo,Restrict)
     var
         WrongNegativeSignErr: Label 'Amount must be positive for: %1';
         WrongPozitiveSignErr: Label 'Amount must be negative for: %1';
@@ -85,6 +85,8 @@ codeunit 6059913 "NPR POS Action: Doc. ExportB"
                     RetailSalesDocMgt.SetDocumentTypeQuote();
                 DocumentTypePozitive::Restrict:
                     Error(WrongPozitiveSignErr, SelectStr(DocumentTypeNegative + 1, OptionDocTypeNegative));
+                DocumentTypePozitive::"Blanket Order":
+                    RetailSalesDocMgt.SetDocumentTypeBlanketOrder();
             end
         else
             case DocumentTypeNegative of
