@@ -28,6 +28,18 @@
         ResetRetryTxt: Label 'Reset Retry Count';
         AllTxt: Label 'All';
 
+    procedure GetImportProcessorCodeunitID(): Integer
+    begin
+        exit(Codeunit::"NPR Nc Import Processor");
+    end;
+
+    procedure GetErrorMessage(ImportEntry: Record "NPR Nc Import Entry"; HtmlFormat: boolean): Text
+    var
+        NcImportMgt: codeunit "NPR Nc Import Mgt.";
+    begin
+        exit(NcImportMgt.GetErrorMessage(ImportEntry, HtmlFormat));
+    end;
+
     local procedure UpdateImportList(JobQueueEntry: Record "Job Queue Entry"; var ImportType: Record "NPR Nc Import Type")
     var
         NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
