@@ -57,11 +57,17 @@
             Caption = 'Message';
             DataClassification = CustomerContent;
         }
+        field(23; "Ext. Line Reference No."; Integer)
+        {
+            Caption = 'Line Reference No.';
+            DataClassification = CustomerContent;
+        }
         field(25; "Admission Code"; Code[20])
         {
             Caption = 'Admission Code';
             DataClassification = CustomerContent;
         }
+
     }
 
     keys
@@ -72,7 +78,7 @@
         key(Key2; "Request Entry No.")
         {
         }
-        key(Key3; "Session Token ID")
+        key(Key3; "Session Token ID", "Ext. Line Reference No.")
         {
         }
     }
