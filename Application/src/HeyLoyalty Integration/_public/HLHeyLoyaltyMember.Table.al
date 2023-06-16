@@ -152,6 +152,11 @@ table 6059801 "NPR HL HeyLoyalty Member"
             Caption = 'Anonymized';
             DataClassification = CustomerContent;
         }
+        field(99; "Created from HeyLoyalty"; Boolean)
+        {
+            Caption = 'Created from HeyLoyalty';
+            DataClassification = CustomerContent;
+        }
         field(100; "HeyLoyalty Id"; Text[50])
         {
             Caption = 'HeyLoyalty Id';
