@@ -94,6 +94,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Login"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeReceiptText'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeRJLVendorFields'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeLogoAlignment'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG PG To Interface"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'MoveHeyLoyaltyValueMappings'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetLine'));
@@ -363,6 +364,8 @@
                         exit('UpgradeReceiptText');
                     'UpgradeRJLVendorFields':
                         exit('UpgradeRJLVendorFields');
+                    'UpgradeLogoAlignment':
+                        exit('UpgradeLogoAlignment');
                 end;
             Codeunit::"NPR UPG PG To Interface":
                 Exit('NPR_UPG_PG_To_Interface_20221204');

@@ -21,12 +21,12 @@
         if Membership.FindSet() then
             repeat
                 Printer.SetFont('COMMAND');
-                Printer.AddLine('STOREDLOGO_1');
+                Printer.AddLine('STOREDLOGO_1', 0);
                 Printer.SetFont('A11');
                 Printer.SetPadChar('.');
-                Printer.AddLine('');
+                Printer.AddLine('', 0);
                 Printer.SetPadChar('');
-                Printer.AddLine(' ');
+                Printer.AddLine(' ', 0);
 
                 Printer.SetBold(true);
                 Printer.AddTextField(1, 0, MEMBERSHIP_TEXT);
@@ -47,7 +47,7 @@
                     until (MembershipEntry.Next() = 0);
                 end;
 
-                Printer.AddLine(' ');
+                Printer.AddLine(' ', 0);
                 Printer.SetBold(false);
                 MemberRole.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
                 if (MemberRole.FindSet()) then begin
@@ -60,7 +60,7 @@
                 end;
 
                 Printer.SetFont('COMMAND');
-                Printer.AddLine('PAPERCUT');
+                Printer.AddLine('PAPERCUT', 0);
             until Membership.Next() = 0;
 
         Printer.ProcessBuffer(Codeunit::"NPR MM POS Receipt Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);

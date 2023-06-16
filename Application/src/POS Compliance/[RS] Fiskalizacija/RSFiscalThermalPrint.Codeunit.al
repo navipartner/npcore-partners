@@ -183,12 +183,12 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
             (Font in ['COMMAND']):
                 begin
                     Printer.SetFont('COMMAND');
-                    Printer.AddLine('PAPERCUT');
+                    Printer.AddLine('PAPERCUT', 0);
                 end;
             (Font in ['LOGO']):
                 begin
                     Printer.SetFont('Logo');
-                    Printer.AddLine(Value);
+                    Printer.AddLine(Value, 0);
                 end;
         end;
         if CR then

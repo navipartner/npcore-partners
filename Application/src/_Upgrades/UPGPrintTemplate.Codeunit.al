@@ -7,6 +7,7 @@ codeunit 6150696 "NPR UPG Print Template"
     begin
         UpgradeReceiptText();
         UpgradeRJLVendorFields();
+        UpgradeLogoAlignment();
     end;
 
     local procedure UpgradeReceiptText()
@@ -43,6 +44,58 @@ codeunit 6150696 "NPR UPG Print Template"
 
         UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeRJLVendorFields'));
         LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpgradeLogoAlignment()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
+        UpgradeTagMgt: Codeunit "Upgrade Tag";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG Print Template', 'OnUpgradePerCompany');
+        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeLogoAlignment')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        UpgradePrintTemplateLogoAlignment();
+
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeLogoAlignment'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpgradePrintTemplateLogoAlignment()
+    var
+        RPTemplateLine: Record "NPR RP Template Line";
+        RPTemplateLine2: Record "NPR RP Template Line";
+        RPTemplateHeader: Record "NPR RP Template Header";
+        TemplateCode: Code[20];
+    begin
+        RPTemplateLine.SetRange(Type, RPTemplateLine.Type::Logo);
+        RPTemplateLine.SetFilter(Align, '<>%1', RPTemplateLine.Align::Left);
+        if RPTemplateLine.FindSet() then
+            repeat
+                if TemplateCode <> RPTemplateLine."Template Code" then begin
+                    TemplateCode := RPTemplateLine."Template Code";
+
+                    if RPTemplateHeader.Get(RPTemplateLine."Template Code") then begin
+                        ArchiveVersionIfNecessary(RPTemplateLine."Template Code");
+                        IncreaseVersionIfNecessary(RPTemplateLine."Template Code");
+
+                        RPTemplateLine2.SetRange("Template Code", RPTemplateLine."Template Code");
+                        RPTemplateLine2.SetRange(Type, RPTemplateLine.Type::Logo);
+                        RPTemplateLine2.SetFilter(Align, '<>%1', RPTemplateLine.Align::Left);
+
+                        if RPTemplateLine2.FindSet(true) then
+                            repeat
+                                RPTemplateLine2.Align := RPTemplateLine2.Align::Left;
+                                RPTemplateLine2.Modify();
+                            until RPTemplateLine2.Next() = 0;
+
+                        ArchiveVersionIfNecessary(RPTemplateLine."Template Code");
+                    end;
+                end;
+            until RPTemplateLine.Next() = 0;
     end;
 
     local procedure UpgradePrintTemplateRJLVendorFields()
