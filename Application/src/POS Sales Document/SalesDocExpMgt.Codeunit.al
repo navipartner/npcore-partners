@@ -96,6 +96,11 @@
         DocumentType := DocumentType::"Credit Memo";
     end;
 
+    procedure SetDocumentTypeBlanketOrder()
+    begin
+        DocumentType := DocumentType::"Blanket Order";
+    end;
+
     procedure SetDocumentTypeQuote()
     begin
         DocumentType := DocumentType::Quote;

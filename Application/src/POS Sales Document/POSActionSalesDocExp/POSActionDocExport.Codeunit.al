@@ -104,8 +104,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         CaptionPaymentMethodCodeFrom: Label 'Use Payment Method Code From';
         DescPaymentMethodCodeFrom: Label 'Select source of payment method code for sales document';
         CaptionPrintProformaInvoice: Label 'Print Pro Forma Invoice';
-        OptionNameSetDocumentType: Label 'Order,Invoice,Quote,Restrict', Locked = true;
-        OptionCptSetDocumentType: Label 'Order,Invoice,Quote,Restrict';
+        OptionNameSetDocumentType: Label 'Order,Invoice,Quote,Restrict,BlanketOrder', Locked = true;
+        OptionCptSetDocumentType: Label 'Order,Invoice,Quote,Restrict,Blanket Order';
         OptionNameSetNegBalDocumentType: Label 'ReturnOrder,CreditMemo,Restrict', Locked = true;
         OptionCptSetNegBalDocumentType: Label 'Return Order,Credit Memo,Restrict';
         OptionNameUseLocationFrom: Label '<Undefined>,POS Store,POS Sale,SpecificLocation', Locked = true;
@@ -398,7 +398,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         AmountExclVAT: Decimal;
         VATAmount: Decimal;
         AmountInclVAT: Decimal;
-        DocumentTypePozitive: Option "Order",Invoice,Quote,Restrict;
+        DocumentTypePozitive: Option "Order",Invoice,Quote,Restrict,"Blanket Order";
         DocumentTypeNegative: Option ReturnOrder,CreditMemo,Restrict;
         LocationSource: Option Undefined,"POS Store","POS Sale",SpecificLocation;
         PaymentMethodCodeSource: Option "Sales Header Default","Force Blank Code","Specific Payment Method Code";
