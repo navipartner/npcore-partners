@@ -135,6 +135,11 @@ page 6150753 "NPR HL HeyLoyalty Members"
                     ToolTip = 'Specifies the value of the Member Created Datetime field.';
                     ApplicationArea = NPRHeyLoyalty;
                 }
+                field("Created from HeyLoyalty"; Rec."Created from HeyLoyalty")
+                {
+                    ToolTip = 'Specifies whether the member was initially created in HeyLoyalty.';
+                    ApplicationArea = NPRHeyLoyalty;
+                }
                 field("Member Anonymized"; Rec.Anonymized)
                 {
                     ToolTip = 'Specifies the value of the Member Anonymized field.';
@@ -258,6 +263,8 @@ page 6150753 "NPR HL HeyLoyalty Members"
 
                 trigger OnAction()
                 begin
+                    if Rec."Member Entry No." = 0 then
+                        Rec.Deleted := true;
                     Rec.TestField(Deleted);
                     Rec.Delete(true);
                     CurrPage.Update(false);
