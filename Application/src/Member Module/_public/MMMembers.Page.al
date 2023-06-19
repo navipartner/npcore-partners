@@ -1,6 +1,6 @@
 ﻿page 6060126 "NPR MM Members"
 {
-    Extensible = False;
+    Extensible = True;
     Caption = 'Members';
     AdditionalSearchTerms = 'Member List';
     CardPageID = "NPR MM Member Card";
