@@ -1,6 +1,5 @@
 ﻿page 6014588 "NPR Item Statistics Subpage"
 {
-    Extensible = False;
     Caption = 'Item Statistics Subform';
     Editable = false;
     PageType = List;
@@ -16,19 +15,16 @@
                 ShowCaption = false;
                 field("No."; Rec."No.")
                 {
-
                     ToolTip = 'Specifies the value of the No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
                 field("-Sale Quantity"; -"Sale Quantity")
                 {
-
                     Caption = 'Sale (QTY)';
                     ToolTip = 'Specifies the value of the Sale (QTY) field';
                     ApplicationArea = NPRRetail;
@@ -38,7 +34,6 @@
                         ItemledgerEntry: Record "Item Ledger Entry";
                         ItemledgerEntryForm: Page "Item Ledger Entries";
                     begin
-
                         SetItemLedgerEntryFilter(ItemledgerEntry);
                         ItemledgerEntryForm.SetTableView(ItemledgerEntry);
                         ItemledgerEntryForm.Editable(false);
@@ -47,7 +42,6 @@
                 }
                 field("-LastYear Sale Quantity"; -"LastYear Sale Quantity")
                 {
-
                     Caption = 'No.';
                     Visible = LSQTY;
                     ToolTip = 'Specifies the value of the No. field';
@@ -55,7 +49,6 @@
                 }
                 field("Sale Amount"; "Sale Amount")
                 {
-
                     Caption = 'Sale (LCY)';
                     ToolTip = 'Specifies the value of the Sale (LCY) field';
                     ApplicationArea = NPRRetail;
@@ -65,7 +58,6 @@
                         ValueEntry: Record "Value Entry";
                         ValueEntries: Page "Value Entries";
                     begin
-
                         SetValueEntryFilter(ValueEntry);
                         ValueEntries.SetTableView(ValueEntry);
                         ValueEntries.Editable(false);
@@ -74,7 +66,6 @@
                 }
                 field("LastYear Sale Amount"; "LastYear Sale Amount")
                 {
-
                     Caption = 'No.';
                     Visible = LSAmount;
                     ToolTip = 'Specifies the value of the No. field';
@@ -82,14 +73,12 @@
                 }
                 field("-CostAmt"; -CostAmt)
                 {
-
                     Caption = 'Cost (LCY)';
                     ToolTip = 'Specifies the value of the Cost (LCY) field';
                     ApplicationArea = NPRRetail;
                 }
                 field("-Last Year CostAmt"; -"Last Year CostAmt")
                 {
-
                     Caption = 'Last year Cost Amount';
                     Visible = LSAmount;
                     ToolTip = 'Specifies the value of the Last year Cost Amount field';
@@ -97,14 +86,12 @@
                 }
                 field("Profit Amount"; "Profit Amount")
                 {
-
                     Caption = 'Profit (LCY)';
                     ToolTip = 'Specifies the value of the Profit (LCY) field';
                     ApplicationArea = NPRRetail;
                 }
                 field("LastYear Profit Amount"; "LastYear Profit Amount")
                 {
-
                     Caption = 'Last Year Proifit Amount';
                     Visible = LPA;
                     ToolTip = 'Specifies the value of the Last Year Proifit Amount field';
@@ -112,14 +99,12 @@
                 }
                 field("Profit %"; Rec."Profit %")
                 {
-
                     Caption = 'Profit %';
                     ToolTip = 'Specifies the value of the Profit % field';
                     ApplicationArea = NPRRetail;
                 }
                 field("LastYear Profit %"; "LastYear Profit %")
                 {
-
                     Caption = '-> Last year';
                     Visible = "LP%";
                     ToolTip = 'Specifies the value of the -> Last year field';
@@ -135,7 +120,6 @@
 
     trigger OnAfterGetRecord()
     begin
-
         Calc();
     end;
 
@@ -159,7 +143,6 @@
         "LastYear Profit %": Decimal;
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
-        // ItemGroupFilter: Code[20];
         HideEmpty: Boolean;
         Periodestart: Date;
         Periodeslut: Date;
@@ -171,7 +154,6 @@
 
     internal procedure SetFilter(GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; LastYearCalc: Text[50]; ItemCatCode: Code[20])
     begin
-        //SetFilter()
         if (Dim1Filter <> GlobalDim1) or (Dim2Filter <> GlobalDim2) or (Periodestart <> DatoStart) or
              (Periodeslut <> DatoEnd) or (ItemCatCodeFilter <> ItemCatCode) then
             ReleaseLock();
@@ -199,7 +181,6 @@
         CostAmount: Decimal;
         SalesAmount: Decimal;
     begin
-        //Calc()
         CalcCostAndSalesAmountFromVE(CostAmount, SalesAmount);
 
         SetItemLedgerEntryFilter(ItemLedgerEntry);
@@ -208,16 +189,13 @@
         "Sale Quantity" := ItemLedgerEntry.Quantity;
         "Sale Amount" := SalesAmount;
         "Profit Amount" := SalesAmount + CostAmount;
-        //-NPR4.12
         CostAmt := CostAmount;
-        //+NPR4.12
 
         if "Sale Amount" <> 0 then
             Rec."Profit %" := "Profit Amount" / "Sale Amount" * 100
         else
             Rec."Profit %" := 0;
 
-        // Calc last year
         LastYear := true;
 
         CalcCostAndSalesAmountFromVE(CostAmount, SalesAmount);
@@ -228,9 +206,7 @@
         "LastYear Sale Quantity" := ItemLedgerEntry.Quantity;
         "LastYear Sale Amount" := SalesAmount;
         "LastYear Profit Amount" := SalesAmount + CostAmount;
-        //-NPR4.12
         "Last Year CostAmt" := CostAmount;
-        //+NPR4.12
 
         if "LastYear Sale Amount" <> 0 then
             "LastYear Profit %" := "LastYear Profit Amount" / "LastYear Sale Amount" * 100
@@ -242,7 +218,6 @@
 
     internal procedure SetItemLedgerEntryFilter(var ItemLedgerEntry: Record "Item Ledger Entry")
     begin
-        //SetItemLedgerEntryFilter
         ItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
         ItemLedgerEntry.SetRange("Item No.", Rec."No.");
@@ -269,7 +244,6 @@
 
     internal procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
     begin
-        //SetValueEntryFilter
         ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
         ValueEntry.SetRange("Item No.", Rec."No.");
         if not LastYear then
@@ -298,7 +272,6 @@
         case ItemCatCodeFilter <> '' of
             true:
                 begin
-                    //SetValueEntryFilter
                     ValueEntryWithItemCat.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
                     ValueEntryWithItemCat.SetRange(Filter_Item_No, Rec."No.");
                     if not LastYear then
@@ -325,7 +298,6 @@
                 end;
             false:
                 begin
-                    //SetValueEntryFilter
                     ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
                     ValueEntry.SetRange("Item No.", Rec."No.");
                     if not LastYear then
@@ -358,11 +330,7 @@
         txtDlg: Label 'Processing Item No. #1######## @2@@@@@@@@';
         Dlg: Dialog;
     begin
-        //ChangeEmptyFilter()
-        //-NPR4.21
-        //HideEmpty := NOT HideEmpty;
         HideEmpty := true;
-        //+NPR4.21
 
         Rec.ClearMarks();
         if HideEmpty then begin
@@ -389,14 +357,12 @@
             Rec.MarkedOnly(false);
         end;
 
-        //CurrForm.Update();
         CurrPage.Update();
         exit(HideEmpty);
     end;
 
     internal procedure InitForm()
     begin
-        //InitForm()
         Rec.Reset();
         Dim1Filter := '';
         Dim2Filter := '';
@@ -408,18 +374,15 @@
 
     internal procedure UpdateHidden()
     begin
-        //UpdateHidden()
         if HideEmpty then begin
             HideEmpty := false;
             ChangeEmptyFilter();
-            //CurrForm.Update();
             CurrPage.Update();
         end;
     end;
 
     internal procedure ReleaseLock()
     begin
-        //ReleaseLock()
         if Rec.Count() = 0 then begin
             Rec.MarkedOnly(false);
             Rec.ClearMarks();
@@ -428,10 +391,6 @@
 
     internal procedure ShowLastYear(Show: Boolean)
     begin
-        //CurrForm."LastYear Sale Quantity".VISIBLE( Show );
-        //CurrForm."LastYear Sale Amount".VISIBLE( Show );
-        //CurrForm."LastYear Profit Amount".VISIBLE( Show );
-        //CurrForm."LastYear Profit %".VISIBLE( Show );
         LSQty := Show;
         LSAmount := Show;
         LPA := Show;
@@ -440,12 +399,10 @@
 
     internal procedure GetGlobals(var InDim1Filter: Code[20]; var InDim2Filter: Code[20]; var InPeriodestart: Date; var InPeriodeslut: Date)
     begin
-        //-NPR5.51 [338480]
         InDim1Filter := Dim1Filter;
         InDim2Filter := Dim2Filter;
         InPeriodestart := Periodestart;
         InPeriodeslut := Periodeslut;
-        //+NPR5.51 [338480]
     end;
 }
 
