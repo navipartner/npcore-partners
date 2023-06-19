@@ -212,7 +212,8 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
         Dimension: Record Dimension;
         SelectedValue: Code[20];
     begin
-
+        if POSParameterValue."Action Code" <> 'SALE_DIMENSION' then
+            exit;
         case POSParameterValue.Name of
             'DimensionCode':
                 begin
@@ -246,6 +247,8 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
         SelectedOptionNo: Integer;
         FilterMaskLbl: Label '@%1*', Locked = true;
     begin
+        if POSParameterValue."Action Code" <> 'SALE_DIMENSION' then
+            exit;
 
         case POSParameterValue.Name of
             'DimensionSource':
