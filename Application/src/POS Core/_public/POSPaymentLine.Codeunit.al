@@ -339,14 +339,24 @@
     end;
 
     procedure DeleteLine()
+    var
+        EFTInterface: Codeunit "NPR EFT Interface";
+        Handled, IsAllowed : Boolean;
     begin
         OnBeforeDeleteLine(Rec);
 
-        if (Rec."EFT Approved") then
-            Error(DeleteNotAllowed);
-
-        Rec.Delete(true);
-        OnAfterDeleteLine(Rec);
+        if Rec."EFT Approved" then begin
+            EFTInterface.AllowVoidEFTRequestOnPaymentLineDelete(Rec, Handled, IsAllowed);
+            if not IsAllowed then
+                Error(DeleteNotAllowed);
+            if (Handled and IsAllowed) then begin
+                Handled := false;
+                EFTInterface.OnCreateVoidEFTRequestOnPaymentLineDelete(Rec, Handled);
+            end;
+        end else begin
+            Rec.Delete(true);
+            OnAfterDeleteLine(Rec);
+        end;
 
         if not Rec.Find('><') then;
 

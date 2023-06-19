@@ -204,4 +204,121 @@
 
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'AllowVoidEFTRequestOnPaymentLineDelete', '', false, false)]
+    local procedure OnIsCancelAllowed(SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean; var IsAllowed: Boolean)
+    var
+        EFTSetup: Record "NPR EFT Setup";
+    begin
+        if Handled then
+            exit;
+
+        if not EFTSetup.Get(SaleLinePOS."No.", SaleLinePOS."Register No.") then
+            if not EFTSetup.Get(SaleLinePOS."No.", '') then
+                EFTSetup.Init();
+
+        Handled := EFTSetup."EFT Integration Type" = IntegrationType();
+
+        if (Handled) then
+            IsAllowed := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateVoidEFTRequestOnPaymentLineDelete', '', false, false)]
+    local procedure OnCreateVoidEFTRequst(var SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean)
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        if Handled then
+            exit;
+
+        EFTTransactionRequest.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+        EFTTransactionRequest.SetRange("Sales Line No.", SaleLinePOS."Line No.");
+        EFTTransactionRequest.SetRange(Reversed, false);
+        if EFTTransactionRequest.FindFirst() then begin
+            if (not EftTransactionRequest.IsType(IntegrationType())) then
+                exit;
+            CreateVoidRequest(EFTTransactionRequest);
+            SetPaymentLineToZero(SaleLinePOS);
+            Handled := true;
+        end;
+    end;
+
+    procedure CreateVoidRequest(EftTransactionRequestToVoid: Record "NPR EFT Transaction Request")
+    var
+        OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
+        DescriptionLbl: Label 'Manual Void of %1';
+        EftTransactionRequest: Record "NPR EFT Transaction Request";
+        ConfirmVoidLbl: Label 'Cannot delete externally approved electronic funds transfer. Do you want to void of the original transaction instead?';
+    begin
+        if not Confirm(ConfirmVoidLbl) then
+            exit;
+
+        EftTransactionRequest.Init();
+        EftTransactionRequest."Entry No." := 0;
+        EftTransactionRequest."Integration Type" := EftTransactionRequestToVoid."Integration Type";
+        EftTransactionRequest."POS Payment Type Code" := EftTransactionRequestToVoid."POS Payment Type Code";
+        EftTransactionRequest."Original POS Payment Type Code" := EftTransactionRequestToVoid."Original POS Payment Type Code";
+        EftTransactionRequest."Register No." := EftTransactionRequestToVoid."Register No.";
+        EftTransactionRequest."Sales Ticket No." := EftTransactionRequestToVoid."Sales Ticket No.";
+        EftTransactionRequest."Sales ID" := EftTransactionRequestToVoid."Sales ID";
+        EftTransactionRequest."User ID" := CopyStr(UserId, 1, MaxStrLen(EftTransactionRequest."User ID"));
+        EftTransactionRequest.Started := CurrentDateTime();
+        EftTransactionRequest.Token := CreateGuid();
+
+        OriginalEftTransactionRequest := EftTransactionRequestToVoid;
+        if OriginalEftTransactionRequest."Processing Type" = OriginalEftTransactionRequest."Processing Type"::LOOK_UP then
+            OriginalEftTransactionRequest.Get(OriginalEftTransactionRequest."Processed Entry No.");
+        OriginalEftTransactionRequest.TestField("Integration Type", EftTransactionRequest."Integration Type");
+
+        if not (OriginalEftTransactionRequest."Processing Type" in
+            [OriginalEftTransactionRequest."Processing Type"::PAYMENT,
+             OriginalEftTransactionRequest."Processing Type"::REFUND])
+        then
+            OriginalEftTransactionRequest.FieldError("Processing Type");
+
+        if (not OriginalEftTransactionRequest.Successful) and (OriginalEftTransactionRequest.Recovered) then
+            OriginalEftTransactionRequest.Get(OriginalEftTransactionRequest."Recovered by Entry No.");
+
+        EftTransactionRequest."Currency Code" := OriginalEftTransactionRequest."Currency Code";
+        EftTransactionRequest."Amount Input" := -OriginalEftTransactionRequest."Result Amount";
+        EftTransactionRequest."Amount Output" := -OriginalEftTransactionRequest."Amount Output";
+        EftTransactionRequest."Result Amount" := -OriginalEftTransactionRequest."Result Amount";
+        EftTransactionRequest."Tip Amount" := OriginalEftTransactionRequest."Tip Amount";
+        EftTransactionRequest."Fee Amount" := OriginalEftTransactionRequest."Fee Amount";
+        EftTransactionRequest."POS Description" := CopyStr(StrSubstNo(DescriptionLbl, OriginalEftTransactionRequest."POS Description"), 1, MaxStrLen(EftTransactionRequest."POS Description"));
+        EftTransactionRequest."Card Name" := OriginalEftTransactionRequest."Card Name";
+        EftTransactionRequest."Card Number" := OriginalEftTransactionRequest."Card Number";
+        EftTransactionRequest."Processing Type" := EftTransactionRequest."Processing Type"::VOID;
+        EftTransactionRequest."Processed Entry No." := EftTransactionRequestToVoid."Entry No.";
+        EftTransactionRequest."External Result Known" := true;
+        EftTransactionRequest.Recoverable := false;
+        EftTransactionRequest.Successful := true;
+        EFTTransactionRequest.Finished := CurrentDateTime;
+        EFTTransactionRequest."Result Processed" := true;
+        if (EftTransactionRequest."Result Amount" <> 0) and (EftTransactionRequest.Successful) then
+            EftTransactionRequest."Financial Impact" := true;
+        EftTransactionRequest."Sales Line No." := OriginalEftTransactionRequest."Sales Line No.";
+        EftTransactionRequest."Sales Line ID" := OriginalEftTransactionRequest."Sales Line ID";
+        EftTransactionRequest.Insert(true);
+
+        MarkAsReversed(OriginalEftTransactionRequest, EftTransactionRequest."Entry No.");
+    end;
+
+    local procedure MarkAsReversed(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; ReversedByEntryNo: Integer)
+    begin
+        if EFTTransactionRequest.Reversed then
+            exit;
+
+        EFTTransactionRequest.Reversed := true;
+        EFTTransactionRequest."Reversed by Entry No." := ReversedByEntryNo;
+        EFTTransactionRequest.Modify();
+    end;
+
+    local procedure SetPaymentLineToZero(var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        SaleLinePOS.Validate("Amount Including VAT", 0);
+        SaleLinePOS.Validate(Amount, 0);
+        SaleLinePOS.Validate("Currency Amount", 0);
+        SaleLinePOS.Modify();
+    end;
+
 }

@@ -1725,9 +1725,14 @@
         SaleLinePOS: Record "NPR POS Sale Line";
         ErrNoDeleteDep: Label 'Deposit line from a rental is not to be deleted.';
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        EFTInterface: Codeunit "NPR EFT Interface";
+        IsAllowed, Handled : Boolean;
     begin
-        if "EFT Approved" then
-            Error(ERR_EFT_DELETE);
+        if Rec."EFT Approved" then begin
+            EFTInterface.AllowVoidEFTRequestOnPaymentLineDelete(Rec, IsAllowed, Handled);
+            if not IsAllowed then
+                Error(ERR_EFT_DELETE);
+        end;
 
         if (("Line Type" = "Line Type"::"Customer Deposit") and ("From Selection")) then
             Error(ErrNoDeleteDep);
@@ -1776,8 +1781,8 @@
         SkipCalcDiscount: Boolean;
         Text002: Label '%1 %2 is used more than once. Adjust the inventory first, and then continue the transaction';
         Text004: Label '%1 %2 is already used.';
-        ERR_EFT_DELETE: Label 'Cannot delete externally approved electronic funds transfer. Please attempt refund or void of the original transaction instead.';
         SkipDependantQuantityUpdate: Boolean;
+        ERR_EFT_DELETE: Label 'Cannot delete externally approved electronic funds transfer. Please attempt refund or void of the original transaction instead.';
 
     local procedure GetPOSHeader()
     var

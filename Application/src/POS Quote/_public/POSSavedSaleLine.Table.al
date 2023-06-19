@@ -33,7 +33,7 @@
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-        }                
+        }
         field(15; "No."; Code[20])
         {
             Caption = 'No.';
