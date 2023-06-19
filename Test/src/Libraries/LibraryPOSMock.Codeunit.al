@@ -82,14 +82,14 @@ codeunit 85003 "NPR Library - POS Mock"
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLineOut: Codeunit "NPR POS Sale Line";
-        POSActionDiscount: Codeunit "NPR POS Action - Discount";
+        POSActionDiscountB: Codeunit "NPR POS Action - Discount B";
     begin
         CreateItemLine(POSSession, ItemNo, Quantity);
 
         POSSession.GetSaleLine(SaleLineOut);
         SaleLineOut.GetCurrentSaleLine(SaleLinePOS);
 
-        POSActionDiscount.SetLineDiscountPctABS(SaleLinePOS, DiscountPct);
+        POSActionDiscountB.SetLineDiscountPctABS(SaleLinePOS, DiscountPct);
     end;
 
     procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; ItemNo: Text; Quantity: Decimal)

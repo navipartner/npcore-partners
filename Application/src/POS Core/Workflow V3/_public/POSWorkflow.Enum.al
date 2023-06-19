@@ -422,6 +422,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ISSUE_VOUCHER', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR NpRv Issue POSAction Mgt.";
     }
+
     value(77; EFT_NETS_BAXI_NATIVE)
     {
         Caption = 'EFT_NETS_BAXI_NATIVE', Locked = true, MaxLength = 20;
@@ -870,6 +871,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     {
         Caption = 'RS_AUDIT_LOOKUP', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: RSAudit Lookup";
+    }
+    value(169; DISCOUNT)
+    {
+        Caption = 'DISCOUNT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action - Discount";
     }
     value(6014600; BALANCE_V4)
     {
