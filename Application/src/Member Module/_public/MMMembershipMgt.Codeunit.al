@@ -1099,6 +1099,8 @@
         end;
 
         BlockMemberCards(MembershipEntryNo, MemberEntryNo, Block);
+
+        MembershipEvents.OnAfterBlockMember(MemberEntryNo);
     end;
 
     internal procedure BlockMemberCards(MembershipEntryNo: Integer; MemberEntryNo: Integer; Block: Boolean)

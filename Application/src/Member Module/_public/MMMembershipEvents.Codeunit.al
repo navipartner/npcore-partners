@@ -77,4 +77,9 @@
     internal procedure OnBeforeApplyAttributeToMemberInfoCapture(var MemberInfoCapture: Record "NPR MM Member Info Capture"; AttributeCode: Text; AttributeValue: Text; var Handled: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterBlockMember(MemberEntryNo: Integer)
+    begin
+    end;
 }
