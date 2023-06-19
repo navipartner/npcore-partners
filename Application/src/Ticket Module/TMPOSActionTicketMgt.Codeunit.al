@@ -812,7 +812,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Price Calc. Mgt.", 'OnAfterFindSalesLinePrice', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Price Calc.Mgt.W", 'OnAfterFindSalesLinePrice', '', true, true)]
     local procedure OnAfterFindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         TicketPrice: Codeunit "NPR TM Dynamic Price";
