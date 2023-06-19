@@ -3,15 +3,17 @@
     Access = Internal;
 
     var
-        Text001: Label 'No handler responded to server-side password validation event for %1.';
         FrontEndCached: Codeunit "NPR POS Front End Management";
+        SecureMethodHelper: Codeunit "NPR POS Secure Method Helper";
         RequestId: Integer;
+        Text001: Label 'No handler responded to server-side password validation event for %1.';
         Text002: Label 'any salesperson password.';
         Text003: Label 'current sales person password.';
         Text004: Label 'supervisors password.';
         Text005: Label 'Retail Setup Open Register Password.';
         Text006: Label 'You are not authorized to execute this action. Function requires %1';
         Text008: Label 'Retail Setup Admin Password.';
+        SecureContextId: Text;
 
     local procedure MethodName(): Text
     begin
@@ -22,17 +24,18 @@
     local procedure OnCustomMethod_SecureMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSUnit: Record "NPR POS Unit";
+        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSSetup: Codeunit "NPR POS Setup";
-        SecureMethod: Text;
         ActionHandled: Boolean;
         ActionType: Text;
-        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+        SecureMethod: Text;
     begin
         if Method <> MethodName() then
             exit;
 
         Handled := true;
 
+        SecureMethodHelper.ClearAll();
         FrontEndCached := FrontEnd;
 
         ActionType := GetJText(Context.AsToken(), 'action');
@@ -40,7 +43,7 @@
             POSSession.GetSetup(POSSetup);
             POSSetup.GetPOSUnit(POSUnit);
             RequestId := GetJInt(Context.AsToken(), 'requestId');
-            If POSAuditLogMgt.IsEnabled(POSUnit."POS Audit Profile") then
+            if POSAuditLogMgt.IsEnabled(POSUnit."POS Audit Profile") then
                 SecureMethodValidateWithAuditLog(Context, FrontEnd, POSUnit, ActionHandled)
             else
                 SecureMethodValidate(Context, FrontEnd, POSUnit, ActionHandled);
@@ -55,34 +58,30 @@
         SecureMethod: Text;
     begin
         SecureMethod := GetJText(Context.AsToken(), 'method');
+        ParseButton(Context);
+
         OnSecureMethodValidatePassword(SecureMethod, GetJText(Context.AsToken(), 'password'), POSUnit, ActionHandled);
     end;
 
     procedure SecureMethodValidateWithAuditLog(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"; POSUnit: Record "NPR POS Unit"; var ActionHandled: Boolean)
     var
-        ButtonParameter: text;
-        ButtonType: text;
-        SecureMethod: Text;
-        WorkflowName: text;
-        JToken: JsonToken;
-        JObj: JsonObject;
-        DescriptionLog: text;
-        AuditLogMgt: codeunit "NPR POS Audit Log Mgt.";
+        AuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         ActionRecordId: RecordId;
+        ButtonParameter: Text;
+        ButtonType: Text;
+        DescriptionLog: Text;
+        SecureMethod: Text;
+        WorkflowName: Text;
     begin
         SecureMethod := GetJText(Context.AsToken(), 'method');
-        If Context.Get('button', JToken) then begin
-            JObj := JToken.AsObject();
-            WorkflowName := GetJText(JObj.AsToken(), 'workflow');
-            ButtonType := GetJText(JObj.AsToken(), 'type');
-            ButtonParameter := GetJText(JObj.AsToken(), 'parameter');
-        end;
+        ParseButton(Context, WorkflowName, ButtonType, ButtonParameter);
+
         AuditLogMgt.PreparePOSActionAuthDescription(WorkflowName, ButtonType, ButtonParameter, POSUnit, ActionRecordId, DescriptionLog);
 
         OnSecureMethodValidatePasswordWithLog(SecureMethod, GetJText(Context.AsToken(), 'password'), POSUnit, DescriptionLog, ActionRecordId, ActionHandled);
     end;
 
-    [BusinessEvent(TRUE)]
+    [BusinessEvent(true)]
 #pragma warning disable AA0150
     local procedure OnSecureMethodValidatePassword(Method: Text; Password: Text; POSUnit: Record "NPR POS Unit"; var Handled: Boolean)
 #pragma warning restore
@@ -166,14 +165,14 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Secure Method Svrside", 'OnSecureMethodValidatePasswordWithLog', '', true, true)]
-    local procedure OnValidatePasswordWithLog(var Sender: Codeunit "NPR POS Secure Method Svrside"; Method: Text; Password: Text; POSUnit: Record "NPR POS Unit"; DescriptionLog: text; ActionRecordId: RecordId; var Handled: Boolean)
+    local procedure OnValidatePasswordWithLog(var Sender: Codeunit "NPR POS Secure Method Svrside"; Method: Text; Password: Text; POSUnit: Record "NPR POS Unit"; DescriptionLog: Text; ActionRecordId: RecordId; var Handled: Boolean)
     var
         AuthorizedBy: Code[20];
     begin
         Handled := true;
         case Method of
             AnySalespersonMethodCode():
-                IF ValidateSalespersonPassword(Sender, false, Password, AuthorizedBy) then
+                if ValidateSalespersonPassword(Sender, false, Password, AuthorizedBy) then
                     LogActionAuthorization(AuthorizedBy, DescriptionLog, POSUnit."No.", ActionRecordId);
             CurrentSalespersonMethodCode():
                 if ValidateCurrentSalesperson(Sender, Password, AuthorizedBy) then
@@ -211,6 +210,7 @@
 
     local procedure ValidateSalespersonPassword(var Sender: Codeunit "NPR POS Secure Method Svrside"; RequireSupervisor: Boolean; Password: Text; var Salesperson: Record "Salesperson/Purchaser"): Boolean
     var
+        ContextId: Text;
         Reason: Text;
     begin
         if (RequireSupervisor) then
@@ -231,6 +231,8 @@
             end;
 
             Sender.ConfirmPassword(Salesperson.Code);
+            ContextId := Sender.GetContextId();
+            SecureMethodHelper.AddSalespersonCodeToContext(ContextId, Salesperson.Code);
             exit(true);
 
         end;
@@ -260,6 +262,7 @@
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         POSSetup: Codeunit "NPR POS Setup";
+        ContextId: Text;
         Reason: Text;
     begin
         Reason := StrSubstNo(Text006, Text003);
@@ -279,6 +282,8 @@
 
         if (Password = Salesperson."NPR Register Password") then begin
             Sender.ConfirmPassword(Salesperson.Code);
+            ContextId := Sender.GetContextId();
+            SecureMethodHelper.AddSalespersonCodeToContext(ContextId, Salesperson.Code);
             exit(true);
         end;
 
@@ -345,10 +350,10 @@
         Sender.RejectPassword(false, Reason);
     end;
 
-    local procedure LogActionAuthorization(AuthorizedBy: Code[20]; Description: text; POSUnitNo: Code[10]; ActionRecordId: RecordId)
+    local procedure LogActionAuthorization(AuthorizedBy: Code[20]; Description: Text; POSUnitNo: Code[10]; ActionRecordId: RecordId)
     var
-        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
+        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         SalespersonLbl: Label 'Salesperson %1 ';
     begin
         Description := StrSubstNo(SalespersonLbl, AuthorizedBy) + Description;
@@ -363,6 +368,7 @@
             if not (JValue.IsNull() or JValue.IsUndefined()) then
                 exit(JValue.AsText());
         exit('');
+
     end;
 
     local procedure GetJValue(Token: JsonToken; Path: Text; var JValue: JsonValue): Boolean
@@ -385,5 +391,39 @@
             if not (JValue.IsNull() or JValue.IsUndefined()) then
                 exit(JValue.AsInteger());
         exit(0);
+    end;
+
+    internal procedure GetContextId(): Text
+    begin
+        exit(SecureContextId);
+    end;
+
+    internal procedure ParseButton(Context: JsonObject; var WorkflowName: Text; var ButtonType: Text; var ButtonParameter: Text)
+    var
+        JObj: JsonObject;
+        JToken: JsonToken;
+    begin
+        if Context.Get('button', JToken) then begin
+            JObj := JToken.AsObject();
+            WorkflowName := GetJText(JObj.AsToken(), 'workflow');
+            ButtonType := GetJText(JObj.AsToken(), 'type');
+            ButtonParameter := GetJText(JObj.AsToken(), 'parameter');
+            SecureContextId := GetJText(JObj.AsToken(), 'secureMethodContextId');
+            if SecureContextId <> '' then
+                SecureMethodHelper.AddContextId(SecureContextId);
+        end;
+    end;
+
+    internal procedure ParseButton(Context: JsonObject)
+    var
+        JObj: JsonObject;
+        JToken: JsonToken;
+    begin
+        if Context.Get('button', JToken) then begin
+            JObj := JToken.AsObject();
+            SecureContextId := GetJText(JObj.AsToken(), 'secureMethodContextId');
+            if SecureContextId <> '' then
+                SecureMethodHelper.AddContextId(SecureContextId);
+        end;
     end;
 }

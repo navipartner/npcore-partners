@@ -163,7 +163,7 @@ codeunit 88103 "NPR BCPT Library - POS Mock"
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         View: Codeunit "NPR POS View";
-        POSActionDiscount: Codeunit "NPR POS Action - Discount";
+        POSActionDiscountB: Codeunit "NPR POS Action - Discount B";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -172,8 +172,8 @@ codeunit 88103 "NPR BCPT Library - POS Mock"
         POSSaleLine.RefreshxRec();
         POSSession.GetCurrentView(View);
 
-        POSActionDiscount.GetMultiLineDiscountTarget(SalePOS, SaleLinePOS, PresetMultiLineDiscTarget, AllowAllLines);
-        POSActionDiscount.SetTotalDiscountAmount(SalePOS, TotalDiscountAmount);
+        POSActionDiscountB.GetMultiLineDiscountTarget(SalePOS, SaleLinePOS, PresetMultiLineDiscTarget, AllowAllLines);
+        POSActionDiscountB.SetTotalDiscountAmount(SalePOS, TotalDiscountAmount);
 
         POSSaleLine.RefreshCurrent();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
