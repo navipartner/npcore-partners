@@ -539,4 +539,16 @@
                 RPTemplateHeader.Modify();
             end;
     end;
+
+    internal procedure GetDataItemTableId(Code: Code[10]; Level: Integer): Integer
+    var
+        RPDataItems: Record "NPR RP Data Items";
+    begin
+        RPDataItems.SetRange(Code, Code);
+        RPDataItems.SetRange(Level, Level);
+        if RPDataItems.FindFirst() then
+            exit(RPDataItems."Table ID");
+
+        exit(0);
+    end;
 }

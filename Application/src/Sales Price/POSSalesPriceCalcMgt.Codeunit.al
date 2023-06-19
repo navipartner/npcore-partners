@@ -50,6 +50,7 @@
         ItemPriceFunction: Text[250];
         ItemPriceCodeunitId: Integer;
         Handled: Boolean;
+        POSSalesPriceCalcMgtW: Codeunit "NPR POS Sales Price Calc.Mgt.W";
     begin
         if POSUnit.Get(SalePOS."Register No.") then;
         PricingProfile.GetItemPriceFunctionIfProfileExist(POSUnit."POS Pricing Profile", ItemPriceCodeunitId, ItemPriceFunction);
@@ -62,17 +63,13 @@
 
         FindSalesLinePrice(SalePOS, SaleLinePOS);
 
-        OnAfterFindSalesLinePrice(SalePOS, SaleLinePOS);
-    end;
-
-
-    [IntegrationEvent(false, false)]
-    internal procedure OnAfterFindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
-    begin
+        POSSalesPriceCalcMgtW.OnAfterFindSalesLinePrice(SalePOS, SaleLinePOS);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Pricing Profile", 'OnFindItemPrice', '', true, true)]
     local procedure FindBestRetailPrice(ItemPriceCodeunitId: Integer; ItemPriceFunctionName: Text[250]; SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean)
+    var
+        POSSalesPriceCalcMgtW: Codeunit "NPR POS Sales Price Calc.Mgt.W";
     begin
         if ItemPriceCodeunitId <> GetPublisherCodeunitId() then
             exit;
@@ -82,7 +79,7 @@
         Handled := true;
         FindSalesLinePrice(SalePOS, SaleLinePOS);
 
-        OnAfterFindSalesLinePrice(SalePOS, SaleLinePOS);
+        POSSalesPriceCalcMgtW.OnAfterFindSalesLinePrice(SalePOS, SaleLinePOS);
     end;
 
     local procedure FindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")

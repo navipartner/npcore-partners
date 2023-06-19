@@ -29,4 +29,11 @@ codeunit 6059844 "NPR Retail Print"
     begin
         LabelLibrary.PrintRetailJournal(JournalLine, ReportType);
     end;
+
+    procedure GetDataItemTableId(Code: Code[10]; Level: Integer): Integer
+    var
+        RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
+    begin
+        exit(RPTemplateMgt.GetDataItemTableId(Code, Level));
+    end;
 }
