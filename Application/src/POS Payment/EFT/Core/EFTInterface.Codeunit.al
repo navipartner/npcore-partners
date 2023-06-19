@@ -109,6 +109,17 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnCreateVoidEFTRequestOnPaymentLineDelete(var SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure AllowVoidEFTRequestOnPaymentLineDelete(SaleLinePOS: Record "NPR POS Sale Line"; var IsAllowed: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+
     /// <summary>
     /// This method should be called from an EFT integration implementing this interface to return control back to the EFT module when a transaction is done. 
     /// It will process the resulting EFT data on the record and create associated records such as POS payments and (!) commit everything. 
