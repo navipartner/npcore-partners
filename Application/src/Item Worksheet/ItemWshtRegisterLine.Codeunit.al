@@ -969,7 +969,7 @@
                 if PriceListLine."Unit Price" <> VariantSalesPrice then begin
                     PriceListLine.Validate("Unit Price", VariantSalesPrice);
                 end;
-                PriceListLine.Modify(true);
+                PriceListLine.Modify();
             end;
         end else begin
             PriceListLineMaster.Reset();
@@ -1076,7 +1076,7 @@
                         (PriceListLine2."Unit of Measure Code" <> PriceListLine."Unit of Measure Code") or
                         (PriceListLine2."Minimum Quantity" <> PriceListLine."Minimum Quantity") then begin
                         PriceListLine2."Ending Date" := EndingDate;
-                        PriceListLine2.Modify(true);
+                        PriceListLine2.Modify();
                     end;
             until PriceListLine2.Next() = 0;
     end;
@@ -1112,10 +1112,10 @@
                 if (ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") or (PriceListLine."Starting Date" = WorkDate()) or
                   (_ItemWkshLine."Purchase Price Start Date" <> 0D) then begin
                     PriceListLine.Validate("Unit Cost", _ItemWkshLine."Direct Unit Cost");
-                    PriceListLine.Modify(true);
+                    PriceListLine.Modify();
                 end else begin
                     PriceListLine.Validate("Ending Date", WorkDate() - 1);
-                    PriceListLine.Modify(true);
+                    PriceListLine.Modify();
                     PriceListLine.Validate("Ending Date", 0D);
                     PriceListLine.Validate("Unit Cost", _ItemWkshLine."Direct Unit Cost");
                     if _ItemWkshLine."Purchase Price Start Date" <> 0D then
@@ -1126,7 +1126,7 @@
                         CreatePriceListHeader(_ItemWkshLine."Worksheet Template Name", PriceListLine."Starting Date", 0D);
                     PriceListLine.Validate(Status, PriceListLine.Status::Active);
                     PriceListLine.Validate("Price List Code", _ItemWkshLine."Worksheet Template Name");
-                    PriceListLine.Insert(true);
+                    PriceListLine.Modify();
                 end;
             end;
         end else begin
@@ -1184,10 +1184,10 @@
                 if (ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant") or (PriceListLine."Starting Date" = WorkDate()) or
                   (_ItemWkshLine."Purchase Price Start Date" <> 0D) then begin
                     PriceListLine.Validate("Unit Cost", _ItemWkshVariantLine."Direct Unit Cost");
-                    PriceListLine.Modify(true);
+                    PriceListLine.Modify();
                 end else begin
                     PriceListLine.Validate("Ending Date", WorkDate() - 1);
-                    PriceListLine.Modify(true);
+                    PriceListLine.Modify();
                     PriceListLine.Validate("Ending Date", 0D);
                     PriceListLine.Validate("Unit Cost", _ItemWkshVariantLine."Direct Unit Cost");
                     PriceListLine.Validate("Starting Date", WorkDate());
@@ -1195,7 +1195,7 @@
                         CreatePriceListHeader(_ItemWkshLine."Worksheet Template Name", PriceListLine."Starting Date", 0D);
                     PriceListLine.Validate("Price List Code", _ItemWkshLine."Worksheet Template Name");
                     PriceListLine.Validate(Status, PriceListLine.Status::Active);
-                    PriceListLine.Insert(true);
+                    PriceListLine.Modify();
                 end;
             end;
         end else begin
