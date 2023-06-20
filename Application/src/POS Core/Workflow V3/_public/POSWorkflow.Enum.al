@@ -885,7 +885,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(6059935; VOUCHER_PAYMENT)
     {
         Caption = 'VOUCHER_PAYMENT', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POSAction VoucherPayment";
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Scan Voucher2";
     }
     value(6059939; FOREIGN_VOUCHER_PMT)
     {

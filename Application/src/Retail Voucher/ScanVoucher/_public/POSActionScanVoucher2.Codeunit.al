@@ -1,4 +1,4 @@
-codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow"
+codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", "NPR POS IPaymentWFHandler"
 {
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
@@ -231,12 +231,16 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow"
         NpRvVoucherType.Get(POSParameterValue.Value);
     end;
 
+    procedure GetPaymentHandler(): Code[20];
+    begin
+        exit(Format(Enum::"NPR POS Workflow"::VOUCHER_PAYMENT));
+    end;
 
     local procedure GetActionScript(): Text
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionScanVoucher2.js###
-'let main=async({workflow:e,parameters:t,popup:o,captions:c})=>{debugger;let r;if(t.VoucherTypeCode)e.context.voucherType=t.VoucherTypeCode;else if(t.AskForVoucherType&&(e.context.voucherType=await e.respond("setVoucherType"),!e.context.voucherType))return;if(t.ReferenceNo?r=t.ReferenceNo:r=await o.input({title:c.VoucherPaymentTitle,caption:c.ReferenceNo}),!r||!e.AskForVoucherType&&!e.context.voucherType&&(e.context.voucherType=await e.respond("setVoucherTypeFromReferenceNo",{VoucherRefNo:r}),!e.context.voucherType))return;let n=await e.respond("prepareRequest",{VoucherRefNo:r});if(n.tryEndSale){t.EndSale&&!n.endSaleWithoutPosting&&await e.respond("endSale");return}n.workflowVersion==1?await e.respond("doLegacyWorkflow",{workflowName:n.workflowName}):await e.run(n.workflowName,{parameters:n.parameters})};'
+'let main=async({workflow:e,parameters:t,popup:u,captions:o})=>{debugger;let r,c={tryEndSale:!1,legacy:!1};if(t.VoucherTypeCode)e.context.voucherType=t.VoucherTypeCode;else if(t.AskForVoucherType&&(e.context.voucherType=await e.respond("setVoucherType"),!e.context.voucherType))return c;if(t.ReferenceNo?r=t.ReferenceNo:r=await u.input({title:o.VoucherPaymentTitle,caption:o.ReferenceNo}),!r||!e.AskForVoucherType&&!e.context.voucherType&&(e.context.voucherType=await e.respond("setVoucherTypeFromReferenceNo",{VoucherRefNo:r}),!e.context.voucherType))return c;let n=await e.respond("prepareRequest",{VoucherRefNo:r});return n.tryEndSale?(t.EndSale&&!n.endSaleWithoutPosting&&await e.respond("endSale"),c):(n.workflowVersion==1?await e.respond("doLegacyWorkflow",{workflowName:n.workflowName}):await e.run(n.workflowName,{parameters:n.parameters}),c)};'
         );
     end;
 
@@ -244,5 +248,6 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow"
     local procedure OnRunLegacyWorkflow(FrontEnd: Codeunit "NPR POS Front End Management"; var POSAction: Record "NPR POS Action"; VoucherType: Code[20]; EndSale: Boolean; var Handled: Boolean)
     begin
     end;
+
 
 }

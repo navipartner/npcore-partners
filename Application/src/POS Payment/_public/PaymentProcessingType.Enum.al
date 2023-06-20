@@ -14,7 +14,7 @@ enum 6014487 "NPR Payment Processing Type" implements "NPR POS IPaymentWFHandler
     value(1; VOUCHER)
     {
         Caption = 'Voucher';
-        Implementation = "NPR POS IPaymentWFHandler" = "NPR POSAction VoucherPayment";
+        Implementation = "NPR POS IPaymentWFHandler" = "NPR POS Action Scan Voucher2";
     }
     value(2; CHECK)
     {
