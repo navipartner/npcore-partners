@@ -133,6 +133,10 @@ page 6059969 "NPR APIV1 PBIValueEntry"
                 {
                     Caption = 'SystemCreatedBy', Locked = true;
                 }
+                field(inventoryPostingGroup; Rec."Inventory Posting Group")
+                {
+                    Caption = 'Inventory Posting Group';
+                }
             }
         }
     }

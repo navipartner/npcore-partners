@@ -40,6 +40,58 @@ page 6059939 "NPR APIV1 PBITicket"
                 {
                     Caption = 'External Member Card No.';
                 }
+                field(blocked; Rec.Blocked)
+                {
+                    Caption = 'Blocked';
+                }
+                field(blockedDate; Rec."Blocked Date")
+                {
+                    Caption = 'Blocked Date';
+                }
+                field(salespersonCode; Rec."Salesperson Code")
+                {
+                    Caption = 'Salesperson Code';
+                }
+                field(salesReceiptNo; Rec."Sales Receipt No.")
+                {
+                    Caption = 'POS Reciept No.';
+                }
+                field(lineNo; Rec."Line No.")
+                {
+                    Caption = 'Line No.';
+                }
+                field(documentDate; Rec."Document Date")
+                {
+                    Caption = 'Document Date';
+                }
+                field(externalTicketNo; Rec."External Ticket No.")
+                {
+                    Caption = 'External Ticket No.';
+                }
+                field(customerNo; Rec."Customer No.")
+                {
+                    Caption = 'Customer No.';
+                }
+                field(validFromDate; Rec."Valid From Date")
+                {
+                    Caption = 'Valid From Date';
+                }
+                field(validFromTime; Rec."Valid From Time")
+                {
+                    Caption = 'Valid From Time';
+                }
+                field(validToDate; Rec."Valid To Date")
+                {
+                    Caption = 'Valid To Date';
+                }
+                field(validToTime; Rec."Valid To Time")
+                {
+                    Caption = 'Valid To Time';
+                }
+                field(variantCode; Rec."Variant Code")
+                {
+                    Caption = 'Variant Code';
+                }
             }
         }
     }
