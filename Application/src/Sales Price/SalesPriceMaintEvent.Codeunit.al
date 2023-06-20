@@ -211,7 +211,7 @@
                     PriceListLine."Unit Price" := UnitPrice;
                     if PriceListLine."Unit Price" <> 0 then
                         PriceListLine."Cost Factor" := 0;
-                    PriceListLine.Modify(true)
+                    PriceListLine.Modify();
                 end;
             until SalesPriceMaintenanceSetup.Next() = 0;
         end;
