@@ -1,11 +1,6 @@
 ﻿page 6059975 "NPR Variety Fields Setup"
 {
-    Extensible = False;
-    // VRT1.11/JDH /20160602 CASE 242940 Added Image to action
-    // NPR5.28/JDH /20161128 CASE 255961 Added OnDrillDown Codeunit Id
-    // NPR5.32/JDH /20170510 CASE 274170 Field Type Name Added
-    // NPR5.47/NPKNAV/20181026  CASE 327541-01 Transport NPR5.47 - 26 October 2018
-
+    Extensible = false;
     Caption = 'Variety Fields Setup';
     ContextSensitiveHelpPage = 'retail/webshopintegrations/shopify/explanation/varieties.html';
     PageType = List;
@@ -16,7 +11,7 @@
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -68,6 +63,16 @@
                 field("Is Table Default"; Rec."Is Table Default")
                 {
                     ToolTip = 'Specifies if the table is default or not.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Is Table Default Maintenance"; Rec."Is Table Default Maintenance")
+                {
+                    ToolTip = 'Specifies if this is the default value to be shown in the Maintenance Matrix';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Show Total Column"; Rec."Show Total Column")
+                {
+                    ToolTip = 'Specifies if the Total Column should be shown in the Matrix';
                     ApplicationArea = NPRRetail;
                 }
                 field("OnDrillDown Codeunit ID"; Rec."OnDrillDown Codeunit ID")
@@ -205,7 +210,7 @@
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             action("Insert Default Setup")
             {
