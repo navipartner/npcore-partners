@@ -1,5 +1,8 @@
 codeunit 6059935 "NPR POSAction VoucherPayment" implements "NPR POS IPaymentWFHandler", "NPR IPOS Workflow"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Use action NPR POS Action Scan Voucher2';
+
     Access = Internal;
     procedure GetPaymentHandler(): Code[20]
     begin
