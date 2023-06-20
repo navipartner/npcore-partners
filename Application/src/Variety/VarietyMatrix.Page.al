@@ -1,6 +1,6 @@
 ﻿page 6059974 "NPR Variety Matrix"
 {
-    Extensible = False;
+    Extensible = false;
     Caption = 'Variety Matrix';
     ContextSensitiveHelpPage = 'retail/varieties/howto/set_up_variety_matrix_so.html';
     DeleteAllowed = false;
@@ -11,12 +11,12 @@
 
     SourceTable = "NPR Variety Buffer";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order");
+    SourceTableView = sorting("Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order");
     ApplicationArea = NPRRetail;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(Control6150615)
             {
@@ -31,7 +31,7 @@
 
                     trigger OnDrillDown()
                     begin
-                        if PAGE.RunModal(0, CurrVRTField) = ACTION::LookupOK then
+                        if Page.RunModal(0, CurrVRTField) = Action::LookupOK then
                             UpdateMatrix(false);
                     end;
                 }
@@ -95,7 +95,7 @@
                     CaptionClass = '3,' + _Item."NPR Variety 1";
                     Editable = false;
                     StyleExpr = 'Strong';
-                    Visible = showvariety1;
+                    Visible = ShowVariety1;
                     ToolTip = 'Specifies the value of the Variety 1 Value field';
                     ApplicationArea = NPRRetail;
                 }
@@ -105,7 +105,7 @@
                     CaptionClass = '3,' + _Item."NPR Variety 2";
                     Editable = false;
                     StyleExpr = 'Strong';
-                    Visible = showvariety2;
+                    Visible = ShowVariety2;
                     ToolTip = 'Specifies the value of the Variety 2 Value field';
                     ApplicationArea = NPRRetail;
                 }
@@ -115,7 +115,7 @@
                     CaptionClass = '3,' + _Item."NPR Variety 3";
                     Editable = false;
                     StyleExpr = 'Strong';
-                    Visible = showvariety3;
+                    Visible = ShowVariety3;
                     ToolTip = 'Specifies the value of the Variety 3 Value field';
                     ApplicationArea = NPRRetail;
                 }
@@ -124,7 +124,7 @@
 
                     CaptionClass = '3,' + _Item."NPR Variety 4";
                     Editable = false;
-                    Visible = showvariety4;
+                    Visible = ShowVariety4;
                     ToolTip = 'Specifies the value of the Variety 4 Value field';
                     ApplicationArea = NPRRetail;
                 }
@@ -995,7 +995,7 @@
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             action("Create Table Copy")
             {
@@ -1104,6 +1104,7 @@
         ShowTotal: Boolean;
         ItemFilters: Record Item;
         ShowColumnNames: Boolean;
+        MATRIX_TotalColumnNo: Integer;
 
     local procedure Initialize()
     begin
@@ -1146,6 +1147,11 @@
                 TempVRTBuffer."Variety 4 Value" := MATRIX_CodeSet[MATRIX_ColumnOrdinal];
         end;
 
+        if MATRIX_ColumnOrdinal = MATRIX_TotalColumnNo then begin
+            VRTMatrixMgt.OnDrillDownTotal(TempVRTBuffer, ShowAsCrossVRT, CurrVRTField, ItemFilters);
+            exit;
+        end;
+
         FieldValue := MATRIX_CellData[MATRIX_ColumnOrdinal];
         VRTMatrixMgt.OnDrillDown(TempVRTBuffer, CurrVRTField, FieldValue, ItemFilters);
         if FieldValue = MATRIX_CellData[MATRIX_ColumnOrdinal] then
@@ -1171,8 +1177,11 @@
                 TempVRTBuffer."Variety 4 Value" := MATRIX_CodeSet[MATRIX_ColumnOrdinal];
         end;
 
+        if MATRIX_ColumnOrdinal = MATRIX_TotalColumnNo then begin
+            VRTMatrixMgt.OnLookupTotal(TempVRTBuffer, ShowAsCrossVRT, CurrVRTField, ItemFilters);
+            exit;
+        end;
         FieldValue := MATRIX_CellData[MATRIX_ColumnOrdinal];
-
         VRTMatrixMgt.OnLookup(TempVRTBuffer, CurrVRTField, FieldValue, ItemFilters);
 
         if FieldValue = MATRIX_CellData[MATRIX_ColumnOrdinal] then
@@ -1196,14 +1205,17 @@
             ShowAsCrossVRT::Variety4:
                 TempVRTBuffer."Variety 4 Value" := MATRIX_CodeSet[MATRIX_ColumnOrdinal];
         end;
-
-        MATRIX_CellData[MATRIX_ColumnOrdinal] := VRTMatrixMgt.GetValue(TempVRTBuffer."Variety 1 Value", TempVRTBuffer."Variety 2 Value",
-                                                 TempVRTBuffer."Variety 3 Value", TempVRTBuffer."Variety 4 Value",
-                                                 CurrVRTField, ItemFilters);
+        if MATRIX_ColumnOrdinal = MATRIX_TotalColumnNo then
+            MATRIX_CellData[MATRIX_ColumnOrdinal] := VRTMatrixMgt.GetTotalValue(TempVRTBuffer, ShowAsCrossVRT, CurrVRTField, ItemFilters)
+        else
+            MATRIX_CellData[MATRIX_ColumnOrdinal] := VRTMatrixMgt.GetValue(TempVRTBuffer."Variety 1 Value", TempVRTBuffer."Variety 2 Value",
+                                                     TempVRTBuffer."Variety 3 Value", TempVRTBuffer."Variety 4 Value",
+                                                     CurrVRTField, ItemFilters);
     end;
 
     internal procedure UpdateMatrix(ReloadMatrixData: Boolean)
     begin
+        AddRemoveTotalColumn();
         Clear(Rec);
 
         Load(MATRIX_CaptionSet, MATRIX_MatrixRecords, MATRIX_CurrentNoOfColumns);
@@ -1260,7 +1272,6 @@
         end;
         CurrVRTField.SetRange("Field No.");
         CurrVRTField.SetRange("Is Table Default");
-
         OnAfterSetRecordRefFilters(ItemFilters, _Item, RecRef);
     end;
 
@@ -1271,6 +1282,8 @@
         VRT3Value: Code[50];
         VRT4Value: Code[50];
     begin
+        if FieldNumber = MATRIX_TotalColumnNo then
+            Error('');
         VRT1Value := Rec."Variety 1 Value";
         VRT2Value := Rec."Variety 2 Value";
         VRT3Value := Rec."Variety 3 Value";
@@ -1298,10 +1311,34 @@
         Clear(MATRIX_MatrixRecords);
         VRTMatrixMgt.MATRIX_GenerateColumnCaptions(MATRIX_SetWanted, Item, ShowCrossVRTNo, MATRIX_CodeSet, MATRIX_CaptionSet, MATRIX_CurrentNoOfColumns, MATRIX_CaptionRange, HideInactive, ShowColumnNames, MATRIX_PrimKeyFirstCaptionInCu);
 
+        MATRIX_TotalColumnNo := 0;
+        if CurrVRTField."Show Total Column" then
+            AddRemoveTotalColumn();
         if MATRIX_CurrentNoOfMatrixColumn > MATRIX_CurrentNoOfColumns then begin
             //The cross variants is decreased. Data that are outside new arraylength must be cleared;
             Clear(MATRIX_CellData);
         end;
+    end;
+
+    local procedure AddRemoveTotalColumn()
+    var
+        TotalLbl: Label 'Total';
+    begin
+        if not (CurrVRTField."Show Total Column") then begin
+            if MATRIX_TotalColumnNo <> 0 then begin
+                MATRIX_CodeSet[MATRIX_TotalColumnNo] := '';
+                MATRIX_CaptionSet[MATRIX_TotalColumnNo] := '';
+                MATRIX_CurrentNoOfColumns -= 1;
+                MATRIX_TotalColumnNo := 0;
+            end;
+        end else
+            if MATRIX_TotalColumnNo = 0 then
+                if MATRIX_CurrentNoOfColumns < ArrayLen(MATRIX_CodeSet) then begin
+                    MATRIX_CodeSet[MATRIX_CurrentNoOfColumns + 1] := '';
+                    MATRIX_CaptionSet[MATRIX_CurrentNoOfColumns + 1] := TotalLbl;
+                    MATRIX_CurrentNoOfColumns += 1;
+                    MATRIX_TotalColumnNo := MATRIX_CurrentNoOfColumns;
+                end;
     end;
 
     [IntegrationEvent(false, false)]

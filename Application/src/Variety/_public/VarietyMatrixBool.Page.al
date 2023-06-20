@@ -9,11 +9,11 @@
 
     SourceTable = "NPR Variety Buffer";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order");
+    SourceTableView = sorting("Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order");
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(Control6150615)
             {
@@ -28,7 +28,7 @@
 
                     trigger OnDrillDown()
                     begin
-                        if PAGE.RunModal(0, CurrVRTField) = ACTION::LookupOK then
+                        if Page.RunModal(0, CurrVRTField) = Action::LookupOK then
                             UpdateMatrix(false);
                     end;
                 }
@@ -92,7 +92,7 @@
                     CaptionClass = '3,' + _Item."NPR Variety 1";
                     Editable = false;
                     StyleExpr = 'Strong';
-                    Visible = showvariety1;
+                    Visible = ShowVariety1;
                     ToolTip = 'Specifies the value of the Variety 1 Value field';
                     ApplicationArea = NPRRetail;
                 }
@@ -102,7 +102,7 @@
                     CaptionClass = '3,' + _Item."NPR Variety 2";
                     Editable = false;
                     StyleExpr = 'Strong';
-                    Visible = showvariety2;
+                    Visible = ShowVariety2;
                     ToolTip = 'Specifies the value of the Variety 2 Value field';
                     ApplicationArea = NPRRetail;
                 }
@@ -112,7 +112,7 @@
                     CaptionClass = '3,' + _Item."NPR Variety 3";
                     Editable = false;
                     StyleExpr = 'Strong';
-                    Visible = showvariety3;
+                    Visible = ShowVariety3;
                     ToolTip = 'Specifies the value of the Variety 3 Value field';
                     ApplicationArea = NPRRetail;
                 }
@@ -121,7 +121,7 @@
 
                     CaptionClass = '3,' + _Item."NPR Variety 4";
                     Editable = false;
-                    Visible = showvariety4;
+                    Visible = ShowVariety4;
                     ToolTip = 'Specifies the value of the Variety 4 Value field';
                     ApplicationArea = NPRRetail;
                 }
@@ -130,7 +130,7 @@
 
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[1];
-                    Visible = visible1;
+                    Visible = Visible1;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[1] field';
                     ApplicationArea = NPRRetail;
 
@@ -144,7 +144,7 @@
 
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[2];
-                    Visible = visible2;
+                    Visible = Visible2;
                     ToolTip = 'Specifies the value of the MATRIX_CellData[2] field';
                     ApplicationArea = NPRRetail;
 
@@ -1652,7 +1652,7 @@
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             action("Create Table Copy")
             {
@@ -1976,6 +1976,8 @@
     end;
 
     internal procedure SetRecordRef(RecRef2: RecordRef; var Item2: Record Item; ShowFieldNo: Integer)
+    var
+        FoundVarietyFieldSetup: Boolean;
     begin
         RecRef := RecRef2;
         _Item := Item2;
@@ -1994,18 +1996,23 @@
             until CurrVRTField.Next() = 0;
         CurrVRTField.MarkedOnly(true);
 
-        if ShowFieldNo <> 0 then
-            CurrVRTField.SetRange("Field No.", ShowFieldNo)
-        else
-            CurrVRTField.SetRange("Is Table Default", true);
-
-        if not CurrVRTField.FindFirst() then begin
+        if ShowFieldNo <> 0 then begin
+            CurrVRTField.SetRange("Field No.", ShowFieldNo);
+            FoundVarietyFieldSetup := CurrVRTField.FindFirst();
             CurrVRTField.SetRange("Field No.");
-            CurrVRTField.SetRange("Is Table Default");
-            CurrVRTField.FindFirst();
         end;
-        CurrVRTField.SetRange("Field No.");
-        CurrVRTField.SetRange("Is Table Default");
+        if not FoundVarietyFieldSetup then begin
+            CurrVRTField.SetRange("Is Table Default Maintenance", true);
+            FoundVarietyFieldSetup := CurrVRTField.FindFirst();
+            CurrVRTField.SetRange("Is Table Default Maintenance");
+        end;
+        if not FoundVarietyFieldSetup then begin
+            CurrVRTField.SetRange("Is Table Default", true);
+            FoundVarietyFieldSetup := CurrVRTField.FindFirst();
+            CurrVRTField.SetRange("Is Table Default");
+        end;
+        if not FoundVarietyFieldSetup then
+            CurrVRTField.FindFirst();
     end;
 
     internal procedure SetValue(FieldNo: Integer): Text[250]
