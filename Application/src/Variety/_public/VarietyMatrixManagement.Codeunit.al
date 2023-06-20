@@ -16,8 +16,8 @@
 
     internal procedure LoadMatrixData(ItemNo: Code[20]; HideInactive: Boolean)
     begin
-        TempVRTBuffer_.LoadCombinations(TempVRTBuffer_, ItemNo, MRecref.Number = DATABASE::"Item Variant", MRecref.RecordId, HideInactive);
-        if MRecref.Number <> DATABASE::"Item Variant" then
+        TempVRTBuffer_.LoadCombinations(TempVRTBuffer_, ItemNo, MRecref.Number = Database::"Item Variant", MRecref.RecordId, HideInactive);
+        if MRecref.Number <> Database::"Item Variant" then
             SetRecordDefault(MRecref);
     end;
 
@@ -32,7 +32,7 @@
         if TempVRTBuffer_."Variant Code" = '' then
             exit('-');
 
-        if ItemVariant.Get(TempVRTBuffer_."Item No.", TempVRTBuffer_."Variant Code") and ItemVariant."NPR Blocked" and ((VRTFieldSetup."Table No." <> DATABASE::"Item Variant") or (VRTFieldSetup."Field No." <> ItemVariant.FieldNo("NPR Blocked"))) then
+        if ItemVariant.Get(TempVRTBuffer_."Item No.", TempVRTBuffer_."Variant Code") and ItemVariant."NPR Blocked" and ((VRTFieldSetup."Table No." <> Database::"Item Variant") or (VRTFieldSetup."Field No." <> ItemVariant.FieldNo("NPR Blocked"))) then
             exit('-');
 
         case VRTFieldSetup.Type of
@@ -187,7 +187,101 @@
         end;
     end;
 
-    internal procedure DeleteLinesQuantityZero(var RecRef: RecordRef; FRef: FieldRef; var TempVRTBuffer: Record "NPR Variety Buffer" temporary; OldVal: Text; Qty: decimal)
+    internal procedure GetTotalValue(CurrentCellVarietyBuffer: Record "NPR Variety Buffer" temporary; ShowAsCrossVRT: Option Variety1,Variety2,Variety3,Variety4; VRTFieldSetup: Record "NPR Variety Field Setup"; var ItemFilters: Record Item) TextValue: Text[1024]
+    var
+        TempVarietyBufferInRange: Record "NPR Variety Buffer" temporary;
+        TextValue2: Text[1024];
+        TotalValue: Decimal;
+    begin
+        TempVRTBuffer_.SetRange("Variety 1 Value", CurrentCellVarietyBuffer."Variety 1 Value");
+        TempVRTBuffer_.SetRange("Variety 2 Value", CurrentCellVarietyBuffer."Variety 2 Value");
+        TempVRTBuffer_.SetRange("Variety 3 Value", CurrentCellVarietyBuffer."Variety 3 Value");
+        TempVRTBuffer_.SetRange("Variety 4 Value", CurrentCellVarietyBuffer."Variety 4 Value");
+        case ShowAsCrossVRT of
+            ShowAsCrossVRT::Variety1:
+                TempVRTBuffer_.SetRange("Variety 1 Value");
+            ShowAsCrossVRT::Variety2:
+                TempVRTBuffer_.SetRange("Variety 2 Value");
+            ShowAsCrossVRT::Variety3:
+                TempVRTBuffer_.SetRange("Variety 3 Value");
+            ShowAsCrossVRT::Variety4:
+                TempVRTBuffer_.SetRange("Variety 4 Value");
+        end;
+        case VRTFieldSetup.Type of
+            VRTFieldSetup.Type::Field:
+                begin
+                    VRTFieldSetup.CalcFields("Field Type Name");
+                    if VRTFieldSetup."Field Type Name" in ['Decimal', 'Integer'] then begin
+                        if TempVRTBuffer_.FindSet() then
+                            repeat
+                                TotalValue += GetBufferFieldValue(TempVRTBuffer_, VRTFieldSetup."Field No.");
+                            until TempVRTBuffer_.Next() = 0;
+                        TextValue := Format(TotalValue);
+                    end else
+                        TextValue := '';
+                end;
+            VRTFieldSetup.Type::Internal:  //current no support for Totals
+                ;
+            VRTFieldSetup.Type::Subscriber:
+                begin
+                    if TempVRTBuffer_.FindSet() then
+                        repeat
+                            TempVarietyBufferInRange := TempVRTBuffer_;
+                            TempVarietyBufferInRange.Insert(false);
+                        until TempVRTBuffer_.Next() = 0;
+                    GetVarietyMatrixTotalValue(CurrentCellVarietyBuffer, TempVarietyBufferInRange, VRTFieldSetup, VRTFieldSetup."Variety Matrix Subscriber 1", ItemFilters, 0, TextValue2);
+                    TextValue := TextValue2;
+                    TextValue2 := '';
+                end;
+        end;
+        case VRTFieldSetup."Secondary Type" of
+            VRTFieldSetup."Secondary Type"::Field:
+                if VRTFieldSetup."Table No." = VRTFieldSetup."Secondary Table No." then begin
+                    VRTFieldSetup.CalcFields("Secondary Field Type Name");
+                    if VRTFieldSetup."Secondary Field Type Name" in ['Decimal', 'Integer'] then begin
+                        TotalValue := 0;
+                        if TempVRTBuffer_.FindSet() then
+                            repeat
+                                TotalValue += GetBufferFieldValue(TempVRTBuffer_, VRTFieldSetup."Field No.");
+                            until TempVRTBuffer_.Next() = 0;
+                        TextValue2 := Format(TotalValue);
+                    end;
+                end;
+
+            VRTFieldSetup."Secondary Type"::Internal:  //current no support for Totals
+                ;
+            VRTFieldSetup."Secondary Type"::Subscriber:
+                begin
+                    TempVarietyBufferInRange.Reset();
+                    TempVarietyBufferInRange.DeleteAll();
+                    if TempVRTBuffer_.FindSet() then
+                        repeat
+                            TempVarietyBufferInRange := TempVRTBuffer_;
+                            TempVarietyBufferInRange.Insert(false);
+                        until TempVRTBuffer_.Next() = 0;
+                    GetVarietyMatrixTotalValue(CurrentCellVarietyBuffer, TempVarietyBufferInRange, VRTFieldSetup, VRTFieldSetup."Variety Matrix Subscriber 2", ItemFilters, 1, TextValue2);
+                end;
+        end;
+        if TextValue2 <> '' then
+            TextValue += ' (' + TextValue2 + ')';
+    end;
+
+    local procedure GetBufferFieldValue(VarietyBuffer: Record "NPR Variety Buffer"; FieldNo: Integer): Decimal
+    var
+        RecRef: RecordRef;
+        FldRef: FieldRef;
+        FieldValue: Decimal;
+
+    begin
+        if Format(VarietyBuffer."Record ID (TMP)") <> '' then
+            if RecRef.Get(VarietyBuffer."Record ID (TMP)") then begin
+                FldRef := RecRef.Field(FieldNo);
+                FieldValue := FldRef.Value;
+            end;
+        exit(FieldValue);
+    end;
+
+    internal procedure DeleteLinesQuantityZero(var RecRef: RecordRef; FRef: FieldRef; var TempVRTBuffer: Record "NPR Variety Buffer" temporary; OldVal: Text; Qty: Decimal)
     var
         RecID: RecordId;
     begin
@@ -396,6 +490,35 @@
         else
             OnDrillDownEvent(TempVRTBuffer_, VrtFieldSetup, FieldValue);
     end;
+
+    internal procedure OnDrillDownTotal(CurrentCellVarietyBuffer: Record "NPR Variety Buffer"; ShowAsCrossVRT: Option Variety1,Variety2,Variety3,Variety4; VrtFieldSetup: Record "NPR Variety Field Setup"; var ItemFilters: Record Item)
+    var
+        TempVarietyBufferInRange: Record "NPR Variety Buffer" temporary;
+    begin
+        if VrtFieldSetup."OnDrillDown Subscriber" = '' then
+            exit;
+        TempVRTBuffer_.SetRange("Variety 1 Value", CurrentCellVarietyBuffer."Variety 1 Value");
+        TempVRTBuffer_.SetRange("Variety 2 Value", CurrentCellVarietyBuffer."Variety 2 Value");
+        TempVRTBuffer_.SetRange("Variety 3 Value", CurrentCellVarietyBuffer."Variety 3 Value");
+        TempVRTBuffer_.SetRange("Variety 4 Value", CurrentCellVarietyBuffer."Variety 4 Value");
+        case ShowAsCrossVRT of
+            ShowAsCrossVRT::Variety1:
+                TempVRTBuffer_.SetRange("Variety 1 Value");
+            ShowAsCrossVRT::Variety2:
+                TempVRTBuffer_.SetRange("Variety 2 Value");
+            ShowAsCrossVRT::Variety3:
+                TempVRTBuffer_.SetRange("Variety 3 Value");
+            ShowAsCrossVRT::Variety4:
+                TempVRTBuffer_.SetRange("Variety 4 Value");
+        end;
+        if TempVRTBuffer_.FindSet() then
+            repeat
+                TempVarietyBufferInRange := TempVRTBuffer_;
+                TempVarietyBufferInRange.Insert(false);
+            until TempVRTBuffer_.Next() = 0;
+        OnDrillDownVarietyMatrixTotal(CurrentCellVarietyBuffer, TempVarietyBufferInRange, VrtFieldSetup, ItemFilters);
+    end;
+
 
     [IntegrationEvent(false, false)]
     local procedure OnDrillDownEvent(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024])
@@ -669,6 +792,35 @@
         OnDrillDownVarietyMatrix(TempVRTBuffer_, VrtFieldSetup, FieldValue, 1, ItemFilters);
     end;
 
+    internal procedure OnLookupTotal(CurrentCellVarietyBuffer: Record "NPR Variety Buffer"; ShowAsCrossVRT: Option Variety1,Variety2,Variety3,Variety4; VrtFieldSetup: Record "NPR Variety Field Setup"; var ItemFilters: Record Item)
+    var
+        TempVarietyBufferInRange: Record "NPR Variety Buffer" temporary;
+    begin
+        if VrtFieldSetup."OnDrillDown Subscriber" = '' then
+            exit;
+        TempVRTBuffer_.SetRange("Variety 1 Value", CurrentCellVarietyBuffer."Variety 1 Value");
+        TempVRTBuffer_.SetRange("Variety 2 Value", CurrentCellVarietyBuffer."Variety 2 Value");
+        TempVRTBuffer_.SetRange("Variety 3 Value", CurrentCellVarietyBuffer."Variety 3 Value");
+        TempVRTBuffer_.SetRange("Variety 4 Value", CurrentCellVarietyBuffer."Variety 4 Value");
+        case ShowAsCrossVRT of
+            ShowAsCrossVRT::Variety1:
+                TempVRTBuffer_.SetRange("Variety 1 Value");
+            ShowAsCrossVRT::Variety2:
+                TempVRTBuffer_.SetRange("Variety 2 Value");
+            ShowAsCrossVRT::Variety3:
+                TempVRTBuffer_.SetRange("Variety 3 Value");
+            ShowAsCrossVRT::Variety4:
+                TempVRTBuffer_.SetRange("Variety 4 Value");
+        end;
+        if TempVRTBuffer_.FindSet() then
+            repeat
+                TempVarietyBufferInRange := TempVRTBuffer_;
+                TempVarietyBufferInRange.Insert(false);
+            until TempVRTBuffer_.Next() = 0;
+        OnLookupVarietyMatrixTotal(CurrentCellVarietyBuffer, TempVarietyBufferInRange, VrtFieldSetup, ItemFilters);
+    end;
+
+
     [IntegrationEvent(false, false)]
     local procedure OnDrillDownVarietyMatrix(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     begin
@@ -678,4 +830,44 @@
     local procedure GetVarietyMatrixFieldValue(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     begin
     end;
+
+    /// <summary>
+    /// Event for setting the value to be shown in Total Column in Variety Matrix
+    /// </summary>
+    /// <param name="CurrentCellVarietyBuffer">Buffer Entry with Variety Values for the row</param>
+    /// <param name="VarietyBufferInRange">Buffer Entries in the range to be summed. Is var so it can be looped, changes to the Buffer will not be saved</param>
+    /// <param name="VrtFieldSetup">The Variety Field Setup shown in the Matrix</param>
+    /// <param name="SubscriberName">Name of the subscriber that should return the Value</param>
+    /// <param name="ItemFilters">Item Record with the filters used in the Matrix</param>
+    /// <param name="CalledFrom">Tells if the value to be returned will be shown in primary or secondary text in Matrix</param>
+    /// <param name="FieldValue">The return value - Text to be shown in the Matrix</param>
+    [IntegrationEvent(false, false)]
+    local procedure GetVarietyMatrixTotalValue(CurrentCellVarietyBuffer: Record "NPR Variety Buffer" temporary; var VarietyBufferInRange: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField; var FieldValue: Text[1024])
+    begin
+    end;
+
+    /// <summary>
+    /// Event for DrillDown in Total Column of Matrix
+    /// </summary>
+    /// <param name="CurrentCellVarietyBuffer">Buffer Entry with Variety Values for the row</param>
+    /// <param name="VarietyBufferInRange">Buffer Entries in the range to be summed. Is var so it can be looped, changes to the Buffer will not be saved</param>
+    /// <param name="VrtFieldSetup">The Variety Field Setup shown in the Matrix</param>
+    /// <param name="ItemFilters">Item Record with the filters used in the Matrix</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnDrillDownVarietyMatrixTotal(CurrentCellVarietyBuffer: Record "NPR Variety Buffer"; var VarietyBufferInRange: Record "NPR Variety Buffer"; VrtFieldSetup: Record "NPR Variety Field Setup"; var ItemFilters: Record Item)
+    begin
+    end;
+
+    /// <summary>
+    /// Event for DrillDown in Total Column of Matrix
+    /// </summary>
+    /// <param name="CurrentCellVarietyBuffer">Buffer Entry with Variety Values for the row</param>
+    /// <param name="VarietyBufferInRange">Buffer Entries in the range to be summed. Is var so it can be looped, changes to the Buffer will not be saved</param>
+    /// <param name="VrtFieldSetup">The Variety Field Setup shown in the Matrix</param>
+    /// <param name="ItemFilters">Item Record with the filters used in the Matrix</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnLookupVarietyMatrixTotal(CurrentCellVarietyBuffer: Record "NPR Variety Buffer"; var VarietyBufferInRange: Record "NPR Variety Buffer"; VrtFieldSetup: Record "NPR Variety Field Setup"; var ItemFilters: Record Item)
+    begin
+    end;
+
 }

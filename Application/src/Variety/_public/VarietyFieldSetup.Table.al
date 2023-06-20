@@ -54,6 +54,11 @@
             DataClassification = CustomerContent;
             NotBlank = true;
         }
+        field(12; "Show Total Column"; Boolean)
+        {
+            Caption = 'Show Total Column';
+            DataClassification = CustomerContent;
+        }
         field(15; "Variety Matrix Subscriber 1"; Text[60])
         {
             Caption = 'Variety Matrix Subscriber 1';
@@ -92,6 +97,11 @@
         field(22; "Is Table Default"; Boolean)
         {
             Caption = 'Is Table Default';
+            DataClassification = CustomerContent;
+        }
+        field(23; "Is Table Default Maintenance"; Boolean)
+        {
+            Caption = 'Is Table Default (Maintenance Matrix)';
             DataClassification = CustomerContent;
         }
         field(30; "Use Location Filter"; Boolean)
@@ -184,6 +194,14 @@
                     "Secondary Description" := CopyStr("Variety Matrix Subscriber 2", 1, MaxStrLen("Secondary Description"));
             end;
         }
+        field(57; "Secondary Field Type Name"; Text[30])
+        {
+            CalcFormula = lookup(Field."Type Name" where(TableNo = field("Secondary Table No."), "No." = field("Secondary Field No.")));
+            Caption = 'Secondary Field Type Name';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+
         field(60; "Use Location Filter (Sec)"; Boolean)
         {
             Caption = 'Use Location Filter (Sec)';
