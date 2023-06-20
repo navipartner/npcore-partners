@@ -186,12 +186,18 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
-    local procedure OnAfterEndSale(SalePOS: Record "NPR POS Sale")
+    local procedure DiscontinueBarcodeOnAfterSale(SalePOS: Record "NPR POS Sale")
     var
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         ItemReference: Record "Item Reference";
+        IsHandled: Boolean;
+        ItemReferenceMgt: Codeunit "NPR Item Reference Mgt.";
     begin
         if (SalePOS."Sales Ticket No." = '') then
+            exit;
+
+        ItemReferenceMgt.OnBeforeDiscontinueBarcode(SalePOS, IsHandled);
+        if IsHandled then
             exit;
 
         POSEntrySalesLine.Reset();
@@ -223,4 +229,3 @@
         end;
     end;
 }
-
