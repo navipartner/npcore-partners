@@ -106,6 +106,7 @@
         Bool: Boolean;
         OldValue: Text;
         VRTCloneData: Codeunit "NPR Variety Clone Data";
+        Handled: Boolean;
     begin
         TempVRTBuffer_.Get(VRT1Value, VRT2Value, VRT3Value, VRT4Value);
         GetItem(TempVRTBuffer_."Item No.");
@@ -124,58 +125,60 @@
                     RecRef.Get(TempVRTBuffer_."Record ID (TMP)");
                     FRef := RecRef.Field(VRTFieldSetup."Field No.");
                     OldValue := Format(FRef.Value);
-                    case UpperCase(Format(FRef.Type)) of
-                        'DATE':
-                            begin
-                                Evaluate(Date, NewValue);
-                                if VRTFieldSetup."Validate Field" then
-                                    FRef.Validate(Date)
-                                else
-                                    FRef.Value(Date);
-                            end;
-                        'INTEGER':
-                            begin
-                                Evaluate(Int, NewValue);
-                                if VRTFieldSetup."Validate Field" then
-                                    FRef.Validate(Int)
-                                else
-                                    FRef.Value(Int);
-                            end;
-                        'DECIMAL':
-                            begin
+                    OnBeforeSetValue(RecRef, FRef, VRTFieldSetup, NewValue, OldValue, Handled);
+                    if not Handled then
+                        case UpperCase(Format(FRef.Type)) of
+                            'DATE':
+                                begin
+                                    Evaluate(Date, NewValue);
+                                    if VRTFieldSetup."Validate Field" then
+                                        FRef.Validate(Date)
+                                    else
+                                        FRef.Value(Date);
+                                end;
+                            'INTEGER':
+                                begin
+                                    Evaluate(Int, NewValue);
+                                    if VRTFieldSetup."Validate Field" then
+                                        FRef.Validate(Int)
+                                    else
+                                        FRef.Value(Int);
+                                end;
+                            'DECIMAL':
+                                begin
 
-                                Evaluate(Dec, NewValue);
-                                if VRTFieldSetup."Validate Field" then
-                                    FRef.Validate(Dec)
-                                else
-                                    FRef.Value(Dec);
-                            end;
-                        'TEXT':
-                            begin
-                                if VRTFieldSetup."Validate Field" then
-                                    FRef.Validate(NewValue)
-                                else
-                                    FRef.Value(NewValue);
-                            end;
-                        'CODE':
-                            begin
-                                Evaluate(Code, NewValue);
-                                if VRTFieldSetup."Validate Field" then
-                                    FRef.Validate(Code)
-                                else
-                                    FRef.Value(Code);
-                            end;
-                        'BOOLEAN':
-                            begin
-                                Evaluate(Bool, NewValue);
-                                if VRTFieldSetup."Validate Field" then
-                                    FRef.Validate(Bool)
-                                else
-                                    FRef.Value(Bool);
-                            end;
-                        else
-                            Error(FieldTypeNotSupported, Format(FRef.Type));
-                    end;
+                                    Evaluate(Dec, NewValue);
+                                    if VRTFieldSetup."Validate Field" then
+                                        FRef.Validate(Dec)
+                                    else
+                                        FRef.Value(Dec);
+                                end;
+                            'TEXT':
+                                begin
+                                    if VRTFieldSetup."Validate Field" then
+                                        FRef.Validate(NewValue)
+                                    else
+                                        FRef.Value(NewValue);
+                                end;
+                            'CODE':
+                                begin
+                                    Evaluate(Code, NewValue);
+                                    if VRTFieldSetup."Validate Field" then
+                                        FRef.Validate(Code)
+                                    else
+                                        FRef.Value(Code);
+                                end;
+                            'BOOLEAN':
+                                begin
+                                    Evaluate(Bool, NewValue);
+                                    if VRTFieldSetup."Validate Field" then
+                                        FRef.Validate(Bool)
+                                    else
+                                        FRef.Value(Bool);
+                                end;
+                            else
+                                Error(FieldTypeNotSupported, Format(FRef.Type));
+                        end;
                     RecRef.Modify();
 
                     DeleteLinesQuantityZero(RecRef, FRef, TempVRTBuffer_, OldValue, Dec);
@@ -867,6 +870,11 @@
     /// <param name="ItemFilters">Item Record with the filters used in the Matrix</param>
     [IntegrationEvent(false, false)]
     local procedure OnLookupVarietyMatrixTotal(CurrentCellVarietyBuffer: Record "NPR Variety Buffer"; var VarietyBufferInRange: Record "NPR Variety Buffer"; VrtFieldSetup: Record "NPR Variety Field Setup"; var ItemFilters: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSetValue(RecRef: RecordRef; FldRef: FieldRef; VRTFieldSetup: Record "NPR Variety Field Setup"; NewValue: Text[250]; OldValue: Text; var Handled: Boolean)
     begin
     end;
 
