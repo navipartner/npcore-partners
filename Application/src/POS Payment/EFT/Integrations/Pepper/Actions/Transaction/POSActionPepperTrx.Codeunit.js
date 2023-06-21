@@ -79,7 +79,7 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
                             // Confirm to Pepper that BC is updated and end the workflow on CommitComplete
                             _dialogRef.updateStatus (captions.statusCommitting);
                             context.request.TransactionRequest.Operation = "CommitTransaction";
-                            hwc.invoke("EFTPepper", context.request, _contextId);
+                            await hwc.invoke("EFTPepper", context.request, _contextId);
                         };
                     }
                     catch (e) {
