@@ -1122,5 +1122,115 @@
 
         end;
     end;
+
+
+    internal procedure ExportNotifications(var Notification: Record "NPR TM Ticket Notif. Entry")
+    var
+        Notifications: JsonArray;
+        Envelope: JsonObject;
+    begin
+        if (not Notification.FindSet()) then
+            exit;
+
+        repeat
+            Notifications.Add(SerializeNotificationEntry(Notification));
+        until (Notification.Next() = 0);
+
+        Envelope.Add('exportedBy', UserId);
+        Envelope.Add('exportedAt', CurrentDateTime());
+        Envelope.Add('companyName', CompanyName());
+        Envelope.Add('version', '1.0');
+        Envelope.Add('filter', Notification.GetFilters());
+        Envelope.Add('count', Notifications.Count());
+        Envelope.Add('notifications', Notifications);
+
+        ExportJsonToFile('Notifications', Envelope);
+    end;
+
+    local procedure SerializeNotificationEntry(Notification: Record "NPR TM Ticket Notif. Entry") Entry: JsonObject
+    begin
+        Entry.Add('systemId', Notification.SystemId);
+        Entry.Add('entryNo', Notification."Entry No.");
+        Entry.Add('dateToNotify', Notification."Date To Notify");
+        Entry.Add('timeToNotify', Notification."Time To Notify");
+        Entry.Add('admissionCode', Notification."Admission Code");
+        Entry.Add('admEventDescription', Notification."Adm. Event Description");
+        Entry.Add('admLocationDescription', Notification."Adm. Location Description");
+        Entry.Add('admissionScheduleEntryNo', Notification."Admission Schedule Entry No.");
+        Entry.Add('authorizationCode', Notification."Authorization Code");
+        Entry.Add('detTicketAccessEntryNo', Notification."Det. Ticket Access Entry No.");
+        Entry.Add('eventStartDate', Notification."Event Start Date");
+        Entry.Add('eventStartTime', Notification."Event Start Time");
+        Entry.Add('expireDate', Notification."Expire Date");
+        Entry.Add('expireDatetime', Notification."Expire Datetime");
+        Entry.Add('expireTime', Notification."Expire Time");
+        Entry.Add('externalOrderNo', Notification."External Order No.");
+        Entry.Add('externalTicketNo', Notification."External Ticket No.");
+        Entry.Add('extraText', Notification."Extra Text");
+        Entry.Add('failedWithMessage', Notification."Failed With Message");
+        Entry.Add('notificationAddress', Notification."Notification Address");
+        Entry.Add('notificationGroupId', Notification."Notification Group Id");
+        Entry.Add('notificationMethod', Notification."Notification Method".AsInteger());
+        Entry.Add('notificationProcessMethod', Notification."Notification Process Method".AsInteger());
+        Entry.Add('notificationSendStatus', Notification."Notification Send Status".AsInteger());
+        Entry.Add('notificationSentAt', Notification."Notification Sent At");
+        Entry.Add('notificationSentByUser', Notification."Notification Sent By User");
+        Entry.Add('notificationTrigger', Notification."Notification Trigger".AsInteger());
+        Entry.Add('publishedTicketURL', Notification."Published Ticket URL");
+        Entry.Add('quantityToAdmit', Notification."Quantity To Admit");
+        Entry.Add('relevantDate', Notification."Relevant Date");
+        Entry.Add('relevantDatetime', Notification."Relevant Datetime");
+        Entry.Add('relevantTime', Notification."Relevant Time");
+        Entry.Add('row', Notification.Row);
+        Entry.Add('seat', Notification.Seat);
+        Entry.Add('section', Notification.Section);
+        Entry.Add('systemCreatedAt', Notification.SystemCreatedAt);
+        Entry.Add('systemCreatedBy', Notification.SystemCreatedBy);
+        Entry.Add('systemModifiedAt', Notification.SystemModifiedAt);
+        Entry.Add('systemModifiedBy', Notification.SystemModifiedBy);
+        Entry.Add('templateCode', Notification."Template Code");
+        Entry.Add('ticketBOMAdmDescription', Notification."Ticket BOM Adm. Description");
+        Entry.Add('ticketBOMDescription', Notification."Ticket BOM Description");
+        Entry.Add('ticketExternalItemNo', Notification."Ticket External Item No.");
+        Entry.Add('ticketHolderEMail', Notification."Ticket Holder E-Mail");
+        Entry.Add('ticketHolderName', Notification."Ticket Holder Name");
+        Entry.Add('ticketItemNo', Notification."Ticket Item No.");
+        Entry.Add('ticketListPrice', Notification."Ticket List Price");
+        Entry.Add('ticketNo', Notification."Ticket No.");
+        Entry.Add('ticketNoForPrinting', Notification."Ticket No. for Printing");
+        Entry.Add('ticketToken', Notification."Ticket Token");
+        Entry.Add('ticketTriggerType', Notification."Ticket Trigger Type".AsInteger());
+        Entry.Add('ticketTypeCode', Notification."Ticket Type Code");
+        Entry.Add('ticketVariantCode', Notification."Ticket Variant Code");
+        Entry.Add('voided', Notification.Voided);
+        Entry.Add('waitingListReferenceCode', Notification."Waiting List Reference Code");
+        Entry.Add('eTicketPassAndriodURL', Notification."eTicket Pass Andriod URL");
+        Entry.Add('eTicketPassDefaultURL', Notification."eTicket Pass Default URL");
+        Entry.Add('eTicketPassId', Notification."eTicket Pass Id");
+        Entry.Add('eTicketPassLandingURL', Notification."eTicket Pass Landing URL");
+        Entry.Add('eTicketTypeCode', Notification."eTicket Type Code");
+    end;
+
+
+    local procedure ExportJsonToFile(Name: Text; JsonData: JsonObject)
+    var
+        IStream: InStream;
+        OStream: OutStream;
+        FileName: Text;
+        JsonText: Text;
+        TempBlob: Codeunit "Temp Blob";
+        FileNameLbl: Label '%1.json', Locked = true;
+    begin
+        TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
+        JsonData.WriteTo(JsonText);
+        OStream.WriteText(JsonText);
+
+        TempBlob.CreateInStream(IStream, TextEncoding::UTF8);
+        CopyStream(OStream, IStream);
+
+        FileName := StrSubstNo(FileNameLbl, Name);
+        DownloadFromStream(IStream, '', '', 'JSON File (*.json)|*.json', FileName);
+    end;
+
 }
 

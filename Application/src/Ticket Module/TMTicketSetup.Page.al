@@ -366,13 +366,17 @@
                     trigger OnAction()
                     var
                         WebServiceMgt: Codeunit "Web Service Management";
+                        WebServiceObjectType: Option ,,,,,"Codeunit",,,"Page","Query",,,,,,,,,,;
                         TicketServiceName: Label 'ticket_services', Locked = true;
                         TicketStatisticsName: Label 'ticket_statistics', Locked = true;
-                        OkMessage: Label 'Services published.';
+                        TicketNotificationName: Label 'NPR_TicketNotifications', Locked = true;
+                        OkMessage: Label 'Services published: [%1, %2, %3]';
                     begin
-                        WebServiceMgt.CreateTenantWebService(5, Codeunit::"NPR TM Ticket WebService", TicketServiceName, true);
-                        WebServiceMgt.CreateTenantWebService(5, Codeunit::"NPR TM Statistics WebService", TicketStatisticsName, true);
-                        Message(OkMessage);
+                        WebServiceMgt.CreateTenantWebService(WebServiceObjectType::"Codeunit", Codeunit::"NPR TM Ticket WebService", TicketServiceName, true);
+                        WebServiceMgt.CreateTenantWebService(WebServiceObjectType::"Codeunit", Codeunit::"NPR TM Statistics WebService", TicketStatisticsName, true);
+                        WebServiceMgt.CreateTenantWebService(WebServiceObjectType::"Page", Page::"NPR APIV1 - TM Notifications", TicketNotificationName, true);
+
+                        Message(StrSubstNo(OkMessage, TicketServiceName, TicketStatisticsName, TicketNotificationName));
                     end;
                 }
 
