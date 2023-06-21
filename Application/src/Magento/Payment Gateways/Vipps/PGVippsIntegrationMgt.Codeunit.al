@@ -108,10 +108,12 @@ codeunit 6150920 "NPR PG Vipps Integration Mgt." implements "NPR IPaymentGateway
     var
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         PaymentCapturedLbl: Label 'Payment for %1 %2', Comment = '%1 = document type, %2 = document no.';
         PaymentRefundLbl: Label 'Payment refund for %1 %2', Comment = '%1 = document type, %2 = document no.';
         UnknownRequestServiceErr: Label 'RequestService type %1 is not supported. Valid options are "cancel","capture" and "refund".', Comment = '%1 = RequestService type', Locked = true;
         InvoiceLbl: Label 'Invoice';
+        CreditMemoLbl: Label 'Credit Memo';
         TransactionTextPlaceHolder: Text;
     begin
         case RequestService of
@@ -130,6 +132,10 @@ codeunit 6150920 "NPR PG Vipps Integration Mgt." implements "NPR IPaymentGateway
                 if TransactionTxt = '' then
                     if SalesInvHeader.GetBySystemId(Request."Document System Id") then
                         TransactionTxt := CopyStr(StrSubstNo(TransactionTextPlaceHolder, InvoiceLbl, SalesInvHeader."No."), 1, MaxStrLen(TransactionTxt));
+            Database::"Sales Cr.Memo Header":
+                if TransactionTxt = '' then
+                    if SalesCrMemoHeader.GetBySystemId(Request."Document System Id") then
+                        TransactionTxt := CopyStr(StrSubstNo(TransactionTextPlaceHolder, CreditMemoLbl, SalesCrMemoHeader."No."), 1, MaxStrLen(TransactionTxt));
             Database::"Sales Header":
                 if TransactionTxt = '' then
                     if SalesHeader.GetBySystemId(Request."Document System Id") then
