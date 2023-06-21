@@ -36,11 +36,8 @@
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
-                    var
-                        RecRef: RecordRef;
                     begin
-                        RecRef.GetTable(Rec);
-                        LabelLibrary.ToggleLine(RecRef);
+                        PrintValidate();
                     end;
                 }
                 field(Description; Rec.Description)
@@ -261,8 +258,11 @@
 
         IsHandled := false;
         OnBeforeOnNewRecord(IsHandled, Print);
-        if IsHandled then
+        if IsHandled then begin
+            if Print then
+                PrintValidate();
             exit;
+        end;
 
         RecRef.GetTable(Rec);
         Print := LabelLibrary.SelectionContains(RecRef);
@@ -404,5 +404,13 @@
 
         Rec.FilterGroup(0);
         CurrPage.Update(false);
+    end;
+
+    local procedure PrintValidate()
+    var
+        RecRef: RecordRef;
+    begin
+        RecRef.GetTable(Rec);
+        LabelLibrary.ToggleLine(RecRef);
     end;
 }
