@@ -10,4 +10,9 @@ codeunit 6059842 "NPR POS Menu Mgt."
         exit(POSMenuImpl.GetPOSMenuButtonLocationFilter(POSSession, ActionCode));
     end;
 
+    procedure GetPOSMenuButtonTableId(): Integer
+    begin
+        exit(Database::"NPR POS Menu Button");
+    end;
+
 }
