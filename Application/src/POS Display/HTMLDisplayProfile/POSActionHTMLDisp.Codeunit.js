@@ -83,7 +83,7 @@ async function QRPaymentScan(context)
     console.log(context);
     if (context.Command === "Open")
     {
-        hwc.invoke("HTMLDisplay", {
+        await hwc.invoke("HTMLDisplay", {
             DisplayAction: "SendJS",
             JSParameter: JSON.stringify({
                 JSAction: "QRPaymentScan",
@@ -96,7 +96,7 @@ async function QRPaymentScan(context)
     }
     else
     {
-        hwc.invoke("HTMLDisplay", {
+        await hwc.invoke("HTMLDisplay", {
             DisplayAction: "SendJS",
             JSParameter: JSON.stringify({
                 JSAction: "QRPaymentScan",
