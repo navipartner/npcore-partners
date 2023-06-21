@@ -401,6 +401,25 @@
                     CurrPage.Update(false);
                 end;
             }
+            action(ExportNotification)
+            {
+                ToolTip = 'Export notifications to file.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Export Notification';
+                Image = ExportMessage;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                var
+                    TicketNotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
+                    Notification: Record "NPR TM Ticket Notif. Entry";
+                begin
+                    Notification.CopyFilters(Rec);
+                    TicketNotifyParticipant.ExportNotifications(Notification);
+                end;
+            }
         }
         area(Navigation)
         {
