@@ -124,6 +124,17 @@
                     ToolTip = 'Specifies pop up warning on return';
                     ApplicationArea = NPRRetail;
                 }
+
+                group(Check)
+                {
+                    Visible = AskForCheckNoVisible;
+                    ShowCaption = false;
+                    field("Ask for Check No."; Rec."Ask for Check No.")
+                    {
+                        ToolTip = 'Specifies the value of the Ask for Check No. field.';
+                        ApplicationArea = NPRRetail;
+                    }
+                }
             }
             group(Rounding)
             {
@@ -311,10 +322,12 @@
 
     var
         IsPostCondensed: Boolean;
+        AskForCheckNoVisible: Boolean;
 
     trigger OnAfterGetCurrRecord()
     begin
         IsPostCondensed := Rec."Post Condensed";
+        AskForCheckNoVisible := Rec."Processing Type" = Rec."Processing Type"::CHECK;
     end;
 }
 

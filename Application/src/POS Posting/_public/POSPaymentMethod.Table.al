@@ -263,6 +263,12 @@
             Caption = 'Warning pop-up on Return';
             DataClassification = CustomerContent;
         }
+
+        field(710; "Ask for Check No."; Boolean)
+        {
+            Caption = 'Ask for Check No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
