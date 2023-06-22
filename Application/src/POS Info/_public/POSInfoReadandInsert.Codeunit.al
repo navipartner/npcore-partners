@@ -35,4 +35,9 @@ codeunit 6059835 "NPR POS Info Read and Insert"
         POSInfoMgmt.UpsertPOSInfo(POSInfoCode, SalePOSLine, POSInfoText);
     end;
 
+    procedure FindPOSInfoTransaction(RegisterNo: Code[10]; SalesTicketNo: Code[20]; SalesLineNo: Integer; POSInfoCode: Code[20]; POSInfo: Text[250]): Boolean
+    begin
+        exit(POSInfoMgmt.FindPOSInfoTransaction(RegisterNo, SalesTicketNo, SalesLineNo, POSInfoCode, POSInfo));
+    end;
+
 }
