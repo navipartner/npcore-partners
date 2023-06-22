@@ -14,16 +14,24 @@
         ParamStoreCode_DescLbl: Label 'Specifies Store Code';
         ParamLocFilter_CptLbl: Label 'Location Filter';
         ParamLocFilter_DescLbl: Label 'Specifies Location Filter';
-        ParamPrepaymentPercent_CptLbl: Label 'Prepayment Percent';
-        ParamPrepaymentPercent_DescLbl: Label 'Specifies Prepayment Percent';
+        ParamPrepaymentValue_CptLbl: Label 'Fixed Prepayment Value';
+        ParamPrepaymentValue_DescLbl: Label 'Specifies Fixed Prepayment Value';
         ParamCheckCustomerCredit_CptLbl: Label 'Check Customer Credit';
         ParamCheckCustomerCredit_DescLbl: Label 'Check Customer Credit';
         ConfirmMissingStockLbl: Label 'Confirm Missing Stock';
-        PrepaymentPercantageLbl: Label 'Enter Prepayment Percentage';
+        CaptionPrepaymentDlg: Label 'Prompt Prepayment';
+        TextPrepaymentPctLead: Label 'Please specify prepayment %';
+        DescPrepaymentDlg: Label 'Ask user for prepayment value.';
+        CaptionPrepayIsAmount: Label 'Prepayment Amount Input';
+        TextPrepaymentAmountLead: Label 'Please specify prepayment amount';
+        DescPrepayIsAmount: Label 'Input prepayment amount instead of percent in prompt';
+        TextPrepaymentTitle: Label 'Prepayment';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
-        WorkflowConfig.AddLabel('SetPrepaymentPercentage', PrepaymentPercantageLbl);
+        WorkflowConfig.AddLabel('prepaymentDialogTitle', TextPrepaymentTitle);
+        WorkflowConfig.AddLabel('prepaymentPctLead', TextPrepaymentPctLead);
+        WorkflowConfig.AddLabel('prepaymentAmountLead', TextPrepaymentAmountLead);
         WorkflowConfig.AddLabel('ConfirmSetStoreForMissingStock', ConfirmMissingStockLbl);
         WorkflowConfig.AddOptionParameter('fromStoreCode',
 #pragma warning disable AA0139
@@ -35,8 +43,10 @@
                                           ParamFromStoreCode_OptCaptionsLbl);
         WorkflowConfig.AddTextParameter('storeCode', '', ParamStoreCode_CptLbl, ParamStoreCode_DescLbl);
         WorkflowConfig.AddTextParameter('locationFilter', '', ParamLocFilter_CptLbl, ParamLocFilter_DescLbl);
-        WorkflowConfig.AddDecimalParameter('prepaymentPercent', 0, ParamPrepaymentPercent_CptLbl, ParamPrepaymentPercent_DescLbl);
+        WorkflowConfig.AddDecimalParameter('prepaymentPercent', 0, ParamPrepaymentValue_CptLbl, ParamPrepaymentValue_DescLbl);
         WorkflowConfig.AddBooleanParameter('checkCustomerCredit', true, ParamCheckCustomerCredit_CptLbl, ParamCheckCustomerCredit_DescLbl);
+        WorkflowConfig.AddBooleanParameter('prepaymentDialog', true, CaptionPrepaymentDlg, DescPrepaymentDlg);
+        WorkflowConfig.AddBooleanParameter('prepayment_is_amount', false, CaptionPrepayIsAmount, DescPrepayIsAmount);
         WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSaleLine());
     end;
 
@@ -262,16 +272,18 @@
         FromStoreCode: Code[20];
         ToStoreCode: Code[20];
         WorkflowCode: Code[20];
-        PrepaymentPct: Decimal;
+        PrepaymentValue: Decimal;
+        PrepaymentIsAmount: Boolean;
         NpCsPOSActionCreOrderB: Codeunit "NPR NpCs POSAction Cr. Order B";
     begin
         FromStoreCode := CopyStr(Context.GetString('fromStoreCode'), 1, MaxStrLen(FromStoreCode));
         ToStoreCode := CopyStr(Context.GetString('toStoreCode'), 1, MaxStrLen(ToStoreCode));
         WorkflowCode := CopyStr(Context.GetString('workflowCode'), 1, MaxStrLen(WorkflowCode));
-        PrepaymentPct := Context.GetDecimal('prepaymentPercent');
+        PrepaymentValue := Context.GetDecimal('prepaymentValue');
+        PrepaymentIsAmount := Context.GetBooleanParameter('prepayment_is_amount');
 
         ExportToDocument(Context, RetailSalesDocMgt);
-        NpCsPOSActionCreOrderB.CreateCollectOrder(FromStoreCode, ToStoreCode, WorkflowCode, PrepaymentPct, RetailSalesDocMgt);
+        NpCsPOSActionCreOrderB.CreateCollectOrder(FromStoreCode, ToStoreCode, WorkflowCode, PrepaymentValue, RetailSalesDocMgt, PrepaymentIsAmount);
     end;
 
     local procedure ExportToDocument(Context: Codeunit "NPR POS JSON Helper"; RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
@@ -294,7 +306,7 @@
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:NpCsCrOrder.Codeunit.js###
-'let main=async({workflow:r,context:e,popup:a,runtime:t,hwc:n,data:m,parameters:i,captions:o,scope:s})=>{switch(i.fromStoreCode+""){case"0":await r.respond("SelectFromStoreCodeFromPOSRelation");break;case"1":await r.respond("SelectFromStoreCodeFromStoreCodeParameter");break;case"2":await r.respond("SelectFromStoreCodeFromLocationFilterParameter");break}!e.fromStoreCode||!e.toStoreCode&&(await r.respond("SelectToStoreCode"),e.ConfirmMissingStock&&e.MissingStockInCompanyLbl.length>0&&!await a.confirm({title:o.ConfirmSetStoreForMissingStock,caption:e.MissingStockInCompanyLbl}))||!e.toStoreCode||(e.workflowCode||await r.respond("SelectWorkflow"),!!e.workflowCode&&(e.customerNo||await r.respond("SelectCustomer"),!!e.customerNo&&(e.prepaymentPercent||(e.prepaymentPercent=await a.numpad({caption:o.SetPrepaymentPercentage,value:i.prepaymentPercent})),await r.respond("CreateCollectOrder"),e.HandlePrepaymentFailed&&e.HandlePrepaymentFailReasonMsg.length>0&&await a.message(e.HandlePrepaymentFailReasonMsg))))};'
+'let main=async({workflow:a,context:e,popup:t,parameters:i,captions:r})=>{switch(i.fromStoreCode+""){case"0":await a.respond("SelectFromStoreCodeFromPOSRelation");break;case"1":await a.respond("SelectFromStoreCodeFromStoreCodeParameter");break;case"2":await a.respond("SelectFromStoreCodeFromLocationFilterParameter");break}!e.fromStoreCode||!e.toStoreCode&&(await a.respond("SelectToStoreCode"),e.ConfirmMissingStock&&e.MissingStockInCompanyLbl.length>0&&!await t.confirm({title:r.ConfirmSetStoreForMissingStock,caption:e.MissingStockInCompanyLbl}))||(e.workflowCode||await a.respond("SelectWorkflow"),e.customerNo||await a.respond("SelectCustomer"),i.prepaymentDialog?i.prepayment_is_amount?e.prepaymentValue=await t.numpad({caption:r.prepaymentAmountLead,title:r.prepaymentDialogTitle,value:i.prepaymentPercent}):e.prepaymentValue=await t.numpad({caption:r.prepaymentPctLead,title:r.prepaymentDialogTitle,value:i.prepaymentPercent}):e.prepaymentValue=i.prepaymentPercent,await a.respond("CreateCollectOrder"),e.HandlePrepaymentFailed&&e.HandlePrepaymentFailReasonMsg.length>0&&await t.message(e.HandlePrepaymentFailReasonMsg))};'
         );
     end;
 }

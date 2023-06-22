@@ -11,15 +11,16 @@
         POSSession: Codeunit "NPR POS Session";
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         PrepaymentPct: Decimal;
-        PrintPrepaymentInvoice: Boolean;
+        PrintPrepaymentInvoice, PrepaymentIsAmount : Boolean;
 
-    procedure SetParameters(POSSessionIn: Codeunit "NPR POS Session"; RetailSalesDocMgtIn: Codeunit "NPR Sales Doc. Exp. Mgt."; PrepaymentPctIn: Decimal; PrintPrepaymentInvoiceIn: Boolean; PreviousSalePOSIn: Record "NPR POS Sale")
+    procedure SetParameters(POSSessionIn: Codeunit "NPR POS Session"; RetailSalesDocMgtIn: Codeunit "NPR Sales Doc. Exp. Mgt."; PrepaymentPctIn: Decimal; PrintPrepaymentInvoiceIn: Boolean; PreviousSalePOSIn: Record "NPR POS Sale"; PrepaymentIsAmountIn: Boolean)
     begin
         POSSession := POSSessionIn;
         RetailSalesDocMgt := RetailSalesDocMgtIn;
         PrepaymentPct := PrepaymentPctIn;
         PrintPrepaymentInvoice := PrintPrepaymentInvoiceIn;
         PreviousSalePOS := PreviousSalePOSIn;
+        PrepaymentIsAmount := PrepaymentIsAmountIn;
     end;
 
     local procedure HandlePrepayment()
@@ -38,7 +39,7 @@
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();
 
-        RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentPct, PrintPrepaymentInvoice, false, false, true, false);
+        RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentPct, PrintPrepaymentInvoice, false, false, true, PrepaymentIsAmount);
 
         POSSession.RequestRefreshData();
     end;
