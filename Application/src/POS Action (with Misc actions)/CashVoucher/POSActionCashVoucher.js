@@ -1,7 +1,15 @@
 let main = async ({ workflow, parameters, popup, captions }) => {
     debugger;
     if (parameters.DeductCommision) {
-        if (parameters.CommisionPercentage === 0 || parameters.CommisionAccount === "") {
+        if (parameters.CommisionAccount === "") {
+            popup.error(captions.InvalidParameters);
+            return;
+        }
+        if (parameters.CommisionPercentage == 0 && parameters.CommisionType == 0) {
+            popup.error(captions.InvalidParameters);
+            return;
+        };
+        if (parameters.CommisionAmount == 0 && parameters.CommisionType == 1) {
             popup.error(captions.InvalidParameters);
             return;
         };
@@ -19,5 +27,4 @@ let main = async ({ workflow, parameters, popup, captions }) => {
             await workflow.respond("InsertCommision", { voucherType: voucherType });
         }
     };
-
 }
