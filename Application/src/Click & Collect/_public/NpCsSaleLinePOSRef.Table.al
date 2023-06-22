@@ -1,6 +1,6 @@
 ﻿table 6151204 "NPR NpCs Sale Line POS Ref."
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'Collect Sale Line POS Reference';
     DataClassification = CustomerContent;
 
