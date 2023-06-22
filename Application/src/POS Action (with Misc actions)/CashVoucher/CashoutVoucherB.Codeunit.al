@@ -25,22 +25,32 @@ codeunit 6184634 "NPR Cashout Voucher B"
         SaleLine.InsertLine(POSSaleLine);
     end;
 
-    internal procedure InsertCommision(GLAccount: Code[20]; VoucherType: Code[20]; CommisionPercentage: Decimal; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line"): boolean
+    internal procedure InsertCommision(GLAccount: Code[20]; VoucherType: Code[20]; CommisionType: Option Percentage,Amount; Commision: Decimal; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line"): boolean
     var
+        GLSetup: Record "General Ledger Setup";
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
         POSLine: Record "NPR POS Sale Line";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         PayInPayOutMgr: Codeunit "NPR Pay-in Payout Mgr";
         CommisionAmount: Decimal;
-        POSPaymentMethod: Record "NPR POS Payment Method";
-        NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        CommisionLbl: label 'Commision %1%', Comment = 'Commision percentage = %1';
+        Description: Text;
+        CommisionLbl: Label 'Commision %1%2', Comment = '%1 - specifies the Commision percentage or amount based on Commision Type, %2 - specifies % sign or LCY based on Commision Type';
     begin
+        GLSetup.Get();
         PaymentLine.GetCurrentPaymentLine(POSLine);
         NpRvVoucherType.Get(VoucherType);
         POSPaymentMethod.Get(NpRvVoucherType."Payment Type");
 
-        CommisionAmount := Round(POSLine."Amount Including VAT" * CommisionPercentage / 100, POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType());
-
-        exit(PayInPayOutMgr.CreatePayInOutPayment(SaleLine, 1, GLAccount, StrSubstNo(CommisionLbl, Format(CommisionPercentage)), CommisionAmount, ''));
+        if CommisionType = CommisionType::Percentage then begin
+            CommisionAmount := Round(POSLine."Amount Including VAT" * Commision / 100, POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType());
+            Description := StrSubstNo(CommisionLbl, Format(Commision), '%');
+        end
+        else begin
+            CommisionAmount := Round(Commision, POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType());
+            Description := StrSubstNo(CommisionLbl, Format(Commision), GLSetup."LCY Code");
+        end;
+#pragma warning disable AA0139
+        exit(PayInPayOutMgr.CreatePayInOutPayment(SaleLine, 1, GLAccount, Description, CommisionAmount, ''));
+#pragma warning restore
     end;
-
 }
