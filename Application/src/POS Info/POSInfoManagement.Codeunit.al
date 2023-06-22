@@ -593,7 +593,11 @@
         POSInfoTransaction.SetRange("Sales Ticket No.", SalePOSLine."Sales Ticket No.");
         POSInfoTransaction.SetRange("Sales Line No.", SalePOSLine."Line No.");
         if POSInfoTransaction.FindFirst() then begin
+            POSInfoTransaction."Sale Date" := SalePOSLine.Date;
+            POSInfoTransaction."Line Type" := SalePOSLine."Line Type";
             POSInfoTransaction."POS Info" := CopyStr(POSInfoText, 1, MaxStrLen(POSInfoTransaction."POS Info"));
+            POSInfoTransaction."No." := SalePOSLine."No.";
+            POSInfoTransaction.Quantity := SalePOSLine.Quantity;
             POSInfoTransaction.Modify(true);
         end else begin
             POSInfoTransaction.Init();
@@ -602,12 +606,13 @@
             POSInfoTransaction."Sales Ticket No." := SalePOSLine."Sales Ticket No.";
             POSInfoTransaction."Sales Line No." := SalePOSLine."Line No.";
             POSInfoTransaction."Sale Date" := SalePOSLine.Date;
-            POSInfoTransaction."Line Type" := POSInfoTransaction."Line Type"::"Customer Deposit";
+            POSInfoTransaction."Line Type" := SalePOSLine."Line Type";
             POSInfoTransaction."POS Info" := CopyStr(POSInfoText, 1, MaxStrLen(POSInfoTransaction."POS Info"));
+            POSInfoTransaction."No." := SalePOSLine."No.";
+            POSInfoTransaction.Quantity := SalePOSLine.Quantity;
             POSInfoTransaction.Insert(true);
         end;
     end;
-
 
     procedure UpsertPOSInfo(POSInfoCode: Code[20]; SalePOS: Record "NPR POS Sale"; POSInfoText: Text)
     var
@@ -632,7 +637,18 @@
         end;
     end;
 
-
+    procedure FindPOSInfoTransaction(RegisterNo: Code[10]; SalesTicketNo: Code[20]; SalesLineNo: Integer; POSInfoCode: Code[20]; POSInfo: Text[250]): Boolean
+    var
+        POSInfoTransaction: Record "NPR POS Info Transaction";
+    begin
+        POSInfoTransaction.SetRange("Register No.", RegisterNo);
+        POSInfoTransaction.SetRange("Sales Ticket No.", SalesTicketNo);
+        POSInfoTransaction.SetRange("Sales Line No.", SalesLineNo);
+        POSInfoTransaction.SetRange("POS Info Code", POSInfoCode);
+        if POSInfo <> '' then
+            POSInfoTransaction.SetRange("POS Info", POSInfo);
+        exit(not POSInfoTransaction.IsEmpty);
+    end;
 
     #region DataSource Extension
     local procedure ThisExtension(): Text
