@@ -32,9 +32,14 @@ let main = async ({ workflow, context, popup, parameters, captions}) => {
         await workflow.respond("SelectCustomer")
     }
 
-    if (!context.prepaymentPercent) {
-        context.prepaymentPercent = await popup.numpad({caption: captions.SetPrepaymentPercentage,value: parameters.prepaymentPercent});
-    }
+    if (parameters.prepaymentDialog) {
+        if (parameters.prepayment_is_amount) {
+            context.prepaymentValue = await popup.numpad({caption: captions.prepaymentAmountLead, title: captions.prepaymentDialogTitle, value: parameters.prepaymentPercent})
+        } else {
+            context.prepaymentValue = await popup.numpad({caption: captions.prepaymentPctLead, title: captions.prepaymentDialogTitle,value: parameters.prepaymentPercent})
+        };
+    } else
+    context.prepaymentValue = parameters.prepaymentPercent;
 
     await workflow.respond("CreateCollectOrder");
 

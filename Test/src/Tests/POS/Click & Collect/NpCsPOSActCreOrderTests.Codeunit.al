@@ -50,13 +50,13 @@ codeunit 85084 "NPR NpCs POSAct CreOrder Tests"
         ToStoreCode := NpCsLibrary.CreateLocalCollectStore();
 
         NpCsLibrary.CreateWorkflowRel(FromStoreCode, CollectWFCode);
-        NpCsLibrary.CreateWorkflowRel(ToStoreCode, CollectWFCode);
-
         LibrarySales.CreateCustomer(Customer);
 
         NpCsCreateOrderB.SelectToStoreCode(TempNpCsStore, FromStoreCode);
+        NpCsLibrary.CreateWorkflowRel(TempNpCsStore.Code, CollectWFCode);
+
         NpCsCreateOrderB.ExportToDocument(Customer."No.", RetailSalesDocMgt, false);
-        NpCsCreateOrderB.CreateCollectOrder(FromStoreCode, TempNpCsStore.Code, CollectWFCode, 0, RetailSalesDocMgt);
+        NpCsCreateOrderB.CreateCollectOrder(FromStoreCode, TempNpCsStore.Code, CollectWFCode, 0, RetailSalesDocMgt, false);
 
         NpCsDocument.SetRange("Reference No.", SalePOS."Sales Ticket No.");
 

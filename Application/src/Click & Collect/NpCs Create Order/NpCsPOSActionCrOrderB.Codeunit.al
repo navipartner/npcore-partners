@@ -134,7 +134,7 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
         end;
     end;
 
-    procedure CreateCollectOrder(FromStoreCode: Code[20]; ToStoreCode: Code[20]; WorkflowCode: Code[20]; PrepaymentPct: Decimal; RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
+    procedure CreateCollectOrder(FromStoreCode: Code[20]; ToStoreCode: Code[20]; WorkflowCode: Code[20]; PrepaymentPct: Decimal; RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; PrepaymentIsAmount: Boolean)
     var
         NpCsDocument: Record "NPR NpCs Document";
         FromNpCsStore: Record "NPR NpCs Store";
@@ -168,7 +168,7 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
             POSSale.GetCurrentSale(SalePOS);
             POSSession.StartTransaction();
             POSSession.ChangeViewSale();
-            HandlePrepayment(RetailSalesDocMgt, PrepaymentPct, true, SalePOS);
+            HandlePrepayment(RetailSalesDocMgt, PrepaymentPct, true, SalePOS, PrepaymentIsAmount);
             NpCsDocument."Prepaid Amount" := POSPrepaymentMgt.GetPrepaymentAmountToPay(SalesHeader);
             NpCsDocument.Modify();
         end else
@@ -178,7 +178,7 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
         NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
     end;
 
-    procedure HandlePrepayment(RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; PrepaymentPct: Decimal; PrintPrepaymentInvoice: Boolean; PreviousSalePOS: Record "NPR POS Sale") Success: Boolean
+    procedure HandlePrepayment(RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; PrepaymentPct: Decimal; PrintPrepaymentInvoice: Boolean; PreviousSalePOS: Record "NPR POS Sale"; PrepaymentIsAmount: Boolean) Success: Boolean
     var
         HandlePrepmtCU: Codeunit "NPR NpCs Cr.Ord: Handle Prepmt";
         POSSession: Codeunit "NPR POS Session";
@@ -187,7 +187,7 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
         Commit();
         ClearLastError();
         Clear(HandlePrepmtCU);
-        HandlePrepmtCU.SetParameters(POSSession, RetailSalesDocMgt, PrepaymentPct, PrintPrepaymentInvoice, PreviousSalePOS);
+        HandlePrepmtCU.SetParameters(POSSession, RetailSalesDocMgt, PrepaymentPct, PrintPrepaymentInvoice, PreviousSalePOS, PrepaymentIsAmount);
         if not HandlePrepmtCU.Run() then
             Success := false;
     end;
