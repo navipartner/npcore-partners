@@ -29,6 +29,7 @@ codeunit 85103 "NPR NpCs POSAct DelOrder Tests"
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        NpCsLibrary: Codeunit "NPR Library Click & Collect";
         CollectWFCode: Code[20];
         FromStoreCode: Code[20];
     begin
@@ -46,8 +47,10 @@ codeunit 85103 "NPR NpCs POSAct DelOrder Tests"
         LibrarySales.CreateCustomer(Customer);
 
         NpCsCreateOrderB.SelectToStoreCode(TempNpCsStore, FromStoreCode);
+        NpCsLibrary.CreateWorkflowRel(TempNpCsStore.Code, CollectWFCode);
+
         NpCsCreateOrderB.ExportToDocument(Customer."No.", RetailSalesDocMgt, false);
-        NpCsCreateOrderB.CreateCollectOrder(FromStoreCode, TempNpCsStore.Code, CollectWFCode, 0, RetailSalesDocMgt);
+        NpCsCreateOrderB.CreateCollectOrder(FromStoreCode, TempNpCsStore.Code, CollectWFCode, 0, RetailSalesDocMgt, false);
 
         NpCsDocument.SetRange("Reference No.", SalePOS."Sales Ticket No.");
         NpCsDocument.FindFirst();
