@@ -64,7 +64,7 @@ codeunit 85076 "NPR POS Cash Voucher Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure VoucherApplicationWithCommision()
+    procedure VoucherApplicationWithCommisionTypePercentage()
     var
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -77,9 +77,10 @@ codeunit 85076 "NPR POS Cash Voucher Tests"
         CommisionAmount: Decimal;
         CommisionPercentage: Decimal;
         VoucherAmount: Decimal;
+        CommisionType: Option Percentage,Amount;
     begin
         //[SCENARIO]
-        //Voucher Application with adding commision
+        //Voucher Application with adding commision as percentage
         // [Given] POS & Payment setup
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
@@ -95,11 +96,60 @@ codeunit 85076 "NPR POS Cash Voucher Tests"
         CommisionAmount := Round(VoucherAmount * CommisionPercentage / 100, POSPaymentMethodCash."Rounding Precision", POSPaymentMethodCash.GetRoundingType());
         //[When]
         CashoutVoucherB.ApplyVoucherPayment(NpRvVoucher."Voucher Type", NpRvVoucher."Reference No.", POSSale, POSPaymentLine, SaleLine);
-        CashoutVoucherB.InsertCommision(AccountNo, VoucherTypeDefault.Code, CommisionPercentage, POSPaymentLine, SaleLine);
+        CashoutVoucherB.InsertCommision(AccountNo, VoucherTypeDefault.Code, CommisionType::Percentage, CommisionPercentage, POSPaymentLine, SaleLine);
         //[Then] Retrieve voucher
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
         Assert.IsTrue(SaleLinePOS."No." = AccountNo, 'GL account is inserted');
         Assert.IsTrue(SaleLinePOS.Description = ('Commision ' + Format(CommisionPercentage) + '%'), 'Commision Description relatable');
+        Assert.IsTrue(SaleLinePOS."Amount Including VAT" = CommisionAmount, 'Commision Amount is correct');
+        //[Then] 
+        TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethodCash.Code, VoucherAmount - CommisionAmount, '');
+        Assert.AreEqual(true, TransactionEnded, 'Transaction is ended');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure VoucherApplicationWithCommisionTypeAmount()
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        TransactionEnded: Boolean;
+        AccountNo: Code[20];
+        CommisionAmount: Decimal;
+        VoucherAmount: Decimal;
+        Pct: Decimal;
+        CommisionType: Option Percentage,Amount;
+        GLSetup: Record "General Ledger Setup";
+    begin
+        //[SCENARIO]
+        //Voucher Application with adding commision as amount
+        // [Given] POS & Payment setup
+        Initialize();
+        GLSetup.Get();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        POSSession.GetPaymentLine(POSPaymentLine);
+        // Voucher already issued
+        VoucherAmount := GetRandomVoucherAmount(VoucherTypeDefault."Payment Type");
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, VoucherTypeDefault.Code);
+        // [Given] Commision Account And Commision Amount
+        AccountNo := LibraryERM.CreateGLAccountWithPurchSetup();
+
+        Pct := LibraryRandom.RandDecInRange(5, 15, 4);
+        CommisionAmount := LibraryRandom.RandDecInRange(1, Round(VoucherAmount * Pct / 100, 1, '='), 4);
+        CommisionAmount := Round(CommisionAmount, POSPaymentMethodCash."Rounding Precision", POSPaymentMethodCash.GetRoundingType());
+        //[When]
+        CashoutVoucherB.ApplyVoucherPayment(NpRvVoucher."Voucher Type", NpRvVoucher."Reference No.", POSSale, POSPaymentLine, SaleLine);
+        CashoutVoucherB.InsertCommision(AccountNo, VoucherTypeDefault.Code, CommisionType::Amount, CommisionAmount, POSPaymentLine, SaleLine);
+        //[Then] Retrieve voucher
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.IsTrue(SaleLinePOS."No." = AccountNo, 'GL account is inserted');
+        Assert.IsTrue(SaleLinePOS.Description = ('Commision ' + Format(CommisionAmount) + GLSetup."LCY Code"), 'Commision Description relatable');
         Assert.IsTrue(SaleLinePOS."Amount Including VAT" = CommisionAmount, 'Commision Amount is correct');
         //[Then] 
         TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethodCash.Code, VoucherAmount - CommisionAmount, '');
@@ -165,6 +215,4 @@ codeunit 85076 "NPR POS Cash Voucher Tests"
         NpRvVoucher.SetRange("Voucher Type", VoucherTypeCode);
         NpRvVoucher.FindFirst();
     end;
-
-
 }
