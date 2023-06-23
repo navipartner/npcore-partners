@@ -154,6 +154,7 @@
             trigger OnValidate()
             var
                 UOMMgt: Codeunit "Unit of Measure Management";
+                NPRPOSIUOMUtils: Codeunit "NPR POS IUOM Utils";
             begin
                 case "Line Type" of
                     "Line Type"::"GL Payment", "Line Type"::"Issue VOucher", "Line Type"::Rounding, "Line Type"::"Issue Voucher", "Line Type"::"Customer Deposit":
@@ -162,6 +163,7 @@
                         end;
                     else begin
                         GetItem();
+                        NPRPOSIUOMUtils.CheckIfUnitOfMeasureBlocked(Rec);
                         "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(_Item, "Unit of Measure Code");
                         "Quantity (Base)" := CalcBaseQty(Quantity);
                         "Unit Price" := FindItemSalesPrice();

@@ -1,4 +1,4 @@
-﻿codeunit 6151140 "NPR POS Action: Change UOM" implements "NPR IPOS Workflow"
+codeunit 6151140 "NPR POS Action: Change UOM" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
@@ -35,6 +35,7 @@
         DefaultUOM := copystr(Context.GetStringParameter('DefaultUOM'), 1, MaxStrLen(SaleLinePOS."Unit of Measure Code"));
         IF DefaultUOM = '' THEN begin
             ItemUnitofMeasure.SetRange("Item No.", SaleLinePOS."No.");
+            ItemUnitofMeasure.SetRange("NPR Block on POS Sale", false);
             ItemUnitsofMeasure.Editable(false);
             ItemUnitsofMeasure.LookupMode(true);
             ItemUnitsofMeasure.SetTableView(ItemUnitofMeasure);
@@ -46,7 +47,7 @@
 
         if SaleLinePOS."Unit of Measure Code" = ItemUnitofMeasure.Code then
             exit;
-        
+
         SaleLine.SetUoM(ItemUnitofMeasure.Code);
     end;
 
@@ -54,7 +55,7 @@
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionChangeUOM.js###
-'let main=async({})=>{await workflow.respond("ChangeUOM")};'
+'let main=async({})=>await workflow.respond("ChangeUOM");'
         )
     end;
 
