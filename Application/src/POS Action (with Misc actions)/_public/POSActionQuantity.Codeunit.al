@@ -7,7 +7,7 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        ActionDescription: Label 'Post Inventory Adjustment directly from POS';
+        ActionDescriptionLbl: Label 'Post Inventory Adjustment directly from POS';
         ParamInputType_CptLbl: Label 'Input Type';
         ParamInputType_OptLbl: Label 'Ask,Fixed,Increment', Locked = true;
         ParamInputType_OptCptLbl: Label 'Ask,Fixed,Increment';
@@ -32,9 +32,11 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         PriceCaptionLbl: Label 'Enter Unit Price';
         QtyCaptionLbl: Label 'Enter Quantity';
         MustBeNegativeErr: Label 'Quantity must be negative.';
+        TakePhotoLbl: Label 'Take photo';
+        TakePhotoDesc: Label 'Specifies if the user has to insert photo.';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
-        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
         WorkflowConfig.AddOptionParameter(
             'InputType',
             ParamInputType_OptLbl,
@@ -64,6 +66,7 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('MustBePositive', MustBePositiveErr);
         WorkflowConfig.AddLabel('MustBeNegative', MustBeNegativeErr);
         WorkflowConfig.AddLabel('CannotExceedMaxQty', CannotExceedMaxQtyErr);
+        WorkflowConfig.AddBooleanParameter(TakePhotoParLbl, false, TakePhotoLbl, TakePhotoDesc);
     end;
 
 
@@ -72,23 +75,24 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
     begin
         case Step of
             'AddPresetValuesToContext':
-                FrontEnd.WorkflowResponse(AddPresetValuesToContext(Context));
+                FrontEnd.WorkflowResponse(AddPresetValuesToContext(Context, Sale));
             'AskForReturnReason':
                 FrontEnd.WorkflowResponse(SelectReturnReason());
             'ChangeQty':
-                ChangeQty(Context, SaleLine);
+                ChangeQty(Context, SaleLine, Sale);
         end;
     end;
 
-    local procedure ChangeQty(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line")
+    local procedure ChangeQty(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line"; Sale: codeunit "NPR POS Sale")
     var
+        POSActQuantityB: Codeunit "NPR POS Action: Quantity B";
+        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
         Quantity: Decimal;
         UnitPrice: Decimal;
         ConstraintOption: Option "No Constraint","Positive Quantity Only","Negative Quantity Only";
         ReturnReasonCode: Code[20];
         NegativeInput: Boolean;
         SkipItemAvailabilityCheck: Boolean;
-        POSActQuantityB: Codeunit "NPR POS Action: Quantity B";
         PromptUnitPriceOnNegativeInput: Boolean;
     begin
         if (Context.GetBoolean('PromptForReason') = true) then
@@ -106,14 +110,16 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         ConstraintOption := Context.GetIntegerParameter('Constraint');
         SkipItemAvailabilityCheck := Context.GetBooleanParameter('SkipItemAvailabilityCheck');
 
+        TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
+        if TakePhotoEnabled then
+            POSActionTakePhoto.CheckIfPhotoIsTaken(Sale);
         POSActQuantityB.ChangeQuantity(ReturnReasonCode, Quantity, UnitPrice, ConstraintOption, NegativeInput, SkipItemAvailabilityCheck, SaleLine);
-
     end;
 
     local procedure GetQty(Context: Codeunit "NPR POS JSON Helper"): Decimal
     var
-        QuantityText: Text;
         POSActQuantityB: Codeunit "NPR POS Action: Quantity B";
+        QuantityText: Text;
     begin
         if not InitializedQty then begin
             QuantityText := Context.GetString('PromptQuantity');
@@ -128,16 +134,20 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         exit(QuantityGlobal);
     end;
 
-    local procedure AddPresetValuesToContext(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
+    local procedure AddPresetValuesToContext(Context: Codeunit "NPR POS JSON Helper"; Sale: codeunit "NPR POS Sale") Response: JsonObject;
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSUnit: Record "NPR POS Unit";
         POSSetup: Codeunit "NPR POS Setup";
         POSSession: Codeunit "NPR POS Session";
+        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
         Quantity: Decimal;
     begin
         Quantity := GetQty(Context);
 
+        TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
+        if TakePhotoEnabled then
+            POSActionTakePhoto.TakePhoto(Sale);
         if (Context.GetBooleanParameter('NegativeInput') = false) and (Quantity > 0) then begin
             Response.Add('PromptForReason', false);
             exit;
@@ -254,4 +264,8 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         exit(Codeunit::"NPR POS Action: Quantity");
     end;
     #endregion
+
+    var
+        TakePhotoEnabled: Boolean;
+        TakePhotoParLbl: Label 'TakePhoto', Locked = true;
 }

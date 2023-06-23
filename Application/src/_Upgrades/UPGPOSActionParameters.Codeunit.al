@@ -12,6 +12,7 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         SalesDocExpPaymentMethodCode();
         SalesDocExpRefreshMenuButtonActions();
         SalesDocImpRefreshMenuButtonActions();
+        TakePhotoRefreshMenuButtonActions();
         ItemIdentifierType();
         ItemPriceIdentifierType();
         ItemLookupSmartSearch();
@@ -312,7 +313,25 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         LogMessageStopwatch.LogFinish();
     end;
 
+    local procedure TakePhotoRefreshMenuButtonActions()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Action Parameters', 'TakePhotoRefreshMenuButtonActions');
 
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'TakePhotoRefreshMenuButtonActions')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        RefreshPOSAction(Enum::"NPR POS Workflow"::QUANTITY);
+        RefreshPOSAction(Enum::"NPR POS Workflow"::PAYMENT_PAYIN_PAYOUT);
+        RefreshPOSAction(Enum::"NPR POS Workflow"::REVERSE_DIRECT_SALE);
+        RefreshPOSAction(Enum::"NPR POS Workflow"::REVERSE_CREDIT_SALE);
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'TakePhotoRefreshMenuButtonActions'));
+        LogMessageStopwatch.LogFinish();
+    end;
 
     local procedure SalesDocImpRefreshMenuButtonActions()
     var

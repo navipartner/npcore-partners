@@ -22,6 +22,8 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
         ReceiptPrompt: Label 'Receipt Number';
         ReasonPrompt: Label 'Return Reason';
         TooLongErr: Label 'Receipt Number cannot have more than 20 characters.';
+        TakePhotoLbl: Label 'Take photo';
+        TakePhotoDesc: Label 'Specifies if the user has to insert photo.';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -49,6 +51,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
                        ParamObfucationMethod_OptCptLbl);
         WorkflowConfig.AddBooleanParameter('CopyHeaderDimensions', false, ParamCopyHdrDim_CptLbl, ParamCopyHdrDim_DescLbl);
         WorkflowConfig.AddBooleanParameter('IncludePaymentLines', false, ParamPayLines_CptLbl, ParamPayLines_DescLbl);
+        WorkflowConfig.AddBooleanParameter(TakePhotoParLbl, false, TakePhotoLbl, TakePhotoDesc);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -56,25 +59,29 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
     begin
         case Step of
             'reason':
-                FrontEnd.WorkflowResponse(GetReason(Setup));
+                FrontEnd.WorkflowResponse(GetReason(Sale, Context, Setup));
             'SelectReturnReason':
                 FrontEnd.WorkflowResponse(SelectReturnReason());
             'handle':
-                HendleReverse(Context, Setup);
+                HendleReverse(Sale, Context, Setup);
         end;
     end;
 
-    local procedure GetReason(Setup: Codeunit "NPR POS Setup"): Boolean
+    local procedure GetReason(Sale: codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup"): Boolean
     var
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
+        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
     begin
+        TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
+        if TakePhotoEnabled then
+            POSActionTakePhoto.TakePhoto(Sale);
         Setup.GetPOSUnit(POSUnit);
         POSAuditProfile.Get(POSUnit."POS Audit Profile");
         exit(POSAuditProfile."Require Item Return Reason");
     end;
 
-    local procedure HendleReverse(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup")
+    local procedure HendleReverse(Sale: codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup")
     var
         SalesTicketNo: Code[20];
         ObfucationMethod: Option "None",MI;
@@ -82,6 +89,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
         ReturnReasonCode: Code[20];
         IncludePaymentLines: Boolean;
         POSActionRevDirSaleB: Codeunit "NPR POS Action: Rev.Dir.Sale B";
+        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
     begin
         SalesTicketNo := CopyStr(UpperCase(Context.GetString('receipt')), 1, MaxStrLen(SalesTicketNo));
         ObfucationMethod := Context.GetIntegerParameter('ObfucationMethod');
@@ -89,6 +97,9 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
         ReturnReasonCode := CopyStr(Context.GetString('ReturnReasonCode'), 1, MaxStrLen(ReturnReasonCode));
         IncludePaymentLines := Context.GetBooleanParameter('IncludePaymentLines');
 
+        TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
+        if TakePhotoEnabled then
+            POSActionTakePhoto.CheckIfPhotoIsTaken(Sale);
         OnBeforeHendleReverse(Setup, SalesTicketNo);
         POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyHeaderDim, ReturnReasonCode, IncludePaymentLines);
     end;
@@ -116,4 +127,8 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
     local procedure OnBeforeHendleReverse(Setup: Codeunit "NPR POS Setup"; var SalesTicketNo: Code[20])
     begin
     end;
+
+    var
+        TakePhotoEnabled: Boolean;
+        TakePhotoParLbl: Label 'TakePhoto', Locked = true;
 }

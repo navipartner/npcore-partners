@@ -9,6 +9,8 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
         OptionStr: Label 'PayOut,PayIn', Locked = true;
         OptionCaptions: Label 'Pay Out,Pay In';
         OptionCaption: Label 'Type of payment';
+        TakePhotoLbl: Label 'Take photo';
+        TakePhotoDesc: Label 'Specifies if the user has to insert photo.';
         OptionDescription: Label 'Pay-in will add money to the till, Payout will subtract money from the till.';
         FixedAccountCaption: Label 'Preset account number';
         FixedAccountDesc: Label 'Specifies the account number to use, without prompting the user.';
@@ -27,25 +29,31 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
         WorkflowConfig.AddBooleanParameter('LookupReasonCode', false, LookupReasonCodeCaption, LookupReasonCodeDesc);
         WorkflowConfig.AddLabel('amountLabel', AmountLabel);
         WorkflowConfig.AddLabel('descriptionLabel', DescriptionLabel);
+        WorkflowConfig.AddBooleanParameter(TakePhotoParLbl, false, TakePhotoLbl, TakePhotoDesc);
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     begin
         case Step of
             'GetAccount':
-                FrontEnd.WorkflowResponse(SelectAccount(Context));
+                FrontEnd.WorkflowResponse(SelectAccount(Sale, Context));
             'GetReason':
                 FrontEnd.WorkflowResponse(SelectReason());
             'HandlePayment':
-                FrontEnd.WorkflowResponse(HandlePayment(Context, SaleLine));
+                FrontEnd.WorkflowResponse(HandlePayment(Sale, Context, SaleLine));
         end;
     end;
 
-    local procedure SelectAccount(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
+    local procedure SelectAccount(Sale: codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
     var
         GLAccount: Record "G/L Account";
+        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
         AccountNo: Code[20];
     begin
+        TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
+        if TakePhotoEnabled then
+            POSActionTakePhoto.TakePhoto(Sale);
+
         Response.ReadFrom('{}');
         AccountNo := CopyStr(UpperCase(Context.GetStringParameter('FixedAccountCode')), 1, MaxStrLen(AccountNo));
 
@@ -72,12 +80,16 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
     end;
 
 #pragma warning disable AA0139 // warning AA0139: Possible overflow
-    local procedure HandlePayment(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line") Result: JsonObject
+    local procedure HandlePayment(Sale: codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line") Result: JsonObject
     var
         PayInPayOutMgr: Codeunit "NPR Pay-in Payout Mgr";
+        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
         Success: Boolean;
     begin
         Result.ReadFrom('{}');
+        TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
+        if TakePhotoEnabled then
+            POSActionTakePhoto.CheckIfPhotoIsTaken(Sale);
         Success := PayInPayOutMgr.CreatePayInOutPayment(SaleLine, Context.GetIntegerParameter('PayOption'), Context.GetString('accountNumber'), Context.GetString('description'), Context.GetDecimal('amount'), Context.GetString('reasonCode'));
 
         Result.Add('tryEndSale', false);
@@ -97,4 +109,8 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
 'let main=async({workflow:n,context:o,popup:a,parameters:t,captions:i})=>{const e={accountNumber:t.FixedAccountCode??"",description:"<Specify payout description>",amount:o.suggestedAmount??0,reasonCode:t.FixedReasonCode??""};return e.amount==0&&(e.amount=await a.numpad({caption:i.amountLabel,title:""}),e.amount===null||e.amount==0)?{success:!1,endSale:!1}:({accountNumber:e.accountNumber,description:e.description}=await n.respond("GetAccount"),e.description=await a.input({caption:"Enter Description",title:"",value:e.description}),e.description===null?{success:!1,endSale:!1}:((t.LookupReasonCode??!1)&&({reasonCode:e.reasonCode}=await n.respond("GetReason"),e.reasonCode===null&&(e.reasonCode="")),await n.respond("HandlePayment",e)))};'
         );
     end;
+
+    var
+        TakePhotoEnabled: Boolean;
+        TakePhotoParLbl: Label 'TakePhoto', Locked = true;
 }
