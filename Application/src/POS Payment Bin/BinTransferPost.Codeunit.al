@@ -166,9 +166,10 @@ codeunit 6150633 "NPR BinTransferPost"
             if (not PosPostEntries.GetPostingSetup(TempBinJournalLinesToTransfer.StoreCode, TempBinJournalLinesToTransfer.PaymentMethod, TempBinJournalLinesToTransfer.TransferToBinCode, TargetPostingSetup)) then
                 Error(TargetPostingNotFound, TargetPostingSetup.TableCaption(), TempBinJournalLinesToTransfer.EntryNo);
 
+            //From Bin
+            GetDim(ShortcutDim1, ShortcutDim2, DimSetID, TempBinJournalLinesToTransfer.TransferFromBinCode, TempBinJournalLinesToTransfer.ReceiveAtPosUnitCode);
+
             MakeGenJournalLine(PosPostingProfile."Journal Template Name",
-                GetGLAccountType(TargetPostingSetup),
-                TargetPostingSetup."Account No.",
                 GetGLAccountType(SourcePostingSetup),
                 SourcePostingSetup."Account No.",
                 Today(),
@@ -177,8 +178,28 @@ codeunit 6150633 "NPR BinTransferPost"
                 PaymentMethod."Currency Code",
                 PaymentMethod."Use Stand. Exc. Rate for Bal.",
                 PaymentMethodExchangeRate,
+                -TempBinJournalLinesToTransfer.Amount,
+                ShortcutDim1, ShortcutDim2, DimSetID,
+                SalespersonCode, // Todo
+                BinTransferProfile.ReasonCode,
+                TempBinJournalLinesToTransfer.ExternalDocumentNo,
+                PosPostingProfile."Source Code",
+                TempGenJournalLine);
+
+            //To Bin
+            GetDim(ShortcutDim1, ShortcutDim2, DimSetID, TempBinJournalLinesToTransfer.TransferToBinCode, TempBinJournalLinesToTransfer.ReceiveAtPosUnitCode);
+
+            MakeGenJournalLine(PosPostingProfile."Journal Template Name",
+                GetGLAccountType(TargetPostingSetup),
+                TargetPostingSetup."Account No.",
+                Today(),
+                DocumentNo,
+                TempBinJournalLinesToTransfer.Description,
+                PaymentMethod."Currency Code",
+                PaymentMethod."Use Stand. Exc. Rate for Bal.",
+                PaymentMethodExchangeRate,
                 TempBinJournalLinesToTransfer.Amount,
-                ShortcutDim1, ShortcutDim2, DimSetID, // Todo
+                ShortcutDim1, ShortcutDim2, DimSetID,
                 SalespersonCode, // Todo
                 BinTransferProfile.ReasonCode,
                 TempBinJournalLinesToTransfer.ExternalDocumentNo,
@@ -190,7 +211,11 @@ codeunit 6150633 "NPR BinTransferPost"
             if (TempBinJournalLinesToTransfer.Status = TempBinJournalLinesToTransfer.Status::RECEIVED) then begin
                 BinTransferJournal.Get(TempBinJournalLinesToTransfer.EntryNo);
                 BinTransferJournal.Delete();
-                GenJnlPostLine.Run(TempGenJournalLine);
+                TempGenJournalLine.Reset();
+                IF TempGenJournalLine.FindSet() then
+                    repeat
+                        GenJnlPostLine.Run(TempGenJournalLine);
+                    until TempGenJournalLine.Next() = 0;
             end;
 
         until (TempBinJournalLinesToTransfer.Next() = 0);
@@ -282,8 +307,6 @@ codeunit 6150633 "NPR BinTransferPost"
     local procedure MakeGenJournalLine(JournalTemplateName: Code[10];
                                         AccountType: Enum "Gen. Journal Account Type";
                                         AccountNo: Code[20];
-                                        BalAccountType: Enum "Gen. Journal Account Type";
-                                        BalAccountNo: Code[20];
                                         PostingDate: Date;
                                         DocumentNo: Code[20];
                                         PostingDescription: Text;
@@ -314,8 +337,6 @@ codeunit 6150633 "NPR BinTransferPost"
 
         TempGenJournalLine.Validate("Account Type", AccountType);
         TempGenJournalLine.Validate("Account No.", AccountNo);
-        TempGenJournalLine.Validate("Bal. Account Type", BalAccountType);
-        TempGenJournalLine.Validate("Bal. Account No.", BalAccountNo);
 
         TempGenJournalLine."Posting Date" := PostingDate;
         TempGenJournalLine."Document Date" := TempGenJournalLine."Posting Date";
@@ -333,15 +354,44 @@ codeunit 6150633 "NPR BinTransferPost"
         TempGenJournalLine."Source Currency Code" := CurrencyCode;
         TempGenJournalLine."Source Currency Amount" := Amount;
 
-        TempGenJournalLine."Shortcut Dimension 1 Code" := ShortcutDim1;
-        TempGenJournalLine."Shortcut Dimension 2 Code" := ShortcutDim2;
-        TempGenJournalLine."Dimension Set ID" := DimSetID;
+        TempGenJournalLine.Validate("Shortcut Dimension 1 Code", ShortcutDim1);
+        TempGenJournalLine.Validate("Shortcut Dimension 2 Code", ShortcutDim2);
+        if DimSetID <> 0 then
+            TempGenJournalLine.Validate("Dimension Set ID", DimSetID);
         TempGenJournalLine."Salespers./Purch. Code" := SalespersonCode;
         TempGenJournalLine."Reason Code" := ReasonCode;
         TempGenJournalLine."Source Code" := SourceCode;
         TempGenJournalLine."System-Created Entry" := true;
 
         TempGenJournalLine.Insert();
+    end;
+
+    local procedure GetDim(var ShortcutDim1: Code[20]; var ShortcutDim2: Code[20]; var DimSetID: Integer; BinCode: Code[10]; ReceiveAtPosUnitCode: Code[20])
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        SalePOS: Record "NPR POS Sale";
+        POSPaymentBin: Record "NPR POS Payment Bin";
+    begin
+
+        if POSPaymentBin.Get(BinCode) then;
+        if POSUnit.Get(POSPaymentBin."Attached to POS Unit No.") then begin
+            ShortcutDim1 := POSUnit."Global Dimension 1 Code";
+            ShortcutDim2 := POSUnit."Global Dimension 2 Code"
+        end else
+            if POSSession.IsInitialized() then begin
+                POSSession.GetSale(POSSale);
+                POSSale.GetCurrentSale(SalePOS);
+                ShortcutDim1 := SalePOS."Shortcut Dimension 1 Code";
+                ShortcutDim2 := SalePOS."Shortcut Dimension 2 Code";
+                DimSetID := SalePOS."Dimension Set ID";
+            end else
+                if POSUnit.Get(ReceiveAtPosUnitCode) then begin
+                    ShortcutDim1 := POSUnit."Global Dimension 1 Code";
+                    ShortcutDim2 := POSUnit."Global Dimension 2 Code";
+                end;
+
     end;
 
     internal procedure ReleasePrint(JournalEntryNo: Integer)
