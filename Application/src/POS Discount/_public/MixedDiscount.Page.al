@@ -1,6 +1,5 @@
 ﻿page 6014450 "NPR Mixed Discount"
-{
-    Extensible = False;
+{   
     Caption = 'Mix Discount';
     ContextSensitiveHelpPage = 'retail/Discounts/explanation/discount_types.html';
     PageType = Card;

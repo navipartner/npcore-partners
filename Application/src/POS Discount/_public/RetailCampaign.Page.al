@@ -1,11 +1,5 @@
 ﻿page 6014611 "NPR Retail Campaign"
 {
-    Extensible = False;
-    // NPR5.38.01/MHA /20171220  CASE 299436 Object created - Retail Campaign
-    // NPR5.38.01/JKL /20180105  CASE 299436 Added action Create Planning Items - Retail Campaign Ùfield Distribution Group + requested delivery date
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
-    // MAG2.26/MHA /20200507  CASE 401235 Added field 6151414 "Magento Category Id"
-
     Caption = 'Retail Campaign';
     PageType = Card;
     UsageCategory = None;
@@ -129,12 +123,10 @@
                 var
                     ItemHierarchyMgmt: Codeunit "NPR Item Hierarchy Mgmt.";
                     ItemHierarchy: Record "NPR Item Hierarchy";
-                begin
-                    //-NPR5.48 [299436]
+                begin                    
                     ItemHierarchyMgmt.CreateItemHierachyFromRetailCampaign(Rec);
                     if ItemHierarchy.Get(Rec.Code) then
-                        PAGE.Run(6151051, ItemHierarchy);
-                    //+NPR5.48 [299436]
+                        PAGE.Run(6151051, ItemHierarchy);                    
                 end;
             }
             action("View Planning Items")
@@ -206,10 +198,8 @@
     trigger OnOpenPage()
     var
         MagentoSetup: Record "NPR Magento Setup";
-    begin
-        //-MAG2.26 [401235]
-        MagentoEnabled := MagentoSetup.Get() and MagentoSetup."Magento Enabled";
-        //+MAG2.26 [401235]
+    begin        
+        MagentoEnabled := MagentoSetup.Get() and MagentoSetup."Magento Enabled";       
     end;
 
     var
