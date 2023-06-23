@@ -28,6 +28,17 @@ tableextension 6014427 "NPR Item" extends Item
             end;
         }
 
+        modify("Base Unit Of Measure")
+        {
+            trigger OnAfterValidate()
+            var
+                NPRPOSIUOMUtils: Codeunit "NPR POS IUOM Utils";
+            begin
+                if Rec."Base Unit Of Measure" <> xRec."Base Unit Of Measure" then
+                    NPRPOSIUOMUtils.CheckIfBaseUnitOfMeasureBlocked(Rec);
+            end;
+        }
+
         field(6014400; "NPR Item Group"; Code[10])
         {
             Caption = 'Item Group';
