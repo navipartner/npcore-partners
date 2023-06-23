@@ -29,6 +29,10 @@ codeunit 6059919 "NPR Videos"
         PrinterSetup(sender, VarModuleInfo.Id);
         UserSetup(sender, VarModuleInfo.Id);
         EntertainmentTicketAdmission(sender, VarModuleInfo.Id);
+        CustomerSetup(sender, VarModuleInfo.Id);
+        MultiplePriceDiscount(sender, VarModuleInfo.Id);
+        MixDiscountGeneralSettings(sender, VarModuleInfo.Id);
+        MixDiscountConditionsAndMixDiscountLines(sender, VarModuleInfo.Id);
     end;
 
     local procedure POSIntroduction(var Video: Codeunit Video; AppID: Guid)
@@ -187,6 +191,38 @@ codeunit 6059919 "NPR Videos"
     var
         VideoLbl: Label 'https://www.youtube.com/embed/kJ6cjtj56VE', locked = true;
         TitleLbl: Label 'NP POS Academy 20: User Setup';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure CustomerSetup(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/nyrOQE1To_I', locked = true;
+        TitleLbl: Label 'NP POS Academy 21: Customer Setup';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure MultiplePriceDiscount(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/TK8aiGYn810', locked = true;
+        TitleLbl: Label 'NP POS Academy 22: Multiple Price Discount';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure MixDiscountGeneralSettings(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/GCjFBjm8jtU', locked = true;
+        TitleLbl: Label 'NP POS Academy 23: Mix Discount 01 - General Settings';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure MixDiscountConditionsAndMixDiscountLines(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/xDJF8fIzZW0', locked = true;
+        TitleLbl: Label 'NP POS Academy 24: Mix Discount 02 - Conditions and Mix Discount Lines';
     begin
         Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
     end;
