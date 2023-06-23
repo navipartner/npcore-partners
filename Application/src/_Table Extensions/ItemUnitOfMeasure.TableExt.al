@@ -9,6 +9,19 @@ tableextension 6014456 "NPR Item Unit Of Measure" extends "Item Unit of Measure"
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
+
+        field(6151480; "NPR Block on POS Sale"; Boolean)
+        {
+            Caption = 'Block on POS Sale';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            var
+                NPRPOSIUOMUtils: Codeunit "NPR POS IUOM Utils";
+            begin
+                if Rec."NPR Block on POS Sale" <> xRec."NPR Block on POS Sale" then
+                    NPRPOSIUOMUtils.CheckIfBlockingBaseUOM(Rec);
+            end;
+        }
     }
 
     keys
