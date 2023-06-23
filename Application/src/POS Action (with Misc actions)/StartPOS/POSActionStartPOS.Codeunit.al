@@ -15,19 +15,13 @@ codeunit 6150858 "NPR POS Action: Start POS" implements "NPR IPOS Workflow"
         ActionDescription: Label 'This action is executed when the POS Unit is in status closed, to verify BIN contents.';
         BinContentTitleLbl: Label 'Confirm Bin Contents.';
         BinBalanceTitleLbl: Label 'Balance Bin.';
-        BalanceNowLbl: Label 'Do you want to balance the bin now?';
         BalancingIsNotAllowedErrorLbl: Label 'This POS is managed, balancing on this POS as an individual is not allowed!';
-        NotConfirmedBinTitleLbl: Label 'Warning!';
-        NotConfirmedBinLbl: Label 'Unless you confirm the bin contents, you must balance the bin, before you open it.';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddLabel('bincontenttitle', BinContentTitleLbl);
         WorkflowConfig.AddLabel('binbalancetitle', BinBalanceTitleLbl);
-        WorkflowConfig.AddLabel('balancenow', BalanceNowLbl);
         WorkflowConfig.AddLabel('BalancingIsNotAllowedError', BalancingIsNotAllowedErrorLbl);
-        WorkflowConfig.AddLabel('notconfirmedbintitle', NotConfirmedBinTitleLbl);
-        WorkflowConfig.AddLabel('NotConfirmedBin', NotConfirmedBinLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
@@ -37,9 +31,20 @@ codeunit 6150858 "NPR POS Action: Start POS" implements "NPR IPOS Workflow"
         case Step of
             'OnBeforeStartPOS':
                 FrontEnd.WorkflowResponse(OnBeforeStartPOS(POSSession));
+            'OpenCashDrawer':
+                OpenDrawer(Sale, Setup);
             'ConfirmBin':
                 StartPOS(Context, POSSession, Setup);
         end;
+    end;
+
+    local procedure OpenDrawer(Sale: codeunit "NPR POS Sale"; Setup: codeunit "NPR POS Setup")
+    var
+        EndOfDayWorker: Codeunit "NPR End Of Day Worker";
+        SalePOS: Record "NPR POS Sale";
+    begin
+        Sale.GetCurrentSale(SalePOS);
+        EndOfDayWorker.OpenDrawer(' ', Setup.GetPOSUnitNo(), SalePOS);
     end;
 
     local procedure OnBeforeStartPOS(POSSession: Codeunit "NPR POS Session") Response: JsonObject
@@ -89,16 +94,16 @@ codeunit 6150858 "NPR POS Action: Start POS" implements "NPR IPOS Workflow"
         Response.Add('BalancingIsNotAllowed', BalancingIsNotAllowed);
         Response.Add('ConfirmBin', true);
 
-        POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
-        POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
-        POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
+        POSWorkshiftCheckpoint.SetRange("POS Unit No.", POSUnit."No.");
+        POSWorkshiftCheckpoint.SetRange(Open, false);
+        POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
         BinContentsHTML := StrSubstNo(BinContentsHTML2Lbl, FirstBalance);
 
         if (POSWorkshiftCheckpoint.FindLast()) then begin
             BinContentsHTML := StrSubstNo(BinContentsHTML3Lbl, EmptyBin);
 
-            POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', POSWorkshiftCheckpoint."Entry No.");
-            POSPaymentBinCheckpoint.SetFilter("New Float Amount", '>%1', 0);
+            POSPaymentBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpoint."Entry No.");
+            POSPaymentBinCheckpoint.SetRange("New Float Amount", 0);
 
             if (POSPaymentBinCheckpoint.FindSet()) then begin
                 BinContentsHTML := StrSubstNo(BinContentsHTML4Lbl, Expected);
@@ -163,9 +168,9 @@ codeunit 6150858 "NPR POS Action: Start POS" implements "NPR IPOS Workflow"
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
     begin
-        POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', UnitNo);
-        POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
-        POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
+        POSWorkshiftCheckpoint.SetRange("POS Unit No.", UnitNo);
+        POSWorkshiftCheckpoint.SetRange(Open, false);
+        POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
 
         if (POSWorkshiftCheckpoint.IsEmpty()) then begin
             POSWorkshiftCheckpoint."Entry No." := 0;
@@ -184,18 +189,18 @@ codeunit 6150858 "NPR POS Action: Start POS" implements "NPR IPOS Workflow"
         ReportSelectionRetail: Record "NPR Report Selection Retail";
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
     begin
-        POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', UnitNo);
-        POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
-        POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
+        POSWorkshiftCheckpoint.SetRange("POS Unit No.", UnitNo);
+        POSWorkshiftCheckpoint.SetRange(Open, false);
+        POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
 
         if (not POSWorkshiftCheckpoint.FindLast()) then
             exit;
 
-        ReportSelectionRetail.SetFilter("Report Type", '=%1', ReportSelectionRetail."Report Type"::"Begin Workshift (POS Entry)");
+        ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Begin Workshift (POS Entry)");
         if (not ReportSelectionRetail.FindFirst()) then
             exit;
 
-        POSWorkshiftCheckpoint.SetFilter("Entry No.", '=%1', POSWorkshiftCheckpoint."Entry No.");
+        POSWorkshiftCheckpoint.SetRange("Entry No.", POSWorkshiftCheckpoint."Entry No.");
         POSWorkshiftCheckpoint.FindFirst();
         RecRef.GetTable(POSWorkshiftCheckpoint);
         RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Begin Workshift (POS Entry)".AsInteger());
@@ -205,7 +210,7 @@ codeunit 6150858 "NPR POS Action: Start POS" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionStartPOS.js###
-'let main=async({workflow:e,context:t,captions:n,popup:i})=>{debugger;const{ConfirmBin:a,BinContents:r,BalancingIsNotAllowed:l,EoDActionCode:o}=await e.respond("OnBeforeStartPOS");a&&(t.confirm=await i.confirm({title:n.bincontenttitle,caption:r}),t.confirm?await e.respond("ConfirmBin"):l?i.error(n.BalancingIsNotAllowedError):await i.confirm({title:n.binbalancetitle,caption:n.balancenow})?e.run(o,{parameters:{Type:1}}):i.message({title:n.notconfirmedbintitle,caption:n.NotConfirmedBin}))};'
+'let main=async({workflow:n,context:e,captions:i,popup:a})=>{debugger;const{ConfirmBin:r,BinContents:t,BalancingIsNotAllowed:o,EoDActionCode:s}=await n.respond("OnBeforeStartPOS");r&&(await n.respond("OpenCashDrawer"),e.confirm=await a.confirm({title:i.bincontenttitle,caption:t}),e.confirm?await n.respond("ConfirmBin"):o?a.error(i.BalancingIsNotAllowedError):n.run(s,{parameters:{Type:1}}))};'
         )
     end;
 }
