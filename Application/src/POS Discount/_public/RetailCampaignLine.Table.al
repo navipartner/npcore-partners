@@ -1,8 +1,6 @@
 ﻿table 6014611 "NPR Retail Campaign Line"
 {
-    Access = Internal;
-    // NPR5.38.01/MHA /20171220  CASE 299436 Object created - Retail Campaign
-
+   
     Caption = 'Retail Campaign Line';
     DataClassification = CustomerContent;
 
@@ -71,10 +69,6 @@
         key(Key1; "Campaign Code", "Line No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
 }
