@@ -42,13 +42,30 @@ codeunit 6059840 "NPR POS Action Take Photo" implements "NPR IPOS Workflow"
             AddImageOnPosEntry(Context, Setup, AddPhotoTo);
     end;
 
-    local procedure TakePhoto(POSSaleCU: Codeunit "NPR POS Sale"): JsonObject
+    procedure TakePhoto(POSSaleCU: Codeunit "NPR POS Sale"): JsonObject
     var
         POSSaleMediaInfo: Record "NPR POS Sale Media Info";
         POSSale: Record "NPR POS Sale";
     begin
         POSSaleCU.GetCurrentSale(POSSale);
         POSSaleMediaInfo.CreateNewEntry(POSSale, 1);
+    end;
+
+    procedure CheckIfPhotoIsTaken(POSSaleCU: Codeunit "NPR POS Sale")
+    var
+        POSSaleMediaInfo: Record "NPR POS Sale Media Info";
+        POSSale: Record "NPR POS Sale";
+        PhotoErr: Label 'The photo has to be taken.';
+    begin
+        POSSaleCU.GetCurrentSale(POSSale);
+        POSSaleMediaInfo.SetCurrentKey("Register No.", "Sales Ticket No.");
+        POSSaleMediaInfo.SetRange("Register No.", POSSale."Register No.");
+        POSSaleMediaInfo.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        if POSSaleMediaInfo.IsEmpty() then
+            Error(PhotoErr);
+        POSSaleMediaInfo.FindLast();
+        if not POSSaleMediaInfo.Image.HasValue then
+            Error(PhotoErr);
     end;
 
     local procedure AddImageOnPosEntry(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup"; AddPhotoTo: Option ,LastPosEntry,SelectPosEntry,PosEntryByDocumentNo)

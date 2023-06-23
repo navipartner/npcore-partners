@@ -113,6 +113,8 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         ParamSetNegDocumentTypeOptions_CptLbl: Label 'Return Order,Credit Memo,Restrict';
         ParamProformaInv_CptLbl: Label 'Set Print Proforma Invoice';
         ParamProformaInv_DescLbl: Label 'Set Print Proforma Invoice for export document';
+        TakePhotoLbl: Label 'Take photo';
+        TakePhotoDesc: Label 'Specifies if the user has to insert photo.';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -194,15 +196,16 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('PaymentMethodCode', '', ParamPaymentMethodCode_CptLbl, ParamPaymentMethodCode_DescLbl);
         WorkflowConfig.AddBooleanParameter('EnforceCustomerFilter', false, ParamEnforceCustomerFilter_CptLbl, ParamEnforceCustomerFilter_DescLbl);
         WorkflowConfig.AddBooleanParameter('SetPrintProformaInvoice', false, ParamProformaInv_CptLbl, ParamProformaInv_DescLbl);
+        WorkflowConfig.AddBooleanParameter(TakePhotoParLbl, false, TakePhotoLbl, TakePhotoDesc);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     begin
         case step of
             'import_sales_doc':
-                FrontEnd.WorkflowResponse(ImportSalesDoc(Context));
+                FrontEnd.WorkflowResponse(ImportSalesDoc(Sale, Context));
             'export_SalesDoc':
-                FrontEnd.WorkflowResponse(ExportSalesDoc(Context));
+                FrontEnd.WorkflowResponse(ExportSalesDoc(Sale, Context));
         end;
     end;
 
@@ -214,9 +217,10 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         )
     end;
 
-    local procedure ImportSalesDoc(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
+    local procedure ImportSalesDoc(Sale: codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
     var
         POSAction: Record "NPR POS Action";
+        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
         SelectCustomer: Boolean;
         ConfirmInvDiscAmt: Boolean;
         LocationSource: Option "POS Store","Location Filter Parameter";
@@ -232,6 +236,9 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         If not POSAction.Get('IMPORT_POSTED_INV') then
             exit;
 
+        TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
+        if TakePhotoEnabled then
+            POSActionTakePhoto.TakePhoto(Sale);
         SelectCustomer := Context.GetBooleanParameter('SelectCustomer');
         SalesDocViewString := Context.GetStringParameter('SalesDocViewString');
         LocationSource := Context.GetIntegerParameter('LocationFrom');
@@ -257,9 +264,10 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         Response.Add('parameters', Parameters);
     end;
 
-    local procedure ExportSalesDoc(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
+    local procedure ExportSalesDoc(Sale: codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
     var
         POSAction: Record "NPR POS Action";
+        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
         Invoice: Boolean;
         ShowMsg: Boolean;
         NegBalDocType: Option ReturnOrder,CreditMemo,Restrict;
@@ -307,6 +315,9 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
         If not POSAction.Get('SALES_DOC_EXP') then
             exit;
 
+        TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
+        if TakePhotoEnabled then
+            POSActionTakePhoto.CheckIfPhotoIsTaken(Sale);
         Invoice := Context.GetBooleanParameter('Post');
         ShowMsg := Context.GetBooleanParameter('ShowExportMessage');
         NegBalDocType := Context.GetIntegerParameter('SetNegBalDocumentType');
@@ -401,4 +412,8 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
 
         Response.Add('expParameters', Parameters);
     end;
+
+    var
+        TakePhotoEnabled: Boolean;
+        TakePhotoParLbl: Label 'TakePhoto', Locked = true;
 }
