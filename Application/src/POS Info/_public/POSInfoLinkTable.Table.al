@@ -1,6 +1,5 @@
 ﻿table 6150642 "NPR POS Info Link Table"
 {
-    Access = Internal;
     Caption = 'POS Info Link Table';
     DataClassification = CustomerContent;
 
