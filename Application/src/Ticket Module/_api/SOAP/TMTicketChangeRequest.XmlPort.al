@@ -207,7 +207,8 @@ xmlport 6060107 "NPR TM Ticket Change Request"
                                     Admission.Get(tmpChangeRequest."Admission Code");
                                     AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', tmpChangeRequest."External Adm. Sch. Entry No.");
                                     AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-                                    AdmissionScheduleEntry.FindLast();
+                                    if (not AdmissionScheduleEntry.FindLast()) then
+                                        AdmissionScheduleEntry.Init();
 
                                     ReservationType := 'Open';
                                     AdmissionDescription := Admission.Description;
