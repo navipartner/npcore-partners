@@ -4894,7 +4894,7 @@
         exit(Membership."Entry No.");
     end;
 
-    internal procedure GetMembershipFromExtCardNo(ExternalCardNo: Text[100]; ReferenceDate: Date; var ReasonNotFound: Text) MembershipEntryNo: Integer
+    procedure GetMembershipFromExtCardNo(ExternalCardNo: Text[100]; ReferenceDate: Date; var ReasonNotFound: Text) MembershipEntryNo: Integer
     var
         CardEntryNo: Integer;
     begin
