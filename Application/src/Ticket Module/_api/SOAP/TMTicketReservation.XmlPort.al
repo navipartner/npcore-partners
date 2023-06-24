@@ -118,7 +118,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
                         {
                             MaxOccurs = Once;
                             MinOccurs = Zero;
-                            tableelement(tmpAdmissions; "NPR TM Ticket Reservation Req.")
+                            tableelement(TempTicketAdmissionRequest; "NPR TM Ticket Reservation Req.")
                             {
                                 XmlName = 'Admission';
                                 UseTemporary = true;
@@ -126,7 +126,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
                                 MaxOccurs = Unbounded;
                                 SourceTableView = sorting("Admission Inclusion");
 
-                                fieldattribute(AdmissionCode; tmpAdmissions."Admission Code")
+                                fieldattribute(AdmissionCode; TempTicketAdmissionRequest."Admission Code")
                                 {
                                     XmlName = 'Code';
                                     Occurrence = Required;
@@ -134,7 +134,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
 
                                 textelement(SceduleEntry)
                                 {
-                                    fieldattribute(EntryNo; tmpAdmissions."External Adm. Sch. Entry No.")
+                                    fieldattribute(EntryNo; TempTicketAdmissionRequest."External Adm. Sch. Entry No.")
                                     {
                                         XmlName = 'ExternalEntryNo';
                                         Occurrence = Required;
@@ -186,7 +186,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
                                         XmlName = 'admission_price';
                                         trigger OnBeforePassVariable()
                                         begin
-                                            admission_price := tmpAdmissions."Notification Address";
+                                            admission_price := TempTicketAdmissionRequest."Notification Address";
                                         end;
                                     }
                                     textelement(admission_is)
@@ -199,7 +199,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
                                             trigger OnBeforePassVariable()
                                             begin
 
-                                                admission_is_id := Format(tmpAdmissions."Admission Inclusion", 0, 9);
+                                                admission_is_id := Format(TempTicketAdmissionRequest."Admission Inclusion", 0, 9);
                                             end;
                                         }
 
@@ -207,7 +207,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
                                         trigger OnBeforePassVariable()
                                         begin
 
-                                            admission_is := Format(tmpAdmissions."Admission Inclusion");
+                                            admission_is := Format(TempTicketAdmissionRequest."Admission Inclusion");
                                         end;
                                     }
 
@@ -226,10 +226,12 @@ xmlport 6060114 "NPR TM Ticket Reservation"
                                     Admission: Record "NPR TM Admission";
                                     Ticket: Record "NPR TM Ticket";
                                 begin
-                                    if Admission.Get(tmpAdmissions."Admission Code") then begin
-                                        AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', tmpAdmissions."External Adm. Sch. Entry No.");
+                                    AdmissionScheduleEntry.Init();
+                                    if Admission.Get(TempTicketAdmissionRequest."Admission Code") then begin
+                                        AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TempTicketAdmissionRequest."External Adm. Sch. Entry No.");
                                         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-                                        AdmissionScheduleEntry.FindLast();
+                                        if (TempTicketAdmissionRequest."Admission Inclusion" <> TempTicketAdmissionRequest."Admission Inclusion"::NOT_SELECTED) then
+                                            AdmissionScheduleEntry.FindLast();
                                     end;
                                     ReservationType := 'Open';
                                     AdmissionDescription := Admission.Description;
@@ -239,7 +241,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
                                     ValidFrom := '';
                                     ValidUntil := '';
 
-                                    CanReschedule := Format(IsRescheduleAllowed(tmpAdmissions."Item No.", tmpAdmissions."Variant Code", tmpAdmissions."Admission Code"));
+                                    CanReschedule := Format(IsRescheduleAllowed(TempTicketAdmissionRequest."Item No.", TempTicketAdmissionRequest."Variant Code", TempTicketAdmissionRequest."Admission Code"));
 
                                     if (Admission.Type = Admission.Type::OCCASION) then begin
                                         ReservationType := 'Reservation';
@@ -257,7 +259,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
                         }
                         trigger OnAfterGetRecord()
                         begin
-                            tmpAdmissions.DeleteAll();
+                            TempTicketAdmissionRequest.DeleteAll();
                             PopulateResponseAdmissions(tmpTicketReservationResponse."Session Token ID", tmpResponseDetails."Request Entry No.");
                         end;
                     }
@@ -379,16 +381,16 @@ xmlport 6060114 "NPR TM Ticket Reservation"
             exit;
 
         repeat
-            tmpAdmissions.TransferFields(TicketReservationRequest, true);
-            if tmpAdmissions."External Adm. Sch. Entry No." = 0 then
-                tmpAdmissions."External Adm. Sch. Entry No." := FindExternalAdmissionScheduleEntryNo(Ticket."No.", TicketReservationRequest."Admission Code");
+            TempTicketAdmissionRequest.TransferFields(TicketReservationRequest, true);
+            if TempTicketAdmissionRequest."External Adm. Sch. Entry No." = 0 then
+                TempTicketAdmissionRequest."External Adm. Sch. Entry No." := FindExternalAdmissionScheduleEntryNo(Ticket."No.", TicketReservationRequest."Admission Code");
 
-            DynamicPrice.CalculateScheduleEntryPrice(tmpAdmissions."Item No.", tmpAdmissions."Variant Code", tmpAdmissions."Admission Code", tmpAdmissions."External Adm. Sch. Entry No.", Today(), Time(), BasePrice, AddonPrice);
+            DynamicPrice.CalculateScheduleEntryPrice(TempTicketAdmissionRequest."Item No.", TempTicketAdmissionRequest."Variant Code", TempTicketAdmissionRequest."Admission Code", TempTicketAdmissionRequest."External Adm. Sch. Entry No.", Today(), Time(), BasePrice, AddonPrice);
             AdmissionPrice := BasePrice + AddonPrice;
-            if tmpAdmissions."Admission Inclusion" <> tmpAdmissions."Admission Inclusion"::NOT_SELECTED then
+            if TempTicketAdmissionRequest."Admission Inclusion" <> TempTicketAdmissionRequest."Admission Inclusion"::NOT_SELECTED then
                 TicketPrice := TicketPrice + AdmissionPrice;
-            tmpAdmissions."Notification Address" := Format(AdmissionPrice, 0, 9);
-            tmpAdmissions.Insert();
+            TempTicketAdmissionRequest."Notification Address" := Format(AdmissionPrice, 0, 9);
+            TempTicketAdmissionRequest.Insert();
         until (TicketReservationRequest.Next() = 0);
     end;
 

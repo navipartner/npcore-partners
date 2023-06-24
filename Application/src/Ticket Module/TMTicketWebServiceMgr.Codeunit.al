@@ -678,6 +678,7 @@
         TicketReservationRequest2.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
         TicketReservationRequest2.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
         TicketReservationRequest2.SetFilter("Ext. Line Reference No.", '=%1', TicketReservationRequest."Ext. Line Reference No.");
+        TicketReservationRequest2.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
         if (not TicketReservationRequest2.FindFirst()) then
             exit(false);
 
