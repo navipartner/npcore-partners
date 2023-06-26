@@ -52,6 +52,7 @@ let main = async ({workflow, context, popup, parameters, captions}) => {
             caption: captions.PriceCaption,
             value: saleLines._current[15],
         });
+        if (!context.PromptUnitPrice) return;
     }
 
     if (PromptForReason["PromptForReason"]) {
