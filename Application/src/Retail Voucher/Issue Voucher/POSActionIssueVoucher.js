@@ -18,6 +18,7 @@ let main = async ({ workflow, parameters, popup, captions }) => {
 
     if(parameters.Amount <= 0){
         amt_input = await popup.numpad({title: captions.IssueVoucherTitle, caption: captions.Amount ,value: 0,notBlank: true});
+        if (amt_input == null) return;
     }else
         amt_input = parameters.Amount;
 
@@ -43,9 +44,11 @@ let main = async ({ workflow, parameters, popup, captions }) => {
     let {SendToEmail, SendToPhoneNo, SendMethodPrint, SendMethodEmail, SendMethodSMS} = await workflow.respond("select_send_method",{VoucherTypeCode:VoucherTypeCode});
     if(SendMethodEmail){
         SendToEmail = await popup.input({title: captions.SendViaEmail, caption: captions.Email, value: SendToEmail, notBlank: true});
+        if (SendToEmail == null) return;
     }
     if(SendMethodSMS){
         SendToPhoneNo = await popup.input({title: captions.SendViaSMS, caption: captions.Phone, value: SendToPhoneNo, notBlank: true});
+        if (SendToPhoneNo == null) return;
     }
    
     await workflow.respond("issue_voucher", {VoucherTypeCode:VoucherTypeCode,qty_input:qty_input,amt_input:amt_input,DiscountType:parameters.DiscountType, discount_input:discount_input, SendMethodPrint:SendMethodPrint, SendToEmail:SendToEmail, SendToPhoneNo:SendToPhoneNo,SendMethodEmail:SendMethodEmail,SendMethodSMS:SendMethodSMS});
