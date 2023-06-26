@@ -1,12 +1,13 @@
 let main = async ({ workflow, context, parameters, popup, captions }) => {
     await workflow.respond("OnBeforeWorkflow");
     var optionNames = ["Select Membership", "View Points", "Redeem Points", "Available Coupons", "Select Membership (EAN Box)"];
-    
-    if (parameters.Function < 0) { parameters.Function = 0; };
+    var functionInt = parameters.Function.toInt();
+
+    if (functionInt < 0) { functionInt = 0; };
     
     if (parameters.DefaultInputValue.length > 0) { context.show_dialog = false; };
     
-    let windowTitle = captions.LoyaltyWindowTitle.substitute(optionNames[parameters.Function]);
+    let windowTitle = captions.LoyaltyWindowTitle.substitute(optionNames[functionInt]);
     
     let membercard_number = '';
     if (context.show_dialog) {
