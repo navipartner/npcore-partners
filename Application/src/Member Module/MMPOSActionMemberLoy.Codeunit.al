@@ -48,7 +48,7 @@
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:MMPOSActionMemberLoy.js###
-'let main=async({workflow:i,context:o,parameters:e,popup:a,captions:l})=>{await i.respond("OnBeforeWorkflow");var r=["Select Membership","View Points","Redeem Points","Available Coupons","Select Membership (EAN Box)"];e.Function<0&&(e.Function=0),e.DefaultInputValue.length>0&&(o.show_dialog=!1);let u=l.LoyaltyWindowTitle.substitute(r[e.Function]),t="";if(o.show_dialog&&(t=await a.input({caption:l.MemberCardPrompt,title:u}),t===null))return;let n=await i.respond("do_work",{membercard_number:t});n.workflowName!=""&&i.run(n.workflowName,{parameters:n.parameters})};'
+'let main=async({workflow:e,context:r,parameters:n,popup:l,captions:o})=>{await e.respond("OnBeforeWorkflow");var m=["Select Membership","View Points","Redeem Points","Available Coupons","Select Membership (EAN Box)"],t=n.Function.toInt();t<0&&(t=0),n.DefaultInputValue.length>0&&(r.show_dialog=!1);let u=o.LoyaltyWindowTitle.substitute(m[t]),i="";if(r.show_dialog&&(i=await l.input({caption:o.MemberCardPrompt,title:u}),i===null))return;let a=await e.respond("do_work",{membercard_number:i});a.workflowName!=""&&e.run(a.workflowName,{parameters:a.parameters})};'
         )
     end;
 
