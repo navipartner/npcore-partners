@@ -20,6 +20,7 @@
             column(Terminalslbl_; Terminalslbl) { }
             column(Voucherslbl_; Voucherslbl) { }
             column(Turnoverlbl_; Turnoverlbl) { }
+            column(TurnoverProfitlbl; TurnoverProfitlbl) { }
             column(Discountlbl_; Discountlbl) { }
             column(OnOrderlbl_; OnOrderlbl) { }
             column(DiscountAmtlbl_; DiscountAmtlbl) { }
@@ -186,6 +187,7 @@
             column(PrintDiscount_; PrintDiscount) { }
             column(PrintCountedAmtInclFloat_; PrintCountedAmtInclFloat) { }
             column(PrintEFT_; PrintEFT) { }
+            column(CountedAmountInclFloatlbl_; CountedAmountInclFloatlbl_) { }
             dataitem("POS Unit"; "NPR POS Unit")
             {
                 DataItemLink = "No." = FIELD("POS Unit No.");
@@ -240,7 +242,6 @@
                 column(CurrencyCodelbl_; BinCounting.FieldCaption("Currency Code")) { }
                 column(PaymentTypeNolbl_; BinCounting.FieldCaption("Payment Type No.")) { }
                 column(FloatAmountlbl_; BinCounting.FieldCaption("Float Amount")) { }
-                column(CountedAmountInclFloatlbl_; BinCounting.FieldCaption("Counted Amount Incl. Float")) { }
                 column(Commentlbl_; BinCounting.FieldCaption(Comment)) { }
                 column(PaymentMethodNo_; BinCounting."Payment Method No.") { }
                 column(Description_; BinCounting.Description) { }
@@ -260,6 +261,9 @@
                 column(TransferredAmount_; BinCounting."Transfer In Amount" + BinCounting."Transfer Out Amount") { }
                 column(VarBin_; VarBin) { }
                 column(BinEntryNo_; BinCounting."Entry No.") { }
+                column(ifBankDenominExists; ifBankDenominExists) { }
+                column(ifMoveBinDenominExists; ifMoveBinDenominExists) { }
+                column(ifCountingDenominExists; ifCountingDenominExists) { }
                 dataitem(BinDenomination; "NPR POS Paym. Bin Denomin.")
                 {
                     DataItemLink = "Bin Checkpoint Entry No." = FIELD("Entry No.");
@@ -274,6 +278,20 @@
                     trigger OnAfterGetRecord()
                     begin
                         VarDenomination := 1;
+
+                        case BinDenomination."Attached-to ID".AsInteger() of
+                            0:
+                                ifCountingDenominExists := true;
+                            1:
+                                ifBankDenominExists := true;
+                            2:
+                                ifMoveBinDenominExists := true;
+                            else begin
+                                ifCountingDenominExists := false;
+                                ifBankDenominExists := false;
+                                ifMoveBinDenominExists := false;
+                            end;
+                        end;
                     end;
                 }
 
@@ -282,7 +300,11 @@
                     VarTax := 0;
                     VarMain := 0;
                     VarBin := 1;
+                    VarDenomination := 0;
                     VarAttachedBin := 0;
+                    ifCountingDenominExists := false;
+                    ifBankDenominExists := false;
+                    ifMoveBinDenominExists := false;
                 end;
             }
             dataitem(AttachedPaymentBins; "NPR POS Unit to Bin Relation")
@@ -344,72 +366,78 @@
                     field("Print TurnOver"; PrintTurnOver)
                     {
                         Caption = 'Print TurnOver';
-
                         ToolTip = 'Specifies the value of the Print TurnOver field';
                         ApplicationArea = NPRRetail;
                     }
-
                     field("Print On Order"; PrintOnOrder)
                     {
                         Caption = 'Print On Order';
-
                         ToolTip = 'Specifies the value of the Print On Order field';
                         ApplicationArea = NPRRetail;
                     }
-
                     field("Print Discount"; PrintDiscount)
                     {
                         Caption = 'Print Discount';
-
                         ToolTip = 'Specifies the value of the Print Discount field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Print Discount Amount"; PrintDiscountAmt)
+                    {
+                        Caption = 'Print Discount Amount';
+                        ToolTip = 'Specifies the value of the Print Discount Amount field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Print Discount Percentage"; PrintDiscountPerc)
+                    {
+                        Caption = 'Print Discount Percentage';
+                        ToolTip = 'Specifies the value of the Print Discount Percentage field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Print Discount Total"; PrintDiscountTotal)
+                    {
+                        Caption = 'Print Discount Total';
+                        ToolTip = 'Specifies the value of the Print Discount Total field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print VAT"; PrintVAT)
                     {
                         Caption = 'Print VAT';
-
                         ToolTip = 'Specifies the value of the Print VAT field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print EFT"; PrintEFT)
                     {
                         Caption = 'Print EFT';
-
                         ToolTip = 'Specifies the value of the Print EFT field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Vouchers"; PrintVouchers)
                     {
                         Caption = 'Print Vouchers';
-
                         ToolTip = 'Specifies the value of the Print Vouchers field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Counting"; PrintCounting)
                     {
                         Caption = 'Print Counting';
-
                         ToolTip = 'Specifies the value of the Print Counting field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Counted Amt Incl Float"; PrintCountedAmtInclFloat)
                     {
                         Caption = 'Print Counted Amt Incl Float';
-
                         ToolTip = 'Specifies the value of the Print Counted Amt Incl Float field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Closing"; PrintClosing)
                     {
                         Caption = 'Print Closing';
-
                         ToolTip = 'Specifies the value of the Print Closing field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Attached Bins"; PrintAttachedBins)
                     {
                         Caption = 'Print Attached Bins';
-
                         ToolTip = 'Specifies the value of the Print Attached Bins field';
                         ApplicationArea = NPRRetail;
                     }
@@ -422,20 +450,6 @@
                 }
             }
         }
-
-        trigger OnOpenPage()
-        begin
-            PrintTurnOver := true;
-            PrintDiscount := true;
-            PrintVAT := true;
-            PrintEFT := true;
-            PrintVouchers := true;
-            PrintCounting := true;
-            PrintCountedAmtInclFloat := true;
-            PrintClosing := true;
-            PrintAttachedBins := true;
-            PrintOnOrder := true;
-        end;
     }
 
     labels
@@ -444,6 +458,23 @@
         BankDepositAmountDetailsCaptionLbl = 'Bank Deposit Amount Details';
         MoveToBinAmountDetailsCaptionLbl = 'Move to Bin Amount Details';
     }
+
+    trigger OnInitReport()
+    begin
+        PrintTurnOver := true;
+        PrintDiscount := true;
+        PrintDiscountAmt := true;
+        PrintDiscountPerc := true;
+        PrintDiscountTotal := true;
+        PrintVAT := true;
+        PrintEFT := true;
+        PrintVouchers := true;
+        PrintCounting := true;
+        PrintCountedAmtInclFloat := true;
+        PrintClosing := true;
+        PrintAttachedBins := true;
+        PrintOnOrder := true;
+    end;
 
     trigger OnPreReport()
     begin
@@ -479,6 +510,8 @@
         VarDenomination: Integer;
         VarMain: Integer;
         VarTax: Integer;
+        ifMoveBinDenominExists: Boolean;
+        ifBankDenominExists: Boolean;
         AttachedPaymentBinslbl: Label 'Attached Payment Bins';
         Closinglbl: Label 'Closing';
         ClosingDatelbl: Label 'Closing Date';
@@ -499,6 +532,7 @@
         SignatureLbl: Label 'Signature';
         Terminalslbl: Label 'Terminals';
         Turnoverlbl: Label 'Turnover (LCY)';
+        TurnoverProfitlbl: Label 'Turnover/Profit';
         VATTaxSummarylbl: Label 'VAT & TAX Summary';
         Voucherslbl: Label 'Vouchers';
         WithLbl: Label 'With';
@@ -511,4 +545,6 @@
         Salespersonlbl: Label 'Salesperson';
         OnOrderlbl: Label 'On Order';
         OtherPaymentslbl: Label 'Other Payments (LCY)';
+        ifCountingDenominExists: Boolean;
+        CountedAmountInclFloatlbl_: Label 'Counted Amount Incl. Float';
 }
