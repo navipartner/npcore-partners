@@ -1,6 +1,5 @@
 ﻿page 6151022 "NPR NpRv Arch. Vouchers"
 {
-    Extensible = False;
     Caption = 'Archived Retail Vouchers';
     CardPageID = "NPR NpRv Arch. Voucher Card";
     Editable = false;
