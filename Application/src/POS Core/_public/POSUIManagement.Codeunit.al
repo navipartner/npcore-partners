@@ -516,6 +516,7 @@
         SaveLayoutModal674563Lbl: label 'There was an error. Code: 674563';
         SaveLayoutModalOverwriteCurrentLayoutLbl: label 'Overwrite current layout';
         SaveLayoutModalSaveAsNewLayoutLbl: label 'Save as new Layout';
+        EditorLayoutPickerDeleteLayoutLbl: label 'Delete Layout';
         PosEditorUnsavedChangesLbl: label 'You have unsaved changes';
         PosEditorUnsavedLbl: label 'Unsaved';
         ColumnsPickerMaxColumnsNumberExceededErrorLbl: label 'Amount of columns is too high.Maximum number allowed is ';
@@ -731,7 +732,7 @@
         Captions.Add('NewLayoutModal_CopyExistingLayout', NewLayoutModalCopyExistingLayoutLbl);
         Captions.Add('NewLayoutModal_DefaultLayout', NewLayoutModalDefaultLayoutLbl);
         Captions.Add('NewLayoutModal_EmptyLayout', NewLayoutModalEmptyLayoutLbl);
-        Captions.Add('NewLayoutModal_LayoutNameCaption', NewLayoutModalLayoutNameLbl);
+        Captions.Add('NewLayoutModal_LayoutName', NewLayoutModalLayoutNameLbl);
         Captions.Add('NewLayoutModal_AlertInvalidLayoutName', NewLayoutModalLayoutAlertInvalidLayoutNameLbl);
         Captions.Add('NewLayoutModal_AlertLayoutAlreadyExists', NewLayoutModalLayoutAlertNameAlreadyExistsLbl);
         Captions.Add('Actions_Editor_DataSourcePopover', ActionsEditorDataSourcePopoverLbl);
@@ -782,6 +783,7 @@
         Captions.Add('Save_Layout_Modal_Error674563', SaveLayoutModal674563Lbl);
         Captions.Add('Save_Layout_Modal_OverwriteCurrentLayout', SaveLayoutModalOverwriteCurrentLayoutLbl);
         Captions.Add('Save_Layout_Modal_SaveAsNewLayout', SaveLayoutModalSaveAsNewLayoutLbl);
+        Captions.Add('Layout_Picker_DeleteLayout', EditorLayoutPickerDeleteLayoutLbl);
         Captions.Add('Pos_Editor_UnsavedChanges', PosEditorUnsavedChangesLbl);
         Captions.Add('Pos_Editor_Unsaved', PosEditorUnsavedLbl);
         Captions.Add('Columns_Picker_MaxColumnsNumberExceededError', ColumnsPickerMaxColumnsNumberExceededErrorLbl);
