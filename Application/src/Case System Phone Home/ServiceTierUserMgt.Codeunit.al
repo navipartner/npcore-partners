@@ -92,17 +92,31 @@
     local procedure UpdatePosUnitsInTenantDiagnostic(PosUnit: Record "NPR POS Unit")
     var
         TenantDiagnostic: Record "NPR Tenant Diagnostic";
+        SaaSTenantDiagnostic: Record "NPR Saas Tenant Diagnostic";
+        EnvironmentInformation: Codeunit "Environment Information";
+        AzureAdTenant: Codeunit "Azure AD Tenant";
         PosUnits: Integer;
     begin
         PosUnits := PosUnit.Count();
-        InitTenantDiagnostic(TenantDiagnostic);
+        if EnvironmentInformation.IsSaaS() then begin
+            InitSaasTenantDiagnostic(AzureAdTenant.GetAadTenantId(), SaaSTenantDiagnostic);
 
-        if TenantDiagnostic."POS Units" = PosUnits then
-            exit;
+            if SaaSTenantDiagnostic."POS Units" = PosUnits then
+                exit;
 
-        TenantDiagnostic."POS Units" := PosUnits;
-        TenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
-        TenantDiagnostic.Modify();
+            SaaSTenantDiagnostic."POS Units" := PosUnits;
+            SaaSTenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
+            SaaSTenantDiagnostic.Modify();
+        end else begin
+            InitTenantDiagnostic(TenantDiagnostic);
+
+            if TenantDiagnostic."POS Units" = PosUnits then
+                exit;
+
+            TenantDiagnostic."POS Units" := PosUnits;
+            TenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
+            TenantDiagnostic.Modify();
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Store", 'OnAfterInsertEvent', '', true, false)]
@@ -120,17 +134,29 @@
     local procedure UpdatePosStoresInTenantDiagnostic(PosStore: Record "NPR POS Store")
     var
         TenantDiagnostic: Record "NPR Tenant Diagnostic";
+        SaaSTenantDiagnostic: Record "NPR Saas Tenant Diagnostic";
+        EnvironmentInformation: Codeunit "Environment Information";
+        AzureAdTenant: Codeunit "Azure AD Tenant";
         PosStores: Integer;
     begin
         PosStores := PosStore.Count();
-        InitTenantDiagnostic(TenantDiagnostic);
+        if EnvironmentInformation.IsSaaS() then begin
+            InitSaasTenantDiagnostic(AzureAdTenant.GetAadTenantId(), SaaSTenantDiagnostic);
+            if SaaSTenantDiagnostic."POS Stores" = PosStores then
+                exit;
 
-        if TenantDiagnostic."POS Stores" = PosStores then
-            exit;
+            SaaSTenantDiagnostic."POS Stores" := PosStores;
+            SaaSTenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
+            SaaSTenantDiagnostic.Modify();
+        end else begin
+            InitTenantDiagnostic(TenantDiagnostic);
+            if TenantDiagnostic."POS Stores" = PosStores then
+                exit;
 
-        TenantDiagnostic."POS Stores" := PosStores;
-        TenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
-        TenantDiagnostic.Modify();
+            TenantDiagnostic."POS Stores" := PosStores;
+            TenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
+            TenantDiagnostic.Modify();
+        end;
     end;
 
     [EventSubscriber(ObjectType::Report, Report::"Copy Company", 'OnAfterCreatedNewCompanyByCopyCompany', '', true, false)]
