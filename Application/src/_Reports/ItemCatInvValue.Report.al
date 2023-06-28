@@ -116,7 +116,7 @@ report 6014448 "NPR Item Cat. Inv. Value"
 
     labels
     {
-        ReportCaptionLbl = 'Item Sales Statistics by Vendor';
+        ReportCaptionLbl = 'Inventory Value by Item Category';
         PageCaptionLbl = 'Page';
         NoCaptionLbl = 'No.';
         VendorItemNoCaptionLbl = 'Vendor Item No.';
