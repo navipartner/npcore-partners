@@ -9,6 +9,7 @@
         XmlElementIsMissingErr: Label 'XmlElement %1 is missing', Comment = '%1=xpath to element';
         CustomerNotFoundErr: Label 'Customer not found and %1 is not enabled', Comment = '%1="E-Commerce Store".FieldCaption("Allow Create Customers")';
         WrongValueTypeInNodeErr: Label 'Value "%1" is not set in proper format in <%2>. (e.g. %3)', Comment = '%1=xml element inner text;%2=xpath to element;%3=BC sample data with XML format';
+        UnknownItemErr: Label 'Unknown Item: %1', Comment = '%1 = item reference given';
 
     procedure DeleteSalesLines(SalesHeader: Record "Sales Header")
     var
@@ -419,7 +420,7 @@
 
         ReferenceNo := Attribute.Value();
         if not FindItemVariant(ReferenceNo, ItemVariant) then
-            exit;
+            Error(UnknownItemErr, ReferenceNo);
 
         Item.Get(ItemVariant."Item No.");
         if ItemVariant.Code <> '' then
