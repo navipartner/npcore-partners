@@ -99,7 +99,13 @@
     var
         Handled: Boolean;
         TaxFreeRequest: Record "NPR Tax Free Request";
+        NoTestActionForPremierPi: Label 'Test operation is not supported by tax free handler Premier PI.';
     begin
+        if TaxFreeUnit."Handler ID Enum" = TaxFreeUnit."Handler ID Enum"::PREMIER_PI then begin
+            Message(NoTestActionForPremierPi);
+            exit;
+        end;
+
         CreateRequest('UNIT_TEST_CONN', TaxFreeUnit, TaxFreeRequest);
 
         RunUnitTestConnectionEvent(TaxFreeRequest, Handled);
