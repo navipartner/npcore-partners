@@ -82,7 +82,6 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                         ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
                         ContinueQst: Label 'You are creating item template for current item category. Do you want to continue?';
                     begin
-                        Rec.Testfield("NPR Item Template Code", '');
                         if Confirm(ContinueQst) then begin
                             TempItem."Item Category Code" := Rec.Code;
                             Rec."NPR Item Template Code" := ItemCategoryMgt.CreateItemTemplate(Rec, TempItem);
