@@ -21,7 +21,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout" implements "NPR IPOS Workflow"
             NPREFrontendAssistant.SetRestaurant(POSSession, FrontEnd, UpdatedRestaurantCode);
     end;
 
-    local procedure SaveLayout(Context: Codeunit "NPR POS JSON Helper");
+    local procedure SaveLayout(Context: Codeunit "NPR POS JSON Helper")
     var
         JArray: JsonArray;
         JObject: JsonObject;
@@ -34,8 +34,6 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout" implements "NPR IPOS Workflow"
 
         if not JObject.ReadFrom(LayoutName) then
             exit;
-
-        // Message('%1', LayoutName);  //DEBUG
 
         if JObject.SelectToken('delete.locations', JToken) then begin
             if JToken.IsArray then begin
@@ -86,20 +84,30 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout" implements "NPR IPOS Workflow"
         end;
     end;
 
-    local procedure NewComponent(ComponentObject: JsonObject);
+    local procedure NewComponent(ComponentObject: JsonObject)
     var
         LocationLayout: Record "NPR NPRE Location Layout";
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
         NoSeriesManagement: Codeunit NoSeriesManagement;
+        xLocationLayoutCode: Code[20];
+        CouldNotGetNextNoErr: Label 'System could not assign next number from the number series %1. Please adjust the number series or specify another number series on page Restaurant Setup field %2, and try again.', Comment = '%1 - No. Series Code, %2 - Component No. Series field caption';
     begin
         LocationLayout.Code := CopyStr(GetStringValue(ComponentObject, 'id'), 1, MaxStrLen(LocationLayout.Code));
-        if LocationLayout.Find() then begin
-            RestaurantSetup.Get();
+        if (LocationLayout.Code = '') or LocationLayout.Find() then begin
+            if not RestaurantSetup.Get() then begin
+                RestaurantSetup.Init();
+                RestaurantSetup.Insert();
+            end;
             if RestaurantSetup."Component No. Series" = '' then begin
                 RestaurantSetup."Component No. Series" := CreateNoSeries('NPR-NPRE', 'NPRE Component Numbering', 'C10000');
                 RestaurantSetup.Modify();
             end;
-            LocationLayout.Code := NoSeriesManagement.GetNextNo(RestaurantSetup."Component No. Series", Today, true);
+            repeat
+                xLocationLayoutCode := LocationLayout.Code;
+                LocationLayout.Code := NoSeriesManagement.GetNextNo(RestaurantSetup."Component No. Series", Today(), true);
+                if (LocationLayout.Code = '') or (LocationLayout.Code = xLocationLayoutCode) then
+                    Error(CouldNotGetNextNoErr, RestaurantSetup."Component No. Series", RestaurantSetup.FieldCaption("Component No. Series"));
+            until not LocationLayout.Find();
         end;
         LocationLayout.Init();
         TransferToLocationLayout(ComponentObject, LocationLayout);
@@ -107,7 +115,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout" implements "NPR IPOS Workflow"
         LocationLayout.Insert(true);
     end;
 
-    local procedure ModifyComponent(ComponentObject: JsonObject);
+    local procedure ModifyComponent(ComponentObject: JsonObject)
     var
         LocationLayout: Record "NPR NPRE Location Layout";
     begin
@@ -120,7 +128,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout" implements "NPR IPOS Workflow"
         LocationLayout.Modify(true);
     end;
 
-    local procedure TransferToLocationLayout(ComponentObject: JsonObject; var LocationLayout: Record "NPR NPRE Location Layout");
+    local procedure TransferToLocationLayout(ComponentObject: JsonObject; var LocationLayout: Record "NPR NPRE Location Layout")
     var
         Seating: Record "NPR NPRE Seating";
         SeatingLocation: Record "NPR NPRE Seating Location";
@@ -152,7 +160,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout" implements "NPR IPOS Workflow"
         SetUpdatedRestaurant(SeatingLocation."Restaurant Code");
     end;
 
-    local procedure TransferToSeating(ComponentObject: JsonObject; var Seating: Record "NPR NPRE Seating");
+    local procedure TransferToSeating(ComponentObject: JsonObject; var Seating: Record "NPR NPRE Seating")
     var
         SeatingLocation: Record "NPR NPRE Seating Location";
         JToken: JsonToken;
@@ -166,7 +174,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout" implements "NPR IPOS Workflow"
             Seating.Capacity := JToken.AsValue().AsInteger();
     end;
 
-    local procedure DeleteComponent(ComponentCode: Text);
+    local procedure DeleteComponent(ComponentCode: Text)
     var
         LocationLayout: Record "NPR NPRE Location Layout";
         Seating: Record "NPR NPRE Seating";
@@ -185,7 +193,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout" implements "NPR IPOS Workflow"
                 Seating.Delete(true);
     end;
 
-    local procedure NewLocation(ComponentObject: JsonObject);
+    local procedure NewLocation(ComponentObject: JsonObject)
     var
         Restaurant: Record "NPR NPRE Restaurant";
         SeatingLocation: Record "NPR NPRE Seating Location";
@@ -205,7 +213,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout" implements "NPR IPOS Workflow"
         SetUpdatedRestaurant(SeatingLocation."Restaurant Code");
     end;
 
-    local procedure ModifyLocation(ComponentObject: JsonObject);
+    local procedure ModifyLocation(ComponentObject: JsonObject)
     var
         SeatingLocation: Record "NPR NPRE Seating Location";
         Restaurant: Record "NPR NPRE Restaurant";
@@ -223,7 +231,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout" implements "NPR IPOS Workflow"
         SetUpdatedRestaurant(SeatingLocation."Restaurant Code");
     end;
 
-    local procedure DeleteLocation(LocationCode: Text);
+    local procedure DeleteLocation(LocationCode: Text)
     var
         LocationLayout: Record "NPR NPRE Location Layout";
         Seating: Record "NPR NPRE Seating";
@@ -265,7 +273,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout" implements "NPR IPOS Workflow"
             Error(TokenNotFound, TokenKey);
     end;
 
-    procedure CreateNoSeries(NoSeriesCode: Code[20]; Desc: Text; StartNumber: Code[20]): Code[20];
+    procedure CreateNoSeries(NoSeriesCode: Code[20]; Desc: Text; StartNumber: Code[20]): Code[20]
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
