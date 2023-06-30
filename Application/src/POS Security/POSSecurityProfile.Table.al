@@ -34,6 +34,11 @@
             Caption = 'Lock Timeout';
             DataClassification = CustomerContent;
         }
+        field(50; "POS Buttons Refresh Time"; Enum "NPR POS View LockTimeout")
+        {
+            Caption = 'POS Buttons Refresh Time';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
