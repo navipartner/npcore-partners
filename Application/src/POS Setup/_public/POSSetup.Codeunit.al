@@ -288,6 +288,14 @@
         exit(SecurityProfile.GetLockTimeoutIfProfileExist(POSUnitRec."POS Security Profile"));
     end;
 
+    internal procedure GetPOSButtonRefreshTime() TimeInSeconds: Integer
+    var
+        SecurityProfile: Codeunit "NPR POS Security Profile";
+    begin
+        POSUnitRec.TestField("No.");
+        exit(SecurityProfile.GetPOSButtonRefreshTimeIfProfileExist(POSUnitRec."POS Security Profile"));
+    end;
+
     internal procedure GetKioskUnlockEnabled(): Boolean
     var
         SelfServiceProfile: Codeunit "NPR SS Profile";

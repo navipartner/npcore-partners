@@ -884,6 +884,7 @@
         Options.Add('taxationType', GetTaxEnvironmentType());
         Options.Add('selectedPosLayoutCode', Setup.GetPosLayoutCode());
         Options.Add('lineOrderOnScreen', 0);
+        Options.Add('posButtonsRefreshTime', Setup.GetPOSButtonRefreshTime());
 
         OnSetOptions(Setup, Options);
 

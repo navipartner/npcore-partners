@@ -57,7 +57,7 @@ codeunit 6059916 "NPR POS Security Profile"
         if not Rec.Get(POSSecurityProfileCode) then
             exit;
         exit(Rec."Password on Unblock Discount" = EnteredPassword);
-    end;  
+    end;
 
     [NonDebuggable]
     procedure IsUnlockPasswordSet(POSSecurityProfileCode: Code[20]): Boolean
@@ -95,7 +95,7 @@ codeunit 6059916 "NPR POS Security Profile"
         if not Rec.Get(POSSecurityProfileCode) then
             exit;
         exit(Rec."Unlock Password" = EnteredPassword);
-    end;  
+    end;
 
     procedure GetLockTimeout(POSSecurityProfileCode: Code[20]) LockTimeoutInSeconds: Integer
     var
@@ -119,9 +119,9 @@ codeunit 6059916 "NPR POS Security Profile"
                 OnGetLockTimeout(Rec."Lock Timeout", LockTimeoutInSeconds, Handled);
                 if not Handled then
                     LockTimeoutInSeconds := 0;
-            end;                
+            end;
         end;
-    end; 
+    end;
 
     procedure GetLockTimeoutIfProfileExist(POSSecurityProfileCode: Code[20]) LockTimeoutInSeconds: Integer
     var
@@ -146,12 +146,46 @@ codeunit 6059916 "NPR POS Security Profile"
                 OnGetLockTimeout(Rec."Lock Timeout", LockTimeoutInSeconds, Handled);
                 if not Handled then
                     LockTimeoutInSeconds := 0;
-            end;                
+            end;
         end;
-    end;     
+    end;
+
+    procedure GetPOSButtonRefreshTimeIfProfileExist(POSSecurityProfileCode: Code[20]) TimeInSeconds: Integer
+    var
+        Rec: Record "NPR POS Security Profile";
+        Handled: Boolean;
+    begin
+        if not Rec.Get(POSSecurityProfileCode) then
+            exit;
+
+        case Rec."POS Buttons Refresh Time" of
+            Rec."POS Buttons Refresh Time"::"30S":
+                TimeInSeconds := 30;
+            Rec."POS Buttons Refresh Time"::"60S":
+                TimeInSeconds := 60;
+            Rec."POS Buttons Refresh Time"::"90S":
+                TimeInSeconds := 90;
+            Rec."POS Buttons Refresh Time"::"120S":
+                TimeInSeconds := 120;
+            Rec."POS Buttons Refresh Time"::"600S":
+                TimeInSeconds := 600;
+            else begin
+                OnGetPOSButtonsRefreshTime(Rec."POS Buttons Refresh Time", TimeInSeconds, Handled);
+                if not Handled then
+                    TimeInSeconds := 0;
+            end;
+        end;
+    end;
+
 
     [IntegrationEvent(true, false)]
     local procedure OnGetLockTimeout(LockTimeout: Enum "NPR POS View LockTimeout"; var LockTimeoutInSeconds: Integer; var Handled: Boolean)
     begin
-    end;           
+    end;
+
+
+    [IntegrationEvent(true, false)]
+    local procedure OnGetPOSButtonsRefreshTime(RefreshTime: Enum "NPR POS View LockTimeout"; var TimeInSeconds: Integer; var Handled: Boolean)
+    begin
+    end;
 }
