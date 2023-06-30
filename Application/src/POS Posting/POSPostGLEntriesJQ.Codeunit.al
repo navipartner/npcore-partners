@@ -4,18 +4,23 @@ codeunit 6014699 "NPR POS Post GL Entries JQ"
 
     trigger OnRun()
     var
-        POSPostEntries: Codeunit "NPR POS Post Entries";
         POSEntry: Record "NPR POS Entry";
         POSEntry2: Record "NPR POS Entry";
         Hashset: Codeunit "NPR HashSet of [Integer]";
-        ErrorCount: Integer;
-        ErrMessage: Label '%1 POS entries failed to post.';
-        DetailedMessage: TextBuilder;
-        ErrorEntries: List of [Integer];
+        POSPostEntries: Codeunit "NPR POS Post Entries";
+        SentryCron: Codeunit "NPR Sentry Cron";
+        CheckInUpdated: Boolean;
         SkipPeriodRegisterGroup: Boolean;
         ErrorTextDictionary: Dictionary of [Integer, Text];
+        ErrorCount: Integer;
         Period: Integer;
+        ErrMessage: Label '%1 POS entries failed to post.';
+        MonitorSlugLbl: Label 'pos_post_gl_entries', Locked = true;
+        ErrorEntries: List of [Integer];
+        CheckInId: Text;
+        DetailedMessage: TextBuilder;
     begin
+        CheckInId := SentryCron.CreateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'in_progress', '0 23 * * *', 0, 1800, 240, '');
         POSPostEntries.SetPostCompressed(true);
         POSPostEntries.SetStopOnError(false);
         POSPostEntries.SetPostPOSEntries(true);
@@ -46,16 +51,25 @@ codeunit 6014699 "NPR POS Post GL Entries JQ"
             end;
         until POSEntry.Next() = 0;
 
-        if ErrorCount > 0 then
+        if ErrorCount > 0 then begin
             Message(ErrMessage, ErrorCount);
+            if CheckInId <> '' then begin
+                SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'error', CheckInId);
+                CheckInUpdated := true;
+            end;
+        end;
 
         if (ErrorTextDictionary.Count() > 0) then begin
             Commit();
             foreach Period in ErrorTextDictionary.Keys() do begin
                 DetailedMessage.AppendLine(StrSubstNo('Period %1 - %2', Period, ErrorTextDictionary.Get(Period)));
             end;
+            if (CheckInId <> '') and not CheckInUpdated then
+                SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'error', CheckInId);
             Error(DetailedMessage.ToText());
         end;
 
+        if (CheckInId <> '') and not CheckInUpdated then
+            SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'ok', CheckInId);
     end;
 }
