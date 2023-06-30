@@ -40,6 +40,11 @@
                     ExtendedDatatype = Masked;
                     ApplicationArea = NPRRetail;
                 }
+                field("POS Buttons Refresh Time"; Rec."POS Buttons Refresh Time")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the POS Buttons Refresh Time field.';
+                }
             }
         }
     }
