@@ -4,15 +4,19 @@ codeunit 6059770 "NPR POS Post Item Entries JQ"
 
     trigger OnRun()
     var
-        POSPostEntries: Codeunit "NPR POS Post Entries";
         POSEntry: Record "NPR POS Entry";
         POSEntry2: Record "NPR POS Entry";
         Hashset: Codeunit "NPR HashSet of [Integer]";
+        POSPostEntries: Codeunit "NPR POS Post Entries";
+        SentryCron: Codeunit "NPR Sentry Cron";
         ErrorCount: Integer;
         ErrMessage: Label '%1 POS entries failed to post.';
+        MonitorSlugLbl: Label 'pos_post_item_entries', Locked = true;
         ErrorEntries: List of [Integer];
         POSItemEntryStatus: Option;
+        CheckInId: Text;
     begin
+        CheckInId := SentryCron.CreateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'in_progress', '* * * * *', 0, 30, 240, '');
         POSPostEntries.SetPostCompressed(true);
         POSPostEntries.SetStopOnError(false);
         POSPostEntries.SetPostPOSEntries(false);
@@ -39,7 +43,12 @@ codeunit 6059770 "NPR POS Post Item Entries JQ"
                 until POSEntry.Next() = 0;
         end;
 
-        if ErrorCount > 0 then
+        if ErrorCount > 0 then begin
             Message(ErrMessage, ErrorCount);
+            if CheckInId <> '' then
+                SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'error', CheckInId);
+        end else
+            if CheckInId <> '' then
+                SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'ok', CheckInId);
     end;
 }
