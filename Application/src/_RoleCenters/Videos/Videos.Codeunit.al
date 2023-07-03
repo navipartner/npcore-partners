@@ -28,11 +28,11 @@ codeunit 6059919 "NPR Videos"
         POSPaymentMethods(sender, VarModuleInfo.Id);
         PrinterSetup(sender, VarModuleInfo.Id);
         UserSetup(sender, VarModuleInfo.Id);
-        EntertainmentTicketAdmission(sender, VarModuleInfo.Id);
         CustomerSetup(sender, VarModuleInfo.Id);
         MultiplePriceDiscount(sender, VarModuleInfo.Id);
         MixDiscountGeneralSettings(sender, VarModuleInfo.Id);
         MixDiscountConditionsAndMixDiscountLines(sender, VarModuleInfo.Id);
+        EntertainmentTicketAdmission(sender, VarModuleInfo.Id);
     end;
 
     local procedure POSIntroduction(var Video: Codeunit Video; AppID: Guid)
@@ -230,7 +230,7 @@ codeunit 6059919 "NPR Videos"
     local procedure EntertainmentTicketAdmission(var Video: Codeunit Video; AppID: Guid)
     var
         VideoLbl: Label 'https://share.synthesia.io/embeds/videos/dddf3d9a-bac6-47e4-b784-4dd50b39cc62', locked = true;
-        TitleLbl: Label 'NP Entertainment - Ticket Admission';
+        TitleLbl: Label 'NP POS Academy 25: Entertainment - Ticket Admission';
     begin
         Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
     end;
