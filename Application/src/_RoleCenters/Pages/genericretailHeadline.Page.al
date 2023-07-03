@@ -51,14 +51,30 @@
                     ToolTip = 'NPR Version';
                     ApplicationArea = NPRRetail;
                 }
+                field(WhatIsNewText; WhatIsNewText)
+                {
+                    Caption = 'What''s new';
+                    Editable = false;
+                    ToolTip = 'What is new in NP Retail.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnDrillDown()
+                    var
+                        DrillDownURLTxt: Label 'https://docs.navipartner.com/release_notes_public.html', Locked = true;
+                    begin
+                        Hyperlink(DrillDownURLTxt);
+                    end;
+                }
             }
         }
     }
     trigger OnOpenPage()
+    var
+        Regex: Codeunit "NPR RegEx";
     begin
-
+        Regex.GetSingleMatchValue(LicenseInformation.GetRetailVersion(), RegexVersionPatternLbl, NPRRetailVersion);
         HeadlineManagement.GetUserGreetingText(GreetingText);
-        NPRVersion := CopyStr(StrSubstNo(NPRVersionTxt, LicenseInformation.GetRetailVersion()), 1, MaxStrLen(NPRVersion));
+        NPRVersion := CopyStr(StrSubstNo(NPRVersionTxt, NPRRetailVersion), 1, MaxStrLen(NPRVersion));
     end;
 
     var
@@ -67,8 +83,9 @@
         NPRetailTxt: Label 'Want to learn more about NP Retail?';
 
         LicenseInformation: Codeunit "NPR License Information";
-        NPRVersionTxt: Label 'You are currently on version %1', Comment = '%1 is the NP Retail version number';
+        NPRVersionTxt: Label 'You are currently on version NP RETAIL %1', Comment = '%1 is the NP Retail version number';
         NPRVersion: Text[250];
-
-
+        WhatIsNewText: Label 'What''s new?', Locked = true;
+        NPRRetailVersion: Text;
+        RegexVersionPatternLbl: Label '[\d.,]+', Locked = true;
 }
