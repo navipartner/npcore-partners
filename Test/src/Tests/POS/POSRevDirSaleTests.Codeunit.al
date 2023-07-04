@@ -26,12 +26,14 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         POSEntryLine: Record "NPR POS Entry Sales Line";
         IncludePayLines: Boolean;
+        CopyLineDimensions: Boolean;
     begin
         //[Scenario] Return Sale with parameters:
         //ObfucationMethod = None
         //CopyDimension = false
         //ReturnReason = '';
         //IncludePayLines = false;
+        //CopyLineDimensions = false;
 
         // [Given] POS & Payment setup
         InitializeData();
@@ -41,10 +43,11 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
         CopyDim := false;
         ReturnReasonCode := '';
         IncludePayLines := false;
+        CopyLineDimensions := false;
 
         SalesTicketNo := DoItemSale();
 
-        POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyDim, ReturnReasonCode, IncludePayLines);
+        POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyDim, ReturnReasonCode, IncludePayLines, CopyLineDimensions);
 
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
@@ -78,12 +81,14 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
         LibraryERM: Codeunit "Library - ERM";
         ReturnReason: Record "Return Reason";
         IncludePayLines: Boolean;
+        CopyLineDimensions: Boolean;
     begin
         //[Scenario] Return Sale with parameters:
         //ObfucationMethod = None
         //CopyDimension = false
         //ReturnReason <> '';
         //IncludePayLines := false;
+        //CopyLineDimensions = false;
 
         // [Given] POS & Payment setup
         InitializeData();
@@ -92,13 +97,14 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
         ObfucationMethod := ObfucationMethod::None;
         CopyDim := false;
         IncludePayLines := false;
+        CopyLineDimensions := false;
 
         LibraryERM.CreateReturnReasonCode(ReturnReason);
         ReturnReasonCode := ReturnReason.Code;
 
         SalesTicketNo := DoItemSale();
 
-        POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyDim, ReturnReasonCode, IncludePayLines);
+        POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyDim, ReturnReasonCode, IncludePayLines, CopyLineDimensions);
 
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
@@ -132,12 +138,14 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
         LibraryERM: Codeunit "Library - ERM";
         ReturnReason: Record "Return Reason";
         IncludePayLines: Boolean;
+        CopyLineDimensions: Boolean;
     begin
         //[Scenario] Return Sale with parameters:
         //ObfucationMethod = None
         //CopyDimension = true
         //ReturnReason <> '';
         //IncludePayLines := false;
+        //CopyLineDimensions = true;
 
         // [Given] POS & Payment setup
         InitializeData();
@@ -146,13 +154,14 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
         ObfucationMethod := ObfucationMethod::None;
         CopyDim := true;
         IncludePayLines := false;
+        CopyLineDimensions := true;
 
         LibraryERM.CreateReturnReasonCode(ReturnReason);
         ReturnReasonCode := ReturnReason.Code;
 
         SalesTicketNo := DoItemSale();
 
-        POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyDim, ReturnReasonCode, IncludePayLines);
+        POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyDim, ReturnReasonCode, IncludePayLines, CopyLineDimensions);
 
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
@@ -190,6 +199,7 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
         LibraryERM: Codeunit "Library - ERM";
         ReturnReason: Record "Return Reason";
         IncludePayLines: Boolean;
+        CopyLineDimensions: Boolean;
         POSEntryPaymentLines: Record "NPR POS Entry Payment Line";
     begin
         //[Scenario] Return Sale with parameters:
@@ -197,6 +207,7 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
         //CopyDimension = true
         //ReturnReason <> '';
         //IncludePayLines := true;
+        //CopyLineDimensions = true;
 
         // [Given] POS & Payment setup
         InitializeData();
@@ -205,13 +216,14 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
         ObfucationMethod := ObfucationMethod::None;
         CopyDim := true;
         IncludePayLines := true;
+        CopyLineDimensions := true;
 
         LibraryERM.CreateReturnReasonCode(ReturnReason);
         ReturnReasonCode := ReturnReason.Code;
 
         SalesTicketNo := DoItemSale();
 
-        POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyDim, ReturnReasonCode, IncludePayLines);
+        POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyDim, ReturnReasonCode, IncludePayLines, CopyLineDimensions);
 
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
@@ -271,6 +283,7 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
         LibraryERM: Codeunit "Library - ERM";
         ReturnReason: Record "Return Reason";
         IncludePayLines: Boolean;
+        CopyLineDimensions: Boolean;
         ActualMessage, ExpectedMessage : Text;
         PaymentMethodCode: Code[20];
     begin
@@ -287,6 +300,7 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
         ObfucationMethod := ObfucationMethod::None;
         CopyDim := true;
         IncludePayLines := true;
+        CopyLineDimensions := true;
 
         LibraryERM.CreateReturnReasonCode(ReturnReason);
         ReturnReasonCode := ReturnReason.Code;
@@ -300,7 +314,7 @@ codeunit 85066 "NPR POS Rev. Dir. Sale Tests"
         asserterror POSPaymentMethod.Get(PaymentMethodCode);
         ExpectedMessage := GetLastErrorText();
         ClearLastError();
-        asserterror POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyDim, ReturnReasonCode, IncludePayLines);
+        asserterror POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyDim, ReturnReasonCode, IncludePayLines, CopyLineDimensions);
         ActualMessage := GetLastErrorText();
         Assert.AreEqual(ExpectedMessage, ActualMessage, ExpectedMessage);
 
