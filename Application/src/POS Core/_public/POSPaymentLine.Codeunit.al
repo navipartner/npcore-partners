@@ -502,13 +502,19 @@
     end;
 
     procedure RoundAmount(POSPaymentMethod: Record "NPR POS Payment Method"; Amount: Decimal): Decimal
+    var
+        GLSetup: Record "General Ledger Setup";
     begin
 
         if (POSPaymentMethod."Rounding Precision" = 0) then
             exit(Amount);
 
-        if POSPaymentMethod."Currency Code" <> '' then
-            exit(Round(Amount, POSPaymentMethod."Rounding Precision", '>')); //Amount is not in LCY - Round up to avoid hitting a value causing LCY loss.
+        if POSPaymentMethod."Currency Code" <> '' then begin
+            if not GLSetup.Get() then
+                GLSetup.Init();
+            if GLSetup."LCY Code" <> POSPaymentMethod."Currency Code" then
+                exit(Round(Amount, POSPaymentMethod."Rounding Precision", '>')); //Amount is not in LCY - Round up to avoid hitting a value causing LCY loss.
+        end;
 
         exit(Round(Amount, POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType()));
     end;
