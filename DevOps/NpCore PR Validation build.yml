@@ -75,6 +75,8 @@ stages:
       objectId: 6014400
       objectName: 'NPR NP RETAIL'
       objectCaption: 'NP Retail'
+      xmlRoleId: 'NP RETAIL'
+      xmlRoleName: 'NP Retail'
     runTests: true
     testApps:
     - 'Performance Toolkit'
