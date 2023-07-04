@@ -11,6 +11,7 @@
     var
         ChangeLogSetup: Record "Change Log Setup";
         ChangeLogSetupTable: Record "Change Log Setup (Table)";
+        SaaSImportSetup: Record "NPR SaaS Import Setup";
     begin
         if NavApp.IsInstalling() then
             exit;
@@ -20,6 +21,12 @@
 
         if not (ChangeLogSetup.WritePermission() and ChangeLogSetupTable.WritePermission()) then
             exit;
+
+        if not SaaSImportSetup.ReadPermission() then
+            exit;
+        if SaaSImportSetup.Get() then
+            if SaaSImportSetup."Disable Database Triggers" then
+                exit;
 
         SetChangeLogSetup();
     end;

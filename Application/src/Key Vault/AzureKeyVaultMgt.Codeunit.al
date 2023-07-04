@@ -10,6 +10,7 @@ codeunit 6014494 "NPR Azure Key Vault Mgt."
         WrongModuleErr: Label 'This procedure cannot be called from another application.';
         CallerModuleInfo: ModuleInfo;
         CurrentModuleInfo: ModuleInfo;
+        SandboxSecretInjection: Codeunit "NPR Sandbox Secret Injection";
     begin
         if not NavApp.GetCallerModuleInfo(CallerModuleInfo) then
             exit;
@@ -17,7 +18,11 @@ codeunit 6014494 "NPR Azure Key Vault Mgt."
             exit;
         if CurrentModuleInfo.Id <> CallerModuleInfo.Id then
             Error(WrongModuleErr);
+
         if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
+            if SandboxSecretInjection.TryGetSecret(Name, KeyValue) then
+                exit;
+
             if not AppKeyVaultSecretProviderInitialised then
                 AppKeyVaultSecretProviderInitialised := AppKeyVaultSecretProvider.TryInitializeFromCurrentApp();
 
