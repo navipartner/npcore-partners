@@ -31,6 +31,7 @@
 
             trigger OnValidate()
             begin
+                CheckGLSetup();
                 if Rec."Currency Code" <> '' then
                     Rec."Use Stand. Exc. Rate for Bal." := ConfirmUsageOfStandardExchangeRate();
             end;
@@ -284,6 +285,10 @@
         fieldgroup(Brick; Code, "Processing Type") { }
     }
 
+    var
+        GLSetup: Record "General Ledger Setup";
+        HasGotGLSetup: Boolean;
+
     trigger OnInsert()
     begin
         CheckReturnProcessingType();
@@ -340,19 +345,38 @@
     var
         CurrExchRate: Record "Currency Exchange Rate";
         Currency: Record Currency;
-        GLSetup: Record "General Ledger Setup";
         EnableStandardExchRateQst: Label 'Standard Exchange Rates will apply for %1 in balancing. With current exchange rate setup 1 %1 is equivalent to %2 %3.\Do you want to proceed?', Comment = '%1=Rec.FieldCaption("Currency Code");%2=Exchange Rate;%3=GLSetup."LCY Code"';
     begin
         if not GuiAllowed() then
             exit;
 
-        GLSetup.Get();
+        GetGLSetup();
         Currency.Get(Rec."Currency Code");
         exit(Confirm(EnableStandardExchRateQst,
                         false,
                         Rec."Currency Code",
                         Round(1 / CurrExchRate.ExchangeRate(Today(), Rec."Currency Code"), Currency."Amount Rounding Precision", Currency.InvoiceRoundingDirection()),
                         GLSetup."LCY Code"));
+    end;
+
+    local procedure CheckGLSetup()
+    var
+        CurrencyCodeMsgLbl: Label 'You have selected the local currency.';
+    begin
+        if not GuiAllowed then
+            exit;
+
+        GetGLSetup();
+        if GLSetup."LCY Code" = Rec."Currency Code" then
+            Message(CurrencyCodeMsgLbl);
+    end;
+
+    local procedure GetGLSetup()
+    begin
+        if not HasGotGLSetup then
+            GLSetup.Get();
+
+        HasGotGLSetup := true;
     end;
 }
 
