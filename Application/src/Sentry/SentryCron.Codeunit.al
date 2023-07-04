@@ -105,11 +105,24 @@ codeunit 6151089 "NPR Sentry Cron"
 
     local procedure ShouldUseSentryCron(): Boolean
     var
+        Company: Record Company;
         EnvironmentInformation: Codeunit "Environment Information";
     begin
-        // for now Sentry Cron should be used only for production SaaS environments
-        if EnvironmentInformation.IsSaaS() and EnvironmentInformation.IsProduction() then
-            exit(true);
+        // for now Sentry Cron should be used only for production SaaS environments for companies which are not Cronus or evaluation
+        if not EnvironmentInformation.IsSaaS() then
+            exit(false);
+
+        if not EnvironmentInformation.IsProduction() then
+            exit(false);
+
+        if CompanyName().ToUpper().Contains('CRONUS') then
+            exit(false);
+
+        if Company.Get(CompanyName()) then
+            if Company."Evaluation Company" then
+                exit(false);
+
+        exit(true);
     end;
 
     local procedure InitUrl(Method: Text) Url: Text[250]
