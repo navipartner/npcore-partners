@@ -5,12 +5,12 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
     var
         POSEntryMgt: Codeunit "NPR POS Entry Management";
 
-    procedure HendleReverse(SalesTicketNo: Code[20]; ObfucationMethod: Option "None",MI; CopyHeaderDim: Boolean; ReturnReasonCode: Code[20]; IncludePaymentLines: Boolean)
+    procedure HendleReverse(SalesTicketNo: Code[20]; ObfucationMethod: Option "None",MI; CopyHeaderDim: Boolean; ReturnReasonCode: Code[20]; IncludePaymentLines: Boolean; CopyLineDimensions: Boolean)
     var
         POSSession: Codeunit "NPR POS Session";
     begin
         VerifyReceiptForReversal(SalesTicketNo, ObfucationMethod);
-        CopySalesReceiptForReversal(SalesTicketNo, ObfucationMethod, CopyHeaderDim, ReturnReasonCode, IncludePaymentLines);
+        CopySalesReceiptForReversal(SalesTicketNo, ObfucationMethod, CopyHeaderDim, ReturnReasonCode, IncludePaymentLines, CopyLineDimensions);
         POSSession.ChangeViewSale();
     end;
 
@@ -33,7 +33,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         OnBeforeReverseSalesTicket(SalesTicketNo);
     end;
 
-    local procedure CopySalesReceiptForReversal(SalesTicketNo: Code[20]; ObfucationMethod: Option "None",MI; CopyHeaderDim: Boolean; ReturnReasonCode: Code[20]; IncludePaymentLines: Boolean)
+    local procedure CopySalesReceiptForReversal(SalesTicketNo: Code[20]; ObfucationMethod: Option "None",MI; CopyHeaderDim: Boolean; ReturnReasonCode: Code[20]; IncludePaymentLines: Boolean; CopyLineDimensions: Boolean)
     var
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
@@ -50,10 +50,10 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
 
         SetCustomerOnReverseSale(SalePOS, SalesTicketNo);
 
-        ReverseSalesTicket(SalePOS, SalesTicketNo, ReturnReasonCode);
+        ReverseSalesTicket(SalePOS, SalesTicketNo, ReturnReasonCode, CopyLineDimensions);
 
         if IncludePaymentLines then
-            ReversePaymentLines(SalePOS, SalesTicketNo);
+            ReversePaymentLines(SalePOS, SalesTicketNo, CopyLineDimensions);
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -73,7 +73,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         POSSale.RefreshCurrent();
     end;
 
-    procedure ReverseSalesTicket(var SalePOS: Record "NPR POS Sale"; SalesTicketNo: Code[20]; ReturnReasonCode: Code[20])
+    procedure ReverseSalesTicket(var SalePOS: Record "NPR POS Sale"; SalesTicketNo: Code[20]; ReturnReasonCode: Code[20]; CopyLineDimensions: Boolean)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSalesLine: Record "NPR POS Entry Sales Line";
@@ -100,7 +100,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
                 SaleLinePOS.Insert(true);
                 SaleLinePOSLineNo := SaleLinePOSLineNo + 10000;
 
-                ReverseAuditInfoToSalesLine(SaleLinePOS, POSSalesLine);
+                ReverseAuditInfoToSalesLine(SaleLinePOS, POSSalesLine, CopyLineDimensions);
 
                 if ReturnReasonCode <> '' then
                     SaleLinePOS.Validate("Return Reason Code", ReturnReasonCode);
@@ -111,7 +111,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
             until POSSalesLine.Next() = 0;
     end;
 
-    procedure ReverseAuditInfoToSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; POSSalesLine: Record "NPR POS Entry Sales Line")
+    procedure ReverseAuditInfoToSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; POSSalesLine: Record "NPR POS Entry Sales Line"; CopyLineDimensions: Boolean)
     var
         POSEntry: Record "NPR POS Entry";
     begin
@@ -143,9 +143,11 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         SaleLinePOS."Unit Price" := POSSalesLine."Unit Price";
         SaleLinePOS."VAT Base Amount" := -POSSalesLine."VAT Base Amount";
         SaleLinePOS."Variant Code" := POSSalesLine."Variant Code";
-        SaleLinePOS."Shortcut Dimension 1 Code" := POSSalesLine."Shortcut Dimension 1 Code";
-        SaleLinePOS."Shortcut Dimension 2 Code" := POSSalesLine."Shortcut Dimension 2 Code";
-        SaleLinePOS."Dimension Set ID" := POSSalesLine."Dimension Set ID";
+        if CopyLineDimensions then begin
+            SaleLinePOS."Shortcut Dimension 1 Code" := POSSalesLine."Shortcut Dimension 1 Code";
+            SaleLinePOS."Shortcut Dimension 2 Code" := POSSalesLine."Shortcut Dimension 2 Code";
+            SaleLinePOS."Dimension Set ID" := POSSalesLine."Dimension Set ID";
+        end;
         SaleLinePOS."Orig.POS Entry S.Line SystemId" := POSSalesLine.SystemId;
         SaleLinePOS."Serial No. not Created" := POSSalesLine."Retail Serial No.";
     end;
@@ -281,7 +283,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         exit(false);
     end;
 
-    local procedure ReversePaymentLines(SalePOS: Record "NPR POS Sale"; SalesTicketNo: Code[20])
+    local procedure ReversePaymentLines(SalePOS: Record "NPR POS Sale"; SalesTicketNo: Code[20]; CopyLineDimensions: Boolean)
     var
         POSEntryPaymentLines: Record "NPR POS Entry Payment Line";
         PaymentLine: Record "NPR POS Sale Line";
@@ -304,9 +306,11 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
                 end else
                     PaymentLine."Amount Including VAT" := -POSEntryPaymentLines.Amount;
                 PaymentLine."EFT Approved" := POSEntryPaymentLines.EFT;
-                PaymentLine."Shortcut Dimension 1 Code" := POSEntryPaymentLines."Shortcut Dimension 1 Code";
-                PaymentLine."Shortcut Dimension 2 Code" := POSEntryPaymentLines."Shortcut Dimension 2 Code";
-                PaymentLine."Dimension Set ID" := POSEntryPaymentLines."Dimension Set ID";
+                if CopyLineDimensions then begin
+                    PaymentLine."Shortcut Dimension 1 Code" := POSEntryPaymentLines."Shortcut Dimension 1 Code";
+                    PaymentLine."Shortcut Dimension 2 Code" := POSEntryPaymentLines."Shortcut Dimension 2 Code";
+                    PaymentLine."Dimension Set ID" := POSEntryPaymentLines."Dimension Set ID";
+                end;
                 if POSEntryPaymentLines."VAT Base Amount (LCY)" <> 0 then
                     PaymentLine."VAT Base Amount" := -POSEntryPaymentLines."VAT Base Amount (LCY)";
                 PaymentLine."Line Type" := PaymentLine."Line Type"::"POS Payment";

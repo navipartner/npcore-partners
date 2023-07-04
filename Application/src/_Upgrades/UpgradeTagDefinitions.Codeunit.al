@@ -75,6 +75,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'SalesDocImpRefreshMenuButtonActions'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'TakePhotoRefreshMenuButtonActions'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'ItemIdentifierType'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'RefreshReverseDirectSalePOSAction'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'ItemPriceIdentifierType'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'ItemLookupSmartSearch'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'CustomerNo'));
@@ -309,6 +310,8 @@
                         exit('NPR-TakePhotoRefreshMenuButtonActions-20230622');
                     'ItemIdentifierType':
                         exit('NPR-POSActionItemIdentifierType-20220623');
+                        'RefreshReverseDirectSalePOSAction':
+                        exit('NPR-POSActionRefreshReverseDirectSalePOSAction-20230628');
                     'ItemPriceIdentifierType':
                         exit('NPR-POSActionItemPriceIdentifierType-20220623');
                     'ItemLookupSmartSearch':
