@@ -14,6 +14,7 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         SalesDocImpRefreshMenuButtonActions();
         TakePhotoRefreshMenuButtonActions();
         ItemIdentifierType();
+        RefreshReverseDirectSalePOSAction();
         ItemPriceIdentifierType();
         ItemLookupSmartSearch();
         CustomerNo();
@@ -414,5 +415,19 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR UPG POS Action Parameters");
+    end;
+
+    local procedure RefreshReverseDirectSalePOSAction()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Action Parameters', 'RefreshReverseDirectSalePOSAction');
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'RefreshReverseDirectSalePOSAction')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+        RefreshPOSAction(Enum::"NPR POS Workflow"::REVERSE_DIRECT_SALE);
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'RefreshReverseDirectSalePOSAction'));
+        LogMessageStopwatch.LogFinish();
     end;
 }
