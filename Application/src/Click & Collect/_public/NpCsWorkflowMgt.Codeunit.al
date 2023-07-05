@@ -55,7 +55,7 @@
         end;
     end;
 
-    internal procedure RunWorkflowSendOrder(var NpCsDocument: Record "NPR NpCs Document")
+    procedure RunWorkflowSendOrder(var NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
     begin
@@ -74,7 +74,7 @@
             SendNotificationToStore(NpCsDocument);
     end;
 
-    internal procedure RunWorkflowOrderStatus(var NpCsDocument: Record "NPR NpCs Document")
+    procedure RunWorkflowOrderStatus(var NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
         PrevStatus: Integer;
