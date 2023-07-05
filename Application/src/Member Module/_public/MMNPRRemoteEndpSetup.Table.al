@@ -106,5 +106,22 @@
         if WebServiceAuthHelper.HasApiPassword(Rec."User Password Key") then
             WebServiceAuthHelper.RemoveApiPassword("User Password Key");
     end;
+
+    procedure SetRequestHeadersAuthorization(var RequestHeaders: HttpHeaders)
+    var
+        AuthParamsBuff: Record "NPR Auth. Param. Buffer";
+        iAuth: Interface "NPR API IAuthorization";
+        WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
+    begin
+        iAuth := Rec.AuthType;
+        case Rec.AuthType of
+            Rec.AuthType::Basic:
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(copystr(Rec."User Account", 1, 50), Rec."User Password Key", AuthParamsBuff);
+            Rec.AuthType::OAuth2:
+                WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
+        end;
+        iAuth.CheckMandatoryValues(AuthParamsBuff);
+        iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
+    end;
 }
 
