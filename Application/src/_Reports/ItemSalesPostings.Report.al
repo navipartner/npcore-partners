@@ -15,23 +15,14 @@
     {
         dataitem(CompanyInformation; "Company Information")
         {
-            column(COMPANYNAME; CompanyName)
-            {
-            }
-            column(ItemFilters; (Pct1Lbl + ' ' + ItemFilter))
-            {
-            }
-            column(DimFilters; Item.GetFilter("Global Dimension 1 Code"))
-            {
-            }
-            column(PrintAlsoWithoutSale; PrintAlsoWithoutSale)
-            {
-            }
-
+            column(COMPANYNAME; CompanyName) { }
+            column(ItemFilters; (Pct1Lbl + ' ' + ItemFilter)) { }
+            column(DimFilters; Item.GetFilter("Global Dimension 1 Code")) { }
+            column(PrintAlsoWithoutSale; PrintAlsoWithoutSale) { }
         }
         dataitem(Item; Item)
         {
-            CalcFields = "Sales (Qty.)", "Sales (LCY)", "COGS (LCY)", "Assembly BOM", Inventory;
+            CalcFields = "Sales (Qty.)", "Sales (LCY)", "Positive Adjmt. (LCY)", Inventory;
             DataItemTableView = SORTING("No.") ORDER(Ascending);
             RequestFilterFields = "No.", "Date Filter", "Item Category Code", "Vendor No.";
             column(No_Item; Item."No.")
@@ -46,82 +37,54 @@
             {
                 IncludeCaption = true;
             }
-            column(VendorItemNo_Item; Item."Vendor Item No.")
-            {
-            }
             column(UnitCost_Item; Item."Unit Cost")
             {
                 IncludeCaption = true;
-            }
-            column(UnitPrice_Item; Item.CalcUnitPriceExclVAT())
-            {
-            }
-            column(SalesQty_Item; ItemSalesQty)
-            {
-            }
-            column(Sales_Unit_Price; Item.CalcUnitPriceExclVAT() * ItemSalesQty)
-            {
-            }
-            column(SalesAmount_Item; ItemSalesAmount)
-            {
-            }
-            column(DiscountAmount; DiscountAmount)
-            {
-            }
-            column(Profit_Item; Profit)
-            {
-            }
-            column(ProfitPct_Item; ItemProfitPct)
-            {
             }
             column(Inventory_Item; Item.Inventory)
             {
                 IncludeCaption = true;
             }
-            column(ShowVendorNo_; ShowVendorNo)
-            {
-            }
-            column(ShowVendorItemNo; ShowVendorItemNo)
-            {
-            }
+            column(VendorItemNo_Item; Item."Vendor Item No.") { }
+            column(UnitPrice_Item; Item.CalcUnitPriceExclVAT()) { }
+            column(SalesQty_Item; ItemSalesQty) { }
+            column(Sales_Unit_Price; Item.CalcUnitPriceExclVAT() * ItemSalesQty) { }
+            column(SalesAmount_Item; ItemSalesAmount) { }
+            column(DiscountAmount; DiscountAmount) { }
+            column(Profit_Item; Profit) { }
+            column(ProfitPct_Item; ItemProfitPct) { }
+            column(ShowVendorNo_; ShowVendorNo) { }
+            column(ShowVendorItemNo; ShowVendorItemNo) { }
 
             trigger OnAfterGetRecord()
-            var
-                ValueEntry: Record "Value Entry";
-                ItemLedgerEntry: Record "Item Ledger Entry";
             begin
-
                 Clear(ItemSalesQty);
                 Clear(ItemSalesAmount);
                 Clear(CostAmountActual);
                 Clear(CostAmountNonInvtbl);
                 Clear(DiscountAmount);
-                ItemLedgerEntry.Reset();
-                ItemLedgerEntry.SetRange("Item No.", Item."No.");
-                ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
-                ItemLedgerEntry.SetFilter("Global Dimension 1 Code", Item.GetFilter("Global Dimension 1 Code"));
-                ItemLedgerEntry.SetFilter("Global Dimension 2 Code", Item.GetFilter("Global Dimension 2 Code"));
-                ItemLedgerEntry.SetFilter("Location Code", Item.GetFilter("Location Filter"));
-                ItemLedgerEntry.SetFilter("Posting Date", Item.GetFilter("Date Filter"));
-                ItemLedgerEntry.CalcSums("Invoiced Quantity");
-                IF ItemLedgerEntry.FindSet() THEN
-                    repeat
-                        ItemLedgerEntry.CalcFields("Sales Amount (Actual)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)");
-                        ItemSalesQty += -ItemLedgerEntry."Invoiced Quantity";
-                        ItemSalesAmount += ItemLedgerEntry."Sales Amount (Actual)";
-                        CostAmountActual += ItemLedgerEntry."Cost Amount (Actual)";
-                        CostAmountNonInvtbl += ItemLedgerEntry."Cost Amount (Non-Invtbl.)";
-                    until ItemLedgerEntry.Next() = 0;
+
+                ItemSalesQty := Item."Sales (Qty.)";
+                ItemSalesAmount := Item."Sales (LCY)";
+                CostAmountActual := Item."Positive Adjmt. (LCY)";
 
                 ValueEntry.Reset();
                 ValueEntry.SetRange("Item No.", Item."No.");
                 ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                ValueEntry.SetFilter("Global Dimension 1 Code", Item.GetFilter("Global Dimension 1 Code"));
-                ValueEntry.SetFilter("Global Dimension 2 Code", Item.GetFilter("Global Dimension 2 Code"));
-                ValueEntry.SetFilter("Location Code", Item.GetFilter("Location Filter"));
-                ValueEntry.SetFilter("Posting Date", Item.GetFilter("Date Filter"));
-                ValueEntry.CalcSums("Discount Amount");
+                ValueEntry.SetLoadFields("Discount Amount", "Cost Amount (Non-Invtbl.)");
+
+                if Item.GetFilter("Global Dimension 1 Code") <> '' then
+                    ValueEntry.SetFilter("Global Dimension 1 Code", Item.GetFilter("Global Dimension 1 Code"));
+                if Item.GetFilter("Global Dimension 2 Code") <> '' then
+                    ValueEntry.SetFilter("Global Dimension 2 Code", Item.GetFilter("Global Dimension 2 Code"));
+                if Item.GetFilter("Location Filter") <> '' then
+                    ValueEntry.SetFilter("Location Code", Item.GetFilter("Location Filter"));
+                if Item.GetFilter("Date Filter") <> '' then
+                    ValueEntry.SetFilter("Posting Date", Item.GetFilter("Date Filter"));
+
+                ValueEntry.CalcSums("Discount Amount", "Cost Amount (Non-Invtbl.)");
                 DiscountAmount := Abs(ValueEntry."Discount Amount");
+                CostAmountNonInvtbl := ValueEntry."Cost Amount (Non-Invtbl.)";
 
                 if Item.Type = Item.Type::Service then
                     ItemCOG := CostAmountNonInvtbl
@@ -138,7 +101,6 @@
                     if (ItemSalesQty = 0) and (ItemSalesAmount = 0) then
                         CurrReport.Skip();
             end;
-
         }
     }
 
@@ -193,17 +155,18 @@
     end;
 
     var
+        ValueEntry: Record "Value Entry";
         PrintAlsoWithoutSale: Boolean;
-        ItemFilter: Text[250];
-        Profit: Decimal;
-        ItemProfitPct: Decimal;
         ShowVendorItemNo: Boolean;
-        ItemSalesQty: Decimal;
-        ItemSalesAmount: Decimal;
-        DiscountAmount: Decimal;
+        ShowVendorNo: Boolean;
         CostAmountActual: Decimal;
         CostAmountNonInvtbl: Decimal;
+        DiscountAmount: Decimal;
         ItemCOG: Decimal;
-        ShowVendorNo: Boolean;
+        ItemProfitPct: Decimal;
+        ItemSalesAmount: Decimal;
+        ItemSalesQty: Decimal;
+        Profit: Decimal;
         Pct1Lbl: Label 'Item Filter:', locked = true;
+        ItemFilter: Text[250];
 }
