@@ -19,6 +19,8 @@ stages:
         - Agent.OS -equals Windows_NT
         - Agent.OSVersion -equals 10.0.17763
       containerDefinitions:
+        - name: BC2105_CLOUD
+          alwaysRun: true       
         - name: vLatest_CLOUD
           alwaysRun: true
         
