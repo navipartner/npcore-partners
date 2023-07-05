@@ -4,9 +4,8 @@
     Caption = 'Nc Task List Subform';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR Nc Task Field";
-    ApplicationArea = NPRNaviConnect;
 
     layout
     {
