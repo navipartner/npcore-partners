@@ -5136,14 +5136,20 @@ End Function
         <Field Name="VendorNo_">
           <DataField>VendorNo_</DataField>
         </Field>
-        <Field Name="VendorItemNo_Item">
-          <DataField>VendorItemNo_Item</DataField>
-        </Field>
         <Field Name="UnitCost_Item">
           <DataField>UnitCost_Item</DataField>
         </Field>
         <Field Name="UnitCost_ItemFormat">
           <DataField>UnitCost_ItemFormat</DataField>
+        </Field>
+        <Field Name="Inventory_Item">
+          <DataField>Inventory_Item</DataField>
+        </Field>
+        <Field Name="Inventory_ItemFormat">
+          <DataField>Inventory_ItemFormat</DataField>
+        </Field>
+        <Field Name="VendorItemNo_Item">
+          <DataField>VendorItemNo_Item</DataField>
         </Field>
         <Field Name="UnitPrice_Item">
           <DataField>UnitPrice_Item</DataField>
@@ -5186,12 +5192,6 @@ End Function
         </Field>
         <Field Name="ProfitPct_ItemFormat">
           <DataField>ProfitPct_ItemFormat</DataField>
-        </Field>
-        <Field Name="Inventory_Item">
-          <DataField>Inventory_Item</DataField>
-        </Field>
-        <Field Name="Inventory_ItemFormat">
-          <DataField>Inventory_ItemFormat</DataField>
         </Field>
         <Field Name="ShowVendorNo_">
           <DataField>ShowVendorNo_</DataField>
