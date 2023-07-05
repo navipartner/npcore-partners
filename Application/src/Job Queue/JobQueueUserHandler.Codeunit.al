@@ -29,6 +29,12 @@ codeunit 6151058 "NPR Job Queue User Handler"
     var
         JobQueueRefreshSetup: Record "NPR Job Queue Refresh Setup";
     begin
+        if not GuiAllowed() then
+            exit;
+
+        if not (JobQueueRefreshSetup.WritePermission() and JobQueueRefreshSetup.ReadPermission()) then
+            exit;
+
         if not IsRefreshJobQueueEntriesEnabled(JobQueueRefreshSetup) then
             exit;
 
@@ -64,10 +70,7 @@ codeunit 6151058 "NPR Job Queue User Handler"
         JobQueueEntry: Record "Job Queue Entry";
         User: Record User;
     begin
-        if not GuiAllowed then
-            exit(false);
-
-        if not (JobQueueEntry.WritePermission and JobQueueEntry.ReadPermission) then
+        if not (JobQueueEntry.WritePermission() and JobQueueEntry.ReadPermission()) then
             exit(false);
 
         if not TryCheckRequiredPermissions() then // native procedure TryCheckRequiredPermissions from "Job Queue Entry" table is marked as internal, so I had to create our version by copying it
