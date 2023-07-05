@@ -140,11 +140,21 @@
         RetentionPolicySetup: Record "Retention Policy Setup";
     begin
         if RetentionPolicySetup.Get(TableId) then begin
-            if not RetentionPolicySetup.WritePermission() then
+            if not RetentionPolicySetup.WritePermission() then begin
+                AddRetentionPolicySetupToBuffer(TableId, RetentionPeriodCode, EnablePolicy);
                 exit;
+            end;
+
             RetentionPolicySetup.Delete(true);
         end;
 
+        InsertRetentionPolicySetup(TableId, RetentionPeriodCode, EnablePolicy);
+    end;
+
+    internal procedure InsertRetentionPolicySetup(TableId: Integer; RetentionPeriodCode: Code[20]; EnablePolicy: Boolean)
+    var
+        RetentionPolicySetup: Record "Retention Policy Setup";
+    begin
         RetentionPolicySetup.Init();
         RetentionPolicySetup.Validate("Table Id", TableId);
 #if BC17
@@ -156,6 +166,23 @@
             RetentionPolicySetup.Validate("Retention Period", RetentionPeriodCode);
         RetentionPolicySetup.Validate(Enabled, EnablePolicy);
         RetentionPolicySetup.Insert(true);
+    end;
+
+    local procedure AddRetentionPolicySetupToBuffer(TableId: Integer; RetentionPeriodCode: Code[20]; EnablePolicy: Boolean)
+    var
+        RetenPolicySetupBuffer: Record "NPR Reten. Policy Setup Buffer";
+    begin
+        if not (RetenPolicySetupBuffer.WritePermission() and RetenPolicySetupBuffer.ReadPermission()) then
+            exit;
+
+        if RetenPolicySetupBuffer.Get(TableId) then // this to cover the case if there were multiple tries to do the install/upgrade, but data from the buffer hasn't been processed in the meantime
+            RetenPolicySetupBuffer.Delete();
+
+        RetenPolicySetupBuffer.Init();
+        RetenPolicySetupBuffer."Table Id" := TableId;
+        RetenPolicySetupBuffer."Retention Period" := RetentionPeriodCode;
+        RetenPolicySetupBuffer.Enabled := EnablePolicy;
+        RetenPolicySetupBuffer.Insert();
     end;
 
 #if not BC17
