@@ -442,6 +442,10 @@
                     '20230515':
                         exit('PosEntryLineDimFix_20230515');
                 end;
+            #IF NOT BC17
+            Codeunit::"NPR UPG Permission Set":
+                exit('NPRUPGPermissionSet');
+            #ENDIF
         end;
     end;
 }
