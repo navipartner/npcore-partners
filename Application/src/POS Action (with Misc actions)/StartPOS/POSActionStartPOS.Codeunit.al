@@ -103,7 +103,7 @@ codeunit 6150858 "NPR POS Action: Start POS" implements "NPR IPOS Workflow"
             BinContentsHTML := StrSubstNo(BinContentsHTML3Lbl, EmptyBin);
 
             POSPaymentBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpoint."Entry No.");
-            POSPaymentBinCheckpoint.SetRange("New Float Amount", 0);
+            POSPaymentBinCheckpoint.SetFilter("New Float Amount", '>%1', 0);
 
             if (POSPaymentBinCheckpoint.FindSet()) then begin
                 BinContentsHTML := StrSubstNo(BinContentsHTML4Lbl, Expected);
