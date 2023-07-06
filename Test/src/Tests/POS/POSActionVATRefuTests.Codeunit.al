@@ -62,7 +62,7 @@ codeunit 85125 "NPR POSAction: VAT Refu. Tests"
         VATAmount := VATRefusionB.CalcVATFromSale(SalePOS);
 
         // [When] We do Refusion
-        VATRefusionB.DoRefusion(POSSession, POSPaymentMethod.Code, VATAmount);
+        VATRefusionB.DoRefusion(POSPaymentMethod.Code, VATAmount);
 
         // [Then] There should be a Line for a VAT refusion
         SaleLinePOS2.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");

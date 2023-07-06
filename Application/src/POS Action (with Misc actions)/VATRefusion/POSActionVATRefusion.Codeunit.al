@@ -25,20 +25,19 @@ codeunit 6150816 "NPR POSAction: VAT Refusion" implements "NPR IPOS Workflow"
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
-    var
-        POSSession: Codeunit "NPR POS Session";
     begin
         case Step of
             'onBeforeRefusion':
-                OnBeforeRefussion(Context, POSSession);
+                OnBeforeRefussion(Context);
             'doRefussion':
-                OnDoRefussion(Context, POSSession);
+                OnDoRefussion(Context);
         end;
     end;
 
-    local procedure OnBeforeRefussion(Context: codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
+    local procedure OnBeforeRefussion(Context: codeunit "NPR POS JSON Helper")
     var
         SalePOS: Record "NPR POS Sale";
+        POSSession: Codeunit "NPR POS Session";
         NPRPOSPaymentMethod: Record "NPR POS Payment Method";
         POSSale: Codeunit "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
@@ -62,7 +61,7 @@ codeunit 6150816 "NPR POSAction: VAT Refusion" implements "NPR IPOS Workflow"
     end;
 
 
-    local procedure OnDoRefussion(Context: codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
+    local procedure OnDoRefussion(Context: codeunit "NPR POS JSON Helper")
     var
         VATRefusionB: Codeunit "NPR POSAction: VAT Refusion-B";
         PaymentTypeCode: Code[10];
@@ -72,7 +71,7 @@ codeunit 6150816 "NPR POSAction: VAT Refusion" implements "NPR IPOS Workflow"
         PaymentTypeCode := CopyStr(Context.GetStringParameter('PaymentTypePOSCode'), 1, MaxStrLen(PaymentTypeCode));
         AmountInclVAT := Context.GetDecimal('VATAmount');
 
-        VATRefusionB.DoRefusion(POSSession, PaymentTypeCode, AmountInclVAT);
+        VATRefusionB.DoRefusion(PaymentTypeCode, AmountInclVAT);
     end;
 
     local procedure GetActionScript(): Text
