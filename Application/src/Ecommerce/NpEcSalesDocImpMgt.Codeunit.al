@@ -1029,7 +1029,7 @@
 
         Position := StrPos(ReferenceNo, '_');
         if Position > 0 then begin
-            ItemNo := UpperCase(CopyStr(ReferenceNo, 1, Position));
+            ItemNo := UpperCase(CopyStr(ReferenceNo, 1, Position - 1));
             VariantCode := UpperCase(DelStr(ReferenceNo, 1, Position));
 
             if (StrLen(ItemNo) <= MaxStrLen(ItemVariant."Item No.")) and (StrLen(VariantCode) <= MaxStrLen(ItemVariant.Code)) then begin
