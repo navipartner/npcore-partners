@@ -38,11 +38,11 @@
 
                 trigger OnAction()
                 var
-                    AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+                    BaseData: Codeunit "NPR Base Data";
                     [NonDebuggable]
                     BaseURL: Text;
                 begin
-                    BaseURL := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl') + '/xmlstylesheet/';
+                    BaseURL := BaseData.GetBaseUrl() + '/xmlstylesheet/';
                     DownloadXmlStylesheet(BaseURL);
                     CurrPage.Close();
                 end;
@@ -89,6 +89,7 @@
     local procedure OnLookupXMLStylesheet(var SelectedValue: Text): Boolean
     var
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        BaseData: Codeunit "NPR Base Data";
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
         xmlStyleList: List of [Text];
         TempRetailList: Record "NPR Retail List" temporary;
@@ -96,7 +97,7 @@
         BaseUri: Text;
         Secret: Text;
     begin
-        BaseUri := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl');
+        BaseUri := BaseData.GetBaseUrl();
         Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
 
         rapidstartBaseDataMgt.GetAllPackagesInBlobStorage(BaseUri + '/xmlstylesheet/?restype=container&comp=list'

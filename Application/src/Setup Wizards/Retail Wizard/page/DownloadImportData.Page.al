@@ -329,7 +329,7 @@ page 6150812 "NPR Download&Import Data"
     local procedure ImportPrintTemplateData()
     var
         ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        BaseData: Codeunit "NPR Base Data";
     begin
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Header");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Line");
@@ -339,7 +339,7 @@ page 6150812 "NPR Download&Import Data"
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Data Item Constr. Links");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Device Settings");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Media Info");
-        ManagedPackageMgt.DeployPrintTemplatePackage(AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl') + PrintTemplatepackage);
+        ManagedPackageMgt.DeployPrintTemplatePackage(BaseData.GetBaseUrl() + PrintTemplatepackage);
     end;
 
     local procedure ImportNPRetailBasicData()

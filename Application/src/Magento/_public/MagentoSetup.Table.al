@@ -962,7 +962,7 @@
     var
         XmlTemplate: Record "NPR NpXml Template";
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        BaseData: Codeunit "NPR Base Data";
         TemplateCode: Text;
         [NonDebuggable]
         BaseURL: Text;
@@ -976,7 +976,7 @@
             else
                 exit;
 
-        BaseURL := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl') + '/npxml/' + XmlTemplateFileName.Substring(1, XmlTemplateFileName.LastIndexOf('/'));
+        BaseURL := BaseData.GetBaseUrl() + '/npxml/' + XmlTemplateFileName.Substring(1, XmlTemplateFileName.LastIndexOf('/'));
         NpXmlTemplateMgt.ImportNpXmlTemplateUrl(CopyStr(TemplateCode, 1, 20), BaseURL);
     end;
 

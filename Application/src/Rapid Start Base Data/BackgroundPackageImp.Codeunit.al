@@ -6,6 +6,7 @@ codeunit 6059792 "NPR Background Package Imp."
     trigger OnRun()
     var
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        BaseData: Codeunit "NPR Base Data";
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
         [NonDebuggable]
         BaseUri: Text;
@@ -14,7 +15,7 @@ codeunit 6059792 "NPR Background Package Imp."
         Secret: Text;
     begin
         packageName := Rec."Package Name".Replace('.rapidstart', '');
-        BaseUri := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl');
+        BaseUri := BaseData.GetBaseUrl();
         Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
 
         BindSubscription(rapidStartBaseDataMgt);
