@@ -78,23 +78,44 @@
     begin
         GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR GraphApi Setup Wizard");
         GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Magento Wizard");
-        AddRetailSetupsWizard();
-        AddRestaurantSetupsWizard();
-        SetupRetailChecklist();
-        SetupRestaurantChecklist();
+        RetailSetups();
+        RestaurantSetups();
     end;
 
     #region Retail
     //This region contains functions for creating Retail Setup Wizards and Checklist
-    local procedure AddRetailSetupsWizard()
+    local procedure RetailSetups()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
         Modul: Option Retail,Restaurant;
     begin
-
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
         if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Retail)) then
             exit;
 
+        RemoveRetailGuidedExperience();
+
+        AddRetailSetupsWizard();
+        CreateRetailChecklistItems();
+
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Retail));
+    end;
+
+    local procedure RemoveRetailGuidedExperience()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Download&Import Data");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Create POS Stores & Units");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Posting Profile");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Payment Methods");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Posting Setup");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Salespeople");
+    end;
+
+    local procedure AddRetailSetupsWizard()
+    begin
         CreateWelcomeVideoExperience();
         DownloadAndImportDataWizard();
         CreatePOSstoresAndUnitsWizard();
@@ -102,8 +123,6 @@
         ModifyPOSpaymentMethodsWizard();
         ModifyPOSPostingSetupWizard();
         ModifySalesPeopleWizard();
-
-        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Retail));
     end;
 
     local procedure CreateWelcomeVideoExperience()
@@ -135,8 +154,8 @@
         GuidedExperienceType: Enum "Guided Experience Type";
         AssistedSetupGroup: Enum "Assisted Setup Group";
         VideoCategory: Enum "Video Category";
-        WizardNameLbl: Label 'Download & Import Data.', Locked = true;
-        SetupDescriptionTxt: Label 'Download & Import Data.', Locked = true;
+        WizardNameLbl: Label 'Download & Import Data', Locked = true;
+        SetupDescriptionTxt: Label 'Download & Import Data', Locked = true;
     begin
         if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Download&Import Data") then
             GuidedExperience.InsertAssistedSetup(WizardNameLbl,
@@ -172,8 +191,8 @@
         GuidedExperienceType: Enum "Guided Experience Type";
         AssistedSetupGroup: Enum "Assisted Setup Group";
         VideoCategory: Enum "Video Category";
-        WizardNameLbl: Label 'Create POS Stores & Units.', Locked = true;
-        SetupDescriptionTxt: Label 'Create POS Stores & Units.', Locked = true;
+        WizardNameLbl: Label 'Create POS Stores & Units', Locked = true;
+        SetupDescriptionTxt: Label 'Create POS Stores & Units', Locked = true;
     begin
         if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Create POS Stores & Units") then
             GuidedExperience.InsertAssistedSetup(WizardNameLbl,
@@ -208,8 +227,8 @@
         GuidedExperienceType: Enum "Guided Experience Type";
         AssistedSetupGroup: Enum "Assisted Setup Group";
         VideoCategory: Enum "Video Category";
-        WizardNameLbl: Label 'Modify POS Posting Profile.', Locked = true;
-        SetupDescriptionTxt: Label 'Modify POS Posting Profile.', Locked = true;
+        WizardNameLbl: Label 'Modify POS Posting Profile', Locked = true;
+        SetupDescriptionTxt: Label 'Modify POS Posting Profile', Locked = true;
     begin
         if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Posting Profile") then
             GuidedExperience.InsertAssistedSetup(WizardNameLbl,
@@ -244,8 +263,8 @@
         GuidedExperienceType: Enum "Guided Experience Type";
         AssistedSetupGroup: Enum "Assisted Setup Group";
         VideoCategory: Enum "Video Category";
-        WizardNameLbl: Label 'Modify POS Payment Methods.', Locked = true;
-        SetupDescriptionTxt: Label 'Modify POS Payment Methods.', Locked = true;
+        WizardNameLbl: Label 'Modify POS Payment Methods', Locked = true;
+        SetupDescriptionTxt: Label 'Modify POS Payment Methods', Locked = true;
     begin
         if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Payment Methods") then
             GuidedExperience.InsertAssistedSetup(WizardNameLbl,
@@ -280,8 +299,8 @@
         GuidedExperienceType: Enum "Guided Experience Type";
         AssistedSetupGroup: Enum "Assisted Setup Group";
         VideoCategory: Enum "Video Category";
-        WizardNameLbl: Label 'Modify POS Posting Setup.', Locked = true;
-        SetupDescriptionTxt: Label 'Modify POS Posting Setup.', Locked = true;
+        WizardNameLbl: Label 'Modify POS Posting Setup', Locked = true;
+        SetupDescriptionTxt: Label 'Modify POS Posting Setup', Locked = true;
     begin
         if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Posting Setup") then
             GuidedExperience.InsertAssistedSetup(WizardNameLbl,
@@ -316,8 +335,8 @@
         GuidedExperienceType: Enum "Guided Experience Type";
         AssistedSetupGroup: Enum "Assisted Setup Group";
         VideoCategory: Enum "Video Category";
-        WizardNameLbl: Label 'Modify Salespeople.', Locked = true;
-        SetupDescriptionTxt: Label 'Modify Salespeople.', Locked = true;
+        WizardNameLbl: Label 'Modify Salespeople', Locked = true;
+        SetupDescriptionTxt: Label 'Modify Salespeople', Locked = true;
     begin
         if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Salespeople") then
             GuidedExperience.InsertAssistedSetup(WizardNameLbl,
@@ -344,21 +363,6 @@
         GuidedExperience: Codeunit "Guided Experience";
     begin
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Modify Salespeople");
-    end;
-
-    local procedure SetupRetailChecklist()
-    var
-        UpgradeTag: Codeunit "Upgrade Tag";
-        Modul: Option Retail,Restaurant;
-    begin
-        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
-            exit;
-        if UpgradeTag.HasUpgradeTag(GetChecklistUpgradeTag(Modul::Retail)) then
-            exit;
-
-        CreateRetailChecklistItems();
-
-        UpgradeTag.SetUpgradeTag(GetChecklistUpgradeTag(Modul::Retail));
     end;
 
     local procedure CreateRetailChecklistItems()
@@ -413,6 +417,22 @@
         UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Restaurant));
     end;
 
+    local procedure RestaurantSetups()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+        Modul: Option Retail,Restaurant;
+    begin
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
+        if UpgradeTag.HasUpgradeTag(GetChecklistUpgradeTag(Modul::Restaurant)) then
+            exit;
+
+        AddRestaurantSetupsWizard();
+        CreateRestaurantChecklistItems();
+
+        UpgradeTag.SetUpgradeTag(GetChecklistUpgradeTag(Modul::Restaurant));
+    end;
+
     local procedure WelcomeVideoRestaurantExperience()
     var
         GuidedExperience: Codeunit "Guided Experience";
@@ -442,8 +462,8 @@
         GuidedExperienceType: Enum "Guided Experience Type";
         AssistedSetupGroup: Enum "Assisted Setup Group";
         VideoCategory: Enum "Video Category";
-        WizardNameLbl: Label 'Download & Import Predefined Setups.', Locked = true;
-        SetupDescriptionTxt: Label 'Download & Import Predefined Setups.', Locked = true;
+        WizardNameLbl: Label 'Download & Import Predefined Setups', Locked = true;
+        SetupDescriptionTxt: Label 'Download & Import Predefined Setups', Locked = true;
     begin
         if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Download&Import Rest Data") then
             GuidedExperience.InsertAssistedSetup(WizardNameLbl,
@@ -694,21 +714,6 @@
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Create Restaurant Layout");
     end;
 
-    local procedure SetupRestaurantChecklist()
-    var
-        UpgradeTag: Codeunit "Upgrade Tag";
-        Modul: Option Retail,Restaurant;
-    begin
-        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
-            exit;
-        if UpgradeTag.HasUpgradeTag(GetChecklistUpgradeTag(Modul::Restaurant)) then
-            exit;
-
-        CreateRestaurantChecklistItems();
-
-        UpgradeTag.SetUpgradeTag(GetChecklistUpgradeTag(Modul::Restaurant));
-    end;
-
     local procedure CreateRestaurantChecklistItems()
     var
         TempAllProfile: Record "All Profile" temporary;
@@ -743,10 +748,10 @@
         case Modul of
             Modul::Retail:
                 //For Any change, increase version
-                exit('NPR-Checklist-v1.3');
+                exit('NPR-Checklist-v1.4');
             Modul::Restaurant:
                 //For Any change, increase version
-                exit('NPR-Checklist-Restaurant-v1.4');
+                exit('NPR-Checklist-Restaurant-v1.5');
         end;
     end;
 
@@ -755,10 +760,10 @@
         case Modul of
             Modul::Retail:
                 //For Any change, increase version
-                exit('NPR-AssistedSetup-v1.0');
+                exit('NPR-AssistedSetup-v1.1');
             Modul::Restaurant:
                 //For Any change, increase version
-                exit('NPR-AssistedSetup-Restaurant-v1.4');
+                exit('NPR-AssistedSetup-Restaurant-v1.5');
         end;
     end;
 
