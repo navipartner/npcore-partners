@@ -343,6 +343,13 @@
         InitDiscountPriority(DiscountPriority);
     end;
 
+    procedure PeriodDiscountLineisValid(var PeriodDiscountLine: Record "NPR Period Discount Line"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; SalePOS: Record "NPR POS Sale"): Boolean
+    var
+        PeriodDiscountMgmt: Codeunit "NPR Period Discount Management";
+    begin
+        exit(PeriodDiscountMgmt.PeriodDiscountLineIsValid(PeriodDiscountLine, TempSaleLinePOS, SalePOS));
+    end;
+
     procedure DeleteAllDiscountPriorities()
     var
         DiscountPriority: Record "NPR Discount Priority";
