@@ -53,7 +53,7 @@
     local procedure OnFinishAction()
     var
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        BaseData: Codeunit "NPR Base Data";
         XmlTemplateList: List of [Text];
         XmlTemplate: Text;
         TemplateCode: Text;
@@ -61,7 +61,7 @@
     begin
         XmlTemplateList := XmlTemplates.Split(',');
         foreach XmlTemplate in XmlTemplateList do begin
-            BaseURL := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl') + '/npxml/' + XmlTemplate.Substring(1, XmlTemplate.LastIndexOf('/'));
+            BaseURL := BaseData.GetBaseUrl() + '/npxml/' + XmlTemplate.Substring(1, XmlTemplate.LastIndexOf('/'));
             TemplateCode := XmlTemplate.Substring(XmlTemplate.LastIndexOf('/') + 1);
             TemplateCode := TemplateCode.Substring(1, TemplateCode.IndexOf('.xml') - 1);
             NpXmlTemplateMgt.ImportNpXmlTemplateUrl(CopyStr(TemplateCode, 1, 20), BaseURL);
@@ -74,6 +74,7 @@
     var
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        BaseData: Codeunit "NPR Base Data";
         packageList: List of [Text];
         TempRetailList: Record "NPR Retail List" temporary;
         RetailListPage: Page "NPR Retail List";
@@ -81,7 +82,7 @@
         BaseUri: Text;
         Secret: Text;
     begin
-        BaseUri := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl');
+        BaseUri := BaseData.GetBaseUrl();
         Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
 
         rapidstartBaseDataMgt.GetAllPackagesInBlobStorage(BaseUri + '/npxml/?restype=container&comp=list'

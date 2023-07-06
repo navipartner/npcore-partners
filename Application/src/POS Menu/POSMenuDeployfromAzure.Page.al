@@ -54,13 +54,14 @@
     var
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        BaseData: Codeunit "NPR Base Data";
         packageList: List of [Text];
         TempRetailList: Record "NPR Retail List" temporary;
         package: Text;
         BaseUri: Text;
         Secret: Text;
     begin
-        BaseUri := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl');
+        BaseUri := BaseData.GetBaseUrl();
         Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
 
         rapidstartBaseDataMgt.GetAllPackagesInBlobStorage(BaseUri + '/posmenupackage/?restype=container&comp=list'
@@ -84,12 +85,12 @@
     local procedure OnFinishAction()
     var
         ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        BaseData: Codeunit "NPR Base Data";
     begin
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR POS Menu");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR POS Menu Button");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR POS Parameter Value");
-        ManagedPackageMgt.DeployPackageFromURL(AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl') + '/posmenupackage/' + PosMenu);
+        ManagedPackageMgt.DeployPackageFromURL(BaseData.GetBaseUrl() + '/posmenupackage/' + PosMenu);
 
         CurrPage.Close();
     end;

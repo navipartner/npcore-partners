@@ -75,6 +75,7 @@ page 6060030 "NPR PepperRapidPackage"
         TempRetailList: Record "NPR Retail List" temporary;
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        BaseData: Codeunit "NPR Base Data";
         packageList: List of [Text];
         RetailListPage: Page "NPR Retail List";
         package: Text;
@@ -82,7 +83,7 @@ page 6060030 "NPR PepperRapidPackage"
         Secret: Text;
         PackageNameFromFileName: Text;
     begin
-        BaseUri := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl');
+        BaseUri := BaseData.GetBaseUrl();
         Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
 
         rapidstartBaseDataMgt.GetAllPackagesInBlobStorage(BaseUri + '/pepperpackage/?restype=container&comp=list'
@@ -128,13 +129,14 @@ page 6060030 "NPR PepperRapidPackage"
     var
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        BaseData: Codeunit "NPR Base Data";
         packageName: Text;
         BaseUri: Text;
         Secret: Text;
         RapidPackageList: List of [Text];
         RapidPackage: Text;
     begin
-        BaseUri := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl');
+        BaseUri := BaseData.GetBaseUrl();
         Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
 
         RapidPackageList := packages.Split(',');

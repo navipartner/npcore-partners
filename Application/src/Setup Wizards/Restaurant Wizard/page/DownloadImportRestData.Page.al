@@ -363,10 +363,10 @@ page 6150894 "NPR Download&Import Rest Data"
     [NonDebuggable]
     local procedure PosLayoutsAzureDataUrl(): Text
     var
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        BaseData: Codeunit "NPR Base Data";
         AzureUriLbl: Label '%1/restaurantsetup', Comment = '%1 - Base Uri';
     begin
-        exit(StrSubstNo(AzureUriLbl, AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl')));
+        exit(StrSubstNo(AzureUriLbl, BaseData.GetBaseUrl()));
     end;
 
     [NonDebuggable]

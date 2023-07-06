@@ -128,7 +128,7 @@
     procedure DeployPackageFromBlobStorage()
     var
         ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        BaseData: Codeunit "NPR Base Data";
     begin
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Header");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Line");
@@ -138,7 +138,7 @@
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Data Item Constr. Links");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Device Settings");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Media Info");
-        ManagedPackageMgt.DeployPackageFromURL(AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl') + '/retailprinttemplates/templates.json');
+        ManagedPackageMgt.DeployPackageFromURL(BaseData.GetBaseUrl() + '/retailprinttemplates/templates.json');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Managed Package Mgt.", 'OnLoadPackage', '', false, false)]
