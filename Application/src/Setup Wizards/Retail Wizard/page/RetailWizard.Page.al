@@ -1199,12 +1199,13 @@ page 6014651 "NPR Retail Wizard"
         TempRetailList: Record "NPR Retail List" temporary;
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        BaseData: Codeunit "NPR Base Data";
         packageList: List of [Text];
         BaseUri: Text;
         locPackage: Text;
         Secret: Text;
     begin
-        BaseUri := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataBaseUrl');
+        BaseUri := BaseData.GetBaseUrl();
         Secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('NpRetailBaseDataSecret');
 
         rapidstartBaseDataMgt.GetAllPackagesInBlobStorage(BaseUri + '/pos-test-data/?restype=container&comp=list'
