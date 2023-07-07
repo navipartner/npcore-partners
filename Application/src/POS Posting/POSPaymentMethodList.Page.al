@@ -49,14 +49,14 @@
                 field("Rounding Gains Account"; Rec."Rounding Gains Account")
                 {
 
-                    Visible = true;
+                    Visible = false;
                     ToolTip = 'Specifies G/L Account No. which will be used for rounding gains.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Rounding Losses Account"; Rec."Rounding Losses Account")
                 {
 
-                    Visible = true;
+                    Visible = false;
                     ToolTip = 'Specifies G/L Account No. which will be used for rounding losses.';
                     ApplicationArea = NPRRetail;
                 }
