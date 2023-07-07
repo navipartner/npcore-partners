@@ -36,6 +36,13 @@ codeunit 6014494 "NPR Azure Key Vault Mgt."
         end;
     end;
 
+    [TryFunction]
+    [NonDebuggable]
+    procedure TryGetAzureKeyVaultSecret(Name: Text; var KeyValueOut: Text)
+    begin
+        KeyValueOut := GetAzureKeyVaultSecret(Name);
+    end;
+
     var
         AppKeyVaultSecretProvider: Codeunit "App Key Vault Secret Provider";
         InMemorySecretProvider: Codeunit "In Memory Secret Provider";
