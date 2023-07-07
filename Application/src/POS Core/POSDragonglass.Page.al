@@ -33,30 +33,17 @@
                 trigger OnInvokeMethod(method: Text; eventContext: JsonObject)
                 var
                     POSPageStackCheck: Codeunit "NPR POS Page Stack Check";
-                    SentryScope: Codeunit "NPR Sentry Scope";
-                    SentryTransaction: Codeunit "NPR Sentry Transaction";
-                    AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
                 begin
                     if method = 'KeepAlive' then
                         exit; //exit asap to minimize overhead of idle sessions       
                     _POSSession.ErrorIfPageIdMismatch(_PageId);
 
-                    SentryScope.InitScopeAndTransaction(
-                        'bc.addin.invoke_method:' + method,
-                        'bc.addin.invoke_method',
-                        AzureKeyVaultMgt.GetAzureKeyVaultSecret('SentryIONpCorePointOfSale'),
-                        '',
-                        '',
-                        SentryTransaction);
                     BindSubscription(POSPageStackCheck);
                     _POSBackgroundTaskManager.ClearQueues();
 
                     _JavaScript.InvokeMethod(method, eventContext, _POSSession, _FrontEnd, _JavaScript);
 
                     ProcessBackgroundTaskQueues();
-                    // TODO: finish sentry integration for distributed tracing between front & backend
-                    //SentryTransaction.Finish();
-                    SentryScope.ClearScope();
                 end;
 
                 trigger OnAction("action": Text; workflowStep: Text; workflowId: Integer; actionId: Integer; context: JsonObject)
