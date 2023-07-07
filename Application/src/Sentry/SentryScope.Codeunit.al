@@ -19,6 +19,17 @@ codeunit 6150994 "NPR Sentry Scope"
         _initialized := true;
     end;
 
+
+    procedure InitScopeAndTransaction(Name: Text; Operation: Text; ExternalTraceId: Text; ExternalSpanId: Text; var TransactionOut: Codeunit "NPR Sentry Transaction")
+    var
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        DefaultDsn: Text;
+    begin
+        if not AzureKeyVaultMgt.TryGetAzureKeyVaultSecret('SentryIONpCorePointOfSale', DefaultDsn) then
+            exit;
+        InitScopeAndTransaction(Name, Operation, DefaultDsn, ExternalTraceId, ExternalSpanId, TransactionOut);
+    end;
+
     procedure SetActiveSpan(var SentrySpan: Codeunit "NPR Sentry Span")
     begin
         if not _initialized then
