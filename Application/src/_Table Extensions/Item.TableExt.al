@@ -9,12 +9,20 @@ tableextension 6014427 "NPR Item" extends Item
                 ItemCategory: Record "Item Category";
                 ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
             begin
-                if not Rec.IsTemporary() then
-                    if Rec."Item Category Code" <> xRec."Item Category Code" then
-                        if ItemCategory.Get(Rec."Item Category Code") then begin
-                            ItemCategoryMgt.SetupItemFromCategory(Rec, ItemCategory);
-                            Rec.Validate("Base Unit of Measure", Rec."Base Unit of Measure");
-                        end;
+                if Rec.IsTemporary() then
+                    exit;
+
+                if Rec."Item Category Code" = xRec."Item Category Code" then
+                    exit;
+
+                if not ItemCategory.Get(Rec."Item Category Code") then
+                    exit;
+
+                if ItemCategory."NPR Item Template Code" = '' then
+                    exit;
+
+                ItemCategoryMgt.SetupItemFromCategory(Rec, ItemCategory);
+                Rec.Validate("Base Unit of Measure", Rec."Base Unit of Measure");
             end;
         }
         modify(GTIN)
