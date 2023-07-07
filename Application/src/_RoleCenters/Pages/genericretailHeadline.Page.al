@@ -13,11 +13,9 @@
             group(Greeting)
             {
                 ShowCaption = false;
-
                 Visible = false;
                 field(GreetingText; GreetingText)
                 {
-
                     Caption = 'Greetings headline';
                     Editable = false;
                     ToolTip = 'Greeting text.';
@@ -28,7 +26,6 @@
             {
                 field(LearnMore; NPRetailTxt)
                 {
-
                     Caption = 'Learn more about NP Retail headline';
                     Editable = false;
                     ToolTip = 'Learn more about NP Retail.';
@@ -40,16 +37,6 @@
                     begin
                         Hyperlink(DrillDownURLTxt)
                     end;
-
-
-                }
-                field(NPRVersionNumber; NPRVersion)
-                {
-
-                    Caption = 'NPR Version';
-                    Editable = false;
-                    ToolTip = 'NPR Version';
-                    ApplicationArea = NPRRetail;
                 }
                 field(WhatIsNewText; WhatIsNewText)
                 {
@@ -64,6 +51,13 @@
                     begin
                         Hyperlink(DrillDownURLTxt);
                     end;
+                }
+                field(NPRVersionNumber; NPRVersion)
+                {
+                    Caption = 'NPR Version';
+                    Editable = false;
+                    ToolTip = 'NPR Version';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }
@@ -81,7 +75,6 @@
         HeadlineManagement: Codeunit "NPR NP Retail Headline Mgt.";
         GreetingText: Text;
         NPRetailTxt: Label 'Want to learn more about NP Retail?';
-
         LicenseInformation: Codeunit "NPR License Information";
         NPRVersionTxt: Label 'You are currently on version NP RETAIL %1', Comment = '%1 is the NP Retail version number';
         NPRVersion: Text[250];
