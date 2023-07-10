@@ -119,22 +119,23 @@
         end;
     end;
 
-    procedure MoveSaleFromPOSToWaiterPad(var SalePOS: Record "NPR POS Sale"; WaiterPad: Record "NPR NPRE Waiter Pad"; CleanupSale: Boolean)
+    procedure MoveSaleFromPOSToWaiterPad(var SalePOS: Record "NPR POS Sale"; WaiterPad: Record "NPR NPRE Waiter Pad"; CleanupSale: Boolean) SaleCleanupSuccessful: Boolean
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         TempTouchedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
         NPHHospitalityPrint: Codeunit "NPR NPRE Restaurant Print";
+        POSSession: Codeunit "NPR POS Session";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinesExist: Boolean;
     begin
-        SaleLinePOS.Reset();
-        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange(Date, SalePOS.Date);
-        SaleLinesExist := SaleLinePOS.FindSet(CleanupSale);
+        FilterSupportedSaleLines(SalePOS, SaleLinePOS);
+        SaleLinesExist := not SaleLinePOS.IsEmpty();
+
         if SaleLinesExist then begin
             TempTouchedWaiterPadLine.DeleteAll();
             UpdateWPHdrFromSaleHdr(SalePOS, WaiterPad);
+            SaleLinePOS.FindSet(CleanupSale);
             CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", true);
             repeat
                 MoveSaleLineFromPOSToWaiterPad(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine);
@@ -163,22 +164,61 @@
                 until WaiterPadLine.Next() = 0;
         end;
 
-        if CleanupSale then begin
-            if SaleLinesExist then
-                SaleLinePOS.DeleteAll(true);
-            ClearSaleHdrNPREPresetFields(SalePOS, true);
-        end;
+        if CleanupSale then
+            if not UnsupportedSaleLinesExist(SalePOS) then begin
+                if SaleLinesExist then begin
+                    POSSession.GetSaleLine(POSSaleLine);
+                    POSSaleLine.DeleteAll();
+                end;
+                ClearSaleHdrNPREPresetFields(SalePOS, true);
+                SaleCleanupSuccessful := true;
+            end;
         if not SaleLinesExist then
             exit;
 
         WaiterPadLine.SetRange("Sale Retail ID");
         WaiterPadLine.MarkedOnly(true);
-        if not WaiterPadLine.IsEmpty then
+        if not WaiterPadLine.IsEmpty() then
             NPHHospitalityPrint.SetWaiterPadPreReceiptPrinted(WaiterPad, false, true);
         OnAfterMoveSaleFromPosToWaiterPad(WaiterPad, WaiterPadLine);
 
         Commit();
         NPHHospitalityPrint.LinesAddedToWaiterPad(WaiterPad);
+    end;
+
+    procedure FilterSupportedSaleLines(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetFilter("Line Type", '%1|%2', SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type"::Comment);
+    end;
+
+    procedure UnsupportedSaleLinesExist(SalePOS: Record "NPR POS Sale"): Boolean
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetFilter("Line Type", '<>%1&<>%2', SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type"::Comment);
+        exit(not SaleLinePOS.IsEmpty());
+    end;
+
+    procedure UnableToCleanupSaleMsgText(ConfirmRemoval: Boolean): Text
+    var
+        Result: TextBuilder;
+        MsgTxt1: Label 'All supported POS sale lines (lines of type "item" and "comment") have been successfully saved to selected waiter pad and processed according to restaurant module configuration.';
+        MsgTxt2: Label 'However, other types of lines, like customer deposit, retail voucher or payment, cannot be saved to waiter pads.';
+        ManualRemovalTxt: Label 'No lines have been removed from the POS sale to respect the warning. You will need to manually remove all unsupported lines and/or void payments from the sale first, or finish the sale.';
+        ConfirmRemovalTxt: Label 'Those will be lost forever. Are you sure you want to continue?';
+    begin
+        Result.AppendLine(MsgTxt1);
+        Result.AppendLine(MsgTxt2);
+        if ConfirmRemoval then
+            Result.AppendLine(ConfirmRemovalTxt)
+        else
+            Result.AppendLine(ManualRemovalTxt);
+        exit(Result.ToText());
     end;
 
     local procedure UpdateWPHdrFromSaleHdr(SalePOS: Record "NPR POS Sale"; var WaiterPad: Record "NPR NPRE Waiter Pad")
