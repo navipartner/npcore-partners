@@ -28,24 +28,17 @@ codeunit 6150795 "NPR POS Action - Insert Comm." implements "NPR IPOS Workflow"
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
-    begin
-        case Step of
-            'InsertComment':
-                InputPosCommentLine(Context, SaleLine);
-        end;
-    end;
-
-    local procedure InputPosCommentLine(Context: Codeunit "NPR POS JSON Helper"; SaleLine: codeunit "NPR POS Sale Line")
     var
-        Line: Record "NPR POS Sale Line";
+        POSSaleLine: Record "NPR POS Sale Line";
+        BusinessLogic: Codeunit "NPR POS Action - Insert Comm B";
         NewDesc: Text[100];
     begin
-        NewDesc := CopyStr(Context.GetString('NewDescription'), 1, MaxStrLen(Line.Description));
+        NewDesc := CopyStr(Context.GetString('NewDescription'), 1, MaxStrLen(POSSaleLine.Description));
 
-        Line."Line Type" := Line."Line Type"::Comment;
-        Line.Description := NewDesc;
-
-        SaleLine.InsertLine(Line);
+        case Step of
+            'InsertComment':
+                BusinessLogic.InputPosCommentLine(NewDesc, SaleLine);
+        end;
     end;
 
     local procedure GetActionScript(): Text

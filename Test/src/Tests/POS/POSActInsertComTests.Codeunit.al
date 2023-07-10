@@ -17,8 +17,8 @@ codeunit 85071 "NPR POS Act. Insert Com. Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryRandom: Codeunit "Library - Random";
         POSSale: Codeunit "NPR POS Sale";
+        BusinessLogic: Codeunit "NPR POS Action - Insert Comm B";
         SaleLinePOS: Record "NPR POS Sale Line";
-        Line: Record "NPR POS Sale Line";
         NewDesc: Text;
     begin
         // [Given] POS & Payment setup
@@ -27,15 +27,12 @@ codeunit 85071 "NPR POS Act. Insert Com. Tests"
         // [Given] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
 
-        NewDesc := LibraryRandom.RandText(MaxStrLen(Line.Description));
+        NewDesc := LibraryRandom.RandText(MaxStrLen(SaleLinePOS.Description));
 
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
 
-        Line."Line Type" := Line."Line Type"::Comment;
-        Line.Description := NewDesc;
-
-        POSSaleLine.InsertLine(Line);
+        BusinessLogic.InputPosCommentLine(NewDesc, POSSaleLine);
 
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
