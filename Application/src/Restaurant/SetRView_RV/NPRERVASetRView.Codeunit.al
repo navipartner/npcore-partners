@@ -2,11 +2,16 @@ codeunit 6150681 "NPR NPRE RVA: Set R-View" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    internal procedure ActionCode(): Code[20]
+    begin
+        exit(Format("NPR POS Workflow"::"RV_SET_R-VIEW"));
+    end;
+
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This built-in action saves currently selected items to Waiter Pad and switches to the Restaurant View';
-        ParamReturnToDefaultEndOfSaleView_CptLbl: Label 'Return To Default End Of Sale View';
-        ParamReturnToDefaultEndOfSaleView_DescLbl: Label 'Specifies if default sale view will bve shown after sale end.';
+        ParamReturnToDefaultEndOfSaleView_CptLbl: Label 'Use Default End Of Sale View';
+        ParamReturnToDefaultEndOfSaleView_DescLbl: Label 'Specifies if system should switch to the default end of sale view set up for current POS unit instead of the restaurant view after saving the sale to waiter pad.';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -17,31 +22,38 @@ codeunit 6150681 "NPR NPRE RVA: Set R-View" implements "NPR IPOS Workflow"
     var
         POSSession: Codeunit "NPR POS Session";
     begin
-        SaveToWaiterPad(POSSession);
-        SelectRestaurantView(POSSession, Context);
+        if SaveToWaiterPad(POSSession, Context) then
+            SelectRestaurantView(POSSession, Context);
     end;
 
-    local procedure SaveToWaiterPad(POSSession: Codeunit "NPR POS Session");
+    local procedure SaveToWaiterPad(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Helper"): Boolean
     var
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
         SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
         POSSale: Codeunit "NPR POS Sale";
         NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        SaleCleanupSuccessful: Boolean;
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
         if SalePOS."NPRE Pre-Set Waiter Pad No." = '' then
-            exit;
+            exit(true);
 
-        NPREWaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
-        NPREWaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, NPREWaiterPad, true);
+        WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
+        SaleCleanupSuccessful := NPREWaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, true);
+        if not SaleCleanupSuccessful then begin
+            Context.SetContext('ShowResultMessage', true);
+            Context.SetContext('ResultMessageText', NPREWaiterPadPOSMgt.UnableToCleanupSaleMsgText(false));
+        end;
 
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
+
+        exit(SaleCleanupSuccessful);
     end;
 
-    local procedure SelectRestaurantView(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Helper");
+    local procedure SelectRestaurantView(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Helper")
     var
         POSSale: Codeunit "NPR POS Sale";
         ReturnToDefaultEndOfSaleView: Boolean;
@@ -58,7 +70,7 @@ codeunit 6150681 "NPR NPRE RVA: Set R-View" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:NPRERVASetRView.js###
-'let main=async({})=>await workflow.respond();'
+'let main=async({context:e})=>{await workflow.respond(),e.ShowResultMessage&&popup.message(e.ResultMessageText)};'
         );
     end;
 }

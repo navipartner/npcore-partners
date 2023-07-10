@@ -2,6 +2,12 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+
+    internal procedure ActionCode(): Code[20]
+    begin
+        exit(Format("NPR POS Workflow"::"SAVE_TO_WAITER_PAD"));
+    end;
+
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         NPRESeating: Record "NPR NPRE Seating";
@@ -30,9 +36,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
         WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSaleLine());
         WorkflowConfig.AddOptionParameter('InputType',
                                           ParamInputType_OptLbl,
-#pragma warning disable AA0139
-                                          SelectStr(1, ParamInputType_OptLbl),
-#pragma warning restore                                          
+                                          CopyStr(SelectStr(1, ParamInputType_OptLbl), 1, 250),
                                           ParamInputType_NameLbl,
                                           ParamInputType_DescLbl,
                                           ParamInputType_OptDescLbl);
@@ -147,6 +151,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
         WaiterPadNo: Code[20];
         OpenWaiterPad: Boolean;
         ReturnToDefaultView: Boolean;
+        SaleCleanupSuccessful: Boolean;
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
         JSON.SetScopeRoot();
@@ -161,7 +166,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        NPREWaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, NPREWaiterPad, true);
+        SaleCleanupSuccessful := NPREWaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, NPREWaiterPad, true);
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
 
@@ -170,8 +175,12 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
         if OpenWaiterPad then
             NPREWaiterPadPOSMgt.UIShowWaiterPad(NPREWaiterPad);
 
-        if ReturnToDefaultView then
+        if ReturnToDefaultView and SaleCleanupSuccessful then
             POSSale.SelectViewForEndOfSale(POSSession);
+        if not SaleCleanupSuccessful then begin
+            JSON.SetContext('ShowResultMessage', true);
+            JSON.SetContext('ResultMessageText', NPREWaiterPadPOSMgt.UnableToCleanupSaleMsgText(false));
+        end;
     end;
 
     local procedure GetConfirmString(NPRESeating: Record "NPR NPRE Seating") ConfirmString: Text
@@ -192,7 +201,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:NPREPOSActionSave2Wa.js###
-'let main=async({workflow:a,context:e,popup:n,parameters:t,captions:d})=>{if(await a.respond("AddPresetValuesToContext"),!e.seatingCode)if(t.FixedSeatingCode)e.seatingCode=t.FixedSeatingCode;else switch(t.InputType+""){case"0":{let i=await n.input({caption:d.InputTypeLabel});if(!i)return;e.seatingCode=i;break}case"1":{let i=await n.numpad({caption:d.InputTypeLabel});if(!i)return;e.seatingCode=i;break}}if(await a.respond("seatingInput"),!!e.seatingCode){if(e.seatingCode&&e.confirmString)if(await n.confirm({title:d.confirmLabel,caption:e.confirmString}))await a.respond("createNewWaiterPad");else return;e.waiterPadNo||e.seatingCode&&await a.respond("selectWaiterPad"),e.waiterPadNo&&await a.respond("saveSale2Pad")}};'
+'let main=async({workflow:a,context:e,popup:s,parameters:d,captions:t})=>{if(await a.respond("AddPresetValuesToContext"),!e.seatingCode)if(d.FixedSeatingCode)e.seatingCode=d.FixedSeatingCode;else switch(d.InputType+""){case"0":{let i=await s.input({caption:t.InputTypeLabel});if(!i)return;e.seatingCode=i;break}case"1":{let i=await s.numpad({caption:t.InputTypeLabel});if(!i)return;e.seatingCode=i;break}}if(await a.respond("seatingInput"),!!e.seatingCode){if(e.seatingCode&&e.confirmString)if(await s.confirm({title:t.confirmLabel,caption:e.confirmString}))await a.respond("createNewWaiterPad");else return;e.waiterPadNo||e.seatingCode&&await a.respond("selectWaiterPad"),e.waiterPadNo&&await a.respond("saveSale2Pad"),e.ShowResultMessage&&s.message(e.ResultMessageText)}};'
         );
     end;
 }

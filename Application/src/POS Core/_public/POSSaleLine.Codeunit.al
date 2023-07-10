@@ -266,6 +266,28 @@
         POSSale.RefreshCurrent();
     end;
 
+    procedure DeleteWPadSupportedLinesOnly()
+    var
+        SupportedSaleLine: Record "NPR POS Sale Line";
+        xSupportedSaleLine: Record "NPR POS Sale Line";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        CheckInit(true);
+        WaiterPadPOSMgt.FilterSupportedSaleLines(Sale, SupportedSaleLine);
+        if SupportedSaleLine.IsEmpty() then
+            exit;
+        SupportedSaleLine.FindSet(true);
+        repeat
+            OnBeforeDeletePOSSaleLine(SupportedSaleLine);
+            xSupportedSaleLine := SupportedSaleLine;
+            SupportedSaleLine.Delete(true);
+            OnAfterDeletePOSSaleLine(xSupportedSaleLine);
+        until SupportedSaleLine.Next() = 0;
+
+        If Rec.Find('=><') then;  //Refresh current
+        POSSale.RefreshCurrent();
+    end;
+
     procedure UpdateLine()
     begin
         OnUpdateLine(Rec);
