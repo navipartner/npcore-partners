@@ -205,12 +205,11 @@
     var
         IntBuffer: Integer;
         DecBuffer: Decimal;
+        Value: Text;
     begin
-        if EanBoxParameter."Ean Box Value" then begin
-            if StrLen(EanBoxValue) > MaxStrLen(EanBoxParameter.Value) then
-                Error(OverMaxLenTextLbl, EanBoxValue, MaxStrLen(EanBoxParameter.Value));
-            EanBoxParameter.Value := CopyStr(EanBoxValue, 1, MaxStrLen(EanBoxParameter.Value));
-        end;
+        Value := EanBoxParameter.Value;
+        if EanBoxParameter."Ean Box Value" then
+            Value := EanBoxValue;
 
         case EanBoxParameter."Data Type" of
             EanBoxParameter."Data Type"::Option:
@@ -219,20 +218,20 @@
                 end;
             EanBoxParameter."Data Type"::Boolean:
                 begin
-                    POSAction.SetWorkflowInvocationParameterUnsafe(EanBoxParameter.Name, LowerCase(EanBoxParameter.Value) in ['yes', '1', 'true']);
+                    POSAction.SetWorkflowInvocationParameterUnsafe(EanBoxParameter.Name, LowerCase(Value) in ['yes', '1', 'true']);
                 end;
             EanBoxParameter."Data Type"::Decimal:
                 begin
-                    Evaluate(DecBuffer, EanBoxParameter.Value);
+                    Evaluate(DecBuffer, Value);
                     POSAction.SetWorkflowInvocationParameterUnsafe(EanBoxParameter.Name, DecBuffer);
                 end;
             EanBoxParameter."Data Type"::Integer:
                 begin
-                    Evaluate(IntBuffer, EanBoxParameter.Value);
+                    Evaluate(IntBuffer, Value);
                     POSAction.SetWorkflowInvocationParameterUnsafe(EanBoxParameter.Name, IntBuffer);
                 end;
             else
-                POSAction.SetWorkflowInvocationParameterUnsafe(EanBoxParameter.Name, EanBoxParameter.Value);
+                POSAction.SetWorkflowInvocationParameterUnsafe(EanBoxParameter.Name, Value);
         end;
     end;
 
