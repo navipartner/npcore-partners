@@ -4,10 +4,9 @@
     Caption = 'Task Output List';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
     PromotedActionCategories = 'New,Process,Report,Navigate,NaviPartner';
     SourceTable = "NPR Nc Task Output";
-    ApplicationArea = NPRNaviConnect;
 
     layout
     {

@@ -11,6 +11,7 @@
     SourceTableView = SORTING("Log Date")
                       ORDER(Descending);
     ApplicationArea = NPRNaviConnect;
+    AdditionalSearchTerms = 'Task List';
 
     layout
     {
