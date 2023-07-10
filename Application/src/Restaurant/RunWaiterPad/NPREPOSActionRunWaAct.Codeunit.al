@@ -2,6 +2,11 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    var
+        _WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving";
+        _ClearSaleOnFinish: Boolean;
+        _ReturnToDefaultView: Boolean;
+
     local procedure ActionCode(): Code[20]
     begin
         exit(Format("NPR POS Workflow"::"RUN_W/PAD_ACTION"));
@@ -29,17 +34,13 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act" implements "NPR IPOS Workflow"
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddOptionParameter('WaiterPadAction',
                                           ParamWaiterPadAction_OptLbl,
-#pragma warning disable AA0139
-                                          SelectStr(1, ParamWaiterPadAction_OptLbl),
-#pragma warning restore
+                                          CopyStr(SelectStr(1, ParamWaiterPadAction_OptLbl), 1, 250),
                                           ParamWaiterPadAction_NameLbl,
                                           ParamWaiterPadAction_DescLbl,
                                           ParamWaiterPadAction_CaptOptLbl);
         WorkflowConfig.AddOptionParameter('LinesToSend',
                                           ParamLinesToSend_OptLbl,
-#pragma warning disable AA0139
-                                          SelectStr(1, ParamLinesToSend_OptLbl),
-#pragma warning restore
+                                          CopyStr(SelectStr(1, ParamLinesToSend_OptLbl), 1, 250),
                                           ParamLinesToSend_NameLbl,
                                           ParamLinesToSend_DescLbl,
                                           ParamLinesToSend_CaptOptLbl);
@@ -49,57 +50,66 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act" implements "NPR IPOS Workflow"
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    begin
+        _WPadAction := Context.GetIntegerParameter('WaiterPadAction');
+        if not Context.GetBooleanParameter('MoveSaleToWPadOnFinish', _ClearSaleOnFinish) then
+            _ClearSaleOnFinish := false;
+        if not Context.GetBooleanParameter('ReturnToDefaultView', _ReturnToDefaultView) then
+            _ReturnToDefaultView := false;
+        if _ReturnToDefaultView then
+            _ClearSaleOnFinish := true;
+
+        case Step of
+            'runMainAction':
+                FrontEnd.WorkflowResponse(RunMainAction(Context, Sale, SaleLine));
+            'runCleanup':
+                CleanupSale(Context, Sale, SaleLine);
+        end;
+    end;
+
+    local procedure RunMainAction(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line") ConfirmSaleCleanup: Boolean
     var
         SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPad2: Record "NPR NPRE Waiter Pad";
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-        POSSession: Codeunit "NPR POS Session";
-        WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving";
         WPadLinesToSend: Option "New/Updated",All;
         ServingStepToRequest: Code[10];
         ResultMessageText: Text;
-        ClearSaleOnFinish: Boolean;
-        ReturnToDefaultView: Boolean;
+        PartlyPaid: Boolean;
+        PartlyPaidErr: Label 'This sales has been partly paid. You must first void the payment.';
         WPadNotSelectedErr: Label 'Please select a waiter pad first.';
+        ConfirmDeletionQst: Label 'All changes not saved to waiter pad will be lost. Are you sure you want to continue?';
     begin
-        WPadAction := Context.GetIntegerParameter('WaiterPadAction');
-        if not Context.GetBooleanParameter('MoveSaleToWPadOnFinish', ClearSaleOnFinish) then
-            ClearSaleOnFinish := false;
-        if not Context.GetBooleanParameter('ReturnToDefaultView', ReturnToDefaultView) then
-            ReturnToDefaultView := false;
-        if ReturnToDefaultView then
-            ClearSaleOnFinish := true;
-
-        POSSession.GetSale(Sale);
         Sale.GetCurrentSale(SalePOS);
-        if WPadAction <> WPadAction::"Close w/out Saving" then begin
+        if _WPadAction <> _WPadAction::"Close w/out Saving" then begin
             if SalePOS."NPRE Pre-Set Waiter Pad No." = '' then
                 Error(WPadNotSelectedErr);
             WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
             WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, false);
             Commit();
 
-            case WPadAction of
-                WPadAction::"Print Pre-Receipt":
+            case _WPadAction of
+                _WPadAction::"Print Pre-Receipt":
                     begin
                         RestaurantPrint.PrintWaiterPadPreReceiptPressed(WaiterPad);
                     end;
 
-                WPadAction::"Send Kitchen Order":
+                _WPadAction::"Send Kitchen Order":
                     begin
                         WPadLinesToSend := Context.GetIntegerParameter('LinesToSend');
                         RestaurantPrint.PrintWaiterPadPreOrderToKitchenPressed(WaiterPad, WPadLinesToSend = WPadLinesToSend::All);
                     end;
 
-                WPadAction::"Request Next Serving":
+                _WPadAction::"Request Next Serving":
                     begin
                         ResultMessageText := RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, true, '');
                     end;
 
-                WPadAction::"Request Specific Serving":
+                _WPadAction::"Request Specific Serving":
                     begin
                         ServingStepToRequest := CopyStr(Context.GetStringParameter('ServingStep'), 1, MaxStrLen(ServingStepToRequest));
                         if ServingStepToRequest = '' then
@@ -108,40 +118,68 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act" implements "NPR IPOS Workflow"
                         ResultMessageText := RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, false, ServingStepToRequest);
                     end;
 
-                WPadAction::"Merge Waiter Pad":
+                _WPadAction::"Merge Waiter Pad":
                     begin
                         if not WaiterPadPOSMgt.SelectWaiterPadToMergeTo(WaiterPad, WaiterPad2) then
                             Error('');
-                        POSSession.GetSaleLine(SaleLine);
-                        SaleLine.DeleteAll();
+                        SaleLine.DeleteWPadSupportedLinesOnly();
                         WaiterPadMgt.MergeWaiterPad(WaiterPad, WaiterPad2);
-                        WaiterPad := WaiterPad2;
+                        Context.SetContext('NewWaiterPadNo', WaiterPad2."No.");
                     end;
             end;
+            Context.SetContext('ShowResultMessage', ResultMessageText <> '');
+            Context.SetContext('ResultMessageText', ResultMessageText);
         end;
 
-        Context.SetContext('ShowResultMessage', ResultMessageText <> '');
-        Context.SetContext('ResultMessageText', ResultMessageText);
-
-        if ClearSaleOnFinish or
-           (WPadAction in [WPadAction::"Merge Waiter Pad", WPadAction::"Close w/out Saving"])
-        then begin
-            if WPadAction <> WPadAction::"Merge Waiter Pad" then begin
-                POSSession.GetSaleLine(SaleLine);
-                SaleLine.DeleteAll();
-            end;
-
-            SalePOS.Find();
-            WaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS, false);
-            Sale.Refresh(SalePOS);
-            Sale.Modify(true, false);
-
-            if (WPadAction = WPadAction::"Merge Waiter Pad") and not ClearSaleOnFinish then
-                WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
-
-            if ReturnToDefaultView then
-                Sale.SelectViewForEndOfSale(POSSession);
+        if (_WPadAction = _WPadAction::"Close w/out Saving") or _ClearSaleOnFinish then begin
+            SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+            SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+            SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"POS Payment");
+            SaleLinePOS.SetFilter("Amount Including VAT", '<> %1', 0);
+            PartlyPaid := not SaleLinePOS.IsEmpty();
+            if PartlyPaid and (_WPadAction = _WPadAction::"Close w/out Saving") then
+                Error(PartlyPaidErr)
         end;
+
+        if (_WPadAction <> _WPadAction::"Merge Waiter Pad") or _ClearSaleOnFinish then begin
+            if _WPadAction = _WPadAction::"Close w/out Saving" then begin
+                Context.SetContext('CleanupMessageText', ConfirmDeletionQst);
+                ConfirmSaleCleanup := true;
+            end else
+                if WaiterPadPOSMgt.UnsupportedSaleLinesExist(SalePOS) then begin
+                    Context.SetContext('CleanupMessageText', WaiterPadPOSMgt.UnableToCleanupSaleMsgText(not PartlyPaid));
+                    ConfirmSaleCleanup := not PartlyPaid;
+                end;
+        end;
+    end;
+
+    local procedure CleanupSale(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line")
+    var
+        SalePOS: Record "NPR POS Sale";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        if not (_ClearSaleOnFinish or (_WPadAction in [_WPadAction::"Merge Waiter Pad", _WPadAction::"Close w/out Saving"])) then
+            exit;
+
+        if (_WPadAction <> _WPadAction::"Merge Waiter Pad") or _ClearSaleOnFinish then
+            SaleLine.DeleteAll();
+
+        Sale.GetCurrentSale(SalePOS);
+        SalePOS.Find();
+        WaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS, false);
+        Sale.Refresh(SalePOS);
+        Sale.Modify(true, false);
+
+        if (_WPadAction = _WPadAction::"Merge Waiter Pad") and not _ClearSaleOnFinish then begin
+            WaiterPad."No." := CopyStr(Context.GetString('NewWaiterPadNo'), 1, MaxStrLen(WaiterPad."No."));
+            WaiterPad.Find();
+            WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
+        end;
+
+        if _ReturnToDefaultView then
+            Sale.SelectViewForEndOfSale(POSSession);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
@@ -211,7 +249,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:NPREPOSActionRunWaAct.js###
-'let main=async({workflow:s,context:e,popup:a})=>{await s.respond(),e.ShowResultMessage&&a.message(e.ResultMessageText)};'
+'let main=async({workflow:s,context:e,popup:a})=>{let i=await s.respond("runMainAction");if(e.ShowResultMessage&&await a.message(e.ResultMessageText),e.CleanupMessageText)if(i){if(!await a.confirm(e.CleanupMessageText))return}else{a.error(e.CleanupMessageText);return}await s.respond("runCleanup")};'
         );
     end;
 }
