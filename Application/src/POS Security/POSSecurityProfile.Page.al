@@ -15,17 +15,17 @@
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies unique code for POS security profile';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the name of POS security profile';
                     ApplicationArea = NPRRetail;
                 }
                 field("Password on Unblock Discount"; Rec."Password on Unblock Discount")
                 {
-                    ToolTip = 'Specifies the value of the Administrator Password field';
+                    ToolTip = 'Specifies the Administrator Password value.';
                     ExtendedDatatype = Masked;
                     ApplicationArea = NPRRetail;
                 }
@@ -43,7 +43,7 @@
                 field("POS Buttons Refresh Time"; Rec."POS Buttons Refresh Time")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the POS Buttons Refresh Time field.';
+                    ToolTip = 'Specifies the time interval of how often POS buttons data will be refreshed';
                 }
             }
         }
