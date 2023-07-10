@@ -1020,6 +1020,95 @@
         PrintMembershipOnEndOfSalesWorker(SalePOS."Sales Ticket No.", false);
     end;
 
+    internal procedure CreateMembershipFromJson(JObject: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"): JsonObject
+    var
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        PosSale: Record "NPR POS Sale";
+        POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
+        Sale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        POSSession: Codeunit "NPR POS Session";
+        JToken: JsonToken;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
+        ItemIdentifier: Text;
+    begin
+        // {"itemNumber":"320100","members":[]}
+        ItemIdentifier := GetJsonText('itemNumber', JObject, 255);
+        POSActionInsertItemB.GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
+        POSSession.GetSale(Sale);
+        POSSession.GetSaleLine(SaleLine);
+        Sale.GetCurrentSale(PosSale);
+
+        JObject.Get('members', JToken);
+        PreloadMemberInfoBuffer(PosSale."Sales Ticket No.", SaleLine.GetNextLineNo(), Item."No.", JToken.AsArray());
+
+        POSActionInsertItemB.AddItemLine(Item, ItemReference, ItemIdentifierType::ItemNo, 1, 0, '', '', '', POSSession, FrontEnd);
+    end;
+
+    internal procedure PreloadMemberInfoBuffer(SalesTicketNo: Code[20]; LineNo: Integer; ItemNo: Code[20]; Members: JsonArray)
+    var
+        MemberInfo: Record "NPR MM Member Info Capture";
+        MemberToken: JsonToken;
+        Member: JsonObject;
+    begin
+        // [{"firstName":"Tim","lastName":"Sannes","address":"Spaljevägen 9","postalCode":"197 36","city":"Bro","country":"Sverige","eMail":"tsa@navipartner.dk","phoneNumber":"0732542026"}]
+        foreach MemberToken in Members do begin
+            Member := MemberToken.AsObject();
+
+            Clear(MemberInfo);
+            MemberInfo."Receipt No." := SalesTicketNo;
+            MemberInfo."Line No." := LineNo;
+            MemberInfo."Item No." := ItemNo;
+
+            MemberInfo."First Name" := GetJsonText50('firstName', Member);
+            MemberInfo."Last Name" := GetJsonText50('lastName', Member);
+            MemberInfo.Address := GetJsonText100('address', Member);
+            MemberInfo.City := GetJsonText50('city', Member);
+            MemberInfo."Post Code Code" := GetJsonText20('city', Member);
+            MemberInfo."E-Mail Address" := GetJsonText80('eMail', Member);
+            MemberInfo."Phone No." := GetJsonText30('phoneNumber', Member);
+            MemberInfo.Insert();
+        end;
+    end;
+
+#pragma warning disable AA0139
+    local procedure GetJsonText20(KeyName: Text; JObject: JsonObject) TextValue: Text[20]
+    begin
+        exit(GetJsonText(KeyName, JObject, MaxStrLen(TextValue)));
+    end;
+
+    local procedure GetJsonText30(KeyName: Text; JObject: JsonObject) TextValue: Text[30]
+    begin
+        exit(GetJsonText(KeyName, JObject, MaxStrLen(TextValue)));
+    end;
+
+    local procedure GetJsonText50(KeyName: Text; JObject: JsonObject) TextValue: Text[50]
+    begin
+        exit(GetJsonText(KeyName, JObject, MaxStrLen(TextValue)));
+    end;
+
+    local procedure GetJsonText80(KeyName: Text; JObject: JsonObject) TextValue: Text[80]
+    begin
+        exit(GetJsonText(KeyName, JObject, MaxStrLen(TextValue)));
+    end;
+
+    local procedure GetJsonText100(KeyName: Text; JObject: JsonObject) TextValue: Text[100]
+    begin
+        exit(GetJsonText(KeyName, JObject, MaxStrLen(TextValue)));
+    end;
+#pragma warning restore AA0139
+    local procedure GetJsonText(KeyName: Text; JObject: JsonObject; Length: Integer): Text
+    var
+        JToken: JsonToken;
+    begin
+        if (not (JObject.Get(KeyName, JToken))) then
+            exit('');
+        exit(CopyStr(JToken.AsValue().AsText(), 1, Length));
+    end;
+
+
+
 }
 
 
