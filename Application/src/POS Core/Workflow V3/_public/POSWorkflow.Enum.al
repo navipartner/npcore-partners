@@ -897,4 +897,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ZOOM', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Zoom";
     }
+    value(6151324; INPUTBOX_JSON)
+    {
+        Caption = 'INPUTBOX_JSON', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSActionInputBoxJson";
+    }
 }
