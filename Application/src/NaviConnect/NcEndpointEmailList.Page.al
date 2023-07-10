@@ -8,9 +8,8 @@
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR Nc Endpoint E-mail";
-    ApplicationArea = NPRNaviConnect;
 
     layout
     {

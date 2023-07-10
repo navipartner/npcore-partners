@@ -2,8 +2,7 @@
 {
     Extensible = False;
     PageType = NavigatePage;
-    ApplicationArea = NPRNaviConnect;
-    UsageCategory = Administration;
+    UsageCategory = None;
     Caption = 'XML Stylesheet Deploy from Azure';
 
     layout
