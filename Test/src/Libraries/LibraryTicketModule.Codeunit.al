@@ -48,6 +48,7 @@ codeunit 85011 "NPR Library - Ticket Module"
 
     procedure CreateScenario_SmokeTest() SalesItemNo: Code[20]
     var
+        TicketSetup: Record "NPR TM Ticket Setup";
         TicketType: Record "NPR TM Ticket Type";
         TicketBom: Record "NPR TM Ticket Admission BOM";
         Admission: Record "NPR TM Admission";
@@ -69,6 +70,9 @@ codeunit 85011 "NPR Library - Ticket Module"
         // This scenario creates a ticket which is always available today.
 
         CreateNumberSeries();
+        TicketSetup.Init();
+        if (not TicketSetup.Insert()) then
+            TicketSetup.Get();
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY, '', ''));
