@@ -261,8 +261,8 @@
         {
             Caption = 'Document Source';
             DataClassification = CustomerContent;
-            OptionCaption = 'POS,Sales Document,Payment Line';
-            OptionMembers = POS,"Sales Document","Payment Line";
+            OptionCaption = 'POS,Sales Document,Payment Line,POS Quote';
+            OptionMembers = POS,"Sales Document","Payment Line","POS Quote";
         }
         field(410; "Document Type"; Enum "Sales Document Type")
         {

@@ -41,6 +41,7 @@ codeunit 6059851 "NPR POS Action: SavePOSSvSl B"
                     SaleLinePOS."From Selection" := false;
                     SaleLinePOS.Modify();
                 end;
+                UpdateNpRvSaleLine(SaleLinePOS);
                 SaleLinePOS.Delete(true);
             until SaleLinePOS.Next() = 0;
     end;
@@ -102,6 +103,22 @@ codeunit 6059851 "NPR POS Action: SavePOSSvSl B"
         POSQuoteLine."EFT Approved" := SaleLinePOS."EFT Approved";
         POSQuoteLine.SystemId := SaleLinePOS.SystemId;
         POSQuoteLine.Insert(true, true);
+    end;
+
+    local procedure UpdateNpRvSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+    begin
+        NpRvSalesLine.SetCurrentKey("Retail ID", "Document Source", Type);
+        NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
+
+        if NpRvSalesLine.IsEmpty() then
+            exit;
+
+        NpRvSalesLine.FindFirst();
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"POS Quote";
+        NpRvSalesLine.Modify();
     end;
 
     procedure PrintAfterSave(PrintTemplateCode: Code[20]; POSQuoteEntry: Record "NPR POS Saved Sale Entry")
