@@ -537,9 +537,8 @@
 #pragma warning disable AA0245 
     procedure ListTicketItems(var ListTicketItems: XmlPort "NPR TM List Ticket Items")
     begin
-
-        ListTicketItems.CreateResponse();
-
+        ListTicketItems.Import();
+        ListTicketItems.CreateResponse(ListTicketItems.GetRequestedStoreCode());
     end;
 #pragma warning restore
 

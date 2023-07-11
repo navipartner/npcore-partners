@@ -58,28 +58,28 @@ table 6059866 "NPR TM TempTicketDescription"
     }
 
     // AA0245 enabled on cloud builds, so lets go hungarian ...
-    internal procedure SetKeyAndDescription(pItemNo: Code[20]; pVariantCode: Code[10]; pAdmissionCode: Code[20])
+    internal procedure SetKeyAndDescription(pItemNo: Code[20]; pVariantCode: Code[10]; pAdmissionCode: Code[20]; StoreCode: Code[32])
     begin
         Clear(Rec);
         Rec.ItemNo := pItemNo;
         Rec.VariantCode := pVariantCode;
         Rec.AdmissionCode := pAdmissionCode;
 
-        SetDescription(pItemNo, pVariantCode, pAdmissionCode);
+        SetDescription(pItemNo, pVariantCode, pAdmissionCode, StoreCode);
     end;
 
-    internal procedure SetDescription(pItemNo: Code[20]; pVariantCode: Code[10]; pAdmissionCode: Code[20])
+    internal procedure SetDescription(pItemNo: Code[20]; pVariantCode: Code[10]; pAdmissionCode: Code[20]; StoreCode: Code[32])
     var
         TicketSetup: Record "NPR TM Ticket Setup";
     begin
-        Rec.Title := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Title")), 1, MaxStrLen(Rec.Title));
-        Rec.Subtitle := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Sub Title")), 1, MaxStrLen(Rec.Subtitle));
-        Rec.Name := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Name")), 1, MaxStrLen(Rec.Name));
-        Rec.Description := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Description")), 1, MaxStrLen(Rec.Description));
-        Rec.FullDescription := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Full Description")), 1, MaxStrLen(Rec.FullDescription));
+        Rec.Title := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Title"), StoreCode), 1, MaxStrLen(Rec.Title));
+        Rec.Subtitle := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Sub Title"), StoreCode), 1, MaxStrLen(Rec.Subtitle));
+        Rec.Name := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Name"), StoreCode), 1, MaxStrLen(Rec.Name));
+        Rec.Description := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Description"), StoreCode), 1, MaxStrLen(Rec.Description));
+        Rec.FullDescription := CopyStr(GetDescription(pItemNo, pVariantCode, pAdmissionCode, TicketSetup.FieldNo("Ticket Full Description"), StoreCode), 1, MaxStrLen(Rec.FullDescription));
     end;
 
-    internal procedure GetDescription(pItemNo: Code[20]; pVariantCode: Code[10]; pAdmissionCode: Code[20]; pFieldNo: Integer) rDescription: Text
+    internal procedure GetDescription(pItemNo: Code[20]; pVariantCode: Code[10]; pAdmissionCode: Code[20]; pFieldNo: Integer; StoreCode: Code[32]) rDescription: Text
     var
         TicketSetup: Record "NPR TM Ticket Setup";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
@@ -88,8 +88,10 @@ table 6059866 "NPR TM TempTicketDescription"
         Item: Record Item;
         Variant: Record "Item Variant";
         MagentoStoreItem: Record "NPR Magento Store Item";
+        TempBlob: Codeunit "Temp Blob";
         DescriptionSelector: Option ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK;
         InStr: InStream;
+        OutStr: OutStream;
     begin
         if (not TicketSetup.Get()) then
             TicketSetup.Init();
@@ -134,8 +136,13 @@ table 6059866 "NPR TM TempTicketDescription"
             if (not Admission.Get(TicketBOM."Admission Code")) then
                 Clear(Admission);
 
-        if (not MagentoStoreItem.Get(Item."No.", TicketSetup."Store Code")) then
-            MagentoStoreItem.Init();
+        if (StoreCode <> '') then
+            if (not MagentoStoreItem.Get(Item."No.", StoreCode)) then
+                MagentoStoreItem.Init();
+
+        if (StoreCode = '') then
+            if (not MagentoStoreItem.Get(Item."No.", TicketSetup."Store Code")) then
+                MagentoStoreItem.Init();
 
         case DescriptionSelector of
             DescriptionSelector::ITEM_DESC:
@@ -149,21 +156,39 @@ table 6059866 "NPR TM TempTicketDescription"
             DescriptionSelector::TYPE_DESC:
                 exit(TicketType.Description);
             DescriptionSelector::WEBSHOP_SHORT:
-                if (MagentoStoreItem."Webshop Short Desc. Enabled") then
+                if (MagentoStoreItem."Webshop Short Desc. Enabled") then begin
                     if (MagentoStoreItem."Webshop Short Desc.".HasValue()) then begin
                         MagentoStoreItem.CalcFields("Webshop Short Desc.");
                         MagentoStoreItem."Webshop Short Desc.".CreateInStream(InStr);
                         InStr.Read(rDescription);
                         exit(rDescription);
                     end;
+                end else begin
+                    if ((Item."NPR Magento Short Desc.".HasValue()) and (StoreCode = '') and (TicketSetup."Store Code" = '')) then begin
+                        TempBlob.CreateOutStream(OutStr);
+                        Item."NPR Magento Short Desc.".ExportStream(OutStr);
+                        TempBlob.CreateInStream(InStr);
+                        InStr.Read(rDescription);
+                        exit(rDescription);
+                    end;
+                end;
             DescriptionSelector::WEBSHOP_FULL:
-                if (MagentoStoreItem."Webshop Description Enabled") then
+                if (MagentoStoreItem."Webshop Description Enabled") then begin
                     if (MagentoStoreItem."Webshop Description".HasValue()) then begin
                         MagentoStoreItem.CalcFields("Webshop Description");
                         MagentoStoreItem."Webshop Description".CreateInStream(InStr);
                         InStr.Read(rDescription);
                         exit(rDescription);
                     end;
+                end else begin
+                    if ((Item."NPR Magento Desc.".HasValue()) and (StoreCode = '') and (TicketSetup."Store Code" = '')) then begin
+                        TempBlob.CreateOutStream(OutStr);
+                        Item."NPR Magento Desc.".ExportStream(OutStr);
+                        TempBlob.CreateInStream(InStr);
+                        InStr.Read(rDescription);
+                        exit(rDescription);
+                    end;
+                end;
         end;
 
         exit('');
