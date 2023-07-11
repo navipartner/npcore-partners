@@ -10,12 +10,33 @@ xmlport 6060112 "NPR TM List Ticket Items"
     {
         textelement(ticket_items)
         {
+            textelement(Request)
+            {
+                MinOccurs = Zero;
+                MaxOccurs = Once;
+                XmlName = 'request';
+
+                textattribute(_StoreCode)
+                {
+                    XmlName = 'store_code';
+                    Occurrence = Required;
+                }
+            }
             textelement(response)
             {
+                MinOccurs = Zero;
                 MaxOccurs = Once;
+                XmlName = 'response';
                 textelement(items)
                 {
                     MinOccurs = Zero;
+                    XmlName = 'items';
+
+                    textattribute(_StoreCodeResponse)
+                    {
+                        Occurrence = Required;
+                        XmlName = 'store_code';
+                    }
                     tableelement(TmpItemVariant; "Item Variant")
                     {
                         MinOccurs = Zero;
@@ -388,18 +409,6 @@ xmlport 6060112 "NPR TM List Ticket Items"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
         _GeneralLedgerSetup: Record "General Ledger Setup";
         _ItemReference: Record "Item Reference";
@@ -408,17 +417,31 @@ xmlport 6060112 "NPR TM List Ticket Items"
         _ItemResponse: Record Item;
         _TicketDescription: Record "NPR TM TempTicketDescription";
 
+    internal procedure GetRequestedStoreCode(): Text
+    begin
+        exit(_StoreCode);
+    end;
+
 #pragma warning disable AA0206 //The variable 'Inserted' is initialized but not used.
-    internal procedure CreateResponse()
+    internal procedure CreateResponse(RequestedStoreCode: Text)
     var
         Item: Record Item;
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         Admission: Record "NPR TM Admission";
+        TicketSetup: Record "NPR TM Ticket Setup";
         Inserted: Boolean;
+        StoreCode: Code[32];
     begin
 
         _GeneralLedgerSetup.Get();
         currency_code := _GeneralLedgerSetup."LCY Code";
+
+        StoreCode := CopyStr(UpperCase(RequestedStoreCode), 1, MaxStrLen(StoreCode));
+        if (StoreCode = '') then
+            if (TicketSetup.Get()) then
+                StoreCode := TicketSetup."Store Code";
+
+        _StoreCodeResponse := StoreCode;
 
         Item.SetFilter("NPR Ticket Type", '<>%1', '');
         Item.SetFilter(Blocked, '=%1', false);
@@ -453,7 +476,7 @@ xmlport 6060112 "NPR TM List Ticket Items"
         TmpItemVariant.Reset();
         if (TmpItemVariant.FindSet()) then begin
             repeat
-                _TicketDescription.SetKeyAndDescription(TmpItemVariant."Item No.", TmpItemVariant.Code, '');
+                _TicketDescription.SetKeyAndDescription(TmpItemVariant."Item No.", TmpItemVariant.Code, '', StoreCode);
                 _TicketDescription.AdmissionCode := '';
                 Inserted := _TicketDescription.Insert();
             until (TmpItemVariant.Next() = 0);
@@ -462,11 +485,11 @@ xmlport 6060112 "NPR TM List Ticket Items"
         TicketBOM.Reset();
         if (TicketBOM.FindSet()) then begin
             repeat
-                _TicketDescription.SetKeyAndDescription(TicketBOM."Item No.", TicketBOM."Variant Code", TicketBOM."Admission Code");
+                _TicketDescription.SetKeyAndDescription(TicketBOM."Item No.", TicketBOM."Variant Code", TicketBOM."Admission Code", StoreCode);
 
                 if (Admission.Get(TicketBOM."Admission Code")) then
                     if (Admission."Additional Experience Item No." <> '') then
-                        _TicketDescription.SetDescription(Admission."Additional Experience Item No.", '', TicketBOM."Admission Code");
+                        _TicketDescription.SetDescription(Admission."Additional Experience Item No.", '', TicketBOM."Admission Code", StoreCode);
 
                 Inserted := _TicketDescription.Insert();
 
