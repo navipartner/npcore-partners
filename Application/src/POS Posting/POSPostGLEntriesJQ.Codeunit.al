@@ -30,8 +30,12 @@ codeunit 6014699 "NPR POS Post GL Entries JQ"
         POSEntry.SetCurrentKey("Post Entry Status");
         POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting");
         POSEntry.SetLoadFields("POS Period Register No.");
-        if not POSEntry.FindSet() then
+        if not POSEntry.FindSet() then begin
+            if CheckInId <> '' then
+                SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'ok', CheckInId);
+
             exit;
+        end;
 
         repeat
             if not Hashset.Contains(POSEntry."POS Period Register No.") then begin
