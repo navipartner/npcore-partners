@@ -216,7 +216,7 @@
         LastYear := false;
     end;
 
-    internal procedure SetItemLedgerEntryFilter(var ItemLedgerEntry: Record "Item Ledger Entry")
+    procedure SetItemLedgerEntryFilter(var ItemLedgerEntry: Record "Item Ledger Entry")
     begin
         ItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
@@ -397,7 +397,7 @@
         "LP%" := Show;
     end;
 
-    internal procedure GetGlobals(var InDim1Filter: Code[20]; var InDim2Filter: Code[20]; var InPeriodestart: Date; var InPeriodeslut: Date)
+    procedure GetGlobals(var InDim1Filter: Code[20]; var InDim2Filter: Code[20]; var InPeriodestart: Date; var InPeriodeslut: Date)
     begin
         InDim1Filter := Dim1Filter;
         InDim2Filter := Dim2Filter;
