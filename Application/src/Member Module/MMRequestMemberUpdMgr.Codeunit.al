@@ -155,7 +155,7 @@
         if ("E-Mail" = '') then
             Error(NOT_BLANK);
 
-        ValidEmail := (StrPos("E-Mail", '@') > 1);
+        ValidEmail := StrLen(DelChr("E-Mail", '<=>', '@')) = StrLen("E-Mail") - 1;
         if (ValidEmail) then
             ValidEmail := (StrPos(CopyStr("E-Mail", STRPOS("E-Mail", '@')), '.') > 1);
 
