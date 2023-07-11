@@ -21,6 +21,7 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         CustomerNoParam();
         UpdateSecureMethodsDiscount();
         POSWorkflow();
+        SecurityParameter();
     end;
 
     local procedure SalesDocExpPaymentMethodCode()
@@ -410,6 +411,65 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
                 end;
                 EanBoxParameter.Modify();
             until EanBoxParameter.Next() = 0;
+    end;
+
+    local procedure SecurityParameter()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Action Parameters', 'SecurityParameter');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SecurityParameter')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+        UpdateSecureMethods();
+        RemoveSecurityParameterFromButtons();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SecurityParameter'));
+        LogMessageStopwatch.LogFinish();
+
+    end;
+
+    local procedure UpdateSecureMethods()
+    var
+        POSActionParameter: Record "NPR POS Parameter Value";
+        POSMenuButton: Record "NPR POS Menu Button";
+    begin
+        POSActionParameter.SetRange("Table No.", Database::"NPR POS Menu Button");
+        POSActionParameter.SetFilter("Action Code", '%1|%2|%3', 'CANCEL_POS_SALE', 'ITEMCARD', 'DISCOUNT');
+        POSActionParameter.SetFilter(Value, '<>%1', 'None');
+        if POSActionParameter.FindSet() then
+            repeat
+                if POSMenuButton.Get(POSActionParameter.Code, POSActionParameter.ID) then begin
+                    case true of
+                        POSActionParameter.Value = 'SalespersonPassword':
+                            POSMenuButton.Validate("Secure Method Code", 'ANY-SALESP');
+                        POSActionParameter.Value = 'CurrentSalespersonPassword':
+                            POSMenuButton.Validate("Secure Method Code", 'CUR-SALESP');
+                        POSActionParameter.Value = 'SupervisorPassword':
+                            POSMenuButton.Validate("Secure Method Code", 'SUPERVISOR');
+                    end;
+                    POSActionParameter.Value := 'None';
+                    POSActionParameter.Modify();
+                    POSMenuButton.Modify();
+                end;
+            until POSActionParameter.Next() = 0;
+    end;
+
+    local procedure RemoveSecurityParameterFromButtons()
+    var
+        POSActionParameter: Record "NPR POS Parameter Value";
+    begin
+        POSActionParameter.SetCurrentKey("Action Code");
+        POSActionParameter.SetRange("Table No.", Database::"NPR POS Menu Button");
+        POSActionParameter.SetFilter("Action Code", '%1|%2|%3', 'CANCEL_POS_SALE', 'ITEMCARD', 'DISCOUNT');
+        POSActionParameter.SetRange(Name, 'Security');
+        POSActionParameter.DeleteAll();
+
+        RefreshPOSAction(Enum::"NPR POS Workflow"::CANCEL_POS_SALE);
+        RefreshPOSAction(Enum::"NPR POS Workflow"::ITEMCARD);
+        RefreshPOSAction(Enum::"NPR POS Workflow"::DISCOUNT);
     end;
 
     local procedure CurrCodeunitId(): Integer
