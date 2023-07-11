@@ -98,6 +98,7 @@
         POSInfoPOSEntry: Record "NPR POS Info POS Entry";
         POSCrossReference: Record "NPR POS Cross Reference";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
+        POSSalesWS: Codeunit "NPR NpGp POS Sales WS";
     begin
         Xml :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:glob="urn:microsoft-dynamics-schemas/codeunit/' + ServiceName + '" xmlns:glob1="urn:microsoft-dynamics-nav/xmlports/global_pos_sales">' +
@@ -203,7 +204,7 @@
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        OnInitRequestBody(POSEntry, Xml);
+        POSSalesWS.OnInitRequestBody(POSEntry, Xml);
     end;
 
     procedure InitGlobalPosSalesService()
@@ -280,11 +281,6 @@
     begin
         Output := TypeHelper.HtmlEncode(Input);
         exit(Output);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInitRequestBody(POSEntry: Record "NPR POS Entry"; var Xml: Text)
-    begin
     end;
 
     [Obsolete('Pending removal use OnInitRequestBody instead')]

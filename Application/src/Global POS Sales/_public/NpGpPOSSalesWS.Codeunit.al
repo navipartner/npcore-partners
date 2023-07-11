@@ -140,5 +140,10 @@
 
         npGpPOSEntries.SetSourceTables(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry, TempNpGpPOSPaymentLine);
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnInitRequestBody(POSEntry: Record "NPR POS Entry"; var Xml: Text)
+    begin
+    end;
 }
 
