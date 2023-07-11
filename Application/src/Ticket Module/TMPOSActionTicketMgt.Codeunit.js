@@ -29,15 +29,16 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
     
     let ticketNumber; 
     if (context.ShowTicketDialog) {
-        if (inputMethod === "Standard")
-        {
+        if (inputMethod === "Standard") {
             ticketNumber = await popup.input ({
                 caption: captions.TicketPrompt, 
                 title: windowTitle
             });
-        } 
-        else if (inputMethod === "MPOS NFC Scan")
-        {
+
+            if (!ticketNumber) 
+                return;
+
+        } else if (inputMethod === "MPOS NFC Scan") {
             var mposResult = await workflow.run("MPOS_API", {
                 context:
                 {
@@ -46,13 +47,15 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
                     Parameters: {}
                 }
             });
-            if (!mposResult.IsSuccessful)
-            {
+
+            if (!mposResult.IsSuccessful) {
                 popup.error(mposResult.ErrorMessage, "mPOS NFC Error");
                 return;
             }
+
             if (!mposResult.Result.ID)
                 return;
+
             ticketNumber = mposResult.Result.ID;
         }
     }
@@ -60,7 +63,7 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
     await workflow.respond("RefineWorkflow", responseObj);
     let ticketQuantity;
     if (context.ShowTicketQtyDialog) { 
-        ticketQty = await popup.numpad({
+        ticketQuantity = await popup.numpad({
             caption: captions.TicketQtyPrompt.substitute(context.TicketMaxQty), 
             title: windowTitle
         });

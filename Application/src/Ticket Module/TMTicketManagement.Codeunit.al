@@ -2758,7 +2758,7 @@
             end;
 
         if (MaxCapacity > 0) then
-            if (AdmittedCount / MaxCapacity * 100 > Schedule."Notify When Percentage Sold") then
+            if (AdmittedCount / MaxCapacity * 100 >= Schedule."Notify When Percentage Sold") then
                 OnSelloutThresholdReached(1, Ticket, AdmissionScheduleEntry, AdmittedCount, MaxCapacity);
 
         if (Admission."Waiting List Setup Code" <> '') then begin

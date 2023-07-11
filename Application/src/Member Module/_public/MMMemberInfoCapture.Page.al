@@ -1013,9 +1013,7 @@
         if (Rec."E-Mail Address" = '') then
             exit;
 
-        ValidEmail := (StrPos(Rec."E-Mail Address", '@') > 1);
-        if (ValidEmail) then
-            ValidEmail := (StrPos(CopyStr(Rec."E-Mail Address", StrPos(Rec."E-Mail Address", '@')), '.') > 1);
+        ValidEmail := IsValidEmail(Rec."E-Mail Address");
 
         if (not ValidEmail) then
             if (Confirm(EMAIL_INVALID_CONFIRM, true, Rec.FieldCaption("E-Mail Address"))) then
@@ -1043,6 +1041,21 @@
                 end;
             end;
         end;
+    end;
+
+    local procedure IsValidEmail(EMail: Text) ValidEmail: Boolean
+    begin
+        if (StrLen(EMail) = 0) then
+            exit(false);
+
+        // Contains 1 @
+        ValidEmail := StrLen(DelChr(Rec."E-Mail Address", '<=>', '@')) = StrLen(Rec."E-Mail Address") - 1;
+
+        // A least 1 dot to the right of @
+        if (ValidEmail) then
+            ValidEmail := (StrPos(CopyStr(Rec."E-Mail Address", StrPos(Rec."E-Mail Address", '@')), '.') > 1);
+
+        exit(ValidEmail);
     end;
 
     internal procedure HaveRequiredFields(MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
@@ -1099,9 +1112,7 @@
                     end;
 
                     if (MemberInfoCapture."E-Mail Address" <> '') then begin
-                        ValidEmail := (StrPos(MemberInfoCapture."E-Mail Address", '@') > 1);
-                        if (ValidEmail) then
-                            ValidEmail := (StrPos(CopyStr(MemberInfoCapture."E-Mail Address", StrPos(MemberInfoCapture."E-Mail Address", '@')), '.') > 1);
+                        ValidEmail := IsValidEmail(MemberInfoCapture."E-Mail Address");
                         SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), not ValidEmail);
                     end;
 
@@ -1157,9 +1168,7 @@
         end else begin
             SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), (MemberInfoCapture."E-Mail Address" = ''));
             if (MemberInfoCapture."E-Mail Address" <> '') then begin
-                ValidEmail := (StrPos(MemberInfoCapture."E-Mail Address", '@') > 1);
-                if (ValidEmail) then
-                    ValidEmail := (StrPos(CopyStr(MemberInfoCapture."E-Mail Address", StrPos(MemberInfoCapture."E-Mail Address", '@')), '.') > 1);
+                ValidEmail := IsValidEmail(MemberInfoCapture."E-Mail Address");
                 SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), not ValidEmail);
             end;
 
