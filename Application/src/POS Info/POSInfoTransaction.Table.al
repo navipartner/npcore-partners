@@ -44,7 +44,7 @@
         {
             Caption = 'Receipt Type';
             DataClassification = CustomerContent;
-        }        
+        }
         field(10; "POS Info Code"; Code[20])
         {
             Caption = 'POS Info Code';
