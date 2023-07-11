@@ -625,25 +625,41 @@
 
             Element.SelectNodes('retail_vouchers/retail_voucher', RetailVoucherNodes);
             foreach RetailVoucherNode in RetailVoucherNodes do begin
-                NpRvSalesLine.Init();
-                RecRef.GetTable(NpRvSalesLine);
-                Xml2RecRef(RetailVoucherNode.AsXmlElement(), TempNpRvSalesLineFieldBuffer, RecRef);
-                RecRef.SetTable(NpRvSalesLine);
-                NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
-                NpRvSalesLine."Register No." := SalePOS."Register No.";
-                NpRvSalesLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
-                NpRvSalesLine."Sale Date" := SalePOS.Date;
-                NpRvSalesLine.Insert(true);
+
+                //check if voucher exists in POS Quote
+                NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
+                NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"POS Quote");
+                if NpRvSalesLine.FindFirst() then begin
+                    NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
+                    NpRvSalesLine.Modify(true);
+
+                end else begin
+                    Clear(NpRvSalesLine);
+                    NpRvSalesLine.Init();
+
+                    RecRef.GetTable(NpRvSalesLine);
+                    Xml2RecRef(RetailVoucherNode.AsXmlElement(), TempNpRvSalesLineFieldBuffer, RecRef);
+                    RecRef.SetTable(NpRvSalesLine);
+
+                    NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
+                    NpRvSalesLine."Register No." := SalePOS."Register No.";
+                    NpRvSalesLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
+                    NpRvSalesLine."Sale Date" := SalePOS.Date;
+                    NpRvSalesLine.Insert(true);
+                end;
 
                 RetailVoucherNode.SelectNodes('references/reference', ReferenceNodes);
                 foreach ReferenceNode in ReferenceNodes do begin
-                    NpRvSalesLineReference.Init();
-                    RecRef.GetTable(NpRvSalesLineReference);
-                    Xml2RecRef(ReferenceNode.AsXmlElement(), TempNpRvSalesLineReferenceFieldBuffer, RecRef);
-                    RecRef.SetTable(NpRvSalesLineReference);
-                    NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
-                    NpRvSalesLineReference.Id := CreateGuid();
-                    NpRvSalesLineReference.Insert(true);
+                    NpRvSalesLineReference.SetRange("Sales Line Id", NpRvSalesLine.Id);
+                    if not NpRvSalesLineReference.FindFirst() then begin
+                        NpRvSalesLineReference.Init();
+                        RecRef.GetTable(NpRvSalesLineReference);
+                        Xml2RecRef(ReferenceNode.AsXmlElement(), TempNpRvSalesLineReferenceFieldBuffer, RecRef);
+                        RecRef.SetTable(NpRvSalesLineReference);
+                        NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
+                        NpRvSalesLineReference.Id := CreateGuid();
+                        NpRvSalesLineReference.Insert(true);
+                    end;
                 end;
             end;
 
