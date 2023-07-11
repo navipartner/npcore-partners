@@ -5,9 +5,6 @@
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescriptionLbl: Label 'Cancel Sale';
-        ParamSecurityOptions: Label 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', Locked = true;
-        ParamSecurity_NameLbl: Label 'Security';
-        ParamSecurity_DescLbl: Label 'Defines security type.';
         TitleLbl: Label 'Cancel Sale';
         PromptLbl: Label 'Are you sure you want to cancel this sales? All lines will be deleted.';
     begin
@@ -15,15 +12,6 @@
         WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
         WorkflowConfig.AddLabel('title', TitleLbl);
         WorkflowConfig.AddLabel('prompt', PromptLbl);
-        WorkflowConfig.AddOptionParameter(
-            'Security',
-            ParamSecurityOptions,
-#pragma warning disable AA0139
-            SelectStr(1, ParamSecurityOptions),
-#pragma warning restore 
-            ParamSecurity_NameLbl,
-            ParamSecurity_DescLbl,
-            ParamSecurityOptions);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")

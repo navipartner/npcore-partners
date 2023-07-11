@@ -17,10 +17,8 @@
         DiscountPercentExtraLabel: Label 'Type in flat extra discount % that you want to give on the whole sales';
         LineUnitPriceLabel: Label 'Type in the unit price for the current sales line';
         DiscountAuthLbl: Label 'Discount Authorisation';
-        SecurityOptionLbl: Label 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', Locked = true;
         DiscountTypeOptionLbl: Label 'TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra', Locked = true;
         TotalDiscTargetLinesCptOptLbl: Label 'Auto,Positive quantity lines only,Negative quantity lines only,All non-zero quantity lines,Ask';
-        SecurityDecrLbl: Label 'Specifies Password Protection';
         DiscountTypeCaptionLbl: Label 'Discount Type';
         FixedDiscountNumberCaptionLbl: Label 'Fixed Discount Number';
         FixedDiscountNumberDescLbl: Label 'Specifies Fixed Discount Number';
@@ -45,15 +43,6 @@
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
-        WorkflowConfig.AddOptionParameter(
-                       'Security',
-                       SecurityOptionLbl,
-#pragma warning disable AA0139
-                       SelectStr(1, SecurityOptionLbl),
-#pragma warning restore 
-                       'Security',
-                       SecurityDecrLbl,
-                       SecurityOptionLbl);
         WorkflowConfig.AddOptionParameter(
                        'DiscountType',
                        DiscountTypeOptionLbl,

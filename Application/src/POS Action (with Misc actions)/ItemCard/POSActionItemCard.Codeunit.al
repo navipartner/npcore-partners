@@ -9,23 +9,11 @@ codeunit 6150827 "NPR POS Action: Item Card" implements "NPR IPOS Workflow"
         ParamRefreshLine_DescLbl: Label 'Specifies if lines should be refreshed.';
         ParamPageEditable_CptLbl: Label 'Page Editable';
         ParamPageEditable_DescLbl: Label 'Specifies if the opened page should be editable or not.';
-        ParamSecurity_OptLbl: Label 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', Locked = true;
-        ParamSecurity_NameLbl: Label 'Security';
-        ParamSecurity_DescLbl: Label 'Specifies security option used.';
-        ParamSecurity_OptCptLbl: Label 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddBooleanParameter('RefreshLine', true, ParamRefreshLine_CptLbl, ParamRefreshLine_DescLbl);
         WorkflowConfig.AddBooleanParameter('PageEditable', true, ParamPageEditable_CptLbl, ParamPageEditable_DescLbl);
-        WorkflowConfig.AddOptionParameter('Security',
-                                          ParamSecurity_OptLbl,
-#pragma warning disable AA0139
-                                          SelectStr(1, ParamSecurity_OptLbl),
-#pragma warning restore                                          
-                                          ParamSecurity_NameLbl,
-                                          ParamSecurity_DescLbl,
-                                          ParamSecurity_OptCptLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");

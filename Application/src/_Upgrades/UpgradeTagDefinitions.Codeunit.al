@@ -82,6 +82,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'CustomerNoParam'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'POSWorkflow1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'UpdateSecureMethodsDiscount'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'SecurityParameter'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Fix POS Entry SystemId"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider", 'NPRShippingProvider'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider", 'NPRPackageDimensions'));
@@ -310,7 +311,7 @@
                         exit('NPR-TakePhotoRefreshMenuButtonActions-20230622');
                     'ItemIdentifierType':
                         exit('NPR-POSActionItemIdentifierType-20220623');
-                        'RefreshReverseDirectSalePOSAction':
+                    'RefreshReverseDirectSalePOSAction':
                         exit('NPR-POSActionRefreshReverseDirectSalePOSAction-20230628');
                     'ItemPriceIdentifierType':
                         exit('NPR-POSActionItemPriceIdentifierType-20220623');
@@ -324,6 +325,8 @@
                         exit('NPR-POSWorkflow-20221202');
                     'UpdateSecureMethodsDiscount':
                         exit('NPR-POSUpdateSecureMethodsDiscount-20230530');
+                    'SecurityParameter':
+                        exit('NPR-SecurityParameter-20230711');
                 end;
             Codeunit::"NPR Fix POS Entry SystemId":
                 exit('NPRFixPOSEntrySystemId_20220126');
@@ -442,10 +445,10 @@
                     '20230515':
                         exit('PosEntryLineDimFix_20230515');
                 end;
-            #IF NOT BC17
+#IF NOT BC17
             Codeunit::"NPR UPG Permission Set":
                 exit('NPRUPGPermissionSet');
-            #ENDIF
+#ENDIF
         end;
     end;
 }
