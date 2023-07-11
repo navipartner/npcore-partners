@@ -1341,7 +1341,7 @@
         CurrPage.NPAttribFactBox.PAGE.Update();
     end;
 
-    internal procedure OpenFilteredView(var VarItemWorksheetLine: Record "NPR Item Worksheet Line")
+    procedure OpenFilteredView(var VarItemWorksheetLine: Record "NPR Item Worksheet Line")
     begin
         ItemWorksheetLine.CopyFilters(VarItemWorksheetLine);
         ItemWorksheetLine.FindFirst();
