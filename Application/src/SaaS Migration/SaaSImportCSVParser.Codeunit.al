@@ -97,7 +97,7 @@ codeunit 6151093 "NPR SaaS Import CSV Parser"
                 //De-escape after our split
                 FormattedValueToFieldRef(FormattedValue.Replace('\|', '|').Replace('\"', '"'), FieldReference);
             end;
-            RecRef.Insert();
+            RecRef.Insert(false, true);
         end;
 
         RecRef.Close();
