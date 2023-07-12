@@ -1,6 +1,7 @@
 ﻿codeunit 6014575 "NPR HWC Response Method"
 {
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Once all v1 workflows are moved to v3, any call to HWC from the POS should go via a workflow instead of this object.';
 
     Access = Internal;

@@ -250,7 +250,7 @@
         exit(Codeunit::"NPR NpGp POS Sales WS");
     end;
 
-    [Obsolete('Use codeunit 6150978 "NPR NpGp Try Get Glob Pos Serv"')]
+    [Obsolete('Use codeunit 6150978 "NPR NpGp Try Get Glob Pos Serv"', 'NPR23.0')]
     [TryFunction]
     procedure TryGetGlobalPosSalesService(NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
     var
@@ -283,7 +283,7 @@
         exit(Output);
     end;
 
-    [Obsolete('Pending removal use OnInitRequestBody instead')]
+    [Obsolete('Pending removal use OnInitRequestBody instead', 'NPR23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnInitReqBody(POSEntry: Record "NPR POS Entry"; var XmlDoc: XmlDocument)
     begin

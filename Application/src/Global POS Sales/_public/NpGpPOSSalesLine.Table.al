@@ -23,6 +23,7 @@
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use systemID instead';
         }
         field(100; "POS Store Code"; Code[10])
@@ -220,6 +221,7 @@
         key(Key3; "Retail ID")
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use systemID instead';
         }
     }

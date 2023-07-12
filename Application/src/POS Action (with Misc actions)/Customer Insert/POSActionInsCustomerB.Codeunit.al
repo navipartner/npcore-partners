@@ -2,7 +2,7 @@ codeunit 6059951 "NPR POSAction: Ins. Customer-B"
 {
     Access = Internal;
 
-    [Obsolete('Not Used.')]
+    [Obsolete('Not Used.', 'NPR23.0')]
     procedure OnActionCreateContact(CardPageId: Integer; var SalePOS: Record "NPR POS Sale")
     var
         Contact: Record Contact;

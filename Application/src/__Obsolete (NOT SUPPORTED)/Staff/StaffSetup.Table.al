@@ -4,6 +4,7 @@
     Caption = 'Staff Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used.';
 
     fields
@@ -20,6 +21,7 @@
             OptionCaption = 'Unit Cost,Last Direct Cost';
             OptionMembers = "Unit Cost","Last Direct";
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(30; "Staff Disc. Group"; Code[20])
@@ -27,6 +29,7 @@
             Caption = 'Staff Disc. Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(40; "Staff Price Group"; Code[10])
@@ -34,6 +37,7 @@
             Caption = 'Staff Price Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(50; "Staff SalesPrice Calc Codeunit"; Integer)
@@ -41,6 +45,7 @@
             Caption = 'Staff SalesPrice Calc Codeunit';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
     }

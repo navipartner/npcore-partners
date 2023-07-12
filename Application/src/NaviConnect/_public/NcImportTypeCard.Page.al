@@ -282,6 +282,7 @@
             {
                 Caption = 'XML Stylesheet';
                 ObsoleteState = Pending;
+                ObsoleteTag = 'NPR23.0';
                 ObsoleteReason = 'Field XML Stylesheet is not used anymore.';
                 Visible = false;
                 field(XMLStylesheetData; XMLStylesheetData)

@@ -46,6 +46,7 @@
             OptionMembers = "G/L Entry",Item,"Item Group",Repair,,Payment,"Open/Close","BOM List",Customer,Comment;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use Line Type field';
         }
         field(6; "No."; Code[20])
@@ -794,6 +795,7 @@
             Caption = 'Item Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Using Item Category Code instead.';
         }
         field(6012; "MR Anvendt antal"; Decimal)
@@ -898,8 +900,8 @@
             Caption = 'Gift Certificate Line';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(6038; "Label Date"; Date)
         {
@@ -1049,6 +1051,7 @@
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Sale Type field not used anymore';
         }
         key(Key3; "Register No.", "Sales Ticket No.", "Sale Type", Type, "No.", "Item Group", Quantity)
@@ -1056,6 +1059,7 @@
             MaintainSIFTIndex = false;
             SumIndexFields = "Amount Including VAT", Amount, Quantity;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Key Removed';
         }
         key(Key4; "Register No.", "Sales Ticket No.", "Line No.")
@@ -1075,6 +1079,7 @@
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Sale Type field not used anymore';
         }
         key(Key7; "Serial No.")
@@ -1094,6 +1099,7 @@
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Sale Type field not used anymore';
         }
 
@@ -1102,6 +1108,7 @@
             MaintainSIFTIndex = false;
             SumIndexFields = "Amount Including VAT", Amount, Quantity;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Sale Type field not used anymore';
         }
         key(Key11; "Register No.", "Sales Ticket No.", Date, "Line Type", "Discount Type", "Line No.")

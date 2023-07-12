@@ -5,6 +5,7 @@
     DataPerCompany = false;
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Task Queue module removed from NP Retail. We are now using Job Queue instead.';
 
     fields
@@ -121,6 +122,7 @@
         field(61; "Last Executed Date"; DateTime)
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Task Queue module removed from NP Retail. We are now using Job Queue instead.';
             CalcFormula = Max("NPR Task Log (Task)"."Ending Time" WHERE("Journal Template Name" = FIELD("Task Template"),
                                                                      "Journal Batch Name" = FIELD("Task Batch"),

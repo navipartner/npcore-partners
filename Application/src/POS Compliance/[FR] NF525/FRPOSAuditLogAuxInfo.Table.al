@@ -4,6 +4,7 @@
     Caption = 'FR POS Entry Aux. Info';
     DataClassification = CustomerContent;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Replaced with table NPR FR POS Audit Log Add. Info';
     fields
     {

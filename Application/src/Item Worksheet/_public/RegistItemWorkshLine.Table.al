@@ -40,6 +40,7 @@
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. field';
         }
         field(8; "Internal Bar Code"; Code[50])
@@ -830,7 +831,6 @@
         {
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
-            ObsoleteState = No;
             //ObsoleteReason = 'Product Groups became first level children of Item Categories.';
         }
         field(5900; "Service Item Group"; Code[10])
@@ -981,6 +981,7 @@
             Caption = 'Item Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Using Item Category Code instead.';
         }
         field(6014401; "Group sale"; Option)
@@ -998,8 +999,8 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'This field won"t be used anymore';
-            ObsoleteTag = 'Refactoring 2/2/2021';
         }
         field(6014410; "Label Barcode"; Code[20])
         {

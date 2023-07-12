@@ -8,6 +8,7 @@
     PageType = List;
     UsageCategory = Administration;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used.';
     ApplicationArea = NPRRetail;
 }

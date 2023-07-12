@@ -7,6 +7,7 @@ page 6059989 "NPR APIV1 PBI Value Entry Aux"
     Editable = false;
     UsageCategory = None;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'The page will be removed, please use page 6059989 "NPR APIV1 PBIValueEntryAux" instead.';
 
     layout

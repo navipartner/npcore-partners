@@ -1207,7 +1207,7 @@
         Commit();
     end;
 
-    [Obsolete('Incorrect Spelling - use RequestMemberFieldUpdate')]
+    [Obsolete('Incorrect Spelling - use RequestMemberFieldUpdate', 'NPR23.0')]
     procedure ReqeustMemberFieldUpdate(MemberCardNumber: Text[50]; FieldId: Code[10]; ScannerStationId: Code[10]): Boolean
     var
         MemberFieldUpdateMgr: Codeunit "NPR MM Request Member Upd Mgr";

@@ -680,12 +680,14 @@
                     ShowCaption = false;
                     Visible = false;
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Not in use anymore.';
                     field("Customer Posting Group"; Rec."Customer Posting Group")
                     {
                         ToolTip = 'Specifies the customer posting group.';
                         ApplicationArea = NPRRetail;
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Not in use anymore.';
                         Visible = false;
                     }
@@ -694,6 +696,7 @@
                         ToolTip = 'Specifies the payment terms code.';
                         ApplicationArea = NPRRetail;
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Not in use anymore.';
                         Visible = false;
                     }

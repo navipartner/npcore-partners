@@ -5,6 +5,7 @@ codeunit 6184494 "NPR Pepper Aux Func. TSD"
     // NPR5.30/TSA/20170123  CASE 263458 Refactored for Transcendence
 
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Migrating to HWC';
 
     trigger OnRun()

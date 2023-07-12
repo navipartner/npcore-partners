@@ -24,7 +24,7 @@ codeunit 6014679 "NPR POS Sale Translation"
         AssignTranslationOnPOSSaleLines(POSSale);
     end;
 
-    [Obsolete('Not Used.')]
+    [Obsolete('Not Used.', 'NPR23.0')]
     local procedure AssignLanguageCodeFromContact(var POSSale: Record "NPR POS Sale"; Rec: Variant)
     begin
 

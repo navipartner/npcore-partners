@@ -4,6 +4,7 @@
     Caption = 'Available POS Keybind';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Almost zero usage since the module was introduced, but caused significant performance issues';
 
     fields

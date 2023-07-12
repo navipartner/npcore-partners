@@ -116,7 +116,7 @@
         exit(ExchangeLabelSetup."Exchange label default date");
     end;
 
-    [Obsolete('Not used anymore. To access security profile use codeunit "NPR POS Secuyrity Profile"')]
+    [Obsolete('Not used anymore. To access security profile use codeunit "NPR POS Secuyrity Profile"', 'NPR23.0')]
     internal procedure CashDrawerPassword(CashDrawerNo: Text): Text
     begin
     end;
@@ -265,7 +265,7 @@
         exit(POSUnitRec.GetProfile(POSViewProfile));
     end;
 
-    [Obsolete('Use codeunit "NPR POS Security Profile"')]
+    [Obsolete('Use codeunit "NPR POS Security Profile"', 'NPR23.0')]
     internal procedure GetPOSSecurityProfile(var POSSecurtyProfile: Record "NPR POS Security Profile"): Boolean
     begin
     end;
@@ -458,7 +458,7 @@
 
     #region events
 
-    [Obsolete('Not used anymore.')]
+    [Obsolete('Not used anymore.', 'NPR23.0')]
     [IntegrationEvent(true, false)]
     local procedure OnGetLockTimeout(POSSecurtyProfile: Record "NPR POS Security Profile"; var LockTimeoutInSeconds: Integer; var Handled: Boolean)
     begin

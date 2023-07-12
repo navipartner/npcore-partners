@@ -12,6 +12,7 @@ report 6151016 "NPR NpRv Voucher 4"
     DefaultLayout = Word;
     DataAccessIntent = ReadOnly;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Will be removed in the next version.';
 
     dataset

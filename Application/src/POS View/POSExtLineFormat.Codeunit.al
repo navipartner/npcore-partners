@@ -71,7 +71,7 @@
         end;
     end;
 
-    [Obsolete('Move to OnGetLineFormat() subscriber with limited control over styling instead')]
+    [Obsolete('Move to OnGetLineFormat() subscriber with limited control over styling instead', 'NPR23.0')]
     [BusinessEvent(false)]
 #pragma warning disable AA0150
     local procedure OnGetLineStyle(var Color: Text; var Weight: Text; var Style: Text; SaleLinePOS: Record "NPR POS Sale Line"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")

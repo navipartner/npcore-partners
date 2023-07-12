@@ -243,7 +243,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
 
     end;
 
-    [Obsolete('Replaced by function ItemRequiresSerialNo in codeunit NPR POS Tracking Utils')]
+    [Obsolete('Replaced by function ItemRequiresSerialNo in codeunit NPR POS Tracking Utils', 'NPR23.0')]
     procedure ItemRequiresSerialNumberOnSale(Item: Record Item; var UseSpecificTracking: Boolean): Boolean
     var
         ItemTrackingCode: Record "Item Tracking Code";
@@ -258,7 +258,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         exit(ItemTrackingCode."SN Sales Outbound Tracking");
     end;
 
-    [Obsolete('Replaced by function SerialNumberCanBeUsedByItem in codeunit NPR POS Tracking Utils')]
+    [Obsolete('Replaced by function SerialNumberCanBeUsedByItem in codeunit NPR POS Tracking Utils', 'NPR23.0')]
     procedure SerialNumberCanBeUsedForItem(var ItemRef: Record "Item Reference"; SerialNumber: Code[50]; var UserInformationErrorWarning: Text; SerialSelectionFromList: Boolean) CanBeUsed: Boolean
     var
         Item: Record Item;
@@ -330,7 +330,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         exit(CanBeUsed);
     end;
 
-    [Obsolete('Replaced by function SelectSerialNoFromList in codeunit NPR POS Tracking Utils')]
+    [Obsolete('Replaced by function SelectSerialNoFromList in codeunit NPR POS Tracking Utils', 'NPR23.0')]
     procedure SelectSerialNoFromList(var ItemRef: Record "Item Reference"; LocationCode: Code[10]; var SerialNo: Text)
     var
         SaleLinePOS: Record "NPR POS Sale Line";

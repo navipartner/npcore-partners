@@ -160,6 +160,7 @@
         key(Key4; "Entry Type", "Document Type", "Document No.")
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'New key (Key6: "Entry Type", "Document Type", "Document No.", "Document Line No.") introduced';
         }
         key(Key5; "Voucher Type")

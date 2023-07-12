@@ -4,6 +4,7 @@
     Caption = 'Audit Roll Posting';
     DataClassification = CustomerContent;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Replaced by POS Entry functionality';
 
     fields
@@ -304,16 +305,16 @@
             Caption = 'Gift Voucher Reference No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(60; "Credit voucher ref."; Code[20])
         {
             Caption = 'Credit Voucher Reference No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(61; "Salgspris inkl. moms"; Boolean)
         {
@@ -349,16 +350,16 @@
             Caption = 'Offline - Gift Voucher Reference';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(73; "Offline - Credit voucher ref."; Code[20])
         {
             Caption = 'Offline - Gift Voucher Reference';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(75; "Bin Code"; Code[20])
         {

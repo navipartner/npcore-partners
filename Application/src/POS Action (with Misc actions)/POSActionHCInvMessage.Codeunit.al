@@ -2,6 +2,7 @@
 {
     Access = Internal;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used.';
     var
         ActionDescription: Label 'This action makes remote call to aquire item price information ';

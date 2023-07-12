@@ -485,13 +485,13 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    [Obsolete('Replaced with explicit enum usage')]
+    [Obsolete('Replaced with explicit enum usage', 'NPR23.0')]
     local procedure OnGetDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var DeviceType: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    [Obsolete('Replaced with interface for matrix printers')]
+    [Obsolete('Replaced with interface for matrix printers', 'NPR23.0')]
     local procedure OnSendPrintJob(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer)
     begin
     end;

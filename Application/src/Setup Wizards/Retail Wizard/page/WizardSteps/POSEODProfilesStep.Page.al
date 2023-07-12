@@ -8,6 +8,7 @@ page 6014656 "NPR POS EOD Profiles Step"
     DelayedInsert = true;
     UsageCategory = None;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used anymore. Retail wizard was modified.';
     layout
     {

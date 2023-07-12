@@ -4,6 +4,7 @@
     Caption = 'Scanner - Field Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used.';
 
     fields
@@ -13,6 +14,7 @@
             Caption = 'ID';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(2; Type; Option)
@@ -22,6 +24,7 @@
             OptionMembers = " ",ItemNo,Quantity,Placement,Color,Size,"Code",ScannerNo,SerialNo,KolliAntal,"Item Description",Sign,"Unit Price","Unit Cost",Inventory,EAN,Text,Date,Time,DateTime;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(3; Prefix; Code[10])
@@ -29,6 +32,7 @@
             Caption = 'Prefix';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(4; Position; Integer)
@@ -36,6 +40,7 @@
             Caption = 'Position';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(5; Length; Integer)
@@ -43,6 +48,7 @@
             Caption = 'Length';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6; Postfix; Text[5])
@@ -50,6 +56,7 @@
             Caption = 'Postfix';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(7; Order; Integer)
@@ -57,6 +64,7 @@
             Caption = 'Order';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(8; "Where To"; Option)
@@ -66,6 +74,7 @@
             OptionMembers = Input,Output;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(9; Padding; Option)
@@ -75,6 +84,7 @@
             OptionMembers = " ","Pre Zeroes","Leading Spaces";
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
     }
@@ -84,6 +94,7 @@
         key(Key1; ID, "Where To", Type, "Order")
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         key(Key2; Prefix)

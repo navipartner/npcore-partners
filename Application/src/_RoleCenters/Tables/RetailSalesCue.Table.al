@@ -124,8 +124,8 @@
             FieldClass = FlowField;
             Editable = false;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(104; "Credit Vouchers"; Integer)
         {
@@ -133,8 +133,8 @@
             FieldClass = FlowField;
             Editable = false;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(105; "Task List"; Integer)
         {

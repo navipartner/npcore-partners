@@ -66,6 +66,7 @@
         field(50; "Company - Clearing"; Text[30])
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table will be obsolete - moved to SMS Setup';
             Caption = 'Company';
             Description = 'regnskab til clearing af gavekort og tilgodebeviser';
@@ -74,6 +75,7 @@
         field(53; "VirtualPDF Name"; Text[50])
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table will be obsolete - moved to SMS Setup';
             Caption = 'VirtualPDF Name';
             DataClassification = CustomerContent;
@@ -146,6 +148,7 @@
         field(172; "Config Request (Customer)"; Option)
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table will be obsolete - moved to SMS Setup';
             Caption = 'Config Request (Customer)';
             Description = '226819';
@@ -156,6 +159,7 @@
         field(173; "Config Request (Vendor)"; Option)
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table will be obsolete - moved to SMS Setup';
             Caption = 'Config Request (Vendor)';
             Description = '226819';
@@ -166,6 +170,7 @@
         field(174; "Config Request (Contact)"; Option)
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table will be obsolete - moved to SMS Setup';
             Caption = 'Config Request (Contact)';
             Description = '226819';
@@ -176,6 +181,7 @@
         field(175; "Config. Template (Customer)"; Code[10])
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table will be obsolete - moved to SMS Setup';
             Caption = 'Config. Template (Customer)';
             Description = '226819';
@@ -184,6 +190,7 @@
         field(176; "Config. Template (Vendor)"; Code[10])
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table will be obsolete - moved to SMS Setup';
             Caption = 'Config. Template (Vendor)';
             Description = '226819';
@@ -192,6 +199,7 @@
         field(177; "Config. Template (Contact)"; Code[10])
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table will be obsolete - moved to SMS Setup';
             Caption = 'Config. Template (Contact)';
             Description = '226819';

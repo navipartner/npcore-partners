@@ -31,6 +31,7 @@
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use systemID instead';
         }
         field(20; "Customer No."; Code[20])
@@ -144,6 +145,7 @@
         key(Key3; "Retail ID")
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use systemID instead';
         }
     }

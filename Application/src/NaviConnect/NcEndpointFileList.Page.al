@@ -44,6 +44,7 @@
                 field("Client Path"; Rec."Client Path")
                 {
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Client Path field is about to be removed because it is not needed anymore.';
                     ToolTip = 'Specifies the value of the Client Path field';
                     ApplicationArea = NPRNaviConnect;

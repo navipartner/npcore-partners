@@ -4,8 +4,8 @@
     Caption = 'MPOS Nets Transactions';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Removing MPOS Payment Gateway';
-    ObsoleteTag = 'Removing MPOS Payment Gateway';
 
     fields
     {
@@ -82,6 +82,7 @@
             Caption = 'Payment Gateway';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(23; "Merchant Id"; Text[30])

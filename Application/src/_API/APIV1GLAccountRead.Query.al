@@ -257,6 +257,7 @@
                 {
                     Caption = 'replicationCounter', Locked = true;
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Replaced by SystemRowVersion';
                 }
             }

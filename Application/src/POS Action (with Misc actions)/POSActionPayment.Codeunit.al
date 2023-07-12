@@ -2,6 +2,7 @@
 {
     Access = Internal;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Will be replaced by codeunit 6059796 "NPR POS Action: Payment WF2"';
 
     var

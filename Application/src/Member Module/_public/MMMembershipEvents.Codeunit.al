@@ -52,7 +52,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    [Obsolete('Replaced by OnBeforeMembInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var ShowStandardUserInterface: Boolean)')]
+    [Obsolete('Replaced by OnBeforeMembInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var ShowStandardUserInterface: Boolean)', 'NPR23.0')]
     internal procedure OnBeforeMemberInfoCaptureDialog(MemberInfoCaptureFilter: Text; var ShowStandardUserInterface: Boolean)
     begin
     end;
@@ -63,7 +63,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    [Obsolete('Replaced by OnAfterMembInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; StandardUserInterface: Boolean; var LookupOK: Boolean)')]
+    [Obsolete('Replaced by OnAfterMembInfoCaptureDialog(var MemberInfoCapture: Record "NPR MM Member Info Capture"; StandardUserInterface: Boolean; var LookupOK: Boolean)', 'NPR23.0')]
     internal procedure OnAfterMemberInfoCaptureDialog(MemberInfoCaptureFilter: Text; StandardUserInterface: Boolean; var LookupOK: Boolean)
     begin
     end;

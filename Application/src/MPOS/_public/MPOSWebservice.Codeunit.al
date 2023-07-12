@@ -144,7 +144,7 @@
         exit(GetBarcodeInventoryView(DataView."Data View Code", Barcode));
     end;
 
-    [Obsolete('Replaced by new function GetBarcodeInventoryView.')]
+    [Obsolete('Replaced by new function GetBarcodeInventoryView.', 'NPR23.0')]
     procedure GetItemInfoByBarcode(Barcode: Code[20]): Text
     var
         Item: Record Item;

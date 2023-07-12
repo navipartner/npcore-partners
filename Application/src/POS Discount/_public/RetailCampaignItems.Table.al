@@ -176,6 +176,7 @@
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. field';
         }
         field(127; "Variant Code"; Code[10])

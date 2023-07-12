@@ -3,6 +3,7 @@
     Caption = 'Dynamic Module Setting';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used';
 
     fields

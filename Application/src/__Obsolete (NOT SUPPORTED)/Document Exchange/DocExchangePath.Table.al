@@ -4,6 +4,7 @@
     Caption = 'Doc. Exchange Path';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Document Exchange functionality removed';
 
     fields

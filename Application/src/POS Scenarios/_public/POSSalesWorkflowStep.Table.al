@@ -6,6 +6,7 @@
     DrillDownPageID = "NPR POS Scenarios Steps";
     LookupPageID = "NPR POS Scenarios Steps";
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Scenarios have been moved to hardcoded codeunit calls for internal steps, and event subscribers for PTE steps';
 
     fields

@@ -15,7 +15,7 @@
         exit('');
     end;
 
-    [Obsolete('Replaced by new function NaviEditorEditTempBlob.')]
+    [Obsolete('Replaced by new function NaviEditorEditTempBlob.', 'NPR23.0')]
     procedure NaviEditorEditBlob(var FieldRef: FieldRef) NewValue: Boolean
     var
         TempBlob: Codeunit "Temp Blob";

@@ -298,16 +298,16 @@
             Caption = 'Gift Voucher Reference';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(60; "Credit voucher ref."; Code[20])
         {
             Caption = 'Credit Voucher Reference';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(61; "Salgspris inkl. moms"; Boolean)
         {
@@ -348,8 +348,8 @@
             Caption = 'Offline - Gift Voucher Reference';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(80; "Special price"; Decimal)
         {
@@ -791,8 +791,8 @@
         key(Key6; "Register No.", Posted, "Sale Date", Type, "Credit voucher ref.")
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Credit Voucher';
         }
         key(Key7; "Sale Type", Type, "No.", Posted)
         {
@@ -836,8 +836,8 @@
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT", Quantity, "Line Discount Amount", Amount, Cost;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         key(Key15; "Register No.", "Sale Date", "Sale Type", Type, Quantity, "Receipt Type", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code")
         {

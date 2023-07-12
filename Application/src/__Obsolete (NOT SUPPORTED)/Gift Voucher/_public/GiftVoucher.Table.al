@@ -4,8 +4,8 @@
     DataClassification = CustomerContent;
     Permissions = TableData "NPR I-Comm" = rimd;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'This table won''t be used anymore.';
-    ObsoleteTag = 'NPR Register';
     fields
     {
         field(1; "No."; Code[20])

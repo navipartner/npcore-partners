@@ -111,6 +111,7 @@
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'No longer needed as we hash+sign with 1 call to external instead of 2 manual steps';
         }
         field(20; "External Implementation"; Text[30])
@@ -156,6 +157,7 @@
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'No longer needed as we hash+sign with 1 call to external instead of 2 manual steps';
         }
         field(29; "Handled by External Impl."; Boolean)
@@ -173,6 +175,7 @@
             Caption = 'Active POS Sale ID';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use systemID instead';
         }
         field(32; "Active POS Unit No."; Code[10])

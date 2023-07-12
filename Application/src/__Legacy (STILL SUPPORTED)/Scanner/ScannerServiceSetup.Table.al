@@ -4,6 +4,7 @@
     Caption = 'Scanner Service Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used.';
 
     fields
@@ -13,6 +14,7 @@
             Caption = 'No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(11; "Log Request"; Boolean)
@@ -20,6 +22,7 @@
             Caption = 'Log Request';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(12; "Stock-Take Config Code"; Code[10])
@@ -27,6 +30,7 @@
             Caption = 'Stock-Take Conf. Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
     }
@@ -36,6 +40,7 @@
         key(Key1; "No.")
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
     }

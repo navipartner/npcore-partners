@@ -10,6 +10,7 @@
     ModifyAllowed = false;
     DeleteAllowed = false;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Aux. Item Ledger Entry has been removed.';
 
     layout

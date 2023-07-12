@@ -4,6 +4,7 @@
     Caption = 'Storage Operation Parameters';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used';
 
     fields

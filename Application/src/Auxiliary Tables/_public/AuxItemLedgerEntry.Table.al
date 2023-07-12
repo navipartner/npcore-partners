@@ -7,6 +7,7 @@
     DrillDownPageId = "NPR Aux. Item Ledger Entries";
     LookupPageId = "NPR Aux. Item Ledger Entries";
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Aux Item Ledger Entry is removed due performance downsides.';
 
     fields
