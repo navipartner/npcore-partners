@@ -542,6 +542,10 @@
         LogoPickerChangeLogoLbl: label 'Change Logo';
         LogoPickerClearLogoLbl: label 'Clear Logo';
         GridEditorSelectGridToEditLbl: Label 'Select grid to edit : ';
+        WizardModalChooseCategoryLbl: Label 'Choose Category';
+        WizardModalCloseWizardLbl: Label 'Close Wizard';
+        GlobalSettingsModalLbl: Label 'Password requirements for opening edit mode : ';
+        GlobalSettingsAuthorizationLbl: Label 'Authorization';
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
@@ -829,6 +833,10 @@
         Captions.Add('Logo_Picker_ChangeLogo', LogoPickerChangeLogoLbl);
         Captions.Add('Logo_Picker_ClearLogo', LogoPickerClearLogoLbl);
         Captions.Add('Grid_Editor_SelectGridToEdit', GridEditorSelectGridToEditLbl);
+        Captions.Add('Wizard_Modal_ChooseCategory', WizardModalChooseCategoryLbl);
+        Captions.Add('Wizard_Modal_CloseWizard', WizardModalCloseWizardLbl);
+        Captions.Add('Global_Settings_PasswordRequirementForEditMode', GlobalSettingsModalLbl);
+        Captions.Add('Global_Settings_Authorization', GlobalSettingsAuthorizationLbl);
 
         RecRef.Open(DATABASE::"NPR POS Sale Line");
         for i := 1 to RecRef.FieldCount do begin
