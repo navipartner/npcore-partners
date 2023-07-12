@@ -23,6 +23,11 @@ page 6150762 "NPR Environment Information"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether a user have verified the Enviroment Type value.';
                 }
+                field("Environment Template"; Rec."Environment Template")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Environment Template. Some features in NP Retail will be enabled/disabled based on the Environment Template';
+                }
                 field("Environment Company Name"; Rec."Environment Company Name")
                 {
                     ApplicationArea = NPRRetail;
