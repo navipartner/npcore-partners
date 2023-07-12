@@ -1,4 +1,4 @@
-﻿codeunit 6150834 "NPR POS Action: Print Template" implements "NPR IPOS Workflow"
+codeunit 6150834 "NPR POS Action: Print Template" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
@@ -28,16 +28,22 @@
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        SalePOS: Record "NPR POS Sale";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        TemplateMgt: Codeunit "NPR RP Template Mgt.";
         RecordSetting: Option "Sale Line POS","Sale POS";
         Template: Text[20];
-        "Record": Variant;
     begin
         Template := CopyStr(Context.GetStringParameter('Template'), 1, MaxStrLen(Template));
         RecordSetting := Context.GetIntegerParameter('Record');
 
+        PrintTemplate(Sale, SaleLine, RecordSetting, Template);
+    end;
+
+    local procedure PrintTemplate(var Sale: Codeunit "NPR POS Sale"; var SaleLine: Codeunit "NPR POS Sale Line"; var RecordSetting: Option "Sale Line POS","Sale POS"; Template: Text[20])
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        TemplateMgt: Codeunit "NPR RP Template Mgt.";
+        "Record": Variant;
+    begin
         case RecordSetting of
             RecordSetting::"Sale Line POS":
                 begin
@@ -61,7 +67,7 @@
     local procedure GetActionScript(): Text
     begin
         exit(
-//###NPR_INJECT_FROM_FILE:POSActionChangeBin.js###
+//###NPR_INJECT_FROM_FILE:POSActionPrintTemplate.js###
 'let main=async({})=>await workflow.respond();'
         )
     end;
