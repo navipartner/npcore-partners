@@ -305,7 +305,7 @@
 
     end;
 
-    internal procedure InvokeEanBoxv3(EanBoxValue: Text; POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSAction: Record "NPR POS Action")
+    internal procedure ResolveEanBoxActionForValue(EanBoxValue: Text; POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSAction: Record "NPR POS Action")
     var
         EanBoxSetup: Record "NPR Ean Box Setup";
         TempEanBoxSetupEvent: Record "NPR Ean Box Setup Event" temporary;
@@ -324,10 +324,10 @@
         if not SelectEanBoxEvent(TempEanBoxSetupEvent) then
             exit;
 
-        InvokePOSActionv3(EanBoxValue, TempEanBoxSetupEvent, POSSession, FrontEnd, POSAction);
+        SetParameterValuesForAction(EanBoxValue, TempEanBoxSetupEvent, POSSession, FrontEnd, POSAction);
     end;
 
-    internal procedure InvokePOSActionv3(EanBoxValue: Text; EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var POSAction: Record "NPR POS Action"): Boolean
+    internal procedure SetParameterValuesForAction(EanBoxValue: Text; EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var POSAction: Record "NPR POS Action"): Boolean
     begin
         if EanBoxSetupEvent."Action Code" = '' then
             exit(false);
