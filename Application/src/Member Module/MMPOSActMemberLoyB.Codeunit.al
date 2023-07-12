@@ -88,7 +88,7 @@ codeunit 6150955 "NPR MM POS Act: Member Loy. B."
 
                 Coupon.Get(CouponNo);
 
-                EanBoxEventHandler.InvokeEanBoxv3(Coupon."Reference No.", POSSession, FrontEnd, POSAction);
+                EanBoxEventHandler.ResolveEanBoxActionForValue(Coupon."Reference No.", POSSession, FrontEnd, POSAction);
 
                 if POSAction.Code <> '' then
                     SetActionContent(ActionContext, POSAction);
@@ -126,7 +126,7 @@ codeunit 6150955 "NPR MM POS Act: Member Loy. B."
 
         CouponsPage.GetRecord(Coupon);
 
-        EanBoxEventHandler.InvokeEanBoxv3(Coupon."Reference No.", POSSession, FrontEnd, POSAction);
+        EanBoxEventHandler.ResolveEanBoxActionForValue(Coupon."Reference No.", POSSession, FrontEnd, POSAction);
         if POSAction.Code <> '' then
             SetActionContent(ActionContext, POSAction);
     end;
