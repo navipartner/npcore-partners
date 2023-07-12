@@ -72,6 +72,12 @@
             OptionCaption = 'Cash Drawer,Bank,Safe,Virtual';
             OptionMembers = CASH_DRAWER,BANK,SAFE,VIRTUAL;
         }
+
+        field(50; "Suppress EOD Posting"; Boolean)
+        {
+            Caption = 'Suppress EOD Posting';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
