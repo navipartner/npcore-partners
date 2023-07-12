@@ -26,6 +26,7 @@
                 field("Table Name"; IndentedTableName)
                 {
                     Caption = 'Table Name';
+                    Editable = false;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
                     ToolTip = 'Specifies the value of the Table Name field';
@@ -162,6 +163,7 @@
     trigger OnAfterGetRecord()
     begin
         Clear(IndentedTableName);
+        Rec.CalcFields("Table Name");
         IndentedTableName := IndentTableName(Rec.Level, Rec."Table Name");
         SetHasNoLinks();
     end;
