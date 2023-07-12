@@ -288,18 +288,83 @@
                 group(FTP)
                 {
                     Caption = 'SFTP/FTP';
+
+                    field("FTP/SFTP Directory"; Rec."FTP/SFTP Dir Path")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the absolute path of the folder used by FTP and SFTP. Use this to specify which folder should be uploaded to.';
+                        trigger OnValidate()
+                        begin
+                            if (Rec."FTP/SFTP Dir Path" = '') then exit;
+                            Rec."FTP/SFTP Dir Path" := CopyStr(Rec."FTP/SFTP Dir Path".Replace('\', '/'), 1, 250);
+                            if (not Rec."FTP/SFTP Dir Path".StartsWith('/')) then
+                                Rec."FTP/SFTP Dir Path" := CopyStr('/' + Rec."FTP/SFTP Dir Path", 1, 250);
+                            if (not Rec."FTP/SFTP Dir Path".EndsWith('/')) then
+                                Rec."FTP/SFTP Dir Path" := CopyStr(Rec."FTP/SFTP Dir Path" + '/', 1, 250);
+                            Rec.Modify(false);
+                        end;
+                    }
+                    field("FTP/SFTP Filename"; Rec."FTP/SFTP Filename")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the filename used by FTP and SFTP. Use this to specify filename rather than using an auto generated one.';
+                        trigger OnValidate()
+                        begin
+                            Rec."FTP/SFTP Filename" := CopyStr(Rec."FTP/SFTP Filename".Replace('/', ''), 1, 250);
+                            Rec."FTP/SFTP Filename" := CopyStr(Rec."FTP/SFTP Filename".Replace('\', ''), 1, 250);
+                            Rec.Modify(false);
+                        end;
+                    }
+                    field("Server File Encoding"; Rec."Server File Encoding")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specify the encoding used for the file.';
+                    }
+                    field("FTP Enabled"; Rec."FTP Enabled")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies if FTP Transfer should be used with the FTP Connection.';
+                    }
+                    field("FTP Connection"; Rec."FTP Connection")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies a FTP Connection. This takes priority over the Nc Endpoint if specified.';
+                        Enabled = Rec."FTP Enabled";
+                    }
+                    field("SFTP Enabled"; Rec."SFTP Enabled")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies if SFTP Transfer should be used with the SFTP Connection.';
+                    }
+                    field("SFTP Connection"; Rec."SFTP Connection")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies a SFTP Connection. This takes priority over the Nc Endpoint if specified.';
+                        Enabled = Rec."SFTP Enabled";
+                    }
+
                     field("FTP Transfer"; Rec."FTP Transfer")
                     {
-
+                        Caption = 'FTP transfer (Nc Endpoint)';
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the FTP or SFTP Transfer field';
                         ApplicationArea = NPRRetail;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Going to be swapped out for FTP and SFTP Connection.';
+                        ObsoleteTag = 'NP';
+                        Visible = False;
                     }
                     field("SFTP/FTP Nc Endpoint"; Rec."SFTP/FTP Nc Endpoint")
                     {
                         ToolTip = 'Specifies the value of the Nc Endpoint field for FTP or SFTP Transfer';
                         ApplicationArea = NPRRetail;
+                        Enabled = Rec."FTP Transfer";
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Going to be swapped out for FTP and SFTP Connection.';
+                        ObsoleteTag = 'NP';
+                        Visible = False;
                     }
+
                     field("FTP Server"; Rec."FTP Server")
                     {
                         ObsoleteState = Pending;
@@ -376,6 +441,7 @@
                         ToolTip = 'Specifies temporrary file extension. If it is entered, file will be uploaded with this extension and then renamed to real (target) one.';
                     }
                 }
+
                 group(API)
                 {
                     field("API Transfer"; Rec."API Transfer")

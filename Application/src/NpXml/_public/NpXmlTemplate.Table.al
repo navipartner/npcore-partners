@@ -258,6 +258,9 @@
             Caption = 'S/FTP Transfer';
             DataClassification = CustomerContent;
             Description = 'NC1.08';
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Splitting FTP and SFTP in two';
+            ObsoleteTag = 'NP';
         }
         field(5110; "FTP Server"; Text[250])
         {
@@ -504,7 +507,51 @@
             Caption = 'SFTP/FTP Nc Endpoint';
             DataClassification = CustomerContent;
             TableRelation = "NPR Nc Endpoint";
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Removeing Nc FTP Endpoints';
+            ObsoleteTag = 'NP';
         }
+        field(5520; "FTP Enabled"; Boolean)
+        {
+            Caption = 'FTP Enabled';
+            DataClassification = CustomerContent;
+        }
+        field(5530; "FTP Connection"; Code[20])
+        {
+            Caption = 'FTP Connection';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR FTP Connection";
+        }
+        field(5540; "SFTP Enabled"; Boolean)
+        {
+            Caption = 'SFTP Enabled';
+            DataClassification = CustomerContent;
+        }
+        field(5550; "SFTP Connection"; Code[20])
+        {
+            Caption = 'SFTP Connection';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR SFTP Connection";
+        }
+        field(5560; "FTP/SFTP Dir Path"; Text[250])
+        {
+            Caption = 'FTP/SFTP Directory Path';
+            DataClassification = CustomerContent;
+        }
+        field(5561; "FTP/SFTP Filename"; Text[250])
+        {
+            Caption = 'FTP/SFTP Filename';
+            DataClassification = CustomerContent;
+        }
+        field(5570; "Server File Encoding"; Option)
+        {
+            Caption = 'File Encoding Connection';
+            DataClassification = CustomerContent;
+            InitValue = UTF8;
+            OptionCaption = 'ANSI,Unicode,UTF-8';
+            OptionMembers = ANSI,Unicode,UTF8;
+        }
+
         field(6059906; "Task Processor Code"; Code[20])
         {
             Caption = 'Task Processor Code';

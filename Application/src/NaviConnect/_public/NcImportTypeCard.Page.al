@@ -127,70 +127,154 @@
                         ToolTip = 'Specifies the value of the Ftp Enabled field';
                         ApplicationArea = NPRNaviConnect;
                     }
-                    field(Sftp; Rec.Sftp)
+                    field("FTP Connection"; Rec."FTP Connection")
                     {
 
-                        ToolTip = 'Specifies the value of the Sftp field';
+                        ToolTip = 'Specifies a FTP Connection. If one is selected, this connection will take priority over the FTP connection fields on this page.';
                         ApplicationArea = NPRNaviConnect;
+                        Enabled = Rec."Ftp Enabled";
                     }
-                    field("Ftp Host"; Rec."Ftp Host")
+                    field("Sftp Enabled"; Rec."Sftp Enabled")
                     {
 
-                        ToolTip = 'Specifies the value of the Ftp Host field';
+                        ToolTip = 'Specifies the value of the Ftp Enabled field';
                         ApplicationArea = NPRNaviConnect;
                     }
-                    field("Ftp Port"; Rec."Ftp Port")
+                    field("SFTP Connection"; Rec."SFTP Connection")
                     {
 
-                        ToolTip = 'Specifies the value of the Ftp Port field';
+                        ToolTip = 'Specifies a SFTP Connection. If one is selected, this connection will take priority over the SFTP connection fields on this page.';
                         ApplicationArea = NPRNaviConnect;
-                    }
-                    field("Ftp Binary"; Rec."Ftp Binary")
-                    {
-
-                        ToolTip = 'Specifies the value of the Ftp Binary field';
-                        ApplicationArea = NPRNaviConnect;
-                    }
-                    field("Ftp User"; Rec."Ftp User")
-                    {
-
-                        ToolTip = 'Specifies the value of the Ftp User field';
-                        ApplicationArea = NPRNaviConnect;
-                    }
-                    field("Ftp Password"; Rec."Ftp Password")
-                    {
-
-                        ToolTip = 'Specifies the value of the Ftp Password field';
-                        ApplicationArea = NPRNaviConnect;
-                    }
-                    field("Ftp Passive"; Rec."Ftp Passive")
-                    {
-
-                        ToolTip = 'Specifies the value of the Ftp Passive field';
-                        ApplicationArea = NPRNaviConnect;
-                    }
-                    field("FTP Encryption mode"; Rec."Ftp EncMode")
-                    {
-                        ToolTip = 'Specifies which mode of encryption is used between client and server';
-                        ApplicationArea = NPRRetail;
+                        Enabled = Rec."Sftp Enabled";
                     }
                     field("Ftp Path"; Rec."Ftp Path")
                     {
 
-                        ToolTip = 'Specifies the value of the Ftp Path field';
+                        ToolTip = 'Specifies the absolute directory path where the file(s) to be downloaded exists.';
                         ApplicationArea = NPRNaviConnect;
+
+                        trigger OnValidate()
+                        begin
+                            Rec."Ftp Path" := CopyStr(Rec."Ftp Path".Replace('\', '/'), 1, 250);
+                            if (not Rec."Ftp Path".StartsWith('/')) then
+                                Rec."Ftp Path" := CopyStr('/' + Rec."Ftp Path", 1, 250);
+                            if (not Rec."Ftp Path".EndsWith('/')) then
+                                Rec."Ftp Path" := CopyStr(Rec."Ftp Path" + '/', 1, 250);
+                            Rec.Modify(False);
+                        end;
+                    }
+                    field("Ftp Filename"; Rec."Ftp Filename")
+                    {
+
+                        ToolTip = 'Specifies the name of the file to be downloaded.';
+                        ApplicationArea = NPRNaviConnect;
+                    }
+                    field("Ftp Backup Dir Path"; Rec."Ftp Backup Dir Path")
+                    {
+
+                        ToolTip = 'Specifies the absolute path of the backup directory. If specified files downloaded will not be deleted but moved to /"Backup Dir Path"/Filename';
+                        ApplicationArea = NPRNaviConnect;
+
+                        trigger OnValidate()
+                        begin
+                            if (Rec."Ftp Backup Dir Path" = '') then exit;
+                            Rec."Ftp Backup Dir Path" := CopyStr(Rec."Ftp Backup Dir Path".Replace('\', '/'), 1, 250);
+                            if (not Rec."Ftp Backup Dir Path".StartsWith('/')) then
+                                Rec."Ftp Backup Dir Path" := CopyStr('/' + Rec."Ftp Backup Dir Path", 1, 250);
+                            if (not Rec."Ftp Backup Dir Path".EndsWith('/')) then
+                                Rec."Ftp Backup Dir Path" := CopyStr(Rec."Ftp Backup Dir Path" + '/', 1, 250);
+                            Rec.Modify(False);
+                        end;
                     }
                     field("Ftp Backup Path"; Rec."Ftp Backup Path")
                     {
 
                         ToolTip = 'Specifies the value of the Ftp Backup Path field';
                         ApplicationArea = NPRNaviConnect;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Using "FTP Backup Dir Path"';
+                        ObsoleteTag = 'NP';
+                        Visible = false;
                     }
-                    field("Ftp Filename"; Rec."Ftp Filename")
+                    field("Ftp Host"; Rec."Ftp Host")
                     {
 
-                        ToolTip = 'Specifies the value of the Ftp Filename field';
+                        ToolTip = 'Specifies the value of the Ftp Host field';
                         ApplicationArea = NPRNaviConnect;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Using Sftp and Ftp connections instead.';
+                        ObsoleteTag = 'NP';
+                        Visible = false;
+                    }
+                    field("Ftp Port"; Rec."Ftp Port")
+                    {
+
+                        ToolTip = 'Specifies the value of the Ftp Port field';
+                        ApplicationArea = NPRNaviConnect;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Using Sftp and Ftp connections instead.';
+                        ObsoleteTag = 'NP';
+                        Visible = false;
+                    }
+                    field("Ftp Binary"; Rec."Ftp Binary")
+                    {
+
+                        ToolTip = 'Specifies the value of the Ftp Binary field';
+                        ApplicationArea = NPRNaviConnect;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Using Sftp and Ftp connections instead.';
+                        ObsoleteTag = 'NP';
+                        Visible = false;
+                    }
+                    field("Ftp User"; Rec."Ftp User")
+                    {
+
+                        ToolTip = 'Specifies the value of the Ftp User field';
+                        ApplicationArea = NPRNaviConnect;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Using Sftp and Ftp connections instead.';
+                        ObsoleteTag = 'NP';
+                        Visible = false;
+                    }
+                    field("Ftp Password"; Rec."Ftp Password")
+                    {
+
+                        ToolTip = 'Specifies the value of the Ftp Password field';
+                        ApplicationArea = NPRNaviConnect;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Using Sftp and Ftp connections instead.';
+                        ObsoleteTag = 'NP';
+                        Visible = false;
+                    }
+                    field("Ftp Passive"; Rec."Ftp Passive")
+                    {
+
+                        ToolTip = 'Specifies the value of the Ftp Passive field';
+                        ApplicationArea = NPRNaviConnect;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Using Sftp and Ftp connections instead.';
+                        ObsoleteTag = 'NP';
+                        Visible = false;
+                    }
+                    field("FTP Encryption mode"; Rec."Ftp EncMode")
+                    {
+                        ToolTip = 'Specifies which mode of encryption is used between client and server';
+                        ApplicationArea = NPRRetail;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Using Sftp and Ftp connections instead.';
+                        ObsoleteTag = 'NP';
+                        Visible = false;
+                    }
+                    field("Sftp"; Rec.Sftp)
+                    {
+
+                        ToolTip = 'Specifies the value of the Sftp field';
+                        ApplicationArea = NPRNaviConnect;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Using Sftp and Ftp connections instead.';
+                        ObsoleteTag = 'NP';
+                        Visible = false;
+
                     }
                 }
             }
@@ -284,7 +368,7 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                Visible = Rec."Ftp Enabled";
+                Visible = (Rec."Ftp Enabled" or Rec."Sftp Enabled");
 
                 ToolTip = 'Executes the Download Ftp action';
                 ApplicationArea = NPRNaviConnect;
