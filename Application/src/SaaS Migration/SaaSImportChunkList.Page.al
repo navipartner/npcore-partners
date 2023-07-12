@@ -45,8 +45,21 @@ page 6150807 "NPR SaaS Import Chunk List"
                 begin
                     Rec.CalcFields(Chunk);
                     Rec.Chunk.CreateInStream(IStream, TextEncoding::UTF8);
-                    FileName := '';
+                    FileName := StrSubstNo('Chunk_%1.csv', Rec.ID);
                     DownloadFromStream(IStream, 'Download chunk', '', 'CSV File (*.csv)|*.csv', FileName);
+                end;
+            }
+            action(ImportChunk)
+            {
+                ToolTip = 'Import the raw chunk to troubleshoot errors';
+                ApplicationArea = NPRRetail;
+                Image = Refresh;
+                trigger OnAction()
+                var
+                    SaaSImportCSVParser: Codeunit "NPR SaaS Import CSV Parser";
+                begin
+                    Rec.CalcFields(Chunk);
+                    SaaSImportCSVParser.Run(Rec);
                 end;
             }
         }
