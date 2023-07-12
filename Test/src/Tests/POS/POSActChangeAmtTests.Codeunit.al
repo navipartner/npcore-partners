@@ -19,6 +19,7 @@ codeunit 85069 "NPR POS Act. Change Amt. Tests"
         LibraryRandom: Codeunit "Library - Random";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
+        BusinessLogic: Codeunit "NPR POS Action:Change LineAm B";
         NewLineAmount: Decimal;
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
@@ -31,13 +32,10 @@ codeunit 85069 "NPR POS Act. Change Amt. Tests"
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
 
         NewLineAmount := LibraryRandom.RandDecInDecimalRange(0.01, Item."Unit Price", 1);
-
-        POSSession.GetSale(POSSale);
+        
         POSSession.GetSaleLine(POSSaleLine);
+        BusinessLogic.ChangeAmount(NewLineAmount, POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-
-        SaleLinePOS.Validate("Amount Including VAT", NewLineAmount);
-        SaleLinePOS.Modify();
 
         Assert.IsTrue(SaleLinePOS."Line Amount" = NewLineAmount, 'Amount is changed.')
     end;
