@@ -22,6 +22,7 @@
             Caption = 'Default POS Entry No. Series';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'It''s not used anywhere';
         }
         field(21; "Journal Template Name"; Code[10])
@@ -64,6 +65,7 @@
             OptionCaption = 'No,After Sale,After End Of Day,After Last End Of Day in Store,After Last End Of Day Companywide';
             OptionMembers = No,AfterSale,AfterEndOfDay,AfterLastEndofDayStore,AfterLastEndofDayCompany;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Auto posting done only via job queue.';
         }
         field(60; "Automatic POS Posting"; Option)
@@ -73,6 +75,7 @@
             OptionCaption = 'No,After Sale,After End Of Day,After Last End Of Day in Store,After Last End Of Day Companywide';
             OptionMembers = No,AfterSale,AfterEndOfDay,AfterLastEndofDayStore,AfterLastEndofDayCompany;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Auto posting done only via job queue.';
         }
         field(70; "Automatic Posting Method"; Option)
@@ -82,6 +85,7 @@
             OptionCaption = 'Start New Session,Direct';
             OptionMembers = StartNewSession,Direct;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Auto posting done only via job queue.';
         }
 
@@ -90,6 +94,7 @@
             Caption = 'Adj. Cost after Item Posting';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Related code moved to job queue instead of direct execution';
 
         }
@@ -98,6 +103,7 @@
             Caption = 'Post to G/L after Item Posting';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Related code moved to job queue instead of direct execution';
         }
         field(100; "POS Sales Rounding Account"; Code[20])
@@ -132,8 +138,8 @@
             Caption = 'POS Payment Bin';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moved to POS Unit';
-            ObsoleteTag = 'POS Posting Profile -> POS Unit';
         }
         field(150; "Gen. Bus. Posting Group"; Code[20])
         {

@@ -6,6 +6,7 @@
     DataClassification = CustomerContent;
 
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'GCP Removed';
     fields
     {

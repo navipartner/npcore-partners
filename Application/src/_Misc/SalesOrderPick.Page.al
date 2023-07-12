@@ -342,6 +342,7 @@
                     ToolTip = 'Specifies the value of the NPR Bill-to Company field';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Not Used.';
                 }
                 field("Bill-To Vendor No."; Rec."NPR Bill-To Vendor No.")
@@ -350,6 +351,7 @@
                     ToolTip = 'Specifies the value of the NPR Bill-To Vendor No. field';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Not Used.';
                 }
                 field("Bill-to E-mail"; Rec."NPR Bill-to E-mail")

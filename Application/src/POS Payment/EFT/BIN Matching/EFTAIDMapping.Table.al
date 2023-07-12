@@ -4,6 +4,7 @@ table 6059783 "NPR EFT AID Mapping"
     Caption = 'EFT Application ID Mapping';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
 
     fields
@@ -13,6 +14,7 @@ table 6059783 "NPR EFT AID Mapping"
             Caption = 'ApplicationID';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
         }
         field(2; "Description"; Text[100])
@@ -20,6 +22,7 @@ table 6059783 "NPR EFT AID Mapping"
             Caption = 'Description';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
         }
         field(3; "Bin Group Code"; Code[10])
@@ -28,6 +31,7 @@ table 6059783 "NPR EFT AID Mapping"
             DataClassification = CustomerContent;
             TableRelation = "NPR EFT BIN Group";
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
         }
         field(4; "RID"; Code[10])
@@ -35,6 +39,7 @@ table 6059783 "NPR EFT AID Mapping"
             DataClassification = CustomerContent;
             Caption = 'Registered application provider ID';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
         }
     }
@@ -44,11 +49,13 @@ table 6059783 "NPR EFT AID Mapping"
         key(Key1; "ApplicationID")
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
         }
         key(Key2; RID)
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Wrong Format this table did not have code fields big enough';
         }
     }

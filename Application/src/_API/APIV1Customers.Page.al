@@ -711,6 +711,7 @@ page 6014507 "NPR APIV1 - Customers"
                 {
                     Caption = 'replicationCounter', Locked = true;
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Replaced by SystemRowVersion';
                 }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

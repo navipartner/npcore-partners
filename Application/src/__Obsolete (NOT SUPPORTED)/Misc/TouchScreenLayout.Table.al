@@ -3,6 +3,7 @@
     Access = Internal;
     Caption = 'Touch Screen - Layout';
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used';
     DataClassification = CustomerContent;
 

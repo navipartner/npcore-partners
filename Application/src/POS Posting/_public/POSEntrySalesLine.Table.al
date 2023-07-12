@@ -341,6 +341,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use systemID instead';
         }
         field(161; "Orig. POS Line No."; Integer)
@@ -349,6 +350,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(170; "Retail ID"; Guid)
@@ -357,6 +359,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.50';
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(200; "Bin Code"; Code[20])
@@ -419,6 +422,7 @@
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(208; "Planned Delivery Date"; Date)

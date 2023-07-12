@@ -41,6 +41,7 @@
             Editable = false;
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'NC Trigger module removed from NpCore. We switched to Job Queue instead of using Task Queue.';
         }
     }

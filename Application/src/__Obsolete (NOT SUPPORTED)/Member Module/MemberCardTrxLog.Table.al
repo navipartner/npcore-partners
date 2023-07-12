@@ -6,6 +6,7 @@
     DataClassification = CustomerContent;
     ObsoleteReason = 'Not used.';
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     fields
     {
         field(1; "Transaction No."; BigInteger)

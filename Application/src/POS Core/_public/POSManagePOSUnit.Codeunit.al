@@ -131,7 +131,7 @@
     end;
 
 
-    [Obsolete('Use the ClosePOSUnitOpenPeriods(POSStoreCode, POSUnitNo) function instead.')]
+    [Obsolete('Use the ClosePOSUnitOpenPeriods(POSStoreCode, POSUnitNo) function instead.', 'NPR23.0')]
     procedure ClosePOSUnitOpenPeriods(POSUnitNo: Code[10])
     var
         POSUnit: Record "NPR POS Unit";

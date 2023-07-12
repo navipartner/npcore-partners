@@ -4,6 +4,7 @@
     Caption = 'Period';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Table is obsolete';
 
     fields
@@ -133,8 +134,8 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(23; "Net. Gift Voucher Change"; Decimal)
         {
@@ -142,8 +143,8 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(24; "Net. Terminal Change"; Decimal)
         {
@@ -175,8 +176,8 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(29; "Credit Voucher issuing"; Decimal)
         {
@@ -184,8 +185,8 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(30; "Cash Received"; Decimal)
         {
@@ -274,8 +275,8 @@
             Caption = 'Gift Voucher Debit';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(51; "Euro Difference"; Decimal)
         {

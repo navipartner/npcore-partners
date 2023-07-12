@@ -59,14 +59,14 @@
 
     #region Workflows 1.0 Coordination
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     procedure WorkflowBackEndStepBegin(WorkflowId: Integer; ActionId: Integer)
     begin
         _WorkflowStack.Push(WorkflowId);
         _ActionStack.Push(ActionId);
     end;
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     procedure WorkflowBackEndStepEnd()
     begin
         if _StepToContinueAt <> '' then begin
@@ -84,21 +84,21 @@
             _ActionStack.Pop();
     end;
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     local procedure CurrentWorkflowID(): Integer
     begin
         if _WorkflowStack.Count() > 0 then
             exit(_WorkflowStack.Peek());
     end;
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     local procedure CurrentActionID(): Integer
     begin
         if _ActionStack.Count() > 0 then
             exit(_ActionStack.Peek());
     end;
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     procedure AbortWorkflow(WorkflowID: Integer)
     begin
         if WorkflowID = CurrentWorkflowID() then begin
@@ -109,7 +109,7 @@
             _PausedWorkflowID := 0;
     end;
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     procedure AbortWorkflows()
     begin
         _Pausing := false;
@@ -119,7 +119,7 @@
         _POSSession.ClearActionState();
     end;
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     procedure ContinueAtStep(Step: Text)
     var
         Text011: Label 'A request was made to continue current workflow at step %1, while no workflow is currently running.';
@@ -130,7 +130,7 @@
         _StepToContinueAt := Step;
     end;
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     procedure IsPaused(): Boolean
     begin
         exit(_PausedWorkflowID > 0);
@@ -140,7 +140,7 @@
 
     #region Workflows 2.0 Coordination
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     procedure CloneForWorkflow20(WorkflowIDIn: Integer; var FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
         FrontEndIn.Initialize(_Framework);
@@ -205,7 +205,7 @@
         exit(StrSubstNo(Text001, Text));
     end;
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     local procedure RegisterWorkflowIfNecessary(Name: Code[20])
     var
         POSAction: Record "NPR POS Action";
@@ -525,12 +525,12 @@
     end;
 #endif
 
-    [Obsolete('Pending removal, not used')]
+    [Obsolete('Pending removal, not used', 'NPR23.0')]
     procedure ApplyAdministrativeTemplates(Templates: JsonArray)
     begin
     end;
 
-    [Obsolete('Action sequences are no longer supported')]
+    [Obsolete('Action sequences are no longer supported', 'NPR23.0')]
     procedure ConfigureActionSequences(var TempSessionAction: Record "NPR POS Action" temporary)
     begin
         Error('Action sequences are no longer supported');
@@ -650,7 +650,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
-    [Obsolete('Remove the need for this request in frontend and delete this. It is currently a dummy event in backend')]
+    [Obsolete('Remove the need for this request in frontend and delete this. It is currently a dummy event in backend', 'NPR23.0')]
     procedure HardwareInitializationComplete()
     var
         Request: Codeunit "NPR Front-End: Generic";
@@ -739,7 +739,7 @@
     end;
 #endif
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     procedure InvokeWorkflow(var POSAction: Record "NPR POS Action")
     var
         Request: Codeunit "NPR Front-End: WorkflowRequest";
@@ -761,7 +761,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     procedure PauseWorkflow(): Integer
     var
         Request: Codeunit "NPR Front-End: PauseWorkflow";
@@ -822,7 +822,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     local procedure RequestWorkflowStep(StepId: Text)
     var
         Request: Codeunit "NPR Front-End: WorkflowRequest";
@@ -832,7 +832,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
-    [Obsolete('Not supported in workflow v3')]
+    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     procedure ResumeWorkflow()
     var
         Request: Codeunit "NPR Front-End: ResumeWorkflow";
@@ -879,7 +879,7 @@
     #region Model UI - TODO: refactor into Dragonglass!
 #if not CLOUD
 
-    [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object')]
+    [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object', 'NPR23.0')]
     procedure ShowModel(Model: DotNet NPRNetModel) ModelID: Guid
     var
         Request: Codeunit "NPR Front-End: Generic";
@@ -902,7 +902,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
-    [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object')]
+    [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object', 'NPR23.0')]
     procedure UpdateModel(Model: DotNet NPRNetModel; ModelID: Guid)
     var
         Request: Codeunit "NPR Front-End: Generic";
@@ -925,7 +925,7 @@
     end;
 #endif
 
-    [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object')]
+    [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object', 'NPR23.0')]
     procedure CloseModel(ModelID: Guid)
     var
         Request: Codeunit "NPR Front-End: Generic";
@@ -945,7 +945,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
-    [Obsolete('Delete once all wf 1.0 are gone')]
+    [Obsolete('Delete once all wf 1.0 are gone', 'NPR23.0')]
     procedure SetActionContext("Action": Text; Context: Codeunit "NPR POS JSON Management")
     var
         Request: Codeunit "NPR Front-End: ProvideContext";
@@ -978,7 +978,7 @@
         _WorkflowResponseContent := ResponseContent;
     end;
 
-    [Obsolete('Queue workflow is not supported anymore.')]
+    [Obsolete('Queue workflow is not supported anymore.', 'NPR23.0')]
     procedure QueueWorkflow(ActionCode: Text; Context: Text)
     begin
         Error('QueueWorkflow method in POSFrontEndManagement codeunit is no longer supported');
@@ -1110,7 +1110,7 @@
     begin
     end;
 
-    [Obsolete('Only server password secure methods will be supported going forward')]
+    [Obsolete('Only server password secure methods will be supported going forward', 'NPR23.0')]
     [BusinessEvent(true)]
     local procedure OnRequestSecureMethodsClientPasswordsRegistration()
     begin

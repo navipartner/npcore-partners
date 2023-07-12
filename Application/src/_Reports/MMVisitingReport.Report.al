@@ -9,6 +9,7 @@
     UsageCategory = None;
     DataAccessIntent = ReadOnly;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used';
 
     dataset

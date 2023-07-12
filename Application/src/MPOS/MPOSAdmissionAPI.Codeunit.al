@@ -2,6 +2,7 @@ codeunit 6014493 "NPR MPOS Admission API"
 {
     Access = Internal;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used anymore.';
 
     var

@@ -30,6 +30,7 @@
             Caption = 'Screen No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'This is device specific and moved to ''table 6014698 "NPR POS Unit Display Helper"''';
         }
         field(13; "Receipt Duration"; Integer)
@@ -59,6 +60,7 @@
             Caption = 'Media Downloaded';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'This is device specific and moved to ''table 6014698 "NPR POS Unit Display Helper"''';
         }
         field(17; "Receipt Description Padding"; Integer)

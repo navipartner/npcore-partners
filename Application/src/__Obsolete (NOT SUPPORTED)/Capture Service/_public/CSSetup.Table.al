@@ -3,6 +3,7 @@
     Caption = 'CS Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Object moved to NP Warehouse App.';
 
 
@@ -120,6 +121,7 @@
             Caption = 'Job Queue Priority for Post';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Target field Prioriti on Job Queue Entry is removed!';
         }
         field(41; "Notify On Success"; Boolean)

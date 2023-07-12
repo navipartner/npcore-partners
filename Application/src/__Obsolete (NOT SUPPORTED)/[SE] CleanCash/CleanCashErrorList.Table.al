@@ -5,7 +5,7 @@
     DataClassification = CustomerContent;
     ObsoleteReason = 'This table is not used anymore';
     ObsoleteState = Removed;
-    ObsoleteTag = 'CleanCash To AL';
+    ObsoleteTag = 'NPR23.0';
 
     fields
     {

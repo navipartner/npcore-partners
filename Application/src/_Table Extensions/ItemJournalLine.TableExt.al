@@ -57,6 +57,7 @@ tableextension 6014452 "NPR Item Journal Line" extends "Item Journal Line"
             DataClassification = CustomerContent;
             Description = 'VRT';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
         field(6059971; "NPR Master Line No."; Integer)
@@ -65,6 +66,7 @@ tableextension 6014452 "NPR Item Journal Line" extends "Item Journal Line"
             DataClassification = CustomerContent;
             Description = 'VRT';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
     }

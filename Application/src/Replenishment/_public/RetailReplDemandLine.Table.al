@@ -163,6 +163,7 @@
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. field';
         }
         field(23; "Sales Order No."; Code[20])
@@ -477,7 +478,6 @@
         {
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
-            ObsoleteState = No;
             //ObsoleteReason = 'Product Groups became first level children of Item Categories.';
         }
         field(5706; "Transfer-from Code"; Code[10])

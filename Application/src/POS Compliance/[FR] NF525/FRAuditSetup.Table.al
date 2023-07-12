@@ -14,6 +14,7 @@
         field(2; "Certification No."; Text[30])
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Hardcoded instead';
             Caption = 'Certification No.';
             DataClassification = CustomerContent;
@@ -23,6 +24,7 @@
         field(3; "Certification Category"; Text[30])
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Hardcoded instead';
             Caption = 'Certification Category';
             DataClassification = CustomerContent;
@@ -81,6 +83,7 @@
             Caption = 'Item VAT Identifier Filter';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'New Field Item VAT ID Filter BLOB Type';
         }
         field(61; "Item VAT ID Filter"; Blob)

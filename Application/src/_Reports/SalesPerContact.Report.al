@@ -1,6 +1,7 @@
 ﻿report 6014597 "NPR Sales Per Contact"
 {
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not Used';
 
 #IF NOT BC17

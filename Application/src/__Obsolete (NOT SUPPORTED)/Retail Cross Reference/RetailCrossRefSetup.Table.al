@@ -6,6 +6,7 @@
     Caption = 'Retail Cross Reference Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Use Setup from module POS Item Reference.';
 
     fields

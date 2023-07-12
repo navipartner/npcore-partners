@@ -17,6 +17,7 @@
             Caption = 'Description';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Text that should follow user language cannot be table data. Changed to page variable populated runtime in workflow v3.';
         }
         field(3; Version; Text[32])
@@ -42,6 +43,7 @@
             OptionCaption = 'Generic,Button,BackEnd';
             OptionMembers = Generic,Button,BackEnd;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Was never implemented fully. Not needed in v3 workflows';
         }
         field(7; "Subscriber Instances Allowed"; Option)
@@ -51,6 +53,7 @@
             OptionCaption = 'Single,Multiple';
             OptionMembers = Single,Multiple;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Was never implemented fully. Not needed in v3 workflows';
         }
         field(8; "Bound to DataSource"; Boolean)
@@ -88,6 +91,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.32.11';
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Was never implemented by any of our actions. A reimplementation should probably be only a POS menu button level, not here.';
         }
         field(13; "Codeunit ID"; Integer)
@@ -97,6 +101,7 @@
             Description = 'NPR5.32.11';
             Editable = false;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by enum for workflow v3. This implementation also assumed that EventSubscription."Number of Calls" count increased by +1 within user session but it was across entire NST. So it never worked robustly.';
         }
         field(14; "Secure Method Code"; Code[10])
@@ -106,6 +111,7 @@
             Description = 'NPR5.43';
             TableRelation = "NPR POS Secure Method";
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Was never implemented by any of our actions. A reimplementation should probably be only a POS menu button level, not here.';
         }
         field(15; "Workflow Engine Version"; Text[30])
@@ -168,14 +174,14 @@
         Param.DeleteAll();
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     local procedure InitializeWorkflowDiscovery()
     begin
         Clear(WorkflowObj);
         ActionInDiscovery := '';
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     local procedure MakeSureDiscoveryIsAllowed("Action": Text)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -191,7 +197,7 @@
         TempDiscoveredAction.Insert();
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure DiscoverAction(ParamCode: Code[20]; ParamDescription: Text[250]; ParamVersion: Text[30]; ParamType: Integer; AllowedInstances: Option): Boolean
     var
         xPOSAction: Record "NPR POS Action";
@@ -243,7 +249,7 @@
         exit(true);
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure DiscoverAction20(ParamCode: Code[20]; ParamDescription: Text[250]; ParamVersion: Text[32]): Boolean
     var
         xPOSAction: Record "NPR POS Action";
@@ -295,7 +301,7 @@
         exit(true);
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     local procedure ActionUpdateCheck(ParamCode: Text; ParamVersion: Text): Boolean
     var
         POSAction: Record "NPR POS Action";
@@ -309,7 +315,7 @@
         end;
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     local procedure HandleActionUpdates()
     begin
         TempUpdatedActions.SetAutoCalcFields(Workflow);
@@ -320,7 +326,7 @@
             until TempUpdatedActions.Next() = 0;
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterWorkflowStep(Label: Text; ParamCode: Text)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -335,7 +341,7 @@
         WorkflowObj.Steps().Add(WorkflowStep);
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterWorkflow(WithOnBeforeWorkflowEvent: Boolean)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -353,7 +359,7 @@
         InitializeWorkflowDiscovery();
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterWorkflow20(ParamCode: Text)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -374,7 +380,7 @@
         InitializeWorkflowDiscovery();
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterTextParameter(Name: Text; DefaultValue: Text)
     var
         Param: Record "NPR POS Action Parameter";
@@ -382,7 +388,7 @@
         RegisterParameter(Name, Param."Data Type"::Text, DefaultValue, '');
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterIntegerParameter(Name: Text; DefaultValue: Integer)
     var
         Param: Record "NPR POS Action Parameter";
@@ -390,7 +396,7 @@
         RegisterParameter(Name, Param."Data Type"::Integer, Format(DefaultValue, 0, 9), '');
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterDateParameter(Name: Text; DefaultValue: Date)
     var
         Param: Record "NPR POS Action Parameter";
@@ -398,7 +404,7 @@
         RegisterParameter(Name, Param."Data Type"::Date, Format(DefaultValue, 0, 9), '');
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterBooleanParameter(Name: Text; DefaultValue: Boolean)
     var
         Param: Record "NPR POS Action Parameter";
@@ -406,7 +412,7 @@
         RegisterParameter(Name, Param."Data Type"::Boolean, Format(DefaultValue, 0, 9), '');
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterDecimalParameter(Name: Text; DefaultValue: Decimal)
     var
         Param: Record "NPR POS Action Parameter";
@@ -414,7 +420,7 @@
         RegisterParameter(Name, Param."Data Type"::Decimal, Format(DefaultValue, 0, 9), '');
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterOptionParameter(Name: Text; Options: Text; DefaultValue: Text)
     var
         Param: Record "NPR POS Action Parameter";
@@ -422,7 +428,7 @@
         RegisterParameter(Name, Param."Data Type"::Option, DefaultValue, Options);
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     local procedure RegisterParameter(Name: Text; DataType: Option; DefaultValue: Text; Options: Text)
     var
         Param: Record "NPR POS Action Parameter";
@@ -443,7 +449,7 @@
         Param.Insert();
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterDataBinding()
     begin
         "Bound to DataSource" := true;
@@ -451,7 +457,7 @@
         UpdateActionBuffers();
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterDataSourceBinding(DataSource: Code[50])
     begin
         "Bound to DataSource" := true;
@@ -460,7 +466,7 @@
         UpdateActionBuffers();
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterCustomJavaScriptLogic(Method: Text; JavaScriptCode: Text)
     var
         Json: JsonObject;
@@ -494,7 +500,7 @@
         StreamCustomJavaScriptToBlobV3(Json);
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterDataSource(Name: Code[50])
     begin
         "Data Source Name" := Name;
@@ -502,7 +508,7 @@
         UpdateActionBuffers();
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterBlockingUI(Blocking: Boolean)
     begin
         "Blocking UI" := Blocking;
@@ -510,7 +516,7 @@
         UpdateActionBuffers();
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterTooltip(TooltipIn: Text)
     begin
         Tooltip := CopyStr(TooltipIn, 1, MaxStrLen(Tooltip));
@@ -518,19 +524,19 @@
         UpdateActionBuffers();
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure RegisterSecureMethod(SecureMethodCode: Code[10])
     begin
         "Secure Method Code" := SecureMethodCode;
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure IsThisAction(ParamCode: Code[20]): Boolean
     begin
         exit(Rec.Code = ParamCode);
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     local procedure UpdateActionBuffers()
     begin
         if Rec.IsTemporary then
@@ -542,7 +548,7 @@
         end;
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     internal procedure RefreshWorkflow()
     begin
         ActionInRefresh := Code;
@@ -551,7 +557,7 @@
             OnAfterActionUpdated(TempUpdatedActions);
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     local procedure StreamWorkflowToBlob()
     var
         OutStr: OutStream;
@@ -579,7 +585,7 @@
     end;
 
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     local procedure StreamCustomJavaScriptToBlob(Json: JsonObject)
     var
         OutStr: OutStream;
@@ -645,7 +651,7 @@
         JsonMgt.AddVariantValueToJsonObject(Json, Name, Value);
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure SetWorkflowInvocationParameter(Name: Text; Value: Variant; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
         CheckParameter(Name, Value, FrontEnd);
@@ -687,7 +693,7 @@
         DiscoverAllWorkflows.RefreshAll(); //v3
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     local procedure RequireVersion10()
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -696,7 +702,7 @@
             FrontEnd.ReportBugAndThrowError(Text007);
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     local procedure RequireVersion20()
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -705,13 +711,13 @@
             FrontEnd.ReportBugAndThrowError(Text008);
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     [IntegrationEvent(TRUE, false)]
     local procedure OnDiscoverActions()
     begin
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnActionDiscovered(var Rec: Record "NPR POS Action")
     begin
@@ -754,7 +760,7 @@
         exit("Requires POS Type");
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     local procedure UpdateMLDescription(ParamCode: Code[20]; ParamDescription: Text[250])
     var
         POSAction: Record "NPR POS Action";

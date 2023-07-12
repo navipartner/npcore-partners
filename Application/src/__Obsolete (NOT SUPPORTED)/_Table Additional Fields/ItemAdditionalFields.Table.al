@@ -4,6 +4,7 @@ table 6014635 "NPR Item Additional Fields"
     Caption = 'Item Table Relation';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Replaced by Auxilary Item Table';
 
     fields

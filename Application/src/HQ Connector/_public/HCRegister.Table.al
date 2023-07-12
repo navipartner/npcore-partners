@@ -37,16 +37,16 @@
             DataClassification = CustomerContent;
             NotBlank = true;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(13; "Credit Voucher Account"; Code[20])
         {
             Caption = 'Credit Voucher Account';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Credit voucher won''t be used anymore';
-            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(14; "Difference Account"; Code[20])
         {
@@ -74,8 +74,8 @@
             DataClassification = CustomerContent;
             NotBlank = true;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(25; Rounding; Code[20])
         {

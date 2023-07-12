@@ -4,8 +4,8 @@
     Caption = 'Retail Document Cue';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Table not used anymore';
-    ObsoleteTag = 'Deprecating 16/2/2021';
 
 
     fields

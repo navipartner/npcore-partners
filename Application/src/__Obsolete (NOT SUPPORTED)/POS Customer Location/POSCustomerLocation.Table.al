@@ -4,6 +4,7 @@
     Caption = 'POS Customer Location';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Restaurant module is used instead.';
 
     fields

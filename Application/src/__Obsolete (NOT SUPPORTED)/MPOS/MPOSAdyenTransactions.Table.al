@@ -4,8 +4,8 @@
     Caption = 'MPOS Adyen Transactions';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Removing MPOS Payment Gateway';
-    ObsoleteTag = 'Removing MPOS Payment Gateway';
     fields
     {
         field(1; "Transaction No."; Integer)
@@ -81,6 +81,7 @@
             Caption = 'Payment Gateway';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(23; "Merchant Id"; Text[30])

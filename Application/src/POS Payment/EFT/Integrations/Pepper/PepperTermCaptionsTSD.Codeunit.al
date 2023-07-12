@@ -4,6 +4,7 @@ codeunit 6184498 "NPR Pepper Term. Captions TSD"
     Access = Internal;
     ObsoleteReason = 'Use HWC';
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
 
     var
         LblTrx_0: Label 'Recovering Last Transaction...';
@@ -42,7 +43,7 @@ codeunit 6184498 "NPR Pepper Term. Captions TSD"
         PepperEftStatus_8: Label '- - -';
 
 #if not CLOUD
-    [Obsolete('Use HWC')]
+    [Obsolete('Use HWC', 'NPR23.0')]
     procedure GetLabels(var ProcessLabels: DotNet NPRNetProcessLabels0)
     begin
         ProcessLabels := ProcessLabels.ProcessLabels();

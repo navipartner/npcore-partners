@@ -4,6 +4,7 @@ table 6014581 "NPR Web Print Buffer"
     Caption = 'Web Print Buffer';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Was never used in prod';
 
     fields

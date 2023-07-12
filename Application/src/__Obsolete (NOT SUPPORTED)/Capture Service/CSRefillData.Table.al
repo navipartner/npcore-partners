@@ -4,6 +4,7 @@
     Caption = 'CS Refill Data';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Object moved to NP Warehouse App.';
 
     fields

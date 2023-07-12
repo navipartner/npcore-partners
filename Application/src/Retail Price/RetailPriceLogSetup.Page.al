@@ -25,6 +25,7 @@
                 field("Task Queue Activated"; Rec."Job Queue Activated")
                 {
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Task Queue module to be removed from NP Retail. We are now using Job Queue instead.';
                     ToolTip = 'Specifies the value of the Task Queue Activated field';
                     ApplicationArea = NPRRetail;

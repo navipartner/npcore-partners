@@ -35,6 +35,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         field(6014404; "NPR Discount Amount"; Decimal)
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
             Caption = 'Discount Amount';
             Description = 'NPR7.100.000';
@@ -43,6 +44,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         field(6014405; "NPR COGS (LCY)"; Decimal)
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
             Caption = 'COGS (LCY)';
             Description = 'NPR7.100.000';
@@ -57,6 +59,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         field(6014407; "NPR Sales (Qty.)"; Decimal)
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
             Caption = 'Sales (Qty.)';
             Description = 'NPR7.100.000';
@@ -70,6 +73,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             OptionCaption = 'Yes,No';
             OptionMembers = Yes,No;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Won''t be used anymore';
         }
         field(6014410; "NPR Register Filter"; Code[10])
@@ -80,6 +84,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             TableRelation = "NPR POS Unit";
             ObsoleteReason = 'Not used.';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
         }
         field(6014411; "NPR Global Dimension 1 Filter"; Code[20])
         {
@@ -91,6 +96,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         field(6014412; "NPR Item Group Sales (LCY)"; Decimal)
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
             Caption = 'Item Group Sales (LCY)';
             Description = 'NPR7.100.000';
@@ -109,6 +115,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             Description = 'NPR7.100.000';
             ObsoleteReason = 'Replaced with POS Unit Group field.';
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
         }
         field(6014417; "NPR POS Unit Group"; Code[20])
         {
@@ -133,6 +140,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             Description = 'NPR5.26';
             SubType = Bitmap;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Standard field used instead.';
         }
         field(6014422; "NPR Supervisor POS"; Boolean)
@@ -147,6 +155,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
     }
@@ -156,6 +165,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         key("NPR Key1"; "NPR Replication Counter")
         {
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

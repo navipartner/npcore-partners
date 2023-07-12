@@ -6,6 +6,7 @@
     Caption = 'CS Communication Log';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Object moved to NP Warehouse App.';
 
 

@@ -62,6 +62,7 @@
             Description = 'DEPRECATED';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by link table (6014644)';
         }
         field(10; Print; BLOB)
@@ -92,6 +93,7 @@
         field(15; "Handler ID"; Text[30])
         {
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced with Enum "Handler ID Enum"';
             Caption = 'Handler ID';
             DataClassification = CustomerContent;

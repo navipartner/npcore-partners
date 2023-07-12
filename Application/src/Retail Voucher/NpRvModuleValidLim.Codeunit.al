@@ -3,7 +3,7 @@
     Access = Internal;
     ObsoleteReason = 'Moving LIMIT from Validation to Apply Payment module';
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR22.0';
+    ObsoleteTag = 'NPR23.0';
     procedure ValidateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
         ArchVoucher: Record "NPR NpRv Arch. Voucher";

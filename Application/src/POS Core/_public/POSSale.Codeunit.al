@@ -220,14 +220,14 @@
         end;
     end;
 
-    [Obsolete('Automatic in workflow v3')]
+    [Obsolete('Automatic in workflow v3', 'NPR23.0')]
     internal procedure GetModified() Result: Boolean
     begin
         Result := IsModified or (not Initialized);
         IsModified := false;
     end;
 
-    [Obsolete('Automatic in workflow v3')]
+    [Obsolete('Automatic in workflow v3', 'NPR23.0')]
     procedure SetModified()
     begin
         IsModified := true;

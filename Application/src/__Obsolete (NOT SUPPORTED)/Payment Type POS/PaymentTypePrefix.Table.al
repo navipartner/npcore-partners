@@ -4,6 +4,7 @@
     Caption = 'Prefix-Payment Type';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Replaced with EFT BIN Groups';
     fields
     {

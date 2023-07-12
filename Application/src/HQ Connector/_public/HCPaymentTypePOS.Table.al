@@ -124,6 +124,7 @@
             Caption = 'Amount in Audit Roll';
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(28; "Customer No."; Code[20])
@@ -211,6 +212,7 @@
             Description = 'Tæller kun linier m. linienr=10000,vare, salg';
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(38; "Normal Sale in Audit Roll"; Decimal)
@@ -219,6 +221,7 @@
             Description = 'Tæller "bel¢b inkl. moms" hvis salg, vare';
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(39; "Debit Sale in Audit Roll"; Decimal)
@@ -227,6 +230,7 @@
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(40; "No. of Items in Audit Roll"; Decimal)
@@ -235,6 +239,7 @@
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(41; "Cost Amount in Audit Roll"; Decimal)
@@ -243,6 +248,7 @@
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(42; "No. of Sale Lines in Aud. Roll"; Integer)
@@ -251,6 +257,7 @@
             Description = 'Tæller alle linier m. type <>Afbrudt &<>Åben/Luk';
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(43; "Salesperson Filter"; Code[20])
@@ -265,6 +272,7 @@
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(45; "No. of Item Lines in Aud. Deb."; Integer)
@@ -273,6 +281,7 @@
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(46; "No. of Deb. Sales in Aud. Roll"; Integer)
@@ -281,6 +290,7 @@
             Description = 'Tæller linie debetsalg,linienr=10000';
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(47; Euro; Boolean)
@@ -332,6 +342,7 @@
             Caption = 'Norm sales in audit ex VAT';
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(54; "Maximum Amount"; Decimal)
@@ -352,6 +363,7 @@
             Description = 'Calcformula tilf¢jet';
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(57; "Debit Sales in Audit Excl. VAT"; Decimal)
@@ -360,6 +372,7 @@
             Description = 'Calcformula tilf¢jet';
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(58; "Cardholder Verification Method"; Option)
@@ -434,6 +447,7 @@
             Editable = false;
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(75; "Match Sales Amount"; Boolean)
@@ -446,16 +460,16 @@
             Caption = 'Fixed Amount';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(81; "Qty. Per Sale"; Integer)
         {
             Caption = 'Qty. Per Sale';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
-            ObsoleteTag = 'NPR Gift Voucher';
 
             trigger OnValidate()
             begin
@@ -467,8 +481,8 @@
             Caption = 'Min Sales Amount';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(83; "Human Validation"; Boolean)
         {
@@ -488,8 +502,8 @@
             DataClassification = CustomerContent;
             Description = 'PBS Gift Voucher if true card balance will be checked.';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(201; "PBS Customer ID"; Text[30])
         {
@@ -502,8 +516,8 @@
             Caption = 'PBS Gift Voucher Barcode';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
-            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(250; "Loyalty Card Type"; Code[20])
         {

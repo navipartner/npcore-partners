@@ -4,6 +4,7 @@
     Caption = 'Audit Roll to POS Entry Link';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Replaced with POS entry';
 
     fields

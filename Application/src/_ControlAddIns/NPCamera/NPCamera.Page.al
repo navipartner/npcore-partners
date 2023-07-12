@@ -43,7 +43,7 @@ page 6150846 "NPR NPCamera"
     /// </summary>
     /// <param name="ImageStream">Will insert the image bytes into the stream.</param>
     /// <returns>Boolean indicating if it has a picture</returns>
-    [Obsolete('Should have been internal procedure from start. Its new so no one depend  on this. Use TakePicture()')]
+    [Obsolete('Should have been internal procedure from start. Its new so no one depend  on this. Use TakePicture()', 'NPR23.0')]
     procedure TakePhoto(ImageStream: InStream): Boolean
     var
         NPCameraProf: Record "NPR NPCamera Profile";
@@ -62,7 +62,7 @@ page 6150846 "NPR NPCamera"
     /// <param name="ImageStream">Will insert the image bytes into the stream.</param>
     /// <returns>Boolean indicating if it has a picture</returns>
 #pragma warning disable AL0749
-    [Obsolete('Should have been internal procedure from start. Its new so no one depend  on this. Use TakePicture()')]
+    [Obsolete('Should have been internal procedure from start. Its new so no one depend  on this. Use TakePicture()', 'NPR23.0')]
     procedure TakePhoto(ImageStream: InStream; Profile: Record "NPR NPCamera Profile"): Boolean
     begin
         SetConfJson(Profile."Pixel X", Profile."Pixel Y", Profile."Quality Value", Format(Profile."File Type"));
@@ -75,7 +75,7 @@ page 6150846 "NPR NPCamera"
     /// </summary>
     /// <param name="ImageStream">Will insert the image bytes into the stream.</param>
     /// <returns>Boolean indicating if it has a picture</returns>
-    [Obsolete('Should have been internal procedure from start. Its new so no one depend  on this. Use TakePicture()')]
+    [Obsolete('Should have been internal procedure from start. Its new so no one depend  on this. Use TakePicture()', 'NPR23.0')]
     procedure TakePhoto(ImageStream: InStream; "Pixel X": Integer; "Pixel Y": Integer; "Quality Value": Decimal; "File Type": Text): Boolean
     begin
         SetConfJson("Pixel X", "Pixel Y", "Quality Value", "File Type");

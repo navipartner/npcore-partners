@@ -558,7 +558,7 @@
         exit(true);
     end;
 
-    [Obsolete('Use procedure that uses "NPR POS JSON Helper" as parameter. Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Use procedure that uses "NPR POS JSON Helper" as parameter. Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure FindSeating(JSON: Codeunit "NPR POS JSON Management"; var NPRESeating: Record "NPR NPRE Seating")
     var
         RestaurantCode: Code[20];
@@ -614,7 +614,7 @@
         end;
     end;
 
-    [Obsolete('Use procedure that uses "NPR POS JSON Helper" as parameter. Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Use procedure that uses "NPR POS JSON Helper" as parameter. Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     local procedure GetSeatingCode(JSON: Codeunit "NPR POS JSON Management"; RestaurantCode: Code[20]) SeatingCode: Code[20]
     var
         SeatingManagement: Codeunit "NPR NPRE Seating Mgt.";

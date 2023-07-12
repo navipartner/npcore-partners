@@ -6,6 +6,7 @@
     PageType = List;
     UsageCategory = None;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Page ''NPR Magento Store List'' is used instead.';
     SourceTable = "NPR Magento Store";
 

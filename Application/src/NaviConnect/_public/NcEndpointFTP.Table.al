@@ -53,6 +53,7 @@
         field(100; Type; Option)
         {
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Option type to be removed. Use new enum field "Protocol Type" instead.';
             Caption = 'Type';
             DataClassification = CustomerContent;

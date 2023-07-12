@@ -641,7 +641,7 @@
             until RetailJournalLine.Next() = 0;
     end;
 
-    [Obsolete('Was used on one call which was replaced by more standardized procedure.')]
+    [Obsolete('Was used on one call which was replaced by more standardized procedure.', 'NPR23.0')]
     internal procedure UpdateDiscount(var RetailJournalLine: Record "NPR Retail Journal Line")
     var
         PeriodDiscountLine: Record "NPR Period Discount Line";

@@ -9,6 +9,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             OptionCaption = 'Customer,Cash';
             OptionMembers = Customer,Cash;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6014402; "NPR Internal y/n"; Boolean)
@@ -16,6 +17,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             Caption = 'Internal';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6014403; "NPR Auto"; Boolean)
@@ -23,6 +25,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             Caption = 'Auto';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6014404; "NPR Record on Debitsale"; Option)
@@ -32,6 +35,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             OptionCaption = ' ,Invoice,Shipping Note,Ask';
             OptionMembers = " ",Invoice,"Shipping Note",Ask;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6014405; "NPR Record on neg. Debitsale"; Option)
@@ -41,6 +45,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             OptionCaption = ' ,Return Order,Credit Memo,Ask';
             OptionMembers = " ","Return Order","Credit Memo",Ask;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6014407; "NPR Primary Key Length"; Integer)
@@ -48,6 +53,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             Caption = 'Primary Key Length';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6014408; "NPR Sales invoice Report No."; Integer)
@@ -55,6 +61,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             Caption = 'Sales invoice Report No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6014409; "NPR Change-to No."; Code[20])
@@ -62,11 +69,13 @@ tableextension 6014423 "NPR Customer" extends Customer
             Caption = 'Change-to No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6014415; "NPR Document Processing"; Option)
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use standard field Document Sending Profile';
             Caption = 'Document Processing';
             DataClassification = CustomerContent;
@@ -80,6 +89,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             Caption = 'Bill-to Company (IC)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6014417; "NPR Bill-to Vendor No."; Code[20])
@@ -87,6 +97,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             Caption = 'Bill-to Vendor No. (IC)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6059771; "NPR Loyalty Customer"; Boolean)
@@ -94,6 +105,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             Caption = 'Loyalty Customer';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6151060; "NPR Anonymized"; Boolean)
@@ -217,6 +229,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
         field(6014401; "NPR Total Sales POS"; Decimal)
@@ -247,6 +260,7 @@ tableextension 6014423 "NPR Customer" extends Customer
         key("NPR Key1"; "NPR Replication Counter")
         {
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

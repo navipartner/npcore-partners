@@ -72,6 +72,7 @@
             OptionCaption = 'Business Central,Point of Sale';
             OptionMembers = BC,POS;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used anymore.';
         }
         field(40; "Force Blind Counting"; Boolean)
@@ -110,6 +111,7 @@
             OptionCaption = 'With Message,With Error,Silent';
             OptionMembers = WITH_MESSAGE,WITH_ERROR,SILENT;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Auto posting done only via job queue.';
         }
         field(75; "End of Day Frequency"; Option)

@@ -389,19 +389,19 @@
         exit(ParamFilterIndicator);
     end;
 
-    [Obsolete('Use v3 workflow inline captions instead')]
+    [Obsolete('Use v3 workflow inline captions instead', 'NPR23.0')]
     [IntegrationEvent(false, false)]
     internal procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
     end;
 
-    [Obsolete('Use v3 workflow inline captions instead')]
+    [Obsolete('Use v3 workflow inline captions instead', 'NPR23.0')]
     [IntegrationEvent(false, false)]
     internal procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
     end;
 
-    [Obsolete('Use v3 workflow inline captions instead')]
+    [Obsolete('Use v3 workflow inline captions instead', 'NPR23.0')]
     [IntegrationEvent(false, false)]
     internal procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin

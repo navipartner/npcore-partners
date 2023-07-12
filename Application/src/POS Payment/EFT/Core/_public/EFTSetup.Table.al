@@ -45,6 +45,7 @@
             OptionCaption = 'Stargate,HardwareConnector';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'No longer needed';
         }
 

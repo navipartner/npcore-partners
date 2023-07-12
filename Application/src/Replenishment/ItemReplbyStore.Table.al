@@ -30,6 +30,7 @@
             OptionMembers = " ","Fixed Reorder Qty.","Maximum Qty.","Order";
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(20; "Reorder Point"; Decimal)
@@ -121,6 +122,7 @@
             Caption = 'Is Master';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
         field(6059972; "Master Record Reference"; Text[250])
@@ -128,6 +130,7 @@
             Caption = 'Master Record Reference';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
     }

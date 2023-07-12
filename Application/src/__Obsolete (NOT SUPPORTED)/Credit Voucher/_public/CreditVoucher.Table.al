@@ -3,8 +3,8 @@
     Caption = 'Credit Voucher';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'This table won''t be used anymore.';
-    ObsoleteTag = 'NPR Register';
 
     fields
     {

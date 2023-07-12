@@ -575,6 +575,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             group("NPR Extra Fields")
             {
                 ObsoleteState = Pending;
+                ObsoleteTag = 'NPR23.0';
                 ObsoleteReason = 'Not in use anymore';
 
                 Caption = 'Extra Fields';
@@ -763,6 +764,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 ToolTip = 'Executes the display Variety Matrix action. View or edit varieties for the item/';
                 ApplicationArea = NPRRetail;
                 ObsoleteState = Pending;
+                ObsoleteTag = 'NPR23.0';
                 ObsoleteReason = 'Not used. No action';
             }
             action("NPR AttributeValues")

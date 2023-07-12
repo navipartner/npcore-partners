@@ -2,6 +2,7 @@
 {
     Access = Internal;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used any more, please use MM_MEMBERMGMT_WF3 instead.';
 
     var

@@ -230,7 +230,7 @@
         _Sale.ResumeExistingSale(SalePOS, _POSUnit, _FrontEnd, _Setup, _Sale);
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure BeginAction("Action": Text): Guid
     var
         Text004: Label 'Action %1 has been invoked while another action %2 with ID %3 is still running.';
@@ -250,7 +250,7 @@
         exit(_ActionStateCurrentActionId);
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure StoreActionState("Key": Text; "Object": Variant)
     var
         RecRefKey: Integer;
@@ -264,59 +264,59 @@
             _FrontEnd.ReportBugAndThrowError(StrSubstNo(_ACTION_STATE_ERROR, _ActionStateCurrentAction, GetLastErrorText));
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure StoreActionState("Key": Text; "Object": Integer)
     begin
         if not TryStoreActionState(Key, Object) then
             _FrontEnd.ReportBugAndThrowError(StrSubstNo(_ACTION_STATE_ERROR, _ActionStateCurrentAction, GetLastErrorText));
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure StoreActionState("Key": Text; "Object": Text)
     begin
         if not TryStoreActionState(Key, Object) then
             _FrontEnd.ReportBugAndThrowError(StrSubstNo(_ACTION_STATE_ERROR, _ActionStateCurrentAction, GetLastErrorText));
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure StoreActionState("Key": Text; "Object": Decimal)
     begin
         if not TryStoreActionState(Key, Object) then
             _FrontEnd.ReportBugAndThrowError(StrSubstNo(_ACTION_STATE_ERROR, _ActionStateCurrentAction, GetLastErrorText));
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure StoreActionState("Key": Text; "Object": Guid)
     begin
         if not TryStoreActionState(Key, Object) then
             _FrontEnd.ReportBugAndThrowError(StrSubstNo(_ACTION_STATE_ERROR, _ActionStateCurrentAction, GetLastErrorText));
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure RetrieveActionState("Key": Text; var "Object": Integer)
     begin
         Object := _ActionStateInt.Get(Key);
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure RetrieveActionState("Key": Text; var "Object": Text)
     begin
         Object := _ActionStateText.Get(Key);
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure RetrieveActionState("Key": Text; var "Object": Decimal)
     begin
         Object := _ActionStateDec.Get(Key);
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure RetrieveActionState("Key": Text; var "Object": Guid)
     begin
         Object := _ActionStateGuid.Get(Key);
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure RetrieveActionStateSafe("Key": Text; var "Object": Integer): Boolean
     begin
         if _ActionStateInt.ContainsKey(Key) then begin
@@ -325,7 +325,7 @@
         end;
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure RetrieveActionStateSafe("Key": Text; var "Object": Text): Boolean
     begin
         if _ActionStateText.ContainsKey(Key) then begin
@@ -334,7 +334,7 @@
         end;
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure RetrieveActionStateSafe("Key": Text; var "Object": Decimal): Boolean
     begin
         if _ActionStateDec.ContainsKey(Key) then begin
@@ -343,7 +343,7 @@
         end;
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure RetrieveActionStateSafe("Key": Text; var "Object": Guid): Boolean
     begin
         if _ActionStateGuid.ContainsKey(Key) then begin
@@ -352,7 +352,7 @@
         end;
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure RetrieveActionStateRecordRef("Key": Text; var RecRef: RecordRef)
     var
         Index: Integer;
@@ -361,7 +361,7 @@
         RecRef := _ActionStateRecRef[Index];
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure EndAction("Action": Text; Id: Guid)
     var
         Text005: Label 'An attempt was made to finish action %1 with ID %2, while another action %3 with ID %4 is in progress.';
@@ -372,7 +372,7 @@
         ClearActionState();
     end;
 
-    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.')]
+    [Obsolete('Only allowed cross invocation state sharing is the database or frontend. Use v3 workflows for better value passing between workflows.', 'NPR23.0')]
     procedure ClearActionState()
     begin
         Clear(_ActionStateInAction);
@@ -444,7 +444,7 @@
     // These methods are used to keep track of "known" actions inside of this session.
     // Primarily this is used to prevent invalid action setup.
 
-    [Obsolete('Remove once workflow v1 and v2 is gone, since v3 keeps the persistant table "POS Action" up to date')]
+    [Obsolete('Remove once workflow v1 and v2 is gone, since v3 keeps the persistant table "POS Action" up to date', 'NPR23.0')]
     internal procedure DiscoverActionsOnce()
     var
         POSAction: Record "NPR POS Action";
@@ -456,7 +456,7 @@
         _ActionsDiscovered := true;
     end;
 
-    [Obsolete('Remove once RetrieveSessionAction() is no longer in use')]
+    [Obsolete('Remove once RetrieveSessionAction() is no longer in use', 'NPR23.0')]
     internal procedure DiscoverSessionAction(var ActionIn: Record "NPR POS Action" temporary)
     begin
         TempSessionActions := ActionIn;
@@ -557,7 +557,7 @@
     end;
 
 #if not CLOUD
-    [Obsolete('Remove when stargate is gone')]
+    [Obsolete('Remove when stargate is gone', 'NPR23.0')]
     procedure GetStargate(var StargateOut: Codeunit "NPR POS Stargate Management")
     begin
         ErrorIfNotInitialized();
@@ -565,13 +565,13 @@
     end;
 #endif
 
-    [Obsolete('Remove when obsolete references are gone. Workflow v3 only supports nesting on frontend inside the javascript')]
+    [Obsolete('Remove when obsolete references are gone. Workflow v3 only supports nesting on frontend inside the javascript', 'NPR23.0')]
     procedure IsInAction(): Boolean
     begin
         exit(_InAction);
     end;
 
-    [Obsolete('Remove when obsolete references are gone. Workflow v3 only supports nesting on frontend inside the javascript')]
+    [Obsolete('Remove when obsolete references are gone. Workflow v3 only supports nesting on frontend inside the javascript', 'NPR23.0')]
     procedure SetInAction(InActionNew: Boolean)
     begin
         _InAction := InActionNew;
@@ -625,7 +625,7 @@
 
     //#region Data Refresh
 
-    [Obsolete('Refresh is automatically handled')]
+    [Obsolete('Refresh is automatically handled', 'NPR23.0')]
     procedure RequestRefreshData()
     begin
     end;
@@ -674,14 +674,14 @@
 
     //#endregion
 
-    [Obsolete('Use GetFrontEnd or just use session directly since it''s single instance now')]
+    [Obsolete('Use GetFrontEnd or just use session directly since it''s single instance now', 'NPR23.0')]
     procedure IsActiveSession(var FrontEndOut: Codeunit "NPR POS Front End Management"): Boolean
     begin
         FrontEndOut := _FrontEnd;
         exit(_Initialized);
     end;
 
-    [Obsolete('Use session directly since it''s single instance now, or use IsInitialized if you need to check if POS is running without error')]
+    [Obsolete('Use session directly since it''s single instance now, or use IsInitialized if you need to check if POS is running without error', 'NPR23.0')]
     procedure GetSession(var POSSessionOut: Codeunit "NPR POS Session"; WithError: Boolean): Boolean
     var
         SESSION_MISSING: Label 'POS Session object could not be retrieved. This is a programming bug, not a user error.';

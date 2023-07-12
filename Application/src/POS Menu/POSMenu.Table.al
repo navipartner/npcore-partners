@@ -18,6 +18,7 @@
             Caption = 'Description';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Fields are not used. Removed in case 508876.';
         }
         field(3; Caption; Text[50])
@@ -35,6 +36,7 @@
             Caption = 'Blocked';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Fields are not used. Removed in case 508876.';
         }
         field(6; "Custom Class Attribute"; Text[30])
@@ -66,6 +68,7 @@
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(45; "Available in App"; Boolean)
@@ -74,6 +77,7 @@
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(46; "Created on version"; Text[250])
@@ -91,6 +95,7 @@
         key(Key2; Blocked, "Register Type", "Register No.", "Salesperson Code")
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Fields are not used. Removed in case 508876.';
         }
         key(Key3; "Register No.", "Salesperson Code")

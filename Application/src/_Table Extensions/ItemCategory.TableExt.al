@@ -150,6 +150,7 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
             Caption = 'Sales (LCY)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
         }
         field(6014419; "NPR Consumption (Amount)"; Decimal)
@@ -157,6 +158,7 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
             Caption = 'Consumption (Amount)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
         }
         field(6014420; "NPR Movement"; Decimal)
@@ -193,6 +195,7 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
             Caption = 'Purchases (LCY)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
         }
         field(6014423; "NPR Inventory Value"; Decimal)
@@ -200,6 +203,7 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
             Caption = 'Inventory Value';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
         }
 
@@ -208,6 +212,7 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
         field(6151480; "NPR Item Filter"; Code[20])
@@ -224,6 +229,7 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
         key("NPR Key1"; "NPR Replication Counter")
         {
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

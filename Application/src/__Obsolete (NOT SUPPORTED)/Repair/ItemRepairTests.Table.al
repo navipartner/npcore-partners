@@ -6,6 +6,7 @@
     Caption = 'Item Repair Tests';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Repairs are not supported in core anymore.';
 
     fields

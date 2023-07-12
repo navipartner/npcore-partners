@@ -4,6 +4,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
     Access = Internal;
     ObsoleteReason = 'This codeunit is obsolete and will be deleted, migrate to Hardware Connector version of this library';
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
 #if not CLOUD
     var
         GlobPOSSession: Codeunit "NPR POS Session";

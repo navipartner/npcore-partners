@@ -46,6 +46,7 @@
         field(14; "From Register No."; Code[10])
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'From Register No.';
             DataClassification = CustomerContent;
@@ -53,6 +54,7 @@
         field(15; "To Register No."; Code[10])
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'To Register No.';
             DataClassification = CustomerContent;
@@ -120,6 +122,7 @@
         field(106; "Handled Register"; Code[10])
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'Handled Register';
             DataClassification = CustomerContent;
@@ -138,6 +141,7 @@
         field(109; "Cancelled Register"; Code[10])
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'Cancelled Register';
             DataClassification = CustomerContent;
@@ -156,6 +160,7 @@
         field(112; "Completed Register"; Code[10])
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'Completed Register';
             DataClassification = CustomerContent;
@@ -173,6 +178,7 @@
         field(202; "Temp Current Register"; Code[10])
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'Temp Current Register';
             DataClassification = CustomerContent;

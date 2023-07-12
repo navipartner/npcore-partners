@@ -18,6 +18,7 @@ table 6014625 "NPR Dependency Mgt. Setup"
             Caption = 'Managed Dependency OData URL';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(11; Username; Text[30])
@@ -25,6 +26,7 @@ table 6014625 "NPR Dependency Mgt. Setup"
             Caption = 'Managed Dependency Username';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(12; Password; BLOB)
@@ -32,6 +34,7 @@ table 6014625 "NPR Dependency Mgt. Setup"
             Caption = 'Managed Dependency Password';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(13; Configured; Boolean)
@@ -40,6 +43,7 @@ table 6014625 "NPR Dependency Mgt. Setup"
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(14; "Accept Statuses"; Option)
@@ -54,6 +58,7 @@ table 6014625 "NPR Dependency Mgt. Setup"
             Caption = 'Tag Filter';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(16; "Tag Filter Comparison Operator"; Option)
@@ -63,6 +68,7 @@ table 6014625 "NPR Dependency Mgt. Setup"
             OptionMembers = Any,All;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(17; "Disable Deployment"; Boolean)

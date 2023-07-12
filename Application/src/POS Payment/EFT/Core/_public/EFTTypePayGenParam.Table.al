@@ -4,6 +4,7 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
     Caption = 'EFT Type Payment Gen. Param.';
     DataClassification = CustomerContent;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Use integration specific setup tables for cleaner code';
 
     fields

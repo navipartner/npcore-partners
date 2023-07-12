@@ -99,6 +99,7 @@
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. filed';
         }
         field(7; "Discount Price Incl. Vat"; Decimal)
@@ -328,6 +329,7 @@
             Caption = 'Vendor Name';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Name filed';
         }
         field(42; "Vendor Search Description"; Code[50])
@@ -335,6 +337,7 @@
             Caption = 'Vendor Search Description';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Search Description filed';
         }
         field(43; "Vend Name"; Text[100])
@@ -553,6 +556,7 @@
             Description = 'VRT';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
         field(6059971; "Master Line No."; Integer)
@@ -561,6 +565,7 @@
             Description = 'VRT';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
     }

@@ -87,6 +87,7 @@ page 6014470 "NPR APIV1 - Campaign Discount"
                 {
                     Caption = 'turnover', Locked = true;
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Aux table are obsoleted. This field can be got only trough calculation. But could make this API slower. Please make separe API if needed.';
                 }
                 field(monday; Rec.Monday)
@@ -129,6 +130,7 @@ page 6014470 "NPR APIV1 - Campaign Discount"
                 {
                     Caption = 'replicationCounter', Locked = true;
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Replaced by SystemRowVersion';
                 }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

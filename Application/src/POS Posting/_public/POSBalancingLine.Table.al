@@ -158,6 +158,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use systemID instead';
         }
         field(161; "Orig. POS Line No."; Integer)
@@ -166,6 +167,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use systemID instead';
         }
         field(200; "POS Bin Checkpoint Entry No."; Integer)

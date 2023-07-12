@@ -174,6 +174,7 @@
         field(20; Comment; Boolean)
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
             CalcFormula = Exist("NPR Retail Comment" WHERE("Table ID" = CONST(6014414),
                                                         "No." = FIELD(Code),
@@ -203,6 +204,7 @@
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. field';
         }
         field(27; "Variant Code"; Code[10])
@@ -369,8 +371,8 @@
         {
             Caption = 'Page no. in advert';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used anymore';
-            ObsoleteTag = 'Field won"t be used anymore 16/03/2021';
             Description = 'NPR5.38';
             DataClassification = CustomerContent;
         }
@@ -384,8 +386,8 @@
         {
             Caption = 'Pagenumber in paper';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used anymore';
-            ObsoleteTag = 'Field won"t be used anymore 16/03/2021';
             Description = 'NPR5.38';
             DataClassification = CustomerContent;
         }
@@ -393,8 +395,8 @@
         {
             Caption = 'Photo';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used anymore';
-            ObsoleteTag = 'Field won"t be used anymore 16/03/2021';
             Description = 'NPR5.38';
             DataClassification = CustomerContent;
         }
@@ -404,6 +406,7 @@
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
     }
@@ -425,6 +428,7 @@
         key(Key5; "Replication Counter")
         {
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

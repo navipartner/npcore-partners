@@ -35,6 +35,7 @@
             OptionCaption = 'System,Named,Basic Authentication';
             OptionMembers = SYSTEM,NAMED,BASIC;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not supported anymore. NTLM replaced with Basic or OAuth2.0';
         }
         field(21; "User Domain"; Text[30])
@@ -42,6 +43,7 @@
             Caption = 'User Domain';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not supported anymore. NTLM replaced with Basic or OAuth2.0';
         }
         field(22; "User Account"; Text[50])
@@ -54,6 +56,7 @@
             Caption = 'User Password';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced with Isolated Storage Password Key';
         }
         field(24; "User Password Key"; GUID)

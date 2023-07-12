@@ -2,6 +2,7 @@
 {
     Access = Internal;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used any more. Please use BALANCE_V4 action instead.';
 
     var

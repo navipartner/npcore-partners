@@ -299,6 +299,7 @@
                 Image = CustomerList;
                 RunObject = Report "NPR TM Admission List";
                 ObsoleteState = Pending;
+                ObsoleteTag = 'NPR23.0';
                 ObsoleteReason = 'NPR TM Admission List is going to be deleted.';
             }
         }

@@ -31,6 +31,7 @@
             Description = 'Client ID for DE Fiskaly';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use field SystemId instead';
         }
         field(20; "TSS ID"; Guid)
@@ -40,6 +41,7 @@
             Description = 'TSS ID for DE Fiskaly';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by field "TSS Code" and related table 6014685 "NPR DE TSS"';
         }
         field(21; "TSS Code"; Code[10])

@@ -9,6 +9,7 @@ tableextension 6014448 "NPR Electronic Document Format" extends "Electronic Docu
             TableRelation = "NPR Nc Endpoint";
             ObsoleteReason = 'Not needed anymore';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
         }
     }
 }

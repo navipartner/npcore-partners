@@ -3,6 +3,7 @@
     Caption = 'E-mail Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not needed anymore. Use E-mail Template instead.';
 
     fields

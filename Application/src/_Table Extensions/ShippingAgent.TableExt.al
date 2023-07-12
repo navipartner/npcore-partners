@@ -16,6 +16,7 @@ tableextension 6014429 "NPR Shipping Agent" extends "Shipping Agent"
             DataClassification = CustomerContent;
             Description = 'PS1.00';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
         field(6014442; "NPR Custom Print Layout"; Code[20])
@@ -31,6 +32,7 @@ tableextension 6014429 "NPR Shipping Agent" extends "Shipping Agent"
             OptionCaption = ' ,GLS,PDK';
             OptionMembers = " ",GLS,PDK;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Upgraded solution for shipmondo does not use this field';
         }
         field(6014451; "NPR Ship to Contact Mandatory"; Boolean)
@@ -38,6 +40,7 @@ tableextension 6014429 "NPR Shipping Agent" extends "Shipping Agent"
             Caption = 'Ship to Contact Mandatory';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Upgraded solution for shipmondo does not use this field';
         }
         field(6014452; "NPR Drop Point Service"; Boolean)
@@ -45,6 +48,7 @@ tableextension 6014429 "NPR Shipping Agent" extends "Shipping Agent"
             Caption = 'Drop Point Service';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Upgraded solution for shipmondo does not use this field';
         }
         field(6014453; "NPR Return Shipping agent"; Boolean)
@@ -52,6 +56,7 @@ tableextension 6014429 "NPR Shipping Agent" extends "Shipping Agent"
             Caption = 'Return Shipping agent';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Upgraded solution for shipmondo does not use this field';
         }
     }

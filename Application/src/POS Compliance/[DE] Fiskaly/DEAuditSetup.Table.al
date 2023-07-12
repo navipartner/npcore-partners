@@ -33,6 +33,7 @@
             Caption = 'Last Fiskaly Context';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not needed in Fiskaly V2 anymore.';
         }
     }

@@ -24,6 +24,7 @@
             OptionCaption = 'Ordinary,Cash';
             OptionMembers = Ord,Cash;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(11; "Customer No."; Code[20])
@@ -77,6 +78,7 @@
             Caption = 'Seating Description';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by procedure GetCurrentSeating(), as the field could contain an outdated value';
         }
         field(22; "Close Reason"; Enum "NPR NPRE W/Pad Closing Reason")

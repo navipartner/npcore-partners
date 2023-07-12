@@ -74,6 +74,7 @@
             Caption = 'Sync POS Sales Immediately';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Discontinued in BC17';
         }
     }

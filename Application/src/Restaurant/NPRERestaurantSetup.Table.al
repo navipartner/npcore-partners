@@ -37,8 +37,8 @@
             OptionCaption = 'No,Yes,Ask';
             OptionMembers = No,Yes,Ask;
             ObsoleteState = Removed;
-            ObsoleteReason = 'Replaced by Enum field 16 "Auto-Send Kitchen Order"';
             ObsoleteTag = 'NPR23.0';
+            ObsoleteReason = 'Replaced by Enum field 16 "Auto-Send Kitchen Order"';
         }
         field(14; "Resend All On New Lines"; Option)
         {
@@ -47,8 +47,8 @@
             OptionCaption = 'No,Yes,Ask';
             OptionMembers = No,Yes,Ask;
             ObsoleteState = Removed;
-            ObsoleteReason = 'Replaced by Enum field 17 "Re-send All on New Lines"';
             ObsoleteTag = 'NPR23.0';
+            ObsoleteReason = 'Replaced by Enum field 17 "Re-send All on New Lines"';
         }
         field(15; "Serving Step Discovery Method"; Enum "NPR NPRE Serv.Step Discovery")
         {
@@ -87,8 +87,8 @@
             OptionCaption = 'Do Nothing,Finish Started,Finish All,Finish Started/Cancel Not Started,Cancel All Unfinished';
             OptionMembers = "Do Nothing","Finish Started","Finish All","Finish Started/Cancel Not Started","Cancel All Unfinished";
             ObsoleteState = Removed;
-            ObsoleteReason = 'Replaced by Enum field 41 "Kitchen Req. Handl. On Serving"';
             ObsoleteTag = 'NPR23.0';
+            ObsoleteReason = 'Replaced by Enum field 41 "Kitchen Req. Handl. On Serving"';
         }
         field(41; "Kitchen Req. Handl. On Serving"; Enum "NPR NPRE Req.Handl.on Serving")
         {
@@ -111,8 +111,8 @@
             OptionCaption = 'Same for Source Document,New Each Time';
             OptionMembers = "Same for Source Document","New Each Time";
             ObsoleteState = Removed;
-            ObsoleteReason = 'Replaced by Enum field 61 "Order ID Assignment Method"';
             ObsoleteTag = 'NPR23.0';
+            ObsoleteReason = 'Replaced by Enum field 61 "Order ID Assignment Method"';
         }
         field(61; "Order ID Assignment Method"; Enum "NPR NPRE Ord.ID Assign. Method")
         {

@@ -460,7 +460,7 @@
     end;
 
     #region LEGACY
-    [Obsolete('Use HWC')]
+    [Obsolete('Use HWC', 'NPR23.0')]
     procedure SendRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTInterface: Codeunit "NPR EFT Interface";
@@ -471,7 +471,7 @@
             Error('EFT Integration %1 is not subscribing to SendRequest correctly.', EFTTransactionRequest."Integration Type");
     end;
 
-    [Obsolete('Refactor to Workflow 3')]
+    [Obsolete('Refactor to Workflow 3', 'NPR23.0')]
     procedure PauseFrontEndBeforeEFTRequest(EFTTransactionRequest: Record "NPR EFT Transaction Request"; POSFrontEnd: Codeunit "NPR POS Front End Management")
     var
         EFTInterface: Codeunit "NPR EFT Interface";
@@ -486,7 +486,7 @@
         end;
     end;
 
-    [Obsolete('Refactor to Workflow 3')]
+    [Obsolete('Refactor to Workflow 3', 'NPR23.0')]
     procedure ResumeFrontEndAfterEFTRequest(EFTTransactionRequest: Record "NPR EFT Transaction Request"; POSFrontEnd: Codeunit "NPR POS Front End Management")
     var
         Skip: Boolean;
@@ -501,7 +501,7 @@
         end;
     end;
 
-    [Obsolete('Replaced by workflow 3 approach')]
+    [Obsolete('Replaced by workflow 3 approach', 'NPR23.0')]
     procedure LookupTransaction(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         POSAction: Record "NPR POS Action";
@@ -529,7 +529,7 @@
         POSFrontEnd.InvokeWorkflow(POSAction);
     end;
 
-    [Obsolete('Replaced by workflow 3 approach')]
+    [Obsolete('Replaced by workflow 3 approach', 'NPR23.0')]
     procedure VoidTransaction(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         POSAction: Record "NPR POS Action";
@@ -557,7 +557,7 @@
         POSFrontEnd.InvokeWorkflow(POSAction);
     end;
 
-    [Obsolete('Replaced by workflow 3 approach')]
+    [Obsolete('Replaced by workflow 3 approach', 'NPR23.0')]
     procedure RefundTransaction(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         POSAction: Record "NPR POS Action";

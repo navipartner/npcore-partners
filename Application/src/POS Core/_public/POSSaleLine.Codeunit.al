@@ -434,7 +434,7 @@
         CurrDataSet.Totals().Add('ItemCount', ItemCountWhenCalculatedBalance);
     end;
 
-    [Obsolete('Zero reference')]
+    [Obsolete('Zero reference', 'NPR23.0')]
     procedure GetDepositLine(var LinePOS: Record "NPR POS Sale Line")
     begin
 
@@ -455,7 +455,7 @@
         LinePOS.Quantity := 1;
     end;
 
-    [Obsolete('Zero reference')]
+    [Obsolete('Zero reference', 'NPR23.0')]
     procedure InsertDepositLine(var Line: Record "NPR POS Sale Line"; ForeignCurrencyAmount: Decimal) Return: Boolean
     begin
         InitLine();
@@ -653,19 +653,19 @@
     begin
     end;
     //--- POS Sales Workflow ---
-    [Obsolete('Remove after POS Scenario is removed')]
+    [Obsolete('Remove after POS Scenario is removed', 'NPR23.0')]
     local procedure OnBeforeInsertSaleLineCode(): Code[20]
     begin
         exit('BEFORE_INSERT_LINE');
     end;
 
-    [Obsolete('Remove after POS Scenario is removed')]
+    [Obsolete('Remove after POS Scenario is removed', 'NPR23.0')]
     local procedure OnAfterInsertSaleLineCode(): Code[20]
     begin
         exit('AFTER_INSERT_LINE');
     end;
 
-    [Obsolete('Remove after POS Scenario is removed')]
+    [Obsolete('Remove after POS Scenario is removed', 'NPR23.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, true)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
@@ -678,7 +678,7 @@
         exit(CODEUNIT::"NPR POS Sale Line");
     end;
 
-    [Obsolete('Remove after POS Scenario is removed')]
+    [Obsolete('Remove after POS Scenario is removed', 'NPR23.0')]
     procedure InvokeOnBeforeInsertSaleLineWorkflow(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
@@ -699,7 +699,7 @@
         until POSSalesWorkflowStep.Next() = 0;
     end;
 
-    [Obsolete('Remove after POS Scenario is removed')]
+    [Obsolete('Remove after POS Scenario is removed', 'NPR23.0')]
     procedure InvokeOnAfterInsertSaleLineWorkflow(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
@@ -720,13 +720,13 @@
         until POSSalesWorkflowStep.Next() = 0;
     end;
 
-    [Obsolete('Use OnBeforeInsertPOSSaleLine')]
+    [Obsolete('Use OnBeforeInsertPOSSaleLine', 'NPR23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertSaleLine(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
-    [Obsolete('Use OnAfterInsertPOSSaleLine')]
+    [Obsolete('Use OnAfterInsertPOSSaleLine', 'NPR23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertSaleLine(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
     begin
