@@ -79,6 +79,22 @@
                         Editable = false;
                         ToolTip = 'Specifies the value of the FTP Transfer field';
                         ApplicationArea = NPRRetail;
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Going to drop Nc Endpoints and this field is going to be removed.';
+                        ObsoleteTag = 'NP';
+                        Visible = False;
+                    }
+                    field("FTP Enabled"; Rec."FTP Enabled")
+                    {
+                        Editable = false;
+                        ToolTip = 'Specifies if FTP is enabled.';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("SFTP Enabled"; Rec."SFTP Enabled")
+                    {
+                        Editable = false;
+                        ToolTip = 'Specifies if SFTP is enabled.';
+                        ApplicationArea = NPRRetail;
                     }
                     field("API Transfer"; Rec."API Transfer")
                     {

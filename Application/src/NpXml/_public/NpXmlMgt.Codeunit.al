@@ -423,7 +423,7 @@
         AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || File Transfer: ' + NPXmlTemplate."File Path", NPXmlTemplate."Do Not Add Comment Line");
 
         Field.Get(DATABASE::"NPR NpXml Template", NPXmlTemplate.FieldNo("File Transfer"));
-        AddTextToResponseTempBlob('<!-- [' + NPXmlTemplate.Code + '] ' + Field."Field Caption" + ': ' + NPXmlTemplate."File Path" + ' -->' + GetChar(13) + GetChar(10));
+        AddTextToResponseTempBlob('<!-- [' + NPXmlTemplate.Code + '] ' + Field."Field Caption" + ': ' + NPXmlTemplate."File Path" + ' -->' + CRLF());
 
         NPXmlTemplate.TestField("File Path");
         Filepath := NPXmlTemplate."File Path" + '\';
@@ -501,7 +501,7 @@
             exit;
 
         Field.Get(DATABASE::"NPR NpXml Template", NpXmlTemplate.FieldNo("API Transfer"));
-        AddTextToResponseTempBlob('<!-- [' + NpXmlTemplate.Code + '] ' + Field."Field Caption" + ': ' + NpXmlTemplate."API Url" + ' -->' + GetChar(13) + GetChar(10));
+        AddTextToResponseTempBlob('<!-- [' + NpXmlTemplate.Code + '] ' + Field."Field Caption" + ': ' + NpXmlTemplate."API Url" + ' -->' + CRLF());
 
         case NpXmlTemplate."API Type" of
             NpXmlTemplate."API Type"::"REST (Xml)", NpXmlTemplate."API Type"::"REST (Json)":
@@ -630,7 +630,7 @@
                 ElementText := JsonManagement.XMLTextToJSONText(Response);
                 Element := XmlElement.Create(ElementText);
 
-                XmlDoc2Text := XMLDomManagement.RemoveNamespaces('<?xml version="1.0" encoding="utf-8"?>' + GetChar(13) + GetChar(10) + '<response />');
+                XmlDoc2Text := XMLDomManagement.RemoveNamespaces('<?xml version="1.0" encoding="utf-8"?>' + CRLF() + '<response />');
                 XmlDocument.ReadFrom(XmlDoc2Text, XmlDoc2);
                 XmlDoc2.GetRoot(RootElement);
                 RootElement.Add(Element);
@@ -735,65 +735,87 @@
         end;
     end;
 
-
-    local procedure SendFtpAndSftp(NPXmlTemplate: Record "NPR NpXml Template"; var XmlDoc: XmlDocument; Filename: Text)
+    local procedure SendSftp(NPXmlTemplate: Record "NPR NpXml Template"; var XmlDoc: XmlDocument; Filename: Text)
     var
-        "Field": Record "Field";
-        NcEndpoint: Record "NPR Nc Endpoint";
-        NcEndpointFtp: Record "NPR Nc Endpoint FTP";
-        TempNcTaskOutput: Record "NPR Nc Task Output" temporary;
-        NcEndpointMgt: Codeunit "NPR Nc Endpoint Mgt.";
-        SendFailedErr: Label 'Upload to Endpoint %1 failed with error description: %2', Comment = '%1 = NC Endpoint code, %2 = LastErrorText';
-        Encoding: TextEncoding;
+        SftpConn: Record "NPR SFTP Connection";
+        SftpClient: Codeunit "NPR AF SFTP Client";
+        TmpBlob: Codeunit "Temp Blob";
         OutStr: OutStream;
-        UseDefaultEncoding: Boolean;
-        Response: Text;
-        FileContent: Text;
+        SendFailedErr: Label 'Upload with SFTP failed with error description: %1';
     begin
-        if not NPXmlTemplate."FTP Transfer" then
+        if not SftpConn.Get(NPXmlTemplate."SFTP Connection") then
             exit;
-        if not NcEndpoint.Get(NPXmlTemplate."SFTP/FTP Nc Endpoint") then
-            exit;
-        if not NcEndpointFtp.Get(NcEndpoint.Code) then
-            exit;
-        if NcEndpointFtp.Server = '' then
-            exit;
+        AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || SFTP: ' + NPXmlTemplate."SFTP Connection", NPXmlTemplate."Do Not Add Comment Line");
 
-        AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || S/FTP Transfer by NC Endpoint: ' + NPXmlTemplate."SFTP/FTP Nc Endpoint", NPXmlTemplate."Do Not Add Comment Line");
-
-        if NcEndpointFtp.Filename <> '' then
-            Filename := NcEndpointFtp.Filename;
-
-        if not NcEndpointMgt.HasInitEndpoint(NcEndpoint) then
-            NcEndpointMgt.InitEndpoint(NcEndpoint);
-
-        case NcEndpointFTP."File Encoding" of
-            NcEndpointFTP."File Encoding"::ANSI:
-                Encoding := TextEncoding::Windows;
-            NcEndpointFTP."File Encoding"::UTF8:
-                Encoding := TextEncoding::UTF8;
+        case NPXmlTemplate."Server File Encoding" of
+            NPXmlTemplate."Server File Encoding"::ANSI:
+                TmpBlob.CreateOutStream(OutStr, TextEncoding::Windows);
+            NPXmlTemplate."Server File Encoding"::UTF8:
+                TmpBlob.CreateOutStream(OutStr, TextEncoding::UTF8);
             else
-                UseDefaultEncoding := true;
+                TmpBlob.CreateOutStream(OutStr);
         end;
+        XmlDoc.WriteTo(OutStr);
+        if (not SftpClient.UploadFile(GetFTPandSFTPRemotePath(NPXmlTemplate, Filename), TmpBlob, SftpConn)) then begin
+            AddTextToResponseTempBlob(StrSubstNo(SendFailedErr, GetLastErrorText()));
+            Error(SendFailedErr, GetLastErrorText());
+        end;
+        AddTextToResponseTempBlob('<!-- [' + NPXmlTemplate.Code + '] SFTP: ' + NPXmlTemplate."SFTP Connection" + ' -->' + CRLF());
+    end;
 
-        if UseDefaultEncoding then
-            TempNcTaskOutput.Data.CreateOutStream(OutStr)
-        else
-            TempNcTaskOutput.Data.CreateOutStream(OutStr, Encoding);
-
-        XmlDoc.WriteTo(FileContent);
-        OutStr.WriteText(FileContent);
-        TempNcTaskOutput.Insert(false);
-        TempNcTaskOutput.Name := CopyStr(FileName, 1, MaxStrLen(TempNcTaskOutput.Name));
-
-        if NcEndpointMgt.RunEndpoint(TempNcTaskOutput, NcEndpoint, Response) then begin
-            "Field".Get(DATABASE::"NPR NpXml Template", NPXmlTemplate.FieldNo("FTP Transfer"));
-            AddTextToResponseTempBlob('<!-- [' + NPXmlTemplate.Code + '] ' + "Field"."Field Caption" + ': ' + NPXmlTemplate."SFTP/FTP Nc Endpoint" + ' -->' + GetChar(13) + GetChar(10));
+    local procedure SendFtp(NPXmlTemplate: Record "NPR NpXml Template"; var XmlDoc: XmlDocument; Filename: Text)
+    var
+        FtpConn: Record "NPR FTP Connection";
+        FtpClient: Codeunit "NPR AF FTP Client";
+        TmpBlob: Codeunit "Temp Blob";
+        OutStr: OutStream;
+        InS: InStream;
+        FTPResponse: JsonObject;
+        JToken: JsonToken;
+        ResponseCodeText: Text;
+        SendFailedErr: Label 'Upload with FTP failed with error description: %1';
+    begin
+        if not FtpConn.Get(NPXmlTemplate."FTP Connection") then
             exit;
+        AddXmlToOutputTempBlob(XmlDoc, 'Xml Template: ' + NPXmlTemplate.Code + ' || FTP: ' + NPXmlTemplate."FTP Connection", NPXmlTemplate."Do Not Add Comment Line");
+
+        case NPXmlTemplate."Server File Encoding" of
+            NPXmlTemplate."Server File Encoding"::ANSI:
+                TmpBlob.CreateOutStream(OutStr, TextEncoding::Windows);
+            NPXmlTemplate."Server File Encoding"::UTF8:
+                TmpBlob.CreateOutStream(OutStr, TextEncoding::UTF8);
+            else
+                TmpBlob.CreateOutStream(OutStr);
         end;
 
-        AddTextToResponseTempBlob(StrSubstNo(SendFailedErr, NcEndpoint.Code, Response));
-        Error(SendFailedErr, NcEndpoint.Code, Response);
+        XmlDoc.WriteTo(OutStr);
+        TmpBlob.CreateInStream(InS);
+        FtpClient.Construct(FtpConn."Server Host", FtpConn.Username, FtpConn.Password, FtpConn."Server Port", 10000, FtpConn."FTP Passive Transfer Mode", FtpConn."FTP Enc. Mode");
+        FTPResponse := FtpClient.UploadFile(InS, GetFTPandSFTPRemotePath(NPXmlTemplate, Filename));
+        FtpClient.Destruct();
+        FTPResponse.Get('StatusCode', JToken);
+        ResponseCodeText := JToken.AsValue().AsText();
+        if (ResponseCodeText <> '200') then begin
+            FTPResponse.Get('Error', JToken);
+            AddTextToResponseTempBlob(StrSubstNo(SendFailedErr, JToken.AsValue().AsText()));
+            Error(SendFailedErr, JToken.AsValue().AsText());
+        end;
+        AddTextToResponseTempBlob('<!-- [' + NPXmlTemplate.Code + '] FTP: ' + NPXmlTemplate."FTP Connection" + ' -->' + CRLF());
+    end;
+
+    local procedure GetFTPandSFTPRemotePath(NpXmlTemplate: Record "NPR NpXml Template"; AutoFileName: Text): Text
+    var
+        RemotePath: Text;
+    begin
+        if ((NpXmlTemplate."FTP/SFTP Filename" <> '') and (NpXmlTemplate."FTP/SFTP Dir Path" <> '')) then
+            RemotePath := NpXmlTemplate."FTP/SFTP Dir Path" + NpXmlTemplate."FTP/SFTP Filename";
+        if ((NpXmlTemplate."FTP/SFTP Filename" = '') and (NpXmlTemplate."FTP/SFTP Dir Path" <> '')) then
+            RemotePath := NpXmlTemplate."FTP/SFTP Dir Path" + AutoFileName;
+        if ((NpXmlTemplate."FTP/SFTP Filename" <> '') and (NpXmlTemplate."FTP/SFTP Dir Path" = '')) then
+            RemotePath := '/' + NpXmlTemplate."FTP/SFTP Filename";
+        if ((NpXmlTemplate."FTP/SFTP Filename" = '') and (NpXmlTemplate."FTP/SFTP Dir Path" = '')) then
+            RemotePath := '/' + AutoFileName;
+        exit(RemotePath);
     end;
 
     local procedure TransferXml(NpXmlTemplate: Record "NPR NpXml Template"; var XmlDoc: XmlDocument; Filename: Text[250]): Boolean
@@ -801,14 +823,17 @@
         Handled: Boolean;
     begin
         OnBeforeTransferXml(NpXmlTemplate, _RecRef, XmlDoc, Filename, Handled);
-        if not (NpXmlTemplate."File Transfer" or NpXmlTemplate."FTP Transfer" or NpXmlTemplate."API Transfer") then
+        if not (NpXmlTemplate."File Transfer" or NpXmlTemplate."API Transfer" or NpXmlTemplate."FTP Enabled" or NpXmlTemplate."SFTP Enabled") then
             exit(false);
 
         if NpXmlTemplate."File Transfer" then
             ExportToFile(NpXmlTemplate, XmlDoc, Filename);
 
-        if NpXmlTemplate."FTP Transfer" then
-            SendFtpAndSftp(NpXmlTemplate, XmlDoc, Filename);
+        if (NpXmlTemplate."FTP Enabled") then
+            SendFtp(NpXmlTemplate, XmlDoc, Filename);
+
+        if (NpXmlTemplate."SFTP Enabled") then
+            SendSftp(NpXmlTemplate, XmlDoc, Filename);
 
         if NpXmlTemplate."API Transfer" then
             SendApi(NpXmlTemplate, XmlDoc);
@@ -838,15 +863,10 @@
     end;
 
     local procedure AddTextToResponseTempBlob(Response: Text)
-    var
-        LF: Char;
-        CR: Char;
     begin
         InitializeOutput();
         if ResponseTempBlob.HasValue() then begin
-            LF := 10;
-            CR := 13;
-            ResponseOutStr.WriteText(Format(CR) + Format(LF));
+            ResponseOutStr.WriteText(CRLF());
         end;
         ResponseOutStr.WriteText(Response);
     end;
@@ -855,7 +875,7 @@
     begin
         InitializeOutput();
         if OutputTempBlob.HasValue() then
-            OutputOutStr.WriteText(GetChar(13) + GetChar(10) + GetChar(13) + GetChar(10));
+            OutputOutStr.WriteText(CRLF() + CRLF());
 
         OutputOutStr.Write(OutputText);
     end;
@@ -873,10 +893,10 @@
     begin
         InitializeOutput();
         if OutputTempBlob.HasValue() then begin
-            OutputOutStr.WriteText(GetChar(13) + GetChar(10) + GetChar(13) + GetChar(10));
+            OutputOutStr.WriteText(CRLF() + CRLF());
         end;
         if (Comment <> '') and not DoNotAddComment then
-            OutputOutStr.WriteText('<!--' + Comment + '-->' + GetChar(13) + GetChar(10));
+            OutputOutStr.WriteText('<!--' + Comment + '-->' + CRLF());
 
         XmlDoc.WriteTo(OutputOutStr);
     end;
@@ -968,12 +988,16 @@
         exit(Base64Convert.ToBase64(Username + ':' + Password, TextEncoding::UTF8));
     end;
 
-    local procedure GetChar(CharInt: Integer): Text[1]
+    local procedure CRLF(): Text[2]
     var
-        Char: Char;
+        cr: Char;
+        lf: Char;
+        res: Text[2];
     begin
-        Char := CharInt;
-        exit(Format(Char));
+        cr := 13;
+        lf := 10;
+        res := Format(cr) + Format(lf);
+        exit(res);
     end;
 
     local procedure GetFilename(XmlEntityType: Text[50]; PrimaryKeyValue: Text; RecordCounter: Integer): Text
@@ -1193,7 +1217,7 @@
             TempBlob2.CreateOutStream(OutStr);
 
             CopyStream(OutStr, InStr);
-            OutStr.Write(GetChar(13) + GetChar(10) + GetChar(13) + GetChar(10));
+            OutStr.Write(CRLF() + CRLF());
             OutStr.Write(JsonString);
 
             TempBlob := TempBlob2;
