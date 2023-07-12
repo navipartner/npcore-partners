@@ -7,6 +7,9 @@
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR Nc Endpoint FTP";
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Going ot switch to use Ftp Connection and Sftp Connection.';
+    ObsoleteTag = 'NP';
 
     layout
     {

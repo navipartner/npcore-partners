@@ -226,9 +226,14 @@ codeunit 6060025 "NPR Environment Mgt."
             NpXmlTemplate.ModifyAll("File Transfer", false, false);
 
         NpXmlTemplate.Reset();
-        NpXmlTemplate.SetRange("FTP Transfer", true);
+        NpXmlTemplate.SetRange("FTP enabled", true);
         if NpXmlTemplate.FindFirst() then
-            NpXmlTemplate.ModifyAll("FTP Transfer", false, false);
+            NpXmlTemplate.ModifyAll("FTP enabled", false, false);
+
+        NpXmlTemplate.Reset();
+        NpXmlTemplate.SetRange("SFTP enabled", true);
+        if NpXmlTemplate.FindFirst() then
+            NpXmlTemplate.ModifyAll("SFTP Enabled", false, false);
 
         NpXmlTemplate.Reset();
         NpXmlTemplate.SetRange("API Transfer", true);

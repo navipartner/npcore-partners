@@ -70,11 +70,22 @@
                     ToolTip = 'Specifies the value of the Ftp Enabled field';
                     ApplicationArea = NPRNaviConnect;
                 }
-                field(Sftp; Rec.Sftp)
+                field("Ftp Connection"; Rec."FTP Connection")
                 {
 
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Sftp field';
+                    ToolTip = 'Specifies the value of the Ftp Host field';
+                    ApplicationArea = NPRNaviConnect;
+                }
+                field("Sftp Enabled"; Rec."Sftp Enabled")
+                {
+
+                    ToolTip = 'Specifies the value of the Sftp Enabled field';
+                    ApplicationArea = NPRNaviConnect;
+                }
+                field("Sftp Connection"; Rec."SFTP Connection")
+                {
+
+                    ToolTip = 'Specifies the value of the Sftp Connection field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Ftp Host"; Rec."Ftp Host")
@@ -82,6 +93,19 @@
 
                     ToolTip = 'Specifies the value of the Ftp Host field';
                     ApplicationArea = NPRNaviConnect;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Using Sftp and Ftp connections instead.';
+                    ObsoleteTag = 'NP';
+                    Visible = false;
+                }
+                field("Sftp"; Rec.Sftp)
+                {
+                    ToolTip = 'Specifies the value of the Sftp field';
+                    ApplicationArea = NPRNaviConnect;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Using Sftp and Ftp connections instead.';
+                    ObsoleteTag = 'NP';
+                    Visible = false;
                 }
             }
         }
@@ -99,7 +123,7 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                Visible = Rec."Ftp Enabled";
+                Visible = (Rec."Ftp Enabled" or Rec."Sftp Enabled");
 
                 ToolTip = 'Executes the Download Ftp action';
                 ApplicationArea = NPRNaviConnect;

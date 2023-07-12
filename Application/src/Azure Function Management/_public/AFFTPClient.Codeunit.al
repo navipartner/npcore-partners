@@ -6,7 +6,7 @@
         gConvert: Codeunit "Base64 Convert";
         //CodeUnit Constants
         gHttpUrlConst, gHttpUsernameConst, gHttpPasswordConst, gHttpPortConst, gHttpFilePathConst, gHttpPasiveConst, gHttpEncmodeConst : Text;
-        gHttpPathConst, gHttpFileContentConst, gHttpTimeoutMsConst : Text;
+        gHttpPathConst, gHttpFileContentConst, gHttpTimeoutMsConst, gHttpForce : Text;
         [NonDebuggable]
         gHttpHostKey: Text;
         gErrorConst, gErrMsg_Post_Fail, gErrMsg_Parse_Fail : Text;
@@ -14,12 +14,18 @@
         //ftpParameters
         gHost, gUsername, gPassword, gEncmode : Text;
         gPort, gTimeoutMs : Integer;
-        gPassive: Boolean;
+        gPassive, gForce : Boolean;
+    internal procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean; EncMode: Enum "NPR Nc FTP Encryption mode"; Force: Boolean)
+    begin
+        gForce := Force;
+        Construct(Host, Username, Password, Port, TimeoutMs, Passive, EncMode);
+    end;
 
     procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean; EncMode: Enum "NPR Nc FTP Encryption mode")
     var
         EncModeText: Text;
     begin
+        gForce := False;
         case EncMode of
             EncMode::Implicit:
                 EncModeText := 'implicit';
@@ -55,6 +61,7 @@
         gHttpFilePathConst := 'filepath';
         gHttpFileContentConst := 'filecontent';
         gHttpTimeoutMsConst := 'timeoutms';
+        gHttpForce := 'overwrite';
         gHttpPasiveConst := 'passive';
         gErrMsg_Post_Fail := 'Post request failed';
         gErrMsg_Parse_Fail := 'Parsing of input failed';
@@ -375,7 +382,8 @@
             reqContent.Add(gHttpPasswordConst, gPassword) and
             reqContent.Add(gHttpPortConst, gPort) and
             reqContent.Add(gHttpPasiveConst, gPassive) and
-            reqContent.Add(gHttpEncmodeConst, gEncmode);
+            reqContent.Add(gHttpEncmodeConst, gEncmode) and
+            reqContent.Add(gHttpForce, gForce);
 
         if gTimeoutMs <> -1 then
             returnVal := returnVal and reqContent.Add(gHttpTimeoutMsConst, gTimeoutMs);

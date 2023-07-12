@@ -4,6 +4,9 @@
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Nc Endpoint FTP List";
     LookupPageID = "NPR Nc Endpoint FTP List";
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Creating Use "NPR FTP Connection" or "NPR SFTP Connection" ';
+    ObsoleteTag = 'NP';
 
     fields
     {
@@ -17,6 +20,9 @@
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
 
             trigger OnValidate()
             begin
@@ -27,6 +33,9 @@
         {
             Caption = 'Enabled';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
 
             trigger OnValidate()
             begin
@@ -37,6 +46,9 @@
         {
             Caption = 'Output Nc Task Entry No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
         }
         field(100; Type; Option)
         {
@@ -52,6 +64,9 @@
         {
             Caption = 'Protocol Type';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
 
             trigger OnValidate()
             begin
@@ -63,6 +78,9 @@
         {
             Caption = 'FTP Server';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
 
             trigger OnValidate()
             begin
@@ -73,21 +91,31 @@
         {
             Caption = 'FTP Username';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
 
             trigger OnValidate()
             begin
                 UpdateNcEndpoint();
             end;
+
         }
         field(130; Password; Text[100])
         {
             Caption = 'FTP Password';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
         }
         field(140; Directory; Text[100])
         {
             Caption = 'FTP Directory';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
 
             trigger OnValidate()
             begin
@@ -98,23 +126,35 @@
         {
             Caption = 'Filename';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
         }
         field(150; Port; Integer)
         {
             Caption = 'FTP Port';
             DataClassification = CustomerContent;
             MinValue = 0;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Moving connection info to dedicated tables FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
         }
         field(160; Passive; Boolean)
         {
             Caption = 'FTP Passive';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Moving connection info to dedicated tables FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
         }
         field(161; EncMode; Enum "NPR Nc FTP Encryption mode")
         {
             Caption = 'FTP Encryption mode';
             InitValue = "None";
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
         }
         field(170; "File Encoding"; Option)
         {
@@ -124,12 +164,18 @@
             InitValue = ANSI;
             OptionCaption = 'ANSI,Unicode,UTF-8';
             OptionMembers = ANSI,Unicode,UTF8;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
         }
         field(175; "File Temporary Extension"; Text[4])
         {
             Caption = 'File Temporary Extension';
             DataClassification = CustomerContent;
             CharAllowed = 'az';
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
+            ObsoleteTag = 'NP';
         }
     }
 

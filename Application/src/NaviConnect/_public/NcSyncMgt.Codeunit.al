@@ -6,7 +6,7 @@
         SyncEndTime: DateTime;
         AuthorizationFailedErrorText: Label 'Authorization failed. Wrong FTP username/password.';
         FTPClient: Codeunit "NPR AF FTP Client";
-        SFTPClient: Codeunit "NPR AF SFTP Client";
+        SFTPClient: Codeunit "NPR AF Sftp Client";
 
     #region "Download Ftp"
 
@@ -43,41 +43,42 @@
     end;
 
     local procedure DownloadFileToImportEntry(var TempImportEntry: Record "NPR Nc Import Entry" temporary; ImportType: Record "NPR Nc Import Type"; Filename: Text): Boolean
+    var
+        ftpConn: Record "NPR FTP Connection";
+        sftpConn: Record "NPR SFTP Connection";
     begin
-        if ImportType.Sftp then
-            exit(TryImportNewEntrySftp(TempImportEntry, ImportType, Filename))
-        else
-            exit(TryImportNewEntry(TempImportEntry, ImportType, Filename));
+
+        if (ImportType."Ftp Enabled" and ftpConn.Get(ImportType."FTP Connection")) then
+            exit(TryImportNewEntryFtp(TempImportEntry, ImportType, Filename));
+        if (ImportType."Sftp Enabled" and sftpConn.Get(ImportType."SFTP Connection")) then
+            exit(TryImportNewEntrySftp(TempImportEntry, ImportType, Filename));
+
     end;
 
     [TryFunction]
-    internal procedure TryImportNewEntry(var TempImportEntry: Record "NPR Nc Import Entry" temporary; ImportType: Record "NPR Nc Import Type"; Filename: Text)
+    internal procedure TryImportNewEntryFtp(var TempImportEntry: Record "NPR Nc Import Entry" temporary; ImportType: Record "NPR Nc Import Type"; Filename: Text)
     var
-        SourceUri: Text;
-        TargetUri: Text;
+        Path: Text;
+        NewPath: Text;
+        DirPath: Text;
         OutStr: OutStream;
         Base64Convert: Codeunit "Base64 Convert";
-        FtpPort: Integer;
         FTPResponse: JsonObject;
         JToken: JsonToken;
         ResponseCodeText: Text;
         FileContent: Text;
-        FtpHost: Text[250];
+        FTPConn: Record "NPR FTP Connection";
+        NoConLbl: Label 'No FTP Connection is specified.';
     begin
         if not ValidFilename(Filename) then
             Error(FileIsNotValidErr, Filename);
+        if (not FTPConn.Get(ImportType."FTP Connection")) then
+            Error(NoConLbl);
 
-        FtpHost := ManageHostPrefix(ImportType."Ftp Host");
-        SourceUri := ManagePathSlashes(ImportType."Ftp Path");
-
-        FtpPort := ImportType."Ftp Port";
-        if FtpPort = 0 then
-            FtpPort := 21;
-
-        //Check for Binary property (probably not needed anymore): if ImportType."Ftp Binary" then FtpWebRequest.UseBinary := true;
-
-        FTPClient.Construct(FtpHost, ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive", ImportType."Ftp EncMode");
-        FTPResponse := FTPClient.DownloadFile(SourceUri + Filename);
+        FTPClient.Construct(FTPConn."Server Host", FTPConn.Username, FTPConn.Password, FTPConn."Server Port", 10000, FTPConn."FTP Passive Transfer Mode", FTPConn."FTP Enc. Mode");
+        DirPath := ManagePathSlashes(ImportType."Ftp Path");
+        Path := DirPath + Filename;
+        FTPResponse := FTPClient.DownloadFile(Path);
 
         FTPResponse.Get('StatusCode', JToken);
         ResponseCodeText := JToken.AsValue().AsText();
@@ -104,15 +105,15 @@
         FileContent := Base64Convert.FromBase64(JToken.AsValue().AsText());
         OutStr.WriteText(FileContent);
 
-        if ImportType."Ftp Backup Path" = '' then begin
-            if not DeleteFtpFile(SourceUri + Filename) then
+        if ImportType."Ftp Backup Dir Path" = '' then begin
+            if not DeleteFtpFile(Path) then
                 Error(FtpBackupErr, Filename, GetLastErrorText());
         end else begin
-            TargetUri := ManagePathSlashes(ImportType."Ftp Backup Path");
-            if not CheckFtpUrlExists(TargetUri) then
-                if MakeFtpUrl(TargetUri) then;
+            NewPath := ImportType."Ftp Backup Dir Path" + Filename;
+            if not FtpDirExists(ImportType."Ftp Backup Dir Path") then
+                if MakeFtpUrl(ImportType."Ftp Backup Dir Path") then;
 
-            if not RenameFtpFile(ManagePathSlashes(SourceUri) + Filename, ManagePathSlashes(ImportType."Ftp Backup Path") + Filename) then
+            if not RenameFtpFile(Path, NewPath) then
                 Error(FtpBackupErr, Filename, GetLastErrorText());
         end;
 
@@ -124,42 +125,24 @@
     internal procedure TryImportNewEntrySftp(var TempImportEntry: Record "NPR Nc Import Entry" temporary; ImportType: Record "NPR Nc Import Type"; Filename: Text)
     var
         OutStr: OutStream;
-        RemotePath: Text;
-        NewRemotePath: Text;
-        Base64Convert: Codeunit "Base64 Convert";
-        FtpPort: Integer;
-        FTPResponse: JsonObject;
-        JToken: JsonToken;
-        ResponseCodeText: Text;
-        FileContent: Text;
-        FtpHost: Text[250];
+        Path: Text;
+        NewPath: Text;
+        DirPath: Text;
+        SFTPConn: Record "NPR SFTP Connection";
+        SFTPJson: JsonObject;
+        Blobber: Codeunit "Temp Blob";
+        InS: InStream;
+        NoConLbl: Label 'No SFTP Connection is specified.';
     begin
         if not ValidFilename(Filename) then
             Error(FileIsNotValidErr, Filename);
+        if (not SFTPConn.Get(ImportType."SFTP Connection")) then
+            Error(NoConLbl);
 
-        FtpHost := ManageHostPrefix(ImportType."Ftp Host");
-        RemotePath := ManagePathSlashes(ImportType."Ftp Path");
-
-        FtpPort := ImportType."Ftp Port";
-        if FtpPort = 0 then
-            FtpPort := 22;
-
-        SFTPClient.Construct(FtpHost, ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000);
-        FTPResponse := SFTPClient.DownloadFile(RemotePath + Filename);
-
-        FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue().AsText();
-
-        case ResponseCodeText of
-            '200':
-                FTPResponse.Get('base64String', JToken);
-            '401':
-                Error(AuthorizationFailedErrorText);
-            else begin
-                FTPResponse.Get('Error', JToken);
-                Error(JToken.AsValue().AsText());
-            end;
-        end;
+        SFTPJson := SFTPClient.GetFileServerJsonRequest(SFTPConn);
+        DirPath := ManagePathSlashes(ImportType."Ftp Path");
+        Path := DirPath + Filename;
+        SFTPClient.DownloadFile(Path, Blobber, SFTPJson);
 
         Clear(TempImportEntry);
         TempImportEntry."Import Type" := ImportType.Code;
@@ -169,18 +152,17 @@
         TempImportEntry."Runtime Error" := false;
         TempImportEntry."Document Source".CreateOutStream(OutStr, TextEncoding::UTF8);
 
-        FileContent := Base64Convert.FromBase64(JToken.AsValue().AsText());
-        OutStr.WriteText(FileContent);
+        Blobber.CreateInStream(InS);
+        CopyStream(OutStr, InS);
 
-        if ImportType."Ftp Backup Path" = '' then
-            SFTPClient.DeleteFile(RemotePath + Filename)
+        if ImportType."Ftp Backup Dir Path" = '' then
+            SFTPClient.DeleteFile(Path, SFTPJson)
         else begin
-            NewRemotePath := ManagePathSlashes(RemotePath + ImportType."Ftp Backup Path");
-            SFTPClient.MoveFile(RemotePath + Filename, NewRemotePath + Filename);
+            NewPath := ImportType."Ftp Backup Dir Path" + Filename;
+            SFTPClient.MoveFile(Path, NewPath, SFTPJson);
         end;
 
         TempImportEntry.Insert();
-        SFTPClient.Destruct();
     end;
     #endregion "Download Ftp"
 
@@ -357,36 +339,36 @@
 
     #region "Ftp List"
     local procedure ListDirectory(NcImportType: Record "NPR Nc Import Type"; var ListDirectoryDetails: List of [Text]): Boolean
+    var
+        ftpConn: Record "NPR FTP Connection";
+        sftpConn: Record "NPR SFTP Connection";
     begin
-        if NcImportType.Sftp then
-            exit(DownloadSftpFilenames(NcImportType, ListDirectoryDetails))
-        else
+        if (NcImportType."Ftp Enabled" and ftpConn.Get(NcImportType."FTP Connection")) then
             exit(DownloadFtpListDirectoryDetails(NcImportType, ListDirectoryDetails));
+        if (NcImportType."Sftp Enabled" and sftpConn.Get(NcImportType."SFTP Connection")) then
+            exit(DownloadSftpFilenames(NcImportType, ListDirectoryDetails));
     end;
 
     [TryFunction]
     local procedure DownloadFtpListDirectoryDetails(ImportType: Record "NPR Nc Import Type"; var ListDirectoryDetails: List of [Text])
     var
-        FtpPort: Integer;
         FTPResponse: JsonObject;
         FileObject: JsonObject;
         JToken: JsonToken;
         JArray: JsonArray;
         i: Integer;
         ResponseCodeText: Text;
-        FtpHost: Text[250];
+        FTPConn: Record "NPR FTP Connection";
+        NoConLbl: Label 'No FTP Connection is specified.';
     begin
         Clear(ListDirectoryDetails);
 
         if not ImportType."Ftp Enabled" then
             exit;
+        if (not FTPConn.Get(ImportType."FTP Connection")) then
+            Error(NoConLbl);
+        FTPClient.Construct(FTPConn."Server Host", FTPConn.Username, FTPConn.Password, FTPConn."Server Port", 10000, FTPConn."FTP Passive Transfer Mode", FTPConn."FTP Enc. Mode");
 
-        FtpHost := ManageHostPrefix(ImportType."Ftp Host");
-        FtpPort := ImportType."Ftp Port";
-        if FtpPort = 0 then
-            FtpPort := 21;
-
-        FTPClient.Construct(FtpHost, ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000, ImportType."Ftp Passive", ImportType."Ftp EncMode");
         FTPResponse := FTPClient.ListDirectory(ManagePathSlashes(ImportType."Ftp Path"));
 
         FTPResponse.Get('StatusCode', JToken);
@@ -424,68 +406,33 @@
     local procedure DownloadSftpFilenames(ImportType: Record "NPR Nc Import Type"; var ParamListDirectory: List of [Text])
     var
         RemotePath: Text;
-        FtpPort: Integer;
-        FTPResponse: JsonObject;
         FileObject: JsonObject;
         JToken: JsonToken;
         JArray: JsonArray;
         i: Integer;
-        ResponseCodeText: Text;
-        FtpHost: Text[250];
+        SFTPConn: Record "NPR SFTP Connection";
+        SFTPJson: JsonObject;
+        NoConLbl: Label 'No SFTP Connection is specified.';
     begin
-        FtpHost := ManageHostPrefix(ImportType."Ftp Host");
-        FtpPort := ImportType."Ftp Port";
-        if FtpPort = 0 then
-            FtpPort := 22;
+        if (not SFTPConn.Get(ImportType."SFTP Connection")) then
+            Error(NoConLbl);
+        SFTPJson := SFTPClient.GetFileServerJsonRequest(SFTPConn);
 
         RemotePath := ManagePathSlashes(ImportType."Ftp Path");
 
-        SFTPClient.Construct(FtpHost, ImportType."Ftp User", ImportType."Ftp Password", FtpPort, 10000);
-        FTPResponse := SFTPClient.ListDirectory(RemotePath);
+        SFTPClient.ListDirectory(RemotePath, JArray, SFTPJson);
 
-        FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue().AsText();
+        for i := 0 to JArray.Count - 1 do begin
+            JArray.Get(i, JToken);
+            FileObject := JToken.AsObject();
 
-        SFTPClient.Destruct();
-
-        case ResponseCodeText of
-            '200':
-                begin
-                    FTPResponse.Get('Files', JToken);
-                    JArray := JToken.AsArray();
-
-                    for i := 0 to JArray.Count - 1 do begin
-                        JArray.Get(i, JToken);
-                        FileObject := JToken.AsObject();
-
-                        FileObject.Get('IsDirectory', JToken);
-                        if not JToken.AsValue().AsBoolean() then begin
-                            FileObject.Get('Name', JToken);
-                            ParamListDirectory.Add(JToken.AsValue().AsText());
-                        end;
-                    end;
-                end;
-            '401':
-                Error(AuthorizationFailedErrorText);
-            else begin
-                FTPResponse.Get('Error', JToken);
-                Error(JToken.AsValue().AsText());
+            FileObject.Get('IsDirectory', JToken);
+            if not JToken.AsValue().AsBoolean() then begin
+                FileObject.Get('Name', JToken);
+                ParamListDirectory.Add(JToken.AsValue().AsText());
             end;
         end;
     end;
-
-#pragma warning disable AA0139
-    local procedure ManageHostPrefix(Host: Text[250]) NewHost: Text[250]
-    begin
-        NewHost := Host;
-
-        if StrPos(Host, 'sftp://') = 1 then
-            NewHost := CopyStr(Host, 8);
-
-        if StrPos(Host, 'ftp://') = 1 then
-            NewHost := CopyStr(Host, 7);
-    end;
-#pragma warning restore AA0139
 
     local procedure ManagePathSlashes(RemotePath: Text) FormattedPath: Text
     begin
@@ -532,7 +479,7 @@
 
     #region Aux
     [TryFunction]
-    local procedure CheckFtpUrlExists(FtpUrl: Text)
+    local procedure FtpDirExists(FtpUrl: Text)
     var
         FTPResponse: JsonObject;
         JToken: JsonToken;
@@ -550,8 +497,6 @@
 
         FTPResponse.Get('StatusCode', JToken);
         ResponseCodeText := JToken.AsValue().AsText();
-
-        SFTPClient.Destruct();
 
         case ResponseCodeText of
             '200':
@@ -635,13 +580,13 @@
     end;
 
     [TryFunction]
-    local procedure RenameFtpFile(FtpUrl: Text; RenameTo: Text)
+    local procedure RenameFtpFile(Path: Text; NewPath: Text)
     var
         FTPResponse: JsonObject;
         JToken: JsonToken;
         ResponseCodeText: Text;
     begin
-        FTPResponse := FTPClient.RenameFile(FtpUrl, RenameTo);
+        FTPResponse := FTPClient.RenameFile(Path, NewPath);
 
         FTPResponse.Get('StatusCode', JToken);
         ResponseCodeText := JToken.AsValue().AsText();
