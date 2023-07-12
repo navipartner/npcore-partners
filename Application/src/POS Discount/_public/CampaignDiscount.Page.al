@@ -40,6 +40,7 @@
                     ToolTip = 'Specifies the value of the Created Date field';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Not used.';
                     Visible = false;
                 }
@@ -51,6 +52,7 @@
                     ToolTip = 'Specifies the value of the Last Changed field';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Not used.';
                     Visible = false;
                 }

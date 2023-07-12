@@ -76,7 +76,7 @@ page 6150765 "NPR TM Admission Card"
                 field("Capacity Control"; Rec."Capacity Control")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies whether it’s possible to sell an indefinite number of tickets, if the capacity is limited by the number of seats in the admission, or if the capacity is governed by the number of entries/the difference between the number of admitted and departed customers.';
+                    ToolTip = 'Specifies whether it???s possible to sell an indefinite number of tickets, if the capacity is limited by the number of seats in the admission, or if the capacity is governed by the number of entries/the difference between the number of admitted and departed customers.';
                     Editable = _ManagedByAdmission;
                 }
                 field("Prebook From"; Rec."Prebook From")
@@ -183,7 +183,7 @@ page 6150765 "NPR TM Admission Card"
                 field("Ticketholder Notification Type"; Rec."Ticketholder Notification Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies whether it’s required for ticketholders to state their phone number/email address when buying a ticket.';
+                    ToolTip = 'Specifies whether it???s required for ticketholders to state their phone number/email address when buying a ticket.';
                 }
                 field("Stakeholder (E-Mail/Phone No.)"; Rec."Stakeholder (E-Mail/Phone No.)")
                 {
@@ -339,6 +339,7 @@ page 6150765 "NPR TM Admission Card"
                 Image = CustomerList;
                 RunObject = Report "NPR TM Admission List";
                 ObsoleteState = Pending;
+                ObsoleteTag = 'NPR23.0';
                 ObsoleteReason = 'NPR TM Admission List is going to be deleted.';
             }
         }

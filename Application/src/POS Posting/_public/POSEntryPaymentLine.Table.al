@@ -225,6 +225,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(161; "Orig. POS Line No."; Integer)
@@ -233,6 +234,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(170; "Retail ID"; Guid)
@@ -240,6 +242,7 @@
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(480; "Dimension Set ID"; Integer)

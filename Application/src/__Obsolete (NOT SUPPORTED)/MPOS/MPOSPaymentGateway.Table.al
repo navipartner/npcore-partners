@@ -4,8 +4,8 @@
     Caption = 'MPOS Payment Gateway';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Removing MPOS Payment Gateway';
-    ObsoleteTag = 'Removing MPOS Payment Gateway';
 
     fields
     {

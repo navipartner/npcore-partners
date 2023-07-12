@@ -41,6 +41,7 @@
             OptionCaption = 'G/L,Item,Item Group,Repair,,Payment,Open/Close,Inventory,Customer,Comment';
             OptionMembers = "G/L Entry",Item,"Item Group",Repair,,Payment,"Open/Close","BOM List",Customer,Comment;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use Line Type';
         }
         field(6; "No."; Code[20])
@@ -135,6 +136,7 @@
             Caption = 'Qty. Discount Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(10; Description; Text[100])
@@ -249,6 +251,7 @@
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'No longer used except as dummy field.';
         }
         field(14; "To Ship (Qty)"; Decimal)
@@ -257,6 +260,7 @@
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(15; "Unit Price"; Decimal)
@@ -353,6 +357,7 @@
             MaxValue = 100;
             MinValue = 0;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(19; "Discount %"; Decimal)
@@ -519,6 +524,7 @@
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used in POS';
         }
         field(33; "Allow Line Discount"; Boolean)
@@ -561,6 +567,7 @@
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(43; "Serial No."; Code[50])
@@ -587,6 +594,7 @@
             MaxValue = 100;
             MinValue = 0;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(46; "Invoice to Customer No."; Code[20])
@@ -595,6 +603,7 @@
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(47; "Invoice Discount Amount"; Decimal)
@@ -604,6 +613,7 @@
             Caption = 'Invoice Discount Amount';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used in POS';
         }
         field(48; "Gen. Bus. Posting Group"; Code[20])
@@ -644,6 +654,7 @@
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(54; "VAT Base Amount"; Decimal)
@@ -664,6 +675,7 @@
             Caption = 'Euro';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(57; "Quantity (Base)"; Decimal)
@@ -676,6 +688,7 @@
             Caption = 'Period Discount code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(59; "Lookup On No."; Boolean)
@@ -683,6 +696,7 @@
             Caption = 'Lookup On No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(70; "Shortcut Dimension 1 Code"; Code[20])
@@ -730,6 +744,7 @@
             Caption = 'Special price';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(84; "Gen. Posting Type"; Enum "General Posting Type")
@@ -826,6 +841,7 @@
             Caption = 'System-Created Entry';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(102; "Variant Code"; Code[10])
@@ -870,6 +886,7 @@
             OptionCaption = ' ,Selection,Retail Order,Wish,Customization,Delivery,Rental contract,Purchase contract,Qoute';
             OptionMembers = " ","Selection Contract","Retail Order",Wish,Customization,Delivery,"Rental contract","Purchase contract",Quote;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(118; "Retail Document No."; Code[20])
@@ -877,6 +894,7 @@
             Caption = 'Retail Document No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'No longer used except as dummy field.';
         }
         field(140; "Sales Document Type"; Enum "Sales Document Type")
@@ -934,6 +952,7 @@
             Caption = 'Customer Location No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(151; "Sales Document Prepay. Refund"; Boolean)
@@ -997,6 +1016,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use systemID instead';
         }
         field(161; "Orig. POS Line No."; Integer)
@@ -1005,6 +1025,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use systemID instead';
         }
         field(170; "Retail ID"; Guid)
@@ -1013,6 +1034,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.50';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use systemID instead';
         }
         field(200; "Qty. per Unit of Measure"; Decimal)
@@ -1028,6 +1050,7 @@
             Caption = 'Return Sale POS Unit No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(301; "Return Sale Sales Ticket No."; Code[20])
@@ -1042,6 +1065,7 @@
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Payment1,Disbursement,Comment,,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Payment1,Disbursement,Comment,,"Open/Close";
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(303; "Return Sale Line No."; Integer)
@@ -1049,6 +1073,7 @@
             Caption = 'Return Sale Line No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(304; "Return Sale No."; Code[20])
@@ -1056,6 +1081,7 @@
             Caption = 'Return Sale No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(305; "Return Sales Sales Date"; Date)
@@ -1063,6 +1089,7 @@
             Caption = 'Return Sales Sales Date';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(400; "Discount Type"; Option)
@@ -1163,6 +1190,7 @@
             DataClassification = CustomerContent;
             Description = 'Only to be set if Cash Terminal Approved';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
 
         }
@@ -1172,6 +1200,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR4.002.005, for indication of opening on drawer.';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(600; "VAT Calculation Type"; Enum "Tax Calculation Type")
@@ -1196,6 +1225,7 @@
             Caption = 'Insurance Category';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5002; Color; Code[20])
@@ -1203,6 +1233,7 @@
             Caption = 'Color';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(5003; Size; Code[20])
@@ -1210,6 +1241,7 @@
             Caption = 'Size';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(5004; Clearing; Option)
@@ -1219,6 +1251,7 @@
             OptionCaption = ' ,Gift Voucher,Credit Voucher';
             OptionMembers = " ",Gavekort,Tilgodebevis;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(5008; "External Document No."; Code[20])
@@ -1226,6 +1259,7 @@
             Caption = 'External Document No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(5700; "Responsibility Center"; Code[10])
@@ -1245,6 +1279,7 @@
             Caption = 'Buffer Ref. No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6000; "Buffer Document Type"; Enum "Gen. Journal Document Type")
@@ -1267,6 +1302,7 @@
             Caption = 'Vendor No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6004; Internal; Boolean)
@@ -1275,6 +1311,7 @@
             DataClassification = CustomerContent;
             InitValue = false;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6005; "Currency Amount"; Decimal)
@@ -1314,6 +1351,7 @@
             Caption = 'Item Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Item Category Used instead.';
         }
         field(6012; "MR Anvendt antal"; Decimal)
@@ -1348,6 +1386,7 @@
             Caption = 'NegPriceZero';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6021; Reference; Text[50])
@@ -1360,6 +1399,7 @@
             Caption = 'Rep. No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6023; "Gift Voucher Ref."; Code[20])
@@ -1367,6 +1407,7 @@
             Caption = 'Gift Voucher Ref.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6024; "Credit voucher ref."; Code[20])
@@ -1374,6 +1415,7 @@
             Caption = 'Credit voucher ref.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6025; "Custom Cost"; Boolean)
@@ -1386,6 +1428,7 @@
             Caption = 'Wish list';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6027; "Wish List Line No."; Integer)
@@ -1393,6 +1436,7 @@
             Caption = 'Wish List Line No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6028; "Item group accessory"; Boolean)
@@ -1410,6 +1454,7 @@
             Caption = 'Label Quantity';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6033; "Offline Sales Ticket No"; Code[20])
@@ -1417,6 +1462,7 @@
             Caption = 'Emergency Ticket No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6034; "Custom Descr"; Boolean)
@@ -1429,6 +1475,7 @@
             Caption = 'Foreign No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6037; GiftCrtLine; Integer)
@@ -1436,6 +1483,7 @@
             Caption = 'Gift Certificate Line';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6038; "Label Date"; Date)
@@ -1443,6 +1491,7 @@
             Caption = 'Label Date';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6039; "Description 2"; Text[50])
@@ -1478,6 +1527,7 @@
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6055; "Lock Code"; Code[10])
@@ -1485,6 +1535,7 @@
             Caption = 'Lock Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6060; "Magento Brand"; Code[20])
@@ -1528,6 +1579,7 @@
             Caption = 'Silent';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(10001; Deleting; Boolean)
@@ -1535,6 +1587,7 @@
             Caption = 'Deleting';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(10002; NoWarning; Boolean)
@@ -1542,6 +1595,7 @@
             Caption = 'No Warning';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(10003; CondFirstRun; Boolean)
@@ -1549,6 +1603,7 @@
             Caption = 'Conditioned First Run';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(10004; CurrencySilent; Boolean)
@@ -1556,6 +1611,7 @@
             Caption = 'Currency (Silent)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(10005; StyklisteSilent; Boolean)
@@ -1563,6 +1619,7 @@
             Caption = 'Bill of materials (Silent)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(10006; "Cust Forsikring"; Boolean)
@@ -1570,6 +1627,7 @@
             Caption = 'Cust. Insurrance';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used anymore.';
         }
         field(10007; Forsikring; Boolean)
@@ -1577,6 +1635,7 @@
             Caption = 'Insurrance';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(10008; TestOnServer; Boolean)
@@ -1584,6 +1643,7 @@
             Caption = 'Test on Server';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(10009; "Customer No. Line"; Boolean)
@@ -1591,6 +1651,7 @@
             Caption = 'Customer No. Line';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(10010; ForceApris; Boolean)
@@ -1598,6 +1659,7 @@
             Caption = 'Force A-Price';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(10011; GuaranteePrinted; Boolean)
@@ -1606,6 +1668,7 @@
             DataClassification = CustomerContent;
             Description = 'Field set true, if guarantee certificate has been printed';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(10012; "Custom Disc Blocked"; Boolean)
@@ -1618,6 +1681,7 @@
             Caption = 'Invoiz Guid';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(10014; "Orig.POS Entry S.Line SystemId"; Guid)
@@ -1630,6 +1694,7 @@
             Caption = 'Label Number';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(6014512; "SQL Server Timestamp"; BigInteger)
@@ -1665,6 +1730,7 @@
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Sale Type field not used anymore. For usage of Sale Type refer to NPR POS Sale table';
         }
         key(Key7; "Serial No.")
@@ -1683,6 +1749,7 @@
             MaintainSIFTIndex = false;
             SumIndexFields = "Amount Including VAT", Amount, Quantity;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Sale Type field not used anymore. For usage of Sale Type refer to NPR POS Sale table';
         }
         key(Key11; "Register No.", "Sales Ticket No.", Date, "Sale Type", Type)
@@ -1691,6 +1758,7 @@
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Sale Type field not used anymore. For usage of Sale Type refer to NPR POS Sale table';
         }
         key(Key12; "Register No.", "Sales Ticket No.", Date, "Line Type", "Discount Type", "Line No.")
@@ -1858,7 +1926,7 @@
         UpdateAmounts(SaleLinePOS);
     end;
 
-    [Obsolete('Use the version with 2 parameters instead.')]
+    [Obsolete('Use the version with 2 parameters instead.', 'NPR23.0')]
     procedure TransferToSalesLine(var SalesLine: Record "Sales Line"): Boolean
     begin
         exit(TransferToSalesLine(SalesLine, true));
@@ -1985,7 +2053,7 @@
         end;
     end;
 
-    [Obsolete('Pending removal, not used')]
+    [Obsolete('Pending removal, not used', 'NPR23.0')]
     procedure TransferToService()
     var
         ServiceItem: Record "Service Item";
@@ -2112,7 +2180,7 @@
         SkipCalcDiscount := NewSkipCalcDiscount;
     end;
 
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]). Use CreateDimFromDefaultDim(FieldNo: Integer) to update line dimensions from default dims.', 'BC 20.0')]
+    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]). Use CreateDimFromDefaultDim(FieldNo: Integer) to update line dimensions from default dims.', 'NPR23.0')]
     procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20])
     var
         TableID: array[10] of Integer;

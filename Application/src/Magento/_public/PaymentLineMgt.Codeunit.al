@@ -3,7 +3,7 @@ codeunit 6150650 "NPR Payment Line Mgt."
     var
         MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
 
-    [Obsolete('Use "CaptureSalesInvoice" procedure instead.')]
+    [Obsolete('Use "CaptureSalesInvoice" procedure instead.', 'NPR23.0')]
     procedure MagentoPmtMgt_CaptureSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header")
     begin
         MagentoPmtMgt.CaptureSalesInvoice(SalesInvoiceHeader);

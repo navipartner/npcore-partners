@@ -7,6 +7,7 @@ table 6014593 "NPR Aux. G/L Entry"
     DataClassification = CustomerContent;
     ObsoleteReason = 'Aux. G/L Entry has been removed due performance issues.';
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
 
 
     fields

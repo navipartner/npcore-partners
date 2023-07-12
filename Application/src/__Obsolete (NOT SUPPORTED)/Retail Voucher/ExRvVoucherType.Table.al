@@ -4,8 +4,8 @@
     Caption = 'External Retail Voucher Type';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Table not used anymore';
-    ObsoleteTag = 'Depcrecating 16/02/2021';
     fields
     {
         field(1; "Code"; Code[20])

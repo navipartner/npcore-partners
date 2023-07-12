@@ -7,6 +7,7 @@ tableextension 6014439 "NPR Config. Template Line" extends "Config. Template Lin
             Caption = 'Aux Table ID';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Rollback of Auxiliary Item table back to Item table extension';
         }
     }

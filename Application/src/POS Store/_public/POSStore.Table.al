@@ -91,6 +91,7 @@
             Caption = 'Fax No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Won''t be used anymore';
         }
         field(17; "E-Mail"; Text[80])
@@ -111,6 +112,7 @@
             DataClassification = CustomerContent;
             SubType = Bitmap;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used anywhere';
         }
         field(21; "Posting Compression"; Option)
@@ -122,8 +124,8 @@
             OptionCaption = 'Uncompressed,Per POS Entry,Per POS Period';
             OptionMembers = Uncompressed,"Per POS Entry","Per POS Period";
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moved to POS Posting Profile';
-            ObsoleteTag = 'POS Store -> POS Posting Profile';
         }
         field(25; "Location Code"; Code[10])
         {
@@ -180,32 +182,32 @@
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moved to dedicated POS Unit Profile';
-            ObsoleteTag = 'NPR POS Store -> NPR POS Unit -> NPR POS Posting Profile';
         }
         field(51; "Tax Area Code"; Code[20])
         {
             Caption = 'Tax Area Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moved to POS Posting Profile';
-            ObsoleteTag = 'POS Store -> POS Posting Profile';
         }
         field(52; "Tax Liable"; Boolean)
         {
             Caption = 'Tax Liable';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moved to POS Posting Profile';
-            ObsoleteTag = 'POS Store -> POS Posting Profile';
         }
         field(53; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moved to dedicated POS Unit Profile';
-            ObsoleteTag = 'NPR POS Store -> NPR POS Unit -> NPR POS Posting Profile';
         }
         field(54; "Default POS Posting Setup"; Option)
         {
@@ -214,8 +216,8 @@
             OptionCaption = 'Store,Customer';
             OptionMembers = Store,Customer;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moved to POS Posting Profile';
-            ObsoleteTag = 'POS Store -> POS Posting Profile';
         }
         field(60; "Item Posting"; Option)
         {
@@ -230,8 +232,8 @@
             Caption = 'POS Period Register No. Series';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moved to dedicated POS Posting Profile';
-            ObsoleteTag = 'NPR POS Store -> NPR POS Posting Profile';
         }
         field(70; "POS Entry Doc. No. Series"; Code[20])
         {
@@ -311,8 +313,8 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.36';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moved to POS Posting Profile';
-            ObsoleteTag = 'POS Store -> POS Posting Profile';
         }
 
         field(860; "Auto Process Ext. POS Sales"; Boolean)
@@ -320,6 +322,7 @@
             Caption = 'Auto Process External POS Sales';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moved to POS Posting Profile';
         }
         field(870; Inactive; Boolean)

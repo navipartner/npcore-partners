@@ -46,6 +46,7 @@
             OptionCaption = 'Customer,Contact';
             OptionMembers = Customer,Contact;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used';
         }
         field(30; "Customer No."; Code[20])
@@ -86,6 +87,7 @@
             Caption = 'Retail ID';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use SystemId instead';
         }
         field(200; "POS Sales Data"; BLOB)

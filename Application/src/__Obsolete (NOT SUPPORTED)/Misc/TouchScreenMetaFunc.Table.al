@@ -6,6 +6,7 @@
 
     Caption = 'Touch Screen - Meta Functions';
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used';
     DataClassification = CustomerContent;
 

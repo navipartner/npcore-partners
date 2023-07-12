@@ -94,8 +94,8 @@
             OptionCaption = 'Never,30 Seconds,60 Seconds,90 Seconds,120 Seconds,600 Seconds';
             OptionMembers = NEVER,"30S","60S","90S","120S","600S";
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Move to dedicated POS Unit Profile';
-            ObsoleteTag = 'NPR POS Unit -> NPR POS View Profile';
         }
         field(50; "Kiosk Mode Unlock PIN"; Text[30])
         {
@@ -103,8 +103,8 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Move to dedicated POS Unit Profile';
-            ObsoleteTag = 'NPR POS Unit -> NPR POS SS Profile';
         }
         field(60; "POS Type"; Option)
         {
@@ -146,8 +146,8 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Move to dedicated POS Unit Profile';
-            ObsoleteTag = 'NPR POS Unit -> NPR POS Pricing Profile';
         }
         field(305; "Item Price Codeunit Name"; Text[30])
         {
@@ -158,8 +158,8 @@
             Editable = false;
             FieldClass = FlowField;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Move to dedicated POS Unit Profile';
-            ObsoleteTag = 'NPR POS Unit -> NPR POS Pricing Profile';
         }
         field(310; "Item Price Function"; Text[250])
         {
@@ -167,8 +167,8 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Move to dedicated POS Unit Profile';
-            ObsoleteTag = 'NPR POS Unit -> NPR POS Pricing Profile';
         }
         field(400; "Global POS Sales Setup"; Code[10])
         {
@@ -204,8 +204,8 @@
             Description = 'NPR5.52';
             NotBlank = true;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moved to POS Store';
-            ObsoleteTag = 'POS Unit -> POS Store';
 
         }
         field(530; "POS Inventory Profile"; Code[20])
@@ -234,6 +234,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Doesn''t have any reference';
         }
         field(570; "POS Restaurant Profile"; Code[20])
@@ -254,6 +255,7 @@
             Caption = 'MPOS Profile';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = '1. Field "Ticket Admission Web Url" moved from MPOS Profile table to table "NPR TM Ticket Setup". 2. Use field "POS Type" to identify if the POS is an mPos device.';
         }
         field(600; "POS Self Service Profile"; Code[20])
@@ -302,6 +304,7 @@
             Caption = 'Open POS Unit Password';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moved to POS View Profile';
         }
         field(6211; "Password on unblock discount"; Text[4])
@@ -309,6 +312,7 @@
             Caption = 'Administrator Password';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moved to POS View Profile';
         }
     }

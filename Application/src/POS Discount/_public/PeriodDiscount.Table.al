@@ -91,6 +91,7 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(11; "Last Date Modified"; Date)
@@ -99,6 +100,7 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(21; "No. Series"; Code[20])
@@ -251,6 +253,7 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented directly';
         }
         field(310; "Customer Disc. Group Filter"; Text[250])
@@ -309,6 +312,7 @@
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
     }
@@ -330,6 +334,7 @@
         key(Key5; "Replication Counter")
         {
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

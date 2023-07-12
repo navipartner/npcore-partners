@@ -4,6 +4,7 @@ table 6014659 "NPR Auxiliary Item"
     Caption = 'Aux Item';
     DataClassification = CustomerContent;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Rollback of Auxiliary Item table back to Item table extension.';
 
     fields

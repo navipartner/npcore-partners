@@ -23,7 +23,7 @@
         )
     end;
 
-    [Obsolete('Use procedure DeletePOSLine instead')]
+    [Obsolete('Use procedure DeletePOSLine instead', 'NPR23.0')]
     procedure DeletePosLine(POSSession: Codeunit "NPR POS Session")
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";

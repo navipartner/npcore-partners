@@ -7,7 +7,7 @@ page 6059859 "NPR Aux Conf. Template Subform"
 #if not CLOUD
     UsageCategory = None;
 
-    [Obsolete('Only available in cloud version')]
+    [Obsolete('Only available in cloud version', 'NPR23.0')]
     procedure SetAuxTableId(_AuxTableId: Integer)
     begin
     end;

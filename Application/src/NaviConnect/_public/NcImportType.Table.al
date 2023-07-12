@@ -186,6 +186,7 @@
             DataClassification = CustomerContent;
             Description = 'NC2.12';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'This field is not going to be used anymore. In Cloud environment we can not store files on server, so we will always store it on Client device. (Field value would always be true).';
         }
         field(405; "Server File Path"; Text[250])
@@ -194,6 +195,7 @@
             DataClassification = CustomerContent;
             Description = 'NC2.12';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'This field is not going to be used anymore. In Cloud environment we can not store files on server, so we will always store it on Client device. (Field value would always be true).';
         }
         field(500; "XML Stylesheet"; BLOB)
@@ -201,6 +203,7 @@
             Caption = 'XML Stylesheet';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'This field is not going to be used anymore. Action Show Formatted Source on page NPR Nc Import List will be deleted.';
         }
         field(520; "Max. Retry Count"; Integer)

@@ -10,6 +10,7 @@
     ModifyAllowed = false;
     DeleteAllowed = false;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Aux. Value Entry table has been removed.';
 
     layout

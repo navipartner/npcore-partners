@@ -2,6 +2,7 @@
 {
     Access = Internal;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Replaced by codeunit 6059884 "NPR POS Action: EFTGiftCard 2"';
 
     var

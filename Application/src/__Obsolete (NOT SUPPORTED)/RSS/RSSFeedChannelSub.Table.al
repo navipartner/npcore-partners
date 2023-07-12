@@ -2,6 +2,7 @@
 {
     Access = Internal;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'We dont use RSS Feed any more.';
     Caption = 'RSS Feed Channel Subscription';
     DataClassification = CustomerContent;

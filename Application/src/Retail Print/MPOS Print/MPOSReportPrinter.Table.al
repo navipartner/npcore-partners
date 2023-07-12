@@ -42,6 +42,7 @@ table 6014689 "NPR MPOS Report Printer"
         {
             Caption = 'Printer Paper Height';
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Payload requires integers, hence use new field: Printer Paper Height.';
             DecimalPlaces = 0 : 2;
             DataClassification = CustomerContent;
@@ -49,6 +50,7 @@ table 6014689 "NPR MPOS Report Printer"
         field(8; "Paper Width"; Decimal)
         {
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Payload requires integers, hence use new field: Printer Paper Width.';
             Caption = 'Printer Paper Width';
             DecimalPlaces = 0 : 2;

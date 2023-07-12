@@ -6,6 +6,7 @@
     LookupPageID = "NPR Sales Price Maint. Groups";
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Item Group is obsoleted, Item Category used instead. New table created with Item Category in primary key.';
 
     fields

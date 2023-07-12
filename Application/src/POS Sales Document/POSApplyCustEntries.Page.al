@@ -20,6 +20,7 @@
                 Caption = 'General';
                 Visible = false;
                 ObsoleteState = Pending;
+                ObsoleteTag = 'NPR23.0';
                 ObsoleteReason = 'Not needed.';
                 field(ApplyingPostingDate; TempApplyingCustLedgEntry."Posting Date")
                 {

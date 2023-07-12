@@ -43,6 +43,7 @@
                 field(Type; Rec.Type)
                 {
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Option type to be removed. Use new enum field "Protocol Type" instead.';
                     Visible = false;
                     ToolTip = 'Specifies the value of the Type field';

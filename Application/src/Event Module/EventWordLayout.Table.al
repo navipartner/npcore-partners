@@ -4,6 +4,7 @@
     Caption = 'Event Word Layout';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Replaced with NPR Event Report Layout';
 
     fields

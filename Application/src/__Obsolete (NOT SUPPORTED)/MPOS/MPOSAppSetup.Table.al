@@ -4,8 +4,8 @@
     Caption = 'MPOS App Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'This table won''t be used anymore.';
-    ObsoleteTag = 'NPR MPOS App Setup -> NPR POS Unit -> NPR MPOS Profile';
 
     fields
     {
@@ -19,8 +19,8 @@
             Caption = 'Payment Gateway';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'This field won''t be used anymore.';
-            ObsoleteTag = 'NPR MPOS App Setup table';
         }
         field(12; "Web Service Is Published"; Boolean)
         {
@@ -45,8 +45,8 @@
             Caption = 'Custom Web Service URL';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'This field won''t be used anymore.';
-            ObsoleteTag = 'NPR MPOS App Setup table';
         }
         field(18; "Receipt Source Type"; Option)
         {
@@ -72,6 +72,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.36';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'We always print mpos EFT receipts from NAV now';
         }
     }

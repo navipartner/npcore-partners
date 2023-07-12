@@ -7,6 +7,7 @@ page 6014655 "NPR POS View Profiles Step"
     SourceTableTemporary = true;
     UsageCategory = None;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used anymore. Retail wizard was modified.';
 
     layout

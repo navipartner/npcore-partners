@@ -10,6 +10,7 @@
     ApplicationArea = NPRRetail;
     DataAccessIntent = ReadOnly;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'This report will be replaced NPR Return Reason Code Stat.';
     
 

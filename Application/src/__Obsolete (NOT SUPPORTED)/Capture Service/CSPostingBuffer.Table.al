@@ -5,6 +5,7 @@
     Caption = 'CS Posting Buffer';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Object moved to NP Warehouse App.';
 
     fields

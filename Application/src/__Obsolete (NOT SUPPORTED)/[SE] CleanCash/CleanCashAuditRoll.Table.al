@@ -6,7 +6,7 @@
 
     ObsoleteReason = 'This table is not used anymore but kept for historical purposes.';
     ObsoleteState = Removed;
-    ObsoleteTag = 'CleanCash To AL';
+    ObsoleteTag = 'NPR23.0';
 
     fields
     {

@@ -17,6 +17,7 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             Caption = 'Document Time';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6014407; "NPR Bill-to Company"; Text[30])
@@ -25,6 +26,7 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             DataClassification = CustomerContent;
             TableRelation = Company;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6014408; "NPR Bill-To Vendor No."; Code[10])
@@ -32,6 +34,7 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             Caption = 'Bill-to Vendor No. (IC)';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6014414; "NPR Bill-to E-mail"; Text[80])
@@ -42,6 +45,7 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
         field(6014415; "NPR Document Processing"; Option)
         {
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Document Sending Profile from Customer is used.';
             Caption = 'Document Processing';
             DataClassification = CustomerContent;
@@ -110,6 +114,7 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             Caption = 'Payment No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
         field(6151420; "NPR Magento Coupon"; Text[20])

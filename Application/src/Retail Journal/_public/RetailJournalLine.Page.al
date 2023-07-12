@@ -74,6 +74,7 @@
                     ToolTip = 'Specifies the value of the Unit price(Item Card) field';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Already available on Item Details - Invoicing FactBox';
                 }
                 field("Last Direct Cost"; Rec."Last Direct Cost")
@@ -89,6 +90,7 @@
                     ToolTip = 'Specifies the value of the Unit cost field';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Already available on Item Details - Invoicing FactBox';
                 }
                 field("Profit % (new)"; Rec."Profit % (new)")

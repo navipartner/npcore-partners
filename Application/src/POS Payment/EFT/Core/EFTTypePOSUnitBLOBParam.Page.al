@@ -10,6 +10,7 @@
     ShowFilter = false;
     SourceTable = "NPR EFTType POSUnit BLOBParam.";
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Use integration specific setup tables for cleaner code';
 
     layout

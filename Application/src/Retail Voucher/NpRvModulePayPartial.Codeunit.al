@@ -4,7 +4,7 @@
     var
         Text000: Label 'Apply Payment - Partial';
 
-    [Obsolete('Delete when final v1/v2 workflow is gone')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
     procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
     var
         SaleLinePOS: Record "NPR POS Sale Line";

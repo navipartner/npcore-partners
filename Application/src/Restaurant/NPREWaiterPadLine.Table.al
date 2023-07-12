@@ -58,12 +58,14 @@
             Caption = 'Meal Flow';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced with table 6150674 "NPR NPRE Assigned Flow Status"';
         }
         field(41; "Meal Flow Description"; Text[50])
         {
             Caption = 'Meal Flow Description';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced with table 6150674 "NPR NPRE Assigned Flow Status"';
             FieldClass = FlowField;
         }
@@ -71,6 +73,7 @@
         {
             Caption = 'Meal Flow Order';
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced with table 6150674 "NPR NPRE Assigned Flow Status"';
             FieldClass = FlowField;
         }
@@ -99,6 +102,7 @@
             OptionCaption = 'G/L,Item,Item Group,Repair,,Payment,Open/Close,Inventory,Customer,Comment';
             OptionMembers = "G/L Entry",Item,"Item Group",Repair,,Payment,"Open/Close","BOM List",Customer,Comment;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use Line Type';
         }        
         field(51; "No."; Code[20])
@@ -198,6 +202,7 @@
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used in POS';
         }
         field(64; "Allow Line Discount"; Boolean)
@@ -227,6 +232,7 @@
             Caption = 'Invoice Discount Amount';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used in POS';
         }
         field(68; "Currency Code"; Code[10])

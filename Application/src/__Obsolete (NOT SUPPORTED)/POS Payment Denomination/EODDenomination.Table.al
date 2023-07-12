@@ -4,6 +4,7 @@
     Caption = 'NPR EOD Denomination';
     DataClassification = CustomerContent;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Replaced by table "NPR POS Pmt. Bin Checkp. Denom"';
 
     fields

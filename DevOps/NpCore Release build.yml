@@ -67,6 +67,7 @@ stages:
         objectCaption: 'NP Retail'
         xmlRoleId: 'NP RETAIL'
         xmlRoleName: 'NP Retail'           
+      obsoleteTagsCheck: true
       testApps:
       - 'Performance Toolkit'
       - 'Test'

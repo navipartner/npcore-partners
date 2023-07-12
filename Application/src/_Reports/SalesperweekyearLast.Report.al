@@ -11,6 +11,7 @@
     UsageCategory = None;
     DataAccessIntent = ReadOnly;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Table renamed to NPR Sales Month Year/Last ';
 
     dataset

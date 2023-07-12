@@ -2,6 +2,7 @@
 {
     Access = Public;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Replication Counter is replaced by SystemRowVersion';
 
     procedure UpdateReplicationCounter(RecRef: RecordRef; ReplicationCounterFieldNo: Integer)

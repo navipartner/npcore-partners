@@ -4,6 +4,7 @@
     Caption = 'EAN Prefix per Country';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Not used';
 
     fields

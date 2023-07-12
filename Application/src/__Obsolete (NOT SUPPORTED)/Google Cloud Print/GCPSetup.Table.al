@@ -5,6 +5,7 @@
     Caption = 'Google Cloud Print Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Cleanup GCP Setup';
 
     fields

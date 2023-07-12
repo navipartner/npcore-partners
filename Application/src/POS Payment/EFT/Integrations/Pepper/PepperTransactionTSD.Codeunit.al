@@ -6,6 +6,7 @@ codeunit 6184492 "NPR Pepper Transaction TSD"
     // NPR5.35/BR /20170815  CASE 284379 Added support for Cashback
     ObsoleteReason = 'Use HWC';
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
 
     trigger OnRun()
     begin

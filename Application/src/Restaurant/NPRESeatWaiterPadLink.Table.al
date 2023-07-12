@@ -27,6 +27,7 @@
             Caption = 'No. Of Waiter Pad For Seating';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced with a FlowField "No. Of Waiter Pads For Seating"';
         }
         field(11; "No. Of Seating For Waiter Pad"; Integer)
@@ -34,6 +35,7 @@
             Caption = 'No. Of Seating For Waiter Pad';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced with a FlowField "No. Of Seatings For Waiter Pad"';
         }
         field(12; "Seating Description FF"; Text[50])
