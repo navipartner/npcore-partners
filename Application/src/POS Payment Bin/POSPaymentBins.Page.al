@@ -17,39 +17,38 @@
             {
                 field("No."; Rec."No.")
                 {
-
                     ToolTip = 'Specifies the number of the POS Payment Bin.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the description of the POS Payment Bin, which will be diplayed when balancing the POS Unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
-
                     ToolTip = 'Specifies which POS Store Code that the POS Payment Bin belongs to.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Attached to POS Unit No."; Rec."Attached to POS Unit No.")
                 {
-
                     ToolTip = 'Specifies which POS Unit is attached to the POS Payment Bin.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Eject Method"; Rec."Eject Method")
                 {
-
                     ToolTip = 'Specifies which method is used to physically eject the POS Payment Bin, if it is a cash drawer.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Bin Type"; Rec."Bin Type")
                 {
-
                     ToolTip = 'Specifies which retail operations the POS Payment Bin will be involved in.';
                     ApplicationArea = NPRRetail;
+                }
+                field("Suppress EOD Posting"; Rec."Suppress EOD Posting")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Suppress EOD Posting field. This setting only applies to virtual bins and prevents the aggregated result from being posted. Useful when EFT bank reconciliation is done per entry.';
                 }
             }
         }
