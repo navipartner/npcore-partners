@@ -1,4 +1,4 @@
-﻿codeunit 6151175 "NPR POS Action: Change LineAm." implements "NPR IPOS Workflow"
+codeunit 6151175 "NPR POS Action: Change LineAm." implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
@@ -14,30 +14,15 @@
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
-    begin
-        case Step of
-            'ChangeAmount':
-                ChangeAmount(Context, SaleLine);
-        end;
-    end;
-
-    local procedure ChangeAmount(Context: codeunit "NPR POS JSON Helper"; POSSaleLine: codeunit "NPR POS Sale Line")
     var
-        SaleLinePOS: Record "NPR POS Sale Line";
+        BusinessLogic: Codeunit "NPR POS Action:Change LineAm B";
         LineAmount: Decimal;
-        NoSaleLineErr: Label 'A sale line must exist in order to change the amount';
     begin
         LineAmount := Context.GetDecimalParameter('NewLineAmount');
-
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-
-        if SaleLinePOS.IsEmpty then
-            Error(NoSaleLineErr);
-
-        SaleLinePOS.Validate("Amount Including VAT", LineAmount);
-        SaleLinePOS.Modify();
-
-        POSSaleLine.ResendAllOnAfterInsertPOSSaleLine();
+        case Step of
+            'ChangeAmount':
+                BusinessLogic.ChangeAmount(LineAmount, SaleLine);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
@@ -96,8 +81,8 @@
     local procedure GetActionScript(): Text
     begin
         exit(
-        //###NPR_INJECT_FROM_FILE:POSActionChangeAmount.js###
-        'let main=async({})=>{await workflow.respond("ChangeAmount")};'
+        //###NPR_INJECT_FROM_FILE:POSActionChangeLineAm.js###
+'let main=async({})=>await workflow.respond("ChangeAmount");'
         )
     end;
 }
