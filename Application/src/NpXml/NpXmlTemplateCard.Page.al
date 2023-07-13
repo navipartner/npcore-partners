@@ -350,8 +350,8 @@
                         ToolTip = 'Specifies the value of the FTP or SFTP Transfer field';
                         ApplicationArea = NPRRetail;
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Going to be swapped out for FTP and SFTP Connection.';
-                        ObsoleteTag = 'NP';
                         Visible = False;
                     }
                     field("SFTP/FTP Nc Endpoint"; Rec."SFTP/FTP Nc Endpoint")
@@ -360,8 +360,8 @@
                         ApplicationArea = NPRRetail;
                         Enabled = Rec."FTP Transfer";
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Going to be swapped out for FTP and SFTP Connection.';
-                        ObsoleteTag = 'NP';
                         Visible = False;
                     }
 

@@ -2,8 +2,8 @@
 {
     Access = Internal;
     ObsoleteState = Pending;
+    ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Going ot switch to use Ftp Connection and Sftp Connection.';
-    ObsoleteTag = 'NP';
 
     var
         FTPClient: Codeunit "NPR AF FTP Client";

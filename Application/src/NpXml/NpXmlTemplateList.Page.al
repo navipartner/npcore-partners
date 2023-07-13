@@ -80,8 +80,8 @@
                         ToolTip = 'Specifies the value of the FTP Transfer field';
                         ApplicationArea = NPRRetail;
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Going to drop Nc Endpoints and this field is going to be removed.';
-                        ObsoleteTag = 'NP';
                         Visible = False;
                     }
                     field("FTP Enabled"; Rec."FTP Enabled")

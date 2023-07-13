@@ -71,48 +71,48 @@
             Caption = 'Sftp';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
-            ObsoleteTag = 'NP';
         }
         field(205; "Ftp Host"; Text[250])
         {
             Caption = 'Ftp Host';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
-            ObsoleteTag = 'NP';
         }
         field(210; "Ftp Port"; Integer)
         {
             Caption = 'Ftp Port';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
-            ObsoleteTag = 'NP';
         }
         field(215; "Ftp User"; Text[50])
         {
             Caption = 'Ftp User';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
-            ObsoleteTag = 'NP';
         }
         field(220; "Ftp Password"; Text[50])
         {
             Caption = 'Ftp Password';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
-            ObsoleteTag = 'NP';
         }
         field(225; "Ftp Passive"; Boolean)
         {
             Caption = 'Ftp Passive';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
-            ObsoleteTag = 'NP';
         }
         field(226; "Ftp EncMode"; Enum "NPR Nc FTP Encryption mode")
         {
@@ -120,8 +120,8 @@
             DataClassification = CustomerContent;
             InitValue = "None";
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
-            ObsoleteTag = 'NP';
         }
         field(227; "SFTP Connection"; Code[20])
         {
@@ -146,8 +146,8 @@
             DataClassification = CustomerContent;
             Description = 'NC2.01';
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use "Ftp Backup Dir Path" instead';
-            ObsoleteTag = 'NP';
         }
         field(236; "Ftp Backup Dir Path"; Text[250])
         {
@@ -161,6 +161,7 @@
             DataClassification = CustomerContent;
             Description = 'NC2.08';
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Note used';
         }
         field(245; "Ftp Filename"; Text[250])
