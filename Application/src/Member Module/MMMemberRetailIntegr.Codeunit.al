@@ -1065,12 +1065,54 @@
             MemberInfo."Last Name" := GetJsonText50('lastName', Member);
             MemberInfo.Address := GetJsonText100('address', Member);
             MemberInfo.City := GetJsonText50('city', Member);
-            MemberInfo."Post Code Code" := GetJsonText20('city', Member);
+            MemberInfo."Post Code Code" := GetJsonText20('postalCode', Member);
             MemberInfo."E-Mail Address" := GetJsonText80('eMail', Member);
             MemberInfo."Phone No." := GetJsonText30('phoneNumber', Member);
+
+            MemberInfo."News Letter" := GetNewsLetter(Member);
+            MemberInfo.Gender := GetGender(Member);
             MemberInfo.Insert();
         end;
     end;
+
+    local procedure GetNewsLetter(JObject: JsonObject): Option
+    var
+        JToken: JsonToken;
+        MemberInfo: Record "NPR MM Member Info Capture";
+    begin
+        if (not (JObject.Get('newsLetter', JToken))) then
+            exit(MemberInfo."News Letter"::NOT_SPECIFIED);
+
+        case UpperCase(JToken.AsValue().AsText()) of
+            'YES', 'Y', 'TRUE':
+                exit(MemberInfo."News Letter"::YES);
+            'NO', 'N', 'FALSE':
+                exit(MemberInfo."News Letter"::NO);
+            else
+                exit(MemberInfo."News Letter"::NOT_SPECIFIED);
+        end;
+    end;
+
+    local procedure GetGender(JObject: JsonObject): Option
+    var
+        JToken: JsonToken;
+        MemberInfo: Record "NPR MM Member Info Capture";
+    begin
+        if (not (JObject.Get('gender', JToken))) then
+            exit(MemberInfo.Gender::NOT_SPECIFIED);
+
+        case UpperCase(JToken.AsValue().AsText()) of
+            'MALE', 'M':
+                exit(MemberInfo.Gender::MALE);
+            'FEMALE', 'F':
+                exit(MemberInfo.Gender::FEMALE);
+            'OTHER':
+                exit(MemberInfo.Gender::OTHER);
+            else
+                exit(MemberInfo.Gender::NOT_SPECIFIED);
+        end;
+    end;
+
 
 #pragma warning disable AA0139
     local procedure GetJsonText20(KeyName: Text; JObject: JsonObject) TextValue: Text[20]
