@@ -35,7 +35,7 @@ codeunit 6150969 "NPR M2 MSI Integration Mgt."
 
         UpdateMsiDataItemLedgerEntry(TempMSIRequest);
         UpdateMsiDataSalesLine(TempMSIRequest);
-        UpdateMsiDataRecordDeletions(TempMSIRequest);
+        UpdateMsiDataRecordChanges(TempMSIRequest);
 
         InsertTasks(TempMSIRequest);
     end;
@@ -64,13 +64,8 @@ codeunit 6150969 "NPR M2 MSI Integration Mgt."
                     (_ItemHelper.IsMagentoItem(SalesLine."No.")) and
                     (Location.Get(SalesLine."Location Code")) and
                     (Location."NPR Magento 2 Source" <> ''))
-            then begin
-                TempMSIRequest."Item No." := SalesLine."No.";
-                TempMSIRequest."Variant Code" := SalesLine."Variant Code";
-                TempMSIRequest."Magento Source" := Location."NPR Magento 2 Source";
-                if (not TempMSIRequest.Find()) then
-                    TempMSIRequest.Insert();
-            end;
+            then
+                CreateMsiRequest(TempMSIRequest, SalesLine."No.", SalesLine."Variant Code", Location."NPR Magento 2 Source");
         until SalesLine.Next() = 0;
 
         IntegrationRecord."Last SystemRowVersionNo" := SalesLine.SystemRowVersion;
@@ -99,27 +94,21 @@ codeunit 6150969 "NPR M2 MSI Integration Mgt."
             if (_ItemHelper.IsMagentoItem(ItemLedgerEntry."Item No.") and
                 (Location.Get(ItemLedgerEntry."Location Code")) and
                 (Location."NPR Magento 2 Source" <> ''))
-            then begin
-                TempMSIRequest."Item No." := ItemLedgerEntry."Item No.";
-                TempMSIRequest."Variant Code" := ItemLedgerEntry."Variant Code";
-                TempMSIRequest."Magento Source" := Location."NPR Magento 2 Source";
-                if (not TempMSIRequest.Find()) then
-                    TempMSIRequest.Insert();
-            end;
+            then
+                CreateMsiRequest(TempMSIRequest, ItemLedgerEntry."Item No.", ItemLedgerEntry."Variant Code", Location."NPR Magento 2 Source");
         until ItemLedgerEntry.Next() = 0;
 
         IntegrationRecord."Last SystemRowVersionNo" := ItemLedgerEntry.SystemRowVersion;
         IntegrationRecord.Modify();
     end;
 
-    local procedure UpdateMsiDataRecordDeletions(var TempMSIRequest: Record "NPR M2 MSI Request" temporary)
+    local procedure UpdateMsiDataRecordChanges(var TempMSIRequest: Record "NPR M2 MSI Request" temporary)
     var
         IntegrationRecord: Record "NPR M2 Integration Record";
         RecordChangeLog: Record "NPR M2 Record Change Log";
         ItemNo: Code[20];
         VariantCode: Code[10];
         Location: Record Location;
-        UnknownRecordTypeErr: Label 'A record of a different type than what can be handled was encountered';
     begin
         IntegrationRecord.LockTable();
         IntegrationRecord.Get(Database::"NPR M2 Record Change Log", Enum::"NPR M2 Integration Area"::"MSI Stock Data");
@@ -134,42 +123,31 @@ codeunit 6150969 "NPR M2 MSI Integration Mgt."
             exit;
 
         repeat
-            Clear(TempMSIRequest);
             _ItemHelper.Sku2ItemNoVariant(RecordChangeLog."Entity Identifier", ItemNo, VariantCode);
-            if (_ItemHelper.IsMagentoItem(ItemNo)) then begin
-                case RecordChangeLog."Type of Change" of
-                    RecordChangeLog."Type of Change"::ItemEnabled:
-                        begin
-                            Location.SetFilter("NPR Magento 2 Source", '<>%1', '');
-                            if (Location.FindSet()) then
-                                repeat
-                                    TempMSIRequest."Item No." := ItemNo;
-                                    TempMSIRequest."Variant Code" := VariantCode;
-                                    TempMSIRequest."Magento Source" := Location."NPR Magento 2 Source";
-                                    if (not TempMSIRequest.Find()) then
-                                        TempMSIRequest.Insert();
-                                until Location.Next() = 0;
-                        end;
-                    RecordChangeLog."Type of Change"::ResendStockData:
-                        begin
-                            if ((Location.Get(RecordChangeLog."Location Code")) and
-                                (Location."NPR Magento 2 Source" <> ''))
-                            then begin
-                                TempMSIRequest."Item No." := ItemNo;
-                                TempMSIRequest."Variant Code" := VariantCode;
-                                TempMSIRequest."Magento Source" := Location."NPR Magento 2 Source";
-                                if (not TempMSIRequest.Find()) then
-                                    TempMSIRequest.Insert();
-                            end;
-                        end;
-                    else
-                        Error(UnknownRecordTypeErr);
-                end;
-            end;
+            if (_ItemHelper.IsMagentoItem(ItemNo)) then
+                if ((RecordChangeLog."Location Code" = '') or
+                    (Location.Get(RecordChangeLog."Location Code") and (Location."NPR Magento 2 Source" <> '')))
+                then
+                    CreateMsiRequest(TempMSIRequest, ItemNo, VariantCode, RecordChangeLog."Location Code");
         until RecordChangeLog.Next() = 0;
 
         IntegrationRecord."Last SystemRowVersionNo" := RecordChangeLog.SystemRowVersion;
         IntegrationRecord.Modify();
+    end;
+
+    local procedure CreateMsiRequest(var TempMSIRequest: Record "NPR M2 MSI Request" temporary; ItemNo: Code[20]; VariantCode: Code[10]; Source: Text[50])
+    begin
+        TempMSIRequest.SetRange("Item No.", ItemNo);
+        TempMSIRequest.SetFilter("Variant Code", '%1|%2', VariantCode, '');
+        TempMSIRequest.SetFilter("Magento Source", '%1|%2', Source, '');
+        if (not TempMSIRequest.IsEmpty()) then
+            exit;
+
+        TempMSIRequest.Init();
+        TempMSIRequest."Item No." := ItemNo;
+        TempMSIRequest."Variant Code" := VariantCode;
+        TempMSIRequest."Magento Source" := Source;
+        TempMSIRequest.Insert();
     end;
 
     local procedure InsertTasks(var TempMSIRequest: Record "NPR M2 MSI Request" temporary)
@@ -213,16 +191,48 @@ codeunit 6150969 "NPR M2 MSI Integration Mgt."
         exit(NPRM2IntegrationTaskProcessorTok);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", 'RunSourceCardEvent', '', true, true)]
+    local procedure TaskListRunSourceCard(var RecRef: RecordRef; var RunCardExecuted: Boolean)
+    var
+        TempMSIRequest: Record "NPR M2 MSI Request" temporary;
+        Item: Record Item;
+        PageMgt: Codeunit "Page Management";
+    begin
+        if ((RunCardExecuted) or (RecRef.Number() <> Database::"NPR M2 MSI Request")) then
+            exit;
+
+        RecRef.SetTable(TempMSIRequest);
+
+        if (TempMSIRequest."Item No." = '') then
+            exit;
+
+        if (not Item.Get(TempMSIRequest."Item No.")) then
+            exit;
+
+        RunCardExecuted := true;
+        PageMgt.PageRun(Item);
+    end;
+
     local procedure EmitUsageTelemetry()
     var
         Dimensions: Dictionary of [Text, Text];
+        Tenant: Text;
+        AzureADTenant: Codeunit "Azure AD Tenant";
     begin
+        Dimensions.Add('NPR_Feature', 'M2_MSI');
+        Dimensions.Add('NPR_Company', CompanyName());
+
+        Tenant := AzureADTenant.GetAadTenantId();
+        if (Tenant = '') then
+            Tenant := TenantId();
+        Dimensions.Add('NPR_Tenant', Tenant);
+
         Session.LogMessage(
-            'alNPR_M2_FEATURE_USAGE',
+            'NPR_M2_FEATURE_USAGE',
             'MSI Integration started',
-            Verbosity::Verbose,
+            Verbosity::Normal,
             DataClassification::OrganizationIdentifiableInformation,
-            TelemetryScope::All,
+            TelemetryScope::ExtensionPublisher,
             Dimensions
         );
     end;
