@@ -259,8 +259,8 @@
             DataClassification = CustomerContent;
             Description = 'NC1.08';
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Splitting FTP and SFTP in two';
-            ObsoleteTag = 'NP';
         }
         field(5110; "FTP Server"; Text[250])
         {
@@ -519,8 +519,8 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR Nc Endpoint";
             ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Removeing Nc FTP Endpoints';
-            ObsoleteTag = 'NP';
         }
         field(5520; "FTP Enabled"; Boolean)
         {
