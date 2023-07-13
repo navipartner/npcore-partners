@@ -42,6 +42,8 @@ codeunit 6150974 "NPR M2 Integration Area Mgt."
         MsiArea: Enum "NPR M2 Integration Area";
         TaskSetup: Record "NPR Nc Task Setup";
         MSIIntegrationMgt: Codeunit "NPR M2 MSI Integration Mgt.";
+        Item: Record Item;
+        M2RecordChangeLog: Record "NPR M2 Record Change Log";
     begin
         MsiArea := Enum::"NPR M2 Integration Area"::"MSI Stock Data";
 
@@ -56,8 +58,19 @@ codeunit 6150974 "NPR M2 Integration Area Mgt."
             TaskSetup."Entry No." := 0;
             TaskSetup."Task Processor Code" := MSIIntegrationMgt.GetTaskProcessor();
             TaskSetup."Table No." := Database::"NPR M2 MSI Request";
+            TaskSetup."Codeunit ID" := Codeunit::"NPR M2 MSI Task Mgt.";
             TaskSetup.Insert(); // don't run the OnInsert trigger! it will insert data log setup, which we don't want to
         end;
+
+        Item.SetRange("NPR Magento Item", true);
+        if (Item.FindSet()) then
+            repeat
+                M2RecordChangeLog.Init();
+                M2RecordChangeLog."Entry No." := 0;
+                M2RecordChangeLog."Entity Identifier" := Item."No.";
+                M2RecordChangeLog."Type of Change" := M2RecordChangeLog."Type of Change"::ResendStockData;
+                M2RecordChangeLog.Insert();
+            until Item.Next() = 0;
 
         if (not JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
