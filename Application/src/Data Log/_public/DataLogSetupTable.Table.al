@@ -81,6 +81,8 @@
     begin
         "User ID" := CopyStr(UserId, 1, MaxStrLen("User ID"));
         "Last Date Modified" := CurrentDateTime;
+
+        HandleDataLogSetupIgnoreFields();
     end;
 
     trigger OnModify()
@@ -110,5 +112,43 @@
         "Log Deletion" := LogDeletion;
         "Keep Log for" := 1000 * 60 * 60 * 24 * 7;
         Insert(true);
+    end;
+
+    local procedure HandleDataLogSetupIgnoreFields()
+    var
+        Item: Record Item;
+        ILE: Record "Item Ledger Entry";
+        Contact: Record Contact;
+    begin
+        case Rec."Table ID" of
+            Database::Item:
+                begin
+                    InsertDataLogSetupIgnoreField(Database::Item, Item.FieldNo("Cost is Adjusted"));
+                    InsertDataLogSetupIgnoreField(Database::Item, Item.FieldNo("Allow Online Adjustment"));
+                    InsertDataLogSetupIgnoreField(Database::Item, Item.FieldNo("Last DateTime Modified"));
+                    InsertDataLogSetupIgnoreField(Database::Item, Item.FieldNo("Last Date Modified"));
+                    InsertDataLogSetupIgnoreField(Database::Item, Item.FieldNo("Last Time Modified"));
+                end;
+            Database::"Item Ledger Entry":
+                InsertDataLogSetupIgnoreField(Database::"Item Ledger Entry", Ile.FieldNo("Applied Entry to Adjust"));
+            Database::Contact:
+                InsertDataLogSetupIgnoreField(Database::Contact, Contact.FieldNo("Last Time Modified"));
+        end;
+    end;
+
+    local procedure InsertDataLogSetupIgnoreField(TableId: Integer; FieldNo: Integer)
+    var
+        DataLogSetupField: Record "NPR Data Log Setup (Field)";
+    begin
+        DataLogSetupField.SetRange("Table ID", TableId);
+        DataLogSetupField.SetRange("Field No.", FieldNo);
+        if not DataLogSetupField.IsEmpty() then
+            exit;
+
+        DataLogSetupField.Init();
+        DataLogSetupField."Table ID" := TableId;
+        DataLogSetupField."Ignore Modification" := true;
+        DataLogSetupField."Field No." := FieldNo;
+        DataLogSetupField.Insert();
     end;
 }
