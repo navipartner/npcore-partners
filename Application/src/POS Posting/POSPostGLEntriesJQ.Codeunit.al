@@ -56,20 +56,22 @@ codeunit 6014699 "NPR POS Post GL Entries JQ"
         until POSEntry.Next() = 0;
 
         if ErrorCount > 0 then begin
-            Message(ErrMessage, ErrorCount);
             if CheckInId <> '' then begin
                 SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'error', CheckInId);
                 CheckInUpdated := true;
             end;
+
+            Message(ErrMessage, ErrorCount);
         end;
 
         if (ErrorTextDictionary.Count() > 0) then begin
             Commit();
-            foreach Period in ErrorTextDictionary.Keys() do begin
-                DetailedMessage.AppendLine(StrSubstNo('Period %1 - %2', Period, ErrorTextDictionary.Get(Period)));
-            end;
             if (CheckInId <> '') and not CheckInUpdated then
                 SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'error', CheckInId);
+
+            foreach Period in ErrorTextDictionary.Keys() do
+                DetailedMessage.AppendLine(StrSubstNo('Period %1 - %2', Period, ErrorTextDictionary.Get(Period)));
+
             Error(DetailedMessage.ToText());
         end;
 
