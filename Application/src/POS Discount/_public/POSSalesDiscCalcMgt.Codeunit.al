@@ -31,6 +31,7 @@
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
         StartTime: DateTime;
         SaleLinePOS: Record "NPR POS Sale Line";
+        CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
     begin
         StartTime := CurrentDateTime;
 
@@ -42,6 +43,7 @@
         //LineOperation & Rec is set as if the last line was just inserted.
         SaleLinePOS.Get(TempSaleLinePOS."Register No.", TempSaleLinePOS."Sales Ticket No.", TempSaleLinePOS.Date, TempSaleLinePOS."Sale Type", TempSaleLinePOS."Line No.");
         ApplyDiscounts(SalePOS, TempSaleLinePOS, TempDiscountPriority, SaleLinePOS, SaleLinePOS, 0, true);
+        CouponMgt.ApplyDiscount(SalePOS);
 
         LogStopwatch('DISCOUNT_RECALCULATE', CurrentDateTime - StartTime);
     end;
