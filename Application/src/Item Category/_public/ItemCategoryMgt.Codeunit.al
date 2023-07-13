@@ -468,16 +468,17 @@
             if not ConfirmationManagement.GetResponseOrDefault(ConfirmQst, false) then
                 exit;
 
-        repeat
-            if DefaultDimension2.Get(Database::Item, Item."No.", DefaultDimension."Dimension Code") then
-                DefaultDimension2.Delete(true);
+        if DefaultDimension.FindSet() then
+            repeat
+                if DefaultDimension2.Get(Database::Item, Item."No.", DefaultDimension."Dimension Code") then
+                    DefaultDimension2.Delete(true);
 
-            DefaultDimension2.Init();
-            DefaultDimension2 := DefaultDimension;
-            DefaultDimension2."Table ID" := Database::Item;
-            DefaultDimension2."No." := Item."No.";
-            DefaultDimension2.Insert(true);
-        until DefaultDimension.Next() = 0;
+                DefaultDimension2.Init();
+                DefaultDimension2 := DefaultDimension;
+                DefaultDimension2."Table ID" := Database::Item;
+                DefaultDimension2."No." := Item."No.";
+                DefaultDimension2.Insert(true);
+            until DefaultDimension.Next() = 0;
     end;
 
     #endregion
