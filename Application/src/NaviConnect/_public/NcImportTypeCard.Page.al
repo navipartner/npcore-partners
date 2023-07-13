@@ -192,8 +192,8 @@
                         ToolTip = 'Specifies the value of the Ftp Backup Path field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Using "FTP Backup Dir Path"';
-                        ObsoleteTag = 'NP';
                         Visible = false;
                     }
                     field("Ftp Host"; Rec."Ftp Host")
@@ -202,8 +202,8 @@
                         ToolTip = 'Specifies the value of the Ftp Host field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
-                        ObsoleteTag = 'NP';
                         Visible = false;
                     }
                     field("Ftp Port"; Rec."Ftp Port")
@@ -212,8 +212,8 @@
                         ToolTip = 'Specifies the value of the Ftp Port field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
-                        ObsoleteTag = 'NP';
                         Visible = false;
                     }
                     field("Ftp Binary"; Rec."Ftp Binary")
@@ -222,8 +222,8 @@
                         ToolTip = 'Specifies the value of the Ftp Binary field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
-                        ObsoleteTag = 'NP';
                         Visible = false;
                     }
                     field("Ftp User"; Rec."Ftp User")
@@ -232,8 +232,8 @@
                         ToolTip = 'Specifies the value of the Ftp User field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
-                        ObsoleteTag = 'NP';
                         Visible = false;
                     }
                     field("Ftp Password"; Rec."Ftp Password")
@@ -242,8 +242,8 @@
                         ToolTip = 'Specifies the value of the Ftp Password field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
-                        ObsoleteTag = 'NP';
                         Visible = false;
                     }
                     field("Ftp Passive"; Rec."Ftp Passive")
@@ -252,8 +252,8 @@
                         ToolTip = 'Specifies the value of the Ftp Passive field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
-                        ObsoleteTag = 'NP';
                         Visible = false;
                     }
                     field("FTP Encryption mode"; Rec."Ftp EncMode")
@@ -261,8 +261,8 @@
                         ToolTip = 'Specifies which mode of encryption is used between client and server';
                         ApplicationArea = NPRRetail;
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
-                        ObsoleteTag = 'NP';
                         Visible = false;
                     }
                     field("Sftp"; Rec.Sftp)
@@ -271,8 +271,8 @@
                         ToolTip = 'Specifies the value of the Sftp field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
+                        ObsoleteTag = 'NPR23.0';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
-                        ObsoleteTag = 'NP';
                         Visible = false;
 
                     }
