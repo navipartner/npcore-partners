@@ -12,68 +12,169 @@ codeunit 6150985 "NPR M2 MSI Task Mgt."
     trigger OnRun()
     var
         RequestTxt: Text;
-        ResponseTxt: Text;
-        Success: Boolean;
         TempMSIRequest: Record "NPR M2 MSI Request" temporary;
-        OutStr: OutStream;
+        ItemVariant: Record "Item Variant";
+        RequestArray: JsonArray;
+        EntityCount: Integer;
+        RequestCount: Integer;
+        HasMoreRecords: Boolean;
+        VariantCodeSpecified: Boolean;
+        MagentoSource: Text[50];
+        MagentoSources: List of [Text[50]];
     begin
+        Clear(Rec."Data Output");
+        Clear(Rec.Response);
+
         TempMSIRequest.SetPosition(Rec."Record Position");
 
         if (not _ItemHelper.IsMagentoItem(TempMSIRequest."Item No.")) then
             exit;
 
-        TempMSIRequest.Quantity := CalcStockQty(TempMSIRequest."Item No.", TempMSIRequest."Variant Code", TempMSIRequest."Magento Source");
+        if (TempMSIRequest."Magento Source" = '') then
+            FillSourcesArray(MagentoSources)
+        else
+            MagentoSources.Add(TempMSIRequest."Magento Source");
 
-        PrepareRequest(TempMSIRequest, RequestTxt);
+        if (MagentoSources.Count() = 0) then
+            exit;
 
-        Rec."Data Output".CreateOutStream(OutStr);
-        OutStr.Write(RequestTxt);
-        Rec.Modify(true);
+        VariantCodeSpecified := (TempMSIRequest."Variant Code" <> '');
+
+        foreach MagentoSource in MagentoSources do begin
+            TempMSIRequest."Magento Source" := MagentoSource;
+
+            if (not VariantCodeSpecified) then begin
+                ItemVariant.SetRange("Item No.", TempMSIRequest."Item No.");
+                ItemVariant.SetRange("NPR Blocked", false);
+                if (ItemVariant.FindSet()) then
+                    repeat
+                        TempMSIRequest."Variant Code" := ItemVariant.Code;
+                        TempMSIRequest.Quantity := CalcStockQty(TempMSIRequest."Item No.", TempMSIRequest."Variant Code", TempMSIRequest."Magento Source");
+                        TempMSIRequest.Insert();
+                    until ItemVariant.Next() = 0
+                else begin
+                    TempMSIRequest.Quantity := CalcStockQty(TempMSIRequest."Item No.", '', TempMSIRequest."Magento Source");
+                    TempMSIRequest.Insert();
+                end;
+            end else begin
+                TempMSIRequest.Quantity := CalcStockQty(TempMSIRequest."Item No.", TempMSIRequest."Variant Code", TempMSIRequest."Magento Source");
+                TempMSIRequest.Insert();
+            end;
+        end;
+
+        if (not TempMSIRequest.FindSet()) then
+            exit;
+
+        HasMoreRecords := true;
+        repeat
+            RequestArray.Add(TempMSIRequest.SerializeToJson());
+            EntityCount += 1;
+
+            HasMoreRecords := (TempMSIRequest.Next() <> 0);
+
+            // Magento has an unspoken limit of 20 entities in the same request
+            if ((EntityCount >= 20) or (not HasMoreRecords)) then begin
+                RequestCount += 1;
+                PrepareRequest(RequestArray, RequestTxt);
+                SendRequest(Rec, RequestCount, RequestTxt);
+                EntityCount := 0;
+                Clear(RequestArray);
+            end;
+        until (not HasMoreRecords);
+    end;
+
+    var
+        _ItemHelper: Codeunit "NPR M2 Integration Item Helper";
+        _HttpClient: HttpClient;
+        _ClientInitialized: Boolean;
+        BadApiResponseErr: Label 'Error received from the Magento API\Status Code: %1 - %2\Body: %3';
+
+    local procedure PrepareRequest(RequestArray: JsonArray; var RequestTxt: Text)
+    var
+        RequestJson: JsonObject;
+    begin
+        RequestJson.Add('sourceItems', RequestArray);
+        RequestJson.WriteTo(RequestTxt);
+    end;
+
+    local procedure SendRequest(var Task: Record "NPR Nc Task"; RequestCount: Integer; RequestTxt: Text)
+    var
+        Success: Boolean;
+        ResponseTxt: Text;
+        OutStr: OutStream;
+        InStr: InStream;
+        TxtBuffer: Text;
+    begin
+        if (Task."Data Output".HasValue()) then begin
+            Task."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
+            InStr.Read(TxtBuffer);
+        end;
+
+        if (RequestCount > 1) then
+            TxtBuffer += NewLine() + NewLine();
+        TxtBuffer += StrSubstNo('Request %1', RequestCount) + NewLine();
+        TxtBuffer += RequestTxt;
+
+        Task."Data Output".CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.Write(TxtBuffer);
+
+        Task.Modify(true);
         Commit();
 
         Success := TrySendRequest(RequestTxt, ResponseTxt);
 
-        Clear(OutStr);
-        Rec.Response.CreateOutStream(OutStr);
+        Clear(TxtBuffer);
+        if (Task.Response.HasValue()) then begin
+            Task.Response.CreateInStream(InStr, TextEncoding::UTF8);
+            InStr.Read(TxtBuffer);
+        end;
 
         if (not Success) then
             ResponseTxt := GetLastErrorText();
 
-        OutStr.Write(ResponseTxt);
-        Rec.Modify(true);
+        if (RequestCount > 1) then
+            TxtBuffer += NewLine() + NewLine();
+        TxtBuffer += StrSubstNo('Request %1', RequestCount) + NewLine();
+        TxtBuffer += ResponseTxt;
+
+        Task.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.Write(TxtBuffer);
+
+        Task.Modify(true);
         Commit();
 
         if (not Success) then
             Error('');
     end;
 
-    var
-        _ItemHelper: Codeunit "NPR M2 Integration Item Helper";
-        BadApiResponseErr: Label 'Error received from the Magento API\Status Code: %1 - %2\Body: %3';
-
-    local procedure PrepareRequest(TempMSIRequest: Record "NPR M2 MSI Request" temporary; var RequestTxt: Text)
-    var
-        RequestArray: JsonArray;
-        RequestJson: JsonObject;
-    begin
-        RequestArray.Add(TempMSIRequest.SerializeToJson());
-        RequestJson.Add('sourceItems', RequestArray);
-        RequestJson.WriteTo(RequestTxt);
-    end;
-
     [TryFunction]
     local procedure TrySendRequest(RequestTxt: Text; var ResponseTxt: Text)
     var
-        MagentoSetup: Record "NPR Magento Setup";
         ResponseMsg: HttpResponseMessage;
         Content: HttpContent;
         ContentHeaders: HttpHeaders;
-        Client: HttpClient;
-        ClientHeaders: HttpHeaders;
     begin
         Content.WriteFrom(RequestTxt);
         Content.GetHeaders(ContentHeaders);
         SetHeader(ContentHeaders, 'Content-Type', 'application/json');
+
+        InitializeHttpClient();
+
+        _HttpClient.Post('/rest/all/V1/inventory/source-items', Content, ResponseMsg);
+
+        if (ResponseMsg.Content.ReadAs(ResponseTxt)) then;
+
+        if (not ResponseMsg.IsSuccessStatusCode()) then
+            Error(BadApiResponseErr, ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase(), ResponseTxt);
+    end;
+
+    local procedure InitializeHttpClient()
+    var
+        MagentoSetup: Record "NPR Magento Setup";
+        ClientHeaders: HttpHeaders;
+    begin
+        if (_ClientInitialized) then
+            exit;
 
         MagentoSetup.Get();
         if (MagentoSetup."Magento Url"[StrLen(MagentoSetup."Magento Url")] = '/') then
@@ -84,20 +185,15 @@ codeunit 6150985 "NPR M2 MSI Task Mgt."
             MagentoSetup."Magento Url" := CopyStr(MagentoSetup."Magento Url", 1, StrLen(MagentoSetup."Magento Url") - 1);
 #pragma warning restore AA0139
 
-        Client.SetBaseAddress(MagentoSetup."Magento Url");
+        _HttpClient.SetBaseAddress(MagentoSetup."Magento Url");
 
-        ClientHeaders := Client.DefaultRequestHeaders();
+        ClientHeaders := _HttpClient.DefaultRequestHeaders();
         SetHeader(ClientHeaders, 'Authorization', MagentoSetup."Api Authorization");
         SetHeader(ClientHeaders, 'User-Agent', 'Microsoft-Dynamics-365-Business-Central-NP-Retail');
         SetHeader(ClientHeaders, 'Connection', 'Keep-Alive');
         SetHeader(ClientHeaders, 'Accept', 'application/json');
 
-        Client.Post('/rest/all/V1/inventory/source-items', Content, ResponseMsg);
-
-        if (ResponseMsg.Content.ReadAs(ResponseTxt)) then;
-
-        if (not ResponseMsg.IsSuccessStatusCode()) then
-            Error(BadApiResponseErr, ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase(), ResponseTxt);
+        _ClientInitialized := true;
     end;
 
     local procedure CalcStockQty(ItemNo: Code[20]; VariantFilter: Text; MagentoSource: Text[50]) Qty: Decimal
@@ -125,6 +221,23 @@ codeunit 6150985 "NPR M2 MSI Task Mgt."
         if (Headers.Contains(HeaderName)) then
             Headers.Remove(HeaderName);
         Headers.Add(HeaderName, HeaderValue);
+    end;
+
+    local procedure FillSourcesArray(var MagentoSources: List of [Text[50]])
+    var
+        Location: Record Location;
+    begin
+        Location.SetFilter("NPR Magento 2 Source", '<>%1', '');
+        if (Location.FindSet()) then
+            repeat
+                if (not MagentoSources.Contains(Location."NPR Magento 2 Source")) then
+                    MagentoSources.Add(Location."NPR Magento 2 Source");
+            until Location.Next() = 0;
+    end;
+
+    local procedure NewLine(): Text[1]
+    begin
+        exit('\');
     end;
 #endif
 }
