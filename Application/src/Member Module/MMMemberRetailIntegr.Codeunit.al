@@ -1029,18 +1029,24 @@
         Sale: Codeunit "NPR POS Sale";
         SaleLine: Codeunit "NPR POS Sale Line";
         POSSession: Codeunit "NPR POS Session";
+        Base64: Codeunit "Base64 Convert";
         JToken: JsonToken;
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
         ItemIdentifier: Text;
     begin
-        // {"itemNumber":"320100","members":[]}
-        ItemIdentifier := GetJsonText('itemNumber', JObject, 255);
+
+        if (JObject.Get('data', JToken)) then
+            // payload is base 64 encoded
+            JObject.ReadFrom(Base64.FromBase64(JToken.AsValue().AsText()));
+
+        // {"in":"320100","m":[]}
+        ItemIdentifier := GetJsonText('in', JObject, 255);
         POSActionInsertItemB.GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
         POSSession.GetSale(Sale);
         POSSession.GetSaleLine(SaleLine);
         Sale.GetCurrentSale(PosSale);
 
-        JObject.Get('members', JToken);
+        JObject.Get('m', JToken);
         PreloadMemberInfoBuffer(PosSale."Sales Ticket No.", SaleLine.GetNextLineNo(), Item."No.", JToken.AsArray());
 
         POSActionInsertItemB.AddItemLine(Item, ItemReference, ItemIdentifierType::ItemNo, 1, 0, '', '', '', POSSession, FrontEnd);
@@ -1052,7 +1058,7 @@
         MemberToken: JsonToken;
         Member: JsonObject;
     begin
-        // [{"firstName":"Tim","lastName":"Sannes","address":"Spaljevägen 9","postalCode":"197 36","city":"Bro","country":"Sverige","eMail":"tsa@navipartner.dk","phoneNumber":"0732542026"}]
+        // [{"fn":"Tim","ln":"Sannes","ad":"Spaljevägen 9","pc":"197 36","ct":"Bro","cc":"SE","em":"tsa@navipartner.dk","pn":"0732542026"}]
         foreach MemberToken in Members do begin
             Member := MemberToken.AsObject();
 
@@ -1061,13 +1067,14 @@
             MemberInfo."Line No." := LineNo;
             MemberInfo."Item No." := ItemNo;
 
-            MemberInfo."First Name" := GetJsonText50('firstName', Member);
-            MemberInfo."Last Name" := GetJsonText50('lastName', Member);
-            MemberInfo.Address := GetJsonText100('address', Member);
-            MemberInfo.City := GetJsonText50('city', Member);
-            MemberInfo."Post Code Code" := GetJsonText20('postalCode', Member);
-            MemberInfo."E-Mail Address" := GetJsonText80('eMail', Member);
-            MemberInfo."Phone No." := GetJsonText30('phoneNumber', Member);
+            MemberInfo."First Name" := GetJsonText50('fn', Member);
+            MemberInfo."Last Name" := GetJsonText50('ln', Member);
+            MemberInfo.Address := GetJsonText100('ad', Member);
+            MemberInfo.City := GetJsonText50('ct', Member);
+            MemberInfo."Post Code Code" := GetJsonText20('pc', Member);
+            MemberInfo."Country Code" := GetJsonText10('cc', Member);
+            MemberInfo."E-Mail Address" := GetJsonText80('em', Member);
+            MemberInfo."Phone No." := GetJsonText30('pn', Member);
 
             MemberInfo."News Letter" := GetNewsLetter(Member);
             MemberInfo.Gender := GetGender(Member);
@@ -1080,7 +1087,7 @@
         JToken: JsonToken;
         MemberInfo: Record "NPR MM Member Info Capture";
     begin
-        if (not (JObject.Get('newsLetter', JToken))) then
+        if (not (JObject.Get('nl', JToken))) then
             exit(MemberInfo."News Letter"::NOT_SPECIFIED);
 
         case UpperCase(JToken.AsValue().AsText()) of
@@ -1098,7 +1105,7 @@
         JToken: JsonToken;
         MemberInfo: Record "NPR MM Member Info Capture";
     begin
-        if (not (JObject.Get('gender', JToken))) then
+        if (not (JObject.Get('gr', JToken))) then
             exit(MemberInfo.Gender::NOT_SPECIFIED);
 
         case UpperCase(JToken.AsValue().AsText()) of
@@ -1115,6 +1122,11 @@
 
 
 #pragma warning disable AA0139
+    local procedure GetJsonText10(KeyName: Text; JObject: JsonObject) TextValue: Text[10]
+    begin
+        exit(GetJsonText(KeyName, JObject, MaxStrLen(TextValue)));
+    end;
+
     local procedure GetJsonText20(KeyName: Text; JObject: JsonObject) TextValue: Text[20]
     begin
         exit(GetJsonText(KeyName, JObject, MaxStrLen(TextValue)));
