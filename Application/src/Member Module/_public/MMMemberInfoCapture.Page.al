@@ -1281,12 +1281,11 @@
             MembershipSalesSetup.SetFilter("No.", '=%1', Rec."Item No.");
             if (MembershipSalesSetup.FindFirst()) then begin
 
-                // MembershipSetup.Get() (MembershipSalesSetup."Membership Code");
-                // MemberCommunity.Get() (MembershipSetup."Community Code");
                 if (MembershipSetup.Get(MembershipSalesSetup."Membership Code")) then
                     MemberCommunity.Get(MembershipSetup."Community Code");
 
-                Rec."Country Code" := MemberCommunity.MemberDefaultCountryCode;
+                if (Rec."Country Code" = '') then
+                    Rec."Country Code" := MemberCommunity.MemberDefaultCountryCode;
 
                 ShowNewCardSection := (MembershipSetup."Loyalty Card" = MembershipSetup."Loyalty Card"::YES);
 
@@ -1323,12 +1322,6 @@
                         end;
                 end;
 
-                //    IF (FORMAT (MembershipSetup."Card Number Valid Until") <> '') THEN
-                //      IF ("Document Date" <> 0D) THEN
-                //        "Valid Until" := CALCDATE (MembershipSetup."Card Number Valid Until", "Document Date")
-                //      ELSE
-                //        "Valid Until" := CALCDATE (MembershipSetup."Card Number Valid Until", TODAY);
-
                 ActivationDateEditable := false;
                 case MembershipSalesSetup."Valid From Base" of
                     MembershipSalesSetup."Valid From Base"::SALESDATE:
@@ -1357,7 +1350,6 @@
                             Rec."Valid Until" := CalcDate(MembershipSetup."Card Number Valid Until", ValidUntilBaseDate);
                         MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED:
                             begin
-                                //Rec."Valid Until" := CalcDate(MembershipSalesSetup."Duration Formula", ValidUntilBaseDate);
                                 MembershipEntry.SetFilter("Membership Entry No.", '=%1', Rec."Membership Entry No.");
                                 MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
                                 MembershipEntry.SetFilter(Blocked, '=%1', false);
