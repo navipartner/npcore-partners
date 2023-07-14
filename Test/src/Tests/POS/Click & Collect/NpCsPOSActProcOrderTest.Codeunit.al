@@ -19,7 +19,7 @@ codeunit 85108 "NPR NpCs POSAct ProcOrder Test"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibrarySales: Codeunit "Library - Sales";
         POSSale: Codeunit "NPR POS Sale";
-        ProcessOrder: Codeunit "NPR NpCs POSAction Proc. Order";
+        ProcessOrderB: Codeunit "NPR NpCs POSAction Proc.OrderB";
         SalesHeader: Record "Sales Header";
     begin
         // [Given] POS & Payment setup
@@ -32,7 +32,7 @@ codeunit 85108 "NPR NpCs POSAct ProcOrder Test"
         CreateNpCsDocument(SalesHeader);
 
         // [Then]
-        ProcessOrder.RunCollectInStoreOrders('', 1);
+        ProcessOrderB.RunCollectInStoreOrders('', 1);
     end;
 
     [ModalPageHandler]
