@@ -261,7 +261,7 @@ codeunit 6151065 "NPR FtpSftp Data Upgrade"
                         Exists := SFTPConn.FindFirst();
                         if (Exists) then begin
                             //Insert ref, and move file info to xml tempalte.
-                            XmlTemplates."SFTP Enabled" := XmlTemplates."FTP Transfer";
+                            XmlTemplates."SFTP Enabled" := Endpoint.Enabled;
                             XmlTemplates."SFTP Connection" := SFTPConn.Code;
                             if (Endpoint.Directory <> '') then begin
                                 pathHelper := Endpoint.Directory.Replace('\', '/');
@@ -295,7 +295,7 @@ codeunit 6151065 "NPR FtpSftp Data Upgrade"
                         Exists := FTPConn.FindFirst();
                         if (Exists) then begin
                             // If exist make ref to existing
-                            XmlTemplates."Ftp Enabled" := XmlTemplates."FTP Transfer";
+                            XmlTemplates."Ftp Enabled" := Endpoint.Enabled;
                             XmlTemplates."FTP Connection" := FTPConn.Code;
                             if (Endpoint.Directory <> '') then begin
                                 pathHelper := Endpoint.Directory.Replace('\', '/');
@@ -366,7 +366,7 @@ codeunit 6151065 "NPR FtpSftp Data Upgrade"
         //Default is true in AF
         SFTPConn."Force Behavior" := True;
         SFTPConn.Insert();
-        XmlTemplates."SFTP Enabled" := XmlTemplates."FTP Transfer";
+        XmlTemplates."SFTP Enabled" := nce.Enabled;
         XmlTemplates."SFTP Connection" := NCE_GenCodeID(XmlTemplates) + Format(Counter);
         if (nce.Directory <> '') then begin
             pathHelper := nce.Directory.Replace('\', '/');
@@ -408,7 +408,7 @@ codeunit 6151065 "NPR FtpSftp Data Upgrade"
         //Default is false in AF
         FTPConn."Force Behavior" := False;
         FTPConn.Insert();
-        XmlTemplates."Ftp Enabled" := XmlTemplates."FTP Transfer";
+        XmlTemplates."Ftp Enabled" := nce.Enabled;
         XmlTemplates."FTP Connection" := NCE_GenCodeID(XmlTemplates) + Format(Counter);
         if (nce.Directory <> '') then begin
             pathHelper := nce.Directory.Replace('\', '/');
