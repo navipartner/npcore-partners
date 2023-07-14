@@ -257,9 +257,15 @@ codeunit 6060004 "NPR NpDc Module Issue: OnSaleB"
         TempNpDcItemBuffer.CalcSums("Line Amount", Quantity);
         case NpDcIssueOnSaleSetup.Type of
             NpDcIssueOnSaleSetup.Type::"Item Sales Amount":
-                NewCouponQty := TempNpDcItemBuffer."Line Amount" div NpDcIssueOnSaleSetup."Item Sales Amount";
+                begin
+                    NpDcIssueOnSaleSetup.TestField("Item Sales Amount");
+                    NewCouponQty := TempNpDcItemBuffer."Line Amount" div NpDcIssueOnSaleSetup."Item Sales Amount";
+                end;
             NpDcIssueOnSaleSetup.Type::"Item Sales Qty.":
-                NewCouponQty := TempNpDcItemBuffer.Quantity div NpDcIssueOnSaleSetup."Item Sales Qty.";
+                begin
+                    NpDcIssueOnSaleSetup.TestField("Item Sales Qty.");
+                    NewCouponQty := TempNpDcItemBuffer.Quantity div NpDcIssueOnSaleSetup."Item Sales Qty.";
+                end;
             NpDcIssueOnSaleSetup.Type::Lot:
                 begin
                     NewCouponQty := GetLotQty(NpDcIssueOnSaleSetup, TempNpDcItemBuffer);
