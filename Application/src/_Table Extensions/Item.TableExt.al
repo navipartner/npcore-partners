@@ -18,11 +18,7 @@ tableextension 6014427 "NPR Item" extends Item
                 if not ItemCategory.Get(Rec."Item Category Code") then
                     exit;
 
-                if ItemCategory."NPR Item Template Code" = '' then
-                    exit;
-
                 ItemCategoryMgt.SetupItemFromCategory(Rec, ItemCategory);
-                Rec.Validate("Base Unit of Measure", Rec."Base Unit of Measure");
             end;
         }
         modify(GTIN)

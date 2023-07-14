@@ -184,9 +184,17 @@
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
         RecRef: RecordRef;
+        DimensionsAppliedToItem: Boolean;
     begin
         ItemCategory.TestField("NPR Blocked", false);
         ItemCategory.TestField("NPR Main Category", false);
+        
+        DimensionsAppliedToItem := ApplyItemCategoryDimensionsToItem(ItemCategory, Item, true);
+        if DimensionsAppliedToItem then
+            Item.Get(Item."No.");
+
+        if ItemCategory."NPR Item Template Code" = '' then
+            exit;
 
         ConfigTemplateHeader.Get(ItemCategory."NPR Item Template Code");
 
@@ -194,7 +202,7 @@
         ConfigTemplateMgt.ApplyTemplateLinesWithoutValidation(ConfigTemplateHeader, RecRef);
         RecRef.SetTable(Item);
 
-        ApplyItemCategoryDimensionsToItem(ItemCategory, Item, true);
+        Item.Validate("Base Unit of Measure");
     end;
 
     internal procedure GetVATPostingSetupFromItemCategory(ItemCategory: Record "Item Category"; var VATPostingSetup: Record "VAT Posting Setup"): Boolean
@@ -447,26 +455,26 @@
         until DefaultDimension.Next() = 0;
     end;
 
-    internal procedure ApplyItemCategoryDimensionsToItem(ItemCategory: Record "Item Category"; Item: Record Item; Silent: Boolean)
+    internal procedure ApplyItemCategoryDimensionsToItem(ItemCategory: Record "Item Category"; Item: Record Item; Silent: Boolean): Boolean
     var
         DefaultDimension: Record "Default Dimension";
         DefaultDimension2: Record "Default Dimension";
         ConfirmQst: Label 'Apply Dimensions from Item Category to Item?';
     begin
         if ItemCategory.IsTemporary() or Item.IsTemporary() then
-            exit;
+            exit(false);
 
         if (ItemCategory.Code = '') or (Item."No." = '') then
-            exit;
+            exit(false);
 
         DefaultDimension.SetRange("Table ID", Database::"Item Category");
         DefaultDimension.SetRange("No.", ItemCategory.Code);
         if DefaultDimension.IsEmpty() then
-            exit;
+            exit(false);
 
         if not Silent then
             if not ConfirmationManagement.GetResponseOrDefault(ConfirmQst, false) then
-                exit;
+                exit(false);
 
         if DefaultDimension.FindSet() then
             repeat
@@ -479,6 +487,8 @@
                 DefaultDimension2."No." := Item."No.";
                 DefaultDimension2.Insert(true);
             until DefaultDimension.Next() = 0;
+        
+        exit(true);
     end;
 
     #endregion
