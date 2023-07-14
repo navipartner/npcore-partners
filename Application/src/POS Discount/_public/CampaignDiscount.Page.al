@@ -16,7 +16,7 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies unique code for period discount';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
@@ -29,43 +29,19 @@
                 {
 
                     Importance = Promoted;
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the name for period discount';
                     ApplicationArea = NPRRetail;
-                }
-                field("Created Date"; '')
-                {
-
-                    Caption = 'Created Date';
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Created Date field';
-                    ApplicationArea = NPRRetail;
-                    ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
-                    ObsoleteReason = 'Not used.';
-                    Visible = false;
-                }
-                field("Last Date Modified"; '')
-                {
-
-                    Caption = 'Last Changed';
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Last Changed field';
-                    ApplicationArea = NPRRetail;
-                    ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
-                    ObsoleteReason = 'Not used.';
-                    Visible = false;
                 }
                 field(Status; Rec.Status)
                 {
 
-                    ToolTip = 'Specifies the value of the Status field';
+                    ToolTip = 'Specifies the status of period discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Block Custom Disc."; Rec."Block Custom Disc.")
                 {
 
-                    ToolTip = 'Specifies the value of the Block Custom Discount field';
+                    ToolTip = 'Specifies if the custom discount is blocked';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -174,7 +150,7 @@
             part(SubForm; "NPR Campaign Discount Lines")
             {
                 SubPageLink = Code = Field(Code);
-                Visible = SubFormVisible;
+                Visible = SubpageVisible;
                 ApplicationArea = NPRRetail;
 
             }
@@ -189,6 +165,11 @@
             {
                 Caption = 'Lin&e';
                 Image = Line;
+                Visible = false;
+                ObsoleteReason = 'Not used';
+                ObsoleteState = Pending;
+                ObsoleteTag = 'NPR23.0';
+
                 action(Comment)
                 {
                     Caption = 'Comment';
@@ -196,18 +177,24 @@
                     RunObject = Page "NPR Retail Comments";
                     RunPageLink = "Table ID" = CONST(6014413),
                                   "No." = FIELD(Code);
-
                     ToolTip = 'Executes the Comment action';
                     ApplicationArea = NPRRetail;
+
+                    ObsoleteReason = 'Not used';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
                 }
                 action("Item Card")
                 {
                     Caption = 'Item Card';
                     Image = Item;
                     ShortCutKey = 'Shift+Ctrl+C';
-
                     ToolTip = 'Executes the Item Card action';
                     ApplicationArea = NPRRetail;
+
+                    ObsoleteReason = 'Not used';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
 
                     trigger OnAction()
                     var
@@ -282,17 +269,15 @@
 
                         trigger OnAction()
                         var
-                            ErrUnitPrice: Label 'Item no. %1 does not have any salesprice';
+                            UnitPriceErr: Label 'Item no. %1 does not have any salesprice.', Comment = '%1 = Item no.';
                             ItemList: Page "Item List";
                         begin
-                            Clear(ItemList);
                             ItemList.LookupMode := true;
                             if (ItemList.RunModal() = ACTION::LookupOK) then begin
                                 ItemList.GetRecord(Item);
-                                Item.SetRange("No.", Item."No.");
-                                Item.Find('-');
                                 if Item."Unit Price" = 0 then
-                                    Error(ErrUnitPrice, Item."No.");
+                                    Error(UnitPriceErr, Item."No.");
+                                Item.SetRange("No.", Item."No.");
                                 TransferToPeriod();
                             end;
                         end;
@@ -312,7 +297,7 @@
                         begin
                             Clear(ItemCategories);
                             ItemCategories.LookupMode := true;
-                            if (ItemCategories.RunModal() = ACTION::LookupOK) then begin
+                            if ItemCategories.RunModal() = ACTION::LookupOK then begin
                                 Item.Reset();
                                 ItemCategories.GetRecord(ItemCategory);
                                 Item.SetRange("Item Category Code", ItemCategory.Code);
@@ -334,7 +319,6 @@
                             Vendor: Record Vendor;
                             VendorList: Page "Vendor List";
                         begin
-                            Clear(VendorList);
                             VendorList.LookupMode := true;
                             if (VendorList.RunModal() = ACTION::LookupOK) then begin
                                 VendorList.GetRecord(Vendor);
@@ -356,9 +340,9 @@
                         trigger OnAction()
                         var
                             FromPeriodDiscount: Record "NPR Period Discount";
-                            CampaignDiscounts: Page "NPR Campaign Discount List";
                             FromPeriodDiscountLine: Record "NPR Period Discount Line";
                             ToPeriodDiscountLine: Record "NPR Period Discount Line";
+                            CampaignDiscounts: Page "NPR Campaign Discount List";
                             NoTransferedItemErr: Label 'There are no items to transfer';
                             ItemAlreadyExistErr: Label 'Item No. %1 already exists in the period', Comment = '%1 = Item No.';
                             OkMsg: Label '%1 Items has been transferred to Period %2', Comment = '%1 = Number of Items, %2 = Period';
@@ -370,20 +354,22 @@
                             if CampaignDiscounts.RunModal() = ACTION::LookupOK then begin
                                 CampaignDiscounts.GetRecord(FromPeriodDiscount);
                                 FromPeriodDiscountLine.SetRange(Code, FromPeriodDiscount.Code);
-                                if not FromPeriodDiscountLine.FindSet() then
+                                if FromPeriodDiscountLine.IsEmpty then
                                     Error(NoTransferedItemErr)
-                                else
-                                    repeat
-                                        if ToPeriodDiscountLine.Get(Rec.Code, FromPeriodDiscountLine."Item No.", FromPeriodDiscountLine."Variant Code") then
-                                            Message(ItemAlreadyExistErr, FromPeriodDiscountLine."Item No.")
-                                        else begin
-                                            ToPeriodDiscountLine.Init();
-                                            ToPeriodDiscountLine := FromPeriodDiscountLine;
-                                            ToPeriodDiscountLine.Code := Rec.Code;
-                                            ToPeriodDiscountLine.Insert(true);
-                                        end;
-                                    until FromPeriodDiscountLine.Next() = 0;
-                                Message(OkMsg, FromPeriodDiscountLine.Count, Rec.Code);
+                                else begin
+                                    if FromPeriodDiscountLine.FindSet() then
+                                        repeat
+                                            if ToPeriodDiscountLine.Get(Rec.Code, FromPeriodDiscountLine."Item No.", FromPeriodDiscountLine."Variant Code") then
+                                                Message(ItemAlreadyExistErr, FromPeriodDiscountLine."Item No.")
+                                            else begin
+                                                ToPeriodDiscountLine.Init();
+                                                ToPeriodDiscountLine := FromPeriodDiscountLine;
+                                                ToPeriodDiscountLine.Code := Rec.Code;
+                                                ToPeriodDiscountLine.Insert(true);
+                                            end;
+                                        until FromPeriodDiscountLine.Next() = 0;
+                                    Message(OkMsg, FromPeriodDiscountLine.Count, Rec.Code);
+                                end;
                             end;
                         end;
                     }
@@ -412,11 +398,11 @@
 
                         trigger OnAction()
                         var
-                            MsgOkCancel: Label 'Do you wish to transfer all items to this period?';
+                            TransferItemsQst: Label 'Do you wish to transfer all items to this period?';
                         begin
                             Item.Reset();
                             Item.SetFilter("Unit Price", '<>0');
-                            if DIALOG.Confirm(MsgOkCancel, false) then
+                            if Confirm(TransferItemsQst, false) then
                                 TransferToPeriod();
                         end;
                     }
@@ -446,18 +432,17 @@
 
                     trigger OnAction()
                     var
-                        PeriodDiscount1: Record "NPR Period Discount";
+                        PeriodDiscount: Record "NPR Period Discount";
                         PeriodDiscountLine1: Record "NPR Period Discount Line";
                         PeriodDiscountLine: Record "NPR Period Discount Line";
                     begin
-                        if Page.RunModal(Page::"NPR Campaign Discount List", PeriodDiscount1) <> Action::LookupOK then
+                        if Page.RunModal(Page::"NPR Campaign Discount List", PeriodDiscount) <> Action::LookupOK then
                             exit;
-                        PeriodDiscountLine1.Reset();
                         PeriodDiscountLine1.SetRange(Code, Rec.Code);
                         PeriodDiscountLine1.DeleteAll();
 
                         PeriodDiscountLine1.Reset();
-                        PeriodDiscountLine1.SetRange(Code, PeriodDiscount1.Code);
+                        PeriodDiscountLine1.SetRange(Code, PeriodDiscount.Code);
                         if PeriodDiscountLine1.FindSet() then
                             repeat
                                 PeriodDiscountLine.Init();
@@ -505,40 +490,38 @@
 
     trigger OnInit()
     begin
-        SubFormVisible := true;
+        SubpageVisible := true;
     end;
 
     trigger OnOpenPage()
     var
         PeriodDiscount: Record "NPR Period Discount";
     begin
-        if not PeriodDiscount.Find('-') then begin
-            SubFormVisible := false;
-            SubFormVisible := true;
-        end;
+        if PeriodDiscount.IsEmpty then
+            SubpageVisible := false;
     end;
 
     var
-        Text10600000: Label 'Enter cost savings in % ';
         Item: Record Item;
-        SubFormVisible: Boolean;
+        SubpageVisible: Boolean;
 
     internal procedure TransferToPeriod()
     var
         PeriodDiscountLine: Record "NPR Period Discount Line";
         InputDialog: Page "NPR Input Dialog";
-        CampaignDiscountList: Page "NPR Campaign Discount List";
         Percentage: Decimal;
-        ErrorNo1: Label 'There are no items to transfer';
-        ErrorNo2: Label 'Item No. %1 already exists in the period';
-        OkMsg: Label '%1 Items has been transferred to Period %2';
+        TransferItemNoErr: Label 'There are no items to transfer';
+        ItemNoErr: Label 'Item No. %1 already exists in the period', Comment = '%1 = Item no.';
+        OkMsg: Label '%1 Items have been transferred to Period %2', Comment = '%1 = No. of items, %2 = Period no.';
+        EnterCostsLbl: Label 'Enter cost savings in % ';
     begin
-        if not Item.Find('-') then
-            Error(ErrorNo1);
-        Clear(CampaignDiscountList);
+        if Item.IsEmpty() then
+            Error(TransferItemNoErr);
+
+        Item.FindSet();
         Percentage := 0;
 
-        InputDialog.SetInput(1, Percentage, Text10600000);
+        InputDialog.SetInput(1, Percentage, EnterCostsLbl);
         if InputDialog.RunModal() = ACTION::OK then
             InputDialog.InputDecimal(1, Percentage);
 
@@ -546,7 +529,7 @@
             exit;
         repeat
             if PeriodDiscountLine.Get(Rec.Code, Item."No.") then
-                Message(ErrorNo2, Item."No.")
+                Message(ItemNoErr, Item."No.")
             else begin
                 PeriodDiscountLine.Init();
                 PeriodDiscountLine.Code := Rec.Code;
