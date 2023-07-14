@@ -1,6 +1,9 @@
-﻿codeunit 6151202 "NPR NpCs POSAction Proc. Order" implements "NPR IPOS Workflow"
+codeunit 6151202 "NPR NpCs POSAction Proc. Order" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
+    var
+        NpCsPOSActionProcOrderB: Codeunit "NPR NpCs POSAction Proc.OrderB";
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
@@ -39,17 +42,11 @@
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; SaleMgr: Codeunit "NPR POS Sale"; SaleLineMgr: Codeunit "NPR POS Sale Line"; PaymentLineMgr: Codeunit "NPR POS Payment Line"; SetupMgr: Codeunit "NPR POS Setup");
-    var
-        LocationFilter: Text;
-        SortingInt: Integer;
     begin
         case Step of
             'run_collect_in_store_orders':
                 begin
-                    LocationFilter := GetLocationFilter(Context);
-                    SortingInt := Context.GetIntegerParameter('Sorting');
-                    RunCollectInStoreOrders(LocationFilter, SortingInt);
-                    SaleMgr.RefreshCurrent();
+                    CollectInStoreOrders(Context, SaleMgr);
                 end;
         end;
     end;
@@ -109,34 +106,6 @@
             if Location.FindFirst() then
                 POSParameterValue.Value := Location.Code;
         end;
-    end;
-
-    procedure RunCollectInStoreOrders(LocationFilter: Text; Sort: Integer)
-    var
-        NpCsDocument: Record "NPR NpCs Document";
-        Sorting: Option "Entry No.","Reference No.","Processing expires at","Entry No. (Desc.)";
-    begin
-        SetUnprocessedFilter(LocationFilter, NpCsDocument);
-        case Sort of
-            Sorting::"Entry No.":
-                begin
-                    NpCsDocument.SetCurrentKey("Entry No.");
-                end;
-            Sorting::"Reference No.":
-                begin
-                    NpCsDocument.SetCurrentKey("Reference No.");
-                end;
-            Sorting::"Processing expires at":
-                begin
-                    NpCsDocument.SetCurrentKey("Processing expires at");
-                end;
-            Sorting::"Entry No. (Desc.)":
-                begin
-                    NpCsDocument.SetCurrentKey("Entry No.");
-                    NpCsDocument.Ascending(false);
-                end;
-        end;
-        Page.RunModal(PAGE::"NPR NpCs Coll. Store Orders", NpCsDocument);
     end;
 
     local procedure GetLocationFilter(Context: Codeunit "NPR POS JSON Helper") LocationFilter: Text
@@ -208,47 +177,23 @@
         Handled := true;
 
         LocationFilter := POSMenuMgt.GetPOSMenuButtonLocationFilter(POSSession, ActionCode());
-        UnprocessedOrdersExists := GetUnprocessedOrdersExists(LocationFilter);
+        UnprocessedOrdersExists := NpCsPOSActionProcOrderB.GetUnprocessedOrdersExists(LocationFilter);
         DataRow.Fields().Add('UnprocessedOrdersExists', UnprocessedOrdersExists);
         if UnprocessedOrdersExists then
-            DataRow.Fields().Add('UnprocessedOrdersQty', GetUnprocessedOrdersQty(LocationFilter))
+            DataRow.Fields().Add('UnprocessedOrdersQty', NpCsPOSActionProcOrderB.GetUnprocessedOrdersQty(LocationFilter))
         else
             DataRow.Fields().Add('UnprocessedOrdersQty', 0);
     end;
 
-    local procedure GetUnprocessedOrdersExists(LocationFilter: Text): Boolean
-    var
-        NpCsDocument: Record "NPR NpCs Document";
-    begin
-        SetUnprocessedFilter(LocationFilter, NpCsDocument);
-        exit(NpCsDocument.FindFirst());
-    end;
 
-    local procedure GetUnprocessedOrdersQty(LocationFilter: Text): Integer
+    local procedure CollectInStoreOrders(var Context: Codeunit "NPR POS JSON Helper"; var POSSale: Codeunit "NPR POS Sale")
     var
-        NpCsDocument: Record "NPR NpCs Document";
-        NpCsPOSActionEvents: Codeunit "NPR NpCs POS Action Events";
-        UnprocessedOrderQty: Decimal;
-        IsHandled: Boolean;
+        LocationFilter: Text;
+        SortingInt: Integer;
     begin
-        NpCsPOSActionEvents.OnBeforeGetUnprocessedOrderQty(LocationFilter, UnprocessedOrderQty, IsHandled);
-        if IsHandled then
-            exit(UnprocessedOrderQty);
-        SetUnprocessedFilter(LocationFilter, NpCsDocument);
-        exit(NpCsDocument.Count());
-    end;
-
-    local procedure SetUnprocessedFilter(LocationFilter: Text; var NpCsDocument: Record "NPR NpCs Document")
-    var
-        NpCsPOSActionEvents: Codeunit "NPR NpCs POS Action Events";
-        IsHandled: Boolean;
-    begin
-        NpCsPOSActionEvents.OnBeforeSetUnprocessedFilter(LocationFilter, NpCsDocument, IsHandled);
-        if IsHandled then
-            exit;
-        NpCsDocument.SetRange(Type, NpCsDocument.Type::"Collect in Store");
-        NpCsDocument.SetRange("Processing Status", NpCsDocument."Processing Status"::Pending);
-        NpCsDocument.SetRange("Delivery Status", NpCsDocument."Delivery Status"::" ");
-        NpCsDocument.SetFilter("Location Code", LocationFilter);
+        LocationFilter := GetLocationFilter(Context);
+        SortingInt := Context.GetIntegerParameter('Sorting');
+        NpCsPOSActionProcOrderB.RunCollectInStoreOrders(LocationFilter, SortingInt);
+        POSSale.RefreshCurrent();
     end;
 }
