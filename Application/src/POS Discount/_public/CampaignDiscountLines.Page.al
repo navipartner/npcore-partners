@@ -18,11 +18,6 @@
                 {
                     ToolTip = 'Specifies the value of the Item No. field';
                     ApplicationArea = NPRRetail;
-
-                    trigger OnLookup(var Text: Text): Boolean
-                    begin
-                        LookUpItem(Text);
-                    end;
                 }
                 field("Cross-Reference No."; Rec."Cross-Reference No.")
                 {
@@ -112,42 +107,41 @@
             }
         }
     }
+    actions
+    {
+        area(processing)
+        {
+            action(Comment)
+            {
+                Caption = 'Comment';
+                Image = Comment;
+                RunObject = Page "NPR Retail Comments";
+                RunPageLink = "Table ID" = CONST(6014413),
+                                  "No." = FIELD(Code);
 
-    trigger OnAfterGetRecord()
-    begin
-        Rec.CalcFields("Unit Price Incl. VAT");
-        AfterGetCurrRecord();
-    end;
+                ToolTip = 'Executes the Comment action';
+                ApplicationArea = NPRRetail;
+            }
+            action("Item Card")
+            {
+                Caption = 'Item Card';
+                Image = Item;
+                ShortCutKey = 'Shift+Ctrl+C';
 
-    trigger OnNewRecord(BelowxRec: Boolean)
-    begin
-        AfterGetCurrRecord();
-    end;
+                ToolTip = 'Executes the Item Card action';
+                ApplicationArea = NPRRetail;
 
-    local procedure AfterGetCurrRecord()
-    begin
-        xRec := Rec;
-        Rec.CalcFields("Unit Price Incl. VAT");
-    end;
-
-    local procedure LookUpItem(Text: Text)
-    var
-        Item: Record Item;
-        Item2: Record Item;
-        ItemList: Page "Item List";
-    begin
-        Item.FilterGroup(2);
-        Item.FilterGroup(0);
-        Clear(ItemList);
-        ItemList.LookupMode(true);
-        ItemList.SetTableView(Item);
-        if Item2.Get(Text) then
-            ItemList.SetRecord(Item2);
-        if ItemList.RunModal() = ACTION::LookupOK then begin
-            ItemList.GetRecord(Item);
-            Rec.Validate("Item No.", Item."No.");
-            Commit();
-        end;
-    end;
+                trigger OnAction()
+                var
+                    Item: Record Item;
+                    PeriodDiscountLine: Record "NPR Period Discount Line";
+                begin
+                    CurrPage.GetRecord(PeriodDiscountLine);
+                    Item.SetRange("No.", PeriodDiscountLine."Item No.");
+                    Page.Run(Page::"Item Card", Item, Item."No.");
+                end;
+            }
+        }
+    }
 }
 
