@@ -14,13 +14,8 @@ codeunit 6150875 "NPR POS Action: Raptor" implements "NPR IPOS Workflow"
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
-    var
-        POSSession: Codeunit "NPR POS Session";
     begin
-        if not TryToRunAction(Context, POSSession) then begin
-            Context.SetContext('ActionFailed', true);
-            Context.SetContext('ActionFailReasonMsg', GetLastErrorText);
-        end;
+        RunAction(Context, Sale);
     end;
 
     local procedure ActionCode(): Code[20]
@@ -28,29 +23,19 @@ codeunit 6150875 "NPR POS Action: Raptor" implements "NPR IPOS Workflow"
         exit(FORMAT("NPR POS workflow"::RAPTOR));
     end;
 
-    [TryFunction]
-    local procedure TryToRunAction(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
+    local procedure RunAction(Context: codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale")
     var
-        RaptorAction: Record "NPR Raptor Action";
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-        RaptorMgt: Codeunit "NPR Raptor Management";
-        RaptorActionCode: Code[20];
+        POSActRaptorB: Codeunit "NPR POS Action: Raptor B";
         ResultOut: Text;
+        RaptorActionCode: Code[20];
     begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        SalePOS.TestField("Customer No.");
-
         if not Context.GetStringParameter('RaptorActionCode', ResultOut) then
             ResultOut := '';
         RaptorActionCode := CopyStr(ResultOut, 1, MaxStrLen(RaptorActionCode));
-        if RaptorActionCode <> '' then
-            RaptorAction.Get(RaptorActionCode)
-        else
-            if not RaptorMgt.SelectRaptorAction('', false, RaptorAction) then
-                Error('');
-        RaptorMgt.ShowRaptorData(RaptorAction, SalePOS."Customer No.");
+        if not POSActRaptorB.TryToRunAction(POSSale, RaptorActionCode) then begin
+            Context.SetContext('ActionFailed', true);
+            Context.SetContext('ActionFailReasonMsg', GetLastErrorText);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
