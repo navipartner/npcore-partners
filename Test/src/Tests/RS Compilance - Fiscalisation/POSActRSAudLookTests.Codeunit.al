@@ -18,6 +18,7 @@ codeunit 85077 "NPR POS Act. RSAud.Look. Tests"
     var
         LibraryRSFiscal: Codeunit "NPR Library RS Fiscal";
         ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction;
+        POSActionRSAuditLkpB: Codeunit "NPR POS Action: RSAudit Lkp-B";
     begin
         // [Scenario] Test action for opening RS Audit Log Info
         // [Given] Enable Mock response instead of real http response
@@ -30,7 +31,7 @@ codeunit 85077 "NPR POS Act. RSAud.Look. Tests"
         DoItemSale();
 
         //[Then]
-        ShowAllRSAuditLog(ParameterShow::AllFiscalised);
+        POSActionRSAuditLkpB.ProcessRequest(ParameterShow::AllFiscalised);
         UnbindSubscription(LibraryRSFiscal);
     end;
 
@@ -40,6 +41,7 @@ codeunit 85077 "NPR POS Act. RSAud.Look. Tests"
     procedure OpenRSAuditLogPageWithAllParameter()
     var
         LibraryRSFiscal: Codeunit "NPR Library RS Fiscal";
+        POSActionRSAuditLkpB: Codeunit "NPR POS Action: RSAudit Lkp-B";
         ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction;
     begin
         // [Scenario] Test action for opening RS Audit Log Info
@@ -53,7 +55,7 @@ codeunit 85077 "NPR POS Act. RSAud.Look. Tests"
         DoItemSale();
 
         //[Then]
-        ShowAllRSAuditLog(ParameterShow::All);
+        POSActionRSAuditLkpB.ProcessRequest(ParameterShow::All);
         UnbindSubscription(LibraryRSFiscal);
     end;
 
@@ -63,6 +65,7 @@ codeunit 85077 "NPR POS Act. RSAud.Look. Tests"
     procedure OpenRSAuditLogPageWithAllNonFiscalisedParameter()
     var
         LibraryRSFiscal: Codeunit "NPR Library RS Fiscal";
+        POSActionRSAuditLkpB: Codeunit "NPR POS Action: RSAudit Lkp-B";
         ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction;
     begin
         // [Scenario] Test action for opening RS Audit Log Info
@@ -76,7 +79,7 @@ codeunit 85077 "NPR POS Act. RSAud.Look. Tests"
         DoItemSale();
 
         //[Then]
-        ShowAllRSAuditLog(ParameterShow::AllNonFiscalised);
+        POSActionRSAuditLkpB.ProcessRequest(ParameterShow::AllNonFiscalised);
         UnbindSubscription(LibraryRSFiscal);
     end;
 
@@ -86,6 +89,7 @@ codeunit 85077 "NPR POS Act. RSAud.Look. Tests"
     procedure OpenRSAuditLogPageWithLastTransactionParameter()
     var
         LibraryRSFiscal: Codeunit "NPR Library RS Fiscal";
+        POSActionRSAuditLkpB: Codeunit "NPR POS Action: RSAudit Lkp-B";
         ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction;
     begin
         // [Scenario] Test action for opening RS Audit Log Info
@@ -99,7 +103,7 @@ codeunit 85077 "NPR POS Act. RSAud.Look. Tests"
         DoItemSale();
 
         //[Then]
-        ShowAllRSAuditLog(ParameterShow::LastTransaction);
+        POSActionRSAuditLkpB.ProcessRequest(ParameterShow::LastTransaction);
         UnbindSubscription(LibraryRSFiscal);
     end;
 
@@ -189,41 +193,6 @@ codeunit 85077 "NPR POS Act. RSAud.Look. Tests"
         _POSSession.ClearAll();
         Clear(_POSSession);
         exit(POSEntry."Entry No.");
-    end;
-
-    local procedure ShowAllRSAuditLog(ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction)
-    var
-        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-        RSPOSAuditLogAuxInfoPage: Page "NPR RS POS Audit Log Aux. Info";
-    begin
-        case ParameterShow of
-            ParameterShow::AllFiscalised:
-                RSPOSAuditLogAuxInfo.SetFilter(Signature, '<>%1', '');
-            ParameterShow::AllNonFiscalised:
-                RSPOSAuditLogAuxInfo.SetFilter(Signature, '%1', '');
-            ParameterShow::LastTransaction:
-                begin
-                    ShowLastRSAuditLog();
-                    exit;
-                end;
-        end;
-        RSPOSAuditLogAuxInfoPage.SetTableView(RSPOSAuditLogAuxInfo);
-        RSPOSAuditLogAuxInfoPage.RunModal();
-    end;
-
-    local procedure ShowLastRSAuditLog()
-    var
-        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-        RSPOSAuditLogAuxInfo2: Record "NPR RS POS Audit Log Aux. Info";
-        RSPOSAuditLogAuxInfoPage: Page "NPR RS POS Audit Log Aux. Info";
-    begin
-        RSPOSAuditLogAuxInfo.SetLoadFields("Audit Entry Type", "Audit Entry No.");
-        RSPOSAuditLogAuxInfo.SetFilter(Signature, '<>%1', '');
-        RSPOSAuditLogAuxInfo.FindLast();
-        RSPOSAuditLogAuxInfo2.SetRange("Audit Entry Type", RSPOSAuditLogAuxInfo."Audit Entry Type");
-        RSPOSAuditLogAuxInfo2.SetRange("Audit Entry No.", RSPOSAuditLogAuxInfo."Audit Entry No.");
-        RSPOSAuditLogAuxInfoPage.SetTableView(RSPOSAuditLogAuxInfo2);
-        RSPOSAuditLogAuxInfoPage.RunModal();
     end;
 
     [ModalPageHandler]

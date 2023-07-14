@@ -34,19 +34,11 @@ codeunit 6150956 "NPR POS Action: RSAudit Lookup" implements "NPR IPOS Workflow"
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
+        POSActionRSAuditLkpB: Codeunit "NPR POS Action: RSAudit Lkp-B";
         ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction;
     begin
         ParameterShow := Context.GetIntegerParameter(ParameterShow_Name());
-        case ParameterShow of
-            ParameterShow::All:
-                ShowAllRSAuditLog(ParameterShow);
-            ParameterShow::AllFiscalised:
-                ShowAllRSAuditLog(ParameterShow);
-            ParameterShow::AllNonFiscalised:
-                ShowAllRSAuditLog(ParameterShow);
-            ParameterShow::LastTransaction:
-                ShowLastRSAuditLog();
-        end;
+        POSActionRSAuditLkpB.ProcessRequest(ParameterShow);
     end;
 
     local procedure ParameterShow_Name(): Text[30]
@@ -54,33 +46,5 @@ codeunit 6150956 "NPR POS Action: RSAudit Lookup" implements "NPR IPOS Workflow"
         exit('Show');
     end;
 
-    local procedure ShowAllRSAuditLog(ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction)
-    var
-        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-        RSPOSAuditLogAuxInfoPage: Page "NPR RS POS Audit Log Aux. Info";
-    begin
-        case ParameterShow of
-            ParameterShow::AllFiscalised:
-                RSPOSAuditLogAuxInfo.SetFilter(Signature, '<>%1', '');
-            ParameterShow::AllNonFiscalised:
-                RSPOSAuditLogAuxInfo.SetFilter(Signature, '%1', '');
-        end;
-        RSPOSAuditLogAuxInfoPage.SetTableView(RSPOSAuditLogAuxInfo);
-        RSPOSAuditLogAuxInfoPage.RunModal();
-    end;
 
-    local procedure ShowLastRSAuditLog()
-    var
-        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-        RSPOSAuditLogAuxInfo2: Record "NPR RS POS Audit Log Aux. Info";
-        RSPOSAuditLogAuxInfoPage: Page "NPR RS POS Audit Log Aux. Info";
-    begin
-        RSPOSAuditLogAuxInfo.SetLoadFields("Audit Entry Type", "Audit Entry No.");
-        RSPOSAuditLogAuxInfo.SetFilter(Signature, '<>%1', '');
-        RSPOSAuditLogAuxInfo.FindLast();
-        RSPOSAuditLogAuxInfo2.SetRange("Audit Entry Type", RSPOSAuditLogAuxInfo."Audit Entry Type");
-        RSPOSAuditLogAuxInfo2.SetRange("Audit Entry No.", RSPOSAuditLogAuxInfo."Audit Entry No.");
-        RSPOSAuditLogAuxInfoPage.SetTableView(RSPOSAuditLogAuxInfo2);
-        RSPOSAuditLogAuxInfoPage.RunModal();
-    end;
 }
