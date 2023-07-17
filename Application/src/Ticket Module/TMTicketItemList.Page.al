@@ -7,6 +7,7 @@ page 6059888 "NPR TM Ticket Item List"
     SourceTable = "Item Variant";
     SourceTableTemporary = true;
     Caption = 'Ticket Item List';
+    PromotedActionCategories = 'New,Process,Report,History,Manage';
     Editable = false;
     ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
     layout
@@ -84,6 +85,9 @@ page 6059888 "NPR TM Ticket Item List"
                 RunPageLink = "Item No." = field("Item No."), "Code" = field("Code");
                 Image = Item;
             }
+        }
+        area(Processing)
+        {
             Action(CreatePrepaidTickets)
             {
                 ToolTip = 'Create a set of tickets for which payment has already been handled. (F.ex. free tickets.) ';
@@ -136,6 +140,24 @@ page 6059888 "NPR TM Ticket Item List"
                     TicketBomPage: Page "NPR TM Ticket BOM";
                 begin
                     TicketBomPage.MakeTourTicket(Rec."Item No.", Rec.Code);
+                end;
+            }
+            Action(ResynchronizeMagento)
+            {
+                ToolTip = 'This action will emit data related to this ticket item to synchronize external systems.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Scope = Repeater;
+                Caption = 'Synchronize Ticket Data';
+                Image = RefreshText;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category5;
+                PromotedIsBig = true;
+                trigger OnAction()
+                var
+                    ResyncTicket: Codeunit "NPR TM TicketToDataLog";
+                begin
+                    ResyncTicket.DeepRefreshItem(Rec."Item No.");
                 end;
             }
         }
