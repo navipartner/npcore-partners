@@ -7,6 +7,7 @@ page 6059884 "NPR TM Ticket Item Card"
     SourceTableTemporary = true;
     InsertAllowed = false;
     DeleteAllowed = false;
+    PromotedActionCategories = 'New,Process,Report,History,Manage';
     ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
     Caption = 'Ticket Item Card';
 
@@ -149,6 +150,24 @@ page 6059884 "NPR TM Ticket Item Card"
                     TicketBomPage: Page "NPR TM Ticket BOM";
                 begin
                     TicketBomPage.MakeTourTicket(Rec."Item No.", Rec.Code);
+                end;
+            }
+            Action(ResynchronizeMagento)
+            {
+                ToolTip = 'This action will emit data related to this ticket item to synchronize external systems.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Scope = Repeater;
+                Caption = 'Synchronize Ticket Data';
+                Image = RefreshText;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category5;
+                PromotedIsBig = true;
+                trigger OnAction()
+                var
+                    ResyncTicket: Codeunit "NPR TM TicketToDataLog";
+                begin
+                    ResyncTicket.DeepRefreshItem(Rec."Item No.");
                 end;
             }
         }
