@@ -21,9 +21,9 @@
     begin
         if not UseCustomDescription() then
             exit;
-        SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
-        if ItemTranslation.Get(SalesLine."No.", SalesLine."Variant Code", SalesHeader."Language Code") then
-            exit;
+        if SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") then
+            if ItemTranslation.Get(SalesLine."No.", SalesLine."Variant Code", SalesHeader."Language Code") then
+                exit;
 
         if ItemVariant.Code <> '' then begin
             Item.Get(SalesLine."No.");
@@ -42,9 +42,9 @@
         if not UseCustomDescription() then
             exit;
 
-        PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
-        if ItemTranslation.Get(PurchaseLine."No.", PurchaseLine."Variant Code", PurchaseHeader."Language Code") then
-            exit;
+        if PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.") then
+            if ItemTranslation.Get(PurchaseLine."No.", PurchaseLine."Variant Code", PurchaseHeader."Language Code") then
+                exit;
 
         if ItemVariant.Code <> '' then begin
             Item.Get(PurchaseLine."No.");
