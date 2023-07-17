@@ -39,10 +39,17 @@
         end;
 
         if TempDataLogSetup.Get(TableId) then begin
-            OnDatabaseInsert := TempDataLogSetup."Log Insertion" <> TempDataLogSetup."Log Insertion"::" ";
-            OnDatabaseModify := TempDataLogSetup."Log Modification" <> TempDataLogSetup."Log Modification"::" ";
-            OnDatabaseDelete := TempDataLogSetup."Log Deletion" <> TempDataLogSetup."Log Deletion"::" ";
-            OnDatabaseRename := OnDatabaseInsert or OnDatabaseModify or OnDatabaseDelete;
+            if not OnDatabaseInsert then
+                OnDatabaseInsert := TempDataLogSetup."Log Insertion" <> TempDataLogSetup."Log Insertion"::" ";
+
+            if not OnDatabaseModify then
+                OnDatabaseModify := TempDataLogSetup."Log Modification" <> TempDataLogSetup."Log Modification"::" ";
+
+            if not OnDatabaseDelete then
+                OnDatabaseDelete := TempDataLogSetup."Log Deletion" <> TempDataLogSetup."Log Deletion"::" ";
+
+            if not OnDatabaseRename then
+                OnDatabaseRename := OnDatabaseInsert or OnDatabaseModify or OnDatabaseDelete;
         end;
     end;
 
