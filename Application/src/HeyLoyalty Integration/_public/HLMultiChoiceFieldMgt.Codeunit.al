@@ -242,9 +242,14 @@ codeunit 6150954 "NPR HL MultiChoice Field Mgt."
         FromSelectedMCFOption: Record "NPR HL Selected MCF Option";
         ToSelectedMCFOption: Record "NPR HL Selected MCF Option";
     begin
-        if not AssignedMCFOptionsExist(FromRecID, MultiChoiceFieldCode, FromSelectedMCFOption) then
-            exit;
-        ChangesFound := CopyAssignedMCFOptions(FromSelectedMCFOption, ToRecID, ToSelectedMCFOption, Move);
+        FilterAssignedMCFOptions(ToRecID, MultiChoiceFieldCode, ToSelectedMCFOption);
+        MarkSelectedMCFOptions(ToSelectedMCFOption);
+
+        if AssignedMCFOptionsExist(FromRecID, MultiChoiceFieldCode, FromSelectedMCFOption) then
+            ChangesFound := CopyAssignedMCFOptions(FromSelectedMCFOption, ToRecID, ToSelectedMCFOption, Move);
+
+        if RemoveObsoleteAssignedMCFOptions(ToSelectedMCFOption) then
+            ChangesFound := true;
     end;
 
     local procedure CopyAssignedMCFOptions(var FromSelectedMCFOption: Record "NPR HL Selected MCF Option"; ToRecID: RecordID; var ToSelectedMCFOption: Record "NPR HL Selected MCF Option"; Move: Boolean) ChangesFound: Boolean
