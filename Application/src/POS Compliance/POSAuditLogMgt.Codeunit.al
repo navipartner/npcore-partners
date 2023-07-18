@@ -220,6 +220,10 @@
                     if POSAction.Get(WorkflowName) then
                         ActionSystemId := POSAction.RecordId;
                 end;
+            ButtonType = 'EditMode':
+                begin
+                    DescriptionLog := 'authorized entering edit mode in POS Editor'
+                end;
             else
                 DescriptionLog := MissingInfoLbl;
         end;
