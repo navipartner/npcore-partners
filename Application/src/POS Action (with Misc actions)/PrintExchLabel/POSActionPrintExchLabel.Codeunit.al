@@ -63,7 +63,7 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel" implements "NPR IPOS Workflow"
     var
         PrintLines: Record "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
-        ExchangeLabelMgt: Codeunit "NPR Exchange Label Mgt.";
+
         POSSaleLine: Codeunit "NPR POS Sale Line";
         UserSelectionJToken: JsonToken;
         UserSelectionJObject: JsonObject;
@@ -73,16 +73,12 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel" implements "NPR IPOS Workflow"
         ValidFromDate: Date;
         Setting: Option Single,"Line Quantity","All Lines",Selection,Package;
         PreventNegativeQty: Boolean;
-        CannotbeNegErr: Label 'cannot be negative';
+        POSActionPrintExchLblB: Codeunit "NPR POS Action: PrintExchLbl-B";
     begin
         if not Context.GetBooleanParameter('PreventNegativeQty', PreventNegativeQty) then
             PreventNegativeQty := false;
-        if PreventNegativeQty then begin
-            POSSession.GetSaleLine(POSSaleLine);
-            POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-            if SaleLinePOS.Quantity < 0 then
-                SaleLinePOS.FieldError(Quantity, CannotbeNegErr);
-        end;
+        if PreventNegativeQty then
+            POSActionPrintExchLblB.CheckPreventNegativeQty(POSSession);
 
         Context.SetScopeRoot();
         Setting := Context.GetIntegerParameter('Setting');
@@ -98,7 +94,6 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel" implements "NPR IPOS Workflow"
                     PrintLines := SaleLinePOS;
                     PrintLines.SetRecFilter();
                 end;
-
             Setting::Selection,
             Setting::Package:
                 begin
@@ -119,8 +114,7 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel" implements "NPR IPOS Workflow"
                     PrintLines.MarkedOnly(true);
                 end;
         end;
-
-        ExchangeLabelMgt.PrintLabelsFromPOSWithoutPrompts(Setting, PrintLines, ValidFromDate);
+        POSActionPrintExchLblB.PrintLabelsFromPOS(Setting, PrintLines, ValidFromDate);
     end;
 
     local procedure PrintExchangeLabelPerQty(Context: Codeunit "NPR POS JSON Helper";
@@ -128,7 +122,6 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel" implements "NPR IPOS Workflow"
     var
         PrintLines: Record "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
-        ExchangeLabelMgt: Codeunit "NPR Exchange Label Mgt.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         UserSelectionJToken: JsonToken;
         PrintLineKeyJsonObject: JsonObject;
@@ -137,7 +130,7 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel" implements "NPR IPOS Workflow"
         ValidFromDate: Date;
         Setting: Option Single,"Line Quantity","All Lines",Selection,Package;
         PreventNegativeQty: Boolean;
-        CannotbeNegErr: Label 'cannot be negative';
+        POSActionPrintExchLblB: Codeunit "NPR POS Action: PrintExchLbl-B";
     begin
         if Context.HasProperty('printLineKey') then begin
             Clear(PrintLineKeyJsonObject);
@@ -156,11 +149,8 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel" implements "NPR IPOS Workflow"
         if not Context.GetBooleanParameter('PreventNegativeQty', PreventNegativeQty) then
             PreventNegativeQty := false;
 
-
-        if PreventNegativeQty and
-           (SaleLinePOS.Quantity < 0)
-        then
-            SaleLinePOS.FieldError(Quantity, CannotbeNegErr);
+        if PreventNegativeQty then
+            POSActionPrintExchLblB.CheckPreventNegativeQty(SaleLinePOS);
 
         Setting := Setting::"Line Quantity";
         UserSelectionJToken := Context.GetJToken('UserSelection');
@@ -169,8 +159,7 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel" implements "NPR IPOS Workflow"
         PrintLines := SaleLinePOS;
         PrintLines.SetRecFilter();
 
-        ExchangeLabelMgt.PrintLabelsFromPOSWithoutPrompts(Setting, PrintLines, ValidFromDate);
-
+        POSActionPrintExchLblB.PrintLabelsFromPOS(Setting, PrintLines, ValidFromDate);
     end;
 
     local procedure GetPrintLinesKeyAsJsonArray(POSSession: Codeunit "NPR POS Session") ResponseJsonObject: JsonObject
@@ -180,7 +169,6 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel" implements "NPR IPOS Workflow"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         PrintLinesKeyJsonArray: JsonArray;
         PrintLineJsonObject: JsonObject;
-
     begin
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
@@ -198,7 +186,6 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel" implements "NPR IPOS Workflow"
             until PrintLines.next() = 0;
 
         ResponseJsonObject.Add('printLineKeys', PrintLinesKeyJsonArray);
-
     end;
 
     local procedure GetActionScript(): Text
