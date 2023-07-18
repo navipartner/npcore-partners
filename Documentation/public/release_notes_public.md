@@ -23,8 +23,6 @@ The NP Retail Click & Collect feature has been expanded with the Prepayment feat
 
 For more information and operating instructions, refer to the article on [Setting up prepayment for Click & Collect](retail/clickandcollect/howto/setup_prepayment.md)
 
-> [!Video https://youtu.be/XvXVOwxP2xk]
-
 ## Version 22.0 (May 28th 2023)
 
 In this release, NP Retail has undergone performance optimization, including transfer of POS to CDN. Additionally, the following features have been developed:
