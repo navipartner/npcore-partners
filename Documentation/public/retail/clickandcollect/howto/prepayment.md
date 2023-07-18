@@ -1,4 +1,4 @@
-# Set up prepayment (Click & Collect)
+# Perform prepayment on POS (Click & Collect)
 
 To set up the prepayment flow of 100% on ordering for the Click & Collect module, follow the provided steps:
 
