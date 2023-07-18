@@ -795,7 +795,7 @@
         end;
     end;
 
-    internal procedure SetupNewLine(var LastRetailJnlLine: Record "NPR Retail Journal Line")
+    procedure SetupNewLine(var LastRetailJnlLine: Record "NPR Retail Journal Line")
     var
         RetailJnlHeader: Record "NPR Retail Journal Header";
     begin
