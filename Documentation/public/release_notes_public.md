@@ -2,6 +2,29 @@
 
 Learn which new features and improvements have been introduced in the newest versions of the NP Retail solution:
 
+## Version 23.0 (June 14th 2023)
+
+### Getting Started Wizard 
+
+A new wizard for simplifying the NP Retail installation process has been introduced. It helps users with quickly setting up the necessary NP Retail components, such as POS Stores, POS Units, POS Profiles, POS Payment Methods, and the POS Posting Setup. 
+
+The Getting Started wizard consists of a basic configuration checklist accompanied with adequate instructional videos to assist you throughout the initial setup process. 
+
+After you’ve been acquainted with the setup, you can proceed to download and import print templates and the NP Retail setup packages and create the basic NP Retail components. 
+
+For more information and operating instructions refer to the article on the [Getting Started Wizard](retail/gettingstarted/getting_started_wizard.md)
+
+### Click and Collect prepayment 
+
+The NP Retail Click & Collect feature has been expanded with the Prepayment feature. When creating a Click & Collect order, it is now possible to choose whether the prepayment will be allowed for the purchase amount or percentage. 
+
+> [!Note]
+> This feature isn’t active by default. If you wish to enable it in your environment, there are several parameters that need to be configured first.
+
+For more information and operating instructions, refer to the article on [Setting up prepayment for Click & Collect](retail/clickandcollect/howto/setup_prepayment.md)
+
+> [!Video https://youtu.be/XvXVOwxP2xk]
+
 ## Version 22.0 (May 28th 2023)
 
 In this release, NP Retail has undergone performance optimization, including transfer of POS to CDN. Additionally, the following features have been developed:

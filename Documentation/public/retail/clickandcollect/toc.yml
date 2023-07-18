@@ -2,9 +2,11 @@
   href: intro.md
 - name: How-To  
   items:
+  - name: Set up prepayment in Business Central (Click & Collect)
+    href: howto/setup_prepayment.md
   - name: Set up the Click & Collect module in NP Retail
     href: howto/clickandcollect_setup.md
-  - name: Set up prepayment (Click & Collect)
+  - name: Perform prepayment on POS (Click & Collect)
     href: howto/prepayment.md
 - name: Explanations
   items:
