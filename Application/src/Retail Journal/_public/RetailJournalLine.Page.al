@@ -36,8 +36,10 @@
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
+                    var
+                        RetailJournalCode: Codeunit "NPR Retail Journal Code";
                     begin
-                        PrintValidate();
+                        RetailJournalCode.PrintValidate(Rec);
                     end;
                 }
                 field(Description; Rec.Description)
@@ -246,11 +248,6 @@
         }
     }
 
-    [IntegrationEvent(true, false)]
-    procedure OnBeforeOnNewRecord(var isHandled: Boolean; var PrintParam: Boolean)
-    begin
-    end;
-
     trigger OnAfterGetRecord()
     var
         RecRef: RecordRef;
@@ -258,13 +255,9 @@
     begin
         Rec.CalcProfit();
 
-        IsHandled := false;
-        OnBeforeOnNewRecord(IsHandled, Print);
-        if IsHandled then begin
-            if Print then
-                PrintValidate();
+        OnBeforeOnAfterGetRecord(IsHandled, Print, Rec);
+        if IsHandled then
             exit;
-        end;
 
         RecRef.GetTable(Rec);
         Print := LabelLibrary.SelectionContains(RecRef);
@@ -280,7 +273,13 @@
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
+    var
+        IsHandled: Boolean;
     begin
+        OnBeforeOnNewRecordTrigger(IsHandled, Print, Rec);
+        if IsHandled then
+            exit;
+
         Print := false;
         Rec.SetupNewLine(xRec);
     end;
@@ -408,11 +407,19 @@
         CurrPage.Update(false);
     end;
 
-    local procedure PrintValidate()
-    var
-        RecRef: RecordRef;
+    [IntegrationEvent(true, false)]
+    procedure OnBeforeOnAfterGetRecord(var isHandled: Boolean; var PrintParam: Boolean; var RetailJournalLine: Record "NPR Retail Journal Line")
     begin
-        RecRef.GetTable(Rec);
-        LabelLibrary.ToggleLine(RecRef);
+    end;
+
+    [IntegrationEvent(true, false)]
+    procedure OnBeforeOnNewRecordTrigger(var isHandled: Boolean; var PrintParam: Boolean; var RetailJournalLine: Record "NPR Retail Journal Line")
+    begin
+    end;
+
+    [Obsolete('Created new Event OnBeforeOnNewRecord', 'NPR23.11')]
+    [IntegrationEvent(true, false)]
+    procedure OnBeforeOnNewRecord(var isHandled: Boolean; var PrintParam: Boolean)
+    begin
     end;
 }
