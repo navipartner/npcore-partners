@@ -1378,7 +1378,7 @@
           GenJournalLine);
 
         OnAfterInsertPOSPostingBufferToGenJnl(POSPostingBuffer, GenJournalLine, false);
-        OnAfterInsertPOSPostingBufferToGenJournal(POSPostingBuffer."POS Unit No.", POSPostingBuffer."Line Type", POSPostingBuffer."POS Payment Method Code", POSPostingBuffer."Posting Date", GenJournalLine);
+        OnAfterInsertFromPOSPostingBufferToGenJournal(POSPostingBuffer."POS Unit No.", POSPostingBuffer."Line Type", POSPostingBuffer."POS Payment Method Code", POSPostingBuffer."Posting Date", POSPostingBuffer."POS Payment Bin Code", POSPostingBuffer."POS Period Register", GenJournalLine);
     end;
 
 
@@ -1648,8 +1648,14 @@
     begin
     end;
 
+    [Obsolete('Replaced by new function OnAfterInsertFromPOSPostingBufferToGenJournal with new additional parameters', 'NPR24.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertPOSPostingBufferToGenJournal(POSUnitNo: Code[10]; LineType: Option; POSPaymentMethodCode: Code[10]; PostingDate: Date; var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertFromPOSPostingBufferToGenJournal(POSUnitNo: Code[10]; LineType: Option; POSPaymentMethodCode: Code[10]; PostingDate: Date; POSPaymentBinCode: Code[10]; POSPeriodRegister: Integer; var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 
