@@ -83,6 +83,33 @@ codeunit 6060083 "NPR POS Html Disp. Req"
         Context.Add('LocalMediaInfo', LocalMediaInfo);
     end;
 
+    procedure GetLabels(): JsonObject;
+    var
+        Lbls: JsonObject;
+
+        lbl_Total: Label 'Total';
+        lbl_PayTotal: Label 'Payment Total';
+        lbl_TotalRemaining: Label 'Total Remaining';
+        lbl_TotalExVat: Label 'Sub Total';
+        lbl_TotalVat: Label 'Tax Total';
+        lbl_TotalPayback: Label 'Total Change';
+
+        lbl_Submit: Label 'Submit';
+        lbl_Clear: Label 'Clear';
+        lbl_PhoneNo: Label 'Phone Number';
+    begin
+        Lbls.Add('Total', lbl_Total);
+        Lbls.Add('PaymentTotal', lbl_PayTotal);
+        Lbls.Add('TotalRemaining', lbl_TotalRemaining);
+        Lbls.Add('TotalExVat', lbl_TotalExVat);
+        Lbls.Add('TotalVat', lbl_TotalVat);
+        Lbls.Add('TotalPayback', lbl_TotalPayback);
+        Lbls.Add('Submit', lbl_Submit);
+        Lbls.Add('Clear', lbl_Clear);
+        Lbls.Add('PhoneNo', lbl_PhoneNo);
+        exit(Lbls);
+    end;
+
     procedure GetReceiptContent(POSUnitCode: Code[10]; SalesTicket: Code[20]; Date: Date): JsonObject
     var
         SaleLinePOS: Record "NPR POS Sale Line";

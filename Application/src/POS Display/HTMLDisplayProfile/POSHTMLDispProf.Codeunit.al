@@ -35,6 +35,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         JsParam.Add('JSAction', 'UpdateReceipt');
         ReceiptContent := HtmlDisplayReq.GetReceiptContent(POSUnit."No.", SaleHeader."Sales Ticket No.", SaleHeader.Date);
         JsParam.Add('ReceiptContent', ReceiptContent);
+        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
         Context.Add('DisplayAction', 'SendJS');
         Context.Add('JSParameter', JsParam);
         SendRequest(POSUnit."No.", Context, False);
@@ -57,6 +58,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         JsParam.Add('JSAction', 'UpdateReceipt');
         Context.Add('DisplayAction', 'SendJS');
         JsParam.Add('ReceiptContent', ReceiptContent);
+        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
         Context.Add('JSParameter', JsParam);
         SendRequest(POSUnit."No.", Context, False);
     end;
@@ -83,6 +85,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         JsParam.Add('JSAction', 'UpdateReceipt');
         Context.Add('DisplayAction', 'SendJS');
         JsParam.Add('ReceiptContent', ReceiptContent);
+        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
         Context.Add('JSParameter', JsParam);
         SendRequest(POSUnit."No.", Context, False);
     end;
@@ -103,6 +106,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         JsParam.Add('JSAction', 'UpdateReceipt');
         Context.Add('DisplayAction', 'SendJS');
         JsParam.Add('ReceiptContent', ReceiptContent);
+        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
         Context.Add('JSParameter', JsParam);
         SendRequest(POSUnit."No.", Context, False);
     end;
@@ -123,6 +127,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         JsParam.Add('JSAction', 'UpdateReceipt');
         Context.Add('DisplayAction', 'SendJS');
         JsParam.Add('ReceiptContent', ReceiptContent);
+        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
         Context.Add('JSParameter', JsParam);
         SendRequest(POSUnit."No.", Context, False);
     end;
@@ -143,6 +148,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         JsParam.Add('JSAction', 'UpdateReceipt');
         Context.Add('DisplayAction', 'SendJS');
         JsParam.Add('ReceiptContent', ReceiptContent);
+        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
         Context.Add('JSParameter', JsParam);
         SendRequest(POSUnit."No.", Context, False);
     end;
@@ -163,6 +169,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         JsParam.Add('JSAction', 'UpdateReceipt');
         Context.Add('DisplayAction', 'SendJS');
         JsParam.Add('ReceiptContent', ReceiptContent);
+        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
         Context.Add('JSParameter', JsParam);
         SendRequest(POSUnit."No.", Context, False);
     end;
@@ -183,6 +190,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         JsParam.Add('JSAction', 'UpdateReceipt');
         Context.Add('DisplayAction', 'SendJS');
         JsParam.Add('ReceiptContent', ReceiptContent);
+        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
         Context.Add('JSParameter', JsParam);
         SendRequest(POSUnit."No.", Context, False);
     end;
