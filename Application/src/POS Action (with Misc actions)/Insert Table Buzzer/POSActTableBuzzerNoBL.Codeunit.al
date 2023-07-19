@@ -1,17 +1,20 @@
 codeunit 6150694 "NPR POS Act:TableBuzzerNo BL"
 {
     Access = Internal;
-    procedure InputPosCommentLine(var SaleLine: Codeunit "NPR POS Sale Line"; CommentTextPattern: Text; InputText: Text)
+
+    procedure InputPosCommentLine(var POSSaleLine: Codeunit "NPR POS Sale Line"; CommentTextPattern: Text; InputText: Text)
     var
-        Line: Record "NPR POS Sale Line";
-        BuzzerText: Label 'Table Buzzer %1';
+        SaleLinePos: Record "NPR POS Sale Line";
+        BuzzerTxt: Label 'Table Buzzer %1';
     begin
+        POSSaleLine.GetNewSaleLine(SaleLinePos);
+
         if CommentTextPattern = '' then
-            CommentTextPattern := BuzzerText;
+            CommentTextPattern := BuzzerTxt;
 
-        Line."Line Type" := Line."Line Type"::Comment;
-        Line.Description := StrSubstNo(CommentTextPattern, InputText);
+        SaleLinePos."Line Type" := SaleLinePos."Line Type"::Comment;
+        SaleLinePos.Description := StrSubstNo(CommentTextPattern, InputText);
 
-        SaleLine.InsertLine(Line);
+        POSSaleLine.InsertLineRaw(SaleLinePos, false);
     end;
 }

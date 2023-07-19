@@ -2,7 +2,7 @@ codeunit 6150795 "NPR POS Action - Insert Comm." implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
-    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'Insert a sales line comment. ';
         ParamDefaultDesc_CptLbl: Label 'Default Description';
@@ -27,17 +27,17 @@ codeunit 6150795 "NPR POS Action - Insert Comm." implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('prompt', Prompt_EnterComment);
     end;
 
-    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup");
     var
         POSSaleLine: Record "NPR POS Sale Line";
         BusinessLogic: Codeunit "NPR POS Action - Insert Comm B";
-        NewDesc: Text[100];
+        CommentDescription: Text[100];
     begin
-        NewDesc := CopyStr(Context.GetString('NewDescription'), 1, MaxStrLen(POSSaleLine.Description));
+        CommentDescription := CopyStr(Context.GetString('NewDescription'), 1, MaxStrLen(POSSaleLine.Description));
 
         case Step of
             'InsertComment':
-                BusinessLogic.InputPosCommentLine(NewDesc, SaleLine);
+                BusinessLogic.InputPosCommentLine(CommentDescription, SaleLine);
         end;
     end;
 
