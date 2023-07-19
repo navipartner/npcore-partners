@@ -1,5 +1,5 @@
 ﻿page 6014450 "NPR Mixed Discount"
-{   
+{
     Caption = 'Mix Discount';
     ContextSensitiveHelpPage = 'retail/Discounts/explanation/discount_types.html';
     PageType = Card;
@@ -25,7 +25,7 @@
                             ShowCaption = false;
                             field("Code"; Rec.Code)
                             {
-                                ToolTip = 'Defines the Code of Mixed Discount';
+                                ToolTip = 'Defines the unique code of Mixed Discount';
                                 ApplicationArea = NPRRetail;
 
                                 trigger OnAssistEdit()
@@ -37,7 +37,7 @@
                             field(Description; Rec.Description)
                             {
                                 Importance = Promoted;
-                                ToolTip = 'Defines the Description of Mixed Discount';
+                                ToolTip = 'Defines the name of Mixed Discount';
                                 ApplicationArea = NPRRetail;
                             }
                             group(Control6014409)
@@ -53,7 +53,6 @@
                                     trigger OnValidate()
                                     begin
                                         UpdateLineView();
-                                        CurrPage.Update(true);
                                     end;
                                 }
                             }
@@ -85,11 +84,6 @@
                                     {
                                         ToolTip = 'Defines the Minimum Quantity of Mixed Discount';
                                         ApplicationArea = NPRRetail;
-
-                                        trigger OnValidate()
-                                        begin
-                                            CurrPage.Update(true);
-                                        end;
                                     }
                                     field("Max. Quantity"; Rec."Max. Quantity")
                                     {
@@ -108,11 +102,6 @@
                                     DecimalPlaces = 0 : 5;
                                     ToolTip = 'Defines the Item Quantity per Lot for Mixed Discount';
                                     ApplicationArea = NPRRetail;
-
-                                    trigger OnValidate()
-                                    begin
-                                        CurrPage.Update(true);
-                                    end;
                                 }
                             }
                             group(Control6014407)
@@ -179,11 +168,6 @@
                                 {
                                     ToolTip = 'Defines the Total Amount for Mixed Discount';
                                     ApplicationArea = NPRRetail;
-
-                                    trigger OnValidate()
-                                    begin
-                                        CurrPage.Update(true);
-                                    end;
                                 }
                                 field("Total Amount Excl. VAT"; Rec."Total Amount Excl. VAT")
                                 {
@@ -201,11 +185,6 @@
                                     Caption = 'Discount Amount Excl. VAT';
                                     ToolTip = 'Specifies whether the discount amounts, specified on the Mix Discount Levels section, are tax-exclusive.';
                                     ApplicationArea = NPRRetail;
-
-                                    trigger OnValidate()
-                                    begin
-                                        CurrPage.Update();
-                                    end;
                                 }
                             }
                             group(Control6014404)
@@ -216,11 +195,6 @@
                                 {
                                     ToolTip = 'Defines the Total Discount % for Mixed Discount';
                                     ApplicationArea = NPRRetail;
-
-                                    trigger OnValidate()
-                                    begin
-                                        CurrPage.Update(true);
-                                    end;
                                 }
                             }
                             group(Control6014405)
@@ -231,11 +205,6 @@
                                 {
                                     ToolTip = 'Defines the Total Discount Amount for Mixed Discount';
                                     ApplicationArea = NPRRetail;
-
-                                    trigger OnValidate()
-                                    begin
-                                        CurrPage.Update(true);
-                                    end;
                                 }
                                 field(TotalAmtExclVAT; Rec."Total Amount Excl. VAT")
                                 {
@@ -252,21 +221,11 @@
                                 {
                                     ToolTip = 'Defines the Item Discount Quantity for Mixed Discount';
                                     ApplicationArea = NPRRetail;
-
-                                    trigger OnValidate()
-                                    begin
-                                        CurrPage.Update(true);
-                                    end;
                                 }
                                 field("Item Discount %"; Rec."Item Discount %")
                                 {
                                     ToolTip = 'Defines the Item Discount % for Mixed Discount';
                                     ApplicationArea = NPRRetail;
-
-                                    trigger OnValidate()
-                                    begin
-                                        CurrPage.Update(true);
-                                    end;
                                 }
                             }
 
@@ -390,7 +349,6 @@
                         var
                             ItemList: Page "Item List";
                         begin
-                            Clear(ItemList);
                             ItemList.LookupMode := true;
                             if (ItemList.RunModal() = ACTION::LookupOK) then begin
                                 Item.Reset();
@@ -412,7 +370,6 @@
                             ItemCategory: Record "Item Category";
                             ItemCategories: Page "Item Categories";
                         begin
-                            Clear(ItemCategories);
                             ItemCategories.LookupMode := true;
                             if (ItemCategories.RunModal() = ACTION::LookupOK) then begin
                                 Item.Reset();
@@ -431,15 +388,14 @@
 
                         trigger OnAction()
                         var
-                            Kreditor: Record Vendor;
-                            KreditorForm: Page "Vendor List";
+                            Vendor: Record Vendor;
+                            VendorList: Page "Vendor List";
                         begin
-                            Clear(KreditorForm);
-                            KreditorForm.LookupMode := true;
-                            if (KreditorForm.RunModal() = ACTION::LookupOK) then begin
-                                KreditorForm.GetRecord(Kreditor);
+                            VendorList.LookupMode := true;
+                            if (VendorList.RunModal() = ACTION::LookupOK) then begin
+                                VendorList.GetRecord(Vendor);
                                 Item.Reset();
-                                Item.SetRange("Vendor No.", Kreditor."No.");
+                                Item.SetRange("Vendor No.", Vendor."No.");
                                 TransferToMix();
                             end;
                         end;
@@ -453,10 +409,10 @@
 
                         trigger OnAction()
                         var
-                            MsgOkCancel: Label 'Transfer all items to this mix?';
+                            OkCancelQst: Label 'Transfer all items to this mix?';
                         begin
                             Item.Reset();
-                            if DIALOG.Confirm(MsgOkCancel, false) then
+                            if Confirm(OkCancelQst, false) then
                                 TransferToMix();
                         end;
                     }
@@ -497,6 +453,9 @@
                     Image = "Action";
                     ToolTip = 'Copy the campaign details to a specific Department Code';
                     ApplicationArea = NPRRetail;
+                    ObsoleteTag = 'NPR24.0';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Not used';
                 }
                 action("Copy Mixed Discount")
                 {
@@ -508,22 +467,22 @@
 
                     trigger OnAction()
                     var
-                        MixedDiscount1: Record "NPR Mixed Discount";
-                        MixedDiscountLine1: Record "NPR Mixed Discount Line";
+                        MixedDiscount: Record "NPR Mixed Discount";
+                        MixedDiscountLine: Record "NPR Mixed Discount Line";
                     begin
-                        if PAGE.RunModal(PAGE::"NPR Mixed Discount List", MixedDiscount1) <> ACTION::LookupOK then
+                        if Page.RunModal(Page::"NPR Mixed Discount List", MixedDiscount) <> Action::LookupOK then
                             exit;
-                        MixedDiscountLine1.SetRange(Code, Rec.Code);
-                        MixedDiscountLine1.DeleteAll();
+                        MixedDiscountLine.SetRange(Code, Rec.Code);
+                        MixedDiscountLine.DeleteAll();
 
-                        MixedDiscountLine1.SetRange(Code, MixedDiscount1.Code);
-                        if MixedDiscountLine1.FindSet() then
+                        MixedDiscountLine.SetRange(Code, MixedDiscount.Code);
+                        if MixedDiscountLine.FindSet() then
                             repeat
                                 MixedDiscountLine.Init();
-                                MixedDiscountLine.TransferFields(MixedDiscountLine1);
+                                MixedDiscountLine.TransferFields(MixedDiscountLine);
                                 MixedDiscountLine.Code := Rec.Code;
                                 MixedDiscountLine.Insert(true);
-                            until MixedDiscountLine1.Next() = 0;
+                            until MixedDiscountLine.Next() = 0;
                     end;
                 }
             }
@@ -557,36 +516,35 @@
 
     var
         Item: Record Item;
-        MixedDiscountLine: Record "NPR Mixed Discount Line";
-        TxtCompressItems: Label 'Compressed to Item Discount Group';
-        TxtCompChngeContinue: Label 'Compression will change one or more Item Disc. Group. Do you wish to continue?';
-        DiscountLevelsApplicable: Boolean;
         MixedDiscountMgt: Codeunit "NPR Mixed Discount Management";
+        CompressItemslbl: Label 'Compressed to Item Discount Group';
+        CompChngeContinueQst: Label 'Compression will change one or more Item Disc. Group. Do you wish to continue?';
+        DiscountLevelsApplicable: Boolean;
 
     internal procedure TransferToMix()
     var
         NPRMixedDiscountLine: Record "NPR Mixed Discount Line";
-        ErrorNo1: Label 'No Items has been selected for transfer';
-        ErrorNo2: Label 'Item No. %1 allready exists in the mix';
-        OkMsg: Label '%1 Item(s) has been transferred to Mix No. %2';
-        MixedDiscountList: Page "NPR Mixed Discount List";
+        ItemNoErr: Label 'No Items has been selected for transfer';
+        ItemNo2Err: Label 'Item No. %1 allready exists in the mix', Comment = '%1 = Item no.';
+        TransferDoneLbl: Label '%1 Item(s) has been transferred to Mix No. %2', Comment = '%1 = No. of item, %2 = mix no.';
     begin
-        if not Item.Find('-') then
-            Error(ErrorNo1);
-        Clear(MixedDiscountList);
-        repeat
-            if NPRMixedDiscountLine.Get(Rec.Code, NPRMixedDiscountLine."Disc. Grouping Type"::Item, Item."No.", '') then
-                Error(ErrorNo2, Item."No.");
-            NPRMixedDiscountLine.Init();
-            NPRMixedDiscountLine.Code := Rec.Code;
-            NPRMixedDiscountLine."No." := Item."No.";
-            NPRMixedDiscountLine."Disc. Grouping Type" := NPRMixedDiscountLine."Disc. Grouping Type"::Item;
-            NPRMixedDiscountLine.Quantity := 1;
-            NPRMixedDiscountLine.Description := Item.Description;
-            NPRMixedDiscountLine.Status := Rec.Status;
-            NPRMixedDiscountLine.Insert();
-        until Item.Next() = 0;
-        Message(OkMsg, Item.Count, Rec.Code);
+        if Item.IsEmpty() then
+            Error(ItemNoErr);
+
+        if Item.FindSet() then
+            repeat
+                if NPRMixedDiscountLine.Get(Rec.Code, NPRMixedDiscountLine."Disc. Grouping Type"::Item, Item."No.", '') then
+                    Error(ItemNo2Err, Item."No.");
+                NPRMixedDiscountLine.Init();
+                NPRMixedDiscountLine.Code := Rec.Code;
+                NPRMixedDiscountLine."No." := Item."No.";
+                NPRMixedDiscountLine."Disc. Grouping Type" := NPRMixedDiscountLine."Disc. Grouping Type"::Item;
+                NPRMixedDiscountLine.Quantity := 1;
+                NPRMixedDiscountLine.Description := Item.Description;
+                NPRMixedDiscountLine.Status := Rec.Status;
+                NPRMixedDiscountLine.Insert();
+            until Item.Next() = 0;
+        Message(TransferDoneLbl, Item.Count, Rec.Code);
     end;
 
     internal procedure CollapseToItemDiscGroup()
@@ -594,19 +552,17 @@
         NPRMixedDiscountLine: Record "NPR Mixed Discount Line";
         ItemDiscGrpRec: Record "Item Discount Group";
     begin
-        if not Confirm(TxtCompChngeContinue) then
+        if not Confirm(CompChngeContinueQst, false) then
             exit;
 
-        Clear(ItemDiscGrpRec);
         ItemDiscGrpRec.Init();
         ItemDiscGrpRec.Code := Rec.Code;
-        ItemDiscGrpRec.Description := CopyStr(TxtCompressItems, 1, MaxStrLen(ItemDiscGrpRec.Description));
+        ItemDiscGrpRec.Description := CopyStr(CompressItemsLbl, 1, MaxStrLen(ItemDiscGrpRec.Description));
         if ItemDiscGrpRec.Insert(true) then;
 
-        Clear(NPRMixedDiscountLine);
         NPRMixedDiscountLine.ClearMarks();
         NPRMixedDiscountLine.SetRange(Code, Rec.Code);
-        if NPRMixedDiscountLine.Find('-') then
+        if NPRMixedDiscountLine.FindSet() then
             repeat
                 if NPRMixedDiscountLine."Disc. Grouping Type" = NPRMixedDiscountLine."Disc. Grouping Type"::Item then begin
                     Item.Reset();
@@ -628,7 +584,7 @@
         NPRMixedDiscountLine.Validate(Code, Rec.Code);
         NPRMixedDiscountLine."Disc. Grouping Type" := NPRMixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group";
         NPRMixedDiscountLine."No." := Rec.Code;
-        NPRMixedDiscountLine.Description := TxtCompressItems;
+        NPRMixedDiscountLine.Description := CompressItemslbl;
         if not NPRMixedDiscountLine.Insert(true) then
             if NPRMixedDiscountLine.Modify(true) then;
     end;

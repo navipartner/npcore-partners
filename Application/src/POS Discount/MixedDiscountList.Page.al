@@ -8,8 +8,8 @@
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR Mixed Discount";
-    SourceTableView = SORTING("Starting date", "Starting time", "Ending date", "Ending time")
-                      WHERE("Mix Type" = FILTER(Standard | Combination));
+    SourceTableView = sorting("Starting date", "Starting time", "Ending date", "Ending time")
+                      where("Mix Type" = filter(Standard | Combination));
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
 
@@ -26,7 +26,7 @@
 
                     Caption = 'Mix No.';
                     Editable = false;
-                    ToolTip = 'Specifies the number of the mix discount';
+                    ToolTip = 'Specifies the unique number of the mix discount';
                     ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
@@ -40,14 +40,14 @@
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the description of the mix discount';
+                    ToolTip = 'Specifies the name of the mix discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Mix Type"; Rec."Mix Type")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the mix type of the mix discount';
+                    ToolTip = 'Specifies the type of the mix discount';
                     ApplicationArea = NPRRetail;
                 }
                 field("Min. Quantity"; Rec."Min. Quantity")
@@ -161,10 +161,6 @@
 
                 ToolTip = 'Displays the dimensions of the selected mix discount. You can manage the dimensions for the selected mix discount';
                 ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                begin
-                end;
             }
         }
     }
