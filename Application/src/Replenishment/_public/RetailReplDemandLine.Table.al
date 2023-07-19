@@ -2,6 +2,9 @@
 {
     Caption = 'Retail Replenishment Demand Line';
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'Retail Replenishment will no longer be supported';
 
     fields
     {

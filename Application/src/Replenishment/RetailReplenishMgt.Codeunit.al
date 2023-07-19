@@ -1,6 +1,10 @@
 ﻿codeunit 6151052 "NPR Retail Replenish. Mgt."
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'Retail Replenishment will no longer be supported';
+
     trigger OnRun()
     begin
     end;

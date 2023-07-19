@@ -11,6 +11,9 @@
 
     SourceTable = "NPR Retail Repl. Demand Line";
     ApplicationArea = NPRRetail;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'Retail Replenishment will no longer be supported';
 
     layout
     {

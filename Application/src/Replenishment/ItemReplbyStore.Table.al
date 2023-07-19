@@ -3,6 +3,9 @@
     Access = Internal;
     Caption = 'Item Replenishment by Store';
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'Retail Replenishment will no longer be supported';
 
     fields
     {
