@@ -2,7 +2,7 @@
 {
     Access = Internal;
 
-    procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config")
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescriptionLbl: Label 'Insert a table buzzer number';
         DialogTypeParam_OptLbl: Label 'TextField,Numpad', Locked = true;
@@ -36,7 +36,7 @@
         );
     end;
 
-    procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup");
     begin
         OnActionInsertTableBuzzer(Context, SaleLine);
     end;

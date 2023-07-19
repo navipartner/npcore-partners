@@ -14,12 +14,12 @@ codeunit 85131 "NPR POS Act Table Buzzer Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure InsertCommentLine()
     var
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         BusinessCodeunit: Codeunit "NPR POS Act:TableBuzzerNo BL";
-        SaleLinePOS: Record "NPR POS Sale Line";
-        BuzzerText: Label 'Table Buzzer %1';
-        InputText: Label 'test';
+        BuzzerTxt: Label 'Table Buzzer %1', Comment = '%1 - input text value';
+        InputTxt: Label 'test';
     begin
         // [Scenario] Insert comment line on pos sale line
         // [Given] POS & Payment setup
@@ -30,12 +30,12 @@ codeunit 85131 "NPR POS Act Table Buzzer Tests"
         POSSession.GetSaleLine(POSSaleLine);
 
         // [When] Insert comment
-        BusinessCodeunit.InputPosCommentLine(POSSaleLine, '', InputText);
+        BusinessCodeunit.InputPosCommentLine(POSSaleLine, '', InputTxt);
 
         // [Then]
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         SaleLinePOS.FindFirst();
         Assert.IsTrue(SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Comment, 'Comment line is not inserted.');
-        Assert.AreEqual(StrSubstNo(BuzzerText, InputText), SaleLinePOS.Description, 'Comment not according to test scenario.');
+        Assert.AreEqual(StrSubstNo(BuzzerTxt, InputTxt), SaleLinePOS.Description, 'Comment not according to test scenario.');
     end;
 }
