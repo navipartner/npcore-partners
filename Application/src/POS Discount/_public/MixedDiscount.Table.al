@@ -83,11 +83,11 @@
 
             trigger OnValidate()
             var
-                ErrDate: Label 'Invalid Starting Date';
+                DateErr: Label 'Invalid Starting Date';
             begin
                 if "Ending date" <> 0D then
                     if "Ending date" < "Starting date" then
-                        Error(ErrDate);
+                        Error(DateErr);
             end;
         }
         field(12; "Ending date"; Date)
@@ -97,11 +97,11 @@
 
             trigger OnValidate()
             var
-                ErrDate: Label 'Invalid Closing Date';
+                DateErr: Label 'Invalid Closing Date';
             begin
                 if "Starting date" <> 0D then
                     if "Ending date" < "Starting date" then
-                        Error(ErrDate);
+                        Error(DateErr);
             end;
         }
         field(13; "Starting time"; Time)
@@ -297,10 +297,6 @@
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
@@ -345,9 +341,9 @@
     end;
 
     var
-        Text000: Label 'Checking Item No.: #1########\Mix Line:          #2######## of #3########';
-        Text001: Label 'The following Lines are already active on other Mixed Discounts:\ %1\\Continue?';
-        Text002: Label '\  - %1 %2 (%3)';
+        CheckingItemLbl: Label 'Checking Item No.: #1########\Mix Line:          #2######## of #3########';
+        ActiveLinesQst: Label 'The following Lines are already active on other Mixed Discounts:\ %1\\Continue?', Comment = '%1 = Line description';
+        LineTextlbl: Label '\  - %1 %2 (%3)';
         StatusErr: Label 'Mix discount configuration not activated.';
 
     procedure Assistedit(MixedDiscount: Record "NPR Mixed Discount"): Boolean
@@ -375,7 +371,6 @@
         MixedDiscount: Record "NPR Mixed Discount";
         MixedDiscountLine: Record "NPR Mixed Discount Line";
     begin
-        //-NPR5.31 [262904]
         if "Mix Type" = "Mix Type"::Combination then begin
             MinQty := 0;
             MixedDiscountLine.SetRange(Code, Code);
@@ -398,7 +393,6 @@
         MixedDiscountLine.SetRange("Disc. Grouping Type", MixedDiscountLine."Disc. Grouping Type"::Item, MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group");
         MixedDiscountLine.CalcSums(Quantity);
         exit(MixedDiscountLine.Quantity);
-        //+NPR5.31 [262904]
     end;
 
     local procedure TestStatus()
@@ -428,7 +422,7 @@
 
         Counter := 0;
         Total := MixedDiscountLine.Count();
-        Window.Open(Text000);
+        Window.Open(CheckingItemLbl);
         Window.Update(3, Total);
 
         MixedDiscountLine.FindSet();
@@ -461,24 +455,21 @@
 
         TempMixedDiscountLine.FindSet();
         repeat
-            LineText += StrSubstNo(Text002, TempMixedDiscountLine."Disc. Grouping Type", TempMixedDiscountLine."No.", TempMixedDiscountLine.Code);
+            LineText += StrSubstNo(LineTextlbl, TempMixedDiscountLine."Disc. Grouping Type", TempMixedDiscountLine."No.", TempMixedDiscountLine.Code);
         until TempMixedDiscountLine.Next() = 0;
         TempMixedDiscountLine.DeleteAll();
 
-        if not Confirm(StrSubstNo(Text001, LineText), true) then
+        if not Confirm(StrSubstNo(ActiveLinesQst, LineText), true) then
             Error(StatusErr);
-        //+NPR5.31 [262904]
     end;
 
     local procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
         DimMgt: Codeunit DimensionManagement;
     begin
-        //-NPR5.31 [263093]
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"NPR Mixed Discount", Code, FieldNumber, ShortcutDimCode);
         Modify();
-        //+NPR5.31 [263093]
     end;
 
     local procedure UpdateLines()
@@ -486,7 +477,6 @@
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         MixedDiscountPart: Record "NPR Mixed Discount";
     begin
-        //-NPR5.40 [294655]
         if IsTemporary then
             exit;
 
@@ -500,7 +490,6 @@
                 MixedDiscountLine."Ending Time" := "Ending time";
                 MixedDiscountLine.Modify();
 
-                //-NPR5.45 [327277]
                 if MixedDiscountLine."Disc. Grouping Type" = MixedDiscountLine."Disc. Grouping Type"::"Mix Discount" then begin
                     MixedDiscountPart.Get(MixedDiscountLine."No.");
                     MixedDiscountPart."Starting date" := "Starting date";
@@ -510,9 +499,7 @@
                     MixedDiscountPart."Ending time" := "Ending time";
                     MixedDiscountPart.Modify(true);
                 end;
-            //+NPR5.45 [327277]
             until MixedDiscountLine.Next() = 0;
-        //+NPR5.40 [294655]
     end;
 
     internal procedure AbsoluteAmountDiscount(): Boolean

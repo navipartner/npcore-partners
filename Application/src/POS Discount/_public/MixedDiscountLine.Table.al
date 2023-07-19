@@ -196,8 +196,8 @@
                 if "No." = '' then begin
                     ItemReference.SetRange("Reference No.", "Cross-Reference No.");
                     if ItemReference.Count() > 1 then begin
-                        ItemReference.SetFilter("Reference Type", '%1', ItemReference."Reference Type"::"Bar Code");
-                        ItemReference.SetFilter("Reference Type No.", '%1', '');
+                        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+                        ItemReference.SetRange("Reference Type No.", '');
 
                         if PAGE.RunModal(PAGE::"Item Reference List", ItemReference) <> ACTION::LookupOK then
                             exit;
