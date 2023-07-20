@@ -1,4 +1,4 @@
-﻿codeunit 6151203 "NPR NpCs POSAction Deliv.Order" implements "NPR IPOS Workflow"
+codeunit 6151203 "NPR NpCs POSAction Deliv.Order" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
@@ -62,17 +62,15 @@
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; SaleMgr: Codeunit "NPR POS Sale"; SaleLineMgr: Codeunit "NPR POS Sale Line"; PaymentLineMgr: Codeunit "NPR POS Payment Line"; SetupMgr: Codeunit "NPR POS Setup");
-    var
-        POSSession: Codeunit "NPR POS Session";
     begin
         case Step of
             'select_document':
                 begin
-                    OnActionSelectDocument(Context, POSSession);
+                    OnActionSelectDocument(Context, SetupMgr);
                 end;
             'deliver_document':
                 begin
-                    OnActionDeliverDocument(Context, POSSession);
+                    OnActionDeliverDocument(Context);
                 end;
         end;
     end;
@@ -134,7 +132,7 @@
         end;
     end;
 
-    local procedure OnActionSelectDocument(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
+    local procedure OnActionSelectDocument(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup")
     var
         NpCsDocument: Record "NPR NpCs Document";
         ConfirmInvDiscAmt, OpenDocument : Boolean;
@@ -145,7 +143,7 @@
         OpenDocument := Context.GetBooleanParameter('OpenDocument');
         ConfirmInvDiscAmt := Context.GetBooleanParameter('ConfirmInvDiscAmt');
         ReferenceNo := CopyStr(Context.GetString('document_input'), 1, MaxStrLen(NpCsDocument."Reference No."));
-        LocationFilter := GetLocationFilter(Context, POSSession);
+        LocationFilter := GetLocationFilter(Context, Setup);
         SortingParam := Context.GetIntegerParameter('Sorting');
 
         if not DelOrderBL.FindAndConfirmDoc(NpCsDocument, ReferenceNo, LocationFilter, SortingParam, ConfirmInvDiscAmt, OpenDocument) then
@@ -154,14 +152,11 @@
         Context.SetContext('entry_no', NpCsDocument."Entry No.");
     end;
 
-    local procedure OnActionDeliverDocument(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
+    local procedure OnActionDeliverDocument(Context: Codeunit "NPR POS JSON Helper")
     var
-        NpCsDocument: Record "NPR NpCs Document";
-        NpCsPOSActionEvents: Codeunit "NPR NpCs POS Action Events";
         ConfirmInvDiscAmt: Boolean;
         EntryNo: Integer;
         DeliverText: Text;
-        IsHandled: Boolean;
     begin
         Context.SetContext('/', false);
         EntryNo := Context.GetInteger('entry_no');
@@ -170,31 +165,16 @@
         if EntryNo = 0 then
             exit;
 
-        NpCsDocument.Get(EntryNo);
-        NpCsPOSActionEvents.OnBeforeDeliverDocument(POSSession, NpCsDocument, DeliverText, IsHandled);
-        if IsHandled then
-            exit;
-        case NpCsDocument."Document Type" of
-            NpCsDocument."Document Type"::Order:
-                begin
-                    DelOrderBL.DeliverOrder(DeliverText, POSSession, NpCsDocument);
-                end;
-            NpCsDocument."Document Type"::"Posted Invoice":
-                begin
-                    DelOrderBL.DeliverPostedInvoice(ConfirmInvDiscAmt, DeliverText, POSSession, NpCsDocument);
-                end;
-        end;
+        DelOrderBL.DeliverDocument(EntryNo, DeliverText, ConfirmInvDiscAmt);
     end;
 
-    local procedure GetLocationFilter(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session") LocationFilter: Text
+    local procedure GetLocationFilter(Context: Codeunit "NPR POS JSON Helper"; POSSetup: Codeunit "NPR POS Setup") LocationFilter: Text
     var
         POSStore: Record "NPR POS Store";
-        POSSetup: Codeunit "NPR POS Setup";
     begin
         case Context.GetIntegerParameter('Location From') of
             0:
                 begin
-                    POSSession.GetSetup(POSSetup);
                     POSSetup.GetPOSStore(POSStore);
                     LocationFilter := POSStore."Location Code";
                 end;
