@@ -91,31 +91,6 @@
         JobPlanningLine.SetFilter("NPR Resource E-Mail", '<>%1', '');
     end;
 
-    procedure ParseEmailTemplateText(var RecRef: RecordRef; Line: Text) NewLine: Text
-    var
-        FieldRef: FieldRef;
-        EndPos: Integer;
-        FieldNo: Integer;
-        StartPos: Integer;
-    begin
-        //this function is a copy of function ParseEmailText in codeunit 6014450 E-Mail Management
-        NewLine := Line;
-        while (StrPos(NewLine, '{') > 0) do begin
-            StartPos := StrPos(NewLine, '{');
-            EndPos := StrPos(NewLine, '}');
-            Evaluate(FieldNo, CopyStr(NewLine, StartPos + 1, EndPos - StartPos - 1));
-            if RecRef.FieldExist(FieldNo) then begin
-                FieldRef := RecRef.Field(FieldNo);
-                if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
-                    FieldRef.CalcField();
-                NewLine := InsStr(DelStr(NewLine, StartPos, EndPos - StartPos + 1), Format(FieldRef), StartPos);
-            end;
-            Line := NewLine;
-        end;
-
-        exit(NewLine);
-    end;
-
     local procedure CustomizedLayoutFound(Job: Record Job; Usage: Option): Boolean
     var
         EventReportLayout: Record "NPR Event Report Layout";
@@ -159,13 +134,14 @@
 
     procedure CreateFileName(Job: Record Job; EMailTemplateHeader: Record "NPR E-mail Template Header") Name: Text
     var
+        EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
         RecRef: RecordRef;
     begin
         Name := Job.FieldCaption("NPR Event") + '-' + Format(Job."NPR Event Status") + '-' + Job."No.";
         if not EMailTemplateHeader.IsEmpty then begin
             RecRef.GetTable(Job);
             if EMailTemplateHeader.Filename <> '' then
-                Name := ParseEmailTemplateText(RecRef, EMailTemplateHeader.Filename);
+                Name := EmailTemplateMgt.MergeMailContent(RecRef, EMailTemplateHeader.Filename, EMailTemplateHeader."Fieldnumber Start Tag", EMailTemplateHeader."Fieldnumber End Tag");
         end;
         exit(Name);
 
