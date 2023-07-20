@@ -82,7 +82,7 @@ codeunit 6059931 "NPR SS Action: Insert Item B."
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SSActionDeletePOSLine: Codeunit "NPR SS Action: Delete POS Line";
+        SSActionDeletePOSLine: Codeunit "NPR SS Action: Delete POSLineB";
         SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease";
         POSSession: Codeunit "NPR POS Session";
     begin

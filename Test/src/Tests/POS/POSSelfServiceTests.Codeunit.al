@@ -305,7 +305,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
-        SSActionDeleteLine: Codeunit "NPR SS Action: Delete POS Line";
+        SSActionDeleteLine: Codeunit "NPR SS Action: Delete POSLineB";
     begin
         // [SCENARIO]
         //Delete Line
