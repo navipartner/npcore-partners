@@ -626,6 +626,7 @@
     local procedure GetEventBodyContent(var BodyText: Text; EMailTemplateHeader: Record "NPR E-mail Template Header"; var RecRef2: RecordRef; var Job: Record Job; UseTemplate: Boolean; var EventExchIntTemplate: Record "NPR Event Exch. Int. Template")
     var
         EMailTemplateLine: Record "NPR E-mail Templ. Line";
+        EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
         CommentLine: Record "Comment Line";
     begin
         BodyText := '<font face="Calibri">';
@@ -634,7 +635,7 @@
             EMailTemplateLine.SetRange("E-mail Template Code", EMailTemplateHeader.Code);
             if EMailTemplateLine.FindSet() then
                 repeat
-                    BodyText += EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateLine."Mail Body Line") + '</br>';
+                    BodyText += EmailTemplateMgt.MergeMailContent(RecRef2, EMailTemplateLine."Mail Body Line", EMailTemplateHeader."Fieldnumber Start Tag", EMailTemplateHeader."Fieldnumber End Tag") + '</br>';
                 until EMailTemplateLine.Next() = 0;
         end else
             BodyText += Job.FieldCaption("No.") + ': ' + Job."No." + '</br>' +
@@ -700,10 +701,12 @@
     end;
 
     local procedure GetSubject(var EMailTemplateHeader: Record "NPR E-mail Template Header"; var RecRef2: RecordRef; var Job: Record Job; var EventExchIntTemplate: Record "NPR Event Exch. Int. Template"; UseTemplate: Boolean; var Subject: Text)
+    var
+        EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
     begin
         if UseTemplate and EMailTemplateHeader.Get(EventExchIntTemplate."E-mail Template Header Code") then begin
             RecRef2.GetTable(Job);
-            Subject := EventEWSMgt.ParseEmailTemplateText(RecRef2, EMailTemplateHeader.Subject);
+            Subject := EmailTemplateMgt.MergeMailContent(RecRef2, EMailTemplateHeader.Subject, EMailTemplateHeader."Fieldnumber Start Tag", EMailTemplateHeader."Fieldnumber End Tag");
         end else
             Subject := Job.Description;
     end;
