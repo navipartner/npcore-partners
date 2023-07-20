@@ -1,6 +1,7 @@
 ﻿codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
 {
     Access = Internal;
+
     var
         Text000: Label 'Extra Coupon Item has not been defined for Coupon %1 (%2)';
         Text001: Label 'Apply Discount - Extra Item';
@@ -58,7 +59,6 @@
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
         SaleLinePOS.Validate("No.", ExtraCouponItem."Item No.");
         SaleLinePOS.Validate(Quantity, 1);
-
         SaleLineOut.InvokeOnBeforeInsertSaleLineWorkflow(SaleLinePOS);
         SaleLinePOS.Insert(true);
         SaleLineOut.InvokeOnAfterInsertSaleLineWorkflow(SaleLinePOS);

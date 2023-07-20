@@ -1,7 +1,6 @@
 ﻿codeunit 6151590 "NPR NpDc Coupon Mgt."
 {
     var
-        Text002: Label 'Discount Coupon';
         Text003: Label 'Coupon Reference No. is too long';
         Text004: Label 'Invalid Coupon Reference No.';
         Text005: Label 'Coupon with Reference No. %1 is archived.';
@@ -636,11 +635,6 @@
     #endregion Archivation
     #region Pos Functionality
 
-    local procedure ActionCode(): Code[20]
-    begin
-        exit(FORMAT("NPR POS Workflow"::SCAN_COUPON));
-    end;
-
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePOSSaleLine(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
     var
@@ -783,62 +777,6 @@
     end;
 
     #endregion Sale Document Functionality
-    #region Ean Box Event Handling
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
-    local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
-    var
-        NpDcCoupon: Record "NPR NpDc Coupon";
-    begin
-        if not EanBoxEvent.Get(EventCodeRefNo()) then begin
-            EanBoxEvent.Init();
-            EanBoxEvent.Code := EventCodeRefNo();
-            EanBoxEvent."Module Name" := Text002;
-            EanBoxEvent.Description := CopyStr(NpDcCoupon.FieldCaption("Reference No."), 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode();
-            EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
-            EanBoxEvent."Event Codeunit" := CurrCodeunitId();
-            EanBoxEvent.Insert(true);
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
-    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
-    begin
-        case EanBoxEvent.Code of
-            EventCodeRefNo():
-                begin
-                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'ReferenceNo', true, '');
-                end;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
-    local procedure SetEanBoxEventInScopeRefNo(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
-    var
-        NpDcCoupon: Record "NPR NpDc Coupon";
-    begin
-        if EanBoxSetupEvent."Event Code" <> EventCodeRefNo() then
-            exit;
-        if StrLen(EanBoxValue) > MaxStrLen(NpDcCoupon."Reference No.") then
-            exit;
-
-        NpDcCoupon.SetRange("Reference No.", EanBoxValue);
-        if not NpDcCoupon.IsEmpty() then
-            InScope := true;
-    end;
-
-    local procedure EventCodeRefNo(): Code[20]
-    begin
-        exit('DISCOUNT_COUPON');
-    end;
-
-    local procedure CurrCodeunitId(): Integer
-    begin
-        exit(CODEUNIT::"NPR NpDc Coupon Mgt.");
-    end;
-
-    #endregion Ean Box Event Handling
     #region Generate Reference No
 
     internal procedure GetAmountPerQty(Coupon: Record "NPR NpDc Coupon"): Decimal
