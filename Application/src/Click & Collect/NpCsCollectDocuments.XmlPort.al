@@ -178,7 +178,7 @@
         exit(NpCsArchDocument.FindLast());
     end;
 
-    internal procedure GetSourceTable(var TempNpCsDocumentTo: Record "NPR NpCs Document" temporary)
+    procedure GetSourceTable(var TempNpCsDocumentTo: Record "NPR NpCs Document" temporary)
     begin
         TempNpCsDocumentTo.Copy(TempNpCsDocument, true);
     end;
@@ -241,7 +241,7 @@
         NpCsDocumentLogEntry."Document Entry No." := NpCsArchDocumentLogEntry."Document Entry No.";
     end;
 
-    internal procedure RefreshSourceTable()
+    procedure RefreshSourceTable()
     begin
         Clear(TempNpCsDocumentLogEntry);
         TempNpCsDocumentLogEntry.DeleteAll();

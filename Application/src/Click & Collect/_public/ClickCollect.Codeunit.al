@@ -96,4 +96,34 @@ codeunit 6059847 "NPR Click & Collect"
         NpCsPOSActDelivOrderB.InsertPOSReference(NpCsDocument, SaleLinePOS);
     end;
 
+    procedure GetImportNpCsDocumentCodeunit(): Integer
+    begin
+        exit(Codeunit::"NPR NpCs Imp. Sales Doc.");
+    end;
+
+    procedure GetLookupNpCsDocumentCodeunit(): Integer
+    begin
+        exit(Codeunit::"NPR NpCs Lookup Sales Document");
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnAfterInitReqBody(NpcsDocument: Record "NPR NpCs Document"; var Context: Text);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeImport(var ImportEntry: Record "NPR Nc Import Entry"; var Element: XmlElement; var Handled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnAfterDocumentIsCreated(Element: XmlElement; var SalesHeader: Record "Sales Header"; var NpCsDocument: Record "NPR NpCs Document");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnFindItemVariant(var Element: XmlElement; var ItemVariant: Record "Item Variant"; var Found: Boolean);
+    begin
+    end;
+
 }
