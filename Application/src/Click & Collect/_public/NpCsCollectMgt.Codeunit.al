@@ -111,7 +111,7 @@
         NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
     end;
 
-    internal procedure ExpireProcessing(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)
+    procedure ExpireProcessing(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)
     var
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
     begin
