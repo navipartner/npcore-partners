@@ -6,9 +6,11 @@
     trigger OnRun()
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        ClickCollect: Codeunit "NPR Click & Collect";
         Document: XmlDocument;
         Element: XmlElement;
         Element2: XmlElement;
+        Handled: Boolean;
     begin
         if not Rec.LoadXmlDoc(Document) then
             Error(Text000);
@@ -19,7 +21,10 @@
 
         NpXmlDomMgt.FindElement(Element, '//sales_document', true, Element2);
 
-        ImportSalesDoc(Element2);
+        ClickCollect.OnBeforeImport(Rec, Element2, Handled);
+
+        if not Handled then
+            ImportSalesDoc(Element2);
     end;
 
     var
@@ -38,6 +43,7 @@
         SalesHeader: Record "Sales Header";
         NpCsExpirationMgt: Codeunit "NPR NpCs Expiration Mgt.";
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
+        ClickCollect: Codeunit "NPR Click & Collect";
         NodeList: XmlNodeList;
         Node: XmlNode;
         LogMessage: Text;
@@ -76,6 +82,8 @@
         Element.SelectNodes('//sales_lines/sales_line', NodeList);
         foreach Node in NodeList do
             InsertSalesLine(Node.AsXmlElement(), SalesHeader);
+
+        ClickCollect.OnAfterDocumentIsCreated(Element, SalesHeader, NpCsDocument);
 
         LogMessage := StrSubstNo(Text005, NpCsDocument."From Store Code");
         NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Send Order";
@@ -569,6 +577,7 @@
         ItemRef: Record "Item Reference";
         NpCsDocumentMapping: Record "NPR NpCs Document Mapping";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        ClickCollect: Codeunit "NPR Click & Collect";
         StoreCode: Code[20];
         FromItemRefNo: Code[50];
         FromItemNo: Code[20];
@@ -576,11 +585,13 @@
         Found: Boolean;
     begin
         Clear(ItemVariant);
-        OnFindItemVariant(Element, ItemVariant, Found);
+        ClickCollect.OnFindItemVariant(Element, ItemVariant, Found);
         if Found then
             exit;
 
         Clear(ItemVariant);
+
+
 
         StoreCode := GetFromStoreCode(Element);
         FromItemRefNo := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'cross_reference_no', MaxStrLen(ItemVariant."Item No."), false), 1, MaxStrLen(ItemVariant."Item No."));
@@ -634,11 +645,6 @@
 
             exit;
         end;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFindItemVariant(Element: XmlElement; var ItemVariant: Record "Item Variant"; var Found: Boolean)
-    begin
     end;
 
     local procedure GetItemRefNo(ItemVariant: Record "Item Variant"): Code[50]
