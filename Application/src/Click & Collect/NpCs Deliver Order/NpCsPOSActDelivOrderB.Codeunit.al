@@ -253,4 +253,28 @@ codeunit 6060069 "NPR NpCs POSAct. Deliv.Order-B"
         NpCsSaleLinePOSReference."Document Type" := NpCsDocument."Document Type";
         NpCsSaleLinePOSReference.Insert();
     end;
+
+    procedure DeliverDocument(EntryNo: Integer; DeliverText: Text; ConfirmInvDiscAmt: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        NpCsPOSActionEvents: Codeunit "NPR NpCs POS Action Events";
+        POSSession: Codeunit "NPR POS Session";
+        IsHandled: Boolean;
+    begin
+        NpCsDocument.Get(EntryNo);
+        NpCsPOSActionEvents.OnBeforeDeliverDocument(POSSession, NpCsDocument, DeliverText, IsHandled);
+        if IsHandled then
+            exit;
+
+        case NpCsDocument."Document Type" of
+            NpCsDocument."Document Type"::Order:
+                begin
+                    DeliverOrder(DeliverText, POSSession, NpCsDocument);
+                end;
+            NpCsDocument."Document Type"::"Posted Invoice":
+                begin
+                    DeliverPostedInvoice(ConfirmInvDiscAmt, DeliverText, POSSession, NpCsDocument);
+                end;
+        end;
+    end;
 }
