@@ -87,7 +87,7 @@
             until NpCsDocument.Next() = 0;
     end;
 
-    internal procedure UpdateExpirationStatus(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)
+    procedure UpdateExpirationStatus(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)
     begin
         if NpCsDocument."Delivery Status" in [NpCsDocument."Delivery Status"::Delivered, NpCsDocument."Delivery Status"::Expired] then
             exit;
