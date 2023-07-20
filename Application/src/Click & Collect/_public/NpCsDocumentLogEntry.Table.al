@@ -90,7 +90,7 @@
             "User ID" := CopyStr(UserId, 1, MaxStrLen("User ID"));
     end;
 
-    internal procedure GetErrorMessage() FullLogMessage: Text
+    procedure GetErrorMessage() FullLogMessage: Text
     var
         InStr: InStream;
         TextBuffer: Text;
