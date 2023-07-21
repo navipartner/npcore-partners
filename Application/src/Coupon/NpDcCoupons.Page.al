@@ -21,7 +21,7 @@
                 field("No."; Rec."No.")
                 {
 
-                    ToolTip = 'Specifies the number of the coupon.';
+                    ToolTip = 'Specifies the unique number of the coupon.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Coupon Type"; Rec."Coupon Type")
@@ -33,7 +33,7 @@
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the description of the coupon.';
+                    ToolTip = 'Specifies the name of the coupon.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Open; Rec.Open)
@@ -134,7 +134,7 @@
                         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
                     begin
                         CurrPage.SetSelectionFilter(Coupon);
-                        if not Confirm(Text000, false, Coupon.Count) then
+                        if not Confirm(ArchiveCouponQst, false, Coupon.Count) then
                             exit;
 
                         NpDcCouponMgt.ArchiveCoupons(Coupon);
@@ -181,6 +181,6 @@
     }
 
     var
-        Text000: Label 'Archive %1 selected Coupons Manually?';
+        ArchiveCouponQst: Label 'Archive %1 selected Coupons Manually?', Comment = '%1 = number of coupons';
 }
 

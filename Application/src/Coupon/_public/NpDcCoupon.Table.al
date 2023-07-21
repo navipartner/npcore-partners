@@ -20,28 +20,8 @@
             TableRelation = "NPR NpDc Coupon Type";
 
             trigger OnValidate()
-            var
-                CouponType: Record "NPR NpDc Coupon Type";
             begin
-                CouponType.Get("Coupon Type");
-                Description := CouponType.Description;
-                "Starting Date" := CouponType."Starting Date";
-                "Ending Date" := CouponType."Ending Date";
-                "Customer No." := CouponType."Customer No.";
-                "Discount Type" := CouponType."Discount Type";
-                "Discount %" := CouponType."Discount %";
-                "Max. Discount Amount" := CouponType."Max. Discount Amount";
-                "Discount Amount" := CouponType."Discount Amount";
-                "Max Use per Sale" := CouponType."Max Use per Sale";
-                "Print Template Code" := CouponType."Print Template Code";
-                "Print Object ID" := CouponType."Print Object ID";
-                "Print Object Type" := CouponType."Print Object Type";
-                "POS Store Group" := CouponType."POS Store Group";
-
-                if ((Rec."Starting Date" = CreateDateTime(0D, 0T)) and (Format(CouponType."Starting Date DateFormula") <> '')) then
-                    Rec."Starting Date" := CreateDateTime(CalcDate(CouponType."Starting Date DateFormula"), 0T);
-                if ((Rec."Ending Date" = CreateDateTime(0D, 0T)) and (Format(CouponType."Ending Date DateFormula") <> '')) then
-                    Rec."Ending Date" := CreateDateTime(CalcDate(CouponType."Ending Date DateFormula"), 235959T);
+                CopyFromCouponType();
             end;
         }
         field(10; Description; Text[30])
@@ -239,14 +219,15 @@
         NpDcExtCouponSalesLine: Record "NPR NpDc Ext. Coupon Reserv.";
     begin
         CouponEntry.SetRange("Coupon No.", "No.");
-        CouponEntry.DeleteAll();
+        if not CouponEntry.IsEmpty() then
+            CouponEntry.DeleteAll();
 
         SaleLinePOSCoupon.SetRange("Coupon No.", "No.");
-        if SaleLinePOSCoupon.FindFirst() then
+        if not SaleLinePOSCoupon.IsEmpty() then
             SaleLinePOSCoupon.DeleteAll();
 
         NpDcExtCouponSalesLine.SetRange("Coupon No.", "No.");
-        if NpDcExtCouponSalesLine.FindFirst() then
+        if not NpDcExtCouponSalesLine.IsEmpty() then
             NpDcExtCouponSalesLine.DeleteAll();
     end;
 
@@ -271,7 +252,7 @@
     end;
 
     var
-        Text000: Label 'Reference No. %1 is already used!';
+        ReferenceNoUsedErr: Label 'Reference No. %1 is already used!', Comment = '%1 = Reference no.';
 
     local procedure InitReferenceNo()
     var
@@ -291,8 +272,35 @@
 
         Coupon.SetFilter("No.", '<>%1', "No.");
         Coupon.SetRange("Reference No.", "Reference No.");
-        if Coupon.FindFirst() then
-            Error(Text000, "Reference No.");
+        if not Coupon.IsEmpty() then
+            Error(ReferenceNoUsedErr, "Reference No.");
+    end;
+
+    local procedure CopyFromCouponType()
+    var
+        CouponType: Record "NPR NpDc Coupon Type";
+    begin
+        if not CouponType.Get("Coupon Type") then
+            exit;
+
+        Description := CouponType.Description;
+        "Starting Date" := CouponType."Starting Date";
+        "Ending Date" := CouponType."Ending Date";
+        "Customer No." := CouponType."Customer No.";
+        "Discount Type" := CouponType."Discount Type";
+        "Discount %" := CouponType."Discount %";
+        "Max. Discount Amount" := CouponType."Max. Discount Amount";
+        "Discount Amount" := CouponType."Discount Amount";
+        "Max Use per Sale" := CouponType."Max Use per Sale";
+        "Print Template Code" := CouponType."Print Template Code";
+        "Print Object ID" := CouponType."Print Object ID";
+        "Print Object Type" := CouponType."Print Object Type";
+        "POS Store Group" := CouponType."POS Store Group";
+
+        if ((Rec."Starting Date" = CreateDateTime(0D, 0T)) and (Format(CouponType."Starting Date DateFormula") <> '')) then
+            Rec."Starting Date" := CreateDateTime(CalcDate(CouponType."Starting Date DateFormula"), 0T);
+        if ((Rec."Ending Date" = CreateDateTime(0D, 0T)) and (Format(CouponType."Ending Date DateFormula") <> '')) then
+            Rec."Ending Date" := CreateDateTime(CalcDate(CouponType."Ending Date DateFormula"), 235959T);
     end;
 
     internal procedure CalcInUseQty() InUseQty: Integer
