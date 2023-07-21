@@ -24,26 +24,26 @@
                     {
 
                         Editable = false;
-                        ToolTip = 'Specifies the value of the No. field';
+                        ToolTip = 'Specifies the unique number of the coupon.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Coupon Type"; Rec."Coupon Type")
                     {
 
                         Editable = false;
-                        ToolTip = 'Specifies the value of the Coupon Type field';
+                        ToolTip = 'Specifies the coupon type.';
                         ApplicationArea = NPRRetail;
                     }
                     field(Description; Rec.Description)
                     {
 
-                        ToolTip = 'Specifies the value of the Description field';
+                        ToolTip = 'Specifies the name of the coupon.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Discount Type"; Rec."Discount Type")
                     {
 
-                        ToolTip = 'Specifies the value of the Discount Type field';
+                        ToolTip = 'Specifies the discount type of the coupon.';
                         ApplicationArea = NPRRetail;
                     }
                     group(Control6014432)
@@ -54,7 +54,7 @@
                         {
 
                             ShowMandatory = true;
-                            ToolTip = 'Specifies the value of the Discount Amount field';
+                            ToolTip = 'Specifies the discount amount of the coupon.';
                             ApplicationArea = NPRRetail;
                         }
                     }
@@ -66,13 +66,13 @@
                         {
 
                             ShowMandatory = true;
-                            ToolTip = 'Specifies the value of the Discount % field';
+                            ToolTip = 'Specifies the discount percent of the coupon.';
                             ApplicationArea = NPRRetail;
                         }
                         field("Max. Discount Amount"; Rec."Max. Discount Amount")
                         {
 
-                            ToolTip = 'Max. Discount Amount per Sale';
+                            ToolTip = 'Specifies the max. discount amount per sale.';
                             ApplicationArea = NPRRetail;
                         }
                     }
@@ -82,18 +82,18 @@
                     ShowCaption = false;
                     field(Open; Rec.Open)
                     {
-                        ToolTip = 'Specifies the value of the Open field';
+                        ToolTip = 'Specifies if the coupon is open.';
                         ApplicationArea = NPRRetail;
                     }
                     field("POS Store Group"; Rec."POS Store Group")
                     {
-                        ToolTip = 'Specifies the group of POS Stores where Coupon can be used.';
+                        ToolTip = 'Specifies the group of POS stores where coupon can be used.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Remaining Quantity"; Rec."Remaining Quantity")
                     {
 
-                        ToolTip = 'Specifies the value of the Remaining Quantity field';
+                        ToolTip = 'Specifies the remaining quantity of the coupon.';
                         ApplicationArea = NPRRetail;
                     }
                     field("In-use Quantity"; Rec."In-use Quantity")
@@ -120,7 +120,7 @@
                     {
 
                         Editable = false;
-                        ToolTip = 'Specifies the value of the Issue Coupon Module field';
+                        ToolTip = 'Specifies the issue coupon module of the coupon.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -131,13 +131,13 @@
                     {
 
                         Editable = false;
-                        ToolTip = 'Specifies the value of the Reference No. field';
+                        ToolTip = 'Specifies the reference no. of the coupon.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Customer No."; Rec."Customer No.")
                     {
 
-                        ToolTip = 'Specifies the value of the Customer No. field';
+                        ToolTip = 'Specifies the customer no. of the coupon.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Object Type"; Rec."Print Object Type")
@@ -159,7 +159,7 @@
                     field("Print Template Code"; Rec."Print Template Code")
                     {
                         Enabled = PrintUsingTemplate;
-                        ToolTip = 'Specifies the value of the Print Template Code field';
+                        ToolTip = 'Specifies the value of the print template code of the coupon';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -219,10 +219,6 @@
                         ApplicationArea = NPRRetail;
                     }
                 }
-                group(Control6014415)
-                {
-                    ShowCaption = false;
-                }
             }
         }
     }
@@ -267,7 +263,7 @@
                 var
                     NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
                 begin
-                    if not Confirm(Text000) then
+                    if not Confirm(DeleteCouponsQst, false) then
                         exit;
 
                     NpDcCouponMgt.ResetInUseQty(Rec);
@@ -290,7 +286,7 @@
                         Coupon: Record "NPR NpDc Coupon";
                         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
                     begin
-                        if not Confirm(Text001, false, Coupon.Count) then
+                        if not Confirm(ArchiveCouponQst, false, Coupon.Count) then
                             exit;
 
                         NpDcCouponMgt.ArchiveCoupons(Rec);
@@ -315,8 +311,8 @@
     }
 
     var
-        Text000: Label 'Are you sure you want to delete Coupons In-use?';
-        Text001: Label 'Archive Coupon Manually?';
+        DeleteCouponsQst: Label 'Are you sure you want to delete Coupons In-use?';
+        ArchiveCouponQst: Label 'Archive Coupon Manually?';
         PrintUsingTemplate: Boolean;
 
     local procedure UpdateControls()
