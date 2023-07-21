@@ -20,6 +20,7 @@
         POSSession: Codeunit "NPR POS Session";
         LineNo: Integer;
         DiscountAmt: Decimal;
+        POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
     begin
         CouponType.Get(SaleLinePOSCoupon."Coupon Type");
         if not FindExtraCouponItem(CouponType, ExtraCouponItem) then
@@ -50,37 +51,61 @@
         end;
 
         LineNo := GetNextLineNo(SaleLinePOSCoupon);
-        SaleLinePOS.SetSkipCalcDiscount(true);
-        SaleLinePOS.Init();
-        SaleLinePOS."Register No." := SaleLinePOSCoupon."Register No.";
-        SaleLinePOS."Sales Ticket No." := SaleLinePOSCoupon."Sales Ticket No.";
-        SaleLinePOS.Date := SaleLinePOSCoupon."Sale Date";
-        SaleLinePOS."Line No." := LineNo;
-        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
-        SaleLinePOS.Validate("No.", ExtraCouponItem."Item No.");
-        SaleLinePOS.Validate(Quantity, 1);
-        SaleLineOut.InvokeOnBeforeInsertSaleLineWorkflow(SaleLinePOS);
-        SaleLinePOS.Insert(true);
-        SaleLineOut.InvokeOnAfterInsertSaleLineWorkflow(SaleLinePOS);
-
-        DiscountAmt := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon);
-
-        if DiscountAmt > SaleLinePOS."Amount Including VAT" then
-            DiscountAmt := SaleLinePOS."Amount Including VAT";
-
         SaleLinePOSCouponApply.Init();
-        SaleLinePOSCouponApply."Register No." := SaleLinePOS."Register No.";
-        SaleLinePOSCouponApply."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        SaleLinePOSCouponApply."Sale Date" := SaleLinePOS.Date;
-        SaleLinePOSCouponApply."Sale Line No." := SaleLinePOS."Line No.";
+        SaleLinePOSCouponApply."Register No." := SaleLinePOSCoupon."Register No.";
+        SaleLinePOSCouponApply."Sales Ticket No." := SaleLinePOSCoupon."Sales Ticket No.";
+        SaleLinePOSCouponApply."Sale Date" := SaleLinePOSCoupon."Sale Date";
+        SaleLinePOSCouponApply."Sale Line No." := LineNo;
         SaleLinePOSCouponApply."Line No." := 10000;
         SaleLinePOSCouponApply.Type := SaleLinePOSCouponApply.Type::Discount;
         SaleLinePOSCouponApply."Applies-to Sale Line No." := SaleLinePOSCoupon."Sale Line No.";
         SaleLinePOSCouponApply."Applies-to Coupon Line No." := SaleLinePOSCoupon."Line No.";
         SaleLinePOSCouponApply."Coupon Type" := SaleLinePOSCoupon."Coupon Type";
         SaleLinePOSCouponApply."Coupon No." := SaleLinePOSCoupon."Coupon No.";
-        SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
+        SaleLinePOSCouponApply."Discount Amount" := 0;
         SaleLinePOSCouponApply.Insert();
+        SaleLinePOSCouponApply.SetRecFilter();
+
+        POSActionInsertItemB.SetSkipCalcDiscount(true);
+        POSActionInsertItemB.AddItemLine(ExtraCouponItem."Item No.",
+                                1, //ItemQuantity,
+                                0, // UnitPrice,
+                                '', // CustomDescription,
+                                '', // CustomDescription2,
+                                '');
+
+        if (SaleLinePOSCouponApply.FindFirst()) then begin
+            SaleLineOut.GetCurrentSaleLine(SaleLinePOS);
+            DiscountAmt := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon);
+
+            if DiscountAmt > SaleLinePOS."Amount Including VAT" then
+                DiscountAmt := SaleLinePOS."Amount Including VAT";
+
+            SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
+            SaleLinePOSCouponApply.Modify();
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::"Codeunit", Codeunit::"NPR POS Sale Line", 'OnBeforeDeletePOSSaleLine', '', true, true)]
+    local procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
+        SaleLinePOSWithCoupon: Record "NPR POS Sale Line";
+        CouponExtraItem: Record "NPR NpDc Extra Coupon Item";
+        POSSession: Codeunit "NPR POS Session";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+    begin
+        if (SaleLinePOSCouponApply.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Sale Type", SaleLinePOS.Date, SaleLinePOS."Line No.", 10000)) then begin
+            CouponExtraItem.SetFilter("Coupon Type", '=%1', SaleLinePOSCouponApply."Coupon Type");
+            CouponExtraItem.SetFilter("Item No.", '=%1', SaleLinePOS."No.");
+            if (CouponExtraItem.FindFirst()) then begin
+                if (SaleLinePOSWithCoupon.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", SaleLinePOSCouponApply."Applies-to Sale Line No.")) then begin
+                    POSSession.GetSaleLine(POSSaleLine);
+                    if (POSSaleLine.SetPosition(SaleLinePOSWithCoupon.GetPosition())) then
+                        POSSaleLine.DeleteLine();
+                end;
+            end;
+        end;
     end;
 
     procedure CalcDiscountAmount(SaleLinePOS: Record "NPR POS Sale Line"; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon") DiscountAmount: Decimal

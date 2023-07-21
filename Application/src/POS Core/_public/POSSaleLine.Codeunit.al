@@ -190,6 +190,7 @@
             Rec."Reason Code" := Line."Reason Code";
         end;
 
+        Rec.SetSkipCalcDiscount(Line.GetSkipCalcDiscount());
         if IncludeDiscountFields then begin
             Rec.Validate("Discount Type", Line."Discount Type");
             Rec.Validate("Discount Code", Line."Discount Code");
@@ -583,7 +584,8 @@
         end;
 
         Rec.UpdateAmounts(Rec);
-        POSSalesDiscountCalcMgt.OnAfterInsertSaleLinePOS(Rec);
+        if (not (Rec.GetSkipCalcDiscount())) then
+            POSSalesDiscountCalcMgt.OnAfterInsertSaleLinePOS(Rec);
         POSIssueOnSale.AddNewSaleCoupons(Rec);
         HTMLDisplay.UpdateHTMLDisplay(Rec);
         POSProxyDisplay.UpdateDisplay(Rec);

@@ -522,6 +522,8 @@
         MemberLinesToSuggest: Integer;
         ReasonMessage: Text;
         AttemptCreateMembership: Codeunit "NPR Membership Attempt Create";
+        POSSession: Codeunit "NPR POS Session";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
 
         if (SaleLinePOS.Quantity < 0) then
@@ -638,9 +640,9 @@
         if (not GuiAllowed()) then
             exit(-1100);
 
-        // In non-gui mode, assume sale line management is handled by publisher.
-        // TODO invoke delete on sale line manager codeunit.
-        if (SaleLinePOS.Delete()) then;
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.DeleteLine();
+
         Commit();
 
         if (ReasonMessage <> '') then begin

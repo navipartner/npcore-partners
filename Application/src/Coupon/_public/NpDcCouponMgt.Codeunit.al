@@ -126,7 +126,7 @@
             SaleLinePOSCoupon2.CalcSums("Discount Amount");
             if SaleLinePOSCoupon."Discount Amount" <> SaleLinePOSCoupon2."Discount Amount" then begin
                 SaleLinePOSCoupon."Discount Amount" := SaleLinePOSCoupon2."Discount Amount";
-                SaleLinePOSCoupon.Modify();
+                if (not SaleLinePOSCoupon.Modify()) then; // Note: A subscriber in ApplyDiscount might have deleted the coupon line
             end;
         until SaleLinePOSCoupon.Next() = 0;
 
