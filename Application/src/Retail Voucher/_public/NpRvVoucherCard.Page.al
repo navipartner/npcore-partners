@@ -103,7 +103,7 @@
                     field(Open; Rec.Open)
                     {
 
-                        ToolTip = 'Specifies the value of the Open field';
+                        ToolTip = 'Specifies if the voucher is open or not.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Initial Amount"; Rec."Initial Amount")
@@ -381,8 +381,10 @@
                 trigger OnAction()
                 var
                     NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+                    ConfirmManagement: Codeunit "Confirm Management";
+                    DeleteVouchersQst: Label 'Are you sure you want to delete vouchers in-use?';
                 begin
-                    if not Confirm(Text000) then
+                    if not ConfirmManagement.GetResponseOrDefault(DeleteVouchersQst, false) then
                         exit;
 
                     NpRvVoucherMgt.ResetInUseQty(Rec);
@@ -404,8 +406,10 @@
                     var
                         Voucher: Record "NPR NpRv Voucher";
                         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+                        ConfirmManagement: Codeunit "Confirm Management";
+                        ArchiveVoucherQst: Label 'Archive voucher manually?';
                     begin
-                        if not Confirm(Text001, false) then
+                        if not ConfirmManagement.GetResponseOrDefault(ArchiveVoucherQst, false) then
                             exit;
 
                         Voucher.Get(Rec."No.");
@@ -443,8 +447,6 @@
 
     var
         PrintUsingTemplate: Boolean;
-        Text000: Label 'Are you sure you want to delete Vouchers In-use?';
-        Text001: Label 'Archive Voucher Manually?';
 
     trigger OnAfterGetCurrRecord()
     begin

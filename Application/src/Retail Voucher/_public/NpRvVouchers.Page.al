@@ -19,13 +19,13 @@
                 field("No."; Rec."No.")
                 {
 
-                    ToolTip = 'Specifies number of the voucher.';
+                    ToolTip = 'Specifies unique number of the voucher.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Voucher Type"; Rec."Voucher Type")
                 {
 
-                    ToolTip = 'Specifies the voucher type.';
+                    ToolTip = 'Specifies the voucher type. Credit and gift vouchers are default, but additional ones can be defined as well.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
@@ -156,9 +156,11 @@
                     var
                         Voucher: Record "NPR NpRv Voucher";
                         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+                        ConfirmManagement: Codeunit "Confirm Management";
+                        ArchiveVoucherQst: Label 'Archive %1 selected vouchers manually?', Comment = '%1 = Number of vouchers';
                     begin
                         CurrPage.SetSelectionFilter(Voucher);
-                        if not Confirm(Text000, false, Voucher.Count) then
+                        if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(ArchiveVoucherQst, Voucher.Count), false) then
                             exit;
 
                         NpRvVoucherMgt.ArchiveVouchers(Voucher);
@@ -215,7 +217,5 @@
         }
     }
 
-    var
-        Text000: Label 'Archive %1 selected Vouchers Manually?';
 }
 
