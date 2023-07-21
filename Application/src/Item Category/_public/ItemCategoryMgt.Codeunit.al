@@ -184,25 +184,20 @@
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
         RecRef: RecordRef;
-        DimensionsAppliedToItem: Boolean;
     begin
         ItemCategory.TestField("NPR Blocked", false);
         ItemCategory.TestField("NPR Main Category", false);
-        
-        DimensionsAppliedToItem := ApplyItemCategoryDimensionsToItem(ItemCategory, Item, true);
-        if DimensionsAppliedToItem then
-            Item.Get(Item."No.");
 
-        if ItemCategory."NPR Item Template Code" = '' then
-            exit;
+        if ItemCategory."NPR Item Template Code" <> '' then begin
+            ConfigTemplateHeader.Get(ItemCategory."NPR Item Template Code");
+            RecRef.GetTable(Item);
+            ConfigTemplateMgt.ApplyTemplateLinesWithoutValidation(ConfigTemplateHeader, RecRef);
+            RecRef.SetTable(Item);
+        end;
 
-        ConfigTemplateHeader.Get(ItemCategory."NPR Item Template Code");
-
-        RecRef.GetTable(Item);
-        ConfigTemplateMgt.ApplyTemplateLinesWithoutValidation(ConfigTemplateHeader, RecRef);
-        RecRef.SetTable(Item);
-
-        Item.Validate("Base Unit of Measure");
+        //onInsert default dimensions there is Item.Modify
+        if ApplyItemCategoryDimensionsToItem(ItemCategory, Item, true) then
+            Item.Modify();
     end;
 
     internal procedure GetVATPostingSetupFromItemCategory(ItemCategory: Record "Item Category"; var VATPostingSetup: Record "VAT Posting Setup"): Boolean
@@ -487,7 +482,7 @@
                 DefaultDimension2."No." := Item."No.";
                 DefaultDimension2.Insert(true);
             until DefaultDimension.Next() = 0;
-        
+
         exit(true);
     end;
 
