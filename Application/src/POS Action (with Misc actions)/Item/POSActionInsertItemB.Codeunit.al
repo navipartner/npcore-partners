@@ -3,7 +3,8 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
     Access = Internal;
 
     var
-        BaseLineNo: Integer;
+        _BaseLineNo: Integer;
+        _SkipCalcDiscount: Boolean;
 
     procedure GetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin)
     var
@@ -63,6 +64,19 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         ItemReference."Item No." := Item."No.";
 
         SentryGetItemSpan.Finish();
+    end;
+
+    procedure AddItemLine(ItemNo: Code[20]; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text)
+    var
+        POSSession: Codeunit "NPR POS Session";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
+    begin
+        POSSession.GetFrontEnd(FrontEnd);
+        Item.Get(ItemNo);
+        AddItemLine(Item, ItemReference, ItemIdentifierType::ItemNo, ItemQuantity, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd);
     end;
 
     procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -127,16 +141,28 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         if (Line."Line Type" = Line."Line Type"::Item) then
             Line."Initial Group Sale Price" := UnitPrice;
 
+        Line.SetSkipCalcDiscount(GetSkipCalcDiscount());
+
         POSSession.GetSaleLine(SaleLine);
         SaleLine.InsertLine(Line, false);
         AddAccessories(Item, SaleLine);
         AutoExplodeBOM(Item, SaleLine);
-        BaseLineNo := Line."Line No.";
+        _BaseLineNo := Line."Line No.";
+    end;
+
+    procedure GetSkipCalcDiscount(): Boolean
+    begin
+        exit(_SkipCalcDiscount);
+    end;
+
+    procedure SetSkipCalcDiscount(SkipCalcDiscount: Boolean)
+    begin
+        _SkipCalcDiscount := SkipCalcDiscount;
     end;
 
     procedure GetLineNo(): Integer;
     begin
-        exit(BaseLineNo)
+        exit(_BaseLineNo)
     end;
 
     local procedure AutoExplodeBOM(Item: Record Item; POSSaleLine: Codeunit "NPR POS Sale Line")
