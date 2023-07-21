@@ -83,7 +83,7 @@ codeunit 6059931 "NPR SS Action: Insert Item B."
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SSActionDeletePOSLine: Codeunit "NPR SS Action: Delete POSLineB";
-        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease";
+        SSActionQtyDecreaseB: Codeunit "NPR SS Action - Qty Decrease B";
         POSSession: Codeunit "NPR POS Session";
     begin
         POSSession.GetSale(POSSale);
@@ -101,7 +101,7 @@ codeunit 6059931 "NPR SS Action: Insert Item B."
         if SaleLinePOS.Quantity - Abs(DecreaseByQty) < ItemMinQuantity then begin
             SSActionDeletePOSLine.DeletePOSLine(POSSaleLine);
         end else begin
-            SSActionQtyDecrease.DecreaseSalelineQuantity(POSSession, Abs(DecreaseByQty), POSSaleLine);
+            SSActionQtyDecreaseB.DecreaseSalelineQuantity(Abs(DecreaseByQty), POSSaleLine);
         end;
 
     end;
