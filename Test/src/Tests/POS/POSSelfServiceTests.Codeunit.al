@@ -337,7 +337,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         LibrarySales: Codeunit "Library - Sales";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         CurrentView: Codeunit "NPR POS View";
-        SelfService: Codeunit "NPR SS Action: Start SelfServ.";
+        SelfServiceB: Codeunit "NPR SS Action: Start SelfServB";
     begin
         // [SCENARIO]
         //Start Self Service
@@ -349,7 +349,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         LibrarySales.CreateSalesperson(Salesperson);
 
         //[When] Active self service
-        SelfService.StartSelfService(POSSession, Salesperson.Code, Language.Code);
+        SelfServiceB.StartSelfService(POSSession, Salesperson.Code, Language.Code);
 
         //[Then]
         POSSession.GetCurrentView(CurrentView);
