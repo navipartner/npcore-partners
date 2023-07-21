@@ -1,6 +1,10 @@
 codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
+    var
+        POSActSwitchRegB: Codeunit "NPR POS Action: Switch RegistB";
+
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'Switch to a different register';
@@ -29,128 +33,26 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
     begin
         case Step of
             'EnterRegister':
-                FrontEnd.WorkflowResponse(SwitchToNewRegister(Context, Setup));
+                SwitchToNewRegister(Context, Setup);
             else
-                FrontEnd.WorkflowResponse(OnActionList(Setup, Context));
+                OnActionList(Setup, Sale, Context);
         end;
     end;
 
-    local procedure GetActionScript(): Text
-    begin
-        EXIT(
-        //###NPR_INJECT_FROM_FILE:POSActionSwitchRegister.js###
-'let main=async({workflow:a,parameters:n,popup:i,captions:r})=>{const t={TextField:0,Numpad:1,List:2};switch(n._parameters.DialogType){case t.TextField:var e=await i.input({caption:r.registerprompt});if(e===null)return" ";await a.respond("EnterRegister",{RegisterNo:e});break;case t.Numpad:var e=await i.numpad({caption:r.registerprompt});if(e===null)return" ";await a.respond("EnterRegister",{RegisterNo:e});break;case t.List:await a.respond();break}};'
-        );
-    end;
-
-    internal procedure SwitchToNewRegister(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup"): JsonObject
+    internal procedure SwitchToNewRegister(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup")
     var
         NewRegisterNo: Code[10];
     begin
         NewRegisterNo := CopyStr(Context.GetString('RegisterNo'), 1, MaxStrLen(NewRegisterNo));
-        SwitchRegister(NewRegisterNo, Setup);
+        POSActSwitchRegB.SwitchRegister(NewRegisterNo, Setup);
     end;
 
-    local procedure TestAllowUnitSwitch(UnitNo: Code[10])
+    local procedure OnActionList(Setup: Codeunit "NPR POS Setup"; POSSale: Codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper")
     var
-        PSOUnit: Record "NPR POS Unit";
-        UserSetup: Record "User Setup";
-        Text000: Label 'User %1 is not allowed to Switch to Register %2';
-    begin
-        UserSetup.Get(UserId);
-        if not UserSetup."NPR Allow Register Switch" then
-            Error(Text000, UserSetup."User ID", UnitNo);
-        if UserSetup."NPR Register Switch Filter" = '' then
-            exit;
-
-        PSOUnit.Get(UnitNo);
-        PSOUnit.SetRecFilter();
-        PSOUnit.FilterGroup(40);
-        PSOUnit.SetFilter("No.", UserSetup."NPR Register Switch Filter");
-        if not PSOUnit.FindFirst() then
-            Error(Text000, UserSetup."User ID", UnitNo);
-    end;
-
-
-    local procedure OnActionList(Setup: Codeunit "NPR POS Setup"; Context: Codeunit "NPR POS JSON Helper"): JsonObject
-    var
-        POSSession: Codeunit "NPR POS Session";
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-        NewRegisterNo: Code[10];
-    begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        if not SelectRegister(SalePOS."Register No.", NewRegisterNo, Setup, Context) then
-            exit;
-        SwitchRegister(NewRegisterNo, Setup);
-    end;
-
-    local procedure SelectRegister(CurrUnitNo: Code[10]; var NewUnitNo: Code[10]; Setup: Codeunit "NPR POS Setup"; Context: Codeunit "NPR POS JSON Helper") LookupOK: Boolean
-    var
-        POSUnit: Record "NPR POS Unit";
-        UserSetup: Record "User Setup";
-        Text001: Label 'User %1 is not allowed to Switch Register';
-    begin
-        UserSetup.Get(UserId);
-        if not UserSetup."NPR Allow Register Switch" then
-            Error(Text001, UserSetup."User ID");
-
-        POSUnit.FilterGroup(41);
-        POSUnit.SetFilter("No.", '<>%1', CurrUnitNo);
-        POSUnit.FilterGroup(42);
-        POSUnit.SetFilter("No.", UserSetup."NPR Register Switch Filter");
-        FilterByPosUnitGroup(POSUnit, Setup, Context);
-        POSUnit.FilterGroup(0);
-
-        LookupOK := PAGE.RunModal(0, POSUnit) = ACTION::LookupOK;
-        NewUnitNo := POSUnit."No.";
-        exit(LookupOK);
-    end;
-
-    local procedure FilterByPosUnitGroup(var POSUnit: Record "NPR POS Unit"; Setup: Codeunit "NPR POS Setup"; Context: Codeunit "NPR POS JSON Helper")
-    var
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
-        POSUnitGroupLine: Record "NPR POS Unit Group Line";
-        FilterText: Text;
         FilterByPosUnitGroupValue: Boolean;
     begin
-        Setup.GetSalespersonRecord(SalespersonPurchaser);
-        if SalespersonPurchaser."NPR POS Unit Group" = '' then
-            exit;
-
         Context.GetBooleanParameter('FilterByPosUnitGroup', FilterByPosUnitGroupValue);
-        if not FilterByPosUnitGroupValue then
-            exit;
-
-        POSUnitGroupLine.SetRange("No.", SalespersonPurchaser."NPR POS Unit Group");
-        if POSUnitGroupLine.IsEmpty() then
-            exit;
-        POSUnitGroupLine.FindSet();
-        repeat
-            if FilterText = '' then
-                FilterText += POSUnitGroupLine."POS Unit"
-            else
-                FilterText += '|' + POSUnitGroupLine."POS Unit";
-        until POSUnitGroupLine.Next() = 0;
-        POSUnit.SetFilter("No.", FilterText);
-    end;
-
-    internal procedure SwitchRegister(RegisterNo: code[10]; Setup: Codeunit "NPR POS Setup")
-    var
-        UserSetup: Record "User Setup";
-        POSUnit: Record "NPR POS Unit";
-        POSSession: Codeunit "NPR POS Session";
-    begin
-        TestAllowUnitSwitch(RegisterNo);
-
-        UserSetup.Get(UserId);
-        UserSetup.Validate("NPR POS Unit No.", RegisterNo);
-        UserSetup.Modify();
-
-        POSUnit.Get(RegisterNo);
-        Setup.SetPOSUnit(POSUnit);
-        POSSession.InitializeSession(true);
+        POSActSwitchRegB.OnActionList(Setup, POSSale, FilterByPosUnitGroupValue);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"User Setup", 'OnAfterValidateEvent', 'NPR Register Switch Filter', true, true)]
@@ -162,6 +64,14 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
             exit;
 
         POSUnit.SetFilter("No.", Rec."NPR Register Switch Filter");
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        EXIT(
+        //###NPR_INJECT_FROM_FILE:POSActionSwitchRegister.js###
+'let main=async({workflow:a,parameters:n,popup:i,captions:r})=>{const t={TextField:0,Numpad:1,List:2};switch(n._parameters.DialogType){case t.TextField:var e=await i.input({caption:r.registerprompt});if(e===null)return" ";await a.respond("EnterRegister",{RegisterNo:e});break;case t.Numpad:var e=await i.numpad({caption:r.registerprompt});if(e===null)return" ";await a.respond("EnterRegister",{RegisterNo:e});break;case t.List:await a.respond();break}};'
+        );
     end;
 }
 
