@@ -19,6 +19,8 @@ tableextension 6014427 "NPR Item" extends Item
                     exit;
 
                 ItemCategoryMgt.SetupItemFromCategory(Rec, ItemCategory);
+
+                Rec.Validate("Base Unit of Measure");
             end;
         }
         modify(GTIN)
