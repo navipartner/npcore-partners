@@ -484,7 +484,7 @@
     var
         VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         ReferenceNo: Text;
-        ReferenceNoErr: Label 'Generated Reference Number for Voucher Type %1 is too long. Please check setup or contact administrator.';
+        ReferenceNoErr: Label 'Generated Reference Number for Voucher Type %1 is too long. Please check setup or contact administrator.', Comment = '%1 = Voucher type';
     begin
         ReferenceNo := VoucherMgt.GenerateReferenceNo(Rec);
         if StrLen(ReferenceNo) > MaxStrLen("Reference No.") then
@@ -495,7 +495,7 @@
     local procedure TestReferenceNo()
     var
         Voucher: Record "NPR NpRv Voucher";
-        ReferenceAlreadyUsedErr: Label 'Reference No. %1 is already used.';
+        ReferenceAlreadyUsedErr: Label 'Reference No. %1 is already used.', Comment = '%1 = Reference no.';
     begin
         if "Reference No." = '' then
             InitReferenceNo();
