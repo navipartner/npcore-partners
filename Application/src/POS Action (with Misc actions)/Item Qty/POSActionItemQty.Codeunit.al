@@ -6,6 +6,7 @@ codeunit 6150856 "NPR POS Action: Item Qty." implements "NPR IPOS Workflow"
         ActionDescription: Label 'Insert Item and Set Quantity directly from Barcode';
         Text001: Label 'Item not found';
         Text002: Label 'Invalid Quantity';
+        POSActItemQtyB: Codeunit "NPR POS Action: Item Qty. B";
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
@@ -35,8 +36,6 @@ codeunit 6150856 "NPR POS Action: Item Qty." implements "NPR IPOS Workflow"
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
-    var
-
     begin
         case Step of
             'InsertItemQty':
@@ -60,33 +59,20 @@ codeunit 6150856 "NPR POS Action: Item Qty." implements "NPR IPOS Workflow"
         Response.Add('itemIdentifierType', 0); //0 = ItemNumber
     end;
 
-    local procedure FindItem(Context: Codeunit "NPR POS JSON Helper"; var Item: Record Item): Boolean
+    local procedure FindItem(Context: Codeunit "NPR POS JSON Helper"; var Item: Record Item) ItemFound: Boolean
     var
         ItemNoBegin: Integer;
         ItemNoEnd: Integer;
         Barcode: Text;
-        ItemNo: Text;
     begin
-
         ItemNoBegin := Context.GetIntegerParameter('Item_No_Begin');
         ItemNoEnd := Context.GetIntegerParameter('Item_No_End');
-        if ItemNoBegin <= 0 then
-            exit(false);
-        if ItemNoBegin > ItemNoEnd then
-            exit(false);
-
         Barcode := UpperCase(Context.GetString('BarCode'));
-        if Barcode = '' then
-            exit(false);
 
-        ItemNo := CopyStr(Barcode, ItemNoBegin, ItemNoEnd - ItemNoBegin + 1);
-        if StrLen(ItemNo) > MaxStrLen(Item."No.") then
-            exit(false);
-
-        exit(Item.Get(ItemNo));
+        ItemFound := POSActItemQtyB.FindItem(ItemNoBegin, ItemNoEnd, Barcode, Item);
     end;
 
-    local procedure FindQuantity(Context: Codeunit "NPR POS JSON Helper"; var Quantity: Decimal): Boolean
+    local procedure FindQuantity(Context: Codeunit "NPR POS JSON Helper"; var Quantity: Decimal) QtyFound: Boolean
     var
         QuantityBegin: Integer;
         QuantityEnd: Integer;
@@ -96,24 +82,9 @@ codeunit 6150856 "NPR POS Action: Item Qty." implements "NPR IPOS Workflow"
         QuantityBegin := Context.GetIntegerParameter('Quantity_Begin');
         QuantityEnd := Context.GetIntegerParameter('Quantity_End');
         QuantityDecimalPosition := Context.GetIntegerParameter('Quantity_Decimal_Position');
-
         Barcode := Context.GetString('BarCode');
-        if Barcode = '' then
-            exit;
 
-        if QuantityBegin <= 0 then
-            exit(false);
-        if QuantityBegin > QuantityEnd then
-            exit(false);
-
-        Barcode := CopyStr(Barcode, QuantityBegin, QuantityEnd - QuantityBegin + 1);
-        if not Evaluate(Quantity, Barcode) then
-            exit(false);
-
-        if (QuantityDecimalPosition >= QuantityBegin) and (QuantityDecimalPosition <= QuantityEnd) then
-            Quantity /= Power(10, QuantityEnd - QuantityDecimalPosition + 1);
-
-        exit(true);
+        QtyFound := POSActItemQtyB.FindQty(QuantityBegin, QuantityEnd, QuantityDecimalPosition, Barcode, Quantity)
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
