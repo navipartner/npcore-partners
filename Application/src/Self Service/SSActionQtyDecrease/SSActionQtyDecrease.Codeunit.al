@@ -17,17 +17,17 @@
     begin
         case Step of
             'DecreaseQty':
-                Frontend.WorkflowResponse(DecreaseQuantity(Context, SaleLine));
+                DecreaseQuantity(Context, SaleLine);
         end;
     end;
 
-    internal procedure DecreaseQuantity(Context: codeunit "NPR POS JSON Helper"; SaleLine: codeunit "NPR POS Sale Line"): JsonObject
+    internal procedure DecreaseQuantity(Context: codeunit "NPR POS JSON Helper"; SaleLine: codeunit "NPR POS Sale Line")
     var
-        POSSession: Codeunit "NPR POS Session";
         Qty: Decimal;
+        SSActionQtyDecreaseB: Codeunit "NPR SS Action - Qty Decrease B";
     begin
         Qty := Context.GetDecimalParameter('decreaseBy');
-        DecreaseSalelineQuantity(POSSession, Qty, SaleLine);
+        SSActionQtyDecreaseB.DecreaseSalelineQuantity(Qty, SaleLine);
     end;
 
     local procedure GetActionScript(): Text
@@ -36,23 +36,6 @@
 //###NPR_INJECT_FROM_FILE:SSActionQtyDecreaseSS.js###
 'let main=async({})=>await workflow.respond("DecreaseQty");'
         )
-    end;
-
-    internal procedure DecreaseSalelineQuantity(POSSession: Codeunit "NPR POS Session"; DecreaseBy: Decimal; SaleLine: codeunit "NPR POS Sale Line")
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-        QuantityErr: Label 'This is a programming error. Please contact system vendor.';
-    begin
-        // This function should be "not local", so test framework can invoke it
-        If DecreaseBy < 0 then
-            Error(QuantityErr);
-        SaleLine.GetCurrentSaleLine(SaleLinePOS);
-
-        if (SaleLinePOS.Quantity - DecreaseBy < 0) then
-            SaleLine.SetQuantity(0)
-        else
-            SaleLine.SetQuantity(SaleLinePOS.Quantity - DecreaseBy);
-
     end;
 }
 

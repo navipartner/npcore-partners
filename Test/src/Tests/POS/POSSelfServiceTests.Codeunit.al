@@ -124,7 +124,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease";
+        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease B";
         GivenQuantity: Decimal;
         NewQuantity: Decimal;
     begin
@@ -144,7 +144,7 @@ codeunit 85073 "NPR POS Self Service Tests"
 
         //[When]
         NewQuantity := LibraryRandom.RandDecInRange(1, 100, 4);
-        SSActionQtyDecrease.DecreaseSalelineQuantity(POSSession, NewQuantity, POSSaleLine);
+        SSActionQtyDecrease.DecreaseSalelineQuantity(NewQuantity, POSSaleLine);
 
         //[Then]
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
@@ -163,7 +163,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease";
+        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease B";
         GivenQuantity: Decimal;
         NewQuantity: Decimal;
     begin
@@ -183,7 +183,7 @@ codeunit 85073 "NPR POS Self Service Tests"
 
         //[When]
         NewQuantity := LibraryRandom.RandDecInRange(1, 100, 4);
-        SSActionQtyDecrease.DecreaseSalelineQuantity(POSSession, NewQuantity, POSSaleLine);
+        SSActionQtyDecrease.DecreaseSalelineQuantity(NewQuantity, POSSaleLine);
 
         //[Then]
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
@@ -201,7 +201,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease";
+        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease B";
         GivenQuantity: Decimal;
         NewQuantity: Decimal;
     begin
@@ -221,7 +221,7 @@ codeunit 85073 "NPR POS Self Service Tests"
 
         //[When]
         NewQuantity := 0;
-        SSActionQtyDecrease.DecreaseSalelineQuantity(POSSession, NewQuantity, POSSaleLine);
+        SSActionQtyDecrease.DecreaseSalelineQuantity(NewQuantity, POSSaleLine);
 
         //[Then]
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
@@ -239,7 +239,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease";
+        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease B";
         GivenQuantity: Decimal;
         NewQuantity: Decimal;
     begin
@@ -259,7 +259,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         //[When]
         NewQuantity := LibraryRandom.RandDecInRange(-100, -1, 4);
         //[Then] Error expected
-        asserterror SSActionQtyDecrease.DecreaseSalelineQuantity(POSSession, NewQuantity, POSSaleLine);
+        asserterror SSActionQtyDecrease.DecreaseSalelineQuantity(NewQuantity, POSSaleLine);
     end;
 
     [Test]
