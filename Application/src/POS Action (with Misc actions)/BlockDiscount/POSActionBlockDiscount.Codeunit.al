@@ -1,6 +1,10 @@
 codeunit 6150838 "NPR POS Action: Block Discount" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
+    var
+        POSActBlockDiscountB: Codeunit "NPR POS Action:Block DiscountB";
+
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'Enable or disable the Custom Disc Block field.';
@@ -19,39 +23,19 @@ codeunit 6150838 "NPR POS Action: Block Discount" implements "NPR IPOS Workflow"
             'ShowPassPrompt':
                 FrontEnd.WorkflowResponse(ShowPassPropmt(Setup));
             'VerifyPassword':
-                FrontEnd.WorkflowResponse(VerifyPassword(Context, Setup));
+                VerifyPassword(Context, Setup);
             'ToggleBlockState':
-                FrontEnd.WorkflowResponse(ToggleBlockState(SaleLine));
+                POSActBlockDiscountB.ToggleBlockState(SaleLine);
         end;
-
     end;
 
-    local procedure ToggleBlockState(POSSaleLine: Codeunit "NPR POS Sale Line"): JsonObject
+    local procedure VerifyPassword(Context: Codeunit "NPR POS JSON Helper"; POSSetup: Codeunit "NPR POS Setup")
     var
-        SaleLinePOS: Record "NPR POS Sale Line";
-    begin
-
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        SaleLinePOS."Custom Disc Blocked" := not SaleLinePOS."Custom Disc Blocked";
-        SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
-        if (not SaleLinePOS."Custom Disc Blocked") then
-            SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::" ";
-
-        SaleLinePOS.Modify();
-    end;
-
-    local procedure VerifyPassword(Context: Codeunit "NPR POS JSON Helper"; POSSetup: Codeunit "NPR POS Setup"): JsonObject
-    var
-        POSUnit: Record "NPR POS Unit";
-        SecurityProfile: Codeunit "NPR POS Security Profile";
         Password: Text;
     begin
-
         Password := Context.GetString('password');
 
-        POSSetup.GetPOSUnit(POSUnit);
-        if not SecurityProfile.IsUnblockDiscountPasswordValidIfProfileExist(POSUnit."POS Security Profile", Password) then
-            Error('');
+        POSActBlockDiscountB.VerifyPassword(POSSetup, Password);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Ext.: Line Format.", 'OnGetLineStyle', '', false, false)]
@@ -72,13 +56,13 @@ codeunit 6150838 "NPR POS Action: Block Discount" implements "NPR IPOS Workflow"
 
     local procedure ShowPassPropmt(Setup: Codeunit "NPR POS Setup") Response: JsonObject;
     var
-        POSUnit: Record "NPR POS Unit";
-        SecurityProfile: Codeunit "NPR POS Security Profile";
+        ShowPasswordPrompt: Boolean;
     begin
-        Setup.GetPOSUnit(POSUnit);
+
+        POSActBlockDiscountB.ShowPassPrompt(Setup, ShowPasswordPrompt);
 
         Response.ReadFrom('{}');
-        Response.Add('ShowPasswordPrompt', SecurityProfile.IsUnblockDiscountPasswordSetIfProfileExist(POSUnit."POS Security Profile"));
+        Response.Add('ShowPasswordPrompt', ShowPasswordPrompt);
         exit(Response);
     end;
 
