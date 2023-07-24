@@ -1,14 +1,11 @@
 let main = async ({ workflow, parameters, captions }) => {
     debugger;
-    var getCurrentViewTypeResponse = await workflow.respond('GetCurrentViewType');
-    var currLine;
-
-    switch (getCurrentViewTypeResponse.viewType) {
-        case "Payment":
-            currLine = runtime.getData("BUILTIN_PAYMENTLINE");
+    switch (workflow.scope.view) {
+        case "payment":
+            var currLine = runtime.getData("BUILTIN_PAYMENTLINE");
             break;
         default:
-            currLine = runtime.getData("BUILTIN_SALELINE");
+            var currLine = runtime.getData("BUILTIN_SALELINE");
     }
 
     if ((!currLine.length) || (currLine._invalid)) {
@@ -21,5 +18,5 @@ let main = async ({ workflow, parameters, captions }) => {
             return;
         };
     };
-    workflow.respond('DeletePosLine');
+    workflow.respond();
 };

@@ -22,20 +22,14 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
     var
         POSSession: Codeunit "NPR POS Session";
     begin
-        case Step of
-            'DeletePosLine':
-                DeletePosLine(POSSession, Context);
-            'GetCurrentViewType':
-                FrontEnd.WorkflowResponse(GetCurrentViewType());
-        END;
+        DeletePosLine(POSSession, Context);
     end;
 
-    local procedure GetActionScript():
-                                Text
+    local procedure GetActionScript(): Text
     begin
         exit(
-//###NPR_INJECT_FROM_FILE:POSActionDeleteLine.js###
-'let main=async({workflow:r,parameters:i,captions:t})=>{debugger;var a=await r.respond("GetCurrentViewType"),e;switch(a.viewType){case"Payment":e=runtime.getData("BUILTIN_PAYMENTLINE");break;default:e=runtime.getData("BUILTIN_SALELINE")}if(!e.length||e._invalid){await popup.error(t.notallowed);return}i.ConfirmDialog&&!await popup.confirm({title:t.title,caption:t.Prompt.substitute(e._current[10])})||r.respond("DeletePosLine")};'
+        //###NPR_INJECT_FROM_FILE:POSActionDeleteLine.js###
+'let main=async({workflow:a,parameters:i,captions:e})=>{debugger;switch(a.scope.view){case"payment":var t=runtime.getData("BUILTIN_PAYMENTLINE");break;default:var t=runtime.getData("BUILTIN_SALELINE")}if(!t.length||t._invalid){await popup.error(e.notallowed);return}i.ConfirmDialog&&!await popup.confirm({title:e.title,caption:e.Prompt.substitute(t._current[10])})||a.respond()};'
         )
     end;
 
@@ -69,6 +63,7 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
             POSSaleLine.SetPosition(Position);
     end;
 
+    [Obsolete('Not Used', 'NPR24.0')]
     procedure GetCurrentViewType() Response: JsonObject;
     var
         NPRPOSSession: Codeunit "NPR POS Session";
