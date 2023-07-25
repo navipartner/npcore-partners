@@ -1,6 +1,9 @@
 ﻿codeunit 6150915 "NPR HC POS Entry Management"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()

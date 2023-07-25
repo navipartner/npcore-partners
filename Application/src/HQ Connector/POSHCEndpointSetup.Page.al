@@ -5,6 +5,9 @@
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR POS HC Endpoint Setup";
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
 
     layout
     {

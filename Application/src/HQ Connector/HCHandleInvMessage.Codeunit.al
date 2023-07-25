@@ -1,6 +1,10 @@
 ﻿codeunit 6150912 "NPR HC Handle Inv. Message"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
+
     var
         TooLong: Label 'Parameter %1 has value %2, which is too long. Field %3 in table %4 can be max. %5 characters. ';
         DoesntExist: Label '%1 %2 cannot be found.';

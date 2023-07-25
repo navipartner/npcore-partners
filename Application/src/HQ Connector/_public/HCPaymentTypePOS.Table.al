@@ -3,6 +3,9 @@
     Caption = 'HC Payment Type POS';
     DataClassification = CustomerContent;
     LookupPageID = "NPR HC Payment Types";
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
 
     fields
     {

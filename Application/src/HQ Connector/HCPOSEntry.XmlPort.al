@@ -3,7 +3,9 @@ xmlport 6150901 "NPR HC POS Entry"
     Caption = 'HC POS Entry';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
     schema
     {
         textelement(postransaction)

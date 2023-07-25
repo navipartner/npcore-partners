@@ -1,6 +1,9 @@
 ﻿codeunit 6150916 "NPR HC Post S.Header"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
     TableNo = "Sales Header";
 
     trigger OnRun()
