@@ -4,6 +4,9 @@
     DataClassification = CustomerContent;
     LookupPageID = "NPR HC Register List";
     Permissions =;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
 
     fields
     {

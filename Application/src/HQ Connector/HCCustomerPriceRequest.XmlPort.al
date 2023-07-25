@@ -4,6 +4,9 @@ xmlport 6150903 "NPR HC Customer Price Request"
     Encoding = UTF8;
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
 
     schema
     {

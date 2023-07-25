@@ -3,6 +3,9 @@
     Access = Internal;
     Caption = 'Endpoint Setup';
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
 
     fields
     {

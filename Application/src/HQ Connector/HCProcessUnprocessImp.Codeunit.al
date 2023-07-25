@@ -1,6 +1,9 @@
 ﻿codeunit 6150905 "NPR HC Process Unprocess. Imp."
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
     trigger OnRun()
     var
         ImportEntry: Record "NPR Nc Import Entry";
