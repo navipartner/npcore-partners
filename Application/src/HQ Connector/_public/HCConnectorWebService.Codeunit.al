@@ -1,5 +1,8 @@
 ﻿codeunit 6150903 "NPR HC Connector Web Service"
 {
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
     procedure InsertPOSEntry(var posentryimport: XMLport "NPR HC POS Entry")
     var
         NaviConnectImportEntry: Record "NPR Nc Import Entry";

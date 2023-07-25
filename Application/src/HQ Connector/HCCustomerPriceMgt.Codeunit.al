@@ -1,6 +1,9 @@
 ﻿codeunit 6150908 "NPR HC Customer Price Mgt."
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
     [TryFunction]
     procedure TryProcessRequest(var TmpSalesHeader: Record "Sales Header"; var TmpSalesLine: Record "Sales Line")
     var

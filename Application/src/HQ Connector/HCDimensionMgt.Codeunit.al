@@ -1,6 +1,10 @@
 ﻿codeunit 6150917 "NPR HC Dimension Mgt."
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
+
     var
         DimensionMgt: Codeunit DimensionManagement;
 

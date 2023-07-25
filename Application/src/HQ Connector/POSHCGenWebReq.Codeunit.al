@@ -1,6 +1,10 @@
 ﻿codeunit 6150913 "NPR POS HC Gen. Web Req."
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
+
     var
         InvalidXml: Label 'The response is not in valid XML format.\\%1';
 

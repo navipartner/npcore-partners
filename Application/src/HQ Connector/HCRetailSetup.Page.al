@@ -7,6 +7,9 @@
     PageType = Card;
     SourceTable = "NPR HC Retail Setup";
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
 
 
     layout

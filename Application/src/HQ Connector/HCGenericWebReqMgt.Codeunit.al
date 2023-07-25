@@ -1,6 +1,9 @@
 ﻿codeunit 6150911 "NPR HC Generic Web Req. Mgt."
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
 
     var
         ResponseStringTooLong: Label 'Response string too long.';

@@ -7,6 +7,9 @@
     SourceTable = "NPR HC Payment Type POS";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
 
 
     layout

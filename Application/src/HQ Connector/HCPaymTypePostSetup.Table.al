@@ -5,6 +5,9 @@
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR HC Paym.Types Post. Setup";
     LookupPageID = "NPR HC Paym.Types Post. Setup";
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
+    ObsoleteReason = 'HQ Connector will no longer be supported';
 
     fields
     {
