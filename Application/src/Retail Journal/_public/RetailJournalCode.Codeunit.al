@@ -668,15 +668,6 @@
         end;
     end;
 
-    procedure PrintValidate(RetailJournalLine: Record "NPR Retail Journal Line")
-    var
-        LabelLibrary: Codeunit "NPR Label Library";
-        RecRef: RecordRef;
-    begin
-        RecRef.GetTable(RetailJournalLine);
-        LabelLibrary.ToggleLine(RecRef);
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Label Library", 'OnBeforePrintRetailJournal', '', true, true)]
     local procedure PrintRetailJournalList(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer; var Skip: Boolean)
     begin
