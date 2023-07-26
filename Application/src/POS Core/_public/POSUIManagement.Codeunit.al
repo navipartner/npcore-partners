@@ -277,6 +277,8 @@
         CaptionGlobalDelete: Label 'Delete';
         CaptionGlobalSave: Label 'Save';
         CaptionGlobalBack: Label 'Back';
+        CaptionGlobalName: Label 'Name';
+        CaptionGlobalManage: Label 'Manage';
         CaptionGlobalPreview: Label 'Preview';
         CaptionGlobalEdit: Label 'Edit';
         CaptionGlobalOK: Label 'OK';
@@ -483,6 +485,11 @@
         ActionsEditorOptionsLabelOpenNestedMenuLbl: Label 'Open Nested Menu';
         ActionsEditorOptionsLabelChangeViewLbl: Label 'Change View';
         CaptionsEditorHavingImgCaptionPopupTextLbl: Label 'Having background image disables having more than one caption.';
+        CaptionsEditorSwipeCaptionPopupTextLbl: Label 'Swipe buttons cant have captions.';
+        CaptionsEditorDrawerCaptionPopupTextLbl: Label 'Drawer buttons can have only one caption.';
+        IconsEditorSwipeIconPopupTextLbl: Label 'Swipe menu buttons cant have images.';
+        IconsEditorDrawerIconPopupTextLbl: Label 'Drawer menu buttons cant have images.';
+        IconsEditorMobileTooltipPopupTextLbl: Label 'Mobile menu buttons cant have tooltips.';
         IconsEditorHavingImgIconPopupTextLbl: Label 'Having background image disables having icon.';
         IconsEditorPleaseProvideLinkLbl: Label 'Please provide link';
         IconsEditorPleaseProvideTooltipLbl: Label 'Please provide tooltip';
@@ -541,11 +548,24 @@
         LogoPickerOrUploadFileLbl: label 'Or upload a file';
         LogoPickerChangeLogoLbl: label 'Change Logo';
         LogoPickerClearLogoLbl: label 'Clear Logo';
+        LogoPickerMaximumFileSizeInfo: Label 'Maximum file size for image uploads is 10 megabytes.';
         GridEditorSelectGridToEditLbl: Label 'Select grid to edit : ';
         WizardModalChooseCategoryLbl: Label 'Choose Category';
+        WizardModalChooseLanguageLbl: Label 'Choose Language';
+        WizardModalChooseLayoutLbl: Label 'Choose Layout';
         WizardModalCloseWizardLbl: Label 'Close Wizard';
         GlobalSettingsModalLbl: Label 'Password requirements for opening edit mode : ';
         GlobalSettingsAuthorizationLbl: Label 'Authorization';
+        GlobalSettingsDecimalNumberDigitsLbl: Label 'Decimal Number Digits';
+        GlobalSettingsDecimalNumberDigitsInfoLbl: Label 'Specifies number of decimal places. Leaving this field blank disables this feature';
+        GlobalSettingsNamedActionsLbl: Label 'Named actions';
+        GlobalSettingsNamedActionTextLbl: Label 'Here you can add re-useable workflows. If you find yourself setting multiple buttons up with the same workflow and same set of parameters, it might be useful to use a named action instead.';
+        GlobalSettingsClickToAddDescriptionLbl: Label 'Click to add description';
+        GlobalSettingsEditNameLbl: Label 'Edit Name';
+        GlobalSettingsEditDescriptionLbl: Label 'Edit Description';
+        GlobalSettingsEditVariablesLbl: Label 'Edit Variables';
+        GlobalSettingsPleaseEnterNameForThisActionLbl: Label 'Please enter name for this action';
+        GlobalSettingsAddNewLbl: Label 'Add New';
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
@@ -575,6 +595,8 @@
         Captions.Add('Global_Close', CaptionGlobalClose);
         Captions.Add('Global_Delete', CaptionGlobalDelete);
         Captions.Add('Global_Back', CaptionGlobalBack);
+        Captions.Add('Global_Name', CaptionGlobalName);
+        Captions.Add('Global_Manage', CaptionGlobalManage);
         Captions.Add('Global_Preview', CaptionGlobalPreview);
         Captions.Add('Global_Edit', CaptionGlobalEdit);
         Captions.Add('Global_Save', CaptionGlobalSave);
@@ -774,6 +796,11 @@
         Captions.Add('Actions_Editor_OptionsLabelOpenNestedMenu', ActionsEditorOptionsLabelOpenNestedMenuLbl);
         Captions.Add('Actions_Editor_OptionsLabelChangeView', ActionsEditorOptionsLabelChangeViewLbl);
         Captions.Add('Captions_Editor_HavingImgCaptionPopupText', CaptionsEditorHavingImgCaptionPopupTextLbl);
+        Captions.Add('Captions_Editor_SwipeCaptionPopupText', CaptionsEditorSwipeCaptionPopupTextLbl);
+        Captions.Add('Captions_Editor_DrawerCaptionPopupText', CaptionsEditorDrawerCaptionPopupTextLbl);
+        Captions.Add('Icons_Editor_SwipeIconPopupText', IconsEditorSwipeIconPopupTextLbl);
+        Captions.Add('Icons_Editor_DrawerIconPopupText', IconsEditorDrawerIconPopupTextLbl);
+        Captions.Add('Icons_Editor_MobileTooltipPopupText', IconsEditorMobileTooltipPopupTextLbl);
         Captions.Add('Icons_Editor_HavingImgIconPopupText', IconsEditorHavingImgIconPopupTextLbl);
         Captions.Add('Icons_Editor_PleaseProvideLink', IconsEditorPleaseProvideLinkLbl);
         Captions.Add('Icons_Editor_PleaseProvideTooltip', IconsEditorPleaseProvideTooltipLbl);
@@ -832,11 +859,24 @@
         Captions.Add('Logo_Picker_OrUploadFile', LogoPickerOrUploadFileLbl);
         Captions.Add('Logo_Picker_ChangeLogo', LogoPickerChangeLogoLbl);
         Captions.Add('Logo_Picker_ClearLogo', LogoPickerClearLogoLbl);
+        Captions.Add('Logo_Picker_MaximumFileSizeInfo', LogoPickerMaximumFileSizeInfo);
         Captions.Add('Grid_Editor_SelectGridToEdit', GridEditorSelectGridToEditLbl);
         Captions.Add('Wizard_Modal_ChooseCategory', WizardModalChooseCategoryLbl);
+        Captions.Add('Wizard_Modal_ChooseLanguage', WizardModalChooseLanguageLbl);
+        Captions.Add('Wizard_Modal_ChooseLayout', WizardModalChooseLayoutLbl);
         Captions.Add('Wizard_Modal_CloseWizard', WizardModalCloseWizardLbl);
         Captions.Add('Global_Settings_PasswordRequirementForEditMode', GlobalSettingsModalLbl);
         Captions.Add('Global_Settings_Authorization', GlobalSettingsAuthorizationLbl);
+        Captions.Add('Global_Settings_DecimalNumberDigits', GlobalSettingsDecimalNumberDigitsLbl);
+        Captions.Add('Global_Settings_DecimalNumberDigitsInfo', GlobalSettingsDecimalNumberDigitsInfoLbl);
+        Captions.Add('Global_Settings_NamedActions', GlobalSettingsNamedActionsLbl);
+        Captions.Add('Global_Settings_NamedActionText', GlobalSettingsNamedActionTextLbl);
+        Captions.Add('Global_Settings_ClickToAddDescription', GlobalSettingsClickToAddDescriptionLbl);
+        Captions.Add('Global_Settings_EditName', GlobalSettingsEditNameLbl);
+        Captions.Add('Global_Settings_EditDescription', GlobalSettingsEditDescriptionLbl);
+        Captions.Add('Global_Settings_EditVariables', GlobalSettingsEditVariablesLbl);
+        Captions.Add('Global_Settings_PleaseEnterNameForThisAction', GlobalSettingsPleaseEnterNameForThisActionLbl);
+        Captions.Add('Global_Settings_AddNew', GlobalSettingsAddNewLbl);
 
         RecRef.Open(DATABASE::"NPR POS Sale Line");
         for i := 1 to RecRef.FieldCount do begin
