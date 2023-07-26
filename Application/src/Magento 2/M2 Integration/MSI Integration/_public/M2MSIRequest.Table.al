@@ -1,6 +1,6 @@
 table 6059863 "NPR M2 MSI Request"
 {
-    Access = Internal;
+    Access = Public;
     TableType = Temporary;
     DataClassification = CustomerContent;
 
