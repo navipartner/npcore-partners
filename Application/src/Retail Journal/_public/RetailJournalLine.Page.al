@@ -36,10 +36,8 @@
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
-                    var
-                        RetailJournalCode: Codeunit "NPR Retail Journal Code";
                     begin
-                        RetailJournalCode.PrintValidate(Rec);
+                        PrintValidate();
                     end;
                 }
                 field(Description; Rec.Description)
@@ -290,6 +288,8 @@
         Caption_DeletePrintedLines: Label 'Delete printed lines?';
         SkipConfirm: Boolean;
 
+
+
     procedure GetSelectionFilter(var Lines: Record "NPR Retail Journal Line")
     var
         t001: Label 'No lines chosen!\Select using mouse or keyboard';
@@ -407,17 +407,27 @@
         CurrPage.Update(false);
     end;
 
+    procedure PrintValidate()
+    var
+        RecRef: RecordRef;
+    begin
+        RecRef.GetTable(Rec);
+        LabelLibrary.ToggleLine(RecRef);
+    end;
+
+    [Obsolete('Event isnt going to be used anymore and will be deleted.', 'NPR24.0')]
     [IntegrationEvent(true, false)]
     procedure OnBeforeOnAfterGetRecord(var isHandled: Boolean; var PrintParam: Boolean; var RetailJournalLine: Record "NPR Retail Journal Line")
     begin
     end;
 
+    [Obsolete('Event isnt going to be used anymore and will be deleted.', 'NPR24.0')]
     [IntegrationEvent(true, false)]
     procedure OnBeforeOnNewRecordTrigger(var isHandled: Boolean; var PrintParam: Boolean; var RetailJournalLine: Record "NPR Retail Journal Line")
     begin
     end;
 
-    [Obsolete('Created new Event OnBeforeOnNewRecord', 'NPR23.11')]
+    [Obsolete('Event isnt going to be used anymore and will be deleted.', 'NPR24.0')]
     [IntegrationEvent(true, false)]
     procedure OnBeforeOnNewRecord(var isHandled: Boolean; var PrintParam: Boolean)
     begin
