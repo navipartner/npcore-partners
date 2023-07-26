@@ -11,16 +11,18 @@ codeunit 6150985 "NPR M2 MSI Task Mgt."
 #else
     trigger OnRun()
     var
-        RequestTxt: Text;
-        TempMSIRequest: Record "NPR M2 MSI Request" temporary;
         ItemVariant: Record "Item Variant";
+        TempMSIRequest: Record "NPR M2 MSI Request" temporary;
+        M2IntegrationEvents: Codeunit "NPR M2 Integration Events";
         RequestArray: JsonArray;
+        HasMoreRecords: Boolean;
+        IsHandled: Boolean;
+        VariantCodeSpecified: Boolean;
         EntityCount: Integer;
         RequestCount: Integer;
-        HasMoreRecords: Boolean;
-        VariantCodeSpecified: Boolean;
         MagentoSource: Text[50];
         MagentoSources: List of [Text[50]];
+        RequestTxt: Text;
     begin
         Clear(Rec."Data Output");
         Clear(Rec.Response);
@@ -40,27 +42,30 @@ codeunit 6150985 "NPR M2 MSI Task Mgt."
 
         VariantCodeSpecified := (TempMSIRequest."Variant Code" <> '');
 
-        foreach MagentoSource in MagentoSources do begin
-            TempMSIRequest."Magento Source" := MagentoSource;
+        IsHandled := false;
+        M2IntegrationEvents.CallOnBeforeFillTempMSIRequest(TempMSIRequest, VariantCodeSpecified, MagentoSources, IsHandled);
+        if not IsHandled then
+            foreach MagentoSource in MagentoSources do begin
+                TempMSIRequest."Magento Source" := MagentoSource;
 
-            if (not VariantCodeSpecified) then begin
-                ItemVariant.SetRange("Item No.", TempMSIRequest."Item No.");
-                ItemVariant.SetRange("NPR Blocked", false);
-                if (ItemVariant.FindSet()) then
-                    repeat
-                        TempMSIRequest."Variant Code" := ItemVariant.Code;
-                        TempMSIRequest.Quantity := CalcStockQty(TempMSIRequest."Item No.", TempMSIRequest."Variant Code", TempMSIRequest."Magento Source");
+                if (not VariantCodeSpecified) then begin
+                    ItemVariant.SetRange("Item No.", TempMSIRequest."Item No.");
+                    ItemVariant.SetRange("NPR Blocked", false);
+                    if (ItemVariant.FindSet()) then
+                        repeat
+                            TempMSIRequest."Variant Code" := ItemVariant.Code;
+                            TempMSIRequest.Quantity := CalcStockQty(TempMSIRequest."Item No.", TempMSIRequest."Variant Code", TempMSIRequest."Magento Source");
+                            TempMSIRequest.Insert();
+                        until ItemVariant.Next() = 0
+                    else begin
+                        TempMSIRequest.Quantity := CalcStockQty(TempMSIRequest."Item No.", '', TempMSIRequest."Magento Source");
                         TempMSIRequest.Insert();
-                    until ItemVariant.Next() = 0
-                else begin
-                    TempMSIRequest.Quantity := CalcStockQty(TempMSIRequest."Item No.", '', TempMSIRequest."Magento Source");
+                    end;
+                end else begin
+                    TempMSIRequest.Quantity := CalcStockQty(TempMSIRequest."Item No.", TempMSIRequest."Variant Code", TempMSIRequest."Magento Source");
                     TempMSIRequest.Insert();
                 end;
-            end else begin
-                TempMSIRequest.Quantity := CalcStockQty(TempMSIRequest."Item No.", TempMSIRequest."Variant Code", TempMSIRequest."Magento Source");
-                TempMSIRequest.Insert();
             end;
-        end;
 
         if (not TempMSIRequest.FindSet()) then
             exit;
@@ -99,10 +104,10 @@ codeunit 6150985 "NPR M2 MSI Task Mgt."
 
     local procedure SendRequest(var Task: Record "NPR Nc Task"; RequestCount: Integer; RequestTxt: Text)
     var
+        InStr: InStream;
+        OutStr: OutStream;
         Success: Boolean;
         ResponseTxt: Text;
-        OutStr: OutStream;
-        InStr: InStream;
         TxtBuffer: Text;
     begin
         if (Task."Data Output".HasValue()) then begin
@@ -150,9 +155,9 @@ codeunit 6150985 "NPR M2 MSI Task Mgt."
     [TryFunction]
     local procedure TrySendRequest(RequestTxt: Text; var ResponseTxt: Text)
     var
-        ResponseMsg: HttpResponseMessage;
         Content: HttpContent;
         ContentHeaders: HttpHeaders;
+        ResponseMsg: HttpResponseMessage;
     begin
         Content.WriteFrom(RequestTxt);
         Content.GetHeaders(ContentHeaders);

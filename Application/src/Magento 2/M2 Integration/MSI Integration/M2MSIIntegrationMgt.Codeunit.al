@@ -30,12 +30,15 @@ codeunit 6150969 "NPR M2 MSI Integration Mgt."
     local procedure UpdateMsiData()
     var
         TempMSIRequest: Record "NPR M2 MSI Request" temporary;
+        M2IntegrationEvents: Codeunit "NPR M2 Integration Events";
     begin
         EmitUsageTelemetry();
 
         UpdateMsiDataItemLedgerEntry(TempMSIRequest);
         UpdateMsiDataSalesLine(TempMSIRequest);
         UpdateMsiDataRecordChanges(TempMSIRequest);
+
+        M2IntegrationEvents.CallOnAfterUpdateMsiDataOnBeforeInsertTasks(TempMSIRequest);
 
         InsertTasks(TempMSIRequest);
     end;
