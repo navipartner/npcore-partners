@@ -215,6 +215,8 @@
             if NpXmlElement.Comment <> '' then
                 NewXmlNode.AddBeforeSelf(XmlComment.Create(NpXmlElement.Comment));
 
+        OnAfterAddXmlElement(Node, NpXmlElement, NewXmlNode);
+
         exit(true);
     end;
 
@@ -1225,6 +1227,11 @@
         TempBlob.CreateInStream(InStr);
 
         DownloadFromStream(InStr, 'Download and preview XML file', '', 'XML Files (*.xml)|*.xml|All Files (*.*)|*.*', FileName);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterAddXmlElement(Node: XmlNode; NpXmlElement: Record "NPR NpXml Element"; var NewXmlNode: XmlNode);
+    begin
     end;
 
     [IntegrationEvent(false, false)]

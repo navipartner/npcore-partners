@@ -764,7 +764,12 @@
         VariantCode: Code[10];
         RequestedDeliveryDate: Date;
         ItemDescription: Text;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeInsertSalesLineItem(XmlElement, SalesHeader, LineNo, IsHandled);
+        if IsHandled then
+            exit;
         ExternalItemNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'external_no', true);
         Position := StrPos(ExternalItemNo, '_');
         if Position = 0 then begin
@@ -829,7 +834,7 @@
         CheckForAutomaticTransferOrder(SalesLine);
     end;
 
-    local procedure CheckForAutomaticTransferOrder(SalesLine: Record "Sales Line")
+    procedure CheckForAutomaticTransferOrder(SalesLine: Record "Sales Line")
     var
         StockQty: Decimal;
         NeededQty: Decimal;
@@ -1941,6 +1946,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertTransferOrder(var TransferHeader: Record "Transfer Header"; var TransferLine: Record "Transfer Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertSalesLineItem(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }
