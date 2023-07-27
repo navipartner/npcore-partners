@@ -158,6 +158,33 @@
     procedure PrintTicketFromSalesTicketNo(SalesTicketNo: Code[20])
     var
         Ticket: Record "NPR TM Ticket";
+    begin
+        Ticket.SetCurrentKey("Sales Receipt No.");
+        Ticket.SetRange("Sales Receipt No.", SalesTicketNo);
+        PrintTicketBatch(Ticket);
+    end;
+
+    procedure PrintTicketsFromExternalOrderNumber(ExternalOrderNumber: Code[20])
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+    begin
+        TicketRequest.SetCurrentKey("External Order No.");
+        TicketRequest.SetFilter("External Order No.", '=%1', ExternalOrderNumber);
+        TicketRequest.SetFilter("Primary Request Line", '=%1', true);
+        if (not TicketRequest.FindSet()) then
+            exit;
+
+        repeat
+            Ticket.Reset();
+            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
+            PrintTicketBatch(Ticket);
+        until (TicketRequest.Next() = 0);
+    end;
+
+    procedure PrintTicketBatch(var Ticket: Record "NPR TM Ticket")
+    var
         Ticket2: Record "NPR TM Ticket";
         TicketSetup: Record "NPR TM Ticket Setup";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
@@ -166,14 +193,9 @@
         PrintTicket: Boolean;
         PublishError: Boolean;
     begin
-
-        Ticket.SetCurrentKey("Sales Receipt No.");
-        Ticket.SetRange("Sales Receipt No.", SalesTicketNo);
-
-        if (Ticket.IsEmpty()) then
+        if (not (Ticket.FindSet())) then
             exit;
 
-        Ticket.FindSet();
         repeat
 
             PrintTicket := true;
@@ -203,7 +225,6 @@
                 end else begin
                     PrintTicket := not TicketSetup."Suppress Print When eTicket";
                 end;
-
             end;
 
             if (PrintTicket) then begin
