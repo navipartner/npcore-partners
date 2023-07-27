@@ -57,8 +57,10 @@
             Subtotal < 0:
                 Error(VoucherAmtErr, Format(POSSaleLine."Amount Including VAT"), Format((POSSaleLine."Amount Including VAT" + Subtotal)));
             Subtotal = 0:
-                if EndSale then
+                if EndSale then begin
                     DoEndSale(POSSession, VoucherType);
+                    ActionContext.Add('endSaleWithoutPosting', true);
+                end;
         end;
 
     end;
@@ -156,6 +158,15 @@
         Handled := true;
 
         NotSupportedError(VoucherType.Code);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Voucher Module", 'OnAfterValidateEvent', 'Ask For Amount', true, true)]
+    local procedure OnAfterValidateAskForAmount(var Rec: Record "NPR NpRv Voucher Module")
+    begin
+        if Rec.Code <> ModuleCode() then
+            exit;
+
+        Rec.TestField("Ask For Amount", false);
     end;
 
     local procedure CurrCodeunitId(): Integer

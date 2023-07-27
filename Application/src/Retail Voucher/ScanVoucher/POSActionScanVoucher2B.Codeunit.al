@@ -24,7 +24,7 @@ codeunit 6150631 "NPR POS Action Scan Voucher2B"
 
     end;
 
-    internal procedure ProcessPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line"; ParamEndSale: Boolean; var ActionContext: JsonObject)
+    internal procedure ProcessPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; SuggestedAmount: Decimal; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line"; ParamEndSale: Boolean; var ActionContext: JsonObject)
     var
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         SalePOS: Record "NPR POS Sale";
@@ -34,7 +34,19 @@ codeunit 6150631 "NPR POS Action Scan Voucher2B"
         Sale.GetCurrentSale(SalePOS);
         PaymentLine.GetPaymentLine(POSLine);
 
-        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, VoucherNumber, POSLine, SalePOS, POSSession, PaymentLine, POSLine, ParamEndSale, ActionContext);
+        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, VoucherNumber, SuggestedAmount, POSLine, SalePOS, POSSession, PaymentLine, POSLine, ParamEndSale, ActionContext);
+    end;
+
+    internal procedure ProcessPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line"; ParamEndSale: Boolean; var ActionContext: JsonObject)
+    begin
+        ProcessPayment(VoucherTypeCode,
+                       VoucherNumber,
+                       0,
+                       Sale,
+                       PaymentLine,
+                       SaleLine,
+                       ParamEndSale,
+                       ActionContext)
     end;
 
     internal procedure EndSale(VoucherTypeCode: Text; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line"; Setup: Codeunit "NPR POS Setup")
@@ -73,4 +85,25 @@ codeunit 6150631 "NPR POS Action Scan Voucher2B"
         else
             Error(BlankReferenceNoErr);
     end;
+
+    internal procedure CalculateRemainingAmount(PaymentLine: Codeunit "NPR POS Payment Line";
+                                                PaymentMethodCode: Code[10];
+                                                var POSPaymentMethodOut: Record "NPR POS Payment Method";
+                                                var RemainingAmount: Decimal)
+    var
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
+        SalesAmount: Decimal;
+        PaidAmount: Decimal;
+        ReturnAmount: Decimal;
+        SubTotal: Decimal;
+    begin
+        POSPaymentMethodOut.Get(PaymentMethodCode);
+        ReturnPOSPaymentMethod.Get(POSPaymentMethodOut."Return Payment Method Code");
+        POSPaymentMethodOut.TestField("Block POS Payment", false);
+        ReturnPOSPaymentMethod.TestField("Block POS Payment", false);
+
+        PaymentLine.CalculateBalance(POSPaymentMethodOut, SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+        RemainingAmount := PaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, POSPaymentMethodOut, ReturnPOSPaymentMethod, true);
+    end;
+
 }

@@ -73,5 +73,10 @@
     internal procedure OnRunApplyPaymentV3(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean; var Handled: Boolean; var ActionContext: JsonObject)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnPreApplyPaymentV3(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var SalePOS: Record "NPR POS Sale"; VoucherType: Record "NPR NpRv Voucher Type"; ReferenceNo: Text; SuggestedAmount: Decimal)
+    begin
+    end;
     #endregion
 }

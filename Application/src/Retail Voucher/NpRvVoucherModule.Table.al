@@ -40,6 +40,11 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(60; "Ask For Amount"; Boolean)
+        {
+            Caption = 'Ask For Amount';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
