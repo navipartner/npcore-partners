@@ -44,6 +44,12 @@
                     ToolTip = 'Specifies the value of the Event Codeunit Name field associated with the Retail Voucher Module';
                     ApplicationArea = NPRRetail;
                 }
+                field("Ask For Amount"; Rec."Ask For Amount")
+                {
+                    ToolTip = 'Specifies the value of the Ask For Amount field associated with the Retail Voucher Module';
+                    ApplicationArea = NPRRetail;
+
+                }
             }
         }
     }

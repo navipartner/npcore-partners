@@ -463,6 +463,15 @@
         ApplyPaymentSalesDoc(VoucherType, SalesHeader, NpRvSalesLine);
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Voucher Module", 'OnAfterValidateEvent', 'Ask For Amount', true, true)]
+    local procedure OnAfterValidateAskForAmount(var Rec: Record "NPR NpRv Voucher Module")
+    begin
+        if Rec.Code <> ModuleCode() then
+            exit;
+
+        Rec.TestField("Ask For Amount", false);
+    end;
+
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR NpRv Module Pay.: Default");

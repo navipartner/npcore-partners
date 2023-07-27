@@ -1690,18 +1690,21 @@
         NpRvModulePaymentDefault.ApplyPayment(POSSession, VoucherType, NpRvSalesLine, EndSale, ActionContext);
     end;
 
-    internal procedure ApplyVoucherPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; EndSale: Boolean; var ActionContext: JsonObject)
+    internal procedure ApplyVoucherPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; SuggestedAmount: Decimal; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; EndSale: Boolean; var ActionContext: JsonObject)
     var
         TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
         VoucherType: Record "NPR NpRv Voucher Type";
         Voucher: Record "NPR NpRv Voucher";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
     begin
         VoucherType.Get(VoucherTypeCode);
         CheckVoucherType(VoucherType, SalePOS);
 
         PrepareVoucherBuffer(TempNpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber);
         ValidateVoucher(TempNpRvVoucherBuffer);
+
+        NpRvModuleMgt.OnPreApplyPaymentV3(TempNpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber, SuggestedAmount);
 
         POSLine."No." := VoucherType."Payment Type";
         POSLine."Register No." := SalePOS."Register No.";
@@ -1722,6 +1725,19 @@
         ApplyPayment(POSSession, NpRvSalesLine, EndSale, ActionContext);
     end;
 
+    internal procedure ApplyVoucherPayment(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; EndSale: Boolean; var ActionContext: JsonObject)
+    begin
+        ApplyVoucherPayment(VoucherTypeCode,
+                            VoucherNumber,
+                            0,
+                            PaymentLine,
+                            SalePOS,
+                            POSSession,
+                            POSPaymentLine,
+                            POSLine,
+                            EndSale,
+                            ActionContext)
+    end;
     #endregion
 
     [IntegrationEvent(false, false)]

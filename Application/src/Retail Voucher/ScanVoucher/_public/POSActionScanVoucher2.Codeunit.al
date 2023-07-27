@@ -16,6 +16,7 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         BlankVoucherTypeErr: Label 'Voucher Type doesn''t exist';
         AskForVoucherType_CptLbl: Label 'Ask for voucher type';
         AskForVoucherType_DescLbl: Label 'The system is going to ask for the voucher type before scanning';
+        ProposedAmountDifferenceConfirmationLbl: Label 'The selected amount {0} is higher than the proposed amount {1}.';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -26,6 +27,7 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         WorkflowConfig.AddLabel('VoucherPaymentTitle', RetailVoucherLbl);
         WorkflowConfig.AddLabel('ReferenceNo', ReferenceNoLbl);
         WorkflowConfig.AddLabel('InvalidVoucherType', BlankVoucherTypeErr);
+        WorkflowConfig.AddLabel('ProposedAmountDifferenceConfirmation', ProposedAmountDifferenceConfirmationLbl);
         WorkflowConfig.AddBooleanParameter('AskForVoucherType', false, AskForVoucherType_CptLbl, AskForVoucherType_DescLbl);
     end;
 
@@ -34,8 +36,8 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         case Step of
             'setVoucherType':
                 FrontEnd.WorkflowResponse(SetVoucherType());
-            'setVoucherTypeFromReferenceNo':
-                FrontEnd.WorkflowResponse(SetVoucherTypeFromReferenceNo(Context));
+            'calculateVoucherInformation':
+                FrontEnd.WorkflowResponse(CalculateVoucherInformation(PaymentLine, Context));
             'prepareRequest':
                 FrontEnd.WorkflowResponse(VoucherPayment(Context, Sale, PaymentLine, SaleLine));
             'doLegacyWorkflow':
@@ -53,14 +55,58 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         exit(VoucherType);
     end;
 
-    local procedure SetVoucherTypeFromReferenceNo(Context: Codeunit "NPR POS JSON Helper") VoucherType: Text
+    local procedure CalculateVoucherInformation(PaymentLine: Codeunit "NPR POS Payment Line";
+                                                Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
     var
+        NPRNpRvVoucherModule: Record "NPR NpRv Voucher Module";
+        NPRNpRvVoucherType: Record "NPR NpRv Voucher Type";
+        NPRPOSPaymentMethod: Record "NPR POS Payment Method";
+        NPRNpRvVoucher: Record "NPR NpRv Voucher";
         NPRNpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        NPRPOSActionScanVoucher2B: Codeunit "NPR POS Action Scan Voucher2B";
         ReferenceNo: Text;
-
+        VoucherType: Text;
+        SuggestedAmount: Decimal;
     begin
-        ReferenceNo := Context.GetString('VoucherRefNo');
-        VoucherType := NPRNpRvVoucherMgt.GetVoucherTypeFromReferenceNumber(ReferenceNo);
+        if Context.GetString('VoucherRefNo', ReferenceNo) then;
+        if Context.GetString('voucherType', VoucherType) then;
+
+        if VoucherType = '' then
+            VoucherType := NPRNpRvVoucherMgt.GetVoucherTypeFromReferenceNumber(ReferenceNo);
+
+        if VoucherType = '' then begin
+            Response.Add('voucherType', '');
+            Response.Add('askForAmount', false);
+            Response.Add('suggestedAmount', 0);
+            Response.Add('paymentDescription', '');
+            exit;
+        end;
+
+        if not NPRNpRvVoucherType.Get(VoucherType) then
+            Clear(NPRNpRvVoucherType);
+
+        if not NPRNpRvVoucherModule.Get(NPRNpRvVoucherModule.Type::"Apply Payment", NPRNpRvVoucherType."Apply Payment Module") then
+            Clear(NPRNpRvVoucherModule);
+
+        NPRNpRvVoucher.Reset();
+        NPRNpRvVoucher.SetCurrentKey("Reference No.");
+        NPRNpRvVoucher.SetRange("Reference No.", ReferenceNo);
+        if not NPRNpRvVoucher.FindFirst() then
+            Clear(NPRNpRvVoucher);
+
+        NPRNpRvVoucher.CalcFields(Amount);
+
+        NPRPOSActionScanVoucher2B.CalculateRemainingAmount(PaymentLine,
+                                                           NPRNpRvVoucherType."Payment Type",
+                                                           NPRPOSPaymentMethod,
+                                                           SuggestedAmount);
+        if SuggestedAmount > NPRNpRvVoucher.Amount then
+            SuggestedAmount := NPRNpRvVoucher.Amount;
+
+        Response.Add('voucherType', VoucherType);
+        Response.Add('askForAmount', NPRNpRvVoucherModule."Ask For Amount");
+        Response.Add('suggestedAmount', SuggestedAmount);
+        Response.Add('paymentDescription', NPRPOSPaymentMethod.Description);
     end;
 
     local procedure GetVoucherType(): Code[20]
@@ -81,27 +127,28 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         POSActionScanActionB: Codeunit "NPR POS Action Scan Voucher2B";
         ActionContext: JsonObject;
         VoucherTypeCode: Code[20];
+        SelectedAmount: Decimal;
         EndSalePar: Boolean;
     begin
-        HandleParameters(Context, VoucherTypeCode, EndSalePar, ReferenceNo);
-        POSActionScanActionB.ProcessPayment(VoucherTypeCode, ReferenceNo, Sale, PaymentLine, SaleLine, EndSalePar, ActionContext);
+        HandleParameters(Context, VoucherTypeCode, EndSalePar, ReferenceNo, SelectedAmount);
+        POSActionScanActionB.ProcessPayment(VoucherTypeCode, ReferenceNo, SelectedAmount, Sale, PaymentLine, SaleLine, EndSalePar, ActionContext);
 
         Response.Add('tryEndSale', HandleWorkflowResponse(Response, ActionContext));
         exit(Response);
 
     end;
 
-    internal procedure HandleParameters(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var ParamEndSale: Boolean; var ReferenceNo: Text)
+    internal procedure HandleParameters(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var ParamEndSale: Boolean; var ReferenceNo: Text; var SelectedAmount: Decimal)
     var
         VoucherListEnabled: Boolean;
         POSActionScanActionB: Codeunit "NPR POS Action Scan Voucher2B";
     begin
-        GetParameterValues(Context, VoucherTypeCode, ParamEndSale, ReferenceNo, VoucherListEnabled);
+        GetParameterValues(Context, VoucherTypeCode, ParamEndSale, ReferenceNo, VoucherListEnabled, SelectedAmount);
         if ReferenceNo = '' then
             POSActionScanActionB.CheckReferenceNo(ReferenceNo, VoucherListEnabled, VoucherTypeCode);
     end;
 
-    internal procedure GetParameterValues(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var ParamEndSale: Boolean; var ReferenceNo: Text; var VoucherListEnabled: Boolean)
+    internal procedure GetParameterValues(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var ParamEndSale: Boolean; var ReferenceNo: Text; var VoucherListEnabled: Boolean; var SelectedAmount: Decimal)
     var
         VoucherType: Text;
     begin
@@ -109,6 +156,7 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         ParamEndSale := Context.GetBooleanParameter('EndSale');
         VoucherListEnabled := Context.GetBooleanParameter('EnableVoucherList');
         VoucherType := Context.GetString('voucherType');
+        if not Context.GetDecimal('selectedAmount', SelectedAmount) then;
         Evaluate(VoucherTypeCode, VoucherType);
     end;
 
@@ -240,7 +288,7 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionScanVoucher2.js###
-'let main=async({workflow:e,parameters:t,popup:u,captions:o})=>{debugger;let r,c={tryEndSale:!1,legacy:!1};if(t.VoucherTypeCode)e.context.voucherType=t.VoucherTypeCode;else if(t.AskForVoucherType&&(e.context.voucherType=await e.respond("setVoucherType"),!e.context.voucherType))return c;if(t.ReferenceNo?r=t.ReferenceNo:r=await u.input({title:o.VoucherPaymentTitle,caption:o.ReferenceNo}),!r||!e.AskForVoucherType&&!e.context.voucherType&&(e.context.voucherType=await e.respond("setVoucherTypeFromReferenceNo",{VoucherRefNo:r}),!e.context.voucherType))return c;let n=await e.respond("prepareRequest",{VoucherRefNo:r});return n.tryEndSale?(t.EndSale&&!n.endSaleWithoutPosting&&await e.respond("endSale"),c):(n.workflowVersion==1?await e.respond("doLegacyWorkflow",{workflowName:n.workflowName}):await e.run(n.workflowName,{parameters:n.parameters}),c)};'
+'let main=async({workflow:e,parameters:r,popup:i,context:s,captions:o})=>{debugger;let t,n={tryEndSale:!1,legacy:!1};if(r.VoucherTypeCode)e.context.voucherType=r.VoucherTypeCode;else if(r.AskForVoucherType&&(e.context.voucherType=await e.respond("setVoucherType"),!e.context.voucherType))return n;if(r.ReferenceNo?t=r.ReferenceNo:t=await i.input({title:o.VoucherPaymentTitle,caption:o.ReferenceNo}),!t||(setVoucherTypeFromReferenceNoResponse=await e.respond("calculateVoucherInformation",{VoucherRefNo:t}),e.context.voucherType=setVoucherTypeFromReferenceNoResponse.voucherType,!e.context.voucherType))return n;var f=setVoucherTypeFromReferenceNoResponse.askForAmount,u=setVoucherTypeFromReferenceNoResponse.suggestedAmount,h=setVoucherTypeFromReferenceNoResponse.paymentDescription,m=setVoucherTypeFromReferenceNoResponse.amountPrompt;let c=u;if(f)for(var p=!0;p;){if(c=u,u>0&&(c=await i.numpad({title:h,caption:m,value:u}),c===null))return n;p=c>u,p&&await i.message(strSubstNo(o.ProposedAmountDifferenceConfirmation,c,u))}let a=await e.respond("prepareRequest",{VoucherRefNo:t,selectedAmount:c});return a.tryEndSale?(r.EndSale&&!a.endSaleWithoutPosting&&await e.respond("endSale"),n):(a.workflowVersion==1?await e.respond("doLegacyWorkflow",{workflowName:a.workflowName}):await e.run(a.workflowName,{parameters:a.parameters}),n)};function strSubstNo(e,...r){if(!e.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return e.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(i,s,o)=>{if(s)return s.replace(/(?:{{)|(?:}})/g,t=>t[0]);if(o>=r.length)throw new Error("argument index is out of range in format");return r[o]})}'
         );
     end;
 

@@ -1,6 +1,7 @@
 ﻿codeunit 6151018 "NPR NpRv Module Pay. - Partial"
 {
     Access = Internal;
+
     var
         Text000: Label 'Apply Payment - Partial';
 
@@ -102,6 +103,17 @@
         Handled := true;
 
         ApplyPaymentSalesDoc(VoucherType, SalesHeader, NpRvSalesLine);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnPreApplyPaymentV3', '', true, true)]
+    local procedure OnPreApplyPaymentV3(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var SalePOS: Record "NPR POS Sale"; VoucherType: Record "NPR NpRv Voucher Type"; ReferenceNo: Text; SuggestedAmount: Decimal)
+    begin
+        if not IsSubscriber(VoucherType) then
+            exit;
+
+        IF (TempNpRvVoucherBuffer.Amount > SuggestedAmount) AND (SuggestedAmount <> 0) THEN
+            TempNpRvVoucherBuffer.Amount := SuggestedAmount;
+
     end;
 
     local procedure CurrCodeunitId(): Integer
