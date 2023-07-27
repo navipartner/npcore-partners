@@ -112,6 +112,26 @@
             until MagentoStore.Next() = 0;
     end;
 
+    procedure ResetStoresVisibility(ItemNo: Code[20])
+    var
+        MagentoStoreItem: Record "NPR Magento Store Item";
+    begin
+        MagentoStoreItem.SetRange("Item No.", ItemNo);
+        if MagentoStoreItem.IsEmpty() then
+            exit;
+        MagentoStoreItem.ModifyAll(Visibility, MagentoStoreItem.Visibility::Hidden);
+    end;
+
+    procedure SetStoreVisibility(ItemNo: Code[20]; StoreCode: Code[32])
+    var
+        MagentoStoreItem: Record "NPR Magento Store Item";
+    begin
+        if not MagentoStoreItem.Get(ItemNo, StoreCode) then
+            exit;
+        MagentoStoreItem.Validate(Visibility, MagentoStoreItem.Visibility::Visible);
+        MagentoStoreItem.Modify();
+    end;
+
     internal procedure InitReplicateSpecialPrice2SalesPrices()
     var
         Item: Record Item;
