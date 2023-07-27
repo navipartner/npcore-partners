@@ -668,6 +668,11 @@
         end;
     end;
 
+    [Obsolete('Not used anymore.', 'NPR24.0')]
+    procedure PrintValidate(RetailJournalLine: Record "NPR Retail Journal Line")
+    begin
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Label Library", 'OnBeforePrintRetailJournal', '', true, true)]
     local procedure PrintRetailJournalList(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer; var Skip: Boolean)
     begin
