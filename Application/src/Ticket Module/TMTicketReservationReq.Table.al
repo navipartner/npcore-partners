@@ -258,6 +258,9 @@
         key(Key7; "Session Token ID", "Admission Inclusion")
         {
         }
+        key(Key8; "External Order No.")
+        {
+        }
     }
 
     fieldgroups

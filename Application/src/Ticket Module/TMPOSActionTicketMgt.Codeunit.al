@@ -5,6 +5,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
     var
         ILLEGAL_VALUE: Label 'Value %1 is not a valid %2.';
         TICKET_NUMBER: Label 'Ticket Number';
+        TICKET_REFERENCE: Label 'Ticket Reference';
         ABORTED: Label 'Aborted.';
         INVALID_ADMISSION: Label 'Parameter %1 specifies an invalid value for admission code. %2 not found.';
         TicketNumberPrompt: Label 'Enter Ticketnumber';
@@ -140,18 +141,19 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
         ShowWelcomeMessage: Boolean;
     begin
         DefaultTicketNumber := Context.GetStringParameter('DefaultTicketNumber');
-        AdmissionCode := CopyStr(Context.GetStringParameter('Admission Code'), 1, MaxStrLen(AdmissionCode));
 
-        if (DefaultTicketNumber = '') then begin
-            ExternalTicketNumber := CopyStr(Context.GetString('TicketNumber'), 1, MaxStrLen(ExternalTicketNumber));
-        end else begin
-            ExternalTicketNumber := CopyStr(DefaultTicketNumber, 1, MaxStrLen(ExternalTicketNumber));
-            ShowWelcomeMessage := not (Context.GetBooleanParameter('SuppressWelcomeMessage'));
-            if (FunctionId = 1) then begin
-                Context.SetContext('Verbose', ShowWelcomeMessage);
-                Context.SetContext('VerboseMessage', Welcome);
-            end;
+        if (DefaultTicketNumber = '') then
+            if (not Context.GetString('TicketNumber', DefaultTicketNumber)) then
+                exit;
+
+        ExternalTicketNumber := CopyStr(DefaultTicketNumber, 1, MaxStrLen(ExternalTicketNumber));
+        ShowWelcomeMessage := not (Context.GetBooleanParameter('SuppressWelcomeMessage'));
+        if (FunctionId = 1) then begin
+            Context.SetContext('Verbose', ShowWelcomeMessage);
+            Context.SetContext('VerboseMessage', Welcome);
         end;
+
+        AdmissionCode := CopyStr(Context.GetStringParameter('Admission Code'), 1, MaxStrLen(AdmissionCode));
         TicketMaxQty := GetGroupTicketQuantity(Context, ExternalTicketNumber, AdmissionCode, FunctionId, ShowQtyDialog);
         Context.SetContext('TicketMaxQty', TicketMaxQty);
         Context.SetContext('ShowTicketQtyDialog', ShowQtyDialog);
@@ -221,15 +223,15 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
         if (ShowReferenceDialogForFunction(Context)) then
             TicketReference := CopyStr(Context.GetString('TicketReference'), 1, MaxStrLen(TicketReference));
 
-        if (DefaultTicketNumber = '') then begin
-            ExternalTicketNumber := CopyStr(Context.GetString('TicketNumber'), 1, MaxStrLen(ExternalTicketNumber));
-        end else begin
-            ExternalTicketNumber := CopyStr(DefaultTicketNumber, 1, MaxStrLen(ExternalTicketNumber));
-            ShowWelcomeMessage := not (Context.GetBooleanParameter('SuppressWelcomeMessage'));
-            if (FunctionId = 1) then begin
-                Context.SetContext('Verbose', ShowWelcomeMessage);
-                Context.SetContext('VerboseMessage', Welcome);
-            end;
+        if (DefaultTicketNumber = '') then
+            Context.GetString('TicketNumber', DefaultTicketNumber);
+
+        ExternalTicketNumber := CopyStr(DefaultTicketNumber, 1, MaxStrLen(ExternalTicketNumber));
+
+        ShowWelcomeMessage := not (Context.GetBooleanParameter('SuppressWelcomeMessage'));
+        if (FunctionId = 1) then begin
+            Context.SetContext('Verbose', ShowWelcomeMessage);
+            Context.SetContext('VerboseMessage', Welcome);
         end;
 
         case FunctionId of
@@ -271,6 +273,9 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
         NewTicketQty: Integer;
         QtyChanged: Boolean;
     begin
+        if (ExternalTicketNumber = '') then
+            Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
+
         Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
         if (not Ticket.FindFirst()) then
             Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
@@ -981,6 +986,9 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Admission: Record "NPR TM Admission";
     begin
+        if (ExternalTicketNumber = '') then
+            Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
+
         if (AdmissionCode <> '') then
             if (not Admission.Get(AdmissionCode)) then
                 Error(INVALID_ADMISSION, 'Admission Code', AdmissionCode);
@@ -1252,32 +1260,48 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
         SaleLinePos: Record "NPR POS Sale Line";
         Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";
+        ReservationFound: Boolean;
     begin
+        if (TicketReference = '') then
+            Error(ILLEGAL_VALUE, TicketReference, TICKET_REFERENCE);
+
         Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(TicketReference, 1, MaxStrLen(Ticket."External Ticket No.")));
         if (Ticket.FindFirst()) then begin
             TicketReservationRequest.SetFilter("Entry No.", '=%1', Ticket."Ticket Reservation Entry No.");
             TicketReservationRequest.FindFirst();
             TicketReservationRequest.Reset();
             TicketReservationRequest.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
-
-        end else begin
-            TicketReservationRequest.SetFilter("External Member No.", '%1', CopyStr(TicketReference, 1, MaxStrLen(TicketReservationRequest."External Member No.")));
-            if (TicketReference = '') then
-                TicketReservationRequest.SetFilter("External Member No.", '<>%1', '');
-
-            if (TicketReservationRequest.IsEmpty()) then
-                TicketReservationRequest.SetFilter("External Member No.", '<>%1', '');
-
+            ReservationFound := TicketReservationRequest.FindFirst();
         end;
 
-        PickUpReservedTickets.SetTableView(TicketReservationRequest);
+        if (not ReservationFound) then begin
+            TicketReservationRequest.Reset();
+            TicketReservationRequest.SetFilter("External Order No.", '=%1', CopyStr(TicketReference, 1, MaxStrLen(TicketReservationRequest."External Order No.")));
+            ReservationFound := TicketReservationRequest.FindFirst();
+        end;
 
-        PickUpReservedTickets.LookupMode(true);
-        PageAction := PickUpReservedTickets.RunModal();
-        if (PageAction <> Action::LookupOK) then
-            exit;
+        if (not ReservationFound) then begin
+            TicketReservationRequest.Reset();
+            TicketReservationRequest.SetFilter("External Member No.", '=%1', CopyStr(TicketReference, 1, MaxStrLen(TicketReservationRequest."External Member No.")));
+            ReservationFound := TicketReservationRequest.FindFirst();
+            if (not ReservationFound) then
+                TicketReservationRequest.SetFilter("External Member No.", '<>%1', '');
+        end;
 
-        PickUpReservedTickets.GetRecord(TicketReservationRequest);
+        if (not GuiAllowed() and (not ReservationFound)) then
+            Error(ILLEGAL_VALUE, TicketReference, TICKET_REFERENCE);
+
+        if (GuiAllowed()) then begin
+            // Confirm or select from list
+            PickUpReservedTickets.SetTableView(TicketReservationRequest);
+
+            PickUpReservedTickets.LookupMode(true);
+            PageAction := PickUpReservedTickets.RunModal();
+            if (PageAction <> Action::LookupOK) then
+                exit;
+
+            PickUpReservedTickets.GetRecord(TicketReservationRequest);
+        end;
 
         // Create a pos sale line to finish the reservation
         if (TicketReservationRequest."Payment Option" = TicketReservationRequest."Payment Option"::UNPAID) then begin
@@ -1303,16 +1327,17 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
         end;
 
         // Print this reservation
-        Ticket.Reset();
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
+        TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
         TicketReservationRequest.FindFirst();
 
         TicketReservationRequest.TestField("Admission Created", true);
-        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
-        Ticket.FindFirst();
 
-        TicketManagement.PrintSingleTicket(Ticket);
+        Ticket.Reset();
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+        TicketManagement.PrintTicketBatch(Ticket);
+
     end;
 
     local procedure ConvertToMembership(POSSession: Codeunit "NPR POS Session"; Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"; ExternalTicketNumber: Code[50]; AdmissionCode: Code[20])
@@ -1353,6 +1378,9 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt." implements "NPR IPOS Workflow"
         SaleLine: Codeunit "NPR POS Sale Line";
         LastLineNo: Integer;
     begin
+        if (ExternalTicketNumber = '') then
+            Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
+
         Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
         if (not Ticket.FindFirst()) then
             Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
