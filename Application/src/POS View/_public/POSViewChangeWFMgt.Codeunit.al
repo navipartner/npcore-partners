@@ -160,25 +160,14 @@
     end;
 
     local procedure FindNotInStockLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var ErrorMessage: Record "Error Message")
-    var
-        Msg: Text;
-        AvailableInventoryDescLbl: Label 'The available inventory for item %1 - %2 is lower than the entered quantity at this location.';
-        AvailableInventoryDesc2Lbl: Label 'The available inventory for item %1 - %2 %3 is lower than the entered quantity at this location.';
     begin
         if not TempSaleLinePOS.FindSet() then
             exit;
 
         repeat
             TempSaleLinePOS."MR Anvendt antal" := CalcInventory(TempSaleLinePOS);
-            if TempSaleLinePOS."MR Anvendt antal" < TempSaleLinePOS."Quantity (Base)" then begin
-                Clear(Msg);
-                if TempSaleLinePOS."Description 2" <> '' then
-                    Msg := StrSubstNo(AvailableInventoryDesc2Lbl, TempSaleLinePOS."No.", TempSaleLinePOS.Description, TempSaleLinePOS."Description 2")
-                else
-                    Msg := StrSubstNo(AvailableInventoryDescLbl, TempSaleLinePOS."No.", TempSaleLinePOS.Description);
-
-                ErrorMessage.LogSimpleMessage(ErrorMessage."Message Type"::Error, Msg);
-            end;
+            if TempSaleLinePOS."MR Anvendt antal" < TempSaleLinePOS."Quantity (Base)" then
+                LogErrorMessage(TempSaleLinePOS, ErrorMessage);
         until TempSaleLinePOS.Next() = 0;
     end;
 
@@ -188,6 +177,9 @@
     begin
         if not Item.Get(TempSaleLinePOS."No.") then
             exit(0);
+
+        if TempSaleLinePOS."Bin Code" <> '' then
+            exit(CheckBinContent(TempSaleLinePOS));
 
         Item.SetRange("Variant Filter", TempSaleLinePOS."Variant Code");
         Item.SetRange("Location Filter", TempSaleLinePOS."Location Code");
@@ -247,6 +239,7 @@
         TempSaleLinePOS.SetRange("Variant Code", SaleLinePOS."Variant Code");
         TempSaleLinePOS.SetRange("Location Code", SaleLinePOS."Location Code");
         TempSaleLinePOS.SetRange("Serial No.", SaleLinePOS."Serial No.");
+        TempSaleLinePOS.SetRange("Bin Code", SaleLinePOS."Bin Code");
         if TempSaleLinePOS.FindFirst() then begin
             TempSaleLinePOS.Quantity += SaleLinePOS.Quantity;
             TempSaleLinePOS."Quantity (Base)" += SaleLinePOS."Quantity (Base)";
@@ -269,6 +262,41 @@
         if ItemTrackingCode."SN Specific Tracking" then
             exit(true);
         exit(false);
+    end;
+
+    local procedure CheckBinContent(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Decimal
+    var
+        BinContent: Record "Bin Content";
+    begin
+        if not BinContent.Get(TempSaleLinePOS."Location Code", TempSaleLinePOS."Bin Code", TempSaleLinePOS."No.", TempSaleLinePOS."Variant Code", TempSaleLinePOS."Unit of Measure Code") then
+            exit;
+        BinContent.SetRange("Serial No. Filter", TempSaleLinePOS."Serial No.");
+        BinContent.CalcFields(Quantity);
+        exit(BinContent.Quantity);
+    end;
+
+    local procedure LogErrorMessage(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var ErrorMessage: Record "Error Message")
+    var
+        Msg: Text;
+        AvailableInventoryDescLbl: Label 'The available inventory for item %1 - %2 is lower than the entered quantity at this location.', Comment = '%1=SaleLinePOS."No.",%2=SaleLinePOS.Description';
+        AvailableInventoryDesc2Lbl: Label 'The available inventory for item %1 - %2 %3 is lower than the entered quantity at this location.', Comment = '%1=SaleLinePOS."No.",%2=SaleLinePOS.Description,%3=SaleLinePOS."Description 2"';
+        AvailableInventoryBinDescLbl: Label 'The available inventory for item %1 - %2 is lower than the entered quantity in this Bin.', Comment = '%1=SaleLinePOS."No.",%2=SaleLinePOS.Description';
+        AvailableInventoryBinDesc2Lbl: Label 'The available inventory for item %1 - %2 %3 is lower than the entered quantity in this Bin.', Comment = '%1=SaleLinePOS."No.",%2=SaleLinePOS.Description,%3=SaleLinePOS."Description 2"';
+    begin
+        Clear(Msg);
+        if TempSaleLinePOS."Bin Code" = '' then begin
+            if TempSaleLinePOS."Description 2" <> '' then
+                Msg := StrSubstNo(AvailableInventoryDesc2Lbl, TempSaleLinePOS."No.", TempSaleLinePOS.Description, TempSaleLinePOS."Description 2")
+            else
+                Msg := StrSubstNo(AvailableInventoryDescLbl, TempSaleLinePOS."No.", TempSaleLinePOS.Description);
+        end else begin
+            if TempSaleLinePOS."Description 2" <> '' then
+                Msg := StrSubstNo(AvailableInventoryBinDesc2Lbl, TempSaleLinePOS."No.", TempSaleLinePOS.Description, TempSaleLinePOS."Description 2")
+            else
+                Msg := StrSubstNo(AvailableInventoryBinDescLbl, TempSaleLinePOS."No.", TempSaleLinePOS.Description);
+        end;
+
+        ErrorMessage.LogSimpleMessage(ErrorMessage."Message Type"::Error, Msg);
     end;
 
 }
