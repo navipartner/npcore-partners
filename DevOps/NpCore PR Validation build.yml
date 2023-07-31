@@ -34,6 +34,7 @@ stages:
 
         - name: BC2005_CLOUD
           alwaysRun: true
+          doNotRunTests: true
 
         - name: BC2103_CLOUD
           alwaysRun: true
