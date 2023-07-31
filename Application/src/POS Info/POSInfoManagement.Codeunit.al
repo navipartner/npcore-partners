@@ -10,7 +10,6 @@
     var
         POSInfoLinkTable: Record "NPR POS Info Link Table";
         POSInfoTransaction: Record "NPR POS Info Transaction";
-        FrontEndUpdateIsNeeded: Boolean;
     begin
         if Rec.IsTemporary then
             exit;
@@ -18,11 +17,9 @@
             POSInfoLinkTable.Reset();
             POSInfoLinkTable.SetRange("Table ID", DATABASE::Item);
             POSInfoLinkTable.SetRange("Primary Key", Rec."No.");
-            FrontEndUpdateIsNeeded := ProcessPOSInfoLinkEntries(POSInfoLinkTable, Rec, ApplicScope::"Current Line");
+            ProcessPOSInfoLinkEntries(POSInfoLinkTable, Rec, ApplicScope::"Current Line");
         end;
-        FrontEndUpdateIsNeeded := CopyPOSInfoTransFromHeader(Rec, POSInfoTransaction) or FrontEndUpdateIsNeeded;
-        if FrontEndUpdateIsNeeded then
-            CallFrontEndUpdate();
+        CopyPOSInfoTransFromHeader(Rec, POSInfoTransaction);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale", 'OnBeforeValidateEvent', 'Customer No.', false, false)]
@@ -31,7 +28,6 @@
         Customer: Record Customer;
         POSInfoLinkTable: Record "NPR POS Info Link Table";
         pSaleLinePos: Record "NPR POS Sale Line";
-        FrontEndUpdateIsNeeded: Boolean;
     begin
         if Rec.IsTemporary then
             exit;
@@ -58,10 +54,7 @@
         pSaleLinePos.Date := Rec.Date;
         pSaleLinePos."Line No." := 0;
 
-        FrontEndUpdateIsNeeded := ProcessPOSInfoLinkEntries(POSInfoLinkTable, pSaleLinePos, ApplicScope::"All Lines");
-
-        if FrontEndUpdateIsNeeded then
-            CallFrontEndUpdate();
+        ProcessPOSInfoLinkEntries(POSInfoLinkTable, pSaleLinePos, ApplicScope::"All Lines");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSEntry', '', true, true)]
@@ -137,7 +130,7 @@
             until TempPOSInfoTransaction.Next() = 0;
     end;
 
-    procedure ProcessPOSInfoMenuFunction(pSaleLinePos: Record "NPR POS Sale Line"; pPOSInfoCode: Code[20]; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask; pClearInfo: Boolean; UserInputString: Text) FrontEndUpdateIsNeeded: Boolean
+    procedure ProcessPOSInfoMenuFunction(pSaleLinePos: Record "NPR POS Sale Line"; pPOSInfoCode: Code[20]; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask; pClearInfo: Boolean; UserInputString: Text): Boolean
     var
         POSInfo: Record "NPR POS Info";
         POSInfoTransParam: Record "NPR POS Info Transaction";
@@ -155,10 +148,7 @@
             POSInfoTransParam.ShowMessage();
         end;
 
-        FrontEndUpdateIsNeeded := SaleLineApplyPOSInfo(pSaleLinePos, POSInfoTransParam, pApplicScope, pClearInfo);
-
-        if FrontEndUpdateIsNeeded then
-            CallFrontEndUpdate();
+        exit(SaleLineApplyPOSInfo(pSaleLinePos, POSInfoTransParam, pApplicScope, pClearInfo));
     end;
 
     local procedure CheckAndAdjustApplicationScope(pSaleLinePos: Record "NPR POS Sale Line"; POSInfo: Record "NPR POS Info"; var pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
@@ -738,20 +728,5 @@
             DataRow.Add(DataSoucePOSInfoColumnName(POSInfo.Code), POSInfoTransaction."POS Info");
         until POSInfo.Next() = 0;
     end;
-
     #endregion DataSource Extension
-
-    local procedure CallFrontEndUpdate()
-    var
-        POSFrontEndManagement: Codeunit "NPR POS Front End Management";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSession: Codeunit "NPR POS Session";
-    begin
-        if POSSession.IsActiveSession(POSFrontEndManagement) then begin
-            POSFrontEndManagement.GetSession(POSSession);
-            POSSession.GetSale(POSSale);
-            POSSale.SetModified();
-            POSSession.RequestRefreshData();
-        end;
-    end;
 }
