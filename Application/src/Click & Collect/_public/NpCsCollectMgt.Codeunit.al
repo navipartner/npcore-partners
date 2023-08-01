@@ -97,6 +97,12 @@
             NpCsExpirationMgt.ScheduleUpdateExpirationStatus(NpCsDocument, NpCsDocument."Delivery expires at");
     end;
 
+    procedure ConfirmAndPrintOrder(var NpCsDocument: Record "NPR NpCs Document")
+    begin
+        ConfirmProcessing(NpCsDocument);
+        PrintOrder(NpCsDocument);
+    end;
+
     procedure RejectProcessing(var NpCsDocument: Record "NPR NpCs Document")
     var
         SalesHeader: Record "Sales Header";
