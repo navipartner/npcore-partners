@@ -5,9 +5,6 @@
 
     Caption = 'Retail Replenishment Setup';
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
-    ObsoleteTag = 'NPR24.0';
-    ObsoleteReason = 'Retail Replenishment will no longer be supported';
     fields
     {
         field(1; "Code"; Code[10])
