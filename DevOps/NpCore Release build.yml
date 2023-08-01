@@ -26,25 +26,21 @@ stages:
 
         - name: BC1711
 
-        - name: BC1803
-
-        - name: BC1905
+        - name: BC1804
        
-        - name: BC2005_CLOUD
-          alwaysRun: true
+        - name: BC1906
 
         - name: BC2103_CLOUD
-          alwaysRun: true
-
-        - name: BC2105_CLOUD
-          alwaysRun: true          
+          alwaysRun: true        
 
         - name: vLatest_CLOUD
+          compareAppWithSpecificCompareAppVersion: true
           alwaysRun: true
 
         - name: Insider_CLOUD
+          compareAppWithSpecificCompareAppVersion: true
           alwaysRun: true
-        #  continueOnError: true
+        #  continueOnError: true        
         
       analyzers: ('UICop','CodeCop')
       keyVaultCert:

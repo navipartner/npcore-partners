@@ -394,7 +394,7 @@
                 begin
                     RecRef.SetTable(WarehouseActivityLine);
                     if WarehouseActivityLine.FindFirst() then;
-#if BC17 or BC18
+#if (BC17 or BC18)
                     RetailJournalMgt.InventoryPutAway2RetailJnl(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.", _TmpRetailJnlCode);
 #else
                     RetailJournalMgt.InventoryPutAway2RetailJnl(WarehouseActivityLine."Activity Type".AsInteger(), WarehouseActivityLine."No.", _TmpRetailJnlCode);
