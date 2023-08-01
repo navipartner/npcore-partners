@@ -4,9 +4,7 @@
     DataClassification = CustomerContent;
     LookupPageId = "NPR Ret. Repl. Transfer Mapp.";
     DrillDownPageId = "NPR Ret. Repl. Transfer Mapp.";
-    ObsoleteState = Pending;
-    ObsoleteTag = 'NPR24.0';
-    ObsoleteReason = 'Retail Replenishment will no longer be supported';
+
     fields
     {
         field(1; "To Location"; Code[10])
