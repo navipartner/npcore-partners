@@ -253,13 +253,13 @@
                     {
                         ShowCaption = false;
                         Visible = NOT Rec."Store Stock";
-                        field(WarningText; UpperCase(Text002))
+                        field(WarningText; UpperCase(WarningLbl))
                         {
 
                             ShowCaption = false;
                             Style = Unfavorable;
                             StyleExpr = TRUE;
-                            ToolTip = 'Specifies the value of the UpperCase(Text002) field';
+                            ToolTip = 'Specifies the value of the warning text field';
                             ApplicationArea = NPRRetail;
                         }
                     }
@@ -527,10 +527,33 @@
                     var
                         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
                     begin
-                        if not Confirm(Text000, true, Rec."Document No.") then
+                        if not Confirm(ConfirmOrderQst, true, Rec."Document No.") then
                             exit;
 
                         NpCsCollectMgt.ConfirmProcessing(Rec);
+                    end;
+                }
+                action("Confirm and Print Order")
+                {
+                    Caption = 'Confirm and Print Order';
+                    Image = PostPrint;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    Visible = ((Rec."Processing Status" = 0) OR (Rec."Processing Status" = 1)) AND (Rec."Delivery Status" = 0) and (Rec."Processing Print Template" <> '');
+                    ToolTip = 'Executes the Confirm and Print Order action';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
+                        ConfirmAndPrintQst: Label 'Do you want to confirm and print order %1?', Comment = '%1 = Document no.';
+                    begin
+                        if not Confirm(ConfirmAndPrintQst, true, Rec."Document No.") then
+                            exit;
+
+                        NpCsCollectMgt.ConfirmAndPrintOrder(Rec);
                     end;
                 }
                 action("Reject Order")
@@ -550,7 +573,7 @@
                     var
                         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
                     begin
-                        if not Confirm(Text001, true, Rec."Document No.") then
+                        if not Confirm(RejectOrderQst, true, Rec."Document No.") then
                             exit;
 
                         NpCsCollectMgt.RejectProcessing(Rec);
@@ -629,8 +652,8 @@
     end;
 
     var
-        Text000: Label 'Confirm Order %1?';
-        Text001: Label 'Reject Order %1?';
-        Text002: Label 'Do not pick from Store Stock';
+        ConfirmOrderQst: Label 'Confirm Order %1?', Comment = '%1 = Document no.';
+        RejectOrderQst: Label 'Reject Order %1?', Comment = '%1 = Document no.';
+        WarningLbl: Label 'Do not pick from Store Stock';
 }
 
