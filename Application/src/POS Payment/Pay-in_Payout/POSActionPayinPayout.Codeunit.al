@@ -47,12 +47,12 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
     local procedure SelectAccount(Sale: codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
     var
         GLAccount: Record "G/L Account";
-        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
+        POSActionTakePhotoB: Codeunit "NPR POS Action Take Photo B";
         AccountNo: Code[20];
     begin
         TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
         if TakePhotoEnabled then
-            POSActionTakePhoto.TakePhoto(Sale);
+            POSActionTakePhotoB.TakePhoto(Sale);
 
         Response.ReadFrom('{}');
         AccountNo := CopyStr(UpperCase(Context.GetStringParameter('FixedAccountCode')), 1, MaxStrLen(AccountNo));
@@ -83,13 +83,13 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
     local procedure HandlePayment(Sale: codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line") Result: JsonObject
     var
         PayInPayOutMgr: Codeunit "NPR Pay-in Payout Mgr";
-        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
+        POSActionTakePhotoB: Codeunit "NPR POS Action Take Photo B";
         Success: Boolean;
     begin
         Result.ReadFrom('{}');
         TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
         if TakePhotoEnabled then
-            POSActionTakePhoto.CheckIfPhotoIsTaken(Sale);
+            POSActionTakePhotoB.CheckIfPhotoIsTaken(Sale);
         Success := PayInPayOutMgr.CreatePayInOutPayment(SaleLine, Context.GetIntegerParameter('PayOption'), Context.GetString('accountNumber'), Context.GetString('description'), Context.GetDecimal('amount'), Context.GetString('reasonCode'));
 
         Result.Add('tryEndSale', false);

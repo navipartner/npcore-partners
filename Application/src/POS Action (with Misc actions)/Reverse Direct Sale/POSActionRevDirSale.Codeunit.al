@@ -74,11 +74,11 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
     var
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
-        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
+        POSActionTakePhotoB: Codeunit "NPR POS Action Take Photo B";
     begin
         TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
         if TakePhotoEnabled then
-            POSActionTakePhoto.TakePhoto(Sale);
+            POSActionTakePhotoB.TakePhoto(Sale);
         Setup.GetPOSUnit(POSUnit);
         POSAuditProfile.Get(POSUnit."POS Audit Profile");
         exit(POSAuditProfile."Require Item Return Reason");
@@ -93,7 +93,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
         ReturnReasonCode: Code[20];
         IncludePaymentLines: Boolean;
         POSActionRevDirSaleB: Codeunit "NPR POS Action: Rev.Dir.Sale B";
-        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
+        POSActionTakePhotoB: Codeunit "NPR POS Action Take Photo B";
     begin
         SalesTicketNo := CopyStr(UpperCase(Context.GetString('receipt')), 1, MaxStrLen(SalesTicketNo));
         ObfucationMethod := Context.GetIntegerParameter('ObfucationMethod');
@@ -104,7 +104,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
 
         TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
         if TakePhotoEnabled then
-            POSActionTakePhoto.CheckIfPhotoIsTaken(Sale);
+            POSActionTakePhotoB.CheckIfPhotoIsTaken(Sale);
         OnBeforeHendleReverse(Setup, SalesTicketNo);
         POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyHeaderDim, ReturnReasonCode, IncludePaymentLines, CopyLineDimensions);
     end;

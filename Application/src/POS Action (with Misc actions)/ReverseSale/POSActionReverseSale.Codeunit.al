@@ -220,7 +220,7 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
     local procedure ImportSalesDoc(Sale: codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
     var
         POSAction: Record "NPR POS Action";
-        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
+        POSActionTakePhotoB: Codeunit "NPR POS Action Take Photo B";
         SelectCustomer: Boolean;
         ConfirmInvDiscAmt: Boolean;
         LocationSource: Option "POS Store","Location Filter Parameter";
@@ -238,7 +238,7 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
 
         TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
         if TakePhotoEnabled then
-            POSActionTakePhoto.TakePhoto(Sale);
+            POSActionTakePhotoB.TakePhoto(Sale);
         SelectCustomer := Context.GetBooleanParameter('SelectCustomer');
         SalesDocViewString := Context.GetStringParameter('SalesDocViewString');
         LocationSource := Context.GetIntegerParameter('LocationFrom');
@@ -267,7 +267,7 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
     local procedure ExportSalesDoc(Sale: codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
     var
         POSAction: Record "NPR POS Action";
-        POSActionTakePhoto: Codeunit "NPR POS Action Take Photo";
+        POSActionTakePhotoB: Codeunit "NPR POS Action Take Photo B";
         Invoice: Boolean;
         ShowMsg: Boolean;
         NegBalDocType: Option ReturnOrder,CreditMemo,Restrict;
@@ -317,7 +317,7 @@ codeunit 6059876 "NPR POS Action: Reverse Sale" implements "NPR IPOS Workflow"
 
         TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
         if TakePhotoEnabled then
-            POSActionTakePhoto.CheckIfPhotoIsTaken(Sale);
+            POSActionTakePhotoB.CheckIfPhotoIsTaken(Sale);
         Invoice := Context.GetBooleanParameter('Post');
         ShowMsg := Context.GetBooleanParameter('ShowExportMessage');
         NegBalDocType := Context.GetIntegerParameter('SetNegBalDocumentType');
