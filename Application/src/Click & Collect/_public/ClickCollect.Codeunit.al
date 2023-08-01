@@ -107,6 +107,11 @@ codeunit 6059847 "NPR Click & Collect"
     end;
 
     [IntegrationEvent(false, false)]
+    procedure OnAfterUpdateSalesHeaderLocation(SalesHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     procedure OnAfterInitReqBody(NpcsDocument: Record "NPR NpCs Document"; var Context: Text);
     begin
     end;

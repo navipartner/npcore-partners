@@ -261,6 +261,7 @@
         SalesLine: Record "Sales Line";
         NpCsStore: Record "NPR NpCs Store";
         ReleaseSalesDoc: Codeunit "Release Sales Document";
+        ClickCollect: Codeunit "NPR Click & Collect";
         ToStoreCode: Code[20];
         PrevRec: Text;
     begin
@@ -286,6 +287,7 @@
                 until SalesLine.Next() = 0;
 
             SalesHeader.Validate("Location Code", NpCsStore."Location Code");
+            ClickCollect.OnAfterUpdateSalesHeaderLocation(SalesHeader);
         end;
 
         if PrevRec <> Format(SalesHeader) then
