@@ -200,7 +200,7 @@
         LINE_Description: Text;
         LINE_StartTime: Text;
         PageStatisticsOption: Option INITIAL,RESERVATION,UTILIZATION_PCT,CAPACITY_PCT;
-#if BC17 or BC18
+#if (BC17 or BC18)
         PagePeriodOption: Option ACTUAL,DAY,WEEK,MONTH,QUARTER,YEAR;
 #else
         PagePeriodOption: Enum "Analysis Period Type";
@@ -218,7 +218,7 @@
         AdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', Rec."Schedule Code");
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
 
-#if BC17 or BC18
+#if (BC17 or BC18)
         if (PagePeriodOption = PagePeriodOption::ACTUAL) then begin
 #else
         if (PagePeriodOption = PagePeriodOption::"Accounting Period") then begin
@@ -253,7 +253,7 @@
         end;
     end;
 
-#if BC17 or BC18
+#if (BC17 or BC18)
     internal procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "NPR TM Admis. Schedule Entry"; CurrentNoOfMatrixColumns: Integer; pStatisticsOption: Option; pPeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period")
 #else    
     internal procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "NPR TM Admis. Schedule Entry"; CurrentNoOfMatrixColumns: Integer; pStatisticsOption: Option; pPeriodType: Enum "Analysis Period Type")
@@ -302,7 +302,7 @@
         AdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', Rec."Schedule Code");
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
 
-#if BC17 or BC18
+#if (BC17 or BC18)
         if (PagePeriodOption = PagePeriodOption::ACTUAL) then begin
 #else
         if (PagePeriodOption = PagePeriodOption::"Accounting Period") then begin

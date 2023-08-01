@@ -515,7 +515,7 @@
         VariantCodeFilter: Text;
         DisplayOption: Option "COUNT",COUNT_TREND,TREND;
         TrendPeriodType: Option PERIOD,YEAR;
-#if BC17 or BC18
+#if (BC17 or BC18)
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period";
 #else
         PeriodType: Enum "Analysis Period Type";
@@ -641,7 +641,7 @@
     local procedure FindPeriod(SearchText: Text[3])
     var
         Calendar: Record Date;
-#if BC17 or BC18
+#if (BC17 or BC18)
         PeriodFormMgt: Codeunit PeriodFormManagement;
 #else
         PeriodPageMgt: Codeunit PeriodPageManagement;
@@ -654,7 +654,7 @@
         if (DateFactFilter <> '') then begin
             Calendar.SetFilter("Period Start", DateFactFilter);
 
-#if BC17 or BC18
+#if (BC17 or BC18)
             if (not PeriodFormMgt.FindDate('-', Calendar, PeriodType)) then
                 PeriodFormMgt.FindDate('-', Calendar, PeriodType::Day);
 #else
@@ -668,7 +668,7 @@
         if Calendar."Period Start" = 0D then
             Calendar."Period Start" := Today();
 
-#if BC17 or BC18
+#if (BC17 or BC18)
         PeriodFormMgt.FindDate(SearchText, Calendar, PeriodType);
 #else
         PeriodPageMgt.FindDate(SearchText, Calendar, PeriodType);

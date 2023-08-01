@@ -166,7 +166,7 @@
     var
         PageAdmissionCode: Code[20];
         PageStatisticsOption: Option INITIAL,RESERVATION,UTILIZATION_PCT,CAPACITY_PCT;
-#if BC17 or BC18
+#if (BC17 or BC18)
         PagePeriodOption: Option ACTUAL,DAY,WEEK,MONTH,QUARTER,YEAR;
 #else
         PagePeriodOption: Enum "Analysis Period Type";
@@ -195,7 +195,7 @@
         if (MATRIX_SetWanted = MATRIX_SetWanted::Initial) then
             MATRIX_PrimKeyFirstCaptionInCu := '';
 
-#if BC17 or BC18
+#if (BC17 or BC18)
         if (PagePeriodOption = PagePeriodOption::ACTUAL) then begin
 #else
         if (PagePeriodOption = PagePeriodOption::"Accounting Period") then begin
@@ -251,7 +251,7 @@
 
         end else begin
 
-#if BC17 or BC18
+#if (BC17 or BC18)
             MatrixMgt.GeneratePeriodMatrixData(
               MATRIX_SetWanted, MATRIX_CurrentNoOfColumns, false,
               PagePeriodOption - 1, '', MATRIX_PrimKeyFirstCaptionInCu,

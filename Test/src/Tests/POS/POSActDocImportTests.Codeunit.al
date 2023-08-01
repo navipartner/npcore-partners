@@ -434,6 +434,7 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     #endregion ImportOrderWithGroupCodeFilterEnabledGroupCodeAssigned
 
     #region ImportOrderWithGroupCodeFilterEnabledWithDifferenceInTheAssignedGroupCodes
+#if not BC18
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('SelectDocumentPageHandler')]
@@ -528,9 +529,11 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         NPRGroupCode.Delete();
 
     end;
+#endif
     #endregion ImportOrderWithGroupCodeFilterEnabledWithDifferenceInTheAssignedGroupCodes
 
     #region ImportOrderWithGroupCodeFilterEnabledWithDifferenceInTheChosenGroupCodes
+#if not BC18
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('SelectDocumentPageHandler,NPRGroupCodesSelectExistingGroupCodePageHandler')]
@@ -625,10 +628,11 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         NPRGroupCode.Delete();
 
     end;
+#endif
     #endregion ImportOrderWithGroupCodeFilterEnabledWithDifferenceInTheChosenGroupCodes
 
-
     #region ImportOrderWithGroupCodeFilterDisabledAndGroupCodeAssigned
+#if not BC18
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     [HandlerFunctions('SelectDocumentPageHandler,MessageHandler')]
@@ -723,6 +727,7 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         NPRGroupCode.Delete();
 
     end;
+#endif
     #endregion ImportOrderWithGroupCodeFilterDisabledAndGroupCodeAssigned
 
     [Test]

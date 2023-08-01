@@ -5,7 +5,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     var
         _FRCertificationSetup: Record "NPR FR Audit Setup";
-#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803) 
+#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804) 
         _SignatureKey: Record "Signature Key";
 #else
         _X509Certificate2: DotNet NPRNetX509Certificate2;
@@ -47,7 +47,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         exit(_Enabled);
     end;
 
-#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803)
+#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804)
     local procedure LoadCertificate()
     var
         X509Certificate2: Codeunit X509Certificate2;
@@ -178,7 +178,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
             CopyStream(MemoryStream, InStream);
             _X509Certificate2 := _X509Certificate2.X509Certificate2(MemoryStream.ToArray(), _FRCertificationSetup."Signing Certificate Password");
             _RSACryptoServiceProvider := _X509Certificate2.PrivateKey;
-#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803)
+#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804)
             _SignatureKey.FromBase64String(Base64Cert2, _FRCertificationSetup."Signing Certificate Password", true);
 #endif
             _CertificateLoaded := true;
@@ -1103,7 +1103,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     procedure Destruct()
     begin
-#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803)
+#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804)
         Clear(_SignatureKey);
 #else
         Clear(_X509Certificate2);
@@ -1115,7 +1115,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         Clear(_CertificateLoaded);
     end;
 
-#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803)
+#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804)
     procedure GenerateArchive(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; var TempBlob: Codeunit "Temp Blob")
     var
         FRPeriodArchive: XMLport "NPR FR Audit Archive";
@@ -1383,7 +1383,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 end;
                 Clear(InStream);
 
-#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803)
+#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804)
                 if not VerifySignature(BaseValue, Enum::"Hash Algorithm"::SHA256, DecodeBase64URL(Signature)) then
                     Error(ERROR_SIGNATURE_VALUE, POSAuditLog.TableCaption, POSAuditLog."Entry No.");
 #else

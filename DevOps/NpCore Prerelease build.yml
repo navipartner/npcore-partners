@@ -30,15 +30,6 @@ stages:
       containerDefinitions:
         - name: Auto
         
-        - name: BC1803
-
-        - name: BC1812
-
-        - name: BC1905
-
-        - name: BC2103_CLOUD
-          alwaysRun: true
-
         - name: vLatest_CLOUD
           alwaysRun: true
 
