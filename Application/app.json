@@ -48,6 +48,11 @@
       "id": "e1436b1a-ab41-4719-89c3-f3a703607dbf",
       "name": "NP Retail Integration Test toolkit",
       "publisher": "NaviPartner"
+    },
+    {
+      "id": "cac9b4fc-1c84-4e7d-ada8-cf5b2d7a5107",
+      "name": "DataUpgrade",
+      "publisher": "NaviPartner"
     }
   ],
   "contextSensitiveHelpUrl": "https://docs.navipartner.com/",

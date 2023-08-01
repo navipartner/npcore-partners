@@ -1,5 +1,8 @@
 codeunit 6150926 "NPR SaaS Import Service"
 {
+    Permissions = tabledata "Change Log Entry" = rimd,
+                tabledata "Tenant Media" = rimd,
+                tabledata "Tenant Media Thumbnails" = rimd;
     procedure Import(Csv: Text)
     var
         SaaSImportBgnSession: Record "NPR SaaS Import Bgn. Session";
@@ -130,6 +133,7 @@ codeunit 6150926 "NPR SaaS Import Service"
         TableTxt: Text;
         JAResponse: JsonArray;
         JOTable: JsonObject;
+        JOResponse: JsonObject;
         TableID: Integer;
         AllObj: Record AllObj;
     begin
@@ -145,6 +149,7 @@ codeunit 6150926 "NPR SaaS Import Service"
             Clear(JOTable);
             Clear(Recref);
         end;
-        JAResponse.WriteTo(Response);
+        JOResponse.Add('tableList', JAResponse);
+        JOResponse.WriteTo(Response);
     end;
 }

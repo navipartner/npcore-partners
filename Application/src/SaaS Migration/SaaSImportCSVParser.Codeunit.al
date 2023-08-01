@@ -34,17 +34,30 @@ codeunit 6151093 "NPR SaaS Import CSV Parser"
                   TableData "Sales Cr.Memo Line" = rimd,
                   TableData "Purch. Rcpt. Header" = rimd,
                   TableData "Purch. Rcpt. Line" = rimd,
+                  TableData "Purch. Inv. Header" = rimd,
+                  TableData "Purch. Inv. Line" = rimd,
+                  TableData "Purch. Cr. Memo Hdr." = rimd,
+                  TableData "Purch. Cr. Memo Line" = rimd,
                   TableData "Drop Shpt. Post. Buffer" = rimd,
                   TableData "General Posting Setup" = rimd,
                   TableData "Posted Assemble-to-Order Link" = rimd,
                   TableData "Service Item" = rimd,
+                  TableData "Value Entry" = rimd,
                   TableData "Item Entry Relation" = rimd,
                   TableData "Value Entry Relation" = rimd,
                   TableData "Return Receipt Header" = rimd,
                   TableData "Return Receipt Line" = rimd,
+                  TableData "Return Shipment Header" = rimd,
+                  TableData "Return Shipment Line" = rimd,
                   TableData "Item Ledger Entry" = rimd,
                   TableData "G/L - Item Ledger Relation" = rimd,
-                  TableData "Maintenance Ledger Entry" = rimd;
+                  TableData "Maintenance Ledger Entry" = rimd,
+                  TableData "Phys. Inventory Ledger Entry" = rimd,
+                  TableData "Dimension Set Entry" = rimd,
+                  TableData "Dimension Set Tree Node" = rimd,
+                  TableData "Tenant Media Thumbnails" = rimd,
+                  TableData "Tenant Media" = rimd,
+                  TableData "Item Register" = rimd;
 
 
     trigger OnRun()
@@ -206,7 +219,8 @@ codeunit 6151093 "NPR SaaS Import CSV Parser"
                 end;
             FieldType::RecordId:
                 begin
-                    Evaluate(ValueRecordID, FormattedValue, 9);
+                    if not Evaluate(ValueRecordID, FormattedValue, 9) then
+                        Evaluate(ValueRecordID, 'NPR ' + FormattedValue, 9);
                     FieldReference.Value := ValueRecordID;
                 end;
             else
