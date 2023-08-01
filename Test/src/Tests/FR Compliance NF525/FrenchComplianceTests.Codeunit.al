@@ -378,7 +378,7 @@ codeunit 85039 "NPR French Compliance Tests"
         WorkshiftCheckpoint.SetRange("Period Type", 'FR_NF525_MONTH');
         WorkshiftCheckpoint.FindFirst();
         BindSubscription(FrenchArchiveHandler);
-#if not BC17
+#if not (BC17 or BC18)
         POSAuditLogMgt.ArchiveWorkshiftPeriod(WorkshiftCheckpoint);
 #else
         asserterror POSAuditLogMgt.ArchiveWorkshiftPeriod(WorkshiftCheckpoint); //only supported in later versions
@@ -599,7 +599,7 @@ codeunit 85039 "NPR French Compliance Tests"
         POSWorkshiftCheckpoint.SetRange("Period Type", 'FR_NF525_MONTH');
         POSWorkshiftCheckpoint.FindLast();
 
-#if not BC17
+#if not (BC17 or BC18)
         POSAuditLogMgt.ArchiveWorkshiftPeriod(POSWorkshiftCheckpoint);
 #else
         asserterror POSAuditLogMgt.ArchiveWorkshiftPeriod(POSWorkshiftCheckpoint); //only supported in later versions

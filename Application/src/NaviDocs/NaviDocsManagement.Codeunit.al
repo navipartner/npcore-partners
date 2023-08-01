@@ -312,7 +312,7 @@
             Database::"Service Contract Header":
                 begin
                     RecRef.SetTable(ServiceContractHeader);
-#if BC17 or BC18
+#if (BC17 or BC18)
                     NaviDocsEntry."Document Type" := ServiceContractHeader."Contract Type";
 #else
                     NaviDocsEntry."Document Type" := ServiceContractHeader."Contract Type".AsInteger();

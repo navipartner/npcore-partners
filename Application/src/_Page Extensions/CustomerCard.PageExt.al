@@ -60,7 +60,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         }
         moveafter("VAT Registration No."; "Tax Liable")
         moveafter("VAT Registration No."; "Tax Area Code")
-#IF (BC1700 or BC1701 or BC1702 or BC1703 or BC1704 or BC1800 or BC1801 or BC1802 or BC1803)
+#IF (BC1700 or BC1701 or BC1702 or BC1703 or BC1704 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804)
         modify(TotalSales2)
         {
             Visible = false;
@@ -69,7 +69,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
         addafter(TotalSales2)
         {
-#IF (BC1700 or BC1701 or BC1702 or BC1703 or BC1704 or BC1800 or BC1801 or BC1802 or BC1803)
+#IF (BC1700 or BC1701 or BC1702 or BC1703 or BC1704 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804)
             field("NPR Sales (LCY)"; Rec."Sales (LCY)")
             {
                 ApplicationArea = NPRRetail;

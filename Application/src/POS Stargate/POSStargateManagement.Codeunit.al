@@ -1,8 +1,8 @@
 ﻿#if not CLOUD
 codeunit 6150716 "NPR POS Stargate Management"
 {
-#IF NOT BC17
-    Access = Internal;      
+#IF NOT BC17 AND NOT BC18
+    Access = Internal;
 #ENDIF
     EventSubscriberInstance = Manual;
 

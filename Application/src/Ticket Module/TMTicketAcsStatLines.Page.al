@@ -231,7 +231,7 @@
         LineFactOption: Option ITEM,TICKET_TYPE,ADMISSION_DATE,ADMISSION_HOUR,PERIOD,ADMISSION_CODE,VARIANT_CODE;
         ColumnFactOption: Option ITEM,TICKET_TYPE,ADMISSION_DATE,ADMISSION_HOUR,PERIOD,ADMISSION_CODE,VARIANT_CODE;
         PeriodFilter: Text;
-#if BC17 or BC18
+#if (BC17 or BC18)
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period";
 #else
         PeriodType: Enum "Analysis Period Type";
@@ -283,7 +283,7 @@
         end;
 
     end;
-#if BC17 or BC18
+#if (BC17 or BC18)
     internal procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "Dimension Code Buffer"; CurrentNoOfMatrixColumns: Integer; pLineDimOption: Integer; pColumnDimOption: Integer; pDisplayOption: Option; pPeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period"; pAdmissionDefinition: Option)
 #else
     internal procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "Dimension Code Buffer"; CurrentNoOfMatrixColumns: Integer; pLineDimOption: Integer; pColumnDimOption: Integer; pDisplayOption: Option; pPeriodType: Enum "Analysis Period Type"; pAdmissionDefinition: Option)
