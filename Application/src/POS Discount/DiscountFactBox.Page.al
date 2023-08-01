@@ -72,6 +72,20 @@
                     QuantityDiscountCard.RunModal();
                 end;
             }
+
+            field("Total Discount"; TotalDiscount)
+            {
+
+                Caption = 'Total Discount';
+                ToolTip = 'Specifies the value of the Total Discount field.';
+                ApplicationArea = NPRRetail;
+                DrillDown = true;
+
+                trigger OnDrillDown()
+                begin
+                    LookUpTotalDiscountLines(Rec);
+                end;
+            }
         }
     }
 
@@ -83,12 +97,15 @@
     begin
         HasDiscounts();
         HasMultipleUnitPrice();
+        HasTotalDiscount(Rec,
+                        TotalDiscount)
     end;
 
     var
         MixDiscount: Boolean;
         PeriodDiscount: Boolean;
         MultipleUnitPrice: Boolean;
+        TotalDiscount: Boolean;
 
     internal procedure HasDiscounts()
     var
@@ -146,6 +163,25 @@
         QuantityDiscountHeader.SetRange(Status, QuantityDiscountHeader.Status::Active);
         if QuantityDiscountHeader.FindFirst() then
             MultipleUnitPrice := true;
+    end;
+
+    local procedure HasTotalDiscount(Item: Record Item;
+                                     var TotalDiscountExists: Boolean)
+    var
+        NPRTotalDiscountManagement: Codeunit "NPR Total Discount Management";
+    begin
+        NPRTotalDiscountManagement.CheckIfItemHasTotalDiscount(Item,
+                                                               TotalDiscountExists);
+
+    end;
+
+    local procedure LookUpTotalDiscountLines(Item: Record Item)
+    var
+        NPRTotalDiscountManagement: Codeunit "NPR Total Discount Management";
+        TempNPRTotalDiscountLine: Record "NPR Total Discount Line" temporary;
+    begin
+        NPRTotalDiscountManagement.LookUpTotalDiscountLines(Item,
+                                                            TempNPRTotalDiscountLine);
     end;
 }
 

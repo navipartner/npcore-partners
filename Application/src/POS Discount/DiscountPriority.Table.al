@@ -147,5 +147,7 @@
         "Discount No. Series" := NoSeriesCode;
         Modify();
     end;
+
+
 }
 

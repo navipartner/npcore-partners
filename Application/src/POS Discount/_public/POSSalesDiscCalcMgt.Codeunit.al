@@ -132,7 +132,7 @@
         StartTime: DateTime;
         DiscountCalculated: Boolean;
     begin
-        if (Rec."Discount Amount" = 0) and (Rec."Discount Type" = Rec."Discount Type"::" ") and (Rec."Discount Code" = Rec."Discount Code") then
+        if (Rec."Discount Amount" = 0) and (Rec."Discount Type" = Rec."Discount Type"::" ") and (Rec."Discount Code" = Rec."Discount Code") and (Rec."Total Discount Code" = '') then
             exit;
         if not CheckDiscTrigger(Rec) then
             exit;
@@ -174,7 +174,34 @@
         NpDcCouponMgt.ApplyDiscount(SalePOS);
     end;
 
-    local procedure ApplyDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
+    internal procedure OnAfterTotalPressedPOS(var Rec: Record "NPR POS Sale Line")
+    var
+        SalePOS: Record "NPR POS Sale";
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
+        TempDiscountPriority: Record "NPR Discount Priority" temporary;
+        StartTime: DateTime;
+        DiscountCalculated: Boolean;
+    begin
+        if not CheckDiscTriggerTotal(Rec) then
+            exit;
+
+        if not SalePOS.Get(Rec."Register No.", Rec."Sales Ticket No.") then
+            exit;
+
+        StartTime := CurrentDateTime;
+
+        if FindRelevantSaleLineDiscounts(SalePOS, Rec, Rec, TempDiscountPriority, 3) then begin
+            SetupTempSalesLines(SalePOS, TempSaleLinePOS, true);
+            ApplyDiscounts(SalePOS, TempSaleLinePOS, TempDiscountPriority, Rec, Rec, 3, false);
+
+            DiscountCalculated := true;
+        end;
+
+        if DiscountCalculated then
+            LogStopwatch('DISCOUNT_ON_TOTALPRESSED', CurrentDateTime - StartTime);
+    end;
+
+    local procedure ApplyDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete,Total; RecalculateAllLines: Boolean)
     begin
 
         tmpDiscountPriority.SetCurrentKey(Priority);
@@ -209,6 +236,8 @@
                         or (SaleLinePOS."Discount %" <> TempSaleLinePOS."Discount %")
                         or (SaleLinePOS."Discount Amount" <> TempSaleLinePOS."Discount Amount")
                         or (SaleLinePOS.Quantity <> TempSaleLinePOS.Quantity)
+                        or (SaleLinePOS."Total Discount Code" <> TempSaleLinePOS."Total Discount Code")
+                        or (SaleLinePOS."Total Discount Step" <> TempSaleLinePOS."Total Discount Step")
                     then begin
                         SaleLinePOS.TransferFields(TempSaleLinePOS, false);
                     end;
@@ -243,6 +272,18 @@
             exit(false);
         if SaleLinePOS.Quantity < 0 then
             exit;
+        if SaleLinePOS."Benefit Item" then
+            exit(false);
+
+        exit(true);
+    end;
+
+    local procedure CheckDiscTriggerTotal(var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
+    begin
+        if SaleLinePOS.IsTemporary then
+            exit(false);
+        if SaleLinePOS.GetSkipCalcDiscount() then
+            exit(false);
 
         exit(true);
     end;
@@ -258,7 +299,7 @@
         exit(SaleLinePOSCoupon.Type = SaleLinePOSCoupon.Type::Coupon);
     end;
 
-    local procedure FindRelevantSaleLineDiscounts(SalePOS: Record "NPR POS Sale"; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; LineOperation: Option Insert,Modify,Delete): Boolean
+    local procedure FindRelevantSaleLineDiscounts(SalePOS: Record "NPR POS Sale"; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; LineOperation: Option Insert,Modify,Delete,Total): Boolean
     var
         DiscountPriority: Record "NPR Discount Priority";
     begin
@@ -299,6 +340,11 @@
     end;
 
     internal procedure SetupTempSalesLines(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
+    begin
+        SetupTempSalesLines(SalePOS, TempSaleLinePOS, false);
+    end;
+
+    internal procedure SetupTempSalesLines(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; SetupLinesForTotalDiscount: Boolean)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
@@ -312,17 +358,24 @@
         SaleLinePOS.SetRange(Date, SalePOS.Date);
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
+        SaleLinePOS.SetRange("Benefit Item", false);
         if SaleLinePOS.FindSet() then
             repeat
                 SaleLinePOS.TestField("Price Includes VAT", SalePOS."Prices Including VAT");
                 TempSaleLinePOS := SaleLinePOS;
-                TempSaleLinePOS."Discount Calculated" := false;
-                TempSaleLinePOS."Discount Type" := TempSaleLinePOS."Discount Type"::" ";
-                TempSaleLinePOS."Discount Code" := '';
-                TempSaleLinePOS."Discount %" := 0;
-                TempSaleLinePOS."Discount Amount" := 0;
-                TempSaleLinePOS."MR Anvendt antal" := 0;
-                TempSaleLinePOS."Custom Disc Blocked" := false;
+
+                if not SetupLinesForTotalDiscount then begin
+                    TempSaleLinePOS."Discount Calculated" := false;
+                    TempSaleLinePOS."Discount Type" := TempSaleLinePOS."Discount Type"::" ";
+                    TempSaleLinePOS."Discount Code" := '';
+                    TempSaleLinePOS."Discount %" := 0;
+                    TempSaleLinePOS."Discount Amount" := 0;
+                    TempSaleLinePOS."Total Discount Amount" := 0;
+                    TempSaleLinePOS."Total Discount Code" := '';
+                    TempSaleLinePOS."Total Discount Step" := 0;
+                    TempSaleLinePOS."MR Anvendt antal" := 0;
+                    TempSaleLinePOS."Custom Disc Blocked" := false;
+                end;
                 TempSaleLinePOS.Insert();
             until SaleLinePOS.Next() = 0;
     end;
@@ -366,12 +419,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure ApplyDiscount(DiscountPriority: Record "NPR Discount Priority"; SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
+    internal procedure ApplyDiscount(DiscountPriority: Record "NPR Discount Priority"; SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete,Total; RecalculateAllLines: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; SalePOS: Record "NPR POS Sale"; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete)
+    internal procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; SalePOS: Record "NPR POS Sale"; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete,Total)
     begin
     end;
 

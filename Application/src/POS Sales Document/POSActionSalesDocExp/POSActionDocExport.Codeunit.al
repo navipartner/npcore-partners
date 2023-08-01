@@ -209,6 +209,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     begin
         case Step of
+            'preparePreWorkflows':
+                FrontEnd.WorkflowResponse(PreparePreWorkflows(Context, Sale));
             'exportDocument':
                 FrontEnd.WorkflowResponse(ExportSalesDoc(Context, Sale, SaleLine));
             'endSaleAndDocumentPayment':
@@ -220,7 +222,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionDocExport.js###
-'let main=async({workflow:p,parameters:t,captions:e})=>{debugger;let l,a,i,o;if(t.ConfirmExport&&!await popup.confirm(e.confirmLead,e.confirmTitle)||t.AskExtDocNo&&(i=await popup.input(e.ExtDocNo),i===null)||t.AskAttention&&(a=await popup.input(e.Attention),a===null)||t.AskYourRef&&(o=await popup.input(e.YourRef),o===null))return;const{createdSalesHeader:u,createdSalesHeaderDocumentType:m,additionalParameters:r}=await p.respond("exportDocument",{extDocNo:i,attention:a,yourref:o});let n;r.prompt_prepayment?r.prepayment_is_amount?n=await popup.numpad(e.prepaymentAmountLead,e.prepaymentDialogTitle):n=await popup.numpad(e.prepaymentPctLead,e.prepaymentDialogTitle):n=t.FixedPrepaymentValue,await p.respond("endSaleAndDocumentPayment",{additionalParameters:r,createdSalesHeader:u,createdSalesHeaderDocumentType:m,prepaymentAmt:n})};'
+'let main=async({workflow:r,parameters:t,captions:e})=>{debugger;let y,n,o,i;if(t.ConfirmExport&&!await popup.confirm(e.confirmLead,e.confirmTitle)||t.AskExtDocNo&&(o=await popup.input(e.ExtDocNo),o===null)||t.AskAttention&&(n=await popup.input(e.Attention),n===null)||t.AskYourRef&&(i=await popup.input(e.YourRef),i===null))return;const{preWorkflows:u}=await r.respond("preparePreWorkflows");if(u)for(const f of Object.entries(u)){let[m,c]=f;m&&await r.run(m,{parameters:c})}const{createdSalesHeader:l,createdSalesHeaderDocumentType:d,additionalParameters:p}=await r.respond("exportDocument",{extDocNo:o,attention:n,yourref:i});let a;p.prompt_prepayment?p.prepayment_is_amount?a=await popup.numpad(e.prepaymentAmountLead,e.prepaymentDialogTitle):a=await popup.numpad(e.prepaymentPctLead,e.prepaymentDialogTitle):a=t.FixedPrepaymentValue,await r.respond("endSaleAndDocumentPayment",{additionalParameters:p,createdSalesHeader:l,createdSalesHeaderDocumentType:d,prepaymentAmt:a})};'
         )
     end;
 
@@ -228,18 +230,11 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     var
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         SalePOS: Record "NPR POS Sale";
-        POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
         SalesHeader: Record "Sales Header";
         CustomerTableView: Text;
-        CustomerLookupPage: Integer;
     begin
         Sale.GetCurrentSale(SalePOS);
-        CustomerTableView := Context.GetStringParameter('CustomerTableView');
-        CustomerLookupPage := Context.GetIntegerParameter('CustomerLookupPage');
-
-        if Context.GetBooleanParameter('SelectCustomer') then
-            if not POSActionDocExportB.SelectCustomer(SalePOS, Sale, CustomerTableView, CustomerLookupPage) then
-                SalePOS.TestField("Customer No.");
+        SalePOS.TestField("Customer No.");
 
         SetReference(SalePOS, Context);
         SetPricesInclVAT(SalePOS, Context);
@@ -307,6 +302,42 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
                 //End sale
                 Sale.SelectViewForEndOfSale(POSSession);
             end;
+    end;
+
+    local procedure PreparePreWorkflows(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale") Response: JsonObject
+    begin
+        Response.Add('preWorkflows', AddPreWorkflowsToRun(Context, Sale));
+    end;
+
+    local procedure AddPreWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale") PreWorkflows: JsonObject
+    var
+        SalePOS: Record "NPR POS Sale";
+        NPRPOSActionDocExpEvents: Codeunit "NPR POS Action Doc Exp Events";
+    begin
+        Sale.GetCurrentSale(SalePOS);
+        AddCustomerWorkflow(Context, PreWorkflows);
+        NPRPOSActionDocExpEvents.OnAddPreWorkflowsToRun(Context, SalePOS, PreWorkflows);
+    end;
+
+    local procedure AddCustomerWorkflow(Context: Codeunit "NPR POS JSON Helper"; var PreWorkflows: JsonObject)
+    var
+        ActionParameters: JsonObject;
+        CustomerTableView: Text;
+        CustomerLookupPage: Integer;
+    begin
+        if not Context.GetBooleanParameter('SelectCustomer') then
+            exit;
+
+        CustomerTableView := Context.GetStringParameter('CustomerTableView');
+        CustomerLookupPage := Context.GetIntegerParameter('CustomerLookupPage');
+
+        ActionParameters.Add('CustomerTableView', CustomerTableView);
+        ActionParameters.Add('CustomerLookupPage', CustomerLookupPage);
+        ActionParameters.Add('CheckCustomerBalance', false);
+        ActionParameters.Add('CustomerNo', '');
+        ActionParameters.Add('Operation', 'Attach');
+
+        PreWorkflows.Add('CUSTOMER_SELECT', ActionParameters);
     end;
 
     local procedure SetPaymentParameters(Context: Codeunit "NPR POS JSON Helper"; SalesHeader: Record "Sales Header"; var Response: JsonObject)

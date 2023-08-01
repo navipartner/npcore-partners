@@ -152,5 +152,42 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             ObsoleteTag = 'NPR23.0';
             ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
+        field(6059972; "NPR Total Discount Code"; Code[20])
+        {
+            Caption = 'Total Discount Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Total Discount Header";
+        }
+        field(6059973; "NPR Total Discount Amount"; Decimal)
+        {
+            Caption = 'Total Discount Amount';
+            DataClassification = CustomerContent;
+        }
+        field(6059974; "NPR Total Discount Step"; Decimal)
+        {
+            Caption = 'Total Discount Step';
+            DataClassification = CustomerContent;
+
+        }
+        field(6059975; "NPR Benefit Item"; Boolean)
+        {
+            Caption = 'Benefit Item';
+            DataClassification = CustomerContent;
+
+        }
+        field(6059976; "NPR Disc Amt W/out Total Disc"; Decimal)
+        {
+            Caption = 'Disc. Amt. Without Total Disc.';
+            DataClassification = CustomerContent;
+
+        }
+
+        field(6059977; "NPR Benefit List Code"; Code[20])
+        {
+            Caption = 'Benefit List Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Item Benefit List Header".Code;
+
+        }
     }
 }

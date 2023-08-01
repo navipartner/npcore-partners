@@ -160,6 +160,8 @@
 
                         SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
                         SaleLinePOS.GetAmount(SaleLinePOS, Item, SaleLinePOS."Unit Price");
+
+                        OnBeforeModifySaleLineCustomerInformation(Rec, xRec, SaleLinePOS, xSaleLinePOS);
                         SaleLinePOS.Modify();
                     until SaleLinePOS.Next() = 0;
                 end;
@@ -1262,6 +1264,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateAllLineDimOnAfterPOSSaleLineModify(var POSSaleLine: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeModifySaleLineCustomerInformation(var POSSale: Record "NPR POS Sale"; xPOSSale: Record "NPR POS Sale"; var POSSaleLine: Record "NPR POS Sale Line"; xPOSSaleLine: Record "NPR POS Sale Line")
     begin
     end;
 }

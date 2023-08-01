@@ -901,6 +901,15 @@
                     ApplicationArea = NPRRetail;
                 }
 
+                Action("Total Discount List")
+                {
+                    Caption = 'Total Discount List';
+                    RunObject = Page "NPR Total Discount List";
+
+                    ToolTip = 'Displays the total discount list.';
+                    ApplicationArea = NPRRetail;
+                }
+
                 Action("Coupon List")
                 {
                     Caption = 'Coupon List';

@@ -79,7 +79,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         AddItemLine(Item, ItemReference, ItemIdentifierType::ItemNo, ItemQuantity, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd);
     end;
 
-    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; BenefitItem: Boolean; TotalDiscountCode: Code[20]; TotalDiscountStepAmount: Decimal; benefitListCode: Code[20])
     var
 
         Line: Record "NPR POS Sale Line";
@@ -137,6 +137,10 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             Line."Description 2" := CopyStr(CustomDescription2, 1, MaxStrLen(Line."Description 2"));
 
         Line."Unit Price" := UnitPrice;
+        Line."Benefit Item" := BenefitItem;
+        Line."Total Discount Code" := TotalDiscountCode;
+        Line."Total Discount Step" := TotalDiscountStepAmount;
+        Line."Benefit List Code" := benefitListCode;
 
         if (Line."Line Type" = Line."Line Type"::Item) then
             Line."Initial Group Sale Price" := UnitPrice;
@@ -158,6 +162,33 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
     procedure SetSkipCalcDiscount(SkipCalcDiscount: Boolean)
     begin
         _SkipCalcDiscount := SkipCalcDiscount;
+    end;
+
+    procedure AddItemLine(Item: Record Item;
+                          ItemReference: Record "Item Reference";
+                          ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
+                          ItemQuantity: Decimal;
+                          UnitPrice: Decimal;
+                          CustomDescription: Text;
+                          CustomDescription2: Text;
+                          InputSerial: Text;
+                          POSSession: Codeunit "NPR POS Session";
+                          FrontEnd: Codeunit "NPR POS Front End Management")
+    begin
+        AddItemLine(Item,
+                    ItemReference,
+                    ItemIdentifierType,
+                    ItemQuantity,
+                    UnitPrice,
+                    CustomDescription,
+                    CustomDescription2,
+                    InputSerial,
+                    POSSession,
+                    FrontEnd,
+                    false,
+                    '',
+                    0,
+                    '');
     end;
 
     procedure GetLineNo(): Integer;
@@ -465,4 +496,61 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         SaleLinePOS.Modify(true);
     end;
     #endregion AssingSerialNo
+    internal procedure AddBenefitItems(SalePOS: Record "NPR POS Sale";
+                                       var TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary;
+                                       FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        Item: Record Item;
+        TempItemReference: Record "Item Reference" temporary;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NPRTotalDiscountManagement: Codeunit "NPR Total Discount Management";
+        POSSession: Codeunit "NPR POS Session";
+        UnitPrice: Decimal;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
+    begin
+        TempNPRTotalDiscBenItemBuffer.Reset();
+        TempNPRTotalDiscBenItemBuffer.SetFilter(Quantity, '<>0');
+        if not TempNPRTotalDiscBenItemBuffer.FindSet(false) then
+            exit;
+
+        repeat
+            if not Item.Get(TempNPRTotalDiscBenItemBuffer."Item No.") then
+                Clear(Item);
+
+            if not GeneralLedgerSetup.Get() then
+                Clear(GeneralLedgerSetup);
+
+            UnitPrice := TempNPRTotalDiscBenItemBuffer."Unit Price";
+            if not SalePOS."Prices Including VAT" then begin
+
+                if not VATPostingSetup.Get(SalePOS."VAT Bus. Posting Group",
+                                           Item."VAT Prod. Posting Group")
+                then
+                    Clear(VATPostingSetup);
+
+                UnitPrice := NPRTotalDiscountManagement.CalcAmountWithoutVAT(UnitPrice,
+                                                                             VATPostingSetup."VAT %",
+                                                                             GeneralLedgerSetup."Amount Rounding Precision");
+            end;
+            TempItemReference."Item No." := TempNPRTotalDiscBenItemBuffer."Item No.";
+            TempItemReference."Variant Code" := TempNPRTotalDiscBenItemBuffer."Variant Code";
+
+            AddItemLine(Item,
+                        TempItemReference,
+                        ItemIdentifierType::ItemNo,
+                        TempNPRTotalDiscBenItemBuffer.Quantity,
+                        UnitPrice,
+                        '',
+                        '',
+                        '',
+                        POSSession,
+                        FrontEnd,
+                        true,
+                        TempNPRTotalDiscBenItemBuffer."Total Discount Code",
+                        TempNPRTotalDiscBenItemBuffer."Total Discount Step",
+                        TempNPRTotalDiscBenItemBuffer."Benefit List Code");
+        until TempNPRTotalDiscBenItemBuffer.Next() = 0;
+
+    end;
 }

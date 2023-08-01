@@ -18,16 +18,16 @@
     begin
         if FindSaleLinePOSCouponApply(SaleLinePOSCoupon, SaleLinePOSCouponApply) then
             SaleLinePOSCouponApply.DeleteAll();
-        
+
         if not FindCouponListItems(SaleLinePOSCoupon, NpDcCouponListItem) then
             exit;
-        
+
         RemainingQty := -1;
         NpDcCouponListItem."Apply Discount" := NpDcCouponListItem."Apply Discount"::Priority;
 
         if NpDcCouponListItem.Get(SaleLinePOSCoupon."Coupon Type", -1) then
             RemainingQty := NpDcCouponListItem."Max. Quantity";
-        
+
         CreateTempNpDcCouponListItems(TempNpDcCouponListItem, SaleLinePOSCoupon, NpDcCouponListItem."Apply Discount");
 
         TotalAmt := CalcTotalAmt(NpDcCouponListItem, TempNpDcCouponListItem, SaleLinePOSCoupon);
@@ -38,7 +38,7 @@
         if DiscountAmt <= 0 then
             exit;
         RemainingDiscountAmt := DiscountAmt;
-        
+
         case NpDcCouponListItem."Apply Discount" of
             NpDcCouponListItem."Apply Discount"::"Priority":
                 begin
@@ -283,10 +283,10 @@
         exit(TotalAmt);
     end;
 
-    local procedure CreateTempNpDcCouponListItems(var TempNpDcCouponListItem: Record "NPR NpDc Coupon List Item" temporary; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; NpDcCouponListItemAssignOption: Option "Priority", "Highest price", "Lowest price")
+    local procedure CreateTempNpDcCouponListItems(var TempNpDcCouponListItem: Record "NPR NpDc Coupon List Item" temporary; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; NpDcCouponListItemAssignOption: Option "Priority","Highest price","Lowest price")
     begin
         case NpDcCouponListItemAssignOption of
-            NpDcCouponListItemAssignOption::"Priority": 
+            NpDcCouponListItemAssignOption::"Priority":
                 begin
                     CreateTempNpDcCouponListItemsPriority(TempNpDcCouponListItem, SaleLinePOSCoupon."Coupon Type");
                 end;
@@ -313,7 +313,7 @@
     end;
 
     local procedure CreateTempNpDcCouponListItemsHighestLowest(var TempNpDcCouponListItem: Record "NPR NpDc Coupon List Item" temporary; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon")
-    var 
+    var
         SaleLinePOS: Record "NPR POS Sale Line";
         LineNo: Integer;
     begin
@@ -321,12 +321,13 @@
         SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOSCoupon."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SaleLinePOSCoupon."Sale Date");
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
+        SaleLinePOS.SetRange("Benefit Item", false);
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
 
 
         if SaleLinePOS.FindSet() then begin
             LineNo := GetInitialTempNpDcCouponListItemLineNo(TempNpDcCouponListItem);
-            
+
             repeat
                 CreateTempNpDcCouponListItemFromSpecificScenario(TempNpDcCouponListItem, SaleLinePOSCoupon, SaleLinePOS, LineNo);
             until SaleLinePOS.Next() = 0;
@@ -367,7 +368,7 @@
             NpDcCouponListItem.SetRange(Type, NpDcCouponListItem.Type::"Magento Brand");
             NpDcCouponListItem.SetRange("No.", SaleLinePOS."Magento Brand");
             if not NpDcCouponListItem.IsEmpty() then
-                CreateTempNpDcCouponListItem(TempNpDcCouponListItem, SaleLinePOS, SaleLinePOSCoupon."Coupon Type", LineNo); 
+                CreateTempNpDcCouponListItem(TempNpDcCouponListItem, SaleLinePOS, SaleLinePOSCoupon."Coupon Type", LineNo);
         end;
     end;
 
@@ -378,7 +379,7 @@
         LineNo := 10000;
         if TempNpDcCouponListItem.FindLast() then
             LineNo += TempNpDcCouponListItem."Line No.";
-        
+
         exit(LineNo);
     end;
 
@@ -410,6 +411,7 @@
         SaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOSCoupon."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SaleLinePOSCoupon."Sale Date");
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
+        SaleLinePOS.SetRange("Benefit Item", false);
         case NpDcCouponListItem.Type of
             NpDcCouponListItem.Type::Item:
                 begin

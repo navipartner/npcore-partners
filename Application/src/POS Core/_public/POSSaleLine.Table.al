@@ -1301,9 +1301,6 @@
         {
             Caption = 'Vendor No.';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
-            ObsoleteReason = 'Not used';
         }
         field(6004; Internal; Boolean)
         {
@@ -1689,6 +1686,43 @@
             Caption = 'Original POS Entry Sale Line SystemId';
             DataClassification = CustomerContent;
         }
+        field(10015; "Total Discount Code"; Code[20])
+        {
+            Caption = 'Total Discount Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Total Discount Header";
+        }
+        field(10016; "Total Discount Amount"; Decimal)
+        {
+            Caption = 'Total Discount Amount';
+            DataClassification = CustomerContent;
+        }
+        field(10017; "Total Discount Step"; Decimal)
+        {
+            Caption = 'Total Discount Step';
+            DataClassification = CustomerContent;
+
+        }
+        field(10018; "Benefit Item"; Boolean)
+        {
+            Caption = 'Benefit Item';
+            DataClassification = CustomerContent;
+
+        }
+        field(10019; "Disc. Amt. Without Total Disc."; Decimal)
+        {
+            Caption = 'Disc. Amt. Without Total Disc.';
+            DataClassification = CustomerContent;
+
+        }
+
+        field(10020; "Benefit List Code"; Code[20])
+        {
+            Caption = 'Benefit List Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Item Benefit List Header".Code;
+
+        }
         field(6014511; "Label No."; Code[8])
         {
             Caption = 'Label Number';
@@ -1773,6 +1807,12 @@
             SumIndexFields = "Amount Including VAT", Amount, Quantity;
         }
         key(Key14; "Register No.", "Sales Ticket No.", Date, "Line Type")
+        {
+            MaintainSIFTIndex = false;
+            MaintainSQLIndex = false;
+            SumIndexFields = "Amount Including VAT";
+        }
+        key(Key15; "Register No.", "Sales Ticket No.", "Line Type", "Total Discount Code", "Benefit Item")
         {
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
@@ -1993,6 +2033,8 @@
         SalesLine.Validate("Unit Price");
         SalesLine."NPR Discount Type" := "Discount Type";
         SalesLine."NPR Discount Code" := "Discount Code";
+
+        OnAfterTransferToSalesLine(Rec, SalesLine);
     end;
 
     local procedure SalesLine_AjdustPriceForVAT(FromSaleLinePOS: Record "NPR POS Sale Line"; var SalesLine: Record "Sales Line"): Boolean
@@ -2507,7 +2549,7 @@
         "Custom Disc Blocked" := _Item."NPR Custom Discount Blocked";
         if "Unit of Measure Code" = '' then
             "Unit of Measure Code" := _Item."Base Unit of Measure";
-
+        "Vendor No." := _Item."Vendor No.";
         GetDescription();
         "Magento Brand" := _Item."NPR Magento Brand";
     end;
@@ -3010,4 +3052,9 @@
     begin
     end;
 #ENDIF
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterTransferToSalesLine(NPRPOSSaleLine: Record "NPR POS Sale Line"; var SaleLine: Record "Sales Line")
+    begin
+    end;
 }
