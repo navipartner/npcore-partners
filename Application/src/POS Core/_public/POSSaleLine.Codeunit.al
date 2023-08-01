@@ -202,24 +202,29 @@
                 if Line."Discount %" > 0 then
                     Rec.Validate("Discount %", Line."Discount %");
         end;
-
-        if (Line."Unit Price" <> 0) and UseLinePriceVATParams then
-            ConvertPriceToVAT(Line."Price Includes VAT", Line."VAT Bus. Posting Group", Line."VAT Prod. Posting Group", Rec, Line."Unit Price")
-        else
-            if (Rec."Line Type" = Rec."Line Type"::Item) and (Rec."No." <> '') and (Line."Unit Price" <> 0) then begin
-                Item.Get(Rec."No.");
-                if Item."Price Includes VAT" then begin
-                    Item.TestField("VAT Bus. Posting Gr. (Price)");
-                    Item.TestField("VAT Prod. Posting Group");
+        if not Line."Benefit Item" then
+            if (Line."Unit Price" <> 0) and UseLinePriceVATParams then
+                ConvertPriceToVAT(Line."Price Includes VAT", Line."VAT Bus. Posting Group", Line."VAT Prod. Posting Group", Rec, Line."Unit Price")
+            else
+                if (Rec."Line Type" = Rec."Line Type"::Item) and (Rec."No." <> '') and (Line."Unit Price" <> 0) then begin
+                    Item.Get(Rec."No.");
+                    if Item."Price Includes VAT" then begin
+                        Item.TestField("VAT Bus. Posting Gr. (Price)");
+                        Item.TestField("VAT Prod. Posting Group");
+                    end;
+                    ConvertPriceToVAT(Item."Price Includes VAT", Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group", Rec, Line."Unit Price");
                 end;
-                ConvertPriceToVAT(Item."Price Includes VAT", Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group", Rec, Line."Unit Price");
-            end;
-        if (Line."Unit Price" <> 0) or Line."Manual Item Sales Price" then
+        if (Line."Unit Price" <> 0) or Line."Manual Item Sales Price" or Line."Benefit Item" then
             Rec.Validate("Unit Price", Line."Unit Price");
 
         if Line."Serial No." <> '' then
             Rec.Validate("Serial No.", Line."Serial No.");
         Rec.Validate("Serial No. not Created", Line."Serial No. not Created");
+
+        Rec."Benefit Item" := Line."Benefit Item";
+        Rec."Total Discount Code" := Line."Total Discount Code";
+        Rec."Total Discount Step" := Line."Total Discount Step";
+        Rec."Benefit List Code" := Line."Benefit List Code";
 
         Return := InsertLineInternal(Rec, true);
         Line := Rec;

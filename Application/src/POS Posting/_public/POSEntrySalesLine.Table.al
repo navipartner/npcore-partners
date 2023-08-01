@@ -597,6 +597,43 @@
             Caption = 'Original POS Entry Sale Line SystemId';
             DataClassification = CustomerContent;
         }
+
+        field(9000; "Total Discount Code"; Code[20])
+        {
+            Caption = 'Total Discount Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Total Discount Header";
+        }
+        field(9010; "Total Discount Step"; Decimal)
+        {
+            Caption = 'Total Discount Step';
+            DataClassification = CustomerContent;
+
+        }
+        field(9020; "Line Total Disc Amt Excl Tax"; Decimal)
+        {
+            Caption = 'Line Total Discount Amount Excluding Tax';
+            DataClassification = CustomerContent;
+        }
+        field(9030; "Line Total Disc Amt Incl Tax"; Decimal)
+        {
+            Caption = 'Line Total Discount Amount Including Tax';
+            DataClassification = CustomerContent;
+        }
+
+        field(9040; "Benefit Item"; Boolean)
+        {
+            Caption = 'Benefit Item';
+            DataClassification = CustomerContent;
+        }
+
+        field(9050; "Benefit List Code"; Code[20])
+        {
+            Caption = 'Benefit List Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Item Benefit List Header".Code;
+
+        }
     }
 
     keys

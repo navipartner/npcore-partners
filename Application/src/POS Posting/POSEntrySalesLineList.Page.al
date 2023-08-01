@@ -143,6 +143,36 @@
                     ToolTip = 'Specifies the value of the Withhold Item field';
                     ApplicationArea = NPRRetail;
                 }
+
+                field("Benefit Item"; Rec."Benefit Item")
+                {
+                    ToolTip = 'Specifies the value of the Benefit Item field.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Total Discount Code"; Rec."Total Discount Code")
+                {
+                    Visible = false;
+                    ToolTip = 'Specifies the value of the Total Discount Code field.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Total Discount Step"; Rec."Total Discount Step")
+                {
+                    Visible = false;
+                    ToolTip = 'Specifies the value of the Total Discount Step field.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Line Total Disc Amt Excl Tax"; Rec."Line Total Disc Amt Excl Tax")
+                {
+                    Visible = false;
+                    ToolTip = 'Specifies the value of the Line Total Discount Amount Excluding Tax field.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Line Total Disc Amt Incl Tax"; Rec."Line Total Disc Amt Incl Tax")
+                {
+                    Visible = false;
+                    ToolTip = 'Specifies the value of the Line Total Discount Amount Including Tax field.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Discount Authorised by"; Rec."Discount Authorised by")
                 {
 

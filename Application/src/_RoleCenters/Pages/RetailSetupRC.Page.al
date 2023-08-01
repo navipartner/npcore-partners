@@ -596,6 +596,14 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'View or edit the Mix Discounts List';
                     ApplicationArea = NPRRetail;
                 }
+                action("Total Discounts")
+                {
+                    Caption = 'Total Discounts List';
+                    RunObject = page "NPR Total Discount List";
+
+                    ToolTip = 'View or edit the Total Discounts List';
+                    ApplicationArea = NPRRetail;
+                }
 
                 action("Period Discounts")
                 {

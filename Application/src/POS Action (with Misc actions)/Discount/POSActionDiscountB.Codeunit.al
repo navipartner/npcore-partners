@@ -230,7 +230,8 @@
 
     local procedure ApplyDiscountOnLine(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountType: Option DiscountAmt,DiscountPct,LineAmt; InputValue: Decimal; SkipAjmts: Boolean)
     var
-        PrevRec: Text;
+        xSaleLine: Record "NPR POS Sale Line";
+        NPRPOSSalesDiscCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
     begin
         if SaleLinePOS."Custom Disc Blocked" then
             exit;
@@ -239,7 +240,7 @@
             AdjustAmountForVat(SaleLinePOS, InputValue);
         end;
 
-        PrevRec := Format(SaleLinePOS);
+        xSaleLine := SaleLinePOS;
 
         SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::" ";
         SaleLinePOS."Discount Code" := '';
@@ -270,8 +271,11 @@
 
         ApplyAdditionalParams(SaleLinePOS);
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
-        if PrevRec <> Format(SaleLinePOS) then
+        if Format(xSaleLine) <> Format(SaleLinePOS) then begin
             SaleLinePOS.Modify();
+            NPRPOSSalesDiscCalcMgt.OnAfterModifySaleLinePOS(SaleLinePOS,
+                                                            xSaleLine);
+        end;
     end;
 
     local procedure ApplyFilterOnLines(var SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")

@@ -24,6 +24,8 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     begin
         case Step of
+            'preparePreWorkflows':
+                Frontend.WorkflowResponse(PreparePreWorkflows(Context));
             'preparePaymentWorkflow':
                 Frontend.WorkflowResponse(PreparePayment(PaymentLine, Context));
             'tryEndSale':
@@ -55,6 +57,11 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         Response.Add('paymentDescription', POSPaymentMethod.Description);
         Response.Add('remainingAmount', RemainingAmount);
         Response.Add('amountPrompt', TextAmountLabel);
+        exit(Response);
+    end;
+
+    local procedure PreparePreWorkflows(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
+    begin
         Response.Add('preWorkflows', AddPreWorkflowsToRun(Context));
         exit(Response);
     end;
@@ -150,7 +157,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPaymentWF2.Codeunit.js###
-'let main=async({workflow:e,popup:i,scope:W,parameters:p,context:l})=>{const{HideAmountDialog:m,HideZeroAmountDialog:s}=p,{dispatchToWorkflow:u,paymentType:c,remainingAmount:a,paymentDescription:y,amountPrompt:d,preWorkflows:n}=await e.respond("preparePaymentWorkflow");if(n)for(const f of Object.entries(n)){let[r,g]=f;r&&await e.run(r,{parameters:g})}let t=a;if(!m&&(!s||a>0)&&(t=await i.numpad({title:y,caption:d,value:a}),t===null))return;let o=await e.run(u,{context:{paymentType:c,suggestedAmount:t}});o.legacy?(l.fallbackAmount=t,await e.respond("doLegacyPaymentWorkflow")):o.tryEndSale&&await e.respond("tryEndSale")};'
+'let main=async({workflow:e,popup:i,scope:W,parameters:p,context:s})=>{const{HideAmountDialog:l,HideZeroAmountDialog:m}=p,{preWorkflows:n}=await e.respond("preparePreWorkflows");if(n)for(const f of Object.entries(n)){let[r,g]=f;r&&await e.run(r,{parameters:g})}const{dispatchToWorkflow:u,paymentType:c,remainingAmount:a,paymentDescription:d,amountPrompt:y}=await e.respond("preparePaymentWorkflow");let t=a;if(!l&&(!m||a>0)&&(t=await i.numpad({title:d,caption:y,value:a}),t===null))return;let o=await e.run(u,{context:{paymentType:c,suggestedAmount:t}});o.legacy?(s.fallbackAmount=t,await e.respond("doLegacyPaymentWorkflow")):o.tryEndSale&&await e.respond("tryEndSale")};'
         );
     end;
 }

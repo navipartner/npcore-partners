@@ -330,6 +330,7 @@ codeunit 6060004 "NPR NpDc Module Issue: OnSaleB"
             SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
             SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
             SaleLinePOS.SetFilter(Quantity, '>%1', 0);
+            SaleLinePOS.SetRange("Benefit Item", false);
             SaleLinePOS2DiscBuffer(SaleLinePOS, NpDcItemBuffer);
             exit;
         end;
@@ -341,6 +342,7 @@ codeunit 6060004 "NPR NpDc Module Issue: OnSaleB"
             SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
             SaleLinePOS.SetFilter("Variant Code", NpDcIssueOnSaleSetupLine."Variant Code");
             SaleLinePOS.SetFilter(Quantity, '>%1', 0);
+            SaleLinePOS.SetRange("Benefit Item", false);
             case NpDcIssueOnSaleSetupLine.Type of
                 NpDcIssueOnSaleSetupLine.Type::Item:
                     SaleLinePOS.SetRange("No.", NpDcIssueOnSaleSetupLine."No.");
