@@ -1,6 +1,7 @@
 ﻿codeunit 6151597 "NPR NpDc Module Valid. Item L."
 {
     Access = Internal;
+
     var
         Text003: Label 'Coupon Items have not been defined on Coupon %1 (%2)';
         Text004: Label 'None of the Coupon Items have been added to the Sale';
@@ -143,6 +144,7 @@
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
+        SaleLinePOS.SetRange("Benefit Item", false);
         case NpDcCouponListItem.Type of
             NpDcCouponListItem.Type::Item:
                 begin
@@ -172,6 +174,7 @@
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
+        SaleLinePOS.SetRange("Benefit Item", false);
         case NpDcCouponListItem.Type of
             NpDcCouponListItem.Type::Item:
                 begin

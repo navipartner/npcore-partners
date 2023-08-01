@@ -1476,7 +1476,7 @@
         exit(true);
     end;
 
-    local procedure DiscSourceTableId(): Integer
+    internal procedure DiscSourceTableId(): Integer
     begin
         exit(DATABASE::"NPR Mixed Discount");
     end;
