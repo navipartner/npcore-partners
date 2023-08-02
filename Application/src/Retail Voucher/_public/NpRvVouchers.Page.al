@@ -1,7 +1,7 @@
 ﻿page 6151015 "NPR NpRv Vouchers"
 {
     Caption = 'Retail Vouchers';
-    ContextSensitiveHelpPage = 'retail/Vouchers/intro.html';
+    ContextSensitiveHelpPage = 'docs/retail/vouchers/explanation/voucher_types/';
     CardPageID = "NPR NpRv Voucher Card";
     Editable = false;
     PageType = List;

@@ -3,7 +3,7 @@
     Extensible = False;
 
     Caption = 'Pepper Terminal Types';
-    ContextSensitiveHelpPage = 'retail/eft/howto/new_terminal_type_setup.html';
+    ContextSensitiveHelpPage = 'docs/retail/eft/how-to/new_terminal_type/';
     CardPageID = "NPR Pepper Terminal Type Card";
     Editable = false;
     PageType = List;

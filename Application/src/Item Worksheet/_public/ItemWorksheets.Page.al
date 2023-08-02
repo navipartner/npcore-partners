@@ -1,7 +1,7 @@
 ﻿page 6060041 "NPR Item Worksheets"
 {
     Caption = 'Item Worksheets';
-    ContextSensitiveHelpPage = 'retail/item_worksheet/intro.html';
+    ContextSensitiveHelpPage = 'docs/retail/item_worksheet/intro/';
     PageType = List;
     SourceTable = "NPR Item Worksheet";
     UsageCategory = Administration;

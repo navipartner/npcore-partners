@@ -5,7 +5,7 @@
     PageType = CardPart;
     SourceTable = "NPR TM Ticket Reservation Req.";
     UsageCategory = None;
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
 
     layout
     {

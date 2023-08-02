@@ -48,7 +48,7 @@ page 6060007 "NPR EFT Softpay Merchant Card"
                     AboutText = 'Specifies the merchant account that can be used if there are multiple merchants with different configurations, so it''s easier to distinguish between them.';
 #endif
                 }
-                field("Enviroment"; Rec.Environment)
+                field(Enviroment; Rec.Environment)
                 {
 
                     ToolTip = 'Specifies the type of environment. For testing purposes choose Sandbox, otherwise choose Production.';

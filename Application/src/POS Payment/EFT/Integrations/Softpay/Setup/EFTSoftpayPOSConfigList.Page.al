@@ -12,7 +12,7 @@ page 6060011 "NPR EFT Softpay Config List"
     AboutTitle = 'Softpay POS Merchants';
     AboutText = 'This is a list of POS units and which Softpay merchants is configured to it.';
 #endif
-    ContextSensitiveHelpPage = 'retail/eft/howto/softpay.html';
+    ContextSensitiveHelpPage = 'docs/retail/eft/how-to/softpay/';
 
     layout
     {

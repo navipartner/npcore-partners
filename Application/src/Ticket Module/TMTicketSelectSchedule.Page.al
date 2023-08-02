@@ -12,7 +12,7 @@
     SourceTableTemporary = true;
     SourceTableView = SORTING("Admission Start Date", "Admission Start Time");
     UsageCategory = None;
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
 
     layout
     {

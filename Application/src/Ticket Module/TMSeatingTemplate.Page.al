@@ -9,7 +9,7 @@
     SourceTableView = SORTING("Admission Code", Path);
     UsageCategory = Administration;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
     layout
     {
         area(content)

@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Display Profiles';
-    ContextSensitiveHelpPage = 'retail/pos_profiles/reference/POS_Display_profile.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/how-to/customer_display/customer_display/';
     PageType = List;
     Editable = false;
     UsageCategory = Administration;

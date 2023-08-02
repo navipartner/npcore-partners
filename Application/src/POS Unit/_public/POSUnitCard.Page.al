@@ -2,7 +2,7 @@
 {
     UsageCategory = None;
     Caption = 'POS Unit Card';
-    ContextSensitiveHelpPage = 'retail/posunit/howto/createnew.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/create_pos_unit/';
     RefreshOnActivate = true;
     SourceTable = "NPR POS Unit";
 

@@ -8,7 +8,7 @@
     Caption = 'Admission Dependency Rule';
     Editable = false;
     CardPageId = "NPR TM Adm. Dependency Card";
-    ContextSensitiveHelpPage = 'entertainment/ticket/explanation/AdmissionDependencyCode.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/reference/ticket_admission/';
 
     layout
     {

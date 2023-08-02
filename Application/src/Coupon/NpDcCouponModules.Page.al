@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Coupon Modules';
-    ContextSensitiveHelpPage = 'retail/coupons/intro.html';
+    ContextSensitiveHelpPage = 'docs/retail/coupons/reference/coupon_types/';
     Editable = false;
     PageType = List;
     PopulateAllFields = true;

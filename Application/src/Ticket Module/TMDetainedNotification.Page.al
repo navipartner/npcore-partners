@@ -7,7 +7,7 @@
     SourceTable = "NPR TM Detained Notification";
     InsertAllowed = false;
     ModifyAllowed = false;
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
 
     layout
     {

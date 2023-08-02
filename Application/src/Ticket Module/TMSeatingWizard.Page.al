@@ -5,7 +5,7 @@
     PageType = Worksheet;
     SourceTable = "Integer";
     UsageCategory = None;
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
     layout
     {
         area(content)

@@ -9,7 +9,7 @@ page 6060009 "NPR EFT Softpay Config Card"
     AboutTitle = 'Softpay Configuration';
     AboutText = 'On this page you can pair POS units and merchants. For example if you select POS unit 1 and merchant id Navi, Then everytime you use POS unit 1, then the account you log in with in Softpay is Navi.';
 #endif
-    ContextSensitiveHelpPage = 'retail/eft/howto/softpay.html';
+    ContextSensitiveHelpPage = 'docs/retail/eft/how-to/softpay/';
 
     layout
     {

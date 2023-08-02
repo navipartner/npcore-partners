@@ -3,7 +3,7 @@
     Extensible = true;
     UsageCategory = None;
     Caption = 'Retail Voucher Type Card';
-    ContextSensitiveHelpPage = 'retail/Vouchers/explanation/Voucher_types.html';
+    ContextSensitiveHelpPage = 'docs/retail/vouchers/explanation/voucher_types/';
     PromotedActionCategories = 'New,Process,Reports,Manage,Setup';
     SourceTable = "NPR NpRv Voucher Type";
 

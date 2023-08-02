@@ -6,7 +6,7 @@
     UsageCategory = Administration;
     SourceTable = "NPR TM Notification Profile";
     Caption = 'Ticket Notification Profile List';
-    ContextSensitiveHelpPage = 'entertainment/ticket/howto/CreateNotificationProfile.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/how-to/create_ticket_notif/';
     CardPageId = "NPR TM Notif. Profile Card";
     Editable = false;
 

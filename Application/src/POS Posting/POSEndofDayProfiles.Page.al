@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS End of Day Profile';
-    ContextSensitiveHelpPage = 'retail/pos_profiles/reference/POS_End_of_Day_Profile.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/eod/balance_config/';
     PageType = List;
     UsageCategory = Administration;
 

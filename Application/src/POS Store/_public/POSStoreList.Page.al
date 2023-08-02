@@ -3,7 +3,7 @@
     ApplicationArea = NPRRetail;
     Caption = 'POS Store List';
     CardPageID = "NPR POS Store Card";
-    ContextSensitiveHelpPage = 'retail/posunit/howto/Create_new_POS_store.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_store/intro/';
     Editable = false;
     PageType = List;
     SourceTable = "NPR POS Store";

@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Print Template List';
-    ContextSensitiveHelpPage = 'retail/printing/howto/create_print_template.html';
+    ContextSensitiveHelpPage = 'docs/retail/printing/how-to/print_template_setup/';
     CardPageID = "NPR RP Template Card";
     Editable = false;
     PageType = List;

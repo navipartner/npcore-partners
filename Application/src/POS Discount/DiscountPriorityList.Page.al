@@ -5,7 +5,7 @@
     // NPR5.44/MMV /20180627  CASE 312154 Added field 30
 
     Caption = 'Discount Priority List';
-    ContextSensitiveHelpPage = 'retail/Discounts/explanation/discount_types.html';
+    ContextSensitiveHelpPage = 'docs/retail/discounts/explanation/discount_types/';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
