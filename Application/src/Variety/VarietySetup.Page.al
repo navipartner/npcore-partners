@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Variety Setup';
-    ContextSensitiveHelpPage = 'retail/varieties/intro.html';
+    ContextSensitiveHelpPage = 'docs/retail/varieties/how-to/create_variety/';
     PageType = Card;
     PromotedActionCategories = 'New,Process,Report,View,Update';
     SourceTable = "NPR Variety Setup";

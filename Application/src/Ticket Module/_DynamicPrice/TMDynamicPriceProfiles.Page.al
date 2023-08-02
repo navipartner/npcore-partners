@@ -6,7 +6,7 @@ page 6059865 "NPR TM Dynamic Price Profiles"
     UsageCategory = Administration;
     SourceTable = "NPR TM Dynamic Price Profile";
     Caption = 'Ticket Price Profiles';
-    ContextSensitiveHelpPage = 'entertainment/ticket/howto/CreatePriceProfile.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/how-to/create_price_profile/';
     CardPageId = "NPR TM Dynamic Price Profile";
     Editable = false;
 

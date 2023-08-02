@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Coupon Card';
-    ContextSensitiveHelpPage = 'retail/coupons/reference/coupon_types.html';
+    ContextSensitiveHelpPage = 'docs/retail/coupons/reference/coupon_types/';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;

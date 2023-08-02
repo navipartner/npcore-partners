@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'SMS Template List';
-    ContextSensitiveHelpPage = 'retail/sms/reference/sms_template_reference.html';
+    ContextSensitiveHelpPage = 'docs/retail/communication/reference/sms_template_ref/';
     CardPageID = "NPR SMS Template Card";
     Editable = false;
     PageType = List;

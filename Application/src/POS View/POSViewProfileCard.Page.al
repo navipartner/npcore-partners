@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS View Profile Card';
-    ContextSensitiveHelpPage = 'retail/pos_profiles/reference/POS_view_profile.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/reference/view_profile/view_profile_ref/';
     PageType = Card;
     SourceTable = "NPR POS View Profile";
     UsageCategory = None;

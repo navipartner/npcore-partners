@@ -7,7 +7,7 @@
     // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
 
     Caption = 'Client Attribute Card';
-    ContextSensitiveHelpPage = 'retail/attributes/reference/client_attribute.html';
+    ContextSensitiveHelpPage = 'docs/retail/attributes/how-to/client_attributes/client_attributes/';
     PageType = Card;
     SourceTable = "NPR Attribute";
     UsageCategory = None;

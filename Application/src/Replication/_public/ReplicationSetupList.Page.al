@@ -3,7 +3,7 @@
     ApplicationArea = NPRRetail;
     Caption = 'Replication API Setup List';
     CardPageId = "NPR Replication Setup Card";
-    ContextSensitiveHelpPage = 'retail/companies/howto/replicationhowto.html';
+    ContextSensitiveHelpPage = 'docs/retail/replication/how-to/setup/';
     Editable = false;
     Extensible = true;
     PageType = List;

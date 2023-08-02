@@ -7,7 +7,7 @@
     SourceTable = "NPR TM Concurrent Admis. Setup";
     UsageCategory = Administration;
     ApplicationArea = NPRTicketAdvanced;
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
     layout
     {
         area(content)

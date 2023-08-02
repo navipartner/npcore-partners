@@ -2,7 +2,7 @@ page 6059883 "NPR MPOS Report Printers"
 {
     Extensible = false;
     PageType = List;
-    ContextSensitiveHelpPage = 'retail/MPOS/Intro.html';
+    ContextSensitiveHelpPage = 'docs/retail/mpos/how-to/mpos_view/';
     ApplicationArea = NPRRetail;
     UsageCategory = Lists;
     SourceTable = "NPR MPOS Report Printer";

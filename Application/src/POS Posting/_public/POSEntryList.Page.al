@@ -1,7 +1,7 @@
 ﻿page 6150652 "NPR POS Entry List"
 {
     Caption = 'POS Entry List';
-    ContextSensitiveHelpPage = 'retail/posunit/intro.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/intro/';
     AdditionalSearchTerms = 'POS Entries';
     CardPageID = "NPR POS Entry Card";
     DeleteAllowed = false;

@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Global POS Sales Setups';
-    ContextSensitiveHelpPage = 'retail/pos_profiles/howto/POS_Global.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/how-to/global_profile/global_profile/';
     CardPageID = "NPR NpGp POS Sales Setup Card";
     Editable = false;
     PageType = List;

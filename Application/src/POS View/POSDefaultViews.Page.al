@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Default Views';
-    ContextSensitiveHelpPage = 'retail/posunit/explanation/POS_menu.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_layout/explanation/sections/';
     PageType = List;
     SourceTable = "NPR POS Default View";
     UsageCategory = Administration;

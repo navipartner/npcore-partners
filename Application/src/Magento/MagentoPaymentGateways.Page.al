@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Payment Gateways';
-    ContextSensitiveHelpPage = 'retail/webshopintegrations/payment_gateway/paymentgateway.html';
+    ContextSensitiveHelpPage = 'docs/retail/integrations/explanation/payment_gateway/';
     PageType = List;
     SourceTable = "NPR Magento Payment Gateway";
     UsageCategory = Administration;

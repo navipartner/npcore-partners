@@ -1,7 +1,7 @@
 ﻿page 6060132 "NPR MM Member Community"
 {
     Caption = 'Member Community';
-    ContextSensitiveHelpPage = 'retail/loyalty/howto/Loyalty%20setup.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/loyalty/how-to/setup/';
     PageType = List;
     SourceTable = "NPR MM Member Community";
     UsageCategory = Administration;

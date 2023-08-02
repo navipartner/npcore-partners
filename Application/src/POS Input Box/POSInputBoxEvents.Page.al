@@ -3,7 +3,7 @@
     Extensible = False;
 
     Caption = 'POS Input Box Events';
-    ContextSensitiveHelpPage = 'retail/pos_profiles/reference/POS_input_box_profile.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/reference/input_box_profile/input_box_profile/';
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR Ean Box Event";

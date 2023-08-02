@@ -5,7 +5,7 @@
     // NPR5.51/ALPO/20190826 CASE 364558 Define inheritable pos info codes (will be copied from Sales POS header to new lines)
 
     Caption = 'POS Info List';
-    ContextSensitiveHelpPage = 'retail/posunit/howto/pos_info_setup.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/pos_info_setup/';
     CardPageID = "NPR POS Info Card";
     Editable = false;
     PageType = List;

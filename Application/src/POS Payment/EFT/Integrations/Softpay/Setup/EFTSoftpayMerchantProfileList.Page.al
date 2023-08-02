@@ -12,7 +12,7 @@ page 6060008 "NPR EFT Softpay Merchant List"
     AboutTitle = 'Softpay Merchants';
     AboutText = 'This is a list of all your configured Softpay merchants. These merchants are supplied by Softpay.';
 #endif
-    ContextSensitiveHelpPage = 'retail/eft/howto/softpay.html';
+    ContextSensitiveHelpPage = 'docs/retail/eft/how-to/softpay/';
 
     layout
     {

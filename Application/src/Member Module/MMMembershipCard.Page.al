@@ -3,7 +3,7 @@
     Extensible = False;
     UsageCategory = None;
     Caption = 'Membership Card';
-    ContextSensitiveHelpPage = 'retail/loyalty/explanation/Navigation%20and%20reports.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/loyalty/explanation/navigation_reports/';
     DataCaptionExpression = Rec."External Membership No." + ' - ' + Rec."Membership Code";
     InsertAllowed = false;
     PromotedActionCategories = 'New,Process,Report,History,Raptor';

@@ -2,7 +2,7 @@ page 6014423 "NPR Report Selection: Retail"
 {
     Extensible = False;
     Caption = 'Report Selection - Retail';
-    ContextSensitiveHelpPage = 'retail/posunit/howto/receipt-printout.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/receipt_printout/';
     DelayedInsert = true;
     Editable = true;
     PageType = Worksheet;

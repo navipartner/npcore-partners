@@ -1,7 +1,7 @@
 ﻿page 6150638 "NPR POS Posting Profiles"
 {
     Caption = 'POS Posting Profiles';
-    ContextSensitiveHelpPage = 'retail/pos_profiles/howto/POS_Pos_Prof.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/how-to/posting_profile/posting_profile/';
     CardPageID = "NPR POS Post. Profile Card";
     Editable = false;
     PageType = List;

@@ -1,7 +1,7 @@
 ﻿page 6014504 "NPR Replication Endpoint"
 {
     Caption = 'Replication Endpoint';
-    ContextSensitiveHelpPage = 'retail/replication/howto/replicationhowto.html';
+    ContextSensitiveHelpPage = 'docs/retail/replication/how-to/setup/';
     Extensible = true;
     PageType = Card;
     SourceTable = "NPR Replication Endpoint";

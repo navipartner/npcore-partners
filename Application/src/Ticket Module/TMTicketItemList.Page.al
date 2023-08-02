@@ -9,7 +9,7 @@ page 6059888 "NPR TM Ticket Item List"
     Caption = 'Ticket Item List';
     PromotedActionCategories = 'New,Process,Report,History,Manage';
     Editable = false;
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
     layout
     {
         area(Content)

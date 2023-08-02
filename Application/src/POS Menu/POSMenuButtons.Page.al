@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Menu Buttons';
-    ContextSensitiveHelpPage = 'retail/posunit/howto/add_button_to_pos_menu.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_layout/how-to/new_button/';
     PageType = List;
     UsageCategory = None;
     PromotedActionCategories = 'New,Process,Reports,Level,Order';

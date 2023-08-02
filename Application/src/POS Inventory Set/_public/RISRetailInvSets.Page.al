@@ -1,7 +1,7 @@
 ﻿page 6151085 "NPR RIS Retail Inv. Sets"
 {
     Caption = 'Retail Inventory Sets';
-    ContextSensitiveHelpPage = 'retail/companies/howto/retail_inventory_sets.html';
+    ContextSensitiveHelpPage = 'docs/retail/replication/how-to/inventory_sets/';
     CardPageID = "NPR RIS Retail Inv. Set Card";
     Editable = false;
     PageType = List;

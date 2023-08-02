@@ -1,7 +1,7 @@
 ﻿page 6014500 "NPR Replication Endpoints"
 {
     Caption = 'Replication Service Endpoints';
-    ContextSensitiveHelpPage = 'retail/replication/howto/replicationhowto.html';
+    ContextSensitiveHelpPage = 'docs/retail/replication/how-to/setup/';
     Editable = true;
     Extensible = true;
     PageType = ListPart;

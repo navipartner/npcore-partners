@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Display Profile';
-    ContextSensitiveHelpPage = 'retail/pos_profiles/reference/POS_Display_profile.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/how-to/customer_display/customer_display/';
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR Display Setup";

@@ -1,7 +1,7 @@
 ﻿page 6014672 "NPR Rep. Spec. Field Mappings"
 {
     Caption = 'Replication Special Field Mappings';
-    ContextSensitiveHelpPage = 'retail/replication/howto/replicationhowto.html';
+    ContextSensitiveHelpPage = 'docs/retail/replication/how-to/setup/';
     Editable = true;
     Extensible = true;
     PageType = Worksheet;

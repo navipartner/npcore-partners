@@ -1,7 +1,7 @@
 ﻿page 6014453 "NPR Campaign Discount"
 {
     Caption = 'Period Discount';
-    ContextSensitiveHelpPage = 'retail/Discounts/howto/Period_discount.html';
+    ContextSensitiveHelpPage = 'docs/retail/discounts/how-to/period_discounts/';
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR Period Discount";

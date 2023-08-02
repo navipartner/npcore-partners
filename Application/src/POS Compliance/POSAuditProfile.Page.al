@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Audit Profile';
-    ContextSensitiveHelpPage = 'retail/pos_profiles/reference/POS_audit_profile.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/reference/audit_prof/audit_prof/';
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR POS Audit Profile";

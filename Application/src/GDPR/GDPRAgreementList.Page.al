@@ -4,7 +4,7 @@
     // MM1.29/TSA /20180509 CASE 313795 Initial Version
 
     Caption = 'GDPR Agreement List';
-    ContextSensitiveHelpPage = 'retail/gdpr/intro.html';
+    ContextSensitiveHelpPage = 'docs/retail/gdpr/intro/';
     CardPageID = "NPR GDPR Agreement Card";
     PageType = List;
     UsageCategory = Administration;

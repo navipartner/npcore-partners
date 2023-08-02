@@ -6,7 +6,7 @@
     SourceTable = "NPR TM Ticket Reservation Req.";
     UsageCategory = None;
     InsertAllowed = false;
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
 
     layout
     {

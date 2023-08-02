@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Payment Bins';
-    ContextSensitiveHelpPage = 'retail/posunit/howto/create_pos_payment_bin.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/payment_bins/';
     PageType = List;
     SourceTable = "NPR POS Payment Bin";
     UsageCategory = Administration;

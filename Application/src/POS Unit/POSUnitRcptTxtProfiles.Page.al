@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Unit Receipt Text Profiles';
-    ContextSensitiveHelpPage = 'retail/pos_profiles/reference/POS_unit_Receipt_profile.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/reference/unit_receipt_profile_ref/unit_receipt_profile_ref/';
     CardPageID = "NPR POS Unit Rcpt.Text Profile";
     Editable = false;
     PageType = List;

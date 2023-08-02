@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Retail Voucher Partners';
-    ContextSensitiveHelpPage = 'retail/Vouchers/intro.html';
+    ContextSensitiveHelpPage = 'docs/retail/vouchers/explanation/voucher_types/';
     CardPageID = "NPR NpRv Partner Card";
     Editable = false;
     PageType = List;

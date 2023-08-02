@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Item Worksheet Templates';
-    ContextSensitiveHelpPage = 'retail/item_worksheet/reference/item_worksheet_template.html';
+    ContextSensitiveHelpPage = 'docs/retail/item_worksheet/reference/template/template_ref/';
     CardPageID = "NPR Item Worksh. Template";
     Editable = false;
     PageType = List;

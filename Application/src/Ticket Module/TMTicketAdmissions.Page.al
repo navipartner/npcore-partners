@@ -6,7 +6,7 @@
     SourceTable = "NPR TM Admission";
     UsageCategory = Administration;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
     PromotedActionCategories = 'New,Process,Report,Navigate';
     CardPageId = "NPR TM Admission Card";
     Editable = true;

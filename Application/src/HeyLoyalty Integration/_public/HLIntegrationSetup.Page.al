@@ -8,7 +8,6 @@ page 6150720 "NPR HL Integration Setup"
     SourceTable = "NPR HL Integration Setup";
     UsageCategory = Administration;
     ApplicationArea = NPRHeyLoyalty;
-    ContextSensitiveHelpPage = 'heyloyaltyintegration.html';
     PromotedActionCategories = 'New,Process,Report,Data Migration';
 
     layout

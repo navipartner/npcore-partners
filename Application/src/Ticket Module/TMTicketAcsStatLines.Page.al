@@ -6,7 +6,7 @@
     PageType = ListPart;
     SourceTable = "Dimension Code Buffer";
     UsageCategory = None;
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
     layout
     {
         area(content)

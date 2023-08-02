@@ -1,7 +1,7 @@
 page 6150771 "NPR POS HTML Disp. Prof. Card"
 {
     PageType = Card;
-    ContextSensitiveHelpPage = 'retail/pos_profiles/howto/POS_HTMLDisplay_profile.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/how-to/html_profile/html_profile/';
     UsageCategory = Administration;
     SourceTable = "NPR POS HTML Disp. Prof.";
     Extensible = false;

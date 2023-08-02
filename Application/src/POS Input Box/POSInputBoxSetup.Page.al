@@ -4,7 +4,7 @@
 
     UsageCategory = None;
     Caption = 'POS Input Box Setup';
-    ContextSensitiveHelpPage = 'retail/pos_profiles/reference/POS_input_box_profile.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/reference/input_box_profile/input_box_profile/';
     SourceTable = "NPR Ean Box Setup";
 
     layout
