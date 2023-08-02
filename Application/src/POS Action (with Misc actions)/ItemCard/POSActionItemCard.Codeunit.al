@@ -20,12 +20,9 @@ codeunit 6150827 "NPR POS Action: Item Card" implements "NPR IPOS Workflow"
     var
         BusinessLogic: Codeunit "NPR POS Action: Item Card-B";
         POSSession: Codeunit "NPR POS Session";
-        JObject: JsonObject;
         PageEditable: Boolean;
         RefreshLine: Boolean;
     begin
-        Context.InitializeJObjectParser(JObject);
-
         if not Context.GetBooleanParameter('PageEditable', PageEditable) then
             PageEditable := false;
         if not Context.GetBooleanParameter('RefreshLine', RefreshLine) then
