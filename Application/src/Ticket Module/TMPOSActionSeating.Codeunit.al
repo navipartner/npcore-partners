@@ -19,10 +19,7 @@ codeunit 6151132 "NPR TM POS Action - Seating" implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     var
         POSSession: Codeunit "NPR POS Session";
-        JObject: JsonObject;
     begin
-        Context.InitializeJObjectParser(JObject);
-
         ShowSeating(FrontEnd, POSSession);
     end;
 
