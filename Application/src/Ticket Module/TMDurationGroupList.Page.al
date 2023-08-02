@@ -5,7 +5,7 @@ page 6060149 "NPR TM DurationGroupList"
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     UsageCategory = Administration;
     SourceTable = "NPR TM DurationGroup";
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
     Editable = true;
     Caption = 'Ticket Duration Group';
 

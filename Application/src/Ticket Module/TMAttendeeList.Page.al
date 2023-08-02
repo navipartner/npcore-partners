@@ -11,7 +11,7 @@
     Editable = false;
     Caption = 'List of Attendees';
     DataCaptionExpression = '';
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
 
     layout
     {

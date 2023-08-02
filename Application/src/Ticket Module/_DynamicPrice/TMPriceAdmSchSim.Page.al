@@ -5,7 +5,7 @@ page 6059930 "NPR TM Price Adm. Sch. Sim."
     UsageCategory = None;
     PageType = Worksheet;
     SourceTable = "NPR TM Admis. Schedule Entry";
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
     layout
     {
         area(Content)

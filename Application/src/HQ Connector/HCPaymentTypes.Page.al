@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'HC Payment Types';
-    ContextSensitiveHelpPage = 'retail/posunit/reference/payment_types.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/create_payment_method/';
     PageType = List;
     SourceTable = "NPR HC Payment Type POS";
     UsageCategory = Administration;

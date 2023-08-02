@@ -7,7 +7,7 @@
     PromotedActionCategories = 'New,Tasks,Reports,Display';
     RefreshOnActivate = true;
     UsageCategory = Administration;
-    ContextSensitiveHelpPage = 'retail/sms/howto/smshowto.html';
+    ContextSensitiveHelpPage = 'docs/retail/communication/how-to/sms_setup/';
     DeleteAllowed = false;
     InsertAllowed = false;
     ApplicationArea = NPRRetail;

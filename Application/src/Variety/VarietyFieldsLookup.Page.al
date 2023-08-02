@@ -6,7 +6,7 @@
     // NPR5.47/JDH /20181012 CASE 324997 Added filter to hide disabled fileds and changed key
 
     Caption = 'Variety Fields Lookup';
-    ContextSensitiveHelpPage = 'retail/varieties/intro.html';
+    ContextSensitiveHelpPage = 'docs/retail/varieties/how-to/create_variety/';
     PageType = List;
     UsageCategory = Administration;
 

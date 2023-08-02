@@ -9,7 +9,7 @@
     SourceTableTemporary = true;
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
 
     layout
     {

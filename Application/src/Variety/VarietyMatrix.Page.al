@@ -2,7 +2,7 @@
 {
     Extensible = false;
     Caption = 'Variety Matrix';
-    ContextSensitiveHelpPage = 'retail/varieties/howto/set_up_variety_matrix_so.html';
+    ContextSensitiveHelpPage = 'docs/retail/varieties/how-to/create_variety/';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;

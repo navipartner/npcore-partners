@@ -2,7 +2,7 @@ page 6059849 "NPR Replication Setup (Source)"
 {
     ApplicationArea = NPRRetail;
     Caption = 'Replication Setup (Source Company)';
-    ContextSensitiveHelpPage = 'retail/companies/howto/replicationhowto.html';
+    ContextSensitiveHelpPage = 'docs/retail/replication/how-to/setup/';
     DataCaptionExpression = '';
     DeleteAllowed = false;
     Extensible = false;

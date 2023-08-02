@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Coupon Types';
-    ContextSensitiveHelpPage = 'retail/coupons/reference/coupon_types.html';
+    ContextSensitiveHelpPage = 'docs/retail/coupons/reference/coupon_types/';
     CardPageID = "NPR NpDc Coupon Type Card";
     Editable = false;
     PageType = List;

@@ -10,7 +10,7 @@
 
     Caption = 'Period Discount List';
     CardPageID = "NPR Campaign Discount";
-    ContextSensitiveHelpPage = 'retail/Discounts/howto/Period_discount.html';
+    ContextSensitiveHelpPage = 'docs/retail/discounts/how-to/period_discounts/';
     Editable = true;
     InsertAllowed = false;
     PageType = List;

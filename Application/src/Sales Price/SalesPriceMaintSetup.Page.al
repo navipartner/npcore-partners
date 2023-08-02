@@ -3,7 +3,7 @@
     Extensible = False;
     AutoSplitKey = true;
     Caption = 'Sales Price Maintenance Setup';
-    ContextSensitiveHelpPage = 'retail/posunit/reference/sales_price_maintenance.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/reference/sales_price_maintenance/';
     PageType = List;
     UsageCategory = Administration;
     SourceTable = "NPR Sales Price Maint. Setup";

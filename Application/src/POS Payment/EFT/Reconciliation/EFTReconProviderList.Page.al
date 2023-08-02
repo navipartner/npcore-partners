@@ -2,7 +2,7 @@
 {
     Extensible = false;
     Caption = 'EFT Recon. Provider List';
-    ContextSensitiveHelpPage = 'retail/eft/howto/reconciliation.html';
+    ContextSensitiveHelpPage = 'docs/retail/eft/how-to/reconciliation/';
     CardPageId = "NPR EFT Recon. Provider Card";
     Editable = false;
     PageType = List;

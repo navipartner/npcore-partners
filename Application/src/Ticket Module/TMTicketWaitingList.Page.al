@@ -7,7 +7,7 @@
     SourceTable = "NPR TM Ticket Wait. List";
     UsageCategory = Lists;
     ApplicationArea = NPRTicketAdvanced;
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
 
     layout
     {

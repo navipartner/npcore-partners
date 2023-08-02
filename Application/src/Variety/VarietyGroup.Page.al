@@ -4,7 +4,7 @@
     // NPR5.43/NPKNAV/20180629  CASE 317108 Transport NPR5.43 - 29 June 2018
 
     Caption = 'Variety Group';
-    ContextSensitiveHelpPage = 'retail/varieties/intro.html';
+    ContextSensitiveHelpPage = 'docs/retail/varieties/how-to/create_variety/';
     PageType = List;
     SourceTable = "NPR Variety Group";
     UsageCategory = Administration;

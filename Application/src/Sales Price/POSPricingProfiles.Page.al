@@ -6,7 +6,7 @@
 
     SourceTable = "NPR POS Pricing Profile";
     Caption = 'POS Pricing Profiles';
-    ContextSensitiveHelpPage = 'retail/pos_profiles/howto/POS_Pricing_profile.html';
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/how-to/pricing_profile/pricing_profile/';
     Editable = false;
     CardPageID = "NPR POS Pricing Profile Card";
     ApplicationArea = NPRRetail;

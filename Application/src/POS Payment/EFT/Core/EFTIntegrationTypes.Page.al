@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'EFT Integration Types';
-    ContextSensitiveHelpPage = 'retail/eft/explanation/EFT_Integration_Type.html';
+    ContextSensitiveHelpPage = 'docs/retail/eft/explanation/integration_types/';
     DeleteAllowed = false;
     Editable = false;
     InsertAllowed = false;

@@ -6,7 +6,7 @@ page 6059886 "NPR TM Ticket BOM Card"
     SourceTable = "NPR TM Ticket Admission BOM";
     Caption = 'Ticket Bill-of-Material';
     PromotedActionCategories = 'New,Process,Report,Create Tickets,Navigate';
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
 
     layout
     {

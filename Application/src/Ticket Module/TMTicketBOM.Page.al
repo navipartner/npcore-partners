@@ -6,7 +6,7 @@
     SourceTable = "NPR TM Ticket Admission BOM";
     UsageCategory = Administration;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-    ContextSensitiveHelpPage = 'entertainment/ticket/intro.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
     PromotedActionCategories = 'New,Process,Report,Create Tickets,Navigate,History';
     CardPageId = "NPR TM Ticket BOM Card";
     Editable = true;

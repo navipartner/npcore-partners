@@ -4,7 +4,7 @@
 
     AutoSplitKey = true;
     Caption = 'Loyalty Points Setup';
-    ContextSensitiveHelpPage = 'retail/loyalty/explanation/Loyalty.html';
+    ContextSensitiveHelpPage = 'docs/entertainment/loyalty/intro/';
     PageType = List;
     UsageCategory = None;
 
