@@ -450,10 +450,11 @@
         until DefaultDimension.Next() = 0;
     end;
 
-    internal procedure ApplyItemCategoryDimensionsToItem(ItemCategory: Record "Item Category"; Item: Record Item; Silent: Boolean): Boolean
+    internal procedure ApplyItemCategoryDimensionsToItem(ItemCategory: Record "Item Category"; var Item: Record Item; Silent: Boolean): Boolean
     var
         DefaultDimension: Record "Default Dimension";
         DefaultDimension2: Record "Default Dimension";
+        DimensionManagement: Codeunit DimensionManagement;
         ConfirmQst: Label 'Apply Dimensions from Item Category to Item?';
     begin
         if ItemCategory.IsTemporary() or Item.IsTemporary() then
@@ -483,6 +484,10 @@
                 DefaultDimension2.Insert(true);
             until DefaultDimension.Next() = 0;
 
+        DimensionManagement.UpdateDefaultDim(
+            Database::Item, Item."No.",
+            Item."Global Dimension 1 Code",
+            Item."Global Dimension 2 Code");
         exit(true);
     end;
 
@@ -1391,7 +1396,6 @@
         DetailFieldsDict.Add(ItemCategoryBuffer.FieldNo("Detail Field 9"), ItemCategoryBuffer."Detail Field 9");
         DetailFieldsDict.Add(ItemCategoryBuffer.FieldNo("Detail Field 10"), ItemCategoryBuffer."Detail Field 10");
     end;
-
     #endregion
 
     internal procedure DeleteItemCategoryBuffer(ItemCategoryCode: Code[20]; SalespersonCode: Code[20]; GlobalDimensionCode1: Code[20]; GlobalDimensionCode2: Code[20]; var ItemCatagoryBuffer: Record "NPR Item Category Buffer" temporary; var ItemCategoryBufferFull: Record "NPR Item Category Buffer" temporary)
