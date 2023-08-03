@@ -32,7 +32,7 @@ codeunit 6150814 "NPR Retail Sales Chart BT"
         ReadData(Period, PeriodType, PeriodLength, PeriodEndDate);
     end;
 
-    local procedure GetPeriodLength(var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period): Text[1]
+    procedure GetPeriodLength(var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period): Text[1]
     begin
         case PeriodType of
             PeriodType::Day:
@@ -84,7 +84,7 @@ codeunit 6150814 "NPR Retail Sales Chart BT"
         Page.SetBackgroundTaskResult(Result);
     end;
 
-    local procedure Setdate(var StartDate: Date; var Enddate: Date; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period; PeriodLength: Text[1]; PeriodEndDate: Date)
+    procedure Setdate(var StartDate: Date; var Enddate: Date; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period; PeriodLength: Text[1]; PeriodEndDate: Date)
     var
         Date: Record Date;
         NextLbl: Label '<C%1+7%1>', Locked = true;
