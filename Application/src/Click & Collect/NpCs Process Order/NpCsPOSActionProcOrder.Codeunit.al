@@ -46,7 +46,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order" implements "NPR IPOS Workflow"
         case Step of
             'run_collect_in_store_orders':
                 begin
-                    CollectInStoreOrders(Context, SaleMgr);
+                    CollectInStoreOrders(Context);
                 end;
         end;
     end;
@@ -186,7 +186,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order" implements "NPR IPOS Workflow"
     end;
 
 
-    local procedure CollectInStoreOrders(var Context: Codeunit "NPR POS JSON Helper"; var POSSale: Codeunit "NPR POS Sale")
+    local procedure CollectInStoreOrders(var Context: Codeunit "NPR POS JSON Helper")
     var
         LocationFilter: Text;
         SortingInt: Integer;
@@ -194,6 +194,5 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order" implements "NPR IPOS Workflow"
         LocationFilter := GetLocationFilter(Context);
         SortingInt := Context.GetIntegerParameter('Sorting');
         NpCsPOSActionProcOrderB.RunCollectInStoreOrders(LocationFilter, SortingInt);
-        POSSale.RefreshCurrent();
     end;
 }
