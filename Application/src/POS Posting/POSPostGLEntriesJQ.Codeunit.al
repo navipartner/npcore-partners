@@ -9,7 +9,6 @@ codeunit 6014699 "NPR POS Post GL Entries JQ"
         Hashset: Codeunit "NPR HashSet of [Integer]";
         POSPostEntries: Codeunit "NPR POS Post Entries";
         SentryCron: Codeunit "NPR Sentry Cron";
-        CheckInUpdated: Boolean;
         SkipPeriodRegisterGroup: Boolean;
         ErrorTextDictionary: Dictionary of [Integer, Text];
         ErrorCount: Integer;
@@ -55,18 +54,12 @@ codeunit 6014699 "NPR POS Post GL Entries JQ"
             end;
         until POSEntry.Next() = 0;
 
-        if ErrorCount > 0 then begin
-            if CheckInId <> '' then begin
-                SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'error', CheckInId);
-                CheckInUpdated := true;
-            end;
-
+        if ErrorCount > 0 then
             Message(ErrMessage, ErrorCount);
-        end;
 
         if (ErrorTextDictionary.Count() > 0) then begin
             Commit();
-            if (CheckInId <> '') and not CheckInUpdated then
+            if CheckInId <> '' then
                 SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'error', CheckInId);
 
             foreach Period in ErrorTextDictionary.Keys() do
@@ -75,7 +68,7 @@ codeunit 6014699 "NPR POS Post GL Entries JQ"
             Error(DetailedMessage.ToText());
         end;
 
-        if (CheckInId <> '') and not CheckInUpdated then
+        if CheckInId <> '' then
             SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'ok', CheckInId);
     end;
 }
