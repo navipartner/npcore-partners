@@ -154,6 +154,8 @@
         ChartIsReady: Boolean;
         BusChartBuf: Record "Business Chart Buffer";
         ChartMgt: Codeunit "NPR Retail Chart Mgt.";
+        DimensionType: Option "Dimension 1","Dimension 2";
+        ChartDataTrackerMgt: Codeunit "NPR Chart Data Tracker Mgt.";
         StatusText: Text[250];
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         Period: Option " ",Next,Previous;
@@ -169,6 +171,7 @@
     local procedure UpdateChart()
     var
         Parameters: Dictionary of [Text, Text];
+        ChartDataUpdateTracker: Record "NPR Chart Data Update Tracker";
     begin
         if not ChartIsReady then
             exit;
@@ -177,6 +180,11 @@
         Parameters.Add('PeriodType', Format(PeriodType));
         Parameters.Add('PeriodLength', Format(BusChartBuf.GetPeriodLength()));
         Parameters.Add('PeriodEndDate', Format(BusChartBuf."Period Filter End Date"));
+
+        if ChartDataTrackerMgt.ShouldUpdateChartFromTable(ChartDataUpdateTracker, GetCurrPageId(), Period, PeriodType, BusChartBuf.GetPeriodLength(), BusChartBuf."Period Filter End Date", DimensionType::"Dimension 1", false) then begin
+            UpdateChartFromTable(ChartDataUpdateTracker);
+            exit;
+        end;
 
         CurrPage.EnqueueBackgroundTask(BackgroundTaskId, Codeunit::"NPR Retail Sales Chart BT", Parameters);
     end;
@@ -191,6 +199,8 @@
         ChartMgt.TurnOver_Revenue(BusChartBuf, Period, PeriodType, Results);
         BusChartBuf.Update(CurrPage.chart);
         StatusText := StrSubstNo(FromToLbl, BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
+
+        ChartDataTrackerMgt.UpsertTrackerTable(GetCurrPageId(), Period, PeriodType, BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date", DimensionType::"Dimension 1", false, Results);
     end;
 
     trigger OnPageBackgroundTaskError(TaskId: Integer; ErrorCode: Text; ErrorText: Text; ErrorCallStack: Text; var IsHandled: Boolean)
@@ -199,5 +209,20 @@
     begin
         if TaskId = BackgroundTaskId then
             BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
+    end;
+
+    local procedure GetCurrPageId() CurrPageId: Integer
+    begin
+        Evaluate(CurrPageId, CurrPage.ObjectId(false).Split(' ').Get(2));
+    end;
+
+    local procedure UpdateChartFromTable(ChartDataUpdateTracker: Record "NPR Chart Data Update Tracker")
+    var
+        Results: Dictionary of [Text, Text];
+    begin
+        ChartDataTrackerMgt.GetResultsFromTable(ChartDataUpdateTracker, Results);
+        ChartMgt.TurnOver_Revenue(BusChartBuf, Period, PeriodType, Results);
+        BusChartBuf.Update(CurrPage.chart);
+        StatusText := StrSubstNo(FromToLbl, BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
     end;
 }

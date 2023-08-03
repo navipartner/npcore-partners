@@ -22,11 +22,11 @@
         SetdateRevenue(StartDate, Enddate, Period, PeriodType, BusChartBuf);
         BusChartBuf.Initialize();
 #if BC17
-        BusChartBuf.AddMeasure(MarginLbl, 2, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
-        BusChartBuf.AddMeasure(TurnoverLbl, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
+        BusChartBuf.AddMeasure(TurnoverLbl, 0, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
+        BusChartBuf.AddMeasure(MarginLbl, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
 #else
-        BusChartBuf.AddMeasure(MarginLbl, 2, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column.AsInteger());
-        BusChartBuf.AddMeasure(TurnoverLbl, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column.AsInteger());
+        BusChartBuf.AddMeasure(TurnoverLbl, 0, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column.AsInteger());
+        BusChartBuf.AddMeasure(MarginLbl, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column.AsInteger());
 #endif
         BusChartBuf.InitializePeriodFilter(StartDate, Enddate);
 
@@ -66,11 +66,11 @@
         SetdatebyDim(StartDate, Enddate, Period, PeriodType, BusChartBuf);
         BusChartBuf.Initialize();
 #if BC17        
-        BusChartBuf.AddMeasure(MarginLbl, 2, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
-        BusChartBuf.AddMeasure(TurnoverLbl, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
+        BusChartBuf.AddMeasure(TurnoverLbl, 0, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
+        BusChartBuf.AddMeasure(MarginLbl, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column);
 #else
-        BusChartBuf.AddMeasure(MarginLbl, 2, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column.AsInteger());
-        BusChartBuf.AddMeasure(TurnoverLbl, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column.AsInteger());
+        BusChartBuf.AddMeasure(TurnoverLbl, 0, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column.AsInteger());
+        BusChartBuf.AddMeasure(MarginLbl, 1, BusChartBuf."Data Type"::Decimal, BusChartBuf."Chart Type"::Column.AsInteger());
 #endif
         BusChartBuf.InitializePeriodFilter(StartDate, Enddate);
         BusChartBuf.SetXAxis(StoreLbl, BusChartBuf."Data Type"::String);
@@ -117,7 +117,7 @@
             StartDate := Date."Period Start"
     end;
 
-    local procedure SetdatebyDim(var StartDate: Date; var Enddate: Date; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period; var BusChartBuf: Record "Business Chart Buffer")
+    procedure SetdatebyDim(var StartDate: Date; var Enddate: Date; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period; var BusChartBuf: Record "Business Chart Buffer")
     var
         Date: Record Date;
         NextLbl: Label '<C%1+1%1>', Locked = true;
@@ -127,9 +127,9 @@
     begin
         case Period of
             Period::Next:
-                Enddate := CalcDate(StrSubstNo(NextLbl, BusChartBuf.GetPeriodLength()), Enddate);
+                Enddate := CalcDate(StrSubstNo(NextLbl, BusChartBuf.GetPeriodLength()), BusChartBuf."Period Filter End Date");
             Period::Previous:
-                Enddate := CalcDate(StrSubstNo(PreviousLbl, BusChartBuf.GetPeriodLength()), Enddate);
+                Enddate := CalcDate(StrSubstNo(PreviousLbl, BusChartBuf.GetPeriodLength()), BusChartBuf."Period Filter End Date");
         end;
 
         Enddate := CalcDate(StrSubstNo(CurrentLbl, BusChartBuf.GetPeriodLength()), Enddate);
