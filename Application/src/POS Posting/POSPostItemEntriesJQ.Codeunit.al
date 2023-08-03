@@ -43,13 +43,10 @@ codeunit 6059770 "NPR POS Post Item Entries JQ"
                 until POSEntry.Next() = 0;
         end;
 
-        if ErrorCount > 0 then begin
-            if CheckInId <> '' then
-                SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'error', CheckInId);
-
+        if ErrorCount > 0 then
             Message(ErrMessage, ErrorCount);
-        end else
-            if CheckInId <> '' then
-                SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'ok', CheckInId);
+
+        if CheckInId <> '' then
+            SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'ok', CheckInId);
     end;
 }
