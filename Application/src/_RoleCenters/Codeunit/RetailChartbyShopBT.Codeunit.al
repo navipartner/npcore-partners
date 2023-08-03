@@ -102,7 +102,7 @@ codeunit 6150806 "NPR Retail Chart by Shop BT"
         Page.SetBackgroundTaskResult(Result);
     end;
 
-    local procedure Setdate(var StartDate: Date; var Enddate: Date; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period; PeriodLength: Text[1]; PeriodEndDate: Date)
+    procedure Setdate(var StartDate: Date; var Enddate: Date; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period; PeriodLength: Text[1]; PeriodEndDate: Date)
     var
         Date: Record Date;
         NextLbl: Label '<C%1+1%1>', Locked = true;
