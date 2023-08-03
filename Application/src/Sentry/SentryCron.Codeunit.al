@@ -4,6 +4,7 @@ codeunit 6151089 "NPR Sentry Cron"
 
     internal procedure CreateCheckIn(OrganizationSlug: Text; MonitorSlug: Text; Status: Text; Schedule: Text; ScheduleType: Option Crontab,Interval; CheckinMarginInMinutes: Integer; MaxRuntimeInMinutes: Integer; Timezone: Text) CheckInId: Text
     var
+        SentryHelper: Codeunit "NPR Sentry Helper";
         RequestContent: HttpContent;
         ResponseContent: HttpContent;
         ResponseJson: JsonObject;
@@ -14,7 +15,7 @@ codeunit 6151089 "NPR Sentry Cron"
         JsonText: Text;
         Url: Text[250];
     begin
-        if not ShouldUseSentryCron() then
+        if not SentryHelper.ShouldUseSentryCron() then
             exit;
 
         Url := InitUrl(StrSubstNo(CreateCheckInLbl, OrganizationSlug, MonitorSlug));
@@ -32,6 +33,7 @@ codeunit 6151089 "NPR Sentry Cron"
 
     internal procedure UpdateCheckIn(OrganizationSlug: Text; MonitorSlug: Text; Status: Text; CheckInId: Text)
     var
+        SentryHelper: Codeunit "NPR Sentry Helper";
         RequestContent: HttpContent;
         ResponseContent: HttpContent;
         UpdateCheckInLbl: Label 'organizations/%1/monitors/%2/checkins/%3/', Locked = true, Comment = '%1 - Organization Slug, %2 - Monitor Slug; %3 - Check-in Id';
@@ -39,7 +41,7 @@ codeunit 6151089 "NPR Sentry Cron"
         Environment: Text;
         Url: Text[250];
     begin
-        if not ShouldUseSentryCron() then
+        if not SentryHelper.ShouldUseSentryCron() then
             exit;
 
         Url := InitUrl(StrSubstNo(UpdateCheckInLbl, OrganizationSlug, MonitorSlug, CheckInId));
@@ -101,28 +103,6 @@ codeunit 6151089 "NPR Sentry Cron"
             Error(ErrorMesssagePlaceholderLbl, ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase());
 
         ResponseContent := ResponseMessage.Content;
-    end;
-
-    local procedure ShouldUseSentryCron(): Boolean
-    var
-        Company: Record Company;
-        EnvironmentInformation: Codeunit "Environment Information";
-    begin
-        // for now Sentry Cron should be used only for production SaaS environments for companies which are not Cronus or evaluation
-        if not EnvironmentInformation.IsSaaS() then
-            exit(false);
-
-        if not EnvironmentInformation.IsProduction() then
-            exit(false);
-
-        if CompanyName().ToUpper().Contains('CRONUS') then
-            exit(false);
-
-        if Company.Get(CompanyName()) then
-            if Company."Evaluation Company" then
-                exit(false);
-
-        exit(true);
     end;
 
     local procedure InitUrl(Method: Text) Url: Text[250]
