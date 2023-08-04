@@ -346,7 +346,7 @@
     var
         POSView: Record "NPR POS View";
         RequestView: Codeunit "NPR POS View";
-        DataMgt: Codeunit "NPR POS Data Management";
+        DataMgt: Codeunit "NPR POS Data Mgmt. Internal";
         DataSource: Codeunit "NPR Data Source";
         DataSourceNames: List of [Text];
         Markup: Text;
@@ -799,6 +799,15 @@
 
         foreach DataSetLine in DataSets do
             Request.AddDataSet(DataSetLine.AsObject());
+        InvokeFrontEndAsync(Request);
+    end;
+
+    internal procedure RefreshData(DataSets: JsonObject)
+    var
+        Request: Codeunit "NPR Front-End: RefreshData";
+    begin
+        MakeSureFrameworkIsAvailable(true);
+        Request.SetDataSets(DataSets);
         InvokeFrontEndAsync(Request);
     end;
 
