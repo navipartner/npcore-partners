@@ -1,7 +1,6 @@
 ﻿codeunit 6150701 "NPR POS JavaScript Interface"
 {
     var
-        _LastView: Codeunit "NPR POS View";
         _Stopwatch: Codeunit "NPR Stopwatch";
 
     // The purpose of this function is to detect if there are action codeunits that respond to either OnBeforeWorkflow or OnAction not intended for them.
@@ -34,11 +33,13 @@
         Success: Boolean;
         Text001: Label 'Action %1 does not seem to have a registered handler, or the registered handler failed to notify the framework about successful processing of the action.';
         JSInterfaceErrorHandler: Codeunit "NPR JS Interface Error Handler";
+        POSRefreshData: Codeunit "NPR POS Refresh Data";
     begin
         _Stopwatch.ResetAll();
         POSSession.RetrieveSessionAction(Action, POSAction);
         _Stopwatch.Start('All');
-        ApplyDataState(Context, POSSession, FrontEnd);
+        POSRefreshData.StartDataCollection(Context);
+        POSSession.SetPOSRefreshData(POSRefreshData);
 
         OnBeforeInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd);
 
@@ -57,11 +58,13 @@
 
         if Success then begin
             OnAfterInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd);
+            POSRefreshData.Refresh();
             _Stopwatch.Start('Data');
-            RefreshData(FrontEnd);
             _Stopwatch.Stop('Data');
             Signal.SignalSuccess(WorkflowId, ActionId);
         end else begin
+            POSSession.RequestFullRefresh(); //In case an action committed before error
+            POSRefreshData.Refresh();
             Signal.SignalFailureAndThrowError(WorkflowId, ActionId, GetLastErrorText);
             FrontEnd.Trace(Signal, 'ErrorCallStack', GetLastErrorCallstack);
         end;
@@ -154,6 +157,7 @@
     local procedure InitializationComplete(POSSession: Codeunit "NPR POS Session")
     var
         StartTime: DateTime;
+        POSRefreshData: Codeunit "NPR POS Refresh Data";
     begin
         StartTime := CurrentDateTime();
 
@@ -161,6 +165,9 @@
         POSSession.InitializeUI();
         POSSession.DebugWithTimestamp('InitializeSession');
         POSSession.InitializeSession(false);
+
+        POSRefreshData.SetFullRefresh();
+        POSRefreshData.Refresh();
 
         LogFinishTelem(StartTime);
     end;
@@ -189,55 +196,6 @@
 
         Msg := StrSubstNo(MsgTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", Format(DurationMs, 0, 9));
         Session.LogMessage(FinishEventIdTok, 'POS Session Initialized: ' + Msg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, LogDict);
-    end;
-
-    internal procedure RefreshData(FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        DataMgt: Codeunit "NPR POS Data Management";
-        DataSetsJson: JsonArray;
-        DataSet: Codeunit "NPR Data Set";
-        DataSetJson: JsonObject;
-        DataSourceToken: JsonToken;
-        DataSource: Codeunit "NPR Data Source";
-        DataStore: Codeunit "NPR Data Store";
-        View: Codeunit "NPR POS View";
-        RefreshSource: Boolean;
-        POSSession: Codeunit "NPR POS Session";
-    begin
-        POSSession.GetCurrentView(View);
-        POSSession.GetDataStore(DataStore);
-        foreach DataSourceToken in View.GetDataSources() do begin
-            Clear(DataSource);
-            DataSource.Constructor(DataSourceToken.AsObject());
-            RefreshSource := false;
-            if (View.InstanceId() = _LastView.InstanceId()) and DataSource.PerSession() then
-                DataMgt.OnIsDataSourceModified(POSSession, DataSource.Id(), RefreshSource)
-            else
-                RefreshSource := true;
-
-            if RefreshSource then begin
-                RefreshDataSet(POSSession, DataSource, DataSet, FrontEnd);
-                DataSetJson := DataStore.StoreAndGetDelta(DataSet);
-                DataSetsJson.Add(DataSetJson);
-                DataSource.SetRetrievedInCurrentSession(true);
-            end;
-        end;
-
-        FrontEnd.RefreshData(DataSetsJson);
-
-        _LastView := View;
-    end;
-
-    local procedure RefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; var DataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        DataMgt: Codeunit "NPR POS Data Management";
-        Handled: Boolean;
-        Text004: Label 'No data driver responded to %1 event for %2 data source.';
-    begin
-        DataMgt.OnRefreshDataSet(POSSession, DataSource, DataSet, FrontEnd, Handled);
-        if not Handled then
-            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, 'OnRefreshDataSet', DataSource.Id()));
-        DataMgt.OnAfterRefreshDataSet(POSSession, DataSource, DataSet, FrontEnd);
     end;
 
     internal procedure ApplyDataState(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")

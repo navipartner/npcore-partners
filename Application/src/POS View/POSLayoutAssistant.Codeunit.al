@@ -28,7 +28,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
             'UserCulture':
                 GetUserCultureName(Context, FrontEnd);
             'CallRefreshData':
-                CallRefreshData(FrontEnd);
+                CallRefreshData();
             else
                 exit;
         end;
@@ -378,11 +378,12 @@ codeunit 6059925 "NPR POS Layout Assistant"
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 
-    local procedure CallRefreshData(FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure CallRefreshData()
     var
-        POSJavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
+        POSRefreshData: Codeunit "NPR POS Refresh Data";
     begin
-        POSJavaScriptInterface.RefreshData(FrontEnd);
+        POSRefreshData.SetFullRefresh();
+        POSRefreshData.Refresh();
     end;
 
     procedure GetUserCultureName(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")

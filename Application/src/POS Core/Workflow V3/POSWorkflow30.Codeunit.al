@@ -82,11 +82,11 @@
 
     internal procedure InvokeAction30(ActionCode: Text; WorkflowId: Integer; WorkflowStep: Text; ActionId: Integer; Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS Workflow 3.0")
     var
-        JavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
         JSON: Codeunit "NPR POS JSON Helper";
         Signal: Codeunit "NPR Front-End: WkfCallCompl.";
         Success: Boolean;
         POSSession: Codeunit "NPR POS Session";
+        POSRefreshData: Codeunit "NPR POS Refresh Data";
         SentryScope: Codeunit "NPR Sentry Scope";
         SentryTransaction: Codeunit "NPR Sentry Transaction";
         SentrySpan: Codeunit "NPR Sentry Span";
@@ -95,7 +95,8 @@
     begin
         FrontEnd.SetWorkflowID(WorkflowId);
 
-        JavaScriptInterface.ApplyDataState(Context, POSSession, FrontEnd);
+        POSRefreshData.StartDataCollection(Context);
+        POSSession.SetPOSRefreshData(POSRefreshData);
         JSON.InitializeJObjectParser(Context);
 
         SentryScope.TryGetActiveTransaction(SentryTransaction);
@@ -110,9 +111,11 @@
         SentrySpan.Finish();
 
         if Success then begin
-            JavaScriptInterface.RefreshData(FrontEnd);
+            POSRefreshData.Refresh();
             Signal.SignalSuccess(WorkflowId, ActionId);
         end else begin
+            POSSession.RequestFullRefresh(); //In case an action committed before error
+            POSRefreshData.Refresh();
             EmitError(ActionCode, WorkflowStep, JSON, GetLastErrorText());
             Signal.SignalFailureAndThrowError(WorkflowId, ActionId, GetLastErrorText);
         end;

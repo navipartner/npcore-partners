@@ -40,7 +40,7 @@
 
     internal procedure ToDataset(CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        DataMgt: Codeunit "NPR POS Data Management";
+        DataMgt: Codeunit "NPR POS Data Mgmt. Internal";
         SaleAmount: Decimal;
         ReturnAmount: Decimal;
         PaidAmount: Decimal;
@@ -59,6 +59,11 @@
     begin
         Rec.SetPosition(Position);
         exit(Rec.Find());
+    end;
+
+    internal procedure GetPosition(UseNames: Boolean): Text
+    begin
+        exit(Rec.GetPosition(UseNames));
     end;
 
     procedure RefreshCurrent(): Boolean
