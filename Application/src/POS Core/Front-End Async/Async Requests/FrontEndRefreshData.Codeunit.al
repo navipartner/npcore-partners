@@ -16,6 +16,11 @@
         _dataSets.Add(DataSource, Set);
     end;
 
+    procedure SetDataSets(DataSets: JsonObject)
+    begin
+        _dataSets := DataSets;
+    end;
+
     procedure GetJson() Json: JsonObject
     begin
         Json.Add('Method', 'RefreshData');

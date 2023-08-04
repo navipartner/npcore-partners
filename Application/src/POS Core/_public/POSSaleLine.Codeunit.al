@@ -18,7 +18,7 @@
         Text001: Label 'After Sale Line POS is inserted';
         Initialized: Boolean;
         CannotCalcPriceInclVATErr: Label 'Prices including VAT cannot be calculated when %1 is %2.';
-        ItemCountWhenCalculatedBalance: Decimal;
+        _ItemCountWhenCalculatedBalance: Decimal;
         UseLinePriceVATParams: Boolean;
         InsertWithAutoSplitKeyForced: Boolean;
         IsAutoSplitKeyRecord: Boolean;
@@ -129,6 +129,11 @@
     begin
         Rec.SetPosition(Position);
         exit(Rec.Find());
+    end;
+
+    internal procedure GetPosition(UseNames: Boolean): Text
+    begin
+        exit(Rec.GetPosition(UseNames));
     end;
 
     procedure GetCurrentSaleLine(var SaleLinePOS: Record "NPR POS Sale Line")
@@ -391,7 +396,7 @@
         POSSale.RefreshCurrent();
     end;
 
-    procedure CalculateBalance(var AmountExclVAT: Decimal; var VATAmount: Decimal; var TotalAmount: Decimal)
+    procedure CalculateBalance(var AmountExclVAT: Decimal; var VATAmount: Decimal; var TotalAmount: Decimal; var ItemCount: Decimal)
     var
         SaleLine: Record "NPR POS Sale Line";
         OutPaymentAmount: Decimal;
@@ -399,17 +404,17 @@
         AmountExclVAT := 0;
         VATAmount := 0;
         TotalAmount := 0;
-
-        ItemCountWhenCalculatedBalance := 0;
+        ItemCount := 0;
 
         if (Rec."Register No." <> '') and (Rec."Sales Ticket No." <> '') then begin
             SaleLine.SetRange("Register No.", Rec."Register No.");
             SaleLine.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
             SaleLine.SetFilter("Line Type", '<>%1', Rec."Line Type"::Comment);
+            SaleLine.SetLoadFields("Line Type", Quantity, Amount, "Amount Including VAT");
             if SaleLine.FindSet() then begin
                 repeat
                     if SaleLine."Line Type" = SaleLine."Line Type"::Item then
-                        ItemCountWhenCalculatedBalance += SaleLine.Quantity;
+                        ItemCount += SaleLine.Quantity;
                     if SaleLine."Line Type" in [SaleLine."Line Type"::"BOM List", SaleLine."Line Type"::"Customer Deposit", SaleLine."Line Type"::"Issue Voucher", SaleLine."Line Type"::"Item Category", SaleLine."Line Type"::"Issue Voucher", SaleLine."Line Type"::Item, SaleLine."Line Type"::Rounding] then begin
                         AmountExclVAT += SaleLine.Amount;
                         TotalAmount += SaleLine."Amount Including VAT";
@@ -425,9 +430,14 @@
         end;
     end;
 
+    procedure CalculateBalance(var AmountExclVAT: Decimal; var VATAmount: Decimal; var TotalAmount: Decimal)
+    begin
+        CalculateBalance(AmountExclVAT, VATAmount, TotalAmount, _ItemCountWhenCalculatedBalance);
+    end;
+
     internal procedure ToDataset(var CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        DataMgt: Codeunit "NPR POS Data Management";
+        DataMgt: Codeunit "NPR POS Data Mgmt. Internal";
         AmountExclVAT: Decimal;
         VATAmount: Decimal;
         TotalAmount: Decimal;
@@ -437,7 +447,7 @@
         CurrDataSet.Totals().Add('AmountExclVAT', AmountExclVAT);
         CurrDataSet.Totals().Add('VATAmount', VATAmount);
         CurrDataSet.Totals().Add('TotalAmount', TotalAmount);
-        CurrDataSet.Totals().Add('ItemCount', ItemCountWhenCalculatedBalance);
+        CurrDataSet.Totals().Add('ItemCount', _ItemCountWhenCalculatedBalance);
     end;
 
     [Obsolete('Zero reference', 'NPR23.0')]

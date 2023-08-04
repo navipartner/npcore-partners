@@ -119,7 +119,7 @@
     internal procedure ToDataset(var CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         TempRec: Record "NPR POS Sale" temporary;
-        DataMgt: Codeunit "NPR POS Data Management";
+        DataMgt: Codeunit "NPR POS Data Mgmt. Internal";
     begin
         if not Initialized then begin
             TempRec."Register No." := POSUnit."No.";
@@ -135,6 +135,11 @@
     begin
         Rec.SetPosition(Position);
         exit(Rec.Find());
+    end;
+
+    internal procedure GetPosition(UseNames: Boolean): Text
+    begin
+        exit(Rec.GetPosition(UseNames));
     end;
 
     procedure GetCurrentSale(var SalePOS: Record "NPR POS Sale")
@@ -676,6 +681,7 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
+        POSSession: Codeunit "NPR POS Session";
     begin
         Rec := SalePOS_ToResume;
         Rec."User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
@@ -703,6 +709,9 @@
         Rec.FilterGroup := 0;
 
         IsModified := true;
+
+        //Because the lines are not modified no table subscribers are hit, so auto refresh doesn't work.
+        POSSession.RequestFullRefresh();
 
         POSResumeSale.LogSaleResume(Rec, SalePOS_ToResume."Sales Ticket No.");
     end;

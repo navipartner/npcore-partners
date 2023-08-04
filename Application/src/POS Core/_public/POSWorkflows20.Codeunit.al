@@ -90,12 +90,12 @@
     internal procedure InvokeAction20("Action": Text; WorkflowId: Integer; WorkflowStep: Text; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS Workflows 2.0")
     var
         POSAction: Record "NPR POS Action";
-        JavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
         JSON: Codeunit "NPR POS JSON Management";
         FrontEnd20: Codeunit "NPR POS Front End Management";
         Signal: Codeunit "NPR Front-End: WkfCallCompl.";
         Success: Boolean;
         Handled: Boolean;
+        POSRefreshData: Codeunit "NPR POS Refresh Data";
     begin
         Stopwatch.ResetAll();
 
@@ -103,7 +103,8 @@
         FrontEnd.CloneForWorkflow20(WorkflowId, FrontEnd20);
 
         Stopwatch.Start('All');
-        JavaScriptInterface.ApplyDataState(Context, POSSession, FrontEnd20);
+        POSRefreshData.StartDataCollection(Context);
+        POSSession.SetPOSRefreshData(POSRefreshData);
         JSON.InitializeJObjectParser(Context, FrontEnd20);
 
         OnBeforeInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd20);
@@ -120,12 +121,14 @@
             FrontEnd20.ReportBugAndThrowError(StrSubstNo(Text001, Action));
 
         if Success then begin
+            POSRefreshData.Refresh();
             OnAfterInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd20);
             Stopwatch.Start('Data');
-            JavaScriptInterface.RefreshData(FrontEnd20);
             Stopwatch.Stop('Data');
             Signal.SignalSuccess(WorkflowId, ActionId);
         end else begin
+            POSSession.RequestFullRefresh(); //In case an action committed before error
+            POSRefreshData.Refresh();
             Signal.SignalFailureAndThrowError(WorkflowId, ActionId, GetLastErrorText);
             FrontEnd20.Trace(Signal, 'ErrorCallStack', GetLastErrorCallstack);
         end;

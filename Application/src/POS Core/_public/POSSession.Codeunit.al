@@ -37,6 +37,7 @@
         _SESSION_FINALIZED_ERROR: Label 'This POS window is no longer active.\This happens if you''ve opened the POS in a newer window. Please use that instead or reload this one.';
         _POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
         TempSessionActions: Record "NPR POS Action" temporary;
+        _POSRefreshData: Codeunit "NPR POS Refresh Data";
 
 
     //#region Initialization
@@ -94,6 +95,7 @@
         Clear(_Framework);
         Clear(TempSessionActions);
         Clear(_POSBackgroundTaskAPI);
+        Clear(_POSRefreshData);
     end;
 
     procedure IsInitialized(): Boolean
@@ -182,7 +184,6 @@
 
     local procedure InitializeDataSources()
     var
-        JS: Codeunit "NPR POS JavaScript Interface";
         DataSources: JsonArray;
     begin
         Clear(_DataStore);
@@ -191,10 +192,6 @@
         _DataStore.Constructor(DataSources);
 
         OnInitializeDataSource(_DataStore);
-
-        if _DataStore.DataSources().Count() > 0 then begin
-            JS.RefreshData(_FrontEnd);
-        end;
     end;
 
     procedure StartPOSSession()
@@ -628,6 +625,16 @@
     [Obsolete('Refresh is automatically handled', 'NPR23.0')]
     procedure RequestRefreshData()
     begin
+    end;
+
+    internal procedure SetPOSRefreshData(var POSRefreshData: Codeunit "NPR POS Refresh Data")
+    begin
+        _POSRefreshData := POSRefreshData;
+    end;
+
+    internal procedure RequestFullRefresh()
+    begin
+        _POSRefreshData.SetFullRefresh();
     end;
     //#endregion
 
