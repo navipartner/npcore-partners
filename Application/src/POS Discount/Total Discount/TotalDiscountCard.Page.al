@@ -1,11 +1,12 @@
 page 6150909 "NPR Total Discount Card"
 {
-    Extensible = False;
     Caption = 'Total Discount Card';
+    ContextSensitiveHelpPage = 'docs/retail/discounts/how-to/total_discount/';
+    Extensible = False;
     PageType = Card;
-    UsageCategory = None;
     SourceTable = "NPR Total Discount Header";
-
+    UsageCategory = None;
+    
     layout
     {
         area(content)
