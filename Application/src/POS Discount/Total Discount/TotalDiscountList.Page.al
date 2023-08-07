@@ -1,15 +1,16 @@
 ﻿page 6150908 "NPR Total Discount List"
 {
-    Extensible = False;
+   ApplicationArea = NPRRetail;
     Caption = 'Total Discount List';
     CardPageID = "NPR Total Discount Card";
+    ContextSensitiveHelpPage = 'docs/retail/discounts/reference/total_discounts/';
     Editable = true;
+    Extensible = False;
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR Total Discount Header";
     SourceTableView = SORTING("Starting date", "Starting time", "Ending date", "Ending time");
     UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
 
 
     layout
