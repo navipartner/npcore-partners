@@ -153,7 +153,11 @@ codeunit 6150832 "NPR POS Action - Login-B"
         POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
 
         if (not POSWorkshiftCheckpoint.FindLast()) then
-            exit(-1); // Never been balanced
+            exit(-1) // Never been balanced
+        else
+            //check is there any cancelled balance after
+            If CancelledBalance(POSWorkshiftCheckpoint."Entry No.", POSUnit."No.") then
+                exit(1);
 
         POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
         POSEntry.SetRange("POS Store Code", POSUnit."POS Store Code");
@@ -203,6 +207,20 @@ codeunit 6150832 "NPR POS Action - Login-B"
                 end;
         end;
         ActionContext.Add('parameters', Parameters);
+    end;
+
+    local procedure CancelledBalance(EntryNo: Integer; POSUnitNo: Code[10]): Boolean
+    var
+        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+    begin
+        POSWorkshiftCheckpoint.SetCurrentKey("POS Unit No.", Open, "Type");
+        POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', POSUnitNo);
+        POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
+        POSWorkshiftCheckpoint.SetFilter(Open, '=%1', true);
+        POSWorkshiftCheckpoint.SetFilter("Entry No.", '>%1', EntryNo);
+        if POSWorkshiftCheckpoint.FindFirst() then
+            exit(true);
+        exit(false);
     end;
 
 }
