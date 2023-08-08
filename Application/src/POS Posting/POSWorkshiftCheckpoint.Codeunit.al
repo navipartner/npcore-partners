@@ -728,6 +728,7 @@
             FromEntryNo := PreviousUnitCheckpoint."POS Entry No.";
         end;
 
+        EntriesToBalance.SetRange("POS Store Code", POSStoreCode);
         EntriesToBalance.SetFilter("Entry No.", '%1..', FromEntryNo);
         EntriesToBalance.SetFilter("System Entry", '=%1', false);
         EntriesToBalance.SetFilter("POS Unit No.", '=%1', POSUnitNo);
