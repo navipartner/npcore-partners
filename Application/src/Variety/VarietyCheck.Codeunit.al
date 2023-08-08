@@ -80,7 +80,7 @@
                 POSSalesLine.SetRange("No.", ItemVar."Item No.");
                 POSSalesLine.SetRange("Variant Code", ItemVar.Code);
                 POSSalesLine.SetRange("Item Entry No.", 0);
-                if POSSalesLine.FindFirst() then
+                if not POSSalesLine.IsEmpty() then
                     Error(Text001, POSSalesLine.TableCaption, ItemVar.TableCaption, ItemVar.Code);
 
                 ItemVar."NPR Blocked" := true;

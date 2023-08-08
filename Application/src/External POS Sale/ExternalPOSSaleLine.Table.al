@@ -1022,17 +1022,17 @@
         POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
         POSSalesLine.SetRange("Item Entry No.", 0);
-        POSSalesLine.SetRange("Serial No.", "Serial No.");
+        POSSalesLine.SetRange("Serial No.", SerialNo);
         if not POSSalesLine.IsEmpty() then
             POSSalesLine.CalcSums(Quantity);
         TotalAuditRollQuantity := POSSalesLine.Quantity;
 
         if Positive then begin
             if POSSalesLine.Quantity = -1 then
-                Error(Err001, "Serial No.", FieldName("Serial No."));
+                Error(Err001, SerialNo, FieldName("Serial No."));
         end else begin
             if POSSalesLine.Quantity = 1 then
-                Error(Err002, "Serial No.", FieldName("Serial No."));
+                Error(Err002, SerialNo, FieldName("Serial No."));
         end;
     end;
 
