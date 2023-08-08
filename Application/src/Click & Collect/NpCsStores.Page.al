@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Collect Stores';
-    ContextSensitiveHelpPage = 'retail/clickandcollect/howto/clickandcollect_setup.html';
+    ContextSensitiveHelpPage = 'retail/click_and_collect/how-to/setup/setup/';
     CardPageID = "NPR NpCs Store Card";
     Editable = false;
     PageType = List;
