@@ -47,7 +47,7 @@
 
                     trigger OnDrillDown()
                     var
-                        DrillDownURLTxt: Label 'https://docs.navipartner.com/release_notes_public.html', Locked = true;
+                        DrillDownURLTxt: Label 'https://docs.navipartner.com/docs/retail/gettingstarted/release_notes/', Locked = true;
                     begin
                         Hyperlink(DrillDownURLTxt);
                     end;
