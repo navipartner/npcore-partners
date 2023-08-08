@@ -649,17 +649,28 @@
         }
         key(Key4; "Serial No.")
         {
+            ObsoleteState = Removed;
+            ObsoleteTag = 'NPR25.0';
+            ObsoleteReason = 'Replaced by Key7: "Item Entry No.", "Serial No."';
+            Enabled = false;
 #if not (BC17 or BC18)
             IncludedFields = "Item Entry No.";
 #endif
         }
         key(Key5; "Item Entry No.")
         {
+            ObsoleteState = Removed;
+            ObsoleteTag = 'NPR25.0';
+            ObsoleteReason = 'Replaced by Key7: "Item Entry No.", "Serial No."';
+            Enabled = false;
 #if not (BC17 or BC18)
             IncludedFields = "Serial No.";
 #endif
         }
         key(Key6; Type, "Salesperson Code", "Discount Type")
+        {
+        }
+        key(Key7; "Item Entry No.", "Serial No.")
         {
         }
     }
