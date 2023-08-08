@@ -9,6 +9,7 @@ codeunit 6059848 "NPR POS Menu Impl."
         POSParameterValue: Record "NPR POS Parameter Value";
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -25,7 +26,10 @@ codeunit 6059848 "NPR POS Menu Impl."
         case POSParameterValue.Value of
             'POS Store':
                 begin
-                    if not POSStore.Get(SalePOS."POS Store Code") then;
+                    if not POSStore.Get(SalePOS."POS Store Code") then begin
+                        POSSession.GetSetup(POSSetup);
+                        POSSetup.GetPOSStore(POSStore);
+                    end;
                     exit(POSStore."Location Code");
                 end;
             'Location Filter Parameter':
