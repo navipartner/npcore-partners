@@ -131,4 +131,10 @@ codeunit 6059847 "NPR Click & Collect"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    procedure OnAfterInitializeTaskProcessors(var NpCsTaskProcessorSetup: Record "NPR NpCs Task Processor Setup")
+    begin
+    end;
+
+
 }

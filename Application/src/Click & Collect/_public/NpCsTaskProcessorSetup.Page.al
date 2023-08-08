@@ -5,7 +5,6 @@ page 6150796 "NPR NpCs Task Processor Setup"
     SourceTable = "NPR NpCs Task Processor Setup";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-    Extensible = False;
 
     layout
     {
