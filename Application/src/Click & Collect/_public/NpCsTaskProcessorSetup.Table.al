@@ -2,7 +2,6 @@ table 6059837 "NPR NpCs Task Processor Setup"
 {
     Caption = 'Collect Task Processor Setup';
     DataClassification = CustomerContent;
-    Access = Internal;
     LookupPageId = "NPR NpCs Task Processor Setup";
     DrillDownPageId = "NPR NpCs Task Processor Setup";
     fields
