@@ -44,6 +44,7 @@ codeunit 6150811 "NPR NpCs Task Processor Setup"
 
     procedure InitializeTaskProcessors(var NpCsTaskProcessorSetup: Record "NPR NpCs Task Processor Setup")
     var
+        ClickCollect: Codeunit "NPR Click & Collect";
         CollectRunWorkflowLbl: Label 'Process Run workflow on Collect Dosuments';
         CollectDocumentPostLbl: Label 'Process Document posting  on Collect Documents';
         CollectExpirationLbl: Label 'Updates expiration time on Collect Documents';
@@ -61,6 +62,7 @@ codeunit 6150811 "NPR NpCs Task Processor Setup"
         if NpCsTaskProcessorSetup."Expiration Code" = '' then
             NpCsTaskProcessorSetup."Expiration Code" := 'COLLECT EXPIRATION';
         InitNcTaskProcessor(NpCsTaskProcessorSetup."Expiration Code", CollectExpirationLbl);
+        ClickCollect.OnAfterInitializeTaskProcessors(NpCsTaskProcessorSetup);
         NpCsTaskProcessorSetup.Modify(true);
     end;
 
