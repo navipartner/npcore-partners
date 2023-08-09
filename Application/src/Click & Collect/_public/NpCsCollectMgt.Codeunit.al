@@ -22,14 +22,16 @@
     var
         WebService: Record "Web Service Aggregate";
         WebServiceManagement: Codeunit "Web Service Management";
+        Handled: Boolean;
     begin
         if not WebService.ReadPermission then
             exit;
-
         if not WebService.WritePermission then
             exit;
 
-        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, CollectInStoreWsCodeunitId(), 'collect_in_store_service', true);
+        OnBeforeCreateTenantWebservice(WebService."Object Type"::Codeunit, CollectInStoreWsCodeunitId(), 'collect_in_store_service', Handled);
+        if not Handled then
+            WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, CollectInStoreWsCodeunitId(), 'collect_in_store_service', true);
     end;
 
     procedure InitSendToStoreDocument(SalesHeader: Record "Sales Header"; NpCsStore: Record "NPR NpCs Store"; NpCsWorkflow: Record "NPR NpCs Workflow"; var NpCsDocument: Record "NPR NpCs Document")
@@ -476,5 +478,10 @@
                     exit(PAGE::"NPR NpCs Coll. Store Orders");
                 end;
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeCreateTenantWebservice(ObjectType: Option; ObjectId: Integer; ServiceName: Text; var Handled: Boolean)
+    begin
     end;
 }
