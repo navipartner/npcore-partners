@@ -95,6 +95,11 @@
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetAutoRescedulePOSPostGL'));
         end;
 
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetEndingTimeForPOSPostGLJQ')) then begin
+            SetEndingTimeForPOSPostGLJQ();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetEndingTimeForPOSPostGLJQ'));
+        end;
+
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -388,6 +393,21 @@
                 JobQueueEntry."NPR Auto-Resched. after Error" := true;
                 JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 45 * 60;  //45 minutes
                 JobQueueEntry.Modify();
+            until JobQueueEntry.Next() = 0;
+    end;
+
+    local procedure SetEndingTimeForPOSPostGLJQ()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR POS Post GL Entries JQ");
+        if JobQueueEntry.FindSet(true) then
+            repeat
+                if (JobQueueEntry."Ending Time" = 0T) and (JobQueueEntry."Starting Time" <> 0T) then begin
+                    JobQueueEntry."Ending Time" := JobQueueEntry."Starting Time" + 60 * 60 * 1000;  //+60 minutes
+                    JobQueueEntry.Modify();
+                end;
             until JobQueueEntry.Next() = 0;
     end;
 
