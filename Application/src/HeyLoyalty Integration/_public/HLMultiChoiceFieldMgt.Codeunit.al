@@ -2,11 +2,15 @@ codeunit 6150954 "NPR HL MultiChoice Field Mgt."
 {
     Access = Public;
 
+    var
+        HLIntegrationEvents: Codeunit "NPR HL Integration Events";
+
     procedure ShowAssignedHLMultiChoiceFieldOptionValues(AppliesToRecID: RecordID; MultiChoiceFieldCode: Code[20]; Editable: Boolean)
     var
         HLMultiChoiceFldOption: Record "NPR HL MultiChoice Fld Option";
         HLSelectedMCFOption: Record "NPR HL Selected MCF Option";
         HLSelectMCFOptions: Page "NPR HL Select MCF Options";
+        ChangesFound: Boolean;
     begin
         if AssignedMCFOptionsExist(AppliesToRecID, MultiChoiceFieldCode, HLSelectedMCFOption) then
             MarkAssignedMCFOptions(HLSelectedMCFOption, HLMultiChoiceFldOption);
@@ -15,6 +19,7 @@ codeunit 6150954 "NPR HL MultiChoice Field Mgt."
         HLMultiChoiceFldOption.FilterGroup(0);
         HLMultiChoiceFldOption.SetCurrentKey("Field Code", "Sort Order");
 
+        HLIntegrationEvents.OnBeforeShowAssignedHLMCFOptionValues(AppliesToRecID, MultiChoiceFieldCode, Editable, HLMultiChoiceFldOption);
         Clear(HLSelectMCFOptions);
         HLSelectMCFOptions.SetDataset(HLMultiChoiceFldOption);
         HLSelectMCFOptions.LookupMode(Editable);
@@ -26,10 +31,15 @@ codeunit 6150954 "NPR HL MultiChoice Field Mgt."
         HLMultiChoiceFldOption.MarkedOnly(true);
         if HLMultiChoiceFldOption.FindSet() then
             repeat
-                AssignMCFOption(AppliesToRecID, HLMultiChoiceFldOption, HLSelectedMCFOption);
+                if AssignMCFOption(AppliesToRecID, HLMultiChoiceFldOption, HLSelectedMCFOption) then
+                    ChangesFound := true;
             until HLMultiChoiceFldOption.Next() = 0;
 
-        RemoveObsoleteAssignedMCFOptions(HLSelectedMCFOption);
+        if RemoveObsoleteAssignedMCFOptions(HLSelectedMCFOption) then
+            ChangesFound := true;
+
+        if ChangesFound then
+            HLIntegrationEvents.OnAfterManuallyModifyAssignedHLMCFOptionValues(AppliesToRecID, MultiChoiceFieldCode);
     end;
 
     procedure GetAssignedHLMultiChoiceFieldOptionValuesAsString(AppliesToRecID: RecordID; MultiChoiceFieldCode: Code[20]; Use: Option "Option IDs",Descriptions,"Magento Names","HeyLoyalty Names"): Text
@@ -89,6 +99,53 @@ codeunit 6150954 "NPR HL MultiChoice Field Mgt."
         exit(true);
     end;
 
+    procedure LookupMultiChoiceFieldOption(MultiChoiceFieldCode: Code[20]; var SelectedValue: Text): Boolean
+    var
+        HLMultiChoiceFldOption: Record "NPR HL MultiChoice Fld Option";
+    begin
+        HLMultiChoiceFldOption.FilterGroup(2);
+        HLMultiChoiceFldOption.SetRange("Field Code", MultiChoiceFieldCode);
+        HLMultiChoiceFldOption.FilterGroup(0);
+        if SelectedValue <> '' then
+            if Evaluate(HLMultiChoiceFldOption."Option ID", SelectedValue, 9) then begin
+                HLMultiChoiceFldOption."Field Code" := MultiChoiceFieldCode;
+                if HLMultiChoiceFldOption.Find('=><') then;
+            end;
+        if Page.RunModal(0, HLMultiChoiceFldOption) <> Action::LookupOK then
+            exit(false);
+        SelectedValue := Format(HLMultiChoiceFldOption."Option ID", 0, 9);
+        exit(true);
+    end;
+
+    procedure MCFOptionIsAssigned(AppliesToRecID: RecordID; MultiChoiceFieldCode: Code[20]; MultiChoiceFieldOptionID: Integer): Boolean
+    var
+        HLSelectedMCFOption: Record "NPR HL Selected MCF Option";
+    begin
+        FilterAssignedMCFOptions(AppliesToRecID, MultiChoiceFieldCode, HLSelectedMCFOption);
+        HLSelectedMCFOption.SetRange("Field Option ID", MultiChoiceFieldOptionID);
+        exit(not HLSelectedMCFOption.IsEmpty());
+    end;
+
+    procedure RemoveAssignedMCFOption(RecID: RecordId; MultiChoiceFieldCode: Code[20]; MultiChoiceFieldOptionID: Integer)
+    var
+        HLSelectedMCFOption: Record "NPR HL Selected MCF Option";
+    begin
+        FilterAssignedMCFOptions(RecID, MultiChoiceFieldCode, HLSelectedMCFOption);
+        HLSelectedMCFOption.SetRange("Field Option ID", MultiChoiceFieldOptionID);
+        if HLSelectedMCFOption.FindFirst() then
+            HLSelectedMCFOption.Delete(true);
+    end;
+
+    procedure AssignMCFOption(RecID: RecordId; MultiChoiceFieldCode: Code[20]; MultiChoiceFieldOptionID: Integer): Boolean
+    var
+        HLMultiChoiceFldOption: Record "NPR HL MultiChoice Fld Option";
+        HLSelectedMCFOption: Record "NPR HL Selected MCF Option";
+    begin
+        HLMultiChoiceFldOption."Field Code" := MultiChoiceFieldCode;
+        HLMultiChoiceFldOption."Option ID" := MultiChoiceFieldOptionID;
+        exit(AssignMCFOption(RecID, HLMultiChoiceFldOption, HLSelectedMCFOption));
+    end;
+
     internal procedure UpdateHLMemberMCFOptionsFromMember(HLMember: Record "NPR HL HeyLoyalty Member"): Boolean
     var
         HLMultiChoiceField: Record "NPR HL MultiChoice Field";
@@ -142,7 +199,7 @@ codeunit 6150954 "NPR HL MultiChoice Field Mgt."
         RemoveObsoleteAssignedMCFOptions(Member_SelectedMCFOption);
     end;
 
-    internal procedure UpdateHLMemberMCFOptionsFromHL(HLMember: Record "NPR HL HeyLoyalty Member"; HLFieldName: Text[100]; HLMCFOptions: JsonArray): Boolean
+    internal procedure UpdateHLMemberMCFOptionsFromHL(var HLMember: Record "NPR HL HeyLoyalty Member"; HLFieldName: Text[100]; HLMCFOptions: JsonArray): Boolean
     var
         HLMultiChoiceField: Record "NPR HL MultiChoice Field";
         HLMultiChoiceFldOption: Record "NPR HL MultiChoice Fld Option";

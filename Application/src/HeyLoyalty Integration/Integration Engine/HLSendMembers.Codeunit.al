@@ -19,7 +19,7 @@ codeunit 6059997 "NPR HL Send Members"
     var
         HLMember: Record "NPR HL HeyLoyalty Member";
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
-        HLMemberMgt: Codeunit "NPR HL Member Mgt.";
+        HLMemberMgt: Codeunit "NPR HL Member Mgt. Impl.";
         HeyLoyaltyMemberJToken: JsonToken;
         HeyLoyaltyResponse: JsonToken;
         UrlQueryString: Text;
@@ -224,7 +224,7 @@ codeunit 6059997 "NPR HL Send Members"
     procedure GetHeyLoyaltyMemberID(HLMember: Record "NPR HL HeyLoyalty Member"; WithError: Boolean): Text[50]
     var
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
-        HLMemberMgt: Codeunit "NPR HL Member Mgt.";
+        HLMemberMgt: Codeunit "NPR HL Member Mgt. Impl.";
         JsonHelper: Codeunit "NPR Json Helper";
         ResponseJToken: JsonToken;
         HeyLoyaltyId: Text;
