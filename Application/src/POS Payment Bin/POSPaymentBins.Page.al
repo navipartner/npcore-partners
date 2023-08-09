@@ -193,6 +193,7 @@
 
         // Confirm amounts counted and float/bank/safe transfer
         POSPaymentBinCheckpoint.Reset();
+        POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
         POSPaymentBinCheckpoint.FilterGroup(2);
         POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', CheckpointEntryNo);
         POSPaymentBinCheckpoint.FilterGroup(0);
@@ -206,7 +207,7 @@
             POSPaymentBinCheckpoint.Reset();
             POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', CheckpointEntryNo);
             POSPaymentBinCheckpoint.SetFilter(Status, '=%1', POSPaymentBinCheckpoint.Status::READY);
-            if (POSPaymentBinCheckpoint.FindFirst()) then begin
+            if (not POSPaymentBinCheckpoint.IsEmpty()) then begin
                 SalePOS."Register No." := 'TMP';
                 SalePOS."POS Store Code" := 'TMP';
                 SalePOS.Date := Today();

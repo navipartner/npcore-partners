@@ -519,7 +519,7 @@
             POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
             POSPaymentBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", Rec."Entry No.");
             POSPaymentBinCheckpoint.SetRange("Include In Counting", POSPaymentBinCheckpoint."Include In Counting"::YES);
-            if (not POSPaymentBinCheckpoint.FindFirst()) then begin
+            if POSPaymentBinCheckpoint.IsEmpty() then begin
                 POSPaymentBinCheckpoint.SetRange("Include In Counting");
                 PaymentBinCheckpointPage.AutoCount(POSPaymentBinCheckpoint);
                 AutoCountCompleted := true;
