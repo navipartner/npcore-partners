@@ -214,6 +214,7 @@
         key(Key2; "Workshift Checkpoint Entry No.")
         {
         }
+        key(Key3; "Workshift Checkpoint Entry No.", "Payment Method No.", "Payment Bin No.") { }
     }
 
     trigger OnDelete()

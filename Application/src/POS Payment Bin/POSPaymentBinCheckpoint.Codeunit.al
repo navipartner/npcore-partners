@@ -102,7 +102,7 @@
             LastCheckpointEntryNo := -1;
 
             PreviousBinCheckpoint.Reset();
-            PreviousBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
+            PreviousBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.", "Payment Method No.", "Payment Bin No.");
 
             case PreviousZReport.Type of
                 PreviousZReport.Type::ZREPORT:
@@ -154,6 +154,7 @@
                     POSBinEntryCalc.SetFilter(PBE_EntryNo_Filter, '>%1', LastCheckpointEntryNo);
                     POSBinEntryCalc.SetRange(PBE_PaymentBinNo_Filter, PaymentBinCheckpoint."Payment Bin No.");
                     POSBinEntryCalc.SetRange(PBE_PaymentMethodCode_Filter, PaymentBinCheckpoint."Payment Method No.");
+                    POSBinEntryCalc.SetRange(PBE_POSUnitNo_Filter, UnitNo);
                     POSBinEntryCalc.SetFilter(PBE_Type_Filter, '=%1|=%2', POSBinEntry.Type::INPAYMENT, POSBinEntry.Type::OUTPAYMENT);
                     if (POSBinEntryCalc.Open()) then begin
                         If POSBinEntryCalc.Read() then
