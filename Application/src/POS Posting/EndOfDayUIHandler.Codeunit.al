@@ -171,6 +171,7 @@
         PaymentMethodDenom: Record "NPR Payment Method Denom";
         CoinTypeDescLbl: Label '%1 %2', Locked = true;
     begin
+        POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
         POSPaymentBinCheckPoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', _POSWorkShiftCheckpoint."Entry No.");
         if (not POSPaymentBinCheckPoint.FindSet()) then
             exit;
@@ -237,6 +238,7 @@
         Line: JsonObject;
         POSPaymentBinCheckPoint: Record "NPR POS Payment Bin Checkp.";
     begin
+        POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
         POSPaymentBinCheckPoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', _POSWorkShiftCheckpoint."Entry No.");
         if (not POSPaymentBinCheckPoint.FindSet()) then
             exit;
@@ -442,6 +444,7 @@
         POSPaymentBinCheckPoint: Record "NPR POS Payment Bin Checkp.";
         VirtualCountComment: Label 'Virtual Count', MaxLength = 50;
     begin
+        POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
         POSPaymentBinCheckPoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', _POSWorkShiftCheckpoint."Entry No.");
         if (not POSPaymentBinCheckPoint.FindSet()) then
             exit;

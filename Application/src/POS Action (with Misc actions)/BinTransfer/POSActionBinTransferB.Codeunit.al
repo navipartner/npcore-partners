@@ -26,6 +26,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
 
         // Confirm amounts counted and float/bank/safe transfer
         POSPaymentBinCheckpoint.Reset();
+        POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
         POSPaymentBinCheckpoint.FilterGroup(2);
         POSPaymentBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", CheckpointEntryNo);
         POSPaymentBinCheckpoint.FilterGroup(0);
@@ -40,7 +41,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
             POSPaymentBinCheckpoint.Reset();
             POSPaymentBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", CheckpointEntryNo);
             POSPaymentBinCheckpoint.SetRange(Status, POSPaymentBinCheckpoint.Status::READY);
-            if (POSPaymentBinCheckpoint.FindFirst()) then begin
+            if (not POSPaymentBinCheckpoint.IsEmpty()) then begin
 
                 POSSession.GetSale(POSSale);
                 POSSale.GetCurrentSale(SalePOS);

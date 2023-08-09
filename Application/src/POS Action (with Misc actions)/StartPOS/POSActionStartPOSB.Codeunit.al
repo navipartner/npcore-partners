@@ -54,6 +54,7 @@ codeunit 6151357 "NPR POS Action: Start POS B"
         if (POSWorkshiftCheckpoint.FindLast()) then begin
             BinContentsHTML := StrSubstNo(BinContentsHTML3Lbl, EmptyBin);
 
+            POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
             POSPaymentBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpoint."Entry No.");
             POSPaymentBinCheckpoint.SetFilter("New Float Amount", '>%1', 0);
 

@@ -662,7 +662,7 @@
         CalculatedByAutoCountLbl: Label 'Calculated by Auto-Count.';
         PymMethodLbl: Label '%1:%2', Locked = true;
     begin
-        POSPaymentBinCheckpoint.CopyFilters(POSPaymentBinCheckpoint2);
+        POSPaymentBinCheckpoint.Copy(POSPaymentBinCheckpoint2);
         POSPaymentBinCheckpoint.SetRange("Include In Counting", POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL);
         if POSPaymentBinCheckpoint.FindSet(true) then
             repeat
