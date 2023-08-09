@@ -186,7 +186,7 @@ page 6150720 "NPR HL Integration Setup"
                     trigger OnAction()
                     var
                         Member: Record "NPR MM Member";
-                        HLMemberMgt: Codeunit "NPR HL Member Mgt.";
+                        HLMemberMgt: Codeunit "NPR HL Member Mgt. Impl.";
                     begin
                         CurrPage.SaveRecord();
                         HLMemberMgt.DoInitialSync(Member, true);

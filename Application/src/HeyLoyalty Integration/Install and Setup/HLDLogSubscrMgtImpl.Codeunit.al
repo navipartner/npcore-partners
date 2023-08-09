@@ -1,4 +1,4 @@
-codeunit 6059989 "NPR HL Data Log Subscr. Mgt."
+codeunit 6059989 "NPR HL DLog Subscr. Mgt. Impl."
 {
     Access = Internal;
     Permissions =
@@ -40,6 +40,9 @@ codeunit 6059989 "NPR HL Data Log Subscr. Mgt."
         LogModificationAlt: Integer;
         Handled: Boolean;
     begin
+        if not HLIntegrationMgt.IsIntegratedTable(IntegrationArea, TableId) then
+            exit;
+
         DataLogSetup.InsertNewTable(TableId, LogInsertion, LogModification, LogDeletion);
         xDataLogSetup := DataLogSetup;
         if DataLogSetup."Log Insertion" < LogInsertion then
@@ -59,22 +62,20 @@ codeunit 6059989 "NPR HL Data Log Subscr. Mgt."
 
         DataLogSubscriber.AddAsSubscriber(HLIntegrationMgt.HeyLoyaltyCode(), DataLogSetup."Table ID");
         xDataLogSubscriber := DataLogSubscriber;
-        if HLIntegrationMgt.IsIntegratedTable(IntegrationArea, DataLogSetup."Table ID") then begin
-            HLIntegrationEvents.OnSetupDataLogSubsriberDataProcessingParams(IntegrationArea, DataLogSetup."Table ID", DataLogSubscriber, Handled);
-            if not Handled then
-                case IntegrationArea of
-                    IntegrationArea::Members:  //handled by Codeunit::"NPR HL Member Mgt."
-                        begin
-                            DataLogSubscriber."Direct Data Processing" := false;
-                            DataLogSubscriber."Delayed Data Processing (sec)" := 5;
-                        end;
-                end;
-        end;
+        HLIntegrationEvents.OnSetupDataLogSubsriberDataProcessingParams(IntegrationArea, DataLogSetup."Table ID", DataLogSubscriber, Handled);
+        if not Handled then
+            case IntegrationArea of
+                IntegrationArea::Members:  //handled by Codeunit::"NPR HL Member Mgt."
+                    begin
+                        DataLogSubscriber."Direct Data Processing" := false;
+                        DataLogSubscriber."Delayed Data Processing (sec)" := 5;
+                    end;
+            end;
         if Format(DataLogSubscriber) <> Format(xDataLogSubscriber) then
             DataLogSubscriber.Modify(true);
     end;
 
-    local procedure DaysToDuration(NoOfDays: Integer): Duration
+    procedure DaysToDuration(NoOfDays: Integer): Duration
     begin
         exit(NoOfDays * 86400000);
     end;
@@ -104,7 +105,7 @@ codeunit 6059989 "NPR HL Data Log Subscr. Mgt."
     var
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
     begin
-        if not (DataLogSubscriber."Data Processing Codeunit ID" in [Codeunit::"NPR HL Member Mgt."]) then
+        if not (DataLogSubscriber."Data Processing Codeunit ID" in [Codeunit::"NPR HL Member Mgt. Impl."]) then
             exit;
         if not HLIntegrationMgt.IsInstantTaskEnqueue() then begin
             DataLogSubscriber.TestField("Direct Data Processing", false);

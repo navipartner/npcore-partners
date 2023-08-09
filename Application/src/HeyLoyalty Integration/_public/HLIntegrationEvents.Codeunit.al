@@ -58,7 +58,7 @@ codeunit 6059992 "NPR HL Integration Events"
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnUpdateHLMemberWithDataFromHeyLoyalty(var HLMember: Record "NPR HL HeyLoyalty Member"; HLMemberJToken: JsonToken; OnlyEssentialFields: Boolean)
+    internal procedure OnUpdateHLMemberWithDataFromHeyLoyalty(var HLMember: Record "NPR HL HeyLoyalty Member"; HLMemberJToken: JsonToken; OnlyEssentialFields: Boolean; var HLMemberRelatedDataUpdated: Boolean)
     begin
     end;
 
@@ -79,6 +79,16 @@ codeunit 6059992 "NPR HL Integration Events"
 
     [IntegrationEvent(false, false)]
     internal procedure OnUnsubscribeMember(var HLMember: Record "NPR HL HeyLoyalty Member"; HLMemberJToken: JsonToken)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeShowAssignedHLMCFOptionValues(AppliesToRecID: RecordID; MultiChoiceFieldCode: Code[20]; var Editable: Boolean; var HLMultiChoiceFldOption: Record "NPR HL MultiChoice Fld Option")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterManuallyModifyAssignedHLMCFOptionValues(AppliesToRecID: RecordID; MultiChoiceFieldCode: Code[20])
     begin
     end;
 }

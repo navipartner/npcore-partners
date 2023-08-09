@@ -14,7 +14,7 @@ codeunit 6060000 "NPR HL Upsert Member"
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
         HLWSMgt: Codeunit "NPR HL Member Webhook Handler";
-        MemberMgt: Codeunit "NPR HL Member Mgt.";
+        MemberMgt: Codeunit "NPR HL Member Mgt. Impl.";
     begin
         if not HLMember.Find() or HLMember.Deleted then
             exit;

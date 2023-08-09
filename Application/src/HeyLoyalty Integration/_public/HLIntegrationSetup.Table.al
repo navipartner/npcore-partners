@@ -114,7 +114,7 @@ table 6059800 "NPR HL Integration Setup"
     end;
 
     var
-        HLDataLogSubscrMgt: Codeunit "NPR HL Data Log Subscr. Mgt.";
+        HLDataLogSubscrMgt: Codeunit "NPR HL DLog Subscr. Mgt. Impl.";
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
         RecordHasBeenRead: Boolean;
 }

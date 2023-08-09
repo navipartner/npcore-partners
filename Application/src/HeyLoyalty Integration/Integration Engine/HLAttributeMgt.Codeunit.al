@@ -8,7 +8,7 @@ codeunit 6059990 "NPR HL Attribute Mgt."
         MembershipRole: Record "NPR MM Membership Role";
         HLMember: Record "NPR HL HeyLoyalty Member";
         Member: Record "NPR MM Member";
-        MemberMgt: Codeunit "NPR HL Member Mgt.";
+        MemberMgt: Codeunit "NPR HL Member Mgt. Impl.";
         HLScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
         IsCascadeUpdate: Boolean;
     begin
@@ -137,7 +137,7 @@ codeunit 6059990 "NPR HL Attribute Mgt."
         if HeyLoyaltyFieldID = '' then
             exit(false);
 
-        if not HLMappedValueMgt.FindMappedValue(Database::"NPR Attribute", NPRAttribute.FieldNo(Code), CopyStr(HeyLoyaltyFieldID, 1, MaxStrLen(HLMappedValue.Value)), RecRef)        then
+        if not HLMappedValueMgt.FindMappedValue(Database::"NPR Attribute", NPRAttribute.FieldNo(Code), CopyStr(HeyLoyaltyFieldID, 1, MaxStrLen(HLMappedValue.Value)), RecRef) then
             exit(false);
         RecRef.SetTable(NPRAttribute);
         if not IsSendAttributeToHL(NPRAttribute) then

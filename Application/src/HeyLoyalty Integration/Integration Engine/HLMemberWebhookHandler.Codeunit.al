@@ -6,7 +6,7 @@ codeunit 6150799 "NPR HL Member Webhook Handler"
     var
         HLIntegrationEvents: Codeunit "NPR HL Integration Events";
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
-        HLMemberMgt: Codeunit "NPR HL Member Mgt.";
+        HLMemberMgt: Codeunit "NPR HL Member Mgt. Impl.";
 
     trigger OnRun()
     begin
@@ -121,7 +121,7 @@ codeunit 6150799 "NPR HL Member Webhook Handler"
         MembershipRole: Record "NPR MM Membership Role";
         HLMember2: Record "NPR HL HeyLoyalty Member";
         Member: Record "NPR MM Member";
-        MemberMgt: Codeunit "NPR HL Member Mgt.";
+        MemberMgt: Codeunit "NPR HL Member Mgt. Impl.";
     begin
         if HLMember."E-Mail Address" = '' then
             exit(false);

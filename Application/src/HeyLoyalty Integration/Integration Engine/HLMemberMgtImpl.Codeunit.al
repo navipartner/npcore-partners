@@ -1,4 +1,4 @@
-codeunit 6059995 "NPR HL Member Mgt."
+codeunit 6059995 "NPR HL Member Mgt. Impl."
 {
     Access = Internal;
     TableNo = "NPR Data Log Record";
@@ -183,7 +183,7 @@ codeunit 6059995 "NPR HL Member Mgt."
         exit(TempMembershipRole.FindSet());
     end;
 
-    local procedure FindMembershipRole(var FilteredMembershipRoles: Record "NPR MM Membership Role"; var MembershipRoleOut: Record "NPR MM Membership Role"): Boolean
+    procedure FindMembershipRole(var FilteredMembershipRoles: Record "NPR MM Membership Role"; var MembershipRoleOut: Record "NPR MM Membership Role"): Boolean
     var
         Found: Boolean;
     begin
@@ -205,7 +205,7 @@ codeunit 6059995 "NPR HL Member Mgt."
         exit(true);
     end;
 
-    local procedure TouchMember(MembershipRole: Record "NPR MM Membership Role"; var TempMembershipRole: Record "NPR MM Membership Role")
+    procedure TouchMember(MembershipRole: Record "NPR MM Membership Role"; var TempMembershipRole: Record "NPR MM Membership Role")
     var
         Member: Record "NPR MM Member";
     begin
@@ -467,7 +467,10 @@ codeunit 6059995 "NPR HL Member Mgt."
             end;
         end;
 
-        HLIntegrationEvents.OnUpdateHLMemberWithDataFromHeyLoyalty(HLMember, HLMemberJToken, OnlyEssentialFields);
+        RelatedDataUpdatedInSubscriber := false;
+        HLIntegrationEvents.OnUpdateHLMemberWithDataFromHeyLoyalty(HLMember, HLMemberJToken, OnlyEssentialFields, RelatedDataUpdatedInSubscriber);
+        if RelatedDataUpdatedInSubscriber then
+            RelatedDataUpdated := true;
 
         if (Format(xHLMember) <> Format(HLMember)) or RelatedDataUpdated then begin
             HLMember.Modify();
@@ -581,7 +584,7 @@ codeunit 6059995 "NPR HL Member Mgt."
     local procedure UpdateDataLogSubscriber(DataLogEntry: Record "NPR Data Log Record")
     var
         DataLogSubscriber: Record "NPR Data Log Subscriber";
-        HLDataLogSubscrMgt: Codeunit "NPR HL Data Log Subscr. Mgt.";
+        HLDataLogSubscrMgt: Codeunit "NPR HL DLog Subscr. Mgt. Impl.";
     begin
         DataLogSubscriber.LockTable();
         if DataLogSubscriber.Get(HLDataLogSubscrMgt.GetSubscriberCode(DataLogEntry."Table ID", CurrCodeunitId()), DataLogEntry."Table ID", '') then
@@ -639,7 +642,7 @@ codeunit 6059995 "NPR HL Member Mgt."
 
     local procedure CurrCodeunitId(): Integer
     begin
-        exit(Codeunit::"NPR HL Member Mgt.");
+        exit(Codeunit::"NPR HL Member Mgt. Impl.");
     end;
 
     procedure CheckHeyLoyaltyIdMaxLength(HeyLoyaltyId: Text)

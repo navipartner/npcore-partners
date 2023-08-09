@@ -113,7 +113,7 @@ table 6059801 "NPR HL HeyLoyalty Member"
 
             trigger OnValidate()
             var
-                MemberMgt: Codeunit "NPR HL Member Mgt.";
+                MemberMgt: Codeunit "NPR HL Member Mgt. Impl.";
             begin
                 "HL Membership Name" := MemberMgt.GetMembershipHLName("Membership Code");
             end;

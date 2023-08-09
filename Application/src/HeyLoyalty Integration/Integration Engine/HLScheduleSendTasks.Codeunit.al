@@ -120,8 +120,13 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
             NcTask2.SetRange("Record ID", NcTask."Record ID");
             NcTask2.SetRange("Record Value", NcTask."Record Value");
             //NcTask2.SetFilter("Log Date", '%1..', CreateDateTime(Today - 1, 0T));
+            NcTask2.LockTable();
             if NcTask2.FindLast() then begin
                 NcTask := NcTask2;
+                if NcTask."Process Count" > 0 then begin
+                    NcTask."Process Count" := 0;
+                    NcTask.Modify();
+                end;
                 exit(false);
             end;
         end;
