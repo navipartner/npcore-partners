@@ -12,56 +12,55 @@ report 6014431 "NPR S.Person Trn by Item Cat."
 
     dataset
     {
-        dataitem(ItemCategoryBuffer; "NPR Item Category Buffer")
-        {
-            DataItemTableView = sorting("Entry No.");
-            column("Code"; "Code") { }
-            column(CodeWithIndentation; "Code with Indentation") { }
-            column(Description; Description) { }
-            column(ParentCategory; "Parent Category") { }
-            column(Has_Children; "Has Children") { }
-            column(Presentation_Order; "Presentation Order") { }
-            column(Indentation; Indentation) { }
-
-            #region Calc Fields
-            column(SalesQty; "Calc Field 1") { }
-            column(CostExclVAT; "Calc Field 2") { }
-            column(TurnoverExclVAT; "Calc Field 3") { }
-
-            #endregion
-
-            column(Request_Page_Filters; _RequestPageFilters) { }
-            column(Company_Name; CompanyName()) { }
-            column(Show_Salespersons_In_All_Categories; _ShowSalespersonsInAllCategories) { }
-
-            dataitem(ItemCategoryBufferDetail; "NPR Item Category Buffer")
-            {
-                DataItemLink = "Code" = field("Code");
-                DataItemTableView = sorting("Entry No.");
-                column(ItemCategoryBufferDetail_Code; "Code") { }
-                column(Salesperson_Code; "Detail Field 1") { }
-                column(Salesperson_Name; "Detail Field 2") { }
-
-                #region Calc Fields
-                column(Salesperson_SalesQty; "Calc Field 1") { }
-                column(Salesperson_COGSLCY; "Calc Field 2") { }
-                column(Salesperson_SalesLCY; "Calc Field 3") { }
-
-                #endregion
-            }
-        }
-
-        dataitem(ItemCategoryFilter; "Item Category")
-        {
-            DataItemTableView = sorting("Code");
-            RequestFilterFields = "Code", "NPR Date Filter";
-            UseTemporary = true;
-        }
-        dataitem(SalespersonPurchaserFilter; "Salesperson/Purchaser")
+        dataitem(SalespersonPurchaser; "Salesperson/Purchaser")
         {
             DataItemTableView = sorting("Code");
             RequestFilterFields = "Code";
-            UseTemporary = true;
+            PrintOnlyIfDetail = true;
+
+            column(Salesperson_Code; "Code") { }
+            column(Salesperson_Name; "Name") { }
+            column(Request_Page_Filters; RequestPageFilters) { }
+            column(Company_Name; CompanyName()) { }
+            column(NumberOfLevels; NumberOfLevels) { }
+
+            dataitem("Item Category"; "Item Category")
+            {
+                DataItemTableView = sorting("Code");
+                RequestFilterFields = "NPR Date Filter";
+                column(ItemCategory_Code; "Code") { }
+                column(ItemCategory_Description; Description) { }
+                column(ItemCategory_ParentCategory; "Parent Category") { }
+                column(ItemCategory_Has_Children; "Has Children") { }
+                column(ItemCategory_Presentation_Order; "Presentation Order") { }
+                column(ItemCategory_Indentation; Indentation) { }
+
+                column(ItemCategory_SalesQty; ItemCategorySalesQty) { }
+                column(ItemCategory_COGSLCY; ItemCategoryCOGSLCY) { }
+                column(ItemCategory_SalesLCY; ItemCategorySalesLCY) { }
+
+                trigger OnAfterGetRecord()
+                begin
+                    GetAmounts("Item Category".Code, SalespersonPurchaser.Code, ItemCategorySalesQty, ItemCategoryCOGSLCY, ItemCategorySalesLCY);
+                end;
+            }
+
+            dataitem(ItemCategory2; Integer)
+            {
+                DataItemTableView = sorting(Number) where(Number = const(1));
+
+                column(ItemCategory2_Code; UncategorizedCategoryCodeLbl) { }
+                column(ItemCategory2_Description; UncategorizedCategoryDescLbl) { }
+
+                column(ItemCategory2_SalesQty; ItemCategory2SalesQty) { }
+                column(ItemCategory2_COGSLCY; ItemCategory2COGSLCY) { }
+                column(ItemCategory2_SalesLCY; ItemCategory2SalesLCY) { }
+
+                trigger OnAfterGetRecord()
+                begin
+                    GetAmounts('', SalespersonPurchaser.Code, ItemCategory2SalesQty, ItemCategory2COGSLCY, ItemCategory2SalesLCY);
+                end;
+            }
         }
     }
 
@@ -75,13 +74,7 @@ report 6014431 "NPR S.Person Trn by Item Cat."
                 group(Options)
                 {
                     Caption = 'Options';
-                    field("Show Salespersons in All Categories"; _ShowSalespersonsInAllCategories)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Show Salesperson in All Categories';
-                        ToolTip = 'Use this option to control whether you want to print the individual Salespersons within each category';
-                    }
-                    field("Number of Levels"; _NumberofLevels)
+                    field("Number of Levels"; NumberOfLevels)
                     {
                         ApplicationArea = NPRRetail;
                         Caption = 'Number of Levels';
@@ -105,202 +98,63 @@ report 6014431 "NPR S.Person Trn by Item Cat."
         SaleQtyCaptionLbl = 'Sales (Qty.)';
         TurnoverExclVatCaptionLbl = 'Turnover Excl. VAT';
         ProfitPctCaptionLbl = 'Profit %';
-        InventoryCaptionLbl = 'Inventory';
         FiltersCaptionLbl = 'Filters:';
     }
 
     trigger OnInitReport()
     begin
-        _NumberofLevels := 2;
+        NumberOfLevels := 2;
     end;
 
     trigger OnPreReport()
     begin
-        _RequestPageFilters := CreateRequestPageFiltersTxt();
-
-        CreateItemCategoryBufferDataItems(ItemCategoryBuffer, ItemCategoryBufferDetail);
-
-        ItemCategoryBuffer.Reset();
-        ItemCategoryBufferDetail.Reset();
-        _ItemCategoryMgt.AddItemCategoryParentsToBuffer(ItemCategoryBuffer);
-
-        if ItemCategoryFilter.GetFilter(Code) = '' then
-            AddUncategorizedToItemCategoryBuffers(ItemCategoryBuffer, ItemCategoryBufferDetail);
-
-        if ItemCategoryBuffer.IsEmpty() then
-            Error(_EmptyDatasetErrorLbl);
-
-        ItemCategoryBuffer.Reset();
-        ItemCategoryBuffer.SetFilter(Indentation, '>%1', _NumberOfLevels - 1);
-        ItemCategoryBuffer.DeleteAll();
-
-        ItemCategoryBuffer.Reset();
-        _ItemCategoryMgt.UpdateHasChildrenFieldInItemCategoryBuffer(ItemCategoryBuffer);
+        RequestPageFilters := CreateRequestPageFiltersTxt();
     end;
 
     var
-        _ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
-        _ShowSalespersonsInAllCategories: Boolean;
-        _NumberofLevels: Integer;
-        _RequestPageFilters: Text;
-        _EmptyDatasetErrorLbl: Label 'The report couldn''t be generated, because it was empty. Adjust your filters and try again.';
-        _UncategorizedCategoryCodeLbl: Label '-';
-        _UncategorizedCategoryDescLbl: Label 'Without category';
+        NumberOfLevels: Integer;
+        RequestPageFilters: Text;
+        UncategorizedCategoryCodeLbl: Label '-';
+        UncategorizedCategoryDescLbl: Label 'Without category';
+        ItemCategorySalesQty, ItemCategoryCOGSLCY, ItemCategory2SalesLCY, ItemCategory2SalesQty, ItemCategory2COGSLCY, ItemCategorySalesLCY : Decimal;
 
     local procedure CreateRequestPageFiltersTxt(): Text
     var
         RequestPageFiltersTxt: Text;
     begin
-        if (RequestPageFiltersTxt <> '') and (ItemCategoryFilter.GetFilters() <> '') then
-            RequestPageFiltersTxt += ', ' + ItemCategoryFilter.GetFilters()
+        if (RequestPageFiltersTxt <> '') and ("Item Category".GetFilters() <> '') then
+            RequestPageFiltersTxt += ', ' + "Item Category".GetFilters()
         else
-            RequestPageFiltersTxt += ItemCategoryFilter.GetFilters();
+            RequestPageFiltersTxt += "Item Category".GetFilters();
 
-        if (RequestPageFiltersTxt <> '') and (SalespersonPurchaserFilter.GetFilters() <> '') then
-            RequestPageFiltersTxt += ', ' + SalespersonPurchaserFilter.GetFilters()
+        if (RequestPageFiltersTxt <> '') and (SalespersonPurchaser.GetFilters() <> '') then
+            RequestPageFiltersTxt += ', ' + SalespersonPurchaser.GetFilters()
         else
-            RequestPageFiltersTxt += SalespersonPurchaserFilter.GetFilters();
+            RequestPageFiltersTxt += SalespersonPurchaser.GetFilters();
 
         exit(RequestPageFiltersTxt);
     end;
 
-    local procedure CreateItemCategoryBufferDataItems(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; var ItemCategoryBufferDetail: Record "NPR Item Category Buffer" temporary)
+    local procedure GetAmounts(ItemCategoryCode: Code[20]; SalespersonCode: Code[20]; var SalesQty: Decimal; var COGSLCY: Decimal; var SalesLCY: Decimal)
     var
-        ItemCategory: Record "Item Category";
-        CalcFieldsDict: Dictionary of [Integer, Decimal];
-        DetailFieldsDict: Dictionary of [Integer, Text[100]];
-        ConsumptionAmount: Decimal;
-        SalesLCY: Decimal;
-        SalesQty: Decimal;
+        SPersonTurnItemCat: Query "NPR SPerson Turn. Item Cat.";
     begin
-        ItemCategory.CopyFilters(ItemCategoryFilter);
-        ItemCategory.SetFilter("NPR Salesperson/Purch. Filter", SalespersonPurchaserFilter.GetFilter("Code"));
+        SPersonTurnItemCat.SetRange(Item_Category_Code, ItemCategoryCode);
+        SPersonTurnItemCat.SetRange(Salespers_Purch_Code, SalespersonCode);
 
-        if not ItemCategory.FindSet() then
-            exit;
+        if "Item Category".GetFilter("NPR Date Filter") <> '' then
+            SPersonTurnItemCat.SetFilter(Filter_DateTime, "Item Category".GetFilter("NPR Date Filter"));
 
-        repeat
-            Clear(SalesLCY);
-            Clear(SalesQty);
-            Clear(ConsumptionAmount);
+        Clear(SalesQty);
+        Clear(SalesLCY);
+        Clear(COGSLCY);
 
-            CreateDetailDataitem(ItemCategory.Code, ItemCategoryBufferDetail, SalesQty, ConsumptionAmount, SalesLCY);
-
-            if (SalesLCY <> 0) or (ConsumptionAmount <> 0) then begin
-                _ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
-
-                CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 1"), SalesQty);
-                CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 2"), ConsumptionAmount);
-                CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), SalesLCY);
-
-                _ItemCategoryMgt.InsertItemCategoryToBuffer(ItemCategory.Code, ItemCategoryBuffer, '', '', '', CalcFieldsDict, DetailFieldsDict);
-            end;
-        until ItemCategory.Next() = 0;
-    end;
-
-    local procedure AddUncategorizedToItemCategoryBuffers(var ItemCategoryBuffer: Record "NPR Item Category Buffer" temporary; var ItemCategoryBufferDetail: Record "NPR Item Category Buffer" temporary)
-    var
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
-        CalcFieldsDict: Dictionary of [Integer, Decimal];
-        COGSLCY: Decimal;
-        SalesLCY: Decimal;
-        SalesQty: Decimal;
-        TotalCOGSLCY: Decimal;
-        TotalSalesLCY: Decimal;
-        TotalSalesQty: Decimal;
-        DetailFieldsDict: Dictionary of [Integer, Text[100]];
-    begin
-        SalespersonPurchaser.SetFilter("Code", SalespersonPurchaserFilter.GetFilter("Code"));
-        SalespersonPurchaser.SetFilter("NPR Item Category Filter", '=%1', '');
-
-        if ItemCategoryFilter.GetFilter("NPR Date Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Date Filter", ItemCategoryFilter.GetFilter("NPR Date Filter"));
-
-        if not SalespersonPurchaser.FindSet() then
-            exit;
-
-        repeat
-            Clear(SalesQty);
-            Clear(SalesLCY);
-            Clear(COGSLCY);
-            _ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
-            _ItemCategoryMgt.ClearDetailFieldsDictionary(DetailFieldsDict);
-
-            SalespersonPurchaser.NPRGetVESalesQty(SalesQty);
-            SalespersonPurchaser.NPRGetVESalesLCY(SalesLCY);
-            SalespersonPurchaser.NPRGetVECOGSLCY(COGSLCY);
-
-            if SalesQty > 0 then begin
-                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 1"), SalesQty);
-                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 2"), COGSLCY);
-                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 3"), SalesLCY);
-
-                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 1"), SalespersonPurchaser."Code");
-                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 2"), SalespersonPurchaser.Name);
-
-                _ItemCategoryMgt.InsertUncatagorizedToItemCategoryBuffer(_UncategorizedCategoryCodeLbl, _UncategorizedCategoryDescLbl, ItemCategoryBufferDetail, '', '', '', CalcFieldsDict, DetailFieldsDict);
-
-                TotalSalesQty += SalesQty;
-                TotalCOGSLCY += COGSLCY;
-                TotalSalesLCY += SalesLCY;
-            end;
-        until SalespersonPurchaser.Next() = 0;
-
-
-        if (TotalSalesLCY <> 0) or (TotalCOGSLCY <> 0) then begin
-            _ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
-
-            CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 1"), TotalSalesQty);
-            CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 2"), TotalCOGSLCY);
-            CalcFieldsDict.Add(ItemCategoryBuffer.FieldNo("Calc Field 3"), TotalSalesLCY);
-
-            _ItemCategoryMgt.InsertUncatagorizedToItemCategoryBuffer(_UncategorizedCategoryCodeLbl, _UncategorizedCategoryDescLbl, ItemCategoryBuffer, '', '', '', CalcFieldsDict, DetailFieldsDict);
+        SPersonTurnItemCat.Open();
+        while SPersonTurnItemCat.Read() do begin
+            SalesQty += -SPersonTurnItemCat.Sum_Invoiced_Quantity;
+            SalesLCY += SPersonTurnItemCat.Sum_Sales_Amount_Actual;
+            COGSLCY += -SPersonTurnItemCat.Sum_Cost_Amount_Actual;
         end;
-    end;
-
-    local procedure CreateDetailDataitem(ItemCategoryCode: Code[20]; var ItemCategoryBufferDetail: Record "NPR Item Category Buffer" temporary; var TotalSalesQty: Decimal; var TotalCOGSLCY: Decimal; var TotalSalesLCY: Decimal)
-    var
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
-        CalcFieldsDict: Dictionary of [Integer, Decimal];
-        COGSLCY: Decimal;
-        SalesLCY: Decimal;
-        SalesQty: Decimal;
-        DetailFieldsDict: Dictionary of [Integer, Text[100]];
-    begin
-        SalespersonPurchaser.SetFilter("Code", SalespersonPurchaserFilter.GetFilter("Code"));
-        SalespersonPurchaser.SetFilter("NPR Item Category Filter", ItemCategoryCode);
-
-        if ItemCategoryFilter.GetFilter("NPR Date Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Date Filter", ItemCategoryFilter.GetFilter("NPR Date Filter"));
-
-        if not SalespersonPurchaser.FindSet() then
-            exit;
-
-        repeat
-            Clear(SalesQty);
-            Clear(SalesLCY);
-            Clear(COGSLCY);
-            _ItemCategoryMgt.ClearCalcFieldsDictionary(CalcFieldsDict);
-            _ItemCategoryMgt.ClearDetailFieldsDictionary(DetailFieldsDict);
-
-            SalespersonPurchaser.NPRGetVESalesQty(SalesQty);
-            SalespersonPurchaser.NPRGetVESalesLCY(SalesLCY);
-            SalespersonPurchaser.NPRGetVECOGSLCY(COGSLCY);
-
-            if SalesQty > 0 then begin
-                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 1"), SalesQty);
-                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 2"), COGSLCY);
-                CalcFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Calc Field 3"), SalesLCY);
-
-                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 1"), SalespersonPurchaser."Code");
-                DetailFieldsDict.Add(ItemCategoryBufferDetail.FieldNo("Detail Field 2"), SalespersonPurchaser.Name);
-
-                _ItemCategoryMgt.InsertItemCategoryToBuffer(ItemCategoryCode, ItemCategoryBufferDetail, SalespersonPurchaser.Code, '', '', CalcFieldsDict, DetailFieldsDict);
-
-                TotalSalesQty += SalesQty;
-                TotalCOGSLCY += COGSLCY;
-                TotalSalesLCY += SalesLCY;
-            end;
-        until SalespersonPurchaser.Next() = 0;
+        SPersonTurnItemCat.Close();
     end;
 }
