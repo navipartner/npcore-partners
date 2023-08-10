@@ -112,7 +112,6 @@ codeunit 6151089 "NPR Sentry Cron"
 
     local procedure GetEnvironment(): Text
     var
-        AzureAdTenant: Codeunit "Azure AD Tenant";
         EnvironmentInformation: Codeunit "Environment Information";
         CharsToKeep: Text;
         NewCompanyName: Text;
@@ -121,11 +120,47 @@ codeunit 6151089 "NPR Sentry Cron"
         NewCompanyName := LowerCase(CompanyName());
         NewCompanyName := DelChr(NewCompanyName, '=', DelChr(NewCompanyName, '=', CharsToKeep));
 
-        if EnvironmentInformation.IsOnPrem() then
-            exit('onprem_' + NewCompanyName + '_' + TenantId());
-
         if EnvironmentInformation.IsSaaS() then
-            exit('saas_' + NewCompanyName + '_' + AzureAdTenant.GetAadTenantId())
+            exit(GetSaaSEnvironment(NewCompanyName));
+
+        if EnvironmentInformation.IsOnPrem() then
+            exit(GetOnPremEnvironment(NewCompanyName));
+    end;
+
+    local procedure GetSaaSEnvironment(ThisCompanyName: Text): Text
+    var
+        AzureAdTenant: Codeunit "Azure AD Tenant";
+        EnvironmentName: Text;
+        EnvironmentTypeAndTenantId: Text;
+    begin
+        EnvironmentName := 'saas_' + ThisCompanyName + '_' + AzureAdTenant.GetAadTenantId();
+
+        if StrLen(EnvironmentName) <= GetEnvironmentNameMaxLength() then
+            exit(EnvironmentName);
+
+        EnvironmentTypeAndTenantId := 'saas_' + '_' + AzureAdTenant.GetAadTenantId();
+        EnvironmentName := 'saas_' + CopyStr(ThisCompanyName, 1, GetEnvironmentNameMaxLength() - StrLen(EnvironmentTypeAndTenantId)) + '_' + AzureAdTenant.GetAadTenantId();
+        exit(EnvironmentName);
+    end;
+
+    local procedure GetOnPremEnvironment(ThisCompanyName: Text): Text
+    var
+        EnvironmentName: Text;
+        EnvironmentTypeAndTenantId: Text;
+    begin
+        EnvironmentName := 'onprem_' + ThisCompanyName + '_' + TenantId();
+
+        if StrLen(EnvironmentName) <= GetEnvironmentNameMaxLength() then
+            exit(EnvironmentName);
+
+        EnvironmentTypeAndTenantId := 'onprem_' + '_' + TenantId();
+        EnvironmentName := 'onprem_' + CopyStr(ThisCompanyName, 1, GetEnvironmentNameMaxLength() - StrLen(EnvironmentTypeAndTenantId)) + '_' + TenantId();
+        exit(EnvironmentName);
+    end;
+
+    local procedure GetEnvironmentNameMaxLength(): Integer
+    begin
+        exit(64);
     end;
 
     local procedure GetBaseUrl(): Text
