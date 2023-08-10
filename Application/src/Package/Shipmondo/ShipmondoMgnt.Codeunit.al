@@ -173,6 +173,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
     local procedure BuildSender(PakkelabelsShipment: Record "NPR Shipping Provider Document") Output: Text;
     var
         CompanyInformation: Record "Company Information";
+        ShipProvPublicAccess: Codeunit "NPR Ship. Prov.Public Access";
         QueryParamsLbl: label '"name": "%1",', Locked = true;
         QueryParams2Lbl: label '"address1": "%1",', Locked = true;
         QueryParams3Lbl: label '"address2": "%1",', Locked = true;
@@ -183,9 +184,8 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         QueryParams8Lbl: label '"telephone": "%1",', Locked = true;
         QueryParams9Lbl: label '"email": "%1"', Locked = true;
         Runtrigger: Boolean;
-
     begin
-        OnBeforeAssignSender(PakkelabelsShipment, Output, Runtrigger);
+        ShipProvPublicAccess.OnBeforeAssignSender(PakkelabelsShipment, Output, Runtrigger);
         if Runtrigger then
             exit;
         CompanyInformation.Get();
@@ -496,7 +496,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', false, false)]
-    local procedure C80OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: codeunit"Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20]);
+    local procedure C80OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20]);
     var
         SalesShptHeader: Record "Sales Shipment Header";
         SalesSetup: Record "Sales & Receivables Setup";
@@ -672,11 +672,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
     local procedure BaseURL(): Text[250]
     begin
         exit('https://app.shipmondo.com/api/public/v3/')
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeAssignSender(var PakkelabelsShipment: Record "NPR Shipping Provider Document"; var Output: Text; var RunTrigger: Boolean)
-    begin
     end;
 
     [IntegrationEvent(false, false)]
