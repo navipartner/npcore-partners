@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Collect Workflow Modules';
+    ContextSensitiveHelpPage = 'docs/retail/click_and_collect/how-to/setup/setup/';
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR NpCs Workflow Module";
