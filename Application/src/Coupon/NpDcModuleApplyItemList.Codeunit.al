@@ -106,39 +106,37 @@
 
         SaleLinePOS.FindSet();
         repeat
-            if not HasAppliedCouponDiscount(SaleLinePOS) then begin
-                QtyToApply := SaleLinePOS.Quantity;
-                if (NpDcCouponListItem."Max. Quantity" > 0) and (AppliedQty + QtyToApply > NpDcCouponListItem."Max. Quantity") then
-                    QtyToApply := NpDcCouponListItem."Max. Quantity" - AppliedQty;
-                if (QtyToApply > RemainingQty) and (RemainingQty >= 0) then
-                    QtyToApply := RemainingQty;
+            QtyToApply := SaleLinePOS.Quantity;
+            if (NpDcCouponListItem."Max. Quantity" > 0) and (AppliedQty + QtyToApply > NpDcCouponListItem."Max. Quantity") then
+                QtyToApply := NpDcCouponListItem."Max. Quantity" - AppliedQty;
+            if (QtyToApply > RemainingQty) and (RemainingQty >= 0) then
+                QtyToApply := RemainingQty;
 
-                SaleLinePOS."Amount Including VAT" := (SaleLinePOS."Amount Including VAT" / SaleLinePOS.Quantity) * QtyToApply;
-                DiscountAmt := SaleLinePOS."Amount Including VAT" * (DiscountPct / 100);
-                if (NpDcCouponListItem."Max. Discount Amount" > 0) and (DiscountAmt > NpDcCouponListItem."Max. Discount Amount") then
-                    DiscountAmt := NpDcCouponListItem."Max. Discount Amount";
+            SaleLinePOS."Amount Including VAT" := (SaleLinePOS."Amount Including VAT" / SaleLinePOS.Quantity) * QtyToApply;
+            DiscountAmt := SaleLinePOS."Amount Including VAT" * (DiscountPct / 100);
+            if (NpDcCouponListItem."Max. Discount Amount" > 0) and (DiscountAmt > NpDcCouponListItem."Max. Discount Amount") then
+                DiscountAmt := NpDcCouponListItem."Max. Discount Amount";
 
-                if DiscountAmt > 0 then begin
-                    LineNo := GetNextLineNo(SaleLinePOS);
-                    SaleLinePOSCouponApply.Init();
-                    SaleLinePOSCouponApply."Register No." := SaleLinePOS."Register No.";
-                    SaleLinePOSCouponApply."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-                    SaleLinePOSCouponApply."Sale Date" := SaleLinePOS.Date;
-                    SaleLinePOSCouponApply."Sale Line No." := SaleLinePOS."Line No.";
-                    SaleLinePOSCouponApply."Line No." := LineNo;
-                    SaleLinePOSCouponApply.Type := SaleLinePOSCouponApply.Type::Discount;
-                    SaleLinePOSCouponApply."Applies-to Sale Line No." := SaleLinePOSCoupon."Sale Line No.";
-                    SaleLinePOSCouponApply."Applies-to Coupon Line No." := SaleLinePOSCoupon."Line No.";
-                    SaleLinePOSCouponApply."Coupon Type" := SaleLinePOSCoupon."Coupon Type";
-                    SaleLinePOSCouponApply."Coupon No." := SaleLinePOSCoupon."Coupon No.";
-                    SaleLinePOSCouponApply.Description := SaleLinePOSCoupon.Description;
-                    SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
-                    SaleLinePOSCouponApply.Insert(true);
+            if DiscountAmt > 0 then begin
+                LineNo := GetNextLineNo(SaleLinePOS);
+                SaleLinePOSCouponApply.Init();
+                SaleLinePOSCouponApply."Register No." := SaleLinePOS."Register No.";
+                SaleLinePOSCouponApply."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+                SaleLinePOSCouponApply."Sale Date" := SaleLinePOS.Date;
+                SaleLinePOSCouponApply."Sale Line No." := SaleLinePOS."Line No.";
+                SaleLinePOSCouponApply."Line No." := LineNo;
+                SaleLinePOSCouponApply.Type := SaleLinePOSCouponApply.Type::Discount;
+                SaleLinePOSCouponApply."Applies-to Sale Line No." := SaleLinePOSCoupon."Sale Line No.";
+                SaleLinePOSCouponApply."Applies-to Coupon Line No." := SaleLinePOSCoupon."Line No.";
+                SaleLinePOSCouponApply."Coupon Type" := SaleLinePOSCoupon."Coupon Type";
+                SaleLinePOSCouponApply."Coupon No." := SaleLinePOSCoupon."Coupon No.";
+                SaleLinePOSCouponApply.Description := SaleLinePOSCoupon.Description;
+                SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
+                SaleLinePOSCouponApply.Insert(true);
 
-                    RemainingDiscountAmt -= DiscountAmt;
-                    AppliedQty += QtyToApply;
-                    RemainingQty -= QtyToApply;
-                end;
+                RemainingDiscountAmt -= DiscountAmt;
+                AppliedQty += QtyToApply;
+                RemainingQty -= QtyToApply;
             end;
         until (SaleLinePOS.Next() = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
     end;
@@ -150,9 +148,6 @@
         LineDiscountAmt: Decimal;
         QtyToApply: Integer;
     begin
-        if HasAppliedCouponDiscount(SaleLinePOS) then
-            exit;
-
         QtyToApply := SaleLinePOS.Quantity;
         if (NpDcCouponListItem."Max. Quantity" > 0) and (AppliedQty + QtyToApply > NpDcCouponListItem."Max. Quantity") then
             QtyToApply := NpDcCouponListItem."Max. Quantity" - AppliedQty;
@@ -210,6 +205,7 @@
     var
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
     begin
+        SaleLinePOSCouponApply.SetRange("Coupon Type", SaleLinePOSCoupon."Coupon Type");
         SaleLinePOSCouponApply.SetRange("Register No.", SaleLinePOSCoupon."Register No.");
         SaleLinePOSCouponApply.SetRange("Sales Ticket No.", SaleLinePOSCoupon."Sales Ticket No.");
         SaleLinePOSCouponApply.SetRange("Sale Date", SaleLinePOSCoupon."Sale Date");
@@ -462,18 +458,6 @@
         if SaleLinePOSCoupon.FindLast() then;
 
         exit(SaleLinePOSCoupon."Line No." + 10000);
-    end;
-
-    local procedure HasAppliedCouponDiscount(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
-    var
-        SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
-    begin
-        SaleLinePOSCouponApply.SetRange("Register No.", SaleLinePOS."Register No.");
-        SaleLinePOSCouponApply.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        SaleLinePOSCouponApply.SetRange("Sale Date", SaleLinePOS.Date);
-        SaleLinePOSCouponApply.SetRange("Sale Line No.", SaleLinePOS."Line No.");
-        SaleLinePOSCouponApply.SetRange(Type, SaleLinePOSCouponApply.Type::Discount);
-        exit(SaleLinePOSCouponApply.FindFirst());
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR NpDc Coupon Type", 'OnBeforeDeleteEvent', '', true, true)]
