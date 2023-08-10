@@ -1,7 +1,7 @@
 ﻿page 6150616 "NPR POS Unit List"
 {
     Caption = 'POS Unit List';
-    ContextSensitiveHelpPage = 'docs/retail/pos_processes/intro/';
+    ContextSensitiveHelpPage = 'docs/retail/pos_academy/configuration/pos_unit/';
     CardPageID = "NPR POS Unit Card";
     Editable = false;
     PageType = List;

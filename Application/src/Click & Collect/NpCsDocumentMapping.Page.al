@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Collect Document Mapping';
+    ContextSensitiveHelpPage = 'docs/retail/click_and_collect/how-to/setup/setup/';
     DelayedInsert = true;
     PageType = List;
     SourceTable = "NPR NpCs Document Mapping";
