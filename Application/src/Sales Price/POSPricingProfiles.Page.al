@@ -18,46 +18,39 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the unique identifier or code for the price profile. This code helps you easily reference and manage different pricing configurations.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies descriptive name or title for the price profile. This helps users understand the purpose or context of the pricing setup.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer Disc. Group"; Rec."Customer Disc. Group")
                 {
-
-                    ToolTip = 'Specifies the value of the Customer Discount Group field';
+                    ToolTip = 'Specifies customer groups assigned to this price profile in order to apply customized discounts based on group membership.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer Price Group"; Rec."Customer Price Group")
                 {
-
-                    ToolTip = 'Specifies the value of the Customer Price Group field';
+                    ToolTip = 'Specifies the link from this price profile to a specific customer price group, allowing tailored pricing for different customer segments.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Price Codeunit ID"; Rec."Item Price Codeunit ID")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Item Price Codeunit ID field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Price Codeunit Name"; Rec."Item Price Codeunit Name")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Item Price Codeunit Name field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item Price Function"; Rec."Item Price Function")
                 {
-
-                    ToolTip = 'Specifies the value of the Item Price Function field';
+                    ToolTip = 'Specifies the function for subscribing to a custom event that calculates the item price in a particular way. The price will be dictated by a specified codeunit.';
                     ApplicationArea = NPRRetail;
                 }
             }
