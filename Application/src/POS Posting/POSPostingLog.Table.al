@@ -129,6 +129,10 @@
         }
         key(Key2; "Posting Per Entry No.", "Posting Per", "Posting Type")
         {
+            ObsoleteState = Removed;
+            ObsoleteTag = 'NPR25.0';
+            ObsoleteReason = 'Use Key3 ["Posting Per Entry No.", "Posting Per", "Posting Type", "With Error"] instead';
+            Enabled = false;
         }
         key(Key3; "Posting Per Entry No.", "Posting Per", "Posting Type", "With Error")
         {
