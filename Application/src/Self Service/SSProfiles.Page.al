@@ -18,20 +18,17 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies unique identifier or product code for the item being purchased. Enter the code to quickly add the item to the transaction.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a brief description of the product or service. This helps both customers and staff identify the item during the checkout process.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Kiosk Mode Unlock PIN"; Rec."Kiosk Mode Unlock PIN")
                 {
-
-                    ToolTip = 'Specifies the value of the Kios Mode Unlock PIN field';
+                    ToolTip = 'Specifies secure PIN to unlock settings and permissions. This is necessary for authorized personnel to access and manage the self-service kiosk functionality.';
                     ApplicationArea = NPRRetail;
                 }
             }
