@@ -315,7 +315,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         NPRPOSActionDocExpEvents: Codeunit "NPR POS Action Doc Exp Events";
     begin
         Sale.GetCurrentSale(SalePOS);
-        AddCustomerWorkflow(Context, PreWorkflows);
+        if SalePOS."Customer No." = '' then
+            AddCustomerWorkflow(Context, PreWorkflows);
         NPRPOSActionDocExpEvents.OnAddPreWorkflowsToRun(Context, SalePOS, PreWorkflows);
     end;
 
