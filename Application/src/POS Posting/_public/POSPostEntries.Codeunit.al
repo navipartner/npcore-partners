@@ -1613,7 +1613,6 @@
         POSPostingLog: Record "NPR POS Posting Log";
         PostingErrorCount: Integer;
     begin
-        POSPostingLog.SetCurrentKey("Posting Per Entry No.", "Posting Per", "Posting Type", "With Error");
         POSPostingLog.SetRange("Posting Per Entry No.", PostingPerEntryNo);
         POSPostingLog.SetRange("Posting Per", PostingPerType);
         POSPostingLog.SetRange("Posting Type", PostingType);
@@ -1623,6 +1622,8 @@
         if PostingErrorCount <= 1 then
             exit;
 
+        POSPostingLog.SetCurrentKey("Posting Per Entry No.", "Posting Per", "Posting Type", "With Error");
+        POSPostingLog.SetLoadFields("Posting Timestamp");
         POSPostingLog.FindLast();
         exit(CurrentDateTime < POSPostingLog."Posting Timestamp" + Power(2, PostingErrorCount) * 60000)
     end;
