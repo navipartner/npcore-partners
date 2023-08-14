@@ -70,6 +70,11 @@
                     ToolTip = 'Specifies the value of the No. field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Variant Code"; Rec."Variant Code")
+                {
+                    ToolTip = 'Specifies the value of the Variant Code field';
+                    ApplicationArea = NPRRetail;
+                }
                 field(Description; Rec.Description)
                 {
 
