@@ -15,44 +15,44 @@
                 Caption = 'General';
                 field("No."; Rec."No.")
                 {
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the number of the POS unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the name of the POS unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the POS Store Code field';
+                    ToolTip = 'Specifies the unique code of the store the POS unit belongs to.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Payment Bin"; Rec."Default POS Payment Bin")
                 {
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the POS Payment Bin field';
+                    ToolTip = 'Specifies the payment bin (cash drawer) that will be used by the POS unit. It’s recommended to use the same number as the one provided in the POS unit No.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
-                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ToolTip = 'Specifies Global Dimension associated with the POS unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
-                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ToolTip = 'Specifies the Global Dimension associated with the POS unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Type"; Rec."POS Type")
                 {
-                    ToolTip = 'Specifies the type of the POS';
+                    ToolTip = 'Specifies the type of the POS unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Status; Rec.Status)
                 {
-                    ToolTip = 'Specifies the value of the Status field';
+                    ToolTip = 'Specifies the current status of the POS unit, updated automatically by the system.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -62,13 +62,13 @@
                 field("POS Audit Profile"; Rec."POS Audit Profile")
                 {
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the POS Audit Profile field';
+                    ToolTip = 'Assign different number series and different rules for printing to a POS unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS View Profile"; Rec."POS View Profile")
                 {
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the POS View Profile field';
+                    ToolTip = 'Add a custom POS theme, and configure various visual components that are displayed on the POS unit screen.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Layout Code"; Rec."POS Layout Code")
@@ -80,78 +80,78 @@
                 field("POS End of Day Profile"; Rec."POS End of Day Profile")
                 {
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the POS End of Day Profile field.';
+                    ToolTip = 'Set up components of the end-of-day process, and intervals in which it is performed.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ean Box Sales Setup"; Rec."Ean Box Sales Setup")
                 {
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the Ean Box Setup that will be used on Sales screen.';
+                    ToolTip = 'Set up what type of data is supported by the input boxes in POS units.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ean Box Payment Setup"; Rec."Ean Box Payment Setup")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Ean Box Setup that will be used on Payment screen.';
+                    ToolTip = 'Choose which Ean Box Setup will be used on Payment screen.';
                 }
                 field("POS Unit Receipt Text Profile"; Rec."POS Unit Receipt Text Profile")
                 {
-                    ToolTip = 'Specifies the value of the POS Unit Receipt Text Profile field';
+                    ToolTip = 'Set up additional custom text in the receipt footer area depending on your business needs.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Sales Workflow Set"; Rec."POS Sales Workflow Set")
                 {
-                    ToolTip = 'Specifies the value of the POS Sales Workflow Set field';
+                    ToolTip = 'Specifies the  scenario used by the POS unit. For example, we can define a particular behaviour such as the user being asked to select a Dimension for the transaction when moving from Sales screen to Payment screen.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Global POS Sales Setup"; Rec."Global POS Sales Setup")
                 {
-                    ToolTip = 'Specifies the value of the Global POS Sales Setup field';
+                    ToolTip = 'Configure multi-company sales transactions.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Named Actions Profile"; Rec."POS Named Actions Profile")
                 {
-                    ToolTip = 'Specifies the value of the POS Named Actions Profile field';
+                    ToolTip = 'Configure the main actions associated with POS units.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Restaurant Profile"; Rec."POS Restaurant Profile")
                 {
-                    ToolTip = 'Specifies the value of the POS Restaurant Profile field';
+                    ToolTip = 'Specifies the default Restaurant profile that is using this POS Unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Pricing Profile"; Rec."POS Pricing Profile")
                 {
-                    ToolTip = 'Specifies the value of the POS Pricing Profile field where customer discount and price group should be set.';
+                    ToolTip = 'Set up the customer price lists, customer discount lists, and price matching associated with the POS unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Self Service Profile"; Rec."POS Self Service Profile")
                 {
-                    ToolTip = 'Specifies the value of the Self Service Profile field.';
+                    ToolTip = 'Configure the behavior of the POS unit if it''s meant to serve as a self-service kiosk.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Display Profile"; Rec."POS Display Profile")
                 {
-                    ToolTip = 'Specifies the value of the POS Display Profile field';
+                    ToolTip = 'Configure the POS unit’s display view.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS HTML Display Profile"; Rec."POS HTML Display Profile")
                 {
-                    ToolTip = 'Specifies the value of the POS HTML Display Profile field';
+                    ToolTip = 'Configure how the media content is displayed, and upload a HTML file which provides responses for customer input on the POS display.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Tax Free Profile"; Rec."POS Tax Free Profile")
                 {
-                    ToolTip = 'Specifies the value of the POS Tax Free Profile field';
+                    ToolTip = 'If there is integration with Global Blue Tax Free or Premier Tax Free in place, you can set the handler for the interface to the POS Unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Security Profile"; Rec."POS Security Profile")
                 {
-                    ToolTip = 'Specifies the value of the POS Security Profile field';
+                    ToolTip = 'Configure security-related settings like passwords and display timeout.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Inventory Profile"; Rec."POS Inventory Profile")
                 {
-                    ToolTip = 'Specifies a POS Inventory Profile, which is used for the POS unit.';
+                    ToolTip = 'Configure Stockout warnings on the POS.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -170,7 +170,7 @@
                 RunPageLink = "Table ID" = CONST(6150615),
                               "No." = FIELD("No.");
                 ShortCutKey = 'Shift+Ctrl+D';
-                ToolTip = 'Executes the Dimensions action';
+                ToolTip = 'Specifies the value of the Default Dimensions attached to the POS Unit.';
                 ApplicationArea = NPRRetail;
             }
             action("POS Period Registers")
@@ -183,7 +183,7 @@
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Period Register List";
                 RunPageLink = "POS Unit No." = FIELD("No.");
-                ToolTip = 'Executes the POS Period Registers action';
+                ToolTip = 'Display the list of POS Period Registers for the POS Unit.';
                 ApplicationArea = NPRRetail;
             }
             action("POS Entries")
@@ -196,7 +196,7 @@
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Entry List";
                 RunPageLink = "POS Unit No." = FIELD("No.");
-                ToolTip = 'Executes the POS Entries action';
+                ToolTip = 'Display the list of POS Entries (transactions) tied to the POS Unit.';
                 ApplicationArea = NPRRetail;
             }
             action("POS Unit Bins")
@@ -205,7 +205,7 @@
                 Image = List;
                 RunObject = Page "NPR POS Unit to Bin Relation";
                 RunPageLink = "POS Unit No." = FIELD("No.");
-                ToolTip = 'Executes the POS Unit Bins action';
+                ToolTip = 'Display the relationships between POS Units and their respective Bins.  You can difine multiple POS Bins for a single POS Unit.';
                 ApplicationArea = NPRRetail;
             }
             action("POS Unit Display")
@@ -213,7 +213,7 @@
                 Caption = 'POS Unit Display';
                 Image = Administration;
                 RunObject = Page "NPR POS Unit Display";
-                ToolTip = 'Set unit-specific info for the POS Display Profile.';
+                ToolTip = 'Set up which screen is used as the second display for that POS Unit.';
                 ApplicationArea = NPRRetail;
             }
         }
