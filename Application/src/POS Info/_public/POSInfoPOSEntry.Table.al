@@ -104,10 +104,6 @@
         key(Key1; "POS Info Code", "POS Entry No.", "Entry No.")
         {
         }
-    }
-
-    fieldgroups
-    {
+        key(Key2; "POS Entry No.", "Sales Line No.") {}
     }
 }
-
