@@ -498,10 +498,8 @@
 
     procedure GetAdmissionCapacity(var AdmissionCapacityCheck: XmlPort "NPR TM Admis. Capacity Check")
     begin
-
         AdmissionCapacityCheck.Import();
         AdmissionCapacityCheck.AddResponse();
-
     end;
 
     procedure GetAdmissionSchedules(var AdmissionSchedules: XmlPort "NPR TM Get Admission Schedules")
@@ -509,6 +507,13 @@
         AdmissionSchedules.Import();
         AdmissionSchedules.CreateResponse();
     end;
+
+    procedure GetAdmissionCapacityPrice(var AdmissionCapacityPrice: XmlPort "NPR TM AdmissionCapacityPrice")
+    begin
+        AdmissionCapacityPrice.Import();
+        AdmissionCapacityPrice.AddResponse();
+    end;
+
 
     procedure GetTicketPrintUrl(var TicketGetTicketPrintURL: XmlPort "NPR TM Ticket Get Print URL")
     begin
