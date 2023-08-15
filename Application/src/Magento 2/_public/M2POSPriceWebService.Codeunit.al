@@ -19,7 +19,7 @@
     end;
 
     [TryFunction]
-    local procedure TryPosQuoteRequest(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary)
+    internal procedure TryPosQuoteRequest(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
         Customer: Record Customer;
         VATBusPostingGroup: Code[20];
