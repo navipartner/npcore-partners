@@ -28,6 +28,31 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 end;
 
             }
+            action("NPR PrintReceipt")
+            {
+                Caption = 'Print Receipt';
+                Ellipsis = true;
+                Image = PrintCheck;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                ToolTip = 'Exceutes the Print Receipt Action.';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    TransferHeader: Record "Transfer Header";
+                    RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
+                begin
+                    ReportSelectionRetail.Reset();
+                    ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Transfer Order");
+                    ReportSelectionRetail.FindFirst();
+                    ReportSelectionRetail.TestField("Print Template");
+                    TransferHeader.Get(Rec."No.");
+                    TransferHeader.SetRecFilter();
+                    RPTemplateMgt.PrintTemplate(ReportSelectionRetail."Print Template", TransferHeader, 0);
+                end;
+            }
         }
         addfirst("F&unctions")
         {
@@ -49,7 +74,7 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 begin
                     if not InventorySetup.Get() then
                         exit;
-                    
+
                     RecRef.GetTable(Rec);
                     ScannerImportMgt.ImportFromScanner(InventorySetup."NPR Scanner Provider", Enum::"NPR Scanner Import"::TRANSFER, RecRef);
                 end;
