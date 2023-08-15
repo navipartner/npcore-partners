@@ -313,6 +313,7 @@ codeunit 6150954 "NPR HL MultiChoice Field Mgt."
     var
         HLMultiChoiceFldOption: Record "NPR HL MultiChoice Fld Option";
     begin
+        FromSelectedMCFOption.SetFilter("Field Option ID", '<>%1', 0);
         if not FromSelectedMCFOption.FindSet() then
             exit;
         repeat
@@ -321,6 +322,7 @@ codeunit 6150954 "NPR HL MultiChoice Field Mgt."
             if AssignMCFOption(ToRecID, HLMultiChoiceFldOption, ToSelectedMCFOption) then
                 ChangesFound := true;
         until FromSelectedMCFOption.Next() = 0;
+        FromSelectedMCFOption.SetRange("Field Option ID");
 
         if Move then
             FromSelectedMCFOption.DeleteAll(true);
@@ -366,14 +368,29 @@ codeunit 6150954 "NPR HL MultiChoice Field Mgt."
             end;
 
         RemoveObsoleteAssignedMCFOptions(HLSelectedMCFOption);
+
+        HLSelectedMCFOption.MarkedOnly(false);
+        if HLSelectedMCFOption.IsEmpty() then begin
+            //Assign an empty option to the member info capture record, so we know later on that this has been processed
+            HLMultiChoiceFldOption."Field Code" := HLMultiChoiceField.Code;
+            HLMultiChoiceFldOption."Option ID" := 0;
+            AssignMCFOption(MemberInfoCapture.RecordId(), HLMultiChoiceFldOption, HLSelectedMCFOption);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Membership Events", 'OnAfterSetMemberFields', '', false, false)]
     local procedure UpdateMemberMCFOptionsFromMemberInfoCapture(var Member: Record "NPR MM Member"; MemberInfoCapture: Record "NPR MM Member Info Capture")
+    var
+        HLMultiChoiceField: Record "NPR HL MultiChoice Field";
+        HLSelectedMCFOption: Record "NPR HL Selected MCF Option";
     begin
         if Member."Entry No." = 0 then
             exit;
-        CopyAssignedMCFOptions(MemberInfoCapture.RecordId(), Member.RecordId());
+        if HLMultiChoiceField.FindSet() then
+            repeat
+                if AssignedMCFOptionsExist(MemberInfoCapture.RecordId(), HLMultiChoiceField.Code, HLSelectedMCFOption) then
+                    CopyAssignedMCFOptions(MemberInfoCapture.RecordId(), Member.RecordId(), HLMultiChoiceField.Code, false);
+            until HLMultiChoiceField.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Membership Events", 'OnAfterMemberCreateEvent', '', false, false)]
