@@ -788,7 +788,7 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Checklist Banner", 'OnBeforeUpdateBannerLabels', '', false, false)]
     local procedure ChecklistBannerOnBeforeUpdateBannerLabels(var IsHandled: Boolean; var DescriptionTxt: Text; var TitleTxt: Text; var HeaderTxt: Text)
     var
-        HeaderTextLbl: Label 'Welcome to our solution!';
+        HeaderTextLbl: Label 'Welcome to NP Retail!';
         TitleTextLbl: Label 'Get Started';
         DescriptionTextLbl: Label 'We''ve prepared activities to quickly get you and your team started. Explore key features and benefits of our solution. Success awaits—let''s get started!';
     begin
