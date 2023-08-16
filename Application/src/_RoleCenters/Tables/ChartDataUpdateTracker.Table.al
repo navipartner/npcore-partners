@@ -17,6 +17,9 @@ table 6059831 "NPR Chart Data Update Tracker"
         {
             Caption = 'Chart Page ID';
             DataClassification = SystemMetadata;
+            ObsoleteReason = 'Replaced by field Chart Codeunit ID';
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
         }
         field(3; "Last Computed"; DateTime)
         {
@@ -52,6 +55,11 @@ table 6059831 "NPR Chart Data Update Tracker"
         field(8; "End Date"; Date)
         {
             Caption = 'End Date';
+            DataClassification = SystemMetadata;
+        }
+        field(9; "Chart Codeunit ID"; Integer)
+        {
+            Caption = 'Chart Codeunit ID"';
             DataClassification = SystemMetadata;
         }
     }
