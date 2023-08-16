@@ -69,6 +69,7 @@
         FileContent: Text;
         FTPConn: Record "NPR FTP Connection";
         NoConLbl: Label 'No FTP Connection is specified.';
+        MakeFtpUrlErr: Label 'Creation of directory %1 failed.\\(%2)', Comment = '%1=Foldername;%2=GetLastErrorText()';
     begin
         if not ValidFilename(Filename) then
             Error(FileIsNotValidErr, Filename);
@@ -111,7 +112,8 @@
         end else begin
             NewPath := ImportType."Ftp Backup Dir Path" + Filename;
             if not FtpDirExists(ImportType."Ftp Backup Dir Path") then
-                if MakeFtpUrl(ImportType."Ftp Backup Dir Path") then;
+                if not MakeFtpUrl(ImportType."Ftp Backup Dir Path") then
+                    Error(MakeFtpUrlErr, ImportType."Ftp Backup Dir Path", GetLastErrorText());
 
             if not RenameFtpFile(Path, NewPath) then
                 Error(FtpBackupErr, Filename, GetLastErrorText());
@@ -443,23 +445,6 @@
             FormattedPath += '/';
     end;
 
-    local procedure PathOneLevelUp(RemotePath: Text; var ReturnedFromFolder: Text): Text
-    var
-        i: Integer;
-        lastSlashPosition: Integer;
-    begin
-        if CopyStr(RemotePath, StrLen(RemotePath), 1) = '/' then
-            RemotePath := CopyStr(RemotePath, 1, StrLen(RemotePath) - 1);
-
-        for i := 1 to StrLen(RemotePath) do begin
-            if RemotePath[StrLen(RemotePath) + 1 - i] = '/' then
-                lastSlashPosition := StrLen(RemotePath) - i;
-        end;
-
-        ReturnedFromFolder := CopyStr(RemotePath, lastSlashPosition, StrLen(RemotePath));
-        exit(CopyStr(RemotePath, 1, lastSlashPosition - 1));
-    end;
-
     local procedure ValidFilename(Filename: Text): Boolean
     var
         Position: Integer;
@@ -477,23 +462,25 @@
     end;
     #endregion "Ftp List"
 
+    local procedure FtpDirExists(FtpUrl: Text): Boolean
+    var
+        FolderExist: Boolean;
+        FtpUrlExistsErr: Label 'Test of directory exists failed (%1):\\(%2)', Comment = '%1=Foldername;%2=GetLastErrorText()';
+    begin
+        if not TryFtpDirExists(FtpUrl, FolderExist) then
+            Error(FtpUrlExistsErr, FtpUrl, GetLastErrorText());
+        exit(FolderExist);
+    end;
+
     #region Aux
     [TryFunction]
-    local procedure FtpDirExists(FtpUrl: Text)
+    local procedure TryFtpDirExists(FtpUrl: Text; var FolderExist: Boolean)
     var
         FTPResponse: JsonObject;
         JToken: JsonToken;
         ResponseCodeText: Text;
-        FolderName: Text;
-        i: Integer;
-        JArray: JsonArray;
-        FileObject: JsonObject;
-        FolderExist: Boolean;
-        FolderDoesNotExistLbl: Label 'Folder with that name does not exist';
     begin
-        FtpUrl := PathOneLevelUp(FtpUrl, FolderName);
-
-        FTPResponse := FTPClient.ListDirectory(FtpUrl);
+        FTPResponse := FTPClient.DirectoryExists(FtpUrl);
 
         FTPResponse.Get('StatusCode', JToken);
         ResponseCodeText := JToken.AsValue().AsText();
@@ -501,20 +488,8 @@
         case ResponseCodeText of
             '200':
                 begin
-                    FTPResponse.Get('Files', JToken);
-                    JArray := JToken.AsArray();
-
-                    for i := 0 to JArray.Count - 1 do begin
-                        JArray.Get(i, JToken);
-                        FileObject := JToken.AsObject();
-
-                        FileObject.Get('IsDirectory', JToken);
-                        if JToken.AsValue().AsBoolean() then begin
-                            FileObject.Get('Name', JToken);
-                            if JToken.AsValue().AsText() = FolderName then
-                                FolderExist := true;
-                        end;
-                    end;
+                    FTPResponse.Get('Exists', JToken);
+                    FolderExist := JToken.AsValue().AsBoolean();
                 end;
             '401':
                 Error(AuthorizationFailedErrorText);
@@ -523,8 +498,6 @@
                 Error(JToken.AsValue().AsText());
             end;
         end;
-        if not FolderExist then
-            Error(FolderDoesNotExistLbl);
     end;
 
     [TryFunction]
@@ -571,7 +544,7 @@
         JToken: JsonToken;
         ResponseCodeText: Text;
     begin
-        FTPClient.CreateDirectory(FtpUrl);
+        FTPResponse := FTPClient.CreateDirectory(FtpUrl);
 
         FTPResponse.Get('StatusCode', JToken);
         ResponseCodeText := JToken.AsValue().AsText();
