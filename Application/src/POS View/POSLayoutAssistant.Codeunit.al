@@ -29,6 +29,8 @@ codeunit 6059925 "NPR POS Layout Assistant"
                 GetUserCultureName(Context, FrontEnd);
             'CallRefreshData':
                 CallRefreshData();
+            'LegacyPOSMenus':
+                GetPOSMenus(Context, FrontEnd);
             else
                 exit;
         end;
@@ -36,7 +38,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         Handled := true;
     end;
 
-    procedure RefreshPOSLayoutData(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure RefreshPOSLayoutData(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSLayout: Record "NPR POS Layout";
         POSLayoutList: JsonArray;
@@ -58,7 +60,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 
-    procedure SavePOSLayoutData(Context: JsonObject)
+    local procedure SavePOSLayoutData(Context: JsonObject)
     var
         POSLayout: JsonToken;
         POSLayouts: JsonToken;
@@ -386,7 +388,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         POSRefreshData.Refresh();
     end;
 
-    procedure GetUserCultureName(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure GetUserCultureName(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         TypeHelper: Codeunit "Type Helper";
         Response: JsonObject;
@@ -395,7 +397,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 
-    procedure AddPOSLayoutToJson(POSLayout: Record "NPR POS Layout"; var POSLayoutContentOut: JsonObject)
+    local procedure AddPOSLayoutToJson(POSLayout: Record "NPR POS Layout"; var POSLayoutContentOut: JsonObject)
     var
         Instr: InStream;
         PropertiesString: Text;
@@ -411,5 +413,15 @@ codeunit 6059925 "NPR POS Layout Assistant"
         end else
             POSLayoutContentOut.Add('blob', '');
         POSLayoutContentOut.Add('assignedToPOSUnits', POSLayout.AssignedToPOSUnits());
+    end;
+
+    local procedure GetPOSMenus(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        Menu: Record "NPR POS Menu";
+        POSUIManagement: Codeunit "NPR POS UI Management";
+        Response: JsonObject;
+    begin
+        Response.Add('POSMenus', POSUIManagement.InitializeMenus(Menu));
+        FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 }

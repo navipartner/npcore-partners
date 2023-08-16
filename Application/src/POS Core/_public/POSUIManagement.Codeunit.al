@@ -72,28 +72,31 @@
     procedure InitializeMenus(POSUnit: Record "NPR POS Unit"; Salesperson: Record "Salesperson/Purchaser")
     var
         Menu: Record "NPR POS Menu";
-        TempPOSParameterValue: Record "NPR POS Parameter Value" temporary;
         POSViewProfile: Record "NPR POS View Profile";
-        MenuObj: Codeunit "NPR POS Menu";
-        Menus: JsonArray;
-        POSSession: Codeunit "NPR POS Session";
     begin
         POSUnit.GetProfile(POSViewProfile);
-
-        PreloadParameters(TempPOSParameterValue);
 
         Menu.SetCurrentKey("Register No.", "Salesperson Code");
         Menu.SetFilter("Register No.", '%1|%2', POSUnit."No.", '');
         Menu.SetFilter("Salesperson Code", '%1|%2', Salesperson.Code, '');
         Menu.SetFilter("Register Type", '%1|%2', POSViewProfile.Code, '');
 
+        FrontEnd.ConfigureMenu(InitializeMenus(Menu));
+    end;
+
+    internal procedure InitializeMenus(var Menu: Record "NPR POS Menu") MenusJArr: JsonArray
+    var
+        TempPOSParameterValue: Record "NPR POS Parameter Value" temporary;
+        MenuObj: Codeunit "NPR POS Menu";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        PreloadParameters(TempPOSParameterValue);
         if Menu.FindSet() then
             repeat
                 Clear(MenuObj);
                 InitializeMenu(Menu, MenuObj, POSSession, TempPOSParameterValue);
-                Menus.Add(MenuObj.GetJson());
+                MenusJArr.Add(MenuObj.GetJson());
             until Menu.Next() = 0;
-        FrontEnd.ConfigureMenu(Menus);
     end;
 
     local procedure InitializeMenu(var Menu: Record "NPR POS Menu"; MenuObj: Codeunit "NPR POS Menu"; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
