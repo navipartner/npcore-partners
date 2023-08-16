@@ -42,6 +42,11 @@
             part(RetailSalesChart; "NPR Retail Sales Chart")
             {
                 ApplicationArea = NPRRetail;
+                Visible = false;
+            }
+            part(RetailPerformance; "NPR Chart Wrapper")
+            {
+                ApplicationArea = NPRRetail;
             }
 #ENDIF
             part(MyJobQueue; "My Job Queue")

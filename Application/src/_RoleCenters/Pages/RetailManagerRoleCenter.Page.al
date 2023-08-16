@@ -26,8 +26,14 @@
             part(RetailSalesChart; "NPR Retail Sales Chart")
             {
                 ApplicationArea = NPRRetail;
+                Visible = false;
             }
             part(RetailSalesByShopChart; "NPR Retail Sales Chart by Shop")
+            {
+                ApplicationArea = NPRRetail;
+                Visible = false;
+            }
+            part(RetailPerformance; "NPR Chart Wrapper")
             {
                 ApplicationArea = NPRRetail;
             }
