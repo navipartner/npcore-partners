@@ -346,6 +346,42 @@
         end;
     end;
 
+    /// <summary>
+    /// Check if the specified directory exists
+    /// Return a Json Object of the form:
+    /// <code>
+    /// {
+    ///     //On Success
+    ///     "Exists":boolean,
+    ///     //On Post request reached server
+    ///     "StatusCode": integer,  
+    ///     //Request parsing Error
+    ///     "Error": string         
+    /// }
+    /// </code>
+    /// </summary>
+    /// <param name="RemotePath">
+    /// The full path where the files will be downloaded from.
+    /// </param>
+    internal procedure DirectoryExists(RemotePath: Text): JsonObject
+    var
+        reqContent: JsonObject;
+        jsonTxt: Text;
+        jsonResult: JsonObject;
+        content: HttpContent;
+    begin
+        if PrepareCommonHttpRequest(reqContent) and
+            reqContent.Add(gHttpPathConst, RemotePath) and
+            reqContent.WriteTo(jsonTxt)
+        then begin
+            content.WriteFrom(jsonTxt);
+            exit(HandlePostRequest('Exists', content));
+        end else begin
+            jsonResult.Add(gErrorConst, gErrMsg_Parse_Fail);
+            exit(jsonResult);
+        end;
+    end;
+
     local procedure HandlePostRequest(AZFunction: Text; Content: HttpContent): JsonObject
     var
         httpResponse: HttpResponseMessage;
