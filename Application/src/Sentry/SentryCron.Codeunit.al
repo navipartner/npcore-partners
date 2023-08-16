@@ -131,30 +131,30 @@ codeunit 6151089 "NPR Sentry Cron"
     var
         AzureAdTenant: Codeunit "Azure AD Tenant";
         EnvironmentName: Text;
-        EnvironmentTypeAndTenantId: Text;
+        AadTenantId: Text;
     begin
-        EnvironmentName := 'saas_' + ThisCompanyName + '_' + AzureAdTenant.GetAadTenantId();
+        EnvironmentName := ThisCompanyName + '_' + AzureAdTenant.GetAadTenantId();
 
         if StrLen(EnvironmentName) <= GetEnvironmentNameMaxLength() then
             exit(EnvironmentName);
 
-        EnvironmentTypeAndTenantId := 'saas_' + '_' + AzureAdTenant.GetAadTenantId();
-        EnvironmentName := 'saas_' + CopyStr(ThisCompanyName, 1, GetEnvironmentNameMaxLength() - StrLen(EnvironmentTypeAndTenantId)) + '_' + AzureAdTenant.GetAadTenantId();
+        AadTenantId := '_' + AzureAdTenant.GetAadTenantId();
+        EnvironmentName := CopyStr(ThisCompanyName, 1, GetEnvironmentNameMaxLength() - StrLen(AadTenantId)) + '_' + AzureAdTenant.GetAadTenantId();
         exit(EnvironmentName);
     end;
 
     local procedure GetOnPremEnvironment(ThisCompanyName: Text): Text
     var
         EnvironmentName: Text;
-        EnvironmentTypeAndTenantId: Text;
+        TenantIdAndEnvironmentType: Text;
     begin
-        EnvironmentName := 'onprem_' + ThisCompanyName + '_' + TenantId();
+        EnvironmentName := TenantId() + '_' + ThisCompanyName + '_onprem';
 
         if StrLen(EnvironmentName) <= GetEnvironmentNameMaxLength() then
             exit(EnvironmentName);
 
-        EnvironmentTypeAndTenantId := 'onprem_' + '_' + TenantId();
-        EnvironmentName := 'onprem_' + CopyStr(ThisCompanyName, 1, GetEnvironmentNameMaxLength() - StrLen(EnvironmentTypeAndTenantId)) + '_' + TenantId();
+        TenantIdAndEnvironmentType := TenantId() + '_' + '_onprem';
+        EnvironmentName := TenantId() + '_' + CopyStr(ThisCompanyName, 1, GetEnvironmentNameMaxLength() - StrLen(TenantIdAndEnvironmentType)) + '_onprem';
         exit(EnvironmentName);
     end;
 
