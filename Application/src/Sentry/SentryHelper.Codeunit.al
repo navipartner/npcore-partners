@@ -7,7 +7,7 @@ codeunit 6151396 "NPR Sentry Helper"
         Company: Record Company;
         EnvironmentInformation: Codeunit "Environment Information";
     begin
-        // for now Sentry Cron should be used only for production SaaS environments for companies which are not Cronus or evaluation and have modified G/L Entries in the last 30 days
+        // for now Sentry Cron should be used only for production SaaS environments for companies which are not Cronus or evaluation and the their last G/L Entry has been modified in the last 30 days
         if not EnvironmentInformation.IsSaaS() then
             exit(false);
 
@@ -21,17 +21,19 @@ codeunit 6151396 "NPR Sentry Helper"
             if Company."Evaluation Company" then
                 exit(false);
 
-        if not IsThereAnyGLEntriesInPeriod(CreateDateTime(CalcDate('<-30D>', Today()), Time()), CurrentDateTime()) then
+        if not IsThereRecentGLEntry(CreateDateTime(CalcDate('<-30D>', Today()), Time())) then
             exit(false);
 
         exit(true);
     end;
 
-    local procedure IsThereAnyGLEntriesInPeriod(FromDateTime: DateTime; ToDateTime: DateTime): Boolean;
+    local procedure IsThereRecentGLEntry(FromDateTime: DateTime): Boolean;
     var
         GLEntry: Record "G/L Entry";
     begin
-        GLEntry.SetRange("Last Modified DateTime", FromDateTime, ToDateTime);
-        exit(not GLEntry.IsEmpty());
+        if not GLEntry.FindLast() then
+            exit(false);
+
+        exit(GLEntry."Last Modified DateTime" > FromDateTime);
     end;
 }
