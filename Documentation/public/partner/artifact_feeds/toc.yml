@@ -1,6 +1,0 @@
-- name: Getting started
-  href: intro.md
-- name: How-to
-  items: 
-  - name: Accessing NaviPartner Artifact Feeds
-    href: howto/AccessNaviPartnerArtifactFeedsBasic.md

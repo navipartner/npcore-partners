@@ -1,6 +1,0 @@
-- name: Introduction
-  href: intro.md
-- name: How-To  
-  items:
-  - name: Install NP Power BI for Retail
-    href: howto/install_power_bi_retail.md
