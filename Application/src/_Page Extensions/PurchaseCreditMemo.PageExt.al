@@ -1,5 +1,22 @@
 pageextension 6014456 "NPR Purchase Credit Memo" extends "Purchase Credit Memo"
 {
+    layout
+    {
+        addlast(General)
+        {
+            field("NPR Prepayment"; RSPurchaseHeader."Prepayment")
+            {
+                ApplicationArea = NPRRSLocal;
+                Caption = 'Prepayment';
+                ToolTip = 'Specifies the value of the Prepayment field.';
+                trigger OnValidate()
+                begin
+                    RSPurchaseHeader.Validate(Prepayment);
+                    RSPurchaseHeader.Save();
+                end;
+            }
+        }
+    }
     actions
     {
         addfirst("F&unctions")
@@ -23,11 +40,19 @@ pageextension 6014456 "NPR Purchase Credit Memo" extends "Purchase Credit Memo"
                 begin
                     if not InventorySetup.Get() then
                         exit;
-                    
+
                     RecRef.GetTable(Rec);
                     ScannerImportMgt.ImportFromScanner(InventorySetup."NPR Scanner Provider", Enum::"NPR Scanner Import"::PURCHASE, RecRef);
                 end;
             }
         }
     }
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        RSPurchaseHeader.Read(Rec.SystemId);
+    end;
+
+    var
+        RSPurchaseHeader: Record "NPR RS Purchase Header";
 }

@@ -6,6 +6,7 @@ page 6150837 "NPR RS App. Area Setup"
     SourceTable = "Application Area Setup";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
+
     layout
     {
         area(Content)
