@@ -3,7 +3,6 @@
     Extensible = False;
     PageType = List;
     UsageCategory = Administration;
-
     SourceTable = "NPR POS NPRE Rest. Profile";
     Caption = 'POS Restaur. Profiles';
     CardPageId = "NPR POS Restaur. Profile Card";
@@ -17,20 +16,22 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this restaurant profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a text that describes the profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ToolTip = 'Specifies the restaurant code, which is selected by default on POS Restaurant View for POS units with this profile assigned.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Default Seating Location"; Rec."Default Seating Location")
+                {
+                    ToolTip = 'Specifies the seating location, which is selected by default on POS Restaurant View for POS units with this profile assigned.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -41,13 +42,11 @@
             {
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
             systempart(Control6014407; Links)
             {
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
         }
     }

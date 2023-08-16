@@ -15,45 +15,61 @@
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this restaurant service flow profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a text that describes the restaurant service flow profile.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Close Waiter Pad On"; Rec."Close Waiter Pad On")
+                group(CloseWaiterPad)
                 {
+                    ShowCaption = false;
+                    field("Close Waiter Pad On"; Rec."Close Waiter Pad On")
+                    {
+                        ToolTip = 'Specifies whether and when system should automatically close waiter pads.';
+                        ApplicationArea = NPRRetail;
 
-                    ToolTip = 'Specifies the value of the Close Waiter Pad On field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnValidate()
-                    begin
-                        UpdateControls();
-                    end;
+                        trigger OnValidate()
+                        begin
+                            UpdateControls();
+                        end;
+                    }
+                    field("Only if Fully Paid"; Rec."Only if Fully Paid")
+                    {
+                        Enabled = IsCloseOnPayment;
+                        ToolTip = 'Specifies whether waiter pads will only be automatically closed after full payment is recieved. If not enabled, system will automatically close waiter pads after the first payment, even if the sale remains partialy unpaid after that.';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
-                field("Only if Fully Paid"; Rec."Only if Fully Paid")
+                group(ClearSeating)
                 {
-
-                    Enabled = IsCloseOnPayment;
-                    ToolTip = 'Specifies whether waiter pads will be closed only after full payment';
-                    ApplicationArea = NPRRetail;
+                    ShowCaption = false;
+                    field("Clear Seating On"; Rec."Clear Seating On")
+                    {
+                        ToolTip = 'Specifies when system should clear seatings. System will assign to the seating the status, specified in "Seating Status after Clearing".';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Seating Status after Clearing"; Rec."Seating Status after Clearing")
+                    {
+                        ToolTip = 'Specifies the status code, which is going to be assigned to seatings on clearing.';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
-                field("Clear Seating On"; Rec."Clear Seating On")
+                group(WPadReadyForPmtStatus)
                 {
-
-                    ToolTip = 'Specifies the value of the Clear Seating On field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Seating Status after Clearing"; Rec."Seating Status after Clearing")
-                {
-
-                    ToolTip = 'Specifies the value of the Seating Status after Clearing field';
-                    ApplicationArea = NPRRetail;
+                    ShowCaption = false;
+                    field("Set W/Pad Ready for Pmt. On"; Rec."Set W/Pad Ready for Pmt. On")
+                    {
+                        ToolTip = 'Specifies whether and when system should automatically change waiter pad status to "ready for payment" (the status specified in field "W/Pad Ready for Pmt. Status").';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("W/Pad Ready for Pmt. Status"; Rec."W/Pad Ready for Pmt. Status")
+                    {
+                        ToolTip = 'Specifies the "ready for payment" waiter pad status code.';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
             }
         }
@@ -62,13 +78,11 @@
             systempart(Control6014407; Notes)
             {
                 ApplicationArea = NPRRetail;
-
             }
             systempart(Control6014408; Links)
             {
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
         }
     }

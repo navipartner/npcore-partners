@@ -4,6 +4,12 @@
 
     var
         NotFoundErr: Label 'The waiter pad "%1", was not found.';
+        _ParamWaiterPadCodeLbl: Label 'WaiterPadCode', MaxLength = 30, Locked = true;
+
+    internal procedure ActionCode(): Code[20]
+    begin
+        exit(Format("NPR POS Workflow"::RV_GET_WAITER_PAD));
+    end;
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
@@ -13,7 +19,7 @@
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
-        WorkflowConfig.AddTextParameter('WaiterPadCode', '', ParamWaiterPadCode_CptLbl, ParamWaiterPadCode_DescLbl);
+        WorkflowConfig.AddTextParameter(_ParamWaiterPadCodeLbl, '', ParamWaiterPadCode_CptLbl, ParamWaiterPadCode_DescLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -21,13 +27,13 @@
         POSSession: Codeunit "NPR POS Session";
         WaiterPadCode: Code[20];
     begin
-        WaiterPadCode := CopyStr(Context.GetStringParameter('WaiterPadCode'), 1, MaxStrLen(WaiterPadCode));
+        WaiterPadCode := CopyStr(Context.GetStringParameter(_ParamWaiterPadCodeLbl), 1, MaxStrLen(WaiterPadCode));
 
         LoadWaiterPad(POSSession, FrontEnd, WaiterPadCode);
         SelectSalesView(POSSession);
     end;
 
-    procedure LoadWaiterPad(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; WaiterPadCode: Code[20]);
+    procedure LoadWaiterPad(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; WaiterPadCode: Code[20])
     var
         NPREWaiterPad: Record "NPR NPRE Waiter Pad";
         NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
@@ -40,20 +46,20 @@
         NPREWaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(NPREWaiterPad, POSSession);
     end;
 
-    procedure RequestWaiterPad(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; WaiterPadCode: Code[20]);
+    procedure RequestWaiterPad(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; WaiterPadCode: Code[20])
     var
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
         NPREFrontendAssistant: Codeunit "NPR NPRE Frontend Assistant";
     begin
-        if not NPREWaiterPad.Get(WaiterPadCode) then begin
+        if not WaiterPad.Get(WaiterPadCode) then begin
             Message(NotFoundErr, WaiterPadCode);
             exit;
         end;
-
-        NPREFrontendAssistant.RefreshWaiterPadContent(POSSession, FrontEnd, WaiterPadCode);
+        WaiterPad.SetRecFilter();
+        NPREFrontendAssistant.RefreshWaiterPadContent(POSSession, FrontEnd, WaiterPad);
     end;
 
-    local procedure SelectSalesView(POSSession: Codeunit "NPR POS Session");
+    local procedure SelectSalesView(POSSession: Codeunit "NPR POS Session")
     begin
         POSSession.ChangeViewSale();
     end;

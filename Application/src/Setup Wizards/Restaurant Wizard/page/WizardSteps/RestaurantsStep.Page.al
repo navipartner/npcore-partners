@@ -16,32 +16,32 @@ page 6150883 "NPR Restaurants Step"
             {
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this restaurant.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies a text that describes the restaurant.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Name 2"; Rec."Name 2")
                 {
-                    ToolTip = 'Specifies the value of the Name 2 field';
+                    ToolTip = 'Specifies optional information in addition to the name.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Service Flow Profile"; Rec."Service Flow Profile")
                 {
-                    ToolTip = 'Specifies the selected Service Flow Profile. A new profile can be created if needed.';
+                    ToolTip = 'Specifies the service flow profile, assigned to the restaurant. Service flow profiles define general restaurant servise flow options, such as at what stage waiter pads should be closed, or when seating should be cleared.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Auto Send Kitchen Order"; Rec."Auto Send Kitchen Order")
                 {
-                    ToolTip = 'Specifies whether the order will be automatically sent to the kitchen once captured.';
+                    ToolTip = 'Specifies if system should automatically create or update kitchen orders as soon as new products are saved to waiter pads.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Resend All On New Lines"; Rec."Resend All On New Lines")
                 {
-                    ToolTip = 'Specifies whether all lines on the waiter pad are sent to the kitchen when new lines are added to the waiter pad.';
+                    ToolTip = 'Specifies if each time, when a new set of products are saved to a waiter pad, system should resend to kitchen both new and existing products from the waiter pad.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Kitchen Printing Active"; Rec."Kitchen Printing Active")
@@ -51,17 +51,17 @@ page 6150883 "NPR Restaurants Step"
                 }
                 field("KDS Active"; Rec."KDS Active")
                 {
-                    ToolTip = 'Specifies whether the KDS is active.';
+                    ToolTip = 'Specifies whether the Kitchen Display Systme (KDS) is active.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Order ID Assign. Method"; Rec."Order ID Assign. Method")
                 {
-                    ToolTip = 'Specifies the assignment method of the order ID.';
+                    ToolTip = 'Specifies whether sistem should updated existing kitchen order or create a new one, when a new set of products is added to an existing waiter pad. This can affect the order products are prepared at kitchen stations.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Station Req. Handl. On Serving"; Rec."Station Req. Handl. On Serving")
                 {
-                    ToolTip = 'Specifies how kitchen station production requests should be handled, if the product has been served prior to finishing production.';
+                    ToolTip = 'Specifies how existing kitchen station production requests should be handled, if a product has been served prior to finishing production.';
                     ApplicationArea = NPRRetail;
                 }
             }

@@ -1,14 +1,11 @@
 ﻿page 6150697 "NPR NPRE Kitchen Req.Src.Links"
 {
     Extensible = False;
-
     Caption = 'Kitchen Request Source Links';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NPRE Kitchen Req.Src. Link";
-    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -18,70 +15,78 @@
             {
                 field("Request No."; Rec."Request No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Request No. field';
+                    ToolTip = 'Specifies the request Id this source document link applies to.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Source Document Type"; Rec."Source Document Type")
                 {
-
-                    ToolTip = 'Specifies the value of the Source Document Type field';
+                    ToolTip = 'Specifies the document type this kitchen request link originates from.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Source Document Subtype"; Rec."Source Document Subtype")
                 {
-
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Source Document Subtype field';
+                    ToolTip = 'Specifies the document subtype this kitchen request link originates from.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Source Document No."; Rec."Source Document No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Source Document No. field';
+                    ToolTip = 'Specifies the document number this kitchen request link originates from.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Source Document Line No."; Rec."Source Document Line No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Source Document Line No. field';
+                    ToolTip = 'Specifies the document line number this kitchen request link originates from.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-
-                    ToolTip = 'Specifies the value of the Quantity field';
+                    ToolTip = 'Specifies how many units of the product have been requested.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Quantity (Base)"; Rec."Quantity (Base)")
                 {
-
-                    ToolTip = 'Specifies the value of the Quantity (Base) field';
+                    ToolTip = 'Specifies how many units (base unit of measure) of the product have been requested.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Context; Rec.Context)
                 {
-
-                    ToolTip = 'Specifies the value of the Context field';
+                    ToolTip = 'Specifies the process this kitchen request link created by.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Serving Step"; Rec."Serving Step")
                 {
-
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Serving Step field';
+                    ToolTip = 'Specifies the meal flow serving step the product of this request is to be served at.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Seating Code"; Rec."Seating Code")
+                {
+                    ToolTip = 'Specifies the seating (table) code the request was created for.';
+                    Visible = false;
+                    ApplicationArea = NPRRetail;
+                }
+                field("Seating No."; Rec."Seating No.")
+                {
+                    ToolTip = 'Specifies the seating (table) No. the request was created for.';
+                    Visible = false;
+                    ApplicationArea = NPRRetail;
+                }
+                field("Assigned Waiter Code"; Rec."Assigned Waiter Code")
+                {
+                    Caption = 'Waiter Code';
+                    ToolTip = 'Specifies the waiter (salesperson) code the request was created for.';
+                    Visible = false;
                     ApplicationArea = NPRRetail;
                 }
                 field("Created Date-Time"; Rec."Created Date-Time")
                 {
-
-                    ToolTip = 'Specifies the value of the Created Date-Time field';
+                    ToolTip = 'Specifies date-time this kitchen request link was created at.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Entry No. field';
+                    ToolTip = 'Specifies a unique entry number, assigned by the system to this record according to an automatically maintained number series.';
                     ApplicationArea = NPRRetail;
                 }
             }

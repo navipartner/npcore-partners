@@ -21,111 +21,121 @@
                 IndentationColumn = 0;
                 field("Request No."; Rec."Request No.")
                 {
-                    ToolTip = 'Specifies the value of the Request No. field';
+                    ToolTip = 'Specifies the request unique Id, assigned by the system according to an automatically maintained number series.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Order ID"; Rec."Order ID")
                 {
-                    ToolTip = 'Specifies the value of the Order ID field';
+                    ToolTip = 'Specifies the order Id this request belongs to.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Line Type"; Rec."Line Type")
                 {
-                    ToolTip = 'Specifies the value of the Type field';
+                    ToolTip = 'Specifies the type of entity for this request line, such as Item, or Comment.';
                     ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the product you are preparing, if you have chosen "Item" in the Line Type field.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-                    ToolTip = 'Specifies the value of the Variant Code field';
+                    ToolTip = 'Specifies the variant of the item on this line.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a description of what you are preparing. Based on your choices in the Line Type and No. fields, the field may show product description or a comment line.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ToolTip = 'Specifies the value of the Quantity field';
+                    ToolTip = 'Specifies how many units of the product have been requested.';
                     ApplicationArea = NPRRetail;
+                    Style = Unfavorable;
+                    StyleExpr = Rec."Qty. Changed";
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
-                    ToolTip = 'Specifies the value of the Unit of Measure Code field';
+                    ToolTip = 'Specifies how each unit of the product is measured, such as in pieces or boxes.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Qty. Changed"; Rec."Qty. Changed")
                 {
                     BlankZero = true;
-                    ToolTip = 'Specifies the value of the Qty. Changed field';
+                    ToolTip = 'Specifies if there is at least one kitchen station yet to accept the quantity change.';
                     ApplicationArea = NPRRetail;
+                    Style = Unfavorable;
+                    StyleExpr = Rec."Qty. Changed";
                 }
                 field("Serving Step"; Rec."Serving Step")
                 {
-                    ToolTip = 'Specifies the value of the Serving Step field';
+                    ToolTip = 'Specifies the meal flow serving step the product of this request is to be served at.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Created Date-Time"; Rec."Created Date-Time")
                 {
-                    ToolTip = 'Specifies the value of the Created Date-Time field';
+                    ToolTip = 'Specifies the date-time the request was created at.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Expected Dine Date-Time"; Rec."Expected Dine Date-Time")
                 {
-                    ToolTip = 'Specifies the date-time the customer requested the order be ready at';
+                    ToolTip = 'Specifies the date-time the customer requested the order be ready at.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Serving Requested Date-Time"; Rec."Serving Requested Date-Time")
                 {
-                    ToolTip = 'Specifies the value of the Serving Requested Date-Time field';
+                    ToolTip = 'Specifies the date-time waiter requested serving of the product on the line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Line Status"; Rec."Line Status")
                 {
-                    ToolTip = 'Specifies the value of the Line Status field';
+                    ToolTip = 'Specifies the status of this request.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Production Status"; Rec."Production Status")
                 {
                     Visible = IsExpediteMode;
-                    ToolTip = 'Specifies the value of the Production Status field';
+                    ToolTip = 'Specifies overal production status of the request.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Station Production Status"; Rec."Station Production Status")
                 {
                     ApplicationArea = NPRRetail;
                     Visible = not IsExpediteMode;
-                    ToolTip = 'Specifies the value of the Station Production Status field';
+                    ToolTip = 'Specifies the production status of the request at specific kitchen station.';
                     DrillDown = false;
                 }
                 field("No. of Kitchen Stations"; Rec."No. of Kitchen Stations")
                 {
                     Visible = IsExpediteMode;
-                    ToolTip = 'Specifies the value of the No. of Kitchen Stations field';
+                    ToolTip = 'Specifies the number of kitchen stations involved in preparation of the product of this request.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ToolTip = 'Specifies the restaurant the ordered was created for.';
                     ApplicationArea = NPRRetail;
                 }
-                field(SeatingCode; Rec.SeatingCode())
+                field(SeatingCodes; SeatingCodes)
                 {
                     Caption = 'Seating Code';
-                    ToolTip = 'Specifies the seating (table) code the request was created for';
+                    ToolTip = 'Specifies the seating (table) code(s) the request was created for.';
                     Visible = false;
                     ApplicationArea = NPRRetail;
                 }
-                field(SeatingNo; Rec.SeatingNo())
+                field(SeatingNos; SeatingNos)
                 {
                     Caption = 'Seating No.';
-                    ToolTip = 'Specifies the seating (table) No. the request was created for';
+                    ToolTip = 'Specifies the seating (table) number(s) the request was created for.';
+                    ApplicationArea = NPRRetail;
+                }
+                field(AssignedWaiters; AssignedWaiters)
+                {
+                    Caption = 'Waiter Code';
+                    ToolTip = 'Specifies the waiter (salesperson) code(s) the request was created for.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -150,9 +160,9 @@
 
                 trigger RefreshPage()
                 begin
-                    CurrPage.Update();
+                    CurrPage.Update(false);
                     if IsExpediteMode then
-                        CurrPage."Kitchen Stations".Page.Update();
+                        CurrPage."Kitchen Stations".Page.Update(false);
                 end;
             }
         }
@@ -174,7 +184,7 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = IsExpediteMode;
-                    ToolTip = 'Executes the Set Served action';
+                    ToolTip = 'Set selected requests as served.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -195,7 +205,7 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
-                    ToolTip = 'Executes the Start Production action';
+                    ToolTip = 'Start production of selected requests.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -212,7 +222,7 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
-                    ToolTip = 'Executes the End Production action';
+                    ToolTip = 'End production of selected requests.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -233,7 +243,7 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
-                    ToolTip = 'Executes the Accept Qty. Change action';
+                    ToolTip = 'Accept requested quantity change.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -245,50 +255,72 @@
             group(View)
             {
                 Caption = 'View';
-                action(ToggleFinished)
+                action(ShowFinished)
                 {
-                    Caption = 'Show/Hide Finished';
+                    Caption = 'Show Finished';
                     Image = FilterLines;
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
-                    Visible = NOT IsExpediteMode;
-                    ToolTip = 'Executes the Show/Hide Finished action';
+                    Visible = not IsExpediteMode and not FinishedIsShown;
+                    ToolTip = 'Show finished requests.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
-                        if Rec.GetFilter("Production Status") <> '' then
-                            if Rec.GetRangeMax("Production Status") = Rec."Production Status"::Finished then begin
-                                Rec.SetRange("Production Status", Rec."Production Status"::"Not Started", Rec."Production Status"::"On Hold");
-                                Rec.SetRange("Station Production Status", Rec."Station Production Status"::"Not Started", Rec."Station Production Status"::Started);
-                                exit;
-                            end;
-                        Rec.SetRange("Production Status", Rec."Production Status"::"Not Started", Rec."Production Status"::Finished);
-                        Rec.SetRange("Station Production Status", Rec."Station Production Status"::"Not Started", Rec."Station Production Status"::Finished);
+                        ToggleFinishedFilter();
                     end;
                 }
-                action(ToggleServed)
+                action(HideFinished)
                 {
-                    Caption = 'Show/Hide Served';
+                    Caption = 'Hide Finished';
                     Image = FilterLines;
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
-                    Visible = IsExpediteMode;
-                    ToolTip = 'Executes the Show/Hide Served action';
+                    Visible = not IsExpediteMode and FinishedIsShown;
+                    ToolTip = 'Hide finished requests.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
                     begin
-                        if Rec.GetFilter("Line Status") <> '' then
-                            if Rec.GetRangeMax("Line Status") = Rec."Line Status"::Served then begin
-                                Rec.SetRange("Line Status", Rec."Line Status"::"Ready for Serving", Rec."Line Status"::Planned);
-                                exit;
-                            end;
-                        Rec.SetRange("Line Status", Rec."Line Status"::"Ready for Serving", Rec."Line Status"::Served);
+                        ToggleFinishedFilter();
+                    end;
+                }
+                action(ShowServed)
+                {
+                    Caption = 'Show Served';
+                    Image = FilterLines;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    PromotedIsBig = true;
+                    Visible = IsExpediteMode and not ServedIsShown;
+                    ToolTip = 'Show served requests.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    begin
+                        ToggleServedFilter();
+                    end;
+                }
+                action(HideServed)
+                {
+                    Caption = 'Hide Served';
+                    Image = FilterLines;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    PromotedIsBig = true;
+                    Visible = IsExpediteMode and ServedIsShown;
+                    ToolTip = 'Hide served requests.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    begin
+                        ToggleServedFilter();
                     end;
                 }
             }
@@ -298,18 +330,44 @@
     trigger OnOpenPage()
     var
         Restaurant: Record "NPR NPRE Restaurant";
+        UserSetup: Record "User Setup";
     begin
         IsExpediteMode := ViewMode = ViewMode::Expedite;
         if IsExpediteMode then begin
-            if Rec.GetFilter("Restaurant Code") = '' then
+            if not Rec.IsFilteredByRestaurant() then
                 if not Restaurant.IsEmpty() then begin
-                    if Page.RunModal(0, Restaurant) <> Action::LookupOK then
-                        Error('');
+                    UserSetup.Get(UserId());
+                    if not UserSetup."NPR Allow Restaurant Switch" then begin
+                        UserSetup.TestField("NPR Backoffice Restaurant Code");
+                        Restaurant.Code := UserSetup."NPR Backoffice Restaurant Code";
+                    end else begin
+                        if UserSetup."NPR Restaurant Switch Filter" <> '' then begin
+                            Restaurant.FilterGroup(2);
+                            Restaurant.SetFilter(Code, UserSetup."NPR Restaurant Switch Filter");
+                            Restaurant.FilterGroup(0);
+                        end;
+                        if Restaurant.Count() = 1 then
+                            Restaurant.FindFirst()
+                        else
+                            if Page.RunModal(0, Restaurant) <> Action::LookupOK then
+                                Error('');
+                    end;
+                    Rec.FilterGroup(2);
                     Rec.SetRange("Restaurant Code", Restaurant.Code);
+                    Rec.FilterGroup(0);
                 end;
             Rec.SetRange("Line Status", Rec."Line Status"::"Ready for Serving", Rec."Line Status"::Planned);
         end;
         CurrPage."Kitchen Stations".Page.SetViewMode(ViewMode);
+
+        if Rec.GetFilter("Production Status") <> '' then
+            FinishedIsShown := Rec.GetRangeMax("Production Status") = Rec."Production Status"::Finished
+        else
+            FinishedIsShown := true;
+        if Rec.GetFilter("Line Status") <> '' then
+            ServedIsShown := Rec.GetRangeMax("Line Status") = Rec."Line Status"::Served
+        else
+            ServedIsShown := true;
     end;
 
     trigger OnClosePage()
@@ -318,14 +376,10 @@
             CurrPage.TimerControl.StopTimer();
     end;
 
-    var
-        KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
-        KitchenStationAction: Option "Accept Qty. Change","Start Production","End Production";
-        ViewMode: Option Expedite,"Kitchen Station";
-        IsExpediteMode: Boolean;
-        TimerStarted: Boolean;
-        StationNotFound: Label 'System was not able to identify kitchen station to apply the action to.';
-        ViewModeListLbl: Label 'Expedite View,Kitchen Station View';
+    trigger OnAfterGetRecord()
+    begin
+        Rec.GetSeatingAndWaiter(AssignedWaiters, SeatingCodes, SeatingNos);
+    end;
 
     local procedure GetPageCaption(): Text
     var
@@ -378,4 +432,44 @@
     begin
         ViewMode := NewViewMode;
     end;
+
+    local procedure ToggleFinishedFilter()
+    begin
+        if Rec.GetFilter("Production Status") <> '' then
+            if Rec.GetRangeMax("Production Status") = Rec."Production Status"::Finished then begin
+                Rec.SetRange("Production Status", Rec."Production Status"::"Not Started", Rec."Production Status"::"On Hold");
+                Rec.SetRange("Station Production Status", Rec."Station Production Status"::"Not Started", Rec."Station Production Status"::Started);
+                FinishedIsShown := false;
+                exit;
+            end;
+        Rec.SetRange("Production Status", Rec."Production Status"::"Not Started", Rec."Production Status"::Finished);
+        Rec.SetRange("Station Production Status", Rec."Station Production Status"::"Not Started", Rec."Station Production Status"::Finished);
+        FinishedIsShown := true;
+    end;
+
+    local procedure ToggleServedFilter()
+    begin
+        if Rec.GetFilter("Line Status") <> '' then
+            if Rec.GetRangeMax("Line Status") = Rec."Line Status"::Served then begin
+                Rec.SetRange("Line Status", Rec."Line Status"::"Ready for Serving", Rec."Line Status"::Planned);
+                ServedIsShown := false;
+                exit;
+            end;
+        Rec.SetRange("Line Status", Rec."Line Status"::"Ready for Serving", Rec."Line Status"::Served);
+        ServedIsShown := true;
+    end;
+
+    var
+        KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
+        KitchenStationAction: Option "Accept Qty. Change","Start Production","End Production";
+        ViewMode: Option Expedite,"Kitchen Station";
+        AssignedWaiters: Text;
+        SeatingCodes: Text;
+        SeatingNos: Text;
+        FinishedIsShown: Boolean;
+        IsExpediteMode: Boolean;
+        ServedIsShown: Boolean;
+        TimerStarted: Boolean;
+        StationNotFound: Label 'System was not able to identify kitchen station to apply the action to.';
+        ViewModeListLbl: Label 'Expedite View,Kitchen Station View';
 }

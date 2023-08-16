@@ -43,12 +43,65 @@
         {
             Caption = 'Capacity';
             DataClassification = CustomerContent;
+            MinValue = 0;
+
+            trigger OnValidate()
+            begin
+                if Capacity <> 0 then begin
+                    if Capacity > "Max Party Size" then
+                        "Max Party Size" := Capacity;
+                    if Capacity < "Min Party Size" then
+                        "Min Party Size" := Capacity;
+                end;
+            end;
+        }
+        field(22; "Min Party Size"; Integer)
+        {
+            Caption = 'Min Party Size';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+
+            trigger OnValidate()
+            var
+                CannotBeBiggerThanErr: Label 'cannot be bigger than %1', Comment = '%1 - field name the value is compared to';
+            begin
+                if "Min Party Size" > Capacity then
+                    FieldError("Min Party Size", StrSubStNo(CannotBeBiggerThanErr, FieldCaption(Capacity)));
+                if "Min Party Size" > "Max Party Size" then
+                    FieldError("Min Party Size", StrSubStNo(CannotBeBiggerThanErr, FieldCaption("Max Party Size")));
+            end;
+        }
+        field(23; "Max Party Size"; Integer)
+        {
+            Caption = 'Max Party Size';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+
+            trigger OnValidate()
+            var
+                CannotBeLessThanErr: Label 'cannot be less than %1', Comment = '%1 - field name the value is compared to';
+            begin
+                if "Max Party Size" < Capacity then
+                    FieldError("Max Party Size", StrSubStNo(CannotBeLessThanErr, FieldCaption(Capacity)));
+                if "Max Party Size" < "Min Party Size" then
+                    FieldError("Max Party Size", StrSubStNo(CannotBeLessThanErr, FieldCaption("Min Party Size")));
+            end;
         }
         field(30; Status; Code[10])
         {
             Caption = 'Status';
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(Seating));
+
+            trigger OnValidate()
+            var
+                SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
+                NewStatusCode: Code[10];
+            begin
+                NewStatusCode := Status;
+                Status := xRec.Status;
+                SeatingMgt.SetSeatingStatus(Rec, xRec, NewStatusCode);
+            end;
         }
         field(31; "Status Description FF"; Text[50])
         {
@@ -84,13 +137,31 @@
         {
             Caption = 'Blocked';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
+
+            trigger OnValidate()
+            var
+                SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+                SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
+                NewBlocked: Boolean;
+            begin
+                NewBlocked := Blocked;
+                if Blocked then
+                    SeatingMgt.SetSeatingIsBlocked(Rec, xRec)
+                else begin
+                    SeatingWaiterPadLink.SetRange("Seating Code", Code);
+                    SeatingWaiterPadLink.SetRange(Closed, false);
+                    if SeatingWaiterPadLink.IsEmpty() then
+                        SeatingMgt.SetSeatingIsOccupied(Rec, xRec)
+                    else
+                        SeatingMgt.SetSeatingIsReady(Rec, xRec);
+                end;
+                Blocked := NewBlocked;
+            end;
         }
         field(51; "Blocking Reason"; Text[100])
         {
             Caption = 'Blocking Reason';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
         }
         field(100; "Current Waiter Pad FF"; Code[20])
         {
@@ -189,36 +260,50 @@
         CurrentColorPriority: Integer;
         HasBeenAssigned: Boolean;
     begin
-        Clear(ColorTable);
-        CurrentColorPriority := 0;
         HasBeenAssigned := false;
-        if FlowStatus.get(Status, FlowStatus."Status Object"::Seating) then begin
-            if ColorTable.Get(FlowStatus.Color) then;
-            CurrentColorPriority := FlowStatus."Status Color Priority";
-            HasBeenAssigned := true;
-        end;
+        if FlowStatus.get(Status, FlowStatus."Status Object"::Seating) then
+            GetGolorTable(FlowStatus, CurrentColorPriority, HasBeenAssigned, ColorTable);
 
         SeatingWaiterPadLink.SetCurrentKey(Closed);
         SeatingWaiterPadLink.SetRange("Seating Code", Code);
         SeatingWaiterPadLink.SetRange(Closed, false);
         if SeatingWaiterPadLink.FindSet() then
             repeat
-                if WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.") then
+                if WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.") then begin
                     if FlowStatus.Get(WaiterPad."Serving Step Code", FlowStatus."Status Object"::WaiterPadLineMealFlow) then
-                        if (CurrentColorPriority < FlowStatus."Status Color Priority") or not HasBeenAssigned then begin
-                            CurrentColorPriority := FlowStatus."Status Color Priority";
-                            HasBeenAssigned := true;
-                            if not ColorTable.Get(FlowStatus.Color) then
-                                Clear(ColorTable);
-                        end;
+                        GetGolorTable(FlowStatus, CurrentColorPriority, HasBeenAssigned, ColorTable);
+                    if FlowStatus.Get(WaiterPad.Status, FlowStatus."Status Object"::WaiterPad) then
+                        GetGolorTable(FlowStatus, CurrentColorPriority, HasBeenAssigned, ColorTable);
+                end;
             until SeatingWaiterPadLink.Next() = 0;
 
         exit(ColorTable.RGBHexCode(IncludeHashMark));
+    end;
+
+    local procedure GetGolorTable(FlowStatus: Record "NPR NPRE Flow Status"; var CurrentColorPriority: Integer; var HasBeenAssigned: Boolean; var ColorTable: Record "NPR NPRE Color Table")
+    begin
+        if not FlowStatus."Available in Front-End" then
+            exit;
+        if (CurrentColorPriority >= FlowStatus."Status Color Priority") and HasBeenAssigned then
+            exit;
+        CurrentColorPriority := FlowStatus."Status Color Priority";
+        HasBeenAssigned := true;
+        if not ColorTable.Get(FlowStatus.Color) then
+            Clear(ColorTable);
     end;
 
     local procedure UpdateSeatingNo()
     begin
         if ("Seating No." = xRec."Code") or ("Seating No." = '') then
             "Seating No." := "Code";
+    end;
+
+    procedure GetSeatingRestaurant(): Code[20]
+    var
+        SeatingLocation: Record "NPR NPRE Seating Location";
+    begin
+        TestField("Seating Location");
+        SeatingLocation.Get("Seating Location");
+        exit(SeatingLocation."Restaurant Code");
     end;
 }

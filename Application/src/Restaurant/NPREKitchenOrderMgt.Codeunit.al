@@ -6,7 +6,7 @@
         GlobalKitchenOrder: Record "NPR NPRE Kitchen Order";
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
 
-    procedure SendWPLinesToKitchen(var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; FlowStatusCode: Code[10]; PrintCategoryCode: Code[20]; RequestType: Option "Order","Serving Request"; SentDateTime: DateTime): Boolean
+    procedure SendWPLinesToKitchen(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; FlowStatusCode: Code[10]; PrintCategoryCode: Code[20]; RequestType: Option "Order","Serving Request"; SentDateTime: DateTime): Boolean
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
@@ -21,7 +21,7 @@
         WaiterPadLine.Copy(WaiterPadLineIn);
         if WaiterPadLine.FindSet() then
             repeat
-                if SendWPLineToKitchen(WaiterPadLine, FlowStatusCode, PrintCategoryCode, RequestType, SentDateTime) then begin
+                if SendWPLineToKitchen(WaiterPad, WaiterPadLine, FlowStatusCode, PrintCategoryCode, RequestType, SentDateTime) then begin
                     RestaurantPrint.LogWaiterPadLinePrint(WaiterPadLine, RequestType, FlowStatusCode, PrintCategoryCode, SentDateTime, 1);
                     Success := true;
                 end;
@@ -30,7 +30,7 @@
         exit(Success);
     end;
 
-    local procedure SendWPLineToKitchen(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; FlowStatusCode: Code[10]; PrintCategoryCode: Code[20]; RequestType: Option "Order","Serving Request"; SentDateTime: DateTime): Boolean
+    local procedure SendWPLineToKitchen(WaiterPad: Record "NPR NPRE Waiter Pad"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; FlowStatusCode: Code[10]; PrintCategoryCode: Code[20]; RequestType: Option "Order","Serving Request"; SentDateTime: DateTime): Boolean
     var
         KitchenRequest: Record "NPR NPRE Kitchen Request";
         KitchenRequest2: Record "NPR NPRE Kitchen Request";
@@ -38,18 +38,23 @@
         KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link";
         KitchenStation: Record "NPR NPRE Kitchen Station";
         TempKitchenStationBuffer: Record "NPR NPRE Kitchen Station Slct." temporary;
+        TouchedKitchenOrderList: List of [BigInteger];
+        TouchedKitchenOrderID: BigInteger;
     begin
         if not FindApplicableWPLineKitchenStations(TempKitchenStationBuffer, WaiterPadLine, FlowStatusCode, PrintCategoryCode) then
             exit(false);
 
+        WaiterPad.CalcFields("Current Seating FF");
         KitchenRequestParam.InitFromWaiterPadLine(WaiterPadLine);
         KitchenRequestParam."Restaurant Code" := TempKitchenStationBuffer."Restaurant Code";
         KitchenRequestParam."Serving Step" := FlowStatusCode;
         KitchenRequestParam."Created Date-Time" := SentDateTime;
         InitKitchenReqSourceFromWaiterPadLine(
-          KitchenReqSourceParam, WaiterPadLine, TempKitchenStationBuffer."Restaurant Code", KitchenRequestParam."Serving Step", KitchenRequestParam."Created Date-Time");
+            KitchenReqSourceParam, WaiterPadLine, TempKitchenStationBuffer."Restaurant Code", WaiterPad."Current Seating FF",
+            WaiterPad."Assigned Waiter Code", KitchenRequestParam."Serving Step", KitchenRequestParam."Created Date-Time");
 
-        FindKitchenRequests(KitchenRequest, KitchenReqSourceParam);
+        KitchenRequest.Reset();
+        FindKitchenRequestsForSourceDoc(KitchenRequest, KitchenReqSourceParam);
         HandleQtyChange(KitchenRequest, KitchenRequestParam, KitchenReqSourceParam);
 
         if KitchenRequest.FindSet() then
@@ -69,24 +74,50 @@
                     CreateKitchenStationRequest(KitchenRequest2, KitchenStation);
                 until TempKitchenStationBuffer.Next() = 0;
 
-                UpdateOrderStatus(KitchenRequest2."Order ID");
+                if not TouchedKitchenOrderList.Contains(KitchenRequest2."Order ID") then
+                    TouchedKitchenOrderList.Add(KitchenRequest2."Order ID");
             until KitchenRequest.Next() = 0;
+
+        foreach TouchedKitchenOrderID in TouchedKitchenOrderList do
+            UpdateOrderStatus(TouchedKitchenOrderID);
+
         exit(true);
     end;
 
-    procedure FindKitchenRequests(var KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link")
+    procedure FindKitchenRequestsForSourceDoc(var KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link")
     var
         KitchenReqWSourceQry: Query "NPR NPRE Kitchen Req. w Source";
     begin
-        KitchenRequest.Reset();
-        KitchenRequest.SetAutoCalcFields(Quantity, "Quantity (Base)");
-
         KitchenReqWSourceQry.SetRange(Source_Document_Type, KitchenReqSourceParam."Source Document Type");
         KitchenReqWSourceQry.SetRange(Source_Document_Subtype, KitchenReqSourceParam."Source Document Subtype");
         KitchenReqWSourceQry.SetRange(Source_Document_No, KitchenReqSourceParam."Source Document No.");
-        KitchenReqWSourceQry.SetRange(Source_Document_Line_No, KitchenReqSourceParam."Source Document Line No.");
-        KitchenReqWSourceQry.SetRange(Restaurant_Code, KitchenReqSourceParam."Restaurant Code");
-        KitchenReqWSourceQry.SetRange(Serving_Step, KitchenReqSourceParam."Serving Step");
+        if KitchenReqSourceParam."Source Document Line No." <> 0 then
+            KitchenReqWSourceQry.SetRange(Source_Document_Line_No, KitchenReqSourceParam."Source Document Line No.");
+        if KitchenReqSourceParam."Restaurant Code" <> '' then
+            KitchenReqWSourceQry.SetRange(Restaurant_Code, KitchenReqSourceParam."Restaurant Code");
+        if KitchenReqSourceParam."Serving Step" <> '' then
+            KitchenReqWSourceQry.SetRange(Serving_Step, KitchenReqSourceParam."Serving Step");
+        KitchenReqWSourceQry.SetFilter(Line_Status, '<>%1', KitchenRequest."Line Status"::Cancelled);
+        KitchenReqWSourceQry.Open();
+        while KitchenReqWSourceQry.Read() do begin
+            KitchenRequest.Get(KitchenReqWSourceQry.Request_No);
+            KitchenRequest.Mark(true);
+        end;
+        KitchenRequest.MarkedOnly(true);
+    end;
+
+    procedure FindKitchenRequestsForWaiterOrSeating(var KitchenRequest: Record "NPR NPRE Kitchen Request"; KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link")
+    var
+        KitchenReqWSourceQry: Query "NPR NPRE Kitchen Req. w Source";
+    begin
+        if KitchenReqSourceParam."Restaurant Code" <> '' then
+            KitchenReqWSourceQry.SetRange(Restaurant_Code, KitchenReqSourceParam."Restaurant Code");
+        if KitchenReqSourceParam."Serving Step" <> '' then
+            KitchenReqWSourceQry.SetRange(Serving_Step, KitchenReqSourceParam."Serving Step");
+        if KitchenReqSourceParam."Assigned Waiter Code" <> '' then
+            KitchenReqWSourceQry.SetRange(Assigned_Waiter_Code, KitchenReqSourceParam."Assigned Waiter Code");
+        if KitchenReqSourceParam."Seating Code" <> '' then
+            KitchenReqWSourceQry.SetRange(Seating_Code, KitchenReqSourceParam."Seating Code");
         KitchenReqWSourceQry.SetFilter(Line_Status, '<>%1', KitchenRequest."Line Status"::Cancelled);
         KitchenReqWSourceQry.Open();
         while KitchenReqWSourceQry.Read() do begin
@@ -132,11 +163,14 @@
         KitchenRequest.SetFilter("Production Status", '<>%1', KitchenRequest."Production Status"::Cancelled);
         KitchenRequest.FilterGroup(0);
 
+        KitchenRequest.SetSourceDocLinkFilter(KitchenReqSourceParam);
+        KitchenRequest.SetAutoCalcFields(Quantity, "Quantity (Base)");
         if KitchenRequest.FindSet() then
             repeat
                 KitchenReqSourceParam.Quantity := KitchenReqSourceParam.Quantity - KitchenRequest.Quantity;
                 KitchenReqSourceParam."Quantity (Base)" := KitchenReqSourceParam."Quantity (Base)" - KitchenRequest."Quantity (Base)";
             until KitchenRequest.Next() = 0;
+        KitchenRequest.ClearSourceDocLinkFilter();
         if KitchenReqSourceParam.Quantity = 0 then
             exit;
 
@@ -200,11 +234,13 @@
         KitchenRequestStation.ModifyAll("Qty. Change Not Accepted", true);
     end;
 
-    procedure InitKitchenReqSourceFromWaiterPadLine(var KitchenReqSource: Record "NPR NPRE Kitchen Req.Src. Link"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; RestaurantCode: Code[20]; ServingStep: Code[10]; SentDateTime: DateTime)
+    procedure InitKitchenReqSourceFromWaiterPadLine(var KitchenReqSource: Record "NPR NPRE Kitchen Req.Src. Link"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; RestaurantCode: Code[20]; SeatingCode: Code[20]; WaiterCode: Code[20]; ServingStep: Code[10]; SentDateTime: DateTime)
     begin
         KitchenReqSource.Init();
         KitchenReqSource.InitSource(WaiterPadLine.RecordId);
         KitchenReqSource."Restaurant Code" := RestaurantCode;
+        KitchenReqSource."Seating Code" := SeatingCode;
+        KitchenReqSource."Assigned Waiter Code" := WaiterCode;
         KitchenReqSource."Serving Step" := ServingStep;
         KitchenReqSource."Created Date-Time" := SentDateTime;
         KitchenReqSource.Quantity := WaiterPadLine.Quantity;
@@ -548,6 +584,7 @@
 
         CancelKitchenStationRequests(KitchenRequest, true);
         UpdateOrderStatus(KitchenRequest."Order ID");
+        AttemptToCloseSourceDocument(KitchenRequest);
     end;
 
     local procedure CheckLineStatusesBeforeServing(var KitchenRequest: Record "NPR NPRE Kitchen Request")
@@ -575,24 +612,24 @@
         exit(true);
     end;
 
-    procedure SplitWaiterPadLineKitchenReqSourceLinks(FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; NewWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; FullLineTransfer: Boolean)
+    procedure SplitWaiterPadLineKitchenReqSourceLinks(FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; NewWaiterPad: Record "NPR NPRE Waiter Pad"; NewWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; FullLineTransfer: Boolean)
     var
         KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
         NewKitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
         RemainingQtyToMove: Decimal;
     begin
+        NewWaiterPad.CalcFields("Current Seating FF");
+        FilterKitchenReqSourceLinks(KitchenReqSourceLink."Source Document Type"::"Waiter Pad", 0, FromWaiterPadLine."Waiter Pad No.", FromWaiterPadLine."Line No.", KitchenReqSourceLink);
         KitchenReqSourceLink.SetCurrentKey(
-          "Source Document Type", "Source Document Subtype", "Source Document No.", "Source Document Line No.", "Serving Step", "Request No.");
-        KitchenReqSourceLink.SetRange("Source Document Type", KitchenReqSourceLink."Source Document Type"::"Waiter Pad");
-        KitchenReqSourceLink.SetRange("Source Document Subtype", 0);
-        KitchenReqSourceLink.SetRange("Source Document No.", FromWaiterPadLine."Waiter Pad No.");
-        KitchenReqSourceLink.SetRange("Source Document Line No.", FromWaiterPadLine."Line No.");
+            "Source Document Type", "Source Document Subtype", "Source Document No.", "Source Document Line No.", "Serving Step", "Request No.");
         if KitchenReqSourceLink.FindSet() then
             repeat
                 if FullLineTransfer then begin
                     NewKitchenReqSourceLink := KitchenReqSourceLink;
                     NewKitchenReqSourceLink."Source Document No." := NewWaiterPadLine."Waiter Pad No.";
                     NewKitchenReqSourceLink."Source Document Line No." := NewWaiterPadLine."Line No.";
+                    NewKitchenReqSourceLink."Seating Code" := NewWaiterPad."Current Seating FF";
+                    NewKitchenReqSourceLink."Assigned Waiter Code" := NewWaiterPad."Assigned Waiter Code";
                     NewKitchenReqSourceLink.Modify();
                 end else begin
                     KitchenReqSourceLink.SetRange("Serving Step", KitchenReqSourceLink."Serving Step");
@@ -614,6 +651,8 @@
 
                             NewKitchenReqSourceLink."Source Document No." := NewWaiterPadLine."Waiter Pad No.";
                             NewKitchenReqSourceLink."Source Document Line No." := NewWaiterPadLine."Line No.";
+                            NewKitchenReqSourceLink."Seating Code" := NewWaiterPad."Current Seating FF";
+                            NewKitchenReqSourceLink."Assigned Waiter Code" := NewWaiterPad."Assigned Waiter Code";
                             NewKitchenReqSourceLink.Quantity := -NewKitchenReqSourceLink.Quantity;
                             NewKitchenReqSourceLink."Quantity (Base)" := -NewKitchenReqSourceLink."Quantity (Base)";
                             NewKitchenReqSourceLink."Entry No." := 0;
@@ -634,16 +673,16 @@
         KitchenRequest: Record "NPR NPRE Kitchen Request";
         KitchenRequest2: Record "NPR NPRE Kitchen Request";
     begin
-        KitchenOrder."Order Status" := KitchenOrder."Order Status"::Cancelled;
-        KitchenOrder.Modify();
-
         KitchenRequest.SetCurrentKey("Order ID");
         KitchenRequest.SetRange("Order ID", KitchenOrder."Order ID");
         if KitchenRequest.FindSet() then
             repeat
-                KitchenRequest := KitchenRequest2;
+                KitchenRequest2 := KitchenRequest;
                 CancelKitchenRequest(KitchenRequest2);
             until KitchenRequest.Next() = 0;
+
+        UpdateOrderStatus(KitchenOrder);
+        KitchenOrder.Modify();
     end;
 
     procedure CancelKitchenRequest(var KitchenRequest: Record "NPR NPRE Kitchen Request")
@@ -656,7 +695,7 @@
         CancelKitchenStationRequests(KitchenRequest, false);
     end;
 
-    procedure CancelKitchenStationRequests(var KitchenRequest: Record "NPR NPRE Kitchen Request"; HandleNotFinished: Boolean)
+    procedure CancelKitchenStationRequests(var KitchenRequest: Record "NPR NPRE Kitchen Request"; CalledByServing: Boolean)
     var
         KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station";
         KitchenRequestStation2: Record "NPR NPRE Kitchen Req. Station";
@@ -666,18 +705,18 @@
         if KitchenRequestStation.FindSet() then
             repeat
                 KitchenRequestStation2 := KitchenRequestStation;
-                CancelKitchenStationRequest(KitchenRequest, KitchenRequestStation2, HandleNotFinished);
+                CancelKitchenStationRequest(KitchenRequest, KitchenRequestStation2, CalledByServing);
             until KitchenRequestStation.Next() = 0;
     end;
 
-    procedure CancelKitchenStationRequest(KitchenRequest: Record "NPR NPRE Kitchen Request"; var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station"; HandleNotFinished: Boolean)
+    procedure CancelKitchenStationRequest(KitchenRequest: Record "NPR NPRE Kitchen Request"; var KitchenRequestStation: Record "NPR NPRE Kitchen Req. Station"; CalledByServing: Boolean)
     var
         HandleAction: Enum "NPR NPRE Req.Handl.on Serving";
     begin
         if KitchenRequestStation."Production Status" in [KitchenRequestStation."Production Status"::Finished, KitchenRequestStation."Production Status"::Cancelled] then
             exit;
 
-        if HandleNotFinished then begin
+        if CalledByServing then begin
             SetupProxy.SetRestaurant(KitchenRequest."Restaurant Code");
             HandleAction := SetupProxy.StationReqHandlingOnServing();
             case true of
@@ -709,5 +748,63 @@
         KitchenRequestStation."Production Status" := KitchenRequestStation."Production Status"::Cancelled;
         KitchenRequestStation.Modify();
         UpdateRequestStatusesFromStation(KitchenRequestStation);
+    end;
+
+    local procedure AttemptToCloseSourceDocument(KitchenRequest: Record "NPR NPRE Kitchen Request")
+    var
+        KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
+    begin
+        KitchenReqSourceLink.SetCurrentKey("Request No.");
+        KitchenReqSourceLink.SetRange("Request No.", KitchenRequest."Request No.");
+        if KitchenReqSourceLink.FindLast() then
+            case KitchenReqSourceLink."Source Document Type" of
+                KitchenReqSourceLink."Source Document Type"::"Waiter Pad":
+                    if WaiterPad.Get(KitchenReqSourceLink."Source Document No.") then
+                        WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Split/Merge Waiter Pad");
+            end;
+    end;
+
+    procedure UpdateKitchenReqSourceSeating(SourceDocType: Enum "NPR NPRE K.Req.Source Doc.Type"; SourceDocSubtype: Integer; SourceDocNo: Code[20]; SourceDocLinNo: Integer; NewSeatingCode: Code[20])
+    var
+        KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
+    begin
+        FilterKitchenReqSourceLinks(SourceDocType, SourceDocSubtype, SourceDocNo, SourceDocLinNo, KitchenReqSourceLink);
+        if KitchenReqSourceLink.IsEmpty() then
+            exit;
+        KitchenReqSourceLink.ModifyAll("Seating Code", NewSeatingCode);
+    end;
+
+    procedure UpdateKitchenReqSourceWaiter(SourceDocType: Enum "NPR NPRE K.Req.Source Doc.Type"; SourceDocSubtype: Integer; SourceDocNo: Code[20]; SourceDocLinNo: Integer; NewWaiterCode: Code[20])
+    var
+        KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
+    begin
+        FilterKitchenReqSourceLinks(SourceDocType, SourceDocSubtype, SourceDocNo, SourceDocLinNo, KitchenReqSourceLink);
+        if KitchenReqSourceLink.IsEmpty() then
+            exit;
+        KitchenReqSourceLink.ModifyAll("Assigned Waiter Code", NewWaiterCode);
+    end;
+
+    local procedure FilterKitchenReqSourceLinks(SourceDocType: Enum "NPR NPRE K.Req.Source Doc.Type"; SourceDocSubtype: Integer; SourceDocNo: Code[20]; SourceDocLinNo: Integer; var KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link")
+    begin
+        KitchenReqSourceLink.Reset();
+        KitchenReqSourceLink.SetRange("Source Document Type", SourceDocType);
+        KitchenReqSourceLink.SetRange("Source Document Subtype", SourceDocSubtype);
+        KitchenReqSourceLink.SetRange("Source Document No.", SourceDocNo);
+        if SourceDocLinNo <> 0 then
+            KitchenReqSourceLink.SetRange("Source Document Line No.", SourceDocLinNo);
+    end;
+
+    procedure EnableKitchenOrderRetentionPolicy()
+    var
+        RetentionPolicySetup: Record "Retention Policy Setup";
+    begin
+        if not RetentionPolicySetup.WritePermission() then
+            exit;
+        if not RetentionPolicySetup.Get(Database::"NPR NPRE Kitchen Order") or RetentionPolicySetup.Enabled then
+            exit;
+        RetentionPolicySetup.Validate(Enabled, true);
+        RetentionPolicySetup.Modify(true);
     end;
 }

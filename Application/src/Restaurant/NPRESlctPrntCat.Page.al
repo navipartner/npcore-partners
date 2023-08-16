@@ -21,7 +21,7 @@
                     Caption = 'Selected';
                     Editable = true;
                     Visible = IsMultiSelectionMode;
-                    ToolTip = 'Specifies the value of the Selected field';
+                    ToolTip = 'Specifies if this line is selected.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -32,20 +32,20 @@
                 field("Code"; Rec.Code)
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this print/production category.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a text that describes the category.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print Tag"; Rec."Print Tag")
                 {
                     Editable = false;
                     Visible = ShowPrintTags;
-                    ToolTip = 'Specifies the value of the Print Tag field';
+                    ToolTip = 'Specifies the list of assigned print tags.';
                     ApplicationArea = NPRRetail;
                 }
                 field(AssignedServingSteps; AssignedServingStepsAsString())
@@ -53,7 +53,7 @@
                     Caption = 'Appl. Only for Serving Steps';
                     Editable = false;
                     Visible = ShowApplOnServingStep;
-                    ToolTip = 'Specifies the value of the Appl. Only for Serving Steps field';
+                    ToolTip = 'Specifies the list of serving steps this category is applied for.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()

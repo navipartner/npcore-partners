@@ -20,12 +20,10 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Kitchen Request";
         }
-        field(20; "Source Document Type"; Option)
+        field(20; "Source Document Type"; Enum "NPR NPRE K.Req.Source Doc.Type")
         {
             Caption = 'Source Document Type';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,Waiter Pad';
-            OptionMembers = " ","Waiter Pad";
         }
         field(21; "Source Document Subtype"; Option)
         {
@@ -81,7 +79,7 @@
         {
             Caption = 'Restaurant Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR NPRE Restaurant";
+            TableRelation = "NPR NPRE Restaurant".Code;
         }
         field(60; "Serving Step"; Code[10])
         {
@@ -93,6 +91,25 @@
         {
             Caption = 'Created Date-Time';
             DataClassification = CustomerContent;
+        }
+        field(80; "Seating Code"; Code[20])
+        {
+            Caption = 'Seating Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPRE Seating".Code;
+        }
+        field(81; "Seating No."; Text[20])
+        {
+            Caption = 'Seating No.';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = Lookup("NPR NPRE Seating"."Seating No." WHERE(Code = FIELD("Seating Code")));
+        }
+        field(90; "Assigned Waiter Code"; Code[20])
+        {
+            Caption = 'Assigned Waiter Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Salesperson/Purchaser".Code;
         }
     }
 
@@ -107,6 +124,10 @@
         }
         key(Key3; "Source Document Type", "Source Document Subtype", "Source Document No.", "Source Document Line No.", "Serving Step", "Request No.")
         {
+            SumIndexFields = Quantity, "Quantity (Base)";
+        }
+        key(Key4; "Restaurant Code", "Assigned Waiter Code", "Seating Code", "Serving Step")
+        {
         }
     }
 
@@ -119,10 +140,10 @@
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         RecRef: RecordRef;
     begin
-        case SourceRecID.TableNo of
-            DATABASE::"NPR NPRE Waiter Pad Line":
+        case SourceRecID.TableNo() of
+            Database::"NPR NPRE Waiter Pad Line":
                 begin
-                    RecRef.Get(SourceRecID);
+                    RecRef := SourceRecID.GetRecord();
                     RecRef.SetTable(WaiterPadLine);
                     "Source Document Type" := "Source Document Type"::"Waiter Pad";
                     "Source Document Subtype" := 0;
@@ -131,7 +152,7 @@
                 end;
 
             else
-                Error(UnsupportedSourceRec, SourceRecID.TableNo);
+                Error(UnsupportedSourceRec, SourceRecID.TableNo());
         end;
     end;
 

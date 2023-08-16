@@ -22,7 +22,7 @@ codeunit 6151317 "NPR Reten. Policy User Handler"
             if RetentionPolicySetup.Get(RetenPolicySetupBuffer."Table Id") then
                 RetentionPolicySetup.Delete(true);
 
-            RetenPolInstall.InsertRetentionPolicySetup(RetenPolicySetupBuffer."Table Id", RetenPolicySetupBuffer."Retention Period", RetenPolicySetupBuffer.Enabled);
+            RetenPolInstall.InsertRetentionPolicySetup(RetenPolicySetupBuffer."Table Id", RetenPolicySetupBuffer."Retention Period", RetenPolicySetupBuffer.Enabled, RetenPolicySetupBuffer."Apply to All Records");
         until RetenPolicySetupBuffer.Next() = 0;
 
         RetenPolicySetupBuffer.DeleteAll();

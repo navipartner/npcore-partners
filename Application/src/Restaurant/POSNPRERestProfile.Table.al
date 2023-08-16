@@ -23,8 +23,13 @@
             Caption = 'Restaurant Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Restaurant";
-        }
 
+            trigger OnValidate()
+            begin
+                if "Restaurant Code" <> xRec."Restaurant Code" then
+                    "Default Seating Location" := '';
+            end;
+        }
         field(30; "Default Seating Location"; Code[10])
         {
             Caption = 'Default Seating Location';

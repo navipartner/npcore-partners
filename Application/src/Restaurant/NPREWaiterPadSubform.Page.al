@@ -15,9 +15,8 @@
             {
                 field(LineIsMarked; LineIsMarked)
                 {
-
                     Caption = 'Select';
-                    ToolTip = 'Specifies the value of the Select field';
+                    ToolTip = 'Specifies if this line is selected to be processed by a multi-line action.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -27,212 +26,180 @@
                 }
                 field("Waiter Pad No."; Rec."Waiter Pad No.")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Waiter Pad No. field';
+                    ToolTip = 'Specifies the waiter pad the line belongs to.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Line No. field';
+                    ToolTip = 'Specifies a unique number to identify current line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
+                    Caption = 'POS Unit No.';
+                    ToolTip = 'Specifies the POS unit number the line was originally created on.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Start Date"; Rec."Start Date")
+                field(openedDateTime; Rec.SystemCreatedAt)
                 {
-
+                    Caption = 'Opened Date-Time';
+                    ToolTip = 'Specifies the date-time the waiter pad was opened at.';
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Start Date field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Start Time"; Rec."Start Time")
-                {
-
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Start Time field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Type; Rec."Line Type")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Type field';
+                    ToolTip = 'Specifies the type of entity for this waiter pad line, such as Item, or Comment.';
                     ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-
                     Editable = false;
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the product you are preparing, if you have chosen "Item" in the Line Type field.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a description of what you are preparing. Based on your choices in the Line Type and No. fields, the field may show product description or a comment line.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
                 {
-
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Quantity field';
+                    ToolTip = 'Specifies how many units of the product are being prepared.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Billed Quantity"; Rec."Billed Quantity")
                 {
-
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Billed Quantity field';
+                    ToolTip = 'Specifies how many units of the product has already been included in a finished sale.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Description 2 field';
+                    ToolTip = 'Specifies information in addition to the description.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Variant Code field';
+                    ToolTip = 'Specifies the variant of the item on the line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Order No. from Web"; Rec."Order No. from Web")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Order No. from Web field';
+                    ToolTip = 'Specifies Magento order number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Order Line No. from Web"; Rec."Order Line No. from Web")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Order Line No. from Web field';
+                    ToolTip = 'Specifies Magento order line number.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Unit Price field';
+                    ToolTip = 'Specifies the price for one unit on the waiter pad line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Type"; Rec."Discount Type")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Discount Type field';
+                    ToolTip = 'Specifies the discount type granted by the system to the line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Code"; Rec."Discount Code")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Discount Code field';
+                    ToolTip = 'Specifies the discount code granted by the system to the line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Allow Line Discount"; Rec."Allow Line Discount")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Allow Line Discount field';
+                    ToolTip = 'Specifies if it is allowed granting discounts for the waiter pad line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount %"; Rec."Discount %")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Discount % field';
+                    ToolTip = 'Specifies the discount percentage that is granted for the item on the line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount Amount"; Rec."Discount Amount")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Discount field';
+                    ToolTip = 'Specifies the discount amount that is granted for the item on the line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Currency Code field';
+                    ToolTip = 'Specifies the currency of amounts on the line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Unit of Measure Code field';
+                    ToolTip = 'Specifies how each unit of the product is measured, such as in pieces or boxes. By default, the value in the Base Unit of Measure field on the item card is inserted.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Amount Excl. VAT"; Rec."Amount Excl. VAT")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Amount Excl. VAT field';
+                    ToolTip = 'Specifies the net amount excluding VAT, that must be paid for products on the line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Amount Incl. VAT"; Rec."Amount Incl. VAT")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Amount Incl. VAT field';
+                    ToolTip = 'Specifies the net amount including VAT, that must be paid for products on the line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Line Status"; Rec."Line Status")
                 {
-
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Line Status field';
+                    ToolTip = 'Specifies current status code of the line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Line Status Description"; Rec."Line Status Description")
                 {
-
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Line Status Description field';
+                    ToolTip = 'Specifies current status of the line.';
                     ApplicationArea = NPRRetail;
                 }
                 field(AssignedFlowStatuses; Rec.AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
                 {
-
                     Caption = 'Serving Steps';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Serving Steps field';
+                    ToolTip = 'Specifies the list of serving steps the product is being prepared and served at.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -242,11 +209,10 @@
                 }
                 field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsString())
                 {
-
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Print/Prod. Categories field';
+                    ToolTip = 'Specifies the list of assigned print/production categories for the line.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -256,51 +222,14 @@
                 }
                 field("Kitchen Order Sent"; Rec."Kitchen Order Sent")
                 {
-
-                    ToolTip = 'Specifies the value of the Kitchen Order Sent field';
+                    ToolTip = 'Specifies if kitchen order has been created and sent to the kitchen for the line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Serving Requested"; Rec."Serving Requested")
                 {
-
-                    ToolTip = 'Specifies the value of the Serving Requested field';
+                    ToolTip = 'Specifies if serving request for the product selected on the line has been sent to the kitchen.';
                     ApplicationArea = NPRRetail;
                 }
-            }
-        }
-    }
-
-    actions
-    {
-        area(processing)
-        {
-            action("Change Quantiy")
-            {
-                Enabled = false;
-                Visible = false;
-
-                ToolTip = 'Executes the Change Quantiy action';
-                Image = ChangeTo;
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                begin
-                    Message('Qty');
-                end;
-            }
-            action("Delete Line")
-            {
-                Enabled = false;
-                Visible = false;
-
-                ToolTip = 'Executes the Delete Line action';
-                Image = DeleteRow;
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                begin
-                    Message('DL');
-                end;
             }
         }
     }

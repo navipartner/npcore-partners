@@ -1,3 +1,3 @@
-let main = async ({}) => {
-    return await workflow.respond();
+let main = async ({ }) => {
+    await workflow.respond();
 };

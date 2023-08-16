@@ -3,93 +3,81 @@
     Access = Internal;
 
     var
-        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-        InQuotes: Label '''%1''', Locked = true;
+        _WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        _InQuotes: Label '''%1''', Locked = true;
 
-    procedure LinkSeatingToWaiterPad(WaiterPadNo: Code[20]; SeatingCode: Code[20]) LinkAdded: Boolean
+    procedure LinkSeatingToWaiterPad(WaiterPad: Record "NPR NPRE Waiter Pad"; SeatingCode: Code[20]; var SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink"): Boolean
     var
-        WaiterPad: Record "NPR NPRE Waiter Pad";
-        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        SeatingWaiterPadLink2: Record "NPR NPRE Seat.: WaiterPadLink";
         Seating: Record "NPR NPRE Seating";
-    begin
-        WaiterPad.Reset();
-        WaiterPad.SetRange("No.", WaiterPadNo);
-        WaiterPad.FindFirst();
-
-        Seating.Reset();
-        Seating.SetRange(Code, SeatingCode);
-        Seating.FindFirst();
-
-        SeatingWaiterPadLink.Reset();
-        SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
-        SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
-        if not SeatingWaiterPadLink.IsEmpty then begin
-            exit(false);
-        end else begin
-            SeatingWaiterPadLink.Init();
-            SeatingWaiterPadLink."Seating Code" := Seating.Code;
-            SeatingWaiterPadLink."Waiter Pad No." := WaiterPad."No.";
-            SeatingWaiterPadLink.Closed := WaiterPad.Closed;
-            SeatingWaiterPadLink.Insert(true);
-            exit(true);
-        end;
-    end;
-
-    procedure RemoveSeatingWaiterPadLink(WaiterPadNo: Code[20]; SeatingCode: Code[20]) LinkAdded: Boolean
-    var
-        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-    begin
-        SeatingWaiterPadLink.Reset();
-        SeatingWaiterPadLink.SetRange("Seating Code", SeatingCode);
-        SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPadNo);
-
-        if SeatingWaiterPadLink.IsEmpty then begin
-            exit(false);
-        end else begin
-            SeatingWaiterPadLink.FindFirst();
-            SeatingWaiterPadLink.Delete(true);
-            exit(true);
-        end;
-    end;
-
-    procedure ChangeSeating(WaiterPadNo: Code[20]; SeatingCode: Code[20]; SeatingCodeNew: Code[20]) Changed: Boolean
-    var
-        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
         SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
-        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
     begin
-        SeatingWaiterPadLink.Reset();
-        SeatingWaiterPadLink.SetRange("Seating Code", SeatingCode);
-        SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPadNo);
-
-        if SeatingWaiterPadLink.IsEmpty then begin
+        if SeatingWaiterPadLink.Get(SeatingCode, WaiterPad."No.") then
             exit(false);
-        end else begin
-            SeatingWaiterPadLink.FindFirst();
-            SeatingWaiterPadLink.Rename(SeatingCodeNew, WaiterPadNo);
 
-            if not SeatingWaiterPadLink.Closed then
-                SeatingMgt.SetSeatingIsOccupied(SeatingCodeNew);
-            SeatingMgt.TrySetSeatingIsCleared(SeatingCode, SetupProxy);
+        Seating.Get(SeatingCode);
+        Seating.TestField(Blocked, false);
+        SeatingWaiterPadLink2.SetCurrentKey("Waiter Pad No.", Primary);
+        SeatingWaiterPadLink2.SetRange("Waiter Pad No.", WaiterPad."No.");
+        SeatingWaiterPadLink2.SetRange(Primary, true);
 
-            exit(true);
-        end;
+        SeatingWaiterPadLink.Init();
+        SeatingWaiterPadLink."Seating Code" := Seating.Code;
+        SeatingWaiterPadLink."Waiter Pad No." := WaiterPad."No.";
+        SeatingWaiterPadLink.Closed := WaiterPad.Closed;
+        SeatingWaiterPadLink.Primary := SeatingWaiterPadLink2.IsEmpty();
+        SeatingWaiterPadLink.Insert(true);
+
+        if SeatingWaiterPadLink.Primary then
+            KitchenOrderMgt.UpdateKitchenReqSourceSeating(Enum::"NPR NPRE K.Req.Source Doc.Type"::"Waiter Pad", 0, WaiterPad."No.", 0, SeatingCode);
+
+        if not SeatingWaiterPadLink.Closed then
+            SeatingMgt.SetSeatingIsOccupied(Seating.Code);
+        exit(true);
     end;
 
-    procedure ChangeWaiterPad(SeatingCode: Code[20]; WaiterPadNo: Code[20]; WaiterPadNoNew: Code[20]) Moved: Boolean
+    procedure RemoveSeatingWaiterPadLink(WaiterPadNo: Code[20]; SeatingCode: Code[20]): Boolean
+    var
+        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        SeatingWaiterPadLink2: Record "NPR NPRE Seat.: WaiterPadLink";
+        SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
+    begin
+        SeatingWaiterPadLink."Seating Code" := SeatingCode;
+        SeatingWaiterPadLink."Waiter Pad No." := WaiterPadNo;
+
+        if not SeatingWaiterPadLink.Find() then
+            exit(false);
+
+        if SeatingWaiterPadLink.Primary then begin
+            SeatingWaiterPadLink2.SetCurrentKey("Waiter Pad No.", Primary);
+            SeatingWaiterPadLink2.SetRange("Waiter Pad No.", WaiterPadNo);
+            SeatingWaiterPadLink2.SetRange(Primary, false);
+            if SeatingWaiterPadLink2.FindFirst() then begin
+                SeatingWaiterPadLink2.Primary := true;
+                SeatingWaiterPadLink2.Modify();
+            end;
+        end;
+
+        SeatingWaiterPadLink.Delete(true);
+        SeatingMgt.TrySetSeatingIsCleared(SeatingCode);
+        exit(true);
+    end;
+
+    procedure ChangeSeating(WaiterPad: Record "NPR NPRE Waiter Pad"; SeatingCode: Code[20]; SeatingCodeNew: Code[20]): Boolean
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
-        SeatingWaiterPadLink.Reset();
-        SeatingWaiterPadLink.SetRange("Seating Code", SeatingCode);
-        SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPadNo);
-        if SeatingWaiterPadLink.IsEmpty then begin
-            exit(false);
-        end else begin
-            SeatingWaiterPadLink.FindFirst();
-            SeatingWaiterPadLink.Rename(SeatingCode, WaiterPadNoNew);
-            exit(true);
-        end;
+        RemoveSeatingWaiterPadLink(WaiterPad."No.", SeatingCode);
+        exit(LinkSeatingToWaiterPad(WaiterPad, SeatingCodeNew, SeatingWaiterPadLink));
+    end;
+
+    procedure ChangeWaiterPad(SeatingCode: Code[20]; FromWaiterPadNo: Code[20]; NewWaiterPad: Record "NPR NPRE Waiter Pad"): Boolean
+    var
+        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+    begin
+        RemoveSeatingWaiterPadLink(FromWaiterPadNo, SeatingCode);
+        exit(LinkSeatingToWaiterPad(NewWaiterPad, SeatingCode, SeatingWaiterPadLink));
     end;
 
     procedure CreateNewWaiterPad(SeatingCode: Code[20]; NumberOfGuests: Integer; AssignedWaiterCode: Code[20]; Description: Text; var WaiterPad: Record "NPR NPRE Waiter Pad"): Boolean
@@ -97,10 +85,26 @@
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
         Clear(WaiterPad);
-        WaiterPad."Number of Guests" := NumberOfGuests;
+        SetPartySize(WaiterPad, NumberOfGuests);
         WaiterPad."Assigned Waiter Code" := AssignedWaiterCode;
         WaiterPad.Description := CopyStr(Description, 1, MaxStrLen(WaiterPad.Description));
         exit(AddNewWaiterPadForSeating(SeatingCode, WaiterPad, SeatingWaiterPadLink));
+    end;
+
+    procedure SetPartySize(WaiterPadNo: Code[20]; NumberOfGuests: Integer)
+    var
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+    begin
+        WaiterPad.Get(WaiterPadNo);
+        SetPartySize(WaiterPad, NumberOfGuests);
+        WaiterPad.Modify();
+    end;
+
+    procedure SetPartySize(var WaiterPad: Record "NPR NPRE Waiter Pad"; NumberOfGuests: Integer)
+    begin
+        if NumberOfGuests < 0 then
+            NumberOfGuests := 0;
+        WaiterPad."Number of Guests" := NumberOfGuests;
     end;
 
     procedure InsertWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; RunInsert: Boolean)
@@ -115,41 +119,29 @@
         NewWaiterPadNo := NoSeriesManagement.GetNextNo(HospitalitySetup."Waiter Pad No. Serie", Today, true);
 
         WaiterPad."No." := NewWaiterPadNo;
-        WaiterPad."Start Date" := WorkDate();
-        WaiterPad."Start Time" := Time;
         if RunInsert then WaiterPad.Insert(true);
     end;
 
     procedure AddNewWaiterPadForSeating(SeatingCode: Code[20]; var WaiterPad: Record "NPR NPRE Waiter Pad"; var SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink"): Boolean
-    var
-        Seating: Record "NPR NPRE Seating";
-        SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
     begin
-        Seating.Get(SeatingCode);
         if WaiterPad."No." = '' then
             InsertWaiterPad(WaiterPad, true);
 
-        SeatingWaiterPadLink.Init();
-        SeatingWaiterPadLink."Seating Code" := Seating.Code;
-        SeatingWaiterPadLink."Waiter Pad No." := WaiterPad."No.";
-        SeatingWaiterPadLink.Insert();
-
-        SeatingMgt.SetSeatingIsOccupied(Seating.Code);
-
-        exit(true);
+        exit(LinkSeatingToWaiterPad(WaiterPad, SeatingCode, SeatingWaiterPadLink));
     end;
 
     procedure DuplicateWaiterPadHdr(FromWaiterPad: Record "NPR NPRE Waiter Pad"; var NewWaiterPad: Record "NPR NPRE Waiter Pad")
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         SeatingWaiterPadLink2: Record "NPR NPRE Seat.: WaiterPadLink";
+        RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
     begin
         NewWaiterPad."No." := '';
         InsertWaiterPad(NewWaiterPad, false);
         NewWaiterPad.TransferFields(FromWaiterPad, false);
         NewWaiterPad."Number of Guests" := 0;
         NewWaiterPad."Billed Number of Guests" := 0;
-        NewWaiterPad."Pre-receipt Printed" := false;
+        RestaurantPrint.SetWaiterPadPreReceiptPrinted(NewWaiterPad, false, false);
         NewWaiterPad.Closed := false;
         NewWaiterPad."Close Date" := 0D;
         NewWaiterPad."Close Time" := 0T;
@@ -165,41 +157,40 @@
 
         NewWaiterPad.Insert(true);
 
-        WaiterPadPOSMgt.CopyPOSInfoWPad2WPad(FromWaiterPad, 0, NewWaiterPad, 0);
+        _WaiterPadPOSMgt.CopyPOSInfoWPad2WPad(FromWaiterPad, 0, NewWaiterPad, 0);
     end;
 
     procedure MergeWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; var MergeToWaiterPad: Record "NPR NPRE Waiter Pad") OK: Boolean
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        NPHWaiterPadPOSManagement: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
     begin
-        MergeToWaiterPad."Number of Guests" := MergeToWaiterPad."Number of Guests" + WaiterPad."Number of Guests";
+        SetPartySize(MergeToWaiterPad, MergeToWaiterPad."Number of Guests" + WaiterPad."Number of Guests");
         MergeToWaiterPad."Billed Number of Guests" := MergeToWaiterPad."Billed Number of Guests" + WaiterPad."Billed Number of Guests";
-        MergeToWaiterPad."Pre-receipt Printed" := false;
         if MergeToWaiterPad."Customer No." = '' then
             MergeToWaiterPad."Customer No." := WaiterPad."Customer No.";
-        MergeToWaiterPad.Modify();
+        RestaurantPrint.SetWaiterPadPreReceiptPrinted(MergeToWaiterPad, false, true);
 
         WaiterPad."Number of Guests" := 0;
         WaiterPad."Billed Number of Guests" := 0;
-        WaiterPad."Pre-receipt Printed" := false;
-        WaiterPad.Modify();
+        RestaurantPrint.SetWaiterPadPreReceiptPrinted(WaiterPad, false, true);
 
         WaiterPadLine.Reset();
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         if WaiterPadLine.FindSet() then begin
             repeat
-                NPHWaiterPadPOSManagement.SplitWaiterPadLine(WaiterPad, WaiterPadLine, WaiterPadLine.Quantity, MergeToWaiterPad);
+                _WaiterPadPOSMgt.SplitWaiterPadLine(WaiterPad, WaiterPadLine, WaiterPadLine.Quantity, MergeToWaiterPad);
             until WaiterPadLine.Next() = 0;
         end;
 
-        CloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Split/Merge Waiter Pad");
+        TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Split/Merge Waiter Pad");
         exit(true);
     end;
 
-    procedure CloseWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; ForceClose: Boolean; CloseReason: Enum "NPR NPRE W/Pad Closing Reason")
+    procedure TryCloseWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; ForceClose: Boolean; CloseReason: Enum "NPR NPRE W/Pad Closing Reason")
     var
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+        IsServed: Option Undefined,No,Yes;
         Handled: Boolean;
         OK: Boolean;
     begin
@@ -215,7 +206,7 @@
         CleanupWaiterPad(WaiterPad);
         OK := ForceClose;
         if not OK then
-            OK := WaiterPadCanBeClosed(WaiterPad, SetupProxy);
+            OK := WaiterPadCanBeClosed(WaiterPad, SetupProxy, IsServed);
         if OK then begin
             WaiterPad."Close Date" := WorkDate();
             WaiterPad."Close Time" := Time;
@@ -223,18 +214,21 @@
             WaiterPad."Close Reason" := CloseReason;
             WaiterPad.Modify();
 
-            CloseWaiterPadSeatings(WaiterPad, SetupProxy);
+            CloseWaiterPadSeatings(WaiterPad);
         end else begin
-            OK := WaiterPadSeatingsCanBeClosed(WaiterPad, SetupProxy);
+            OK := WaiterPadSeatingsCanBeClosed(WaiterPad, SetupProxy, IsServed);
             if OK then
-                CloseWaiterPadSeatings(WaiterPad, SetupProxy);
+                CloseWaiterPadSeatings(WaiterPad)
+            else
+                if WaiterPadIsReadyForPayment(WaiterPad, SetupProxy, IsServed) then
+                    SetWaiterPadStatusInPayment(WaiterPad, SetupProxy);
         end;
 
         if OK then
             OnAfterCloseWaiterPad(WaiterPad);
     end;
 
-    procedure CloseWaiterPadSeatings(var WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy")
+    procedure CloseWaiterPadSeatings(var WaiterPad: Record "NPR NPRE Waiter Pad")
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
@@ -243,11 +237,11 @@
         SeatingWaiterPadLink.SetRange(Closed, false);
         if SeatingWaiterPadLink.FindSet() then
             repeat
-                CloseWaiterPadSeatingLink(SeatingWaiterPadLink, SetupProxy);
+                CloseWaiterPadSeatingLink(SeatingWaiterPadLink);
             until SeatingWaiterPadLink.Next() = 0;
     end;
 
-    local procedure CloseWaiterPadSeatingLink(SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy")
+    local procedure CloseWaiterPadSeatingLink(SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink")
     var
         SeatingWaiterPadLink2: Record "NPR NPRE Seat.: WaiterPadLink";
         SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
@@ -256,7 +250,7 @@
         SeatingWaiterPadLink2.Closed := true;
         SeatingWaiterPadLink2.Modify();
 
-        SeatingMgt.TrySetSeatingIsCleared(SeatingWaiterPadLink2."Seating Code", SetupProxy);
+        SeatingMgt.TrySetSeatingIsCleared(SeatingWaiterPadLink2."Seating Code");
     end;
 
     local procedure CleanupWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
@@ -267,11 +261,11 @@
         WaiterPadLine.Reset();
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         WaiterPadLine.SetFilter("Line Type", '<>%1', WaiterPadLine."Line Type"::Comment);
-        if not WaiterPadLine.IsEmpty then
+        if not WaiterPadLine.IsEmpty() then
             exit;
 
         WaiterPadLine.SetRange("Line Type", WaiterPadLine."Line Type"::Comment);
-        if not WaiterPadLine.IsEmpty then
+        if not WaiterPadLine.IsEmpty() then
             WaiterPadLine.DeleteAll(true);
 
         POSInfoWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
@@ -280,7 +274,7 @@
         OnAfterWaiterPadCleanup(WaiterPad);
     end;
 
-    local procedure WaiterPadCanBeClosed(WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"): Boolean
+    local procedure WaiterPadCanBeClosed(WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"; var IsServed: Option Undefined,No,Yes): Boolean
     var
         ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
@@ -296,21 +290,33 @@
                 exit(WaiterPad."Pre-receipt Printed");
 
             ServiceFlowProfile."Close Waiter Pad On"::"Pre-Receipt if Served":
-                if WaiterPad."Pre-receipt Printed" then
-                    exit(WPIsServed(WaiterPad, SetupProxy));
+                if WaiterPad."Pre-receipt Printed" then begin
+                    if IsServed = IsServed::Undefined then
+                        if WPIsServed(WaiterPad, SetupProxy) then
+                            IsServed := IsServed::Yes
+                        else
+                            IsServed := IsServed::No;
+                    exit(IsServed = IsServed::Yes);
+                end;
 
             ServiceFlowProfile."Close Waiter Pad On"::Payment:
                 exit(WPIsPaid(WaiterPad, ServiceFlowProfile."Only if Fully Paid"));
 
             ServiceFlowProfile."Close Waiter Pad On"::"Payment if Served":
-                if WPIsPaid(WaiterPad, ServiceFlowProfile."Only if Fully Paid") then
-                    exit(WPIsServed(WaiterPad, SetupProxy));
+                if WPIsPaid(WaiterPad, ServiceFlowProfile."Only if Fully Paid") then begin
+                    if IsServed = IsServed::Undefined then
+                        if WPIsServed(WaiterPad, SetupProxy) then
+                            IsServed := IsServed::Yes
+                        else
+                            IsServed := IsServed::No;
+                    exit(IsServed = IsServed::Yes);
+                end;
         end;
 
         exit(false);
     end;
 
-    local procedure WaiterPadSeatingsCanBeClosed(WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"): Boolean
+    local procedure WaiterPadSeatingsCanBeClosed(WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"; var IsServed: Option Undefined,No,Yes): Boolean
     var
         ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
     begin
@@ -323,8 +329,61 @@
                 exit(WaiterPad."Pre-receipt Printed");
 
             ServiceFlowProfile."Clear Seating On"::"Pre-Receipt if Served":
-                if WaiterPad."Pre-receipt Printed" then
-                    exit(WPIsServed(WaiterPad, SetupProxy));
+                if WaiterPad."Pre-receipt Printed" then begin
+                    if IsServed = IsServed::Undefined then
+                        if WPIsServed(WaiterPad, SetupProxy) then
+                            IsServed := IsServed::Yes
+                        else
+                            IsServed := IsServed::No;
+                    exit(IsServed = IsServed::Yes);
+                end;
+        end;
+
+        exit(false);
+    end;
+
+    local procedure SetWaiterPadStatusInPayment(var WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy")
+    var
+        ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
+    begin
+        SetupProxy.GetServiceFlowProfile(ServiceFlowProfile);
+        if ServiceFlowProfile."W/Pad Ready for Pmt. Status" = '' then
+            exit;
+        if SetWaiterPadStatus(WaiterPad, ServiceFlowProfile."W/Pad Ready for Pmt. Status") then
+            WaiterPad.Modify();
+    end;
+
+    procedure SetWaiterPadStatus(var WaiterPad: Record "NPR NPRE Waiter Pad"; NewStatusCode: Code[10]): Boolean
+    var
+        xWaiterPad: Record "NPR NPRE Waiter Pad";
+    begin
+        if WaiterPad.Status = NewStatusCode then
+            exit(false);
+
+        xWaiterPad := WaiterPad;
+        WaiterPad.Validate(Status, NewStatusCode);
+        OnAfterChangeWaiterPadStatus(xWaiterPad, WaiterPad);
+        exit(true);
+    end;
+
+    local procedure WaiterPadIsReadyForPayment(WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"; var IsServed: Option Undefined,No,Yes): Boolean
+    var
+        ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
+    begin
+        SetupProxy.GetServiceFlowProfile(ServiceFlowProfile);
+        case ServiceFlowProfile."Set W/Pad Ready for Pmt. On" of
+            ServiceFlowProfile."Set W/Pad Ready for Pmt. On"::"Pre-Receipt":
+                exit(WaiterPad."Pre-receipt Printed");
+
+            ServiceFlowProfile."Set W/Pad Ready for Pmt. On"::"Pre-Receipt if Served":
+                if WaiterPad."Pre-receipt Printed" then begin
+                    if IsServed = IsServed::Undefined then
+                        if WPIsServed(WaiterPad, SetupProxy) then
+                            IsServed := IsServed::Yes
+                        else
+                            IsServed := IsServed::No;
+                    exit(IsServed = IsServed::Yes);
+                end;
         end;
 
         exit(false);
@@ -366,14 +425,14 @@
 
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         WaiterPadLine.SetFilter("Line Type", '<>%1', WaiterPadLine."Line Type"::Comment);
-        if WaiterPadLine.IsEmpty then
+        if WaiterPadLine.IsEmpty() then
             exit(true);
 
         RestPrint.InitTempFlowStatusList(TempFlowStatus, TempFlowStatus."Status Object"::WaiterPadLineMealFlow);
         RestPrint.InitTempPrintCategoryList(TempPrintCategory);
         RestPrint.BufferEligibleForSendingWPadLines(
-          WaiterPadLine, WaiterPadLine."Output Type Filter"::KDS, WaiterPadLine."Print Type Filter"::"Kitchen Order",
-          TempFlowStatus, TempPrintCategory, true, false, TempWPadLineBuffer);
+            WaiterPadLine, WaiterPadLine."Output Type Filter"::KDS, WaiterPadLine."Print Type Filter"::"Kitchen Order",
+            TempFlowStatus, TempPrintCategory, true, false, TempWPadLineBuffer);
 
         if TempWPadLineBuffer.FindSet() then
             repeat
@@ -382,8 +441,9 @@
                         TempKitchenStationBuffer, WaiterPadLine, TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code")
                     then begin
                         KitchenOrderMgt.InitKitchenReqSourceFromWaiterPadLine(
-                          KitchenReqSourceParam, WaiterPadLine, TempKitchenStationBuffer."Restaurant Code", TempWPadLineBuffer."Serving Step", 0DT);
-                        KitchenOrderMgt.FindKitchenRequests(KitchenRequest, KitchenReqSourceParam);
+                            KitchenReqSourceParam, WaiterPadLine, TempKitchenStationBuffer."Restaurant Code", '', '', TempWPadLineBuffer."Serving Step", 0DT);
+                        KitchenRequest.Reset();
+                        KitchenOrderMgt.FindKitchenRequestsForSourceDoc(KitchenRequest, KitchenReqSourceParam);
                         if not KitchenRequest.FindSet() then
                             exit(false);
                         repeat
@@ -398,17 +458,13 @@
 
     procedure MoveNumberOfGuests(var FromWaiterPad: Record "NPR NPRE Waiter Pad"; var ToWaiterPad: Record "NPR NPRE Waiter Pad"; NumberOfGuests: Integer)
     begin
-        ToWaiterPad."Number of Guests" := NumberOfGuests;
-        if ToWaiterPad."Number of Guests" < 0 then
-            ToWaiterPad."Number of Guests" := 0;
+        SetPartySize(ToWaiterPad, NumberOfGuests);
         ToWaiterPad."Billed Number of Guests" := FromWaiterPad."Billed Number of Guests" - FromWaiterPad."Number of Guests" + ToWaiterPad."Number of Guests";
         if ToWaiterPad."Billed Number of Guests" < 0 then
             ToWaiterPad."Billed Number of Guests" := 0;
         ToWaiterPad.Modify();
 
-        FromWaiterPad."Number of Guests" := FromWaiterPad."Number of Guests" - ToWaiterPad."Number of Guests";
-        if FromWaiterPad."Number of Guests" < 0 then
-            FromWaiterPad."Number of Guests" := 0;
+        SetPartySize(FromWaiterPad, FromWaiterPad."Number of Guests" - ToWaiterPad."Number of Guests");
         FromWaiterPad."Billed Number of Guests" := FromWaiterPad."Billed Number of Guests" - ToWaiterPad."Billed Number of Guests";
         if FromWaiterPad."Billed Number of Guests" < 0 then
             FromWaiterPad."Billed Number of Guests" := 0;
@@ -442,7 +498,7 @@
             if Include then begin
                 if AssignedPrintCategories <> '' then
                     AssignedPrintCategories := AssignedPrintCategories + '|';
-                AssignedPrintCategories := AssignedPrintCategories + StrSubstNo(InQuotes, AssignedPrintCategory."Print/Prod. Category Code");
+                AssignedPrintCategories := AssignedPrintCategories + StrSubstNo(_InQuotes, AssignedPrintCategory."Print/Prod. Category Code");
             end;
         until AssignedPrintCategory.Next() = 0;
         exit(AssignedPrintCategories);
@@ -467,7 +523,7 @@
         repeat
             if AssignedFlowStatuses <> '' then
                 AssignedFlowStatuses := AssignedFlowStatuses + '|';
-            AssignedFlowStatuses := AssignedFlowStatuses + StrSubstNo(InQuotes, AssignedFlowStatus."Flow Status Code");
+            AssignedFlowStatuses := AssignedFlowStatuses + StrSubstNo(_InQuotes, AssignedFlowStatus."Flow Status Code");
         until AssignedFlowStatus.Next() = 0;
         exit(AssignedFlowStatuses);
     end;
@@ -610,7 +666,7 @@
         AssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.";
     begin
         FilterAssignedPrintCategories(AppliesToRecID, AssignedPrintCategory);
-        if not AssignedPrintCategory.IsEmpty then
+        if not AssignedPrintCategory.IsEmpty() then
             AssignedPrintCategory.DeleteAll(true);
     end;
 
@@ -747,7 +803,7 @@
         AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status";
     begin
         FilterAssignedFlowStatuses(AppliesToRecID, StatusObject, AssignedFlowStatus);
-        if not AssignedFlowStatus.IsEmpty then
+        if not AssignedFlowStatus.IsEmpty() then
             AssignedFlowStatus.DeleteAll(true);
     end;
 
@@ -769,6 +825,22 @@
     begin
         CopyAssignedFlowStatuses(FromRecId, ToRecId, StatusObject);
         ClearAssignedFlowStatuses(FromRecId, StatusObject);
+    end;
+
+    procedure EnableWaiterPadRetentionPolicies()
+    var
+        RetentionPolicySetup: Record "Retention Policy Setup";
+    begin
+        if not RetentionPolicySetup.WritePermission() then
+            exit;
+        if RetentionPolicySetup.Get(Database::"NPR NPRE Waiter Pad") and not RetentionPolicySetup.Enabled then begin
+            RetentionPolicySetup.Validate(Enabled, true);
+            RetentionPolicySetup.Modify(true);
+        end;
+        if RetentionPolicySetup.Get(Database::"NPR NPRE W.Pad Prnt LogEntry") and not RetentionPolicySetup.Enabled then begin
+            RetentionPolicySetup.Validate(Enabled, true);
+            RetentionPolicySetup.Modify(true);
+        end;
     end;
 
     [IntegrationEvent(true, false)]
@@ -808,6 +880,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterWaiterPadCleanup(var WaiterPad: Record "NPR NPRE Waiter Pad")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterChangeWaiterPadStatus(xWaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPad: Record "NPR NPRE Waiter Pad")
     begin
     end;
 }

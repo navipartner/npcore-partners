@@ -53,6 +53,18 @@
             DataClassification = CustomerContent;
             OptionCaption = '<Default>,No,Yes';
             OptionMembers = Default,No,Yes;
+
+            trigger OnValidate()
+            var
+                KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
+                SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+            begin
+                if IsTemporary() or ("KDS Active" = "KDS Active"::No) then
+                    exit;
+                Modify();
+                if SetupProxy.KDSActivatedForAnyRestaurant() then
+                    KitchenOrderMgt.EnableKitchenOrderRetentionPolicy();
+            end;
         }
         field(60; "Order ID Assign. Method"; Enum "NPR NPRE Ord.ID Assign. Method")
         {

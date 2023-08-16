@@ -79,6 +79,18 @@
         {
             Caption = 'KDS Active';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
+                SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+            begin
+                if IsTemporary() or not "KDS Active" then
+                    exit;
+                Modify();
+                if SetupProxy.KDSActivatedForAnyRestaurant() then
+                    KitchenOrderMgt.EnableKitchenOrderRetentionPolicy();
+            end;
         }
         field(40; "Station Req. Handl. On Serving"; Option)
         {
@@ -142,6 +154,12 @@
         field(73; "Seat.Status: Cleaning Required"; Code[10])
         {
             Caption = 'Seat.Status: Cleaning Required';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(Seating));
+        }
+        field(74; "Seat.Status: Blocked"; Code[10])
+        {
+            Caption = 'Seat.Status: Blocked';
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(Seating));
         }
@@ -318,6 +336,15 @@
         {
         }
     }
+
+    trigger OnInsert()
+    var
+        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
+    begin
+        if IsTemporary() then
+            exit;
+        WaiterPadMgt.EnableWaiterPadRetentionPolicies();
+    end;
 
     var
         ParamMgt: Codeunit "NPR POS Action Param. Mgt.";

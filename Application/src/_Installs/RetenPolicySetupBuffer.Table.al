@@ -24,6 +24,10 @@ table 6059993 "NPR Reten. Policy Setup Buffer"
         {
             DataClassification = SystemMetadata;
         }
+        field(6; "Apply to All Records"; Boolean)
+        {
+            DataClassification = SystemMetadata;
+        }
     }
 
     keys

@@ -1,11 +1,15 @@
 codeunit 6150668 "NPR NPRE POSAction: Split Wa." implements "NPR IPOS Workflow"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR25.0';
+    ObsoleteReason = 'Not supported in Dragonglass environment. Please use POS action ''SPLIT_BILL'' instead.';
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         NPRESeating: Record "NPR NPRE Seating";
-        ActionDescription: Label 'This built-in action splits waiter pads (bills). It can be run from both Sale and Restaurant View';
+        //ActionDescription: Label 'This built-in action splits waiter pads (bills). It can be run from both Sale and Restaurant View';
+        ActionDescription: Label 'This action is not supported anymore. Please use POS action ''SPLIT_BILL'' instead.';
         ParamInputType_OptionLbl: Label 'stringPad,intPad,List', locked = true;
         ParamInputType_CptLbl: Label 'Seating Selection Method';
         ParamInputType_DescLbl: Label 'Specifies seating selection method.';
@@ -36,8 +40,10 @@ codeunit 6150668 "NPR NPRE POSAction: Split Wa." implements "NPR IPOS Workflow"
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        POSSession: Codeunit "NPR POS Session";
+        NotSupportedErr: Label 'This action is not supported anymore. Please use POS action ''SPLIT_BILL'' instead.';
     begin
+        Error(NotSupportedErr);
+        /*
         case Step of
             'addPresetValuesToContext':
                 OnActionAddPresetValuesToContext(Context, POSSession);
@@ -48,6 +54,7 @@ codeunit 6150668 "NPR NPRE POSAction: Split Wa." implements "NPR IPOS Workflow"
             'splitWaiterPad':
                 OnActionSplitWaiterPad(Context, POSSession);
         end;
+        
     end;
 
     local procedure OnActionAddPresetValuesToContext(JSON: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
@@ -118,6 +125,7 @@ codeunit 6150668 "NPR NPRE POSAction: Split Wa." implements "NPR IPOS Workflow"
         NPREWaiterPad.Get(WaiterPadNo);
 
         NPREWaiterPadPOSMgt.SplitBill(NPREWaiterPad, POSSession, 1, true);
+        */
     end;
 
     local procedure GetActionScript(): Text

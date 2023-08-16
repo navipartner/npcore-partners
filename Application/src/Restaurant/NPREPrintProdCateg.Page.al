@@ -9,7 +9,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -18,21 +17,18 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this print/production category.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a text that describes the category.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print Tag"; Rec."Print Tag")
                 {
-
                     Visible = ShowPrintTags;
-                    ToolTip = 'Specifies the value of the Print Tag field';
+                    ToolTip = 'Specifies the list of assigned print tags.';
                     ApplicationArea = NPRRetail;
                 }
             }
