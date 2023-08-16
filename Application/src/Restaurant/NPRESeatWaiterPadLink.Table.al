@@ -78,6 +78,26 @@
             FieldClass = FlowField;
             CalcFormula = Lookup("NPR NPRE Seating"."Seating No." WHERE(Code = FIELD("Seating Code")));
         }
+        field(50; Primary; Boolean)
+        {
+            Caption = 'Primary';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+                DisablingNotAllowedErr: Label 'You cannot directly unset a seating as primary. Please set another seating as primary, and system will remove the checkmark from this line automatically.';
+            begin
+                if not Primary then
+                    Error(DisablingNotAllowedErr);
+
+                SeatingWaiterPadLink.SetCurrentKey("Waiter Pad No.", Primary);
+                SeatingWaiterPadLink.SetRange("Waiter Pad No.", Rec."Waiter Pad No.");
+                SeatingWaiterPadLink.SetRange(Primary, true);
+                SeatingWaiterPadLink.SetFilter("Seating Code", '<>%1', Rec."Seating Code");
+                SeatingWaiterPadLink.ModifyAll(Primary, false);
+            end;
+        }
     }
 
     keys
@@ -86,6 +106,9 @@
         {
         }
         key(Key2; Closed)
+        {
+        }
+        key(Key3; "Waiter Pad No.", Primary)
         {
         }
     }

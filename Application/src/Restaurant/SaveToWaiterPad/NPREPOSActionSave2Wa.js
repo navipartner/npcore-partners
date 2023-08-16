@@ -1,5 +1,5 @@
 let main = async ({ workflow, context, popup, parameters, captions }) => {
-    await workflow.respond("AddPresetValuesToContext");
+    await workflow.respond("addPresetValuesToContext");
     //seatingInput
     if (!context.seatingCode) {
         if (parameters.FixedSeatingCode) {

@@ -20,49 +20,29 @@ codeunit 6150681 "NPR NPRE RVA: Set R-View" implements "NPR IPOS Workflow"
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
-        POSSession: Codeunit "NPR POS Session";
-    begin
-        if SaveToWaiterPad(POSSession, Context) then
-            SelectRestaurantView(POSSession, Context);
-    end;
-
-    local procedure SaveToWaiterPad(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Helper"): Boolean
-    var
+        BusinessLogic: Codeunit "NPR NPRE RVA: Set R-View-B";
         SalePOS: Record "NPR POS Sale";
-        WaiterPad: Record "NPR NPRE Waiter Pad";
-        POSSale: Codeunit "NPR POS Sale";
-        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-        SaleCleanupSuccessful: Boolean;
+        ResultMessageText: Text;
     begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        if SalePOS."NPRE Pre-Set Waiter Pad No." = '' then
-            exit(true);
-
-        WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
-        SaleCleanupSuccessful := NPREWaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, WaiterPad, true);
-        if not SaleCleanupSuccessful then begin
+        Sale.GetCurrentSale(SalePOS);
+        if BusinessLogic.SaveToWaiterPad(SalePOS, ResultMessageText) then begin
+            Sale.Refresh(SalePOS);
+            Sale.Modify(true, false);
+            SelectRestaurantView(Context, Sale);
+        end else begin
             Context.SetContext('ShowResultMessage', true);
-            Context.SetContext('ResultMessageText', NPREWaiterPadPOSMgt.UnableToCleanupSaleMsgText(false));
+            Context.SetContext('ResultMessageText', ResultMessageText);
         end;
-
-        POSSale.Refresh(SalePOS);
-        POSSale.Modify(true, false);
-
-        exit(SaleCleanupSuccessful);
     end;
 
-    local procedure SelectRestaurantView(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Helper")
+    local procedure SelectRestaurantView(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale")
     var
-        POSSale: Codeunit "NPR POS Sale";
+        POSSession: Codeunit "NPR POS Session";
         ReturnToDefaultEndOfSaleView: Boolean;
     begin
-        if Context.GetBooleanParameter('ReturnToDefaultEndOfSaleView', ReturnToDefaultEndOfSaleView) and
-           ReturnToDefaultEndOfSaleView then begin
-            POSSession.GetSale(POSSale);
-            POSSale.SelectViewForEndOfSale(POSSession);
-        end else
+        if Context.GetBooleanParameter('ReturnToDefaultEndOfSaleView', ReturnToDefaultEndOfSaleView) and ReturnToDefaultEndOfSaleView then
+            POSSale.SelectViewForEndOfSale(POSSession)
+        else
             POSSession.ChangeViewRestaurant();
     end;
 

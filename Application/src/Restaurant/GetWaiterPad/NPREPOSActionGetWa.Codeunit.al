@@ -1,6 +1,11 @@
-﻿codeunit 6150667 "NPR NPRE POSAction: Get Wa." implements "NPR IPOS Workflow"
+codeunit 6150667 "NPR NPRE POSAction: Get Wa." implements "NPR IPOS Workflow"
 {
     Access = Internal;
+
+    internal procedure ActionCode(): Code[20]
+    begin
+        exit(Format("NPR POS Workflow"::GET_WAITER_PAD));
+    end;
 
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
@@ -54,7 +59,7 @@
     local procedure GetActionScript(): Text
     begin
         exit(
-        //###NPR_INJECT_FROM_FILE:NPREPOSActionNewWa.js###
+        //###NPR_INJECT_FROM_FILE:NPREPOSActionGetWa.js###
 'let main=async({workflow:a,popup:d,parameters:i,context:e,captions:n})=>{if(await a.respond("addPresetValuesToContext"),i.FixedSeatingCode)e.seatingCode=i.FixedSeatingCode;else switch(i.InputType+""){case"0":e.seatingCode=await d.input({caption:n.InputTypeLabel});break;case"1":e.seatingCode=await d.numpad({caption:n.InputTypeLabel});break;case"2":await a.respond("seatingInput");break}!e.seatingCode||(e.seatingCode&&await a.respond("selectWaiterPad"),e.waiterPadNo&&await a.respond("getSaleFromPad"))};'
         );
     end;

@@ -16,39 +16,39 @@ page 6150873 "NPR Seating Flow Stat. Step"
             {
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this status.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Status Object"; Rec."Status Object")
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Status Object field';
+                    ToolTip = 'Specifies the object this status is applicable for.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a text that describes the status.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Available in Front-End"; Rec."Available in Front-End")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies whether this status will be visible in restaurant view';
+                    ToolTip = 'Specifies whether this status is visible in restaurant view.';
                 }
                 field(Color; Rec.Color)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the color of the status in restaurant view';
+                    ToolTip = 'Specifies the color of the status in restaurant view.';
                 }
                 field("Status Color Priority"; Rec."Status Color Priority")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the priority this status''s color will take, when defining table colors in restaurant view. Higher number means higher priority';
+                    ToolTip = 'Specifies the priority this status takes, when defining table colors in restaurant view. Higher number means higher priority.';
                 }
                 field("Icon Class"; Rec."Icon Class")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the icon of the status in restaurant view';
+                    ToolTip = 'Specifies the icon of the status in restaurant view.';
                 }
             }
         }

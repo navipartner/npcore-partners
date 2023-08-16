@@ -6,6 +6,7 @@
     Editable = false;
     PageType = List;
     SourceTable = "NPR NPRE Kitchen Order";
+    SourceTableView = order(descending);
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
 
@@ -17,32 +18,32 @@
             {
                 field("Order ID"; Rec."Order ID")
                 {
-                    ToolTip = 'Specifies the value of the Order ID field';
+                    ToolTip = 'Specifies the order unique Id, assigned by the system according to an automatically maintained number series.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-                    ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ToolTip = 'Specifies the restaurant the ordered was created for.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Expected Dine Date-Time"; Rec."Expected Dine Date-Time")
                 {
-                    ToolTip = 'Specifies the date-time the customer requested the order be ready at';
+                    ToolTip = 'Specifies the date-time the customer requested the order be ready at.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Order Status"; Rec."Order Status")
                 {
-                    ToolTip = 'Specifies current status of the order';
+                    ToolTip = 'Specifies current status of the order.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Priority; Rec.Priority)
                 {
-                    ToolTip = 'Specifies the value of the Priority field';
+                    ToolTip = 'Specifies the priority of the order. The higher the number, the lower the priority. This priority is going to be assigned by default to all kitchen requests created under this order.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Created Date-Time"; Rec."Created Date-Time")
                 {
-                    ToolTip = 'Specifies the value of the Created Date-Time field';
+                    ToolTip = 'Specifies the date-time the order was created at.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -77,7 +78,7 @@
                 RunObject = Page "NPR NPRE Kitchen Req.";
                 RunPageLink = "Order ID" = FIELD("Order ID");
                 RunPageView = SORTING("Order ID");
-                ToolTip = 'Executes the Show Requests action';
+                ToolTip = 'View outstaning kitchen requests for the order.';
                 ApplicationArea = NPRRetail;
             }
         }

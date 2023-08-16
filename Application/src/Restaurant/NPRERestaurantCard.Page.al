@@ -16,22 +16,22 @@
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies a code for the Restaurant.';
+                    ToolTip = 'Specifies a code to identify this restaurant.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ToolTip = 'Specifies the name of the Restaurant.';
+                    ToolTip = 'Specifies a text that describes the restaurant.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Name 2"; Rec."Name 2")
                 {
-                    ToolTip = 'Specifies optional additional information about the Restaurant name.';
+                    ToolTip = 'Specifies optional information in addition to the name.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Service Flow Profile"; Rec."Service Flow Profile")
                 {
-                    ToolTip = 'Specifies the selected Service Flow Profile. A new profile can be created if needed.';
+                    ToolTip = 'Specifies the service flow profile, assigned to the restaurant. Service flow profiles define general restaurant servise flow options, such as at what stage waiter pads should be closed, or when seating should be cleared.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -40,7 +40,7 @@
                 Caption = 'Kitchen Integration';
                 field("Auto Send Kitchen Order"; Rec."Auto Send Kitchen Order")
                 {
-                    ToolTip = 'Specifies whether the order will be automatically sent to the kitchen once captured.';
+                    ToolTip = 'Specifies if system should automatically create or update kitchen orders as soon as new products are saved to waiter pads.';
                     ApplicationArea = NPRRetail;
                 }
                 group(Print)
@@ -53,7 +53,7 @@
                     }
                     field("Resend All On New Lines"; Rec."Resend All On New Lines")
                     {
-                        ToolTip = 'Specifies whether all lines on the waiter pad are sent to the kitchen when new lines are added to the waiter pad.';
+                        ToolTip = 'Specifies if each time, when a new set of products are saved to a waiter pad, system should resend to kitchen both new and existing products from the waiter pad.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -63,23 +63,23 @@
                     Visible = ShowKDS;
                     field("KDS Active"; Rec."KDS Active")
                     {
-                        ToolTip = 'Specifies whether the KDS is active.';
+                        ToolTip = 'Specifies whether the Kitchen Display Systme (KDS) is active.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Order ID Assign. Method"; Rec."Order ID Assign. Method")
                     {
-                        ToolTip = 'Specifies the assignment method of the order ID.';
+                        ToolTip = 'Specifies whether system should update existing kitchen order or create a new one, when a new set of products is added to an existing waiter pad. This can affect the order products are prepared at kitchen stations.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Station Req. Handl. On Serving"; Rec."Station Req. Handl. On Serving")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies how kitchen station production requests should be handled, if the product has been served prior to finishing production.';
+                        ToolTip = 'Specifies how existing kitchen station production requests should be handled, if a product has been served prior to finishing production.';
                     }
                     field("Order Is Ready For Serving"; Rec."Order Is Ready For Serving")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies when kitchen order is assigned "Ready for Serving" status';
+                        ToolTip = 'Specifies when kitchen order is assigned "Ready for Serving" status.';
                     }
                 }
             }
@@ -116,7 +116,7 @@
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Kitchen Stations";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-                    ToolTip = 'Executes the Stations action';
+                    ToolTip = 'View restaurant kitchen stations.';
                     ApplicationArea = NPRRetail;
                 }
                 action(KitchenStationSelection)
@@ -129,7 +129,7 @@
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-                    ToolTip = 'Executes the Station Selection Setup action';
+                    ToolTip = 'View or edit kitchen station selection setup. You can define which kitchen stations should be used to prepare products depending on item categories, serving steps etc.';
                     ApplicationArea = NPRRetail;
                 }
                 action(ShowKitchenRequests)
@@ -141,7 +141,7 @@
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Scope = Repeater;
-                    ToolTip = 'Executes the Kitchen Requests (Expedite View) action';
+                    ToolTip = 'View outstaning kitchen requests (expedite view) for the restaurant.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -164,7 +164,7 @@
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Seating Location";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-                    ToolTip = 'Executes the Locations action';
+                    ToolTip = 'View restaurant seating locations.';
                     ApplicationArea = NPRRetail;
                 }
                 action(Seatings)
@@ -176,7 +176,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
-                    ToolTip = 'Executes the Seatings action';
+                    ToolTip = 'View seatings defined at the restaurant.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

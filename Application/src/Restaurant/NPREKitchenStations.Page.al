@@ -17,23 +17,23 @@
             {
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-                    ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ToolTip = 'Specifies the restaurant this kitchen station belongs to.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this kitchen station.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a text that describes the kitchen station.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Description 2 field';
+                    ToolTip = 'Specifies optional information in addition to the description.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -64,7 +64,7 @@
                 RunObject = Page "NPR NPRE Kitchen Station Slct.";
                 RunPageLink = "Restaurant Code" = FIELD("Restaurant Code"),
                               "Kitchen Station" = FIELD(Code);
-                ToolTip = 'Executes the Station Selection Setup action';
+                ToolTip = 'View or edit kitchen station selection setup. You can define which kitchen stations should be used to prepare products depending on item categories, serving steps etc.';
                 ApplicationArea = NPRRetail;
             }
             action(ShowKitchenRequests)
@@ -76,7 +76,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Scope = Repeater;
-                ToolTip = 'Executes the Kitchen Requests action';
+                ToolTip = 'View outstaning kitchen requests for the kitchen station.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

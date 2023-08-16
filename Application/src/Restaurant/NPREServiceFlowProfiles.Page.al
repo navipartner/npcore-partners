@@ -9,7 +9,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -18,14 +17,12 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this restaurant service flow profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a text that describes the restaurant service flow profile.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -36,13 +33,11 @@
             {
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
             systempart(Control6014406; Links)
             {
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
         }
     }

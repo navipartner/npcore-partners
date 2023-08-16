@@ -35,6 +35,11 @@ codeunit 6059994 "NPR Json Helper"
         exit(Value);
     end;
 
+    procedure GetJCode(Token: JsonToken; Path: Text; Required: Boolean): Text
+    begin
+        exit(GetJCode(Token, Path, 0, Required));
+    end;
+
     procedure GetJCode(Token: JsonToken; Path: Text; MaxLength: Integer; Required: Boolean) Value: Text
     var
         JValue: JsonValue;
@@ -118,6 +123,27 @@ codeunit 6059994 "NPR Json Helper"
         if Required then
             RequiredValueMissingError(Token, Path);
         exit(0);
+    end;
+
+    procedure GetJInteger(Token: JsonToken; Path: Text; Required: Boolean): Integer
+    begin
+        exit(GetJInteger(Token, Path, Required, 0));
+    end;
+
+    procedure GetJInteger(Token: JsonToken; Path: Text; Required: Boolean; DefaultValue: Integer): Integer
+    var
+        JValue: JsonValue;
+        Value: Integer;
+        Found: Boolean;
+    begin
+        Found := GetJValue(Token, Path, JValue);
+        if Found then
+            Value := JValue.AsInteger();
+        if Required and not (Found and (Value <> 0)) then
+            RequiredValueMissingError(Token, Path);
+        if Value = 0 then
+            Value := DefaultValue;
+        exit(Value);
     end;
 
     procedure GetJBigInteger(Token: JsonToken; Path: Text; Required: Boolean): BigInteger

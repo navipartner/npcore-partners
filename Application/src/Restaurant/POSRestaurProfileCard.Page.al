@@ -15,26 +15,22 @@
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a text that describes the profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ToolTip = 'Specifies the restaurant code, which is selected by default on POS Restaurant View for POS units with this profile assigned.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Default Seating Location"; Rec."Default Seating Location")
                 {
-
-                    ToolTip = 'Specifies the value of the Default Seating Location field';
+                    ToolTip = 'Specifies the seating location, which is selected by default on POS Restaurant View for POS units with this profile assigned.';
                     ApplicationArea = NPRRetail;
                 }
             }

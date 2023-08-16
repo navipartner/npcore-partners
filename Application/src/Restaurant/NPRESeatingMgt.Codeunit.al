@@ -3,8 +3,10 @@
     Access = Internal;
 
     var
-        AdditionalFiltersSet: Boolean;
+        RestSetup: Record "NPR NPRE Restaurant Setup";
         SeatingFiltersGlobal: Record "NPR NPRE Seating";
+        AdditionalFiltersSet: Boolean;
+        RestSetupRetrieved: Boolean;
         InQuotes: Label '''%1''', Comment = '{Fixed}';
 
     procedure GetSeatingDescription(SeatingCode: Code[20]) SeatingDescription: Text
@@ -14,7 +16,7 @@
         SeatingDescription := '';
         Seating.Reset();
         Seating.SetRange(Code, SeatingCode);
-        if not Seating.IsEmpty then begin
+        if not Seating.IsEmpty() then begin
             Seating.FindFirst();
             SeatingDescription := Seating.Description;
         end;
@@ -52,10 +54,11 @@
         AdditionalFiltersSet := true;
     end;
 
-    procedure TrySetSeatingIsCleared(SeatingCode: Code[20]; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy")
+    procedure TrySetSeatingIsCleared(SeatingCode: Code[20])
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
+        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
     begin
         SetupProxy.SetSeating(SeatingCode);
         SetupProxy.GetServiceFlowProfile(ServiceFlowProfile);
@@ -65,30 +68,46 @@
         SeatingWaiterPadLink.SetCurrentKey(Closed);
         SeatingWaiterPadLink.SetRange("Seating Code", SeatingCode);
         SeatingWaiterPadLink.SetRange(Closed, false);
-        if not SeatingWaiterPadLink.IsEmpty then
+        if not SeatingWaiterPadLink.IsEmpty() then
             exit;
 
         SetSeatingStatus(SeatingCode, ServiceFlowProfile."Seating Status after Clearing");
     end;
 
     procedure SetSeatingIsReady(SeatingCode: Code[20])
-    var
-        RestSetup: Record "NPR NPRE Restaurant Setup";
     begin
-        if not RestSetup.Get() or (RestSetup."Seat.Status: Ready" = '') then
-            exit;
-
+        GetRestSetup();
         SetSeatingStatus(SeatingCode, RestSetup."Seat.Status: Ready");
     end;
 
-    procedure SetSeatingIsOccupied(SeatingCode: Code[20])
-    var
-        RestSetup: Record "NPR NPRE Restaurant Setup";
+    procedure SetSeatingIsReady(var Seating: Record "NPR NPRE Seating"; xSeating: Record "NPR NPRE Seating")
     begin
-        if not RestSetup.Get() or (RestSetup."Seat.Status: Occupied" = '') then
-            exit;
+        GetRestSetup();
+        SetSeatingStatus(Seating, xSeating, RestSetup."Seat.Status: Ready");
+    end;
 
+    procedure SetSeatingIsOccupied(SeatingCode: Code[20])
+    begin
+        GetRestSetup();
         SetSeatingStatus(SeatingCode, RestSetup."Seat.Status: Occupied");
+    end;
+
+    procedure SetSeatingIsOccupied(var Seating: Record "NPR NPRE Seating"; xSeating: Record "NPR NPRE Seating")
+    begin
+        GetRestSetup();
+        SetSeatingStatus(Seating, xSeating, RestSetup."Seat.Status: Occupied");
+    end;
+
+    procedure SetSeatingIsBlocked(SeatingCode: Code[20])
+    begin
+        GetRestSetup();
+        SetSeatingStatus(SeatingCode, RestSetup."Seat.Status: Blocked");
+    end;
+
+    procedure SetSeatingIsBlocked(var Seating: Record "NPR NPRE Seating"; xSeating: Record "NPR NPRE Seating")
+    begin
+        GetRestSetup();
+        SetSeatingStatus(Seating, xSeating, RestSetup."Seat.Status: Blocked");
     end;
 
     procedure SetSeatingStatus(SeatingCode: Code[20]; NewStatusCode: Code[10])
@@ -97,13 +116,24 @@
         xSeating: Record "NPR NPRE Seating";
     begin
         Seating.Get(SeatingCode);
-        if Seating.Status = NewStatusCode then
-            exit;
-
         xSeating := Seating;
+        if SetSeatingStatus(Seating, xSeating, NewStatusCode) then
+            Seating.Modify();
+    end;
+
+    procedure SetSeatingStatus(var Seating: Record "NPR NPRE Seating"; xSeating: Record "NPR NPRE Seating"; NewStatusCode: Code[10]): Boolean
+    begin
+        if Seating.Status = NewStatusCode then
+            exit(false);
+
         Seating.Status := NewStatusCode;
+        if NewStatusCode <> '' then begin
+            GetRestSetup();
+            Seating.Blocked := RestSetup."Seat.Status: Blocked" = NewStatusCode;
+        end;
+
         OnAfterChangeSeatingStatus(xSeating, Seating);
-        Seating.Modify();
+        exit(true);
     end;
 
     procedure RestaurantSeatingLocationFilter(RestaurantCode: Code[20]): Text
@@ -122,6 +152,15 @@
                 LocationFilter := LocationFilter + StrSubstNo(InQuotes, SeatingLocation.Code);
             until SeatingLocation.Next() = 0;
         exit(LocationFilter);
+    end;
+
+    procedure GetRestSetup()
+    begin
+        if RestSetupRetrieved then
+            exit;
+        if not RestSetup.Get() then
+            RestSetup.Init();
+        RestSetupRetrieved := true;
     end;
 
     [IntegrationEvent(false, false)]

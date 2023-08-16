@@ -141,6 +141,22 @@
         exit(_Restaurant."KDS Active" = _Restaurant."KDS Active"::Yes);
     end;
 
+    procedure KDSActivatedForAnyRestaurant(): Boolean
+    var
+        Restaurant: Record "NPR NPRE Restaurant";
+        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+    begin
+        if Restaurant.IsEmpty() then
+            exit(RestaurantSetup.Get() and RestaurantSetup."KDS Active");
+
+        Restaurant.SetRange("KDS Active", Restaurant."KDS Active"::Yes);
+        if not Restaurant.IsEmpty() then
+            exit(true);
+
+        Restaurant.SetRange("KDS Active", Restaurant."KDS Active"::Default);
+        exit(RestaurantSetup.Get() and RestaurantSetup."KDS Active" and not Restaurant.IsEmpty());
+    end;
+
     procedure OrderIDAssignmentMethod(): Enum "NPR NPRE Ord.ID Assign. Method"
     begin
         MakeSureIsInitialized();

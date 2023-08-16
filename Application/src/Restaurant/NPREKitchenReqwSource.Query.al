@@ -44,6 +44,12 @@
                     column(Source_Document_Line_No; "Source Document Line No.")
                     {
                     }
+                    column(Assigned_Waiter_Code; "Assigned Waiter Code")
+                    {
+                    }
+                    column(Seating_Code; "Seating Code")
+                    {
+                    }
                 }
             }
         }
