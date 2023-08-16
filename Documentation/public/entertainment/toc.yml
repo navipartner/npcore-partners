@@ -1,8 +1,0 @@
-- name: Getting started
-  href: intro.md
-- name: Ticket module
-  href: ticket/toc.yml
-- name: Restaurant module
-  href: restaurant/toc.yml
-- name: Membership module
-  href: membership/toc.yml
