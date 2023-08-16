@@ -22,7 +22,7 @@
                     Caption = 'Selected';
                     Editable = true;
                     Visible = IsMultiSelectionMode;
-                    ToolTip = 'Specifies the value of the Selected field';
+                    ToolTip = 'Specifies if this line is selected.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -33,7 +33,7 @@
                 field("Code"; Rec.Code)
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this status.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Status Object"; Rec."Status Object")
@@ -41,19 +41,25 @@
                     Editable = false;
                     Enabled = StatusObjectVisible;
                     Visible = StatusObjectVisible;
-                    ToolTip = 'Specifies the value of the Status Object field';
+                    ToolTip = 'Specifies the object this status is applicable for.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a text that describes the status.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Flow Order"; Rec."Flow Order")
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Flow Order field';
+                    ToolTip = 'Specifies the place the status takes in the flow. The higher the number, the further in the flow the status is placed.';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Auxiliary; Rec.Auxiliary)
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies whether this is an auxiliary meal flow (serving) step. When requested, auxiliary steps do not update waiter pad current serving step.';
                     ApplicationArea = NPRRetail;
                 }
                 field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsFilterString())
@@ -61,7 +67,7 @@
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
                     Visible = ShowPrintCategories;
-                    ToolTip = 'Specifies the value of the Print/Prod. Categories field';
+                    ToolTip = 'Specifies the list of assigned item print/production categories.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -72,14 +78,14 @@
                 field(Color; Rec.Color)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the color of the status in restaurant view';
+                    ToolTip = 'Specifies the color of the status in restaurant view.';
                     Editable = false;
                     Visible = false;
                 }
                 field("Icon Class"; Rec."Icon Class")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the icon of the status in restaurant view';
+                    ToolTip = 'Specifies the icon of the status in restaurant view.';
                     Editable = false;
                     Visible = false;
                 }
@@ -103,7 +109,7 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = ShowPrintCategories;
-                    ToolTip = 'Executes the Print/Prod. Categories action';
+                    ToolTip = 'View or edit assigned item print/production categories for the record.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

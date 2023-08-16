@@ -65,7 +65,7 @@ codeunit 6151058 "NPR Job Queue User Handler"
             ShouldRefresh := DT2Date(JobQueueRefreshSetup."Last Refreshed") < Today(); // refresh should happen when the date is changed
     end;
 
-    local procedure CanUserRefreshJobQueueEntries(): Boolean
+    procedure CanUserRefreshJobQueueEntries(): Boolean
     var
         JobQueueEntry: Record "Job Queue Entry";
         User: Record User;

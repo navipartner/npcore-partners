@@ -78,6 +78,13 @@
             OptionCaption = 'Ordering,Line Splitting';
             OptionMembers = Ordering,"Line Splitting";
         }
+        field(60; "Waiter Pad Line Exists"; Boolean)
+        {
+            Caption = 'Waiter Pad Line Exists';
+            FieldClass = FlowField;
+            CalcFormula = Exist("NPR NPRE Waiter Pad Line" where("Waiter Pad No." = field("Waiter Pad No."), "Line No." = field("Waiter Pad Line No.")));
+            Editable = false;
+        }
     }
 
     keys

@@ -1,16 +1,17 @@
-﻿page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
+page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
 {
     Extensible = False;
     Caption = 'Add lines to ticket';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR NPRE Waiter Pad Line";
     SourceTableTemporary = true;
-    ApplicationArea = NPRRetail;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR25.0';
+    ObsoleteReason = 'Not supported in Dragonglass environment. Please use POS action ''SPLIT_BILL'' instead.';
 
     layout
     {
@@ -21,13 +22,11 @@
                 ShowCaption = false;
                 field(Marked; Rec.Marked)
                 {
-
                     ToolTip = 'Specifies the value of the Marked field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Waiter Pad No."; Rec."Waiter Pad No.")
                 {
-
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Waiter Pad No. field';
@@ -35,7 +34,6 @@
                 }
                 field("Line No."; Rec."Line No.")
                 {
-
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
@@ -43,7 +41,6 @@
                 }
                 field(Type; Rec."Line Type")
                 {
-
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Type field';
@@ -51,7 +48,6 @@
                 }
                 field("No."; Rec."No.")
                 {
-
                     Editable = false;
                     StyleExpr = StyleTxt;
                     Visible = false;
@@ -60,7 +56,6 @@
                 }
                 field(Description; Rec.Description)
                 {
-
                     Editable = false;
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the value of the Description field';
@@ -68,7 +63,6 @@
                 }
                 field(Quanity; Rec.RemainingQtyToBill())
                 {
-
                     Caption = 'Quantity';
                     DecimalPlaces = 0 : 5;
                     StyleExpr = StyleTxt;
@@ -77,14 +71,12 @@
                 }
                 field("Marked Qty"; Rec."Marked Qty")
                 {
-
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the value of the Qty. to ticket field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
-
                     StyleExpr = StyleTxt;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
@@ -109,7 +101,6 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-
                     ToolTip = 'Executes the OK action';
                     ApplicationArea = NPRRetail;
 
@@ -122,6 +113,18 @@
         }
     }
 
+    trigger OnOpenPage()
+    var
+        NotSupportedErr: Label 'This action is not supported anymore. Please use POS action ''SPLIT_BILL'' instead.';
+    begin
+        Error(NotSupportedErr);
+        /*
+        OKLines := false;
+        FirstOpen := true;
+        Rec.FindFirst();
+        */
+    end;
+
     trigger OnAfterGetCurrRecord()
     var
         ChosenQty: Decimal;
@@ -133,11 +136,11 @@
         end else begin
             Rec.Marked := not Rec.Marked;
             if Rec.RemainingQtyToBill() > 1 then begin
-                if not WaiterPadPOSManagement.GetQtyUI(Rec.RemainingQtyToBill(), Rec.Description, ChosenQty) then begin
-                    Rec.Marked := false;
-                    StyleTxt := '';
-                    exit;
-                end;
+                //if not WaiterPadPOSManagement.GetQtyUI(Rec.RemainingQtyToBill(), Rec.Description, ChosenQty) then begin
+                Rec.Marked := false;
+                StyleTxt := '';
+                //exit;
+                //end;
                 if ChosenQty = 0 then Error(ERRQTYZERO);
                 if ChosenQty > Rec.RemainingQtyToBill() then Error(ERRQTYTOHIGH, Rec.RemainingQtyToBill());
                 Rec."Marked Qty" := ChosenQty;
@@ -153,18 +156,10 @@
         StyleTxt := GetStyle();
     end;
 
-    trigger OnOpenPage()
-    begin
-        OKLines := false;
-        FirstOpen := true;
-        Rec.FindFirst();
-    end;
-
     var
         OKLines: Boolean;
         StyleTxt: Text;
         FirstOpen: Boolean;
-        WaiterPadPOSManagement: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         ERRQTYZERO: Label 'Quantity must be zero or higher.';
         ERRQTYTOHIGH: Label 'Quantity can not be more than %1.';
 

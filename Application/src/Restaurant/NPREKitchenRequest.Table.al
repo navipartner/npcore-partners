@@ -91,10 +91,12 @@
             ValuesAllowed = Item, Comment;
 
             trigger OnValidate()
+            var
+                xKitchenOrderLine: Record "NPR NPRE Kitchen Request";
             begin
                 if "Line Type" <> xRec."Line Type" then begin
                     TestChangesAllowed();
-                    RevertToNewLineState();
+                    RevertToNewLineState(xKitchenOrderLine);
                 end;
             end;
         }
@@ -105,11 +107,13 @@
             TableRelation = IF ("Line Type" = CONST(Item)) Item;
 
             trigger OnValidate()
+            var
+                xKitchenOrderLine: Record "NPR NPRE Kitchen Request";
             begin
                 if "No." <> xRec."No." then begin
                     TestChangesAllowed();
-                    RevertToNewLineState();
-                    "No." := KitchenOrderLine."No.";
+                    RevertToNewLineState(xKitchenOrderLine);
+                    "No." := xKitchenOrderLine."No.";
                     if "No." = '' then
                         exit;
                 end;
@@ -118,8 +122,8 @@
                     "Line Type"::Item:
                         begin
                             GetItem();
-                            Item.TestField(Blocked, false);
-                            Validate("Unit of Measure Code", Item."Sales Unit of Measure");
+                            _Item.TestField(Blocked, false);
+                            Validate("Unit of Measure Code", _Item."Sales Unit of Measure");
                         end;
                     else
                         Validate("Unit of Measure Code");
@@ -139,7 +143,12 @@
         }
         field(130; Quantity; Decimal)
         {
-            CalcFormula = Sum("NPR NPRE Kitchen Req.Src. Link".Quantity where("Request No." = field("Request No.")));
+            CalcFormula = Sum("NPR NPRE Kitchen Req.Src. Link".Quantity
+                          where("Request No." = field("Request No."),
+                                "Source Document Type" = field("Source Document Type Filter"),
+                                "Source Document Subtype" = field("Source Document Subtype Filter"),
+                                "Source Document No." = field("Source Document No. Filter"),
+                                "Source Document Line No." = field("Source Doc. Line No. Filter")));
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -160,7 +169,7 @@
                     "Line Type"::Item:
                         begin
                             GetItem();
-                            "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
+                            "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(_Item, "Unit of Measure Code");
                         end;
                     else
                         "Qty. per Unit of Measure" := 1;
@@ -177,7 +186,12 @@
         }
         field(160; "Quantity (Base)"; Decimal)
         {
-            CalcFormula = Sum("NPR NPRE Kitchen Req.Src. Link"."Quantity (Base)" where("Request No." = field("Request No.")));
+            CalcFormula = Sum("NPR NPRE Kitchen Req.Src. Link"."Quantity (Base)"
+                          where("Request No." = field("Request No."),
+                                "Source Document Type" = field("Source Document Type Filter"),
+                                "Source Document Subtype" = field("Source Document Subtype Filter"),
+                                "Source Document No." = field("Source Document No. Filter"),
+                                "Source Document Line No." = field("Source Doc. Line No. Filter")));
             Caption = 'Quantity (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -199,6 +213,30 @@
             Caption = 'Production Restaurant Filter';
             FieldClass = FlowFilter;
             TableRelation = "NPR NPRE Restaurant";
+        }
+        field(1020; "Source Document Type Filter"; Enum "NPR NPRE K.Req.Source Doc.Type")
+        {
+            Caption = 'Source Document Type Filter';
+            FieldClass = FlowFilter;
+        }
+        field(1021; "Source Document Subtype Filter"; Option)
+        {
+            Caption = 'Source Document Subtype Filter';
+            FieldClass = FlowFilter;
+            OptionCaption = '0,1,2,3,4,5,6,7,8,9,10';
+            OptionMembers = "0","1","2","3","4","5","6","7","8","9","10";
+        }
+        field(1022; "Source Document No. Filter"; Code[20])
+        {
+            Caption = 'Source Document No. Filter';
+            FieldClass = FlowFilter;
+            TableRelation = If ("Source Document Type Filter" = const("Waiter Pad")) "NPR NPRE Waiter Pad";
+        }
+        field(1023; "Source Doc. Line No. Filter"; Integer)
+        {
+            Caption = 'Source Doc. Line No. Filter';
+            FieldClass = FlowFilter;
+            TableRelation = If ("Source Document Type Filter" = const("Waiter Pad")) "NPR NPRE Waiter Pad Line"."Line No." where("Waiter Pad No." = field("Source Document No. Filter"));
         }
         field(1100; "Applicable for Kitchen Station"; Boolean)
         {
@@ -252,36 +290,33 @@
         DeleteSourceLinks();
     end;
 
-    var
-        Item: Record Item;
-        KitchenOrderLine: Record "NPR NPRE Kitchen Request";
-
     local procedure TestChangesAllowed()
     begin
         TestField("Line Status", "Line Status"::"Ready for Serving");
         TestField("Production Status", "Production Status"::"Not Started");
     end;
 
-    local procedure RevertToNewLineState()
+    local procedure RevertToNewLineState(var xKitchenOrderLine: Record "NPR NPRE Kitchen Request")
     begin
-        KitchenOrderLine := Rec;
+        xKitchenOrderLine := Rec;
         Init();
-        "Restaurant Code" := KitchenOrderLine."Restaurant Code";
-        "Line Type" := KitchenOrderLine."Line Type";
+        "Restaurant Code" := xKitchenOrderLine."Restaurant Code";
+        "Line Type" := xKitchenOrderLine."Line Type";
     end;
 
     local procedure GetItem()
     begin
         TestField("Line Type", "Line Type"::Item);
         TestField("No.");
-        if "No." <> Item."No." then
-            Item.Get("No.");
+        if "No." <> _Item."No." then
+            _Item.Get("No.");
     end;
 
     internal procedure GetNextStationReqLineNo(): Integer
     var
         KitchenReqStation: Record "NPR NPRE Kitchen Req. Station";
     begin
+        KitchenReqStation.LockTable();
         KitchenReqStation.SetRange("Request No.", "Request No.");
         if not KitchenReqStation.FindLast() then
             KitchenReqStation."Line No." := 0;
@@ -300,52 +335,139 @@
         "Qty. per Unit of Measure" := WaiterPadLine."Qty. per Unit of Measure";
     end;
 
-    internal procedure SeatingCode(): Code[20]
-    var
-        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
-    begin
-        KitchenReqSourceLink.SetCurrentKey("Request No.");
-        KitchenReqSourceLink.SetRange("Request No.", Rec."Request No.");
-        if KitchenReqSourceLink.FindLast() then
-            case KitchenReqSourceLink."Source Document Type" of
-                KitchenReqSourceLink."Source Document Type"::"Waiter Pad":
-                    begin
-                        SeatingWaiterPadLink.SetRange("Waiter Pad No.", KitchenReqSourceLink."Source Document No.");
-                        if SeatingWaiterPadLink.FindFirst() then
-                            exit(SeatingWaiterPadLink."Seating Code");
-                    end;
-            end;
-        exit('');
-    end;
-
-    internal procedure SeatingNo(): Text[20]
-    var
-        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
-    begin
-        KitchenReqSourceLink.SetCurrentKey("Request No.");
-        KitchenReqSourceLink.SetRange("Request No.", Rec."Request No.");
-        if KitchenReqSourceLink.FindLast() then
-            case KitchenReqSourceLink."Source Document Type" of
-                KitchenReqSourceLink."Source Document Type"::"Waiter Pad":
-                    begin
-                        SeatingWaiterPadLink.SetAutoCalcFields("Seating No.");
-                        SeatingWaiterPadLink.SetRange("Waiter Pad No.", KitchenReqSourceLink."Source Document No.");
-                        if SeatingWaiterPadLink.FindFirst() then
-                            exit(SeatingWaiterPadLink."Seating No.");
-                    end;
-            end;
-        exit('');
-    end;
-
     local procedure DeleteSourceLinks()
     var
         KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
     begin
         KitchenReqSourceLink.SetCurrentKey("Request No.");
         KitchenReqSourceLink.SetRange("Request No.", "Request No.");
-        if not KitchenReqSourceLink.IsEmpty then
+        if not KitchenReqSourceLink.IsEmpty() then
             KitchenReqSourceLink.DeleteAll();
     end;
+
+    internal procedure SetSourceDocLinkFilter(KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link")
+    begin
+        SetRange("Source Document Type Filter", KitchenReqSourceLink."Source Document Type");
+        SetRange("Source Document Subtype Filter", KitchenReqSourceLink."Source Document Subtype");
+        SetRange("Source Document No. Filter", KitchenReqSourceLink."Source Document No.");
+        SetRange("Source Doc. Line No. Filter", KitchenReqSourceLink."Source Document Line No.");
+    end;
+
+    internal procedure ClearSourceDocLinkFilter()
+    begin
+        SetRange("Source Document Type Filter");
+        SetRange("Source Document Subtype Filter");
+        SetRange("Source Document No. Filter");
+        SetRange("Source Doc. Line No. Filter");
+    end;
+
+    internal procedure GetSeatingAndWaiter(var AssignedWaiters: Text; var SeatingCodes: Text; var SeatingNos: Text)
+    var
+        KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
+        AssignedWaiterList: List of [Code[20]];
+        SeatingCodeList: List of [Code[20]];
+        SeatingNoList: List of [Code[20]];
+    begin
+        AssignedWaiters := '';
+        SeatingCodes := '';
+        SeatingNos := '';
+
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        KitchenReqSourceLink.ReadIsolation := IsolationLevel::ReadUncommitted;
+#ENDIF
+        KitchenReqSourceLink.SetCurrentKey("Request No.");
+        KitchenReqSourceLink.SetRange("Request No.", "Request No.");
+        KitchenReqSourceLink.SetAutoCalcFields("Seating No.");
+        if not KitchenReqSourceLink.FindSet() then
+            exit;
+        repeat
+            if KitchenReqSourceLink."Assigned Waiter Code" <> '' then
+                if not AssignedWaiterList.Contains(KitchenReqSourceLink."Assigned Waiter Code") then
+                    AssignedWaiterList.Add(KitchenReqSourceLink."Assigned Waiter Code");
+            if KitchenReqSourceLink."Seating Code" <> '' then
+                if not SeatingCodeList.Contains(KitchenReqSourceLink."Seating Code") then begin
+                    SeatingCodeList.Add(KitchenReqSourceLink."Seating Code");
+                    if not SeatingNoList.Contains(KitchenReqSourceLink."Seating No.") then
+                        SeatingNoList.Add(KitchenReqSourceLink."Seating No.");
+                end;
+        until KitchenReqSourceLink.Next() = 0;
+
+        AssignedWaiters := ListToText(AssignedWaiterList);
+        SeatingCodes := ListToText(SeatingCodeList);
+        SeatingNos := ListToText(SeatingNoList);
+    end;
+
+    local procedure ListToText(ListOfCodes: List of [Code[20]]): Text
+    var
+        Result: TextBuilder;
+        Entry: Text;
+    begin
+        if ListOfCodes.Count() = 0 then
+            exit('');
+        foreach Entry in ListOfCodes do
+            Result.Append(Entry + ',');
+        exit(Result.ToText(1, Result.Length - 1));
+    end;
+
+    procedure IsFilteredByRestaurant() IsFiltered: Boolean
+    begin
+        IsFiltered := GetFilter("Restaurant Code") <> '';
+        if not IsFiltered then begin
+            FilterGroup(2);
+            IsFiltered := GetFilter("Restaurant Code") <> '';
+            FilterGroup(0);
+        end;
+    end;
+
+    procedure GetRestaurantFromFilter() RestaurantCode: Code[20]
+    begin
+        RestaurantCode := GetFilterRestCode();
+        if RestaurantCode = '' then begin
+            FilterGroup(2);
+            RestaurantCode := GetFilterRestCode();
+            if RestaurantCode = '' then
+                RestaurantCode := GetFilterRestCodeByApplyingFilter();
+            FilterGroup(0);
+        end;
+    end;
+
+    local procedure GetFilterRestCode(): Code[20]
+    var
+        MinValue: Code[20];
+        MaxValue: Code[20];
+    begin
+        if GetFilter("Restaurant Code") <> '' then begin
+            if TryGetFilterRestCodeRange(MinValue, MaxValue) then
+                if MinValue = MaxValue then
+                    exit(MaxValue);
+        end;
+    end;
+
+    [TryFunction]
+    local procedure TryGetFilterRestCodeRange(var MinValue: Code[20]; var MaxValue: Code[20])
+    begin
+        MinValue := GetRangeMin("Restaurant Code");
+        MaxValue := GetRangeMax("Restaurant Code");
+    end;
+
+    local procedure GetFilterRestCodeByApplyingFilter(): Code[20]
+    var
+        KitchenOrderLine: Record "NPR NPRE Kitchen Request";
+        MinValue: Code[20];
+        MaxValue: Code[20];
+    begin
+        if GetFilter("Restaurant Code") <> '' then begin
+            KitchenOrderLine.CopyFilters(Rec);
+            KitchenOrderLine.SetCurrentKey("Restaurant Code");
+            if KitchenOrderLine.FindFirst() then
+                MinValue := KitchenOrderLine."Restaurant Code";
+            if KitchenOrderLine.FindLast() then
+                MaxValue := KitchenOrderLine."Restaurant Code";
+            if MinValue = MaxValue then
+                exit(MaxValue);
+        end;
+    end;
+
+    var
+        _Item: Record Item;
 }

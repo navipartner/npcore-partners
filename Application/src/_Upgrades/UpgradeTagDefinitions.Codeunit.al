@@ -43,6 +43,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSSavedSales'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'RetenTableListUpdate_20230223'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'HeyLoyaltyWebhookRequests'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRE'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddJobQueues'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddTaskCountResetJQ'));
@@ -125,6 +126,9 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Entry Dims", '20230515'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Enum Upgrade", 'UpgradeNPREKitchenOrderStatusEnum'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR FtpSftp Data Upgrade"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdatePrimarySeating'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateKitchenRequestSeatingAndWaiter'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'RefreshKitchenOrderStatus'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -222,6 +226,8 @@
                         exit('HeyLoyaltyWebhookRequests-20230525');
                     'M2RecordChangeLogTable':
                         exit('NPR-RetPol-M2RecordChangeLogTable-20230510');
+                    'NPRE':
+                        exit('NPRE-20230720');
                 end;
             Codeunit::"NPR Job Queue Install":
                 Case UpgradeStep of
@@ -455,6 +461,15 @@
 #ENDIF
             Codeunit::"NPR FtpSftp Data Upgrade":
                 exit('NPR_FTP_SFTP_CONNECTION_UPGRADE');
+            Codeunit::"NPR NPRE Upgrade":
+                case UpgradeStep of
+                    'UpdatePrimarySeating':
+                        exit('NPRE_PrimarySeating_20230704');
+                    'UpdateKitchenRequestSeatingAndWaiter':
+                        exit('NPRE_KitchReqSeatWaiter_20230704');
+                    'RefreshKitchenOrderStatus':
+                        exit('NPRE_RefreshKitchenOrderStatus_20230704');
+                end;
         end;
     end;
 }

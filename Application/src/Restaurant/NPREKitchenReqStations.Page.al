@@ -4,10 +4,8 @@
     Caption = 'Kitchen Request Stations';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
-
+    UsageCategory = None;
     SourceTable = "NPR NPRE Kitchen Req. Station";
-    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -17,46 +15,39 @@
             {
                 field("Request No."; Rec."Request No.")
                 {
-
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Request No. field';
+                    ToolTip = 'Specifies the request Id this kitchen station is assigned to.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Line No."; Rec."Line No.")
                 {
-
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Line No. field';
+                    ToolTip = 'Specifies the line number to identify this kitchen station request.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Production Restaurant Code"; Rec."Production Restaurant Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Production Restaurant Code field';
+                    ToolTip = 'Specifies the restaurant this request is handled by.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Kitchen Station"; Rec."Kitchen Station")
                 {
-
-                    ToolTip = 'Specifies the value of the Kitchen Station field';
+                    ToolTip = 'Specifies the kitchen station this request is handled by.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Production Status"; Rec."Production Status")
                 {
-
-                    ToolTip = 'Specifies the value of the Production Status field';
+                    ToolTip = 'Specifies the production status of this kitchen station request.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Start Date-Time"; Rec."Start Date-Time")
                 {
-
-                    ToolTip = 'Specifies the value of the Start Date-Time field';
+                    ToolTip = 'Specifies the date-time production of this request started at the kitchen station.';
                     ApplicationArea = NPRRetail;
                 }
                 field("End Date-Time"; Rec."End Date-Time")
                 {
-
-                    ToolTip = 'Specifies the value of the End Date-Time field';
+                    ToolTip = 'Specifies the date-time production of this request ended at the kitchen station.';
                     ApplicationArea = NPRRetail;
                 }
             }

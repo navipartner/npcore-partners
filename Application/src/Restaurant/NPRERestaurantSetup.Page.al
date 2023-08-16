@@ -18,12 +18,12 @@
                 Caption = 'General';
                 field("Waiter Pad No. Series"; Rec."Waiter Pad No. Serie")
                 {
-                    ToolTip = 'Specifies the value of the Waiter Pad No. Serie field';
+                    ToolTip = 'Specifies the code for the number series that will be used to assign numbers to waiter pads.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Default Service Flow Profile"; Rec."Default Service Flow Profile")
                 {
-                    ToolTip = 'Specifies the value of the Default Service Flow Profile field';
+                    ToolTip = 'Specifies the default service flow profile, which is used for all restaurants not having their own profile assigned. Service flow profiles define general restaurant servise flow options, such as at what stage waiter pads should be closed, or when seating should be cleared.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -36,25 +36,31 @@
                     field("Seat.Status: Ready"; Rec."Seat.Status: Ready")
                     {
                         Caption = 'Ready for New Guests';
-                        ToolTip = 'Specifies the value of the Ready for New Guests field';
+                        ToolTip = 'Specifies the status that is assigned to tables, when they become available for the next guests. The status can be assigned automatically by the system depending on selected service flow profile.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Seat.Status: Occupied"; Rec."Seat.Status: Occupied")
                     {
                         Caption = 'Occupied';
-                        ToolTip = 'Specifies the value of the Occupied field';
+                        ToolTip = 'Specifies the status that is assigned to occupied tables. The status is assigned automatically, when a new waiter pad is created for an unoccupied table.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Seat.Status: Reserved"; Rec."Seat.Status: Reserved")
                     {
                         Caption = 'Reserved';
-                        ToolTip = 'Specifies the value of the Reserved field';
+                        ToolTip = 'Specifies the status that is assigned to reserved tables.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Seat.Status: Cleaning Required"; Rec."Seat.Status: Cleaning Required")
                     {
                         Caption = 'Cleaning Required';
-                        ToolTip = 'Specifies the value of the Cleaning Required field';
+                        ToolTip = 'Specifies the status that can be assigned to tables, when cleanig is required.';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Seat.Status: Blocked"; Rec."Seat.Status: Blocked")
+                    {
+                        Caption = 'Blocked';
+                        ToolTip = 'Specifies the status that is automatically assigned to blocked tables.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -64,12 +70,12 @@
                 Caption = 'Kitchen Integration';
                 field("Auto-Send Kitchen Order"; Rec."Auto-Send Kitchen Order")
                 {
-                    ToolTip = 'Specifies whether system will automatically send kitchen orders as soon as items are saved to waiter pad';
+                    ToolTip = 'Specifies if system should automatically create or update kitchen orders as soon as new products are saved to waiter pads. Please note that this setting may be overridden for each individual restaurant on Restaurant Card page.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Serving Step Discovery Method"; Rec."Serving Step Discovery Method")
                 {
-                    ToolTip = 'Specifies the value of the Serving Step Discovery Method field';
+                    ToolTip = 'Specifies the serving step discovery method. Recommended method involves usage of item routing profiles. Please avoid using the legacy method, which requires setting up print tags, as it may be discontinued at any moment.';
                     ApplicationArea = NPRRetail;
                 }
                 group(Print)
@@ -77,13 +83,13 @@
                     Caption = 'Print';
                     field("Kitchen Printing Active"; Rec."Kitchen Printing Active")
                     {
-                        ToolTip = 'Specifies the value of the Kitchen Printing Active field';
+                        ToolTip = 'Specifies whether the kitchen printing is active. Please note that this setting may be overridden for each individual restaurant on Restaurant Card page.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Re-send All on New Lines"; Rec."Re-send All on New Lines")
                     {
                         Enabled = Rec."Kitchen Printing Active";
-                        ToolTip = 'Specifies whether full kitchen order with all items, including those previously existed on the waiter pad, should be sent to kitchen, when new items are added';
+                        ToolTip = 'Specifies if each time, when a new set of products are saved to a waiter pad, system should resend to kitchen both new and existing products from the waiter pad. Please note that this setting may be overridden for each individual restaurant on Restaurant Card page.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -93,23 +99,23 @@
                     Visible = ShowKDS;
                     field("KDS Active"; Rec."KDS Active")
                     {
-                        ToolTip = 'Specifies the value of the KDS Active field';
+                        ToolTip = 'Specifies whether the Kitchen Display Systme (KDS) is active by default. Please note that this setting may be overridden for each individual restaurant on Restaurant Card page.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Order ID Assignment Method"; Rec."Order ID Assignment Method")
                     {
-                        ToolTip = 'Specifies whether system should amend previously created kitchen order for the waiter pad with newly added items, or create a new order';
+                        ToolTip = 'Specifies whether system should update existing kitchen order or create a new one, when a new set of products is added to an existing waiter pad. This can affect the order products are prepared at kitchen stations. Please note that this setting may be overridden for each individual restaurant on Restaurant Card page.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Kitchen Req. Handl. On Serving"; Rec."Kitchen Req. Handl. On Serving")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies how existing kitchen station production requests should be handled, if an item has been served prior to finishing production';
+                        ToolTip = 'Specifies how existing kitchen station production requests should be handled, if a product has been served prior to finishing production. Please note that this setting may be overridden for each individual restaurant on Restaurant Card page.';
                     }
                     field("Order Is Ready For Serving"; Rec."Order Is Ready For Serving")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies when kitchen order is assigned "Ready for Serving" status';
+                        ToolTip = 'Specifies when kitchen order is assigned "Ready for Serving" status. Please note that this setting may be overridden for each individual restaurant on Restaurant Card page.';
                     }
                 }
             }
@@ -119,7 +125,7 @@
 
                 field("Save Layout Action"; Rec."Save Layout Action")
                 {
-                    ToolTip = 'Specifies the value of the Save Layout Action field';
+                    ToolTip = 'Specifies the code for the POS action that is used, when restaurant layout is modified on restaurant view. Recommended value is "RV_SAVE_LAYOUT"';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
@@ -129,7 +135,7 @@
                 }
                 field("Select Restaurant Action"; Rec."Select Restaurant Action")
                 {
-                    ToolTip = 'Specifies the value of the Select Restaurant Action field';
+                    ToolTip = 'Specifies the code for the POS action that is used, when a restaurant is selected on restaurant view. Recommended value is "RV_SELECT_RESTAURANT"';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
@@ -139,7 +145,7 @@
                 }
                 field("Select Table Action"; Rec."Select Table Action")
                 {
-                    ToolTip = 'Specifies the value of the Select Table Action field';
+                    ToolTip = 'Specifies the code for the POS action that is used, when a seating (table) is selected on restaurant view. Recommended value is "RV_SELECT_TABLE"';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
@@ -149,7 +155,8 @@
                 }
                 field("Go to POS Action"; Rec."Go to POS Action")
                 {
-                    ToolTip = 'Specifies the value of the Go to POS Action field';
+                    ToolTip = 'The field is not used.';
+                    Visible = false;
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
@@ -159,7 +166,7 @@
                 }
                 field("New Waiter Pad Action"; Rec."New Waiter Pad Action")
                 {
-                    ToolTip = 'Specifies the value of the New Waiter Pad Action field';
+                    ToolTip = 'Specifies the code for the POS action that is used, when a new waiter pad is created on restaurant view. Recommended value is "RV_NEW_WAITER_PAD"';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
@@ -169,7 +176,7 @@
                 }
                 field("Select Waiter Pad Action"; Rec."Select Waiter Pad Action")
                 {
-                    ToolTip = 'Specifies the value of the Select Waiter Pad Action field';
+                    ToolTip = 'Specifies the code for the POS action that is used, when a waiter pad is selected on restaurant view.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
@@ -179,7 +186,7 @@
                 }
                 field("Set Waiter Pad Status Action"; Rec."Set Waiter Pad Status Action")
                 {
-                    ToolTip = 'Specifies the value of the Set Waiter Pad Status Action field';
+                    ToolTip = 'Specifies the code for the POS action that is used, when waiter pad status is changed on restaurant view. Recommended value is "RV_SET_W/PAD_STATUS"';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
@@ -189,7 +196,7 @@
                 }
                 field("Set Table Status Action"; Rec."Set Table Status Action")
                 {
-                    ToolTip = 'Specifies the value of the Set Table Status Action field';
+                    ToolTip = 'Specifies the code for the POS action that is used, when table status is changed on restaurant view. Recommended value is "RV_SET_TABLE_STATUS"';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
@@ -199,7 +206,7 @@
                 }
                 field("Set Number of Guests Action"; Rec."Set Number of Guests Action")
                 {
-                    ToolTip = 'Specifies the value of the Set Number of Guests Action field';
+                    ToolTip = 'Specifies the code for the POS action that is used, when party size (number of guests) is changed for a waiter pad on restaurant view. Recommended value is "RV_SET_PARTYSIZE"';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
@@ -225,7 +232,7 @@
                 Caption = 'Print Categories';
                 Image = PrintForm;
                 RunObject = Page "NPR NPRE Slct Prnt Cat.";
-                ToolTip = 'Executes the Print Categories action';
+                ToolTip = 'View or edit item print/production categories.';
                 ApplicationArea = NPRRetail;
             }
             action(Restaurants)
@@ -237,7 +244,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NPRE Restaurants";
-                ToolTip = 'Executes the Restaurants action';
+                ToolTip = 'View restaurants created in the database.';
                 ApplicationArea = NPRRetail;
             }
             group(Kitchen)
@@ -250,7 +257,7 @@
                     Image = Category;
                     RunObject = Page "NPR NPRE Kitchen Stations";
                     RunPageLink = "Restaurant Code" = CONST('');
-                    ToolTip = 'Executes the Stations action';
+                    ToolTip = 'View kitchen stations created in the database.';
                     ApplicationArea = NPRRetail;
                 }
                 action(KitchenStationSelection)
@@ -259,7 +266,7 @@
                     Image = Flow;
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
                     RunPageLink = "Restaurant Code" = CONST('');
-                    ToolTip = 'Executes the Station Selection Setup action';
+                    ToolTip = 'View or edit kitchen station selection setup. You can define which kitchen stations should be used to prepare products depending on item categories, serving steps etc.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -271,7 +278,7 @@
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
     begin
         if not Rec.Get() then
-            Rec.Insert();
+            Rec.Insert(true);
 
         ShowKDS := KitchenOrderMgt.KDSAvailable();
     end;

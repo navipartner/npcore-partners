@@ -32,6 +32,8 @@
                 if "Close Waiter Pad On" = "Close Waiter Pad On"::"Pre-Receipt" then
                     if "Clear Seating On" = "Clear Seating On"::"Pre-Receipt if Served" then
                         "Clear Seating On" := "Clear Seating On"::"Pre-Receipt";
+                if "Close Waiter Pad On" in ["Close Waiter Pad On"::"Pre-Receipt", "Close Waiter Pad On"::"Pre-Receipt if Served"] then
+                    "Set W/Pad Ready for Pmt. On" := "Set W/Pad Ready for Pmt. On"::Manual;
             end;
         }
         field(30; "Seating Status after Clearing"; Code[10])
@@ -58,6 +60,27 @@
         {
             Caption = 'Only if Fully Paid';
             DataClassification = CustomerContent;
+        }
+        field(60; "W/Pad Ready for Pmt. Status"; Code[10])
+        {
+            Caption = 'W/Pad Ready for Pmt. Status';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPad));
+        }
+        field(70; "Set W/Pad Ready for Pmt. On"; Enum "NPR NPRE W/Pad Status Pmt. On")
+        {
+            Caption = 'Set W/Pad Ready for Pmt. On';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Set W/Pad Ready for Pmt. On" = "Set W/Pad Ready for Pmt. On"::Manual then
+                    exit;
+                if "Close Waiter Pad On" in ["Close Waiter Pad On"::"Pre-Receipt", "Close Waiter Pad On"::"Pre-Receipt if Served"] then
+                    FieldError("Close Waiter Pad On");
+                if "Set W/Pad Ready for Pmt. On" = "Set W/Pad Ready for Pmt. On"::"Pre-Receipt if Served" then
+                    Message(AvailableWithKDS);
+            end;
         }
     }
 

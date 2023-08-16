@@ -35,10 +35,20 @@ page 6059998 "NPR APIV1 PBIWaiterPad"
                 field(startDate; Rec."Start Date")
                 {
                     Caption = 'Start Date', Locked = true;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR25.0';
+                    ObsoleteReason = 'Replaced by openedDateTime field';
                 }
                 field(startTime; Rec."Start Time")
                 {
                     Caption = 'Start Time', Locked = true;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR25.0';
+                    ObsoleteReason = 'Replaced by openedDateTime field';
+                }
+                field(openedDateTime; Rec.SystemCreatedAt)
+                {
+                    Caption = 'Opened Date-Time', Locked = true;
                 }
                 field(closeDate; Rec."Close Date")
                 {

@@ -17,18 +17,18 @@
                 CuegroupLayout = Wide;
                 field("Waiter Pads - Open"; Rec."Waiter Pads - Open")
                 {
-                    ToolTip = 'Specifies the value of the Waiter Pads - Open field';
+                    ToolTip = 'Specifies the number of currently opened waiter pads.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Kitchen Requests - Open"; Rec."Kitchen Requests - Open")
                 {
-                    ToolTip = 'Specifies the value of the Kitchen Requests - Open field';
+                    ToolTip = 'Specifies the number of currently active kitchen requests (the requests that hasn’t been finished or cancelled so far).';
                     ApplicationArea = NPRRetail;
                 }
                 field("Pending Reservations"; Rec."Pending Reservations")
                 {
                     Caption = 'Pending Reservations';
-                    ToolTip = 'Specifies the value of the Pending Reservations field';
+                    ToolTip = 'Specifies the number of upcoming reservations.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
@@ -38,22 +38,22 @@
                 Caption = 'Current Table Status';
                 field("Seatings: Ready"; Rec."Seatings: Ready")
                 {
-                    ToolTip = 'Specifies the value of the Available field';
+                    ToolTip = 'Specifies the number of tables that are currently ready for next guests.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Seatings: Occupied"; Rec."Seatings: Occupied")
                 {
-                    ToolTip = 'Specifies the value of the Occupied field';
+                    ToolTip = 'Specifies the number of occupied tables.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Seatings: Reserved"; Rec."Seatings: Reserved")
                 {
-                    ToolTip = 'Specifies the value of the Reserved field';
+                    ToolTip = 'Specifies the number of reserved tables.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Seatings: Cleaning Required"; Rec."Seatings: Cleaning Required")
                 {
-                    ToolTip = 'Specifies the value of the Cleaning Required field';
+                    ToolTip = 'Specifies the number of tables requiring cleaning.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -62,12 +62,12 @@
                 Caption = 'Seats';
                 field("Available seats"; Rec."Available seats")
                 {
-                    ToolTip = 'Specifies the value of the Available Seats field';
+                    ToolTip = 'Specifies the number of currently available seats.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Inhouse Guests"; Rec."Inhouse Guests")
                 {
-                    ToolTip = 'Specifies the value of the Inhouse Guests field';
+                    ToolTip = 'Specifies current number of inhouse guests.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -92,10 +92,10 @@
             }
             cuegroup(TodaySummary)
             {
-                Caption = 'Today''s Summary';
+                Caption = 'Today’s Summary';
                 field("Turnover (LCY)"; Rec."Turnover (LCY)")
                 {
-                    ToolTip = 'Specifies the value of the Turnover field';
+                    ToolTip = 'Specifies today’s turnover amount posted so far.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -105,7 +105,7 @@
                 }
                 field("No. of Sales"; Rec."No. of Sales")
                 {
-                    ToolTip = 'Specifies the value of the No. of Sales field';
+                    ToolTip = 'Specifies today’s number of POS sales posted so far.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -115,17 +115,17 @@
                 }
                 field("Total No. of Guests"; Rec."Total No. of Guests")
                 {
-                    ToolTip = 'Specifies the value of the Total No. of Guests field';
+                    ToolTip = 'Specifies today’s total of number of guests registered on posted POS sales so far.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Average per Sale (LCY)"; Rec."Average per Sale (LCY)")
                 {
-                    ToolTip = 'Specifies the value of the Average per Sale field';
+                    ToolTip = 'Specifies today’s average amount per sale.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Average per Guest (LCY)"; Rec."Average per Guest (LCY)")
                 {
-                    ToolTip = 'Specifies the value of the Average per Guest field';
+                    ToolTip = 'Specifies today’s average amount per guest.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -135,17 +135,17 @@
                 Visible = false;
                 field("Completed Reservations"; Rec."Completed Reservations")
                 {
-                    ToolTip = 'Specifies the value of the Completed field';
+                    ToolTip = 'Specifies today’s number of completed reservations.';
                     ApplicationArea = NPRRetail;
                 }
                 field("No-Shows"; Rec."No-Shows")
                 {
-                    ToolTip = 'Specifies the value of the No-Shows field';
+                    ToolTip = 'Specifies today’s number of reservation no-shows.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Cancelled Reservations"; Rec."Cancelled Reservations")
                 {
-                    ToolTip = 'Specifies the value of the Cancelled field';
+                    ToolTip = 'Specifies today’s number of cancelled reservations.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -158,7 +158,6 @@
         {
             action("Set Up Cues")
             {
-
                 Caption = 'Set Up Cues';
                 Image = Setup;
                 ToolTip = 'Set up the cues (status tiles) related to the role.';
@@ -174,10 +173,9 @@
             }
             action("Select Restaurant")
             {
-
                 Caption = 'Select Restaurant';
                 Image = NewBranch;
-                ToolTip = 'Select active restaurant for the cue calculations.';
+                ToolTip = 'Select active restaurant for cue calculations.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

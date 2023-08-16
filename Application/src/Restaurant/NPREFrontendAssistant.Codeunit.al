@@ -6,7 +6,7 @@
         _JsonHelper: Codeunit "NPR Json Helper";
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnConfigureReusableWorkflows', '', true, true)]
-    local procedure OnConfigureReusableWorkflows(var Sender: Codeunit "NPR POS UI Management"; POSSession: Codeunit "NPR POS Session"; Setup: Codeunit "NPR POS Setup");
+    local procedure OnConfigureReusableWorkflows(var Sender: Codeunit "NPR POS UI Management"; POSSession: Codeunit "NPR POS Session"; Setup: Codeunit "NPR POS Setup")
     var
         TempPOSAction: Record "NPR POS Action" temporary;
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
@@ -71,7 +71,7 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnSetOptions', '', true, true)]
-    local procedure OnSetOptions(Setup: Codeunit "NPR POS Setup"; var Options: JsonObject);
+    local procedure OnSetOptions(Setup: Codeunit "NPR POS Setup"; var Options: JsonObject)
     var
         POSRestaurantProfile: Record "NPR POS NPRE Rest. Profile";
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
@@ -168,7 +168,7 @@
         RestaurantCode := CopyStr(_JsonHelper.GetJText(Context.AsToken(), 'restaurantId', false), 1, MaxStrLen(RestaurantCode));
     end;
 
-    internal procedure RefreshWaiterPadData(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; LocationCode: Code[20]);
+    internal procedure RefreshWaiterPadData(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; LocationCode: Code[20])
     var
         Seating: Record "NPR NPRE Seating";
         SeatingLocation: Record "NPR NPRE Seating Location";
@@ -209,6 +209,7 @@
                                 WaiterPadSeatingContent.Add('locationId', SeatingLocation.Code);
                                 WaiterPadSeatingContent.Add('seatingId', SeatingWaiterPadLink."Seating Code");
                                 WaiterPadSeatingContent.Add('waiterPadId', SeatingWaiterPadLink."Waiter Pad No.");
+                                WaiterPadSeatingContent.Add('primary', SeatingWaiterPadLink.Primary);
                                 WaiterPadSeatingList.Add(WaiterPadSeatingContent);
 
                                 WaiterPadContent.Add('id', WaiterPad."No.");
@@ -220,6 +221,7 @@
                                 WaiterPadContent.Add('statusId', WaiterPad.Status);
                                 WaiterPadContent.Add('servingStepCode', WaiterPad."Serving Step Code");
                                 WaiterPadContent.Add('servingStepColor', GetFlowStatusRgbColorHex(WaiterPad."Serving Step Code", 2));
+                                WaiterPadContent.Add('numberOfGuests', WaiterPad."Number of Guests");
                                 WaiterPadList.Add(WaiterPadContent);
                             until SeatingWaiterPadLink.Next() = 0;
                     until Seating.Next() = 0;
@@ -231,7 +233,7 @@
         FrontEnd.InvokeFrontEndMethod2(Request);
     end;
 
-    local procedure RefreshRestaurantLayout(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]);
+    local procedure RefreshRestaurantLayout(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20])
     var
         FlowStatus: Record "NPR NPRE Flow Status";
         LocationLayout: Record "NPR NPRE Location Layout";
@@ -239,32 +241,44 @@
         TempRestaurant: Record "NPR NPRE Restaurant" temporary;
         Seating: Record "NPR NPRE Seating";
         SeatingLocation: Record "NPR NPRE Seating Location";
+        UserSetup: Record "User Setup";
         Request: Codeunit "NPR Front-End: Generic";
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
         ComponentList: JsonArray;
-        ComponentContent: JsonObject;
         LocationList: JsonArray;
-        LocationContent: JsonObject;
         RestaurantList: JsonArray;
-        RestaurantContent: JsonObject;
-        StatusContent: JsonObject;
         StatusObjectList: JsonArray;
+        ComponentContent: JsonObject;
+        FrontEndProperties: JsonObject;
+        LocationContent: JsonObject;
+        RestaurantContent: JsonObject;
+        SeatingFrontEndSetup: JsonObject;
+        StatusContent: JsonObject;
         Instr: InStream;
         PropertiesString: Text;
         AddToList: Boolean;
+        IsTable: Boolean;
     begin
-        SeatingLocation.SetCurrentKey("Restaurant Code");
-        Request.SetMethod('UpdateRestaurantLayout');
+        if not UserSetup.Get(UserId()) then
+            Clear(UserSetup);
         if RestaurantCode <> '' then begin
             SeatingLocation.FilterGroup(2);
             SeatingLocation.SetRange("Restaurant Code", RestaurantCode);
             SeatingLocation.FilterGroup(0);
 
-            Restaurant.Get(RestaurantCode);
-            TempRestaurant := Restaurant;
-            TempRestaurant.Insert();
-        end else
+            if not UserSetup."NPR Allow Restaurant Switch" then begin
+                Restaurant.Get(RestaurantCode);
+                TempRestaurant := Restaurant;
+                TempRestaurant.Insert();
+            end;
+        end;
+        if TempRestaurant.IsEmpty() then begin
             SetupProxy.GetRestaurantList(TempRestaurant);
+            if UserSetup."NPR Restaurant Switch Filter" <> '' then
+                TempRestaurant.SetFilter(Code, UserSetup."NPR Restaurant Switch Filter");
+        end;
+        SeatingLocation.SetCurrentKey("Restaurant Code");
+        Request.SetMethod('UpdateRestaurantLayout');
 
         if TempRestaurant.FindSet() then
             repeat
@@ -306,32 +320,49 @@
                         LocationLayout.SetRange("Seating Location", SeatingLocation.Code);
                         if LocationLayout.FindSet() then
                             repeat
-                                Clear(ComponentContent);
-                                ComponentContent.Add('id', LocationLayout.Code);
-                                ComponentContent.Add('user_friendly_id', LocationLayout."Seating No.");
-                                ComponentContent.Add('type', LocationLayout.Type);
-                                ComponentContent.Add('caption', LocationLayout.Description);
-                                if LocationLayout."Frontend Properties".HasValue() then begin
-                                    LocationLayout.CalcFields("Frontend Properties");
-                                    LocationLayout."Frontend Properties".CreateInStream(Instr);
-                                    Instr.Read(PropertiesString);
-                                    ComponentContent.Add('blob', PropertiesString);
-                                end else
-                                    ComponentContent.Add('blob', '');
+                                IsTable := LocationLayout.Type = 'table';
+                                if IsTable then
+                                    AddToList := Seating.Get(LocationLayout.Code)
+                                else
+                                    AddToList := true;
 
-                                if LocationLayout.Type = 'table' then begin
-                                    AddToList := Seating.Get(LocationLayout.Code);
-                                    if AddToList then begin
+                                if AddToList then begin
+                                    Clear(ComponentContent);
+                                    ComponentContent.Add('id', LocationLayout.Code);
+                                    ComponentContent.Add('user_friendly_id', LocationLayout."Seating No.");
+                                    ComponentContent.Add('type', LocationLayout.Type);
+                                    ComponentContent.Add('caption', LocationLayout.Description);
+                                    if LocationLayout."Frontend Properties".HasValue() then begin
+                                        LocationLayout.CalcFields("Frontend Properties");
+                                        LocationLayout."Frontend Properties".CreateInStream(Instr);
+                                        if IsTable and FrontEndProperties.ReadFrom(Instr) and FrontEndProperties.Contains('chairs') then begin
+                                            SeatingFrontEndSetup := _JsonHelper.GetJsonToken(FrontEndProperties.AsToken(), 'chairs').AsObject();
+                                            if SeatingFrontEndSetup.Contains('count') then
+                                                SeatingFrontEndSetup.Remove('count');
+                                            SeatingFrontEndSetup.Add('count', Seating.Capacity);
+                                            if SeatingFrontEndSetup.Contains('min') then
+                                                SeatingFrontEndSetup.Remove('min');
+                                            SeatingFrontEndSetup.Add('min', Seating."Min Party Size");
+                                            if SeatingFrontEndSetup.Contains('max') then
+                                                SeatingFrontEndSetup.Remove('max');
+                                            SeatingFrontEndSetup.Add('max', Seating."Max Party Size");
+                                            FrontEndProperties.Replace('chairs', SeatingFrontEndSetup);
+                                            FrontEndProperties.WriteTo(PropertiesString);
+                                        end else
+                                            Instr.Read(PropertiesString);
+                                        ComponentContent.Add('blob', PropertiesString);
+                                    end else
+                                        ComponentContent.Add('blob', '');
+
+                                    if IsTable then begin
                                         ComponentContent.Add('blocked', Seating.Blocked);
                                         ComponentContent.Add('statusId', Seating.Status);
                                         ComponentContent.Add('capacity', Seating.Capacity);
                                         ComponentContent.Add('color', Seating.RGBColorCodeHex(true));
                                     end;
-                                end else
-                                    AddToList := true;
 
-                                if AddToList then
                                     ComponentList.Add(ComponentContent);
+                                end;
                             until LocationLayout.Next() = 0;
 
                         LocationContent.Add('components', ComponentList);
@@ -355,14 +386,13 @@
 
         FrontEnd.InvokeFrontEndMethod2(Request);
 
-        RefreshStatus(FrontEnd, RestaurantCode, '');
+        RefreshStatus(FrontEnd, RestaurantCode, '', '');
     end;
 
-    internal procedure RefreshWaiterPadContent(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; WaiterpadCode: Code[20]);
+    internal procedure RefreshWaiterPadContent(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var WaiterPad: Record "NPR NPRE Waiter Pad")
     var
         Seating: Record "NPR NPRE Seating";
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         Request: Codeunit "NPR Front-End: Generic";
         WaiterPadList: JsonArray;
@@ -374,7 +404,6 @@
     begin
         Request.SetMethod('UpdateWaiterPadContent');
 
-        WaiterPad.SetRange("No.", WaiterpadCode);
         if WaiterPad.FindSet() then
             repeat
                 // head
@@ -389,10 +418,12 @@
                 WaiterPadContent.Add('statusId', WaiterPad.Status);
                 WaiterPadContent.Add('servingStepCode', WaiterPad."Serving Step Code");
                 WaiterPadContent.Add('servingStepColor', GetFlowStatusRgbColorHex(WaiterPad."Serving Step Code", 2));
+                WaiterPadContent.Add('numberOfGuests', WaiterPad."Number of Guests");
 
                 // links to tables
                 Clear(WaiterPadSeatingList);
                 SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
+                SeatingWaiterPadLink.SetRange(Closed, false);
                 if SeatingWaiterPadLink.FindSet() then
                     repeat
                         Seating.Get(SeatingWaiterPadLink."Seating Code");
@@ -400,6 +431,7 @@
                         WaiterPadSeatingContent.Add('id', SeatingWaiterPadLink."Seating Code");
                         WaiterPadSeatingContent.Add('description', Seating.Description);
                         WaiterPadSeatingContent.Add('statusId', Seating.Status);
+                        WaiterPadSeatingContent.Add('primary', SeatingWaiterPadLink.Primary);
                         WaiterPadSeatingList.Add(WaiterPadSeatingContent);
                     until SeatingWaiterPadLink.Next() = 0;
                 WaiterPadContent.Add('seatings', WaiterPadSeatingList);
@@ -437,7 +469,7 @@
         FrontEnd.InvokeFrontEndMethod2(Request);
     end;
 
-    local procedure RefreshStatus(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; LocationCode: Code[20]);
+    procedure RefreshStatus(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; LocationCode: Code[20]; SeatingCode: Code[20])
     var
         Seating: Record "NPR NPRE Seating";
         SeatingLocation: Record "NPR NPRE Seating Location";
@@ -453,6 +485,8 @@
             SeatingLocation.SetRange("Restaurant Code", RestaurantCode);
         if LocationCode <> '' then
             SeatingLocation.SetRange(Code, LocationCode);
+        if SeatingCode <> '' then
+            Seating.SetRange(Code, SeatingCode);
 
         if SeatingLocation.FindSet() then
             repeat
@@ -463,9 +497,10 @@
                             SeatingStatus.Add(Seating.Code, Seating.Status);
 
                         SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
+                        SeatingWaiterPadLink.SetRange(Closed, false);
                         if SeatingWaiterPadLink.FindSet() then
                             repeat
-                                if WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.") then
+                                if WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.") and not WaiterPad.Closed then
                                     if not WaiterPadStatus.Contains(WaiterPad."No.") then
                                         WaiterPadStatus.Add(WaiterPad."No.", WaiterPad.Status);
                             until SeatingWaiterPadLink.Next() = 0;
@@ -497,7 +532,7 @@
         RefreshRestaurantLayout(FrontEnd, RestaurantCode);
     end;
 
-    local procedure SelectStatusObjects(var NPREFlowStatus: Record "NPR NPRE Flow Status"; var StatusObjectList: JsonArray);
+    local procedure SelectStatusObjects(var NPREFlowStatus: Record "NPR NPRE Flow Status"; var StatusObjectList: JsonArray)
     var
         ColorTable: Record "NPR NPRE Color Table";
         StatusObjectContent: JsonObject;

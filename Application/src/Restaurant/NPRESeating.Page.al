@@ -16,32 +16,32 @@
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies internal unique Id of the seating';
+                    ToolTip = 'Specifies a code to identify this seating.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Seating No."; Rec."Seating No.")
                 {
-                    ToolTip = 'Specifies a user friendly id of the seating (table number)';
+                    ToolTip = 'Specifies a user friendly id of the seating (table number).';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a text that describes the seating.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Seating Location"; Rec."Seating Location")
                 {
-                    ToolTip = 'Specifies the value of the Seating Location field';
+                    ToolTip = 'Specifies the location this seating is created at.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ToolTip = 'Specifies the value of the Blocked field';
+                    ToolTip = 'Specifies if the seating is blocked. Waiter pads cannot be created for blocked locations.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Blocking Reason"; Rec."Blocking Reason")
                 {
-                    ToolTip = 'Specifies the value of the Blocking Reason field';
+                    ToolTip = 'Specifies a text describing the reason of seating blocking.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -50,12 +50,23 @@
                 Caption = 'Capasity';
                 field("Fixed Capasity"; Rec."Fixed Capasity")
                 {
-                    ToolTip = 'Specifies the value of the Fixed Capasity field';
+                    ToolTip = 'Specifies if the seating has a fixed capacity.';
+                    Visible = false;
                     ApplicationArea = NPRRetail;
                 }
                 field(Capacity; Rec.Capacity)
                 {
-                    ToolTip = 'Specifies the value of the Capacity field';
+                    ToolTip = 'Specifies the current capacity of the table, that is the number of guests, which actually can be seated at the table without rearranging/borrowing chairs from other seatings.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Min Party Size"; Rec."Min Party Size")
+                {
+                    ToolTip = 'Specifies the minimal number of guests allowed for the table.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Max Party Size"; Rec."Max Party Size")
+                {
+                    ToolTip = 'Specifies the maximal number of guests that potentially can be seated at the table, given there are chairs available for borrowing at other tables.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -65,7 +76,7 @@
                 field(Status; Rec.Status)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Status field';
+                    ToolTip = 'Specifies the current status of the seating.';
 
                     trigger OnValidate()
                     begin
@@ -76,7 +87,7 @@
                 {
                     Editable = false;
                     DrillDown = false;
-                    ToolTip = 'Specifies the value of the Status Description field';
+                    ToolTip = 'Specifies a description of the current status of the seating.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -86,13 +97,13 @@
                 field("Current Waiter Pad FF"; Rec."Current Waiter Pad FF")
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Current Waiter Pad field';
+                    ToolTip = 'Specifies the number of the first waiter pad currently assigned to the seating.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Multiple Waiter Pad FF"; Rec."Multiple Waiter Pad FF")
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Multiple Waiter Pad field';
+                    ToolTip = 'Specifies the number of waiter pads currently assigned to the seating.';
                     ApplicationArea = NPRRetail;
                 }
             }

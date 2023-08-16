@@ -12,58 +12,6 @@
         CFRM_Merge: Label 'Do you want to move lines from waiter pad %1 %2 into waiter pad %3 %4.';
         WPInAnotherSale: Label 'Waiter pad %1 (seating %2) is being processed in another sale at the moment. If you continue, you will get only lines, which were not copied to the other sale.\Are you sure you want to continue?';
         CannotParkWPSale: Label 'Waiter pad related transaction cannot be parked. Please finish your work with the sale by moving it to the waiter pad instead.';
-        SplitCancelled: Label 'The split process has been aborted.';
-        ReadingErr: Label 'reading in %1';
-
-    local procedure ObjectIdentifier(): Text
-    begin
-        exit('Codeunit Waiter Pad POS Mgt.');
-    end;
-
-    procedure SplitBill(WaiterPad: Record "NPR NPRE Waiter Pad"; POSSession: Codeunit "NPR POS Session"; NumberOfGuests: Integer; CopyToSale: Boolean)
-    var
-        NewWaiterPad: Record "NPR NPRE Waiter Pad";
-        TempWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
-        ChoosenWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-    begin
-        if not UIShowWaiterPadSplitBilForm(WaiterPad, TempWaiterPadLine) then
-            Error(SplitCancelled);
-
-        TempWaiterPadLine.SetRange(Marked, true);
-        TempWaiterPadLine.FilterGroup(-1);
-        TempWaiterPadLine.SetFilter("Marked Qty", '<>%1', 0);
-        TempWaiterPadLine.SetRange("Line Type", TempWaiterPadLine."Line Type"::Comment);
-        TempWaiterPadLine.FilterGroup(0);
-        if TempWaiterPadLine.IsEmpty then
-            exit;
-
-        WaiterPad.CalcFields("Current Seating FF");
-        WaiterPadMgt.DuplicateWaiterPadHdr(WaiterPad, NewWaiterPad);
-        WaiterPadMgt.MoveNumberOfGuests(WaiterPad, NewWaiterPad, NumberOfGuests);
-
-        TempWaiterPadLine.FindSet();
-        repeat
-            ChoosenWaiterPadLine.Get(TempWaiterPadLine."Waiter Pad No.", TempWaiterPadLine."Line No.");
-            SplitWaiterPadLine(WaiterPad, ChoosenWaiterPadLine, TempWaiterPadLine."Marked Qty", NewWaiterPad);
-        until (0 = TempWaiterPadLine.Next());
-
-        WaiterPadMgt.CloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Split/Merge Waiter Pad");
-
-        if CopyToSale then begin
-            POSSession.GetSaleLine(POSSaleLine);
-            POSSaleLine.DeleteAll();
-
-            POSSession.GetSale(POSSale);
-            POSSale.GetCurrentSale(SalePOS);
-            ClearSaleHdrNPREPresetFields(SalePOS, false);
-            POSSale.Refresh(SalePOS);
-            POSSale.Modify(true, false);
-            GetSaleFromWaiterPadToPOS(NewWaiterPad, POSSession);
-        end;
-    end;
 
     procedure SplitWaiterPadLine(var FromWaiterPad: Record "NPR NPRE Waiter Pad"; var FromWaiterPadLine: Record "NPR NPRE Waiter Pad Line"; MoveQty: Decimal; ToWaiterPad: Record "NPR NPRE Waiter Pad")
     var
@@ -104,7 +52,7 @@
         CopyPOSInfoWPad2WPad(FromWaiterPad, FromWaiterPadLine."Line No.", ToWaiterPad, NewWaiterPadLine."Line No.");
 
         RestPrint.SplitWaiterPadLinePrintLogEntries(FromWaiterPadLine, NewWaiterPadLine, FullLineTransfer);
-        KitchenOrderMgt.SplitWaiterPadLineKitchenReqSourceLinks(FromWaiterPadLine, NewWaiterPadLine, FullLineTransfer);
+        KitchenOrderMgt.SplitWaiterPadLineKitchenReqSourceLinks(FromWaiterPadLine, ToWaiterPad, NewWaiterPadLine, FullLineTransfer);
 
         FromWaiterPadLine.CalcFields("Sent to Kitchen");
         FromWaiterPadLine.Validate(Quantity, FromWaiterPadLine.Quantity - NewWaiterPadLine.Quantity);
@@ -124,7 +72,7 @@
         SaleLinePOS: Record "NPR POS Sale Line";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         TempTouchedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
-        NPHHospitalityPrint: Codeunit "NPR NPRE Restaurant Print";
+        RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
         POSSession: Codeunit "NPR POS Session";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinesExist: Boolean;
@@ -149,18 +97,8 @@
             if WaiterPadLine.FindSet() then
                 repeat
                     TempTouchedWaiterPadLine := WaiterPadLine;
-                    if not TempTouchedWaiterPadLine.Find() then begin
-                        if (WaiterPadLine."Kitchen Order Sent" or WaiterPadLine."Serving Requested") and
-                           (WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Item)
-                        then begin
-                            if WaiterPadLine.Quantity <> 0 then begin
-                                WaiterPadLine.Validate(Quantity, 0);
-                                WaiterPadLine.Modify();
-                                WaiterPadLine.Mark := true;
-                            end;
-                        end else
-                            WaiterPadLine.Delete(true);
-                    end;
+                    if not TempTouchedWaiterPadLine.Find() then
+                        CleanupWaiterPadLine(WaiterPadLine, true);
                 until WaiterPadLine.Next() = 0;
         end;
 
@@ -179,11 +117,46 @@
         WaiterPadLine.SetRange("Sale Retail ID");
         WaiterPadLine.MarkedOnly(true);
         if not WaiterPadLine.IsEmpty() then
-            NPHHospitalityPrint.SetWaiterPadPreReceiptPrinted(WaiterPad, false, true);
+            RestaurantPrint.SetWaiterPadPreReceiptPrinted(WaiterPad, false, true);
         OnAfterMoveSaleFromPosToWaiterPad(WaiterPad, WaiterPadLine);
 
         Commit();
-        NPHHospitalityPrint.LinesAddedToWaiterPad(WaiterPad);
+        RestaurantPrint.LinesAddedToWaiterPad(WaiterPad);
+    end;
+
+    procedure CleanupWaiterPadOnSaleCancel(SalePOS: Record "NPR POS Sale"; WaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        PrintTemplate: Record "NPR NPRE Print Templ.";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
+    begin
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
+        WaiterPadLine.SetRange("Sale Retail ID", SalePOS.SystemId);
+        if WaiterPadLine.IsEmpty() then
+            exit;
+        WaiterPadLine.SetAutoCalcFields("Kitchen Order Sent", "Serving Requested");
+        WaiterPadLine.FindSet(true);
+        repeat
+            CleanupWaiterPadLine(WaiterPadLine, false);
+        until WaiterPadLine.Next() = 0;
+        Commit();
+        RestaurantPrint.PrintWaiterPadLinesToKitchen(WaiterPad, WaiterPadLine, PrintTemplate."Print Type"::"Kitchen Order", '', false, false);  //Includes commit
+        WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Cancelled Sale");
+    end;
+
+    local procedure CleanupWaiterPadLine(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; MarkTouched: Boolean)
+    begin
+        if (WaiterPadLine."Kitchen Order Sent" or WaiterPadLine."Serving Requested" or (WaiterPadLine."Billed Quantity" <> 0)) and
+           (WaiterPadLine."Line Type" = WaiterPadLine."Line Type"::Item)
+        then begin
+            if WaiterPadLine.Quantity > WaiterPadLine."Billed Quantity" then begin
+                WaiterPadLine.Validate(Quantity, WaiterPadLine."Billed Quantity");
+                WaiterPadLine.Modify();
+                if MarkTouched then
+                    WaiterPadLine.Mark := true;
+            end;
+        end else
+            WaiterPadLine.Delete(true);
     end;
 
     procedure FilterSupportedSaleLines(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
@@ -207,10 +180,10 @@
     procedure UnableToCleanupSaleMsgText(ConfirmRemoval: Boolean): Text
     var
         Result: TextBuilder;
+        ConfirmRemovalTxt: Label 'Those will be lost forever. Are you sure you want to continue?';
+        ManualRemovalTxt: Label 'No lines have been removed from the POS sale to respect the warning. You will need to manually remove all unsupported lines and/or void payments from the sale first, or finish the sale.';
         MsgTxt1: Label 'All supported POS sale lines (lines of type "item" and "comment") have been successfully saved to selected waiter pad and processed according to restaurant module configuration.';
         MsgTxt2: Label 'However, other types of lines, like customer deposit, retail voucher or payment, cannot be saved to waiter pads.';
-        ManualRemovalTxt: Label 'No lines have been removed from the POS sale to respect the warning. You will need to manually remove all unsupported lines and/or void payments from the sale first, or finish the sale.';
-        ConfirmRemovalTxt: Label 'Those will be lost forever. Are you sure you want to continue?';
     begin
         Result.AppendLine(MsgTxt1);
         Result.AppendLine(MsgTxt2);
@@ -248,9 +221,6 @@
             WaiterPadLine.Init();
             WaiterPadLine."Waiter Pad No." := WaiterPad."No.";
             WaiterPadLine."Register No." := SaleLinePOS."Register No.";
-            WaiterPadLine."Start Date" := Today();
-            WaiterPadLine."Start Time" := Time;
-
             WaiterPadLine."Line Type" := SaleLinePOS."Line Type";
             WaiterPadLine."No." := SaleLinePOS."No.";
             WaiterPadLine."Variant Code" := SaleLinePOS."Variant Code";
@@ -258,7 +228,6 @@
             WaiterPadLine."Description 2" := SaleLinePOS."Description 2";
             WaiterPadLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
             WaiterPadLine."Qty. per Unit of Measure" := SaleLinePOS."Qty. per Unit of Measure";
-
             WaiterPadLine."Sale Retail ID" := SalePOS.SystemId;
             WaiterPadLine."Sale Line Retail ID" := SaleLinePOS.SystemId;
             WaiterPadLine.Insert(true);
@@ -445,54 +414,10 @@
         exit(LookUpOK);
     end;
 
-    local procedure UIShowWaiterPadSplitBilForm(WaiterPad: Record "NPR NPRE Waiter Pad"; var TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary): Boolean
-    var
-        POSWaiterPadLines: Page "NPR NPRE Tmp POSWaiterPadLines";
-        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-    begin
-        WaiterPadLine.Reset();
-        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
-
-        TMPWaiterPadLine.Reset();
-        TMPWaiterPadLine.DeleteAll();
-
-        if WaiterPadLine.FindSet() then
-            repeat
-                if WaiterPadLine.Quantity > WaiterPadLine."Billed Quantity" then begin
-                    TMPWaiterPadLine.TransferFields(WaiterPadLine);
-                    TMPWaiterPadLine.Marked := false;
-                    TMPWaiterPadLine."Marked Qty" := 0;
-                    TMPWaiterPadLine.Insert();
-                end;
-            until (0 = WaiterPadLine.Next());
-
-        Clear(POSWaiterPadLines);
-
-        POSWaiterPadLines.fnSetLines(TMPWaiterPadLine);
-        POSWaiterPadLines.SetTableView(TMPWaiterPadLine);
-
-        POSWaiterPadLines.Editable(false);
-
-        if POSWaiterPadLines.RunModal() = ACTION::OK then begin
-            exit(true);
-        end else begin
-            exit(false);
-        end;
-    end;
-
     procedure UIShowWaiterPad(WaiterPad: Record "NPR NPRE Waiter Pad")
     begin
         WaiterPadUI.SetRecord(WaiterPad);
         WaiterPadUI.RunModal();
-    end;
-
-    procedure GetQtyUI(OrgQty: Decimal; Description: Text; var ioChosenQty: Decimal) OK: Boolean
-    var
-    begin
-        ioChosenQty := OrgQty;
-
-        Error('CTRLUPGRADE');
-
     end;
 
     procedure MoveWaiterPadToNewSeatingUI(var WaiterPad: Record "NPR NPRE Waiter Pad")
@@ -509,7 +434,7 @@
 
         if not Confirm(StrSubstNo(CFRM_Move_seating, WaiterPad."No.", WaiterPad.Description, CurrentSeating.Description, NewSeating.Description), true) then
             exit;
-        WaiterPadManagement.ChangeSeating(WaiterPad."No.", WaiterPad."Current Seating FF", NewSeating.Code);
+        WaiterPadManagement.ChangeSeating(WaiterPad, WaiterPad."Current Seating FF", NewSeating.Code);
     end;
 
     procedure MergeWaiterPadUI(var WaiterPad: Record "NPR NPRE Waiter Pad"): Boolean
@@ -558,35 +483,6 @@
         exit(true);
     end;
 
-    [Obsolete('Use procedure that uses "NPR POS JSON Helper" as parameter. Delete when final v1/v2 workflow is gone', 'NPR23.0')]
-    procedure FindSeating(JSON: Codeunit "NPR POS JSON Management"; var NPRESeating: Record "NPR NPRE Seating")
-    var
-        RestaurantCode: Code[20];
-        SeatingCode: Code[20];
-        SeatingManagement: Codeunit "NPR NPRE Seating Mgt.";
-        LocationFilter: Text;
-        SeatingFilter: Text;
-    begin
-        RestaurantCode := CopyStr(JSON.GetString('restaurantCode'), 1, MaxStrLen(RestaurantCode));
-        SeatingCode := GetSeatingCode(JSON, RestaurantCode);
-        NPRESeating.Get(SeatingCode);
-
-        if not JSON.SetScope('parameters') then
-            exit;
-
-        SeatingFilter := JSON.GetString('SeatingFilter');
-        LocationFilter := JSON.GetString('LocationFilter');
-        if LocationFilter = '' then
-            LocationFilter := SeatingManagement.RestaurantSeatingLocationFilter(RestaurantCode);
-        if (SeatingFilter <> '') or (LocationFilter <> '') then begin
-            NPRESeating.SetRecFilter();
-            NPRESeating.FilterGroup(2);
-            NPRESeating.SetFilter(Code, SeatingFilter);
-            NPRESeating.SetFilter("Seating Location", LocationFilter);
-            NPRESeating.FindFirst();
-        end;
-    end;
-
     procedure FindSeating(JSON: Codeunit "NPR POS JSON Helper"; var NPRESeating: Record "NPR NPRE Seating")
     var
         SeatingManagement: Codeunit "NPR NPRE Seating Mgt.";
@@ -612,36 +508,6 @@
             NPRESeating.SetFilter("Seating Location", LocationFilter);
             NPRESeating.FindFirst();
         end;
-    end;
-
-    [Obsolete('Use procedure that uses "NPR POS JSON Helper" as parameter. Delete when final v1/v2 workflow is gone', 'NPR23.0')]
-    local procedure GetSeatingCode(JSON: Codeunit "NPR POS JSON Management"; RestaurantCode: Code[20]) SeatingCode: Code[20]
-    var
-        SeatingManagement: Codeunit "NPR NPRE Seating Mgt.";
-        SeatingFilter: Text;
-        LocationFilter: Text;
-        NPRESeating: Record "NPR NPRE Seating";
-    begin
-        SeatingCode := CopyStr(UpperCase(JSON.GetString('seatingCode')), 1, MaxStrLen(SeatingCode));
-        if SeatingCode <> '' then
-            exit(SeatingCode);
-
-        JSON.SetScopeRoot();
-        JSON.SetScopeParameters(ObjectIdentifier());
-        if JSON.GetIntegerOrFail('InputType', StrSubstNo(ReadingErr, ObjectIdentifier())) <> 2 then
-            exit('');
-
-        if JSON.GetBoolean('ShowOnlyActiveWaiPad') then begin
-            NPRESeating.SetAutoCalcFields("Current Waiter Pad FF");
-            NPRESeating.SetFilter("Current Waiter Pad FF", '<>%1', '');
-            SeatingManagement.SetAddSeatingFilters(NPRESeating);
-        end;
-        SeatingFilter := JSON.GetStringOrFail('SeatingFilter', StrSubstNo(ReadingErr, ObjectIdentifier()));
-        LocationFilter := JSON.GetStringOrFail('LocationFilter', StrSubstNo(ReadingErr, ObjectIdentifier()));
-        if LocationFilter = '' then
-            LocationFilter := SeatingManagement.RestaurantSeatingLocationFilter(RestaurantCode);
-        SeatingCode := SeatingManagement.UILookUpSeating(SeatingFilter, LocationFilter);
-        exit(SeatingCode);
     end;
 
     local procedure GetSeatingCode(JSON: Codeunit "NPR POS JSON Helper"; RestaurantCode: Code[20]) SeatingCode: Code[20]
@@ -832,6 +698,76 @@
             WaiterPadLine.ModifyAll("Sale Line Retail ID", GetNullGuid());
     end;
 
+    procedure RunWaiterPadAction(WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Open Waiter Pad"; SendAllLines: Boolean; ServingStepToRequest: Code[10]; WaiterPad: Record "NPR NPRE Waiter Pad"; var ResultMessageText: Text)
+    var
+        WaiterPad2: Record "NPR NPRE Waiter Pad";
+    begin
+        Clear(WaiterPad2);
+        RunWaiterPadAction(WPadAction, SendAllLines, ServingStepToRequest, WaiterPad, WaiterPad2, ResultMessageText);
+    end;
+
+    procedure RunWaiterPadAction(WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Open Waiter Pad"; SendAllLines: Boolean; ServingStepToRequest: Code[10]; WaiterPad: Record "NPR NPRE Waiter Pad"; var MergeToWaiterPad: Record "NPR NPRE Waiter Pad"; var ResultMessageText: Text)
+    var
+        RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
+    begin
+        case WPadAction of
+            WPadAction::"Print Pre-Receipt":
+                begin
+                    RestaurantPrint.PrintWaiterPadPreReceiptPressed(WaiterPad);
+                end;
+
+            WPadAction::"Send Kitchen Order":
+                begin
+                    RestaurantPrint.PrintWaiterPadPreOrderToKitchenPressed(WaiterPad, SendAllLines);
+                end;
+
+            WPadAction::"Request Next Serving":
+                begin
+                    ResultMessageText := RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, true, '');
+                end;
+
+            WPadAction::"Request Specific Serving":
+                begin
+                    if ServingStepToRequest = '' then
+                        if not LookupServingStep(ServingStepToRequest) then
+                            Error('');
+                    ResultMessageText := RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, false, ServingStepToRequest);
+                end;
+
+            WPadAction::"Merge Waiter Pad":
+                begin
+                    if MergeToWaiterPad."No." = '' then
+                        if not SelectWaiterPadToMergeTo(WaiterPad, MergeToWaiterPad) then
+                            Error('');
+                    WaiterPadMgt.MergeWaiterPad(WaiterPad, MergeToWaiterPad);
+                end;
+
+            WPadAction::"Open Waiter Pad":
+                begin
+                    Page.Run(Page::"NPR NPRE Waiter Pad", WaiterPad);
+                end;
+        end;
+    end;
+
+    procedure LookupServingStep(var SelectedServingStep: Code[10]): Boolean
+    var
+        FlowStatus: Record "NPR NPRE Flow Status";
+    begin
+        FlowStatus.FilterGroup(2);
+        FlowStatus.SetRange("Status Object", FlowStatus."Status Object"::WaiterPadLineMealFlow);
+        FlowStatus.FilterGroup(0);
+        if SelectedServingStep <> '' then begin
+            FlowStatus."Status Object" := FlowStatus."Status Object"::WaiterPadLineMealFlow;
+            FlowStatus.Code := SelectedServingStep;
+            if FlowStatus.Find('=><') then;
+        end;
+        if Page.RunModal(0, FlowStatus) = Action::LookupOK then begin
+            SelectedServingStep := FlowStatus.Code;
+            exit(true);
+        end;
+        exit(false);
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale", 'OnAfterDeleteEvent', '', true, false)]
     local procedure ClearWPadLinksOnSaleHdrDelete(var Rec: Record "NPR POS Sale"; RunTrigger: Boolean)
     begin
@@ -877,7 +813,7 @@
             end;
 
             if WaiterPad.Get(WaiterPadLine."Waiter Pad No.") then
-                WaiterPadMgt.CloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Finished Sale");
+                WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Finished Sale");
         end;
     end;
 

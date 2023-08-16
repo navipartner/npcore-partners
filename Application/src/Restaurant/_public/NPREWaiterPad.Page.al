@@ -3,7 +3,7 @@
     Caption = 'Waiter Pad';
     InsertAllowed = false;
     PageType = Document;
-    PromotedActionCategories = 'New,Process,Report,Kitchen Print';
+    PromotedActionCategories = 'New,Process,Report,Kitchen';
     SourceTable = "NPR NPRE Waiter Pad";
     UsageCategory = None;
 
@@ -14,16 +14,27 @@
             group(General)
             {
                 Caption = 'General';
+                field(openedDateTime; Rec.SystemCreatedAt)
+                {
+                    Caption = 'Opened Date-Time';
+                    Editable = false;
+                    ToolTip = 'Specifies the date-time the waiter pad was opened at.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Start Time"; Rec."Start Time")
                 {
                     Caption = 'Opened';
                     Editable = false;
+                    Visible = false;
                     ToolTip = 'Specifies the value of the Opened field';
                     ApplicationArea = NPRRetail;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR25.0';
+                    ObsoleteReason = 'Replaced by SystemCreatedAt field.';
                 }
                 field(Description; Rec.Description)
                 {
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies additional optional description of the waiter pad. You can use it to specify main guest name or other information, which can help you distinguish this waiter pad from other ones created for the same seating.';
                     ApplicationArea = NPRRetail;
                 }
                 field(CustomerDetails; GetCustomerDetails())
@@ -36,49 +47,52 @@
                 field("Number of Guests"; Rec."Number of Guests")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Number of Guests field';
+                    ToolTip = 'Specifies the party size (number of guests) the waiter pad was opened for.';
                 }
                 field("Assigned Waiter Code"; Rec."Assigned Waiter Code")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the waiter assigned to the waiterpad';
+                    ToolTip = 'Specifies the waiter assigned to the waiter pad.';
                 }
                 field(Status; Rec.Status)
                 {
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Status field';
+                    ToolTip = 'Specifies current waiter pad status code.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Status Description FF"; Rec."Status Description FF")
                 {
                     Caption = 'Waiter Pad Status';
                     DrillDown = false;
-                    ToolTip = 'Specifies the value of the Waiter Pad Status field';
+                    ToolTip = 'Specifies current waiter pad status.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     var
                         FlowStatus: Record "NPR NPRE Flow Status";
+                        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
                         NewStatusCode: Code[10];
                     begin
                         NewStatusCode := Rec.Status;
                         if LookupFlowStatus(FlowStatus."Status Object"::WaiterPad, NewStatusCode) then begin
-                            Rec.Validate(Status, NewStatusCode);
-                            Rec.CalcFields("Status Description FF");
+                            if Rec.Status <> NewStatusCode then begin
+                                WaiterPadMgt.SetWaiterPadStatus(Rec, NewStatusCode);
+                                Rec.CalcFields("Status Description FF");
+                            end;
                         end;
                     end;
                 }
                 field("Serving Step Code"; Rec."Serving Step Code")
                 {
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Serving Step Code field';
+                    ToolTip = 'Specifies the serving step code the waiter is currently on.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Serving Step Description"; Rec."Serving Step Description")
                 {
                     Caption = 'Serving Step';
                     DrillDown = false;
-                    ToolTip = 'Specifies the value of the Serving Step field';
+                    ToolTip = 'Specifies the serving step the waiter is currently on.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
@@ -96,7 +110,7 @@
                 field("Pre-receipt Printed"; Rec."Pre-receipt Printed")
                 {
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Pre-receipt Printed field';
+                    ToolTip = 'Specifies if pre-receipt has already been printed for the waiter pad.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -107,7 +121,7 @@
                 {
                     Caption = 'Code';
                     Editable = false;
-                    ToolTip = 'Specifies internal unique Id of the first seating currently assigned to the waiter pad';
+                    ToolTip = 'Specifies the internal unique Id of the primary seating currently assigned to the waiter pad.';
                     ApplicationArea = NPRRetail;
                     Importance = Promoted;
                 }
@@ -115,7 +129,7 @@
                 {
                     Caption = 'No.';
                     Editable = false;
-                    ToolTip = 'Specifies a user friendly id (table number) of the first seating currently assigned to the waiter pad';
+                    ToolTip = 'Specifies the user friendly id (table number) of the primary seating currently assigned to the waiter pad.';
                     ApplicationArea = NPRRetail;
                     Importance = Promoted;
                 }
@@ -123,7 +137,7 @@
                 {
                     Caption = 'Description';
                     Editable = false;
-                    ToolTip = 'Specifies description of the first seating currently assigned to the waiter pad';
+                    ToolTip = 'Specifies description of the primary seating currently assigned to the waiter pad.';
                     ApplicationArea = NPRRetail;
                     Importance = Promoted;
                 }
@@ -131,7 +145,7 @@
                 {
                     Caption = 'Assigned Seatings';
                     Editable = false;
-                    ToolTip = 'Specifies the total number of seatings currently assigned to the waiter pad';
+                    ToolTip = 'Specifies the total number of seatings currently assigned to the waiter pad.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -149,24 +163,24 @@
                 field(Closed; Rec.Closed)
                 {
                     Importance = Promoted;
-                    ToolTip = 'Specifies the value of the Closed field';
+                    ToolTip = 'Specifies if the waiter pad has been already finished and closed.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Close Date"; Rec."Close Date")
                 {
                     Importance = Promoted;
-                    ToolTip = 'Specifies the value of the Close Date field';
+                    ToolTip = 'Specifies the date when the waiter pad was closed on.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Close Time"; Rec."Close Time")
                 {
                     Importance = Promoted;
-                    ToolTip = 'Specifies the value of the Close Time field';
+                    ToolTip = 'Specifies the time when the waiter pad was closed at.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Close Reason"; Rec."Close Reason")
                 {
-                    ToolTip = 'Specifies a reason or process context for the waiter pad was closure.';
+                    ToolTip = 'Specifies a reason or process context for the waiter pad closure.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -181,8 +195,45 @@
             {
                 group("Kitchen Print")
                 {
-                    Caption = 'Kitchen Print';
+                    Caption = 'Kitchen';
                     Image = SendToMultiple;
+                    action(ShowKitchenRequests)
+                    {
+                        Caption = 'Kitchen Requests';
+                        Image = BlanketOrder;
+                        Promoted = true;
+                        PromotedOnly = true;
+                        PromotedCategory = Category4;
+                        PromotedIsBig = true;
+                        ToolTip = 'View outstaning kitchen requests (expedite view) for the waiter pad.';
+                        ApplicationArea = NPRRetail;
+
+                        trigger OnAction()
+                        var
+                            KitchenRequest: Record "NPR NPRE Kitchen Request";
+                            KitchenReqSourceParam: Record "NPR NPRE Kitchen Req.Src. Link";
+                            Seating: Record "NPR NPRE Seating";
+                            WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+                            KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
+                            KitchenRequests: Page "NPR NPRE Kitchen Req.";
+                            RestaurantCode: Code[20];
+                        begin
+                            Rec.CalcFields("Current Seating FF");
+                            Rec.TestField("Current Seating FF");
+                            Seating.Get(Rec."Current Seating FF");
+                            RestaurantCode := Seating.GetSeatingRestaurant();
+                            WaiterPadLine."Waiter Pad No." := Rec."No.";
+                            WaiterPadLine."Line No." := 0;
+                            KitchenOrderMgt.InitKitchenReqSourceFromWaiterPadLine(KitchenReqSourceParam, WaiterPadLine, RestaurantCode, '', '', '', 0DT);
+                            KitchenOrderMgt.FindKitchenRequestsForSourceDoc(KitchenRequest, KitchenReqSourceParam);
+                            KitchenRequest.SetRange("Restaurant Code", RestaurantCode);
+
+                            Clear(KitchenRequests);
+                            KitchenRequests.SetViewMode(0);
+                            KitchenRequests.SetTableView(KitchenRequest);
+                            KitchenRequests.Run();
+                        end;
+                    }
                     action(SendOrder)
                     {
                         Caption = 'Send Full Order';
@@ -191,7 +242,7 @@
                         PromotedOnly = true;
                         PromotedCategory = Category4;
                         PromotedIsBig = true;
-                        ToolTip = 'Notify kitchen of all ordered items regardless of serving step and print categories';
+                        ToolTip = 'Notify kitchen of all ordered items regardless of serving step and print categories.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnAction()
@@ -207,7 +258,7 @@
                         PromotedOnly = true;
                         PromotedCategory = Category4;
                         PromotedIsBig = true;
-                        ToolTip = 'Ask kitchen to prepare next set of items based on current serving step and print categories';
+                        ToolTip = 'Ask kitchen to prepare next set of items based on current serving step and print categories.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnAction()
@@ -223,7 +274,7 @@
                         PromotedOnly = true;
                         PromotedCategory = Category4;
                         PromotedIsBig = true;
-                        ToolTip = 'Ask kitchen to prepare set of items belonging to a specific serving step';
+                        ToolTip = 'Ask kitchen to prepare set of items belonging to a specific serving step.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnAction()
@@ -239,7 +290,7 @@
                         PromotedOnly = true;
                         PromotedCategory = Category4;
                         PromotedIsBig = true;
-                        ToolTip = 'Ask kitchen to prepare selected waiter pad lines regardless of serving step and print categories';
+                        ToolTip = 'Ask kitchen to prepare selected waiter pad lines regardless of serving step and print categories.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnAction()
@@ -266,7 +317,7 @@
                     PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
-                    ToolTip = 'Executes the Print Pre Receipt action';
+                    ToolTip = 'Print pre-receipt for the waiter pad.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -289,7 +340,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ToolTip = 'Executes the Move seating action';
+                    ToolTip = 'Move the waiter pad to another seating (table).';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -305,7 +356,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ToolTip = 'Executes the Merge waiter pad action';
+                    ToolTip = 'Merge current waiter pad with another one.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -323,7 +374,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ToolTip = 'Executes the Close waiter pad action';
+                    ToolTip = 'Close the waiter pad. Please note that once closed, you won''t be able to reopen the waiter pad again.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

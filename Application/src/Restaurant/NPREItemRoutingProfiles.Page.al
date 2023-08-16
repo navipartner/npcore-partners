@@ -1,8 +1,6 @@
 ﻿page 6150681 "NPR NPRE Item Routing Profiles"
 {
     Extensible = False;
-    //TODO: Show assigned print/prod categories and serving steps
-
     Caption = 'Rest. Item Routing Profiles';
     DelayedInsert = true;
     LinksAllowed = false;
@@ -10,7 +8,6 @@
     SourceTable = "NPR NPRE Item Routing Profile";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-
 
     layout
     {
@@ -20,22 +17,19 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this item routing profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a text that describes the profile.';
                     ApplicationArea = NPRRetail;
                 }
                 field(AssignedFlowStatuses; Rec.AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
                 {
-
                     Caption = 'Serving Steps';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Serving Steps field';
+                    ToolTip = 'Specifies the list of assigned serving steps.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -45,10 +39,9 @@
                 }
                 field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsString())
                 {
-
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Print/Prod. Categories field';
+                    ToolTip = 'Specifies the list of assigned item print/production categories.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -75,8 +68,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-
-                    ToolTip = 'Executes the Serving Steps action';
+                    ToolTip = 'View or edit assigned serving steps for the record.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -95,8 +87,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-
-                    ToolTip = 'Executes the Print/Prod. Categories action';
+                    ToolTip = 'View or edit assigned item print/production categories for the record.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

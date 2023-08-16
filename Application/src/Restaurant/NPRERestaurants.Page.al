@@ -17,18 +17,18 @@
             {
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this restaurant.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
                 {
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies a text that describes the restaurant.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Name 2"; Rec."Name 2")
                 {
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Name 2 field';
+                    ToolTip = 'Specifies optional information in addition to the name.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -62,7 +62,7 @@
                     Image = Category;
                     RunObject = Page "NPR NPRE Kitchen Stations";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-                    ToolTip = 'Executes the Stations action';
+                    ToolTip = 'View restaurant kitchen stations.';
                     ApplicationArea = NPRRetail;
                 }
                 action(KitchenStationSelection)
@@ -71,7 +71,7 @@
                     Image = Flow;
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-                    ToolTip = 'Executes the Station Selection Setup action';
+                    ToolTip = 'View or edit kitchen station selection setup. You can define which kitchen stations should be used to prepare products depending on item categories, serving steps etc.';
                     ApplicationArea = NPRRetail;
                 }
                 action(ShowKitchenRequests)
@@ -84,7 +84,7 @@
                     PromotedIsBig = true;
                     Scope = Repeater;
                     Visible = ShowRequests;
-                    ToolTip = 'Executes the Kitchen Requests (Expedite View) action';
+                    ToolTip = 'View outstaning kitchen requests (expedite view) for the restaurant.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -103,14 +103,14 @@
                     Image = Zones;
                     RunObject = Page "NPR NPRE Seating Location";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
-                    ToolTip = 'Executes the Locations action';
+                    ToolTip = 'View restaurant seating locations.';
                     ApplicationArea = NPRRetail;
                 }
                 action(Seatings)
                 {
                     Caption = 'Seatings';
                     Image = Lot;
-                    ToolTip = 'Executes the Seatings action';
+                    ToolTip = 'View seatings defined at the restaurant.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -130,6 +130,23 @@
     trigger OnOpenPage()
     begin
         ShowRequests := not CurrPage.LookupMode;
+    end;
+
+    internal procedure GetSelectionFilter(): Text
+    var
+        Restaurant: Record "NPR NPRE Restaurant";
+    begin
+        CurrPage.SetSelectionFilter(Restaurant);
+        exit(GetSelectionFilter(Restaurant));
+    end;
+
+    internal procedure GetSelectionFilter(var Restaurant: Record "NPR NPRE Restaurant"): Text
+    var
+        SelectionFilterManagement: Codeunit SelectionFilterManagement;
+        RecRef: RecordRef;
+    begin
+        RecRef.GetTable(Restaurant);
+        exit(SelectionFilterManagement.GetSelectionFilter(RecRef, Restaurant.FieldNo(Code)));
     end;
 
     var

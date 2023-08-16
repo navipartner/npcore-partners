@@ -2,6 +2,11 @@ codeunit 6150661 "NPR NPRE POSAction: Print Wa." implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    internal procedure ActionCode(): Code[20]
+    begin
+        exit(Format("NPR POS Workflow"::PRINT_WAITER_PAD));
+    end;
+
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         NPRESeating: Record "NPR NPRE Seating";
@@ -36,12 +41,10 @@ codeunit 6150661 "NPR NPRE POSAction: Print Wa." implements "NPR IPOS Workflow"
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
-    var
-        POSSession: Codeunit "NPR POS Session";
     begin
         case Step of
             'addPresetValuesToContext':
-                OnActionAddPresetValuesToContext(Context, POSSession);
+                OnActionAddPresetValuesToContext(Context, Sale, Setup);
             'seatingInput':
                 OnActionSeatingInput(Context);
             'selectWaiterPad':
@@ -51,75 +54,48 @@ codeunit 6150661 "NPR NPRE POSAction: Print Wa." implements "NPR IPOS Workflow"
         end;
     end;
 
-    local procedure OnActionAddPresetValuesToContext(JSON: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
+    local procedure OnActionAddPresetValuesToContext(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; Setup: Codeunit "NPR POS Setup")
     var
-        NPRESeating: Record "NPR NPRE Seating";
-        NPRESeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        SalePOS: Record "NPR POS Sale";
-        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
-        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSetup: Codeunit "NPR POS Setup";
-    begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        POSSession.GetSetup(POSSetup);
-
-        JSON.SetContext('restaurantCode', POSSetup.RestaurantCode());
-
-        if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
-            NPRESeating.Get(SalePOS."NPRE Pre-Set Seating Code");
-            JSON.SetContext('seatingCode', SalePOS."NPRE Pre-Set Seating Code");
-        end;
-
-        if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
-            NPREWaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
-            if SalePOS."NPRE Pre-Set Seating Code" <> '' then
-                if not NPRESeatingWaiterPadLink.Get(NPRESeating.Code, NPREWaiterPad."No.") then
-                    WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code, NPREWaiterPad, NPRESeatingWaiterPadLink);
-            WaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, NPREWaiterPad, false);
-            JSON.SetContext('waiterPadNo', SalePOS."NPRE Pre-Set Waiter Pad No.");
-        end;
-    end;
-
-    local procedure OnActionSeatingInput(JSON: Codeunit "NPR POS JSON Helper")
-    var
-        NPRESeating: Record "NPR NPRE Seating";
-        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-    begin
-        NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        JSON.SetContext('seatingCode', NPRESeating.Code);
-    end;
-
-    local procedure OnActionSelectWaiterPad(JSON: Codeunit "NPR POS JSON Helper")
-    var
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        NPRESeating: Record "NPR NPRE Seating";
-        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-    begin
-        NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        if not NPREWaiterPadPOSMgt.SelectWaiterPad(NPRESeating, NPREWaiterPad) then
-            exit;
-
-        JSON.SetContext('waiterPadNo', NPREWaiterPad."No.");
-    end;
-
-    local procedure OnActionPrintWaiterPad(JSON: Codeunit "NPR POS JSON Helper")
-    var
-        NPRESeating: Record "NPR NPRE Seating";
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-        HospitalityPrint: Codeunit "NPR NPRE Restaurant Print";
+        BusinessLogic: Codeunit "NPR NPRE POSAction: Print WP-B";
+        RestaurantCode: Code[20];
+        SeatingCode: Code[20];
         WaiterPadNo: Code[20];
     begin
-        NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        JSON.SetScopeRoot();
-#pragma warning disable AA0139         
-        WaiterPadNo := JSON.GetString('waiterPadNo');
-#pragma warning restore
-        NPREWaiterPad.Get(WaiterPadNo);
-        HospitalityPrint.PrintWaiterPadPreReceiptPressed(NPREWaiterPad);
+        BusinessLogic.GetPresetValues(Sale, Setup, RestaurantCode, SeatingCode, WaiterPadNo);
+        Context.SetContext('restaurantCode', RestaurantCode);
+        if SeatingCode <> '' then
+            Context.SetContext('seatingCode', SeatingCode);
+        if WaiterPadNo <> '' then
+            Context.SetContext('waiterPadNo', WaiterPadNo);
+    end;
+
+    local procedure OnActionSeatingInput(Context: Codeunit "NPR POS JSON Helper")
+    var
+        Seating: Record "NPR NPRE Seating";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        WaiterPadPOSMgt.FindSeating(Context, Seating);
+        Context.SetContext('seatingCode', Seating.Code);
+    end;
+
+    local procedure OnActionSelectWaiterPad(Context: Codeunit "NPR POS JSON Helper")
+    var
+        Seating: Record "NPR NPRE Seating";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+    begin
+        WaiterPadPOSMgt.FindSeating(Context, Seating);
+        if not WaiterPadPOSMgt.SelectWaiterPad(Seating, WaiterPad) then
+            exit;
+
+        Context.SetContext('waiterPadNo', WaiterPad."No.");
+    end;
+
+    local procedure OnActionPrintWaiterPad(Context: Codeunit "NPR POS JSON Helper")
+    var
+        BusinessLogic: Codeunit "NPR NPRE POSAction: Print WP-B";
+    begin
+        BusinessLogic.PrintWaiterPad(Context.GetString('waiterPadNo'));
     end;
 
     local procedure GetActionScript(): Text

@@ -12,14 +12,14 @@ codeunit 6059872 "NPR POSAction: Cancel Sale B"
         Line: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
         WaiterPad: Record "NPR NPRE Waiter Pad";
-        WaiterPadManagement: Codeunit "NPR NPRE Waiter Pad Mgt.";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         CANCEL_SALELbl: Label 'Sale was canceled %1';
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
             WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
-            WaiterPadManagement.CloseWaiterPad(WaiterPad, true, "NPR NPRE W/Pad Closing Reason"::"Cancelled Sale");
+            WaiterPadPOSMgt.CleanupWaiterPadOnSaleCancel(SalePOS, WaiterPad);  //Includes commit
         end;
 
         HandleLinkedDocuments(SalePOS);

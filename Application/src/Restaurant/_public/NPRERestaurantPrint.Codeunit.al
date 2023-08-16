@@ -96,13 +96,13 @@
                                             WaiterPadLine.FindSet();
                                             repeat
                                                 LogWaiterPadLinePrint(
-                                                  WaiterPadLine, PrintType, TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code", PrintDateTime, 0);
+                                                    WaiterPadLine, PrintType, TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code", PrintDateTime, 0);
                                             until WaiterPadLine.Next() = 0;
                                         end;
                                     TempWPadLineBuffer."Output Type"::KDS:
                                         KDSUpdated :=
-                                          KitchenOrderMgt.SendWPLinesToKitchen(
-                                            WaiterPadLine, TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code", PrintType, PrintDateTime) or KDSUpdated;
+                                            KitchenOrderMgt.SendWPLinesToKitchen(
+                                                WaiterPad, WaiterPadLine, TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code", PrintType, PrintDateTime) or KDSUpdated;
                                 end;
 
                             TempWPadLineBuffer.DeleteAll();
@@ -242,7 +242,7 @@
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         if FindAndPrintTemplates(WaiterPad, WaiterPadLine, GlobalPrintTemplate."Print Type"::"Pre Receipt", '', '') then begin
             SetWaiterPadPreReceiptPrinted(WaiterPad, true, true);
-            WaiterPadMgt.CloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::Undefined);
+            WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::Undefined);
         end;
     end;
 
@@ -481,6 +481,7 @@
         if AutoSelectFlowStatus then begin
             FlowStatus.SetCurrentKey("Status Object", "Flow Order");
             FlowStatus.SetRange("Status Object", FlowStatus."Status Object"::WaiterPadLineMealFlow);
+            FlowStatus.SetRange(Auxiliary, false);
             if WaiterPad."Serving Step Code" = '' then
                 FlowStatus.FindFirst()
             else begin
@@ -591,7 +592,7 @@
             until FlowStatus.Next() = 0;
 
         FlowStatusTmp.Init();
-        FlowStatusTmp."Status Object" := FlowStatus."Status Object"::WaiterPadLineMealFlow;
+        FlowStatusTmp."Status Object" := StatusObject;
         FlowStatusTmp.Code := '';
         if not FlowStatusTmp.Find() then
             FlowStatusTmp.Insert();

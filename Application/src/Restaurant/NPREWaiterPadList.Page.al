@@ -5,6 +5,7 @@
     CardPageID = "NPR NPRE Waiter Pad";
     PageType = List;
     SourceTable = "NPR NPRE Waiter Pad";
+    SourceTableView = order(descending);
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
     Editable = false;
@@ -17,76 +18,72 @@
             {
                 field("No."; Rec."No.")
                 {
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the waiter pad unique number, assigned by the system according to the specified number series.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Start Date"; Rec."Start Date")
+                field(openedDateTime; Rec.SystemCreatedAt)
                 {
-                    ToolTip = 'Specifies the value of the Start Date field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Start Time"; Rec."Start Time")
-                {
-                    ToolTip = 'Specifies the value of the Start Time field';
+                    Caption = 'Opened Date-Time';
+                    ToolTip = 'Specifies the date-time the waiter pad was opened at.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies additional optional description of the waiter pad. You can use it to specify main guest name or other information, which can help you distinguish this waiter pad from other ones created for the same seating.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Current Seating Code"; Rec."Current Seating FF")
                 {
                     Caption = 'Seating Code';
-                    ToolTip = 'Specifies internal unique Id of the first seating currently assigned to the waiter pad';
+                    ToolTip = 'Specifies the internal unique Id of the primary seating currently assigned to the waiter pad.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field("Current Seating No."; Seating."Seating No.")
                 {
                     Caption = 'Seating No.';
-                    ToolTip = 'Specifies a user friendly id (table number) of the first seating currently assigned to the waiter pad';
+                    ToolTip = 'Specifies the user friendly id (table number) of the primary seating currently assigned to the waiter pad.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Current Seating Description"; Seating.Description)
                 {
                     Caption = 'Seating Description';
-                    ToolTip = 'Specifies description of the first seating currently assigned to the waiter pad';
+                    ToolTip = 'Specifies description of the primary seating currently assigned to the waiter pad.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Multiple Seating FF"; Rec."Multiple Seating FF")
                 {
                     Caption = 'Assigned Seatings';
-                    ToolTip = 'Specifies the total number of seatings currently assigned to the waiter pad';
+                    ToolTip = 'Specifies the total number of seatings currently assigned to the waiter pad.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Pre-receipt Printed"; Rec."Pre-receipt Printed")
                 {
-                    ToolTip = 'Specifies the value of the Pre-receipt Printed field';
+                    ToolTip = 'Specifies if pre-receipt has already been printed for the waiter pad.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Closed; Rec.Closed)
                 {
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Closed field';
+                    ToolTip = 'Specifies if the waiter pad has been already finished and closed.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Close Date"; Rec."Close Date")
                 {
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Close Date field';
+                    ToolTip = 'Specifies the date when the waiter pad was closed on.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Close Time"; Rec."Close Time")
                 {
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Close Time field';
+                    ToolTip = 'Specifies the time when the waiter pad was closed at.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Close Reason"; Rec."Close Reason")
                 {
                     Visible = false;
-                    ToolTip = 'Specifies a reason or process context for the waiter pad was closure.';
+                    ToolTip = 'Specifies a reason or process context for the waiter pad closure.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -107,7 +104,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ToolTip = 'Executes the Print Pre Receipt action';
+                    ToolTip = 'Print pre-receipt for the waiter pad.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -127,7 +124,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ToolTip = 'Executes the Close waiter pad action';
+                    ToolTip = 'Close the waiter pad. Please note that once closed, you won’t be able to reopen the waiter pad again.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

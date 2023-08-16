@@ -2,6 +2,11 @@
 {
     Access = Internal;
 
+    internal procedure ActionCode(): Code[20]
+    begin
+        exit(Format("NPR POS Workflow"::SHOW_WAITER_PAD));
+    end;
+
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
         NPRESeating: Record "NPR NPRE Seating";

@@ -37,23 +37,28 @@
         {
             Caption = 'Start Date';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR25.0';
+            ObsoleteReason = 'Replaced by SystemCreatedAt field.';
         }
         field(15; "Start Time"; Time)
         {
             Caption = 'Start Time';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR25.0';
+            ObsoleteReason = 'Replaced by SystemCreatedAt field.';
         }
         field(16; "Current Seating FF"; Code[20])
         {
-            CalcFormula = Lookup("NPR NPRE Seat.: WaiterPadLink"."Seating Code" WHERE("Waiter Pad No." = FIELD("No.")));
+            CalcFormula = Lookup("NPR NPRE Seat.: WaiterPadLink"."Seating Code" WHERE("Waiter Pad No." = FIELD("No."), Primary = Const(true)));
             Caption = 'Current Seating Code';
             Editable = false;
             FieldClass = FlowField;
         }
         field(17; "Multiple Seating FF"; Integer)
         {
-            CalcFormula = Count("NPR NPRE Seat.: WaiterPadLink" WHERE("Waiter Pad No." = FIELD("No."),
-                                                                        Closed = FIELD(Closed)));
+            CalcFormula = Count("NPR NPRE Seat.: WaiterPadLink" WHERE("Waiter Pad No." = FIELD("No."), Closed = FIELD(Closed)));
             Caption = 'Multiple Seating';
             Editable = false;
             FieldClass = FlowField;
@@ -128,6 +133,7 @@
                 ServingStep: Record "NPR NPRE Flow Status";
                 WPStatus: Record "NPR NPRE Flow Status";
                 WPStatusNew: Record "NPR NPRE Flow Status";
+                WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
                 UpdateStatus: Boolean;
             begin
                 if ServingStep.Get("Serving Step Code", ServingStep."Status Object"::WaiterPadLineMealFlow) then
@@ -139,7 +145,7 @@
                             UpdateStatus := WPStatusNew."Flow Order" >= WPStatus."Flow Order";
                         end;
                         if UpdateStatus then
-                            Validate(Status, ServingStep."Waiter Pad Status Code");
+                            WaiterPadMgt.SetWaiterPadStatus(Rec, ServingStep."Waiter Pad Status Code");
                     end;
             end;
         }
@@ -183,6 +189,13 @@
             Caption = 'Assigned Waiter Code';
             DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser";
+
+            trigger OnValidate()
+            var
+                KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
+            begin
+                KitchenOrderMgt.UpdateKitchenReqSourceWaiter(Enum::"NPR NPRE K.Req.Source Doc.Type"::"Waiter Pad", 0, "No.", 0, "Assigned Waiter Code");
+            end;
         }
         field(100; "Print Category Filter"; Code[20])
         {
@@ -219,6 +232,7 @@
     begin
         if WaiterPad."No." = '' then
             exit;
+        WaiterPad.TestField(Closed, true);
 
         WaiterPadLine.Reset();
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
@@ -238,10 +252,10 @@
     internal procedure CloseWaiterPad()
     var
         WaiterPadManagement: Codeunit "NPR NPRE Waiter Pad Mgt.";
-        ConfirmCloseQst: Label 'Once closed, you wouldn''t be able to reopen the waiter pad again.\Are you sure you want to continue and close the waiter pad %1?';
+        ConfirmCloseQst: Label 'Once closed, you won''t be able to reopen the waiter pad again.\Please note that the system won''t notify kitchen about this action, nor cancel any outstanding kitchen requests sent earlier. They will remain active. If you want the system to automatically cancel all kitchen requests, created for this waiter pad, please open the waiter pad in a POS sale, and cancel the sale. In that case the waiter pad may be closed automatically by the system as well.\Are you sure you want to continue and close the waiter pad %1?';
     begin
         if not Confirm(ConfirmCloseQst, false, Rec."No.") then
             exit;
-        WaiterPadManagement.CloseWaiterPad(Rec, true, "NPR NPRE W/Pad Closing Reason"::"Manually Closed");
+        WaiterPadManagement.TryCloseWaiterPad(Rec, true, "NPR NPRE W/Pad Closing Reason"::"Manually Closed");
     end;
 }

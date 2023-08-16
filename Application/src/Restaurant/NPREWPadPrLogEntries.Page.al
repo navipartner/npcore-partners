@@ -8,7 +8,6 @@
     UsageCategory = History;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -17,65 +16,55 @@
             {
                 field("Waiter Pad No."; Rec."Waiter Pad No.")
                 {
-
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Waiter Pad No. field';
+                    ToolTip = 'Specifies the waiter pad number the reqiest was created for.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Waiter Pad Line No."; Rec."Waiter Pad Line No.")
                 {
-
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Waiter Pad Line No. field';
+                    ToolTip = 'Specifies the waiter pad line number the reqiest was created for.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print Type"; Rec."Print Type")
                 {
-
-                    ToolTip = 'Specifies the value of the Request Type field';
+                    ToolTip = 'Specifies the request type this log entry was created for.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Flow Status Object"; Rec."Flow Status Object")
                 {
-
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Flow Status Object field';
+                    ToolTip = 'Specifies the status object the reqiest was created for.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Flow Status Code"; Rec."Flow Status Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Serving Step Code field';
+                    ToolTip = 'Specifies the serving step the reqiest was created for.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print Category Code"; Rec."Print Category Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Print Category Code field';
+                    ToolTip = 'Specifies the item print/production category the reqiest was created for.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sent Date-Time"; Rec."Sent Date-Time")
                 {
-
-                    ToolTip = 'Specifies the value of the Sent Date-Time field';
+                    ToolTip = 'Specifies the date-time the reqiest was created at.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sent Quanity (Base)"; Rec."Sent Quanity (Base)")
                 {
-
-                    ToolTip = 'Specifies the value of the Sent Quanity (Base) field';
+                    ToolTip = 'Specifies quanity (base) included in the request.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Output Type"; Rec."Output Type")
                 {
-
-                    ToolTip = 'Specifies the value of the Output Type field';
+                    ToolTip = 'Specifies if the request output type is KDS or printer.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Entry No. field';
+                    ToolTip = 'Specifies the unique number of the log entry, as assigned from the specified number series when the entry was created.';
                     ApplicationArea = NPRRetail;
                 }
             }

@@ -34,7 +34,38 @@ tableextension 6014454 "NPR User Setup" extends "User Setup"
         {
             Caption = 'POS Unit Switch Filter';
             DataClassification = CustomerContent;
-            Description = 'NPR5.38';
+            TableRelation = "NPR POS Unit";
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                POSUnitList: Page "NPR POS Unit List";
+            begin
+                POSUnitList.LookupMode(true);
+                if POSUnitList.RunModal() = Action::LookupOK then
+                    Validate("NPR Register Switch Filter", POSUnitList.GetSelectionFilter());
+            end;
+        }
+        field(6150640; "NPR Allow Restaurant Switch"; Boolean)
+        {
+            Caption = 'Allow Restaurant Switch';
+            DataClassification = CustomerContent;
+        }
+        field(6150650; "NPR Restaurant Switch Filter"; Text[100])
+        {
+            Caption = 'Restaurant Switch Filter';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPRE Restaurant";
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                RestaurantList: Page "NPR NPRE Restaurants";
+            begin
+                RestaurantList.LookupMode(true);
+                if RestaurantList.RunModal() = Action::LookupOK then
+                    Validate("NPR Restaurant Switch Filter", RestaurantList.GetSelectionFilter());
+            end;
         }
         field(6150660; "NPR Backoffice Restaurant Code"; Code[20])
         {

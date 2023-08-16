@@ -2,10 +2,9 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
-
     internal procedure ActionCode(): Code[20]
     begin
-        exit(Format("NPR POS Workflow"::"SAVE_TO_WAITER_PAD"));
+        exit(Format("NPR POS Workflow"::SAVE_TO_WAITER_PAD));
     end;
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
@@ -51,157 +50,107 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
-    var
-        POSSession: Codeunit "NPR POS Session";
     begin
         case Step of
             'addPresetValuesToContext':
-                AddPresetValuesToContext(Context, POSSession);
+                AddPresetValuesToContext(Context, Sale, Setup);
             'seatingInput':
                 SeatingInput(Context);
             'createNewWaiterPad':
-                CreateNewWaiterPad(Context, POSSession);
+                CreateNewWaiterPad(Context, Sale);
             'selectWaiterPad':
                 SelectWaiterPad(Context);
             'saveSale2Pad':
-                SaveSale2Pad(Context, POSSession);
+                SaveSale2Pad(Context, Sale);
         end;
     end;
 
-    local procedure AddPresetValuesToContext(JSON: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
+    local procedure AddPresetValuesToContext(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; Setup: Codeunit "NPR POS Setup")
     var
-        NPRESeating: Record "NPR NPRE Seating";
-        NPRESeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        SalePOS: Record "NPR POS Sale";
-        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSetup: Codeunit "NPR POS Setup";
+        BusinessLogic: Codeunit "NPR NPRE POSAction: Save2WP-B";
+        RestaurantCode: Code[20];
+        SeatingCode: Code[20];
+        WaiterPadNo: Code[20];
     begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        POSSession.GetSetup(POSSetup);
-
-        JSON.SetContext('restaurantCode', POSSetup.RestaurantCode());
-
-        if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
-            NPRESeating.Get(SalePOS."NPRE Pre-Set Seating Code");
-            JSON.SetContext('seatingCode', SalePOS."NPRE Pre-Set Seating Code");
-        end;
-
-        if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
-            NPREWaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
-            if SalePOS."NPRE Pre-Set Seating Code" <> '' then
-                if not NPRESeatingWaiterPadLink.Get(NPRESeating.Code, NPREWaiterPad."No.") then
-                    WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code, NPREWaiterPad, NPRESeatingWaiterPadLink);
-            JSON.SetContext('waiterPadNo', SalePOS."NPRE Pre-Set Waiter Pad No.");
-        end;
+        BusinessLogic.GetPresetValues(Sale, Setup, RestaurantCode, SeatingCode, WaiterPadNo);
+        Context.SetContext('restaurantCode', RestaurantCode);
+        if SeatingCode <> '' then
+            Context.SetContext('seatingCode', SeatingCode);
+        if WaiterPadNo <> '' then
+            Context.SetContext('waiterPadNo', WaiterPadNo);
     end;
 
-    local procedure SeatingInput(JSON: Codeunit "NPR POS JSON Helper")
+    local procedure SeatingInput(Context: Codeunit "NPR POS JSON Helper")
     var
-        NPRESeating: Record "NPR NPRE Seating";
-        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        Seating: Record "NPR NPRE Seating";
+        BusinessLogic: Codeunit "NPR NPRE POSAction: Save2WP-B";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         ConfirmString: Text;
     begin
-        NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-
-        JSON.SetContext('seatingCode', NPRESeating.Code);
-        ConfirmString := GetConfirmString(NPRESeating);
+        WaiterPadPOSMgt.FindSeating(Context, Seating);
+        Context.SetContext('seatingCode', Seating.Code);
+        ConfirmString := BusinessLogic.GetSeatingConfirmString(Seating);
         if ConfirmString <> '' then
-            JSON.SetContext('confirmString', ConfirmString);
+            Context.SetContext('confirmString', ConfirmString);
     end;
 
-    local procedure CreateNewWaiterPad(JSON: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
+    local procedure CreateNewWaiterPad(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale")
     var
         SalePOS: Record "NPR POS Sale";
         Seating: Record "NPR NPRE Seating";
         WaiterPad: Record "NPR NPRE Waiter Pad";
-        POSSale: Codeunit "NPR POS Sale";
-        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
     begin
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        WaiterPadPOSMgt.FindSeating(JSON, Seating);
+        Sale.GetCurrentSale(SalePOS);
+        WaiterPadPOSMgt.FindSeating(Context, Seating);
         WaiterPadMgt.CreateNewWaiterPad(Seating.Code, SalePOS."NPRE Number of Guests", SalePOS."Salesperson Code", '', WaiterPad);
     end;
 
-    local procedure SelectWaiterPad(JSON: Codeunit "NPR POS JSON Helper")
+    local procedure SelectWaiterPad(Context: Codeunit "NPR POS JSON Helper")
     var
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        NPRESeating: Record "NPR NPRE Seating";
-        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        Seating: Record "NPR NPRE Seating";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
     begin
-        NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        if not NPREWaiterPadPOSMgt.SelectWaiterPad(NPRESeating, NPREWaiterPad) then
+        WaiterPadPOSMgt.FindSeating(Context, Seating);
+        if not WaiterPadPOSMgt.SelectWaiterPad(Seating, WaiterPad) then
             exit;
 
-        JSON.SetContext('waiterPadNo', NPREWaiterPad."No.");
+        Context.SetContext('waiterPadNo', WaiterPad."No.");
     end;
 
-    local procedure SaveSale2Pad(JSON: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
+    local procedure SaveSale2Pad(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale")
     var
-        NPRESeating: Record "NPR NPRE Seating";
-        NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        SalePOS: Record "NPR POS Sale";
-        NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-        POSSale: Codeunit "NPR POS Sale";
+        BusinessLogic: Codeunit "NPR NPRE POSAction: Save2WP-B";
+        POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         WaiterPadNo: Code[20];
         OpenWaiterPad: Boolean;
         ReturnToDefaultView: Boolean;
         SaleCleanupSuccessful: Boolean;
     begin
-        NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        JSON.SetScopeRoot();
-        WaiterPadNo := CopyStr(JSON.GetString('waiterPadNo'), 1, MaxStrLen(WaiterPadNo));
-        NPREWaiterPad.Get(WaiterPadNo);
-
-        if not JSON.GetBooleanParameter('OpenWaiterPad', OpenWaiterPad) then
+        WaiterPadNo := CopyStr(Context.GetString('waiterPadNo'), 1, MaxStrLen(WaiterPadNo));
+        if not Context.GetBooleanParameter('OpenWaiterPad', OpenWaiterPad) then
             OpenWaiterPad := false;
-        if not JSON.GetBooleanParameter('ReturnToDefaultView', ReturnToDefaultView) then
+        if not Context.GetBooleanParameter('ReturnToDefaultView', ReturnToDefaultView) then
             ReturnToDefaultView := false;
 
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        SaleCleanupSuccessful := NPREWaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, NPREWaiterPad, true);
-        POSSale.Refresh(SalePOS);
-        POSSale.Modify(true, false);
-
-        Commit();
-
-        if OpenWaiterPad then
-            NPREWaiterPadPOSMgt.UIShowWaiterPad(NPREWaiterPad);
+        BusinessLogic.SaveSale2WPad(Sale, WaiterPadNo, OpenWaiterPad, SaleCleanupSuccessful);
 
         if ReturnToDefaultView and SaleCleanupSuccessful then
-            POSSale.SelectViewForEndOfSale(POSSession);
+            Sale.SelectViewForEndOfSale(POSSession);
         if not SaleCleanupSuccessful then begin
-            JSON.SetContext('ShowResultMessage', true);
-            JSON.SetContext('ResultMessageText', NPREWaiterPadPOSMgt.UnableToCleanupSaleMsgText(false));
+            Context.SetContext('ShowResultMessage', true);
+            Context.SetContext('ResultMessageText', WaiterPadPOSMgt.UnableToCleanupSaleMsgText(false));
         end;
-    end;
-
-    local procedure GetConfirmString(NPRESeating: Record "NPR NPRE Seating") ConfirmString: Text
-    var
-        NPRESeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        NoWaiterPadOnSeatingQst: Label 'There are no open waiter pads exist for seating %1. Do you want to create a new one?';
-    begin
-        NPRESeatingWaiterPadLink.SetRange(Closed, false);
-        NPRESeatingWaiterPadLink.SetRange("Seating Code", NPRESeating.Code);
-        if not NPRESeatingWaiterPadLink.IsEmpty() then
-            exit('');
-
-        ConfirmString := StrSubstNo(NoWaiterPadOnSeatingQst, NPRESeating.Code);
-        exit(ConfirmString);
     end;
 
     local procedure GetActionScript(): Text
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:NPREPOSActionSave2Wa.js###
-'let main=async({workflow:a,context:e,popup:s,parameters:d,captions:t})=>{if(await a.respond("AddPresetValuesToContext"),!e.seatingCode)if(d.FixedSeatingCode)e.seatingCode=d.FixedSeatingCode;else switch(d.InputType+""){case"0":{let i=await s.input({caption:t.InputTypeLabel});if(!i)return;e.seatingCode=i;break}case"1":{let i=await s.numpad({caption:t.InputTypeLabel});if(!i)return;e.seatingCode=i;break}}if(await a.respond("seatingInput"),!!e.seatingCode){if(e.seatingCode&&e.confirmString)if(await s.confirm({title:t.confirmLabel,caption:e.confirmString}))await a.respond("createNewWaiterPad");else return;e.waiterPadNo||e.seatingCode&&await a.respond("selectWaiterPad"),e.waiterPadNo&&await a.respond("saveSale2Pad"),e.ShowResultMessage&&s.message(e.ResultMessageText)}};'
+'let main=async({workflow:a,context:e,popup:s,parameters:d,captions:t})=>{if(await a.respond("addPresetValuesToContext"),!e.seatingCode)if(d.FixedSeatingCode)e.seatingCode=d.FixedSeatingCode;else switch(d.InputType+""){case"0":{let i=await s.input({caption:t.InputTypeLabel});if(!i)return;e.seatingCode=i;break}case"1":{let i=await s.numpad({caption:t.InputTypeLabel});if(!i)return;e.seatingCode=i;break}}if(await a.respond("seatingInput"),!!e.seatingCode){if(e.seatingCode&&e.confirmString)if(await s.confirm({title:t.confirmLabel,caption:e.confirmString}))await a.respond("createNewWaiterPad");else return;e.waiterPadNo||e.seatingCode&&await a.respond("selectWaiterPad"),e.waiterPadNo&&await a.respond("saveSale2Pad"),e.ShowResultMessage&&s.message(e.ResultMessageText)}};'
         );
     end;
 }

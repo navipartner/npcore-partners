@@ -9,7 +9,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -18,38 +17,32 @@
             {
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ToolTip = 'Specifies the restaurant this kitchen station selection setup line is used at. Leave the field blank if you want the setup line to be used for all restaurants.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Seating Location"; Rec."Seating Location")
                 {
-
-                    ToolTip = 'Specifies the value of the Seating Location field';
+                    ToolTip = 'Specifies the seating location this kitchen station selection setup line is used at. Leave the field blank if you want the setup line to be used for all seating locations.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Serving Step"; Rec."Serving Step")
                 {
-
-                    ToolTip = 'Specifies the value of the Serving Step field';
+                    ToolTip = 'Specifies the meal flow serving step this kitchen station selection setup line is used at. Leave the field blank if you want the setup line to be used regardless of the serving step.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print Category Code"; Rec."Print Category Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Print Category Code field';
+                    ToolTip = 'Specifies the item print/production category this kitchen station selection setup line is used for. Leave the field blank if you want the setup line to be used regardless of the category.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Production Restaurant Code"; Rec."Production Restaurant Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Production Restaurant Code field';
+                    ToolTip = 'Specifies the restaurant system should send kitchen requests to for the setup line.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Kitchen Station"; Rec."Kitchen Station")
                 {
-
-                    ToolTip = 'Specifies the value of the Kitchen Station field';
+                    ToolTip = 'Specifies the production restaurant kitchen station system should send kitchen requests to for the setup line.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -60,13 +53,11 @@
             {
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
             systempart(Control6014410; Links)
             {
                 Visible = false;
                 ApplicationArea = NPRRetail;
-
             }
         }
     }

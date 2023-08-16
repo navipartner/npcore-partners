@@ -17,43 +17,43 @@
             {
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this status.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Status Object"; Rec."Status Object")
                 {
                     Enabled = StatusObjectVisible;
                     Visible = StatusObjectVisible;
-                    ToolTip = 'Specifies the value of the Status Object field';
+                    ToolTip = 'Specifies the object this status is applicable for.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a text that describes the status.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Flow Order"; Rec."Flow Order")
                 {
-                    ToolTip = 'Specifies the value of the Flow Order field';
+                    ToolTip = 'Specifies the place the status takes in the flow. The higher the number, the further in the flow the status is placed.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Auxiliary; Rec.Auxiliary)
                 {
                     Visible = IsServingSteps;
-                    ToolTip = 'Specifies whether this is an auxiliary meal flow (serving) step. When requested, auxiliary steps do not update waiter pad current serving step';
+                    ToolTip = 'Specifies whether this is an auxiliary meal flow (serving) step. When requested, auxiliary steps do not update waiter pad current serving step.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Waiter Pad Status Code"; Rec."Waiter Pad Status Code")
                 {
                     Visible = IsServingSteps;
-                    ToolTip = 'Specifies the value of the Waiter Pad Status Code field';
+                    ToolTip = 'Specifies the code for the waiter pad status that is assigned to waiter pads together with this serving step.';
                     ApplicationArea = NPRRetail;
                 }
                 field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsFilterString())
                 {
                     Caption = 'Print/Prod. Categories';
                     Visible = ShowPrintCategories;
-                    ToolTip = 'Specifies the value of the Print/Prod. Categories field';
+                    ToolTip = 'Specifies the list of assigned item print/production categories.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnDrillDown()
@@ -64,22 +64,22 @@
                 field("Available in Front-End"; Rec."Available in Front-End")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies whether this status will be visible in restaurant view';
+                    ToolTip = 'Specifies whether this status is visible in restaurant view.';
                 }
                 field(Color; Rec.Color)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the color of the status in restaurant view';
+                    ToolTip = 'Specifies the color of the status in restaurant view.';
                 }
                 field("Status Color Priority"; Rec."Status Color Priority")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the priority this status''s color will take, when defining table colors in restaurant view. Higher number means higher priority';
+                    ToolTip = 'Specifies the priority this status takes, when defining table colors in restaurant view. Higher number means higher priority.';
                 }
                 field("Icon Class"; Rec."Icon Class")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the icon of the status in restaurant view';
+                    ToolTip = 'Specifies the icon of the status in restaurant view.';
                 }
             }
         }
@@ -101,7 +101,7 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = ShowPrintCategories;
-                    ToolTip = 'Executes the Print/Prod. Categories action';
+                    ToolTip = 'View or edit assigned item print/production categories for the record.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()

@@ -6,7 +6,6 @@
     PromotedActionCategories = 'New,Process,Report,Layout';
     SourceTable = "NPR NPRE Seating Location";
     UsageCategory = Administration;
-
     PopulateAllFields = true;
     ApplicationArea = NPRRetail;
 
@@ -18,47 +17,40 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies a code to identify this seating location.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a text that describes the seating location.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Restaurant Code"; Rec."Restaurant Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Restaurant Code field';
+                    ToolTip = 'Specifies the restaurant this seating location belongs to.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Control6014404; Rec.Seatings)
                 {
-
                     Editable = false;
                     ShowCaption = false;
-                    ToolTip = 'Specifies the value of the Seatings field';
+                    ToolTip = 'Specifies the total number of seatings (tables) created at the seating location.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Seats; Rec.Seats)
                 {
-
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Seats field';
+                    ToolTip = 'Specifies the total number of guests that can be simultaneously seated at the seating location.';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Store"; Rec."POS Store")
                 {
-
-                    ToolTip = 'Specifies the value of the POS Store field';
+                    ToolTip = 'Specifies the POS store this seating location belongs to.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Auto Send Kitchen Order"; Rec."Auto Send Kitchen Order")
                 {
-
-                    ToolTip = 'Specifies the value of the Auto Send Kitchen Order field';
+                    ToolTip = 'Specifies if system should automatically create or update kitchen orders as soon as new products are saved to waiter pads.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -83,8 +75,7 @@
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Seating List";
                     RunPageLink = "Seating Location" = FIELD(Code);
-
-                    ToolTip = 'Executes the Seatings action';
+                    ToolTip = 'View seatings defined at the location.';
                     ApplicationArea = NPRRetail;
                 }
             }

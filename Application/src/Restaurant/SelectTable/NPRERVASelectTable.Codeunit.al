@@ -2,6 +2,11 @@ codeunit 6150687 "NPR NPRE RVA: Select Table" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+    internal procedure ActionCode(): Code[20]
+    begin
+        exit(Format("NPR POS Workflow"::RV_SELECT_TABLE));
+    end;
+
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This built-in action can be run when a table is selected in Restaurant View.';

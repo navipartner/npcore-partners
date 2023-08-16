@@ -29,11 +29,17 @@
         {
             Caption = 'Start Date';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR25.0';
+            ObsoleteReason = 'Replaced by SystemCreatedAt field.';
         }
         field(15; "Start Time"; Time)
         {
             Caption = 'Start Time';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR25.0';
+            ObsoleteReason = 'Replaced by SystemCreatedAt field.';
         }
         field(20; "Marked Qty"; Decimal)
         {
@@ -93,6 +99,7 @@
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
+            ValuesAllowed = Item, Comment;
         }
         field(50; Type; Option)
         {
@@ -104,7 +111,7 @@
             ObsoleteState = Removed;
             ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use Line Type';
-        }        
+        }
         field(51; "No."; Code[20])
         {
             Caption = 'No.';
