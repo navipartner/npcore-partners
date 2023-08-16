@@ -2,7 +2,20 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
 {
     layout
     {
-
+        addlast(General)
+        {
+            field("NPR Prepayment"; RSPurchaseHeader."Prepayment")
+            {
+                ApplicationArea = NPRRSLocal;
+                Caption = 'Prepayment';
+                ToolTip = 'Specifies the value of the Prepayment field.';
+                trigger OnValidate()
+                begin
+                    RSPurchaseHeader.Validate(Prepayment);
+                    RSPurchaseHeader.Save();
+                end;
+            }
+        }
         addafter(Control1906949207)
         {
             part("NPR NPAttributes"; "NPR NP Attributes FactBox")
@@ -66,4 +79,12 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
             }
         }
     }
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        RSPurchaseHeader.Read(Rec.SystemId);
+    end;
+
+    var
+        RSPurchaseHeader: Record "NPR RS Purchase Header";
 }
