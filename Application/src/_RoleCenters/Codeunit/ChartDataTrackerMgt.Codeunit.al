@@ -2,7 +2,7 @@ codeunit 6060006 "NPR Chart Data Tracker Mgt."
 {
     Access = Internal;
 
-    procedure ShouldUpdateChartFromTable(var ChartDataUpdateTracker: Record "NPR Chart Data Update Tracker"; ChartPageId: Integer; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period; PeriodLength: Text[1]; PeriodEndDate: Date; DimensionType: Option "Dimension 1","Dimension 2"; IncludeDim: Boolean): Boolean
+    procedure ShouldUpdateChartFromTable(var ChartDataUpdateTracker: Record "NPR Chart Data Update Tracker"; ChartCodeunitId: Integer; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period; PeriodLength: Text[1]; PeriodEndDate: Date; DimensionType: Option "Dimension 1","Dimension 2"; IncludeDim: Boolean): Boolean
     var
         RetailChartbyShopBT: Codeunit "NPR Retail Chart by Shop BT";
         RetailSalesChartBT: Codeunit "NPR Retail Sales Chart BT";
@@ -18,10 +18,11 @@ codeunit 6060006 "NPR Chart Data Tracker Mgt."
         else
             RetailSalesChartBT.Setdate(StartDate, EndDate, Period, PeriodType, PeriodLength, PeriodEndDate);
 
-        ChartDataUpdateTracker.SetRange("Chart Page ID", ChartPageId);
+        ChartDataUpdateTracker.SetRange("Chart Codeunit ID", ChartCodeunitId);
         ChartDataUpdateTracker.SetRange("Period Type", PeriodType);
         ChartDataUpdateTracker.SetRange("Start Date", StartDate);
         ChartDataUpdateTracker.SetRange("End Date", EndDate);
+
         if IncludeDim then
             ChartDataUpdateTracker.SetRange(Dimension, DimensionType);
 
@@ -34,13 +35,12 @@ codeunit 6060006 "NPR Chart Data Tracker Mgt."
         exit(true);
     end;
 
-    procedure UpsertTrackerTable(ChartPageId: Integer; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period; StartDate: Date; EndDate: Date; DimensionType: Option "Dimension 1","Dimension 2"; IncludeDim: Boolean; Results: Dictionary of [Text, Text])
+    procedure UpsertTrackerTable(ChartCodeunitId: Integer; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period; StartDate: Date; EndDate: Date; DimensionType: Option "Dimension 1","Dimension 2"; IncludeDim: Boolean; Results: Dictionary of [Text, Text])
     var
         ChartData: Record "NPR Chart Data";
         ChartDataUpdateTracker: Record "NPR Chart Data Update Tracker";
-        "Key": Text;
     begin
-        ChartDataUpdateTracker.SetRange("Chart Page ID", ChartPageId);
+        ChartDataUpdateTracker.SetRange("Chart Codeunit ID", ChartCodeunitId);
         ChartDataUpdateTracker.SetRange("Period Type", PeriodType);
         ChartDataUpdateTracker.SetRange("Start Date", StartDate);
         ChartDataUpdateTracker.SetRange("End Date", EndDate);
@@ -50,7 +50,7 @@ codeunit 6060006 "NPR Chart Data Tracker Mgt."
 
         if not ChartDataUpdateTracker.FindFirst() then begin
             ChartDataUpdateTracker.Init();
-            ChartDataUpdateTracker."Chart Page ID" := ChartPageId;
+            ChartDataUpdateTracker."Chart Codeunit ID" := ChartCodeunitId;
             ChartDataUpdateTracker."Last Computed" := CurrentDateTime();
             ChartDataUpdateTracker.Period := Period;
             ChartDataUpdateTracker."Period Type" := PeriodType;
@@ -59,15 +59,7 @@ codeunit 6060006 "NPR Chart Data Tracker Mgt."
             ChartDataUpdateTracker.Dimension := DimensionType;
             ChartDataUpdateTracker.Insert();
 
-            foreach "Key" in Results.Keys() do begin
-                ChartData.Init();
-                ChartData."Tracker Entry No." := ChartDataUpdateTracker."Entry No.";
-#pragma warning disable AA0139
-                ChartData."Key" := "Key";
-                ChartData.Val := Results.Get("Key");
-#pragma warning restore
-                ChartData.Insert();
-            end;
+            InsertChartData(ChartDataUpdateTracker."Entry No.", Results);
         end
         else begin
             ChartDataUpdateTracker."Last Computed" := CurrentDateTime();
@@ -75,13 +67,10 @@ codeunit 6060006 "NPR Chart Data Tracker Mgt."
 
             ChartData.SetRange("Tracker Entry No.", ChartDataUpdateTracker."Entry No.");
 
-            if ChartData.FindSet() then
-                repeat
-#pragma warning disable AA0139
-                    ChartData.Val := Results.Get(ChartData."Key");
-#pragma warning restore
-                until ChartData.Next() = 0;
-            ChartData.Modify();
+            if not ChartData.IsEmpty() then
+                ChartData.DeleteAll();
+
+            InsertChartData(ChartDataUpdateTracker."Entry No.", Results);
         end;
     end;
 
@@ -97,6 +86,22 @@ codeunit 6060006 "NPR Chart Data Tracker Mgt."
         repeat
             Results.Add(ChartData."Key", Format(ChartData.Val));
         until ChartData.Next() = 0;
+    end;
+
+    local procedure InsertChartData(TrackerEntryNo: Integer; Results: Dictionary of [Text, Text])
+    var
+        ChartData: Record "NPR Chart Data";
+        "Key": Text;
+    begin
+        foreach "Key" in Results.Keys() do begin
+            ChartData.Init();
+            ChartData."Tracker Entry No." := TrackerEntryNo;
+#pragma warning disable AA0139
+            ChartData."Key" := "Key";
+            ChartData.Val := Results.Get("Key");
+#pragma warning restore
+            ChartData.Insert();
+        end;
     end;
 
     local procedure CheckLastUpdateTimestamp(ChartDataUpdateTracker: Record "NPR Chart Data Update Tracker"): Boolean
