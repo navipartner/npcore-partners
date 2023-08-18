@@ -139,7 +139,7 @@
                     ToolTip = 'Configure how the media content is displayed, and upload a HTML file which provides responses for customer input on the POS display.';
                     ApplicationArea = NPRRetail;
                 }
-                field("POS Tax Free Profile"; Rec."POS Tax Free Profile")
+                field("POS Tax Free Profile"; Rec."POS Tax Free Prof.")
                 {
                     ToolTip = 'If there is integration with Global Blue Tax Free or Premier Tax Free in place, you can set the handler for the interface to the POS Unit.';
                     ApplicationArea = NPRRetail;

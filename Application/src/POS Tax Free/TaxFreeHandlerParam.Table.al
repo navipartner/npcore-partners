@@ -40,7 +40,7 @@
         }
     }
 
-    procedure SerializeParameterBLOB(var TaxFreeUnit: Record "NPR Tax Free POS Unit")
+    procedure SerializeParameterBLOB(var TaxFreeProfile: Record "NPR POS Tax Free Profile")
     var
         OutStream: OutStream;
         JSON: Text;
@@ -55,12 +55,12 @@
 
         JObject.WriteTo(JSON);
 
-        Clear(TaxFreeUnit."Handler Parameters");
-        TaxFreeUnit."Handler Parameters".CreateOutStream(OutStream, TEXTENCODING::UTF8);
+        Clear(TaxFreeProfile."Handler Parameters");
+        TaxFreeProfile."Handler Parameters".CreateOutStream(OutStream, TEXTENCODING::UTF8);
         OutStream.WriteText(JSON);
     end;
 
-    procedure DeserializeParameterBLOB(var TaxFreeUnit: Record "NPR Tax Free POS Unit")
+    procedure DeserializeParameterBLOB(var TaxFreeProfile: Record "NPR POS Tax Free Profile")
     var
         Buffer: Text;
         JSON: Text;
@@ -69,8 +69,8 @@
         TempJsonBuffer: Record "JSON Buffer" temporary;
         JsonPropertyValue: Text;
     begin
-        TaxFreeUnit.CalcFields("Handler Parameters");
-        TaxFreeUnit."Handler Parameters".CreateInStream(InStream, TEXTENCODING::UTF8);
+        TaxFreeProfile.CalcFields("Handler Parameters");
+        TaxFreeProfile."Handler Parameters".CreateInStream(InStream, TEXTENCODING::UTF8);
         while (not InStream.EOS) do begin
             InStream.ReadText(Buffer);
             JSON += Buffer;

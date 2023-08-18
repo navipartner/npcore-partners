@@ -9,8 +9,8 @@
     {
         field(1; "Tax Free Unit"; Code[10])
         {
-            Caption = 'Tax Free Unit';
-            TableRelation = "NPR Tax Free POS Unit"."POS Unit No.";
+            Caption = 'Tax Free Profile';
+            TableRelation = "NPR POS Tax Free Profile"."Tax Free Profile";
             DataClassification = CustomerContent;
         }
         field(2; "Shop ID"; Text[30])
