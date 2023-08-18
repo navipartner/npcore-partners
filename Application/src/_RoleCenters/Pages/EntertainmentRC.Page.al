@@ -49,17 +49,15 @@
                 ApplicationArea = NPRRetail;
             }
 #ENDIF
+            part(MyReports; "NPR My Reports")
+            {
+                ApplicationArea = NPRRetail;
+            }
             part(MyJobQueue; "My Job Queue")
             {
                 Caption = 'Job Queue';
                 ApplicationArea = NPRRetail;
             }
-            part(MyReports; "NPR My Reports")
-            {
-                ApplicationArea = NPRRetail;
-
-            }
-
         }
     }
 
