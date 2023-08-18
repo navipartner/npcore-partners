@@ -488,10 +488,14 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         ExtDocNo: Text;
         Attention: Text;
         YourRef: Text;
+        AttentionValueLengthOverflowErr: Label 'The value entered in the Attention field exceeds the maximum allowed size of field %1. Reduce the entered value to %2 characters.', Comment = '%1=SalePOS.FieldCaption("Contact No.");%2=MaxStrLen(SalePOS."Contact No.")';
     begin
         if Context.GetString('extDocNo', ExtDocNo) then;
         if Context.GetString('attention', Attention) then;
         if Context.GetString('yourref', YourRef) then;
+
+        if StrLen(Attention) > MaxStrLen(SalePOS."Contact No.") then
+            Error(AttentionValueLengthOverflowErr, SalePOS.FieldCaption("Contact No."), MaxStrLen(SalePOS."Contact No."));
 
 # pragma warning disable AA0139
         if POSActionDocExportB.SetInputs(ExtDocNo, Attention, YourRef, SalePOS) then
