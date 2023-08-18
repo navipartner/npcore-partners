@@ -1,4 +1,4 @@
-﻿codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interface"
+﻿codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler IF"
 {
     Access = Internal;
 
@@ -30,16 +30,18 @@
     local procedure InitializeHandler(TaxFreeRequest: Record "NPR Tax Free Request")
     var
         TempHandlerParameters: Record "NPR Tax Free Handler Param." temporary;
-        TaxFreeUnit: Record "NPR Tax Free POS Unit";
+        TaxFreeProfile: Record "NPR POS Tax Free Profile";
+        POSUnit: Record "NPR POS Unit";
         Variant: Variant;
     begin
-        TaxFreeUnit.Get(TaxFreeRequest."POS Unit No.");
+        POSUnit.Get(TaxFreeRequest."POS Unit No.");
+        TaxFreeProfile.Get(POSUnit."POS Tax Free Prof.");
 
-        if not TaxFreeUnit."Handler Parameters".HasValue() then
-            Error(Error_MissingParameters, TaxFreeUnit."Handler ID Enum", TaxFreeUnit."POS Unit No.");
+        if not TaxFreeProfile."Handler Parameters".HasValue() then
+            Error(Error_MissingParameters, TaxFreeProfile."Handler ID Enum", TaxFreeProfile."Tax Free Profile");
 
         AddParameters(TempHandlerParameters);
-        TempHandlerParameters.DeserializeParameterBLOB(TaxFreeUnit);
+        TempHandlerParameters.DeserializeParameterBLOB(TaxFreeProfile);
 
         if TempHandlerParameters.TryGetParameterValue('Merchant ID', Variant) then
             MerchantID := Variant;
@@ -53,10 +55,10 @@
         if TempHandlerParameters.TryGetParameterValue('Minimum Amount Limit', Variant) then
             MinimumAmountLimit := Variant;
 
-        POSUnitNo := TaxFreeUnit."POS Unit No.";
+        POSUnitNo := POSUnit."No.";
 
         if (StrLen(MerchantID) = 0) or (StrLen(VATNumber) = 0) or (CountryCode = 0) then
-            Error(Error_MissingParameters, TaxFreeUnit."Handler ID Enum", TaxFreeUnit."POS Unit No.");
+            Error(Error_MissingParameters, TaxFreeProfile."Handler ID Enum", TaxFreeProfile."Tax Free Profile");
     end;
 
     local procedure AddParameters(var tmpHandlerParameters: Record "NPR Tax Free Handler Param.")
@@ -740,19 +742,19 @@
     #endregion
 
     #region Interface integration
-    procedure OnLookupHandlerParameter(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
+    procedure OnLookupHandlerParameter(TaxFreeProfile: Record "NPR POS Tax Free Profile"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
     begin
 
         Handled := true;
         AddParameters(tmpHandlerParameters);
     end;
 
-    procedure OnSetUnitParameters(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean)
+    procedure OnSetUnitParameters(TaxFreeProfile: Record "NPR POS Tax Free Profile"; var Handled: Boolean)
     var
         TaxFreeMgt: Codeunit "NPR Tax Free Handler Mgt.";
     begin
         Handled := true;
-        TaxFreeMgt.SetGenericHandlerParameters(TaxFreeUnit); //Use the built-in support for storing parameters in the unit BLOB instead of externally.
+        TaxFreeMgt.SetGenericHandlerParameters(TaxFreeProfile); //Use the built-in support for storing parameters in the unit BLOB instead of externally.
     end;
 
     procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "NPR Tax Free Request"; Silent: Boolean)

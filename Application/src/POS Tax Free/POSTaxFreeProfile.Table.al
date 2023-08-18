@@ -1,29 +1,26 @@
-﻿table 6014641 "NPR Tax Free POS Unit"
+table 6060005 "NPR POS Tax Free Profile"
 {
-    ObsoleteState = Pending;
-    ObsoleteTag = 'NPR24.0';
-    ObsoleteReason = 'Use "NPR POS Tax Free Profile" instead';
 #IF NOT BC17
-    Access = Internal;      
-#ENDIF
+    Access = Internal;
+#endif
 
-    Caption = 'POS Tax Free POS Unit';
+    Caption = 'POS Tax Free Profile';
     LookupPageID = "NPR POS Tax Free Profiles";
     DrillDownPageId = "NPR POS Tax Free Profiles";
     DataClassification = CustomerContent;
 
     fields
     {
-        field(1; "POS Unit No."; Code[10])
+        field(1; "Tax Free Profile"; Code[10])
         {
-            Caption = 'Code';
+            Caption = 'Tax Free Profile';
             DataClassification = CustomerContent;
             NotBlank = true;
         }
         field(2; "Handler ID"; Text[30])
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = 'NPR24.0';
             ObsoleteReason = 'Replaced with "Enum Handler ID Enum"';
             Caption = 'Handler ID';
             DataClassification = CustomerContent;
@@ -91,19 +88,19 @@
 
     keys
     {
-        key(Key1; "POS Unit No.")
+        key(Key1; "Tax Free Profile")
         {
         }
     }
 
     trigger OnInsert()
     begin
-        TestField("POS Unit No.");
+        TestField("Tax Free Profile");
     end;
 
     trigger OnModify()
     begin
-        TestField("POS Unit No.");
+        TestField("Tax Free Profile");
     end;
 
     var

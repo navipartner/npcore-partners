@@ -2,49 +2,49 @@ codeunit 85017 "NPR Library - Tax Free"
 {
     Access = Internal;
 
-    procedure CreateTaxFreePosUnit(PosUnitNo: Code[10]; var TaxFreePosUnit: Record "NPR Tax Free POS Unit");
+    procedure CreateTaxFreePosUnit(PosUnitNo: Code[10]; var TaxFreeProfile: Record "NPR POS Tax Free Profile");
     begin
-        TaxFreePosUnit.Init();
-        TaxFreePosUnit.Validate(
-          "Pos Unit No.", PosUnitNo);
-        TaxFreePosUnit.Validate(Mode, TaxFreePosUnit.Mode::Test);
-        TaxFreePosUnit."Check POS Terminal IIN" := true;
-        TaxFreePosUnit.Insert();
+        TaxFreeProfile.Init();
+        TaxFreeProfile.Validate(
+          "Tax Free Profile", PosUnitNo);
+        TaxFreeProfile.Validate(Mode, TaxFreeProfile.Mode::Test);
+        TaxFreeProfile."Check POS Terminal IIN" := true;
+        TaxFreeProfile.Insert();
     end;
 
-    procedure AddHandlerTaxFreePosUnit(var TaxFreePosUnit: Record "NPR Tax Free POS Unit"; var TaxFreeService: Record "NPR Tax Free GB I2 Service"; var tmpHandlerParameter: Record "NPR Tax Free Handler Param."; TaxFreeHandlerID: Enum "NPR Tax Free Handler ID");
+    procedure AddHandlerTaxFreePosUnit(var TaxFreeProfile: Record "NPR POS Tax Free Profile"; var TaxFreeService: Record "NPR Tax Free GB I2 Service"; var tmpHandlerParameter: Record "NPR Tax Free Handler Param."; TaxFreeHandlerID: Enum "NPR Tax Free Handler ID");
     begin
-        TaxFreePosUnit.Get(TaxFreePosUnit."POS Unit No.");
-        Clear(TaxFreePosUnit."Handler Parameters");
-        TaxFreePosUnit.Validate("Handler ID Enum", TaxFreeHandlerID);
-        TaxFreePosUnit.Modify();
+        TaxFreeProfile.Get(TaxFreeProfile."Tax Free Profile");
+        Clear(TaxFreeProfile."Handler Parameters");
+        TaxFreeProfile.Validate("Handler ID Enum", TaxFreeHandlerID);
+        TaxFreeProfile.Modify();
 
-        InitParametersTaxFree(TaxFreePosUnit, TaxFreeService, tmpHandlerParameter);
+        InitParametersTaxFree(TaxFreeProfile, TaxFreeService, tmpHandlerParameter);
     end;
 
-    procedure CreatePosUnitTaxFreeParameterGB(TaxFreePosUnit: Record "NPR Tax Free POS Unit"; var TaxFreeService: Record "NPR Tax Free GB I2 Service")
+    procedure CreatePosUnitTaxFreeParameterGB(TaxFreeProfile: Record "NPR POS Tax Free Profile"; var TaxFreeService: Record "NPR Tax Free GB I2 Service")
     var
         TaxFreePosUnitPrm: Record "NPR Tax Free GB I2 Param.";
     begin
         TaxFreePosUnitPrm.Init();
-        TaxFreePosUnitPrm."Tax Free Unit" := TaxFreePosUnit."POS Unit No.";
+        TaxFreePosUnitPrm."Tax Free Unit" := TaxFreeProfile."Tax Free Profile";
         TaxFreePosUnitPrm.Validate("Shop ID", GenerateRandomCode(TaxFreePosUnitPrm.FieldNo("Shop ID"), DATABASE::"NPR Tax Free GB I2 Param."));
         TaxFreePosUnitPrm.Validate("Desk ID", GenerateRandomCode(TaxFreePosUnitPrm.FieldNo("Desk ID"), DATABASE::"NPR Tax Free GB I2 Param."));
         TaxFreePosUnitPrm.Validate("UserName", GenerateRandomCode(TaxFreePosUnitPrm.FieldNo("UserName"), DATABASE::"NPR Tax Free GB I2 Param."));
         TaxFreePosUnitPrm.Validate("Password", GenerateRandomCode(TaxFreePosUnitPrm.FieldNo("Password"), DATABASE::"NPR Tax Free GB I2 Param."));
         TaxFreePosUnitPrm."Date Last Auto Configured" := Today();
         if TaxFreePosUnitPrm.Insert() then;
-        DeleteOldCreateNewTaxFreeService(TaxFreePosUnit, TaxFreeService);
+        DeleteOldCreateNewTaxFreeService(TaxFreeProfile, TaxFreeService);
     end;
 
-    procedure InitParametersTaxFree(TaxFreePosUnit: Record "NPR Tax Free POS Unit"; var TaxFreeService: Record "NPR Tax Free GB I2 Service"; var tmpHandlerParameter: Record "NPR Tax Free Handler Param.")
+    procedure InitParametersTaxFree(TaxFreeProfile: Record "NPR POS Tax Free Profile"; var TaxFreeService: Record "NPR Tax Free GB I2 Service"; var tmpHandlerParameter: Record "NPR Tax Free Handler Param.")
     var
         GlobalBlueIINBlacklist: Record "NPR Tax Free GB IIN Blacklist";
     begin
         case true of
-            TaxFreePosUnit."Handler ID Enum" = TaxFreePosUnit."Handler ID Enum"::GLOBALBLUE_I2:
+            TaxFreeProfile."Handler ID Enum" = TaxFreeProfile."Handler ID Enum"::GLOBALBLUE_I2:
                 begin
-                    CreatePosUnitTaxFreeParameterGB(TaxFreePosUnit, TaxFreeService);
+                    CreatePosUnitTaxFreeParameterGB(TaxFreeProfile, TaxFreeService);
                     GlobalBlueIINBlacklist.DeleteAll();
                     GlobalBlueIINBlacklist.Init();
                     GlobalBlueIINBlacklist."Shop Country Code" := 0;
@@ -53,15 +53,15 @@ codeunit 85017 "NPR Library - Tax Free"
                     GlobalBlueIINBlacklist.Insert();
                 end;
 
-            TaxFreePosUnit."Handler ID Enum" in [TaxFreePosUnit."Handler ID Enum"::PREMIER_PI]:
-                DeleteAndCreatePosUnitTaxFreeParameterPFPI(TaxFreePosUnit, tmpHandlerParameter);
+            TaxFreeProfile."Handler ID Enum" in [TaxFreeProfile."Handler ID Enum"::PREMIER_PI]:
+                DeleteAndCreatePosUnitTaxFreeParameterPFPI(TaxFreeProfile, tmpHandlerParameter);
             else begin
                 Error('');
             end;
         end;
     end;
 
-    procedure DeleteAndCreatePosUnitTaxFreeParameterPFPI(TaxFreePosUnit: Record "NPR Tax Free POS Unit"; var tmpHandlerParameter: Record "NPR Tax Free Handler Param.")
+    procedure DeleteAndCreatePosUnitTaxFreeParameterPFPI(TaxFreePosUnit: Record "NPR POS Tax Free Profile"; var tmpHandlerParameter: Record "NPR Tax Free Handler Param.")
     begin
         AddParametersPTFPI(tmpHandlerParameter);
         AddRandomValue(tmpHandlerParameter);
@@ -93,12 +93,12 @@ codeunit 85017 "NPR Library - Tax Free"
         tmpHandlerParameters.AddParameter('Minimum Amount Limit', tmpHandlerParameters."Data Type"::Decimal);
     end;
 
-    procedure DeleteOldCreateNewTaxFreeService(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var TaxFreeService: Record "NPR Tax Free GB I2 Service")
+    procedure DeleteOldCreateNewTaxFreeService(TaxFreeUnit: Record "NPR POS Tax Free Profile"; var TaxFreeService: Record "NPR Tax Free GB I2 Service")
     begin
-        TaxFreeService.SetRange("Tax Free Unit", TaxFreeUnit."POS Unit No.");
+        TaxFreeService.SetRange("Tax Free Unit", TaxFreeUnit."Tax Free Profile");
         TaxFreeService.DeleteAll();
         TaxFreeService.Init();
-        TaxFreeService."Tax Free Unit" := TaxFreeUnit."POS Unit No.";
+        TaxFreeService."Tax Free Unit" := TaxFreeUnit."Tax Free Profile";
         TaxFreeService."Service ID" := Random(50);
         TaxFreeService."Minimum Purchase Amount" := GenerateRandomDec(999, 2);
         TaxFreeService."Maximum Purchase Amount" := GenerateRandomDecBetween(9999, TaxFreeService."Minimum Purchase Amount", 2);

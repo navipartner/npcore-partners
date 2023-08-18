@@ -116,7 +116,7 @@
                     TaxFreeMgt: Codeunit "NPR Tax Free Handler Mgt.";
                 begin
                     if Rec.FindSet() then begin
-                        TaxFreeMgt.VoucherConsolidate(TaxFreeUnit, Rec);
+                        TaxFreeMgt.VoucherConsolidate(TaxFreeProfile, Rec);
                         CurrPage.Close();
                     end;
                 end;
@@ -128,7 +128,7 @@
         Caption_VoidExisting: Label 'The selected receipt already has another tax free voucher attached. Continue with void of the existing voucher?';
         Caption_DeleteSelected: Label 'Delete selected receipt from consolidation list?';
         Error_AlreadySelected: Label 'You have already added receipt %1 to the consolidation list';
-        TaxFreeUnit: Record "NPR Tax Free POS Unit";
+        TaxFreeProfile: Record "NPR POS Tax Free Profile";
 
     internal procedure SetRec(var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary)
     begin
@@ -146,11 +146,11 @@
         tmpTaxFreeConsolidation.Copy(Rec, true);
     end;
 
-    internal procedure SetTaxFreeUnit(TaxFreeUnitIn: Record "NPR Tax Free POS Unit")
+    internal procedure SetTaxFreeUnit(TaxFreeProfileIn: Record "NPR POS Tax Free Profile")
     begin
-        TaxFreeUnit := TaxFreeUnitIn;
-        TaxFreeUnit.SetRecFilter();
-        TaxFreeUnit.FindFirst();
+        TaxFreeProfile := TaxFreeProfileIn;
+        TaxFreeProfile.SetRecFilter();
+        TaxFreeProfile.FindFirst();
     end;
 }
 

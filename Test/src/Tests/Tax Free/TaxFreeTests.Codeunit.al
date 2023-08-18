@@ -612,9 +612,9 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [Given] POS, EFT, Payment setup, TaxFreePosUnit, TaxFreePosUnitParam
         InitializeData();
-        // [Given] Set Globl Blue
+        // [Given] Set Global Blue
         NPRLibraryTaxFree.AddHandlerTaxFreePosUnit(_TaxFreePOSUnit, _TaxFreeService, tmpHandlerParameter, _TaxFreePOSUnit."Handler ID Enum"::GLOBALBLUE_I2);
-        _TaxFreePosUnitPrm.SetRange("Tax Free Unit", _TaxFreePOSUnit."POS Unit No.");
+        _TaxFreePosUnitPrm.SetRange("Tax Free Unit", _TaxFreePOSUnit."Tax Free Profile");
         _TaxFreePosUnitPrm.FindFirst();
 
         xValue := _TaxFreePosUnitPrm."Shop ID";
@@ -1333,6 +1333,7 @@ codeunit 85019 "NPR Tax Free Tests"
             NPRLibraryEFT.CreateEFTPaymentTypePOS(_POSPaymentMethod, _POSUnit, _POSStore);
             NPRLibraryEFT.CreateMockEFTSetup(_EFTSetup, _POSUnit."No.", _POSPaymentMethod.Code);
             NPRLibraryTaxFree.CreateTaxFreePosUnit(_POSUnit."No.", _TaxFreePOSUnit);
+            NPRLibraryPOSMasterData.SetPOSUnitTaxFreeProfile(_POSUnit, _TaxFreePOSUnit."Tax Free Profile");
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod, _POSPaymentMethod."Processing Type"::CASH, '', false);
             _Initialized := true;
         end;
@@ -1352,7 +1353,7 @@ codeunit 85019 "NPR Tax Free Tests"
         _POSSession: Codeunit "NPR POS Session";
         _POSStore: Record "NPR POS Store";
         _POSSetup: Record "NPR POS Setup";
-        _TaxFreePOSUnit: Record "NPR Tax Free POS Unit";
+        _TaxFreePOSUnit: Record "NPR POS Tax Free Profile";
         _TaxFreeservice: Record "NPR Tax Free GB I2 Service";
         _TaxFreePosUnitPrm: Record "NPR Tax Free GB I2 Param.";
         _LastTrxEntryNo: Integer;
@@ -1371,7 +1372,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Tax Free Handler Mgt.", 'OnBeforeSetConstructor', '', true, true)]
-    procedure OnBeforeSetConstructor(var TaxFreeHandlerIfaceIn: Interface "NPR Tax Free Handler Interface"; var ConstrSet: Boolean)
+    procedure OnBeforeSetConstructor(var TaxFreeHandlerIfaceIn: Interface "NPR Tax Free Handler IF"; var ConstrSet: Boolean)
     var
         MockTaxFreeHadnlerIface: Codeunit "NPR Mock Tax Free Handler";
     begin

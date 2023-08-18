@@ -1,9 +1,6 @@
-﻿interface "NPR Tax Free Handler Interface"
+interface "NPR Tax Free Handler IF"
 {
 #IF NOT BC17
-    ObsoleteState = Pending;
-    ObsoleteTag = 'NPR24.0';
-    ObsoleteReason = 'Please use "NPR Tax Free Handler IF"';
     Access = Internal;      
 #ENDIF
 
@@ -18,6 +15,6 @@
     procedure OnIsValidTerminalIIN(var TaxFreeRequest: Record "NPR Tax Free Request"; MaskedCardNo: Text; var IsForeignIIN: Boolean)
     procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean)
     procedure OnIsStoredSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean)
-    procedure OnLookupHandlerParameter(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
-    procedure OnSetUnitParameters(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean)
+    procedure OnLookupHandlerParameter(TaxFreeProfile: Record "NPR POS Tax Free Profile"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
+    procedure OnSetUnitParameters(TaxFreeProfile: Record "NPR POS Tax Free Profile"; var Handled: Boolean)
 }

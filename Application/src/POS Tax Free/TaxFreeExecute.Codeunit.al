@@ -32,9 +32,9 @@
             OnRunFunction::IsActiveSaleEligible:
                 TaxFreeHandlerInterface.OnIsActiveSaleEligible(OnRunTaxFreeRequest, OnRunSalesReceiptNo, OnRunEligible);
             else begin
-                    OnRunHandled := false;
-                    exit;
-                end;
+                OnRunHandled := false;
+                exit;
+            end;
         end;
         Commit();
     end;
@@ -43,7 +43,7 @@
         OnRunTaxFreeRequest: Record "NPR Tax Free Request";
         OnRunTaxFreeVoucher: Record "NPR Tax Free Voucher";
         TempOnRunTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary;
-        TaxFreeHandlerInterface: Interface "NPR Tax Free Handler Interface";
+        TaxFreeHandlerInterface: Interface "NPR Tax Free Handler IF";
         OnRunFunction: Enum "NPR Tax Free OnRunFunction";
         OnRunSalesReceiptNo: Code[20];
         OnRunVoucherNo: Text;
@@ -55,7 +55,7 @@
         OnRunIsRecentVoucher: Boolean;
         OnRunEligible: Boolean;
 
-    procedure TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterfacePar: Interface "NPR Tax Free Handler Interface")
+    procedure TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterfacePar: Interface "NPR Tax Free Handler IF")
     begin
         TaxFreeHandlerInterface := TaxFreeHandlerInterfacePar
     end;

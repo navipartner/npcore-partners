@@ -1,4 +1,4 @@
-﻿codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface"
+﻿codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler IF"
 {
     Access = Internal;
     // Consumes Global Blue I2 solution, GRIPS MX API v16.06
@@ -12,7 +12,7 @@
     var
         GlobalBlueParameters: Record "NPR Tax Free GB I2 Param.";
         GlobalBlueServices: Record "NPR Tax Free GB I2 Service";
-        GlobalTaxFreeUnit: Record "NPR Tax Free POS Unit";
+        GlobalTaxFreeProfile: Record "NPR POS Tax Free Profile";
         Caption_ReissueConfirm: Label 'Are you sure you want to proceed with reissue of tax free voucher:\\%1: %2\%3: %4\%5: %6\\Reissuing a tax free voucher voids the current voucher and issues a new one in its place.\The current voucher will no longer be valid for tax free refunding.\\Please proceed only if the customer is present in the store!';
         Caption_VoidConfirm: Label 'Are you sure you want to proceed with void of tax free voucher:\\%1: %2\%3: %4\%5: %6\\It will no longer be valid for tax free refund!';
         Error_AutoConfigureFailure: Label 'Automatic desk configuration failed for handler %1. Cancelling tax free operation.';
@@ -48,19 +48,21 @@
 
     procedure InitializeHandler(TaxFreeRequest: Record "NPR Tax Free Request")
     var
+        POSUnit: Record "NPR POS Unit";
         TaxFreeInterface: Codeunit "NPR Tax Free Handler Mgt.";
     begin
-        GlobalTaxFreeUnit.Get(TaxFreeRequest."POS Unit No.");
+        POSUnit.Get(TaxFreeRequest."POS Unit No.");
+        GlobalTaxFreeProfile.Get(POSUnit."POS Tax Free Prof.");
 
-        GlobalBlueParameters.Get(TaxFreeRequest."POS Unit No.");
+        GlobalBlueParameters.Get(POSUnit."POS Tax Free Prof.");
         if (GlobalBlueParameters."Date Last Auto Configured" < Today) then begin
-            TaxFreeInterface.UnitAutoConfigure(GlobalTaxFreeUnit, true); //Will silently run desk config & verify that NAS jobs are configured.
-            GlobalBlueParameters.Get(TaxFreeRequest."POS Unit No.");
+            TaxFreeInterface.UnitAutoConfigure(GlobalTaxFreeProfile, true); //Will silently run desk config & verify that NAS jobs are configured.
+            GlobalBlueParameters.Get(POSUnit."POS Tax Free Prof.");
             if GlobalBlueParameters."Date Last Auto Configured" <> Today then
                 Error(Error_AutoConfigureFailure, TaxFreeRequest."Handler ID Enum");
         end;
 
-        GlobalBlueServices.SetRange("Tax Free Unit", TaxFreeRequest."POS Unit No.");
+        GlobalBlueServices.SetRange("Tax Free Unit", POSUnit."POS Tax Free Prof.");
         GlobalBlueServices.FindSet();
     end;
 
@@ -91,24 +93,24 @@
             Error(TaxFreeRequest."Error Message");
 
         if not TrySelectSingleNodeText(XMLDoc, '//ClientIdentification/ShopCountryCode', Value) then
-            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID Enum", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeProfile."Handler ID Enum", TaxFreeRequest."Request Type");
         Evaluate(GlobalBlueParameters."Shop Country Code", Value, 9);
 
         Services := XMLDoc.GetDescendantElements('Service');
         ServiceCount := Services.Count();
         if not (ServiceCount > 0) then
-            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID Enum", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeProfile."Handler ID Enum", TaxFreeRequest."Request Type");
 
         for i := 1 to (ServiceCount) do begin //Update or create service records
             Services.Get(i, Service);
 
             if not TryGetItemInnerText(Service, 'ServiceID', Value) then
-                Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID Enum", TaxFreeRequest."Request Type");
+                Error(Error_InvalidResponse, GlobalTaxFreeProfile."Handler ID Enum", TaxFreeRequest."Request Type");
             Evaluate(ServiceID, Value, 9);
 
-            if not GlobalBlueServices.Get(GlobalTaxFreeUnit."POS Unit No.", ServiceID) then begin
+            if not GlobalBlueServices.Get(GlobalTaxFreeProfile."Tax Free Profile", ServiceID) then begin
                 GlobalBlueServices.Init();
-                GlobalBlueServices."Tax Free Unit" := GlobalTaxFreeUnit."POS Unit No.";
+                GlobalBlueServices."Tax Free Unit" := GlobalTaxFreeProfile."Tax Free Profile";
                 GlobalBlueServices."Service ID" := ServiceID;
                 GlobalBlueServices.Insert(true);
             end;
@@ -132,7 +134,7 @@
 
         //Delete any old services that was not part of the latest auto configuration response
         GlobalBlueServices.Reset();
-        GlobalBlueServices.SetRange("Tax Free Unit", GlobalTaxFreeUnit."POS Unit No.");
+        GlobalBlueServices.SetRange("Tax Free Unit", GlobalTaxFreeProfile."Tax Free Profile");
         GlobalBlueServices.SetFilter("Service ID", ServiceIDFilterString);
         GlobalBlueServices.DeleteAll();
 
@@ -142,7 +144,7 @@
         Commit();
 
         GlobalBlueServices.Reset();
-        GlobalBlueServices.SetRange("Tax Free Unit", GlobalTaxFreeUnit."POS Unit No.");
+        GlobalBlueServices.SetRange("Tax Free Unit", GlobalTaxFreeProfile."Tax Free Profile");
         GlobalBlueServices.FindSet();
     end;
 
@@ -165,7 +167,7 @@
         Countries := XMLDoc.GetDescendantElements('Country');
         CountryCount := Countries.Count();
         if not (CountryCount > 0) then
-            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID Enum", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeProfile."Handler ID Enum", TaxFreeRequest."Request Type");
 
         GlobalBlueCountries.DeleteAll(false);
         for i := 1 to (CountryCount) do begin
@@ -211,7 +213,7 @@
         Countries := XMLDoc.GetDescendantElements('CountryCode');
         CountryCount := Countries.Count();
         if not (CountryCount > 0) then
-            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID Enum", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeProfile."Handler ID Enum", TaxFreeRequest."Request Type");
 
         GlobalBlueBlockedCountries.SetRange("Shop Country Code", GlobalBlueParameters."Shop Country Code");
         GlobalBlueBlockedCountries.DeleteAll(false);
@@ -250,7 +252,7 @@
         Ranges := XMLDoc.GetDescendantElements('Range');
         RangeCount := Ranges.Count();
         if not (RangeCount > 0) then
-            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID Enum", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeProfile."Handler ID Enum", TaxFreeRequest."Request Type");
 
         GlobalBlueIINBlacklist.SetRange("Shop Country Code", GlobalBlueParameters."Shop Country Code");
         GlobalBlueIINBlacklist.DeleteAll(false);
@@ -347,10 +349,12 @@
     local procedure ReissueVoucher(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher")
     var
         VoucherService: Record "NPR Tax Free GB I2 Service";
+        POSUnit: Record "NPR POS Unit";
         XMLDoc: XmlDocument;
         NoOfDaysLbl: Label '<%1D>', Locked = true;
     begin
-        if VoucherService.Get(TaxFreeVoucher."POS Unit No.", TaxFreeVoucher."Service ID") then
+        POSUnit.Get(TaxFreeVoucher."POS Unit No.");
+        if VoucherService.Get(POSUnit."POS Tax Free Prof.", TaxFreeVoucher."Service ID") then
             if VoucherService."Void Limit In Days" <> 0 then
                 if CalcDate(StrSubstNo(NoOfDaysLbl, VoucherService."Void Limit In Days"), TaxFreeVoucher."Issued Date") < Today then
                     Error(Error_VoidLimit, TaxFreeVoucher."External Voucher No.", VoucherService."Void Limit In Days");
@@ -420,10 +424,12 @@
     local procedure VoidVoucher(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher")
     var
         VoucherService: Record "NPR Tax Free GB I2 Service";
+        POSUnit: Record "NPR POS Unit";
         XMLDoc: XmlDocument;
         NoOfDaysLbl: Label '<%1D>', Locked = true;
     begin
-        if VoucherService.Get(TaxFreeVoucher."POS Unit No.", TaxFreeVoucher."Service ID") then
+        POSUnit.Get(TaxFreeVoucher."POS Unit No.");
+        if VoucherService.Get(POSUnit."POS Tax Free Prof.", TaxFreeVoucher."Service ID") then
             if VoucherService."Void Limit In Days" <> 0 then
                 if CalcDate(StrSubstNo(NoOfDaysLbl, VoucherService."Void Limit In Days"), TaxFreeVoucher."Issued Date") < Today then
                     Error(Error_VoidLimit, TaxFreeVoucher."External Voucher No.", VoucherService."Void Limit In Days");
@@ -484,8 +490,8 @@
     begin
         TaxFreeRequest.Init();
         TaxFreeRequest."Request Type" := 'LOOKUP_TRAVELLER';
-        TaxFreeRequest.Mode := GlobalTaxFreeUnit.Mode;
-        TaxFreeRequest."Timeout (ms)" := GlobalTaxFreeUnit."Request Timeout (ms)";
+        TaxFreeRequest.Mode := GlobalTaxFreeProfile.Mode;
+        TaxFreeRequest."Timeout (ms)" := GlobalTaxFreeProfile."Request Timeout (ms)";
         TaxFreeRequest."Time Start" := Time;
         TaxFreeRequest."Date Start" := Today();
 
@@ -1643,22 +1649,22 @@
     #region Interface integration
 
 #pragma warning disable AA0150
-    procedure OnLookupHandlerParameter(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
+    procedure OnLookupHandlerParameter(TaxFreeProfile: Record "NPR POS Tax Free Profile"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
 #pragma warning restore
     begin
-        Error(Error_NotSupported, TaxFreeUnit."Handler ID Enum");
+        Error(Error_NotSupported, TaxFreeProfile."Handler ID Enum");
     end;
 
-    procedure OnSetUnitParameters(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean)
+    procedure OnSetUnitParameters(TaxFreeProfile: Record "NPR POS Tax Free Profile"; var Handled: Boolean)
     var
         GlobalBlueI2Parameters: Record "NPR Tax Free GB I2 Param.";
         GlobalBlueParameterPage: Page "NPR Tax Free GB I2 Param.";
     begin
         Handled := true;
 
-        if not GlobalBlueI2Parameters.Get(TaxFreeUnit."POS Unit No.") then begin
+        if not GlobalBlueI2Parameters.Get(TaxFreeProfile."Tax Free Profile") then begin
             GlobalBlueI2Parameters.Init();
-            GlobalBlueI2Parameters."Tax Free Unit" := TaxFreeUnit."POS Unit No.";
+            GlobalBlueI2Parameters."Tax Free Unit" := TaxFreeProfile."Tax Free Profile";
             GlobalBlueI2Parameters.Insert();
             Commit();
         end;
@@ -1670,12 +1676,14 @@
 
     procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "NPR Tax Free Request"; Silent: Boolean)
     var
+        POSUnit: Record "NPR POS Unit";
         GetCountriesJob: Codeunit "NPR TaxFree GBI2 GetCountries";
         GetBlockedCountriesJob: Codeunit "NPR TaxFree GBI2 GetBCountries";
         GetIINBlacklistJob: Codeunit "NPR TaxFree GBI2 GetBlockedIIN";
     begin
-        GlobalTaxFreeUnit.Get(TaxFreeRequest."POS Unit No.");
-        GlobalBlueParameters.Get(TaxFreeRequest."POS Unit No.");
+        POSUnit.Get(TaxFreeRequest."POS Unit No.");
+        GlobalTaxFreeProfile.Get(POSUnit."POS Tax Free Prof.");
+        GlobalBlueParameters.Get(GlobalTaxFreeProfile."Tax Free Profile");
         DownloadDeskConfiguration(TaxFreeRequest);
 
         if not Silent then begin
@@ -1689,9 +1697,12 @@
     end;
 
     procedure OnUnitTestConnection(var TaxFreeRequest: Record "NPR Tax Free Request")
+    var
+        POSUnit: Record "NPR POS Unit";
     begin
-        GlobalTaxFreeUnit.Get(TaxFreeRequest."POS Unit No.");
-        GlobalBlueParameters.Get(TaxFreeRequest."POS Unit No.");
+        POSUnit.Get(TaxFreeRequest."POS Unit No.");
+        GlobalTaxFreeProfile.Get(POSUnit."POS Tax Free Prof.");
+        GlobalBlueParameters.Get(GlobalTaxFreeProfile."Tax Free Profile");
         DownloadDeskConfiguration(TaxFreeRequest);
     end;
 
@@ -1779,8 +1790,8 @@
         Eligible := IsStoredSaleEligible(SalesTicketNo, TempEligibleServices);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR Tax Free POS Unit", 'OnAfterDeleteEvent', '', false, false)]
-    local procedure OnAfterTaxFreeUnitDelete(var Rec: Record "NPR Tax Free POS Unit"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Tax Free Profile", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure OnAfterTaxFreeUnitDelete(var Rec: Record "NPR POS Tax Free Profile"; RunTrigger: Boolean)
     var
         GlobalBlueI2Parameters: Record "NPR Tax Free GB I2 Param.";
         GlobalBlueI2Services: Record "NPR Tax Free GB I2 Service";
@@ -1792,10 +1803,10 @@
         if not (Rec."Handler ID Enum" = Rec."Handler ID Enum"::GLOBALBLUE_I2) then
             exit;
 
-        GlobalBlueI2Parameters.SetRange("Tax Free Unit", Rec."POS Unit No.");
+        GlobalBlueI2Parameters.SetRange("Tax Free Unit", Rec."Tax Free Profile");
         GlobalBlueI2Parameters.DeleteAll(true);
 
-        GlobalBlueI2Services.SetRange("Tax Free Unit", Rec."POS Unit No.");
+        GlobalBlueI2Services.SetRange("Tax Free Unit", Rec."Tax Free Profile");
         GlobalBlueI2Services.DeleteAll(true);
     end;
 

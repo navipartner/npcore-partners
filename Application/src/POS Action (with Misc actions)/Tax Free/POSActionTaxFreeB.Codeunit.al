@@ -5,13 +5,13 @@ codeunit 6150649 "NPR POS Action Tax Free B."
     procedure OnActionTaxFree(SettingParam: Integer; POSSale: Codeunit "NPR POS Sale"; POSSetup: Codeunit "NPR POS Setup")
     var
         POSUnit: Record "NPR POS Unit";
-        TaxFreeUnit: Record "NPR Tax Free POS Unit";
+        TaxFreeProfile: Record "NPR POS Tax Free Profile";
         TaxFreeVoucher: Record "NPR Tax Free Voucher";
         TaxFreeInterface: Codeunit "NPR Tax Free Handler Mgt.";
         Setting: Option "Sale Toggle","Voucher List","Unit List","Print Last",Consolidate;
     begin
         POSSetup.GetPOSUnit(POSUnit);
-        TaxFreeUnit.Get(POSUnit."No.");
+        TaxFreeProfile.Get(POSUnit."POS Tax Free Prof.");
 
         case SettingParam of
             Setting::"Sale Toggle":
@@ -19,11 +19,11 @@ codeunit 6150649 "NPR POS Action Tax Free B."
             Setting::"Voucher List":
                 Page.RunModal(0, TaxFreeVoucher);
             Setting::"Unit List":
-                Page.RunModal(0, TaxFreeUnit);
+                Page.RunModal(0, TaxFreeProfile);
             Setting::"Print Last":
                 TaxFreeInterface.VoucherPrintLast();
             Setting::Consolidate:
-                Consolidate(TaxFreeUnit);
+                Consolidate(TaxFreeProfile);
         end;
     end;
 
@@ -38,11 +38,11 @@ codeunit 6150649 "NPR POS Action Tax Free B."
         POSSale.Modify(true, false);
     end;
 
-    local procedure Consolidate(var TaxFreeUnit: Record "NPR Tax Free POS Unit")
+    local procedure Consolidate(var TaxFreeProfile: Record "NPR POS Tax Free Profile")
     var
         TaxFreeConsolidation: Page "NPR Tax Free Consolidation";
     begin
-        TaxFreeConsolidation.SetTaxFreeUnit(TaxFreeUnit);
+        TaxFreeConsolidation.SetTaxFreeUnit(TaxFreeProfile);
         TaxFreeConsolidation.RunModal();
     end;
 
@@ -55,13 +55,13 @@ codeunit 6150649 "NPR POS Action Tax Free B."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
     local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     var
-        TaxFreeUnit: Record "NPR Tax Free POS Unit";
+        TaxFreeProfile: Record "NPR POS Tax Free Profile";
         POSDataMgt: Codeunit "NPR POS Data Management";
     begin
         if POSDataMgt.POSDataSource_BuiltInSale() <> DataSourceName then
             exit;
 
-        if TaxFreeUnit.IsEmpty then //Only activate data extension in companies using tax free.
+        if TaxFreeProfile.IsEmpty then //Only activate data extension in companies using tax free.
             exit;
 
         Extensions.Add(ThisExtension());
@@ -108,18 +108,20 @@ codeunit 6150649 "NPR POS Action Tax Free B."
     local procedure OnAttemptEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale")
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        TaxFreeUnit: Record "NPR Tax Free POS Unit";
+        TaxFreeProfile: Record "NPR POS Tax Free Profile";
         TaxFreeMgt: Codeunit "NPR Tax Free Handler Mgt.";
         Valid: Boolean;
         Caption_IssueTaxFreeVoucher: Label 'Foreign credit card detected. Should a tax free voucher be issued for this sale?';
+        POSUnit: Record "NPR POS Unit";
     begin
         if SalePOS."Issue Tax Free Voucher" then //Already enabled
             exit;
 
-        if not TaxFreeUnit.Get(SalePOS."Register No.") then
+        POSUnit.Get(SalePOS."Register No.");
+        if not TaxFreeProfile.Get(POSUnit."POS Tax Free Prof.") then
             exit;
 
-        if not TaxFreeUnit."Check POS Terminal IIN" then
+        if not TaxFreeProfile."Check POS Terminal IIN" then
             exit;
 
         EFTTransactionRequest.SetCurrentKey("Sales Ticket No.");
@@ -128,13 +130,13 @@ codeunit 6150649 "NPR POS Action Tax Free B."
         EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::PAYMENT);
         if EFTTransactionRequest.FindSet() then
             repeat
-                Valid := TaxFreeMgt.IsValidTerminalIIN(TaxFreeUnit, PadStr(CopyStr(EFTTransactionRequest."Card Number", 1, 6), StrLen(EFTTransactionRequest."Card Number"), 'X'));
+                Valid := TaxFreeMgt.IsValidTerminalIIN(TaxFreeProfile, PadStr(CopyStr(EFTTransactionRequest."Card Number", 1, 6), StrLen(EFTTransactionRequest."Card Number"), 'X'));
             until (EFTTransactionRequest.Next() = 0) or Valid;
 
         if not Valid then
             exit;
 
-        if not TaxFreeMgt.IsActiveSaleEligible(TaxFreeUnit, SalePOS."Sales Ticket No.") then
+        if not TaxFreeMgt.IsActiveSaleEligible(TaxFreeProfile, SalePOS."Sales Ticket No.") then
             exit;
 
         if Confirm(Caption_IssueTaxFreeVoucher) then begin

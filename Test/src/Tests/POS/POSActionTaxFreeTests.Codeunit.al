@@ -16,7 +16,7 @@ codeunit 85128 "NPR POS Action Tax Free Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure RunVoucherList()
     var
-        TaxFreePosUnit: Record "NPR Tax Free POS Unit";
+        TaxFreeProfile: Record "NPR POS Tax Free Profile";
         ActionBussinesLogic: Codeunit "NPR POS Action Tax Free B.";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
@@ -27,8 +27,9 @@ codeunit 85128 "NPR POS Action Tax Free Tests"
         // [Given] Active POS session
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         POSSession.GetSetup(POSSetup);
-        if not TaxFreePosUnit.Get(POSUnit."No.") then
-            LibTaxFree.CreateTaxFreePosUnit(POSUnit."No.", TaxFreePosUnit);
+
+        if not TaxFreeProfile.Get(POSUnit."POS Tax Free Prof.") then
+            LibTaxFree.CreateTaxFreePosUnit(POSUnit."POS Tax Free Prof.", TaxFreeProfile);
 
         //[When]
         ActionBussinesLogic.OnActionTaxFree(1, POSSale, POSSetup);
@@ -45,7 +46,7 @@ codeunit 85128 "NPR POS Action Tax Free Tests"
     procedure RunToggleTaxFree()
     var
         SalePOS: Record "NPR POS Sale";
-        TaxFreePosUnit: Record "NPR Tax Free POS Unit";
+        TaxFreeProfile: Record "NPR POS Tax Free Profile";
         ActionBussinesLogic: Codeunit "NPR POS Action Tax Free B.";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
@@ -57,8 +58,8 @@ codeunit 85128 "NPR POS Action Tax Free Tests"
         // [Given] Active POS session
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         POSSession.GetSetup(POSSetup);
-        if not TaxFreePosUnit.Get(POSUnit."No.") then
-            LibTaxFree.CreateTaxFreePosUnit(POSUnit."No.", TaxFreePosUnit);
+        if not TaxFreeProfile.Get(POSUnit."POS Tax Free Prof.") then
+            LibTaxFree.CreateTaxFreePosUnit(POSUnit."POS Tax Free Prof.", TaxFreeProfile);
 
         // [When]
         POSSale.GetCurrentSale(SalePOS);
