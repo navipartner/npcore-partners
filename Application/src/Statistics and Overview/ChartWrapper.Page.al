@@ -60,6 +60,15 @@ page 6150737 "NPR Chart Wrapper"
                     Initialize();
                 end;
             }
+#if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC2200)
+            usercontrol(Logo; "NPR Welcome Logo")
+            {
+                ApplicationArea = NPRRetail;
+                trigger InsertLogoEvent()
+                begin
+                end;
+            }
+#endif
         }
     }
 

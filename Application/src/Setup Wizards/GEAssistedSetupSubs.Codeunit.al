@@ -788,10 +788,16 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Checklist Banner", 'OnBeforeUpdateBannerLabels', '', false, false)]
     local procedure ChecklistBannerOnBeforeUpdateBannerLabels(var IsHandled: Boolean; var DescriptionTxt: Text; var TitleTxt: Text; var HeaderTxt: Text)
     var
+        ProfileRole: Record "All Profile";
         HeaderTextLbl: Label 'Welcome to NP Retail!';
         TitleTextLbl: Label 'Get Started';
         DescriptionTextLbl: Label 'We''ve prepared activities to quickly get you and your team started. Explore key features and benefits of our solution. Success awaits—let''s get started!';
+        SessionSettings: SessionSettings;
     begin
+        SessionSettings.Init();
+        ProfileRole.SetRange("Profile ID", SessionSettings.ProfileId());
+        if (not ProfileRole.FindFirst()) or (ProfileRole."Role Center ID" <> Page::"NPR Retail Manager Role Center") then
+            exit;
         IsHandled := true;
         TitleTxt := TitleTextLbl;
         DescriptionTxt := DescriptionTextLbl;
