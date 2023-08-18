@@ -64,7 +64,7 @@ codeunit 6150721 "NPR POS Action - Login" implements "NPR IPOS Workflow"
 
                 end;
             else
-                FrontEnd.ReportBugAndThrowError(StrSubstNo(Text001, Type));
+                Error(Text001, Type);
         end;
         HandleWorkflowResponse(Response, ActionContext);
         exit(Response);
