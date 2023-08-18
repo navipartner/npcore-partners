@@ -126,6 +126,8 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Entry Dims", '20230515'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Enum Upgrade", 'UpgradeNPREKitchenOrderStatusEnum'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR FtpSftp Data Upgrade"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Tax Free", 'NPRTaxFreePOSProfileTable'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Tax Free", 'NPRTaxFreePOSProfile'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdatePrimarySeating'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateKitchenRequestSeatingAndWaiter'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'RefreshKitchenOrderStatus'));
@@ -461,6 +463,13 @@
 #ENDIF
             Codeunit::"NPR FtpSftp Data Upgrade":
                 exit('NPR_FTP_SFTP_CONNECTION_UPGRADE');
+            Codeunit::"NPR UPG Tax Free":
+                case UpgradeStep of
+                    'NPRTaxFreePOSProfileTable':
+                        Exit('NPRTaxFreePOSProfileTables');
+                    'NPRTaxFreePOSProfile':
+                        Exit('NPRTaxFreePOSProfiles');
+                end;
             Codeunit::"NPR NPRE Upgrade":
                 case UpgradeStep of
                     'UpdatePrimarySeating':

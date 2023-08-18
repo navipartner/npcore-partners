@@ -682,6 +682,12 @@ codeunit 85002 "NPR Library - POS Master Data"
         NpRvRetVouchType.Insert();
     end;
 
+    procedure SetPOSUnitTaxFreeProfile(var POSUnit: Record "NPR POS Unit"; POSTaxFreeProfileCode: Code[10])
+    begin
+        POSUnit."POS Tax Free Prof." := POSTaxFreeProfileCode;
+        POSUnit.Modify();
+    end;
+
     procedure CreatePosMenuFilter(ObjectType: Option ,,,"Report",,"Codeunit","XMLPort",,"Page"; ObjectID: Integer; FilterCode: Code[20])
     var
         POSMenuFilter: Record "NPR POS Menu Filter";

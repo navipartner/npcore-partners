@@ -1,4 +1,4 @@
-﻿codeunit 6014661 "NPR Tax Free CC" implements "NPR Tax Free Handler Interface"
+﻿codeunit 6014661 "NPR Tax Free CC" implements "NPR Tax Free Handler IF"
 {
     Access = Internal;
     // TEST: 5A@d3[wsDK[c97b
@@ -30,21 +30,21 @@
         Error(Error_NotSupported, TaxFreeRequest."Handler ID Enum");
     end;
 
-    procedure OnLookupHandlerParameter(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
+    procedure OnLookupHandlerParameter(TaxFreeProfile: Record "NPR POS Tax Free Profile"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
     begin
         Handled := false;
-        Error(Error_NotSupported, TaxFreeUnit."Handler ID Enum");
+        Error(Error_NotSupported, TaxFreeProfile."Handler ID Enum");
     end;
 
-    procedure OnSetUnitParameters(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean)
+    procedure OnSetUnitParameters(TaxFreeProfile: Record "NPR POS Tax Free Profile"; var Handled: Boolean)
     var
         TaxFreeCCParam: Record "NPR Tax Free CC Param.";
     begin
         Handled := true;
 
-        if not TaxFreeCCParam.Get(TaxFreeUnit."POS Unit No.") then begin
+        if not TaxFreeCCParam.Get(TaxFreeProfile."Tax Free Profile") then begin
             TaxFreeCCParam.Init();
-            TaxFreeCCParam."Tax Free POS Unit Code" := TaxFreeUnit."POS Unit No.";
+            TaxFreeCCParam."Tax Free POS Unit Code" := TaxFreeProfile."Tax Free Profile";
             TaxFreeCCParam.Insert();
             Commit();
         end;
@@ -164,8 +164,10 @@
         HttpHdr: HttpHeaders;
         HttpCont: HttpContent;
         TaxFreeCCParam: Record "NPR Tax Free CC Param.";
+        POSUnit: Record "NPR POS Unit";
     begin
-        TaxFreeCCParam.Get(TaxFreeRequest."POS Unit No.");
+        POSUnit.Get(TaxFreeRequest."POS Unit No.");
+        TaxFreeCCParam.Get(POSUnit."POS Tax Free Prof.");
         TaxFreeRequest.Request.CreateInStream(InStr, TEXTENCODING::UTF8);
         InStr.Read(JsonRequest);
 
@@ -224,8 +226,10 @@
         JsonRequest: Text;
         GLSetup: Record "General Ledger Setup";
         MultipleVATPctErr: Label 'You cannot issue voucher with different VAT %.';
+        POSUnit: Record "NPR POS Unit";
     begin
-        TaxFreeCCParam.Get(TaxFreeRequest."POS Unit No.");
+        POSUnit.Get(TaxFreeRequest."POS Unit No.");
+        TaxFreeCCParam.Get(POSUnit."POS Tax Free Prof.");
 
         CheckParams(TaxFreeCCParam);
 
@@ -301,6 +305,7 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         TaxFreeCCParam: Record "NPR Tax Free CC Param.";
+        POSUnit: Record "NPR POS Unit";
     begin
         SaleLinePOS.SetRange("Sales Ticket No.", SalesTicketNo);
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
@@ -312,7 +317,8 @@
 
         SaleLinePOS.CalcSums("Amount Including VAT");
 
-        TaxFreeCCParam.Get(TaxFreeRequest."POS Unit No.");
+        POSUnit.Get(TaxFreeRequest."POS Unit No.");
+        TaxFreeCCParam.Get(POSUnit."POS Tax Free Prof.");
         if (TaxFreeCCParam."Minimal Amount" <> 0) and (TaxFreeCCParam."Maximal Amount" <> 0) then
             exit(SaleLinePOS."Amount Including VAT" in [TaxFreeCCParam."Minimal Amount" .. TaxFreeCCParam."Maximal Amount"]);
 
@@ -330,6 +336,7 @@
         TaxFreeCCParam: Record "NPR Tax Free CC Param.";
         POSSalesLine: Record "NPR POS Entry Sales Line";
         POSEntry: Record "NPR POS Entry";
+        POSUnit: Record "NPR POS Unit";
     begin
         POSSalesLine.SetCurrentKey("Document No.", "Line No.");
         POSSalesLine.SetRange("Document No.", SalesTicketNo);
@@ -347,7 +354,8 @@
         if POSEntry."Entry Type" <> POSEntry."Entry Type"::"Direct Sale" then
             exit;
 
-        TaxFreeCCParam.Get(TaxFreeRequest."POS Unit No.");
+        POSUnit.Get(TaxFreeRequest."POS Unit No.");
+        TaxFreeCCParam.Get(POSUnit."POS Tax Free Prof.");
 
         if (TaxFreeCCParam."Minimal Amount" <> 0) and (TaxFreeCCParam."Maximal Amount" <> 0) then
             exit(POSSalesLine."Amount Incl. VAT (LCY)" in [TaxFreeCCParam."Minimal Amount" .. TaxFreeCCParam."Maximal Amount"]);
@@ -373,12 +381,14 @@
         HttpCont: HttpContent;
         AddToLink: Text;
         TaxFreeCCParam: Record "NPR Tax Free CC Param.";
+        POSUnit: Record "NPR POS Unit";
     begin
         TaxFreeRequest.CalcFields(Print);
         if TaxFreeRequest.Print.HasValue then
             exit;
 
-        TaxFreeCCParam.Get(TaxFreeRequest."POS Unit No.");
+        POSUnit.Get(TaxFreeRequest."POS Unit No.");
+        TaxFreeCCParam.Get(POSUnit."POS Tax Free Prof.");
 
         AddToLink := '/' + TaxFreeVoucherNo + '/json/print';
 

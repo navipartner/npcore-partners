@@ -4,7 +4,7 @@
     Caption = 'POS Tax Free Profile';
     PageType = Card;
     UsageCategory = None;
-    SourceTable = "NPR Tax Free POS Unit";
+    SourceTable = "NPR POS Tax Free Profile";
 
     layout
     {
@@ -13,10 +13,9 @@
             group(General)
             {
                 Caption = 'General';
-                field("POS Unit No."; Rec."POS Unit No.")
+                field("Tax Free Profile"; Rec."Tax Free Profile")
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the value of the Tax Free Profile field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
@@ -135,7 +134,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Tax Free Requests";
-                RunPageLink = "POS Unit No." = FIELD("POS Unit No.");
+                RunPageLink = "Tax Free Profile" = FIELD("Tax Free Profile");
 
                 ToolTip = 'Executes the View Log action';
                 ApplicationArea = NPRRetail;

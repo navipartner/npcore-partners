@@ -161,6 +161,11 @@
             Caption = 'Handler ID';
             DataClassification = CustomerContent;
         }
+        field(45; "Tax Free Profile"; Code[10])
+        {
+            Caption = 'Tax Free Profile';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

@@ -297,7 +297,15 @@
         {
             Caption = 'POS Tax Free Profile';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Tax Free POS Unit";
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR24.0';
+            ObsoleteReason = 'New field "POS Tax Free Prof." created, use this instead.';
+        }
+        field(640; "POS Tax Free Prof."; Code[10])
+        {
+            Caption = 'POS Tax Free Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Tax Free Profile";
         }
         field(5058; "Open Register Password"; Code[20])
         {

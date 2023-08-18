@@ -1,4 +1,4 @@
-codeunit 85018 "NPR Mock Tax Free Handler" implements "NPR Tax Free Handler Interface"
+codeunit 85018 "NPR Mock Tax Free Handler" implements "NPR Tax Free Handler IF"
 {
     Access = Internal;
     EventSubscriberInstance = Manual;
@@ -63,17 +63,27 @@ codeunit 85018 "NPR Mock Tax Free Handler" implements "NPR Tax Free Handler Inte
         TaxFreeRequest.Success := true;
     end;
 
+    [Obsolete('We have changed record to "NPR POS Tax Free Profile"', 'BC21')]
     procedure OnLookupHandlerParameter(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
     begin
     end;
 
+    procedure OnLookupHandlerParameter(TaxFreeProfile: Record "NPR POS Tax Free Profile"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
+    begin
+    end;
+
+    [Obsolete('We have changed record to "NPR POS Tax Free Profile"', 'BC21')]
     procedure OnSetUnitParameters(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean)
+    begin
+    end;
+
+    procedure OnSetUnitParameters(TaxFreeProfile: Record "NPR POS Tax Free Profile"; var Handled: Boolean)
     begin
     end;
 
     var
         ConstructorSet: Boolean;
-        TaxFreeHandlerInterface: Interface "NPR Tax Free Handler Interface";
+        TaxFreeHandlerInterface: Interface "NPR Tax Free Handler IF";
 
     procedure Constructor(TaxFreeHandlerID: Enum "NPR Tax Free Handler ID")
     begin
