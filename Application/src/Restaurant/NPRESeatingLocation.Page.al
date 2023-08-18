@@ -33,7 +33,6 @@
                 field(Control6014404; Rec.Seatings)
                 {
                     Editable = false;
-                    ShowCaption = false;
                     ToolTip = 'Specifies the total number of seatings (tables) created at the seating location.';
                     ApplicationArea = NPRRetail;
                 }
