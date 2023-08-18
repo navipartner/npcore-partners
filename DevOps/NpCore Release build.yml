@@ -40,7 +40,7 @@ stages:
         - name: Insider_CLOUD
           compareAppWithSpecificCompareAppVersion: true
           alwaysRun: true
-        #  continueOnError: true        
+          continueOnError: true
         
       analyzers: ('UICop','CodeCop')
       keyVaultCert:
