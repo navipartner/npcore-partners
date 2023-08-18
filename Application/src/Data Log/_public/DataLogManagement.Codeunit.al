@@ -25,6 +25,9 @@
         if CompanyName = '' then
             exit;
 
+        if not DataLogSetupTable.ReadPermission() then
+            exit;
+
         if not DataLogChecked then begin
             DataLogChecked := true;
             DataLogActivated := not DataLogSetupTable.IsEmpty();
