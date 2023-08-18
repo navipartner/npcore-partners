@@ -22,7 +22,6 @@
                 ApplicationArea = NPRRetail;
             }
 #IF NOT BC17
-            //NOTE: If this part is to be deleted from RoleCenter, Logo will be deleted as well
             part(RetailSalesChart; "NPR Retail Sales Chart")
             {
                 ApplicationArea = NPRRetail;
@@ -33,6 +32,7 @@
                 ApplicationArea = NPRRetail;
                 Visible = false;
             }
+            //NOTE: If this part is to be deleted from RoleCenter, Logo will be deleted as well
             part(RetailPerformance; "NPR Chart Wrapper")
             {
                 ApplicationArea = NPRRetail;
