@@ -28,6 +28,7 @@
         SalesHeader: Record "Sales Header";
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
     begin
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeader);
         if not SalesHeader.Find() then
@@ -38,8 +39,9 @@
         SalePOS.Validate("Customer No.", PreviousSalePOS."Customer No.");
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();
+        POSSalesDocumentPost := POSSalesDocumentPost::Synchronous;
 
-        RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentPct, PrintPrepaymentInvoice, false, false, true, PrepaymentIsAmount);
+        RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentPct, PrintPrepaymentInvoice, false, false, POSSalesDocumentPost, PrepaymentIsAmount);
 
         POSSession.RequestRefreshData();
     end;

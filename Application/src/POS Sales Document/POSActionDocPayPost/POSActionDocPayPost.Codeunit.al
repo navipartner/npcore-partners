@@ -86,6 +86,8 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post" implements "NPR IPOS Workflow"
         AutoQtyToReceive: Integer;
         POSActionDocPayPostB: Codeunit "NPR POS Action: Doc.Pay&Post B";
         POSSession: Codeunit "NPR POS Session";
+        POSAsyncPosting: Codeunit "NPR POS Async. Posting Mgt.";
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
     begin
         Sale.GetCurrentSale(SalePOS);
 
@@ -112,6 +114,11 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post" implements "NPR IPOS Workflow"
         if not POSActionDocPayPostB.ConfirmImportInvDiscAmt(SalesHeader, ConfirmInvDiscAmt) then
             exit;
 
-        POSActionDocPayPostB.CreateDocumentPaymentLine(POSSession, SalesHeader, PrintDocument, Send, Pdf2Nav);
+        POSSalesDocumentPost := POSAsyncPosting.GetPOSSalePostingMandatoryFlow(SalePOS."POS Store Code");
+        if not OpenDocument then
+            if POSSalesDocumentPost = POSSalesDocumentPost::Asynchronous then
+                POSAsyncPosting.FromPOSRelatedPOSTransExist(SalesHeader);
+
+        POSActionDocPayPostB.CreateDocumentPaymentLine(POSSession, SalesHeader, PrintDocument, Send, Pdf2Nav, POSSalesDocumentPost);
     end;
 }

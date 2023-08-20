@@ -194,7 +194,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('SetPrintProformaInvoice', false, CaptionPrintProformaInvoice, CaptionPrintProformaInvoice);
         WorkflowConfig.AddBooleanParameter('GroupCodesEnabled', false, CaptioneGroupCodesEnabled, DescGroupCodesEnabled);
         WorkflowConfig.AddTextParameter('GroupCode', '', CaptionGroupCode, DescGroupCode);
-
         //labels
         WorkflowConfig.AddLabel('ExtDocNo', TextExtDocNoLabel);
         WorkflowConfig.AddLabel('Attention', TextAttentionLabel);
@@ -241,7 +240,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         SetGroupCode(SalePOS,
                      Context);
 
-        SetParameters(SaleLine, Context, RetailSalesDocMgt);
+        SetParameters(SalePOS, SaleLine, Context, RetailSalesDocMgt);
         ValidateSale(SalePOS, RetailSalesDocMgt, Context, CustomerTableView);
 
         Sale.RefreshCurrent();
@@ -269,11 +268,15 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         PrintPrepayment: Boolean;
         FullPosting: Boolean;
         SalesHeader: Record "Sales Header";
+        SalePOS: Record "NPR POS Sale";
         CreatedSalesHeader: Text;
         POSSession: Codeunit "NPR POS Session";
         POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
         CreatedDocTypeIndex: Integer;
+        POSAsyncPosting: Codeunit "NPR POS Async. Posting Mgt.";
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
     begin
+        Sale.GetCurrentSale(SalePOS);
         CreatedSalesHeader := Context.GetString('createdSalesHeader');
         CreatedDocTypeIndex := Context.GetInteger('createdSalesHeaderDocumentType');
         if SalesHeader.Get(CreatedDocTypeIndex, CreatedSalesHeader) then;
@@ -291,13 +294,15 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
             //End sale, auto start new sale, and insert prepayment line.
             POSSession.StartTransaction();
             POSSession.ChangeViewSale();
-            POSActionDocExportB.HandlePrepayment(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, PrintPrepayment, PrepaymentSend, PrepaymentPdf2Nav);
+            POSSalesDocumentPost := POSAsyncPosting.GetPOSSalePostingMandatoryFlow(SalePOS."POS Store Code");
+            POSActionDocExportB.HandlePrepayment(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, PrintPrepayment, PrepaymentSend, PrepaymentPdf2Nav, POSSalesDocumentPost);
         end else
             if PayAndPost then begin
                 //End sale, auto start new sale, and insert payment line.
                 POSSession.StartTransaction();
                 POSSession.ChangeViewSale();
-                POSActionDocExportB.HandlePayAndPost(POSSession, SalesHeader, PayAndPostPrint, PayAndPostPdf2Nav, PayAndPostSend, FullPosting);
+                POSSalesDocumentPost := POSAsyncPosting.GetPOSSalePostingMandatoryFlow(SalePOS."POS Store Code");
+                POSActionDocExportB.HandlePayAndPost(POSSession, SalesHeader, PayAndPostPrint, PayAndPostPdf2Nav, PayAndPostSend, FullPosting, POSSalesDocumentPost);
             end else begin
                 //End sale
                 Sale.SelectViewForEndOfSale(POSSession);
@@ -424,9 +429,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         RetailSalesDocMgt.TestSalePOS(SalePOS);
     end;
 
-    local procedure SetParameters(var POSSaleLine: Codeunit "NPR POS Sale Line"; Context: Codeunit "NPR POS JSON Helper"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
+    local procedure SetParameters(SalePOS: Record "NPR POS Sale"; var POSSaleLine: Codeunit "NPR POS Sale Line"; Context: Codeunit "NPR POS JSON Helper"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
     var
         POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
+        POSAsyncPosting: Codeunit "NPR POS Async. Posting Mgt.";
         AmountExclVAT: Decimal;
         VATAmount: Decimal;
         AmountInclVAT: Decimal;
@@ -455,6 +461,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         RetailSalesDocMgt.SetCustomerCreditCheck(Context.GetBooleanParameter('CheckCustomerCredit'));
         RetailSalesDocMgt.SetWarningCustomerCreditCheck(Context.GetBooleanParameter('CheckCustomerCreditWarning'));
         RetailSalesDocMgt.SetPrintProformaInvoice(Context.GetBooleanParameter('SetPrintProformaInvoice'));
+
+        RetailSalesDocMgt.SetAsyncPosting(POSAsyncPosting.AsyncPostingEnabled(SalePOS."POS Store Code"));
 
         if Context.GetBooleanParameter('SetShowCreationMessage') then
             RetailSalesDocMgt.SetShowCreationMessage();

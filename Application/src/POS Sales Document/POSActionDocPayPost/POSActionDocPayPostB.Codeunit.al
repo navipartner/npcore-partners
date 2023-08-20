@@ -154,13 +154,15 @@
         SalesHeader.SetFilter("No.", FilterSalesNo);
     end;
 
-    internal procedure CreateDocumentPaymentLine(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean)
+    internal procedure CreateDocumentPaymentLine(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean; POSSalesDocumentPost: Enum "NPR POS Sales Document Post")
     var
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         Ship: Boolean;
         Receive: Boolean;
         Invoice: Boolean;
+        Post: Boolean;
         SalesLine: Record "Sales Line";
+        POSAsyncPosting: Codeunit "NPR POS Async. Posting Mgt.";
     begin
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -177,7 +179,15 @@
         Receive := not SalesLine.IsEmpty;
         SalesLine.SetRange("Return Qty. to Receive");
 
-        RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, Invoice, Ship, Receive, Print, Pdf2Nav, Send, true);
+        Post := Ship or Invoice or Receive;
+
+        if Post then begin
+            if POSSalesDocumentPost = POSSalesDocumentPost::Asynchronous then
+                POSAsyncPosting.CheckPostingStatusFromPOS(SalesHeader);
+        end else
+            POSSalesDocumentPost := POSSalesDocumentPost::No;
+
+        RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, Invoice, Ship, Receive, Print, Pdf2Nav, Send, POSSalesDocumentPost);
     end;
 
 }

@@ -61,7 +61,6 @@
                         InsertLine(SalesLine, POSSaleLine, SalesHeader);
                     end;
             end;
-
         until SalesLine.Next() = 0;
 
         if DeleteDocument then begin
@@ -180,7 +179,7 @@
         SaleLinePOS.SetSkipCalcDiscount(false);
     end;
 
-    procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Invoice: Boolean; Ship: Boolean; Receive: Boolean; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; SyncPost: Boolean)
+    procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Invoice: Boolean; Ship: Boolean; Receive: Boolean; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; SalePostingIn: Enum "NPR POS Sales Document Post")
     var
         PaymentAmount: Decimal;
         POSSale: Codeunit "NPR POS Sale";
@@ -211,12 +210,12 @@
         SalesHeader.Ship := Ship;
         SalesHeader."Print Posted Documents" := Print;
         SalesHeader.Receive := Receive;
-        SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount, SaleLinePOS, SalesHeader, Pdf2Nav, Send, SyncPost);
+        SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount, SaleLinePOS, SalesHeader, Pdf2Nav, Send, SalePostingIn);
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
     end;
 
-    procedure SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount: Decimal; var SaleLinePOS: Record "NPR POS Sale Line"; var SalesHeader: Record "Sales Header"; Pdf2Nav: Boolean; Send: Boolean; SyncPost: Boolean)
+    procedure SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount: Decimal; var SaleLinePOS: Record "NPR POS Sale Line"; var SalesHeader: Record "Sales Header"; Pdf2Nav: Boolean; Send: Boolean; SalePostingIn: Enum "NPR POS Sales Document Post")
     begin
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"Customer Deposit";
         SaleLinePOS.Validate(Quantity, 1);
@@ -227,7 +226,7 @@
         SaleLinePOS."Sales Document Ship" := SalesHeader.Ship;
         SaleLinePOS."Sales Document Print" := SalesHeader."Print Posted Documents";
         SaleLinePOS."Sales Document Receive" := SalesHeader.Receive;
-        SaleLinePOS."Sales Document Sync. Posting" := SyncPost;
+        SaleLinePOS."Sales Document Post" := SalePostingIn;
         SaleLinePOS."Sales Document Send" := Send;
         SaleLinePOS."Sales Document Pdf2Nav" := Pdf2Nav;
         if SalesHeader."Document Type" in [SalesHeader."Document Type"::"Return Order", SalesHeader."Document Type"::"Credit Memo"] then

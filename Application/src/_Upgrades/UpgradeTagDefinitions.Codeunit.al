@@ -48,6 +48,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddTaskCountResetJQ'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'NotifyOnSuccessFalse'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddPosSaleDocumentPostingJQ'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'CustomCUforPostInvtCostToGL'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AutoRescheduleRetenPolicy'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'TMRetentionJQCategory'));
@@ -241,6 +242,8 @@
                         exit('NPRJobQueueInstall-20211125');
                     'NotifyOnSuccessFalse':
                         exit('NotifyOnSuccessFalse-20220304');
+                    'AddPosSaleDocumentPostingJQ':
+                        exit('AddPosSaleDocumentPostingJQ-20230802');
                     'CustomCUforPostInvtCostToGL':
                         exit('CustomCUforPostInvtCostToGL-20220530');
                     'AutoRescheduleRetenPolicy':

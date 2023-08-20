@@ -155,6 +155,14 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Posting Log";
         }
+        field(55; "Post Sales Document Status"; Option)
+        {
+            Caption = 'Post Sales Document Status';
+            Editable = false;
+            DataClassification = CustomerContent;
+            OptionCaption = 'Not To Be Posted,Unposted,Error while Posting,Posted';
+            OptionMembers = "Not To Be Posted",Unposted,"Error while Posting",Posted;
+        }
         field(60; "Posting Date"; Date)
         {
             Caption = 'Posting Date';

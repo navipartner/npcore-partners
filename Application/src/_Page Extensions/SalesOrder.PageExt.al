@@ -36,7 +36,20 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 ApplicationArea = NPRRetail;
                 ToolTip = 'Specifies the value of the Group Code field.';
             }
+            field("NPR PR POS Trans. Scheduled For Post"; Rec."NPR POS Trans. Sch. For Post")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies if there are POS entries scheduled for posting';
+                Visible = AsyncEnabled;
+                trigger OnDrillDown()
+                var
+                    POSAsyncPostingMgt: Codeunit "NPR POS Async. Posting Mgt.";
+                begin
+                    POSAsyncPostingMgt.ScheduledTransFromPOSOnDrillDown(Rec);
+                end;
+            }
         }
+
         addafter(Control85)
         {
             field("NPR Bill-to Company"; Rec."NPR Bill-to Company")
@@ -475,9 +488,18 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
 
     var
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+        AsyncEnabled: Boolean;
 
     trigger OnAfterGetCurrRecord()
+
     begin
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(Rec);
+    end;
+
+    trigger OnOpenPage()
+    var
+        POSAsyncPostingMgt: Codeunit "NPR POS Async. Posting Mgt.";
+    begin
+        AsyncEnabled := POSAsyncPostingMgt.SetVisibility();
     end;
 }

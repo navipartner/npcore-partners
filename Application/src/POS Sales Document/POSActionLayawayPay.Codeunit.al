@@ -63,13 +63,15 @@
         OrderPaymentTermsFilter: Text;
         SelectionMethod: Integer;
         SelectCustomer, ConfirmInvDiscAmt : Boolean;
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
     begin
         OrderPaymentTermsFilter := Context.GetStringParameter('OrderPaymentTermsFilter');
         SelectionMethod := Context.GetIntegerParameter('SelectionMethod');
         SelectCustomer := Context.GetBooleanParameter('SelectCustomer');
         ConfirmInvDiscAmt := Context.GetBooleanParameter('ConfirmInvDiscAmt');
+        POSSalesDocumentPost := POSSalesDocumentPost::Synchronous;
 
-        LayawayPayBusLogic.PayLayaway(POSSession, OrderPaymentTermsFilter, SelectionMethod, SelectCustomer, ConfirmInvDiscAmt);
+        LayawayPayBusLogic.PayLayaway(POSSession, OrderPaymentTermsFilter, SelectionMethod, SelectCustomer, ConfirmInvDiscAmt, POSSalesDocumentPost);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]

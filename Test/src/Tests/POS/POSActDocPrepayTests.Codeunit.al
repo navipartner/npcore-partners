@@ -33,12 +33,14 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         ValueIsAmount: Boolean;
         PREPAYMENT: Label 'Prepayment of %1 %2';
         ExpectedPrepayAmt: Decimal;
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
     begin
         // [Scenario] Create prepayment for existing order, prepayment amount is value
         // [Given]
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         CreateSalesOrder(SalesHeader); //Sales Order With with one line
+        POSSalesDocumentPost := POSSalesDocumentPost::Synchronous;
 
         POSSale.GetCurrentSale(SalePOS);
         SalesHeader.CalcFields("Amount Including VAT");
@@ -46,7 +48,7 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         PrepaymentValue := SalesHeader."Amount Including VAT" + 1;
         ValueIsAmount := true;
         // [When]
-        POSActionDocPrepayB.CreatePrepaymentLine(POSSession, SalesHeader, false, PrepaymentValue, ValueIsAmount, false, false);
+        POSActionDocPrepayB.CreatePrepaymentLine(POSSession, SalesHeader, false, PrepaymentValue, ValueIsAmount, false, false, POSSalesDocumentPost);
         POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, PrepaymentValue);
         ExpectedPrepayAmt := PrepaymentValue;
         // [Then]
@@ -75,12 +77,14 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         LibraryRandom: Codeunit "Library - Random";
         PREPAYMENT: Label 'Prepayment of %1 %2';
         ExpectedPrepayAmt: Decimal;
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
     begin
         // [Scenario] Create prepayment for existing order, prepayment amount is in percentage
         // [Given]
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         CreateSalesOrder(SalesHeader); //Sales Order With with one line
+        POSSalesDocumentPost := POSSalesDocumentPost::Synchronous;
 
         POSSale.GetCurrentSale(SalePOS);
         SalesHeader.CalcFields("Amount Including VAT");
@@ -88,7 +92,7 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         PrepaymentValue := LibraryRandom.RandDecInRange(0, 100, 4);
         ValueIsAmount := true;
         // [When]
-        POSActionDocPrepayB.CreatePrepaymentLine(POSSession, SalesHeader, false, PrepaymentValue, ValueIsAmount, false, false);
+        POSActionDocPrepayB.CreatePrepaymentLine(POSSession, SalesHeader, false, PrepaymentValue, ValueIsAmount, false, false, POSSalesDocumentPost);
         POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, PrepaymentValue);
         ExpectedPrepayAmt := PrepaymentValue;
         // [Then]
@@ -115,12 +119,14 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         ValueIsAmount: Boolean;
         ExpectedPrepayAmt: Decimal;
         PREPAYMENT: Label 'Prepayment of %1 %2';
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
     begin
         // [Scenario] Create prepayment for existing order, prepayment amount is value
         // [Given]
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         CreateSalesOrder(SalesHeader); //Sales Order With with one line
+        POSSalesDocumentPost := POSSalesDocumentPost::Synchronous;
 
         POSSale.GetCurrentSale(SalePOS);
         SalesHeader.CalcFields("Amount Including VAT");
@@ -128,7 +134,7 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         PrepaymentValue := 100;
         ValueIsAmount := true;
         // [When]
-        POSActionDocPrepayB.CreatePrepaymentLine(POSSession, SalesHeader, false, PrepaymentValue, ValueIsAmount, false, false);
+        POSActionDocPrepayB.CreatePrepaymentLine(POSSession, SalesHeader, false, PrepaymentValue, ValueIsAmount, false, false, POSSalesDocumentPost);
         POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, PrepaymentValue);
         ExpectedPrepayAmt := PrepaymentValue;
         // [Then]
@@ -185,6 +191,7 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         PrepaymentValue: Decimal;
         ValueIsAmount: Boolean;
         PREPAYMENT_REFUND: Label 'Prepayment refund of %1 %2';
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
     begin
         // [Scenario] Chose order with prepayment ,post it and then refund prepayment
         // [Given]
@@ -194,15 +201,16 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         POSSale.GetCurrentSale(SalePOS);
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        POSSalesDocumentPost := POSSalesDocumentPost::Synchronous;
         // Create and post prepayment
         // parameters
         PrepaymentValue := 50;
-        POSActionDocPrepayB.CreatePrepaymentLine(POSSession, SalesHeader, false, PrepaymentValue, ValueIsAmount, false, false);
+        POSActionDocPrepayB.CreatePrepaymentLine(POSSession, SalesHeader, false, PrepaymentValue, ValueIsAmount, false, false, POSSalesDocumentPost);
         // End Sale
         SalesHeader.CalcFields("Amount Including VAT");
         SaleEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethodCash.Code, SalesHeader."Amount Including VAT", '');
         // [When] Chose order with prepayment
-        POSActionDocPrepayB.CreatePrepaymentRefundLine(possession, salesHeader, false, false, false, false);
+        POSActionDocPrepayB.CreatePrepaymentRefundLine(possession, salesHeader, false, false, false, false, POSSalesDocumentPost);
         // [Then]
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);

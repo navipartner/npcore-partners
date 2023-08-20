@@ -52,7 +52,10 @@
             SetJQNotifyOnSuccessFalse();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'NotifyOnSuccessFalse'));
         end;
-
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddPosSaleDocumentPostingJQ')) then begin
+            JobQueueMgt.AddPosSaleDocumentPostingJobQueue();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddPosSaleDocumentPostingJQ'));
+        end;
 #if not BC17
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'CustomCUforPostInvtCostToGL')) then begin
             SetCustomCUforPostInvtCostToGL();

@@ -487,6 +487,9 @@
         {
             Caption = 'Sales Document Sync. Posting';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
+            ObsoleteReason = 'Use Enum POS Sales Document Post instead';
         }
         field(148; "Sales Document Print"; Boolean)
         {
@@ -566,6 +569,16 @@
         field(161; "Orig. POS Line No."; Integer)
         {
             Caption = 'Orig. POS Line No.';
+            DataClassification = CustomerContent;
+        }
+        field(162; "Sales Document Post"; Enum "NPR POS Sales Document Post")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Sales Document Post';
+        }
+        field(163; "Sales Posting Type"; Enum "NPR Post Sales Posting Type")
+        {
+            Caption = 'Sales Posting Type';
             DataClassification = CustomerContent;
         }
         field(170; "Retail ID"; Guid)
