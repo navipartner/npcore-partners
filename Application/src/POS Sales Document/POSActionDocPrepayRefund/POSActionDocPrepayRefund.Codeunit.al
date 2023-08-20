@@ -48,6 +48,8 @@
         SalePOS: Record "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
         POSActionDocPrepayB: Codeunit "NPR POS Action: Doc. Prepay B";
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
+        POSAsyncPosting: Codeunit "NPR POS Async. Posting Mgt.";
         PrintPrepaymentCreditNote, DeleteDocumentAfterRefund, SelectCustomer, Send, Pdf2Nav, ConfirmInvDiscAmt : Boolean;
     begin
         Sale.GetCurrentSale(SalePOS);
@@ -57,6 +59,7 @@
         Send := Context.GetBooleanParameter('SendDocument');
         Pdf2Nav := Context.GetBooleanParameter('Pdf2NavDocument');
         ConfirmInvDiscAmt := Context.GetBooleanParameter('ConfirmInvDiscAmt');
+        POSSalesDocumentPost := POSAsyncPosting.GetPOSSalePostingMandatoryFlow(SalePOS."POS Store Code");
 
         if not POSActionDocPrepayB.CheckCustomer(SalePOS, Sale, SelectCustomer) then
             exit;
@@ -67,7 +70,9 @@
         if not POSActionDocPrepayB.ConfirmImportInvDiscAmt(SalesHeader, ConfirmInvDiscAmt) then
             exit;
 
-        POSActionDocPrepayB.CreatePrepaymentRefundLine(POSSession, SalesHeader, PrintPrepaymentCreditNote, DeleteDocumentAfterRefund, Send, Pdf2Nav);
+        if POSSalesDocumentPost = POSSalesDocumentPost::Asynchronous then
+            POSAsyncPosting.FromPOSRelatedPOSTransExist(SalesHeader);
+        POSActionDocPrepayB.CreatePrepaymentRefundLine(POSSession, SalesHeader, PrintPrepaymentCreditNote, DeleteDocumentAfterRefund, Send, Pdf2Nav, POSSalesDocumentPost);
 
     end;
 }

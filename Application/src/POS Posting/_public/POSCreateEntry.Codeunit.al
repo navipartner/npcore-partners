@@ -12,6 +12,7 @@
         POSAuditLog: Record "NPR POS Audit Log";
         SaleCancelled: Boolean;
         POSSaleMediaInfo: Record "NPR POS Sale Media Info";
+        POSAsyncPostingMgt: Codeunit "NPR POS Async. Posting Mgt.";
     begin
         Clear(GlobalPOSEntry);
         ValidateSaleHeader(Rec);
@@ -31,6 +32,11 @@
         end;
 
         CreateLines(POSEntry, Rec);
+
+        UpdatePostSaleDocumentStatus(POSEntry, SaleCancelled);
+        if POSEntry."Entry Type" = POSEntry."Entry Type"::"Direct Sale" then
+            if POSAsyncPostingMgt.AsyncPostingEnabled(POSEntry."POS Store Code") then
+                CreateBufferLines(POSEntry, Rec);
 
         POSEntryManagement.RecalculatePOSEntry(POSEntry, WasModified);
         POSEntry.Modify();
@@ -97,12 +103,47 @@
         end;
     end;
 
-    internal procedure CreatePOSEntryForCreatedSalesDocument(var POSSale: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header"; Posted: Boolean)
+    local procedure CreateBufferLines(var POSEntry: Record "NPR POS Entry"; var POSSale: Record "NPR POS Sale")
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetFilter("Sales Document No.", '<>%1', '');
+        POSSaleLine.SetRange("Sales Document Post", POSSaleLine."Sales Document Post"::Asynchronous);
+        if POSSaleLine.FindSet() then begin
+            repeat
+                case POSSaleLine."Line Type" of
+                    POSSaleLine."Line Type"::"Customer Deposit":
+                        InsertBufferPOSSaleLine(POSSaleLine, POSEntry);
+                end
+            until POSSaleLine.Next() = 0;
+        end;
+    end;
+
+    internal procedure UpdatePostSaleDocumentStatus(var POSEntry: Record "NPR POS Entry"; SaleCancelled: Boolean)
+    var
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+    begin
+        POSEntrySalesDocLink.SetCurrentKey("POS Entry No.", "Post Sales Document Status");
+        POSEntrySalesDocLink.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if SaleCancelled then begin
+            POSEntrySalesDocLink.ModifyAll("Post Sales Document Status", POSEntrySalesDocLink."Post Sales Document Status"::"Not To Be Posted");
+        end else begin
+            POSEntrySalesDocLink.SetRange("Post Sales Document Status", POSEntrySalesDocLink."Post Sales Document Status"::Unposted);
+            if not POSEntrySalesDocLink.IsEmpty() then
+                POSEntry."Post Sales Document Status" := POSEntry."Post Sales Document Status"::Unposted;
+        end;
+
+    end;
+
+    internal procedure CreatePOSEntryForCreatedSalesDocument(var POSSale: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header"; Posted: Boolean; AsyncPosting: Boolean; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean)
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
         WasModified: Boolean;
+        POSAsyncPosting: Codeunit "NPR POS Async. Posting Mgt.";
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
@@ -123,13 +164,19 @@
         POSEntry."Sales Document Type" := SalesHeader."Document Type";
         POSEntry."Sales Document No." := SalesHeader."No.";
 
-        POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry, SalesHeader."Document Type", SalesHeader."No.");
+        if AsyncPosting then begin
+            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReferenceAsyncPosting(POSEntry, SalesHeader."Document Type", SalesHeader."No.", ReadyToBePosted(SalesHeader), Print, Send, Pdf2Nav);
+            if POSAsyncPosting.ReadyToBePosted(SalesHeader) then
+                POSEntry."Post Sales Document Status" := POSEntry."Post Sales Document Status"::Unposted;
+        end else
+            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry, SalesHeader."Document Type", SalesHeader."No.");
+
         if Posted then
             SetPostedSalesDocInfo(POSEntry, SalesHeader);
 
-        if POSEntry.Description = '' then begin
+        if POSEntry.Description = '' then
             POSEntry.Description := StrSubstNo(SalesHeaderLbl, SalesHeader."Document Type", SalesHeader."No.");
-        end;
+
         POSEntry.Modify();
 
         POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::CREDIT_SALE_END, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", TXT_CREDIT_SALE_END, '');
@@ -213,6 +260,7 @@
         PricesIncludeTax: Boolean;
         POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        POSAsyncPosting: Codeunit "NPR POS Async. Posting Mgt.";
     begin
         POSEntrySalesLine.Reset();
         POSEntrySalesLine."POS Entry No." := POSEntry."Entry No.";
@@ -250,7 +298,6 @@
             POSSaleLine."Line Type"::Comment:
                 POSEntrySalesLine.Type := POSEntrySalesLine.Type::Comment;
         end;
-
         POSEntrySalesLine."Exclude from Posting" := ExcludeFromPosting(POSSaleLine);
         POSEntrySalesLine."No." := POSSaleLine."No.";
         POSEntrySalesLine."Variant Code" := POSSaleLine."Variant Code";
@@ -320,26 +367,28 @@
         POSEntrySalesLine."Copy Description" := POSSaleLine."Copy Description";
 
         CreateRMAEntry(POSEntry, POSSale, POSSaleLine);
-
-        if POSSaleLine."Sales Document No." <> '' then begin
-            POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSEntrySalesLine, POSSaleLine."Sales Document Type", POSSaleLine."Sales Document No.");
-        end;
+        if POSSaleLine."Sales Document No." <> '' then
+            if POSSaleLine."Sales Document Post" <> POSSaleLine."Sales Document Post"::Asynchronous then
+                POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSEntrySalesLine, POSSaleLine."Sales Document Type", POSSaleLine."Sales Document No.", POSAsyncPosting.GetInvoiceType(POSSaleLine))
+            else
+                POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReferenceAsyncPost(POSEntrySalesLine, POSSaleLine."Sales Document Type", POSSaleLine."Sales Document No.", POSAsyncPosting.GetInvoiceType(POSSaleLine), POSSaleLine."Sales Document Print",
+                    POSSaleLine."Sales Document Send", POSSaleLine."Sales Document Pdf2Nav", POSSaleLine."Sales Doc. Prepay Is Percent", POSSaleLine."Sales Document Delete");
 
         if POSSaleLine."Posted Sales Document No." <> '' then begin
             case POSSaleLine."Posted Sales Document Type" of
                 POSSaleLine."Posted Sales Document Type"::INVOICE:
-                    POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSEntrySalesLine, POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE, POSSaleLine."Posted Sales Document No.");
+                    POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSEntrySalesLine, POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE, POSSaleLine."Posted Sales Document No.", POSAsyncPosting.GetInvoiceType(POSSaleLine));
                 POSSaleLine."Posted Sales Document Type"::CREDIT_MEMO:
-                    POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSEntrySalesLine, POSEntrySalesDocLink."Sales Document Type"::POSTED_CREDIT_MEMO, POSSaleLine."Posted Sales Document No.");
+                    POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSEntrySalesLine, POSEntrySalesDocLink."Sales Document Type"::POSTED_CREDIT_MEMO, POSSaleLine."Posted Sales Document No.", POSAsyncPosting.GetInvoiceType(POSSaleLine));
             end;
         end;
 
         if POSSaleLine."Delivered Sales Document No." <> '' then begin
             case POSSaleLine."Delivered Sales Document Type" of
                 POSSaleLine."Delivered Sales Document Type"::SHIPMENT:
-                    POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSEntrySalesLine, POSEntrySalesDocLink."Sales Document Type"::SHIPMENT, POSSaleLine."Delivered Sales Document No.");
+                    POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSEntrySalesLine, POSEntrySalesDocLink."Sales Document Type"::SHIPMENT, POSSaleLine."Delivered Sales Document No.", POSAsyncPosting.GetInvoiceType(POSSaleLine));
                 POSSaleLine."Delivered Sales Document Type"::RETURN_RECEIPT:
-                    POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSEntrySalesLine, POSEntrySalesDocLink."Sales Document Type"::RETURN_RECEIPT, POSSaleLine."Delivered Sales Document No.");
+                    POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSEntrySalesLine, POSEntrySalesDocLink."Sales Document Type"::RETURN_RECEIPT, POSSaleLine."Delivered Sales Document No.", POSAsyncPosting.GetInvoiceType(POSSaleLine));
             end;
         end;
 
@@ -369,6 +418,320 @@
         OnBeforeInsertPOSSalesLine(POSSale, POSSaleLine, POSEntry, POSEntrySalesLine);
         POSEntrySalesLine.Insert(false, true);
         OnAfterInsertPOSSalesLine(POSSale, POSSaleLine, POSEntry, POSEntrySalesLine);
+    end;
+
+    local procedure InsertBufferPOSSaleLine(POSSaleLine: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry")
+    var
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        POSEntrySalesDocLink2: Record "NPR POS Entry Sales Doc. Link";
+        BufferPOSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+    begin
+        POSEntrySalesDocLink.SetCurrentKey("POS Entry No.", "Sales Document Type", "Orig. Sales Document No.", "Orig. Sales Document Type");
+        POSEntrySalesDocLink.SetFilter("Orig. Sales Document No.", POSSaleLine."Sales Document No.");
+        POSEntrySalesDocLink.SetRange("Orig. Sales Document Type", POSSaleLine."Sales Document Type");
+        if not POSEntrySalesDocLink.FindFirst() then
+            exit;
+        //Find previous non-items entries for same order
+        POSEntrySalesDocLink2.SetCurrentKey("POS Entry No.");
+        POSEntrySalesDocLink2.SetAscending("POS Entry No.", false);
+        POSEntrySalesDocLink2.SetRange("Orig. Sales Document No.", POSEntrySalesDocLink."Orig. Sales Document No.");
+        POSEntrySalesDocLink2.SetRange("Orig. Sales Document Type", POSEntrySalesDocLink."Orig. Sales Document Type");
+        POSEntrySalesDocLink2.SetFilter("POS Entry No.", '<%1', POSEntry."Entry No.");
+        if POSEntrySalesDocLink2.FindFirst() then begin
+            POSEntrySalesLine.SetRange("POS Entry No.", POSEntrySalesDocLink2."POS Entry No.");
+            POSEntrySalesLine.SetFilter(Type, '<>%1', POSEntrySalesLine.Type::Item);
+            if POSEntrySalesLine.FindSet() then
+                repeat
+                    BufferPOSEntrySalesLine.Reset();
+                    BufferPOSEntrySalesLine.Init();
+                    BufferPOSEntrySalesLine.TransferFields(POSEntrySalesLine);
+                    InitBufferPOSEntrySalesLine(BufferPOSEntrySalesLine, POSEntry);
+                    BufferPOSEntrySalesLine.Insert();
+                until POSEntrySalesLine.Next() = 0;
+        end;
+        //items fetched from sale document
+        if POSSaleLine."Sales Document Post" = POSSaleLine."Sales Document Post"::Posted then begin//posted in meantime in BC
+            if POSSaleLine."Sales Document Ship" or
+                POSSaleLine."Sales Document Receive" or
+                 POSSaleLine."Sales Document Invoice" then
+                if POSSaleLine."Posted Sales Document No." <> '' then begin
+                    if POSSaleLine."Posted Sales Document Type" = POSSaleLine."Posted Sales Document Type"::INVOICE then begin
+                        if SalesInvoiceHeader.Get(POSSaleLine."Posted Sales Document No.") then
+                            InsertItemLines(POSEntry, SalesInvoiceHeader);
+                    end else
+                        if SalesCrMemoHeader.Get(POSSaleLine."Posted Sales Document No.") then
+                            InsertItemLines(POSEntry, SalesCrMemoHeader);
+                end;
+            if POSSaleLine."Sales Document Prepayment" or
+            POSSaleLine."Sales Document Prepay. Refund" then
+                if POSEntrySalesDocLink."Sales Document Type" = POSEntrySalesDocLink."Sales Document Type"::ORDER then
+                    if SalesHeader.Get(SalesHeader."Document Type"::Order, POSSaleLine."Sales Document No.") then
+                        InsertItemLines(POSEntry, SalesHeader);
+
+        end else begin
+            if POSSaleLine."Sales Document No." <> '' then
+                if SalesHeader.Get(POSSaleLine."Sales Document Type", POSSaleLine."Sales Document No.") then
+                    InsertItemLines(POSEntry, SalesHeader);
+        end;
+    end;
+
+
+    local procedure GetLastPOSEntrySaleLineLineNo(POSEntry: Record "NPR POS Entry"): Integer
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if POSEntrySalesLine.FindLast() then
+            exit(POSEntrySalesLine."Line No." + 10000)
+        else
+            exit(10000)
+    end;
+
+    local procedure InitBufferPOSEntrySalesLine(var DummyPOSEntrySalesLine: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry")
+    begin
+        DummyPOSEntrySalesLine."POS Entry No." := POSEntry."Entry No.";
+        DummyPOSEntrySalesLine."Line No." := GetLastPOSEntrySaleLineLineNo(POSEntry);
+        DummyPOSEntrySalesLine."POS Period Register No." := POSEntry."POS Period Register No.";
+        DummyPOSEntrySalesLine."Exclude from Posting" := true;
+        DummyPOSEntrySalesLine."POS Store Code" := POSEntry."POS Store Code";
+        DummyPOSEntrySalesLine."POS Unit No." := POSEntry."POS Unit No.";
+        DummyPOSEntrySalesLine."Document No." := POSEntry."Document No.";
+        DummyPOSEntrySalesLine."Customer No." := POSEntry."Customer No.";
+        DummyPOSEntrySalesLine."Salesperson Code" := POSEntry."Salesperson Code";
+    end;
+
+    local procedure InsertItemLines(POSEntry: Record "NPR POS Entry"; SalesInvoiceHeader: Record "Sales Invoice Header")
+    var
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        BufferPOSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        PricesIncludeTax: Boolean;
+        ItemTrackingDocManagement: Codeunit "Item Tracking Doc. Management";
+        TempItemLedgEntry: Record "Item Ledger Entry" temporary;
+    begin
+        SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
+        SalesInvoiceLine.SetFilter(Type, '=%1', SalesInvoiceLine.Type::Item);
+        SalesInvoiceLine.SetFilter(Quantity, '<>%1', 0);
+        if SalesInvoiceLine.FindSet() then
+            repeat
+                BufferPOSEntrySalesLine.Reset();
+                BufferPOSEntrySalesLine.Init();
+                InitBufferPOSEntrySalesLine(BufferPOSEntrySalesLine, POSEntry);
+                BufferPOSEntrySalesLine.Insert();
+
+                BufferPOSEntrySalesLine.Type := BufferPOSEntrySalesLine.Type::Item;
+                BufferPOSEntrySalesLine."Responsibility Center" := SalesInvoiceLine."Responsibility Center";
+                BufferPOSEntrySalesLine."No." := SalesInvoiceLine."No.";
+                BufferPOSEntrySalesLine."Variant Code" := SalesInvoiceLine."Variant Code";
+                BufferPOSEntrySalesLine."Location Code" := SalesInvoiceLine."Location Code";
+                BufferPOSEntrySalesLine."Bin Code" := SalesInvoiceLine."Bin Code";
+                BufferPOSEntrySalesLine."Posting Group" := SalesInvoiceLine."Posting Group";
+                BufferPOSEntrySalesLine.Description := SalesInvoiceLine.Description;
+                BufferPOSEntrySalesLine."Description 2" := SalesInvoiceLine."Description 2";
+                BufferPOSEntrySalesLine."Gen. Bus. Posting Group" := SalesInvoiceLine."Gen. Bus. Posting Group";
+                BufferPOSEntrySalesLine."VAT Bus. Posting Group" := SalesInvoiceLine."VAT Bus. Posting Group";
+                BufferPOSEntrySalesLine."Gen. Prod. Posting Group" := SalesInvoiceLine."Gen. Prod. Posting Group";
+                BufferPOSEntrySalesLine."VAT Prod. Posting Group" := SalesInvoiceLine."VAT Prod. Posting Group";
+                BufferPOSEntrySalesLine."Tax Area Code" := SalesInvoiceLine."Tax Area Code";
+                BufferPOSEntrySalesLine."Tax Liable" := SalesInvoiceLine."Tax Liable";
+                BufferPOSEntrySalesLine."Tax Group Code" := SalesInvoiceLine."Tax Group Code";
+                BufferPOSEntrySalesLine."Unit of Measure Code" := SalesInvoiceLine."Unit of Measure Code";
+                BufferPOSEntrySalesLine."Qty. per Unit of Measure" := SalesInvoiceLine."Qty. per Unit of Measure";
+                BufferPOSEntrySalesLine."Unit Price" := SalesInvoiceLine."Unit Price";
+                BufferPOSEntrySalesLine."Unit Cost (LCY)" := SalesInvoiceLine."Unit Cost (LCY)";
+                BufferPOSEntrySalesLine."Unit Cost" := SalesInvoiceLine."Unit Cost";
+                BufferPOSEntrySalesLine."VAT %" := SalesInvoiceLine."VAT %";
+                BufferPOSEntrySalesLine."VAT Identifier" := SalesInvoiceLine."VAT Identifier";
+                BufferPOSEntrySalesLine."VAT Calculation Type" := SalesInvoiceLine."VAT Calculation Type";
+
+                PricesIncludeTax := SalesInvoiceHeader."Prices Including VAT";
+                if PricesIncludeTax then begin
+                    BufferPOSEntrySalesLine."Line Discount Amount Incl. VAT" := SalesInvoiceLine."Line Discount Amount";
+                    BufferPOSEntrySalesLine."Line Discount Amount Excl. VAT" := SalesInvoiceLine."Line Discount Amount" / (1 + (SalesInvoiceLine."VAT %" / 100));
+                end else begin
+                    BufferPOSEntrySalesLine."Line Discount Amount Excl. VAT" := SalesInvoiceLine."Line Discount Amount";
+                    BufferPOSEntrySalesLine."Line Discount Amount Incl. VAT" := (1 + (SalesInvoiceLine."VAT %" / 100)) * SalesInvoiceLine."Line Discount Amount";
+                end;
+
+                BufferPOSEntrySalesLine."Line Amount" := SalesInvoiceLine."Line Amount";
+                BufferPOSEntrySalesLine."Amount Excl. VAT (LCY)" := SalesInvoiceLine.Amount * POSEntry."Currency Factor";
+                BufferPOSEntrySalesLine."Amount Incl. VAT (LCY)" := SalesInvoiceLine."Amount Including VAT" * POSEntry."Currency Factor";
+                BufferPOSEntrySalesLine."Line Dsc. Amt. Excl. VAT (LCY)" := BufferPOSEntrySalesLine."Line Discount Amount Excl. VAT" * POSEntry."Currency Factor";
+                BufferPOSEntrySalesLine."Line Dsc. Amt. Incl. VAT (LCY)" := BufferPOSEntrySalesLine."Line Discount Amount Incl. VAT" * POSEntry."Currency Factor";
+                BufferPOSEntrySalesLine."Item Category Code" := SalesInvoiceLine."Item Category Code";
+                ItemTrackingDocManagement.RetrieveEntriesFromPostedInvoice(TempItemLedgEntry, SalesInvoiceLine.RowID1());
+                BufferPOSEntrySalesLine."Serial No." := TempItemLedgEntry."Serial No.";
+
+                BufferPOSEntrySalesLine."Return Reason Code" := SalesInvoiceLine."Return Reason Code";
+                BufferPOSEntrySalesLine.Quantity := -SalesInvoiceLine.Quantity;
+                BufferPOSEntrySalesLine."Line Discount %" := SalesInvoiceLine."Line Discount %";
+                BufferPOSEntrySalesLine."Dimension Set ID" := SalesInvoiceLine."Dimension Set ID";
+                BufferPOSEntrySalesLine."Amount Excl. VAT" := -SalesInvoiceLine.Amount;
+                BufferPOSEntrySalesLine."Amount Incl. VAT" := -SalesInvoiceLine."Amount Including VAT";
+                BufferPOSEntrySalesLine."VAT Base Amount" := -SalesInvoiceLine."VAT Base Amount";
+                BufferPOSEntrySalesLine."Quantity (Base)" := -SalesInvoiceLine."Quantity (Base)";
+                BufferPOSEntrySalesLine."VAT Difference" := -SalesInvoiceLine."VAT Difference";
+                BufferPOSEntrySalesLine.Modify();
+
+            until SalesInvoiceLine.Next() = 0;
+    end;
+
+    local procedure InsertItemLines(POSEntry: Record "NPR POS Entry"; SalesCrMemoHeader: Record "Sales Cr.Memo Header")
+    var
+        SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        BufferPOSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        PricesIncludeTax: Boolean;
+        ItemTrackingDocManagement: Codeunit "Item Tracking Doc. Management";
+        TempItemLedgEntry: Record "Item Ledger Entry" temporary;
+    begin
+        SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
+        SalesCrMemoLine.SetFilter(Type, '=%1', SalesCrMemoLine.Type::Item);
+        SalesCrMemoLine.SetFilter(Quantity, '<>%1', 0);
+        if SalesCrMemoLine.FindSet() then
+            repeat
+                BufferPOSEntrySalesLine.Reset();
+                BufferPOSEntrySalesLine.Init();
+                InitBufferPOSEntrySalesLine(BufferPOSEntrySalesLine, POSEntry);
+                BufferPOSEntrySalesLine.Insert();
+
+                BufferPOSEntrySalesLine.Type := BufferPOSEntrySalesLine.Type::Item;
+                BufferPOSEntrySalesLine."Responsibility Center" := SalesCrMemoLine."Responsibility Center";
+                BufferPOSEntrySalesLine."No." := SalesCrMemoLine."No.";
+                BufferPOSEntrySalesLine."Variant Code" := SalesCrMemoLine."Variant Code";
+                BufferPOSEntrySalesLine."Location Code" := SalesCrMemoLine."Location Code";
+                BufferPOSEntrySalesLine."Bin Code" := SalesCrMemoLine."Bin Code";
+                BufferPOSEntrySalesLine."Posting Group" := SalesCrMemoLine."Posting Group";
+                BufferPOSEntrySalesLine.Description := SalesCrMemoLine.Description;
+                BufferPOSEntrySalesLine."Description 2" := SalesCrMemoLine."Description 2";
+                BufferPOSEntrySalesLine."Gen. Bus. Posting Group" := SalesCrMemoLine."Gen. Bus. Posting Group";
+                BufferPOSEntrySalesLine."VAT Bus. Posting Group" := SalesCrMemoLine."VAT Bus. Posting Group";
+                BufferPOSEntrySalesLine."Gen. Prod. Posting Group" := SalesCrMemoLine."Gen. Prod. Posting Group";
+                BufferPOSEntrySalesLine."VAT Prod. Posting Group" := SalesCrMemoLine."VAT Prod. Posting Group";
+                BufferPOSEntrySalesLine."Tax Area Code" := SalesCrMemoLine."Tax Area Code";
+                BufferPOSEntrySalesLine."Tax Liable" := SalesCrMemoLine."Tax Liable";
+                BufferPOSEntrySalesLine."Tax Group Code" := SalesCrMemoLine."Tax Group Code";
+                BufferPOSEntrySalesLine."Unit of Measure Code" := SalesCrMemoLine."Unit of Measure Code";
+                BufferPOSEntrySalesLine."Qty. per Unit of Measure" := SalesCrMemoLine."Qty. per Unit of Measure";
+                BufferPOSEntrySalesLine."Unit Price" := SalesCrMemoLine."Unit Price";
+                BufferPOSEntrySalesLine."Unit Cost (LCY)" := SalesCrMemoLine."Unit Cost (LCY)";
+                BufferPOSEntrySalesLine."Unit Cost" := SalesCrMemoLine."Unit Cost";
+                BufferPOSEntrySalesLine."VAT %" := SalesCrMemoLine."VAT %";
+                BufferPOSEntrySalesLine."VAT Identifier" := SalesCrMemoLine."VAT Identifier";
+                BufferPOSEntrySalesLine."VAT Calculation Type" := SalesCrMemoLine."VAT Calculation Type";
+
+                PricesIncludeTax := SalesCrMemoHeader."Prices Including VAT";
+                if PricesIncludeTax then begin
+                    BufferPOSEntrySalesLine."Line Discount Amount Incl. VAT" := SalesCrMemoLine."Line Discount Amount";
+                    BufferPOSEntrySalesLine."Line Discount Amount Excl. VAT" := SalesCrMemoLine."Line Discount Amount" / (1 + (SalesCrMemoLine."VAT %" / 100));
+                end else begin
+                    BufferPOSEntrySalesLine."Line Discount Amount Excl. VAT" := SalesCrMemoLine."Line Discount Amount";
+                    BufferPOSEntrySalesLine."Line Discount Amount Incl. VAT" := (1 + (SalesCrMemoLine."VAT %" / 100)) * SalesCrMemoLine."Line Discount Amount";
+                end;
+
+                BufferPOSEntrySalesLine."Line Amount" := SalesCrMemoLine."Line Amount";
+                BufferPOSEntrySalesLine."Amount Excl. VAT (LCY)" := SalesCrMemoLine.Amount * POSEntry."Currency Factor";
+                BufferPOSEntrySalesLine."Amount Incl. VAT (LCY)" := SalesCrMemoLine."Amount Including VAT" * POSEntry."Currency Factor";
+                BufferPOSEntrySalesLine."Line Dsc. Amt. Excl. VAT (LCY)" := BufferPOSEntrySalesLine."Line Discount Amount Excl. VAT" * POSEntry."Currency Factor";
+                BufferPOSEntrySalesLine."Line Dsc. Amt. Incl. VAT (LCY)" := BufferPOSEntrySalesLine."Line Discount Amount Incl. VAT" * POSEntry."Currency Factor";
+                BufferPOSEntrySalesLine."Item Category Code" := SalesCrMemoLine."Item Category Code";
+                ItemTrackingDocManagement.RetrieveEntriesFromPostedInvoice(TempItemLedgEntry, SalesCrMemoLine.RowID1());
+                BufferPOSEntrySalesLine."Serial No." := TempItemLedgEntry."Serial No.";
+                BufferPOSEntrySalesLine."Return Reason Code" := SalesCrMemoLine."Return Reason Code";
+                BufferPOSEntrySalesLine.Quantity := -SalesCrMemoLine.Quantity;
+                BufferPOSEntrySalesLine."Line Discount %" := SalesCrMemoLine."Line Discount %";
+                BufferPOSEntrySalesLine."Dimension Set ID" := SalesCrMemoLine."Dimension Set ID";
+                BufferPOSEntrySalesLine."Amount Excl. VAT" := -SalesCrMemoLine.Amount;
+                BufferPOSEntrySalesLine."Amount Incl. VAT" := -SalesCrMemoLine."Amount Including VAT";
+                BufferPOSEntrySalesLine."VAT Base Amount" := -SalesCrMemoLine."VAT Base Amount";
+                BufferPOSEntrySalesLine."Quantity (Base)" := -SalesCrMemoLine."Quantity (Base)";
+                BufferPOSEntrySalesLine."VAT Difference" := -SalesCrMemoLine."VAT Difference";
+                BufferPOSEntrySalesLine.Modify();
+
+            until SalesCrMemoLine.Next() = 0;
+    end;
+
+    local procedure InsertItemLines(POSEntry: Record "NPR POS Entry"; SalesHeader: Record "Sales Header")
+    var
+        SalesLine: Record "Sales Line";
+        PricesIncludeTax: Boolean;
+        ReservationEntry: Record "Reservation Entry";
+        BufferPOSEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetFilter(Type, '=%1', SalesLine.Type::Item);
+        SalesLine.SetFilter(Quantity, '<>%1', 0);
+        if SalesLine.FindSet() then
+            repeat
+                BufferPOSEntrySalesLine.Reset();
+                BufferPOSEntrySalesLine.Init();
+                InitBufferPOSEntrySalesLine(BufferPOSEntrySalesLine, POSEntry);
+                BufferPOSEntrySalesLine.Insert();
+
+                BufferPOSEntrySalesLine.Type := BufferPOSEntrySalesLine.Type::Item;
+                BufferPOSEntrySalesLine."Responsibility Center" := SalesLine."Responsibility Center";
+                BufferPOSEntrySalesLine."No." := SalesLine."No.";
+                BufferPOSEntrySalesLine."Variant Code" := SalesLine."Variant Code";
+                BufferPOSEntrySalesLine."Location Code" := SalesLine."Location Code";
+                BufferPOSEntrySalesLine."Bin Code" := SalesLine."Bin Code";
+                BufferPOSEntrySalesLine."Posting Group" := SalesLine."Posting Group";
+                BufferPOSEntrySalesLine.Description := SalesLine.Description;
+                BufferPOSEntrySalesLine."Description 2" := SalesLine."Description 2";
+                BufferPOSEntrySalesLine."Gen. Bus. Posting Group" := SalesLine."Gen. Bus. Posting Group";
+                BufferPOSEntrySalesLine."VAT Bus. Posting Group" := SalesLine."VAT Bus. Posting Group";
+                BufferPOSEntrySalesLine."Gen. Prod. Posting Group" := SalesLine."Gen. Prod. Posting Group";
+                BufferPOSEntrySalesLine."VAT Prod. Posting Group" := SalesLine."VAT Prod. Posting Group";
+                BufferPOSEntrySalesLine."Tax Area Code" := SalesLine."Tax Area Code";
+                BufferPOSEntrySalesLine."Tax Liable" := SalesLine."Tax Liable";
+                BufferPOSEntrySalesLine."Tax Group Code" := SalesLine."Tax Group Code";
+                BufferPOSEntrySalesLine."Dimension Set ID" := SalesLine."Dimension Set ID";
+                BufferPOSEntrySalesLine."Unit of Measure Code" := SalesLine."Unit of Measure Code";
+                BufferPOSEntrySalesLine."Qty. per Unit of Measure" := SalesLine."Qty. per Unit of Measure";
+                BufferPOSEntrySalesLine."Unit Price" := SalesLine."Unit Price";
+                BufferPOSEntrySalesLine."Unit Cost (LCY)" := SalesLine."Unit Cost (LCY)";
+                BufferPOSEntrySalesLine."Unit Cost" := SalesLine."Unit Cost";
+                BufferPOSEntrySalesLine."VAT %" := SalesLine."VAT %";
+                BufferPOSEntrySalesLine."VAT Identifier" := SalesLine."VAT Identifier";
+                BufferPOSEntrySalesLine."VAT Calculation Type" := SalesLine."VAT Calculation Type";
+
+                PricesIncludeTax := SalesHeader."Prices Including VAT";
+                if PricesIncludeTax then begin
+                    BufferPOSEntrySalesLine."Line Discount Amount Incl. VAT" := SalesLine."Line Discount Amount";
+                    BufferPOSEntrySalesLine."Line Discount Amount Excl. VAT" := SalesLine."Line Discount Amount" / (1 + (SalesLine."VAT %" / 100));
+                end else begin
+                    BufferPOSEntrySalesLine."Line Discount Amount Excl. VAT" := SalesLine."Line Discount Amount";
+                    BufferPOSEntrySalesLine."Line Discount Amount Incl. VAT" := (1 + (SalesLine."VAT %" / 100)) * SalesLine."Line Discount Amount";
+                end;
+
+                BufferPOSEntrySalesLine."Line Amount" := SalesLine."Line Amount";
+                BufferPOSEntrySalesLine."Amount Excl. VAT (LCY)" := SalesLine.Amount * POSEntry."Currency Factor";
+                BufferPOSEntrySalesLine."Amount Incl. VAT (LCY)" := SalesLine."Amount Including VAT" * POSEntry."Currency Factor";
+                BufferPOSEntrySalesLine."Line Dsc. Amt. Excl. VAT (LCY)" := BufferPOSEntrySalesLine."Line Discount Amount Excl. VAT" * POSEntry."Currency Factor";
+                BufferPOSEntrySalesLine."Line Dsc. Amt. Incl. VAT (LCY)" := BufferPOSEntrySalesLine."Line Discount Amount Incl. VAT" * POSEntry."Currency Factor";
+                BufferPOSEntrySalesLine."Item Category Code" := SalesLine."Item Category Code";
+
+                ReservationEntry.SetRange("Item No.", SalesLine."No.");
+                ReservationEntry.SetRange("Source ID", SalesLine."Document No.");
+                ReservationEntry.SetRange("Source Type", Database::"Sales Line");
+                ReservationEntry.SetRange("Source Ref. No.", SalesLine."Line No.");
+                ReservationEntry.SetRange("Source Subtype", SalesLine."Document Type");
+                if ReservationEntry.FindFirst() then
+                    BufferPOSEntrySalesLine."Serial No." := ReservationEntry."Serial No.";
+
+                BufferPOSEntrySalesLine."Return Reason Code" := SalesLine."Return Reason Code";
+                BufferPOSEntrySalesLine.Quantity := -SalesLine.Quantity;
+                BufferPOSEntrySalesLine."Line Discount %" := SalesLine."Line Discount %";
+                BufferPOSEntrySalesLine."Line Discount Amount Excl. VAT" := -SalesLine."Line Discount Amount";
+                BufferPOSEntrySalesLine."Line Discount Amount Incl. VAT" := -SalesLine."Line Discount Amount";
+                BufferPOSEntrySalesLine."Amount Excl. VAT" := -SalesLine.Amount;
+                BufferPOSEntrySalesLine."Amount Incl. VAT" := -SalesLine."Amount Including VAT";
+                BufferPOSEntrySalesLine."VAT Base Amount" := -SalesLine."VAT Base Amount";
+                BufferPOSEntrySalesLine."Quantity (Base)" := -SalesLine."Quantity (Base)";
+                BufferPOSEntrySalesLine."VAT Difference" := -SalesLine."VAT Difference";
+                BufferPOSEntrySalesLine.Modify();
+            until SalesLine.Next() = 0;
     end;
 
     local procedure InsertPOSPaymentLine(POSSale: Record "NPR POS Sale"; POSSaleLine: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; var POSEntryPaymentLine: Record "NPR POS Entry Payment Line")
@@ -1202,6 +1565,11 @@
         exit(SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::Comment]);
     end;
 
+    internal procedure ReadyToBePosted(SalesHeader: Record "Sales Header"): Boolean
+    begin
+        exit(SalesHeader.Ship or SalesHeader.Invoice or SalesHeader.Receive);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreatePOSEntry(var SalePOS: Record "NPR POS Sale")
     begin
@@ -1273,12 +1641,12 @@
     begin
     end;
 
-    [IntegrationEvent(FALSE, FALSE)]
+    [IntegrationEvent(false, false)]
     local procedure OnAfterInsertRmaEntry(POSRMALine: Record "NPR POS RMA Line"; POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
-    [IntegrationEvent(FALSE, FALSE)]
+    [IntegrationEvent(false, false)]
     local procedure OnAfterInsertRmaEntryFromExternalPOSSale(POSRMALine: Record "NPR POS RMA Line"; POSEntry: Record "NPR POS Entry"; ExtSalePOS: Record "NPR External POS Sale"; ExtSaleLinePOS: Record "NPR External POS Sale Line")
     begin
     end;
@@ -1310,14 +1678,14 @@
             POSEntry.Reset();
             POSEntry.SetFilter("Document No.", DocNoFilter);
             POSEntry.SetFilter("Posting Date", PostingDateFilter);
-            RecordCount := InsertIntoDocEntry(DocumentEntry, DATABASE::"NPR POS Entry", 0, CopyStr(DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count());
+            RecordCount := InsertIntoDocEntry(DocumentEntry, Database::"NPR POS Entry", 0, CopyStr(DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count());
 
             if (RecordCount = 0) then begin
                 if not (POSEntry.SetCurrentKey(POSEntry."Fiscal No.")) then;
                 POSEntry.Reset();
                 POSEntry.SetFilter("Fiscal No.", DocNoFilter);
                 POSEntry.SetFilter("Posting Date", PostingDateFilter);
-                RecordCount := InsertIntoDocEntry(DocumentEntry, DATABASE::"NPR POS Entry", 1, CopyStr(DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count());
+                RecordCount := InsertIntoDocEntry(DocumentEntry, Database::"NPR POS Entry", 1, CopyStr(DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count());
             end;
 
             if (RecordCount = 0) then begin
@@ -1327,7 +1695,7 @@
                     POSEntry.SetCurrentKey("POS Period Register No.");
                     POSEntry.SetFilter("POS Period Register No.", '=%1', POSPeriodRegister."No.");
                     POSEntry.SetFilter("System Entry", '=%1', false);
-                    RecordCount := InsertIntoDocEntry(DocumentEntry, DATABASE::"NPR POS Entry", 2, CopyStr(DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count());
+                    RecordCount := InsertIntoDocEntry(DocumentEntry, Database::"NPR POS Entry", 2, CopyStr(DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count());
                 end;
             end;
         end;
@@ -1342,7 +1710,7 @@
         TempDocumentEntry: Record "Document Entry" temporary;
     begin
 
-        if (TableID = DATABASE::"NPR POS Entry") then begin
+        if (TableID = Database::"NPR POS Entry") then begin
 
             OnNavigateFindRecords(TempDocumentEntry, DocNoFilter, PostingDateFilter);
 
@@ -1377,9 +1745,9 @@
             end;
 
             if (TempDocumentEntry."No. of Records" = 1) then
-                PAGE.Run(PAGE::"NPR POS Entry List", POSEntry)
+                Page.Run(Page::"NPR POS Entry List", POSEntry)
             else
-                PAGE.Run(0, POSEntry);
+                Page.Run(0, POSEntry);
 
         end;
     end;
@@ -1407,14 +1775,14 @@
 
     local procedure InsertPOSTaxAmount(SystemId: Guid; POSEntry: Record "NPR POS Entry")
     var
-        POSEntryTaxCalc: codeunit "NPR POS Entry Tax Calc.";
+        POSEntryTaxCalc: Codeunit "NPR POS Entry Tax Calc.";
     begin
         POSEntryTaxCalc.PostPOSTaxAmountCalculation(POSEntry."Entry No.", SystemId);
     end;
 
     local procedure InsertPOSTaxAmountReverseSign(SystemId: Guid; POSEntry: Record "NPR POS Entry")
     var
-        POSEntryTaxCalc: codeunit "NPR POS Entry Tax Calc.";
+        POSEntryTaxCalc: Codeunit "NPR POS Entry Tax Calc.";
     begin
         POSEntryTaxCalc.PostPOSTaxAmountCalculationReverseSign(POSEntry."Entry No.", SystemId);
     end;
@@ -1423,7 +1791,6 @@
     begin
         POSEntryOut := GlobalPOSEntry;
     end;
-
     #region External POS Sale
     internal procedure CreatePOSEntryFromExternalPOSSale(var ExtPOSSale: Record "NPR External POS Sale")
     var
@@ -1639,7 +2006,7 @@
 
     local procedure InsertPOSTaxAmountExt(var POSEntryTaxLine: Record "NPR POS Entry Tax Line"; ExtPOSSaleLine: Record "NPR External POS Sale Line"; POSEntry: Record "NPR POS Entry")
     var
-        POSEntryTaxCalcExt: codeunit "NPR External POS Tax Calc";
+        POSEntryTaxCalcExt: Codeunit "NPR External POS Tax Calc";
     begin
         POSEntryTaxCalcExt.PostExternalPOSSalesLineTaxAmount(POSEntryTaxLine, ExtPOSSaleLine, POSEntry);
     end;
@@ -1647,8 +2014,6 @@
     local procedure InsertPOSSaleLineExt(ExtSalePOS: Record "NPR External POS Sale"; ExtSaleLinePOS: Record "NPR External POS Sale Line"; POSEntry: Record "NPR POS Entry"; ReverseSign: Boolean; var POSSalesLine: Record "NPR POS Entry Sales Line")
     var
         PricesIncludeTax: Boolean;
-    //POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
-    //POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
     begin
         POSSalesLine.Init();
         POSSalesLine."POS Entry No." := POSEntry."Entry No.";

@@ -49,6 +49,7 @@
         CustomerCreditCheck: Boolean;
         WarningCustomerCreditCheck: Boolean;
         PrintProformaInv: Boolean;
+        AsyncPosting: Boolean;
         CUSTOMER_CREDIT_CHECK_FAILED: Label 'Customer credit check failed';
 
     procedure SetAsk(AskIn: Boolean)
@@ -192,6 +193,11 @@
         PrintProformaInv := PrintIn;
     end;
 
+    procedure SetAsyncPosting(AsyncPostingIn: Boolean)
+    begin
+        AsyncPosting := AsyncPostingIn;
+    end;
+
     procedure ProcessPOSSale(POSSale: Codeunit "NPR POS Sale")
     var
         SalesHeader: Record "Sales Header";
@@ -239,19 +245,25 @@
         Post := SalesHeader.Invoice or SalesHeader.Receive or SalesHeader.Ship;
 
         if Post then begin
-            if Ask then
-                Posted := SalesPostYesNo.Run(SalesHeader)
-            else
-                Posted := SalesPost.Run(SalesHeader);
+            if (not AsyncPosting) then begin
+                if Ask then
+                    Posted := SalesPostYesNo.Run(SalesHeader)
+                else
+                    Posted := SalesPost.Run(SalesHeader);
+            end else
+                if Ask then begin
+                    ConfirmPost(SalesHeader);
+                    HandleSelection(SalesHeader);
+                end;
         end;
-
         if Post and (not Posted) then
-            Message(POSTING_ERROR, SalesHeader."Document Type", SalesHeader."No.", GetLastErrorText);
+            if (not AsyncPosting) then
+                Message(POSTING_ERROR, SalesHeader."Document Type", SalesHeader."No.", GetLastErrorText);
 
         if not (Post and Posted) and SendICOrderConf then
             SendICOrderConfirmation(SalesHeader);
 
-        POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, Posted);
+        POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, Posted, AsyncPosting, _Print, SendDocument, SendPostedPdf2Nav);
         SaleLinePOS.DeleteAll();
         SalePOS.Delete();
         POSSale.SetEnded(true);
@@ -296,6 +308,88 @@
 
         Commit();
     end;
+
+    local procedure ConfirmPost(var SalesHeader: Record "Sales Header"): Boolean
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        DefaultOption: Integer;
+        Selection: Integer;
+        ShipInvoiceQst: Label '&Ship,&Invoice,Ship &and Invoice';
+        PostConfirmQst: Label 'Do you want to post the %1?', Comment = '%1 = Document Type';
+        ReceiveInvoiceQst: Label '&Receive,&Invoice,Receive &and Invoice';
+    begin
+        DefaultOption := 3;
+
+        if DefaultOption > 3 then
+            DefaultOption := 3;
+        if DefaultOption <= 0 then
+            DefaultOption := 1;
+
+        case SalesHeader."Document Type" of
+            SalesHeader."Document Type"::Order:
+                begin
+                    Selection := StrMenu(ShipInvoiceQst, DefaultOption);
+                    SalesHeader.Ship := Selection in [1, 3];
+                    SalesHeader.Invoice := Selection in [2, 3];
+                    if Selection = 0 then
+                        exit(false);
+                end;
+            SalesHeader."Document Type"::"Return Order":
+                begin
+                    Selection := StrMenu(ReceiveInvoiceQst, DefaultOption);
+                    if Selection = 0 then
+                        exit(false);
+                    SalesHeader.Receive := Selection in [1, 3];
+                    SalesHeader.Invoice := Selection in [2, 3];
+                end
+            else
+                if not ConfirmManagement.GetResponseOrDefault(
+                     StrSubstNo(PostConfirmQst, LowerCase(Format(SalesHeader."Document Type"))), true)
+                then
+                    exit(false);
+        end;
+        SalesHeader."Print Posted Documents" := false;
+
+        exit(true);
+    end;
+
+    local procedure HandleSelection(var SalesHeader: Record "Sales Header")
+    var
+        NothingToPostErr: Label 'There is nothing to post.';
+    begin
+        SalesHeader.Invoice := CalcInvoice(SalesHeader);
+        SalesHeader.Modify();
+        if not (SalesHeader.Ship or SalesHeader.Invoice or SalesHeader.Receive) then
+            Error(NothingToPostErr);
+    end;
+
+    local procedure CalcInvoice(SalesHeader: Record "Sales Header") NewInvoice: Boolean
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetFilter(Quantity, '<>0');
+        if SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::"Return Order"] then
+            SalesLine.SetFilter("Qty. to Invoice", '<>0');
+        NewInvoice := not SalesLine.IsEmpty;
+        if NewInvoice then
+            case SalesHeader."Document Type" of
+                SalesHeader."Document Type"::Order:
+                    if not SalesHeader.Ship then begin
+                        SalesLine.SetFilter("Qty. Shipped Not Invoiced", '<>0');
+                        NewInvoice := not SalesLine.IsEmpty;
+                    end;
+                SalesHeader."Document Type"::"Return Order":
+                    if not SalesHeader.Receive then begin
+                        SalesLine.SetFilter("Return Qty. Rcd. Not Invd.", '<>0');
+                        SalesHeader.Invoice := not SalesLine.IsEmpty;
+                    end;
+            end;
+
+        exit(NewInvoice);
+    end;
+
 
     procedure CreateSalesHeader(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
     var
@@ -471,9 +565,9 @@
                 if Item.Get(SaleLinePOS."No.") then begin
                     if Item."Item Tracking Code" <> '' then begin
                         ItemTrackingCode.Get(Item."Item Tracking Code");
-#if BC17                        
-                        ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, 1, false, ItemTrackingSetup);
-#else
+#IF BC17
+                          ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, 1, false, ItemTrackingSetup);
+#ELSE
                         ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, "Item Ledger Entry Type"::Sale, false, ItemTrackingSetup);
 #endif
                         if ItemTrackingSetup."Serial No. Required" then begin
@@ -753,6 +847,9 @@
         Pdf2Nav: Boolean;
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
     begin
+        if SaleLinePOS."Sales Document Post" = SaleLinePOS."Sales Document Post"::Posted then
+            exit;
+
         SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
 
         if SaleLinePOS."Sales Doc. Prepay Is Percent" then
@@ -763,11 +860,10 @@
         Pdf2Nav := SaleLinePOS."Sales Document Pdf2Nav";
         Send := SaleLinePOS."Sales Document Send";
         POSPrint := SaleLinePOS."Sales Document Print";
-        SaleLinePOS."Sales Document Prepayment" := false;
+        SaleLinePOS."Sales Document Post" := SaleLinePOS."Sales Document Post"::Posted;
         SaleLinePOS."Sales Document Print" := false;
         SaleLinePOS."Sales Document Pdf2Nav" := false;
         SaleLinePOS."Sales Document Send" := false;
-        SaleLinePOS.Modify(true);
 
         SalesPostPrepayments.Invoice(SalesHeader);
         SaleLinePOS."Buffer Document Type" := SaleLinePOS."Buffer Document Type"::Invoice;
@@ -785,6 +881,7 @@
         if Pdf2Nav then
             POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 1);
         SendCollectDocument(SalesHeader);
+
     end;
 
     local procedure PostPrepaymentRefundBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR POS Sale Line")
@@ -796,17 +893,18 @@
         Pdf2Nav: Boolean;
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
     begin
+        IF SaleLinePOS."Sales Document Post" = SaleLinePOS."Sales Document Post"::Posted then
+            Exit;
         SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
         DeleteAfter := SaleLinePOS."Sales Document Delete";
         POSPrint := SaleLinePOS."Sales Document Print";
         Send := SaleLinePOS."Sales Document Send";
         Pdf2Nav := SaleLinePOS."Sales Document Pdf2Nav";
-        SaleLinePOS."Sales Document Prepay. Refund" := false;
+        SaleLinePOS."Sales Document Post" := SaleLinePOS."Sales Document Post"::Posted;
         SaleLinePOS."Sales Document Delete" := false;
         SaleLinePOS."Sales Document Print" := false;
         SaleLinePOS."Sales Document Send" := false;
         SaleLinePOS."Sales Document Pdf2Nav" := false;
-        SaleLinePOS.Modify(true);
 
         SalesPostPrepayments.CreditMemo(SalesHeader);
         SaleLinePOS."Posted Sales Document Type" := SaleLinePOS."Posted Sales Document Type"::CREDIT_MEMO;
@@ -843,6 +941,8 @@
     begin
         if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::Order, SalesHeader."Document Type"::"Credit Memo", SalesHeader."Document Type"::"Return Order"]) then
             SalesHeader.FieldError("Document Type");
+        IF SaleLinePOS."Sales Document Post" = SaleLinePOS."Sales Document Post"::Posted then
+            Exit;
         SalesHeader.Ship := SaleLinePOS."Sales Document Ship";
         SalesHeader.Invoice := SaleLinePOS."Sales Document Invoice";
         SalesHeader.Receive := SaleLinePOS."Sales Document Receive";
@@ -850,10 +950,7 @@
         POSPrint := SaleLinePOS."Sales Document Print";
         Send := SaleLinePOS."Sales Document Send";
         Pdf2Nav := SaleLinePOS."Sales Document Pdf2Nav";
-
-        SaleLinePOS."Sales Document Invoice" := false;
-        SaleLinePOS."Sales Document Ship" := false;
-        SaleLinePOS."Sales Document Receive" := false;
+        SaleLinePOS."Sales Document Post" := SaleLinePOS."Sales Document Post"::Posted;
         SaleLinePOS."Sales Document Print" := false;
         SaleLinePOS."Sales Document Send" := false;
         SaleLinePOS."Sales Document Pdf2Nav" := false;
@@ -924,7 +1021,7 @@
         end;
     end;
 
-    procedure CreatePrepaymentLine(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"; PrepaymentValue: Decimal; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean; SyncPosting: Boolean; ValueIsAmount: Boolean)
+    procedure CreatePrepaymentLine(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"; PrepaymentValue: Decimal; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean; SalePosting: Enum "NPR POS Sales Document Post"; ValueIsAmount: Boolean)
     var
         PrepaymentAmount: Decimal;
         POSSale: Codeunit "NPR POS Sale";
@@ -967,14 +1064,14 @@
         SaleLinePOS."Sales Document Print" := Print;
         SaleLinePOS."Sales Document Send" := Send;
         SaleLinePOS."Sales Document Pdf2Nav" := Pdf2Nav;
-        SaleLinePOS."Sales Document Sync. Posting" := SyncPosting;
+        SaleLinePOS."Sales Document Post" := SalePosting;
         SaleLinePOS.Validate("Unit Price", PrepaymentAmount);
         SaleLinePOS.Description := StrSubstNo(PREPAYMENT, SalesHeader."Document Type", SalesHeader."No.");
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
     end;
 
-    procedure CreatePrepaymentRefundLine(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean; SyncPosting: Boolean; DeleteDocumentAfter: Boolean)
+    procedure CreatePrepaymentRefundLine(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean; SyncPosting: Boolean; DeleteDocumentAfter: Boolean; SalePosting: Enum "NPR POS Sales Document Post")
     var
         PrepaymentRefundAmount: Decimal;
         POSSale: Codeunit "NPR POS Sale";
@@ -999,7 +1096,7 @@
         SaleLinePOS."Sales Document Print" := Print;
         SaleLinePOS."Sales Document Send" := Send;
         SaleLinePOS."Sales Document Pdf2Nav" := Pdf2Nav;
-        SaleLinePOS."Sales Document Sync. Posting" := SyncPosting;
+        SaleLinePOS."Sales Document Post" := SalePosting;
         SaleLinePOS."Sales Document Delete" := DeleteDocumentAfter;
         SaleLinePOS.Validate("Unit Price", -PrepaymentRefundAmount);
         SaleLinePOS.Description := StrSubstNo(PREPAYMENT_REFUND, SalesHeader."Document Type", SalesHeader."No.");
@@ -1023,29 +1120,48 @@
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        SaleLinePOS.SetRange("Sales Document Sync. Posting", true);
+        SaleLinePOS.SetFilter("Sales Document Post", '<>%1', Enum::"NPR POS Sales Document Post"::No);
         SaleLinePOS.SetFilter("Sales Document No.", '<>%1', '');
         if not SaleLinePOS.FindSet() then
             exit;
 
         repeat
-            if SalesHeader.Get(SaleLinePOS."Sales Document Type", SaleLinePOS."Sales Document No.") then begin
-                case true of
-                    SaleLinePOS."Sales Document Prepayment":
-                        PostPrepaymentBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
+            IF SaleLinePOS."Sales Document Post" = SaleLinePOS."Sales Document Post"::Asynchronous then
+                HandleAsyncPosting(SalesHeader, SaleLinePOS)
+            else
+                IF SaleLinePOS."Sales Document Post" = SaleLinePOS."Sales Document Post"::Synchronous then
+                    HandleSyncPosting(SalesHeader, SaleLinePOS);
 
-                    SaleLinePOS."Sales Document Prepay. Refund":
-                        PostPrepaymentRefundBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
-
-                    SaleLinePOS."Sales Document Ship",
-                    SaleLinePOS."Sales Document Receive",
-                    SaleLinePOS."Sales Document Invoice":
-                        PostDocumentBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
-                end;
-            end;
         until SaleLinePOS.Next() = 0;
 
         POSSaleLine.RefreshCurrent();
+    end;
+
+    local procedure HandleAsyncPosting(SalesHeader: Record "Sales Header"; SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        POSAsyncPosting: Codeunit "NPR POS Async. Posting Mgt.";
+    begin
+        if SalesHeader.Get(SaleLinePOS."Sales Document Type", SaleLinePOS."Sales Document No.") then
+            POSAsyncPosting.HandlePosting(SalesHeader, SaleLinePOS);
+
+    end;
+
+    local procedure HandleSyncPosting(SalesHeader: Record "Sales Header"; SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        if SalesHeader.Get(SaleLinePOS."Sales Document Type", SaleLinePOS."Sales Document No.") then begin
+            case true of
+                SaleLinePOS."Sales Document Prepayment":
+                    PostPrepaymentBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
+
+                SaleLinePOS."Sales Document Prepay. Refund":
+                    PostPrepaymentRefundBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
+
+                SaleLinePOS."Sales Document Ship",
+                SaleLinePOS."Sales Document Receive",
+                SaleLinePOS."Sales Document Invoice":
+                    PostDocumentBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
+            end;
+        end;
     end;
 
     local procedure OpenSalesDocCardAndSyncChangesBackToPOSSale(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR POS Sale")

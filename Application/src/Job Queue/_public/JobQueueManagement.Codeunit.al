@@ -451,6 +451,26 @@
             StartJobQueueEntry(JobQueueEntry);
     end;
 
+    internal procedure AddPosSaleDocumentPostingJobQueue()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueDescrLbl: Label 'POS Sale Document posting', MaxLength = 250;
+    begin
+        SetJobTimeout(4, 0);  //4 hours
+
+        if InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::codeunit,
+            Codeunit::"NPR Post Sales Documents JQ",
+            '',
+            JobQueueDescrLbl,
+            NowWithDelayInSeconds(360),
+            1,
+            CreateAndAssignJobQueueCategory(),
+            JobQueueEntry)
+        then
+            StartJobQueueEntry(JobQueueEntry);
+    end;
+
     local procedure RefreshRetentionPolicyJQ()
     var
         JobQueueEntry: Record "Job Queue Entry";

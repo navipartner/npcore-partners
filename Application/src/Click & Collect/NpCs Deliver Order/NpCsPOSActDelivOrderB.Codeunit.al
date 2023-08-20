@@ -123,6 +123,8 @@ codeunit 6060069 "NPR NpCs POSAct. Deliv.Order-B"
         SalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         NpCsPOSActionEvents: Codeunit "NPR NpCs POS Action Events";
         RemainingAmount: Decimal;
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
+
     begin
         SalesHeader.Get(SalesHeader."Document Type"::Order, NpCsDocument."Document No.");
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -165,7 +167,13 @@ codeunit 6060069 "NPR NpCs POSAct. Deliv.Order-B"
         SalesHeader.Ship := NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS;
         SalesHeader.Receive := false;
         SalesHeader."Print Posted Documents" := false;
-        SalesDocImpMgt.SalesDocumentPaymentAmountToPOSSaleLine(RemainingAmount, SaleLinePOS, SalesHeader, false, false, NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS);
+
+        IF NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS then
+            POSSalesDocumentPost := POSSalesDocumentPost::Synchronous
+        else
+            POSSalesDocumentPost := POSSalesDocumentPost::No;
+
+        SalesDocImpMgt.SalesDocumentPaymentAmountToPOSSaleLine(RemainingAmount, SaleLinePOS, SalesHeader, false, false, POSSalesDocumentPost);
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
         InsertPOSReference(NpCsDocument, SaleLinePOS);

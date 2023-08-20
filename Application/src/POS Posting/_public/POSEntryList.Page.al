@@ -170,6 +170,12 @@
                     ToolTip = 'Specifies the post entry status.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Post Sales Document Status"; Rec."Post Sales Document Status")
+                {
+                    ApplicationArea = NPRRetail;
+                    Visible = AsyncEnabled;
+                    ToolTip = 'Specifies the post Sale Documents status.';
+                }
                 field("Amount Excl. Tax"; Rec."Amount Excl. Tax")
                 {
                     ToolTip = 'Specifies the amount excluding tax.';
@@ -677,6 +683,20 @@
                     ToolTip = 'Displays the failed G/L posting list.';
                     ApplicationArea = NPRRetail;
                 }
+                action("Failed Sales Doc. Posting List")
+                {
+                    Caption = 'Failed Sales Documents Posting List';
+                    Image = ErrorLog;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+                    RunObject = Page "NPR POS Entries";
+                    RunPageView = SORTING("Entry No.")
+                                  WHERE("Post Sales Document Status" = FILTER("Error while Posting"));
+                    ToolTip = 'Displays the failed Sales Documents posting list.';
+                    ApplicationArea = NPRRetail;
+                }
                 action("Unposted Item List")
                 {
                     Caption = 'Unposted Item List';
@@ -703,6 +723,20 @@
                     RunPageView = SORTING("Entry No.")
                                   WHERE("Post Entry Status" = FILTER(Unposted));
                     ToolTip = 'Displays the unposted G/L list.';
+                    ApplicationArea = NPRRetail;
+                }
+                action("Unposted Sales Doc. Posting List")
+                {
+                    Caption = 'Unposted Sales Documents Posting List';
+                    Image = Pause;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+                    RunObject = Page "NPR POS Entries";
+                    RunPageView = SORTING("Entry No.")
+                                  WHERE("Post Sales Document Status" = FILTER(Unposted));
+                    ToolTip = 'Displays the unposted Sales Documents posting list.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -797,6 +831,8 @@
                         POSPostEntries.SetPostItemEntries(true);
                     if Rec."Post Entry Status" < Rec."Post Entry Status"::Posted then
                         POSPostEntries.SetPostPOSEntries(true);
+                    if (Rec."Post Sales Document Status" = Rec."Post Sales Document Status"::unPosted) or (Rec."Post Sales Document Status" = Rec."Post Sales Document Status"::"Error while Posting") then
+                        POSPostEntries.SetPostSaleDocuments(true);
                     POSPostEntries.SetStopOnError(true);
                     POSPostEntries.SetPostCompressed(false);
                     POSPostEntries.Run(POSEntryToPost);
@@ -1011,19 +1047,23 @@
     end;
 
     trigger OnOpenPage()
+    var
+        POSAsyncPostingMgt: Codeunit "NPR POS Async. Posting Mgt.";
     begin
         Rec.SetRange("System Entry", false);
         if Rec.GetFilter("Entry Type") = '' then
             Rec.SetFilter("Entry Type", '<>%1', Rec."Entry Type"::"Cancelled Sale");
         if Rec.FindFirst() then;
         CheckIsSimpleView();
+        AsyncEnabled := POSAsyncPostingMgt.SetVisibility();
+
     end;
 
     var
         TextSalesDocNotFound: Label 'Sales Document %1 %2 not found.';
         LastOpenSalesDocumentNo: Code[20];
         LastPostedSalesDocumentNo: Code[20];
-        _IsSimpleView: Boolean;
+        _IsSimpleView, AsyncEnabled : Boolean;
 
     local procedure TryGetLastOpenSalesDoc(var POSEntrySalesDocLinkOut: Record "NPR POS Entry Sales Doc. Link"): Boolean
     begin
