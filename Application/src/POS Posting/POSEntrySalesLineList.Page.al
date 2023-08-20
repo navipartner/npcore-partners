@@ -90,7 +90,7 @@
                 }
                 field("Serial No."; Rec."Serial No.")
                 {
-                    Visible = false;
+                    Visible = true;
                     ToolTip = 'Specifies the value of the Serial No. field.';
                     ApplicationArea = NPRRetail;
                 }

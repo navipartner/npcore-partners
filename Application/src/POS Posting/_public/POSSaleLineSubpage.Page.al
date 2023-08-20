@@ -21,6 +21,8 @@
                 {
                     ToolTip = 'Specifies the value of the Type field';
                     ApplicationArea = NPRRetail;
+                    Style = StrongAccent;
+                    StyleExpr = Emphasize;
                 }
                 field("No."; Rec."No.")
                 {
@@ -202,12 +204,15 @@
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
     begin
         LastPostedSalesDocNo := '';
+        Emphasize := False;
         if TryGetLastPostedSalesDoc(POSEntrySalesDocLink) then
             LastPostedSalesDocNo := POSEntrySalesDocLink."Sales Document No";
+        Emphasize := (Rec."Exclude from Posting") and (Rec.Type <> Rec.Type::Comment)
     end;
 
     var
         LastPostedSalesDocNo: Code[20];
+        Emphasize: Boolean;
 
     local procedure TryGetLastPostedSalesDoc(var POSEntrySalesDocLinkOut: Record "NPR POS Entry Sales Doc. Link"): Boolean
     begin

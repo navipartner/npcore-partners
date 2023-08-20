@@ -1,7 +1,7 @@
 codeunit 6060020 "NPR POS Action: Layaway Pay-B"
 {
     Access = Internal;
-    procedure PayLayaway(var POSSession: Codeunit "NPR POS Session"; OrderPaymentTermsFilter: Text; SelectionMethod: Integer; SelectCustomer: Boolean; ConfirmInvDiscAmt: Boolean)
+    procedure PayLayaway(var POSSession: Codeunit "NPR POS Session"; OrderPaymentTermsFilter: Text; SelectionMethod: Integer; SelectCustomer: Boolean; ConfirmInvDiscAmt: Boolean; POSSalesDocumentPost: Enum "NPR POS Sales Document Post")
     var
         SalesHeader: Record "Sales Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
@@ -23,7 +23,7 @@ codeunit 6060020 "NPR POS Action: Layaway Pay-B"
             exit;
 
         POSApplyCustomerEntries.BalanceDocument(POSSession, CustLedgerEntry."Document Type"::Invoice, SalesInvoiceHeader."No.", true, false);
-        InsertCompletionLine(POSSession, SalesHeader, SalesInvoiceHeader);
+        InsertCompletionLine(POSSession, SalesHeader, SalesInvoiceHeader, POSSalesDocumentPost);
         CreateLayawayComments(POSSession, SalesHeader, SelectionMethod, SalesInvoiceHeader);
     end;
 
@@ -121,7 +121,7 @@ codeunit 6060020 "NPR POS Action: Layaway Pay-B"
             InsertCommentLine(POSSaleLine, LAYAWAY_COMPLETED);
     end;
 
-    local procedure InsertCompletionLine(var POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; SalesInvoiceHeader: Record "Sales Invoice Header")
+    local procedure InsertCompletionLine(var POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; SalesInvoiceHeader: Record "Sales Invoice Header"; SalePostingIn: Enum "NPR POS Sales Document Post")
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NextInvoice: Record "Sales Invoice Header";
@@ -131,7 +131,8 @@ codeunit 6060020 "NPR POS Action: Layaway Pay-B"
         if GetNextDuePrepayment(SalesHeader, NextInvoice, SalesInvoiceHeader."Due Date", false) then
             exit;
 
-        RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, true, true, true, false, false, false, true);
+        RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, true, true, true, false, false, false, SalePostingIn);
+
     end;
 
     local procedure GetTotalRemainingLayawayAmount(SalesHeader: Record "Sales Header"; DueLaterThan: Date): Decimal

@@ -131,25 +131,25 @@ codeunit 6059913 "NPR POS Action: Doc. ExportB"
         RetailSalesDocMgt.SetPaymentMethod(SpecificPaymentMethodCode);
     end;
 
-    internal procedure HandlePrepayment(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; PrepaymentValue: Decimal; PrepaymentIsAmount: Boolean; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean)
+    internal procedure HandlePrepayment(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; PrepaymentValue: Decimal; PrepaymentIsAmount: Boolean; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean; SalePosting: Enum "NPR POS Sales Document Post")
     var
         HandlePayment: Codeunit "NPR POS Doc. Export Try Pay";
         ERR_PREPAY: Label 'Sale was exported correctly but prepayment in new sale failed: %1';
     begin
         //An error after sale end, before front end sync, is not allowed so we catch all
         Commit();
-        if not HandlePayment.HandlePrepaymentTransactional(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, Print, Send, Pdf2Nav, HandlePayment) then
+        if not HandlePayment.HandlePrepaymentTransactional(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, Print, Send, Pdf2Nav, HandlePayment, SalePosting) then
             Message(ERR_PREPAY, GetLastErrorText);
     end;
 
-    internal procedure HandlePayAndPost(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; FullPosting: Boolean)
+    internal procedure HandlePayAndPost(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; FullPosting: Boolean; SalePosting: Enum "NPR POS Sales Document Post")
     var
         HandlePayment: Codeunit "NPR POS Doc. Export Try Pay";
         ERR_PAY: Label 'Sale was exported correctly but payment in new sale failed: %1';
     begin
         //An error after sale end, before front end sync, is not allowed so we catch all
         Commit();
-        if not HandlePayment.HandlePayAndPostTransactional(POSSession, SalesHeader, Print, Pdf2Nav, Send, FullPosting, HandlePayment) then
+        if not HandlePayment.HandlePayAndPostTransactional(POSSession, SalesHeader, Print, Pdf2Nav, Send, FullPosting, HandlePayment, SalePosting) then
             Message(ERR_PAY, GetLastErrorText);
     end;
 }

@@ -544,6 +544,8 @@
                         POSPostEntries.SetPostItemEntries(true);
                     if Rec."Post Entry Status" < Rec."Post Entry Status"::Posted then
                         POSPostEntries.SetPostPOSEntries(true);
+                    if (Rec."Post Sales Document Status" = Rec."Post Sales Document Status"::Unposted) or (Rec."Post Sales Document Status" = Rec."Post Sales Document Status"::"Error while Posting") then
+                        POSPostEntries.SetPostSaleDocuments(true);
                     POSPostEntries.SetStopOnError(true);
                     POSPostEntries.SetPostCompressed(false);
                     POSPostEntries.Run(POSEntryToPost);

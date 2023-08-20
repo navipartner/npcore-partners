@@ -26,6 +26,7 @@
     begin
         InitExchangeLabelSetup();
         JobQueueManagement.InitJobQueueRefreshSetup();
+        InitPOSPostingProfile();
     end;
 
     local procedure InitExchangeLabelSetup()
@@ -36,5 +37,22 @@
             ExchangeLabelSetup.Init();
             ExchangeLabelSetup.Insert();
         end;
+    end;
+
+    local procedure InitPOSPostingProfile()
+    var
+        POSPostingProfile: Record "NPR POS Posting Profile";
+    begin
+        if not POSPostingProfile.FindSet() then
+            CreatePosPostingProfile(POSPostingProfile);
+    end;
+
+    local procedure CreatePosPostingProfile(var NPRPOSPostingProfile: Record "NPR POS Posting Profile")
+    begin
+        NPRPOSPostingProfile.Init();
+        NPRPOSPostingProfile.Code := 'DEFAULT';
+        NPRPOSPostingProfile.Description := 'Default POS Posting Profile';
+        NPRPOSPostingProfile."Post POS Sale Doc. With JQ" := true;
+        NPRPOSPostingProfile.Insert();
     end;
 }

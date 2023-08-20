@@ -69,22 +69,27 @@
         SalesHeader.SetFilter("No.", FilterSalesNo);
     end;
 
-    internal procedure CreatePrepaymentLine(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; PrepaymentValue: Decimal; ValueIsAmount: Boolean; Send: Boolean; Pdf2Nav: Boolean)
+    internal procedure CreatePrepaymentLine(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; PrepaymentValue: Decimal; ValueIsAmount: Boolean; Send: Boolean; Pdf2Nav: Boolean; SalePostingIn: Enum "NPR POS Sales Document Post")
     var
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        POSAsyncPosting: Codeunit "NPR POS Async. Posting Mgt.";
     begin
-        RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentValue, Print, Send, Pdf2Nav, true, ValueIsAmount);
+        if SalePostingIn = SalePostingIn::Asynchronous then
+            POSAsyncPosting.CheckPostingStatusFromPOS(SalesHeader);
+        RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentValue, Print, Send, Pdf2Nav, SalePostingIn, ValueIsAmount);
     end;
 
-    internal procedure CreatePrepaymentRefundLine(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; DeleteDocumentAfterRefund: Boolean; Send: Boolean; Pdf2Nav: Boolean)
+    internal procedure CreatePrepaymentRefundLine(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; DeleteDocumentAfterRefund: Boolean; Send: Boolean; Pdf2Nav: Boolean; SalePostingIn: Enum "NPR POS Sales Document Post")
     var
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
         NO_PREPAYMENT: Label '%1 %2 has no refundable prepayments!';
+        POSAsyncPosting: Codeunit "NPR POS Async. Posting Mgt.";
     begin
-        if POSPrepaymentMgt.GetPrepaymentAmountToDeductInclVAT(SalesHeader) <= 0 then
+        if SalePostingIn = SalePostingIn::Asynchronous then
+            POSAsyncPosting.CheckPostingStatusFromPOS(SalesHeader);
+        if (POSPrepaymentMgt.GetPrepaymentAmountToDeductInclVAT(SalesHeader) <= 0) THEN
             Error(NO_PREPAYMENT, SalesHeader."Document Type", SalesHeader."No.");
-
-        RetailSalesDocMgt.CreatePrepaymentRefundLine(POSSession, SalesHeader, Print, Send, Pdf2Nav, true, DeleteDocumentAfterRefund);
+        RetailSalesDocMgt.CreatePrepaymentRefundLine(POSSession, SalesHeader, Print, Send, Pdf2Nav, true, DeleteDocumentAfterRefund, SalePostingIn);
     end;
 }

@@ -120,6 +120,11 @@
             Caption = 'Parameter Stop On Error';
             DataClassification = CustomerContent;
         }
+        field(209; "Parameter Post Sales Documents"; Boolean)
+        {
+            Caption = 'Parameter Post Sales Documents';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

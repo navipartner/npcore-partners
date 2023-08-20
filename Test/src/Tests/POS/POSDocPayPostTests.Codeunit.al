@@ -59,6 +59,7 @@ codeunit 85078 "NPR POS Doc.Pay&Post Tests"
         LibrarySales: Codeunit "Library - Sales";
         SaleLinePOS: Codeunit "NPR POS Sale Line";
         POSSaleLine: Record "NPR POS Sale Line";
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
     begin
         // [Scenario] Select order from list and import to POS
         // [Given]
@@ -67,9 +68,10 @@ codeunit 85078 "NPR POS Doc.Pay&Post Tests"
         LibrarySales.CreateCustomer(Customer);
         LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
         POSSale.GetCurrentSale(SalePOS);
+        POSSalesDocumentPost := POSSalesDocumentPost::No;
         // [When]
         POSActionDocPayPostB.SelectDocument(SalePOS, NewSalesHeader);
-        POSActionDocPayPostB.CreateDocumentPaymentLine(POSSession, NewSalesHeader, false, false, false);
+        POSActionDocPayPostB.CreateDocumentPaymentLine(POSSession, NewSalesHeader, false, false, false, POSSalesDocumentPost);
         // [Then]
         POSSession.GetSaleLine(SaleLinePOS);
         SaleLinePOS.GetCurrentSaleLine(POSSaleLine);
@@ -152,6 +154,7 @@ codeunit 85078 "NPR POS Doc.Pay&Post Tests"
         SaleEnded: Boolean;
         POSEntry: Record "NPR POS Entry";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
     begin
         // [Scenario] Create document and post it
         // [Given]
@@ -159,9 +162,10 @@ codeunit 85078 "NPR POS Doc.Pay&Post Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         LibrarySales.CreateSalesOrder(SalesHeader); //Sales Order With with one line
         POSSale.GetCurrentSale(SalePOS);
+        POSSalesDocumentPost := POSSalesDocumentPost::Synchronous;
         // [When]
         POSActionDocPayPostB.SetLinesToPost(SalesHeader, AutoQtyOpt::All, AutoQtyOpt::All, AutoQtyOpt::Disabled);
-        POSActionDocPayPostB.CreateDocumentPaymentLine(POSSession, SalesHeader, false, false, false);
+        POSActionDocPayPostB.CreateDocumentPaymentLine(POSSession, SalesHeader, false, false, false, POSSalesDocumentPost);
         // [Then]
         SalesLine.Get(SalesHeader."Document Type", SalesHeader."No.", 10000);
         Assert.AreEqual(SalesLine.Quantity, SalesLine."Qty. to Invoice", 'Qty. to Invoice Set');
@@ -207,6 +211,7 @@ codeunit 85078 "NPR POS Doc.Pay&Post Tests"
         SaleEnded: Boolean;
         POSEntry: Record "NPR POS Entry";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
     begin
         // [Scenario] Create document and finish sale
         // [Given]
@@ -214,9 +219,10 @@ codeunit 85078 "NPR POS Doc.Pay&Post Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         LibrarySales.CreateSalesOrder(SalesHeader); //Sales Order With with one line
         POSSale.GetCurrentSale(SalePOS);
+        POSSalesDocumentPost := POSSalesDocumentPost::Asynchronous;
         // [When]
         POSActionDocPayPostB.SetLinesToPost(SalesHeader, AutoQtyOpt::None, AutoQtyOpt::None, AutoQtyOpt::None);
-        POSActionDocPayPostB.CreateDocumentPaymentLine(POSSession, SalesHeader, false, false, false);
+        POSActionDocPayPostB.CreateDocumentPaymentLine(POSSession, SalesHeader, false, false, false, POSSalesDocumentPost);
         // [Then]
         SalesLine.Get(SalesHeader."Document Type", SalesHeader."No.", 10000);
         Assert.AreEqual(SalesLine."Qty. to Invoice", 0, 'Qty. to Invoice 0');

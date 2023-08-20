@@ -122,6 +122,7 @@ codeunit 85101 "NPR POS Action Layaway Tests"
         LayawayCancelB: Codeunit "NPR POS Action: Layaway Pay-B";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         AmountToPay, PaidAmount : Decimal;
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
     begin
         //[Given] Init Data
         InitDataForLayway();
@@ -134,6 +135,7 @@ codeunit 85101 "NPR POS Action Layaway Tests"
         PaidAmount := SaleLinePOS."Amount Including VAT";
         SalesHeader.CalcFields("Amount Including VAT");
         AmountToPay := SalesHeader."Amount Including VAT" - PaidAmount;
+        POSSalesDocumentPost := POSSalesDocumentPost::Synchronous;
 
         LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, SaleLinePOS."Amount Including VAT", '', false);
 
@@ -144,7 +146,7 @@ codeunit 85101 "NPR POS Action Layaway Tests"
         POSSession.GetSaleLine(POSSaleLine);
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Validate("Customer No.", Customer."No.");
-        LayawayCancelB.PayLayaway(POSSession, '', 0, false, false);
+        LayawayCancelB.PayLayaway(POSSession, '', 0, false, false, POSSalesDocumentPost);
 
         //[Then]
         CustLedgEntry.SetRange("Document Type", CustLedgEntry."Document Type"::Invoice);

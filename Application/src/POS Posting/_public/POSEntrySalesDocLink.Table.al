@@ -55,8 +55,63 @@
 
             ValidateTableRelation = false;
         }
+        field(6; "Post Sales Document Status"; Option)
+        {
+            Caption = 'Post Sales Document Status';
+            Editable = false;
+            DataClassification = CustomerContent;
+            OptionCaption = 'Not To Be Posted,Unposted,Error while Posting,Posted';
+            OptionMembers = "Not To Be Posted",Unposted,"Error while Posting",Posted;
+        }
+        field(7; "Post Sales Invoice Type"; Enum "NPR Post Sales Posting Type")
+        {
+            Caption = 'Post Sales Invoice Type';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(8; "Sales Document Print"; Boolean)
+        {
+            Caption = 'Sales Document Print';
+            DataClassification = CustomerContent;
+        }
+        field(9; "Sales Document Send"; Boolean)
+        {
+            Caption = 'Sales Document Send';
+            DataClassification = CustomerContent;
+        }
+        field(10; "Sales Document Pdf2Nav"; Boolean)
+        {
+            Caption = 'Sales Document Pdf2Nav';
+            DataClassification = CustomerContent;
+        }
+        field(12; "Sales Document Delete"; Boolean)
+        {
+            Caption = 'Sales Document Delete';
+            DataClassification = CustomerContent;
+        }
+        field(13; "Orig. Sales Document No."; Code[20])
+        {
+            Caption = 'Original Sales Document No';
+            DataClassification = CustomerContent;
+            TableRelation = IF ("Sales Document Type" = CONST(QUOTE)) "Sales Header"."No." WHERE("Document Type" = CONST(Quote))
+            ELSE
+            IF ("Sales Document Type" = CONST(ORDER)) "Sales Header"."No." WHERE("Document Type" = CONST(Order))
+            ELSE
+            IF ("Sales Document Type" = CONST(INVOICE)) "Sales Header"."No." WHERE("Document Type" = CONST(Invoice))
+            ELSE
+            IF ("Sales Document Type" = CONST(CREDIT_MEMO)) "Sales Header"."No." WHERE("Document Type" = CONST("Credit Memo"))
+            ELSE
+            IF ("Sales Document Type" = CONST(BLANKET_ORDER)) "Sales Header"."No." WHERE("Document Type" = CONST("Blanket Order"))
+            ELSE
+            IF ("Sales Document Type" = CONST(RETURN_ORDER)) "Sales Header"."No." WHERE("Document Type" = CONST("Return Order"));
+            ValidateTableRelation = false;
+        }
+        field(11; "Orig. Sales Document Type"; Enum "NPR POS Sales Document Type")
+        {
+            Caption = 'Original Sales Document Type';
+            DataClassification = CustomerContent;
+        }
     }
-
     keys
     {
         key(Key1; "POS Entry No.", "POS Entry Reference Type", "POS Entry Reference Line No.", "Sales Document Type", "Sales Document No")

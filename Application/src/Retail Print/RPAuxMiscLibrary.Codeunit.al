@@ -101,6 +101,17 @@
             ProcessingValue := Format(ParseAsDecimal(ProcessingValue), 0, '<Precision,2:2><Standard Format,0>');
     end;
 
+    procedure FormatNegativeNumberSeparator(var ProcessingValue: Text)
+    var
+        Dec: Decimal;
+    begin
+        if ProcessingValue <> '' then
+            if Evaluate(Dec, ProcessingValue) then begin
+                Dec := dec * -1;
+                ProcessingValue := Format(dec, 0, '<Precision,2:2><Standard Format,0>');
+            end;
+    end;
+
     procedure FormatNumberSeperatorAndRound(var ProcessingValue: Text)
     begin
         if ProcessingValue <> '' then
@@ -434,6 +445,8 @@
                 GetReceiptPrintCount(TemplateLine."Processing Value", RecID, true);
             'RECEIPT_REPRINT_COUNT':
                 GetReceiptPrintCount(TemplateLine."Processing Value", RecID, false);
+            'NEGATIVE_TWO_DECIMAL':
+                FormatNegativeNumberSeparator(TemplateLine."Processing Value");
             'BLOB_TO_TEXT':
                 GetBlobAsText(TemplateLine, RecID);
             else

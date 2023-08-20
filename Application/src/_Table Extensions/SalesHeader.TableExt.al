@@ -133,5 +133,14 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             DataClassification = CustomerContent;
             TableRelation = "NPR Group Code".Code;
         }
+        field(6151436; "NPR POS Trans. Sch. For Post"; boolean)
+        {
+            Caption = 'POS Transactions Scheduled For Posting';
+            FieldClass = FlowField;
+            Editable = false;
+            CalcFormula = Exist("NPR POS Entry Sales Doc. Link" WHERE("Orig. Sales Document No." = field("No."),
+                                                      "Orig. Sales Document Type" = field("Document Type"),
+                                                     "Post Sales Document Status" = filter("Error while Posting" | "Unposted")));
+        }
     }
 }

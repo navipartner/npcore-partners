@@ -10,7 +10,7 @@
     end;
 
     var
-        PostItemEntriesVar, PostPOSEntriesVar, PostCompressedVar, StopOnErrorVar, ShowProgressDialog, PostingDateExists, ReplacePostingDate, ReplaceDocumentDate : Boolean;
+        PostItemEntriesVar, PostPOSEntriesVar, PostCompressedVar, StopOnErrorVar, ShowProgressDialog, PostingDateExists, ReplacePostingDate, ReplaceDocumentDate, PostSalesDocumentsVar : Boolean;
         _PostingDate: Date;
         TextErrorMultiple: Label '%3 %1 and %2 cannot be posted together. Only one %3 can be posted at a time.';
         TextErrorSalesTaxCompressed: Label '%1 %2 cannot be posted compressed because it has Sales Tax Lines. Please check the POS posting compression settings.';
@@ -29,7 +29,8 @@
         PreparingGenJournalLinesLbl: Label 'Preparing Gen. Journal Lines       #4###### @5@@@@@@@@@@@@@\';
         PostingGenJournalLinesLbl: Label 'Posting Gen Journal lines         #8###### @9@@@@@@@@@@@@@\';
         PostingItemLinesLbl: Label 'Posting Item Lines         #10###### @11@@@@@@@@@@@@@\';
-        _POSPostingLogEntryNo, POSItemPostingLogEntryNo : Integer;
+        PostingSaleDocumentLbl: Label 'Posting Sale Documents';
+        _POSPostingLogEntryNo, POSItemPostingLogEntryNo, POSSalesDocPostingLogEntryNo : Integer;
         PostingPerPeriodRegister, JobQueuePosting : Boolean;
         ErrorText: Text;
         PostingPOSEntriesOpenDialogLbl: Label 'Posting POS Entries individually\#1######\@2@@@@@@@@@@@@@\';
@@ -38,25 +39,27 @@
         TextPostingDifference: Label 'POS Posting Difference';
         _GLPostingErrorEntries: List of [Integer];
         _ItemPostingErrorEntries: List of [Integer];
+        _SalesDocPostingErrorEntries: List of [Integer];
         IsSalesTaxEnabled: Boolean;
 
     local procedure "Code"(var POSEntry: Record "NPR POS Entry")
     var
     begin
 
-        if ((not PostItemEntriesVar) and (not PostPOSEntriesVar)) or POSEntry.IsEmpty then
+        if ((not PostItemEntriesVar) and (not PostPOSEntriesVar) and (not PostSalesDocumentsVar)) or POSEntry.IsEmpty then
             Error(TextNothingToPost);
 
-        if ShowProgressDialog then begin
-            if PostItemEntriesVar and PostPOSEntriesVar then
-                ProgressWindow.Open(PostingItemLinesLbl + PostingPOSEntriesLbl + CreatingBufferLinesLbl + PreparingGenJournalLinesLbl + PostingGenJournalLinesLbl)
-            else
-                if PostItemEntriesVar then
-                    ProgressWindow.Open(PostingItemLinesLbl + PostingPOSEntriesLbl)
-                else
-                    if PostPOSEntriesVar then
-                        ProgressWindow.Open(PostingPOSEntriesLbl + CreatingBufferLinesLbl + PreparingGenJournalLinesLbl + PostingGenJournalLinesLbl);
-        end;
+        if ShowProgressDialog then
+            case true of
+                PostItemEntriesVar and PostPOSEntriesVar:
+                    ProgressWindow.Open(PostingItemLinesLbl + PostingPOSEntriesLbl + CreatingBufferLinesLbl + PreparingGenJournalLinesLbl + PostingGenJournalLinesLbl);
+                PostItemEntriesVar:
+                    ProgressWindow.Open(PostingItemLinesLbl + PostingPOSEntriesLbl);
+                PostPOSEntriesVar:
+                    ProgressWindow.Open(PostingPOSEntriesLbl + CreatingBufferLinesLbl + PreparingGenJournalLinesLbl + PostingGenJournalLinesLbl);
+                PostSalesDocumentsVar:
+                    ProgressWindow.Open(PostingSaleDocumentLbl);
+            end;
 
         CheckDimensions(POSEntry);
 
@@ -71,6 +74,10 @@
             Commit();
             Clear(_GLPostingErrorEntries);
             PostPOSEntries(POSEntry);
+        end;
+
+        if PostSalesDocumentsVar then begin
+            PostSalesDocuments(POSEntry);
         end;
 
         if POSEntry.FindSet(true) then
@@ -608,7 +615,6 @@
         ItemPostingErrorMsg: Label '%1 error/s occurred. Successfully processed %2.', Comment = '%1-Errors count, %2-Successfully posted count';
         DoSkipProcessing: Boolean;
     begin
-
         if ShowProgressDialog then begin
             NoOfRecords := POSEntry.Count();
             ProgressWindow.Update(10, NoOfRecords);
@@ -649,6 +655,45 @@
         Commit();
         ErrorText := StrSubstNo(ItemPostingErrorMsg, _ItemPostingErrorEntries.Count, LineToProcessCount - _ItemPostingErrorEntries.Count);
         UpdatePOSPostingLogEntry(POSItemPostingLogEntryNo, _ItemPostingErrorEntries.Count > 0);
+        ErrorText := '';
+    end;
+
+    local procedure PostSalesDocuments(var POSEntry: Record "NPR POS Entry")
+    var
+        POSEntryToPost: Record "NPR POS Entry";
+        POSPostSalesDocTrans: Codeunit "NPR POS Post Sales Doc. Trans.";
+        LineToProcessCount: Integer;
+        SalesDocPostingErrorMsg: Label '%1 error/s occurred. Successfully processed %2.', Comment = '%1-Errors count, %2-Successfully posted count';
+        DoSkipProcessing: Boolean;
+    begin
+        Clear(_SalesDocPostingErrorEntries);
+        POSSalesDocPostingLogEntryNo := CreatePOSPostingLogEntry(POSEntry, 0);
+        Commit();
+
+        if POSEntry.FindSet() then
+            repeat
+                if (POSEntry."Post Sales Document Status" in [POSEntry."Post Sales Document Status"::Unposted, POSEntry."Post Sales Document Status"::"Error while Posting"]) then begin
+                    DoSkipProcessing := JobQueuePosting;
+                    if JobQueuePosting then
+                        DoSkipProcessing := SkipProcessing(2, POSEntry."Entry No.", 0);
+                    if not DoSkipProcessing then begin
+                        POSEntryToPost.Get(POSEntry."Entry No.");
+                        LineToProcessCount += 1;
+                        if StopOnErrorVar then begin
+                            POSPostSalesDocTrans.Run(POSEntryToPost);
+                        end else begin
+                            if (not POSPostSalesDocTrans.Run(POSEntryToPost)) then begin
+                                _SalesDocPostingErrorEntries.Add(POSEntryToPost."Entry No.");
+                                CreateErrorPOSPostingLogEntry(POSEntryToPost, 0, GetLastErrorText(), true);
+                            end;
+                        end;
+                    end;
+                end;
+            until POSEntry.Next() = 0;
+
+        Commit();
+        ErrorText := StrSubstNo(SalesDocPostingErrorMsg, _SalesDocPostingErrorEntries.Count, LineToProcessCount - _SalesDocPostingErrorEntries.Count);
+        UpdatePOSPostingLogEntry(POSSalesDocPostingLogEntryNo, _SalesDocPostingErrorEntries.Count > 0);
         ErrorText := '';
     end;
 
@@ -815,6 +860,12 @@
     begin
         PostPOSEntriesVar := PostPOSEntriesIn;
     end;
+
+    procedure SetPostSaleDocuments(PostSaleDocumentsIn: Boolean)
+    begin
+        PostSalesDocumentsVar := PostSaleDocumentsIn;
+    end;
+
 
     procedure SetStopOnError(StopOnErrorIn: Boolean)
     begin
@@ -1116,6 +1167,7 @@
         POSPostingLog."Parameter Replace Doc. Date" := ReplaceDocumentDate;
         POSPostingLog."Parameter Post Item Entries" := PostItemEntriesVar;
         POSPostingLog."Parameter Post POS Entries" := PostPOSEntriesVar;
+        POSPostingLog."Parameter Post Sales Documents" := PostSalesDocumentsVar;
         POSPostingLog."Parameter Post Compressed" := PostCompressedVar;
         POSPostingLog."Parameter Stop On Error" := StopOnErrorVar;
         if PostingPerPeriodRegister then begin
@@ -1159,6 +1211,7 @@
         POSPostingLog."Parameter Replace Doc. Date" := ReplaceDocumentDate;
         POSPostingLog."Parameter Post Item Entries" := PostItemEntriesVar;
         POSPostingLog."Parameter Post POS Entries" := PostPOSEntriesVar;
+        POSPostingLog."Parameter Post Sales Documents" := PostSalesDocumentsVar;
         POSPostingLog."Parameter Post Compressed" := PostCompressedVar;
         POSPostingLog."Parameter Stop On Error" := StopOnErrorVar;
         POSPostingLog."Posting Per" := POSPostingLog."Posting Per"::"POS Entry";
@@ -1253,6 +1306,11 @@
     internal procedure GetItemPostingErrorEntries(var ListOut: List of [Integer])
     begin
         ListOut := _ItemPostingErrorEntries;
+    end;
+
+    internal procedure GetSaleDocPostingErrorEntries(var ListOut: List of [Integer])
+    begin
+        ListOut := _SalesDocPostingErrorEntries;
     end;
 
     local procedure GetGLAccountType(POSPostingSetup: Record "NPR POS Posting Setup"): Enum "Gen. Journal Account Type"

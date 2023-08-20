@@ -52,6 +52,18 @@
                     ToolTip = 'Specifies the value of the POS Entry Reference Type field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Post Sales Document Status"; Rec."Post Sales Document Status")
+                {
+                    ApplicationArea = NPRRetail;
+                    Visible = AsyncEnabled;
+                    ToolTip = 'Specifies the value of the Post Sales Document Status field';
+                }
+                field("Post Sales Invoice Type"; Rec."Post Sales Invoice Type")
+                {
+                    ApplicationArea = NPRRetail;
+                    Visible = AsyncEnabled;
+                    ToolTip = 'Specifies the value of the Post Sales Document Type field';
+                }
             }
         }
     }
@@ -62,5 +74,13 @@
 
     var
         RecordVar: Variant;
+        AsyncEnabled: Boolean;
+
+    trigger OnOpenPage()
+    var
+        POSAsyncPostingMgt: Codeunit "NPR POS Async. Posting Mgt.";
+    begin
+        AsyncEnabled := POSAsyncPostingMgt.SetVisibility();
+    end;
 }
 

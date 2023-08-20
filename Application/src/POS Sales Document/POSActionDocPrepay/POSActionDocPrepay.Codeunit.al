@@ -64,6 +64,8 @@
         PrintPrepaymentDocument, SelectCustomer, InputIsAmount, Send, Pdf2Nav, ConfirmInvDiscAmt : Boolean;
         PrepaymentValue: Decimal;
         POSActionDocPrepayB: Codeunit "NPR POS Action: Doc. Prepay B";
+        POSAsyncPosting: Codeunit "NPR POS Async. Posting Mgt.";
+        POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
     begin
         Sale.GetCurrentSale(SalePOS);
 
@@ -75,6 +77,8 @@
         ConfirmInvDiscAmt := Context.GetBooleanParameter('ConfirmInvDiscAmt');
         PrepaymentValue := Context.GetDecimal('prepaymentValue');
 
+        POSSalesDocumentPost := POSAsyncPosting.GetPOSSalePostingMandatoryFlow(SalePOS."POS Store Code");
+
         if not POSActionDocPrepayB.CheckCustomer(SalePOS, Sale, SelectCustomer) then
             exit;
 
@@ -84,7 +88,9 @@
         if not POSActionDocPrepayB.ConfirmImportInvDiscAmt(SalesHeader, ConfirmInvDiscAmt) then
             exit;
 
-        POSActionDocPrepayB.CreatePrepaymentLine(POSSession, SalesHeader, PrintPrepaymentDocument, PrepaymentValue, InputIsAmount, Send, Pdf2Nav);
+        if POSSalesDocumentPost = POSSalesDocumentPost::Asynchronous then
+            POSAsyncPosting.FromPOSRelatedPOSTransExist(SalesHeader);
+        POSActionDocPrepayB.CreatePrepaymentLine(POSSession, SalesHeader, PrintPrepaymentDocument, PrepaymentValue, InputIsAmount, Send, Pdf2Nav, POSSalesDocumentPost);
 
     end;
 }

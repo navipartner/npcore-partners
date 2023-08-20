@@ -9,6 +9,18 @@ pageextension 6014443 "NPR Sales Return Order" extends "Sales Return Order"
                 ApplicationArea = NPRRetail;
                 ToolTip = 'Specifies the value of the Group Code field.';
             }
+            field("NPR PR POS Trans. Scheduled For Post"; Rec."NPR POS Trans. Sch. For Post")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies if there are POS entries scheduled for posting';
+                Visible = AsyncEnabled;
+                trigger OnDrillDown()
+                var
+                    POSAsyncPostingMgt: Codeunit "NPR POS Async. Posting Mgt.";
+                begin
+                    POSAsyncPostingMgt.ScheduledTransFromPOSOnDrillDown(Rec);
+                end;
+            }
         }
 
         addlast("Invoice Details")
@@ -51,4 +63,13 @@ pageextension 6014443 "NPR Sales Return Order" extends "Sales Return Order"
             }
         }
     }
+    var
+        AsyncEnabled: Boolean;
+
+    trigger OnOpenPage()
+    var
+        POSAsyncPostingMgt: Codeunit "NPR POS Async. Posting Mgt.";
+    begin
+        AsyncEnabled := POSAsyncPostingMgt.SetVisibility();
+    end;
 }

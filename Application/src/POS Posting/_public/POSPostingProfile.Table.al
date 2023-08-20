@@ -2,8 +2,8 @@
 {
     Caption = 'POS Posting Profile';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR POS Posting Profiles";
-    LookupPageID = "NPR POS Posting Profiles";
+    DrillDownPageId = "NPR POS Posting Profiles";
+    LookupPageId = "NPR POS Posting Profiles";
     fields
     {
         field(1; "Code"; Code[20])
@@ -110,7 +110,7 @@
         {
             Caption = 'POS Sales Rounding Account';
             DataClassification = CustomerContent;
-            TableRelation = "G/L Account"."No." WHERE(Blocked = CONST(false));
+            TableRelation = "G/L Account"."No." where(Blocked = const(false));
         }
         field(110; "POS Sales Amt. Rndng Precision"; Decimal)
         {
@@ -235,15 +235,20 @@
                 ExtPOSSaleProcessor: Codeunit "NPR Ext. POS Sale Processor";
                 PosPostingProfile: Record "NPR POS Posting Profile";
             begin
-                IF Rec."Auto Process Ext. POS Sales" then
+                if Rec."Auto Process Ext. POS Sales" then
                     ExtPOSSaleProcessor.RegisterNcImportType('EXTPOSSALES')
                 else begin
                     PosPostingProfile.SetFilter(Code, '<>%1', Rec.Code);
                     PosPostingProfile.SetRange("Auto Process Ext. POS Sales", true);
-                    IF PosPostingProfile.IsEmpty() then
+                    if PosPostingProfile.IsEmpty() then
                         ExtPOSSaleProcessor.DeleteNCImportType('EXTPOSSALES');
                 end;
             end;
+        }
+        field(171; "Post POS Sale Doc. With JQ"; Boolean)
+        {
+            Caption = 'Post POS Sale Documents with Job Queue';
+            DataClassification = CustomerContent;
         }
     }
 

@@ -129,6 +129,16 @@
                         ApplicationArea = NPRRetail;
                     }
                 }
+                group(BackgroundPosting)
+                {
+                    Caption = 'Background Posting';
+                    field("Post POS Sale Documents With Job Queue"; Rec."Post POS Sale Doc. With JQ")
+                    {
+                        ToolTip = 'Specifies If the POS Sale Document will be scheduled for backgroung posting';
+                        ApplicationArea = NPRRetail;
+                    }
+
+                }
             }
         }
     }
