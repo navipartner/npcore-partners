@@ -1,10 +1,11 @@
 ﻿page 6150640 "NPR POS Info Card"
 {
-    Extensible = False;
     Caption = 'POS Info Card';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/pos_info_setup/';
+    Extensible = False;
     PageType = Card;
-    UsageCategory = None;
     SourceTable = "NPR POS Info";
+    UsageCategory = None;
 
     layout
     {
@@ -15,23 +16,23 @@
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies the code of "POS Info".';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies a unique code for the POS info entity.';
                 }
                 field(Description; Rec.Description)
                 {
-                    ToolTip = 'Specifies a Short Description for the POS Info code.';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Describes the POS info entity, and provides more information about its purpose.';
                 }
                 field("Message"; Rec.Message)
                 {
-                    ToolTip = 'Specifies the message that you want to be displayed on POS.';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Provide a message which will be displayed on the POS. If you wish the salesperson to be able to provide a message themselves, leave this field blank.';
                 }
                 field("Once per Transaction"; Rec."Once per Transaction")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies whether the POS Info code is set to be used per lines or per whole transaction (ticket). If activated, the POS Info will be applied for the whole transaction.';
+                    ToolTip = 'Indicates whether the POS info is set to be used per a line or per a whole transaction. If active, the POS info entity will be applied per a whole transaction.';
 
                     trigger OnValidate()
                     begin
@@ -58,13 +59,13 @@
                 }
                 field("Available in Front-End"; Rec."Available in Front-End")
                 {
-                    ToolTip = 'If active, the POS Info Codes can be identified and available in the front end via a data source extension. Those POS Info Codes can be displayed on POS Menu Button, as well as on the Sales View Status bar and the Caption Box.';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'If active, the POS info codes can be identified and made available in the front end via a data source extension. Those POS info codes can be displayed on a POS menu button, as well as on the sales view status bar and the caption box.';
                 }
                 field(Type; Rec.Type)
                 {
-                    ToolTip = 'Specifies how the POS Info Code is used. Show Message - a predefined message from the Message field is displayed on the POS on calling a customer or Item as information pertaining to that customer/item. Request Data - data needs to be selected from a set or inserted manually, and recorded in the POS Info POS Entry List. Write Default Message - a predefined message from the Message field is selected and recorded in the POS Info POS Entry List.';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies how the POS info code is used. The following options are available: Request Data - the data needs to be selected from an existing set or input manually and recorded in the POS Info POS Entry List; Write Default Message - a predefined message from the Message field is displayed on the POS when information on a customer or an item is retrieved; Show Message - a predefined message from the Message field is displayed on the POS when a customer or an item is retrieved.';
 
                     trigger OnValidate()
                     begin
@@ -81,12 +82,12 @@
                     field("Input Mandatory"; Rec."Input Mandatory")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies that the POS Info Code is imperative. There will be an error if user tries to close the Numpad, list of values or Message Windows on the POS without entering or selecting data.';
+                        ToolTip = 'If active, the salesperson will be required to provide a POS Info Code if they press the POS menu button.';
                     }
                     field("Input Type"; Rec."Input Type")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'If Request Data is the selected method, you need to specify in this field what kind of data you will get. Text - manually input text, where the Message field is left BLANK. SubCode - choose from a list created in the POS Info SubCodes. Table - choose from a set of values from a Business Central.';
+                        ToolTip = 'Select which type of input a salesperson needs to provide. You can choose between text, subcode (a list created in POS Info SubCodes) or table (a set of values provided in Business Central).';
 
                         trigger OnValidate()
                         begin
@@ -110,9 +111,9 @@
             }
             part("POS Info Subform"; "NPR POS Info Subform")
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'POS Info SubCodes';
                 SubPageLink = Code = FIELD(Code);
-                ApplicationArea = NPRRetail;
                 Visible = IsInputTypeSubcode;
             }
         }
@@ -124,11 +125,11 @@
         {
             action("Field Mapping")
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'Field Mapping';
                 Image = "Action";
 
                 ToolTip = 'Executes the Field Mapping action';
-                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
