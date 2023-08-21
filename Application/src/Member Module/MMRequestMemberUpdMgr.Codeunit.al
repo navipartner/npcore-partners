@@ -140,7 +140,7 @@
         exit(RequestMemberUpdate."Entry No.");
     end;
 
-    local procedure ValidateEmail(Member: Record "NPR MM Member"; "E-Mail": Text[80]): Text[80]
+    local procedure ValidateEmail(Member: Record "NPR MM Member"; "EMail": Text[80]): Text[80]
     var
         ValidEmail: Boolean;
         TempMemberCommunity: Record "NPR MM Member Community" temporary;
@@ -152,15 +152,24 @@
         INVALID_VALUE: Label 'The %1 is invalid.';
     begin
 
-        if ("E-Mail" = '') then
+        if (EMail = '') then
             Error(NOT_BLANK);
 
-        ValidEmail := StrLen(DelChr("E-Mail", '<=>', '@')) = StrLen("E-Mail") - 1;
+        ValidEmail := StrLen(DelChr(EMail, '<=>', '@')) = StrLen(EMail) - 1;
         if (ValidEmail) then
-            ValidEmail := (StrPos(CopyStr("E-Mail", STRPOS("E-Mail", '@')), '.') > 1);
+            ValidEmail := (StrPos(CopyStr(EMail, STRPOS(EMail, '@')), '.') > 1);
 
         if (not ValidEmail) then
-            Error(INVALID_VALUE, Member.FIELDCAPTION("E-Mail Address"));
+            Error(INVALID_VALUE, Member.FieldCaption("E-Mail Address"));
+
+        // strict check is 0-9, a-z, A-Z, and ~!$%^&*_=+}{'?-.
+        EMail := DelChr(EMail, '<=>', '0123456789');
+        EMail := DelChr(EMail, '<=>', 'abcdefghijklmnopqrstuvwqyz');
+        EMail := DelChr(EMail, '<=>', 'ABCDEFGHIJKLMNOPQRSTUVWQYZ');
+        EMail := DelChr(EMail, '<=>', '~!$%^&*_=+}{?-.@');
+        ValidEmail := StrLen(EMail) = 0;
+        if (not ValidEmail) then
+            Error(INVALID_VALUE, Member.FieldCaption("E-Mail Address"));
 
         // Add all communities target member belongs to
         MembershipRole.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
@@ -178,7 +187,7 @@
         end;
 
         // Find other members with same email and check if they belong to the same community with email constraint
-        Member2.SetFilter("E-Mail Address", '=%1', LowerCase("E-Mail"));
+        Member2.SetFilter("E-Mail Address", '=%1', LowerCase(EMail));
         if (Member2.FindSet()) then begin
             repeat
                 if (Member."Entry No." <> Member2."Entry No.") then begin
@@ -202,7 +211,7 @@
             until (Member2.Next() = 0);
         end;
 
-        exit(LowerCase("E-Mail"));
+        exit(LowerCase(EMail));
 
     end;
 

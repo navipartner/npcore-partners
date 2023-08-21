@@ -1041,16 +1041,48 @@
     end;
 
     local procedure IsValidEmail(EMail: Text) ValidEmail: Boolean
+    var
+        Name: Text;
+        Domain: Text;
     begin
         if (StrLen(EMail) = 0) then
             exit(false);
 
         // Contains 1 @
-        ValidEmail := StrLen(DelChr(Rec."E-Mail Address", '<=>', '@')) = StrLen(Rec."E-Mail Address") - 1;
+        ValidEmail := StrLen(DelChr(EMail, '<=>', '@')) = StrLen(EMail) - 1;
 
         // A least 1 dot to the right of @
         if (ValidEmail) then
-            ValidEmail := (StrPos(CopyStr(Rec."E-Mail Address", StrPos(Rec."E-Mail Address", '@')), '.') > 1);
+            ValidEmail := (StrPos(CopyStr(EMail, StrPos(EMail, '@')), '.') > 1);
+
+        // strict check is 0-9, a-z, A-Z, and ~!$%^&*_=+}{'?-.
+        if (ValidEmail) then begin
+            Name := CopyStr(EMail, 1, StrPos(EMail, '@'));
+            if (StrLen(Name) = 1) then
+                exit(false);
+
+            Name := DelChr(Name, '<=>', '0123456789');
+            Name := DelChr(Name, '<=>', 'abcdefghijklmnopqrstuvwqyz');
+            Name := DelChr(Name, '<=>', 'ABCDEFGHIJKLMNOPQRSTUVWQYZ');
+            Name := DelChr(Name, '<=>', '~!$%^&*_=+}{?-.@');
+            ValidEmail := StrLen(Name) = 0;
+        end;
+
+        // strict check is 0-9, a-z, A-Z, and -.
+        if (ValidEmail) then begin
+            Domain := CopyStr(EMail, StrPos(EMail, '@'));
+            if (StrPos(Domain, '.') <= 2) then
+                exit(false);
+
+            if (Domain[StrLen(Domain)]) in ['-', '.', '@'] then
+                exit(false);
+
+            Domain := DelChr(Domain, '<=>', '0123456789');
+            Domain := DelChr(Domain, '<=>', 'abcdefghijklmnopqrstuvwqyz');
+            Domain := DelChr(Domain, '<=>', 'ABCDEFGHIJKLMNOPQRSTUVWQYZ');
+            Domain := DelChr(Domain, '<=>', '-.@');
+            ValidEmail := StrLen(Domain) = 0;
+        end;
 
         exit(ValidEmail);
     end;
