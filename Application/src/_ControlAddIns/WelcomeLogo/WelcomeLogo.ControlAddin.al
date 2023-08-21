@@ -1,4 +1,4 @@
-#if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC2200)
+#if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
 controladdin "NPR Welcome Logo"
 {
     Images = 'src/_ControlAddins/WelcomeLogo/Images/NPLogo_NEW.png';
