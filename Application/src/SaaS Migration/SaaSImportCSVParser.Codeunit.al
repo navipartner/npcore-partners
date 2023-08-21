@@ -134,6 +134,8 @@ codeunit 6151093 "NPR SaaS Import CSV Parser"
         ValueBool: Boolean;
         IStream: InStream;
         MediaId: Guid;
+        TextValue: Text;
+        ClosingDateVar: Date;
         SaaSImportMediaBuffer: Record "NPR SaaS Import Media Buffer";
     begin
         case FieldReference.Type of
@@ -189,8 +191,14 @@ codeunit 6151093 "NPR SaaS Import CSV Parser"
                 end;
             FieldType::Date:
                 begin
-                    Evaluate(ValueDate, FormattedValue, 9);
-                    FieldReference.Value := ValueDate;
+                    if FormattedValue[1] = 'C' then begin
+                        TextValue := FormattedValue.TrimStart('C');
+                        Evaluate(ClosingDateVar, TextValue, 9);
+                        FieldReference.Value := ClosingDate(ClosingDateVar);
+                    end else begin
+                        Evaluate(ValueDate, FormattedValue, 9);
+                        FieldReference.Value := ValueDate;
+                    end;
                 end;
             FieldType::DateTime:
                 begin
