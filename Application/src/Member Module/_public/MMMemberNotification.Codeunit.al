@@ -171,8 +171,13 @@
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipEntry: Record "NPR MM Membership Entry";
         Coupon: Record "NPR NpDc Coupon";
+        AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
+        AzureLog: Record "NPR MM AzureMemberUpdateLog";
+        Base64: Codeunit "Base64 Convert";
         Method: Code[10];
         EMailLbl: Label '%1?email=%2', Locked = true;
+        MemberInfoJson: JsonObject;
+        MemberInfoText: Text;
     begin
 
         NotificationSetup.Get(MembershipNotification."Notification Code");
@@ -323,6 +328,36 @@
                         MemberNotificationEntry."Coupon Starting Date" := Coupon."Starting Date";
                     end;
 
+                    // Azure Member SignUp
+                    if (MembershipNotification.AzureRegistrationSetupCode <> '') then begin
+                        if (AzureRegistrationSetup.Get(MembershipNotification.AzureRegistrationSetupCode)) then begin
+                            MemberNotificationEntry.DataSubjectId := MembershipRole."GDPR Data Subject Id";
+                            MemberNotificationEntry.AzureRegistrationSetupCode := MembershipNotification.AzureRegistrationSetupCode;
+
+                            MemberNotificationEntry."Template Filter Value" := AzureRegistrationSetup.EmailTemplate;
+
+                            MemberInfoJson.Add('firstName', Member."First Name");
+                            MemberInfoJson.Add('phoneNumber', Member."Phone No.");
+                            MemberInfoJson.Add('tos', AzureRegistrationSetup.TermsOfServiceUrl);
+                            MemberInfoJson.WriteTo(MemberInfoText);
+                            MemberInfoText := Base64.ToBase64(MemberInfoText);
+
+                            MemberNotificationEntry.ClientSignUpUrl := CopyStr(
+                                    StrSubstNo('%1?PartitionKey=%2&RowKey=%3&data=%4',
+                                        AzureRegistrationSetup.MemberRegistrationUrl, AzureRegistrationSetup.QueueName,
+                                        MembershipRole."GDPR Data Subject Id", MemberInfoText),
+                                    1, MaxStrLen(MemberNotificationEntry.ClientSignUpUrl));
+                            if (MemberNotificationEntry."Notification Method" = MemberNotificationEntry."Notification Method"::SMS) then
+                                MemberNotificationEntry."Template Filter Value" := AzureRegistrationSetup.SMSTemplate;
+
+                            AzureLog.SetupCode := MembershipNotification.AzureRegistrationSetupCode;
+                            AzureLog.DataSubjectId := MemberNotificationEntry.DataSubjectId;
+                            AzureLog.NotificationAddress := Member."Phone No.";
+                            AzureLog.RequestCreated := CurrentDateTime();
+                            AzureLog.Insert();
+                        end;
+                    end;
+
                     if (MemberNotificationEntry.Insert()) then;
                 end;
             until ((MembershipRole.Next() = 0) or (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::FIRST_ADMIN));
@@ -335,6 +370,7 @@
         MemberNotificationEntry2: Record "NPR MM Member Notific. Entry";
         ResponseMessage: Text;
         SendStatus: Option;
+        AzureUpdateOrAzureSkip: Boolean;
     begin
 
         MemberNotificationEntry.SetFilter("Notification Entry No.", '=%1', MembershipNotification."Entry No.");
@@ -370,9 +406,11 @@
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
                             end;
 
-                            if (MemberNotificationEntry2."Notification Trigger" <> MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE) then
-                                if (SendMail(MemberNotificationEntry2, ResponseMessage)) then
+                            if (MemberNotificationEntry2."Notification Trigger" <> MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE) then begin
+                                AzureUpdateOrAzureSkip := SendDataSubjectIdToAzure(MemberNotificationEntry2);
+                                if ((AzureUpdateOrAzureSkip) and (SendMail(MemberNotificationEntry2, ResponseMessage))) then
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
+                            end;
                         end;
 
                     MemberNotificationEntry2."Notification Method"::SMS:
@@ -384,18 +422,18 @@
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
                             end;
 
-                            if (MemberNotificationEntry2."Notification Trigger" <> MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE) then
-                                if (SendSMS(MemberNotificationEntry2, ResponseMessage)) then
+                            if (MemberNotificationEntry2."Notification Trigger" <> MemberNotificationEntry2."Notification Trigger"::WALLET_UPDATE) then begin
+                                AzureUpdateOrAzureSkip := SendDataSubjectIdToAzure(MemberNotificationEntry2);
+                                if ((AzureUpdateOrAzureSkip) and (SendSMS(MemberNotificationEntry2, ResponseMessage))) then
                                     SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
+                            end;
                         end;
 
                     MemberNotificationEntry2."Notification Method"::MANUAL:
                         begin
-                            if (MemberNotificationEntry2."Include NP Pass") then begin
+                            if (MemberNotificationEntry2."Include NP Pass") then
                                 CreateNpPass(MemberNotificationEntry2);
-                                MemberNotificationEntry2.Modify();
-                            end;
-
+                            SendDataSubjectIdToAzure(MemberNotificationEntry2);
                             SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
                         end;
 
@@ -410,6 +448,27 @@
 
             until (MemberNotificationEntry.Next() = 0);
         end;
+    end;
+
+    local procedure SendDataSubjectIdToAzure(var MemberNotificationEntry: Record "NPR MM Member Notific. Entry") AzureInsert: Boolean
+    var
+        AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
+        AzureMemberRegistration: Codeunit "NPR MM AzureMemberRegistration";
+    begin
+        if (MemberNotificationEntry.AzureRegistrationSetupCode = '') then
+            exit(true); // Not for Azure
+
+        if (not AzureRegistrationSetup.Get(MemberNotificationEntry.AzureRegistrationSetupCode)) then
+            exit(false); // Intended for Azure - but setup is missing 
+
+        if (not AzureRegistrationSetup.Enabled) then
+            exit(true); // Not for Azure (disabled)
+
+        AzureInsert := AzureMemberRegistration.CreateMemberSignUpReference(MemberNotificationEntry.AzureRegistrationSetupCode, MemberNotificationEntry.DataSubjectId);
+        if (not AzureInsert) then
+            MemberNotificationEntry."Failed With Message" := CopyStr(GetLastErrorText(), 1, MaxStrLen(MemberNotificationEntry."Failed With Message"));
+
+        exit(AzureInsert);
     end;
 
     local procedure CreateNextNotification(MembershipNotification: Record "NPR MM Membership Notific.")
@@ -501,11 +560,35 @@
         exit(ResponseMessage = '');
     end;
 
-    internal procedure AddMemberWelcomeNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer) NotificationEntryNo: Integer
+    internal procedure AddMemberWelcomeNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; var NotificationEntryNoList: List of [Integer])
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
+    begin
+        MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipEntry.SetFilter(Context, '=%1', MembershipEntry.Context::NEW);
+        if (not MembershipEntry.FindFirst()) then
+            MembershipEntry.Init();
+
+        AddMemberWelcomeNotification(MembershipEntryNo, MemberEntryNo, MembershipEntry."Item No.", NotificationEntryNoList);
+    end;
+
+    internal procedure AddMemberWelcomeNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MembershipSaleItemNo: Code[20]; var NotificationEntryNoList: List of [Integer])
+    var
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+    begin
+        if (not MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MembershipSaleItemNo)) then
+            MembershipSalesSetup.Init();
+
+        AddMemberWelcomeNotificationWorker(MembershipEntryNo, MemberEntryNo, MembershipSalesSetup.AzureMemberRegSetupCode, NotificationEntryNoList);
+    end;
+
+    internal procedure AddMemberWelcomeNotificationWorker(MembershipEntryNo: Integer; MemberEntryNo: Integer; AzureMemberRegSetupCode: Code[10]; var NotificationEntryNoList: List of [Integer])
     var
         Membership: Record "NPR MM Membership";
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipNotification: Record "NPR MM Membership Notific.";
+        AzureMemberRegistration: Boolean;
+        AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
     begin
 
         Membership.Get(MembershipEntryNo);
@@ -520,7 +603,7 @@
             if (not NotificationSetup.FindFirst()) then begin
                 NotificationSetup.SetFilter("Community Code", '=%1', '');
                 if (not NotificationSetup.FindFirst()) then
-                    exit(0);
+                    exit;
             end;
         end;
 
@@ -537,11 +620,34 @@
         MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
 
         MembershipNotification."Processing Method" := NotificationSetup."Processing Method";
+
         MembershipNotification."Include NP Pass" := NotificationSetup."Include NP Pass";
 
-        MembershipNotification.Insert();
+        AzureMemberRegistration := false;
+        if (AzureMemberRegSetupCode <> '') then
+            if (AzureRegistrationSetup.Get(AzureMemberRegSetupCode)) then
+                AzureMemberRegistration := AzureRegistrationSetup.Enabled;
 
-        exit(MembershipNotification."Entry No.");
+        if ((AzureMemberRegistration) and (NotificationSetup."Include NP Pass")) then begin
+            // We need 2 notifications
+            MembershipNotification."Entry No." := 0;
+            MembershipNotification."Include NP Pass" := false;
+            MembershipNotification.AzureRegistrationSetupCode := AzureMemberRegSetupCode;
+            MembershipNotification.Insert();
+            NotificationEntryNoList.Add(MembershipNotification."Entry No.");
+
+            if (AzureRegistrationSetup.AllowAnonymousWallet) then begin
+                MembershipNotification."Entry No." := 0;
+                MembershipNotification."Include NP Pass" := true;
+                MembershipNotification.AzureRegistrationSetupCode := '';
+                NotificationEntryNoList.Add(MembershipNotification."Entry No.");
+            end;
+        end else begin
+            MembershipNotification."Entry No." := 0;
+            NotificationEntryNoList.Add(MembershipNotification."Entry No.");
+        end;
+
+        exit;
     end;
 
     internal procedure RefreshAllMembershipRenewalNotifications(MembershipCode: Code[20])
@@ -754,8 +860,12 @@
             PassData += AssignDataToPassTemplate(RecRef, templateText);
         end;
 
-        if (CreatePass(MemberNotificationEntry, PassData)) then
+        if (CreatePass(MemberNotificationEntry, PassData)) then begin
             SetPassUrl(MemberNotificationEntry);
+        end else begin
+            MemberNotificationEntry."Failed With Message" := CopyStr(GetLastErrorText(), 1, MaxStrLen(MemberNotificationEntry."Failed With Message"));
+        end;
+
     end;
 
     local procedure CreatePass(var MemberNotificationEntry: Record "NPR MM Member Notific. Entry"; PassData: Text): Boolean

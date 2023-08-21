@@ -579,11 +579,55 @@
             AddGuardianMember(MembershipEntryNo, MembershipInfoCapture."Guardian External Member No.", MembershipInfoCapture."GDPR Approval");
 
         TransferInfoCaptureAttributes(MembershipInfoCapture."Entry No.", Database::"NPR MM Member", Member."Entry No.");
-
         SynchronizeCustomerAndContact(MembershipEntryNo);
 
         exit(true);
+    end;
 
+    internal procedure UpdateMember(DataSubjectId: Text[64]; JsonMember: JsonObject; ImageB64: Text) Success: Boolean
+    var
+        MemberRole: Record "NPR MM Membership Role";
+        Member: Record "NPR MM Member";
+        MemberInfo: Record "NPR MM Member Info Capture";
+        MembershipNotification: Record "NPR MM Membership Notific.";
+        MemberNotification: Codeunit "NPR MM Member Notification";
+        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
+        JToken: JsonToken;
+        EntryNo: Integer;
+    begin
+
+        MemberRole.SetFilter("GDPR Data Subject Id", '=%1', CopyStr(DataSubjectId, 1, MaxStrLen(MemberRole."GDPR Data Subject Id")));
+        if (not MemberRole.FindFirst()) then
+            exit(false);
+
+        if (not Member.Get(MemberRole."Member Entry No.")) then
+            exit(false);
+
+        if (JsonMember.Get('m', JToken)) then
+            JsonMember := JToken.AsObject();
+
+        // {"fn":"Tim","ln":"Sannes","ad":"Spaljevägen 9","pc":"197 36","ct":"Bro","cc":"SE","em":"tsa@navipartner.dk","pn":"0732542026"}
+        MemberRetailIntegration.MemberJSonToMemberInfo(JsonMember, MemberInfo);
+
+        MemberInfo."Notification Method" := Member."Notification Method";
+        if (not UpdateMember(MemberRole."Membership Entry No.", MemberRole."Member Entry No.", MemberInfo)) then
+            exit(false);
+
+        if (StrLen(ImageB64) > 100) then
+            if (not UpdateMemberImage(MemberRole."Member Entry No.", ImageB64)) then
+                exit(false);
+
+        if (MemberRole."Wallet Pass Id" <> '') then
+            EntryNo := MemberNotification.CreateUpdateWalletNotification(MemberRole."Membership Entry No.", MemberRole."Member Entry No.", 0, Today());
+
+        if (MemberRole."Wallet Pass Id" = '') then
+            EntryNo := MemberNotification.CreateWalletSendNotification(MemberRole."Membership Entry No.", MemberRole."Member Entry No.", 0, Today());
+
+        if (MembershipNotification.Get(EntryNo)) then
+            if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
+                MemberNotification.HandleMembershipNotification(MembershipNotification);
+
+        exit(true);
     end;
 
     internal procedure UpdateMemberImage(MemberEntryNo: Integer; Base64StringImage: Text) Success: Boolean
@@ -593,12 +637,19 @@
         Member: Record "NPR MM Member";
         Base64Convert: Codeunit "Base64 Convert";
         TempBlob: Codeunit "Temp Blob";
+        Base64Start: Integer;
     begin
         if (not Member.Get(MemberEntryNo)) then
             exit(false);
 
+        Base64Start := 1;
+        // Remove mime type prefix
+        if (StrLen(Base64StringImage) > 10) then
+            if (CopyStr(Base64StringImage, 1, 5) = 'data:') then
+                Base64Start := StrPos(Base64StringImage, ',') + 1;
+
         TempBlob.CreateOutStream(OutStr);
-        Base64Convert.FromBase64(Base64StringImage, OutStr);
+        Base64Convert.FromBase64(CopyStr(Base64StringImage, Base64Start), OutStr);
         TempBlob.CreateInStream(InStr);
         Member.Image.ImportStream(InStr, Member.FieldName(Image));
         exit(Member.Modify());
@@ -898,6 +949,9 @@
     var
         Community: Record "NPR MM Member Community";
         Member: Record "NPR MM Member";
+        RequireField: Label '%1 is required.';
+        RequireFieldOrField: Label 'Either %1 or %2 is required.';
+        RequireFieldAndField: Label 'Both %1 and %2 are required.';
         MemberFound: Boolean;
     begin
 
@@ -916,30 +970,33 @@
                 Member.SetFilter("Entry No.", '=%1', -1); // This should never match a current user
             Community."Member Unique Identity"::EMAIL:
                 begin
-                    MemberInfoCapture.TestField("E-Mail Address");
+                    if (MemberInfoCapture."E-Mail Address" = '') then
+                        Error(RequireField, MemberInfoCapture."E-Mail Address");
                     Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
                 end;
             Community."Member Unique Identity"::PHONENO:
                 begin
-                    MemberInfoCapture.TestField("Phone No.");
+                    if (MemberInfoCapture."Phone No." = '') then
+                        Error(RequireField, MemberInfoCapture."Phone No.");
                     Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
                 end;
             Community."Member Unique Identity"::SSN:
                 begin
-                    MemberInfoCapture.TestField("Social Security No.");
+                    if (MemberInfoCapture."Social Security No." = '') then
+                        Error(RequireField, MemberInfoCapture."Social Security No.");
                     Member.SetFilter("Social Security No.", '=%1', MemberInfoCapture."Social Security No.");
                 end;
             Community."Member Unique Identity"::EMAIL_AND_PHONE:
                 begin
-                    MemberInfoCapture.TestField("E-Mail Address");
-                    MemberInfoCapture.TestField("Phone No.");
+                    if ((MemberInfoCapture."E-Mail Address" = '') or (MemberInfoCapture."Phone No." = '')) then
+                        Error(RequireFieldAndField, MemberInfoCapture.FieldCaption("E-Mail Address"), MemberInfoCapture.FieldCaption("Phone No."));
                     Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
                     Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
                 end;
             Community."Member Unique Identity"::EMAIL_OR_PHONE:
                 begin
-                    MemberInfoCapture.TestField("E-Mail Address");
-                    MemberInfoCapture.TestField("Phone No.");
+                    if ((MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." = '')) then
+                        Error(RequireFieldOrField, MemberInfoCapture.FieldCaption("E-Mail Address"), MemberInfoCapture.FieldCaption("Phone No."));
                     Member.FilterGroup(-1);
                     Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
                     Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
@@ -3012,13 +3069,28 @@
     local procedure AddMemberCreateNotification(MembershipEntryNo: Integer; MembershipSetup: Record "NPR MM Membership Setup"; Member: Record "NPR MM Member"; MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         MemberNotification: Codeunit "NPR MM Member Notification";
+        MembershipNotification: Record "NPR MM Membership Notific.";
+        AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
+        EntryNoList: List of [Integer];
+        EntryNo: Integer;
+        AllowWallet: Boolean;
     begin
+        AllowWallet := true;
 
-        if (MembershipSetup."Create Welcome Notification") then
-            MemberNotification.AddMemberWelcomeNotification(MembershipEntryNo, Member."Entry No.");
+        if (MembershipSetup."Create Welcome Notification") then begin
+            MemberNotification.AddMemberWelcomeNotification(MembershipEntryNo, Member."Entry No.", MemberInfoCapture."Item No.", EntryNoList);
+            foreach EntryNo in EntryNoList do
+                if (MembershipNotification.Get(EntryNo)) then
+                    if (MembershipNotification.AzureRegistrationSetupCode <> '') then
+                        if (AzureRegistrationSetup.Get(MembershipNotification.AzureRegistrationSetupCode)) then
+                            AllowWallet := (AllowWallet and AzureRegistrationSetup.AllowAnonymousWallet);
 
-        if (MemberInfoCapture."Member Card Type" in [MemberInfoCapture."Member Card Type"::CARD_PASSSERVER, MemberInfoCapture."Member Card Type"::PASSSERVER]) then
-            MemberNotification.CreateWalletSendNotification(MembershipEntryNo, Member."Entry No.", 0, TODAY);
+        end;
+
+        if (AllowWallet) then
+            if (MemberInfoCapture."Member Card Type" in [MemberInfoCapture."Member Card Type"::CARD_PASSSERVER, MemberInfoCapture."Member Card Type"::PASSSERVER]) then
+                EntryNo := MemberNotification.CreateWalletSendNotification(MembershipEntryNo, Member."Entry No.", 0, TODAY);
+
     end;
 
     local procedure ValidAlterationGracePeriod(MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; MembershipEntry: Record "NPR MM Membership Entry"; ReferenceDate: Date): Boolean
@@ -4484,6 +4556,8 @@
     var
         Community: Record "NPR MM Member Community";
         NoSeriesManagement: Codeunit NoSeriesManagement;
+        Member: Record "NPR MM Member";
+        ConflictLbl: Label 'Multiple members share the same external member number (%1). Verify number series %2 for issues. This action can not be completed until this has been attended.';
     begin
 
         Community.Get(CommunityCode);
@@ -4493,6 +4567,11 @@
         end;
 
         ExternalNo := NoSeriesManagement.GetNextNo(Community."External Member No. Series", Today, true);
+
+        Member.SetCurrentKey("External Member No.");
+        Member.SetFilter("External Member No.", '=%1', ExternalNo);
+        if (not Member.IsEmpty()) then
+            Error(ConflictLbl, ExternalNo, Community."External Member No. Series");
     end;
 
     local procedure GenerateExtCardNoSimple(MembershipCode: Code[20]; var MemberInfoCapture: Record "NPR MM Member Info Capture")

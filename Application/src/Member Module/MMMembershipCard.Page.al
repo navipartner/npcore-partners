@@ -556,12 +556,29 @@
                 var
                     MemberNotification: Codeunit "NPR MM Member Notification";
                     MembershipNotification: Record "NPR MM Membership Notific.";
+                    AzureMemberRegistration: Record "NPR MM AzureMemberRegSetup";
+                    EntryNoList: List of [Integer];
                     EntryNo: Integer;
+                    AzureSetupCount: Integer;
+                    ForceIncludeAzureSetup: Boolean;
                 begin
-                    EntryNo := MemberNotification.AddMemberWelcomeNotification(Rec."Entry No.", 0);
-                    if (MembershipNotification.Get(EntryNo)) then
-                        if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
-                            MemberNotification.HandleMembershipNotification(MembershipNotification);
+                    AzureMemberRegistration.SetFilter(Enabled, '=%1', true);
+                    AzureSetupCount := AzureMemberRegistration.Count();
+                    if (AzureSetupCount > 0) then
+                        ForceIncludeAzureSetup := Confirm('Force include the Azure Member Registration information? Else it will be determined by original membership sales item.', false);
+
+                    if (ForceIncludeAzureSetup) and (AzureSetupCount = 1) then
+                        AzureMemberRegistration.FindFirst();
+
+                    if (ForceIncludeAzureSetup) and (AzureSetupCount > 1) then
+                        if (Page.RunModal(Page::"NPR MM AzureMemberRegList", AzureMemberRegistration) <> Action::LookupOK) then
+                            Error('');
+
+                    MemberNotification.AddMemberWelcomeNotificationWorker(Rec."Entry No.", 0, AzureMemberRegistration.AzureRegistrationSetupCode, EntryNoList);
+                    foreach EntryNo in EntryNoList do
+                        if (MembershipNotification.Get(EntryNo)) then
+                            if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
+                                MemberNotification.HandleMembershipNotification(MembershipNotification);
                 end;
             }
             action("Create Wallet Notification")
