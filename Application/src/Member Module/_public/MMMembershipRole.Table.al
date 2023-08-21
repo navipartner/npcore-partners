@@ -199,15 +199,13 @@
     keys
     {
         key(Key1; "Membership Entry No.", "Member Entry No.")
-        {
-        }
+        { }
         key(Key2; "Member Entry No.", "Membership Entry No.")
-        {
-        }
+        { }
         key(Key3; "Contact No.")
-        {
-
-        }
+        { }
+        key(Key4; "GDPR Data Subject Id")
+        { }
     }
 
     fieldgroups

@@ -14,7 +14,7 @@
             group(MembershipLookupGroup)
             {
                 Caption = 'Membership Lookup';
-                Visible = ShowAddToMembershipSection;
+                Visible = _ShowAddToMembershipSection;
                 field("External Membership No."; Rec."External Membership No.")
                 {
 
@@ -74,7 +74,7 @@
             group(AddMemberCard)
             {
                 Caption = 'Add Member Card';
-                Visible = ShowAddMemberCardSection;
+                Visible = _ShowAddMemberCardSection;
                 field("External Member No"; Rec."External Member No")
                 {
 
@@ -102,7 +102,7 @@
                                 until (MemberInfoCapture.Next() = 0);
                             end;
 
-                            if (PAGE.RunModal(6060126, TempMember) = ACTION::LookupOK) then begin
+                            if (PAGE.RunModal(Page::"NPR MM Members", TempMember) = ACTION::LookupOK) then begin
                                 Rec."First Name" := TempMember."First Name";
                                 Rec."Last Name" := TempMember."Last Name";
                                 Rec."E-Mail Address" := TempMember."E-Mail Address";
@@ -158,7 +158,7 @@
             group(ReplaceMemberCard)
             {
                 Caption = 'Replace Member Card';
-                Visible = ShowReplaceCardSection;
+                Visible = _ShowReplaceCardSection;
                 field(ReplaceMemberNoCard; Rec."External Member No")
                 {
 
@@ -220,7 +220,7 @@
             group(Cardholder)
             {
                 Caption = 'Cardholder';
-                Visible = ShowCardholderSection;
+                Visible = _ShowCardholderSection;
 
                 field(FirstName2; Rec."First Name")
                 {
@@ -240,7 +240,7 @@
                 {
 
                     Editable = false;
-                    ShowMandatory = EmailMandatory;
+                    ShowMandatory = _EmailMandatory;
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
@@ -250,10 +250,9 @@
                     end;
                 }
             }
-
             group(General)
             {
-                Visible = ShowNewMemberSection;
+                Visible = _ShowNewMemberSection;
                 field("Company Name"; Rec."Company Name")
                 {
                     Editable = not _PreSelectedCustomerContact;
@@ -281,7 +280,7 @@
                 field("Phone No."; Rec."Phone No.")
                 {
                     Editable = not _PreSelectedCustomerContact;
-                    ShowMandatory = phonenomandatory;
+                    ShowMandatory = _PhoneNoMandatory;
                     ToolTip = 'Specifies the value of the Phone No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
@@ -289,7 +288,7 @@
                 {
 
                     Importance = Additional;
-                    ShowMandatory = SSNMandatory;
+                    ShowMandatory = _SSNMandatory;
                     ToolTip = 'Specifies the value of the Social Security No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
@@ -319,7 +318,7 @@
                 }
                 field("Enable Auto-Renew"; Rec."Enable Auto-Renew")
                 {
-                    Editable = ShowAutoRenew;
+                    Editable = _ShowAutoRenew;
                     Importance = Additional;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Enable Auto-Renew field';
@@ -391,7 +390,7 @@
             }
             group(CRM)
             {
-                Visible = ShowNewMemberSection;
+                Visible = _ShowNewMemberSection;
 
                 field(Gender; Rec.Gender)
                 {
@@ -403,7 +402,7 @@
                 {
 
                     Importance = Additional;
-                    ShowMandatory = BirthDateMandatory;
+                    ShowMandatory = _BirthDateMandatory;
                     ToolTip = 'Specifies the value of the Birthday field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
@@ -416,7 +415,7 @@
                         ReasonLbl: Label ' {%5 must be %4 %3 => (%1 + %2)}';
                         ReasonDateLbl: Label '<+%1Y>', Locked = true;
                     begin
-                        if (BirthDateMandatory) then begin
+                        if (_BirthDateMandatory) then begin
 
                             if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, Rec."Item No.")) then begin
                                 MembershipSetup.Get(MembershipSalesSetup."Membership Code");
@@ -443,8 +442,8 @@
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
-                    Editable = (not _PreSelectedCustomerContact) or (EmailMandatory and (Rec."E-Mail Address" = ''));
-                    ShowMandatory = EmailMandatory;
+                    Editable = (not _PreSelectedCustomerContact) or (_EmailMandatory and (Rec."E-Mail Address" = ''));
+                    ShowMandatory = _EmailMandatory;
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
@@ -467,36 +466,8 @@
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnDrillDown()
-                    var
-                        TempMember: Record "NPR MM Member" temporary;
-                        MemberInfoCapture: Record "NPR MM Member Info Capture";
-                        Member: Record "NPR MM Member";
                     begin
-                        if (Rec."Receipt No." <> '') then begin
-                            MemberInfoCapture.SetFilter("Receipt No.", '=%1', Rec."Receipt No.");
-                            MemberInfoCapture.SetFilter("Line No.", '<>%1', Rec."Line No.");
-                            MemberInfoCapture.SetFilter("Guardian External Member No.", '=%1', '');
-                            if (MemberInfoCapture.FindSet()) then begin
-                                repeat
-                                    if (Member.Get(MemberInfoCapture."Member Entry No")) then begin
-                                        TempMember.TransferFields(Member, true);
-                                        TempMember.Insert();
-                                    end;
-                                until (MemberInfoCapture.Next() = 0);
-                            end;
-
-                            if (PAGE.RunModal(6060126, TempMember) = ACTION::LookupOK) then begin
-                                Rec."Guardian External Member No." := TempMember."External Member No.";
-                                Rec."E-Mail Address" := TempMember."E-Mail Address";
-                                CurrPage.Update(true);
-                            end;
-                        end else begin
-                            if (PAGE.RunModal(6060126, Member) = ACTION::LookupOK) then begin
-                                Rec."Guardian External Member No." := Member."External Member No.";
-                                Rec."E-Mail Address" := Member."E-Mail Address";
-                                CurrPage.Update(true);
-                            end;
-                        end;
+                        SetGuardian();
                     end;
 
                     trigger OnValidate()
@@ -611,7 +582,7 @@
             }
             group(Card)
             {
-                Visible = ShowNewCardSection;
+                Visible = _ShowNewCardSection;
                 field("External Card No."; Rec."External Card No.")
                 {
 
@@ -647,7 +618,7 @@
             group(Attributes)
             {
                 Caption = 'Attributes';
-                Visible = ShowAttributesSection;
+                Visible = _ShowAttributesSection;
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
 
@@ -839,12 +810,39 @@
                     end;
                 }
             }
+            group(AzureMemberRegistration)
+            {
+                Caption = 'Sign-Up with External Application';
+                Visible = _ShowAzureSection;
+                field(FirstName3; Rec."First Name")
+                {
+                    ToolTip = 'Specifies the value of the First Name field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field(PhoneNo3; Rec."Phone No.")
+                {
+                    ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the Phone No. field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                    trigger OnValidate()
+                    begin
+                        if ((StrLen(Rec."Phone No.") >= 1) and (CopyStr(Rec."Phone No.", 1, 1) <> '+')) then
+                            Error('Phone number must be in international format (starting with a +) for the SMS Service to work correctly.');
+                    end;
+
+                    trigger OnDrillDown()
+                    begin
+                        SetGuardian();
+                    end;
+                }
+            }
         }
+
         area(factboxes)
         {
             part(MMMemberInfoCapturePicture; "NPR MM Member Info Picture")
             {
-
                 Caption = 'Picture';
                 SubPageLink = "Entry No." = field("Entry No.");
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
@@ -888,13 +886,11 @@
         if (ActivationDateEditable) then
             Rec.Validate("Document Date", ActivationDate);
 
-        if (ShowAddToMembershipSection) then
+        if (_ShowAddToMembershipSection) then
             SetMembershipDetails(ExternalMembershipNo);
 
         SetDefaultValues();
-
         SetMandatoryVisualQue();
-
         GetMasterDataAttributeValue();
 
         CurrPage.Update(false);
@@ -903,8 +899,8 @@
     trigger OnInit()
     begin
 
-        ShowNewMemberSection := true;
-        ShowNewCardSection := true;
+        _ShowNewMemberSection := true;
+        _ShowNewCardSection := true;
     end;
 
     trigger OnOpenPage()
@@ -953,11 +949,11 @@
         EMAIL_EXISTS: Label '%1 is already in use by member [%2] %3.\\If you are certain that the existing member should be blocked from the existing membership and re-registered with the new membership, press Yes.';
         MISSING_REQUIRED_FIELDS: Label 'All fields do not have valid values.\\ The following fields needs attention: %1';
         EMAIL_INVALID_CONFIRM: Label 'The %1 seems invalid, do you want to correct it?';
-        EmailMandatory: Boolean;
-        PhoneNoMandatory: Boolean;
-        SSNMandatory: Boolean;
+        _EmailMandatory: Boolean;
+        _PhoneNoMandatory: Boolean;
+        _SSNMandatory: Boolean;
         INVALID_VALUE: Label 'The %1 is invalid.';
-        BirthDateMandatory: Boolean;
+        _BirthDateMandatory: Boolean;
         ExternalCardNoMandatory: Boolean;
         GuardianMandatory: Boolean;
 
@@ -966,15 +962,16 @@
         INVALID_ACTIVATION_DATE: Label 'The activation date %1 is not valid. The resulting membership must have remaining time when applying the membership duration formula to activation date.';
         ActivationDate: Date;
         ExternalMembershipNo: Code[20];
-        ShowNewMemberSection: Boolean;
-        ShowNewCardSection: Boolean;
-        ShowAddToMembershipSection: Boolean;
-        ShowAddMemberCardSection: Boolean;
-        ShowReplaceCardSection: Boolean;
-        ShowCardholderSection: Boolean;
-        ShowAttributesSection: Boolean;
+        _ShowNewMemberSection: Boolean;
+        _ShowNewCardSection: Boolean;
+        _ShowAddToMembershipSection: Boolean;
+        _ShowAddMemberCardSection: Boolean;
+        _ShowReplaceCardSection: Boolean;
+        _ShowCardholderSection: Boolean;
+        _ShowAttributesSection: Boolean;
         EditMemberCardType: Boolean;
-        ShowAutoRenew: Boolean;
+        _ShowAutoRenew: Boolean;
+        _ShowAzureSection: Boolean;
         ExternalMembershipNoEditable: Boolean;
         AutoRenewPaymentMethodMandatory: Boolean;
         SetAddGuardianMode: Boolean;
@@ -1082,7 +1079,7 @@
                 if (MembershipSetup.Get(MembershipSalesSetup."Membership Code")) then
                     MemberCommunity.Get(MembershipSetup."Community Code");
 
-                if (ShowNewMemberSection) then begin
+                if (_ShowNewMemberSection) then begin
                     case MemberCommunity."Member Unique Identity" of
                         MemberCommunity."Member Unique Identity"::NONE:
                             MissingInformation := false;
@@ -1097,7 +1094,7 @@
                     if (ActivationDateEditable) and (MemberInfoCapture."Document Date" = 0D) then
                         SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Document Date"), (MemberInfoCapture."Document Date" = 0D));
 
-                    if (BirthDateMandatory) then begin
+                    if (_BirthDateMandatory) then begin
                         SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption(Birthday), (MemberInfoCapture.Birthday = 0D));
                         if (MemberInfoCapture.Birthday <> 0D) then
                             if (not MembershipManagement.CheckAgeConstraint(
@@ -1118,7 +1115,7 @@
 
                 end;
 
-                if (ShowNewCardSection) then begin
+                if (_ShowNewCardSection) then begin
                     if (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::EXTERNAL) then begin
                         SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("External Card No."), (MemberInfoCapture."External Card No." = ''));
 
@@ -1128,11 +1125,11 @@
                     end;
                 end;
 
-                if (ShowAddToMembershipSection) or (ShowAddMemberCardSection) or (ShowReplaceCardSection) then begin
+                if (_ShowAddToMembershipSection) or (_ShowAddMemberCardSection) or (_ShowReplaceCardSection) then begin
                     SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("External Membership No."), (MemberInfoCapture."External Membership No." = ''));
                 end;
 
-                if (ShowAddMemberCardSection) or (ShowReplaceCardSection) then begin
+                if (_ShowAddMemberCardSection) or (_ShowReplaceCardSection) then begin
                     SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("External Member No"), (MemberInfoCapture."External Member No" = ''));
                 end;
 
@@ -1201,11 +1198,11 @@
                     MemberCommunity."Member Unique Identity"::NONE:
                         ;
                     MemberCommunity."Member Unique Identity"::EMAIL:
-                        EmailMandatory := true;
+                        _EmailMandatory := true;
                     MemberCommunity."Member Unique Identity"::PHONENO:
-                        PhoneNoMandatory := true;
+                        _PhoneNoMandatory := true;
                     MemberCommunity."Member Unique Identity"::SSN:
-                        SSNMandatory := true;
+                        _SSNMandatory := true;
                 end;
 
                 ExternalCardNoMandatory := (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::EXTERNAL);
@@ -1221,15 +1218,15 @@
 
                 AutoRenewPaymentMethodMandatory := Rec."Enable Auto-Renew";
 
-                BirthDateMandatory := MembershipSetup."Enable Age Verification";
+                _BirthDateMandatory := MembershipSetup."Enable Age Verification";
 
             end;
         end else begin
-            EmailMandatory := true;
-            PhoneNoMandatory := false;
-            SSNMandatory := false;
+            _EmailMandatory := true;
+            _PhoneNoMandatory := false;
+            _SSNMandatory := false;
 
-            BirthDateMandatory := false;
+            _BirthDateMandatory := false;
 
         end;
     end;
@@ -1244,17 +1241,17 @@
     begin
 
         _PreSelectedCustomerContact := ((Rec."Contact No." <> '') or (Rec."Customer No." <> '')) and not Rec."Originates From File Import";
-        ShowNewMemberSection := true;
+        _ShowNewMemberSection := true;
 
-        ShowAddToMembershipSection := false;
-        ShowCardholderSection := false;
-        ShowAddMemberCardSection := false;
-        ShowReplaceCardSection := false;
-        ShowNewCardSection := false;
-        ShowAutoRenew := false;
+        _ShowAddToMembershipSection := false;
+        _ShowCardholderSection := false;
+        _ShowAddMemberCardSection := false;
+        _ShowReplaceCardSection := false;
+        _ShowNewCardSection := false;
+        _ShowAutoRenew := false;
         EditMemberCardType := false;
 
-        ShowAttributesSection := true;
+        _ShowAttributesSection := true;
         GuardianMandatory := false;
 
         Rec.Quantity := 1;
@@ -1262,15 +1259,14 @@
         ExternalMembershipNoEditable := (Rec."External Membership No." = '');
 
         if (SetAddGuardianMode) then begin
-            ShowAddToMembershipSection := false;
-            ShowReplaceCardSection := false;
-            ShowNewMemberSection := false;
-            ShowCardholderSection := false;
-            ShowNewCardSection := false;
+            _ShowAddToMembershipSection := false;
+            _ShowReplaceCardSection := false;
+            _ShowNewMemberSection := false;
+            _ShowCardholderSection := false;
+            _ShowNewCardSection := false;
 
-            ShowAttributesSection := false;
+            _ShowAttributesSection := false;
             GuardianMandatory := true;
-
         end;
 
         if (Rec."Store Code" = '') and (_PosUnitNo <> '') then
@@ -1287,40 +1283,57 @@
                 if (Rec."Country Code" = '') then
                     Rec."Country Code" := MemberCommunity.MemberDefaultCountryCode;
 
-                ShowNewCardSection := (MembershipSetup."Loyalty Card" = MembershipSetup."Loyalty Card"::YES);
+                _ShowNewCardSection := (MembershipSetup."Loyalty Card" = MembershipSetup."Loyalty Card"::YES);
 
                 EditMemberCardType := (MembershipSalesSetup."Member Card Type Selection" = MembershipSalesSetup."Member Card Type Selection"::USER_SELECT);
                 Rec."Member Card Type" := MembershipSalesSetup."Member Card Type";
 
-                ShowAutoRenew := MemberCommunity."Membership to Cust. Rel.";
+                _ShowAutoRenew := MemberCommunity."Membership to Cust. Rel.";
 
                 case MembershipSalesSetup."Business Flow Type" of
+                    MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
+                        begin
+                            if (MembershipSalesSetup.AzureMemberRegSetupCode <> '') then begin
+                                _ShowAddToMembershipSection := false;
+                                _ShowReplaceCardSection := false;
+                                _ShowNewMemberSection := false;
+                                _ShowCardholderSection := false;
+                                _ShowNewCardSection := false;
+                                _ShowAddMemberCardSection := false;
+                                _ShowAttributesSection := false;
+                                _ShowAutoRenew := false;
+                                _ShowNewMemberSection := false;
+                                _ShowAzureSection := true;
+                            end;
+                        end;
                     MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER:
-                        ShowAddToMembershipSection := true;
+                        _ShowAddToMembershipSection := true;
 
                     MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER:
                         begin
-                            ShowAddToMembershipSection := true;
-                            ShowReplaceCardSection := false;
-                            ShowNewMemberSection := false;
-                            ShowCardholderSection := false;
-                            ShowNewCardSection := false;
+                            _ShowAddToMembershipSection := true;
+                            _ShowReplaceCardSection := false;
+                            _ShowNewMemberSection := false;
+                            _ShowCardholderSection := false;
+                            _ShowNewCardSection := false;
                         end;
 
                     MembershipSalesSetup."Business Flow Type"::ADD_CARD:
                         begin
-                            ShowAddMemberCardSection := true;
-                            ShowNewMemberSection := false;
-                            ShowCardholderSection := true;
+                            _ShowAddMemberCardSection := true;
+                            _ShowNewMemberSection := false;
+                            _ShowCardholderSection := true;
                         end;
 
                     MembershipSalesSetup."Business Flow Type"::REPLACE_CARD:
                         begin
-                            ShowReplaceCardSection := true;
-                            ShowNewMemberSection := false;
-                            ShowCardholderSection := true;
+                            _ShowReplaceCardSection := true;
+                            _ShowNewMemberSection := false;
+                            _ShowCardholderSection := true;
                         end;
                 end;
+
+
 
                 ActivationDateEditable := false;
                 case MembershipSalesSetup."Valid From Base" of
@@ -1344,7 +1357,7 @@
                 if (MembershipSalesSetup."Membership Code" = '') then
                     MembershipSetup."Card Number Valid Until" := MembershipSalesSetup."Duration Formula";
 
-                if (not ShowReplaceCardSection) then begin
+                if (not _ShowReplaceCardSection) then begin
                     case MembershipSetup."Card Expire Date Calculation" of
                         MembershipSetup."Card Expire Date Calculation"::DATEFORMULA:
                             Rec."Valid Until" := CalcDate(MembershipSetup."Card Number Valid Until", ValidUntilBaseDate);
@@ -1427,7 +1440,7 @@
         ExternalMembershipNo := Membership."External Membership No.";
 
         // Set guardian
-        if (ShowAddToMembershipSection) then begin
+        if (_ShowAddToMembershipSection) then begin
             MembershipRole.SetFilter("Membership Entry No.", '=%1', Rec."Membership Entry No.");
             MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::GUARDIAN);
             MembershipRole.SetFilter(Blocked, '=%1', false);
@@ -1435,9 +1448,45 @@
                 GuardianMember.Get(MembershipRole."Member Entry No.");
                 Rec."Guardian External Member No." := GuardianMember."External Member No.";
                 Rec."E-Mail Address" := GuardianMember."E-Mail Address";
+                Rec."Phone No." := GuardianMember."Phone No.";
             end;
         end;
 
+    end;
+
+    local procedure SetGuardian()
+    var
+        TempMember: Record "NPR MM Member" temporary;
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        Member: Record "NPR MM Member";
+    begin
+        if (Rec."Receipt No." <> '') then begin
+            MemberInfoCapture.SetFilter("Receipt No.", '=%1', Rec."Receipt No.");
+            MemberInfoCapture.SetFilter("Line No.", '<>%1', Rec."Line No.");
+            MemberInfoCapture.SetFilter("Guardian External Member No.", '=%1', '');
+            if (MemberInfoCapture.FindSet()) then begin
+                repeat
+                    if (Member.Get(MemberInfoCapture."Member Entry No")) then begin
+                        TempMember.TransferFields(Member, true);
+                        TempMember.Insert();
+                    end;
+                until (MemberInfoCapture.Next() = 0);
+            end;
+
+            if (PAGE.RunModal(Page::"NPR MM Members", TempMember) = ACTION::LookupOK) then begin
+                Rec."Guardian External Member No." := TempMember."External Member No.";
+                Rec."E-Mail Address" := TempMember."E-Mail Address";
+                Rec."Phone No." := TempMember."Phone No.";
+                CurrPage.Update(true);
+            end;
+        end else begin
+            if (PAGE.RunModal(Page::"NPR MM Members", Member) = ACTION::LookupOK) then begin
+                Rec."Guardian External Member No." := Member."External Member No.";
+                Rec."E-Mail Address" := Member."E-Mail Address";
+                Rec."Phone No." := Member."Phone No.";
+                CurrPage.Update(true);
+            end;
+        end;
     end;
 
     local procedure SetMemberDetails(pExternalMemberNo: Code[20])
@@ -1477,10 +1526,13 @@
         end else
             Clear(Rec.Image);
 
-        Rec."First Name" := Member."First Name";
-        Rec."Middle Name" := Member."Middle Name";
-        Rec."Last Name" := Member."Last Name";
+        if (not _ShowAzureSection) then begin
+            Rec."First Name" := Member."First Name";
+            Rec."Middle Name" := Member."Middle Name";
+            Rec."Last Name" := Member."Last Name";
+        end;
         Rec."E-Mail Address" := Member."E-Mail Address";
+        Rec."Phone No." := Member."Phone No.";
         Rec."Valid Until" := 0D;
 
         Membership.Get(MembershipManagement.GetMembershipFromExtMemberNo(pExternalMemberNo));
@@ -1503,7 +1555,7 @@
 
         MembersListPage.GetRecord(Member);
 
-        if (ShowAddMemberCardSection) then
+        if (_ShowAddMemberCardSection) then
             SetMemberDetails(Member."External Member No.");
 
         MemberRole.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
@@ -1537,13 +1589,15 @@
             Membership.Get(MemberRole."Membership Entry No.");
             SetMembershipDetails(Membership."External Membership No.");
 
-            if (ShowAddMemberCardSection) then
+            if (_ShowAddMemberCardSection) then
                 SetMemberDetails(Member."External Member No.");
 
-            if (ShowReplaceCardSection) then begin
+            if (_ShowReplaceCardSection) then begin
                 SetMemberDetails(Member."External Member No.");
                 MemberCardLookup(Member."Entry No.", false);
             end;
+
+            if (_ShowAzureSection) then;
 
             if (SetAddGuardianMode) then
                 Rec."Guardian External Member No." := Member."External Member No.";

@@ -76,7 +76,6 @@
 
                 'SearchMembers':
                     ; // Do nothing, handled by xmlport */
-
                 else
                     Error(MISSING_CASE, Rec."Import Type", FunctionName);
             end;
@@ -1452,6 +1451,6 @@
     begin
         exit(CopyStr(NpXmlDomMgt.GetXmlAttributeText(Element, AttributeName, Required), 1, 100));
     end;
-#pragma warning restore
+
 }
 
