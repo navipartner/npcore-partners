@@ -784,7 +784,7 @@
     end;
     #endregion
 
-#if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC2200)
+#if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Checklist Banner", 'OnBeforeUpdateBannerLabels', '', false, false)]
     local procedure ChecklistBannerOnBeforeUpdateBannerLabels(var IsHandled: Boolean; var DescriptionTxt: Text; var TitleTxt: Text; var HeaderTxt: Text)
     var
