@@ -122,27 +122,28 @@
                 }
                 field("Template Filter Value"; Rec."Template Filter Value")
                 {
-
                     ToolTip = 'Specifies the value of the Template Filter Value field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Target Member Role"; Rec."Target Member Role")
                 {
-
                     ToolTip = 'Specifies the value of the Target Member Role field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Include NP Pass"; Rec."Include NP Pass")
                 {
-
                     ToolTip = 'Specifies the value of the Include NP Pass field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Processing Method"; Rec."Processing Method")
                 {
-
                     ToolTip = 'Specifies the value of the Processing Method field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field(MemberRegistrationSetupCode; Rec.AzureRegistrationSetupCode)
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Profile to determine how to manage user delegated members.';
                 }
             }
         }
@@ -166,13 +167,23 @@
                 ToolTip = 'Executes the View Members Notified action';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
+            action(ViewSmsSetup)
+            {
+                Caption = 'View SMS Log';
+                Image = ServiceSetup;
+                Promoted = false;
+                RunObject = Page "NPR SMS Log";
+
+                ToolTip = 'Navigates to View SMS Log';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+            }
         }
         area(processing)
         {
             action("Send Notifications")
             {
                 Caption = 'Send Notification';
-                Image = SendTo;
+                Image = SendToMultiple;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
@@ -182,12 +193,32 @@
 
                 trigger OnAction()
                 begin
-
                     SendNotification(Rec);
+                end;
+            }
+            action(SendSms)
+            {
+                Caption = 'Send Pending SMS''s Now';
+                Image = SendToMultiple;
+                Promoted = false;
+
+                ToolTip = 'Executes the Send SMS action for all pending SMS.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                begin
+                    ForceSendPendingSms();
                 end;
             }
         }
     }
+
+    local procedure ForceSendPendingSms()
+    var
+        MessageJOBHandler: Codeunit "NPR Send SMS Job Handler";
+    begin
+        MessageJOBHandler.Run();
+    end;
 
     local procedure SendNotification(MembershipNotification: Record "NPR MM Membership Notific.")
     var

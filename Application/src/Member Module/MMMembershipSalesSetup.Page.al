@@ -125,6 +125,11 @@
                     ToolTip = 'Specifies the value of the Requires Guardian field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(AzureMemberRegSetupCode; Rec.AzureMemberRegSetupCode)
+                {
+                    ToolTip = 'Specifies the value of the Azure Member Registration Setup Code used for having a delegated member registration process.';
+                    ApplicationArea = NPRMembershipAdvanced;
+                }
             }
         }
     }

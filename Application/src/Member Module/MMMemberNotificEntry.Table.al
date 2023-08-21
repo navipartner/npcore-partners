@@ -360,6 +360,22 @@
             DataClassification = CustomerContent;
             Description = '';
         }
+        field(500; ClientSignUpUrl; text[500])
+        {
+            Caption = 'Client URL to SignUp Form';
+            DataClassification = CustomerContent;
+        }
+        field(510; AzureRegistrationSetupCode; Code[10])
+        {
+            Caption = 'Member Registration Profile Code.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM AzureMemberRegSetup";
+        }
+        field(520; DataSubjectId; Text[64])
+        {
+            Caption = 'Member Identifier';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

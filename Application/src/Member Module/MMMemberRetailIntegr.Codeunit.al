@@ -1032,6 +1032,7 @@
         SaleLine: Codeunit "NPR POS Sale Line";
         POSSession: Codeunit "NPR POS Session";
         Base64: Codeunit "Base64 Convert";
+        TextHelper: Codeunit "NPR MM Text Helper";
         JToken: JsonToken;
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
         ItemIdentifier: Text;
@@ -1042,7 +1043,7 @@
             JObject.ReadFrom(Base64.FromBase64(JToken.AsValue().AsText()));
 
         // {"in":"320100","m":[]}
-        ItemIdentifier := GetJsonText('in', JObject, 255);
+        ItemIdentifier := TextHelper.AsText('in', JObject, 100);
         POSActionInsertItemB.GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
         POSSession.GetSale(Sale);
         POSSession.GetSaleLine(SaleLine);
@@ -1059,29 +1060,36 @@
         MemberInfo: Record "NPR MM Member Info Capture";
         MemberToken: JsonToken;
         Member: JsonObject;
+
     begin
-        // [{"fn":"Tim","ln":"Sannes","ad":"Spaljevägen 9","pc":"197 36","ct":"Bro","cc":"SE","em":"tsa@navipartner.dk","pn":"0732542026"}]
         foreach MemberToken in Members do begin
+            // {"fn":"Tim","ln":"Sannes","ad":"Spaljevägen 9","pc":"197 36","ct":"Bro","cc":"SE","em":"tsa@navipartner.dk","pn":"0732542026"}
             Member := MemberToken.AsObject();
 
             Clear(MemberInfo);
             MemberInfo."Receipt No." := SalesTicketNo;
             MemberInfo."Line No." := LineNo;
             MemberInfo."Item No." := ItemNo;
-
-            MemberInfo."First Name" := GetJsonText50('fn', Member);
-            MemberInfo."Last Name" := GetJsonText50('ln', Member);
-            MemberInfo.Address := GetJsonText100('ad', Member);
-            MemberInfo.City := GetJsonText50('ct', Member);
-            MemberInfo."Post Code Code" := GetJsonText20('pc', Member);
-            MemberInfo."Country Code" := GetJsonText10('cc', Member);
-            MemberInfo."E-Mail Address" := GetJsonText80('em', Member);
-            MemberInfo."Phone No." := GetJsonText30('pn', Member);
-
-            MemberInfo."News Letter" := GetNewsLetter(Member);
-            MemberInfo.Gender := GetGender(Member);
+            MemberJSonToMemberInfo(Member, MemberInfo);
             MemberInfo.Insert();
         end;
+    end;
+
+    internal procedure MemberJSonToMemberInfo(Member: JsonObject; var MemberInfo: Record "NPR MM Member Info Capture")
+    var
+        TextHelper: Codeunit "NPR MM Text Helper";
+    begin
+        MemberInfo."First Name" := TextHelper.AsText50('fn', Member);
+        MemberInfo."Last Name" := TextHelper.AsText50('ln', Member);
+        MemberInfo.Address := TextHelper.AsText100('ad', Member);
+        MemberInfo.City := TextHelper.AsText50('ct', Member);
+        MemberInfo."Post Code Code" := TextHelper.AsText20('pc', Member);
+        MemberInfo."Country Code" := TextHelper.AsText10('cc', Member);
+        MemberInfo."E-Mail Address" := LowerCase(TextHelper.AsText80('em', Member));
+        MemberInfo."Phone No." := TextHelper.AsText30('pn', Member);
+
+        MemberInfo."News Letter" := GetNewsLetter(Member);
+        MemberInfo.Gender := GetGender(Member);
     end;
 
     local procedure GetNewsLetter(JObject: JsonObject): Option
@@ -1121,49 +1129,6 @@
                 exit(MemberInfo.Gender::NOT_SPECIFIED);
         end;
     end;
-
-
-#pragma warning disable AA0139
-    local procedure GetJsonText10(KeyName: Text; JObject: JsonObject) TextValue: Text[10]
-    begin
-        exit(GetJsonText(KeyName, JObject, MaxStrLen(TextValue)));
-    end;
-
-    local procedure GetJsonText20(KeyName: Text; JObject: JsonObject) TextValue: Text[20]
-    begin
-        exit(GetJsonText(KeyName, JObject, MaxStrLen(TextValue)));
-    end;
-
-    local procedure GetJsonText30(KeyName: Text; JObject: JsonObject) TextValue: Text[30]
-    begin
-        exit(GetJsonText(KeyName, JObject, MaxStrLen(TextValue)));
-    end;
-
-    local procedure GetJsonText50(KeyName: Text; JObject: JsonObject) TextValue: Text[50]
-    begin
-        exit(GetJsonText(KeyName, JObject, MaxStrLen(TextValue)));
-    end;
-
-    local procedure GetJsonText80(KeyName: Text; JObject: JsonObject) TextValue: Text[80]
-    begin
-        exit(GetJsonText(KeyName, JObject, MaxStrLen(TextValue)));
-    end;
-
-    local procedure GetJsonText100(KeyName: Text; JObject: JsonObject) TextValue: Text[100]
-    begin
-        exit(GetJsonText(KeyName, JObject, MaxStrLen(TextValue)));
-    end;
-#pragma warning restore AA0139
-    local procedure GetJsonText(KeyName: Text; JObject: JsonObject; Length: Integer): Text
-    var
-        JToken: JsonToken;
-    begin
-        if (not (JObject.Get(KeyName, JToken))) then
-            exit('');
-        exit(CopyStr(JToken.AsValue().AsText(), 1, Length));
-    end;
-
-
 
 }
 

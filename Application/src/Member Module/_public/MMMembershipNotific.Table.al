@@ -115,6 +115,12 @@
             OptionCaption = 'Member,External';
             OptionMembers = MEMBER,EXTERNAL;
         }
+        field(200; AzureRegistrationSetupCode; Code[10])
+        {
+            Caption = 'Member Registration Profile Code.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM AzureMemberRegSetup";
+        }
         field(300; "External Membership No."; Code[20])
         {
             CalcFormula = Lookup("NPR MM Membership"."External Membership No." WHERE("Entry No." = FIELD("Membership Entry No.")));
