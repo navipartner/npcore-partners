@@ -116,6 +116,10 @@ page 6059925 "NPR APIV1 PBIGLEntry"
                 {
                     Caption = 'Dimension Set ID', Locked = true;
                 }
+                field(description; Rec.Description)
+                {
+                    Caption = 'Description', Locked = true;
+                }
             }
         }
     }
