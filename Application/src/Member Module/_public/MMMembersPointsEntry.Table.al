@@ -184,5 +184,6 @@
         {
         }
         key(Key7; "Document No.", "Posting Date") { }
+        key(Key8; "Redeem Reference No.", "Redeem Ref. Type", "Entry Type", Adjustment) { }
     }
 }

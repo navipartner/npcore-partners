@@ -228,9 +228,8 @@
         key(Key1; "Entry No.")
         {
         }
-        key(Key2; "External Member No.")
-        {
-        }
+        key(Key2; "External Member No.") { }
+        key(Key3; "E-Mail Address") { }
     }
 
     fieldgroups
