@@ -46,4 +46,9 @@ codeunit 6059924 "NPR NpCs POS Action Events"
 
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnCreateCollectOrderBeforeScheduleRunWorkflow(NpCsDocument: Record "NPR NpCs Document")
+    begin
+    end;
+
 }
