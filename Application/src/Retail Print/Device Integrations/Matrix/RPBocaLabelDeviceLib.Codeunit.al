@@ -10,7 +10,21 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
         _DotNetEncoding: Codeunit DotNet_Encoding;
         InvalidDeviceSettingErr: Label 'Invalid device setting: %1';
         SettingPrintWidthLbl: Label 'Set print width (in dots) - value between 1 and label width';
+        SettingPrintHeightLbl: Label 'Set print height (in dots) - value between 1 and label height';
+        SettingRfidTagTypeLbl: Label 'Select RFID tag type, to enable RFID functionality. (requires physical module from Boca)';
+        ErrRfidWriteOutsideMemoryLbl: Label 'Error in writing to chip. Data is exceeding available memory for chip type: %1.';
+        ErrRfidDeviceSettingsChipTypeLbl: Label 'You need to define RFID_CHIP_TYPE in Device Settings for the Print Template to use RFID methods.';
+        ErrRfidUnknownChipTypeLbl: Label 'Unknown chip type';
+        ErrDeviceSettingsWidthLbl: Label 'The PRINT_WIDTH value is invalid.';
+        ErrDeviceSettingsWidthFormatLbl: Label 'Please set a positive value for PRINT_WIDTH.';
+        ErrDeviceSettingsHeightLbl: Label 'The PRINT_HEIGHT value is invalid.';
+        ErrDeviceSettingsHeightFormatLbl: Label 'Please set a positive value for PRINT_HEIGHT.';
+        ErrXCoordinateOutsideAreaLbl: Label 'The X-coordinate is outside printing space, please update the X-coordinate or increase the PRINT_WIDTH.';
+        ErrPrintHeightWithRotationLbl: Label 'You must set the Device Setting: "PRINT_HEIGHT" to a value higher than 0, to use right-alignment with this rotation.';
+        ErrQRTooMuchDataLbl: Label 'The value of the QR code exceeds the max limit for current QR settings. Try Lowering the Error Correction Level or increasing the QR version.';
         _PrintWidth: Integer;
+        _PrintHeight: Integer;
+        _RfidChipType: Text;
 
     procedure InitJob(var DeviceSettings: Record "NPR RP Device Settings");
     begin
@@ -20,15 +34,25 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
             repeat
                 case DeviceSettings.Name of
                     'PRINT_WIDTH':
-                        if not Evaluate(_PrintWidth, DeviceSettings.Value) then
-                            Error('The PRINT_WIDTH value is invalid.');
+                        begin
+                            if not Evaluate(_PrintWidth, DeviceSettings.Value) then
+                                Error(ErrDeviceSettingsWidthLbl);
+                            if not (_PrintWidth > 0) then
+                                Error(ErrDeviceSettingsWidthFormatLbl);
+                        end;
+                    'PRINT_HEIGHT':
+                        begin
+                            if not Evaluate(_PrintHeight, DeviceSettings.Value) then
+                                Error(ErrDeviceSettingsHeightLbl);
+                            if not (_PrintHeight > 0) then
+                                Error(ErrDeviceSettingsHeightFormatLbl);
+                        end;
+                    'RFID_CHIP_TYPE':
+                        _RfidChipType := DeviceSettings.Value;
                     else
                         Error(InvalidDeviceSettingErr, DeviceSettings.Name);
                 end;
             until DeviceSettings.Next() = 0;
-
-        if not (_PrintWidth > 0) then
-            Error('Please set a positive value for PRINT_WIDTH.');
     end;
 
     procedure PrintData(var POSPrintBuffer: Record "NPR RP Print Buffer" temporary);
@@ -40,7 +64,7 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
     begin
         // As X-coordinates are defined from the right, we need to perform following check:
         if POSPrintBuffer.X > _PrintWidth then
-            Error('The X-coordinate is outside printing space, please update the X-coordinate or increase the PRINT_WIDTH.');
+            Error(ErrXCoordinateOutsideAreaLbl);
 
         // We are rotating based on default print direction/orientation.
         case POSPrintBuffer.Rotation of
@@ -64,18 +88,20 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
             IsBarcodeFont(POSPrintBuffer.Font):
                 begin
                     if (UpperCase(CopyStr(POSPrintBuffer.Font, 1, 2)) = 'QR') then
-                        PrintQR(Font, (FontParam <> 'NOHRI'), POSPrintBuffer.Width, POSPrintBuffer.Align, R, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text)
+                        PrintQR(Font, POSPrintBuffer."Hide HRI", POSPrintBuffer.Width, POSPrintBuffer.Align, R, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text)
                     else
-                        PrintBarcode(Font, (FontParam <> 'NOHRI'), POSPrintBuffer.Height, POSPrintBuffer.Width, POSPrintBuffer.Align, R, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
+                        PrintBarcode(Font, POSPrintBuffer."Hide HRI", POSPrintBuffer.Height, POSPrintBuffer.Width, POSPrintBuffer.Align, R, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
                 end;
             (UpperCase(CopyStr(POSPrintBuffer.Font, 1, 1)) = 'F'):
                 PrintText(Font, FontParam, POSPrintBuffer.Align, R, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
+            (UpperCase(CopyStr(POSPrintBuffer.Font, 1, 4)) = 'RFID'):
+                PrintRFID(FontParam, POSPrintBuffer.Text);
         end;
     end;
 
     procedure EndJob();
     begin
-        AddStringToBuffer('<p>');
+        AddStringToBuffer('<p>', true);
     end;
 
     procedure LookupFont(var Value: Text): Boolean;
@@ -121,8 +147,25 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
         DotNetString: Codeunit "DotNet_String";
     begin
         //This function over allocates and is verbose, all because of the beautiful DotNet wrapper codeunits.
-
         DotNetString.Set(String);
+        DotNetString.ToCharArray(0, DotNetString.Length(), DotNetCharArray);
+        _DotNetEncoding.GetBytes(DotNetCharArray, 0, DotNetCharArray.Length(), DotNetByteArray);
+        _DotNetStream.Write(DotNetByteArray, 0, DotNetByteArray.Length());
+    end;
+
+    local procedure AddStringToBuffer(String: Text; AppendCRLF: Boolean)
+    var
+        DotNetCharArray: Codeunit "DotNet_Array";
+        DotNetByteArray: Codeunit "DotNet_Array";
+        DotNetString: Codeunit "DotNet_String";
+        TypeHelper: Codeunit "Type Helper";
+    begin
+        //This function over allocates and is verbose, all because of the beautiful DotNet wrapper codeunits.
+        if AppendCRLF then
+            DotNetString.Set(String + TypeHelper.CRLFSeparator())
+        else
+            DotNetString.Set(String);
+
         DotNetString.ToCharArray(0, DotNetString.Length(), DotNetCharArray);
         _DotNetEncoding.GetBytes(DotNetCharArray, 0, DotNetCharArray.Length(), DotNetByteArray);
         _DotNetStream.Write(DotNetByteArray, 0, DotNetByteArray.Length());
@@ -154,29 +197,23 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
             case tmpDeviceSetting.Name of
                 'PRINT_WIDTH':
                     tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Integer;
+                'PRINT_HEIGHT':
+                    tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Integer;
+                'RFID_CHIP_TYPE':
+                    begin
+                        tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
+                        tmpDeviceSetting.Options := 'MiFare Ultralight, ';
+                    end;
             end;
             exit(tmpDeviceSetting.Insert());
-
         end;
     end;
 
     local procedure ConstructDeviceSettingList(var tmpRetailList: Record "NPR Retail List" temporary)
     begin
         AddOption(tmpRetailList, SettingPrintWidthLbl, 'PRINT_WIDTH');
-        /*
-        AddOption(tmpRetailList, SettingLabelHomeLbl, 'LABEL_HOME');
-        AddOption(tmpRetailList, SettingLabelLengthLbl, 'LABEL_LENGTH');
-        AddOption(tmpRetailList, SettingMediaDarknessLbl, 'MEDIA_DARKNESS');
-        AddOption(tmpRetailList, SettingMediaTypeLbl, 'MEDIA_TYPE');
-        AddOption(tmpRetailList, SettingPrintOrientationLbl, 'PRINT_ORIENTATION');
-        AddOption(tmpRetailList, SettingPrintRateLbl, 'PRINT_RATE');
-        AddOption(tmpRetailList, SettingPrintWidthLbl, 'PRINT_WIDTH');
-        AddOption(tmpRetailList, SettingSetDarknessLbl, 'SET_DARKNESS');
-        AddOption(tmpRetailList, SettingRfidEpcMemLbl, 'RFID_EPC_MEMORY');
-        AddOption(tmpRetailList, SettingEncodingLbl, 'ENCODING');
-        AddOption(tmpRetailList, SettingLabelReverseLbl, 'LABEL_REVERSE');
-        AddOption(tmpRetailList, SettingSensorSelectLbl, 'SENSOR_SELECT');
-        */
+        AddOption(tmpRetailList, SettingPrintHeightLbl, 'PRINT_HEIGHT');
+        AddOption(tmpRetailList, SettingRfidTagTypeLbl, 'RFID_CHIP_TYPE');
     end;
 
     procedure ConstructFontSelectionList(var RetailList: Record "NPR Retail List" temporary)
@@ -204,9 +241,7 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
 
         // Regular Barcodes
         AddOption(RetailList, 'EAN13', '');
-        AddOption(RetailList, 'EAN13 NOHRI', '');
         AddOption(RetailList, 'CODE128', '');
-        AddOption(RetailList, 'CODE128 NOHRI', '');
 
         AddOption(RetailList, 'UPC', '');
         AddOption(RetailList, '3OF9', '');
@@ -215,7 +250,6 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
 
         // QR
         AddOption(RetailList, 'QR', '');
-        AddOption(RetailList, 'QR NOHRI', '');
         AddOption(RetailList, 'QR2L', '');
         AddOption(RetailList, 'QR2M', '');
         AddOption(RetailList, 'QR2Q', '');
@@ -233,11 +267,12 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
         AddOption(RetailList, 'QR15Q', '');
         AddOption(RetailList, 'QR15H', '');
 
-        /* Might need later
+        // RFID/NFC
         AddOption(RetailList, 'RFID EPC_HEX', '');
-        AddOption(RetailList, 'RFID EPC_ASCII', '');
-        AddOption(RetailList, 'RFID EPC_STD', '');
-        */
+
+        /* IMPLEMENT AT A LATER STAGE */
+        //AddOption(RetailList, 'RFID EPC_ASCII', '');
+        //AddOption(RetailList, 'RFID EPC_STD', '');
     end;
 
     procedure AddOption(var RetailList: Record "NPR Retail List" temporary; Choice: Text; Value: Text)
@@ -333,14 +368,30 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
                     if X > (_PrintWidth DIV 2) then
                         CTR := _PrintWidth - X;
                     CTR := X * 2;
+                    // Might need to handle rotation at a later point as well. Seek inspiration in the right-alignment case
                     AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><CTR%6>~%7~', Rotation, ((_PrintWidth - X) + (CTR DIV 2)), Y, Font, HW, CTR, Input));
                 end;
             2:
-                AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><RTJ%6>~%7~', Rotation, _PrintWidth, Y, Font, HW, X, Input));
+                case Rotation of
+                    'RL':
+                        AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><RTJ%6>~%7~', Rotation, _PrintWidth, Y, Font, HW, X, Input));
+                    'NR':
+                        AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><RTJ%6>~%7~', Rotation, (_PrintWidth - X), 0, Font, HW, Y, Input));
+                    'RR':
+                        AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><RTJ%6>~%7~', Rotation, 0, Y, Font, HW, (_PrintWidth - X), Input));
+                    'RU':
+                        begin
+                            if _PrintHeight = 0 then
+                                Error(ErrPrintHeightWithRotationLbl);
+
+                            AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><RTJ%6>~%7~', Rotation, (_PrintWidth - X), _PrintHeight, Font, HW, (_PrintHeight - Y), Input));
+                        end;
+
+                end;
         end;
     end;
 
-    local procedure PrintBarcode(Barcode: Text[50]; HRI: Boolean; Height: Integer; Width: Integer; Alignment: Option; Rotation: Text[2]; X: Integer; Y: Integer; Input: Text[100])
+    local procedure PrintBarcode(Barcode: Text[50]; HideHRI: Boolean; Height: Integer; Width: Integer; Alignment: Option; Rotation: Text[2]; X: Integer; Y: Integer; Input: Text[100])
     var
         H: Text[10];
         UPCEAN8Split: Integer;
@@ -357,7 +408,7 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
                 AddStringToBuffer(StrSubstNo('<CTR%1>', _PrintWidth));
         end;
 
-        if HRI then
+        if not HideHRI then
             AddStringToBuffer('<BI>');
 
         if Width > 1 then
@@ -403,7 +454,7 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
         end;
     end;
 
-    local procedure PrintQR(Barcode: Text[50]; HRI: Boolean; Size: Integer; Alignment: Option; Rotation: Text[2]; X: Integer; Y: Integer; Input: Text[100])
+    local procedure PrintQR(Barcode: Text[50]; HideHRI: Boolean; Size: Integer; Alignment: Option; Rotation: Text[2]; X: Integer; Y: Integer; Input: Text[100])
     var
         QRBarcodeVers: Integer;
         QRBarcodeErrLvl: Integer;
@@ -437,7 +488,7 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
         QRMaxLength := CheckMaxLengthQR(QRBarcodeVers, QRBarcodeErrLvl);
 
         if StrLen(Input) > QRMaxLength then
-            Error('The value of the QR code exceeds the max limit for current QR settings. Try Lowering the Error Correction Level or increasing the QR version.')
+            Error(ErrQRTooMuchDataLbl)
         else begin
             AddStringToBuffer(StrSubstNo('<QRV%1>', QRBarcodeVers));
 
@@ -478,13 +529,35 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
                 AddStringToBuffer(StrSubstNo('<RC%1,%2>', (_PrintWidth - X), Y));
             AddStringToBuffer(StrSubstNo('<QR%1,%2,%3,%4>{%5}', QRWidth, 0, 0, QRBarcodeErrLvl, Input));
 
-            if HRI then begin
+            if not HideHRI then begin
                 AddStringToBuffer('<RL>');
                 AddStringToBuffer(StrSubstNo('<RC%1,%2>', _PrintWidth, Y + yHRI));
                 AddStringToBuffer('<F8>');
                 AddStringToBuffer(StrSubstNo('<CTR%1>', _PrintWidth));
                 AddStringToBuffer('~' + Input + '~');
             end;
+        end;
+    end;
+
+    local procedure PrintRFID(Params: Text[10]; Input: Text[100])
+    var
+        HexString: Text;
+    begin
+        if _RfidChipType = '' then
+            Error(ErrRfidDeviceSettingsChipTypeLbl);
+
+        case Params of
+            'EPC_HEX':
+                begin
+                    HexString := AsciiToHex(Input);
+                    EncodeRFID(HexString);
+                end;
+        /*
+        'EPC_ASCII':
+            Error('EPC_ASCII not supported yet');
+        'EPC_STD':
+            Error('EPC_STD not supported yet');
+        */
         end;
     end;
 
@@ -500,6 +573,94 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
         if Font in ['EAN13', 'CODE128', 'UPC', '3OF9', 'I2OF5', 'CODABAR', 'SOFTSTRIP',
                     'QR', 'QR2L', 'QR2M', 'QR2Q', 'QR2H', 'QR7L', 'QR7M', 'QR7Q', 'QR7H', 'QR11L', 'QR11M', 'QR11Q', 'QR11H', 'QR15L', 'QR15M', 'QR15Q', 'QR15H'] then
             exit(true);
+    end;
+
+    // Might want to expand functionality to target specific blocks rather than just the user memory area.
+    local procedure EncodeRFID(RfidData: Text)
+    var
+        NoOfBytes: Integer;
+    begin
+        NoOfBytes := StrLen(RfidData) div 2;
+
+        if not CheckUserDataArea(_RfidChipType, NoOfBytes) then
+            Error(ErrRfidWriteOutsideMemoryLbl, _RfidChipType);
+
+        case _RfidChipType of
+            'MiFare Ultralight':
+                WriteRFCard(2, 4, true, NoOfBytes, RfidData, true); // Currently always locking, might expand functionality later
+        end;
+    end;
+
+    local procedure WriteRFCard(DataFormat: Integer; StartingBlock: Integer; LockOption: Boolean; OptionalByteCount: Integer; Data: Text; CarriageReturn: Boolean)
+    var
+        LockInt: Integer;
+    begin
+        if LockOption then
+            LockInt := 1;
+
+        if OptionalByteCount <> 0 then
+            AddStringToBuffer(StrSubstNo('<RFW%1,%2,%3,%4>%5', DataFormat, StartingBlock, LockInt, OptionalByteCount, Data), CarriageReturn)
+        else
+            AddStringToBuffer(StrSubstNo('<RFW%1,%2,%3>%4', DataFormat, StartingBlock, LockInt, Data), CarriageReturn);
+    end;
+
+    local procedure CheckUserDataArea(ChipType: Text; NoOfBytes: Integer): Boolean
+    var
+        AvailableNoOfBytes: Integer;
+    begin
+        case ChipType of
+            'MiFare Ultralight':
+                AvailableNoOfBytes := 48;
+            'MiFare Ultralight C':
+                AvailableNoOfBytes := 144;
+            'MiFare 1K':
+                AvailableNoOfBytes := 752;
+            'MiFare 4K':
+                AvailableNoOfBytes := 3440;
+            else
+                Error(ErrRfidUnknownChipTypeLbl);
+        end;
+
+        exit(NoOfBytes <= AvailableNoOfBytes);
+    end;
+
+    local procedure AsciiToHex(AsciiString: Text): Text
+    var
+        HexString: Text;
+        AsciiIdx: Integer;
+        AsciiInt: Integer;
+        AsciiLeft: Integer;
+        AsciiRight: Integer;
+    begin
+        // might need to check if ascii string
+        for AsciiIdx := 1 to StrLen(AsciiString) do begin
+            AsciiInt := AsciiString[AsciiIdx];
+            AsciiLeft := Round(AsciiInt / 16, 1, '<');
+            AsciiRight := AsciiInt mod 16;
+            HexString += HexValue(AsciiLeft) + HexValue(AsciiRight);
+        end;
+
+        exit(HexString);
+    end;
+
+    local procedure HexValue(Int: Integer): Text[1]
+    begin
+        case Int of
+            0 .. 9:
+                exit(Format(Int));
+            10:
+                exit('A');
+            11:
+                exit('B');
+            12:
+                exit('C');
+            13:
+                exit('D');
+            14:
+                exit('E');
+            15:
+                exit('F');
+        end;
     end;
 #pragma warning restore AA0139
 }
