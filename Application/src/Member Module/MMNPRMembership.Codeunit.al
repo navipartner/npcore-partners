@@ -1562,17 +1562,22 @@ codeunit 6060147 "NPR MM NPR Membership"
 
 
     local procedure CreateSearchMemberRequest(MemberInfoCapture: Record "NPR MM Member Info Capture") XmlText: Text
+    var
+        Buffer: TextBuilder;
     begin
-        XmlText :=
-        '<searchmembers>' +
-          '<request>' +
-            StrSubstNo('<firstname>%1</firstname>', XmlSafe(MemberInfoCapture."First Name")) +
-            StrSubstNo('<lastname>%1</lastname>', XmlSafe(MemberInfoCapture."Last Name")) +
-            StrSubstNo('<phonenumber>%1</phonenumber>', XmlSafe(MemberInfoCapture."Phone No.")) +
-            StrSubstNo('<email>%1</email>', XmlSafe(MemberInfoCapture."E-Mail Address")) +
-            StrSubstNo('<limitresultset>%1</limitresultset>', Format(MemberInfoCapture.Quantity, 0, 9)) +
-          '</request>' +
-        '</searchmembers>';
+        Buffer.AppendLine('<searchmembers>');
+        Buffer.AppendLine('<request>');
+        Buffer.AppendLine(StrSubstNo('<firstname>%1</firstname>', XmlSafe(MemberInfoCapture."First Name")));
+        Buffer.AppendLine(StrSubstNo('<lastname>%1</lastname>', XmlSafe(MemberInfoCapture."Last Name")));
+        Buffer.AppendLine(StrSubstNo('<phonenumber>%1</phonenumber>', XmlSafe(MemberInfoCapture."Phone No.")));
+        Buffer.AppendLine(StrSubstNo('<email>%1</email>', XmlSafe(MemberInfoCapture."E-Mail Address")));
+        Buffer.AppendLine(StrSubstNo('<membernumber>%1</membernumber>', XmlSafe(MemberInfoCapture."External Member No")));
+        Buffer.AppendLine(StrSubstNo('<cardnumber>%1</cardnumber>', XmlSafe(MemberInfoCapture."External Card No.")));
+        Buffer.AppendLine(StrSubstNo('<limitresultset>%1</limitresultset>', Format(MemberInfoCapture.Quantity, 0, 9)));
+        Buffer.AppendLine('</request>');
+        Buffer.AppendLine('</searchmembers>');
+
+        XmlText := Buffer.ToText();
     end;
 
 

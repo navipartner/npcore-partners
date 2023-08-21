@@ -39,8 +39,29 @@ page 6151189 "NPR MM MemberRemoteSearch"
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
+            group(References)
+            {
+                Caption = 'Reference Number Filters';
+
+                field("External Member No"; Rec."External Member No")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the External Member No. field';
+                }
+                field("External Card No."; _CardNumber)
+                {
+                    Caption = 'External Card No.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the External Card No. field';
+                    trigger OnValidate()
+                    begin
+                        Rec."External Card No." := _CardNumber;
+                    end;
+                }
+            }
             group(Limits)
             {
+                Caption = 'Limits';
                 field(LimitResultSetTo; Rec.Quantity)
                 {
                     Caption = 'Limit ResultSet to Max Lines';
@@ -54,6 +75,7 @@ page 6151189 "NPR MM MemberRemoteSearch"
 
     var
         _CommunityCode: Code[20];
+        _CardNumber: Text[100];
         TempMemberInfoCaptureSelected: Record "NPR MM Member Info Capture" temporary;
 
     trigger OnInit()

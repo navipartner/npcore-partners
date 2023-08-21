@@ -53,6 +53,18 @@ xmlport 6151186 "NPR MM Search Members"
                         MaxOccurs = Once;
                         MinOccurs = Zero;
                     }
+                    fieldelement(ExternalMemberNo; TempMemberInfoRequest."External Member No")
+                    {
+                        XmlName = 'membernumber';
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                    }
+                    fieldelement(ExternalCardNo; TempMemberInfoRequest."External Card No.")
+                    {
+                        XmlName = 'cardnumber';
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                    }
                     fieldelement(Quantity; TempMemberInfoRequest.Quantity)
                     {
                         XmlName = 'limitresultset';
@@ -265,6 +277,7 @@ xmlport 6151186 "NPR MM Search Members"
     procedure AddResponse()
     var
         Member: Record "NPR MM Member";
+        MemberCard: Record "NPR MM Member Card";
         NOT_FOUND: Label 'Member not found.';
     begin
         ErrorDescription := '';
@@ -276,6 +289,19 @@ xmlport 6151186 "NPR MM Search Members"
             TempMemberInfoRequest.Quantity := 100;
 
         Member.SetFilter(Blocked, '=%1', false);
+
+        if (TempMemberInfoRequest."External Card No." <> '') then begin
+            MemberCard.SetFilter(Blocked, '=%1', false);
+            MemberCard.SetFilter("External Card No.", '=%1', TempMemberInfoRequest."External Card No.");
+
+            Member.SetFilter("Entry No.", '=%1', -1); // member entry no -1 does not exist - so an invalid member card will not find a member
+            if (MemberCard.FindFirst()) then
+                if (MemberCard."Member Entry No." > 0) then // Memberships can have anonymous members in which case the member entry no would be zero
+                    Member.SetFilter("Entry No.", '=%1', MemberCard."Member Entry No.");
+        end;
+
+        if (TempMemberInfoRequest."External Member No" <> '') then
+            Member.SetFilter("External Member No.", '=%1', TempMemberInfoRequest."External Member No");
 
         if (TempMemberInfoRequest."Last Name" <> '') then
             Member.SetFilter("Last Name", '%1', StrSubstNo('@%1', TempMemberInfoRequest."Last Name"));
