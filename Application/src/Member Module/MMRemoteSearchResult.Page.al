@@ -66,6 +66,11 @@ page 6151190 "NPR MM RemoteSearchResult"
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the External Card No. field';
                 }
+                field("External Member No"; Rec."External Member No")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the External Member No. field';
+                }
             }
         }
     }
