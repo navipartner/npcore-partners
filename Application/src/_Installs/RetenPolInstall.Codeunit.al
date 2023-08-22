@@ -36,8 +36,6 @@
             AddAllowedTable(Database::"NPR POS Entry Output Log", Enum::"Retention Period Enum"::"3 Months", Enum::"Reten. Pol. Deleting"::Default);
             AddAllowedTable(Database::"NPR Nc Import Entry", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
 
-            AddAllowedTable(Database::"NPR POS Posting Log", Enum::"Retention Period Enum"::"6 Months", Enum::"Reten. Pol. Deleting"::Default);
-
             AddAllowedTable(Database::"NPR NpCs Arch. Document", Enum::"Retention Period Enum"::"1 Year", Enum::"Reten. Pol. Deleting"::Default);
 
             AddAllowedTable(Database::"NPR Exchange Label", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
@@ -62,6 +60,11 @@
             // if you add a new table above, also update codeunit 6059926 "NPR Retail Logs Delete"
 
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install"));
+        end;
+
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSPostingLog')) then begin
+            AddAllowedTable(Database::"NPR POS Posting Log", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSPostingLog'));
         end;
 
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSLayoutArchive')) then begin
