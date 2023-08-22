@@ -206,10 +206,11 @@
         SalesPost: Codeunit "Sales-Post";
         SalesPostYesNo: Codeunit "Sales-Post (Yes/No)";
         TicketManagement: Codeunit "NPR TM Ticket Management";
-        Posted: Boolean;
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
+        SalesDocExpMgtPublic: Codeunit "NPR Sales Doc. Exp. Mgt Public";
         Post: Boolean;
+        Posted: Boolean;
         Type: Option Proforma,Draft;
     begin
         POSSale.GetCurrentSale(SalePOS);
@@ -305,6 +306,7 @@
         InvokeOnFinishCreditSaleWorkflow(SalePOS);
 
         OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted);
+        SalesDocExpMgtPublic.OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted);
 
         Commit();
     end;
